@@ -20,8 +20,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import com.duckduckgo.app.browser.Domain
-import com.duckduckgo.app.di.JsonModule
+import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
 import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 
 @Entity(tableName = "tds_tracker")
@@ -98,7 +99,9 @@ class CategoriesTypeConverter {
 
 class Adapters {
     companion object {
-        private val moshi = JsonModule.moshi()
+        private val moshi = Moshi.Builder()
+            .add(ActionJsonAdapter())
+            .build()
         private val ruleListType = Types.newParameterizedType(List::class.java, Rule::class.java)
         private val stringListType = Types.newParameterizedType(List::class.java, String::class.java)
         val ruleListAdapter: JsonAdapter<List<Rule>> = moshi.adapter(ruleListType)

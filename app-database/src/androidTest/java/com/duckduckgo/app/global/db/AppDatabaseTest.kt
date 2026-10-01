@@ -25,10 +25,7 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
-import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.NEVER
 import com.duckduckgo.app.onboarding.store.AppStage
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -53,8 +50,8 @@ class AppDatabaseTest {
     val testHelper = MigrationTestHelper(getInstrumentation(), AppDatabase::class.qualifiedName!!, FrameworkSQLiteOpenHelperFactory())
 
     private val context = mock<Context>()
-    private val mockSettingsDataStore: SettingsDataStore = mock()
-    private val migrationsProvider: MigrationsProvider = MigrationsProvider(context, mockSettingsDataStore)
+    private val legacyFireproofSettingsMigration: LegacyFireproofSettingsMigration = mock()
+    private val migrationsProvider: MigrationsProvider = MigrationsProvider(context, legacyFireproofSettingsMigration)
     private val sharedPreferences: SharedPreferences = mock()
 
     @Before
@@ -470,17 +467,9 @@ class AppDatabaseTest {
     }
 
     @Test
-    fun whenMigratingFromVersion42To43IfUserHasLoginDetectionEnabledThenMapToAskEveryTime() {
-        whenever(mockSettingsDataStore.appLoginDetection).thenReturn(true)
+    fun whenMigratingFromVersion42To43ThenLegacyFireproofSettingsMigrationIsInvoked() {
         createDatabaseAndMigrate(42, 43, migrationsProvider.MIGRATION_42_TO_43)
-        verify(mockSettingsDataStore).automaticFireproofSetting = ASK_EVERY_TIME
-    }
-
-    @Test
-    fun whenMigratingFromVersion42To43IfUserHasLoginDetectionDisabledThenMapToNever() {
-        whenever(mockSettingsDataStore.appLoginDetection).thenReturn(false)
-        createDatabaseAndMigrate(42, 43, migrationsProvider.MIGRATION_42_TO_43)
-        verify(mockSettingsDataStore).automaticFireproofSetting = NEVER
+        verify(legacyFireproofSettingsMigration).updateFireproofSettingType()
     }
 
     private fun givenUserStageIs(

@@ -49,8 +49,6 @@ import com.duckduckgo.app.browser.httperrors.StringSiteErrorHandlerImpl
 import com.duckduckgo.app.browser.logindetection.*
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlightPlugin
 import com.duckduckgo.app.browser.menu.TopInContextSection
-import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
-import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
 import com.duckduckgo.app.browser.suggestredirect.DnsLookupApi29Impl
 import com.duckduckgo.app.browser.suggestredirect.DnsLookupPreApi29Impl
 import com.duckduckgo.app.browser.suggestredirect.HostnameResolver
@@ -66,7 +64,6 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -326,18 +323,6 @@ class BrowserModule {
         duckAiHostProvider: DuckAiHostProvider,
     ): ThirdPartyCookieManager {
         return AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository, thirdPartyCookieNames, duckAiHostProvider)
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun providePageLoadedPixelDao(appDatabase: AppDatabase): PageLoadedPixelDao {
-        return appDatabase.pageLoadedPixelDao()
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun providePagePaintedPixelDao(appDatabase: AppDatabase): PagePaintedPixelDao {
-        return appDatabase.pagePaintedPixelDao()
     }
 
     private val Context.indonesiaNewTabSectionDataStore: DataStore<Preferences> by preferencesDataStore(
