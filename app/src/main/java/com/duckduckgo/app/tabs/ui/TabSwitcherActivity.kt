@@ -108,6 +108,7 @@ import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.TabSwitcher
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsScreens.DownloadsScreenNoParams
+import com.duckduckgo.duckchat.api.DuckAiChatsMenu
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import kotlinx.coroutines.CoroutineScope
@@ -176,6 +177,9 @@ class TabSwitcherActivity :
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var duckAiChatsMenu: DuckAiChatsMenu
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
@@ -939,6 +943,18 @@ class TabSwitcherActivity :
         }
     }
 
+    private fun showDuckAiChatsMenu() {
+        lifecycleScope.launch {
+            duckAiChatsMenu.show(
+                anchorView = findViewById(R.id.duckAIToolbarButton),
+                listener = object : DuckAiChatsMenu.Listener {
+                    override fun onNewChatSelected() = viewModel.onDuckAiNewChatSelected()
+                    override fun onChatSelected(chatUrl: String) = viewModel.onDuckAiChatSelected(chatUrl)
+                },
+            )
+        }
+    }
+
     private fun showBookmarkSnackbarWithUndo(numBookmarks: Int) {
         val message = resources.getQuantityString(R.plurals.tabSwitcherBookmarkToast, numBookmarks, numBookmarks)
         lastSnackbar = DefaultSnackbar(
@@ -1001,7 +1017,7 @@ class TabSwitcherActivity :
             R.id.fireToolbarButton -> viewModel.onFireButtonTapped()
             R.id.popupMenuToolbarButton -> showPopupMenu(item.itemId)
             R.id.newTabToolbarButton -> onNewTabRequested(fromOverflowMenu = false)
-            R.id.duckAIToolbarButton -> viewModel.onDuckAIButtonClicked()
+            R.id.duckAIToolbarButton -> showDuckAiChatsMenu()
             android.R.id.home -> {
                 viewModel.onUpButtonPressed()
                 return true

@@ -21,7 +21,7 @@
 
     <item
         android:id="@+id/duckAIToolbarButton"
-        android:icon="@drawable/ic_ai_chat_24"
+        android:icon="@drawable/ic_chats_24"
         android:title="@string/duckChatMenuItem"
         app:showAsAction="always" />
 

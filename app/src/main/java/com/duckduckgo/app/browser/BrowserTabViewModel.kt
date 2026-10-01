@@ -5829,7 +5829,7 @@ class BrowserTabViewModel @Inject constructor(
      */
     fun openDuckAiChatById(chatUrl: String) {
         browserInteractionsPlugins.getPlugins().forEach { it.onChatSelected() }
-        navigateToDuckAi(chatUrl, DuckChatEntryPoint.CHAT_HISTORY_OPEN_CHAT, hasPrompt = false)
+        navigateToDuckAi(chatUrl, DuckChatEntryPoint.RECENT_CHAT_INPUT, hasPrompt = false)
     }
 
     /**

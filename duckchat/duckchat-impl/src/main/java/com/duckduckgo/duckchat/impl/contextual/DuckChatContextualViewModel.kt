@@ -931,7 +931,7 @@ class DuckChatContextualViewModel @Inject constructor(
         duckChatPixels.reportContextualRecentChatSelected()
         val url = duckChatInternal.buildChatUrl(chatId)
         val sourceTabId = _viewState.value.tabId
-        duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.CHAT_HISTORY_OPEN_CHAT, opensNewTab = true, hasPrompt = false)
+        duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.RECENT_CHAT_CONTEXTUAL, opensNewTab = true, hasPrompt = false)
         commandChannel.trySend(Command.OpenChatUrl(url = url, sourceTabId = sourceTabId))
     }
 

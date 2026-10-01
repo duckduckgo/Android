@@ -2425,7 +2425,7 @@ class DuckChatContextualViewModelTest {
         }
 
         verify(duckChatInternal, times(1)).reportDuckChatEntry(
-            DuckChatEntryPoint.CHAT_HISTORY_OPEN_CHAT,
+            DuckChatEntryPoint.RECENT_CHAT_CONTEXTUAL,
             opensNewTab = true,
             hasPrompt = false,
         )
