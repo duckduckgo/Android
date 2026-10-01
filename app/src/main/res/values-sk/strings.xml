@@ -264,6 +264,7 @@
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Oprávnenia</string>
+    <string name="permissionsGeneralPermissionsTitle" instruction="Section header on the Permissions settings screen, above the Notifications and Open Links in Apps settings">Všeobecné povolenia</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Vzhľad</string>
