@@ -249,6 +249,28 @@
             }
         ]
     },
+    "m_privacy-pro_app-settings_pir-freemium_impression": {
+        "description": "Fired when the Freemium PIR promo appears in app Settings. Denominator for the Freemium PIR settings funnel.",
+        "owners": ["landomen"],
+        "triggers": ["other"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_privacy-pro_app-settings_pir-freemium_click": {
+        "description": "Fired when the Freemium PIR promo in app Settings is tapped. Numerator for the Freemium PIR settings funnel.",
+        "owners": ["landomen"],
+        "triggers": ["other"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "cta_state",
+                "description": "Which call to action the promo was showing when tapped.",
+                "type": "string",
+                "enum": ["start_free_scan", "view_scan_results"]
+            }
+        ]
+    },
     "m_privacy-pro_terms-conditions_subscribe_click": {
         "description": "Subscription-funnel click: the user tapped the primary Subscribe CTA on the subscription offer page. Carries the entry-point origin the offer was launched with.",
         "owners": ["YoussefKeyrouz"],
