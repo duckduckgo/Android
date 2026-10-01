@@ -105,4 +105,21 @@
     <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo bu siteye mikrofon erişimi veremedi</string>
     <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo bu siteye kamera ve mikrofon erişimi veremedi</string>
 
+    <!-- Permission settings redesign -->
+    <string name="permissionSettingsAlwaysAllow" instruction="Permission setting option: the site gets the permission without asking">Her Zaman İzin Ver</string>
+    <string name="permissionSettingsAskEachTime" instruction="Permission setting option: the site has to ask for the permission every time">Her Seferinde Sor</string>
+    <string name="permissionSettingsLocationDialogTitle">Sitelerin konum izni istemesine izin ver</string>
+    <string name="permissionSettingsLocationDialogMessage">“Asla İzin Verme”yi seçersen haritalardaki yol tarifleri veya yakındaki mağazalar gibi sitelerdeki belirli özellikleri kullanamazsın.</string>
+    <string name="permissionSettingsCameraDialogTitle">Sitelerin kamera izni istemesine izin ver</string>
+    <string name="permissionSettingsCameraDialogMessage">“Asla İzin Verme”yi seçersen sitelerde görüntülü sohbet gibi özellikleri kullanamazsın.</string>
+    <string name="permissionSettingsMicrophoneDialogTitle">Sitelerin mikrofon izni istemesine izin ver</string>
+    <string name="permissionSettingsMicrophoneDialogMessage">“Asla İzin Verme”yi seçersen, sitelerdeki sesli sohbet gibi özellikleri kullanamazsın.</string>
+    <string name="permissionSettingsDrmDialogTitle">Sitelerin Dijital Haklar Yönetimi (DRM) izni istemesine izin ver</string>
+    <string name="permissionSettingsDrmTitle" instruction="Name of a permission setting for playing protected video content">Dijital Haklar Yönetimi (DRM)</string>
+    <string name="permissionsPerWebsiteRedesignHeader" instruction="Placeholder is the name of a website">%1$s için izinler</string>
+    <string name="permissionsPerWebsiteRemovePermissions" instruction="Button that removes all saved permissions for the website shown on the screen">İzinleri Kaldır</string>
+    <string name="permissionsRemovedForSiteSnackbar" instruction="Placeholder is the name of a website">&lt;b&gt;%1$s&lt;/b&gt; için izinler kaldırıldı</string>
+    <string name="permissionsRemovedForAllSitesSnackbar">Tüm siteler için izinler kaldırıldı</string>
+    <string name="permissionSettingsDrmDialogMessage">“Hiçbir Zaman İzin Verme” seçeneğini seçersen sitedeki videolar oynatılamaz duruma gelebilir.</string>
+
 </resources>
