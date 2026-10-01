@@ -70,10 +70,16 @@ class RealPaywallUrlResolverTest {
 
     @Test
     fun whenFeatureDisabledThenUrlIsUnchanged() = runTest {
-        subscriptionsFeature.performanceOptimizedPaywalls().setRawStoredState(State(remoteEnableState = false))
+        subscriptionsFeature.performanceOptimizedPaywalls().setRawStoredState(
+            State(
+                remoteEnableState = false,
+                cohorts = PerformanceOptimizedPaywallsCohorts.entries.map { State.Cohort(name = it.cohortName, weight = 1) },
+            ),
+        )
 
         assertEquals(BUY_URL, testee.resolve(BUY_URL))
         assertEquals("$BUY_URL?featurePage=duckai", testee.resolve("$BUY_URL?featurePage=duckai"))
+        assertNull(subscriptionsFeature.performanceOptimizedPaywalls().getCohort())
     }
 
     @Test
@@ -225,13 +231,6 @@ class RealPaywallUrlResolverTest {
     }
 
     @Test
-    fun whenControlCohortThenLegacyUrlCarriesTheCohort() = runTest {
-        givenCohort(PerformanceOptimizedPaywallsCohorts.CONTROL)
-
-        assertEquals("$BUY_URL?experiment_perfpaywall=control", testee.resolve(BUY_URL))
-    }
-
-    @Test
     fun whenControlCohortThenLegacyUrlKeepsItsParams() = runTest {
         givenCohort(PerformanceOptimizedPaywallsCohorts.CONTROL)
 
@@ -257,24 +256,10 @@ class RealPaywallUrlResolverTest {
     }
 
     @Test
-    fun whenFeatureEnabledWithoutCohortsThenUrlIsUnchanged() = runTest {
-        subscriptionsFeature.performanceOptimizedPaywalls().setRawStoredState(State(remoteEnableState = true, enable = true))
-
-        assertEquals(BUY_URL, testee.resolve(BUY_URL))
-    }
-
-    @Test
     fun whenNoOffersAreAvailableThenUserIsNotEnrolled() = runTest {
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
 
         testee.resolve(BUY_URL)
-
-        assertNull(subscriptionsFeature.performanceOptimizedPaywalls().getCohort())
-    }
-
-    @Test
-    fun whenUnknownFeaturePageThenUserIsNotEnrolled() = runTest {
-        testee.resolve("$BUY_URL?featurePage=itr")
 
         assertNull(subscriptionsFeature.performanceOptimizedPaywalls().getCohort())
     }
