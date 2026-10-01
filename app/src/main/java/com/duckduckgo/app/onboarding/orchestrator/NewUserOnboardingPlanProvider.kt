@@ -167,8 +167,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
         val quickSetupPlan = quickSetupPlan(ctx)
 
-        val showWidget = withContext(dispatchers.io()) { !widgetCapabilities.hasInstalledWidgets }
-
         val showPasswordImport = onboardingPasswordImportExperimentManager.enroll() == OnboardingPasswordImportVariant.TREATMENT
 
         return rootPlan(
@@ -183,10 +181,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 add(initialStep(firstDialog))
                 add(comparisonChartStep())
                 add(defaultBrowserPromptStep())
-                if (showWidget) {
-                    add(widgetPromptStep(ctx))
-                    add(addWidgetStep(ctx))
-                }
+                addAll(widgetSteps(ctx))
                 if (showPasswordImport) {
                     add(passwordImportStep(ctx))
                     add(passwordImportLaunchStep(ctx))
@@ -237,8 +232,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             rootOnSkipped()
         }
 
-        val showWidget = withContext(dispatchers.io()) { !widgetCapabilities.hasInstalledWidgets }
-
         return rootPlan(
             ctx = ctx,
             onCompleted = onCompleted,
@@ -260,10 +253,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 add(duckAiDemoStep(ctx))
                 add(comparisonChartStep())
                 add(defaultBrowserPromptStep())
-                if (showWidget) {
-                    add(widgetPromptStep(ctx))
-                    add(addWidgetStep(ctx))
-                }
+                addAll(widgetSteps(ctx))
                 add(addressBarPositionStep())
             },
         )
@@ -564,34 +554,41 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun segmentedSearchPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan {
+    private suspend fun segmentedSearchPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan {
         val duckAiEnabled = SuspendMemo { duckAiOnboardingAvailability.isDuckAiOnboardingEnabled() }
         return sidePlan(
             id = SEGMENTED_SEARCH_PLAN_ID,
-            steps = listOf(
-                comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedSearchPath)),
-                defaultBrowserPromptStep(),
-                preferenceSelectorStep(
-                    ctx = ctx,
-                    pixelName = OnboardingPixelName.ONBOARDING_PREFERENCES_SERP,
-                    titleRes = R.string.searchPathPreferenceSelectorTitle,
-                    listOf(
-                        OnboardingPreference.SEARCH_HISTORY,
-                        OnboardingPreference.SAFE_SEARCH,
+            steps = buildList {
+                add(comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedSearchPath)))
+                add(defaultBrowserPromptStep())
+                add(
+                    preferenceSelectorStep(
+                        ctx = ctx,
+                        pixelName = OnboardingPixelName.ONBOARDING_PREFERENCES_SERP,
+                        titleRes = R.string.searchPathPreferenceSelectorTitle,
+                        listOf(
+                            OnboardingPreference.SEARCH_HISTORY,
+                            OnboardingPreference.SAFE_SEARCH,
+                        ),
                     ),
-                ),
-                inputScreenStep(
-                    ctx = ctx,
-                    embellishment = Embellishment.BottomWing,
-                    background = OnboardingBackground.Horizon,
-                ),
-                addressBarPositionStep(),
-                inputScreenPreviewStep(
-                    ctx = ctx,
-                    isSearchDefault = true,
-                    showModeToggle = { ctx.inputModeWasAi && duckAiEnabled() },
-                ),
-            ),
+                )
+                addAll(widgetSteps(ctx))
+                add(
+                    inputScreenStep(
+                        ctx = ctx,
+                        embellishment = Embellishment.BottomWing,
+                        background = OnboardingBackground.Horizon,
+                    ),
+                )
+                add(addressBarPositionStep())
+                add(
+                    inputScreenPreviewStep(
+                        ctx = ctx,
+                        isSearchDefault = true,
+                        showModeToggle = { ctx.inputModeWasAi && duckAiEnabled() },
+                    ),
+                )
+            },
         )
     }
 
@@ -604,14 +601,15 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         ctx.onFinish { onboardingInputScreenLaunchTarget.setOpenOnDuckAi() }
         return sidePlan(
             id = SEGMENTED_AI_PLAN_ID,
-            steps = listOf(
-                comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedAiPath)),
-                defaultBrowserPromptStep(),
-                modelProviderStep(modelProviderChoice),
-                togglePositionStep(togglePositionChoice),
-                addressBarPositionStep(),
-                inputScreenPreviewStep(ctx = ctx, isSearchDefault = false),
-            ),
+            steps = buildList {
+                add(comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedAiPath)))
+                add(defaultBrowserPromptStep())
+                add(modelProviderStep(modelProviderChoice))
+                add(togglePositionStep(togglePositionChoice))
+                addAll(widgetSteps(ctx))
+                add(addressBarPositionStep())
+                add(inputScreenPreviewStep(ctx = ctx, isSearchDefault = false))
+            },
         )
     }
 
@@ -622,55 +620,65 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         applyInputModeSelection(ctx, withAi = false, fireTelemetry = false)
         return sidePlan(
             id = SEGMENTED_NO_AI_PLAN_ID,
-            steps = listOf(
-                comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedNoAiPath)),
-                defaultBrowserPromptStep(),
-                preferenceSelectorStep(
-                    ctx = ctx,
-                    pixelName = OnboardingPixelName.ONBOARDING_PREFERENCES_AI_SEARCH,
-                    titleRes = R.string.noAiPathPreferenceSelectorTitle,
-                    listOf(
-                        OnboardingPreference.SEARCH_ASSIST,
-                        OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
+            steps = buildList {
+                add(comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedNoAiPath)))
+                add(defaultBrowserPromptStep())
+                add(
+                    preferenceSelectorStep(
+                        ctx = ctx,
+                        pixelName = OnboardingPixelName.ONBOARDING_PREFERENCES_AI_SEARCH,
+                        titleRes = R.string.noAiPathPreferenceSelectorTitle,
+                        listOf(
+                            OnboardingPreference.SEARCH_ASSIST,
+                            OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
+                        ),
                     ),
-                ),
-                duckAiStateStep(ctx, duckAiStateChoice),
-                addressBarPositionStep(),
-                inputScreenPreviewStep(ctx = ctx, isSearchDefault = true),
-            ),
+                )
+                addAll(widgetSteps(ctx))
+                add(duckAiStateStep(ctx, duckAiStateChoice))
+                add(addressBarPositionStep())
+                add(inputScreenPreviewStep(ctx = ctx, isSearchDefault = true))
+            },
         )
     }
 
-    private fun segmentedBlockAdsPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan {
+    private suspend fun segmentedBlockAdsPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan {
         val duckAiEnabled = SuspendMemo { duckAiOnboardingAvailability.isDuckAiOnboardingEnabled() }
         return sidePlan(
             id = SEGMENTED_BLOCK_ADS_PLAN_ID,
-            steps = listOf(
-                comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedBlockAdsPath)),
-                defaultBrowserPromptStep(),
-                preferenceSelectorStep(
-                    ctx = ctx,
-                    pixelName = OnboardingPixelName.ONBOARDING_PREFERENCES_AD_BLOCKING,
-                    titleRes = R.string.blockAdsPathPreferenceSelectorTitle,
-                    listOf(
-                        OnboardingPreference.BLOCK_ADS,
-                        OnboardingPreference.REJECT_OPTIONAL_COOKIES,
-                        OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES,
+            steps = buildList {
+                add(comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedBlockAdsPath)))
+                add(defaultBrowserPromptStep())
+                add(
+                    preferenceSelectorStep(
+                        ctx = ctx,
+                        pixelName = OnboardingPixelName.ONBOARDING_PREFERENCES_AD_BLOCKING,
+                        titleRes = R.string.blockAdsPathPreferenceSelectorTitle,
+                        listOf(
+                            OnboardingPreference.BLOCK_ADS,
+                            OnboardingPreference.REJECT_OPTIONAL_COOKIES,
+                            OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES,
+                        ),
+                        caption = R.string.preferenceChangeInSettingsCaption,
                     ),
-                    caption = R.string.preferenceChangeInSettingsCaption,
-                ),
-                inputScreenStep(
-                    ctx = ctx,
-                    embellishment = Embellishment.BottomWing,
-                    background = OnboardingBackground.Horizon,
-                ),
-                addressBarPositionStep(),
-                inputScreenPreviewStep(
-                    ctx = ctx,
-                    isSearchDefault = true,
-                    showModeToggle = { ctx.inputModeWasAi && duckAiEnabled() },
-                ),
-            ),
+                )
+                addAll(widgetSteps(ctx))
+                add(
+                    inputScreenStep(
+                        ctx = ctx,
+                        embellishment = Embellishment.BottomWing,
+                        background = OnboardingBackground.Horizon,
+                    ),
+                )
+                add(addressBarPositionStep())
+                add(
+                    inputScreenPreviewStep(
+                        ctx = ctx,
+                        isSearchDefault = true,
+                        showModeToggle = { ctx.inputModeWasAi && duckAiEnabled() },
+                    ),
+                )
+            },
         )
     }
 
@@ -845,6 +853,13 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             }
         },
     )
+
+    private suspend fun widgetSteps(ctx: NewUserOnboardingPlanContext): List<LinearOnboardingStep> =
+        if (withContext(dispatchers.io()) { widgetCapabilities.hasInstalledWidgets }) {
+            emptyList()
+        } else {
+            listOf(widgetPromptStep(ctx), addWidgetStep(ctx))
+        }
 
     private fun widgetPromptStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_WIDGET_PROMPT
