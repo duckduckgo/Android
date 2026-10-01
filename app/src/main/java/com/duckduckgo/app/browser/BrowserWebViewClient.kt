@@ -243,7 +243,20 @@ class BrowserWebViewClient @Inject constructor(
         request: WebResourceRequest,
     ): Boolean {
         val url = request.url
-        return shouldOverride(view, url, request.isForMainFrame, request.isRedirect, request.hasGesture())
+        val isMainFrameRedirect = request.isForMainFrame && request.isRedirect
+        // Reported before the override logic so a reload issued from inside it is not undone by the cancellation below.
+        if (isMainFrameRedirect) {
+            webViewClientListener?.onMainFrameNavigationStarted(url.toString(), view.url, isRedirect = true)
+        }
+        val overridden = shouldOverride(view, url, request.isForMainFrame, request.isRedirect, request.hasGesture())
+        if (request.isForMainFrame) {
+            when {
+                isMainFrameRedirect && overridden -> webViewClientListener?.onMainFrameNavigationCancelled(url.toString())
+                !isMainFrameRedirect && !overridden ->
+                    webViewClientListener?.onMainFrameNavigationStarted(url.toString(), view.url, isRedirect = false)
+            }
+        }
+        return overridden
     }
 
     /**
@@ -538,6 +551,7 @@ class BrowserWebViewClient @Inject constructor(
         url: String,
     ) {
         logcat(VERBOSE) { "onPageCommitVisible webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
+        webViewClientListener?.onMainFrameContentVisible(url)
         pageCommitVisibleFired = true
         // Show only when the commit matches the tab state
         if (webView.url == url) {
@@ -591,6 +605,7 @@ class BrowserWebViewClient @Inject constructor(
         }
 
         lastInterceptedAppSchemeUrl = null
+        webViewClientListener?.onMainFrameCommitted(url)
 
         var wideEventNavigation: Pair<String, Long>? = null
         url?.let {
@@ -694,6 +709,7 @@ class BrowserWebViewClient @Inject constructor(
         isReload: Boolean,
     ) {
         super.doUpdateVisitedHistory(view, url, isReload)
+        webViewClientListener?.onMainFrameHistoryUpdated()
         url?.let {
             if (duckChat.isDuckChatUrl(it.toUri())) {
                 logcat { "doUpdateVisitedHistory url=$it" }
@@ -748,6 +764,7 @@ class BrowserWebViewClient @Inject constructor(
         url: String?,
     ) {
         logcat(VERBOSE) { "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
+        webViewClientListener?.onMainFrameFinished(url)
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
@@ -1127,6 +1144,7 @@ enum class WebViewErrorResponse(
     OMITTED(R.string.webViewErrorNoConnection),
     LOADING(R.string.webViewErrorNoConnection),
     SSL_PROTOCOL_ERROR(R.string.webViewErrorSslProtocol),
+    TIMEOUT(R.string.webViewErrorTimeout),
 }
 
 data class SslErrorResponse(

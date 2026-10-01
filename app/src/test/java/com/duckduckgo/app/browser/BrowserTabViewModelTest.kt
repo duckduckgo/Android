@@ -78,6 +78,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.WebViewErrorResponse.SSL_PROTOCOL_ERROR
+import com.duckduckgo.app.browser.WebViewErrorResponse.TIMEOUT
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
@@ -144,7 +145,10 @@ import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromBookmark
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromUser
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
+import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Phase
+import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Timeout
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
+import com.duckduckgo.app.browser.pageload.RealPageLoadTimeoutWatchdog
 import com.duckduckgo.app.browser.pdf.CachedFileDownloader
 import com.duckduckgo.app.browser.pdf.InlinePdfHandler
 import com.duckduckgo.app.browser.pdf.PdfDownloadResult
@@ -423,10 +427,12 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -761,6 +767,13 @@ class BrowserTabViewModelTest {
     private val mockBadUrlErrorPageWideEvent: BadUrlErrorPageWideEvent = mock()
     private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
     private val mockBrowserMenuAcknowledgement: BrowserMenuAcknowledgement = mock()
+    private val pageLoadTimeouts = MutableSharedFlow<Timeout>(extraBufferCapacity = 1)
+    private val mockPageLoadTimeoutWatchdog: RealPageLoadTimeoutWatchdog = mock {
+        on { timeouts } doReturn pageLoadTimeouts
+    }
+    private val mockPageLoadTimeoutWatchdogFactory: RealPageLoadTimeoutWatchdog.Factory = mock {
+        on { create(any()) } doReturn mockPageLoadTimeoutWatchdog
+    }
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
     private val mockPdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore = mock()
     private val mockCachedFileDownloader: CachedFileDownloader = mock()
@@ -1122,6 +1135,7 @@ class BrowserTabViewModelTest {
                 customErrorPagesFeature = fakeCustomErrorPagesFeature,
                 duckAiSessionCallback = mockDuckAiSessionCallback,
                 browserMenuAcknowledgement = mockBrowserMenuAcknowledgement,
+                pageLoadTimeoutWatchdogFactory = mockPageLoadTimeoutWatchdogFactory,
             )
 
         testee.loadData("abc", null, false, false)
@@ -9032,6 +9046,101 @@ class BrowserTabViewModelTest {
             assertEquals(BAD_URL, browserViewState().browserError)
             assertCommandIssued<Command.WebViewError>()
         }
+
+    // region Page load timeout
+    @Test
+    fun whenPageLoadTimesOutThenTimeoutErrorIsShownAndLoadIsNotStopped() = runTest {
+        loadUrl("https://example.com")
+        clearInvocations(mockCommandObserver)
+
+        pageLoadTimeouts.tryEmit(Timeout(Phase.NOT_COMMITTED))
+
+        assertEquals(TIMEOUT, browserViewState().browserError)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(listOf(Command.WebViewError::class), commandCaptor.allValues.map { it::class })
+        assertEquals(TIMEOUT, (commandCaptor.lastValue as Command.WebViewError).errorType)
+    }
+
+    @Test
+    fun whenPageLoadTimesOutWhileBrowserIsNotShowingThenNoErrorIsShown() = runTest {
+        loadUrl("https://example.com", isBrowserShowing = false)
+
+        pageLoadTimeouts.tryEmit(Timeout(Phase.NOT_COMMITTED))
+
+        assertEquals(OMITTED, browserViewState().browserError)
+        assertCommandNotIssued<Command.WebViewError>()
+    }
+
+    @Test
+    fun whenPageLoadTimesOutWhileAnotherErrorIsShownThenItIsKept() = runTest {
+        givenErrorPageShowingForSite(BAD_URL, FAILED_SITE)
+
+        pageLoadTimeouts.tryEmit(Timeout(Phase.NOT_COMMITTED))
+
+        assertEquals(BAD_URL, browserViewState().browserError)
+    }
+
+    @Test
+    fun whenPageLoadTimesOutWhileReloadingAnErrorPageThenTimeoutErrorIsShown() = runTest {
+        givenErrorPageShowingForSite(BAD_URL, FAILED_SITE)
+        testee.onWebViewRefreshed()
+        assertEquals(LOADING, browserViewState().browserError)
+
+        pageLoadTimeouts.tryEmit(Timeout(Phase.NOT_COMMITTED))
+
+        assertEquals(TIMEOUT, browserViewState().browserError)
+    }
+
+    @Test
+    fun whenPageLoadTimesOutThenTimeoutErrorDoesNotFireErrorPixels() = runTest {
+        fakeAndroidConfigBrowserFeature.errorPagePixel().setRawStoredState(State(enable = true))
+        loadUrl("https://example.com")
+
+        pageLoadTimeouts.tryEmit(Timeout(Phase.NOT_COMMITTED))
+
+        verify(mockPixel, never()).enqueueFire(eq(AppPixelName.ERROR_PAGE_SHOWN), any(), any(), any())
+    }
+
+    @Test
+    fun whenWebViewReportsNavigationSignalsThenWatchdogReceivesThem() {
+        testee.onAppInitiatedLoad("https://example.com/a#top", currentUrl = "https://example.com/a")
+        testee.onMainFrameNavigationStarted("https://example.com/b", currentUrl = "https://example.com/a", isRedirect = false)
+        testee.onMainFrameNavigationStarted("https://example.com/c", currentUrl = "https://example.com/a", isRedirect = true)
+        testee.onMainFrameNavigationCancelled("https://example.com/c")
+        testee.onMainFrameCommitted("https://example.com/b")
+        testee.onMainFrameContentVisible("https://example.com/b")
+        testee.onMainFrameFinished("https://example.com/b")
+        testee.onMainFrameHistoryUpdated()
+
+        inOrder(mockPageLoadTimeoutWatchdog) {
+            verify(mockPageLoadTimeoutWatchdog).onNavigationStarted("https://example.com/a#top", isRedirect = false, isSameDocument = true)
+            verify(mockPageLoadTimeoutWatchdog).onNavigationStarted("https://example.com/b", isRedirect = false, isSameDocument = false)
+            verify(mockPageLoadTimeoutWatchdog).onNavigationStarted("https://example.com/c", isRedirect = true, isSameDocument = false)
+            verify(mockPageLoadTimeoutWatchdog).onNavigationCancelled("https://example.com/c")
+            verify(mockPageLoadTimeoutWatchdog).onCommitted("https://example.com/b")
+            verify(mockPageLoadTimeoutWatchdog).onFirstContentVisible("https://example.com/b")
+            verify(mockPageLoadTimeoutWatchdog).onFinished("https://example.com/b")
+            verify(mockPageLoadTimeoutWatchdog).onHistoryUpdated()
+        }
+    }
+
+    @Test
+    fun whenEngineReportsMainFrameOutcomeThenWatchdogIsDisarmed() {
+        testee.onReceivedError(OMITTED, "https://example.com", "ERROR_UNKNOWN")
+        testee.recordHttpErrorCode(500, "https://example.com")
+        testee.recoverFromRenderProcessGone()
+        testee.onReceivedSslError(aHandler(), SslErrorResponse(SslError(SslError.SSL_EXPIRED, aRSASslCertificate(), exampleUrl), EXPIRED, exampleUrl))
+
+        verify(mockPageLoadTimeoutWatchdog, times(4)).onEngineError()
+    }
+
+    @Test
+    fun whenViewModelIsClearedThenWatchdogIsDisarmed() {
+        testee.onCleared()
+
+        verify(mockPageLoadTimeoutWatchdog).onNavigatedAway()
+    }
+    // endregion
 
     // region Custom error page is kept until the next page starts loading
     @Test

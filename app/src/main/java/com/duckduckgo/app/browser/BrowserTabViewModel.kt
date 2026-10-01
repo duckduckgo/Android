@@ -68,6 +68,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.WebViewErrorResponse.SSL_PROTOCOL_ERROR
+import com.duckduckgo.app.browser.WebViewErrorResponse.TIMEOUT
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
@@ -219,6 +220,8 @@ import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.browser.omnibar.toBrowserViewMode
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
+import com.duckduckgo.app.browser.pageload.RealPageLoadTimeoutWatchdog
+import com.duckduckgo.app.browser.pageload.isSameDocumentNavigation
 import com.duckduckgo.app.browser.pdf.CachedFileDownloader
 import com.duckduckgo.app.browser.pdf.InlinePdfHandler
 import com.duckduckgo.app.browser.pdf.PdfDownloadResult
@@ -625,6 +628,7 @@ class BrowserTabViewModel @Inject constructor(
     private val customErrorPagesFeature: CustomErrorPagesFeature,
     private val duckAiSessionCallback: DuckAiSessionCallback,
     private val browserMenuAcknowledgement: BrowserMenuAcknowledgement,
+    pageLoadTimeoutWatchdogFactory: RealPageLoadTimeoutWatchdog.Factory,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -863,6 +867,8 @@ class BrowserTabViewModel @Inject constructor(
 
     private var errorPagePendingDismissal = false
 
+    private val pageLoadTimeoutWatchdog = pageLoadTimeoutWatchdogFactory.create(viewModelScope)
+
     private fun registerAndScheduleDismissAction() {
         viewModelScope.launch(dispatchers.io()) {
             val fireButtonHighlightedEvent = userEventsStore.getUserEvent(UserEventKey.FIRE_BUTTON_HIGHLIGHTED)
@@ -925,6 +931,10 @@ class BrowserTabViewModel @Inject constructor(
 
         observeSyncStatusChangesForDuckChat()
         observeSubscriptionChangesForDuckChat()
+
+        pageLoadTimeoutWatchdog.timeouts
+            .onEach { showPageLoadTimeoutError() }
+            .launchIn(viewModelScope)
 
         tabRepository.childClosedTabs
             .onEach { closedTab ->
@@ -1295,6 +1305,7 @@ class BrowserTabViewModel @Inject constructor(
 
     @VisibleForTesting
     public override fun onCleared() {
+        pageLoadTimeoutWatchdog.onNavigatedAway()
         newTabPageModalPresenterRegistry.unregister(this)
         buildingSiteFactoryJob?.cancel()
         autoCompleteJob.cancel()
@@ -2631,6 +2642,49 @@ class BrowserTabViewModel @Inject constructor(
         errorPagePendingDismissal = currentBrowserViewState().browserError != OMITTED
     }
 
+    fun onAppInitiatedLoad(
+        url: String?,
+        currentUrl: String?,
+    ) {
+        pageLoadTimeoutWatchdog.onNavigationStarted(url, isSameDocument = isSameDocumentNavigation(currentUrl, url))
+    }
+
+    override fun onMainFrameNavigationStarted(
+        url: String,
+        currentUrl: String?,
+        isRedirect: Boolean,
+    ) {
+        pageLoadTimeoutWatchdog.onNavigationStarted(url, isRedirect, isSameDocument = !isRedirect && isSameDocumentNavigation(currentUrl, url))
+    }
+
+    override fun onMainFrameNavigationCancelled(url: String) = pageLoadTimeoutWatchdog.onNavigationCancelled(url)
+
+    override fun onMainFrameCommitted(url: String?) = pageLoadTimeoutWatchdog.onCommitted(url)
+
+    override fun onMainFrameContentVisible(url: String?) = pageLoadTimeoutWatchdog.onFirstContentVisible(url)
+
+    override fun onMainFrameFinished(url: String?) = pageLoadTimeoutWatchdog.onFinished(url)
+
+    override fun onMainFrameHistoryUpdated() = pageLoadTimeoutWatchdog.onHistoryUpdated()
+
+    private fun showPageLoadTimeoutError() {
+        val state = currentBrowserViewState()
+        val canShowError = state.browserShowing &&
+            state.sslError == NONE &&
+            !state.maliciousSiteBlocked &&
+            (state.browserError == OMITTED || state.browserError == LOADING)
+        if (!canShowError) return
+
+        errorPagePendingDismissal = false
+        browserViewState.value = state.copy(
+            browserError = TIMEOUT,
+            redirectSuggestion = null,
+            showPrivacyShield = HighlightableButton.Visible(enabled = false),
+        )
+        command.value = WebViewError(TIMEOUT, url.orEmpty())
+        suggestRedirectJob.cancel()
+    }
+
     override fun pageRefreshed(refreshedUrl: String) {
         logcat { "pageRefreshed URL: $url refreshedUrl $refreshedUrl" }
         if (url == null || refreshedUrl == url) {
@@ -2699,7 +2753,7 @@ class BrowserTabViewModel @Inject constructor(
         }
         when (currentBrowserViewState().browserError) {
             OMITTED, LOADING -> badUrlErrorPageWideEvent.onPageLoadFinished(tabId)
-            BAD_URL, CONNECTION, SSL_PROTOCOL_ERROR -> Unit
+            BAD_URL, CONNECTION, SSL_PROTOCOL_ERROR, TIMEOUT -> Unit
         }
         if (!currentBrowserViewState().maliciousSiteBlocked && site != null) {
             navigationStateChanged(webViewNavigationState)
@@ -2985,6 +3039,7 @@ class BrowserTabViewModel @Inject constructor(
         handler: SslErrorHandler,
         errorResponse: SslErrorResponse,
     ) {
+        pageLoadTimeoutWatchdog.onEngineError()
         if (sslCertificatesFeature.allowBypass().isEnabled()) {
             logcat { "SSLError: error received for ${errorResponse.url} and nextUrl is ${site?.nextUrl} and currentUrl is ${site?.url}" }
             if (site?.nextUrl != null && errorResponse.url != site?.nextUrl) {
@@ -4165,6 +4220,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun recoverFromRenderProcessGone() {
+        pageLoadTimeoutWatchdog.onEngineError()
         webNavigationState?.let {
             navigationStateChanged(EmptyNavigationState(it))
         }
@@ -4736,6 +4792,7 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         errorCode: String,
     ) {
+        pageLoadTimeoutWatchdog.onEngineError()
         if (errorType != OMITTED) {
             errorPagePendingDismissal = false
             browserViewState.value =
@@ -4755,7 +4812,7 @@ class BrowserTabViewModel @Inject constructor(
             CONNECTION -> badUrlErrorPageWideEvent.onConnectionErrorPageDisplayed(tabId)
             SSL_PROTOCOL_ERROR -> badUrlErrorPageWideEvent.onOtherErrorPageDisplayed(tabId)
             OMITTED -> badUrlErrorPageWideEvent.onOmittedErrorReceived(tabId)
-            LOADING -> Unit
+            LOADING, TIMEOUT -> Unit
         }
         if (errorType == BAD_URL &&
             suggestRedirectOnUnresolvedErrorFeature.self().isEnabled() &&
@@ -4798,6 +4855,7 @@ class BrowserTabViewModel @Inject constructor(
         )
 
         if (!exempted) {
+            if (isMainframe) pageLoadTimeoutWatchdog.onEngineError()
             badUrlErrorPageWideEvent.onOtherErrorPageDisplayed(tabId)
             if (currentBrowserViewState().maliciousSiteBlocked && previousSite?.url == url.toString()) {
                 logcat { "maliciousSiteBlocked already shown for $url, previousSite: ${previousSite.url}" }
@@ -4882,6 +4940,7 @@ class BrowserTabViewModel @Inject constructor(
         statusCode: Int,
         url: String,
     ) {
+        pageLoadTimeoutWatchdog.onEngineError()
         siteHttpErrorHandler.handleError(currentSite = site, urlWithError = url, error = statusCode)
         logcat { "recordHttpErrorCode $statusCode in ${site?.url}" }
         updateHttpErrorCount(statusCode)

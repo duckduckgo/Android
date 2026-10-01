@@ -46,6 +46,24 @@ interface WebViewClientListener {
      */
     fun onMainFrameLoadStarted(navigationId: Long)
 
+    /** The WebView is going to load [url] in the main frame, while [currentUrl] is what it shows now. */
+    fun onMainFrameNavigationStarted(
+        url: String,
+        currentUrl: String?,
+        isRedirect: Boolean,
+    )
+
+    /** The app handled the main-frame redirect to [url] itself, so the WebView will not load it. */
+    fun onMainFrameNavigationCancelled(url: String)
+
+    fun onMainFrameCommitted(url: String?)
+
+    fun onMainFrameContentVisible(url: String?)
+
+    fun onMainFrameFinished(url: String?)
+
+    fun onMainFrameHistoryUpdated()
+
     fun progressChanged(
         newProgress: Int,
         webViewNavigationState: WebViewNavigationState,

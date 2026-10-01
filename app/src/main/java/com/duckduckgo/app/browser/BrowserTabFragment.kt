@@ -4259,6 +4259,7 @@ class BrowserTabFragment :
 
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
+            it.onLoadRequested = viewModel::onAppInitiatedLoad
             it.clearSslPreferences()
 
             it.settings.apply {

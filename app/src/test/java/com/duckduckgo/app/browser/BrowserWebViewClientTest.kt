@@ -2219,7 +2219,107 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
 
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
-        verifyNoInteractions(listener)
+        verify(listener, never()).pageFinished(any(), any(), anyOrNull())
+    }
+
+    @Test
+    fun whenOnPageFinishedCalledBeforeCompleteThenPageLoadTimeoutSignalStillReported() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(10)
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+
+        verify(listener).onMainFrameFinished(EXAMPLE_URL)
+    }
+
+    @Test
+    fun whenOnPageStartedCalledThenCommitReportedToListener() {
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+
+        verify(listener).onMainFrameCommitted(EXAMPLE_URL)
+    }
+
+    @Test
+    fun whenOnPageCommitVisibleCalledThenContentVisibleReportedToListener() {
+        testee.onPageCommitVisible(webView, EXAMPLE_URL)
+
+        verify(listener).onMainFrameContentVisible(EXAMPLE_URL)
+    }
+
+    @Test
+    fun whenDoUpdateVisitedHistoryCalledThenHistoryUpdateReportedToListener() {
+        testee.doUpdateVisitedHistory(webView, EXAMPLE_URL, false)
+
+        verify(listener).onMainFrameHistoryUpdated()
+    }
+
+    @Test
+    fun whenMainFrameNavigationIsNotOverriddenThenNavigationStartReportedToListener() {
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.isRedirect).thenReturn(false)
+        webView.webViewUrl = "https://current.example"
+        whenever(specialUrlDetector.determineType(initiatingUrl = anyOrNull(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Web(EXAMPLE_URL))
+
+        assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+
+        verify(listener).onMainFrameNavigationStarted(EXAMPLE_URL, "https://current.example", isRedirect = false)
+    }
+
+    @Test
+    fun whenMainFrameNavigationIsOverriddenThenNavigationStartIsNotReported() {
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.isRedirect).thenReturn(false)
+        whenever(specialUrlDetector.determineType(initiatingUrl = anyOrNull(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Telephone("123"))
+
+        assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+
+        verify(listener, never()).onMainFrameNavigationStarted(any(), anyOrNull(), any())
+    }
+
+    @Test
+    fun whenMainFrameRedirectIsNotOverriddenThenItIsReportedAsRedirectAndNotCancelled() {
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.isRedirect).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = anyOrNull(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Web(EXAMPLE_URL))
+
+        assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+
+        verify(listener).onMainFrameNavigationStarted(eq(EXAMPLE_URL), anyOrNull(), eq(true))
+        verify(listener, never()).onMainFrameNavigationCancelled(any())
+    }
+
+    @Test
+    fun whenMainFrameRedirectIsOverriddenThenItIsReportedAsCancelled() {
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.isRedirect).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = anyOrNull(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Telephone("123"))
+
+        assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+
+        verify(listener).onMainFrameNavigationCancelled(EXAMPLE_URL)
+    }
+
+    @Test
+    fun whenSubFrameNavigationThenNoPageLoadTimeoutSignalReported() {
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+        whenever(specialUrlDetector.determineType(initiatingUrl = anyOrNull(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Web(EXAMPLE_URL))
+
+        testee.shouldOverrideUrlLoading(webView, webResourceRequest)
+
+        verify(listener, never()).onMainFrameNavigationStarted(any(), anyOrNull(), any())
+        verify(listener, never()).onMainFrameNavigationCancelled(any())
     }
 
     @Test

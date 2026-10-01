@@ -73,6 +73,9 @@ class DuckDuckGoWebView :
     private var canSwipeToRefresh = true
     private var systemAutofillCallback: (() -> Unit)? = null
 
+    /** Called with the target and the current URL (the target is null for reload and history navigation) before the app starts a load. */
+    var onLoadRequested: ((url: String?, currentUrl: String?) -> Unit)? = null
+
     private var lastY: Int = 0
     private var lastDeltaY: Int = 0
     private val scrollOffset = IntArray(2)
@@ -148,6 +151,7 @@ class DuckDuckGoWebView :
 
     override fun loadUrl(url: String) {
         if (!isDestroyed) {
+            notifyLoadRequested(url)
             super.loadUrl(url)
         }
     }
@@ -157,26 +161,42 @@ class DuckDuckGoWebView :
         additionalHttpHeaders: Map<String, String>,
     ) {
         if (!isDestroyed) {
+            notifyLoadRequested(url)
             super.loadUrl(url, additionalHttpHeaders)
         }
     }
 
     override fun reload() {
         if (!isDestroyed) {
+            notifyLoadRequested(null)
             super.reload()
+        }
+    }
+
+    override fun goBack() {
+        if (!isDestroyed) {
+            notifyLoadRequested(null)
+            super.goBack()
         }
     }
 
     override fun goForward() {
         if (!isDestroyed) {
+            notifyLoadRequested(null)
             super.goForward()
         }
     }
 
     override fun goBackOrForward(steps: Int) {
         if (!isDestroyed) {
+            notifyLoadRequested(null)
             super.goBackOrForward(steps)
         }
+    }
+
+    private fun notifyLoadRequested(url: String?) {
+        if (url?.startsWith(JAVASCRIPT_SCHEME, ignoreCase = true) == true) return
+        onLoadRequested?.invoke(url, this.url)
     }
 
     override fun findAllAsync(find: String) {
@@ -578,5 +598,6 @@ class DuckDuckGoWebView :
          * We can't use that value directly as it was only added on Oreo, but we can apply the value anyway.
          */
         private const val IME_FLAG_NO_PERSONALIZED_LEARNING = 0x1000000
+        private const val JAVASCRIPT_SCHEME = "javascript:"
     }
 }
