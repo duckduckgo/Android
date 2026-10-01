@@ -1684,6 +1684,34 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
+    fun whenCustomAiPlanAndNoWidgetInstalledThenWidgetPromptAndAddWidgetInsertedAfterDefaultBrowser() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        val ids = stepIds()
+        assertEquals(
+            ids.indexOf(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT) + 1,
+            ids.indexOf(NewUserOnboardingStepIds.WIDGET_PROMPT),
+        )
+        assertEquals(
+            ids.indexOf(NewUserOnboardingStepIds.WIDGET_PROMPT) + 1,
+            ids.indexOf(NewUserOnboardingStepIds.ADD_WIDGET),
+        )
+        assertEquals(
+            ids.indexOf(NewUserOnboardingStepIds.ADD_WIDGET) + 1,
+            ids.indexOf(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION),
+        )
+    }
+
+    @Test
+    fun whenCustomAiPlanAndUserAlreadyHasWidgetThenWidgetStepsNotInserted() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        val ids = stepIds()
+        assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
+        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
+    }
+
+    @Test
     fun whenUserAlreadyHasWidgetThenWidgetStepsNotInserted() = runTest {
         whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(true)
         val ids = stepIds()

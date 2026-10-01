@@ -206,7 +206,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun buildCustomAiPlan(
+    private suspend fun buildCustomAiPlan(
         ctx: NewUserOnboardingPlanContext,
         rootOnCompleted: suspend () -> Unit,
         rootOnSkipped: suspend () -> Unit,
@@ -237,27 +237,35 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             rootOnSkipped()
         }
 
+        val showWidget = withContext(dispatchers.io()) { !widgetCapabilities.hasInstalledWidgets }
+
         return rootPlan(
             ctx = ctx,
             onCompleted = onCompleted,
             onSkipped = onSkipped,
-            steps = listOf(
-                introAnimationStep(withDuckAi = true),
-                notificationPermissionStep(),
-                initialReinstallUserStep(firstDialog, quickSetupPlan, isCustomAiPlan = true),
-                initialStep(firstDialog),
-                aiComparisonChartStep(),
-                inputScreenPreviewStep(
-                    ctx = ctx,
-                    isSearchDefault = false,
-                    showsStepIndicator = true,
-                    handsPromptToDemoStep = true,
-                ),
-                duckAiDemoStep(ctx),
-                comparisonChartStep(),
-                defaultBrowserPromptStep(),
-                addressBarPositionStep(),
-            ),
+            steps = buildList {
+                add(introAnimationStep(withDuckAi = true))
+                add(notificationPermissionStep())
+                add(initialReinstallUserStep(firstDialog, quickSetupPlan, isCustomAiPlan = true))
+                add(initialStep(firstDialog))
+                add(aiComparisonChartStep())
+                add(
+                    inputScreenPreviewStep(
+                        ctx = ctx,
+                        isSearchDefault = false,
+                        showsStepIndicator = true,
+                        handsPromptToDemoStep = true,
+                    ),
+                )
+                add(duckAiDemoStep(ctx))
+                add(comparisonChartStep())
+                add(defaultBrowserPromptStep())
+                if (showWidget) {
+                    add(widgetPromptStep(ctx))
+                    add(addWidgetStep(ctx))
+                }
+                add(addressBarPositionStep())
+            },
         )
     }
 
