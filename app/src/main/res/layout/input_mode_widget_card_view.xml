@@ -39,20 +39,18 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <!-- Compat padding reserved room for the shadow, and since the content is offset by the card's
-            bounds that room opened a gap above the content scrolling under. The shadow falls outside the
-            bounds instead, and the margin replaces the side inset compat padding used to give. -->
+            <!-- Negative top margin pulls the card up to account for the shadow -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/inputModeWidgetCard"
                 android:theme="?attr/daxInputModeCardThemeOverlay"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="13dp"
+                android:layout_marginTop="-9dp"
                 android:layout_weight="1"
                 app:cardBackgroundColor="?attr/daxColorSurface"
                 app:cardCornerRadius="24dp"
                 app:cardElevation="6dp"
-                app:cardUseCompatPadding="false">
+                app:cardUseCompatPadding="true">
 
                 <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
                     android:id="@+id/inputModeWidget"
