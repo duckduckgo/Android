@@ -137,14 +137,14 @@ class NativeInputFooterDockLayoutTest {
         dock.addView(row, LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT))
         val footer = NativeInputFooterView(context)
         dock.addView(footer, LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT))
-        val footerCard = MaterialCardView(context).apply { minimumHeight = FOOTER_HEIGHT_PX }
+        val footerRow = View(context).apply { minimumHeight = FOOTER_HEIGHT_PX }
         footer.bind(
             coroutineRule.testScope,
-            flowOf(NativeInputFooterCoordinator.State(view = footerCard)),
+            flowOf(NativeInputFooterCoordinator.State(rows = listOf(footerRow))),
         )
         shadowOf(dock).callOnAttachedToWindow()
         shadowOf(footer).callOnAttachedToWindow()
-        return Hierarchy(dock, row, sibling, card, footer, footerCard)
+        return Hierarchy(dock, row, sibling, card, footer, footer.getChildAt(0) as MaterialCardView)
     }
 
     private fun View.measureAndLayout() {

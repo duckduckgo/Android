@@ -17,18 +17,13 @@
 package com.duckduckgo.duckchat.impl.nativeinput.footer.highusage
 
 import android.content.Context
-import android.graphics.RectF
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
-import android.view.View
 import android.widget.ImageView
-import android.widget.LinearLayout
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.impl.R
-import com.google.android.material.card.MaterialCardView
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -75,39 +70,6 @@ class HighUsageModelFooterViewTest {
 
         assertEquals(minimumTouchTarget, dismiss.layoutParams.width)
         assertEquals(minimumTouchTarget, dismiss.layoutParams.height)
-    }
-
-    @Test
-    fun whenCreatedThenFooterUsesCardSurfaceCornersAndElevation() {
-        val root: View = testee
-
-        assertTrue(root is MaterialCardView)
-        val card = root as MaterialCardView
-        assertEquals(
-            context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface),
-            card.cardBackgroundColor.defaultColor,
-        )
-        assertTrue(card.cardElevation > 0f)
-    }
-
-    @Test
-    fun whenCreatedThenOnlyBottomCornersAreRounded() {
-        val bounds = RectF(0f, 0f, 100f, 100f)
-        val shape = testee.shapeAppearanceModel
-        val radius = context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
-
-        assertEquals(0f, shape.topLeftCornerSize.getCornerSize(bounds), 0f)
-        assertEquals(0f, shape.topRightCornerSize.getCornerSize(bounds), 0f)
-        assertEquals(radius, shape.bottomLeftCornerSize.getCornerSize(bounds), 0f)
-        assertEquals(radius, shape.bottomRightCornerSize.getCornerSize(bounds), 0f)
-    }
-
-    @Test
-    fun whenCreatedThenContentStartsBelowTheHostOverlap() {
-        val content = testee.getChildAt(0) as LinearLayout
-
-        assertEquals(context.resources.getDimensionPixelSize(R.dimen.nativeInputFooterOverlap), content.paddingTop)
-        assertEquals(0, content.paddingBottom)
     }
 
     @Test

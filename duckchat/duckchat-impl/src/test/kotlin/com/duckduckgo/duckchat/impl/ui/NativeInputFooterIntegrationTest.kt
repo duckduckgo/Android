@@ -20,6 +20,7 @@ import android.content.Context
 import android.view.ContextThemeWrapper
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -58,8 +59,8 @@ class NativeInputFooterIntegrationTest {
     private val widgetContext = ContextThemeWrapper(context, com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Light)
 
     @Test
-    fun whenSelectedFooterChangesThenHostOwnsOnlyTheSelectedView() = runTest {
-        val host = NativeInputFooterView(context)
+    fun whenFootersChangeThenHostOwnsOnlyTheVisibleRowsInPriorityOrder() = runTest {
+        val host = NativeInputFooterView(widgetContext)
         val hostContext = MutableStateFlow(duckAiContext())
         val primaryState = MutableStateFlow(NativeInputFooterState(visible = true))
         val primaryView = View(context)
@@ -73,20 +74,22 @@ class NativeInputFooterIntegrationTest {
         host.attach()
         advanceUntilIdle()
 
-        assertEquals(1, host.childCount)
-        assertSame(primaryView, host.getChildAt(0))
+        val rows = (host.getChildAt(0) as ViewGroup).getChildAt(0) as ViewGroup
+        assertEquals(2, rows.childCount)
+        assertSame(primaryView, rows.getChildAt(0))
+        assertSame(fallbackView, rows.getChildAt(1))
 
         primaryState.value = NativeInputFooterState(visible = false)
         advanceUntilIdle()
 
-        assertEquals(1, host.childCount)
-        assertSame(fallbackView, host.getChildAt(0))
+        assertEquals(1, rows.childCount)
+        assertSame(fallbackView, rows.getChildAt(0))
         host.detach()
     }
 
     @Test
     fun whenContextualSurfaceIsHiddenThenLaterFooterEmissionsCannotReshowHost() = runTest {
-        val host = NativeInputFooterView(context)
+        val host = NativeInputFooterView(widgetContext)
         val footerState = MutableStateFlow(NativeInputFooterState(visible = true))
         val coordinator = coordinator(plugin(priority = 10, view = View(context), state = footerState))
 
@@ -106,7 +109,7 @@ class NativeInputFooterIntegrationTest {
 
     @Test
     fun whenExitAnimationRunsThenHostHidesAndReturnsWhenItStops() = runTest {
-        val host = NativeInputFooterView(context)
+        val host = NativeInputFooterView(widgetContext)
         val coordinator = coordinator(plugin(priority = 10, view = View(context), state = MutableStateFlow(NativeInputFooterState(visible = true))))
 
         host.bind(this, coordinator.state(context, MutableStateFlow(duckAiContext()), FakeNativeInputFooterHost()))
@@ -124,10 +127,10 @@ class NativeInputFooterIntegrationTest {
 
     @Test
     fun whenFooterHostDetachesThenItsStateCollectionIsCancelled() = runTest {
-        val host = NativeInputFooterView(context)
+        val host = NativeInputFooterView(widgetContext)
         var collectionCancelled = false
         val state = flow {
-            emit(NativeInputFooterCoordinator.State(view = View(context)))
+            emit(NativeInputFooterCoordinator.State(rows = listOf(View(context))))
             try {
                 awaitCancellation()
             } finally {
@@ -143,7 +146,7 @@ class NativeInputFooterIntegrationTest {
         advanceUntilIdle()
 
         assertTrue(collectionCancelled)
-        assertEquals(0, host.childCount)
+        assertEquals(0, ((host.getChildAt(0) as ViewGroup).getChildAt(0) as ViewGroup).childCount)
     }
 
     @Test
@@ -213,10 +216,10 @@ class NativeInputFooterIntegrationTest {
     @Test
     fun whenSelectedFooterBlocksComposerThenWidgetLocksWithoutAffectingFooter() = runTest {
         val widget = NativeInputModeWidget(widgetContext)
-        val host = NativeInputFooterView(context)
+        val host = NativeInputFooterView(widgetContext)
         val state = MutableStateFlow(
             NativeInputFooterCoordinator.State(
-                view = View(context),
+                rows = listOf(View(context)),
                 blocksComposer = true,
             ),
         )
@@ -239,10 +242,10 @@ class NativeInputFooterIntegrationTest {
     @Test
     fun whenNoFooterIsSelectedThenFooterOwnedWidgetLockClears() = runTest {
         val widget = NativeInputModeWidget(widgetContext)
-        val host = NativeInputFooterView(context)
+        val host = NativeInputFooterView(widgetContext)
         val state = MutableStateFlow(
             NativeInputFooterCoordinator.State(
-                view = View(context),
+                rows = listOf(View(context)),
                 blocksComposer = true,
             ),
         )
@@ -250,7 +253,7 @@ class NativeInputFooterIntegrationTest {
         host.attach()
         advanceUntilIdle()
 
-        state.value = NativeInputFooterCoordinator.State(view = null, blocksComposer = true)
+        state.value = NativeInputFooterCoordinator.State(rows = emptyList(), blocksComposer = true)
         advanceUntilIdle()
 
         assertEquals(1f, widget.alpha)
@@ -261,10 +264,10 @@ class NativeInputFooterIntegrationTest {
     @Test
     fun whenExistingAndFooterLocksCoexistThenClearingEitherOneKeepsTheOther() = runTest {
         val widget = NativeInputModeWidget(widgetContext)
-        val host = NativeInputFooterView(context)
+        val host = NativeInputFooterView(widgetContext)
         val state = MutableStateFlow(
             NativeInputFooterCoordinator.State(
-                view = View(context),
+                rows = listOf(View(context)),
                 blocksComposer = true,
             ),
         )
@@ -279,7 +282,7 @@ class NativeInputFooterIntegrationTest {
         assertTrue(widget.onInterceptTouchEvent(null))
 
         widget.setInteractionLocked(true)
-        state.value = NativeInputFooterCoordinator.State(view = View(context), blocksComposer = false)
+        state.value = NativeInputFooterCoordinator.State(rows = listOf(View(context)), blocksComposer = false)
         advanceUntilIdle()
         assertEquals(0.4f, widget.alpha)
         assertEquals(1f, widget.findViewById<View>(com.duckduckgo.duckchat.impl.R.id.inputModeWidgetCardContent).alpha)
@@ -294,10 +297,10 @@ class NativeInputFooterIntegrationTest {
     @Test
     fun whenFooterHostUnbindsOrDetachesThenOnlyItsWidgetLockClears() = runTest {
         val widget = NativeInputModeWidget(widgetContext)
-        val host = NativeInputFooterView(context)
+        val host = NativeInputFooterView(widgetContext)
         val blockingState = MutableStateFlow(
             NativeInputFooterCoordinator.State(
-                view = View(context),
+                rows = listOf(View(context)),
                 blocksComposer = true,
             ),
         )

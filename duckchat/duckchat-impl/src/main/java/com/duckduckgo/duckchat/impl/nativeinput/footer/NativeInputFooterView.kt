@@ -21,6 +21,10 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.LinearLayout
+import com.duckduckgo.common.ui.view.getColorFromAttr
+import com.duckduckgo.duckchat.impl.R
+import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -31,17 +35,36 @@ class NativeInputFooterView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : FrameLayout(context, attrs, defStyle) {
-
     private var bindingScope: CoroutineScope? = null
     private var stateSource: Flow<NativeInputFooterCoordinator.State>? = null
     private var bindingJob: Job? = null
-    private var selectedView: View? = null
+    private val card = MaterialCardView(context)
+    private val rowsContainer = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
+    private var renderedRows: List<View> = emptyList()
     private var surfaceVisible = true
     private var exitAnimationRunning = false
     private var blocksComposer = false
     private var onBlocksComposerChanged: ((Boolean) -> Unit)? = null
 
     init {
+        val cornerRadius = resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
+        card.shapeAppearanceModel = card.shapeAppearanceModel.toBuilder()
+            .setTopLeftCornerSize(0f)
+            .setTopRightCornerSize(0f)
+            .setBottomLeftCornerSize(cornerRadius)
+            .setBottomRightCornerSize(cornerRadius)
+            .build()
+        card.cardElevation = resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_0)
+        card.setCardBackgroundColor(context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface))
+        card.strokeColor = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorOmnibarAccent)
+        card.strokeWidth = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarOutlineWidth)
+        card.useCompatPadding = false
+        // The host stays flat and the card is its child: the dock layout reads the card, and a flat host keeps the
+        // footer behind the input card, which an elevated host would not.
+        // Rows are tucked under the input card; the dock layout positions this view against its bottom edge.
+        rowsContainer.setPaddingRelative(0, resources.getDimensionPixelSize(R.dimen.nativeInputFooterOverlap), 0, 0)
+        card.addView(rowsContainer, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
+        addView(card, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
         visibility = GONE
     }
 
@@ -103,16 +126,18 @@ class NativeInputFooterView @JvmOverloads constructor(
     }
 
     private fun render(state: NativeInputFooterCoordinator.State) {
-        val view = state.view
-        if (selectedView !== view) {
-            removeAllViews()
-            selectedView = view
-            if (view != null) {
-                (view.parent as? ViewGroup)?.removeView(view)
-                addView(view)
+        val rows = state.rows
+        if (renderedRows != rows) {
+            rowsContainer.removeAllViews()
+            rows.forEachIndexed { index, row ->
+                (row.parent as? ViewGroup)?.removeView(row)
+                val params = LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                if (index > 0) params.topMargin = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
+                rowsContainer.addView(row, params)
             }
+            renderedRows = rows
         }
-        updateBlocksComposer(view != null && state.blocksComposer)
+        updateBlocksComposer(rows.isNotEmpty() && state.blocksComposer)
         updateVisibility()
     }
 
@@ -123,7 +148,7 @@ class NativeInputFooterView @JvmOverloads constructor(
     }
 
     private fun updateVisibility() {
-        visibility = if (surfaceVisible && selectedView != null && !exitAnimationRunning) VISIBLE else GONE
+        visibility = if (surfaceVisible && renderedRows.isNotEmpty() && !exitAnimationRunning) VISIBLE else GONE
         (parent as? NativeInputFooterDockLayout)?.onFooterVisibilityChanged()
     }
 }

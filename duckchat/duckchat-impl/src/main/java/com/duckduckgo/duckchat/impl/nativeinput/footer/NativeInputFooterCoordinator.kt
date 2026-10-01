@@ -29,8 +29,9 @@ import javax.inject.Inject
 class NativeInputFooterCoordinator @Inject constructor(
     private val plugins: ActivePluginPoint<NativeInputFooterPlugin>,
 ) {
+    /** [rows] are the visible footers, highest priority (lowest value) first. */
     data class State(
-        val view: View? = null,
+        val rows: List<View> = emptyList(),
         val blocksComposer: Boolean = false,
     )
 
@@ -49,18 +50,14 @@ class NativeInputFooterCoordinator @Inject constructor(
 
         emitAll(
             combine(footers.map { it.second.state }) { states ->
-                val selectedIndex = states.indices
+                val visible = states.indices
                     .filter { states[it].visible }
-                    .minByOrNull { footers[it].first }
+                    .sortedBy { footers[it].first }
 
-                if (selectedIndex == null) {
-                    State()
-                } else {
-                    State(
-                        view = footers[selectedIndex].second.view,
-                        blocksComposer = states[selectedIndex].blocksComposer,
-                    )
-                }
+                State(
+                    rows = visible.map { footers[it].second.view },
+                    blocksComposer = visible.any { states[it].blocksComposer },
+                )
             },
         )
     }
