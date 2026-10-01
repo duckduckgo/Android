@@ -23,6 +23,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.store.impl.DuckAiBridgeStorage
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingEntity
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -30,7 +34,7 @@ import javax.inject.Inject
  * Duck.ai ToS acceptance, shared with the frontend through the native storage setting it already reads.
  */
 interface DuckAiTermsRepository {
-    suspend fun hasAcceptedTerms(browserMode: BrowserMode): Boolean
+    fun observeTermsAccepted(browserMode: BrowserMode): Flow<Boolean>
 
     suspend fun markTermsAccepted(browserMode: BrowserMode)
 }
@@ -41,9 +45,12 @@ class RealDuckAiTermsRepository @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : DuckAiTermsRepository {
 
-    override suspend fun hasAcceptedTerms(browserMode: BrowserMode): Boolean = withContext(dispatchers.io()) {
-        storageProvider.forMode(browserMode).settings.get(TERMS_KEY)?.value == ACCEPTED
-    }
+    override fun observeTermsAccepted(browserMode: BrowserMode): Flow<Boolean> =
+        storageProvider.forMode(browserMode).settings
+            .observe(TERMS_KEY)
+            .map { it?.value == ACCEPTED }
+            .distinctUntilChanged()
+            .flowOn(dispatchers.io())
 
     override suspend fun markTermsAccepted(browserMode: BrowserMode) {
         withContext(dispatchers.io()) {
