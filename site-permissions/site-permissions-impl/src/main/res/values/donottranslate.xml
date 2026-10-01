@@ -29,6 +29,10 @@
     <string name="permissionSettingsMicrophoneDialogMessage">If you choose “Never Allow”, you won’t be able to use features like voice chatting on sites.</string>
     <string name="permissionSettingsDrmDialogTitle">Allow sites to ask for Digital Rights Management (DRM) permission</string>
     <string name="permissionSettingsDrmTitle">Digital Rights Management (DRM)</string>
+    <string name="permissionsPerWebsiteRedesignHeader" instruction="Placeholder is the name of a website">Permissions for %1$s</string>
+    <string name="permissionsPerWebsiteRemovePermissions">Remove Permissions</string>
+    <string name="permissionsRemovedForSiteSnackbar" instruction="Placeholder is the name of a website">Permissions removed for &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="permissionsRemovedForAllSitesSnackbar">Permissions removed for all sites</string>
     <string name="permissionSettingsDrmDialogMessage">If you choose “Never Allow”, videos on the site may become unplayable.</string>
 
 </resources>
