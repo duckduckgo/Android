@@ -516,6 +516,8 @@ class AppDatabaseTest {
         return runMigrations(newVersion, *migrations)
     }
 
+    // Stubs the platform call MigrationsProvider makes on the Context it is given.
+    @Suppress("DenyListedApi")
     private fun givenSharedPreferencesEmpty() {
         val editor: Editor = mock()
         whenever(context.getSharedPreferences(anyString(), anyInt())).thenReturn(sharedPreferences)

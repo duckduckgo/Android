@@ -19,9 +19,6 @@ package com.duckduckgo.app.di
 import android.content.Context
 import com.duckduckgo.app.browser.DefaultWebViewDatabaseProvider
 import com.duckduckgo.app.browser.WebViewDatabaseProvider
-import com.duckduckgo.app.global.db.LegacyFireproofSettingsMigration
-import com.duckduckgo.app.settings.db.RealLegacyFireproofSettingsMigration
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -36,12 +33,5 @@ object DatabaseModule {
     @SingleInstanceIn(AppScope::class)
     fun provideWebViewDatabaseProvider(context: Context): WebViewDatabaseProvider {
         return DefaultWebViewDatabaseProvider(context)
-    }
-
-    @Provides
-    fun provideLegacyFireproofSettingsMigration(
-        settingsDataStore: SettingsDataStore,
-    ): LegacyFireproofSettingsMigration {
-        return RealLegacyFireproofSettingsMigration(settingsDataStore)
     }
 }

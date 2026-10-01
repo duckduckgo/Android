@@ -732,6 +732,8 @@ class MigrationsProvider(val context: Context, private val legacyFireproofSettin
         private val keyVersion = "com.duckduckgo.app.onboarding.currentVersion"
         private val currentVersion = 1
 
+        // Reads a legacy file written with the platform API; migrations must read it back exactly as it was stored.
+        @Suppress("DenyListedApi")
         private val preferences: SharedPreferences by lazy { context.getSharedPreferences(fileName, Context.MODE_PRIVATE) }
 
         fun shouldShow(): Boolean {
