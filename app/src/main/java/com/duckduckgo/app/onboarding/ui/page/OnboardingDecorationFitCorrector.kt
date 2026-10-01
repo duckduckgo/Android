@@ -163,7 +163,9 @@ class OnboardingDecorationFitCorrector(
         val content = cardContainer.measuredHeight.takeIf { it > 0 } ?: return false
         val span = root.height - root.paddingTop - root.paddingBottom -
             params.topMargin - params.bottomMargin - roomBelowCard
-        val shouldClamp = dialog.paddingTop + content > span
+        // A bounded card reports its viewport height, so reaching the span does not prove its content fits.
+        val retainClamp = params.constrainedHeight && dialog.measuredHeight >= span
+        val shouldClamp = dialog.paddingTop + content > span || retainClamp
         if (params.constrainedHeight == shouldClamp) return false
         dialog.updateLayoutParams<ConstraintLayout.LayoutParams> { constrainedHeight = shouldClamp }
         return true

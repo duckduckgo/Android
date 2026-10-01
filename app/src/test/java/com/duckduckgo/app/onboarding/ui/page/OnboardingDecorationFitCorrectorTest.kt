@@ -43,6 +43,106 @@ class OnboardingDecorationFitCorrectorTest {
         val decoration: View,
     )
 
+    private class BoundedHarness(
+        val root: ConstraintLayout,
+        val dialog: ConstraintLayout,
+        val content: FrameLayout,
+        val body: View,
+        val corrector: OnboardingDecorationFitCorrector,
+    ) {
+        fun measureAndLayout() {
+            body.forceLayout()
+            content.forceLayout()
+            dialog.forceLayout()
+            root.forceLayout()
+            root.measure(
+                View.MeasureSpec.makeMeasureSpec(1920, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(2015, View.MeasureSpec.EXACTLY),
+            )
+            root.layout(0, 0, 1920, 2015)
+        }
+    }
+
+    private fun boundedHarness(): BoundedHarness {
+        val root = ConstraintLayout(context)
+        val dialog = ConstraintLayout(context).apply {
+            id = View.generateViewId()
+            setPadding(0, 120, 0, 0)
+        }
+        root.addView(
+            dialog,
+            ConstraintLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                constrainedHeight = false
+                verticalBias = 0f
+                bottomMargin = 220
+            },
+        )
+        val content = FrameLayout(context).apply { id = View.generateViewId() }
+        val body = View(context)
+        content.addView(body, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1686))
+        dialog.addView(
+            content,
+            ConstraintLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                constrainedHeight = true
+                verticalBias = 0f
+            },
+        )
+        val corrector = OnboardingDecorationFitCorrector(root, dialog, content, cardBottomInsetPx = { 220 }).apply {
+            enabled = true
+        }
+        return BoundedHarness(root, dialog, content, body, corrector)
+    }
+
+    @Test
+    fun whenWrappingContentOverflowsThenBoundedLayoutConvergesAndAllowsDrawing() {
+        val h = boundedHarness()
+        h.measureAndLayout()
+        assertEquals(1806, h.dialog.measuredHeight)
+        assertFalse(h.corrector.correctOnce())
+
+        h.measureAndLayout()
+        assertEquals(1795, h.dialog.measuredHeight)
+        assertEquals(1675, h.content.measuredHeight)
+        assertTrue(h.corrector.correctOnce())
+        assertTrue((h.dialog.layoutParams as ConstraintLayout.LayoutParams).constrainedHeight)
+
+        repeat(4) {
+            h.measureAndLayout()
+            assertTrue(h.corrector.correctOnce())
+            assertEquals(1795, h.dialog.measuredHeight)
+        }
+    }
+
+    @Test
+    fun whenBoundedContentShrinksThenClampReleasesAndLayoutStillAllowsDrawing() {
+        val h = boundedHarness()
+        h.measureAndLayout()
+        assertFalse(h.corrector.correctOnce())
+        h.measureAndLayout()
+        assertTrue(h.corrector.correctOnce())
+
+        h.body.layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 300)
+        h.measureAndLayout()
+        assertEquals(420, h.dialog.measuredHeight)
+        assertFalse(h.corrector.correctOnce())
+        assertFalse((h.dialog.layoutParams as ConstraintLayout.LayoutParams).constrainedHeight)
+
+        repeat(4) {
+            h.measureAndLayout()
+            assertTrue(h.corrector.correctOnce())
+            assertEquals(420, h.dialog.measuredHeight)
+            assertFalse((h.dialog.layoutParams as ConstraintLayout.LayoutParams).constrainedHeight)
+        }
+    }
+
     private fun harness(
         rootHeight: Int,
         rootPaddingBottom: Int = 0,
