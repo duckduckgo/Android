@@ -26,10 +26,10 @@ import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 
-@BindingContainer(includes = [DaoModule::class])
+@BindingContainer
 @ContributesTo(
     scope = AppScope::class,
-    replaces = [DatabaseModule::class, RoomDatabaseModule::class],
+    replaces = [RoomDatabaseModule::class],
 )
 class StubDatabaseModule {
 
