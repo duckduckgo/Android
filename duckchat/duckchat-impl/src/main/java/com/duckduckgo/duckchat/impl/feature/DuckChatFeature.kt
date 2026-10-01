@@ -325,8 +325,8 @@ interface DuckChatFeature {
 
     /**
      * @return `true` when native Duck.ai usage-limit and high-usage model notices may be shown.
-     * If the remote feature is not present defaults to `false`.
+     * If the remote feature is not present defaults to `internal`.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun duckAiUsageWarnings(): Toggle
 }
