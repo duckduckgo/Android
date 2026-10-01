@@ -40,6 +40,7 @@ import com.duckduckgo.remote.messaging.impl.store.ModalSurfaceStore
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -203,7 +204,9 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
 
         val result = testee.evaluate()
 
-        assertEquals(ModalEvaluator.EvaluationResult.ModalShown, result)
+        // Deciding alone launches nothing: the activity starts only once the show action runs.
+        verify(mockApplicationContext, never()).startActivity(any(), any())
+        assertTrue(result.invokeShow())
         coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
         verify(mockApplicationContext).startActivity(mockIntent, mockOptionsBundle)
         verify(mockIntent).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -254,7 +257,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
 
         val result = testee.evaluate()
 
-        assertEquals(ModalEvaluator.EvaluationResult.ModalShown, result)
+        assertTrue(result.invokeShow())
         coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
         verify(mockApplicationContext).startActivity(mockIntent, mockOptionsBundle)
     }
@@ -269,7 +272,12 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
         whenever(mockRemoteMessagingRepository.message()).thenReturn(message)
         whenever(mockGlobalActivityStarter.startIntent(any(), any<GlobalActivityStarter.ActivityParams>())).thenReturn(mockIntent)
 
-        testee.evaluate()
+        val result = testee.evaluate()
+
+        // Deciding alone consumes nothing: the message is only recorded once the show action runs,
+        // so a refused surface cannot burn the message.
+        verify(mockModalSurfaceStore, never()).recordLastShownRemoteMessage(message)
+        assertTrue(result.invokeShow())
 
         verify(mockModalSurfaceStore).recordLastShownRemoteMessage(message)
     }
@@ -284,7 +292,8 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
         whenever(mockRemoteMessagingRepository.message()).thenReturn(message)
         whenever(mockGlobalActivityStarter.startIntent(any(), any<GlobalActivityStarter.ActivityParams>())).thenReturn(mockIntent)
 
-        testee.evaluate()
+        val result = testee.evaluate()
+        assertTrue(result.invokeShow())
 
         verify(mockModalSurfaceStore).clearBackgroundTimestamp()
     }
@@ -315,7 +324,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
 
         val result = testee.evaluate()
 
-        assertEquals(ModalEvaluator.EvaluationResult.ModalShown, result)
+        assertTrue(result.invokeShow())
         coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
         verify(mockApplicationContext).startActivity(mockIntent, mockOptionsBundle)
     }
@@ -328,6 +337,11 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
     @Test
     fun evaluatorHasCorrectId() {
         assertEquals("remote_message_modal", testee.evaluatorId)
+    }
+
+    private suspend fun ModalEvaluator.EvaluationResult.invokeShow(): Boolean {
+        assertTrue("expected WantsToShow but was $this", this is ModalEvaluator.EvaluationResult.WantsToShow)
+        return (this as ModalEvaluator.EvaluationResult.WantsToShow).show()
     }
 
     private fun givenFeatureTogglesEnabled() {

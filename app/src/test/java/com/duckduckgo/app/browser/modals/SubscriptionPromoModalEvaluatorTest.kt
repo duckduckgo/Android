@@ -24,6 +24,7 @@ import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import com.duckduckgo.promptscoordinator.api.ModalTrigger
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -59,9 +60,10 @@ class SubscriptionPromoModalEvaluatorTest {
     }
 
     @Test
-    fun whenEligibleButNoPresenterRegisteredThenSkipped() = runTest {
+    fun whenEligibleButNoPresenterRegisteredThenSkippedWithoutClaiming() = runTest {
         whenever(decider.decide()).thenReturn(SubscriptionPromoModalDecision(SubscriptionPromoFlow.NUDGE, isFreeTrialCopy = false))
 
+        // Resolved during evaluation, so a missing host never costs a claim.
         assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
     }
 
@@ -73,18 +75,25 @@ class SubscriptionPromoModalEvaluatorTest {
 
         val result = testee.evaluate()
 
-        assertEquals(ModalEvaluator.EvaluationResult.ModalShown, result)
+        // Eligibility alone never shows: the modal only shows once the deferred action is invoked.
+        assertFalse(presenter.subscriptionShown)
+        assertTrue(result.invokeShow())
         assertTrue(presenter.subscriptionShown)
         assertEquals(SubscriptionPromoFlow.SKIPPED_ONBOARDING, presenter.shownFlow)
         assertTrue(presenter.shownFreeTrialCopy)
     }
 
     @Test
-    fun whenEligibleButPresenterDeclinesThenSkipped() = runTest {
+    fun whenEligibleButPresenterDeclinesThenShowFallsThrough() = runTest {
         whenever(decider.decide()).thenReturn(SubscriptionPromoModalDecision(SubscriptionPromoFlow.NUDGE, isFreeTrialCopy = false))
         registry.register(FakePresenter(subscriptionResult = false))
 
-        assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
+        assertFalse(testee.evaluate().invokeShow())
+    }
+
+    private suspend fun ModalEvaluator.EvaluationResult.invokeShow(): Boolean {
+        assertTrue("expected WantsToShow but was $this", this is ModalEvaluator.EvaluationResult.WantsToShow)
+        return (this as ModalEvaluator.EvaluationResult.WantsToShow).show()
     }
 
     private class FakePresenter(

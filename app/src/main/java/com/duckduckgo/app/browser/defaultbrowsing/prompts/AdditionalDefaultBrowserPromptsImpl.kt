@@ -269,25 +269,32 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         }
 
         if (newStage != null) {
-            defaultBrowserPromptsDataStore.storeStage(newStage)
-
             val action = stageEvaluator.evaluate(newStage)
             logcat { "evaluate: action = $action show message dialog = ${action.showMessageDialog}" }
 
+            // The stage transition is committed together with its dialog: if the show never runs
+            // (surface refused), the stage must not advance, or its dialog would be skipped forever.
             if (action.showMessageDialog) {
-                _commands.send(OpenMessageDialog)
+                return@withLock ModalEvaluator.EvaluationResult.WantsToShow {
+                    applyStageTransition(newStage, action)
+                    _commands.send(OpenMessageDialog)
+                    true
+                }
             }
-            defaultBrowserPromptsDataStore.storeShowSetAsDefaultPopupMenuItemState(action.showSetAsDefaultPopupMenuItem)
-            defaultBrowserPromptsDataStore.storeHighlightPopupMenuState(action.highlightPopupMenu)
-            defaultBrowserPromptsDataStore.storeShowSetAsDefaultMessageState(action.showMessage)
 
-            return@withLock if (action.showMessageDialog) {
-                ModalEvaluator.EvaluationResult.ModalShown
-            } else {
-                ModalEvaluator.EvaluationResult.Skipped
-            }
+            applyStageTransition(newStage, action)
         }
         return@withLock ModalEvaluator.EvaluationResult.Skipped
+    }
+
+    private suspend fun applyStageTransition(
+        newStage: Stage,
+        action: DefaultBrowserPromptsFlowStageAction,
+    ) {
+        defaultBrowserPromptsDataStore.storeStage(newStage)
+        defaultBrowserPromptsDataStore.storeShowSetAsDefaultPopupMenuItemState(action.showSetAsDefaultPopupMenuItem)
+        defaultBrowserPromptsDataStore.storeHighlightPopupMenuState(action.highlightPopupMenu)
+        defaultBrowserPromptsDataStore.storeShowSetAsDefaultMessageState(action.showMessage)
     }
 
     override fun onBrowserMenuLaunched() {

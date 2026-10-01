@@ -62,19 +62,25 @@ class AddWidgetModalEvaluator @Inject constructor(
             }
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
+
+        // Paced and resolved here rather than inside the show action: both can still decline, and a
+        // claim held while deciding refuses a competing prompt that would otherwise have its turn.
         delay(MODAL_DISPLAY_DELAY)
         val presenter = presenterRegistry.current()
         if (presenter == null) {
             logcat { "AddWidgetModalEvaluator: skipped, no presenter registered" }
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
+
+        ModalEvaluator.EvaluationResult.WantsToShow { showPromo(presenter) }
+    }
+
+    private suspend fun showPromo(presenter: NewTabPageModalPresenter): Boolean {
         val shown = presenter.showAddWidgetPromo(widgetCapabilities.supportsAutomaticWidgetAdd)
-        if (shown) {
-            ModalEvaluator.EvaluationResult.ModalShown
-        } else {
-            logcat { "AddWidgetModalEvaluator: skipped, presenter declined (not on New Tab Page)" }
-            ModalEvaluator.EvaluationResult.Skipped
+        if (!shown) {
+            logcat { "AddWidgetModalEvaluator: not shown, presenter declined (not on New Tab Page)" }
         }
+        return shown
     }
 
     private fun canShowWidgetCta(): Boolean =

@@ -43,6 +43,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineScope
@@ -403,7 +404,12 @@ class AdditionalDefaultBrowserPromptsImplTest {
         )
         whenever(stageEvaluatorMock.evaluate(Stage.STAGE_1)).thenReturn(action)
 
-        testee.evaluate()
+        val result = testee.evaluate()
+
+        // A dialog-showing transition is committed only when the show action runs, so a refused
+        // prompt surface cannot advance the stage without its dialog ever showing.
+        verify(dataStoreMock, never()).storeStage(any())
+        result.invokeShow()
 
         verify(dataStoreMock).storeStage(Stage.STAGE_1)
         verify(stageEvaluatorMock).evaluate(Stage.STAGE_1)
@@ -482,7 +488,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         whenever(userBrowserPropertiesMock.daysSinceInstalled()).thenReturn(1)
         whenever(stageEvaluatorMock.evaluate(Stage.STAGE_2)).thenReturn(action)
 
-        testee.evaluate()
+        testee.evaluate().invokeShow()
 
         verify(dataStoreMock).storeStage(Stage.STAGE_2)
         verify(stageEvaluatorMock).evaluate(Stage.STAGE_2)
@@ -510,7 +516,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
             whenever(userBrowserPropertiesMock.daysSinceInstalled()).thenReturn(5)
             whenever(stageEvaluatorMock.evaluate(Stage.STAGE_3)).thenReturn(action)
 
-            testee.evaluate()
+            testee.evaluate().invokeShow()
 
             verify(dataStoreMock).storeStage(Stage.STAGE_3)
             verify(stageEvaluatorMock).evaluate(Stage.STAGE_3)
@@ -601,7 +607,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceStart()).thenReturn(Result.success(1))
         whenever(stageEvaluatorMock.evaluate(Stage.STAGE_1)).thenReturn(action)
 
-        testee.evaluate()
+        testee.evaluate().invokeShow()
         val command = testee.commands.first()
 
         assertEquals(Command.OpenMessageDialog, command)
@@ -815,6 +821,11 @@ class AdditionalDefaultBrowserPromptsImplTest {
         pixel = pixel,
         moshi = moshi,
     )
+
+    private suspend fun ModalEvaluator.EvaluationResult.invokeShow(): Boolean {
+        assertTrue("expected WantsToShow but was $this", this is ModalEvaluator.EvaluationResult.WantsToShow)
+        return (this as ModalEvaluator.EvaluationResult.WantsToShow).show()
+    }
 
     private fun createDataStoreFake(
         initialStage: Stage = Stage.NOT_STARTED,
