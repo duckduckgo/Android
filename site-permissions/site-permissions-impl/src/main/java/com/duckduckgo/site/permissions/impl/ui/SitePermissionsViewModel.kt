@@ -33,7 +33,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -132,7 +132,7 @@ class SitePermissionsViewModel @Inject constructor(
     fun removeAllSitesSelected() {
         val sitePermissions = _viewState.value.sitesPermissionsAllowed.toMutableList()
         viewModelScope.launch(dispatcherProvider.io()) {
-            cachedAllowedSites = sitePermissionsRepository.sitePermissionsAllowedFlow().first()
+            cachedAllowedSites = sitePermissionsRepository.sitePermissionsAllowedFlow().firstOrNull().orEmpty()
             sitePermissionsRepository.deleteAll()
             _commands.send(ShowRemovedAllConfirmationSnackbar(sitePermissions))
         }
@@ -141,7 +141,7 @@ class SitePermissionsViewModel @Inject constructor(
     fun removeSiteSelected(domain: String) {
         viewModelScope.launch(dispatcherProvider.io()) {
             val sitePermissions = sitePermissionsRepository.getSitePermissionsForWebsite(domain)
-            val allowedSites = sitePermissionsRepository.sitePermissionsAllowedFlow().first().filter { it.domain == domain }
+            val allowedSites = sitePermissionsRepository.sitePermissionsAllowedFlow().firstOrNull().orEmpty().filter { it.domain == domain }
             sitePermissionsRepository.deletePermissionsForSite(domain)
             _commands.send(ShowRemovedSiteConfirmationSnackbar(domain, listOfNotNull(sitePermissions), allowedSites))
         }
