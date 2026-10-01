@@ -17,6 +17,7 @@
 package com.duckduckgo.app.anr.ndk
 
 import androidx.lifecycle.LifecycleOwner
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.anr.CrashPixel.APPLICATION_CRASH_NATIVE
 import com.duckduckgo.app.anr.CrashPixel.APPLICATION_CRASH_NATIVE_HANDLER_REGISTERED
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -25,8 +26,11 @@ import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.feature.toggles.api.Toggle
+import org.json.JSONObject
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
@@ -35,6 +39,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class NativeCrashInitTest {
 
     private val mockCustomTabDetector: CustomTabDetector = mock()
@@ -213,4 +218,18 @@ class NativeCrashInitTest {
         processName = processName,
         crashpadInitializer = mockCrashpadInitializer,
     )
+
+    @Test
+    fun `crash metadata carries crash info`() {
+        whenever(mockCustomTabDetector.isCustomTab()).thenReturn(true)
+        val json = JSONObject(buildNativeCrashInit(isMainProcess = true).crashMetadata())
+        assertEquals("AndroidNativeCrash", json.getString("ExceptionType"))
+        assertEquals("1.0.0-PLAY", json.getString("AppVersion"))
+        assertEquals("Android SDK 33", json.getString("OsVersion"))
+        val tags = json.getJSONObject("tags")
+        assertEquals("com.example", tags.getString("pn"))
+        assertEquals(true, tags.getBoolean("customTab"))
+        assertEquals("com.google.android.webview", tags.getString("webViewPackage"))
+        assertEquals("120", tags.getString("webViewVersion"))
+    }
 }
