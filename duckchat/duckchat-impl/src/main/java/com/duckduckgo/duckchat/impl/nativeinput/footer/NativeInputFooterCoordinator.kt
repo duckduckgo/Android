@@ -29,11 +29,12 @@ import javax.inject.Inject
 class NativeInputFooterCoordinator @Inject constructor(
     private val plugins: ActivePluginPoint<NativeInputFooterPlugin>,
 ) {
+    /** [footers] are the visible footers, highest priority (lowest value) first. */
     data class State(
-        val footer: NativeInputFooter? = null,
+        val footers: List<NativeInputFooter> = emptyList(),
         val blocksComposer: Boolean = false,
     ) {
-        val view: View? get() = footer?.view
+        val rows: List<View> get() = footers.map { it.view }
     }
 
     fun state(
@@ -51,18 +52,14 @@ class NativeInputFooterCoordinator @Inject constructor(
 
         emitAll(
             combine(footers.map { it.second.state }) { states ->
-                val selectedIndex = states.indices
+                val visible = states.indices
                     .filter { states[it].visible }
-                    .minByOrNull { footers[it].first }
+                    .sortedBy { footers[it].first }
 
-                if (selectedIndex == null) {
-                    State()
-                } else {
-                    State(
-                        footer = footers[selectedIndex].second,
-                        blocksComposer = states[selectedIndex].blocksComposer,
-                    )
-                }
+                State(
+                    footers = visible.map { footers[it].second },
+                    blocksComposer = visible.any { states[it].blocksComposer },
+                )
             },
         )
     }
