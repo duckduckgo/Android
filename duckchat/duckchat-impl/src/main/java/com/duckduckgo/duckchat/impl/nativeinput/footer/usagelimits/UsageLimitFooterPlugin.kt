@@ -31,6 +31,10 @@ import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterState
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningCta
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningExposure
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningMeasurements
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.store.impl.DuckAiBridgeStorage
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingEntity
 import kotlinx.coroutines.CoroutineScope
@@ -41,6 +45,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
@@ -62,6 +67,7 @@ class UsageLimitFooterPlugin @Inject constructor(
     private val storageProvider: BrowserModeDataProvider<DuckAiBridgeStorage>,
     private val duckChatFeature: DuckChatFeature,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val measurements: UsageWarningMeasurements,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : NativeInputFooterPlugin {
@@ -84,6 +90,10 @@ class UsageLimitFooterPlugin @Inject constructor(
     ): NativeInputFooter {
         val footerView = UsageLimitFooterView(context)
         var lastSelectedModelId: String? = null
+        val measurement = measurements.forHost(host) { DuckChatPixelSurface.from(hostContext.value.inputContext) }
+        var lastContext: NativeInputFooterContext? = null
+        var currentExposure: UsageWarningExposure? = null
+        var isDisplayed = false
 
         val activeBrowserMode = combine(hostContext, duckChatFeature.duckAiUsageWarnings().enabled()) { footerContext, enabled ->
             footerContext.browserMode.takeIf {
@@ -109,6 +119,12 @@ class UsageLimitFooterPlugin @Inject constructor(
         val state = combine(inputs, hostContext) { input, footerContext ->
             val previousModelId = lastSelectedModelId
             lastSelectedModelId = input?.selectedModelId ?: previousModelId
+            val previousContext = lastContext
+            lastContext = footerContext
+            // A prompt is attributed before the focus loss that follows it, even when both arrive in one emission.
+            if (previousContext != null && footerContext.promptSubmissions > previousContext.promptSubmissions) measurement.promptSubmitted()
+            if (previousModelId != null && input?.selectedModelId != null && input.selectedModelId != previousModelId) measurement.modelSwitched()
+            if (input == null || !footerContext.isInputFocused) measurement.inputSessionEnded()
             val snapshot = input?.snapshot ?: return@combine NativeInputFooterState(visible = false)
             val notice = snapshot.notice
             if (notice.resetsAtMillis <= currentTimeProvider.currentTimeMillis()) return@combine NativeInputFooterState(visible = false)
@@ -125,18 +141,46 @@ class UsageLimitFooterPlugin @Inject constructor(
             val resolvedCta = ctaResolver.resolve(snapshot.cta, modelManager.modelState.value, host.draft(), input.isFreeTrialEligible)
             retireIfManuallySwitched(snapshot, selectedModelId = input.selectedModelId, previousModelId = previousModelId)
 
+            val exposure = UsageWarningExposure.of(notice)
+            if (isDisplayed && exposure != currentExposure) measurement.cardBecameVisible(exposure)
+            currentExposure = exposure
+
             footerView.render(
                 message = messageMapper.map(notice, currentTimeProvider.currentTimeMillis(), context.resources, resolvedCta),
-                onDismiss = { appCoroutineScope.launch { dismissalStore.dismiss(notice) } },
-                onCta = { resolvedCta?.let { runCta(it, snapshot, host, footerContext.browserMode) } },
+                onDismiss = {
+                    measurement.warningDismissed()
+                    appCoroutineScope.launch { dismissalStore.dismiss(notice) }
+                },
+                onCta = {
+                    resolvedCta?.let {
+                        measurement.ctaTapped(it.measurementCta())
+                        runCta(it, snapshot, host, footerContext.browserMode)
+                    }
+                },
             )
             NativeInputFooterState(visible = true, blocksComposer = notice.reached)
         }.distinctUntilChanged()
 
         return object : NativeInputFooter {
             override val view: UsageLimitFooterView = footerView
-            override val state: Flow<NativeInputFooterState> = state
+            override val state: Flow<NativeInputFooterState> = state.onCompletion {
+                // The widget can go away right after a prompt (the NTP hands off to a new chat), before the
+                // updated context reaches this flow, so settle that prompt before ending the session.
+                if (hostContext.value.promptSubmissions > (lastContext?.promptSubmissions ?: Int.MAX_VALUE)) measurement.promptSubmitted()
+                measurement.inputSessionEnded()
+            }
+
+            override fun onDisplayed(displayed: Boolean) {
+                isDisplayed = displayed
+                if (displayed) currentExposure?.let(measurement::cardBecameVisible)
+            }
         }
+    }
+
+    private fun ResolvedUsageCta.measurementCta(): UsageWarningCta = when (this) {
+        is ResolvedUsageCta.SwitchModel -> UsageWarningCta.SWITCH_MODEL
+        is ResolvedUsageCta.StartUsingWeeklyLimit -> UsageWarningCta.WEEKLY_LIMIT
+        is ResolvedUsageCta.Subscribe -> UsageWarningCta.UPSELL
     }
 
     private fun runCta(

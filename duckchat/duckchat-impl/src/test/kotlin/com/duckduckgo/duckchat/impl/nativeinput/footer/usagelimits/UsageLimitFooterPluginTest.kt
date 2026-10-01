@@ -28,6 +28,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.view.button.DaxButtonSecondary
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.AIChatModel
@@ -35,12 +36,20 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.nativeinput.footer.FakeNativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.FakeUsageWarningPixelSender
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningCta
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningEvent
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningExposure
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningExposureKind
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningMeasurements
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.store.impl.DuckAiBridgeStorage
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingsDao
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -79,6 +88,7 @@ class UsageLimitFooterPluginTest {
     private val feature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java, ioDispatcher = coroutineRule.testDispatcher)
     private val hostContext = MutableStateFlow(duckAiContext())
     private val host = FakeNativeInputFooterHost()
+    private val pixelSender = FakeUsageWarningPixelSender()
 
     private lateinit var testee: UsageLimitFooterPlugin
 
@@ -101,6 +111,7 @@ class UsageLimitFooterPluginTest {
             storageProvider = storageProvider,
             duckChatFeature = feature,
             currentTimeProvider = currentTimeProvider,
+            measurements = UsageWarningMeasurements(pixelSender),
             dispatchers = coroutineRule.testDispatcherProvider,
             appCoroutineScope = coroutineRule.testScope,
         )
@@ -454,6 +465,161 @@ class UsageLimitFooterPluginTest {
         }
     }
 
+    @Test
+    fun whenCardIsDisplayedThenShownIsReportedOncePerAppearance() = runTest {
+        snapshot.value = approaching(75)
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            assertTrue(pixelSender.events.isEmpty())
+
+            footer.onDisplayed(true)
+            footer.onDisplayed(false)
+            footer.onDisplayed(true)
+
+            val exposure = UsageWarningExposure(UsageWarningExposureKind.APPROACHING, UsageWindow.WEEKLY, percentBucket = 75)
+            assertEquals(listOf<UsageWarningEvent>(UsageWarningEvent.Shown(exposure)), pixelSender.events)
+            assertEquals(listOf(DuckChatPixelSurface.DUCK_AI), pixelSender.surfaces)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPromptAndFocusLossArriveInOneEmissionThenPromptIsReportedInsteadOfAbandoned() = runTest {
+        snapshot.value = approaching(75)
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            hostContext.value = duckAiContext(isInputFocused = false, promptSubmissions = 1)
+
+            assertFalse(awaitItem().visible)
+            assertEquals(
+                listOf(UsageWarningEvent.Shown::class, UsageWarningEvent.PromptSubmitted::class),
+                pixelSender.events.map { it::class },
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenFocusIsLostWithoutFollowThroughThenAbandonedIsReported() = runTest {
+        snapshot.value = reached()
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            hostContext.value = duckAiContext(isInputFocused = false)
+
+            assertFalse(awaitItem().visible)
+            val exposure = UsageWarningExposure(UsageWarningExposureKind.LIMIT_REACHED, UsageWindow.DAILY)
+            assertEquals(listOf(UsageWarningEvent.Shown(exposure), UsageWarningEvent.Abandoned(exposure)), pixelSender.events)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserSwitchesModelThemselvesThenModelSwitchedIsReported() = runTest {
+        snapshot.value = approaching(75)
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            modelState.value = modelState.value.copy(selectedModelId = HAIKU.id)
+
+            assertEquals(
+                listOf(UsageWarningEvent.Shown::class, UsageWarningEvent.ModelSwitched::class),
+                pixelSender.events.map { it::class },
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchCtaIsTappedThenTheTapIsReportedAndTheResultingSwitchIsNot() = runTest {
+        snapshot.value = approaching(75).copy(cta = switchCta(HAIKU.id))
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            footer.view.findViewById<DaxButtonSecondary>(R.id.usageLimitFooterCta).performClick()
+            modelState.value = modelState.value.copy(selectedModelId = HAIKU.id)
+
+            val exposure = UsageWarningExposure(UsageWarningExposureKind.APPROACHING, UsageWindow.WEEKLY, percentBucket = 75)
+            assertEquals(
+                listOf(UsageWarningEvent.Shown(exposure), UsageWarningEvent.CtaTapped(exposure, UsageWarningCta.SWITCH_MODEL)),
+                pixelSender.events,
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDismissIsTappedThenDismissedIsReportedAndTheExposureStaysOpenForAPrompt() = runTest {
+        snapshot.value = approaching(75)
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            footer.view.findViewById<ImageView>(R.id.usageLimitFooterDismiss).performClick()
+            hostContext.value = duckAiContext(promptSubmissions = 1)
+
+            assertEquals(
+                listOf(UsageWarningEvent.Shown::class, UsageWarningEvent.Dismissed::class, UsageWarningEvent.PromptSubmitted::class),
+                pixelSender.events.map { it::class },
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAPromptLandsAsTheFooterStopsBeingCollectedThenItIsReportedInsteadOfAbandoned() = runTest {
+        snapshot.value = approaching(75)
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+            hostContext.value = duckAiContext(promptSubmissions = 1)
+            cancelAndIgnoreRemainingEvents()
+        }
+        advanceUntilIdle()
+
+        assertEquals(
+            listOf(UsageWarningEvent.Shown::class, UsageWarningEvent.PromptSubmitted::class),
+            pixelSender.events.map { it::class },
+        )
+    }
+
+    @Test
+    fun whenTheFooterStopsBeingCollectedThenAnOpenExposureIsAbandoned() = runTest {
+        snapshot.value = approaching(75)
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+            cancelAndIgnoreRemainingEvents()
+        }
+        advanceUntilIdle()
+
+        assertEquals(
+            listOf(UsageWarningEvent.Shown::class, UsageWarningEvent.Abandoned::class),
+            pixelSender.events.map { it::class },
+        )
+    }
+
     private fun switchCta(vararg modelIds: String) =
         UsageCta(UsageCtaId.SWITCH_TO_CHEAPER, modelId = null, modelIds = modelIds.toList(), byModelId = emptyMap(), putEntries = emptyList())
 
@@ -487,11 +653,14 @@ class UsageLimitFooterPluginTest {
         isEditing: Boolean = false,
         browserMode: BrowserMode = BrowserMode.REGULAR,
         isInputFocused: Boolean = true,
+        promptSubmissions: Int = 0,
     ) = NativeInputFooterContext(
         isDuckAiSelected = true,
         isEditing = isEditing,
         browserMode = browserMode,
         isInputFocused = isInputFocused,
+        inputContext = NativeInputState.InputContext.DUCK_AI,
+        promptSubmissions = promptSubmissions,
     )
 
     private companion object {

@@ -30,9 +30,11 @@ class NativeInputFooterCoordinator @Inject constructor(
     private val plugins: ActivePluginPoint<NativeInputFooterPlugin>,
 ) {
     data class State(
-        val view: View? = null,
+        val footer: NativeInputFooter? = null,
         val blocksComposer: Boolean = false,
-    )
+    ) {
+        val view: View? get() = footer?.view
+    }
 
     fun state(
         context: Context,
@@ -57,7 +59,7 @@ class NativeInputFooterCoordinator @Inject constructor(
                     State()
                 } else {
                     State(
-                        view = footers[selectedIndex].second.view,
+                        footer = footers[selectedIndex].second,
                         blocksComposer = states[selectedIndex].blocksComposer,
                     )
                 }

@@ -753,6 +753,8 @@ class RealNativeInputManager @Inject constructor(
                 } else {
                     widget.saveLastUsedTogglePosition(isChat = true)
                     widget.storePendingPrompt(query)
+                    // Before the widget is removed below, so the footer can attribute the prompt to the card that was up.
+                    widget.onPromptSubmitted()
                     animator.cancelAnimation()
                     rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList)?.gone()
                     rootView.findViewById<View?>(R.id.focusedView)?.gone()

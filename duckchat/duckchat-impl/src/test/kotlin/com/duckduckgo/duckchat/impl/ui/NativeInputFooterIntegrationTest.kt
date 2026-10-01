@@ -25,6 +25,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.nativeinput.footer.FakeNativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooter
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
@@ -39,6 +40,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -127,7 +129,7 @@ class NativeInputFooterIntegrationTest {
         val host = NativeInputFooterView(context)
         var collectionCancelled = false
         val state = flow {
-            emit(NativeInputFooterCoordinator.State(view = View(context)))
+            emit(NativeInputFooterCoordinator.State(footer = footer(View(context))))
             try {
                 awaitCancellation()
             } finally {
@@ -216,7 +218,7 @@ class NativeInputFooterIntegrationTest {
         val host = NativeInputFooterView(context)
         val state = MutableStateFlow(
             NativeInputFooterCoordinator.State(
-                view = View(context),
+                footer = footer(View(context)),
                 blocksComposer = true,
             ),
         )
@@ -242,7 +244,7 @@ class NativeInputFooterIntegrationTest {
         val host = NativeInputFooterView(context)
         val state = MutableStateFlow(
             NativeInputFooterCoordinator.State(
-                view = View(context),
+                footer = footer(View(context)),
                 blocksComposer = true,
             ),
         )
@@ -250,7 +252,7 @@ class NativeInputFooterIntegrationTest {
         host.attach()
         advanceUntilIdle()
 
-        state.value = NativeInputFooterCoordinator.State(view = null, blocksComposer = true)
+        state.value = NativeInputFooterCoordinator.State(footer = null, blocksComposer = true)
         advanceUntilIdle()
 
         assertEquals(1f, widget.alpha)
@@ -264,7 +266,7 @@ class NativeInputFooterIntegrationTest {
         val host = NativeInputFooterView(context)
         val state = MutableStateFlow(
             NativeInputFooterCoordinator.State(
-                view = View(context),
+                footer = footer(View(context)),
                 blocksComposer = true,
             ),
         )
@@ -279,7 +281,7 @@ class NativeInputFooterIntegrationTest {
         assertTrue(widget.onInterceptTouchEvent(null))
 
         widget.setInteractionLocked(true)
-        state.value = NativeInputFooterCoordinator.State(view = View(context), blocksComposer = false)
+        state.value = NativeInputFooterCoordinator.State(footer = footer(View(context)), blocksComposer = false)
         advanceUntilIdle()
         assertEquals(0.4f, widget.alpha)
         assertEquals(1f, widget.findViewById<View>(com.duckduckgo.duckchat.impl.R.id.inputModeWidgetCardContent).alpha)
@@ -297,7 +299,7 @@ class NativeInputFooterIntegrationTest {
         val host = NativeInputFooterView(context)
         val blockingState = MutableStateFlow(
             NativeInputFooterCoordinator.State(
-                view = View(context),
+                footer = footer(View(context)),
                 blocksComposer = true,
             ),
         )
@@ -321,6 +323,36 @@ class NativeInputFooterIntegrationTest {
         assertFalse(widget.onInterceptTouchEvent(null))
     }
 
+    @Test
+    fun whenSelectedFooterIsOnScreenThenItIsToldSoAndToldAgainWhenItLeaves() = runTest {
+        val host = NativeInputFooterView(context)
+        val log = mutableListOf<Boolean>()
+        val footer = object : NativeInputFooter {
+            override val view: View = View(context)
+            override val state: Flow<NativeInputFooterState> = emptyFlow()
+            override fun onDisplayed(displayed: Boolean) {
+                log += displayed
+            }
+        }
+        val state = MutableStateFlow(NativeInputFooterCoordinator.State(footer = footer))
+
+        host.bind(this, state)
+        host.attach()
+        advanceUntilIdle()
+        assertEquals(listOf(true), log)
+
+        host.setSurfaceVisible(false)
+        assertEquals(listOf(true, false), log)
+
+        host.setSurfaceVisible(true)
+        assertEquals(listOf(true, false, true), log)
+
+        state.value = NativeInputFooterCoordinator.State()
+        advanceUntilIdle()
+        assertEquals(listOf(true, false, true, false), log)
+        host.detach()
+    }
+
     private fun coordinator(vararg plugins: NativeInputFooterPlugin): NativeInputFooterCoordinator {
         return NativeInputFooterCoordinator(
             object : ActivePluginPoint<NativeInputFooterPlugin> {
@@ -340,10 +372,15 @@ class NativeInputFooterIntegrationTest {
             context: Context,
             hostContext: StateFlow<NativeInputFooterContext>,
             host: NativeInputFooterHost,
-        ): NativeInputFooter = object : NativeInputFooter {
-            override val view: View = view
-            override val state: Flow<NativeInputFooterState> = state
-        }
+        ): NativeInputFooter = footer(view, state)
+    }
+
+    private fun footer(
+        view: View,
+        state: Flow<NativeInputFooterState> = emptyFlow(),
+    ): NativeInputFooter = object : NativeInputFooter {
+        override val view: View = view
+        override val state: Flow<NativeInputFooterState> = state
     }
 
     private fun duckAiContext() = NativeInputFooterContext(
@@ -351,6 +388,7 @@ class NativeInputFooterIntegrationTest {
         isEditing = false,
         browserMode = BrowserMode.REGULAR,
         isInputFocused = true,
+        inputContext = NativeInputState.InputContext.DUCK_AI,
     )
 
     private fun View.attach() = shadowOf(this).callOnAttachedToWindow()

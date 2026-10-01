@@ -18,7 +18,6 @@ package com.duckduckgo.duckchat.impl.nativeinput.footer
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import kotlinx.coroutines.CoroutineScope
@@ -35,7 +34,8 @@ class NativeInputFooterView @JvmOverloads constructor(
     private var bindingScope: CoroutineScope? = null
     private var stateSource: Flow<NativeInputFooterCoordinator.State>? = null
     private var bindingJob: Job? = null
-    private var selectedView: View? = null
+    private var selectedFooter: NativeInputFooter? = null
+    private var displayedFooter: NativeInputFooter? = null
     private var surfaceVisible = true
     private var exitAnimationRunning = false
     private var blocksComposer = false
@@ -103,16 +103,16 @@ class NativeInputFooterView @JvmOverloads constructor(
     }
 
     private fun render(state: NativeInputFooterCoordinator.State) {
-        val view = state.view
-        if (selectedView !== view) {
+        val footer = state.footer
+        if (selectedFooter !== footer) {
             removeAllViews()
-            selectedView = view
-            if (view != null) {
+            selectedFooter = footer
+            footer?.view?.let { view ->
                 (view.parent as? ViewGroup)?.removeView(view)
                 addView(view)
             }
         }
-        updateBlocksComposer(view != null && state.blocksComposer)
+        updateBlocksComposer(footer != null && state.blocksComposer)
         updateVisibility()
     }
 
@@ -123,7 +123,13 @@ class NativeInputFooterView @JvmOverloads constructor(
     }
 
     private fun updateVisibility() {
-        visibility = if (surfaceVisible && selectedView != null && !exitAnimationRunning) VISIBLE else GONE
+        visibility = if (surfaceVisible && selectedFooter != null && !exitAnimationRunning) VISIBLE else GONE
         (parent as? NativeInputFooterDockLayout)?.onFooterVisibilityChanged()
+        val displayed = selectedFooter?.takeIf { visibility == VISIBLE }
+        if (displayedFooter !== displayed) {
+            displayedFooter?.onDisplayed(false)
+            displayedFooter = displayed
+            displayed?.onDisplayed(true)
+        }
     }
 }

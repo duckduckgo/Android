@@ -21,6 +21,7 @@ import android.view.View
 import app.cash.turbine.test
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -41,6 +42,7 @@ class NativeInputFooterCoordinatorTest {
             isEditing = false,
             browserMode = BrowserMode.REGULAR,
             isInputFocused = true,
+            inputContext = NativeInputState.InputContext.DUCK_AI,
         ),
     )
 
