@@ -52,7 +52,6 @@ tags:
           text: ".*Remember: every time you browse with me a creepy ad loses its.wings..*"
       - runFlow: ../shared/browser_screen/click_on_tabs_button.yaml
       - tapOn: "New Tab"
-      # The widget prompt in linear onboarding replaces the in-context widget CTA.
       - extendedWaitUntil:
           visible:
             text: ".*Try our Home screen widget!.*"
