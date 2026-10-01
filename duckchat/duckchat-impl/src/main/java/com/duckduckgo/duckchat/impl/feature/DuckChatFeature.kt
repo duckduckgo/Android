@@ -329,4 +329,12 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun duckAiUsageWarnings(): Toggle
+
+    /**
+     * @return `true` when the Duck.ai Terms of Service consent is handled by the native input
+     * (disclaimer under the input, consent carried by the first prompt submit).
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun nativeToSConsent(): Toggle
 }
