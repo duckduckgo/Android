@@ -108,6 +108,7 @@ class ModelPickerView @JvmOverloads constructor(
             iconEnd = chip.iconEndPadding,
             closeIconStart = chip.closeIconStartPadding,
             closeIconEnd = chip.closeIconEndPadding,
+            closeIconSize = chip.closeIconSize,
         )
     }
 
@@ -247,7 +248,19 @@ class ModelPickerView @JvmOverloads constructor(
         val iconEnd: Float,
         val closeIconStart: Float,
         val closeIconEnd: Float,
+        val closeIconSize: Float,
     )
+
+    // Sized for the longest model name, so picking a different model never changes how the row is laid out.
+    override fun worstCaseWidth(level: Int): Int {
+        val margin = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
+        if (level >= AdaptiveBottomRowLayout.LEVEL_MODEL_ICON) return chipSize.toInt() + margin
+        val defaults = defaultPaddings
+        val longestName = if (isAttachedToWindow) viewModel.state.value.models.maxOfOrNull { it.shortName }.orEmpty() else ""
+        val textWidth = chip.paint.measureText(longestName.ifEmpty { chipLabelText.orEmpty() })
+        val closeIconWidth = defaults.closeIconStart + defaults.closeIconSize + defaults.closeIconEnd
+        return (defaults.chipStart + defaults.textStart + textWidth + defaults.textEnd + closeIconWidth + defaults.chipEnd).toInt() + margin
+    }
 
     override fun hasPendingRecoverySelection(): Boolean = viewModel.hasPendingRecoverySelection()
 
