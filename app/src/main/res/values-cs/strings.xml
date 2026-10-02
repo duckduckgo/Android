@@ -264,6 +264,7 @@
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Oprávnění</string>
+    <string name="permissionsGeneralPermissionsTitle" instruction="Section header on the Permissions settings screen, above the Notifications and Open Links in Apps settings">Obecná oprávnění</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Vzhled</string>
