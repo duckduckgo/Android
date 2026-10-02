@@ -18,10 +18,16 @@ package com.duckduckgo.subscriptions.api
 
 interface SubscriptionPurchaseSuccessPlugin {
     /**
-     * Invoked once a subscription purchase has completed and the subscription is confirmed active.
+     * Invoked after a subscription purchase has completed and the subscription is confirmed active.
      *
      * Called for every purchase, not only those originating from a particular surface, so an
      * implementation that cares about provenance must gate on its own state.
+     *
+     * Not guaranteed to be exactly once per new subscription: a plan switch arrives through the same
+     * path, and the confirmation step it is driven from is retried, so an implementation that counts
+     * purchases must de-duplicate itself.
+     *
+     * Exceptions are caught and logged, so throwing does not break the purchase or other plugins.
      */
     suspend fun onSubscriptionPurchaseSuccess()
 }

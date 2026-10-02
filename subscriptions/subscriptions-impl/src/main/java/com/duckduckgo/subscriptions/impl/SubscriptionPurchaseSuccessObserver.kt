@@ -27,6 +27,8 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
+import logcat.LogPriority.ERROR
+import logcat.logcat
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -48,7 +50,12 @@ class SubscriptionPurchaseSuccessObserver @Inject constructor(
             subscriptionsManager.currentPurchaseState
                 .filterIsInstance<CurrentPurchase.Success>()
                 .collect {
-                    plugins.getPlugins().forEach { plugin -> plugin.onSubscriptionPurchaseSuccess() }
+                    plugins.getPlugins().forEach { plugin ->
+                        // This collector runs for the lifetime of the process, so an exception escaping
+                        // it would both crash the purchase and leave every later purchase unreported.
+                        runCatching { plugin.onSubscriptionPurchaseSuccess() }
+                            .onFailure { logcat(ERROR) { "Subscription purchase-success plugin failed: $it" } }
+                    }
                 }
         }
     }
