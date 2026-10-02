@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ import org.jetbrains.uast.visitor.AbstractUastVisitor
 import java.util.EnumSet
 
 @Suppress("UnstableApiUsage")
-class DaxListItemContentDetector : Detector(), SourceCodeScanner {
+class DaxContextMenuContentDetector : Detector(), SourceCodeScanner {
 
     override fun getApplicableUastTypes() = listOf(UCallExpression::class.java)
 
@@ -44,10 +44,8 @@ class DaxListItemContentDetector : Detector(), SourceCodeScanner {
     internal class Handler(private val context: JavaContext) : UElementHandler() {
 
         override fun visitCallExpression(node: UCallExpression) {
-            if (node.methodName !in LIST_ITEM_COMPOSABLES) return
-            check(node, "leadingContent", LEADING_SCOPE)
-            check(node, "trailingContent", TRAILING_SCOPE)
-            check(node, "inlineContent", INLINE_SCOPE)
+            if (node.methodName !in CONTEXT_MENU_COMPOSABLES) return
+            check(node, "content", CONTEXT_MENU_SCOPE)
         }
 
         private fun check(node: UCallExpression, paramName: String, scope: String) {
@@ -55,16 +53,9 @@ class DaxListItemContentDetector : Detector(), SourceCodeScanner {
             var violation = false
             arg.accept(object : AbstractUastVisitor() {
                 override fun visitCallExpression(node: UCallExpression): Boolean {
-                    // DaxContextMenu's `anchor` renders directly in this slot, so it's still checked here.
-                    if (node.methodName in DAX_CONTEXT_MENU_COMPOSABLES) {
-                        val anchorArg = node.valueArguments.find { node.getParameterForArgument(it)?.name == "anchor" }
-                        anchorArg?.accept(this)
-                        return true
-                    }
                     val owner = node.resolve()?.containingClass?.qualifiedName
                     if (owner != null && owner.startsWith("kotlin.")) {
-                        // Descend into stdlib scaffolding (forEach, map, etc.) via its trailing lambda only,
-                        // since that's the only place it can emit slot content.
+                        // Only the trailing lambda of a stdlib call can emit slot content.
                         (node.valueArguments.lastOrNull() as? ULambdaExpression)?.body?.accept(this)
                         return true
                     }
@@ -84,28 +75,27 @@ class DaxListItemContentDetector : Detector(), SourceCodeScanner {
 
         private fun report(arg: UExpression) {
             context.report(
-                issue = INVALID_DAX_LIST_ITEM_CONTENT_USAGE,
+                issue = INVALID_DAX_CONTEXT_MENU_CONTENT_USAGE,
                 location = context.getLocation(arg),
-                message = INVALID_DAX_LIST_ITEM_CONTENT_USAGE.getExplanation(TextFormat.RAW),
+                message = INVALID_DAX_CONTEXT_MENU_CONTENT_USAGE.getExplanation(TextFormat.RAW),
             )
         }
     }
 
     companion object {
-        private const val LEADING_SCOPE = "com.duckduckgo.common.ui.compose.listitem.DaxListItemLeadingScope"
-        private const val TRAILING_SCOPE = "com.duckduckgo.common.ui.compose.listitem.DaxListItemTrailingScope"
-        private const val INLINE_SCOPE = "com.duckduckgo.common.ui.compose.listitem.DaxListItemInlineScope"
-        private val LIST_ITEM_COMPOSABLES = setOf("DaxOneLineListItem", "DaxTwoLineListItem", "DaxSettingsListItem")
-        private val DAX_CONTEXT_MENU_COMPOSABLES = setOf("DaxContextMenu", "DaxContextMenuIconButton")
+        private const val CONTEXT_MENU_SCOPE = "com.duckduckgo.common.ui.compose.contextmenu.DaxContextMenuScope"
+        private val CONTEXT_MENU_COMPOSABLES = setOf(
+            "DaxContextMenu",
+            "DaxContextMenuIconButton",
+        )
 
-        val INVALID_DAX_LIST_ITEM_CONTENT_USAGE: Issue = Issue
+        val INVALID_DAX_CONTEXT_MENU_CONTENT_USAGE: Issue = Issue
             .create(
-                id = "InvalidDaxListItemContentUsage",
-                briefDescription = "List-item slots should only use DaxListItem*Scope composables",
+                id = "InvalidDaxContextMenuContentUsage",
+                briefDescription = "Context-menu content slot should only use DaxContextMenuScope composables",
                 explanation = """
-                    Use composables from DaxListItemLeadingScope / DaxListItemTrailingScope / DaxListItemInlineScope
-                    for the leadingContent / trailingContent / inlineContent slots, to keep list items consistent
-                    with the design system.
+                    Use composables from DaxContextMenuScope (DefaultItem, IconItem, InsetItem) for the content
+                    slot, to keep context menus consistent with the design system.
                 """.trimIndent(),
                 moreInfo = "",
                 category = CUSTOM_LINT_CHECKS,
@@ -113,7 +103,7 @@ class DaxListItemContentDetector : Detector(), SourceCodeScanner {
                 severity = Severity.WARNING,
                 androidSpecific = true,
                 implementation = Implementation(
-                    DaxListItemContentDetector::class.java,
+                    DaxContextMenuContentDetector::class.java,
                     EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES),
                 ),
             )
