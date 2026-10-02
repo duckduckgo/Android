@@ -21,7 +21,7 @@ import com.duckduckgo.duckchat.impl.R
 
 @DrawableRes
 internal fun ChatType.iconRes(pinned: Boolean): Int = when (this) {
-    ChatType.Discussion -> if (pinned) R.drawable.ic_chat_pin_24 else R.drawable.ic_chat_24
+    ChatType.Discussion -> if (pinned) R.drawable.ic_pin_24 else R.drawable.ic_chat_24
     ChatType.ImageGeneration -> if (pinned) R.drawable.ic_images_pin_24 else R.drawable.ic_images_24
     ChatType.Voice -> if (pinned) R.drawable.ic_voice_pin_24 else R.drawable.ic_voice_24
 }
