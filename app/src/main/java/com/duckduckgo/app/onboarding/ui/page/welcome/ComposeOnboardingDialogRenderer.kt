@@ -18,6 +18,7 @@ package com.duckduckgo.app.onboarding.ui.page.welcome
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import android.text.Editable
 import android.text.TextWatcher
@@ -92,6 +93,9 @@ class ComposeOnboardingDialogRenderer(
     private var released = false
     private var stageConfig: DialogConfig? = null
     private val anchorResolver = CardAnchorResolver(isTablet)
+
+    // This local proof of concept exercises Compose inside the existing View onboarding host.
+    @SuppressLint("NoComposeViewUsage")
     private val composeView = ComposeView(binding.root.context).apply {
         id = View.generateViewId()
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -124,13 +128,60 @@ class ComposeOnboardingDialogRenderer(
         canCorrectDecoration = { !dialogState.isAnimating },
     )
 
+    private val dialogContent: @Composable () -> Unit = content@{
+        val bound = current ?: return@content
+        DaxOnboardingDialog(
+            contentKey = bound.contentKey,
+            title = bound.title,
+            state = dialogState,
+            animate = bound.animate,
+            entryDelay = if (bound.config.cardEntry == CardEntry.AfterBackgroundTransition) {
+                OnboardingBackgroundAnimator.EXIT_DURATION.milliseconds
+            } else {
+                0.milliseconds
+            },
+            headerImage = bound.header,
+            boundsAnimationDuration = bound.boundsDuration(),
+            tail = tailFor(bound.config.cardArrow),
+            tailExtended = bound.tailExtended,
+            primaryCta = bound.config.primaryCta?.let { cta(bound, it, bound.primaryEnabled) },
+            secondaryCta = bound.config.secondaryCta?.let { cta(bound, it, true) },
+            content = {
+                val contentEnabled = enabled
+                onContentReady { animated -> if (current === bound && !released) bound.ready(animated) }
+                key(bound.contentKey) {
+                    AndroidView(
+                        factory = { bound.gate },
+                        modifier = Modifier.fillMaxWidth(),
+                        onRelease = { bound.dispose() },
+                        update = { bound.gate.setReady(contentEnabled) },
+                    )
+                }
+            },
+        )
+        LaunchedEffect(bound, bound.config) {
+            if (current !== bound || bound.disposed) return@LaunchedEffect
+            if (stageConfig != null && bound.animate) {
+                androidx.transition.TransitionManager.beginDelayedTransition(
+                    binding.daxDialogCta.root,
+                    androidx.transition.ChangeBounds()
+                        .addTarget(binding.daxDialogCta.root)
+                        .setDuration(DaxOnboardingDialogDefaults.BoundsAnimationDuration.inWholeMilliseconds),
+                )
+            }
+            val settled = embellishments.transition(stageConfig?.embellishment, bound.config.embellishment, bound.animate)
+            applyAnchor(settled)
+            stageConfig = bound.config
+        }
+    }
+
     init {
         binding.daxDialogCta.cardView.isVisible = false
         binding.daxDialogCta.root.addView(composeView)
         embellishments.resetStage()
         composeView.setContent {
             DuckDuckGoTheme(isDarkTheme = !isLightMode()) {
-                OnboardingTheme { Dialog() }
+                OnboardingTheme { dialogContent() }
             }
         }
         binding.daxDialogCta.root.addOnAttachStateChangeListener(boundsDetachListener)
@@ -218,54 +269,6 @@ class ComposeOnboardingDialogRenderer(
             scope.launch { ctaState.enabled.collect { bound.primaryEnabled = it } }
         }
         return bound
-    }
-
-    @Composable
-    private fun Dialog() {
-        val bound = current ?: return
-        DaxOnboardingDialog(
-            contentKey = bound.contentKey,
-            title = bound.title,
-            state = dialogState,
-            animate = bound.animate,
-            entryDelay = if (bound.config.cardEntry == CardEntry.AfterBackgroundTransition) {
-                OnboardingBackgroundAnimator.EXIT_DURATION.milliseconds
-            } else {
-                0.milliseconds
-            },
-            headerImage = bound.header,
-            boundsAnimationDuration = bound.boundsDuration(),
-            tail = tailFor(bound.config.cardArrow),
-            tailExtended = bound.tailExtended,
-            primaryCta = bound.config.primaryCta?.let { cta(bound, it, bound.primaryEnabled) },
-            secondaryCta = bound.config.secondaryCta?.let { cta(bound, it, true) },
-            content = {
-                val contentEnabled = enabled
-                onContentReady { animated -> if (current === bound && !released) bound.ready(animated) }
-                key(bound.contentKey) {
-                    AndroidView(
-                        factory = { bound.gate },
-                        modifier = Modifier.fillMaxWidth(),
-                        onRelease = { bound.dispose() },
-                        update = { bound.gate.setReady(contentEnabled) },
-                    )
-                }
-            },
-        )
-        LaunchedEffect(bound, bound.config) {
-            if (current !== bound || bound.disposed) return@LaunchedEffect
-            if (stageConfig != null && bound.animate) {
-                androidx.transition.TransitionManager.beginDelayedTransition(
-                    binding.daxDialogCta.root,
-                    androidx.transition.ChangeBounds()
-                        .addTarget(binding.daxDialogCta.root)
-                        .setDuration(DaxOnboardingDialogDefaults.BoundsAnimationDuration.inWholeMilliseconds),
-                )
-            }
-            val settled = embellishments.transition(stageConfig?.embellishment, bound.config.embellishment, bound.animate)
-            applyAnchor(settled)
-            stageConfig = bound.config
-        }
     }
 
     private fun cta(bound: BoundContent, config: CtaConfig, enabled: Boolean) = DaxOnboardingDialogCta(
@@ -421,7 +424,7 @@ class ComposeOnboardingDialogRenderer(
         override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
             if (event.actionMasked == MotionEvent.ACTION_DOWN) {
                 consumingGesture = !ready
-                if (consumingGesture) skip()
+                if (consumingGesture) performClick()
             }
             return consumingGesture || super.onInterceptTouchEvent(event)
         }
@@ -429,11 +432,20 @@ class ComposeOnboardingDialogRenderer(
         override fun onTouchEvent(event: MotionEvent): Boolean {
             if (event.actionMasked == MotionEvent.ACTION_DOWN && !consumingGesture && !ready) {
                 consumingGesture = true
-                skip()
+                performClick()
             }
             if (!consumingGesture) return super.onTouchEvent(event)
             if (event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) consumingGesture = false
             return true
+        }
+
+        override fun performClick(): Boolean {
+            val handled = super.performClick()
+            if (!ready) {
+                skip()
+                return true
+            }
+            return handled
         }
     }
 }
