@@ -953,7 +953,7 @@
             "features": {
                 "onboardingFlowByDownloadReasonExperiment": {
                     "state": "enabled",
-                    "minSupportedVersion": 52960000,
+                    "minSupportedVersion": 52970000,
                     "targets": [
                         {
                             "localeCountry": "us",
