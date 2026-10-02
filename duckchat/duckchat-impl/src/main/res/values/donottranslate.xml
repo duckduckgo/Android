@@ -50,6 +50,9 @@
     <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model's short name">%1$s uses limits up to 2–5x faster than basic models.</string>
     <string name="duckChatUsageFooterDismissContentDescription">Dismiss</string>
 
+    <!-- Duck.ai ToS consent submit button -->
+    <string name="duckChatSubmitAskLabel" instruction="Label of the submit button while the Duck.ai terms are not yet accepted. Required wording from legal, tapping it is how the user accepts.">Ask</string>
+
     <!-- Duck.ai ToS consent footer -->
     <string name="duckChatTermsFooterMessage" instruction="Disclaimer under the Duck.ai input. The two annotated phrases are tappable links to the Terms of Service and the Privacy Policy.">By sending a prompt you agree to our <annotation type="terms_link">Terms of Service</annotation> and <annotation type="privacy_link">Privacy Policy</annotation>.</string>
 

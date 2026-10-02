@@ -176,7 +176,7 @@
                     android:layout_height="wrap_content"
                     android:visibility="gone" />
 
-                <FrameLayout
+                <com.duckduckgo.duckchat.impl.ui.nativeinput.views.AdaptiveBottomRowLayout
                     android:id="@+id/inputModeWidgetBottomRow"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -251,7 +251,7 @@
 
                     </LinearLayout>
 
-                </FrameLayout>
+                </com.duckduckgo.duckchat.impl.ui.nativeinput.views.AdaptiveBottomRowLayout>
 
             </LinearLayout>
 
