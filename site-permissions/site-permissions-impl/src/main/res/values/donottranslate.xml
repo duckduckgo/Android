@@ -28,6 +28,7 @@
     <string name="permissionSettingsMicrophoneDialogTitle">Allow sites to ask for microphone permission</string>
     <string name="permissionSettingsMicrophoneDialogMessage">If you choose “Never Allow”, you won’t be able to use features like voice chatting on sites.</string>
     <string name="permissionSettingsDrmDialogTitle">Allow sites to ask for Digital Rights Management (DRM) permission</string>
+    <string name="permissionSettingsDrmTitle">Digital Rights Management (DRM)</string>
     <string name="permissionSettingsDrmDialogMessage">If you choose “Never Allow”, videos on the site may become unplayable.</string>
 
 </resources>

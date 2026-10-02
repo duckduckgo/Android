@@ -27,6 +27,7 @@ import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command.
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,6 +49,7 @@ class SitePermissionsViewModel @Inject constructor(
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
     private var cachedAllowedSites: List<SitePermissionAllowedEntity> = listOf()
+    private var allowedSitesJob: Job? = null
 
     data class ViewState(
         val askLocationEnabled: Boolean = true,
@@ -55,6 +57,7 @@ class SitePermissionsViewModel @Inject constructor(
         val askMicEnabled: Boolean = true,
         val askDrmEnabled: Boolean = true,
         val sitesPermissionsAllowed: List<SitePermissionsEntity> = listOf(),
+        val sitesLoaded: Boolean = false,
     )
 
     sealed class Command {
@@ -73,11 +76,13 @@ class SitePermissionsViewModel @Inject constructor(
     }
 
     fun allowedSites() {
-        viewModelScope.launch {
+        if (allowedSitesJob?.isActive == true) return
+        allowedSitesJob = viewModelScope.launch {
             sitePermissionsRepository.sitePermissionsWebsitesFlow().collect {
                 _viewState.emit(
                     _viewState.value.copy(
                         sitesPermissionsAllowed = it,
+                        sitesLoaded = true,
                     ),
                 )
             }
