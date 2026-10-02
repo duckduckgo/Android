@@ -23,9 +23,6 @@
     <string name="newTabReturnHatchUndo">Vrátit</string>
     <string name="hatchMenuReturnTab">Zpět na kartu</string>
     <string name="hatchMenuAfterInactivitySettings">Po nečinnosti</string>
-    <string name="hatchMenuAfterInactivityOpenLastUsedTab">Otevřít naposledy použitou kartu</string>
-    <string name="hatchMenuAfterInactivityOpenNewTab">Otevřít novou kartu</string>
-    <string name="hatchMenuAfterInactivityOpenSpecificPage">Otevřít konkrétní stránku</string>
     <string name="hatchMenuCloseTab">Zavřít kartu</string>
     <string name="hatchMenuBurnTab">Smazat kartu</string>
     <string name="hatchMenuHideShortcut">Skrýt zkratku</string>

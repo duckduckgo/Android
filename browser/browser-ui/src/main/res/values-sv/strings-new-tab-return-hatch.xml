@@ -23,9 +23,6 @@
     <string name="newTabReturnHatchUndo">Ångra</string>
     <string name="hatchMenuReturnTab">Återgå till flik</string>
     <string name="hatchMenuAfterInactivitySettings">Efter inaktivitet</string>
-    <string name="hatchMenuAfterInactivityOpenLastUsedTab">Öppna den senast använda fliken</string>
-    <string name="hatchMenuAfterInactivityOpenNewTab">Öppna en ny flik</string>
-    <string name="hatchMenuAfterInactivityOpenSpecificPage">Öppna en särskild sida</string>
     <string name="hatchMenuCloseTab">Stäng flik</string>
     <string name="hatchMenuBurnTab">Radera flik</string>
     <string name="hatchMenuHideShortcut">Dölj genväg</string>

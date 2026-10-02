@@ -23,9 +23,6 @@
     <string name="newTabReturnHatchUndo">Anulează</string>
     <string name="hatchMenuReturnTab">Înapoi la filă</string>
     <string name="hatchMenuAfterInactivitySettings">După inactivitate</string>
-    <string name="hatchMenuAfterInactivityOpenLastUsedTab">Deschide ultima filă utilizată</string>
-    <string name="hatchMenuAfterInactivityOpenNewTab">Deschide o filă nouă</string>
-    <string name="hatchMenuAfterInactivityOpenSpecificPage">Deschide o pagină specifică</string>
     <string name="hatchMenuCloseTab">Închide fila</string>
     <string name="hatchMenuBurnTab">Șterge fila</string>
     <string name="hatchMenuHideShortcut">Ascunde scurtătura</string>

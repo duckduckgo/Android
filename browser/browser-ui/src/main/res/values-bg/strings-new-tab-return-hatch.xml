@@ -23,9 +23,6 @@
     <string name="newTabReturnHatchUndo">Отмяна</string>
     <string name="hatchMenuReturnTab">Връщане към раздела</string>
     <string name="hatchMenuAfterInactivitySettings">След неактивност</string>
-    <string name="hatchMenuAfterInactivityOpenLastUsedTab">Отваряне на последно използвания раздел</string>
-    <string name="hatchMenuAfterInactivityOpenNewTab">Отваряне на нов раздел</string>
-    <string name="hatchMenuAfterInactivityOpenSpecificPage">Отваряне на конкретна страница</string>
     <string name="hatchMenuCloseTab">Затваряне на раздела</string>
     <string name="hatchMenuBurnTab">Изтриване на раздела</string>
     <string name="hatchMenuHideShortcut">Скриване на прекия път</string>
