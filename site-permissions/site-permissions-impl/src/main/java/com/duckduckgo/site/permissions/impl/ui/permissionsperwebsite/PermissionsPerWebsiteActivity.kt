@@ -18,14 +18,21 @@ package com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.os.BundleCompat
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ConcatAdapter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
@@ -51,6 +58,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
@@ -64,9 +72,13 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var sitePermissionsDialogRedesignFeature: SitePermissionsDialogRedesignFeature
 
+    @Inject
+    lateinit var faviconManager: FaviconManager
+
     private val viewModel: PermissionsPerWebsiteViewModel by bindViewModel()
     private val binding: ActivityPermissionPerWebsiteBinding by viewBinding()
-    private val adapter: PermissionSettingAdapter by lazy { PermissionSettingAdapter(viewModel) }
+    private val permissionSettingsRedesign by lazy { sitePermissionsDialogRedesignFeature.permissionSettingsRedesign().isEnabled() }
+    private val permissionSettingsAdapter: PermissionSettingAdapter by lazy { PermissionSettingAdapter(viewModel, permissionSettingsRedesign) }
     private val url: String by lazy { intent.getStringExtra(EXTRA_URL) ?: "" }
     private var permissionSettingDialog: DaxAlertDialog? = null
     private var pendingPermissionSetting: WebsitePermissionSetting? = null
@@ -112,6 +124,7 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        if (permissionSettingsRedesign) return false
         menuInflater.inflate(R.menu.menu_permissions_per_website_activity, menu)
         return true
     }
@@ -128,12 +141,45 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
 
     private fun setViews() {
         setupToolbar(toolbar)
-        supportActionBar?.title = url.websiteFromGeoLocationsApiOrigin()
-        binding.sitePermissionsSectionHeader.primaryText = String.format(
-            getString(R.string.permissionPerWebsiteText),
-            url.websiteFromGeoLocationsApiOrigin(),
-        )
-        binding.permissionsPerWebsiteRecyclerView.adapter = adapter
+        val website = url.websiteFromGeoLocationsApiOrigin()
+        supportActionBar?.title = website
+        if (permissionSettingsRedesign) {
+            binding.sitePermissionsSectionHeader.primaryText = getString(R.string.permissionsPerWebsiteRedesignHeader, website)
+            binding.permissionsPerWebsiteRecyclerView.adapter = ConcatAdapter(
+                permissionSettingsAdapter,
+                RemovePermissionsAdapter {
+                    // The caller deletes the site so it can offer an undo once this screen is gone
+                    setResult(RESULT_OK, Intent().putExtra(EXTRA_REMOVED_URL, url))
+                    finish()
+                },
+            )
+            loadToolbarFavicon(website)
+        } else {
+            binding.sitePermissionsSectionHeader.primaryText = String.format(getString(R.string.permissionPerWebsiteText), website)
+            binding.permissionsPerWebsiteRecyclerView.adapter = permissionSettingsAdapter
+        }
+    }
+
+    private fun loadToolbarFavicon(website: String) {
+        val size = resources.getDimensionPixelSize(CommonR.dimen.toolbarIconSize)
+        supportActionBar?.apply {
+            setDisplayUseLogoEnabled(true)
+            setLogo(getToolbarLogo(faviconManager.generateDefaultFavicon(placeholder = null, domain = website).toBitmap(size, size)))
+        }
+        lifecycleScope.launch {
+            val favicon = faviconManager.loadFromDiskWithParams(
+                url = url,
+                cornerRadius = resources.getDimensionPixelSize(CommonR.dimen.keyline_0),
+                width = size,
+                height = size,
+            ) ?: return@launch
+            supportActionBar?.setLogo(getToolbarLogo(favicon))
+        }
+    }
+
+    private fun getToolbarLogo(favicon: Bitmap): Drawable {
+        val gap = resources.getDimensionPixelSize(CommonR.dimen.keyline_2)
+        return InsetDrawable(favicon.toDrawable(resources), 0, 0, gap, 0)
     }
 
     private fun observeViewModel() {
@@ -164,11 +210,11 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
     }
 
     private fun updatePermissionsList(permissionsSettings: List<WebsitePermissionSetting>) {
-        adapter.updateItems(permissionsSettings)
+        permissionSettingsAdapter.updateItems(permissionsSettings)
     }
 
     private fun showPermissionSettingSelectionDialog(currentOption: WebsitePermissionSetting) {
-        if (sitePermissionsDialogRedesignFeature.permissionSettingsRedesign().isEnabled()) {
+        if (permissionSettingsRedesign) {
             showRedesignedPermissionSettingSelectionDialog(currentOption)
             return
         }
@@ -248,7 +294,10 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val EXTRA_URL = "URL"
+        private const val EXTRA_REMOVED_URL = "REMOVED_URL"
         private const val KEY_PENDING_PERMISSION_SETTING = "pendingPermissionSetting"
+
+        fun removedUrl(result: Intent?): String? = result?.getStringExtra(EXTRA_REMOVED_URL)
 
         fun intent(
             context: Context,

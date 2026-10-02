@@ -30,11 +30,12 @@ data class WebsitePermissionSetting(
 enum class WebsitePermissionSettingOption(
     val order: Int,
     @StringRes val stringRes: Int,
+    @StringRes val redesignedStringRes: Int,
 ) {
-    ASK(1, R.string.permissionsPerWebsiteAskSetting),
-    ASK_DISABLED(1, R.string.permissionsPerWebsiteAskDisabledSetting),
-    DENY(2, R.string.permissionsPerWebsiteDenySetting),
-    ALLOW(3, R.string.permissionsPerWebsiteAllowSetting),
+    ASK(1, R.string.permissionsPerWebsiteAskSetting, R.string.permissionSettingsAskEachTime),
+    ASK_DISABLED(1, R.string.permissionsPerWebsiteAskDisabledSetting, R.string.permissionsPerWebsiteAskDisabledSetting),
+    DENY(2, R.string.permissionsPerWebsiteDenySetting, R.string.sitePermissionsDialogNeverAllowButton),
+    ALLOW(3, R.string.permissionsPerWebsiteAllowSetting, R.string.permissionSettingsAlwaysAllow),
     ;
 
     fun toSitePermissionSettingEntityType(): SitePermissionAskSettingType =
