@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class, boundType = AfterInactivitySettingsDataProvider::class)
@@ -61,8 +62,11 @@ class AfterInactivitySettingsDataProviderImpl @Inject constructor(
 
     override suspend fun setDestination(destination: AfterInactivityReturnDestination) {
         val requestedOption = destination.toShowOnAppLaunchOption()
+        val currentOption = showOnAppLaunchOptionDataStore.optionFlow.first()
 
-        showOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(requestedOption)
+        if (!currentOption.hasSameDestinationAs(requestedOption)) {
+            showOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(requestedOption)
+        }
 
         when (destination) {
             AfterInactivityReturnDestination.LastUsedTab -> Unit
@@ -108,5 +112,10 @@ class AfterInactivitySettingsDataProviderImpl @Inject constructor(
         AfterInactivityReturnDestination.LastUsedTab -> LastOpenedTab
         is AfterInactivityReturnDestination.NewTabPage -> NewTabPage
         is AfterInactivityReturnDestination.SpecificPage -> SpecificPage(urlConverter.convertUrl(url))
+    }
+
+    private fun ShowOnAppLaunchOption.hasSameDestinationAs(other: ShowOnAppLaunchOption): Boolean = when {
+        this is SpecificPage && other is SpecificPage -> url == other.url
+        else -> this == other
     }
 }

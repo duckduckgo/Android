@@ -19,10 +19,6 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
-import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
-import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
-import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
@@ -53,7 +49,7 @@ class ShowOnAppLaunchViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class ViewState(
-        val selectedOption: ShowOnAppLaunchOption,
+        val selectedOption: AfterInactivitySettings,
         val specificPageUrl: String,
         val showNTPAfterIdleReturn: Boolean = false,
         val selectedIdleThresholdSeconds: Long = FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_SECONDS,
@@ -93,9 +89,9 @@ class ShowOnAppLaunchViewModel @Inject constructor(
             is AfterInactivitySettings.SpecificPage -> effectiveTimeoutSeconds
         }
         val specificPageUrl = (this as? AfterInactivitySettings.SpecificPage)?.url
-            ?: AfterInactivityReturnDestination.SpecificPage().url
+            ?: AfterInactivityReturnDestination.SpecificPage.DEFAULT_URL
         return ViewState(
-            selectedOption = toShowOnAppLaunchOption(),
+            selectedOption = this,
             specificPageUrl = specificPageUrl,
             showNTPAfterIdleReturn = showNTPAfterIdleReturn,
             selectedIdleThresholdSeconds = effectiveTimeoutSeconds,
@@ -104,21 +100,15 @@ class ShowOnAppLaunchViewModel @Inject constructor(
         )
     }
 
-    private fun AfterInactivitySettings.toShowOnAppLaunchOption(): ShowOnAppLaunchOption = when (this) {
-        AfterInactivitySettings.LastUsedTab -> LastOpenedTab
-        is AfterInactivitySettings.NewTabPage -> NewTabPage
-        is AfterInactivitySettings.SpecificPage -> SpecificPage(url)
-    }
-
-    fun onShowOnAppLaunchOptionChanged(option: ShowOnAppLaunchOption) {
+    fun onShowOnAppLaunchOptionChanged(destination: AfterInactivityReturnDestination) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            afterInactivitySettingsDataProvider.setDestination(option.toDestination())
-            val (countPixel, dailyPixel) = when (option) {
-                LastOpenedTab ->
+            afterInactivitySettingsDataProvider.setDestination(destination)
+            val (countPixel, dailyPixel) = when (destination) {
+                AfterInactivityReturnDestination.LastUsedTab ->
                     ShowOnAppLaunchPixelName.LAUNCH_OPTION_LAST_OPENED_TAB to ShowOnAppLaunchPixelName.LAUNCH_OPTION_LAST_OPENED_TAB_DAILY
-                NewTabPage ->
+                is AfterInactivityReturnDestination.NewTabPage ->
                     ShowOnAppLaunchPixelName.LAUNCH_OPTION_NEW_TAB_PAGE to ShowOnAppLaunchPixelName.LAUNCH_OPTION_NEW_TAB_PAGE_DAILY
-                is SpecificPage ->
+                is AfterInactivityReturnDestination.SpecificPage ->
                     ShowOnAppLaunchPixelName.LAUNCH_OPTION_SPECIFIC_PAGE to ShowOnAppLaunchPixelName.LAUNCH_OPTION_SPECIFIC_PAGE_DAILY
             }
             pixel.fire(countPixel, type = Count)
@@ -126,14 +116,8 @@ class ShowOnAppLaunchViewModel @Inject constructor(
         }
     }
 
-    private fun ShowOnAppLaunchOption.toDestination(): AfterInactivityReturnDestination = when (this) {
-        LastOpenedTab -> AfterInactivityReturnDestination.LastUsedTab
-        NewTabPage -> AfterInactivityReturnDestination.NewTabPage()
-        is SpecificPage -> AfterInactivityReturnDestination.SpecificPage(url = url)
-    }
-
     fun setSpecificPageUrl(url: String) {
-        if (_viewState.value?.selectedOption !is SpecificPage) return
+        if (_viewState.value?.selectedOption !is AfterInactivitySettings.SpecificPage) return
         viewModelScope.launch(dispatcherProvider.io()) {
             afterInactivitySettingsDataProvider.setDestination(AfterInactivityReturnDestination.SpecificPage(url = url))
         }
@@ -149,20 +133,20 @@ class ShowOnAppLaunchViewModel @Inject constructor(
     fun onTimeoutSelected(seconds: Long) {
         viewModelScope.launch(dispatcherProvider.io()) {
             when (val selectedOption = _viewState.value?.selectedOption) {
-                is SpecificPage -> afterInactivitySettingsDataProvider.setDestination(
+                is AfterInactivitySettings.SpecificPage -> afterInactivitySettingsDataProvider.setDestination(
                     AfterInactivityReturnDestination.SpecificPage(url = selectedOption.url, selectedTimeoutSeconds = seconds),
                 )
-                NewTabPage -> afterInactivitySettingsDataProvider.setDestination(
+                is AfterInactivitySettings.NewTabPage -> afterInactivitySettingsDataProvider.setDestination(
                     AfterInactivityReturnDestination.NewTabPage(selectedTimeoutSeconds = seconds),
                 )
-                LastOpenedTab, null -> return@launch
+                AfterInactivitySettings.LastUsedTab, null -> return@launch
             }
             pixel.fire(SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED, mapOf("selectedSeconds" to seconds.toString()))
         }
     }
 
     fun onReturnToLastTabToggled(enabled: Boolean) {
-        if (_viewState.value?.selectedOption != NewTabPage) return
+        if (_viewState.value?.selectedOption !is AfterInactivitySettings.NewTabPage) return
         viewModelScope.launch(dispatcherProvider.io()) {
             afterInactivitySettingsDataProvider.setDestination(
                 AfterInactivityReturnDestination.NewTabPage(returnToLastTabShortcutEnabled = enabled),

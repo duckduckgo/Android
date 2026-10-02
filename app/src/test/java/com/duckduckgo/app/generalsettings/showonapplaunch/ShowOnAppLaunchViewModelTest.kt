@@ -18,9 +18,6 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import app.cash.turbine.test
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewModel.Command.ShowTimeoutDialog
-import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
-import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
-import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
@@ -70,31 +67,31 @@ class ShowOnAppLaunchViewModelTest {
     fun whenViewModelInitializedThenInitialStateIsCorrect() = runTest {
         testee.viewState.test {
             val initialState = awaitItem()
-            assertEquals(LastOpenedTab, initialState.selectedOption)
+            assertEquals(AfterInactivitySettings.LastUsedTab, initialState.selectedOption)
             assertEquals("https://duckduckgo.com/", initialState.specificPageUrl)
         }
     }
 
     @Test
     fun whenShowOnAppLaunchOptionChangedThenStateIsUpdated() = runTest {
-        testee.onShowOnAppLaunchOptionChanged(NewTabPage)
+        testee.onShowOnAppLaunchOptionChanged(AfterInactivityReturnDestination.NewTabPage())
 
         testee.viewState.test {
             val updatedState = awaitItem()
-            assertEquals(NewTabPage, updatedState.selectedOption)
+            assertEquals(AfterInactivitySettings.NewTabPage(300L, true), updatedState.selectedOption)
         }
     }
 
     @Test
     fun whenShowOnAppLaunchOptionChangedThenProviderReceivesDestination() = runTest {
-        testee.onShowOnAppLaunchOptionChanged(NewTabPage)
+        testee.onShowOnAppLaunchOptionChanged(AfterInactivityReturnDestination.NewTabPage())
 
         assertEquals(listOf(AfterInactivityReturnDestination.NewTabPage()), fakeProvider.destinations)
     }
 
     @Test
     fun whenLaunchOptionChangedToLastOpenedTabThenPixelsFired() = runTest {
-        testee.onShowOnAppLaunchOptionChanged(LastOpenedTab)
+        testee.onShowOnAppLaunchOptionChanged(AfterInactivityReturnDestination.LastUsedTab)
 
         verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_LAST_OPENED_TAB, type = Count)
         verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_LAST_OPENED_TAB_DAILY, type = Daily())
@@ -102,7 +99,7 @@ class ShowOnAppLaunchViewModelTest {
 
     @Test
     fun whenLaunchOptionChangedToNewTabPageThenPixelsFired() = runTest {
-        testee.onShowOnAppLaunchOptionChanged(NewTabPage)
+        testee.onShowOnAppLaunchOptionChanged(AfterInactivityReturnDestination.NewTabPage())
 
         verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_NEW_TAB_PAGE, type = Count)
         verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_NEW_TAB_PAGE_DAILY, type = Daily())
@@ -110,7 +107,7 @@ class ShowOnAppLaunchViewModelTest {
 
     @Test
     fun whenLaunchOptionChangedToSpecificPageThenPixelsFired() = runTest {
-        testee.onShowOnAppLaunchOptionChanged(SpecificPage("https://example.com"))
+        testee.onShowOnAppLaunchOptionChanged(AfterInactivityReturnDestination.SpecificPage(url = "https://example.com"))
 
         verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_SPECIFIC_PAGE, type = Count)
         verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_SPECIFIC_PAGE_DAILY, type = Daily())
@@ -143,12 +140,12 @@ class ShowOnAppLaunchViewModelTest {
 
     @Test
     fun whenMultipleOptionsChangedThenStateIsUpdatedCorrectly() = runTest {
-        testee.onShowOnAppLaunchOptionChanged(NewTabPage)
-        testee.onShowOnAppLaunchOptionChanged(LastOpenedTab)
+        testee.onShowOnAppLaunchOptionChanged(AfterInactivityReturnDestination.NewTabPage())
+        testee.onShowOnAppLaunchOptionChanged(AfterInactivityReturnDestination.LastUsedTab)
 
         testee.viewState.test {
             val updatedState = awaitItem()
-            assertEquals(LastOpenedTab, updatedState.selectedOption)
+            assertEquals(AfterInactivitySettings.LastUsedTab, updatedState.selectedOption)
         }
     }
 

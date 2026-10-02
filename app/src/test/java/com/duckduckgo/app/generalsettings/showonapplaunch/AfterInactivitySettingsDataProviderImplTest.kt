@@ -18,11 +18,10 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import app.cash.turbine.test
 import com.duckduckgo.app.FakeSettingsDataStore
-import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
-import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.generalsettings.showonapplaunch.store.FakeShowOnAppLaunchOptionDataStore
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -31,6 +30,7 @@ import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.settings.api.AfterInactivityReturnDestination
 import com.duckduckgo.settings.api.AfterInactivitySettings
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -46,11 +46,8 @@ class AfterInactivitySettingsDataProviderImplTest {
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
 
-    private val optionFlow = MutableStateFlow<ShowOnAppLaunchOption>(NewTabPage)
+    private val optionDataStore = FakeShowOnAppLaunchOptionDataStore(NewTabPage)
     private val shortcutEnabled = MutableStateFlow(true)
-    private val optionDataStore: ShowOnAppLaunchOptionDataStore = mock {
-        on { optionFlow }.thenReturn(optionFlow)
-    }
     private val settingsDataStore = FakeSettingsDataStore()
     private val ntpAfterIdleManager: NtpAfterIdleManager = mock {
         on { returnToLastTabEnabled }.thenReturn(shortcutEnabled)
@@ -120,10 +117,10 @@ class AfterInactivitySettingsDataProviderImplTest {
                 awaitItem(),
             )
 
-            optionFlow.value = LastOpenedTab
+            optionDataStore.setShowOnAppLaunchOption(LastOpenedTab)
             assertEquals(AfterInactivitySettings.LastUsedTab, awaitItem())
 
-            optionFlow.value = SpecificPage("https://example.com/", null)
+            optionDataStore.setShowOnAppLaunchOption(SpecificPage("https://example.com/", null))
             assertEquals(
                 AfterInactivitySettings.SpecificPage("https://example.com/", 300L),
                 awaitItem(),
@@ -133,19 +130,20 @@ class AfterInactivitySettingsDataProviderImplTest {
     }
 
     @Test
-    fun whenNewTabPageCommandContainsTimeoutThenItPersistsOnlyThatField() = runTest {
-        optionFlow.value = NewTabPage
+    fun whenNewTabPageCommandContainsTimeoutThenOptionIsUnchangedButTimeoutPersists() = runTest {
+        optionDataStore.setShowOnAppLaunchOption(NewTabPage)
+        val callCountBeforeDestination = optionDataStore.setShowOnAppLaunchOptionCallCount
 
         testee.setDestination(AfterInactivityReturnDestination.NewTabPage(selectedTimeoutSeconds = 60L))
 
-        verify(optionDataStore).setShowOnAppLaunchOption(NewTabPage)
+        assertEquals(callCountBeforeDestination, optionDataStore.setShowOnAppLaunchOptionCallCount)
         assertEquals(60L, settingsDataStore.userSelectedIdleThresholdSeconds)
         verify(ntpAfterIdleManager).onIdleTimeoutSelected(60L)
     }
 
     @Test
     fun whenNewTabPageCommandContainsShortcutThenItPersistsOnlyThatField() = runTest {
-        optionFlow.value = NewTabPage
+        optionDataStore.setShowOnAppLaunchOption(NewTabPage)
 
         testee.setDestination(AfterInactivityReturnDestination.NewTabPage(returnToLastTabShortcutEnabled = false))
 
@@ -156,13 +154,85 @@ class AfterInactivitySettingsDataProviderImplTest {
 
     @Test
     fun whenSpecificPageCommandContainsTimeoutThenItPersistsTimeoutAndNotifiesIdleManager() = runTest {
-        optionFlow.value = SpecificPage("https://example.com/", null)
+        optionDataStore.setShowOnAppLaunchOption(SpecificPage("https://example.com/", null))
 
         testee.setDestination(AfterInactivityReturnDestination.SpecificPage("example.com", selectedTimeoutSeconds = 600L))
 
-        verify(optionDataStore).setShowOnAppLaunchOption(SpecificPage("example.com"))
+        assertEquals(SpecificPage("example.com"), optionDataStore.optionFlow.first())
         assertEquals(600L, settingsDataStore.userSelectedIdleThresholdSeconds)
         verify(ntpAfterIdleManager).onIdleTimeoutSelected(600L)
+    }
+
+    @Test
+    fun whenTimeoutOnlyChangeOnSpecificPageWithSameUrlThenResolvedUrlAndTabIdAreKeptAndTimeoutPersists() = runTest {
+        val url = "https://example.com/"
+        val resolvedUrl = "https://www.example.com/"
+        optionDataStore.setShowOnAppLaunchOption(SpecificPage(url, resolvedUrl))
+        optionDataStore.setShowOnAppLaunchTabId("tab-1")
+
+        testee.setDestination(AfterInactivityReturnDestination.SpecificPage(url = url, selectedTimeoutSeconds = 600L))
+
+        assertEquals(SpecificPage(url, resolvedUrl), optionDataStore.optionFlow.first())
+        assertEquals("tab-1", optionDataStore.showOnAppLaunchTabId)
+        assertEquals(600L, settingsDataStore.userSelectedIdleThresholdSeconds)
+        verify(ntpAfterIdleManager).onIdleTimeoutSelected(600L)
+    }
+
+    @Test
+    fun whenSameUrlSpecificPageDestinationIsSetThenResolvedUrlAndTabIdAreKept() = runTest {
+        val url = "https://example.com/"
+        val resolvedUrl = "https://www.example.com/"
+        optionDataStore.setShowOnAppLaunchOption(SpecificPage(url, resolvedUrl))
+        optionDataStore.setShowOnAppLaunchTabId("tab-1")
+        val callCountBeforeDestination = optionDataStore.setShowOnAppLaunchOptionCallCount
+
+        testee.setDestination(AfterInactivityReturnDestination.SpecificPage(url = url))
+
+        assertEquals(callCountBeforeDestination, optionDataStore.setShowOnAppLaunchOptionCallCount)
+        assertEquals(SpecificPage(url, resolvedUrl), optionDataStore.optionFlow.first())
+        assertEquals("tab-1", optionDataStore.showOnAppLaunchTabId)
+    }
+
+    @Test
+    fun whenNewTabPageIsReselectedThenOptionIsNotRewritten() = runTest {
+        optionDataStore.setShowOnAppLaunchOption(NewTabPage)
+        val callCountBeforeDestination = optionDataStore.setShowOnAppLaunchOptionCallCount
+
+        testee.setDestination(AfterInactivityReturnDestination.NewTabPage())
+
+        assertEquals(callCountBeforeDestination, optionDataStore.setShowOnAppLaunchOptionCallCount)
+    }
+
+    @Test
+    fun whenShortcutToggledThenOptionIsNotRewritten() = runTest {
+        optionDataStore.setShowOnAppLaunchOption(NewTabPage)
+        val callCountBeforeDestination = optionDataStore.setShowOnAppLaunchOptionCallCount
+
+        testee.setDestination(AfterInactivityReturnDestination.NewTabPage(returnToLastTabShortcutEnabled = true))
+
+        assertEquals(callCountBeforeDestination, optionDataStore.setShowOnAppLaunchOptionCallCount)
+    }
+
+    @Test
+    fun whenEditedSpecificUrlIsSubmittedThenNewUrlIsPersistedAndResolvedStateCleared() = runTest {
+        val oldUrl = "https://example.com/"
+        val newUrl = "https://new.example.com/"
+        optionDataStore.setShowOnAppLaunchOption(SpecificPage(oldUrl, "https://www.example.com/"))
+        optionDataStore.setShowOnAppLaunchTabId("tab-1")
+
+        testee.setDestination(AfterInactivityReturnDestination.SpecificPage(url = newUrl))
+
+        assertEquals(SpecificPage(newUrl), optionDataStore.optionFlow.first())
+        assertNull(optionDataStore.showOnAppLaunchTabId)
+    }
+
+    @Test
+    fun whenOptionTypeChangesThenItIsPersisted() = runTest {
+        optionDataStore.setShowOnAppLaunchOption(NewTabPage)
+
+        testee.setDestination(AfterInactivityReturnDestination.LastUsedTab)
+
+        assertEquals(LastOpenedTab, optionDataStore.optionFlow.first())
     }
 
     private fun setRemoteDefault(seconds: Long) {

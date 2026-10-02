@@ -47,7 +47,11 @@ sealed interface AfterInactivityReturnDestination {
     ) : AfterInactivityReturnDestination
 
     data class SpecificPage(
-        val url: String = "https://duckduckgo.com/",
+        val url: String = DEFAULT_URL,
         val selectedTimeoutSeconds: Long? = null,
-    ) : AfterInactivityReturnDestination
+    ) : AfterInactivityReturnDestination {
+        companion object {
+            const val DEFAULT_URL = "https://duckduckgo.com/"
+        }
+    }
 }

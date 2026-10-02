@@ -27,9 +27,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityShowOnAppLaunchSettingBinding
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewModel.Command.ShowTimeoutDialog
-import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
-import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
-import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -37,6 +34,8 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.settings.api.AfterInactivityReturnDestination
+import com.duckduckgo.settings.api.AfterInactivitySettings
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -99,21 +98,21 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         binding.lastOpenedTabCheckListItem.setClickListener {
-            viewModel.onShowOnAppLaunchOptionChanged(LastOpenedTab)
+            viewModel.onShowOnAppLaunchOptionChanged(AfterInactivityReturnDestination.LastUsedTab)
         }
 
         binding.newTabCheckListItem.setClickListener {
-            viewModel.onShowOnAppLaunchOptionChanged(NewTabPage)
+            viewModel.onShowOnAppLaunchOptionChanged(AfterInactivityReturnDestination.NewTabPage())
         }
 
         binding.specificPageCheckListItem.setClickListener {
-            viewModel.onShowOnAppLaunchOptionChanged(SpecificPage(binding.specificPageUrlInput.text))
+            viewModel.onShowOnAppLaunchOptionChanged(AfterInactivityReturnDestination.SpecificPage(url = binding.specificPageUrlInput.text))
         }
 
         binding.specificPageUrlInput.addFocusChangedListener { _, hasFocus ->
             if (hasFocus) {
                 viewModel.onShowOnAppLaunchOptionChanged(
-                    SpecificPage(binding.specificPageUrlInput.text),
+                    AfterInactivityReturnDestination.SpecificPage(url = binding.specificPageUrlInput.text),
                 )
             }
         }
@@ -128,17 +127,17 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 when (viewState.selectedOption) {
-                    LastOpenedTab -> {
+                    AfterInactivitySettings.LastUsedTab -> {
                         uncheckNewTabCheckListItem()
                         uncheckSpecificPageCheckListItem()
                         binding.lastOpenedTabCheckListItem.setChecked(true)
                     }
-                    NewTabPage -> {
+                    is AfterInactivitySettings.NewTabPage -> {
                         uncheckLastOpenedTabCheckListItem()
                         uncheckSpecificPageCheckListItem()
                         binding.newTabCheckListItem.setChecked(true)
                     }
-                    is SpecificPage -> {
+                    is AfterInactivitySettings.SpecificPage -> {
                         uncheckLastOpenedTabCheckListItem()
                         uncheckNewTabCheckListItem()
                         with(binding) {
@@ -159,7 +158,7 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
                     binding.afterInactivityTimeoutDivider.visibility = View.GONE
                 }
 
-                val showReturnToLastTabToggle = viewState.showNTPAfterIdleReturn && viewState.selectedOption == NewTabPage
+                val showReturnToLastTabToggle = viewState.showNTPAfterIdleReturn && viewState.selectedOption is AfterInactivitySettings.NewTabPage
                 binding.returnToLastTabDivider.visibility = if (showReturnToLastTabToggle) View.VISIBLE else View.GONE
                 binding.returnToLastTabToggle.visibility = if (showReturnToLastTabToggle) View.VISIBLE else View.GONE
                 binding.returnToLastTabToggle.quietlySetIsChecked(viewState.returnToLastTabEnabled) { _, isChecked ->
