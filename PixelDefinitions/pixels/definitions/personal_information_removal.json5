@@ -379,6 +379,13 @@
             }
         ]
     },
+    "m_dbp_freemium_upsell_u": {
+        "description": "Fired once per install when a subscription purchase completes for a user who had activated Freemium PIR, i.e. the free scan converted.",
+        "owners": ["landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_dbp_weekly_child-broker_orphaned-optouts": {
         "description": "Pixel to know orphaned opt-out records on child data brokers that don't have matching profiles on their parent broker.",
         "owners": ["karlenDimla", "landomen"],

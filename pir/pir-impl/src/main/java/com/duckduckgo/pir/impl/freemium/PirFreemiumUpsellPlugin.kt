@@ -1,0 +1,46 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.pir.impl.freemium
+
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
+import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
+import com.duckduckgo.subscriptions.api.SubscriptionPurchaseSuccessPlugin
+import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
+
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = SubscriptionPurchaseSuccessPlugin::class,
+)
+class PirFreemiumUpsellPlugin @Inject constructor(
+    private val pirFreemiumDataStore: PirFreemiumDataStore,
+    private val pirPixelSender: PirPixelSender,
+    private val dispatcherProvider: DispatcherProvider,
+) : SubscriptionPurchaseSuccessPlugin {
+
+    // The plugin point fires for every purchase, so provenance has to be established here: only a
+    // user who activated freemium PIR converted through this funnel.
+    override suspend fun onSubscriptionPurchaseSuccess() {
+        val didActivate = withContext(dispatcherProvider.io()) { pirFreemiumDataStore.didActivate }
+        if (didActivate) {
+            pirPixelSender.reportFreemiumUpsell()
+        }
+    }
+}
