@@ -351,5 +351,64 @@
         "type": "string",
         "description": "Version of the prompt exposure pixels, bumped whenever the meaning of a parameter or the session sampling rate changes.",
         "enum": ["1"]
+    },
+    "eventHubAttributionPeriod": {
+        "key": "attributionPeriod",
+        "type": "integer",
+        "description": "Unix timestamp (UTC seconds) denoting the start of the measurement period"
+    },
+    "eventHubBucketedCount": {
+        "key": "count",
+        "type": "string",
+        "description": "Bucketed count for the period. Bucket boundaries are set by the eventHub remote config",
+        "pattern": "^\\d+(-\\d+|\\+)?$"
+    },
+    "eventHubBaseline": {
+        "key": "baseline",
+        "type": "string",
+        "description": "Bucketed count of periods in which EventHub ran. Bucket boundaries are set by the eventHub remote config",
+        "pattern": "^\\d+(-\\d+|\\+)?$"
+    },
+    "eventHubAdwallCount": {
+        "key": "adwallCount",
+        "type": "string",
+        "description": "Bucketed adwall detection count for the period. Bucket boundaries are set by the eventHub remote config",
+        "pattern": "^\\d+(-\\d+|\\+)?$"
+    },
+    "eventHubAdmiralAdwallCount": {
+        "key": "admiralAdwallCount",
+        "type": "string",
+        "description": "Bucketed Admiral-served adwall detection count for the period. Bucket boundaries are set by the eventHub remote config",
+        "pattern": "^\\d+(-\\d+|\\+)?$"
+    },
+    "eventHubYoutubeVideoAdCount": {
+        "key": "videoAd",
+        "type": "string",
+        "description": "Bucketed count of YouTube video-ad detections for the period. Bucket boundaries are set by the eventHub remote config",
+        "pattern": "^\\d+(-\\d+|\\+)?$"
+    },
+    "eventHubYoutubeStaticAdCount": {
+        "key": "staticAd",
+        "type": "string",
+        "description": "Bucketed count of YouTube static-ad detections for the period. Bucket boundaries are set by the eventHub remote config",
+        "pattern": "^\\d+(-\\d+|\\+)?$"
+    },
+    "eventHubYoutubePlayabilityErrorCount": {
+        "key": "playabilityError",
+        "type": "string",
+        "description": "Bucketed count of YouTube playability-error detections for the period. Bucket boundaries are set by the eventHub remote config",
+        "pattern": "^\\d+(-\\d+|\\+)?$"
+    },
+    "eventHubYoutubeAdBlockerCount": {
+        "key": "adBlocker",
+        "type": "string",
+        "description": "Bucketed count of YouTube ad-blocker-challenge detections for the period. Bucket boundaries are set by the eventHub remote config",
+        "pattern": "^\\d+(-\\d+|\\+)?$"
+    },
+    "eventHubYoutubeBufferingCount": {
+        "key": "buffering",
+        "type": "string",
+        "description": "Bucketed count of YouTube playback-buffering detections for the period. Bucket boundaries are set by the eventHub remote config",
+        "pattern": "^\\d+(-\\d+|\\+)?$"
     }
 }
