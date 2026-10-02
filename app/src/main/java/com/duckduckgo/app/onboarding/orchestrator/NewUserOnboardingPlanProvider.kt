@@ -29,12 +29,12 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
 import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
-import com.duckduckgo.app.onboarding.NextStepsItemsExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
 import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.OnboardingPreferenceCatalog
+import com.duckduckgo.app.onboarding.OnboardingPrivacyConfigPersistedGate
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentMetrics
@@ -67,6 +67,7 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
+import com.duckduckgo.nextsteps.impl.NextStepsItemsExperimentManager
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
 import com.duckduckgo.onboarding.api.LinearOnboardingPlan
 import com.duckduckgo.onboarding.api.LinearOnboardingPlanId
@@ -118,6 +119,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val segmentedOnboardingExperimentManager: SegmentedOnboardingExperimentManager,
     private val segmentedOnboardingExperimentMetrics: SegmentedOnboardingExperimentMetrics,
     private val nextStepsItemsExperimentManager: NextStepsItemsExperimentManager,
+    private val onboardingPrivacyConfigPersistedGate: OnboardingPrivacyConfigPersistedGate,
     private val onboardingPasswordImportExperimentManager: OnboardingPasswordImportExperimentManager,
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog,
     private val singleChoiceDataPlugins: ActivePluginPoint<OnboardingSingleChoiceDataPlugin>,
@@ -138,7 +140,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         onboardingPixelSender.clearFlowAttribution()
         onboardingStore.setDownloadReason(null)
 
-        if (!ctx.isReinstall) {
+        if (!ctx.isReinstall && onboardingPrivacyConfigPersistedGate.awaitPersisted()) {
             nextStepsItemsExperimentManager.enroll()
         }
 

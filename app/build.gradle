@@ -568,6 +568,8 @@ dependencies {
     implementation project(':dax-prompts-api')
     implementation project(':dax-prompts-impl')
 
+    implementation project(':next-steps-impl')
+
     implementation project(':serp-logos-api')
     implementation project(':serp-logos-impl')
 
