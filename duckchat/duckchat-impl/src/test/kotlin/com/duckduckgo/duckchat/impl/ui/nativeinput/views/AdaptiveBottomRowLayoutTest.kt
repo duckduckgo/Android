@@ -122,6 +122,18 @@ class AdaptiveBottomRowLayoutTest {
         assertEquals(shown.model.level, hidden.model.level)
     }
 
+    @Test
+    fun whenAWorstCaseShrinksThenTheNextMeasureRelaxesTheLevel() {
+        val row = row(100, intArrayOf(60, 40, 40), intArrayOf(80, 80, 40), 100, modelWorstCase = intArrayOf(300, 40, 40))
+        row.measureWithWidth(440)
+        assertEquals(1, row.model.level)
+
+        row.model.worstCasePerLevel = intArrayOf(60, 40, 40)
+        row.measureWithWidth(440)
+
+        assertEquals(0, row.model.level)
+    }
+
     private class Row(
         val layout: AdaptiveBottomRowLayout,
         val model: FakeControl,
@@ -161,7 +173,7 @@ class AdaptiveBottomRowLayoutTest {
     private class FakeControl(
         context: Context,
         private val widthsPerLevel: IntArray,
-        private val worstCasePerLevel: IntArray = widthsPerLevel,
+        var worstCasePerLevel: IntArray = widthsPerLevel,
     ) : View(context), CompactableControl {
         var level = 0
             private set
