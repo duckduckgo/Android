@@ -34,6 +34,7 @@
     <dimen name="largeShapeCornerRadius">16dp</dimen>
     <dimen name="extraLargeShapeCornerRadius">24dp</dimen>
     <dimen name="pillShapeCornerRadius">1000dp</dimen>
+    <dimen name="onboardingBottomSheetCornerRadius">36dp</dimen>
 
     <!-- App Components -->
     <dimen name="changeAppIconSize">64dp</dimen>

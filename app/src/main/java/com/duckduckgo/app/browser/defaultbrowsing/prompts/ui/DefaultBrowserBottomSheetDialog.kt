@@ -24,6 +24,7 @@ import android.widget.FrameLayout
 import androidx.core.content.ContextCompat.getString
 import com.duckduckgo.app.browser.databinding.BottomSheetDefaultBrowserBinding
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.ui.view.getDimensionFromAttr
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.preventWidows
@@ -95,10 +96,11 @@ class DefaultBrowserBottomSheetDialog(
         val bottomSheet = bottomSheetDialog.findViewById<FrameLayout>(R.id.design_bottom_sheet)
 
         val shapeDrawable = MaterialShapeDrawable.createWithElevationOverlay(context)
+        val radius = bottomSheetDialog.context.getDimensionFromAttr(CommonR.attr.daxSheetRadius, CommonR.dimen.dialogBorderRadius)
         shapeDrawable.shapeAppearanceModel = shapeDrawable.shapeAppearanceModel
             .toBuilder()
-            .setTopLeftCorner(CornerFamily.ROUNDED, context.resources.getDimension(CommonR.dimen.dialogBorderRadius))
-            .setTopRightCorner(CornerFamily.ROUNDED, context.resources.getDimension(CommonR.dimen.dialogBorderRadius))
+            .setTopLeftCorner(CornerFamily.ROUNDED, radius)
+            .setTopRightCorner(CornerFamily.ROUNDED, radius)
             .build()
         bottomSheet?.background = shapeDrawable
     }

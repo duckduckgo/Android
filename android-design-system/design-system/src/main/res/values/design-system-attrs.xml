@@ -35,5 +35,6 @@
 
     <attr name="daxOmnibarThemeOverlay" format="reference"/>
     <attr name="daxInputModeCardThemeOverlay" format="reference"/>
+    <attr name="daxInputModeCardDarkFireThemeOverlay" format="reference"/>
 
 </resources>

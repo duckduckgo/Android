@@ -66,6 +66,10 @@
         <item name="backgroundTint">?attr/daxColorSurface</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.Snackbar.Rebrand" parent="Widget.DuckDuckGo.Snackbar">
+        <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.LargeComponent</item>
+    </style>
+
     <style name="Widget.DuckDuckGo.SnackbarButton" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
         <item name="android:textColor">?attr/daxColorSnackbarAction</item>
         <item name="android:textAppearance">?attr/textAppearanceButton</item>
@@ -294,7 +298,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="cardElevation">4dp</item>
-        <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="cardCornerRadius">?attr/daxContainerRadius</item>
         <item name="android:layout_margin">@dimen/keyline_4</item>
     </style>
 
@@ -302,7 +306,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="cardElevation">4dp</item>
-        <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="cardCornerRadius">?attr/daxContainerRadius</item>
         <item name="android:layout_marginTop">@dimen/keyline_4</item>
         <item name="android:layout_marginHorizontal">@dimen/keyline_4</item>
     </style>
@@ -361,7 +365,7 @@
 
     <style name="Widget.DuckDuckGo.DialogCorners">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">@dimen/dialogBorderRadius</item>
+        <item name="cornerSize">?attr/daxDialogRadius</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DialogCorners.Rebrand">
@@ -391,7 +395,7 @@
     <style name="Widget.DuckDuckGo.DaxDialog"/>
 
     <style name="Widget.DuckDuckGo.DaxDialog.Outline">
-        <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="cardCornerRadius">?attr/daxContainerRadius</item>
         <item name="android:backgroundTint">?attr/daxColorSurface</item>
         <item name="android:layout_marginStart">@dimen/keyline_4</item>
         <item name="android:layout_marginEnd">@dimen/keyline_4</item>
@@ -520,8 +524,8 @@
 
     <style name="Widget.DuckDuckGo.BottomSheetDialogCorners">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSizeTopRight">@dimen/dialogBorderRadius</item>
-        <item name="cornerSizeTopLeft">@dimen/dialogBorderRadius</item>
+        <item name="cornerSizeTopRight">?attr/daxSheetRadius</item>
+        <item name="cornerSizeTopLeft">?attr/daxSheetRadius</item>
         <item name="cornerSizeBottomRight">0dp</item>
         <item name="cornerSizeBottomLeft">0dp</item>
     </style>

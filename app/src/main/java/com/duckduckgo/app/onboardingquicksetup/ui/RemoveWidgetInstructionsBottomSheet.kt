@@ -22,29 +22,30 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.BottomSheetRemoveWidgetInstructionsBinding
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.ui.setRoundCorners
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.FragmentScope
-import com.google.android.material.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.shape.CornerFamily
-import com.google.android.material.shape.MaterialShapeDrawable
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import com.duckduckgo.app.browser.R as BrowserR
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class RemoveWidgetInstructionsBottomSheet : BottomSheetDialogFragment() {
 
     @Inject
     lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -57,6 +58,9 @@ class RemoveWidgetInstructionsBottomSheet : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?,
     ): View {
         val binding = BottomSheetRemoveWidgetInstructionsBinding.inflate(inflater, container, false)
+        if (appBrandDesignUpdateToggles.radius().isEnabled()) {
+            binding.root.applyRadiusOverlayToSheetBackground()
+        }
         binding.removeWidgetInstructionsDoneButton.setOnClickListener { dismiss() }
         binding.removeWidgetInstructionsCloseButton.setOnClickListener { dismiss() }
         if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
@@ -75,7 +79,12 @@ class RemoveWidgetInstructionsBottomSheet : BottomSheetDialogFragment() {
         val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
         dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         dialog.behavior.isDraggable = false
-        dialog.setOnShowListener(::setRoundCorners)
+        dialog.setOnShowListener {
+            dialog.setRoundCorners(
+                CommonR.attr.daxOnboardingSheetRadius,
+                CommonR.dimen.onboardingBottomSheetCornerRadius,
+            )
+        }
         return dialog
     }
 
@@ -84,18 +93,6 @@ class RemoveWidgetInstructionsBottomSheet : BottomSheetDialogFragment() {
             setFragmentResult(REQUEST_KEY, Bundle.EMPTY)
         }
         super.onDismiss(dialog)
-    }
-
-    private fun setRoundCorners(dialogInterface: DialogInterface) {
-        val bottomSheet = (dialogInterface as BottomSheetDialog).findViewById<FrameLayout>(R.id.design_bottom_sheet)
-        val ctx = requireContext()
-        val shapeDrawable = MaterialShapeDrawable.createWithElevationOverlay(ctx)
-        shapeDrawable.shapeAppearanceModel = shapeDrawable.shapeAppearanceModel
-            .toBuilder()
-            .setTopLeftCorner(CornerFamily.ROUNDED, ctx.resources.getDimension(BrowserR.dimen.onboardingBottomSheetCornerRadius))
-            .setTopRightCorner(CornerFamily.ROUNDED, ctx.resources.getDimension(BrowserR.dimen.onboardingBottomSheetCornerRadius))
-            .build()
-        bottomSheet?.background = shapeDrawable
     }
 
     companion object {
