@@ -82,7 +82,7 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.nextsteps.impl.NextStepsItemsExperimentManager
+import com.duckduckgo.nextsteps.api.NextSteps
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Completed
 import com.duckduckgo.onboarding.api.LinearOnboardingState.InProgress
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Skipped
@@ -134,7 +134,7 @@ class NewUserOnboardingPlanProviderTest {
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo = mock()
     private val segmentedOnboardingExperiment: SegmentedOnboardingExperimentManager = mock()
     private val segmentedOnboardingMetrics: SegmentedOnboardingExperimentMetrics = mock()
-    private val nextStepsItemsExperiment: NextStepsItemsExperimentManager = mock()
+    private val nextSteps: NextSteps = mock()
     private val privacyConfigPersistedGate: OnboardingPrivacyConfigPersistedGate = mock()
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog = mock {
         onBlocking { offer(any()) } doReturn emptyList()
@@ -179,7 +179,6 @@ class NewUserOnboardingPlanProviderTest {
             whenever(customAiOnboardingResolver.resolve()).thenReturn(false)
             whenever(segmentedOnboardingExperiment.enroll()).thenReturn(null)
             whenever(passwordImportExperiment.enroll()).thenReturn(null)
-            whenever(nextStepsItemsExperiment.enroll()).thenReturn(null)
             whenever(privacyConfigPersistedGate.awaitPersisted()).thenReturn(true)
         }
         provider = NewUserOnboardingPlanProvider(
@@ -203,7 +202,7 @@ class NewUserOnboardingPlanProviderTest {
             duckAiOnboardingDemo = duckAiOnboardingDemo,
             segmentedOnboardingExperimentManager = segmentedOnboardingExperiment,
             segmentedOnboardingExperimentMetrics = segmentedOnboardingMetrics,
-            nextStepsItemsExperimentManager = nextStepsItemsExperiment,
+            nextSteps = nextSteps,
             onboardingPrivacyConfigPersistedGate = privacyConfigPersistedGate,
             onboardingPasswordImportExperimentManager = passwordImportExperiment,
             onboardingPreferenceCatalog = onboardingPreferenceCatalog,
@@ -2141,7 +2140,7 @@ class NewUserOnboardingPlanProviderTest {
     fun `when new user then the next steps items experiment is enrolled once`() = runTest {
         start()
 
-        verify(nextStepsItemsExperiment, times(1)).enroll()
+        verify(nextSteps, times(1)).enroll()
     }
 
     @Test
@@ -2149,7 +2148,7 @@ class NewUserOnboardingPlanProviderTest {
         whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
         start()
 
-        verify(nextStepsItemsExperiment, never()).enroll()
+        verify(nextSteps, never()).enroll()
     }
 
     @Test
@@ -2157,7 +2156,7 @@ class NewUserOnboardingPlanProviderTest {
         whenever(privacyConfigPersistedGate.awaitPersisted()).thenReturn(false)
         start()
 
-        verify(nextStepsItemsExperiment, never()).enroll()
+        verify(nextSteps, never()).enroll()
     }
 
     @Test
@@ -2165,7 +2164,7 @@ class NewUserOnboardingPlanProviderTest {
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()
 
-        verify(nextStepsItemsExperiment, times(1)).enroll()
+        verify(nextSteps, times(1)).enroll()
     }
 
     // endregion

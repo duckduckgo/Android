@@ -67,7 +67,7 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
-import com.duckduckgo.nextsteps.impl.NextStepsItemsExperimentManager
+import com.duckduckgo.nextsteps.api.NextSteps
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
 import com.duckduckgo.onboarding.api.LinearOnboardingPlan
 import com.duckduckgo.onboarding.api.LinearOnboardingPlanId
@@ -118,7 +118,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
     private val segmentedOnboardingExperimentManager: SegmentedOnboardingExperimentManager,
     private val segmentedOnboardingExperimentMetrics: SegmentedOnboardingExperimentMetrics,
-    private val nextStepsItemsExperimentManager: NextStepsItemsExperimentManager,
+    private val nextSteps: NextSteps,
     private val onboardingPrivacyConfigPersistedGate: OnboardingPrivacyConfigPersistedGate,
     private val onboardingPasswordImportExperimentManager: OnboardingPasswordImportExperimentManager,
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog,
@@ -141,7 +141,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         onboardingStore.setDownloadReason(null)
 
         if (!ctx.isReinstall && onboardingPrivacyConfigPersistedGate.awaitPersisted()) {
-            nextStepsItemsExperimentManager.enroll()
+            nextSteps.enroll()
         }
 
         return if (customAiOnboardingResolver.resolve()) {

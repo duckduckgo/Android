@@ -21,19 +21,17 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.nextsteps.impl.NextStepsItemsExperimentManager.NextStepsItemsExperimentVariant
 import com.duckduckgo.nextsteps.impl.NextStepsItemsExperimentToggles.Cohorts
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
-class NextStepsItemsExperimentManagerTest {
+class RealNextStepsTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
@@ -41,61 +39,71 @@ class NextStepsItemsExperimentManagerTest {
     private val toggles: NextStepsItemsExperimentToggles = FakeFeatureToggleFactory.create(NextStepsItemsExperimentToggles::class.java)
     private val appBuildConfig: AppBuildConfig = mock()
 
-    private val testee = NextStepsItemsExperimentManagerImpl(
+    private val testee = RealNextSteps(
         nextStepsItemsFeatureToggles = toggles,
         appBuildConfig = appBuildConfig,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
     @Test
-    fun `when kill switch is off then enroll returns null and does not enrol`() = runTest {
+    fun `when kill switch is off then user is not enrolled`() = runTest {
         givenKillSwitch(enabled = false)
         givenCohortEnabled(Cohorts.STACKED_CARDS)
 
-        assertNull(testee.enroll())
+        testee.enroll()
+
         assertFalse(toggles.nextStepsItemsExperiment().isEnrolled())
     }
 
     @Test
-    fun `when reinstall user then enroll returns null and does not enrol`() = runTest {
+    fun `when reinstall user then user is not enrolled`() = runTest {
         givenKillSwitch(enabled = true)
         whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
         givenCohortEnabled(Cohorts.STACKED_CARDS)
 
-        assertNull(testee.enroll())
+        testee.enroll()
+
         assertFalse(toggles.nextStepsItemsExperiment().isEnrolled())
     }
 
     @Test
-    fun `when enrolled in stacked cards then enroll returns stacked cards`() = runTest {
+    fun `when stacked cards cohort wins then user is enrolled in stacked cards`() = runTest {
         givenKillSwitch(enabled = true)
         givenCohortEnabled(Cohorts.STACKED_CARDS)
 
-        assertEquals(NextStepsItemsExperimentVariant.STACKED_CARDS, testee.enroll())
+        testee.enroll()
+
+        assertTrue(toggles.nextStepsItemsExperiment().isEnrolledAndEnabled(Cohorts.STACKED_CARDS))
     }
 
     @Test
-    fun `when enrolled in check list then enroll returns check list`() = runTest {
+    fun `when check list cohort wins then user is enrolled in check list`() = runTest {
         givenKillSwitch(enabled = true)
         givenCohortEnabled(Cohorts.CHECK_LIST)
 
-        assertEquals(NextStepsItemsExperimentVariant.CHECK_LIST, testee.enroll())
+        testee.enroll()
+
+        assertTrue(toggles.nextStepsItemsExperiment().isEnrolledAndEnabled(Cohorts.CHECK_LIST))
     }
 
     @Test
-    fun `when enrolled in control then enroll returns control`() = runTest {
+    fun `when control cohort wins then user is enrolled in control`() = runTest {
         givenKillSwitch(enabled = true)
         givenCohortEnabled(Cohorts.CONTROL)
 
-        assertEquals(NextStepsItemsExperimentVariant.CONTROL, testee.enroll())
+        testee.enroll()
+
+        assertTrue(toggles.nextStepsItemsExperiment().isEnrolledAndEnabled(Cohorts.CONTROL))
     }
 
     @Test
-    fun `when experiment has no cohort then enroll returns null`() = runTest {
+    fun `when experiment has no cohort then user is not enrolled`() = runTest {
         givenKillSwitch(enabled = true)
         givenCohortEnabled(winner = null)
 
-        assertNull(testee.enroll())
+        testee.enroll()
+
+        assertFalse(toggles.nextStepsItemsExperiment().isEnrolled())
     }
 
     private suspend fun givenKillSwitch(enabled: Boolean) {
