@@ -258,6 +258,7 @@
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Δικαιώματα</string>
+    <string name="permissionsGeneralPermissionsTitle" instruction="Section header on the Permissions settings screen, above the Notifications and Open Links in Apps settings">Γενικά δικαιώματα</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Εμφάνιση</string>

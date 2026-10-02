@@ -105,4 +105,21 @@
     <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo nije mogao dati pristup mikrofonu ovoj stranici</string>
     <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo nije mogao dati pristup kameri i mikrofonu ovoj stranici</string>
 
+    <!-- Permission settings redesign -->
+    <string name="permissionSettingsAlwaysAllow" instruction="Permission setting option: the site gets the permission without asking">Uvijek dopusti</string>
+    <string name="permissionSettingsAskEachTime" instruction="Permission setting option: the site has to ask for the permission every time">Pitaj svaki puta</string>
+    <string name="permissionSettingsLocationDialogTitle">Dopusti web-mjestima da zatraže dopuštenje za lokaciju</string>
+    <string name="permissionSettingsLocationDialogMessage">Ako odabereš „Nikad ne dopusti“, nećeš moći upotrebljavati određene značajke na web-mjestima, poput uputa na kartama ili obližnjih trgovina.</string>
+    <string name="permissionSettingsCameraDialogTitle">Dopusti web-mjestima da zatraže dopuštenje za kameru</string>
+    <string name="permissionSettingsCameraDialogMessage">Ako odabereš „Nikad ne dopusti“, nećeš moći upotrebljavati značajke poput videorazgovora na web-mjestima.</string>
+    <string name="permissionSettingsMicrophoneDialogTitle">Dopusti web-mjestima da zatraže dozvolu za mikrofon</string>
+    <string name="permissionSettingsMicrophoneDialogMessage">Ako odabereš „Nikad ne dopusti“, nećeš moći koristiti funkcije poput glasovnog razgovora na web-mjestima.</string>
+    <string name="permissionSettingsDrmDialogTitle">Dopusti web-mjestima da zatraže dopuštenje za upravljanje digitalnim pravima (DRM)</string>
+    <string name="permissionSettingsDrmTitle" instruction="Name of a permission setting for playing protected video content">Upravljanje digitalnim pravima (DRM)</string>
+    <string name="permissionsPerWebsiteRedesignHeader" instruction="Placeholder is the name of a website">Dopuštenja za %1$s</string>
+    <string name="permissionsPerWebsiteRemovePermissions" instruction="Button that removes all saved permissions for the website shown on the screen">Ukloni dopuštenja</string>
+    <string name="permissionsRemovedForSiteSnackbar" instruction="Placeholder is the name of a website">Uklonjena su dopuštenja za &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="permissionsRemovedForAllSitesSnackbar">Uklonjene su dopuštenja za sva web-mjesta</string>
+    <string name="permissionSettingsDrmDialogMessage">Ako odabereš „Nikada ne dopusti“, videozapise na web-mjestu možda neće biti moguće reproducirati.</string>
+
 </resources>

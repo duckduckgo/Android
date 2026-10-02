@@ -105,4 +105,21 @@
     <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo nemohl tomuto webu udělit přístup k mikrofonu</string>
     <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo nemohlo tomuto webu udělit přístup k fotoaparátu a mikrofonu</string>
 
+    <!-- Permission settings redesign -->
+    <string name="permissionSettingsAlwaysAllow" instruction="Permission setting option: the site gets the permission without asking">Vždy povolit</string>
+    <string name="permissionSettingsAskEachTime" instruction="Permission setting option: the site has to ask for the permission every time">Pokaždé se zeptat</string>
+    <string name="permissionSettingsLocationDialogTitle">Povolit webům žádat o přístup k poloze</string>
+    <string name="permissionSettingsLocationDialogMessage">Pokud zvolíš „Nikdy nepovolit”, nebudeš moct používat určité funkce na webech, jako jsou trasy na mapách nebo obchody v okolí.</string>
+    <string name="permissionSettingsCameraDialogTitle">Povolit webům žádat o přístup k fotoaparátu</string>
+    <string name="permissionSettingsCameraDialogMessage">Pokud zvolíš „Nikdy nepovolit“, nebudeš moct na stránkách používat funkce, jako je videochat.</string>
+    <string name="permissionSettingsMicrophoneDialogTitle">Povolit webům žádat o přístup k mikrofonu</string>
+    <string name="permissionSettingsMicrophoneDialogMessage">Pokud zvolíš „Nikdy nepovolit“, nebudeš moct používat funkce, jako je hlasový chat na webech.</string>
+    <string name="permissionSettingsDrmDialogTitle">Povolit webům žádat o přístup ke správě digitálních práv (DRM)</string>
+    <string name="permissionSettingsDrmTitle" instruction="Name of a permission setting for playing protected video content">Správa digitálních práv (DRM)</string>
+    <string name="permissionsPerWebsiteRedesignHeader" instruction="Placeholder is the name of a website">Oprávnění pro %1$s</string>
+    <string name="permissionsPerWebsiteRemovePermissions" instruction="Button that removes all saved permissions for the website shown on the screen">Odebrat oprávnění</string>
+    <string name="permissionsRemovedForSiteSnackbar" instruction="Placeholder is the name of a website">Oprávnění odebrána pro &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="permissionsRemovedForAllSitesSnackbar">Oprávnění odebrána všem webům</string>
+    <string name="permissionSettingsDrmDialogMessage">Pokud vybereš možnost „Nikdy nepovolit”, může se stát, že nepůjdou přehrát videa na stránce.</string>
+
 </resources>
