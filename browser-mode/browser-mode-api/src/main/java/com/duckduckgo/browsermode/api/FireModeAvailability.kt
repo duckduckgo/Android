@@ -19,9 +19,8 @@ package com.duckduckgo.browsermode.api
 /**
  * Single facade for whether Fire Mode is available to the user right now.
  *
- * Combines two independent checks:
- *  1. The Fire mode feature flag
- *  2. Whether the installed WebView reports support for the `MultiProfile` capability
+ * Fire Mode is available when the installed WebView supports both the `MULTI_PROFILE`
+ * and `DELETE_BROWSING_DATA` capabilities.
  */
 interface FireModeAvailability {
     /** Returns true if the prerequisites are satisfied, false otherwise **/
