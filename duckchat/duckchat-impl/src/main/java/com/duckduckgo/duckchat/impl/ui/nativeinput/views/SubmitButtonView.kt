@@ -27,6 +27,7 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.view.button.DaxButtonPrimary
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.R
@@ -52,6 +53,7 @@ class SubmitButtonView @JvmOverloads constructor(
     }
 
     private val button: ImageView by lazy { findViewById(R.id.nativeInputSubmitButton) }
+    private val askButton: DaxButtonPrimary by lazy { findViewById(R.id.nativeInputAskButton) }
     private var stateJob: Job? = null
 
     var host: NativeInputHost? = null
@@ -64,6 +66,7 @@ class SubmitButtonView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
         button.setOnClickListener { if (button.isEnabled) host?.onSubmitClicked() }
+        askButton.setOnClickListener { if (askButton.isEnabled) host?.onSubmitClicked() }
         observeState()
     }
 
@@ -83,6 +86,10 @@ class SubmitButtonView @JvmOverloads constructor(
                 )
                 button.isEnabled = state.enabled
                 button.alpha = if (state.enabled) ENABLED_ALPHA else DISABLED_ALPHA
+                button.isVisible = !state.askLabel
+                askButton.isVisible = state.askLabel
+                askButton.isEnabled = state.enabled
+                askButton.alpha = if (state.enabled) ENABLED_ALPHA else DISABLED_ALPHA
                 isVisible = state.visible
                 (parent as? View)?.isVisible = state.visible
             }
