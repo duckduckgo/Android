@@ -28,6 +28,7 @@ import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.pir.impl.dashboard.purchase.PirPurchaseRoute.NativePurchaseFlow
 import com.duckduckgo.pir.impl.pixels.PirInteractionReporter
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.store.PirRepository
@@ -62,6 +63,17 @@ class PirDashboardWebViewViewModel @Inject constructor(
         // TODO Handle any JS messages that requires UI updates or other user actions
     }
 
+    fun onSubscriptionPurchaseRequested(route: NativePurchaseFlow) {
+        viewModelScope.launch {
+            command.send(
+                Command.LaunchSubscriptionPurchase(
+                    origin = route.origin,
+                    featurePage = route.featurePage,
+                ),
+            )
+        }
+    }
+
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
         pirPixelSender.reportDashboardOpened()
@@ -82,5 +94,9 @@ class PirDashboardWebViewViewModel @Inject constructor(
         data class SendJsEvent(val event: SubscriptionEventData) : Command()
         data class SendResponseToJs(val data: JsCallbackData) : Command()
         data class ShowManualConfigWarning(val show: Boolean) : Command()
+        data class LaunchSubscriptionPurchase(
+            val origin: String,
+            val featurePage: String,
+        ) : Command()
     }
 }
