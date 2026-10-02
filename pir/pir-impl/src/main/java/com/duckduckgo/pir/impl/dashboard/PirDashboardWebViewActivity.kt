@@ -36,14 +36,17 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command.SendJsEvent
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command.SendResponseToJs
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebViewClient
+import com.duckduckgo.pir.impl.dashboard.purchase.PirPurchaseRoute.NativePurchaseFlow
 import com.duckduckgo.pir.impl.databinding.ActivityPirDashboardWebviewBinding
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.json.JSONObject
@@ -69,6 +72,9 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val viewModel: PirDashboardWebViewViewModel by bindViewModel()
 
@@ -134,6 +140,11 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
         )
 
         binding.pirWebView.webViewClient = webViewClient
+        webViewClient.listener = object : PirDashboardWebViewClient.Listener {
+            override fun onSubscriptionPurchaseRequested(route: NativePurchaseFlow) {
+                viewModel.onSubscriptionPurchaseRequested(route)
+            }
+        }
         binding.pirWebView.webChromeClient = object : WebChromeClient() {
 
             override fun onCreateWindow(
@@ -166,6 +177,7 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
     }
 
     private fun cleanupWebView() {
+        webViewClient.listener = null
         binding.pirWebView.stopLoading()
         binding.pirWebView.removeJavascriptInterface(pirWebJsMessaging.context)
         binding.webViewContainer.removeView(binding.pirWebView)
@@ -186,6 +198,11 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
             is Command.ShowManualConfigWarning -> {
                 binding.manualConfigWarning.isVisible = command.show
             }
+
+            is Command.LaunchSubscriptionPurchase -> globalActivityStarter.start(
+                this,
+                SubscriptionPurchase(origin = command.origin, featurePage = command.featurePage),
+            )
         }
     }
 
