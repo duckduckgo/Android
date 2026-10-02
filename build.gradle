@@ -1,6 +1,5 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 import static de.fayard.refreshVersions.core.Versions.versionFor
-import static com.gradle.develocity.agent.gradle.test.JUnitXmlDialect.*
 import com.gradle.develocity.agent.gradle.test.ImportJUnitXmlReports
 
 buildscript {
@@ -352,13 +351,12 @@ fladle {
             useOrchestrator.set(false)
             recordVideo.set(false)
             testTimeout.set("45m")
+            // Must not throw: the configuration cache evaluates this provider whenever any Fladle task is
+            // scheduled. The missing-APK check happens in execFlankPerfTests below.
             debugApk.set(project.provider {
                 def dir = rootProject.file("app/build/outputs/apk/internal/release")
                 def apks = dir.exists() ? (dir.listFiles() ?: []).findAll { it.name.endsWith("-internal-release.apk") } : []
-                if (apks.isEmpty()) {
-                    throw new GradleException("No internalRelease APK in $dir — run :app:assembleInternalRelease first")
-                }
-                apks.first().absolutePath
+                apks.isEmpty() ? new File(dir, "missing-internal-release.apk").absolutePath : apks.first().absolutePath
             })
             instrumentationApk.set(rootProject.file("macrobenchmark/build/outputs/apk/release/macrobenchmark-release.apk").absolutePath)
             additionalTestApks.set([])
@@ -376,21 +374,22 @@ fladle {
     }
 }
 
-afterEvaluate {
-    // Export Firebase Test Lab (Flank) tests to Develocity
-    tasks.matching { it.name.startsWith("execFlank") }.names.each {
-        ImportJUnitXmlReports.register(
-                tasks,
-                tasks.named(it),
-                ANDROID_FIREBASE
-        ).configure {
-            // Import FullJUnitReport.xml, not JUnitReport.xml. fullJunitResult=true makes
-            // Flank emit this extra report carrying the flaky markers (failure nodes on
-            // passed-after-retry tests) that the ANDROID_FIREBASE dialect needs to detect
-            // flaky tests; the plain JUnitReport.xml has no such markers (imports fine but
-            // always reports 0 flaky).
-            reports.setFrom(file("build/fladle/fladleResults/FullJUnitReport.xml"))
+tasks.matching { it.name == "execFlankPerfTests" }.configureEach {
+    doFirst {
+        if (!file(config.debugApk.get()).exists()) {
+            throw new GradleException("No internalRelease APK in app/build/outputs/apk/internal/release — run :app:assembleInternalRelease first")
         }
+    }
+}
+
+afterEvaluate {
+    // Fladle registers the Develocity import of Firebase Test Lab (Flank) results itself, pointing at
+    // JUnitReport.xml. Import FullJUnitReport.xml instead: fullJunitResult=true makes Flank emit this
+    // extra report carrying the flaky markers (failure nodes on passed-after-retry tests) that the
+    // ANDROID_FIREBASE dialect needs to detect flaky tests; the plain JUnitReport.xml has no such
+    // markers (imports fine but always reports 0 flaky).
+    tasks.withType(ImportJUnitXmlReports).matching { it.name.startsWith("execFlank") }.configureEach {
+        reports.setFrom(file("build/fladle/fladleResults/FullJUnitReport.xml"))
     }
 }
 
