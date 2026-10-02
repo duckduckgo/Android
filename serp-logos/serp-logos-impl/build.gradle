@@ -29,7 +29,6 @@ dependencies {
     implementation project(':design-system')
     implementation project(':common-utils')
     implementation project(':di')
-    implementation project(':feature-toggles-api')
     implementation project(':navigation-api')
     implementation project(':serp-logos-api')
 
@@ -53,7 +52,6 @@ dependencies {
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation CashApp.turbine
     testImplementation project(':common-test')
-    testImplementation project(':feature-toggles-test')
     testImplementation(KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy
@@ -81,4 +79,3 @@ android {
         coreLibraryDesugaringEnabled = true
     }
 }
-
