@@ -93,6 +93,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.appendFunnelOriginParam
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
 import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
+import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingActivity
 import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
@@ -696,7 +697,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                     override fun onPositiveButtonClicked() {
                         when {
                             launchOnboarding -> {
-                                globalActivityStarter.start(this@SubscriptionsWebViewActivity, SubscriptionOnboardingScreenWithEmptyParams)
+                                startSubscriptionOnboarding()
                                 finish()
                             }
                             subscriptionEventData != null -> {
@@ -754,22 +755,31 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     }
 
     private fun finishToSettings() {
-        // RETURN_TO_CALLER means the screen that started the purchase is still beneath us, so
-        // stacking Settings on top of it would take the user somewhere they did not come from.
-        if (params.completion == SubscriptionPurchaseCompletion.RETURN_TO_CALLER) {
-            finish()
-            return
-        }
-
-        if (params.url == subscriptionsUrlProvider.activateUrl) {
-            setResult(RESULT_OK)
-        } else {
-            globalActivityStarter.startIntent(this, SettingsScreenNoParams)?.let { intent ->
+        when (purchaseFlowExit(params.completion, isActivateUrl = params.url == subscriptionsUrlProvider.activateUrl)) {
+            PurchaseFlowExit.ActivateResult -> setResult(RESULT_OK)
+            // The screen that started the purchase is still beneath us, so stacking Settings on top
+            // of it would take the user somewhere they did not come from.
+            PurchaseFlowExit.ReturnToCaller -> Unit
+            PurchaseFlowExit.GoToSettings -> globalActivityStarter.startIntent(this, SettingsScreenNoParams)?.let { intent ->
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 startActivity(intent)
             }
         }
         finish()
+    }
+
+    // Onboarding owns the back stack once it starts, and its own exit goes to Settings with
+    // CLEAR_TOP — which would destroy the caller this purchase was asked to return to.
+    private fun startSubscriptionOnboarding() {
+        val returnToCaller = purchaseFlowExit(
+            params.completion,
+            isActivateUrl = params.url == subscriptionsUrlProvider.activateUrl,
+        ) == PurchaseFlowExit.ReturnToCaller
+
+        globalActivityStarter.startIntent(this, SubscriptionOnboardingScreenWithEmptyParams)?.let { intent ->
+            intent.putExtra(SubscriptionOnboardingActivity.EXTRA_RETURN_TO_CALLER, returnToCaller)
+            startActivity(intent)
+        }
     }
 
     private fun hasCompletedPurchaseFlow(): Boolean =

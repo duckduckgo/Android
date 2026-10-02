@@ -43,14 +43,20 @@ class SubscriptionPurchaseSuccessObserverTest {
         }
     }
 
+    private class ThrowingPlugin : SubscriptionPurchaseSuccessPlugin {
+        override suspend fun onSubscriptionPurchaseSuccess() = throw RuntimeException("plugin blew up")
+    }
+
     private val plugin = CountingPlugin()
 
-    private fun observer(): SubscriptionPurchaseSuccessObserver {
+    private fun observer(
+        plugins: List<SubscriptionPurchaseSuccessPlugin> = listOf(plugin),
+    ): SubscriptionPurchaseSuccessObserver {
         whenever(subscriptionsManager.currentPurchaseState).thenReturn(purchaseState)
         return SubscriptionPurchaseSuccessObserver(
             subscriptionsManager = subscriptionsManager,
             plugins = object : PluginPoint<SubscriptionPurchaseSuccessPlugin> {
-                override fun getPlugins(): Collection<SubscriptionPurchaseSuccessPlugin> = listOf(plugin)
+                override fun getPlugins(): Collection<SubscriptionPurchaseSuccessPlugin> = plugins
             },
             appCoroutineScope = coroutineTestRule.testScope,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
@@ -66,6 +72,30 @@ class SubscriptionPurchaseSuccessObserverTest {
         advanceUntilIdle()
 
         assertEquals(1, plugin.invocations)
+    }
+
+    @Test
+    fun whenOnePluginThrowsThenTheOthersStillRun() = runTest {
+        observer(plugins = listOf(ThrowingPlugin(), plugin)).onCreate(mock())
+        advanceUntilIdle()
+
+        purchaseState.emit(CurrentPurchase.Success(isFreeTrial = false))
+        advanceUntilIdle()
+
+        assertEquals(1, plugin.invocations)
+    }
+
+    @Test
+    fun whenAPluginThrowsThenALaterPurchaseStillInvokesPlugins() = runTest {
+        observer(plugins = listOf(ThrowingPlugin(), plugin)).onCreate(mock())
+        advanceUntilIdle()
+
+        purchaseState.emit(CurrentPurchase.Success(isFreeTrial = false))
+        advanceUntilIdle()
+        purchaseState.emit(CurrentPurchase.Success(isFreeTrial = false))
+        advanceUntilIdle()
+
+        assertEquals(2, plugin.invocations)
     }
 
     @Test

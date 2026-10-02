@@ -49,6 +49,8 @@ class PirDashboardWebViewViewModelTest {
     private val subscriptions: Subscriptions = mock()
     private val subscriptionStatus = MutableStateFlow(SubscriptionStatus.UNKNOWN)
 
+    private val route = PirPurchaseRoute.NativePurchaseFlow(origin = "funnel_freescan_android", featurePage = "pir")
+
     private lateinit var testee: PirDashboardWebViewViewModel
 
     @Before
@@ -75,6 +77,37 @@ class PirDashboardWebViewViewModelTest {
                 LaunchSubscriptionPurchase(origin = "funnel_freescan_android", featurePage = "pir"),
                 awaitItem(),
             )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test ignores a second purchase request while one is already outstanding`() = runTest {
+        advanceUntilIdle()
+
+        testee.commands().test {
+            testee.onSubscriptionPurchaseRequested(route)
+            assertEquals(LaunchSubscriptionPurchase(origin = "funnel_freescan_android", featurePage = "pir"), awaitItem())
+
+            testee.onSubscriptionPurchaseRequested(route)
+
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test allows a purchase request again after returning to the dashboard`() = runTest {
+        advanceUntilIdle()
+
+        testee.commands().test {
+            testee.onSubscriptionPurchaseRequested(route)
+            assertEquals(LaunchSubscriptionPurchase(origin = "funnel_freescan_android", featurePage = "pir"), awaitItem())
+
+            testee.onStart(mock())
+            testee.onSubscriptionPurchaseRequested(route)
+
+            assertEquals(LaunchSubscriptionPurchase(origin = "funnel_freescan_android", featurePage = "pir"), awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }

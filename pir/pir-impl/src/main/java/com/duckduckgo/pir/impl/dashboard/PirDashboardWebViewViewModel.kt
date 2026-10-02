@@ -35,7 +35,6 @@ import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -59,7 +58,9 @@ class PirDashboardWebViewViewModel @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ViewModel(), DefaultLifecycleObserver {
 
-    private val command = Channel<Command>(1, DROP_OLDEST)
+    private var purchaseFlowOutstanding = false
+
+    private val command = Channel<Command>(Channel.BUFFERED)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
     init {
@@ -83,6 +84,11 @@ class PirDashboardWebViewViewModel @Inject constructor(
     }
 
     fun onSubscriptionPurchaseRequested(route: NativePurchaseFlow) {
+        // The CTA stays tappable while the purchase screen opens, and a replayed second request would
+        // put the paywall back on top of the dashboard the user was just returned to.
+        if (purchaseFlowOutstanding) return
+        purchaseFlowOutstanding = true
+
         viewModelScope.launch {
             command.send(
                 Command.LaunchSubscriptionPurchase(
@@ -95,6 +101,7 @@ class PirDashboardWebViewViewModel @Inject constructor(
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
+        purchaseFlowOutstanding = false
         pirPixelSender.reportDashboardOpened()
         appCoroutineScope.launch {
             pirInteractionReporter.attemptFirePixel()
