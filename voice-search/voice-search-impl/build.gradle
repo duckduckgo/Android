@@ -17,7 +17,6 @@
 plugins {
     id 'com.android.library'
     id 'com.squareup.anvil'
-    id 'kotlin-android'
     id 'com.google.devtools.ksp'
 }
 
