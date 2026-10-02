@@ -35,6 +35,7 @@ import com.duckduckgo.site.permissions.impl.drm.DrmPolicyManager
 import com.duckduckgo.site.permissions.impl.drm.DrmPolicyReason
 import com.duckduckgo.site.permissions.impl.drm.DrmSessionStore
 import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
+import com.duckduckgo.site.permissions.impl.feature.SitePermissionsDialogRedesignFeature
 import com.duckduckgo.site.permissions.impl.feature.SitePermissionsSystemRecoveryFeature
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.nhaarman.mockitokotlin2.any
@@ -71,6 +72,7 @@ class SitePermissionsManagerTest {
     private val mockDrmPolicyManager: DrmPolicyManager = mock()
     private val drmSessionStore = DrmSessionStore()
     private val mockPixel: Pixel = mock()
+    private val sitePermissionsDialogRedesignFeature = FakeFeatureToggleFactory.create(SitePermissionsDialogRedesignFeature::class.java)
 
     private val testee by lazy {
         SitePermissionsManagerImpl(
@@ -84,6 +86,7 @@ class SitePermissionsManagerTest {
             mockDrmPolicyManager,
             drmSessionStore,
             mockPixel,
+            sitePermissionsDialogRedesignFeature,
         )
     }
 
@@ -365,6 +368,38 @@ class SitePermissionsManagerTest {
 
         testee.clearAllButFireproof(testFireproofList)
         verify(mockSitePermissionsRepository).deletePermissionsForSite(domain)
+    }
+
+    @Test
+    fun whenClearForDomainsButFireproofThenDeleteOnlyNonFireproofHostsUnderThoseDomains() = runTest {
+        sitePermissionsDialogRedesignFeature.self().setRawStoredState(Toggle.State(true))
+        sitePermissionsDialogRedesignFeature.singleTabBurnClearing().setRawStoredState(Toggle.State(true))
+        whenever(mockSitePermissionsRepository.sitePermissionsForAllWebsites()).thenReturn(
+            listOf(
+                SitePermissionsEntity("maps.example.com"),
+                SitePermissionsEntity("www.example.com"),
+                SitePermissionsEntity("other.com"),
+                SitePermissionsEntity("192.168.1.1"),
+            ),
+        )
+
+        testee.clearForDomainsButFireproof(setOf("example.com", "192.168.1.1"), listOf("www.example.com"))
+
+        verify(mockSitePermissionsRepository).deletePermissionsForSite("maps.example.com")
+        verify(mockSitePermissionsRepository).deletePermissionsForSite("192.168.1.1")
+        verify(mockSitePermissionsRepository, never()).deletePermissionsForSite("www.example.com")
+        verify(mockSitePermissionsRepository, never()).deletePermissionsForSite("other.com")
+    }
+
+    @Test
+    fun whenClearForDomainsButFireproofAndSingleTabBurnClearingDisabledThenNothingDeleted() = runTest {
+        sitePermissionsDialogRedesignFeature.self().setRawStoredState(Toggle.State(true))
+        sitePermissionsDialogRedesignFeature.singleTabBurnClearing().setRawStoredState(Toggle.State(false))
+
+        testee.clearForDomainsButFireproof(setOf("example.com"), emptyList())
+
+        verify(mockSitePermissionsRepository, never()).sitePermissionsForAllWebsites()
+        verify(mockSitePermissionsRepository, never()).deletePermissionsForSite(any())
     }
 
     @Test

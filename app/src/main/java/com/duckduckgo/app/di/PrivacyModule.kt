@@ -41,7 +41,7 @@ import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
+import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
 import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -80,7 +80,7 @@ object PrivacyModule {
         savedSitesRepository: SavedSitesRepository,
         navigationHistory: NavigationHistory,
         dispatcherProvider: DispatcherProvider,
-        webTrackingRepository: WebTrackersBlockedRepository,
+        webTrackersBlockedHistory: WebTrackersBlockedHistory,
         tabVisitedSitesRepository: TabVisitedSitesRepository,
         webViewCapabilityChecker: WebViewCapabilityChecker,
         duckAiHostProvider: DuckAiHostProvider,
@@ -104,7 +104,7 @@ object PrivacyModule {
             savedSitesRepository,
             navigationHistory,
             dispatcherProvider,
-            webTrackingRepository,
+            webTrackersBlockedHistory,
             tabVisitedSitesRepository,
             webViewCapabilityChecker,
             duckAiHostProvider,

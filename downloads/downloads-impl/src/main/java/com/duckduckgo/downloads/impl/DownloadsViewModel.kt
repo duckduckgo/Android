@@ -152,7 +152,7 @@ class DownloadsViewModel @Inject constructor(
             if (staleDownloadIds.isNotEmpty()) {
                 downloadsRepository.delete(staleDownloadIds)
             }
-            newDownloadState.onDownloadsScreenViewed()
+            newDownloadState.onNewDownloadAcknowledged()
         }
     }
 

@@ -39,12 +39,10 @@ import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.ChangePrivac
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.CustomTabs
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.Notifications
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.OpenUASelector
-import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.SendTdsIntent
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.Tabs
 import com.duckduckgo.app.dev.settings.customtabs.CustomTabsInternalSettingsActivity
 import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.dev.settings.notifications.NotificationsActivity
-import com.duckduckgo.app.dev.settings.privacy.TrackerDataDevReceiver.Companion.DOWNLOAD_TDS_INTENT_ACTION
 import com.duckduckgo.app.dev.settings.tabs.DevTabsActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
@@ -115,6 +113,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         }
         binding.overrideUserAgentSelector.setOnClickListener { viewModel.onUserAgentSelectorClicked() }
         binding.overridePrivacyRemoteConfigUrl.setOnClickListener { viewModel.onRemotePrivacyUrlClicked() }
+        binding.resetTds.setOnClickListener { viewModel.onResetTdsClicked() }
         binding.customTabs.setOnClickListener { viewModel.customTabsClicked() }
         binding.notifications.setOnClickListener { viewModel.notificationsClicked() }
         binding.tabs.setOnClickListener { viewModel.tabsClicked() }
@@ -141,7 +140,6 @@ class DevSettingsActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: Command) {
         when (it) {
-            is SendTdsIntent -> sendTdsIntent()
             is OpenUASelector -> showUASelector()
             is ChangePrivacyConfigUrl -> showChangePrivacyUrl()
             is CustomTabs -> showCustomTabs()
@@ -154,13 +152,6 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     private fun goToUrl(url: String) {
         startActivity(BrowserActivity.intent(this, launchSource = InAppNavigation, queryExtra = url))
         finish()
-    }
-
-    private fun sendTdsIntent() {
-        Toast.makeText(this, getString(R.string.devSettingsScreenTdsWait), Toast.LENGTH_SHORT).show()
-        val intent = Intent()
-        intent.action = DOWNLOAD_TDS_INTENT_ACTION
-        sendBroadcast(intent)
     }
 
     private fun showUASelector() {

@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toTldPlusOneOrSelf
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
@@ -37,6 +38,7 @@ import com.duckduckgo.site.permissions.impl.drm.DrmPolicyManager
 import com.duckduckgo.site.permissions.impl.drm.DrmPolicyReason
 import com.duckduckgo.site.permissions.impl.drm.DrmSessionStore
 import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
+import com.duckduckgo.site.permissions.impl.feature.SitePermissionsDialogRedesignFeature
 import com.duckduckgo.site.permissions.impl.feature.SitePermissionsSystemRecoveryFeature
 import com.duckduckgo.site.permissions.impl.feature.isCentralPolicyEnabled
 import com.squareup.anvil.annotations.ContributesBinding
@@ -57,6 +59,7 @@ class SitePermissionsManagerImpl @Inject constructor(
     private val drmPolicyManager: DrmPolicyManager,
     private val drmSessionStore: DrmSessionStore,
     private val pixel: Pixel,
+    private val sitePermissionsDialogRedesignFeature: SitePermissionsDialogRedesignFeature,
 ) : SitePermissionsManager {
 
     private suspend fun getSitePermissionsGranted(
@@ -144,6 +147,15 @@ class SitePermissionsManagerImpl @Inject constructor(
         drmSessionStore.clear()
         sitePermissionsRepository.sitePermissionsForAllWebsites().forEach { permission ->
             if (!fireproofDomains.contains(permission.domain)) {
+                sitePermissionsRepository.deletePermissionsForSite(permission.domain)
+            }
+        }
+    }
+
+    override suspend fun clearForDomainsButFireproof(domains: Set<String>, fireproofDomains: List<String>) {
+        if (!withContext(dispatcherProvider.io()) { sitePermissionsDialogRedesignFeature.singleTabBurnClearing().isEnabled() }) return
+        sitePermissionsRepository.sitePermissionsForAllWebsites().forEach { permission ->
+            if (permission.domain.toTldPlusOneOrSelf() in domains && permission.domain !in fireproofDomains) {
                 sitePermissionsRepository.deletePermissionsForSite(permission.domain)
             }
         }

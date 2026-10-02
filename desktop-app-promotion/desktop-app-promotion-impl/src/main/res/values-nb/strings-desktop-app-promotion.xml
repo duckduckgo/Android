@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
   ~ Copyright (c) 2026 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,15 +14,14 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="desktopAppPromotionToolbarTitle">Skaff deg nettleseren for datamaskin</string>
+    <string name="desktopAppPromotionToolbarTitle" instruction="Toolbar title of the screen promoting the DuckDuckGo desktop browser">Skaff deg nettleseren for datamaskin</string>
     <string name="desktopAppPromotionTitle">Beskytt personopplysningene dine på Mac og Windows også!</string>
     <string name="desktopAppPromotionBody">For å laste ned DuckDuckGo på Mac eller Windows kan du gå til:</string>
-    <string name="desktopAppPromotionUrl">duckduckgo.com/browser</string>
+    <string name="desktopAppPromotionUrl" instruction="The download URL shown on screen; not a full link">duckduckgo.com/browser</string>
     <string name="desktopAppPromotionShareDownloadLink">Del nedlastingslenke</string>
     <string name="desktopAppPromotionNoThanks">Nei takk</string>
-    <string name="desktopAppPromotionLinkCopied">Lenken er kopiert</string>
+    <string name="desktopAppPromotionLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Lenken er kopiert</string>
 </resources>

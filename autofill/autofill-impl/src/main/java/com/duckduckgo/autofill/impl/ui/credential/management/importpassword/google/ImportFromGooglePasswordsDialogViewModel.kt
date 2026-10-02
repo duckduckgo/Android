@@ -31,6 +31,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goog
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.PreImport
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -43,6 +44,7 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val importPasswordsPixelSender: ImportPasswordsPixelSender,
     private val autofillStore: InternalAutofillStore,
+    private val promptExposureReporter: PromptExposureReporter,
 ) : ViewModel() {
 
     fun onImportFlowFinishedSuccessfully() {
@@ -90,6 +92,10 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
             autofillStore.inBrowserImportPromoShownCount += 1
         }
         importPasswordsPixelSender.onImportPasswordsDialogDisplayed(importSource)
+        // Only the password-field promo is app-originated; the other sources are opened by the user.
+        if (importSource == AutofillImportLaunchSource.InBrowserPromo) {
+            promptExposureReporter.reportPromptShown(IMPORT_PASSWORDS_GOOGLE_PROMPT_ID)
+        }
         _viewState.value = viewState.value.copy(viewMode = viewMode)
     }
 
@@ -114,5 +120,9 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
         data class ImportSuccess(val importResult: ImportResult.Finished) : ViewMode
         data object ImportError : ViewMode
         data object FlowTerminated : ViewMode
+    }
+
+    private companion object {
+        const val IMPORT_PASSWORDS_GOOGLE_PROMPT_ID = "import_passwords_google"
     }
 }

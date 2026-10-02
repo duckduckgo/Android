@@ -18,4 +18,16 @@
     <!-- DRM -->
     <string name="sitePermissionsSettingsDRM">DRM</string>
 
+    <!-- Permission settings redesign -->
+    <string name="permissionSettingsAlwaysAllow">Always Allow</string>
+    <string name="permissionSettingsAskEachTime">Ask Each Time</string>
+    <string name="permissionSettingsLocationDialogTitle">Allow sites to ask for location permission</string>
+    <string name="permissionSettingsLocationDialogMessage">If you choose “Never Allow”, you won’t be able to use certain features on sites, like directions on maps, or nearby shops.</string>
+    <string name="permissionSettingsCameraDialogTitle">Allow sites to ask for camera permission</string>
+    <string name="permissionSettingsCameraDialogMessage">If you choose “Never Allow”, you won’t be able to use features like video chatting on sites.</string>
+    <string name="permissionSettingsMicrophoneDialogTitle">Allow sites to ask for microphone permission</string>
+    <string name="permissionSettingsMicrophoneDialogMessage">If you choose “Never Allow”, you won’t be able to use features like voice chatting on sites.</string>
+    <string name="permissionSettingsDrmDialogTitle">Allow sites to ask for Digital Rights Management (DRM) permission</string>
+    <string name="permissionSettingsDrmDialogMessage">If you choose “Never Allow”, videos on the site may become unplayable.</string>
+
 </resources>

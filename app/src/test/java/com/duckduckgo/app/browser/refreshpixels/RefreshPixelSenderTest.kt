@@ -9,6 +9,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
 import com.duckduckgo.app.trackerdetection.blocklist.BlockListPixelsPlugin
 import com.duckduckgo.app.trackerdetection.blocklist.FakeFeatureTogglesInventory
+import com.duckduckgo.app.trackerdetection.blocklist.RealBlockListExperiment
 import com.duckduckgo.app.trackerdetection.blocklist.TestBlockListFeature
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -83,7 +84,7 @@ class RefreshPixelSenderTest {
             pixel = mockPixel,
             appCoroutineScope = coroutineTestRule.testScope,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            blockListPixelsPlugin = BlockListPixelsPlugin(inventory),
+            blockListExperiment = RealBlockListExperiment(inventory, blockListPixelsPlugin),
         )
     }
 

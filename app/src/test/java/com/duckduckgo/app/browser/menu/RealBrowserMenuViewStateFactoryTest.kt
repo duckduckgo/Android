@@ -687,4 +687,38 @@ class RealBrowserMenuViewStateFactoryTest {
         assertTrue(header is PageContextHeaderState.Error)
         assertEquals("broken-site.com", (header as PageContextHeaderState.Error).shortUrl)
     }
+
+    @Test
+    fun `when has new download then showDownloadDot is true`() = runTest {
+        whenever(newDownloadState.hasNewDownload()).thenReturn(true)
+
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser("https://example.com"),
+            viewState = BrowserViewState(),
+            customTabsMode = false,
+            tabId = "tabId",
+            title = "title",
+            shortUrl = "example.com",
+            omnibarText = "https://example.com",
+        )
+
+        assertTrue((result as BrowserMenuViewState.Browser).showDownloadDot)
+    }
+
+    @Test
+    fun `when no new download then showDownloadDot is false`() = runTest {
+        whenever(newDownloadState.hasNewDownload()).thenReturn(false)
+
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser("https://example.com"),
+            viewState = BrowserViewState(),
+            customTabsMode = false,
+            tabId = "tabId",
+            title = "title",
+            shortUrl = "example.com",
+            omnibarText = "https://example.com",
+        )
+
+        assertFalse((result as BrowserMenuViewState.Browser).showDownloadDot)
+    }
 }

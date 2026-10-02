@@ -255,8 +255,8 @@
     <string name="duck_ai_chat_history_action_new">Нов</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Изтегляне на чатове</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Завършено изтегляне на %1$d чат</item>
-        <item quantity="other">Завършено изтегляне на %1$d чата</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Завършено изтегляне на %1$d чат</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Завършено изтегляне на %1$d чата</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Отваряне на менюто с допълнителни опции</string>
     <string name="duck_ai_chat_history_select_all">Избиране на всички</string>
@@ -282,6 +282,11 @@
     <string name="native_input_chat_duck_mode_hint">Отговор…</string>
 
     <!-- Model Picker -->
+    <string name="duckAiModelPickerLabelEverydayUse" instruction="Subline under a model in the Duck.ai model picker, describing what that model suits.">Най-подходящ за ежедневна употреба</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster" instruction="Subline under a model in the Duck.ai model picker. &apos;Limits&apos; means the user&apos;s usage allowance, which this model consumes more quickly.">Стабилен, но достига лимитите по-бързо</string>
+    <string name="duckAiModelPickerTryFreeTrial" instruction="Header above the locked models in the Duck.ai model picker, shown when the user can still start a free trial.">Пробвайте безплатно</string>
+    <string name="duckAiModelPickerSubscriberExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when unlocking them requires a paid subscription.">Ексклузивно за абонати</string>
+    <string name="duckAiModelPickerProExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when they require the Pro plan specifically. &apos;Pro&apos; is the plan name and stays untranslated.">Ексклузивно за план Pro</string>
     <string name="duckAiModelPickerPlusModels">Плюс</string>
     <string name="duckAiModelPickerProModels">Pro</string>
 
@@ -350,4 +355,23 @@
     <string name="duckChatContextualAskAboutPage">Попитайте за страницата</string>
     <string name="duckChatContextualAskAboutSearch">Продължаване в Duck.ai</string>
     <string name="duckChatContextualOpenDuckAi">Отваряне на Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Обобщи този избран текст</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Обобщи този избран текст.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Преведи този избран текст</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Преведи този избран текст на %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Избран текст</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Можеш да добавиш до %1$d избрани текста. Премахни един, за да добавиш друг.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Попитайте Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d дума</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d думи</item>
+    </plurals>
 </resources>

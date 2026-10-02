@@ -37,26 +37,51 @@ class PageLoadProgressBar @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : View(context, attrs, defStyleAttr) {
 
-    private val config = ProgressBarConfig()
+    private val defaultConfig = ProgressBarConfig()
+    private val updatedConfig = ProgressBarConfig(
+        initialProgress = 10f,
+        fastStartDurationMs = 300L,
+        fadeInDurationMs = 50L,
+    )
+    private var activeConfig = defaultConfig
 
     private val timeProvider = object : TimeProvider {
         override fun elapsedRealtime(): Long = SystemClock.elapsedRealtime()
     }
 
-    private val engine = ProgressPhaseEngine(config, timeProvider)
+    private var engine = ProgressPhaseEngine(activeConfig, timeProvider)
 
     private val barColor = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorOmnibarAccent)
 
-    private val shimmerRenderer = ShimmerRenderer(
+    private var shimmerRenderer = buildShimmerRenderer(activeConfig)
+
+    private var indeterminateSweepRenderer = buildIndeterminateSweepRenderer(activeConfig)
+
+    private fun buildShimmerRenderer(config: ProgressBarConfig) = ShimmerRenderer(
         config = config,
         density = resources.displayMetrics.density,
         shimmerColor = lighten(barColor, shimmerLightenFraction(config)),
     )
 
-    private val indeterminateSweepRenderer = IndeterminateSweepRenderer(
+    private fun buildIndeterminateSweepRenderer(config: ProgressBarConfig) = IndeterminateSweepRenderer(
         config = config,
         barColor = barColor,
     )
+
+    /**
+     * Selects the right progress config and rebuilds internal states from it,
+     * so all states always agree on the same config, then starts.
+     */
+    fun start(animationUpdateEnabled: Boolean) {
+        val resolved = if (animationUpdateEnabled) updatedConfig else defaultConfig
+        if (resolved != activeConfig) {
+            activeConfig = resolved
+            engine = ProgressPhaseEngine(activeConfig, timeProvider)
+            shimmerRenderer = buildShimmerRenderer(activeConfig)
+            indeterminateSweepRenderer = buildIndeterminateSweepRenderer(activeConfig)
+        }
+        start()
+    }
 
     private val progressPaint = Paint().apply {
         color = barColor
@@ -118,7 +143,7 @@ class PageLoadProgressBar @JvmOverloads constructor(
         }
     }
 
-    fun start() {
+    private fun start() {
         val wasVisible = isDismissing || isVisible
         if (isDismissing) {
             animate().cancel()
@@ -136,7 +161,7 @@ class PageLoadProgressBar @JvmOverloads constructor(
             alpha = 1f
         } else {
             alpha = 0f
-            animate().alpha(1f).setDuration(config.fadeInDurationMs).start()
+            animate().alpha(1f).setDuration(activeConfig.fadeInDurationMs).start()
         }
         visibility = VISIBLE
         lastFrameTimeNanos = 0L
@@ -188,7 +213,7 @@ class PageLoadProgressBar @JvmOverloads constructor(
         isDismissing = true
         animate()
             .alpha(0f)
-            .setDuration(config.fadeOutDurationMs)
+            .setDuration(activeConfig.fadeOutDurationMs)
             .withEndAction {
                 if (isDismissing) {
                     _isStarted = false

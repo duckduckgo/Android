@@ -45,11 +45,6 @@ interface DuckAiFeatureState {
     val showOmnibarShortcutInAllStates: StateFlow<Boolean>
 
     /**
-     * Indicates whether the new address bar option choice screen feature is enabled.
-     */
-    val showAIChatAddressBarOptionChoiceScreen: StateFlow<Boolean>
-
-    /**
      * Indicates whether the Setting for allowing Duck.ai chats to be deleted with the Fire Button is enabled
      */
     val showClearDuckAIChatHistory: StateFlow<Boolean>
@@ -69,6 +64,11 @@ interface DuckAiFeatureState {
      * Indicates whether Duck.ai should be open in Contextual mode
      */
     val showContextualMode: StateFlow<Boolean>
+
+    /**
+     * Indicates whether the "Ask Duck.ai" text selection menu item should be shown.
+     */
+    val showTextSelectionAction: StateFlow<Boolean>
 
     /**
      * Indicates whether Duck.ai should be used as digital assistant

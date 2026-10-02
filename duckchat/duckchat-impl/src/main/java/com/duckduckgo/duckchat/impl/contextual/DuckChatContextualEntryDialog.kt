@@ -341,7 +341,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
         viewModel.viewState
-            .map { it.attachedContext?.serialized }
+            .map { it.latestPageContext }
             .filterNotNull()
             .distinctUntilChanged()
             .onEach { binding.entrySuggestionsView.onPageContextUpdated(it) }
@@ -355,6 +355,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
             tabId = tabId,
             card = binding.entryNativeInputCard,
             widget = binding.entryNativeInputWidget,
+            footer = binding.entryNativeInputFooter,
             jsMessaging = contentScopeScripts,
             lifecycleOwner = viewLifecycleOwner,
             chatIdFlow = chatIdFlow,

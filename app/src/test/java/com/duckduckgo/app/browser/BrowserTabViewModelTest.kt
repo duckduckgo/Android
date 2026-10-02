@@ -128,6 +128,8 @@ import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
+import com.duckduckgo.app.browser.menu.BrowserMenuAcknowledgement
+import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.modals.NewTabPageModalPresenterRegistry
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
@@ -255,6 +257,7 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.tabs.model.AggregateTabProvider
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
+import com.duckduckgo.app.tabs.model.TabAtomicOperations
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabPageContextRepository
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -294,6 +297,7 @@ import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
+import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -473,6 +477,8 @@ class BrowserTabViewModelTest {
     private val mockOmnibarConverter: OmnibarEntryConverter = mock()
 
     private val mockTabRepository: TabRepository = mock()
+
+    private val mockTabAtomicOperations: TabAtomicOperations = mock()
 
     private val mockAggregateTabProvider: AggregateTabProvider = mock()
 
@@ -746,6 +752,7 @@ class BrowserTabViewModelTest {
     private var fakeFaviconFetchingFixFeature = FakeFeatureToggleFactory.create(FaviconFetchingFixFeature::class.java)
     private var fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
     private val fakeAutocompleteHistoryDeleteFeature = FakeFeatureToggleFactory.create(AutocompleteHistoryDeleteFeature::class.java)
+    private val fakeNewTabReturnHatchFeature = FakeFeatureToggleFactory.create(NewTabReturnHatchFeature::class.java)
     private val mockDesktopModeSettings: DesktopModeSettings = mock()
     private val fakeRememberDesktopModeFeature = FakeFeatureToggleFactory.create(RememberDesktopModeFeature::class.java)
     private val fakeSuggestRedirectFeature = FakeFeatureToggleFactory.create(SuggestRedirectOnUnresolvedErrorFeature::class.java)
@@ -753,6 +760,7 @@ class BrowserTabViewModelTest {
     private val mockSuggestRedirectEvaluator: SuggestRedirectEvaluator = mock()
     private val mockBadUrlErrorPageWideEvent: BadUrlErrorPageWideEvent = mock()
     private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
+    private val mockBrowserMenuAcknowledgement: BrowserMenuAcknowledgement = mock()
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
     private val mockPdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore = mock()
     private val mockCachedFileDownloader: CachedFileDownloader = mock()
@@ -990,6 +998,8 @@ class BrowserTabViewModelTest {
                 duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
                 siteFactory = siteFactory,
                 tabRepository = mockTabRepository,
+                tabAtomicOperations = mockTabAtomicOperations,
+                newTabReturnHatchFeature = fakeNewTabReturnHatchFeature,
                 userAllowListRepository = mockUserAllowListRepository,
                 networkLeaderboardDao = mockNetworkLeaderboardDao,
                 autoComplete = mockAutoCompleteApi,
@@ -1111,6 +1121,7 @@ class BrowserTabViewModelTest {
                 badUrlErrorPageWideEvent = mockBadUrlErrorPageWideEvent,
                 customErrorPagesFeature = fakeCustomErrorPagesFeature,
                 duckAiSessionCallback = mockDuckAiSessionCallback,
+                browserMenuAcknowledgement = mockBrowserMenuAcknowledgement,
             )
 
         testee.loadData("abc", null, false, false)
@@ -1168,6 +1179,48 @@ class BrowserTabViewModelTest {
 
             verify(mockTabRepository).addNewTabAfterExistingTab(url, "abc")
         }
+
+    @Test
+    fun whenReturningToRegularHatchAndDefaultOnFeatureAndAtomicOperationSucceedsThenFallbackNavigationIsSuppressed() = runTest {
+        whenever(mockTabAtomicOperations.deleteSelectedBlankTabAndSelectTarget("current", "target")).thenReturn(true)
+        val navigations = mutableListOf<Pair<BrowserMode, String>>()
+
+        testee.returnToHatch("current", BrowserMode.REGULAR, "target") { mode, id -> navigations += mode to id }
+
+        verify(mockTabAtomicOperations).deleteSelectedBlankTabAndSelectTarget("current", "target")
+        assertTrue(navigations.isEmpty())
+    }
+
+    @Test
+    fun whenReturningToRegularHatchAndAtomicOperationIsRejectedThenFallbackNavigationUsesExactTarget() = runTest {
+        whenever(mockTabAtomicOperations.deleteSelectedBlankTabAndSelectTarget("current", "target")).thenReturn(false)
+        val navigations = mutableListOf<Pair<BrowserMode, String>>()
+
+        testee.returnToHatch("current", BrowserMode.REGULAR, "target") { mode, id -> navigations += mode to id }
+
+        assertEquals(listOf(BrowserMode.REGULAR to "target"), navigations)
+    }
+
+    @Test
+    fun whenReturningToRegularHatchAndFeatureIsDisabledThenFallbackUsesExactTargetWithoutAtomicDeletion() = runTest {
+        fakeNewTabReturnHatchFeature.closeNewTabOnReturn().setRawStoredState(State(enable = false))
+        val navigations = mutableListOf<Pair<BrowserMode, String>>()
+
+        testee.returnToHatch("current", BrowserMode.REGULAR, "target") { mode, id -> navigations += mode to id }
+
+        verifyNoInteractions(mockTabAtomicOperations)
+        assertEquals(listOf(BrowserMode.REGULAR to "target"), navigations)
+    }
+
+    @Test
+    fun whenReturningToFireHatchThenCleanupIsBypassedAndFallbackNavigationUsesExactTarget() = runTest {
+        val navigations = mutableListOf<Pair<BrowserMode, String>>()
+
+        testee.returnToHatch("current", BrowserMode.FIRE, "fire-target") { mode, id -> navigations += mode to id }
+
+        verifyNoInteractions(mockTabAtomicOperations)
+        assertEquals(listOf(BrowserMode.FIRE to "fire-target"), navigations)
+    }
 
     @Test
     fun whenViewBecomesVisibleAndHomeShowingThenKeyboardShown() =
@@ -9970,6 +10023,20 @@ class BrowserTabViewModelTest {
         }
 
     @Test
+    fun whenBrowserMenuLaunchedThenBrowserMenuAcknowledgementIsNotified() =
+        runTest {
+            testee.onBrowserMenuLaunched(ViewMode.Browser("https://example.com"))
+            verify(mockBrowserMenuAcknowledgement).onBrowserMenuViewed(BrowserViewMode.Browser)
+        }
+
+    @Test
+    fun whenBrowserMenuLaunchedInCustomTabThenBrowserMenuAcknowledgementStillReceivesTheMode() =
+        runTest {
+            testee.onBrowserMenuLaunched(ViewMode.CustomTab(0, "example.com", null))
+            verify(mockBrowserMenuAcknowledgement).onBrowserMenuViewed(BrowserViewMode.CustomTab)
+        }
+
+    @Test
     fun whenBrowserMenuLaunchedInNonBrowserModeThenDoNotClearHighlight() =
         runTest {
             testee.onBrowserMenuLaunched(ViewMode.NewTab)
@@ -11450,9 +11517,9 @@ class BrowserTabViewModelTest {
         fakeCustomHeadersPlugin.headers = mapOf(X_DUCKDUCKGO_ANDROID_HEADER to "TEST_VALUE")
     }
 
-    private suspend fun givenFireButtonPulsing() {
+    private suspend fun givenFireButtonPulsing(dismissedCta: CtaId = DAX_DIALOG_TRACKERS_FOUND) {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
-        dismissedCtaDaoChannel.send(listOf(DismissedCta(DAX_DIALOG_TRACKERS_FOUND)))
+        dismissedCtaDaoChannel.send(listOf(DismissedCta(dismissedCta)))
     }
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
@@ -11653,6 +11720,22 @@ class BrowserTabViewModelTest {
     private fun brandDesignDuckAiFireButtonCta() = DaxDuckAiFireButtonBrandDesignUpdateContextualCta(
         onboardingStore = mockOnboardingStore,
         appInstallStore = mockAppInstallStore,
+        isLightTheme = true,
+        deviceInfo = mockDeviceInfo,
+    )
+
+    private fun trackersBlockedCta() = DaxTrackersBlockedCta(
+        onboardingStore = mockOnboardingStore,
+        appInstallStore = mockAppInstallStore,
+        trackers = emptyList(),
+        settingsDataStore = mockSettingsDataStore,
+    )
+
+    private fun brandDesignTrackersBlockedCta() = DaxTrackersBlockedBrandDesignUpdateContextualCta(
+        onboardingStore = mockOnboardingStore,
+        appInstallStore = mockAppInstallStore,
+        trackers = emptyList(),
+        settingsDataStore = mockSettingsDataStore,
         isLightTheme = true,
         deviceInfo = mockDeviceInfo,
     )
@@ -11872,24 +11955,41 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDuckChatNativeNewChatRequested() = runTest {
-        val expectedEvent = SubscriptionEventData(
-            featureName = "event1",
-            subscriptionName = "subscription1",
-            params = JSONObject(),
-        )
-        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)).thenReturn(expectedEvent)
+    fun whenNewChatRequestedFromChatMenuThenOpensNewTabWithEmptyChat() = runTest {
+        testee.openNewDuckChatFromChatMenu()
 
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertEquals(duckChatURL, query)
+            assertEquals("abc", sourceTabId)
+        }
+        verify(mockDuckChatJSHelper, never()).onNativeAction(NativeAction.NEW_CHAT)
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, opensNewTab = true, hasPrompt = false)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
+        verify(mockDuckAiSessionCallback).onNewChatCreated("abc")
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+    }
+
+    @Test
+    fun whenNewChatRequestedFromBrowsingMenuOnDuckAiTabThenOpensNewTabWithDuckAiEntryPoint() = runTest {
         testee.openNewDuckChat(ViewMode.DuckAI)
 
-        testee.subscriptionEventDataFlow.test {
-            val emittedEvent = awaitItem()
-            assertEquals(expectedEvent.featureName, emittedEvent.featureName)
-            assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
-            assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
-            cancelAndIgnoreRemainingEvents()
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertEquals(duckChatURL, query)
+            assertEquals("abc", sourceTabId)
         }
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.BROWSING_MENU_DUCKAI, opensNewTab = true, hasPrompt = false)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
+        verify(mockDuckAiSessionCallback).onNewChatCreated("abc")
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+    }
+
+    @Test
+    fun whenNewChatRequestedFromBrowsingMenuOnWebpageThenNoNewChatRecordedForTheSession() = runTest {
+        testee.openNewDuckChat(ViewMode.Browser("https://example.com"))
+
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE, opensNewTab = true, hasPrompt = false)
+        verify(mockDuckAiSessionCallback, never()).onNewChatCreated(any())
+        verify(mockDuckAiSessionCallback, never()).onExitIntent(any(), any())
     }
 
     @Test
@@ -11920,6 +12020,7 @@ class BrowserTabViewModelTest {
             assertTrue(command.query == duckChatURL)
 
             verify(mockDuckChat, never()).openDuckChat(any())
+            verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.BROWSING_MENU_NTP, opensNewTab = true, hasPrompt = false)
             verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
         }
 
@@ -13459,6 +13560,46 @@ class BrowserTabViewModelTest {
         advanceUntilIdle()
 
         assertFalse((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
+    }
+
+    @Test
+    fun whenTrackersBlockedCtaShownAndPulseActiveThenFireButtonNotHighlighted() = runTest {
+        val observer = ValueCaptorObserver<BrowserViewState>(false)
+        testee.browserViewState.observeForever(observer)
+        givenFireButtonPulsing(DAX_DIALOG_NETWORK)
+
+        testee.ctaViewState.value = ctaViewState().copy(cta = trackersBlockedCta())
+        advanceUntilIdle()
+
+        assertFalse((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
+    }
+
+    @Test
+    fun whenBrandDesignTrackersBlockedCtaShownAndPulseActiveThenFireButtonNotHighlighted() = runTest {
+        val observer = ValueCaptorObserver<BrowserViewState>(false)
+        testee.browserViewState.observeForever(observer)
+        givenFireButtonPulsing(DAX_DIALOG_NETWORK)
+
+        testee.ctaViewState.value = ctaViewState().copy(cta = brandDesignTrackersBlockedCta())
+        advanceUntilIdle()
+
+        assertFalse((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
+    }
+
+    @Test
+    fun whenTrackersBlockedCtaDismissedAndPulseActiveThenFireButtonHighlightRestored() = runTest {
+        val observer = ValueCaptorObserver<BrowserViewState>(false)
+        testee.browserViewState.observeForever(observer)
+        givenFireButtonPulsing(DAX_DIALOG_NETWORK)
+
+        testee.ctaViewState.value = ctaViewState().copy(cta = trackersBlockedCta())
+        advanceUntilIdle()
+        assertFalse((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
+
+        testee.ctaViewState.value = ctaViewState().copy(cta = null)
+        advanceUntilIdle()
+
+        assertTrue((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
     }
 
     @Test

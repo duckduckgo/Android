@@ -405,6 +405,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_goneMarginBottom="@dimen/keyline_4" />
 
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/subscriptionOnboardingVpnNextButtonSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:importantForAccessibility="no"
+        android:visibility="gone"
+        app:indicatorSize="20dp"
+        app:layout_constraintBottom_toBottomOf="@id/subscriptionOnboardingVpnNextButton"
+        app:layout_constraintEnd_toEndOf="@id/subscriptionOnboardingVpnNextButton"
+        app:layout_constraintStart_toStartOf="@id/subscriptionOnboardingVpnNextButton"
+        app:layout_constraintTop_toTopOf="@id/subscriptionOnboardingVpnNextButton"
+        app:trackThickness="2dp" />
+
     <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
         android:id="@+id/subscriptionOnboardingVpnSkipButton"
         android:layout_width="match_parent"

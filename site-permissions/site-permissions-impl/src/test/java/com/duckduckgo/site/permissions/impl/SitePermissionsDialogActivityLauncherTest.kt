@@ -596,9 +596,10 @@ class SitePermissionsDialogActivityLauncherTest {
     }
 
     @Test
-    fun whenFireModeAndNeverAllowClickedThenDeniedButNothingPersisted() {
+    fun whenFireModeAndDenyClickedThenDeniedButNothingPersisted() {
         val fireLauncher = createLauncher(BrowserMode.FIRE)
         sitePermissionsDialogRedesignFeature.self().setRawStoredState(Toggle.State(true))
+        drmPolicyFeature.fireModeDenyButton().setRawStoredState(Toggle.State(true))
 
         val activity = Robolectric.buildActivity(ThemedActivity::class.java).setup().get()
         val request: PermissionRequest = mock()
@@ -618,7 +619,17 @@ class SitePermissionsDialogActivityLauncherTest {
         )
 
         val dialog = ShadowDialog.getLatestDialog() as AlertDialog
-        dialog.findViewById<LinearLayout>(CommonR.id.stackedAlertDialogButtonLayout)!!.getChildAt(2).performClick()
+        val buttons = dialog.tieredButtons()
+        assertEquals(2, buttons.childCount)
+        assertEquals(
+            dialog.context.getString(R.string.sitePermissionsDialogAllowThisTimeButton),
+            (buttons.getChildAt(0) as Button).text,
+        )
+        assertEquals(
+            dialog.context.getString(R.string.sitePermissionsDialogDenyButton),
+            (buttons.getChildAt(1) as Button).text,
+        )
+        buttons.getChildAt(1).performClick()
         shadowOf(Looper.getMainLooper()).idle()
 
         verify(request).deny()
@@ -626,7 +637,38 @@ class SitePermissionsDialogActivityLauncherTest {
     }
 
     @Test
-    fun whenFireModeAndAllowWhileUsingSiteClickedThenGrantedButNothingPersisted() {
+    fun whenFireModeAndDenyButtonDisabledThenStandardTiersShown() {
+        val fireLauncher = createLauncher(BrowserMode.FIRE)
+        sitePermissionsDialogRedesignFeature.self().setRawStoredState(Toggle.State(true))
+        drmPolicyFeature.fireModeDenyButton().setRawStoredState(Toggle.State(false))
+
+        val activity = Robolectric.buildActivity(ThemedActivity::class.java).setup().get()
+        val request: PermissionRequest = mock()
+        whenever(request.resources).thenReturn(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE))
+        whenever(request.origin).thenReturn(Uri.parse("https://example.com"))
+
+        fireLauncher.askForSitePermission(
+            activity = activity,
+            url = "https://example.com",
+            tabId = "tabId",
+            permissionsRequested = SitePermissions(
+                autoAccept = emptyList(),
+                userHandled = listOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE),
+            ),
+            request = request,
+            permissionsGrantedListener = permissionsGrantedListener,
+        )
+
+        val buttons = (ShadowDialog.getLatestDialog() as AlertDialog).tieredButtons()
+        assertEquals(3, buttons.childCount)
+        assertEquals(
+            buttons.context.getString(R.string.sitePermissionsDialogNeverAllowButton),
+            (buttons.getChildAt(2) as Button).text,
+        )
+    }
+
+    @Test
+    fun whenFireModeAndAllowThisTimeClickedThenGrantedButNothingPersisted() {
         val fireLauncher = createLauncher(BrowserMode.FIRE)
         sitePermissionsDialogRedesignFeature.self().setRawStoredState(Toggle.State(true))
         whenever(systemPermissionsHelper.hasCameraPermissionsGranted()).thenReturn(true)

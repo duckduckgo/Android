@@ -255,9 +255,9 @@
     <string name="duck_ai_chat_history_action_new">Nou</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Descarcă chaturile</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Descărcare finalizată pentru %1$d chat</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Descărcare finalizată pentru %1$d chat</item>
         <item quantity="few">Descărcare completă pentru %1$d chaturi</item>
-        <item quantity="other">Descărcare completă pentru %1$d de chaturi</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Descărcare completă pentru %1$d de chaturi</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Deschide meniul suplimentar</string>
     <string name="duck_ai_chat_history_select_all">Selectează toate</string>
@@ -283,6 +283,11 @@
     <string name="native_input_chat_duck_mode_hint">Răspunde…</string>
 
     <!-- Model Picker -->
+    <string name="duckAiModelPickerLabelEverydayUse" instruction="Subline under a model in the Duck.ai model picker, describing what that model suits.">Optim pentru utilizare zilnică</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster" instruction="Subline under a model in the Duck.ai model picker. &apos;Limits&apos; means the user&apos;s usage allowance, which this model consumes more quickly.">Robust, dar atinge limitele mai repede</string>
+    <string name="duckAiModelPickerTryFreeTrial" instruction="Header above the locked models in the Duck.ai model picker, shown when the user can still start a free trial.">Încearcă gratuit</string>
+    <string name="duckAiModelPickerSubscriberExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when unlocking them requires a paid subscription.">Exclusiv pentru abonați</string>
+    <string name="duckAiModelPickerProExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when they require the Pro plan specifically. &apos;Pro&apos; is the plan name and stays untranslated.">Exclusiv pentru planul Pro</string>
     <string name="duckAiModelPickerPlusModels">Plus</string>
     <string name="duckAiModelPickerProModels">Pro</string>
 
@@ -351,4 +356,24 @@
     <string name="duckChatContextualAskAboutPage">Întreabă despre pagină</string>
     <string name="duckChatContextualAskAboutSearch">Continuă în Duck.ai</string>
     <string name="duckChatContextualOpenDuckAi">Deschide Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Rezumă această selecție</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Rezumă această selecție.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Tradu această selecție</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Tradu această selecție în %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Selecție de text</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Poți adăuga până la %1$d selecții de text. Elimină una pentru a adăuga alta.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Întreabă Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d cuvânt</item>
+        <item quantity="few">%1$d cuvinte</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d de cuvinte</item>
+    </plurals>
 </resources>

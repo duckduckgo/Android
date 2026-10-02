@@ -255,8 +255,8 @@
     <string name="duck_ai_chat_history_action_new">Neu</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Chats herunterladen</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Download für %1$d Chat abgeschlossen</item>
-        <item quantity="other">Download für %1$d Chats abgeschlossen</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Download für %1$d Chat abgeschlossen</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Download für %1$d Chats abgeschlossen</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Überlaufmenü öffnen</string>
     <string name="duck_ai_chat_history_select_all">Alle auswählen</string>
@@ -282,6 +282,11 @@
     <string name="native_input_chat_duck_mode_hint">Antworten …</string>
 
     <!-- Model Picker -->
+    <string name="duckAiModelPickerLabelEverydayUse" instruction="Subline under a model in the Duck.ai model picker, describing what that model suits.">Ideal für den täglichen Gebrauch</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster" instruction="Subline under a model in the Duck.ai model picker. &apos;Limits&apos; means the user&apos;s usage allowance, which this model consumes more quickly.">Solide, erreicht Limits aber früher</string>
+    <string name="duckAiModelPickerTryFreeTrial" instruction="Header above the locked models in the Duck.ai model picker, shown when the user can still start a free trial.">Kostenlos testen</string>
+    <string name="duckAiModelPickerSubscriberExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when unlocking them requires a paid subscription.">Exklusiv für Abonnenten</string>
+    <string name="duckAiModelPickerProExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when they require the Pro plan specifically. &apos;Pro&apos; is the plan name and stays untranslated.">Exklusiv für Pro-Abonnenten</string>
     <string name="duckAiModelPickerPlusModels">Plus</string>
     <string name="duckAiModelPickerProModels">Pro</string>
 
@@ -350,4 +355,23 @@
     <string name="duckChatContextualAskAboutPage">Frage zur Seite</string>
     <string name="duckChatContextualAskAboutSearch">In Duck.ai fortfahren</string>
     <string name="duckChatContextualOpenDuckAi">Duck.ai öffnen</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Diese Auswahl zusammenfassen</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Fasse diese Auswahl zusammen.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Diese Auswahl übersetzen</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Diese Auswahl in %1$s übersetzen.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Textauswahl</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Du kannst bis zu %1$d Textauswahlen hinzufügen. Entferne eine, um eine andere hinzuzufügen.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Frag Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d Wort</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d Wörter</item>
+    </plurals>
 </resources>

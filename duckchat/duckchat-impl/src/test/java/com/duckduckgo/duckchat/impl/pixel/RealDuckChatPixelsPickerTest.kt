@@ -100,6 +100,17 @@ class RealDuckChatPixelsPickerTest {
     }
 
     @Test
+    fun whenUnknownModelLabelThenDailyIsTaggedByLabelSoOtherLabelsStillReport() = runTest {
+        testee.fireUnknownModelLabel("EXTRA_PRIVACY")
+
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_MODEL_LABEL_UNKNOWN_DAILY,
+            parameters = mapOf(DuckChatPixelParameters.MODEL_LABEL to "EXTRA_PRIVACY"),
+            type = Pixel.PixelType.Daily(tag = "m_aichat_model_label_unknown_daily_EXTRA_PRIVACY"),
+        )
+    }
+
+    @Test
     fun whenShowModelPickerThenFiresCountAndDaily() = runTest {
         testee.fireShowModelPicker(DuckChatPixelSurface.DUCK_AI)
 

@@ -62,14 +62,6 @@ interface DuckChatFeature {
     fun duckAiInputScreen(): Toggle
 
     /**
-     * @return `true` when the new address bar option choice screen should be shown.
-     * If the remote feature is not present defaults to `internal`.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    @InternalAlwaysEnabled
-    fun showNewAddressBarPickerScreen(): Toggle
-
-    /**
      * @return `true` when the Setting for allowing Duck.ai chats to be deleted with the Fire Button is enabled
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
@@ -323,4 +315,18 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun contextualEntryDismissOnTabChange(): Toggle
+
+    /**
+     * @return `true` when the "Ask Duck.ai" text selection menu item is enabled.
+     * If the remote feature is not present defaults to `INTERNAL`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiTextSelectionAction(): Toggle
+
+    /**
+     * @return `true` when native Duck.ai usage-limit and high-usage model notices may be shown.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiUsageWarnings(): Toggle
 }

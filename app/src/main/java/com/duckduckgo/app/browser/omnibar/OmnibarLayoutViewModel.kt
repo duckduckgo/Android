@@ -137,6 +137,8 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val isProgressBarUpgradeEnabled = progressBarUpgradeFeature.behaviourUpdate().isEnabled()
     private val isProgressBarIndeterminateEnabled =
         isProgressBarUpgradeEnabled && progressBarUpgradeFeature.indeterminateFallback().isEnabled()
+    private val isAnimationUpdateEnabled =
+        isProgressBarUpgradeEnabled && progressBarUpgradeFeature.animationConfigUpdate().isEnabled()
     private val addressBarRebrandToggle = appBrandDesignUpdateToggles.addressBar()
     private var isSetFavouriteEasterEggLogoFeatureEnabled: Boolean = false
 
@@ -153,6 +155,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             isProgressBarUpgradeEnabled = isProgressBarUpgradeEnabled,
             isProgressBarIndeterminateEnabled = isProgressBarIndeterminateEnabled,
             isAddressBarRebrandEnabled = addressBarRebrandToggle.isEnabled(),
+            isAnimationUpdateEnabled = isAnimationUpdateEnabled,
         ),
     )
 
@@ -175,15 +178,6 @@ class OmnibarLayoutViewModel @Inject constructor(
             )
         }
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
-
-    private fun ViewMode.toBrowserViewMode(): BrowserViewMode = when (this) {
-        is Browser -> BrowserViewMode.Browser
-        is ViewMode.Pdf -> BrowserViewMode.Browser
-        is NewTab -> BrowserViewMode.NewTab
-        is CustomTab -> BrowserViewMode.CustomTab
-        is ViewMode.DuckAI -> BrowserViewMode.DuckAi
-        is Error, is SSLWarning, is MaliciousSiteWarning -> BrowserViewMode.Error
-    }
 
     private fun getViewMode(state: ViewState): ViewMode {
         return if (state.viewMode is CustomTab) {
@@ -284,6 +278,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val isProgressBarIndeterminateEnabled: Boolean = false,
         val enabledState: EnabledState = EnabledState.ALL,
         val isAddressBarRebrandEnabled: Boolean = false,
+        val isAnimationUpdateEnabled: Boolean = false,
     ) {
         /**
          * The Duck.ai entry icon shows the chevron-down (contextual sheet) variant when the native
@@ -1347,4 +1342,13 @@ class OmnibarLayoutViewModel @Inject constructor(
     companion object {
         private const val ABOUT_BLANK = "about:blank"
     }
+}
+
+internal fun ViewMode.toBrowserViewMode(): BrowserViewMode = when (this) {
+    is Browser -> BrowserViewMode.Browser
+    is ViewMode.Pdf -> BrowserViewMode.Browser
+    is NewTab -> BrowserViewMode.NewTab
+    is CustomTab -> BrowserViewMode.CustomTab
+    is ViewMode.DuckAI -> BrowserViewMode.DuckAi
+    is Error, is SSLWarning, is MaliciousSiteWarning -> BrowserViewMode.Error
 }

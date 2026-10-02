@@ -70,6 +70,9 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.extensions.launchAutofillProviderSystemSettings
+import com.duckduckgo.credentialexchange.api.CredentialExchange
+import com.duckduckgo.credentialexchange.api.CredentialExchangeLauncher
+import com.duckduckgo.credentialexchange.api.CredentialExchangeResult
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -146,6 +149,12 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
+    @Inject
+    lateinit var credentialExchange: CredentialExchange
+
+    @Inject
+    lateinit var credentialExchangeLauncher: CredentialExchangeLauncher
 
     private var passwordImportWatcher = ConflatedJob()
 
@@ -362,6 +371,22 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
                     getString(R.string.autofillDevSettingsSimulatePasswordsImportedConfirmation),
                     Toast.LENGTH_SHORT,
                 ).show()
+        }
+
+        binding.importPasswordsCredentialExchangeButton.setClickListener {
+            lifecycleScope.launch {
+                if (!credentialExchange.isImportSupported()) {
+                    getString(R.string.autofillDevSettingsCredentialExchangeNotSupported).showSnackbar()
+                    return@launch
+                }
+
+                when (val result = credentialExchangeLauncher.launchImportFlow()) {
+                    is CredentialExchangeResult.Success ->
+                        "Received ${result.credentials.size} credentials from ${result.exporterPackageName}".showSnackbar()
+                    is CredentialExchangeResult.Cancelled -> "Cancelled".showSnackbar()
+                    is CredentialExchangeResult.Failure -> "Failed: ${result.reason}".showSnackbar()
+                }
+            }
         }
     }
 

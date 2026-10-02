@@ -23,13 +23,17 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.ModelLabel
 import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
-import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.models.UserTier
+import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModel
+import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModelProvider
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
@@ -50,7 +54,14 @@ import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
-data class ModelSection(@StringRes val headerRes: Int?, val models: List<AIChatModel>)
+data class ModelSection(
+    @StringRes val headerRes: Int?,
+    val models: List<AIChatModel>,
+    /** Rows in a gated section open an upsell instead of selecting, so they render the follow-up ellipsis. */
+    val gated: Boolean = false,
+    /** Set on the gated section, for the upsell impression pixel. */
+    val gatedHeader: GatedHeader? = null,
+)
 
 /** Emitted when the user picks a model during the FE recovery model-change flow. */
 sealed class PickerModelChange {
@@ -63,13 +74,23 @@ class ModelPickerViewModel @Inject constructor(
     private val duckChatPixels: DuckChatPixels,
     private val nativeInputStateProvider: NativeInputStateProvider,
     private val duckAiChatStore: DuckAiChatStore,
+    private val effectiveModelProvider: EffectiveModelProvider,
+    private val duckChatFeature: DuckChatFeature,
+    private val duckChatInternal: DuckChatInternal,
 ) : ViewModel() {
 
     val state: StateFlow<ModelState> = modelManager.modelState
 
+    /** FE recovery "Switch Model" events, carrying the target tabId. The view filters to its own tab. */
+    val showPickerEvents: Flow<String> = duckChatInternal.showModelPickerEvents
+
     private val currentChat = MutableStateFlow<DuckAiChat?>(null)
 
     private var modelChangeMode: Boolean = false
+
+    // The published chatId, which is the key for the recovery pick. Read from state rather than
+    // currentChat, which can still be resolving when the user picks.
+    private var publishedChatId: String? = null
 
     // The pixel surface for the active tab, tracked from the published input context.
     // Named distinctly from the [PickerSurface] param on [onModelTapped] to avoid shadowing.
@@ -93,28 +114,28 @@ class ModelPickerViewModel @Inject constructor(
         viewModelScope.launch {
             nativeInputStateProvider.state.collect { state ->
                 modelChangeMode = state.modelChangeMode
+                publishedChatId = state.chatId
                 pixelSurface = DuckChatPixelSurface.from(state.inputContext)
-                if (!state.modelChangeMode) recoverySelectedModelId.value = null
+                if (!state.modelChangeMode) {
+                    recoverySelectedModelId.value = null
+                    effectiveModelProvider.clearRecoveryModelPick(state.chatId)
+                }
             }
         }
     }
 
     /**
-     * The model the chip displays and whose capabilities the options should reflect: a just-picked
-     * recovery model, else the active chat's model (when in the list, e.g. not lost access), else
-     * the global selection. Single source of truth for [chipLabel] and [getSelectedModel].
+     * The model the chip displays. An answer resolved for a different chat is ignored: state and the
+     * provider arrive on separate flows, so a tab switch can pair this tab's state with the previous
+     * tab's model, and the chip would name a model this chat is not using.
      */
     val effectiveModelId: StateFlow<String?> = combine(
-        modelManager.modelState,
         nativeInputStateProvider.state,
-        currentChat,
-        recoverySelectedModelId,
-    ) { modelState, nativeState, chat, recoveryId ->
-        val modelIds = modelState.models.mapTo(HashSet()) { it.id }
-        // A just-picked recovery model wins (display, before the chat's model syncs back).
-        recoveryId?.takeIf { it in modelIds }?.let { return@combine it }
-        val activeChat = chat?.takeIf { it.chatId == nativeState.chatId }
-        activeChat?.model?.takeIf { it in modelIds } ?: modelState.selectedModelId
+        effectiveModelProvider.effectiveModel,
+        modelManager.modelState,
+    ) { state, effective, modelState ->
+        (effective as? EffectiveModel.Resolved)?.takeIf { it.chatId == state.chatId }?.modelId
+            ?: modelState.selectedModelId
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
@@ -150,14 +171,6 @@ class ModelPickerViewModel @Inject constructor(
 
     var menuShowing = false
 
-    fun getSelectedModelId(): String? = modelManager.getSelectedModelId()
-
-    fun getSelectedModel(): AIChatModel? = state.value.models.firstOrNull { it.id == effectiveModelId.value }
-
-    fun isImageGenerationSupported(): Boolean = getSelectedModel()?.supportsTool(Tool.IMAGE_GENERATION) ?: true
-
-    fun isWebSearchSupported(): Boolean = getSelectedModel()?.supportsTool(Tool.WEB_SEARCH) ?: true
-
     fun fetchModels() {
         viewModelScope.launch {
             modelManager.fetchModels()
@@ -172,7 +185,17 @@ class ModelPickerViewModel @Inject constructor(
 
     /** Subscription-funnel impression: the model picker was shown to the user. */
     fun onPickerShown(surface: PickerSurface) {
-        duckChatPixels.fireModelPickerShown(effectiveOrigin(surface))
+        val origin = effectiveOrigin(surface)
+        duckChatPixels.fireModelPickerShown(origin)
+        val state = modelManager.modelState.value
+        buildSections(state).firstOrNull { it.gated }?.gatedHeader?.let { header ->
+            duckChatPixels.firePickerUpsellShown(
+                source = UPSELL_SOURCE_MODEL_PICKER,
+                header = header.pixelValue,
+                currentTier = state.userTier.toParam(),
+                origin = origin,
+            )
+        }
     }
 
     /**
@@ -194,6 +217,7 @@ class ModelPickerViewModel @Inject constructor(
                 }
                 duckChatPixels.fireSubmitChangeModel(model.id, pixelSurface)
                 recoverySelectedModelId.value = model.id
+                effectiveModelProvider.onRecoveryModelPicked(chatId = publishedChatId, modelId = model.id)
                 modelChangeChannel.trySend(PickerModelChange.ChangeModel(model.id))
             } else {
                 if (model.id != modelManager.getSelectedModelId()) {
@@ -212,7 +236,7 @@ class ModelPickerViewModel @Inject constructor(
         val origin = effectiveOrigin(surface)
         routeUpsell(userTier, requiredTier, origin, modelState.isSubscriptionEligible)?.let { upsell ->
             duckChatPixels.fireSubscriptionUpsellTriggered(
-                source = "model_picker",
+                source = UPSELL_SOURCE_MODEL_PICKER,
                 currentTier = userTier.toParam(),
                 requiredTier = requiredTier.toParam(),
                 flowType = upsell.toFlowTypeParam(),
@@ -222,15 +246,34 @@ class ModelPickerViewModel @Inject constructor(
         }
     }
 
+    fun updatedPickersEnabled(): Boolean = duckChatFeature.updatedPickers().isEnabled()
+
     fun buildSections(state: ModelState): List<ModelSection> {
-        val byTier = state.models.groupBy { it.requiredTier }
         // Models with a null requiredTier (non-public access tiers only, e.g. "internal") have no
         // section to land in and are intentionally hidden from the picker.
+        val public = state.models.filter { it.requiredTier != null }
+        if (!updatedPickersEnabled()) {
+            val byTier = public.groupBy { it.requiredTier }
+            return listOfNotNull(
+                byTier[UserTier.FREE].orEmpty().toSectionOrNull(headerRes = null),
+                byTier[UserTier.PLUS].orEmpty().toSectionOrNull(R.string.duckAiModelPickerPlusModels),
+                byTier[UserTier.PRO].orEmpty().toSectionOrNull(R.string.duckAiModelPickerProModels),
+            )
+        }
+        val (available, gated) = public.partition { it.isAccessible }
+        val gatedHeader = gatedSectionHeader(gated.map { it.requiredTier }, state.isFreeTrialEligible)
         return listOfNotNull(
-            byTier[UserTier.FREE].orEmpty().toSectionOrNull(headerRes = null),
-            byTier[UserTier.PLUS].orEmpty().toSectionOrNull(R.string.duckAiModelPickerPlusModels),
-            byTier[UserTier.PRO].orEmpty().toSectionOrNull(R.string.duckAiModelPickerProModels),
+            available.toSectionOrNull(headerRes = null),
+            gated.toSectionOrNull(headerRes = gatedHeader.titleRes, gated = true, gatedHeader = gatedHeader),
         )
+    }
+
+    @StringRes
+    fun subtitleResFor(model: AIChatModel): Int? = when (model.label) {
+        ModelLabel.EVERYDAY_USE -> R.string.duckAiModelPickerLabelEverydayUse
+        ModelLabel.USES_LIMITS_FASTER -> R.string.duckAiModelPickerLabelUsesLimitsFaster
+        // A label this version does not know still promotes the model, but we have no copy for it.
+        ModelLabel.UNKNOWN, null -> null
     }
 
     @DrawableRes
@@ -243,6 +286,9 @@ class ModelPickerViewModel @Inject constructor(
         ModelProvider.OSS, ModelProvider.UNKNOWN -> R.drawable.ic_ai_model_oss_16
     }
 
-    private fun List<AIChatModel>.toSectionOrNull(@StringRes headerRes: Int?): ModelSection? =
-        takeIf { it.isNotEmpty() }?.let { ModelSection(headerRes, it) }
+    private fun List<AIChatModel>.toSectionOrNull(
+        @StringRes headerRes: Int?,
+        gated: Boolean = false,
+        gatedHeader: GatedHeader? = null,
+    ): ModelSection? = takeIf { it.isNotEmpty() }?.let { ModelSection(headerRes, it, gated, gatedHeader) }
 }

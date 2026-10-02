@@ -56,7 +56,7 @@ class CookiePopupOptInEvaluator @Inject constructor(
     private val appInstallTimeProvider: AppInstallTimeProvider,
 ) : ModalEvaluator {
 
-    override val priority: Int = 6
+    override val priority: Int = 7
 
     override val evaluatorId: String = "cookie_popup_opt_in"
 

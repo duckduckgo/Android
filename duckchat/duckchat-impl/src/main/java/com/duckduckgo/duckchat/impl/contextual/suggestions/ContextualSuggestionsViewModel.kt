@@ -23,6 +23,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
+import com.duckduckgo.duckchat.impl.wideevents.SelectionSubmissionAction
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,6 +43,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
     private val duckChatFeature: DuckChatFeature,
     private val dispatchers: DispatcherProvider,
     private val duckChatPixels: DuckChatPixels,
+    private val selectionJourney: DuckAiSelectionJourneyWideEvent,
 ) : ViewModel() {
 
     data class ViewState(
@@ -59,6 +62,10 @@ class ContextualSuggestionsViewModel @Inject constructor(
     private var pageType: SuggestionsPageType = SuggestionsPageType.NONE
     private var isSmart: Boolean = false
     private var suggestionsVisible = false
+    private var textSelectionCount: Int = 0
+    private var textSelectionsTabId: String? = null
+    private var otherAttachmentCount: Int = 0
+    private var lastInput: ResolvePageSuggestionsInput? = null
 
     fun load() {
         loadJob?.cancel()
@@ -79,6 +86,14 @@ class ContextualSuggestionsViewModel @Inject constructor(
 
     fun onSuggestionSelected(suggestionId: String) {
         duckChatPixels.reportContextualSuggestionSelected(suggestionId, pageType.pixelValue)
+        when (suggestionId) {
+            "summarize-selection" -> reportSuggestionSelected(SelectionSubmissionAction.SUMMARIZE)
+            "translate-selection" -> reportSuggestionSelected(SelectionSubmissionAction.TRANSLATE)
+        }
+    }
+
+    private fun reportSuggestionSelected(action: SelectionSubmissionAction) {
+        textSelectionsTabId?.let { selectionJourney.onSuggestionSelected(it, action) }
     }
 
     fun currentPageType(): SuggestionsPageType = pageType
@@ -100,8 +115,52 @@ class ContextualSuggestionsViewModel @Inject constructor(
     fun clear() {
         loadJob?.cancel()
         resolvedSuggestions = emptyList()
+        textSelectionCount = 0
+        otherAttachmentCount = 0
         hideSuggestions()
     }
+
+    fun onAttachmentsChanged(
+        textSelections: Int,
+        otherAttachments: Int,
+        textSelectionsTabId: String? = null,
+    ) {
+        val modeChanged = (textSelectionCount > 0) != (textSelections > 0)
+        textSelectionCount = textSelections
+        this.textSelectionsTabId = textSelectionsTabId
+        otherAttachmentCount = otherAttachments
+        if (!modeChanged) {
+            _viewState.update { it.copy(suggestions = visibleSuggestions()) }
+            return
+        }
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch { loadSuggestions() }
+    }
+
+    private suspend fun loadSuggestions() {
+        if (!suggestionsEnabled()) {
+            hideSuggestions()
+            return
+        }
+        if (textSelectionCount > 0) resolveTextSelectionSuggestions() else resolvePageSuggestions()
+    }
+
+    private suspend fun resolvePageSuggestions() {
+        fetchSuggestions(lastInput?.url, lastInput?.pageTypeSignals)
+        showSuggestions()
+    }
+
+    private suspend fun resolveTextSelectionSuggestions() {
+        resolvedSuggestions = suggestedPromptsProvider.resolveTextSelectionSuggestions(currentInput())
+        showSuggestions()
+    }
+
+    private fun currentInput(): ResolvePageSuggestionsInput =
+        lastInput ?: ResolvePageSuggestionsInput(
+            pageTypeSignals = null,
+            url = null,
+            uiLocale = Locale.getDefault().toLanguageTag(),
+        )
 
     fun onReservedQuickActionSlotsChanged(count: Int) {
         if (reservedQuickActionSlots == count) return
@@ -110,6 +169,8 @@ class ContextualSuggestionsViewModel @Inject constructor(
     }
 
     private fun visibleSuggestions(): List<ContextualSuggestedPrompt> {
+        if (textSelectionCount + otherAttachmentCount > 1) return emptyList()
+        if (textSelectionCount > 0) return resolvedSuggestions.take(MAX_TEXT_SELECTION_SUGGESTIONS)
         val capacity = (maxSuggestedPrompts - reservedQuickActionSlots).coerceAtLeast(0)
         if (resolvedSuggestions.size <= capacity) return resolvedSuggestions
         val prioritySuggestions = resolvedSuggestions.filter { it.id in prioritySuggestionIds }
@@ -124,6 +185,15 @@ class ContextualSuggestionsViewModel @Inject constructor(
     ) {
         if (!suggestionsEnabled()) {
             hideSuggestions()
+            return
+        }
+        lastInput = ResolvePageSuggestionsInput(
+            pageTypeSignals = pageTypeSignals,
+            url = url,
+            uiLocale = Locale.getDefault().toLanguageTag(),
+        )
+        if (textSelectionCount > 0) {
+            resolveTextSelectionSuggestions()
             return
         }
         fetchSuggestions(url, pageTypeSignals)
@@ -142,6 +212,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
             url = url,
             uiLocale = Locale.getDefault().toLanguageTag(),
         )
+        lastInput = input
         val resolved = suggestedPromptsProvider.resolveSuggestions(input)
         maxSuggestedPrompts = suggestedPromptsProvider.maxSuggestedPrompts()
         prioritySuggestionIds = suggestedPromptsProvider.prioritySuggestionIds()
@@ -158,6 +229,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
         } else if (!suggestionsVisible) {
             suggestionsVisible = true
             duckChatPixels.reportContextualSuggestionsViewed(isSmart, pageType.pixelValue)
+            if (textSelectionCount > 0) textSelectionsTabId?.let { selectionJourney.onSuggestionsViewed(it) }
         }
     }
 
@@ -191,5 +263,6 @@ class ContextualSuggestionsViewModel @Inject constructor(
 
     companion object {
         private const val TIMEOUT_MS = 5_000L
+        private const val MAX_TEXT_SELECTION_SUGGESTIONS = 2
     }
 }

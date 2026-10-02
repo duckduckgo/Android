@@ -171,6 +171,8 @@ android {
     productFlavors {
         internal {
             dimension "store"
+            // use a separate proguard file for internal
+            proguardFiles 'proguard-rules-internal.pro'
         }
         fdroid {
             dimension "store"
@@ -219,6 +221,21 @@ android {
             } else {
                 java.srcDirs += 'src/anvilDagger/java'
             }
+        }
+    }
+    packagingOptions {
+        jniLibs {
+            // this is required so the handler exists as a real file on disk
+            useLegacyPackaging = true
+        }
+    }
+}
+
+androidComponents {
+    // only minify (enable R8) for internal release builds
+    beforeVariants(selector().withBuildType("release")) { variantBuilder ->
+        if (variantBuilder.productFlavors.any { it.second == "internal" }) {
+            variantBuilder.minifyEnabled = true
         }
     }
 }
@@ -488,6 +505,12 @@ dependencies {
 
     implementation project(':event-hub-impl')
 
+    implementation project(':credential-exchange-api')
+
+    internalImplementation project(':credential-exchange-impl')
+    playImplementation project(':credential-exchange-impl')
+    fdroidImplementation project(':credential-exchange-dummy-impl')
+
     implementation project(':subscriptions-api')
 
     internalImplementation project(':subscriptions-impl')
@@ -562,6 +585,8 @@ dependencies {
     implementation AndroidX.recyclerView
     implementation AndroidX.swipeRefreshLayout
     implementation AndroidX.webkit
+    // Backs the internal-flavor PageLoadTracer (src/internal); other flavors bind a no-op instead.
+    internalImplementation AndroidX.tracing
     implementation Square.okHttp3.okHttp
     implementation "com.squareup.okhttp3:okhttp-tls:_"
     implementation Square.retrofit2.retrofit

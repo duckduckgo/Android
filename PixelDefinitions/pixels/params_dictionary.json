@@ -126,7 +126,10 @@
             "deep_link_other",
             "paid_settings",
             "return_to_chat_card",
-            "tab_switcher_existing_chat"
+            "tab_switcher_existing_chat",
+            "subscription_onboarding",
+            "browsing_menu_duckai",
+            "duck_ai_new_chat"
         ]
     },
     "osVersion": {
@@ -336,5 +339,17 @@
             "funnel_duckai_android__disclaimerbanner",
             "funnel_duckai_android__unknown"
         ]
+    },
+    "promptDaysSinceInstall": {
+        "key": "days_since_install",
+        "type": "string",
+        "description": "Days since install, bucketed by install-week (lower bound inclusive).",
+        "enum": ["d0_6", "d7_13", "d14_20", "d21_27", "d28_plus"]
+    },
+    "promptExposureVersion": {
+        "key": "version",
+        "type": "string",
+        "description": "Version of the prompt exposure pixels, bumped whenever the meaning of a parameter or the session sampling rate changes.",
+        "enum": ["1"]
     }
 }

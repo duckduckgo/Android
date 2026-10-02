@@ -202,6 +202,7 @@ import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Ev
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
+import com.duckduckgo.app.browser.menu.BrowserMenuAcknowledgement
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.modals.NewTabPageModalPresenter
 import com.duckduckgo.app.browser.modals.NewTabPageModalPresenterRegistry
@@ -216,6 +217,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
+import com.duckduckgo.app.browser.omnibar.toBrowserViewMode
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.pdf.CachedFileDownloader
 import com.duckduckgo.app.browser.pdf.InlinePdfHandler
@@ -319,6 +321,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
+import com.duckduckgo.app.tabs.model.TabAtomicOperations
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabPageContextRepository
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -356,6 +359,7 @@ import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
+import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.AppUrl
@@ -504,6 +508,8 @@ class BrowserTabViewModel @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val siteFactory: SiteFactory,
     private val tabRepository: TabRepository,
+    private val tabAtomicOperations: TabAtomicOperations,
+    private val newTabReturnHatchFeature: NewTabReturnHatchFeature,
     private val userAllowListRepository: UserAllowListRepository,
     private val contentBlocking: ContentBlocking,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
@@ -618,6 +624,7 @@ class BrowserTabViewModel @Inject constructor(
     private val badUrlErrorPageWideEvent: BadUrlErrorPageWideEvent,
     private val customErrorPagesFeature: CustomErrorPagesFeature,
     private val duckAiSessionCallback: DuckAiSessionCallback,
+    private val browserMenuAcknowledgement: BrowserMenuAcknowledgement,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -754,16 +761,32 @@ class BrowserTabViewModel @Inject constructor(
 
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
 
+    private enum class PulseCtaEffect { FORCE, SUPPRESS, DEFAULT }
+
     @ExperimentalCoroutinesApi
     @FlowPreview
     private val showPulseAnimation: LiveData<Boolean> =
         combine(
-            ctaViewState.asFlow().map {
-                it.cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || it.cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta
+            ctaViewState.asFlow().map { state ->
+                when {
+                    // The trackers dialog points at the privacy shield; a fire pulse would compete.
+                    state.cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta ||
+                        state.cta is DaxTrackersBlockedBrandDesignUpdateContextualCta -> PulseCtaEffect.SUPPRESS
+
+                    state.cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta ||
+                        state.cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta -> PulseCtaEffect.FORCE
+
+                    else -> PulseCtaEffect.DEFAULT
+                }
             }.distinctUntilChanged(),
             ctaViewModel.showFireButtonPulseAnimation,
-        ) { isShowingDuckAiFireButtonCta, showPulseAnimation -> isShowingDuckAiFireButtonCta || showPulseAnimation }
-            .asLiveData(context = viewModelScope.coroutineContext)
+        ) { ctaEffect, showPulseAnimation ->
+            when (ctaEffect) {
+                PulseCtaEffect.SUPPRESS -> false
+                PulseCtaEffect.FORCE -> true
+                PulseCtaEffect.DEFAULT -> showPulseAnimation
+            }
+        }.asLiveData(context = viewModelScope.coroutineContext)
 
     private var autoCompleteJob = ConflatedJob()
     private var serpLogoJob = ConflatedJob()
@@ -3531,6 +3554,22 @@ class BrowserTabViewModel @Inject constructor(
         command.value = OpenInNewBackgroundTab(url)
     }
 
+    suspend fun returnToHatch(
+        currentTabId: String,
+        targetMode: BrowserMode,
+        targetTabId: String,
+        navigateFallback: (BrowserMode, String) -> Unit,
+    ) {
+        val selectedTargetAtomically =
+            targetMode == BrowserMode.REGULAR &&
+                newTabReturnHatchFeature.closeNewTabOnReturn().isEnabled() &&
+                tabAtomicOperations.deleteSelectedBlankTabAndSelectTarget(currentTabId, targetTabId)
+
+        if (!selectedTargetAtomically) {
+            navigateFallback(targetMode, targetTabId)
+        }
+    }
+
     fun onFindInPageSelected() {
         findInPageViewState.value = FindInPageViewState(visible = true)
     }
@@ -3767,6 +3806,7 @@ class BrowserTabViewModel @Inject constructor(
         if (viewMode is ViewMode.Browser) {
             additionalDefaultBrowserPrompts.onBrowserMenuLaunched()
         }
+        browserMenuAcknowledgement.onBrowserMenuViewed(viewMode.toBrowserViewMode())
     }
 
     fun onNewTabMenuItemClicked(longPress: Boolean = false): Boolean {
@@ -3919,7 +3959,7 @@ class BrowserTabViewModel @Inject constructor(
 
     /**
      * The input-screen mode the next auto-launched input screen on this tab should open in, cleared as
-     * it is read. Prefers this tab's own launch target (e.g. "New Search" → Search) and falls back to
+     * it is read. Prefers this tab's own launch target (e.g. "New Tab" → Search) and falls back to
      * the post-onboarding signal (→ Duck.ai). Returns `null` when neither is armed.
      */
     fun consumeInitialInputMode(): InputMode? =
@@ -5831,25 +5871,33 @@ class BrowserTabViewModel @Inject constructor(
         duckChat.openDuckChatImageGeneration(entryPoint)
     }
 
+    /** New Chat from the Duck.ai omnibar "+" menu, which is only ever shown in a Duck.ai chat. */
+    fun openNewDuckChatFromChatMenu() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
+        openNewDuckChatTab(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, fromDuckAiChat = true)
+    }
+
+    /** New Chat from the browsing menu, which is reachable from any view mode. */
     fun openNewDuckChat(viewMode: ViewMode) {
-        if (viewMode == ViewMode.DuckAI) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
-            duckAiSessionCallback.onNewChatCreated(tabId)
-            viewModelScope.launch {
-                val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
-                _subscriptionEventDataChannel.send(subscriptionEvent)
-            }
-        } else {
-            val url = duckChat.getDuckChatUrl("", false)
-            val entryPoint = if (viewMode == ViewMode.NewTab) {
-                DuckChatEntryPoint.BROWSING_MENU_NTP
-            } else {
-                DuckChatEntryPoint.BROWSING_MENU_WEBPAGE
-            }
-            duckChat.reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
-            command.value = OpenInNewTab(url, tabId)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
+        val entryPoint = when (viewMode) {
+            ViewMode.NewTab -> DuckChatEntryPoint.BROWSING_MENU_NTP
+            ViewMode.DuckAI -> DuckChatEntryPoint.BROWSING_MENU_DUCKAI
+            else -> DuckChatEntryPoint.BROWSING_MENU_WEBPAGE
         }
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
+        openNewDuckChatTab(entryPoint, fromDuckAiChat = viewMode == ViewMode.DuckAI)
+    }
+
+    private fun openNewDuckChatTab(
+        entryPoint: DuckChatEntryPoint,
+        fromDuckAiChat: Boolean,
+    ) {
+        if (fromDuckAiChat) {
+            duckAiSessionCallback.onNewChatCreated(tabId)
+            recordPendingNewTabOpenedExit()
+        }
+        duckChat.reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
+        command.value = OpenInNewTab(duckChat.getDuckChatUrl("", false), tabId)
     }
 
     fun onCustomizeResponsesClicked() {

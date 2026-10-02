@@ -34,8 +34,8 @@ private const val FOLLOW_UP_SUFFIX = "…"
  * subline, and a trailing tick for the current selection. The ADS [PopupMenuItemView] carries no
  * secondary text, which is why these pickers own their row.
  *
- * Set [opensFollowUp] for a row that leads somewhere else, such as a gated model that opens an
- * upsell, rather than selecting outright.
+ * Set [showsFollowUpEllipsis] for a row that leads somewhere else, such as a gated model that
+ * opens an upsell, rather than selecting outright: it appends the ellipsis that signals as much.
  */
 internal fun pickerMenuItem(
     parent: ViewGroup,
@@ -43,7 +43,7 @@ internal fun pickerMenuItem(
     @DrawableRes leadingIconRes: Int,
     subtitle: String? = null,
     selected: Boolean = false,
-    opensFollowUp: Boolean = false,
+    showsFollowUpEllipsis: Boolean = false,
     onClick: () -> Unit,
 ): View {
     val item = LayoutInflater.from(parent.context).inflate(R.layout.view_picker_menu_item, parent, false)
@@ -52,7 +52,7 @@ internal fun pickerMenuItem(
         .setImageDrawable(AppCompatResources.getDrawable(parent.context, leadingIconRes))
 
     item.findViewById<DaxTextView>(R.id.pickerMenuItemTitle).text =
-        if (opensFollowUp) "$title$FOLLOW_UP_SUFFIX" else title
+        if (showsFollowUpEllipsis) "$title$FOLLOW_UP_SUFFIX" else title
 
     item.findViewById<DaxTextView>(R.id.pickerMenuItemSubtitle).apply {
         text = subtitle

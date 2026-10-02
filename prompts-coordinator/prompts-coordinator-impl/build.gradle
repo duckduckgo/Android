@@ -46,6 +46,8 @@ dependencies {
 
     implementation project(':common-utils')
     implementation project(':feature-toggles-api')
+    implementation project(':statistics-api')
+    implementation project(':browser-api')
 
     ksp project(':anvil-ksp')
     implementation project(':anvil-annotations')

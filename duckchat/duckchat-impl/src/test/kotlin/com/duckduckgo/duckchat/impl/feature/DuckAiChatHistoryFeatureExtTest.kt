@@ -76,4 +76,34 @@ class DuckAiChatHistoryFeatureExtTest {
         whenever(toggle.getSettings()).thenReturn("{nope")
         assertEquals(10, feature.maxHistoryCount())
     }
+
+    @Test
+    fun `recentDaysCutoff returns parsed value when settings present`() {
+        whenever(toggle.getSettings()).thenReturn("""{"recentDaysCutoff": 30}""")
+        assertEquals(30, feature.recentDaysCutoff())
+    }
+
+    @Test
+    fun `recentDaysCutoff returns zero when disabled remotely`() {
+        whenever(toggle.getSettings()).thenReturn("""{"recentDaysCutoff": 0}""")
+        assertEquals(0, feature.recentDaysCutoff())
+    }
+
+    @Test
+    fun `recentDaysCutoff returns default when key missing`() {
+        whenever(toggle.getSettings()).thenReturn("""{"other":1}""")
+        assertEquals(7, feature.recentDaysCutoff())
+    }
+
+    @Test
+    fun `recentDaysCutoff returns default when settings null`() {
+        whenever(toggle.getSettings()).thenReturn(null)
+        assertEquals(7, feature.recentDaysCutoff())
+    }
+
+    @Test
+    fun `recentDaysCutoff returns default when settings malformed`() {
+        whenever(toggle.getSettings()).thenReturn("{nope")
+        assertEquals(7, feature.recentDaysCutoff())
+    }
 }

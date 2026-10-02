@@ -29,6 +29,7 @@
     <string name="autoconsentPromptFootnote">Du kan altid justere det senere i Indstillinger.</string>
     <string name="autoconsentPromptCpmOnMessage">Nogle cookies kan ikke fravælges. Vi kan acceptere disse for dig.</string>
     <string name="autoconsentPromptCpmOnPrimaryButton">Acceptér cookies for mig</string>
+    <string name="autoconsentPromptCpmOnPrimaryButtonV2">Afvis hvis muligt, eller acceptér for mig</string>
     <string name="autoconsentPromptCpmOnSecondaryButton">Jeg vil acceptere dem selv</string>
     <string name="autoconsentPromptCpmOffMessage">Lad os gøre det for dig. Vi afviser cookies, når det er muligt, og accepterer dem, der ikke kan fravælges.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Afvis hvis muligt, eller acceptér for mig</string>

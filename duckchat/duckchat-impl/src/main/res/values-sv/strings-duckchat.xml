@@ -255,8 +255,8 @@
     <string name="duck_ai_chat_history_action_new">Ny</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Ladda ner chattar</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Nedladdning klar för %1$d chatt</item>
-        <item quantity="other">Nedladdning klar för %1$d chattar</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Nedladdning klar för %1$d chatt</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Nedladdning klar för %1$d chattar</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Öppna överflödesmeny</string>
     <string name="duck_ai_chat_history_select_all">Välj alla</string>
@@ -282,6 +282,11 @@
     <string name="native_input_chat_duck_mode_hint">Svara…</string>
 
     <!-- Model Picker -->
+    <string name="duckAiModelPickerLabelEverydayUse" instruction="Subline under a model in the Duck.ai model picker, describing what that model suits.">Perfekt för vardagsbruk</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster" instruction="Subline under a model in the Duck.ai model picker. &apos;Limits&apos; means the user&apos;s usage allowance, which this model consumes more quickly.">Stabil men når gränser tidigare</string>
+    <string name="duckAiModelPickerTryFreeTrial" instruction="Header above the locked models in the Duck.ai model picker, shown when the user can still start a free trial.">Prova gratis</string>
+    <string name="duckAiModelPickerSubscriberExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when unlocking them requires a paid subscription.">Exklusivt för abonnenter</string>
+    <string name="duckAiModelPickerProExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when they require the Pro plan specifically. &apos;Pro&apos; is the plan name and stays untranslated.">Exklusivt för Pro-planen</string>
     <string name="duckAiModelPickerPlusModels">Plus</string>
     <string name="duckAiModelPickerProModels">Pro</string>
 
@@ -350,4 +355,23 @@
     <string name="duckChatContextualAskAboutPage">Fråga om sidan</string>
     <string name="duckChatContextualAskAboutSearch">Fortsätt i Duck.ai</string>
     <string name="duckChatContextualOpenDuckAi">Öppna Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Sammanfatta detta urval</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Sammanfatta detta urval.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Översätt detta urval</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Översätt detta urval till %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Texturval</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Du kan lägga till upp till %1$d textmarkeringar. Ta bort en för att lägga till en annan.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Fråga Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d ord</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d ord</item>
+    </plurals>
 </resources>

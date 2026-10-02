@@ -255,8 +255,8 @@
     <string name="duck_ai_chat_history_action_new">Új</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Csevegések letöltése</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">%1$d csevegés letöltése befejeződött</item>
-        <item quantity="other">%1$d csevegés letöltése befejeződött</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">%1$d csevegés letöltése befejeződött</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">%1$d csevegés letöltése befejeződött</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Túlfolyó menü megnyitása</string>
     <string name="duck_ai_chat_history_select_all">Összes kijelölése</string>
@@ -282,6 +282,11 @@
     <string name="native_input_chat_duck_mode_hint">Válasz…</string>
 
     <!-- Model Picker -->
+    <string name="duckAiModelPickerLabelEverydayUse" instruction="Subline under a model in the Duck.ai model picker, describing what that model suits.">Ideális mindennapi használatra</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster" instruction="Subline under a model in the Duck.ai model picker. &apos;Limits&apos; means the user&apos;s usage allowance, which this model consumes more quickly.">Megbízható, de hamarabb éri el a limitet</string>
+    <string name="duckAiModelPickerTryFreeTrial" instruction="Header above the locked models in the Duck.ai model picker, shown when the user can still start a free trial.">Ingyenes próba</string>
+    <string name="duckAiModelPickerSubscriberExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when unlocking them requires a paid subscription.">Csak előfizetőknek</string>
+    <string name="duckAiModelPickerProExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when they require the Pro plan specifically. &apos;Pro&apos; is the plan name and stays untranslated.">Csak a Pro csomagban</string>
     <string name="duckAiModelPickerPlusModels">Plus</string>
     <string name="duckAiModelPickerProModels">Pro</string>
 
@@ -350,4 +355,23 @@
     <string name="duckChatContextualAskAboutPage">Kérdés az oldalról</string>
     <string name="duckChatContextualAskAboutSearch">Folytatás a Duck.ai-ban</string>
     <string name="duckChatContextualOpenDuckAi">Duck.ai megnyitása</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Kijelölés összefoglalása</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Foglald össze ezt a kijelölést.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Kijelölés lefordítása</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Fordítsd le ezt a kijelölést %1$s nyelvre.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Szövegkijelölés</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Legfeljebb %1$d szövegkijelölést adhatsz hozzá. Távolíts el egyet, hogy újat adhass hozzá.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Duck.ai kérdezése</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d szó</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d szó</item>
+    </plurals>
 </resources>

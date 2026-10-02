@@ -722,7 +722,7 @@ class BrowserTabFragment :
 
     var messageFromPreviousTab: Message? = null
 
-    // One-shot input-screen mode this tab should land on (e.g. "New Search" → Search), set by whoever
+    // One-shot input-screen mode this tab should land on (e.g. "New Tab" → Search), set by whoever
     // opened the tab and handed to the viewmodel in loadData. Not persisted: only meaningful for the
     // tab's initial launch within this process.
     var inputModeTarget: InputMode? = null
@@ -836,7 +836,7 @@ class BrowserTabFragment :
     private val chatMenuPopup by lazy {
         PopupMenu(layoutInflater, com.duckduckgo.duckchat.impl.R.layout.popup_chat_menu).apply {
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewChat)) {
-                viewModel.openNewDuckChat(omnibar.viewMode)
+                viewModel.openNewDuckChatFromChatMenu()
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewVoiceChat)) {
                 duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
@@ -845,9 +845,9 @@ class BrowserTabFragment :
                 viewModel.openNewImageDuckChat(omnibar.viewMode)
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)) {
-                // With the native sidebar this entry is relabelled "New Search": open the new tab with
-                // its input screen surfaced on the Search tab. The target is threaded to the new tab
-                // itself rather than armed globally, so it can't be consumed by another tab.
+                // With the native sidebar this entry opens the new tab with its input screen surfaced on
+                // the Search tab. The target is threaded to the new tab itself rather than armed globally,
+                // so it can't be consumed by another tab.
                 viewModel.recordPendingNewTabOpenedExit()
                 browserActivity?.launchNewTab(
                     browserMode = BrowserMode.REGULAR,
@@ -1409,7 +1409,7 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showNativeInput(query: String = "", forceImageGeneration: Boolean = false) {
+    private fun showNativeInput(query: String = "", forceImageGeneration: Boolean = false, textSelection: String? = null) {
         nativeInputManager.showNativeInput(
             tabId = tabId,
             layoutInflater = layoutInflater,
@@ -1419,6 +1419,7 @@ class BrowserTabFragment :
             query = query,
             initialInputMode = viewModel.consumeInitialInputMode(),
             forceImageGeneration = forceImageGeneration,
+            textSelection = textSelection,
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = { text -> onUserEnteredText(text) },
                 onClearAutocomplete = {
@@ -1434,7 +1435,7 @@ class BrowserTabFragment :
                     }
                 },
                 onSearchSubmitted = { query -> onUserSubmittedText(query) },
-                onDuckAiChatSubmitted = { query, modelId, reasoningEffort, selectedTool, imagesJson, filesJson ->
+                onDuckAiChatSubmitted = { query, modelId, reasoningEffort, selectedTool, imagesJson, filesJson, selectionsJson ->
                     viewModel.onDuckAiChatPromptSubmitted()
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
@@ -1465,6 +1466,9 @@ class BrowserTabFragment :
                                         }
                                     },
                                 )
+                                if (selectionsJson != null) {
+                                    put("selections", selectionsJson)
+                                }
                             },
                         ),
                     )
@@ -1497,6 +1501,15 @@ class BrowserTabFragment :
                                 put("platform", "android")
                                 put("modelId", modelId)
                             },
+                        ),
+                    )
+                },
+                onStartUsingWeeklyLimit = {
+                    contentScopeScripts.sendSubscriptionEvent(
+                        SubscriptionEventData(
+                            featureName = "aiChat",
+                            subscriptionName = "submitStartUsingWeeklyLimitAction",
+                            params = JSONObject().apply { put("platform", "android") },
                         ),
                     )
                 },
@@ -2207,7 +2220,11 @@ class BrowserTabFragment :
             viewModel.areFavoritesDisplayed
                 .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                 .collectLatest { hasFavorites ->
-                    binding.includeNewBrowserTab.topNtpOutlineStroke.isVisible = hasFavorites
+                    // The native input hides this stroke while it is open, and favorites can load after
+                    // that, so honour the hide here instead of drawing a divider over the input's edge.
+                    if (!nativeInputManager.isNativeInputShown()) {
+                        binding.includeNewBrowserTab.topNtpOutlineStroke.isVisible = hasFavorites
+                    }
                     binding.includeNewBrowserTab.bottomNtpOutlineStroke.isVisible = hasFavorites && omnibarRepository.omnibarType != OmnibarType.SPLIT
                 }
         }
@@ -2437,13 +2454,18 @@ class BrowserTabFragment :
         }
     }
 
+    // Pinch and double-tap zoom distort the Duck.ai chat layout, so zoom is only supported off Duck.ai.
+    private fun setWebViewZoomSupported(supported: Boolean) {
+        webView?.settings?.setSupportZoom(supported)
+    }
+
     private fun showDuckAI(browserViewState: BrowserViewState) {
         renderBrowserMenu(viewState = browserViewState, omnibarViewMode = ViewMode.DuckAI)
         omnibar.setViewMode(ViewMode.DuckAI)
         browserNavigationBarIntegration.configureDuckAIViewMode()
         val forceImageGeneration = !nativeInputManager.isNativeInputShown() &&
             (browserActivity?.consumeDuckChatForceImageGeneration() ?: false)
-        showNativeInput(forceImageGeneration = forceImageGeneration)
+        showNativeInput(forceImageGeneration = forceImageGeneration, textSelection = browserActivity?.consumePendingDuckChatTextSelection())
     }
 
     private fun showMaliciousWarning(
@@ -2695,7 +2717,12 @@ class BrowserTabFragment :
                     viewModel.autoCompleteSuggestionsGone()
                 }
                 binding.autoCompleteSuggestionsList.gone()
-                nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
+                // Skip Duck.ai for the same reason launchTabSwitcher does: the widget is that tab's
+                // persistent chat input, and tearing it down restores the default omnibar, so the
+                // chat would be sitting behind an address bar when the user comes back to it.
+                if (omnibar.viewMode != DuckAI) {
+                    nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
+                }
 
                 if (swipingTabsFeature.isEnabled) {
                     browserActivity?.launchNewTab(it.query, it.sourceTabId)
@@ -3107,8 +3134,13 @@ class BrowserTabFragment :
 
             is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
             is Command.PageStarted -> onPageStarted()
-            is Command.EnableDuckAIFullScreen -> showDuckAI(it.browserViewState)
+            is Command.EnableDuckAIFullScreen -> {
+                setWebViewZoomSupported(false)
+                showDuckAI(it.browserViewState)
+            }
+
             is Command.DuckAIFullScreenDisabled -> {
+                setWebViewZoomSupported(true)
                 if (omnibar.viewMode == DuckAI) {
                     nativeInputManager.hideNativeInput()
                 }
@@ -3874,11 +3906,19 @@ class BrowserTabFragment :
                     if (newTabReturnHatchView.isDuckChat) {
                         duckChat.reportDuckChatEntry(DuckChatEntryPoint.RETURN_TO_CHAT_CARD, opensNewTab = false, hasPrompt = false)
                     }
-                    browserActivity?.openExistingTabInMode(
-                        newTabReturnHatchView.targetMode,
-                        newTabReturnHatchView.tabId,
-                        BrowserModeSwitchSource.ESCAPE_HATCH,
-                    )
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        viewModel.returnToHatch(
+                            tabId,
+                            newTabReturnHatchView.targetMode,
+                            newTabReturnHatchView.tabId,
+                        ) { targetMode, targetTabId ->
+                            browserActivity?.openExistingTabInMode(
+                                targetMode,
+                                targetTabId,
+                                BrowserModeSwitchSource.ESCAPE_HATCH,
+                            )
+                        }
+                    }
                 }
 
                 override fun onHatchRendered(visible: Boolean) {
@@ -3973,13 +4013,7 @@ class BrowserTabFragment :
                     chatMenuPopup.contentView
                         .findViewById<PopupMenuItemView>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)
                         .setPrimaryText(
-                            getString(
-                                if (nativeSidebarEnabled) {
-                                    com.duckduckgo.browser.ui.R.string.chatMenuPopupNewSearch
-                                } else {
-                                    com.duckduckgo.browser.ui.R.string.chatMenuPopupNewTab
-                                },
-                            ),
+                            getString(com.duckduckgo.browser.ui.R.string.chatMenuPopupNewTab),
                         )
                     chatMenuPopup.showAnchoredView(activity, binding.rootView, anchor)
                 }
@@ -4025,6 +4059,12 @@ class BrowserTabFragment :
                 }
             },
         )
+    }
+
+    fun launchContextualDuckAi(textSelection: String? = null) {
+        viewLifecycleOwner.lifecycleScope.launch(dispatchers.main()) {
+            duckChatContextual.launch(tabId, webView?.url, webView, textSelection) { showDuckChatContextualSheet(tabId) }
+        }
     }
 
     private fun showDuckChatContextualSheet(tabId: String) {

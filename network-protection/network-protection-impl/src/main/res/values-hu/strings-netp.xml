@@ -89,8 +89,8 @@
     <string name="netpManagementManageItemExclusion">Kizárt alkalmazások</string>
     <string name="netpManagementManageItemExclusionSubtitleEmpty">Nincs</string>
     <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
-        <item quantity="one">%1$d alkalmazás</item>
-        <item quantity="other">%1$d alkalmazás</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d alkalmazás</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d alkalmazás</item>
     </plurals>
     <string name="netpManagementVpnSettings">VPN-beállítások</string>
 
@@ -242,14 +242,14 @@
     <string name="netpAutoExcludePromptTitle">Szeretnéd kizárni a VPN-ekkel nem kompatibilis alkalmazásokat?</string>
     <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">%1$s került azonosításra, miközben a VPN csatlakoztatva volt.</string>
     <plurals name="netpAutoExcludeAppLabel">
-        <item quantity="one">%1$d új alkalmazás nem kompatibilis a VPN-ekkel. Zárd ki az alkalmazást, hogy használni tudd</item>
-        <item quantity="other">%1$d új alkalmazás nem kompatibilis a VPN-ekkel. Zárd ki az alkalmazásokat, hogy használni tudd őket</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d új alkalmazás nem kompatibilis a VPN-ekkel. Zárd ki az alkalmazást, hogy használni tudd</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d új alkalmazás nem kompatibilis a VPN-ekkel. Zárd ki az alkalmazásokat, hogy használni tudd őket</item>
     </plurals>
 
     <string name="netpAutoExcludePromptExcludeAllTitle">Szeretnéd kizárni az összes olyan alkalmazást, amely nem kompatibilis a VPN-ekkel?</string>
     <plurals name="netpAutoExcludeAllAppLabel">
-        <item quantity="one">%1$d másik alkalmazás nem kompatibilis a VPN-ekkel. Zárd ki az alkalmazást, hogy használni tudd</item>
-        <item quantity="other">%1$d másik alkalmazás nem kompatibilis a VPN-ekkel. Zárd ki az alkalmazásokat, hogy használni tudd őket</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d másik alkalmazás nem kompatibilis a VPN-ekkel. Zárd ki az alkalmazást, hogy használni tudd</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d másik alkalmazás nem kompatibilis a VPN-ekkel. Zárd ki az alkalmazásokat, hogy használni tudd őket</item>
     </plurals>
     <string name="netpAutoExcludePromptOptionEnable">Inkompatibilis alkalmazások automatikus kizárása</string>
     <string name="netpAutoExcludePromptActionAdd">Alkalmazások kizárása</string>

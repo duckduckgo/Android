@@ -376,7 +376,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Sync &amp; Backup är krypterad på alla dina enheter.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Kontrollera din andra enhet</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Kontrollera din andra enhet.</string>
     <string name="sync_simplified_pairing_headline_recovery">Återställer data</string>
     <string name="sync_simplified_pairing_body">Ansluter …</string>
 

@@ -100,7 +100,6 @@ class NoNewBrowserFeatureToggleDetector : Detector(), SourceCodeScanner {
             "AndroidBrowserConfigFeature#glideSuspend",
             "AndroidBrowserConfigFeature#omnibarAnimation",
             "AndroidBrowserConfigFeature#showNTPAfterIdleReturn",
-            "AndroidBrowserConfigFeature#ntpAsDefaultAfterIdleReturn",
             "AndroidBrowserConfigFeature#storeFaviconSuspend",
             "AndroidBrowserConfigFeature#atomicFaviconWrites",
             "AndroidBrowserConfigFeature#checkMaliciousAfterHttpsUpgrade",

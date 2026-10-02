@@ -23,6 +23,9 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,10 +46,14 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     private val contextualEntryPromptStore: ContextualEntryPromptStore,
     private val duckChatPixels: DuckChatPixels,
     private val modelManager: DuckAiModelManager,
+    private val textSelectionRepository: TextSelectionRepository,
+    private val selectionPayloadBuilder: TextSelectionPayloadBuilder,
+    private val selectionJourney: DuckAiSelectionJourneyWideEvent,
 ) : ViewModel() {
 
     data class ViewState(
         val attachedContext: AttachedPageContext? = null,
+        val latestPageContext: String? = null,
     )
 
     data class AttachedPageContext(
@@ -82,9 +89,10 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     fun onPageContextReceived(serializedPageContext: String) {
         if (!isContextValid(serializedPageContext)) return
         latestValidPageContext = serializedPageContext
+        _viewState.update { it.copy(latestPageContext = serializedPageContext) }
         // The dialog is only shown from "Ask about page", so attach regardless of the auto-attach feature
         // flag — unless the user explicitly removed the context this session.
-        if (!userRemovedContext) attach(serializedPageContext)
+        if (!userRemovedContext && !hasTextSelections()) attach(serializedPageContext)
     }
 
     /** The composer's "attach page context" affordance (shown when nothing is attached). */
@@ -103,7 +111,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
 
     /** A suggested prompt was picked; suggestions are page-specific, so attach the context before submit. */
     fun onSuggestionSubmitted(prompt: NativeInputPrompt) {
-        if (_viewState.value.attachedContext == null) latestValidPageContext?.let { attach(it) }
+        if (_viewState.value.attachedContext == null && !hasTextSelections()) latestValidPageContext?.let { attach(it) }
         fireUnifiedInputPromptSubmitted()
         submit(prompt)
     }
@@ -134,12 +142,24 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     }
 
     private fun submit(prompt: NativeInputPrompt) {
+        val selectionsJson = prompt.selectionsJson ?: selectionPayloadBuilder.toJson(textSelectionRepository.consume(tabId))
+        selectionsJson?.length()?.takeIf { it > 0 }?.let {
+            duckChatPixels.reportContextualPromptSubmittedWithSelections(it)
+            selectionJourney.onPromptSubmitted(tabId)
+        }
         contextualEntryPromptStore.store(
-            ContextualEntryPrompt(tabId, prompt, _viewState.value.attachedContext?.serialized),
+            ContextualEntryPrompt(
+                tabId = tabId,
+                prompt = prompt,
+                serializedPageContext = _viewState.value.attachedContext?.serialized,
+                selectionsJson = selectionsJson,
+            ),
         )
         duckChatPixels.reportContextualFloatingInputPromotedToSheet()
         commandChannel.trySend(Command.HandOffToSheet)
     }
+
+    private fun hasTextSelections(): Boolean = textSelectionRepository.selections(tabId).value.isNotEmpty()
 
     private fun attach(serializedPageContext: String) {
         val json = runCatching { JSONObject(serializedPageContext) }.getOrNull() ?: return
@@ -162,5 +182,6 @@ class DuckChatContextualEntryViewModel @Inject constructor(
 
     fun onDismiss() {
         duckChatPixels.reportContextualFloatingInputDismissedWithoutSubmission()
+        selectionJourney.onSurfaceDismissed(tabId)
     }
 }

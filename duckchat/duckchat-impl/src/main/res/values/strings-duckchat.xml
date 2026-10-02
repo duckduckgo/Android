@@ -281,6 +281,11 @@
     <string name="native_input_chat_duck_mode_hint">Reply…</string>
 
     <!-- Model Picker -->
+    <string name="duckAiModelPickerLabelEverydayUse" instruction="Subline under a model in the Duck.ai model picker, describing what that model suits.">Best for everyday use</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster" instruction="Subline under a model in the Duck.ai model picker. 'Limits' means the user's usage allowance, which this model consumes more quickly.">Solid but hits limits sooner</string>
+    <string name="duckAiModelPickerTryFreeTrial" instruction="Header above the locked models in the Duck.ai model picker, shown when the user can still start a free trial.">Try for Free</string>
+    <string name="duckAiModelPickerSubscriberExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when unlocking them requires a paid subscription.">Subscriber Exclusive</string>
+    <string name="duckAiModelPickerProExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when they require the Pro plan specifically. 'Pro' is the plan name and stays untranslated.">Pro Plan Exclusive</string>
     <string name="duckAiModelPickerPlusModels">Plus</string>
     <string name="duckAiModelPickerProModels">Pro</string>
 
@@ -349,4 +354,23 @@
     <string name="duckChatContextualAskAboutPage">Ask About Page</string>
     <string name="duckChatContextualAskAboutSearch">Continue in Duck.ai</string>
     <string name="duckChatContextualOpenDuckAi">Open Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Summarize this selection</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Summarize this selection.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Translate this selection</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user's language.">Translate this selection into %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Text selection</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">You can add up to %1$d text selections. Remove one to add another.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Ask Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d word</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d words</item>
+    </plurals>
 </resources>

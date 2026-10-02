@@ -108,6 +108,21 @@ object ContextualSuggestionsMatcher {
         )
     }
 
+    fun resolveIds(
+        ids: List<String>,
+        input: ResolvePageSuggestionsInput,
+        catalog: SuggestionCatalog,
+    ): List<ContextualSuggestedPrompt> = ids.mapNotNull { id ->
+        val entry = catalog.catalog[id] ?: return@mapNotNull null
+        if (!conditionPasses(entry.condition, input)) return@mapNotNull null
+        ContextualSuggestedPrompt(
+            id = id,
+            label = entry.label,
+            prompt = applyTemplate(entry.prompt, input),
+            icon = entry.icon,
+        )
+    }
+
     fun classifyPageType(signals: PageTypeSignals?): SuggestionsPageType {
         if (signals == null) return SuggestionsPageType.NONE
         for (type in signals.jsonLdType) {

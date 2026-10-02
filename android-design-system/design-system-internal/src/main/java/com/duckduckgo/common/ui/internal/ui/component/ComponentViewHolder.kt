@@ -79,8 +79,11 @@ import com.duckduckgo.common.ui.compose.listitem.DaxListItemIconBackground
 import com.duckduckgo.common.ui.compose.listitem.DaxListItemIconSize
 import com.duckduckgo.common.ui.compose.listitem.DaxListItemTrailingIconSize
 import com.duckduckgo.common.ui.compose.listitem.DaxOneLineListItem
+import com.duckduckgo.common.ui.compose.listitem.DaxSectionHeader
 import com.duckduckgo.common.ui.compose.listitem.DaxSettingsListItem
 import com.duckduckgo.common.ui.compose.listitem.DaxTwoLineListItem
+import com.duckduckgo.common.ui.compose.message.DaxAppTPBannerDisabled
+import com.duckduckgo.common.ui.compose.message.DaxAppTPBannerEnabled
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigSingleActionMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigTwoActionsMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxMediumMessage
@@ -577,6 +580,56 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         }
     }
 
+    class AppTPBannerComponentViewHolder(
+        parent: ViewGroup,
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_apptp_banner)) {
+        override fun bind(component: Component) {
+            val onClick = { Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show() }
+
+            view.setupThemedComposeView(R.id.apptp_banner_enabled_compose, isDarkTheme = isDarkTheme) {
+                DaxAppTPBannerEnabled(
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("App Tracking Protection is enabled") }
+                        append(" and blocking tracking attempts across your apps.")
+                    },
+                    onClick = onClick,
+                )
+            }
+
+            view.setupThemedComposeView(R.id.apptp_banner_trackers_blocked_compose, isDarkTheme = isDarkTheme) {
+                DaxAppTPBannerEnabled(
+                    text = buildAnnotatedString {
+                        append("App Tracking Protection blocked 1,235 tracking attempts in ")
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("Yelp and 14 other apps") }
+                        append(" (past hour).")
+                    },
+                    onClick = onClick,
+                )
+            }
+
+            view.setupThemedComposeView(R.id.apptp_banner_disabled_compose, isDarkTheme = isDarkTheme) {
+                DaxAppTPBannerDisabled(
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("App Tracking Protection disabled.") }
+                        append("\nTap to continue blocking tracking attempts across your apps.")
+                    },
+                    onClick = onClick,
+                )
+            }
+
+            view.setupThemedComposeView(R.id.apptp_banner_revoked_compose, isDarkTheme = isDarkTheme) {
+                DaxAppTPBannerDisabled(
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("A VPN app on your device disabled App Tracking Protection.") }
+                        append("\nTap to re-enable.")
+                    },
+                    onClick = onClick,
+                )
+            }
+        }
+    }
+
     class SearchBarComponentViewHolder(
         parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_search_bar))
@@ -591,6 +644,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
     class HeaderSectionComponentViewHolder(
         parent: ViewGroup,
+        private val isDarkTheme: Boolean,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_section_header_item)) {
         override fun bind(component: Component) {
             view.findViewById<SectionHeaderListItem>(R.id.sectionHeaderItemTitle).apply {
@@ -599,6 +653,10 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             view.findViewById<SectionHeaderListItem>(R.id.sectionHeaderWithOverflow).apply {
                 setOverflowMenuClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
                 revertUpperCaseTitleText()
+            }
+            val snackbar = ShowcaseSnackbar(view, component.name)
+            view.setupThemedComposeView(id = R.id.composeSectionHeader, isDarkTheme = isDarkTheme) {
+                ComposeSectionHeader(snackbar)
             }
         }
     }
@@ -1098,7 +1156,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.SEARCH_BAR -> SearchBarComponentViewHolder(parent)
                 Component.MENU_ITEM -> MenuItemComponentViewHolder(parent)
                 Component.POPUP_MENU_ITEM -> PopupMenuItemComponentViewHolder(parent)
-                Component.SECTION_HEADER_LIST_ITEM -> HeaderSectionComponentViewHolder(parent)
+                Component.SECTION_HEADER_LIST_ITEM -> HeaderSectionComponentViewHolder(parent, isDarkTheme)
                 Component.SINGLE_LINE_LIST_ITEM -> OneLineListItemComponentViewHolder(parent, isDarkTheme)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent, isDarkTheme)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent, isDarkTheme)
@@ -1107,6 +1165,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.CARD -> CardComponentViewHolder(parent, isDarkTheme)
                 Component.SCAFFOLD -> ScaffoldComponentViewHolder(parent, isDarkTheme)
                 Component.SETTINGS_LIST_ITEM -> SettingsListItemComponentViewHolder(parent, isDarkTheme)
+                Component.APP_TRACKING_PROTECTION_BANNER -> AppTPBannerComponentViewHolder(parent, isDarkTheme)
                 else -> {
                     TODO()
                 }
@@ -1133,6 +1192,19 @@ private class ShowcaseSnackbar(
     fun switch(checked: Boolean) = show("Switch checked: $checked")
 
     private fun show(message: String) = Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show()
+}
+
+@Composable
+private fun ComposeSectionHeader(snackbar: ShowcaseSnackbar) {
+    Column {
+        ComposeCaption()
+        DaxSectionHeader(title = "Section Header")
+        DaxSectionHeader(
+            title = "Section Header with Overflow Menu",
+            overflowMenuClickListener = { snackbar.trailingIcon() },
+            overflowMenuContentDescription = "Overflow menu",
+        )
+    }
 }
 
 @Composable

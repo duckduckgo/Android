@@ -73,12 +73,12 @@
     <string name="bookmarkFolderDeleteDialogMessage">"Möchtest du wirklich löschen "</string>
     <string name="bookmarkFolderEmpty">Leer</string>
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s und %3$d Element?</item>
-        <item quantity="other">%1$s%2$s und %3$d Elemente?</item>
+        <item quantity="one" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s und %3$d Element?</item>
+        <item quantity="other" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s und %3$d Elemente?</item>
     </plurals>
     <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d Element</item>
-        <item quantity="other">%1$d Elemente</item>
+        <item quantity="one" instruction="Placeholder is the number of items">%1$d Element</item>
+        <item quantity="other" instruction="Placeholder is the number of items">%1$d Elemente</item>
     </plurals>
 
     <!-- Bookmarks -->
@@ -93,8 +93,8 @@
     <string name="removeFromFavorites">Aus Favoriten entfernen</string>
     <string name="addToFavoritesMenu">Zu Favoriten hinzufügen</string>
     <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">Möchtest du diesen Ordner mit %1$d Element wirklich löschen?</item>
-        <item quantity="other">Möchtest du diesen Ordner mit %1$d Elementen wirklich löschen?</item>
+        <item quantity="one" instruction="%1$d is the number of items inside the folder">Möchtest du diesen Ordner mit %1$d Element wirklich löschen?</item>
+        <item quantity="other" instruction="%1$d is the number of items inside the folder">Möchtest du diesen Ordner mit %1$d Elementen wirklich löschen?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Bist du sicher, dass du das Lesezeichen &lt;b&gt;%1$s&lt;/b&gt; löschen möchtest?</string>
 

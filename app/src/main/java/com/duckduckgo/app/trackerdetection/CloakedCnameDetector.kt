@@ -30,10 +30,6 @@ import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
 
-interface CloakedCnameDetector {
-    fun detectCnameCloakedHost(documentUrl: String?, url: Uri): String?
-}
-
 interface CloakedCnameRefresher {
     @WorkerThread
     fun refresh()

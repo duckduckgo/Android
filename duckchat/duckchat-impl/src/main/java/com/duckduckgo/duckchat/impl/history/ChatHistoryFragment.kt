@@ -92,13 +92,10 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         ViewModelProvider(this, viewModelFactory)[ChatHistoryViewModel::class.java]
     }
 
-    private var overflowMenuEnabled = false
-
     private val adapter = ChatHistoryAdapter(
         onChatClicked = { item -> viewModel.onChatRowClicked(item.chatId) },
         onChatMoreClicked = { item, anchor -> showRowPopup(item, anchor) },
         onChatLongClicked = { item -> viewModel.onChatRowLongClicked(item.chatId) },
-        onSelectAllClicked = { viewModel.onSelectAllToggled() },
     )
 
     private val onBackPressedCallback = object : OnBackPressedCallback(enabled = false) {
@@ -135,15 +132,10 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         binding.toolbar.inflateMenu(R.menu.menu_chat_history_default)
         binding.toolbar.setOnMenuItemClickListener(::onMenuItemClicked)
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            overflowMenuEnabled = withContext(dispatchers.io()) { duckChatFeature.nativeDuckAiSidebar().isEnabled() }
-            if (!viewModel.isSelectMode() && !binding.searchBar.isVisible) {
-                binding.toolbar.menu.findItem(R.id.chat_history_action_overflow)?.isVisible = overflowMenuEnabled
-            }
-        }
-
         binding.chatHistoryList.layoutManager = LinearLayoutManager(requireContext())
         binding.chatHistoryList.adapter = adapter
+
+        binding.chatHistorySelectAll.root.setOnClickListener { viewModel.onSelectAllToggled() }
 
         binding.chatHistoryEmptyState.setOnPrimaryCtaClickListener { viewModel.onOpenDuckAiClicked() }
 
@@ -191,14 +183,6 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         when (event) {
             is ChatHistoryViewModel.NavigationEvent.OpenChat ->
                 startActivity(browserNav.openInNewTab(requireContext(), event.url, event.sourceTabId))
-            is ChatHistoryViewModel.NavigationEvent.OpenChatProtection ->
-                startActivity(
-                    if (event.inNewTab) {
-                        browserNav.openInNewTab(requireContext(), event.url, event.sourceTabId)
-                    } else {
-                        browserNav.openInCurrentTab(requireContext(), event.url)
-                    },
-                )
             is ChatHistoryViewModel.NavigationEvent.OpenRename -> openRenameScreen(event.chatId, event.currentTitle)
             is ChatHistoryViewModel.NavigationEvent.ShowDownloadComplete -> showDownloadCompleteSnackbar(event.fileName)
             is ChatHistoryViewModel.NavigationEvent.ShowBulkDownloadComplete -> showBulkDownloadCompleteSnackbar(event.count)
@@ -255,23 +239,19 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
 
     private fun render(state: ChatHistoryUiState) {
         logcat { "ChatHistory: render ${state::class.simpleName}" }
+        binding.chatHistoryList.isVisible = state is ChatHistoryUiState.Loaded
+        binding.chatHistoryEmptyState.isVisible = state is ChatHistoryUiState.Empty
         when (state) {
             ChatHistoryUiState.Loading -> {
-                binding.chatHistoryList.visibility = View.GONE
-                binding.chatHistoryEmptyState.visibility = View.GONE
                 applyDefaultToolbar()
                 setFireActionVisible(false)
             }
             ChatHistoryUiState.Empty -> {
-                binding.chatHistoryList.visibility = View.GONE
-                binding.chatHistoryEmptyState.visibility = View.VISIBLE
                 adapter.submitList(emptyList())
                 applyDefaultToolbar()
                 setFireActionVisible(false)
             }
             is ChatHistoryUiState.Loaded -> {
-                binding.chatHistoryList.visibility = View.VISIBLE
-                binding.chatHistoryEmptyState.visibility = View.GONE
                 val selectMode = state.mode as? ChatHistoryUiState.Mode.Selecting
                 adapter.submitList(buildEntries(state, selectMode))
                 if (selectMode != null) {
@@ -285,6 +265,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
                 renderConfirmation(state.confirmation)
             }
         }
+        renderSelectAllHeader(state)
         // Re-derive every render so a transition out of Loaded (e.g. last chat deleted externally)
         // can't leave us intercepting back presses with no overlay to dismiss.
         onBackPressedCallback.isEnabled = shouldInterceptBack(state)
@@ -304,7 +285,6 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         binding.toolbar.menu.findItem(R.id.chat_history_action_new)?.isVisible = true
         binding.toolbar.menu.findItem(R.id.chat_history_action_search)?.isVisible = true
         binding.toolbar.menu.findItem(R.id.chat_history_action_download_selected)?.isVisible = false
-        binding.toolbar.menu.findItem(R.id.chat_history_action_overflow)?.isVisible = overflowMenuEnabled
     }
 
     private fun applySelectModeToolbar(count: Int) {
@@ -316,18 +296,33 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         binding.toolbar.menu.findItem(R.id.chat_history_action_new)?.isVisible = false
         binding.toolbar.menu.findItem(R.id.chat_history_action_search)?.isVisible = false
         binding.toolbar.menu.findItem(R.id.chat_history_action_download_selected)?.isVisible = true
-        binding.toolbar.menu.findItem(R.id.chat_history_action_overflow)?.isVisible = false
+    }
+
+    private fun renderSelectAllHeader(state: ChatHistoryUiState) {
+        val loaded = state as? ChatHistoryUiState.Loaded
+        val selectMode = loaded?.mode as? ChatHistoryUiState.Mode.Selecting
+        if (loaded == null || selectMode == null) {
+            setSelectAllHeaderVisible(false)
+            return
+        }
+        val visibleIds = (loaded.pinned + loaded.recent).map { it.chatId }.toSet()
+        val allSelected = visibleIds.isNotEmpty() && selectMode.selectedChatIds == visibleIds
+        binding.chatHistorySelectAll.root.isSelected = allSelected
+        binding.chatHistorySelectAll.chatHistorySelectAllLabel.setText(
+            if (allSelected) R.string.duck_ai_chat_history_unselect_all else R.string.duck_ai_chat_history_select_all,
+        )
+        setSelectAllHeaderVisible(true)
+    }
+
+    private fun setSelectAllHeaderVisible(visible: Boolean) {
+        binding.chatHistorySelectAll.root.isVisible = visible
+        binding.chatHistorySelectAllDivider.isVisible = visible
     }
 
     private fun buildEntries(
         state: ChatHistoryUiState.Loaded,
         selectMode: ChatHistoryUiState.Mode.Selecting?,
     ): List<ChatHistoryListEntry> = buildList {
-        if (selectMode != null) {
-            val visibleIds = (state.pinned + state.recent).map { it.chatId }.toSet()
-            val allSelected = visibleIds.isNotEmpty() && selectMode.selectedChatIds == visibleIds
-            add(ChatHistoryListEntry.SelectAllHeader(allSelected = allSelected))
-        }
         if (state.pinned.isNotEmpty()) {
             if (!state.searchActive) add(ChatHistoryListEntry.Header(R.string.duck_ai_chat_history_section_pinned))
             state.pinned.forEach { item ->
@@ -379,10 +374,6 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
             viewModel.onDownloadSelectedRequested()
             true
         }
-        R.id.chat_history_action_overflow -> {
-            binding.toolbar.findViewById<View>(R.id.chat_history_action_overflow)?.let { showOverflowPopup(it) }
-            true
-        }
         else -> false
     }
 
@@ -399,20 +390,6 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         binding.toolbar.show()
         viewModel.onSearchClosed()
         // onBackPressedCallback.isEnabled is reset by render() — select mode may still be active.
-    }
-
-    private fun showOverflowPopup(anchor: View) {
-        val popup = PopupMenu(layoutInflater, R.layout.popup_chat_history_overflow)
-        val view = popup.contentView
-        val selectChats = view.findViewById<PopupMenuItemView>(R.id.selectChats)
-        if (viewModel.uiState.value is ChatHistoryUiState.Loaded) {
-            selectChats.show()
-            popup.onMenuItemClicked(selectChats) { viewModel.onEnterSelectMode() }
-        } else {
-            selectChats.gone()
-        }
-        popup.onMenuItemClicked(view.findViewById(R.id.chatsProtection)) { viewModel.onChatsProtectionClicked() }
-        popup.show(binding.root, anchor)
     }
 
     private fun showRowPopup(item: ChatHistoryItem, anchor: View) {

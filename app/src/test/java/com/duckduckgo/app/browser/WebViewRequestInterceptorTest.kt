@@ -30,8 +30,7 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
-import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
-import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
+import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
@@ -49,13 +48,11 @@ import com.duckduckgo.tracker.detection.api.TrackerDetector
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
-import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -86,7 +83,7 @@ class WebViewRequestInterceptorTest {
     private val mockUserAgentProvider: UserAgentProvider = mock()
     private val mockMaliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration = mock()
     private val fakeAndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
-    private val mockWebTrackersBlockedDao: WebTrackersBlockedDao = mock()
+    private val mockWebTrackersBlockedHistory: WebTrackersBlockedHistory = mock()
     private val webView: WebView = mock()
 
     @Before
@@ -113,7 +110,7 @@ class WebViewRequestInterceptorTest {
             appCoroutineScope = coroutineTestRule.testScope,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             isMainProcess = true,
-            webTrackersBlockedDao = mockWebTrackersBlockedDao,
+            webTrackersBlockedHistory = mockWebTrackersBlockedHistory,
         )
     }
 
@@ -153,7 +150,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenInterceptFromServiceWorkerAndRequestIsBlockedThenWebTrackerBlockedInsertedOnCoroutineDispatchWithCorrectValues() = runTest {
+    fun whenInterceptFromServiceWorkerAndRequestIsBlockedThenTrackerBlockedRecordedOnCoroutineDispatchWithCorrectValues() = runTest {
         whenever(mockRequest.url).thenReturn("tracker.com".toUri())
         whenever(mockRequest.isForMainFrame).thenReturn(false)
         whenever(mockRequest.requestHeaders).thenReturn(emptyMap())
@@ -168,10 +165,10 @@ class WebViewRequestInterceptorTest {
 
         advanceUntilIdle()
 
-        val captor = argumentCaptor<WebTrackerBlocked>()
-        verify(mockWebTrackersBlockedDao).insert(captor.capture())
-        assertEquals("tracker.com", captor.firstValue.trackerUrl)
-        assertEquals("Tracker Inc", captor.firstValue.trackerCompany)
+        verify(mockWebTrackersBlockedHistory).onTrackerBlocked(
+            trackerUrl = "tracker.com",
+            trackerCompany = "Tracker Inc",
+        )
     }
 
     private fun blockedTrackingEvent() = TrackingEvent(

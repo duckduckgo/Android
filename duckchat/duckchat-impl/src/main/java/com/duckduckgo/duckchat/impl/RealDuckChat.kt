@@ -190,9 +190,6 @@ interface DuckChatInternal : DuckChat {
     /** Single source of truth for the Duck.ai chat URL shape. */
     fun buildChatUrl(chatId: String): String
 
-    /** Returns the Duck.ai URL that opens with the chat protections panel open (e.g. https://duck.ai/chat?chatProtection=open). */
-    fun getChatProtectionUrl(): String
-
     /**
      * Calls onClose when a close event is emitted.
      */
@@ -495,7 +492,6 @@ class RealDuckChat @Inject constructor(
     private val _showPopupMenuShortcut = MutableStateFlow(false)
     private val _showOmnibarShortcutOnNtpAndOnFocus = MutableStateFlow(false)
     private val _showOmnibarShortcutInAllStates = MutableStateFlow(false)
-    private val _showAIChatAddressBarOptionChoiceScreen = MutableStateFlow(false)
     private val _showClearDuckAIChatHistory = MutableStateFlow(true)
 
     private val _chatState = MutableStateFlow(ChatState.HIDE)
@@ -508,6 +504,7 @@ class RealDuckChat @Inject constructor(
     private val _showVoiceSearchToggle = MutableStateFlow(false)
     private val _showVoiceChatEntry = MutableStateFlow(false)
     private val _showContextualMode = MutableStateFlow(false)
+    private val _showTextSelectionAction = MutableStateFlow(false)
     private val _allowDuckAiAsDigitalAssistant = MutableStateFlow(false)
     private val _displayedMode = MutableStateFlow(InputMode.SEARCH)
     private val _inputQuery = MutableStateFlow("")
@@ -520,7 +517,6 @@ class RealDuckChat @Inject constructor(
     private var isDuckChatFeatureEnabled = false
     private var isDuckAiInBrowserEnabled = false
     private var duckAiInputScreen = false
-    private var showNewAddressBarPickerScreen = false
     private var isDuckChatUserEnabled = false
     private var isChatSyncFeatureEnabled = false
     private var duckChatLink = DUCK_CHAT_WEB_LINK
@@ -716,8 +712,6 @@ class RealDuckChat @Inject constructor(
 
     override val showOmnibarShortcutInAllStates: StateFlow<Boolean> = _showOmnibarShortcutInAllStates.asStateFlow()
 
-    override val showAIChatAddressBarOptionChoiceScreen: StateFlow<Boolean> = _showAIChatAddressBarOptionChoiceScreen.asStateFlow()
-
     override val showClearDuckAIChatHistory: StateFlow<Boolean> = _showClearDuckAIChatHistory.asStateFlow()
 
     override val showVoiceSearchToggle: StateFlow<Boolean> = _showVoiceSearchToggle.asStateFlow()
@@ -725,6 +719,8 @@ class RealDuckChat @Inject constructor(
     override val showVoiceChatEntry: StateFlow<Boolean> = _showVoiceChatEntry.asStateFlow()
 
     override val showContextualMode: StateFlow<Boolean> = _showContextualMode.asStateFlow()
+
+    override val showTextSelectionAction: StateFlow<Boolean> = _showTextSelectionAction.asStateFlow()
 
     override val allowDuckAiAsDigitalAssistant: StateFlow<Boolean> = _allowDuckAiAsDigitalAssistant.asStateFlow()
 
@@ -798,9 +794,6 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun getDuckChatSettingsUrl(): String = resolveDuckAiUrl(DUCK_CHAT_SETTINGS_WEB_LINK)
-
-    override fun getChatProtectionUrl(): String =
-        appendParameters(mapOf(CHAT_PROTECTION_QUERY_NAME to CHAT_PROTECTION_QUERY_VALUE) + nativeChatInputParameters(), getDuckChatLink())
 
     private fun addChatParameters(
         query: String,
@@ -1053,7 +1046,6 @@ class RealDuckChat @Inject constructor(
             isDuckAiInBrowserEnabled = duckChatFeature.duckAiButtonInBrowser().isEnabled()
             duckAiInputScreen = duckChatFeature.duckAiInputScreen().isEnabled()
             clearChatHistory = duckChatFeature.clearHistory().isEnabled()
-            showNewAddressBarPickerScreen = duckChatFeature.showNewAddressBarPickerScreen().isEnabled()
             isChatSyncFeatureEnabled = deviceSyncState.isDuckChatSyncFeatureEnabled()
 
             val settingsString = duckChatFeature.self().getSettings()
@@ -1127,8 +1119,6 @@ class RealDuckChat @Inject constructor(
             val showOmnibarShortcutInAllStates = showInAddressBar && isDuckAiInBrowserEnabled
             _showOmnibarShortcutInAllStates.emit(showOmnibarShortcutInAllStates)
 
-            _showAIChatAddressBarOptionChoiceScreen.emit(showNewAddressBarPickerScreen)
-
             val showClearChatHistory = clearChatHistory
             _showClearDuckAIChatHistory.emit(showClearChatHistory)
 
@@ -1155,6 +1145,12 @@ class RealDuckChat @Inject constructor(
 
             contextualMenuAllChatsEnabled = contextualSheetRedesignEnabled && duckChatFeature.contextualMenuAllChats().isEnabled()
 
+            _showTextSelectionAction.emit(
+                contextualSheetRedesignEnabled &&
+                    isContextualNativeInputEnabled &&
+                    duckChatFeature.duckAiTextSelectionAction().isEnabled(),
+            )
+
             isAutomaticContextAttachmentEnabled = isContextualModeEnabled &&
                 duckChatFeature.automaticContextAttachment()
                     .isEnabled() && duckChatFeatureRepository.isAutomaticPageContextAttachmentUserSettingEnabled()
@@ -1178,8 +1174,6 @@ class RealDuckChat @Inject constructor(
         private const val PROMPT_QUERY_VALUE = "1"
         private const val PLACEMENT_QUERY_NAME = "placement"
         private const val PLACEMENT_QUERY_VALUE = "sidebar"
-        private const val CHAT_PROTECTION_QUERY_NAME = "chatProtection"
-        private const val CHAT_PROTECTION_QUERY_VALUE = "open"
         private const val BANG_QUERY_NAME = "bang"
         private const val BANG_QUERY_VALUE = "true"
         private const val MODE_QUERY_NAME = "mode"

@@ -85,7 +85,6 @@ class OnboardingDialogShownPixelsTest {
 
     @Test
     fun `fires nothing for the dialogs legacy had no shown pixel for`() {
-        testee.fireFor(NewUserOnboardingActivityDialog.AddToDock)
         testee.fireFor(NewUserOnboardingActivityDialog.WidgetPrompt)
         testee.fireFor(
             NewUserOnboardingActivityDialog.InputScreenPreview(

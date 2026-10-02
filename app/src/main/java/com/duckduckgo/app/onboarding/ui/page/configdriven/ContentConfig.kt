@@ -60,11 +60,6 @@ sealed interface ContentConfig {
         override fun initialState() = InputScreenContentState(withAi = initialWithAi)
     }
 
-    data class AddToDock(
-        override val title: TextConfig,
-        val body: TextConfig,
-    ) : ContentConfig
-
     data class WidgetPrompt(
         override val title: TextConfig,
         val body: TextConfig,

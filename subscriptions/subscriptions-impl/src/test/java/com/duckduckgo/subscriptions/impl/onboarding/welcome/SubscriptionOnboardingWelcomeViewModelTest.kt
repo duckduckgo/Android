@@ -23,7 +23,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.impl.onboarding.welcome.SubscriptionOnboardingWelcomeStepPlugin.Companion.WELCOME_STEP_ID
 import com.duckduckgo.subscriptions.impl.onboarding.welcome.SubscriptionOnboardingWelcomeViewModel.Command.LaunchConfetti
-import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -41,7 +41,7 @@ class SubscriptionOnboardingWelcomeViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private val controller: SubscriptionOnboardingController = mock()
-    private val stepStore: SubscriptionOnboardingStepStore = mock()
+    private val onboardingStore: SubscriptionOnboardingStore = mock()
 
     private fun viewModelStartingOn(date: LocalDate): SubscriptionOnboardingWelcomeViewModel {
         val timeProvider = object : CurrentTimeProvider {
@@ -49,7 +49,7 @@ class SubscriptionOnboardingWelcomeViewModelTest {
             override fun currentTimeMillis(): Long = 0
             override fun localDateTimeNow(): LocalDateTime = date.atStartOfDay()
         }
-        return SubscriptionOnboardingWelcomeViewModel(controller, timeProvider, stepStore, coroutineRule.testDispatcherProvider)
+        return SubscriptionOnboardingWelcomeViewModel(controller, timeProvider, onboardingStore, coroutineRule.testDispatcherProvider)
     }
 
     @Test
@@ -104,7 +104,7 @@ class SubscriptionOnboardingWelcomeViewModelTest {
 
     @Test
     fun whenScreenShownAndWelcomeStepNotCompletedThenLaunchesConfetti() = runTest {
-        whenever(stepStore.isCompleted(WELCOME_STEP_ID)).thenReturn(false)
+        whenever(onboardingStore.isStepCompleted(WELCOME_STEP_ID)).thenReturn(false)
         val viewModel = viewModelStartingOn(LocalDate.of(2026, 5, 7))
 
         viewModel.commands.test {
@@ -116,7 +116,7 @@ class SubscriptionOnboardingWelcomeViewModelTest {
 
     @Test
     fun whenScreenShownAndWelcomeStepAlreadyCompletedThenDoesNotLaunchConfetti() = runTest {
-        whenever(stepStore.isCompleted(WELCOME_STEP_ID)).thenReturn(true)
+        whenever(onboardingStore.isStepCompleted(WELCOME_STEP_ID)).thenReturn(true)
         val viewModel = viewModelStartingOn(LocalDate.of(2026, 5, 7))
 
         viewModel.commands.test {
@@ -128,7 +128,7 @@ class SubscriptionOnboardingWelcomeViewModelTest {
 
     @Test
     fun whenScreenShownAgainThenDoesNotLaunchConfettiTwice() = runTest {
-        whenever(stepStore.isCompleted(WELCOME_STEP_ID)).thenReturn(false)
+        whenever(onboardingStore.isStepCompleted(WELCOME_STEP_ID)).thenReturn(false)
         val viewModel = viewModelStartingOn(LocalDate.of(2026, 5, 7))
 
         viewModel.commands.test {

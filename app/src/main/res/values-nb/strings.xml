@@ -63,8 +63,8 @@
     <string name="undoSnackbarAction">Angre</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Blokkert sporer</item>
-        <item quantity="other">Blokkerte sporere</item>
+        <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">Blokkert sporer</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">Blokkerte sporere</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -223,7 +223,7 @@
     <string name="dataClearingDescription">Sletting av nettleserdata kan gi sterkere personvern på nettet. Bruk Fire Button til å slette data manuelt, eller sett opp automatisk sletting.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d nettsted er unntatt fra datafjerning</item>
-        <item quantity="other">%1$d nettsteder er unntatt fra datafjerning</item>
+        <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d nettsteder er unntatt fra datafjerning</item>
     </plurals>
     <string name="dataClearingAutomaticClearingOn">På</string>
     <string name="dataClearingAutomaticClearingOff">Av</string>
@@ -250,8 +250,8 @@
     <string name="singleTabFireDialogSubtitleSiteData">Hvis du sletter nettstedsdata, kan du bli logget ut av kontoer.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Dette avbryter pågående nedlastinger.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">%1$d fane og dens data er slettet</item>
-        <item quantity="other">%1$d faner og deres data er slettet</item>
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">%1$d fane og dens data er slettet</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">%1$d faner og deres data er slettet</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Nettstedsdataene kunne ikke slettes. Oppdater WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Nettstedsdataene kunne ikke slettes på grunn av en feil.</string>
@@ -766,12 +766,12 @@
     <string name="onboardingSerpDaxDialogButton">Skjønner!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Nå kan du prøve å besøke et nettsted!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
-        <item quantity="one"><![CDATA[ og <b>%1$d andre</b> prøvde å spore deg her. Jeg blokkerte dem!<br/><br/>☝️ Trykk på skjoldet for mer informasjon.️]]></item>
-        <item quantity="other"><![CDATA[ og <b>%1$d andre</b> prøvde å spore deg her. Jeg blokkerte dem!<br/><br/>☝️ Trykk på skjoldet for mer informasjon.️]]></item>
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[ og <b>%1$d andre</b> prøvde å spore deg her. Jeg blokkerte dem!<br/><br/>☝️ Trykk på skjoldet for mer informasjon.️]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[ og <b>%1$d andre</b> prøvde å spore deg her. Jeg blokkerte dem!<br/><br/>☝️ Trykk på skjoldet for mer informasjon.️]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ prøvde å spore deg her. Jeg blokkerte dem!<br/><br/>☝️ Trykk på skjoldet for mer info.️]]></item>
-        <item quantity="other"><![CDATA[ prøvde å spore deg her. Jeg blokkerte dem!<br/><br/>☝️ Trykk på skjoldet for mer info.️]]></item>
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[ prøvde å spore deg her. Jeg blokkerte dem!<br/><br/>☝️ Trykk på skjoldet for mer info.️]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[ prøvde å spore deg her. Jeg blokkerte dem!<br/><br/>☝️ Trykk på skjoldet for mer info.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Skjønner!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Fjern nettleseraktiviteten din umiddelbart med <b>Fire Button</b>.<br/><br/>Prøv den!️ 🔥]]></string>
@@ -977,9 +977,6 @@
     <string name="preOnboardingImportErrorRetry">Prøv igjen</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Legg meg til i favorittraden din.</string>
-    <string name="preOnboardingAddToDockBody">Finn DuckDuckGo-ikonet på startskjermen. Trykk på det og dra det dit du vil ha det. Det er det hele!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Skjønner!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Start en privat AI-chat med Duck.ai eller bytt til Søk for beskyttet surfing.<br/><br/>Du kan bruke Duck.ai overalt der du ser chat-ikonet]]></string>

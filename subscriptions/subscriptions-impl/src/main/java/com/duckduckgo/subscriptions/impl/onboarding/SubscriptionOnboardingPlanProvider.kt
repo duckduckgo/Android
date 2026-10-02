@@ -25,7 +25,7 @@ import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Stay
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.BackPressed
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.StepFinished
-import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
@@ -38,16 +38,15 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class SubscriptionOnboardingPlanProvider @Inject constructor(
     private val stepPlugins: PluginPoint<SubscriptionOnboardingStepPlugin>,
-    private val stepStore: SubscriptionOnboardingStepStore,
+    private val onboardingStore: SubscriptionOnboardingStore,
 ) {
 
     suspend fun buildPlan(): LinearOnboardingPlan {
-        val steps = stepPlugins.getPlugins()
-            .filter { it.shouldShow() }
-            .map { stepPlugin -> activityStep(stepPlugin) }
+        val (available, unavailable) = stepPlugins.getPlugins().partition { it.shouldShow() }
+        unavailable.forEach { onboardingStore.setStepCompleted(it.stepId) }
         return LinearOnboardingPlan(
             id = SUBSCRIPTION_ONBOARDING_PLAN_ID,
-            steps = steps,
+            steps = available.map { stepPlugin -> activityStep(stepPlugin) },
         )
     }
 
@@ -55,7 +54,7 @@ class SubscriptionOnboardingPlanProvider @Inject constructor(
         SubscriptionOnboardingActivityStep(
             id = stepPlugin.stepId,
             stepPlugin = stepPlugin,
-            precondition = { !stepStore.isCompleted(stepPlugin.stepId) },
+            precondition = { !onboardingStore.isStepCompleted(stepPlugin.stepId) },
             transition = { event ->
                 when {
                     event is StepFinished && event.stepId == stepPlugin.stepId -> Advance

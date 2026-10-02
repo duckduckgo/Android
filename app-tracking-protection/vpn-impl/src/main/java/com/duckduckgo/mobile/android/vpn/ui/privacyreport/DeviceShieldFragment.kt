@@ -44,6 +44,7 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTracker
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class DeviceShieldFragment : DuckDuckGoFragment() {
@@ -124,18 +125,18 @@ class DeviceShieldFragment : DuckDuckGoFragment() {
             renderTrackersBlockedWhenEnabled(viewState.trackersBlocked)
         } else {
             deviceShieldCtaHeaderTextView.setText(R.string.atp_NewTabEnabled)
-            deviceShieldCtaImageView.setImageResource(R.drawable.shield_check_recolorable_24)
+            deviceShieldCtaImageView.setImageResource(CommonR.drawable.shield_check_recolorable_24)
         }
     }
 
     private fun renderStateDisabled() {
         deviceShieldCtaHeaderTextView.setText(R.string.atp_NewTabDisabled)
-        deviceShieldCtaImageView.setImageResource(R.drawable.exclamation_recolorable_24)
+        deviceShieldCtaImageView.setImageResource(CommonR.drawable.exclamation_recolorable_24)
     }
 
     private fun renderStateRevoked() {
         deviceShieldCtaHeaderTextView.setText(R.string.atp_NewTabRevoked)
-        deviceShieldCtaImageView.setImageResource(R.drawable.exclamation_recolorable_24)
+        deviceShieldCtaImageView.setImageResource(CommonR.drawable.exclamation_recolorable_24)
     }
 
     private fun renderTrackersBlockedWhenEnabled(trackerBlocked: TrackersBlocked) {
@@ -191,6 +192,6 @@ class DeviceShieldFragment : DuckDuckGoFragment() {
             }
 
         deviceShieldCtaHeaderTextView.text = HtmlCompat.fromHtml(textToStyle, HtmlCompat.FROM_HTML_MODE_LEGACY)
-        deviceShieldCtaImageView.setImageResource(R.drawable.shield_check_recolorable_24)
+        deviceShieldCtaImageView.setImageResource(CommonR.drawable.shield_check_recolorable_24)
     }
 }
