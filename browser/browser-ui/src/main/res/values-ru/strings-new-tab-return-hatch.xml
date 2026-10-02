@@ -23,9 +23,6 @@
     <string name="newTabReturnHatchUndo">Отменить</string>
     <string name="hatchMenuReturnTab">Вернуться к вкладке</string>
     <string name="hatchMenuAfterInactivitySettings">После бездействия</string>
-    <string name="hatchMenuAfterInactivityOpenLastUsedTab">Открыть последнюю использованную вкладку</string>
-    <string name="hatchMenuAfterInactivityOpenNewTab">Открыть новую вкладку</string>
-    <string name="hatchMenuAfterInactivityOpenSpecificPage">Открыть определенную страницу</string>
     <string name="hatchMenuCloseTab">Закрыть вкладку</string>
     <string name="hatchMenuBurnTab">Удалить вкладку</string>
     <string name="hatchMenuHideShortcut">Скрыть ярлык</string>

@@ -23,9 +23,6 @@
     <string name="newTabReturnHatchUndo">Αναίρεση</string>
     <string name="hatchMenuReturnTab">Επιστροφή στην καρτέλα</string>
     <string name="hatchMenuAfterInactivitySettings">Μετά από αδράνεια</string>
-    <string name="hatchMenuAfterInactivityOpenLastUsedTab">Άνοιγμα τελευταίας καρτέλας που χρησιμοποιήθηκε</string>
-    <string name="hatchMenuAfterInactivityOpenNewTab">Άνοιγμα νέας καρτέλας</string>
-    <string name="hatchMenuAfterInactivityOpenSpecificPage">Άνοιγμα συγκεκριμένης σελίδας</string>
     <string name="hatchMenuCloseTab">Κλείσιμο καρτέλας</string>
     <string name="hatchMenuBurnTab">Διαγραφή καρτέλας</string>
     <string name="hatchMenuHideShortcut">Απόκρυψη συντόμευσης</string>
