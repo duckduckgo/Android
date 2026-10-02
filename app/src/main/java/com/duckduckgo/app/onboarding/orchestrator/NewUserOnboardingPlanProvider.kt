@@ -29,6 +29,7 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
 import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
+import com.duckduckgo.app.onboarding.NextStepsItemsExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
@@ -116,6 +117,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
     private val segmentedOnboardingExperimentManager: SegmentedOnboardingExperimentManager,
     private val segmentedOnboardingExperimentMetrics: SegmentedOnboardingExperimentMetrics,
+    private val nextStepsItemsExperimentManager: NextStepsItemsExperimentManager,
     private val onboardingPasswordImportExperimentManager: OnboardingPasswordImportExperimentManager,
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog,
     private val singleChoiceDataPlugins: ActivePluginPoint<OnboardingSingleChoiceDataPlugin>,
@@ -135,6 +137,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         // CTAs and the segment retention metrics of a branch this run may never reach.
         onboardingPixelSender.clearFlowAttribution()
         onboardingStore.setDownloadReason(null)
+
+        if (!ctx.isReinstall) {
+            nextStepsItemsExperimentManager.enroll()
+        }
 
         return if (customAiOnboardingResolver.resolve()) {
             // in custom AI onboarding path, the input toggle is enabled by default
