@@ -17,6 +17,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionTier
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingExperiments
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingProgress
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
@@ -31,6 +32,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Subscr
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -57,12 +59,14 @@ class SubscriptionSettingsViewModelTest {
     private val subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java, FakeToggleStore())
     private val onboardingProgress: SubscriptionOnboardingProgress = mock()
     private val onboardingStore: SubscriptionOnboardingStore = mock()
+    private val subscriptionOnboardingExperiments: SubscriptionOnboardingExperiments = mock()
     private val currentTimeProvider: CurrentTimeProvider = mock()
 
     private lateinit var viewModel: SubscriptionSettingsViewModel
 
     @Before
     fun before() {
+        runBlocking { whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(false) }
         viewModel = SubscriptionSettingsViewModel(
             subscriptionsManager,
             pixelSender,
@@ -70,6 +74,7 @@ class SubscriptionSettingsViewModelTest {
             subscriptionsFeature,
             onboardingProgress,
             onboardingStore,
+            subscriptionOnboardingExperiments,
             currentTimeProvider,
         )
     }
@@ -700,7 +705,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenOnboardingIncompleteAndWithinPurchaseWindowThenCardShownWithPercentage() = runTest {
-        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
         stubReadySubscription(startedAt = 1_000L)
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1_000L)
         whenever(onboardingProgress.completionPercentage()).thenReturn(50)
@@ -713,7 +718,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenOnboardingIncompleteAndPastPurchaseWindowThenNoCard() = runTest {
-        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
         stubReadySubscription(startedAt = 0L)
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(FIFTEEN_DAYS_MILLIS)
         whenever(onboardingProgress.completionPercentage()).thenReturn(50)
@@ -726,7 +731,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenOnboardingCompleteAndUnderViewCapThenCardShown() = runTest {
-        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
         stubReadySubscription()
         whenever(onboardingProgress.completionPercentage()).thenReturn(100)
         whenever(onboardingStore.completedEntryPointViews()).thenReturn(0)
@@ -739,7 +744,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenOnboardingCompleteAndViewCapReachedThenNoCard() = runTest {
-        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
         stubReadySubscription()
         whenever(onboardingProgress.completionPercentage()).thenReturn(100)
         whenever(onboardingStore.completedEntryPointViews()).thenReturn(2)
@@ -752,7 +757,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenOnboardingCompleteAndOneViewUsedUnderCapThenCardShown() = runTest {
-        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
         stubReadySubscription()
         whenever(onboardingProgress.completionPercentage()).thenReturn(100)
         // One view used, still under the cap → keep showing (even across app launches).
@@ -766,7 +771,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenCompletedCardShownThenViewIsCountedOnceAcrossResumeAndStatusEmission() = runTest {
-        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
         stubReadySubscription()
         whenever(onboardingProgress.completionPercentage()).thenReturn(100)
 
@@ -792,7 +797,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionInactiveThenNoOnboardingEntryPoint() = runTest {
-        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
         stubReadySubscription(status = EXPIRED)
 
         viewModel.onCreate(mock())

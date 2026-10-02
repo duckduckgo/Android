@@ -357,21 +357,23 @@ interface SubscriptionsFeature {
     fun schedulePaywallNotSeenPixels(): Toggle
 
     /**
-     * When enabled, shows the native subscription onboarding after a free-trial purchase
-     * instead of redirecting the FE to /welcome.
-     *
-     * TODO: Change for experiment framework
+     * Experiment for free-trial purchases: control keeps the current FE /welcome page, treatment shows the
+     * native subscription onboarding. Enrolled on a successful free-trial purchase.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun onboardingSubscriptionExperiment(): Toggle
+    fun subscriptionOnboardingFreeTrialsOct2026(): Toggle
 
     /**
-     * When enabled, shows the native subscription onboarding after a non-free-trial purchase
-     *
-     * TODO: Change for experiment framework
+     * Experiment for paid (non-free-trial) purchases: control keeps the current FE /welcome page, treatment
+     * shows the native subscription onboarding. Enrolled on a successful paid purchase.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun onboardingSubscriptionExperimentMonthly(): Toggle
+    fun subscriptionOnboardingPaidSubsOct2026(): Toggle
+
+    enum class SubscriptionOnboardingCohorts(override val cohortName: String) : CohortName {
+        CONTROL("control"),
+        TREATMENT("treatment"),
+    }
 
     /**
      * Controls the experiment attribution sent with purchase confirmation.
