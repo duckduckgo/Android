@@ -87,7 +87,7 @@ class AuthTokenRefreshWideEventTest {
                 "process_name" to "main",
             ),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
-            definition = WideEventDefinition(version = Version(minor = 1, patch = 0)),
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 1)),
         )
 
         verify(wideEventClient).intervalStart(123L, "total_duration_ms_bucketed", null)
@@ -203,13 +203,61 @@ class AuthTokenRefreshWideEventTest {
             .thenReturn(Result.success(14L))
         authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
 
-        authWideEvent.onBackendErrorResponse("backend-err")
+        authWideEvent.onBackendErrorResponse(backendErrorResponse = "backend-err", backendErrorCode = 3)
+
+        verify(wideEventClient).flowStep(
+            wideEventId = 14L,
+            stepName = "token_request",
+            success = false,
+            metadata = mapOf("backend_error_response" to "backend-err", "backend_error_code" to "3"),
+        )
+    }
+
+    @Test
+    fun `onBackendErrorResponse without error code sends only error`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(14L))
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+
+        authWideEvent.onBackendErrorResponse(backendErrorResponse = "backend-err", backendErrorCode = null)
 
         verify(wideEventClient).flowStep(
             wideEventId = 14L,
             stepName = "token_request",
             success = false,
             metadata = mapOf("backend_error_response" to "backend-err"),
+        )
+    }
+
+    @Test
+    fun `onBackendErrorResponse without error sends only error code`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(14L))
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+
+        authWideEvent.onBackendErrorResponse(backendErrorResponse = null, backendErrorCode = 0)
+
+        verify(wideEventClient).flowStep(
+            wideEventId = 14L,
+            stepName = "token_request",
+            success = false,
+            metadata = mapOf("backend_error_code" to "0"),
+        )
+    }
+
+    @Test
+    fun `onBackendErrorResponse sends error code outside known range as is`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(14L))
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+
+        authWideEvent.onBackendErrorResponse(backendErrorResponse = "backend-err", backendErrorCode = 7)
+
+        verify(wideEventClient).flowStep(
+            wideEventId = 14L,
+            stepName = "token_request",
+            success = false,
+            metadata = mapOf("backend_error_response" to "backend-err", "backend_error_code" to "7"),
         )
     }
 

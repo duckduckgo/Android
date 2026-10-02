@@ -4,7 +4,7 @@
         "owners": ["lmac012"],
         "meta": {
             "type": "android-auth-token-refresh",
-            "version": "1.0"
+            "version": "1.1"
         },
         "feature": {
             "name": "auth-token-refresh",
@@ -60,6 +60,11 @@
                         "type": "string",
                         "description": "Backend-supplied error code from the `error` field of the token endpoint's error body. Free-form as far as the app is concerned - the app only special-cases 'unknown_account'.",
                         "examples": ["unknown_account", "invalid_token_request"]
+                    },
+                    "backend_error_code": {
+                        "type": "string",
+                        "description": "Backend-supplied numeric code from the `error_code` field of the token endpoint's error body, sent alongside `error`.",
+                        "enum": ["0", "1", "2", "3", "4"]
                     },
                     "play_login_error": {
                         "type": "string",
