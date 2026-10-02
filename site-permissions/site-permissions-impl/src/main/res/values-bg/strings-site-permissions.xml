@@ -105,4 +105,21 @@
     <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo не можа да даде достъп до микрофона на този сайт</string>
     <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo не можа да предостави достъп до камерата и микрофона на този сайт</string>
 
+    <!-- Permission settings redesign -->
+    <string name="permissionSettingsAlwaysAllow" instruction="Permission setting option: the site gets the permission without asking">Винаги разрешено</string>
+    <string name="permissionSettingsAskEachTime" instruction="Permission setting option: the site has to ask for the permission every time">Питай всеки път</string>
+    <string name="permissionSettingsLocationDialogTitle">Разрешаване на сайтовете да искат разрешение за местоположение</string>
+    <string name="permissionSettingsLocationDialogMessage">Ако изберете „Никога не разрешавай“, няма да можете да използвате определени функции на сайтове, като например упътвания в карти или магазини наблизо.</string>
+    <string name="permissionSettingsCameraDialogTitle">Разрешаване на сайтове да искат разрешение за камерата</string>
+    <string name="permissionSettingsCameraDialogMessage">Ако изберете „Никога не разрешавай“, няма да можете да използвате функции като видео чат в сайтове.</string>
+    <string name="permissionSettingsMicrophoneDialogTitle">Разрешаване на сайтовете да искат разрешение за микрофона</string>
+    <string name="permissionSettingsMicrophoneDialogMessage">Ако изберете „Никога не разрешавай“, няма да можете да използвате функции като гласов чат в сайтове.</string>
+    <string name="permissionSettingsDrmDialogTitle">Разрешаване на сайтовете да искат разрешение за управление на цифровите права (DRM)</string>
+    <string name="permissionSettingsDrmTitle" instruction="Name of a permission setting for playing protected video content">Управление на цифровите права (DRM)</string>
+    <string name="permissionsPerWebsiteRedesignHeader" instruction="Placeholder is the name of a website">Разрешения за %1$s</string>
+    <string name="permissionsPerWebsiteRemovePermissions" instruction="Button that removes all saved permissions for the website shown on the screen">Премахване на разрешенията</string>
+    <string name="permissionsRemovedForSiteSnackbar" instruction="Placeholder is the name of a website">Разрешенията са премахнати за &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="permissionsRemovedForAllSitesSnackbar">Разрешенията са премахнати за всички сайтове</string>
+    <string name="permissionSettingsDrmDialogMessage">Ако изберете „Никога не разрешавай“, видеоклиповете на сайта няма да могат да бъдат възпроизвеждани.</string>
+
 </resources>
