@@ -14,20 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboarding
+package com.duckduckgo.nextsteps.impl
 
-import com.duckduckgo.app.onboarding.NextStepsItemsExperimentManager.NextStepsItemsExperimentVariant
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.remote.messaging.impl.nextstepsitems.NextStepsItemsExperimentToggles
-import com.duckduckgo.remote.messaging.impl.nextstepsitems.NextStepsItemsExperimentToggles.Cohorts
+import com.duckduckgo.nextsteps.impl.NextStepsItemsExperimentManager.NextStepsItemsExperimentVariant
+import com.duckduckgo.nextsteps.impl.NextStepsItemsExperimentToggles.Cohorts
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface NextStepsItemsExperimentManager {
+    /**
+     * Enrols the user in the experiment and returns the assigned variant, or null when the
+     * feature is off, the user is a reinstall or no cohort was assigned.
+     *
+     * Callers must only invoke this once the privacy config has been persisted, otherwise the
+     * remote cohort weights are not available yet and enrolment is a no-op.
+     */
     suspend fun enroll(): NextStepsItemsExperimentVariant?
 
     enum class NextStepsItemsExperimentVariant {
@@ -43,13 +49,9 @@ class NextStepsItemsExperimentManagerImpl @Inject constructor(
     private val nextStepsItemsFeatureToggles: NextStepsItemsExperimentToggles,
     private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
-    private val onboardingPrivacyConfigPersistedGate: OnboardingPrivacyConfigPersistedGate,
 ) : NextStepsItemsExperimentManager {
 
     override suspend fun enroll(): NextStepsItemsExperimentVariant? = withContext(dispatcherProvider.io()) {
-        if (!onboardingPrivacyConfigPersistedGate.awaitPersisted()) {
-            return@withContext null
-        }
         if (!nextStepsItemsFeatureToggles.self().isEnabled() || appBuildConfig.isAppReinstall()) {
             return@withContext null
         }

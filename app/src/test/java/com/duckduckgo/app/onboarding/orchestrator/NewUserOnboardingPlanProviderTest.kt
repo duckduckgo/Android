@@ -28,12 +28,12 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.FakeOnboardingSingleChoiceDataPlugin
-import com.duckduckgo.app.onboarding.NextStepsItemsExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
 import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.OnboardingPreferenceCatalog
+import com.duckduckgo.app.onboarding.OnboardingPrivacyConfigPersistedGate
 import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
@@ -83,6 +83,7 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.nextsteps.impl.NextStepsItemsExperimentManager
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Completed
 import com.duckduckgo.onboarding.api.LinearOnboardingState.InProgress
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Skipped
@@ -136,6 +137,7 @@ class NewUserOnboardingPlanProviderTest {
     private val segmentedOnboardingExperiment: SegmentedOnboardingExperimentManager = mock()
     private val segmentedOnboardingMetrics: SegmentedOnboardingExperimentMetrics = mock()
     private val nextStepsItemsExperiment: NextStepsItemsExperimentManager = mock()
+    private val privacyConfigPersistedGate: OnboardingPrivacyConfigPersistedGate = mock()
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog = mock {
         onBlocking { offer(any()) } doReturn emptyList()
     }
@@ -181,6 +183,7 @@ class NewUserOnboardingPlanProviderTest {
             whenever(segmentedOnboardingExperiment.enroll()).thenReturn(null)
             whenever(passwordImportExperiment.enroll()).thenReturn(null)
             whenever(nextStepsItemsExperiment.enroll()).thenReturn(null)
+            whenever(privacyConfigPersistedGate.awaitPersisted()).thenReturn(true)
         }
         provider = NewUserOnboardingPlanProvider(
             syncAutoRestore = syncAutoRestore,
@@ -205,6 +208,7 @@ class NewUserOnboardingPlanProviderTest {
             segmentedOnboardingExperimentManager = segmentedOnboardingExperiment,
             segmentedOnboardingExperimentMetrics = segmentedOnboardingMetrics,
             nextStepsItemsExperimentManager = nextStepsItemsExperiment,
+            onboardingPrivacyConfigPersistedGate = privacyConfigPersistedGate,
             onboardingPasswordImportExperimentManager = passwordImportExperiment,
             onboardingPreferenceCatalog = onboardingPreferenceCatalog,
             singleChoiceDataPlugins = singleChoiceDataPlugins,
@@ -2139,6 +2143,14 @@ class NewUserOnboardingPlanProviderTest {
     @Test
     fun `when reinstall user then the next steps items experiment is never enrolled`() = runTest {
         whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
+        start()
+
+        verify(nextStepsItemsExperiment, never()).enroll()
+    }
+
+    @Test
+    fun `when privacy config is not persisted in time then the next steps items experiment is never enrolled`() = runTest {
+        whenever(privacyConfigPersistedGate.awaitPersisted()).thenReturn(false)
         start()
 
         verify(nextStepsItemsExperiment, never()).enroll()

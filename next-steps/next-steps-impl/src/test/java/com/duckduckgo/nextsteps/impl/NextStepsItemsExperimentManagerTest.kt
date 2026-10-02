@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboarding
+package com.duckduckgo.nextsteps.impl
 
 import android.annotation.SuppressLint
-import com.duckduckgo.app.onboarding.NextStepsItemsExperimentManager.NextStepsItemsExperimentVariant
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.remote.messaging.impl.nextstepsitems.NextStepsItemsExperimentToggles
-import com.duckduckgo.remote.messaging.impl.nextstepsitems.NextStepsItemsExperimentToggles.Cohorts
+import com.duckduckgo.nextsteps.impl.NextStepsItemsExperimentManager.NextStepsItemsExperimentVariant
+import com.duckduckgo.nextsteps.impl.NextStepsItemsExperimentToggles.Cohorts
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -40,30 +39,18 @@ class NextStepsItemsExperimentManagerTest {
     val coroutineRule = CoroutineTestRule()
 
     private val toggles: NextStepsItemsExperimentToggles = FakeFeatureToggleFactory.create(NextStepsItemsExperimentToggles::class.java)
-    private val privacyConfigPersistedGate = OnboardingPrivacyConfigPersistedGateImpl()
     private val appBuildConfig: AppBuildConfig = mock()
 
     private val testee = NextStepsItemsExperimentManagerImpl(
         nextStepsItemsFeatureToggles = toggles,
         appBuildConfig = appBuildConfig,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
-        onboardingPrivacyConfigPersistedGate = privacyConfigPersistedGate,
     )
-
-    @Test
-    fun `when privacy config never persisted then enroll returns null and does not enrol`() = runTest {
-        givenKillSwitch(enabled = true)
-        givenCohortEnabled(Cohorts.STACKED_CARDS)
-
-        assertNull(testee.enroll())
-        assertFalse(toggles.nextStepsItemsExperiment().isEnrolled())
-    }
 
     @Test
     fun `when kill switch is off then enroll returns null and does not enrol`() = runTest {
         givenKillSwitch(enabled = false)
         givenCohortEnabled(Cohorts.STACKED_CARDS)
-        privacyConfigPersistedGate.onPrivacyConfigPersisted()
 
         assertNull(testee.enroll())
         assertFalse(toggles.nextStepsItemsExperiment().isEnrolled())
@@ -74,7 +61,6 @@ class NextStepsItemsExperimentManagerTest {
         givenKillSwitch(enabled = true)
         whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
         givenCohortEnabled(Cohorts.STACKED_CARDS)
-        privacyConfigPersistedGate.onPrivacyConfigPersisted()
 
         assertNull(testee.enroll())
         assertFalse(toggles.nextStepsItemsExperiment().isEnrolled())
@@ -84,7 +70,6 @@ class NextStepsItemsExperimentManagerTest {
     fun `when enrolled in stacked cards then enroll returns stacked cards`() = runTest {
         givenKillSwitch(enabled = true)
         givenCohortEnabled(Cohorts.STACKED_CARDS)
-        privacyConfigPersistedGate.onPrivacyConfigPersisted()
 
         assertEquals(NextStepsItemsExperimentVariant.STACKED_CARDS, testee.enroll())
     }
@@ -93,7 +78,6 @@ class NextStepsItemsExperimentManagerTest {
     fun `when enrolled in check list then enroll returns check list`() = runTest {
         givenKillSwitch(enabled = true)
         givenCohortEnabled(Cohorts.CHECK_LIST)
-        privacyConfigPersistedGate.onPrivacyConfigPersisted()
 
         assertEquals(NextStepsItemsExperimentVariant.CHECK_LIST, testee.enroll())
     }
@@ -102,7 +86,6 @@ class NextStepsItemsExperimentManagerTest {
     fun `when enrolled in control then enroll returns control`() = runTest {
         givenKillSwitch(enabled = true)
         givenCohortEnabled(Cohorts.CONTROL)
-        privacyConfigPersistedGate.onPrivacyConfigPersisted()
 
         assertEquals(NextStepsItemsExperimentVariant.CONTROL, testee.enroll())
     }
@@ -111,7 +94,6 @@ class NextStepsItemsExperimentManagerTest {
     fun `when experiment has no cohort then enroll returns null`() = runTest {
         givenKillSwitch(enabled = true)
         givenCohortEnabled(winner = null)
-        privacyConfigPersistedGate.onPrivacyConfigPersisted()
 
         assertNull(testee.enroll())
     }
