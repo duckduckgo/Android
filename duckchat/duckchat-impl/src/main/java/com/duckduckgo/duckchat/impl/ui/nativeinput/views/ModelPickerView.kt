@@ -22,6 +22,7 @@ import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -97,8 +98,18 @@ class ModelPickerView @JvmOverloads constructor(
     private var compactLevel = AdaptiveBottomRowLayout.LEVEL_FULL
     private var chipLabelText: String? = null
     private var chipIconJob: Job? = null
-    private val defaultTextStartPadding by lazy { chip.textStartPadding }
-    private val defaultTextEndPadding by lazy { chip.textEndPadding }
+    private val chipSize = resources.getDimension(R.dimen.nativeInputButtonSize)
+    private val defaultPaddings by lazy {
+        ChipPaddings(
+            textStart = chip.textStartPadding,
+            textEnd = chip.textEndPadding,
+            chipStart = chip.chipStartPadding,
+            chipEnd = chip.chipEndPadding,
+            iconEnd = chip.iconEndPadding,
+            closeIconStart = chip.closeIconStartPadding,
+            closeIconEnd = chip.closeIconEndPadding,
+        )
+    }
 
     // Mirrors the input context from the per-tab native input state so currentSurface() can be
     // read synchronously from popup callbacks. Updated by observeInputContext().
@@ -207,18 +218,36 @@ class ModelPickerView @JvmOverloads constructor(
         applyCompactLevel()
     }
 
-    // Collapsed, the pill is the provider icon and still opens the same menu.
+    // Collapsed, the pill is the provider icon and still opens the same menu. The chip keeps reserving room for its
+    // text and close icon unless their paddings are zeroed, which leaves blank space beside the icon.
     private fun applyCompactLevel() {
-        val startPadding = defaultTextStartPadding
-        val endPadding = defaultTextEndPadding
+        val defaults = defaultPaddings
         val iconOnly = compactLevel >= AdaptiveBottomRowLayout.LEVEL_MODEL_ICON
         chip.text = if (iconOnly) "" else chipLabelText.orEmpty()
         chip.isChipIconVisible = iconOnly
         chip.isCloseIconVisible = !iconOnly
-        chip.textStartPadding = if (iconOnly) 0f else startPadding
-        chip.textEndPadding = if (iconOnly) 0f else endPadding
+        chip.textStartPadding = if (iconOnly) 0f else defaults.textStart
+        chip.textEndPadding = if (iconOnly) 0f else defaults.textEnd
+        // A square the size of the other bottom-row buttons, with the icon centred in it.
+        val sidePadding = ((chipSize - chip.chipIconSize) / 2f).coerceAtLeast(0f)
+        chip.chipStartPadding = if (iconOnly) sidePadding else defaults.chipStart
+        chip.chipEndPadding = if (iconOnly) sidePadding else defaults.chipEnd
+        chip.updateLayoutParams { width = if (iconOnly) chipSize.toInt() else ViewGroup.LayoutParams.WRAP_CONTENT }
+        chip.iconEndPadding = if (iconOnly) 0f else defaults.iconEnd
+        chip.closeIconStartPadding = if (iconOnly) 0f else defaults.closeIconStart
+        chip.closeIconEndPadding = if (iconOnly) 0f else defaults.closeIconEnd
         chip.contentDescription = chipLabelText
     }
+
+    private data class ChipPaddings(
+        val textStart: Float,
+        val textEnd: Float,
+        val chipStart: Float,
+        val chipEnd: Float,
+        val iconEnd: Float,
+        val closeIconStart: Float,
+        val closeIconEnd: Float,
+    )
 
     override fun hasPendingRecoverySelection(): Boolean = viewModel.hasPendingRecoverySelection()
 
