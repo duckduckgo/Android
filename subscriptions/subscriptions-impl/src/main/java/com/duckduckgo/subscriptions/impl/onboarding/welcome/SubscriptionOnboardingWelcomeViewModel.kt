@@ -22,8 +22,10 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
+import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.onboarding.welcome.SubscriptionOnboardingWelcomeStepPlugin.Companion.WELCOME_STEP_ID
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -42,10 +44,12 @@ class SubscriptionOnboardingWelcomeViewModel @Inject constructor(
     private val controller: SubscriptionOnboardingController,
     private val currentTimeProvider: CurrentTimeProvider,
     private val onboardingStore: SubscriptionOnboardingStore,
+    private val subscriptionsManager: SubscriptionsManager,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(
+        val isFreeTrial: Boolean = false,
         val formattedBillingDate: String = "",
         val freeTrialDayLabels: List<String> = emptyList(),
     )
@@ -54,7 +58,7 @@ class SubscriptionOnboardingWelcomeViewModel @Inject constructor(
         data object LaunchConfetti : Command
     }
 
-    private val _viewState = MutableStateFlow(buildViewState())
+    private val _viewState = MutableStateFlow(ViewState())
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
 
     private val _commands = Channel<Command>(1, DROP_OLDEST)
@@ -62,9 +66,17 @@ class SubscriptionOnboardingWelcomeViewModel @Inject constructor(
 
     private var confettiRequested = false
 
-    private fun buildViewState(): ViewState {
+    init {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val isFreeTrial = subscriptionsManager.getSubscription()?.activeOffers?.contains(ActiveOfferType.TRIAL) == true
+            _viewState.value = if (isFreeTrial) freeTrialViewState() else ViewState(isFreeTrial = false)
+        }
+    }
+
+    private fun freeTrialViewState(): ViewState {
         val startDate = currentTimeProvider.localDateTimeNow().toLocalDate()
         return ViewState(
+            isFreeTrial = true,
             formattedBillingDate = startDate.plusDays(FREE_TRIAL_DAYS.toLong()).format(DATE_FORMATTER),
             freeTrialDayLabels = (0 until FREE_TRIAL_DAYS).map { startDate.plusDays(it.toLong()).dayOfMonth.toString() },
         )

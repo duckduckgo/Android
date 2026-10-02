@@ -184,6 +184,52 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
+    fun whenFreeTrialPurchaseAndFreeTrialOnboardingEnabledThenLaunchOnboarding() = runTest {
+        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.onboardingSubscriptionExperimentMonthly().setRawStoredState(Toggle.State(enable = false))
+        assertLaunchOnboarding(isFreeTrial = true, expected = true)
+    }
+
+    @Test
+    fun whenFreeTrialPurchaseAndFreeTrialOnboardingDisabledThenDoNotLaunchOnboarding() = runTest {
+        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = false))
+        subscriptionsFeature.onboardingSubscriptionExperimentMonthly().setRawStoredState(Toggle.State(enable = true))
+        assertLaunchOnboarding(isFreeTrial = true, expected = false)
+    }
+
+    @Test
+    fun whenNonFreeTrialPurchaseAndMonthlyOnboardingEnabledThenLaunchOnboarding() = runTest {
+        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = false))
+        subscriptionsFeature.onboardingSubscriptionExperimentMonthly().setRawStoredState(Toggle.State(enable = true))
+        assertLaunchOnboarding(isFreeTrial = false, expected = true)
+    }
+
+    @Test
+    fun whenNonFreeTrialPurchaseAndMonthlyOnboardingDisabledThenDoNotLaunchOnboarding() = runTest {
+        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.onboardingSubscriptionExperimentMonthly().setRawStoredState(Toggle.State(enable = false))
+        assertLaunchOnboarding(isFreeTrial = false, expected = false)
+    }
+
+    private suspend fun assertLaunchOnboarding(
+        isFreeTrial: Boolean,
+        expected: Boolean,
+    ) {
+        val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowTest)
+        viewModel.start()
+
+        viewModel.currentPurchaseViewState.test {
+            assertTrue(awaitItem().purchaseState is PurchaseStateView.Inactive)
+            flowTest.emit(CurrentPurchase.Success(isFreeTrial = isFreeTrial))
+            val success = awaitItem().purchaseState
+            assertTrue(success is Success)
+            assertEquals(expected, (success as Success).launchOnboarding)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenPurchaseStateFailedThenSendCanceledMessage() = runTest {
         val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
         whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowTest)

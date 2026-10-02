@@ -35,6 +35,9 @@ import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -58,18 +61,23 @@ class SubscriptionOnboardingViewModel @Inject constructor(
 ) : ViewModel() {
 
     sealed interface Command {
-        data class ShowStep(
-            val stepPlugin: SubscriptionOnboardingStepPlugin,
-            val canGoBack: Boolean,
-            val showNavigationIcon: Boolean = true,
-        ) : Command
+        data class ShowStep(val stepPlugin: SubscriptionOnboardingStepPlugin) : Command
         data class RunHandoff(val action: () -> Unit) : Command
         data object FinishToSettings : Command
         data object Finish : Command
     }
 
+    data class ToolbarState(
+        val titleResId: Int? = null,
+        val canGoBack: Boolean = false,
+        val showNavigationIcon: Boolean = false,
+    )
+
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
+
+    private val _toolbarState = MutableStateFlow(ToolbarState())
+    val toolbarState: StateFlow<ToolbarState> = _toolbarState.asStateFlow()
 
     private var started = false
     private var canGoBack = false
@@ -98,7 +106,12 @@ class SubscriptionOnboardingViewModel @Inject constructor(
                 val step = state.currentStep
                 if (step is SubscriptionOnboardingActivityStep) {
                     canGoBack = state.canGoBack && step.stepPlugin.allowsBackNavigation
-                    _commands.send(Command.ShowStep(step.stepPlugin, canGoBack, showNavigationIcon = !handoffState.isHandoff))
+                    _toolbarState.value = ToolbarState(
+                        titleResId = step.stepPlugin.titleResId,
+                        canGoBack = canGoBack,
+                        showNavigationIcon = !handoffState.isHandoff,
+                    )
+                    _commands.send(Command.ShowStep(step.stepPlugin))
                     scheduleHandoffIfPending()
                 }
             }
