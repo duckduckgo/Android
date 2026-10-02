@@ -325,12 +325,12 @@ class AttachmentView(
 
         val container = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
-            applyMenuRadiusClipping()
         }
         val popup = PopupWindow(
             ScrollView(context).apply {
                 addView(container)
                 setBackgroundResource(com.duckduckgo.mobile.android.R.drawable.popup_menu_bg)
+                applyMenuRadiusClipping()
                 isVerticalScrollBarEnabled = false
             },
             resources.getDimensionPixelSize(R.dimen.nativeInputMenuWidth),

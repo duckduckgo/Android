@@ -198,12 +198,12 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     private fun showMenu() {
         val container = LinearLayout(context).apply {
             orientation = VERTICAL
-            applyMenuRadiusClipping()
         }
         val popup = PopupWindow(
             ScrollView(context).apply {
                 addView(container)
                 setBackgroundResource(com.duckduckgo.mobile.android.R.drawable.popup_menu_bg)
+                applyMenuRadiusClipping()
                 isVerticalScrollBarEnabled = false
             },
             resources.getDimensionPixelSize(R.dimen.nativeInputMenuWidth),

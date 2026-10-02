@@ -237,7 +237,6 @@ class ModelPickerView @JvmOverloads constructor(
     private fun buildMenuContainer(): LinearLayout {
         val container = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
-            applyMenuRadiusClipping()
         }
         return container
     }
@@ -247,6 +246,7 @@ class ModelPickerView @JvmOverloads constructor(
             ScrollView(context).apply {
                 addView(container)
                 setBackgroundResource(com.duckduckgo.mobile.android.R.drawable.popup_menu_bg)
+                applyMenuRadiusClipping()
                 isVerticalScrollBarEnabled = false
             },
             resources.getDimensionPixelSize(R.dimen.nativeInputMenuWidth),
