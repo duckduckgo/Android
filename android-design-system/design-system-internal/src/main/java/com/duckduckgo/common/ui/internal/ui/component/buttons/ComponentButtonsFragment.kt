@@ -29,6 +29,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
+import com.duckduckgo.common.ui.compose.button.DaxBrandButton
+import com.duckduckgo.common.ui.compose.button.DaxBrandButtonTypography
 import com.duckduckgo.common.ui.compose.button.DaxButtonSize
 import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostAltButton
 import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostButton
@@ -108,6 +110,41 @@ class ComponentButtonsFragment : Fragment() {
         view: View,
         isDarkTheme: Boolean,
     ) {
+        // Brand
+        view.setupThemedComposeView(
+            id = com.duckduckgo.common.ui.internal.R.id.compose_button_brand,
+            isDarkTheme = isDarkTheme,
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                DaxBrandButton(text = "Brand Small", onClick = {})
+                DaxBrandButton(
+                    text = "Brand Small",
+                    onClick = {},
+                    leadingIconPainter = painterResource(R.drawable.ic_add_16),
+                )
+                DaxBrandButton(
+                    text = "Brand Large",
+                    onClick = {},
+                    size = DaxButtonSize.Large,
+                )
+                DaxBrandButton(
+                    text = "Brand Large",
+                    onClick = {},
+                    size = DaxButtonSize.Large,
+                    leadingIconPainter = painterResource(R.drawable.ic_device_desktop_16),
+                )
+                DaxBrandButton(text = "Brand Disabled", onClick = {}, enabled = false)
+                DaxBrandButton(
+                    text = "Brand DuckSans",
+                    onClick = {},
+                    typography = DaxBrandButtonTypography.DuckSans,
+                )
+            }
+        }
+
         // Primary
         view.setupThemedComposeView(
             id = com.duckduckgo.common.ui.internal.R.id.compose_button_primary,
