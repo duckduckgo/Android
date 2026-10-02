@@ -48,7 +48,7 @@ class AdaptiveBottomRowLayout @JvmOverloads constructor(
             if (groups.size == 2 && MeasureSpec.getMode(widthMeasureSpec) != MeasureSpec.UNSPECIFIED && controls.isNotEmpty()) {
                 for (level in LEVEL_FULL..LEVEL_MAX) {
                     controls.forEach { it.setCompactLevel(level) }
-                    if (groups.sumOf { it.naturalWidth(heightMeasureSpec) } + minGap <= available) break
+                    if (neededWidth(groups, controls, level, heightMeasureSpec) <= available) break
                 }
             } else {
                 controls.forEach { it.setCompactLevel(LEVEL_FULL) }
@@ -63,6 +63,36 @@ class AdaptiveBottomRowLayout @JvmOverloads constructor(
     // the row is already doing. Swallowing it avoids a measure loop.
     override fun requestLayout() {
         if (!measuring) super.requestLayout()
+    }
+
+    // What the groups need at [level] if every control took its worst-case width: the measured groups, with each
+    // control's current contribution swapped for its worst case. The result does not depend on what is selected,
+    // typed or active, so the same screen always gets the same layout.
+    private fun neededWidth(
+        groups: List<View>,
+        controls: List<CompactableControl>,
+        level: Int,
+        heightMeasureSpec: Int,
+    ): Int {
+        val measured = groups.sumOf { it.naturalWidth(heightMeasureSpec) }
+        val current = controls.sumOf { contributionOf(it as View, groups) }
+        val worstCase = controls.sumOf { it.worstCaseWidth(level) }
+        return measured - current + worstCase + minGap
+    }
+
+    // A control sits in a container that is a direct child of one of the two groups; the container's visibility and
+    // margins decide how much room the control takes right now.
+    private fun contributionOf(
+        control: View,
+        groups: List<View>,
+    ): Int {
+        var container: View = control
+        while (groups.none { it === container.parent }) {
+            container = container.parent as? View ?: return 0
+        }
+        if (container.visibility == GONE) return 0
+        val params = container.layoutParams as? MarginLayoutParams
+        return container.measuredWidth + (params?.marginStart ?: 0) + (params?.marginEnd ?: 0)
     }
 
     private fun View.naturalWidth(heightMeasureSpec: Int): Int {

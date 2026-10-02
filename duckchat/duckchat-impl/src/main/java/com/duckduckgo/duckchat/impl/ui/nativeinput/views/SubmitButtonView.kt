@@ -44,7 +44,7 @@ class SubmitButtonView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : FrameLayout(context, attrs, defStyle) {
+) : FrameLayout(context, attrs, defStyle), CompactableControl {
 
     @Inject lateinit var viewModelFactory: ViewViewModelFactory
 
@@ -57,9 +57,22 @@ class SubmitButtonView @JvmOverloads constructor(
     private var stateJob: Job? = null
 
     var host: NativeInputHost? = null
+    private var askPossible = false
 
     init {
         inflate(context, R.layout.view_native_input_submit_button, this)
+    }
+
+    override fun setCompactLevel(level: Int) = Unit
+
+    // Counts the labelled button whenever the terms are unaccepted, even before anything is typed, so typing the
+    // first character does not change the layout.
+    override fun worstCaseWidth(level: Int): Int {
+        val margin = resources.getDimensionPixelSize(CommonR.dimen.keyline_1)
+        val arrow = resources.getDimensionPixelSize(R.dimen.nativeInputButtonSize)
+        if (!askPossible) return arrow + margin
+        askButton.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
+        return maxOf(arrow, askButton.measuredWidth) + margin
     }
 
     override fun onAttachedToWindow() {
@@ -86,6 +99,7 @@ class SubmitButtonView @JvmOverloads constructor(
                 )
                 button.isEnabled = state.enabled
                 button.alpha = if (state.enabled) ENABLED_ALPHA else DISABLED_ALPHA
+                askPossible = state.askPossible
                 button.isVisible = !state.askLabel
                 askButton.isVisible = state.askLabel
                 askButton.isEnabled = state.enabled

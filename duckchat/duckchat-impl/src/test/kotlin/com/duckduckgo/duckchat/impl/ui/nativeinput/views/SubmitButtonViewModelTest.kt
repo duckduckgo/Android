@@ -81,6 +81,7 @@ class SubmitButtonViewModelTest {
 
             assertFalse(state.visible)
             assertFalse(state.askLabel)
+            assertTrue(state.askPossible)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -102,7 +103,10 @@ class SubmitButtonViewModelTest {
         feature.nativeToSConsent().setRawStoredState(Toggle.State(enable = false))
 
         testee.viewState(editTabId = null).test {
-            assertFalse(awaitItem().askLabel)
+            val state = awaitItem()
+
+            assertFalse(state.askLabel)
+            assertFalse(state.askPossible)
             cancelAndIgnoreRemainingEvents()
         }
     }

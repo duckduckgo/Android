@@ -16,9 +16,13 @@
 package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 /**
- * A bottom-row control that can shrink to make room for the submit button.
+ * A bottom-row control whose width depends on what it shows, so the row can decide its layout from worst-case
+ * widths and never reshuffle because of the selected model, the typed text or an active mode.
  * Levels are cumulative: [AdaptiveBottomRowLayout.LEVEL_FULL] is the normal look, and each higher level frees more width.
  */
 interface CompactableControl {
     fun setCompactLevel(level: Int)
+
+    /** The most width this control may need at [level], including its container's margin, whether or not it is showing. */
+    fun worstCaseWidth(level: Int): Int
 }

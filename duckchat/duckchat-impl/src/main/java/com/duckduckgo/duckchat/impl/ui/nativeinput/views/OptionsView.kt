@@ -173,6 +173,18 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         applyMergedState()
     }
 
+    // The tools button plus a mode chip at full size; at the top level only the chip, standing in for both.
+    override fun worstCaseWidth(level: Int): Int {
+        val button = resources.getDimensionPixelSize(R.dimen.nativeInputButtonSize)
+        val space = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
+        val chipPadding = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
+        val chipIcon = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_5)
+        val chipClose = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_4)
+        val mergedChip = space + chipPadding * 2 + chipIcon
+        if (level >= AdaptiveBottomRowLayout.LEVEL_MERGED_TOOLS) return mergedChip
+        return button + mergedChip + space + chipClose
+    }
+
     private fun applyMergedState() {
         refreshOptionsButtonVisibility()
         val chip = getChildAt(1) ?: return

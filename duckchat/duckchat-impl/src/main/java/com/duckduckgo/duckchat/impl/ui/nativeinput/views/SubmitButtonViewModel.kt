@@ -38,6 +38,8 @@ data class SubmitButtonViewState(
     val duckAiIcon: Boolean,
     /** Show the labelled "Ask" button, whose tap is how the user accepts the Duck.ai terms. */
     val askLabel: Boolean = false,
+    /** The labelled button may show, even before there is input to send. Lets the bottom row reserve its width. */
+    val askPossible: Boolean = false,
 )
 
 @ContributesViewModel(ViewScope::class)
@@ -61,7 +63,7 @@ class SubmitButtonViewModel @Inject constructor(
         val state = if (editTabId != null) nativeInputStateProvider.stateForTab(editTabId) else nativeInputStateProvider.state
         val terms = if (editTabId != null) flowOf(false) else termsRequired
         return combine(state, terms) { inputState, termsRequired ->
-            inputState.toSubmitButtonState().let { it.copy(askLabel = termsRequired && it.visible) }
+            inputState.toSubmitButtonState().let { it.copy(askLabel = termsRequired && it.visible, askPossible = termsRequired) }
         }.distinctUntilChanged()
     }
 }

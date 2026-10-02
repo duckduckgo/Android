@@ -85,6 +85,43 @@ class AdaptiveBottomRowLayoutTest {
         assertEquals(0, row.model.level)
     }
 
+    @Test
+    fun whenRealContentIsShorterThanWorstCaseThenLevelFollowsTheWorstCase() {
+        val row = row(
+            startWidth = 100,
+            modelWidths = intArrayOf(50, 40, 40),
+            toolsWidths = intArrayOf(80, 80, 40),
+            endFixedWidth = 100,
+            modelWorstCase = intArrayOf(300, 40, 40),
+        )
+
+        row.measureWithWidth(440)
+
+        assertEquals(1, row.model.level)
+    }
+
+    @Test
+    fun whenSelectedContentDiffersThenTheSameLevelIsChosen() {
+        val shortName = row(100, intArrayOf(60, 40, 40), intArrayOf(80, 80, 40), 100, modelWorstCase = intArrayOf(300, 40, 40))
+        val longName = row(100, intArrayOf(300, 40, 40), intArrayOf(80, 80, 40), 100, modelWorstCase = intArrayOf(300, 40, 40))
+
+        shortName.measureWithWidth(440)
+        longName.measureWithWidth(440)
+
+        assertEquals(longName.model.level, shortName.model.level)
+    }
+
+    @Test
+    fun whenAControlIsHiddenThenItsWorstCaseIsStillReserved() {
+        val shown = row(100, intArrayOf(300, 40, 40), intArrayOf(80, 80, 40), 100)
+        val hidden = row(100, intArrayOf(300, 40, 40), intArrayOf(80, 80, 40), 100, modelVisible = false)
+
+        shown.measureWithWidth(440)
+        hidden.measureWithWidth(440)
+
+        assertEquals(shown.model.level, hidden.model.level)
+    }
+
     private class Row(
         val layout: AdaptiveBottomRowLayout,
         val model: FakeControl,
@@ -104,12 +141,14 @@ class AdaptiveBottomRowLayoutTest {
         modelWidths: IntArray,
         toolsWidths: IntArray,
         endFixedWidth: Int,
+        modelWorstCase: IntArray = modelWidths,
+        modelVisible: Boolean = true,
     ): Row {
         val layout = AdaptiveBottomRowLayout(context)
         val start = LinearLayout(context)
         val end = LinearLayout(context)
         val tools = FakeControl(context, toolsWidths)
-        val model = FakeControl(context, modelWidths)
+        val model = FakeControl(context, modelWidths, modelWorstCase).apply { if (!modelVisible) visibility = View.GONE }
         start.addView(FakeControl(context, intArrayOf(startWidth)))
         start.addView(tools)
         end.addView(model)
@@ -122,6 +161,7 @@ class AdaptiveBottomRowLayoutTest {
     private class FakeControl(
         context: Context,
         private val widthsPerLevel: IntArray,
+        private val worstCasePerLevel: IntArray = widthsPerLevel,
     ) : View(context), CompactableControl {
         var level = 0
             private set
@@ -129,6 +169,8 @@ class AdaptiveBottomRowLayoutTest {
         override fun setCompactLevel(level: Int) {
             this.level = level
         }
+
+        override fun worstCaseWidth(level: Int): Int = worstCasePerLevel[minOf(level, worstCasePerLevel.lastIndex)]
 
         override fun onMeasure(
             widthMeasureSpec: Int,
