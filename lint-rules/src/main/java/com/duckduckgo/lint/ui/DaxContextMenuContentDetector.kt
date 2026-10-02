@@ -28,6 +28,8 @@ import com.android.tools.lint.detector.api.SourceCodeScanner
 import com.android.tools.lint.detector.api.TextFormat
 import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.UExpression
+import org.jetbrains.uast.ULambdaExpression
+import org.jetbrains.uast.UQualifiedReferenceExpression
 import org.jetbrains.uast.getParameterForArgument
 import org.jetbrains.uast.visitor.AbstractUastVisitor
 import java.util.EnumSet
@@ -52,10 +54,19 @@ class DaxContextMenuContentDetector : Detector(), SourceCodeScanner {
             arg.accept(object : AbstractUastVisitor() {
                 override fun visitCallExpression(node: UCallExpression): Boolean {
                     val owner = node.resolve()?.containingClass?.qualifiedName
-                    // Descend into stdlib scaffolding (forEach, map, etc.) to check the content it builds.
-                    if (owner != null && owner.startsWith("kotlin.")) return false
+                    if (owner != null && owner.startsWith("kotlin.")) {
+                        // Only the trailing lambda of a stdlib call can emit slot content.
+                        (node.valueArguments.lastOrNull() as? ULambdaExpression)?.body?.accept(this)
+                        return true
+                    }
                     if (owner != null && owner != scope) violation = true
                     // Judge only what the slot emits, so a call's own arguments are left unvisited.
+                    return true
+                }
+
+                override fun visitQualifiedReferenceExpression(node: UQualifiedReferenceExpression): Boolean {
+                    // The receiver is an input value (e.g. `items.filter { ... }`), not content the slot emits.
+                    node.selector.accept(this)
                     return true
                 }
             })

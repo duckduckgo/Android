@@ -153,6 +153,40 @@ class DaxContextMenuItemContentDetectorTest {
     }
 
     @Test
+    fun whenTrailingIconFiltersWithNonScopeCallThenNoWarning() {
+        run(
+            """DaxDefaultContextMenuItem(text = "x", trailingIcon = {
+                listOf(1).filter { painterResource(it) == 0 }.forEach { Icon(it) }
+            })""",
+        ).expectClean()
+    }
+
+    @Test
+    fun whenTrailingIconPassesNonScopeCallToStdlibThenNoWarning() {
+        run(
+            """DaxDefaultContextMenuItem(text = "x", trailingIcon = { listOf(painterResource(1)).forEach { Icon(it) } })""",
+        ).expectClean()
+    }
+
+    @Test
+    fun whenTrailingIconFiltersThenBuildsArbitraryComposableThenWarning() {
+        run(
+            """DaxDefaultContextMenuItem(text = "x", trailingIcon = {
+                listOf("a").filter { painterResource(0) == 0 }.forEach { Text(it) }
+            })""",
+        ).expectWarningCount(1)
+    }
+
+    @Test
+    fun whenTrailingIconNestsStdlibScopeFunctionAroundArbitraryComposableThenWarning() {
+        run(
+            """DaxDefaultContextMenuItem(text = "x", trailingIcon = {
+                listOf("a").forEach { it.let { s -> Text(s) } }
+            })""",
+        ).expectWarningCount(1)
+    }
+
+    @Test
     fun whenTrailingLambdaUsesScopeMemberThenNoWarning() {
         run("""DaxDefaultContextMenuItem(text = "x") { Icon() }""").expectClean()
     }

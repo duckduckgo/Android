@@ -133,6 +133,42 @@ class DaxContextMenuContentDetectorTest {
     }
 
     @Test
+    fun whenContextMenuContentFiltersWithNonScopeCallThenNoWarning() {
+        run(
+            """DaxContextMenu(expanded = true, onDismissRequest = {}, content = {
+                listOf("a").filter { painterResource(0) == 0 }.forEach { DaxDefaultItem(it) }
+            })""",
+        ).expectClean()
+    }
+
+    @Test
+    fun whenContextMenuContentPassesNonScopeCallToStdlibThenNoWarning() {
+        run(
+            """DaxContextMenu(expanded = true, onDismissRequest = {}, content = {
+                listOf(painterResource(0)).forEach { DaxIconItem("x") }
+            })""",
+        ).expectClean()
+    }
+
+    @Test
+    fun whenContextMenuContentFiltersThenBuildsArbitraryComposableThenWarning() {
+        run(
+            """DaxContextMenu(expanded = true, onDismissRequest = {}, content = {
+                listOf("a").filter { painterResource(0) == 0 }.forEach { Text(it) }
+            })""",
+        ).expectWarningCount(1)
+    }
+
+    @Test
+    fun whenContextMenuContentNestsStdlibScopeFunctionAroundArbitraryComposableThenWarning() {
+        run(
+            """DaxContextMenu(expanded = true, onDismissRequest = {}, content = {
+                listOf("a").forEach { it.let { s -> Text(s) } }
+            })""",
+        ).expectWarningCount(1)
+    }
+
+    @Test
     fun whenContextMenuTrailingLambdaUsesScopeMemberThenNoWarning() {
         run("""DaxContextMenu(expanded = true, onDismissRequest = {}) { DaxDefaultItem("x") }""").expectClean()
     }

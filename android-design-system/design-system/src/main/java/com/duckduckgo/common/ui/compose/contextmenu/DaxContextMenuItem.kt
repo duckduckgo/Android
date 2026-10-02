@@ -26,14 +26,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.divider.DaxHorizontalDivider
 import com.duckduckgo.common.ui.compose.text.DaxText
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTextStyle
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import androidx.compose.material3.Icon as M3Icon
 
@@ -48,7 +52,7 @@ import androidx.compose.material3.Icon as M3Icon
  * @param endPadding Trailing edge padding.
  * @param leadingIcon Optional leading icon artwork, only rendered by [DaxIconContextMenuItem].
  * @param showDivider Whether a [DaxHorizontalDivider] is rendered below the row.
- * @param isDestructive Whether the text defaults colour to the destructive token.
+ * @param isDestructive Whether the label and leading icon colour to the destructive token.
  * @param enabled Whether the row is enabled and interactive. Disabled rows use the disabled text and
  * icon tokens, and the trailing scope passes the state on to its members.
  * @param textColor Label colour; must be a [DuckDuckGoTheme] colour (lint-enforced).
@@ -88,7 +92,11 @@ internal fun DaxContextMenuItem(
                 M3Icon(
                     painter = leadingIcon,
                     contentDescription = null,
-                    tint = if (enabled) colors.icon else colors.disabledIcon,
+                    tint = when {
+                        !enabled -> colors.disabledIcon
+                        isDestructive -> colors.destructiveIcon
+                        else -> colors.icon
+                    },
                     modifier = Modifier.size(DaxContextMenuItemDefaults.LeadingIconSize),
                 )
                 Spacer(Modifier.width(DaxContextMenuItemDefaults.ContentGap))
@@ -152,3 +160,50 @@ class DaxContextMenuItemTrailingScope internal constructor(
         )
     }
 }
+
+internal object DaxContextMenuItemDefaults {
+    val VerticalPadding: Dp = 12.dp
+    val ContentGap: Dp = 16.dp
+    val DividerSpacing: Dp = 4.dp
+
+    val DefaultStartPadding: Dp = 16.dp
+    val DefaultEndPadding: Dp = 16.dp
+
+    val IconStartPadding: Dp = 12.dp
+    val IconEndPadding: Dp = 16.dp
+    val LeadingIconSize: Dp = 24.dp
+
+    val InsetStartPadding: Dp = 48.dp
+    val InsetEndPadding: Dp = 16.dp
+
+    val TrailingIconSize: Dp = 16.dp
+
+    val textStyle: DuckDuckGoTextStyle
+        @Composable
+        @ReadOnlyComposable
+        get() = DuckDuckGoTheme.typography.body1
+
+    @Composable
+    @ReadOnlyComposable
+    fun textColor(enabled: Boolean, isDestructive: Boolean): Color = when {
+        !enabled -> DuckDuckGoTheme.textColors.disabled
+        isDestructive -> DuckDuckGoTheme.textColors.destructive
+        else -> DuckDuckGoTheme.textColors.primary
+    }
+
+    val colors: DaxContextMenuItemColors
+        @Composable
+        @ReadOnlyComposable
+        get() = DaxContextMenuItemColors(
+            icon = DuckDuckGoTheme.iconColors.primary,
+            disabledIcon = DuckDuckGoTheme.iconColors.disabled,
+            destructiveIcon = DuckDuckGoTheme.iconColors.destructive,
+        )
+}
+
+@Immutable
+internal data class DaxContextMenuItemColors(
+    val icon: Color,
+    val disabledIcon: Color,
+    val destructiveIcon: Color,
+)

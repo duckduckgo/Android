@@ -22,14 +22,22 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.PreviewFontScale
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.button.DaxIconButton
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
@@ -113,6 +121,26 @@ fun DaxContextMenuIconButton(
     )
 }
 
+internal object DaxContextMenuDefaults {
+    val Offset: DpOffset = DpOffset(0.dp, 0.dp)
+
+    val MinWidth: Dp = 240.dp
+
+    val ContainerElevation: Dp = 4.dp
+
+    val TonalElevation: Dp = 0.dp
+
+    val Shape: Shape
+        @Composable
+        @ReadOnlyComposable
+        get() = DuckDuckGoTheme.shapes.small
+
+    val ContainerColor: Color
+        @Composable
+        @ReadOnlyComposable
+        get() = DuckDuckGoTheme.colors.backgrounds.window
+}
+
 @PreviewLightDark
 @Composable
 private fun DaxContextMenuIconButtonClosedPreview() {
@@ -166,6 +194,28 @@ private fun DaxContextMenuIconButtonExpandedPreview() {
                 showDivider = true,
             )
             DaxDefaultItem(text = "Delete", onClick = {}, isDestructive = true)
+        }
+    }
+}
+
+@PreviewFontScale
+@Composable
+private fun DaxContextMenuRowTypesPreview() {
+    PreviewBox {
+        Column(modifier = Modifier.widthIn(min = DaxContextMenuDefaults.MinWidth)) {
+            DaxIconContextMenuItem(
+                text = "Bookmark",
+                painterLeadingIcon = painterResource(R.drawable.ic_bookmark_24),
+                onClick = {},
+                showDivider = true,
+            )
+            DaxInsetContextMenuItem(
+                text = "Copy link",
+                onClick = {},
+                trailingIcon = { Icon(painterResource(R.drawable.ic_copy_24), null) },
+                showDivider = true,
+            )
+            DaxDefaultContextMenuItem(text = "Delete", onClick = {}, isDestructive = true)
         }
     }
 }

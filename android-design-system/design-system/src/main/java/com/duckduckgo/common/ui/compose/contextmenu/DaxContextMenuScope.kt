@@ -37,7 +37,17 @@ internal val LocalDaxContextMenuOnDismissRequest = staticCompositionLocalOf<() -
 @Stable
 object DaxContextMenuScope {
 
-    /** Delegates to [DaxDefaultContextMenuItem], dismissing the enclosing menu after [onClick]. */
+    /**
+     * Delegates to [DaxDefaultContextMenuItem], dismissing the enclosing menu after [onClick].
+     *
+     * @param text Item label.
+     * @param onClick Called when the row is tapped, before the enclosing menu is dismissed.
+     * @param modifier Modifier applied to the row.
+     * @param showDivider Whether a horizontal divider is rendered below the row.
+     * @param isDestructive Whether the label colours to the destructive token.
+     * @param enabled Whether the row is enabled and interactive.
+     * @param trailingIcon Optional trailing slot — use [DaxContextMenuItemTrailingScope] members.
+     */
     @Composable
     fun DaxDefaultItem(
         text: String,
@@ -63,7 +73,18 @@ object DaxContextMenuScope {
         )
     }
 
-    /** Delegates to [DaxIconContextMenuItem], dismissing the enclosing menu after [onClick]. */
+    /**
+     * Delegates to [DaxIconContextMenuItem], dismissing the enclosing menu after [onClick].
+     *
+     * @param text Item label.
+     * @param painterLeadingIcon Leading icon artwork.
+     * @param onClick Called when the row is tapped, before the enclosing menu is dismissed.
+     * @param modifier Modifier applied to the row.
+     * @param showDivider Whether a horizontal divider is rendered below the row.
+     * @param isDestructive Whether the label and leading icon colour to the destructive token.
+     * @param enabled Whether the row is enabled and interactive.
+     * @param trailingIcon Optional trailing slot — use [DaxContextMenuItemTrailingScope] members.
+     */
     @Composable
     fun DaxIconItem(
         text: String,
@@ -91,7 +112,17 @@ object DaxContextMenuScope {
         )
     }
 
-    /** Delegates to [DaxInsetContextMenuItem], dismissing the enclosing menu after [onClick]. */
+    /**
+     * Delegates to [DaxInsetContextMenuItem], dismissing the enclosing menu after [onClick].
+     *
+     * @param text Item label.
+     * @param onClick Called when the row is tapped, before the enclosing menu is dismissed.
+     * @param modifier Modifier applied to the row.
+     * @param showDivider Whether a horizontal divider is rendered below the row.
+     * @param isDestructive Whether the label colours to the destructive token.
+     * @param enabled Whether the row is enabled and interactive.
+     * @param trailingIcon Optional trailing slot — use [DaxContextMenuItemTrailingScope] members.
+     */
     @Composable
     fun DaxInsetItem(
         text: String,

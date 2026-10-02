@@ -169,4 +169,14 @@ class DaxListItemContentDetectorTest {
             })""",
         ).expectClean()
     }
+
+    @Test
+    fun whenTrailingContentBuildsScopeMemberFromForEachThenNoWarning() {
+        run("""DaxOneLineListItem(text = "x", trailingContent = { listOf(1).forEach { Icon(it) } })""").expectClean()
+    }
+
+    @Test
+    fun whenTrailingContentBuildsArbitraryComposableFromForEachThenWarning() {
+        run("""DaxOneLineListItem(text = "x", trailingContent = { listOf(1).forEach { BadIcon() } })""").expectWarningCount(1)
+    }
 }
