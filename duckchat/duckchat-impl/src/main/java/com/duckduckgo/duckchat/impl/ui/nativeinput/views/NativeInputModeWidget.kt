@@ -718,8 +718,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     /**
-     * The leading fire menu in the bottom-bar layout lives as a sibling of this widget
-     * (see input_mode_widget_card_view_bottom.xml). Wire its click here so it shares the
+     * The leading fire menu lives as a sibling of this widget in the bottom omnibar
+     * (see input_mode_widget_card_view.xml). Wire its click here so it shares the
      * same [onFireButtonTapped] callback as the trailing fire that lives inside the widget.
      */
     private fun bindLeadingFireButtonClick() {
@@ -1110,8 +1110,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     /**
-     * In a fullscreen Duck.ai chat the fire button moves into the bottom-bar layout
-     * (sibling to this widget, see input_mode_widget_card_view_bottom.xml). The trailing
+     * In a fullscreen Duck.ai chat the fire button moves into the bottom omnibar layout
+     * (sibling to this widget, see input_mode_widget_card_view.xml). The trailing
      * fire that lives inside the widget hides in DUCK_AI so the user only ever sees one
      * fire affordance; other contexts keep today's trailing placement.
      *
@@ -1119,7 +1119,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
      * typing and the chrome around the input should yield space to the keyboard / input area.
      */
     private fun updateFireButtonVisibility(state: NativeInputState) {
-        val showLeading = state.shouldShowLeadingFireButton(isEditing = isEditWidget) && !inputField.hasFocus()
+        // The leading fire lives only in the bottom omnibar's layout row; the unified wrapper now carries
+        // the view in both positions, so gate on position to keep it bottom-only as before.
+        val showLeading = isWidgetBottom() && state.shouldShowLeadingFireButton(isEditing = isEditWidget) && !inputField.hasFocus()
         leadingFireButtonView()?.visibility = if (showLeading) VISIBLE else GONE
         fireButton.visibility =
             if (state.shouldShowTrailingFireButton(isEditing = isEditWidget)) VISIBLE else GONE
