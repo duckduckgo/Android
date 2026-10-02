@@ -78,8 +78,21 @@ class SubscriptionOnboardingViewModelTest {
             assertTrue(command is SubscriptionOnboardingViewModel.Command.ShowStep)
             command as SubscriptionOnboardingViewModel.Command.ShowStep
             assertEquals(stepPlugin, command.stepPlugin)
-            assertTrue(command.canGoBack)
         }
+        assertTrue(testee.toolbarState.value.canGoBack)
+        assertTrue(testee.toolbarState.value.showNavigationIcon)
+    }
+
+    @Test
+    fun whenInProgressOnActivityStepThenToolbarShowsStepTitle() = runTest {
+        val stepPlugin = stepPluginMock()
+        whenever(stepPlugin.titleResId).thenReturn(TITLE_RES_ID)
+        orchestrator.stateFlow.value = inProgressState(stepPlugin = stepPlugin)
+        val testee = createViewModel()
+        testee.start()
+        advanceUntilIdle()
+
+        assertEquals(TITLE_RES_ID, testee.toolbarState.value.titleResId)
     }
 
     @Test
@@ -89,11 +102,9 @@ class SubscriptionOnboardingViewModelTest {
         val testee = createViewModel()
         testee.start()
 
-        testee.commands.test {
-            val command = awaitItem() as SubscriptionOnboardingViewModel.Command.ShowStep
-            assertFalse(command.showNavigationIcon)
-            cancelAndConsumeRemainingEvents()
-        }
+        advanceUntilIdle()
+
+        assertFalse(testee.toolbarState.value.showNavigationIcon)
     }
 
     @Test
@@ -207,8 +218,8 @@ class SubscriptionOnboardingViewModelTest {
         testee.start()
 
         testee.commands.test {
-            val command = awaitItem() as SubscriptionOnboardingViewModel.Command.ShowStep
-            assertFalse(command.canGoBack)
+            assertTrue(awaitItem() is SubscriptionOnboardingViewModel.Command.ShowStep)
+            assertFalse(testee.toolbarState.value.canGoBack)
 
             controller.onBack()
             assertEquals(SubscriptionOnboardingViewModel.Command.FinishToSettings, awaitItem())
@@ -312,6 +323,10 @@ class SubscriptionOnboardingViewModelTest {
         mock<SubscriptionOnboardingStepPlugin>().also {
             whenever(it.allowsBackNavigation).thenReturn(allowsBackNavigation)
         }
+
+    private companion object {
+        const val TITLE_RES_ID = 42
+    }
 
     private fun emptyPluginPoint() = object : PluginPoint<SubscriptionOnboardingStepPlugin> {
         override fun getPlugins(): Collection<SubscriptionOnboardingStepPlugin> = emptyList()
