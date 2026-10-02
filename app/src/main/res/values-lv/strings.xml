@@ -261,6 +261,7 @@
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Atļaujas</string>
+    <string name="permissionsGeneralPermissionsTitle" instruction="Section header on the Permissions settings screen, above the Notifications and Open Links in Apps settings">Vispārīgās atļaujas</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Izskats</string>
