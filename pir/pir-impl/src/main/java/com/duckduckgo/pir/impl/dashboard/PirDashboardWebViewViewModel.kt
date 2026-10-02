@@ -32,10 +32,17 @@ import com.duckduckgo.pir.impl.dashboard.purchase.PirPurchaseRoute.NativePurchas
 import com.duckduckgo.pir.impl.pixels.PirInteractionReporter
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.store.PirRepository
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
+import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -48,11 +55,23 @@ class PirDashboardWebViewViewModel @Inject constructor(
     private val pirInteractionReporter: PirInteractionReporter,
     private val appBuildConfig: AppBuildConfig,
     private val pirRepository: PirRepository,
+    private val subscriptions: Subscriptions,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
+
+    init {
+        // The dashboard handshakes isAuthenticatedUser once, at load. A purchase completed while it
+        // is alive has to be picked up by reloading, which re-runs that handshake.
+        subscriptions.getSubscriptionStatusFlow()
+            .map { it != UNKNOWN }
+            .distinctUntilChanged()
+            .drop(1)
+            .onEach { command.send(Command.ReloadWebView) }
+            .launchIn(viewModelScope)
+    }
 
     fun handleJsMessage(
         featureName: String,
@@ -98,5 +117,7 @@ class PirDashboardWebViewViewModel @Inject constructor(
             val origin: String,
             val featurePage: String,
         ) : Command()
+
+        data object ReloadWebView : Command()
     }
 }

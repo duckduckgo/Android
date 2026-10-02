@@ -200,6 +200,8 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
                 binding.manualConfigWarning.isVisible = command.show
             }
 
+            Command.ReloadWebView -> binding.pirWebView.reload()
+
             is Command.LaunchSubscriptionPurchase -> globalActivityStarter.start(
                 this,
                 SubscriptionPurchase(

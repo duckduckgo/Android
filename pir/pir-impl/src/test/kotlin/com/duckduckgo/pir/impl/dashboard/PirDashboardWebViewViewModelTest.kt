@@ -19,17 +19,23 @@ package com.duckduckgo.pir.impl.dashboard
 import app.cash.turbine.test
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command.LaunchSubscriptionPurchase
 import com.duckduckgo.pir.impl.dashboard.purchase.PirPurchaseRoute
 import com.duckduckgo.pir.impl.pixels.PirInteractionReporter
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.store.PirRepository
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
+import com.duckduckgo.subscriptions.api.Subscriptions
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class PirDashboardWebViewViewModelTest {
 
@@ -40,16 +46,20 @@ class PirDashboardWebViewViewModelTest {
     private val pirInteractionReporter: PirInteractionReporter = mock()
     private val appBuildConfig: AppBuildConfig = mock()
     private val pirRepository: PirRepository = mock()
+    private val subscriptions: Subscriptions = mock()
+    private val subscriptionStatus = MutableStateFlow(SubscriptionStatus.UNKNOWN)
 
     private lateinit var testee: PirDashboardWebViewViewModel
 
     @Before
     fun setUp() {
+        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(subscriptionStatus)
         testee = PirDashboardWebViewViewModel(
             pirPixelSender = pirPixelSender,
             pirInteractionReporter = pirInteractionReporter,
             appBuildConfig = appBuildConfig,
             pirRepository = pirRepository,
+            subscriptions = subscriptions,
             appCoroutineScope = coroutineTestRule.testScope,
         )
     }
@@ -65,6 +75,43 @@ class PirDashboardWebViewViewModelTest {
                 LaunchSubscriptionPurchase(origin = "funnel_freescan_android", featurePage = "pir"),
                 awaitItem(),
             )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test does not reload on first subscription status emission`() = runTest {
+        advanceUntilIdle()
+
+        testee.commands().test {
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test reloads when the user becomes signed in`() = runTest {
+        advanceUntilIdle()
+
+        testee.commands().test {
+            subscriptionStatus.value = SubscriptionStatus.AUTO_RENEWABLE
+
+            assertEquals(Command.ReloadWebView, awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test does not reload when the status changes within signed in`() = runTest {
+        advanceUntilIdle()
+
+        testee.commands().test {
+            subscriptionStatus.value = SubscriptionStatus.AUTO_RENEWABLE
+            assertEquals(Command.ReloadWebView, awaitItem())
+
+            subscriptionStatus.value = SubscriptionStatus.GRACE_PERIOD
+
+            expectNoEvents()
             cancelAndConsumeRemainingEvents()
         }
     }
