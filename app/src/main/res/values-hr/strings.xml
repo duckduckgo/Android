@@ -264,6 +264,7 @@
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Dozvole</string>
+    <string name="permissionsGeneralPermissionsTitle" instruction="Section header on the Permissions settings screen, above the Notifications and Open Links in Apps settings">Opća dopuštenja</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Izgled</string>
