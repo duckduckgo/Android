@@ -50,6 +50,9 @@
     <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model's short name">%1$s uses limits up to 2–5x faster than basic models.</string>
     <string name="duckChatUsageFooterDismissContentDescription">Dismiss</string>
 
+    <!-- Duck.ai ToS consent footer -->
+    <string name="duckChatTermsFooterMessage" instruction="Disclaimer under the Duck.ai input. The two annotated phrases are tappable links to the Terms of Service and the Privacy Policy.">By sending a prompt you agree to our <annotation type="terms_link">Terms of Service</annotation> and <annotation type="privacy_link">Privacy Policy</annotation>.</string>
+
     <!-- Duck.ai usage-limit footer -->
     <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">%1$d%% of daily limit</string>
     <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">%1$d%% of weekly limit</string>
