@@ -30,6 +30,9 @@ appId: com.duckduckgo.mobile.android
     id: "preferenceSelectorTitle"
 - tapOn: "next"
 - assertVisible:
+    id: "widgetPromptTitle"
+- tapOn: "Not Now"
+- assertVisible:
     id: "inputScreenTitle"
 - tapOn: "next"
 - assertVisible:

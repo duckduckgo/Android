@@ -47,7 +47,7 @@ appId: com.duckduckgo.mobile.android
           commands:
             - tapOn: "cancel"
       - assertVisible:
-              id: "widgetPromptTitle"
+          id: "widgetPromptTitle"
       - tapOn: "Not Now"
       - assertVisible:
           text: ".*where should I put your address.bar?.*"
