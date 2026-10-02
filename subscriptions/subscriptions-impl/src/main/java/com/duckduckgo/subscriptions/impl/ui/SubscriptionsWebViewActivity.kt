@@ -79,6 +79,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
+import com.duckduckgo.subscriptions.api.SubscriptionPurchaseCompletion
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
@@ -136,6 +137,7 @@ data class SubscriptionsWebViewActivityWithParams(
     val toolbarConfig: ToolbarConfig = DaxSubscription,
     val origin: String? = null,
     val launchPixel: String? = null,
+    val completion: SubscriptionPurchaseCompletion = SubscriptionPurchaseCompletion.GO_TO_SETTINGS,
 ) : ActivityParams {
 
     sealed class ToolbarConfig : Serializable {
@@ -381,6 +383,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             return SubscriptionsWebViewActivityWithParams(
                 url = subscriptionsUrlProvider.buyUrl,
                 origin = subscriptionPurchaseActivityParams.origin,
+                completion = subscriptionPurchaseActivityParams.completion,
             ).let { webViewActivityWithParams ->
                 if (subscriptionPurchaseActivityParams.featurePage.isNullOrBlank().not()) {
                     val urlWithParams = runCatching {
@@ -751,6 +754,13 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     }
 
     private fun finishToSettings() {
+        // RETURN_TO_CALLER means the screen that started the purchase is still beneath us, so
+        // stacking Settings on top of it would take the user somewhere they did not come from.
+        if (params.completion == SubscriptionPurchaseCompletion.RETURN_TO_CALLER) {
+            finish()
+            return
+        }
+
         if (params.url == subscriptionsUrlProvider.activateUrl) {
             setResult(RESULT_OK)
         } else {
