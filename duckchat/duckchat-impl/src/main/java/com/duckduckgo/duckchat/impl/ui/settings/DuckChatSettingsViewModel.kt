@@ -32,6 +32,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.pixel.fireCountAndDaily
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.impl.subscriptiononboarding.SubscriptionOnboardingExperimentMetrics
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenShortcutSettings
@@ -67,6 +68,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val duckChatFeature: DuckChatFeature,
     private val serpSettingsDataProvider: SerpSettingsDataProvider,
+    private val subscriptionOnboardingExperimentMetrics: SubscriptionOnboardingExperimentMetrics,
 ) : ViewModel() {
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
@@ -208,6 +210,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             countPixel = DuckChatPixelName.AI_FEATURES_DISABLED_COUNT,
             dailyPixel = DuckChatPixelName.AI_FEATURES_DISABLED_DAILY,
         )
+        viewModelScope.launch { subscriptionOnboardingExperimentMetrics.fireAiFeaturesDisabled() }
         // Only disable Duck.ai if it's currently on, so we don't fire a spurious aichat_disabled when
         // the action is reachable purely because Search Assist or Hide AI Images is still non-no-AI.
         if (viewState.value.isDuckChatUserEnabled) {

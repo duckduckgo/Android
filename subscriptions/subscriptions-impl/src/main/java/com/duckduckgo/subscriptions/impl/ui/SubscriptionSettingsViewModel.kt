@@ -35,8 +35,8 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_MONTHLY_PLU
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_MONTHLY_PRO_PLANS
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingExperiments
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingProgress
+import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboardingExperiments
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.PendingPlan
 import com.duckduckgo.subscriptions.impl.repository.Subscription

@@ -26,21 +26,33 @@ import com.duckduckgo.onboarding.api.LinearOnboardingPlan
 import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.LinearOnboardingState.InProgress
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition
+import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.SKIPPED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingPlanProvider.Companion.SUBSCRIPTION_ONBOARDING_PLAN_ID
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionOnboardingStepPixels.Step
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
+import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class SubscriptionOnboardingViewModelTest {
@@ -53,6 +65,13 @@ class SubscriptionOnboardingViewModelTest {
     private val controller = RealSubscriptionOnboardingController()
     private val planProvider = SubscriptionOnboardingPlanProvider(emptyPluginPoint(), onboardingStore)
     private val handoffState = SubscriptionOnboardingHandoffState()
+    private val pixelSender: SubscriptionPixelSender = mock()
+    private val subscriptionsManager: SubscriptionsManager = mock()
+
+    @Before
+    fun setup() {
+        runBlocking { whenever(subscriptionsManager.getSubscription()).thenReturn(subscription(isFreeTrial = false)) }
+    }
 
     private class FakeOrchestrator : LinearOnboardingOrchestrator {
         val stateFlow = MutableStateFlow<LinearOnboardingState>(LinearOnboardingState.NotStarted)
@@ -64,7 +83,16 @@ class SubscriptionOnboardingViewModelTest {
         }
     }
 
-    private fun createViewModel() = SubscriptionOnboardingViewModel(orchestrator, planProvider, onboardingStore, controller, handoffState)
+    private fun createViewModel() =
+        SubscriptionOnboardingViewModel(
+            orchestrator,
+            planProvider,
+            onboardingStore,
+            controller,
+            handoffState,
+            pixelSender,
+            subscriptionsManager,
+        )
 
     @Test
     fun whenInProgressOnActivityStepThenShowsStepWithCanGoBack() = runTest {
@@ -155,6 +183,77 @@ class SubscriptionOnboardingViewModelTest {
 
         assertFalse(onboardingStore.isStepCompleted("welcome"))
         assertTrue(orchestrator.events.contains(SubscriptionOnboardingEvent.StepFinished("welcome", SKIPPED)))
+    }
+
+    @Test
+    fun whenStepShownThenReportsStepShownPixel() = runTest {
+        orchestrator.stateFlow.value = inProgressState(stepPlugin = stepPluginMock(stepId = "vpn"))
+        val testee = createViewModel()
+        testee.start()
+        advanceUntilIdle()
+
+        verify(pixelSender).reportOnboardingStepShown(Step.VPN, false)
+    }
+
+    @Test
+    fun whenStepShownAndFreeTrialActiveThenReportsFreeTrialTrue() = runTest {
+        whenever(subscriptionsManager.getSubscription()).thenReturn(subscription(isFreeTrial = true))
+        orchestrator.stateFlow.value = inProgressState(stepPlugin = stepPluginMock(stepId = "vpn"))
+        val testee = createViewModel()
+        testee.start()
+        advanceUntilIdle()
+
+        verify(pixelSender).reportOnboardingStepShown(Step.VPN, true)
+    }
+
+    @Test
+    fun whenStepShownWithUnknownStepIdThenNoPixel() = runTest {
+        orchestrator.stateFlow.value = inProgressState(stepPlugin = stepPluginMock(stepId = "not_a_step"))
+        val testee = createViewModel()
+        testee.start()
+        advanceUntilIdle()
+
+        verify(pixelSender, never()).reportOnboardingStepShown(any(), any())
+    }
+
+    @Test
+    fun whenStepCompletedThenReportsStepCompletedPixel() = runTest {
+        orchestrator.stateFlow.value = inProgressState()
+        val testee = createViewModel()
+        testee.start()
+        advanceUntilIdle()
+
+        controller.onStepFinished("vpn", COMPLETED)
+        advanceUntilIdle()
+
+        verify(pixelSender).reportOnboardingStepCompleted(Step.VPN, false)
+    }
+
+    @Test
+    fun whenStepSkippedThenReportsStepSkippedPixel() = runTest {
+        orchestrator.stateFlow.value = inProgressState()
+        val testee = createViewModel()
+        testee.start()
+        advanceUntilIdle()
+
+        controller.onStepFinished("duck_ai", SKIPPED)
+        advanceUntilIdle()
+
+        verify(pixelSender).reportOnboardingStepSkipped(Step.DUCK_AI, false)
+    }
+
+    @Test
+    fun whenCompletionStepFinishedThenNoOutcomePixel() = runTest {
+        orchestrator.stateFlow.value = inProgressState()
+        val testee = createViewModel()
+        testee.start()
+        advanceUntilIdle()
+
+        controller.onStepFinished("completion", COMPLETED)
+        advanceUntilIdle()
+
+        verify(pixelSender, never()).reportOnboardingStepCompleted(eq(Step.COMPLETION), any())
+        verify(pixelSender, never()).reportOnboardingStepSkipped(any(), any())
     }
 
     @Test
@@ -319,9 +418,13 @@ class SubscriptionOnboardingViewModelTest {
 
     // Mockito returns false for an unstubbed Boolean, so back navigation has to be stubbed back to the
     // interface default.
-    private fun stepPluginMock(allowsBackNavigation: Boolean = true): SubscriptionOnboardingStepPlugin =
+    private fun stepPluginMock(
+        allowsBackNavigation: Boolean = true,
+        stepId: String = "welcome",
+    ): SubscriptionOnboardingStepPlugin =
         mock<SubscriptionOnboardingStepPlugin>().also {
             whenever(it.allowsBackNavigation).thenReturn(allowsBackNavigation)
+            whenever(it.stepId).thenReturn(stepId)
         }
 
     private companion object {
@@ -331,4 +434,14 @@ class SubscriptionOnboardingViewModelTest {
     private fun emptyPluginPoint() = object : PluginPoint<SubscriptionOnboardingStepPlugin> {
         override fun getPlugins(): Collection<SubscriptionOnboardingStepPlugin> = emptyList()
     }
+
+    private fun subscription(isFreeTrial: Boolean) = Subscription(
+        productId = "test-plan",
+        billingPeriod = "Monthly",
+        startedAt = 0L,
+        expiresOrRenewsAt = 0L,
+        status = AUTO_RENEWABLE,
+        platform = "android",
+        activeOffers = if (isFreeTrial) listOf(ActiveOfferType.TRIAL) else emptyList(),
+    )
 }
