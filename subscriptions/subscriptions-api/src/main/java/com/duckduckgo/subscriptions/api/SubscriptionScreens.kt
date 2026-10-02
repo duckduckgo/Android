@@ -21,10 +21,25 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 sealed class SubscriptionScreens {
     data object SubscriptionsSettingsScreenWithEmptyParams : ActivityParams
     data class RestoreSubscriptionScreenWithParams(val isOriginWeb: Boolean = true) : ActivityParams
-    data class SubscriptionPurchase(val origin: String? = null, val featurePage: String? = null) : ActivityParams
+    data class SubscriptionPurchase(
+        val origin: String? = null,
+        val featurePage: String? = null,
+        val completion: SubscriptionPurchaseCompletion = SubscriptionPurchaseCompletion.GO_TO_SETTINGS,
+    ) : ActivityParams
     data class SubscriptionUpgrade(val origin: String? = null) : ActivityParams
     data object SubscriptionOnboardingScreenWithEmptyParams : ActivityParams
     data class SubscriptionOnboardingFeatureInfoScreen(val feature: SubscriptionOnboardingFeature) : ActivityParams
 }
 
 enum class SubscriptionOnboardingFeature { VPN, ITR, DUCK_AI, PIR }
+
+/**
+ * Where the purchase flow leaves the user once it finishes.
+ */
+enum class SubscriptionPurchaseCompletion {
+    /** Navigate to Settings, clearing anything above it. The long-standing behaviour. */
+    GO_TO_SETTINGS,
+
+    /** Finish the purchase screen only, revealing whichever screen started it. */
+    RETURN_TO_CALLER,
+}
