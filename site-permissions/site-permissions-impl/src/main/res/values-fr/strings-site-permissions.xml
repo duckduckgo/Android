@@ -105,4 +105,21 @@
     <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo n’a pas pu donner l’accès au micro à ce site</string>
     <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo n’a pas pu donner l’accès à l’appareil photo et au micro à ce site</string>
 
+    <!-- Permission settings redesign -->
+    <string name="permissionSettingsAlwaysAllow" instruction="Permission setting option: the site gets the permission without asking">Toujours autoriser</string>
+    <string name="permissionSettingsAskEachTime" instruction="Permission setting option: the site has to ask for the permission every time">Demander à chaque fois</string>
+    <string name="permissionSettingsLocationDialogTitle">Autoriser les sites à demander l\'autorisation d\'accès à la position</string>
+    <string name="permissionSettingsLocationDialogMessage">Si vous choisissez « Ne jamais autoriser », vous ne pourrez pas utiliser certaines fonctionnalités sur les sites, comme les itinéraires sur les cartes ou les commerces à proximité.</string>
+    <string name="permissionSettingsCameraDialogTitle">Autoriser les sites à demander l\'autorisation d\'accès à l\'appareil photo</string>
+    <string name="permissionSettingsCameraDialogMessage">Si tu choisis « Ne jamais autoriser », tu ne pourras pas utiliser des fonctionnalités comme le chat vidéo sur les sites.</string>
+    <string name="permissionSettingsMicrophoneDialogTitle">Autoriser les sites à demander l\'autorisation d\'accès au micro</string>
+    <string name="permissionSettingsMicrophoneDialogMessage">Si vous choisissez « Ne jamais autoriser », vous ne pourrez pas utiliser des fonctionnalités comme le chat vocal sur les sites.</string>
+    <string name="permissionSettingsDrmDialogTitle">Autoriser les sites à demander l\'autorisation relative à la gestion des droits numériques (DRM)</string>
+    <string name="permissionSettingsDrmTitle" instruction="Name of a permission setting for playing protected video content">Gestion des droits numériques (DRM)</string>
+    <string name="permissionsPerWebsiteRedesignHeader" instruction="Placeholder is the name of a website">Autorisations pour %1$s</string>
+    <string name="permissionsPerWebsiteRemovePermissions" instruction="Button that removes all saved permissions for the website shown on the screen">Supprimer les autorisations</string>
+    <string name="permissionsRemovedForSiteSnackbar" instruction="Placeholder is the name of a website">Autorisations supprimées pour &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="permissionsRemovedForAllSitesSnackbar">Autorisations supprimées pour tous les sites</string>
+    <string name="permissionSettingsDrmDialogMessage">Si vous choisissez « Ne jamais autoriser », il est possible que vous ne puissiez pas lire les vidéos sur le site.</string>
+
 </resources>
