@@ -49,7 +49,7 @@ import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
 @SuppressLint("ViewConstructor")
-class OptionsView(context: Context, private val host: NativeInputHost) : LinearLayout(context) {
+class OptionsView(context: Context, private val host: NativeInputHost) : LinearLayout(context), CompactableControl {
 
     @Inject lateinit var viewModelFactory: ViewViewModelFactory
 
@@ -92,6 +92,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     private var nativeInputStateJob: Job? = null
     private var visibleToolsJob: Job? = null
     private var lastNativeInputState: NativeInputState? = null
+    private var compactLevel = AdaptiveBottomRowLayout.LEVEL_FULL
 
     init {
         orientation = HORIZONTAL
@@ -160,13 +161,30 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         lastNativeInputState?.inputContext == NativeInputState.InputContext.DUCK_AI
 
     private fun refreshOptionsButtonVisibility(visibleTools: Set<Tool> = viewModel.visibleTools.value) {
-        optionsButton.isVisible = visibleTools.isNotEmpty() || isCustomizeResponsesAvailable()
+        optionsButton.isVisible = (visibleTools.isNotEmpty() || isCustomizeResponsesAvailable()) && !isMergedWithChip()
+    }
+
+    // At the top compact level the active mode's chip stands in for the tools button: tapping it opens the
+    // tools menu, and the mode is turned off from there.
+    private fun isMergedWithChip(): Boolean = compactLevel >= AdaptiveBottomRowLayout.LEVEL_MERGED_TOOLS && childCount > 1
+
+    override fun setCompactLevel(level: Int) {
+        if (compactLevel == level) return
+        compactLevel = level
+        applyMergedState()
+    }
+
+    private fun applyMergedState() {
+        refreshOptionsButtonVisibility()
+        val chip = getChildAt(1) ?: return
+        chip.findViewById<ImageView>(R.id.optionsChipClose)?.isVisible = !isMergedWithChip()
     }
 
     private fun renderSelection(tool: Tool?) {
         val matchingItem = tool?.let { selected -> menuItems.firstOrNull { it.tool == selected } }
         removeChip()
         if (matchingItem != null) addView(buildChip(matchingItem), 1)
+        applyMergedState()
         val show = viewModel.shouldShowPickers
         host.showModelPicker(show)
         host.showReasoningPicker(show)
@@ -280,14 +298,18 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         view.findViewById<ImageView>(R.id.optionsChipIcon).setImageResource(item.iconRes)
         view.contentDescription = context.getString(R.string.duckChatOptionsChipDismissContentDescription, context.getString(item.titleRes))
         view.setOnClickListener {
-            viewModel.onToolDeselectedByUser(item.tool)
-            host.toolSelected(null)
+            if (isMergedWithChip()) {
+                showMenu()
+            } else {
+                viewModel.onToolDeselectedByUser(item.tool)
+                host.toolSelected(null)
+            }
         }
         return view
     }
 
     private fun showAtPosition(popup: PopupWindow) {
-        val button = getChildAt(0) ?: this
+        val button = (0 until childCount).map(::getChildAt).firstOrNull { it.isVisible } ?: this
         val loc = IntArray(2).also { button.getLocationOnScreen(it) }
         val y = resources.displayMetrics.heightPixels - loc[1] + resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
         popup.showAtLocation(rootView, Gravity.BOTTOM or Gravity.START, loc[0], y)

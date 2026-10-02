@@ -74,7 +74,7 @@ class ModelPickerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : FrameLayout(context, attrs, defStyle), ModelPicker {
+) : FrameLayout(context, attrs, defStyle), ModelPicker, CompactableControl {
 
     @Inject lateinit var viewModelFactory: ViewViewModelFactory
 
@@ -94,6 +94,11 @@ class ModelPickerView @JvmOverloads constructor(
     private var showPickerJob: Job? = null
     private var popupWindow: PopupWindow? = null
     private var lastNativeInputState: NativeInputState? = null
+    private var compactLevel = AdaptiveBottomRowLayout.LEVEL_FULL
+    private var chipLabelText: String? = null
+    private var chipIconJob: Job? = null
+    private val defaultTextStartPadding by lazy { chip.textStartPadding }
+    private val defaultTextEndPadding by lazy { chip.textEndPadding }
 
     // Mirrors the input context from the per-tab native input state so currentSurface() can be
     // read synchronously from popup callbacks. Updated by observeInputContext().
@@ -155,7 +160,15 @@ class ModelPickerView @JvmOverloads constructor(
 
         chipLabelJob?.cancel()
         chipLabelJob = viewModel.chipLabel
-            .onEach { label -> label?.let { chip.text = it } }
+            .onEach { label ->
+                chipLabelText = label ?: chipLabelText
+                applyCompactLevel()
+            }
+            .launchIn(scope)
+
+        chipIconJob?.cancel()
+        chipIconJob = viewModel.chipIconRes
+            .onEach { iconRes -> chip.setChipIconResource(iconRes) }
             .launchIn(scope)
 
         commandJob?.cancel()
@@ -186,6 +199,25 @@ class ModelPickerView @JvmOverloads constructor(
                 }
             }
             .launchIn(scope)
+    }
+
+    override fun setCompactLevel(level: Int) {
+        if (compactLevel == level) return
+        compactLevel = level
+        applyCompactLevel()
+    }
+
+    // Collapsed, the pill is the provider icon and still opens the same menu.
+    private fun applyCompactLevel() {
+        val startPadding = defaultTextStartPadding
+        val endPadding = defaultTextEndPadding
+        val iconOnly = compactLevel >= AdaptiveBottomRowLayout.LEVEL_MODEL_ICON
+        chip.text = if (iconOnly) "" else chipLabelText.orEmpty()
+        chip.isChipIconVisible = iconOnly
+        chip.isCloseIconVisible = !iconOnly
+        chip.textStartPadding = if (iconOnly) 0f else startPadding
+        chip.textEndPadding = if (iconOnly) 0f else endPadding
+        chip.contentDescription = chipLabelText
     }
 
     override fun hasPendingRecoverySelection(): Boolean = viewModel.hasPendingRecoverySelection()
