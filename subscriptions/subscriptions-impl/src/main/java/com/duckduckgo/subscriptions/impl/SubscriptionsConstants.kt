@@ -121,6 +121,7 @@ object SubscriptionsConstants {
         "funnel_duckai_android__modelpicker",
         "funnel_duckai_android__reasoningdropdown",
         "funnel_duckai_android__switchmodel",
+        "funnel_freescan_android",
         "funnel_modal_android__skippedonboardingupsell",
         "funnel_modal_android__subscriptionnudge",
         "funnel_onboarding_android",
