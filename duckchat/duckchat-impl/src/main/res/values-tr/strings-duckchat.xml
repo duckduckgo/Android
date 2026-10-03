@@ -255,8 +255,8 @@
     <string name="duck_ai_chat_history_action_new">Yeni</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Sohbetleri indir</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">%1$d sohbet için indirme tamamlandı</item>
-        <item quantity="other">%1$d sohbet için indirme tamamlandı</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">%1$d sohbet için indirme tamamlandı</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">%1$d sohbet için indirme tamamlandı</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Overflow menüsünü aç</string>
     <string name="duck_ai_chat_history_select_all">Tümünü seç</string>
@@ -282,6 +282,11 @@
     <string name="native_input_chat_duck_mode_hint">Yanıtla…</string>
 
     <!-- Model Picker -->
+    <string name="duckAiModelPickerLabelEverydayUse" instruction="Subline under a model in the Duck.ai model picker, describing what that model suits.">Günlük kullanım için en iyisi</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster" instruction="Subline under a model in the Duck.ai model picker. &apos;Limits&apos; means the user&apos;s usage allowance, which this model consumes more quickly.">Sağlam ama limitleri daha hızlı tüketir</string>
+    <string name="duckAiModelPickerTryFreeTrial" instruction="Header above the locked models in the Duck.ai model picker, shown when the user can still start a free trial.">Ücretsiz Deneyin</string>
+    <string name="duckAiModelPickerSubscriberExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when unlocking them requires a paid subscription.">Abonelere Özel</string>
+    <string name="duckAiModelPickerProExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when they require the Pro plan specifically. &apos;Pro&apos; is the plan name and stays untranslated.">Pro Plan\'a Özel</string>
     <string name="duckAiModelPickerPlusModels">Plus</string>
     <string name="duckAiModelPickerProModels">Pro</string>
 
@@ -366,7 +371,32 @@
 
     <!-- Prefix on the Duck.ai attachment chip for a text selection -->
     <plurals name="duckAiTextSelectionWordCount">
-        <item quantity="one">%1$d kelime</item>
-        <item quantity="other">%1$d kelime</item>
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d kelime</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d kelime</item>
+    </plurals>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model&apos;s short name">%1$s, limitleri temel modellere göre 2–5 kata kadar daha hızlı tüketir.</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Reddet</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">Günlük limitin %%%1$d kadarı</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">Haftalık limitin %%%1$d kadarı</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Günlük limit doldu</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Haftalık limit doldu</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Haftalık kullanım limiti doldu</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Gelişmiş yapay zeka modelleri limitine ulaşıldı</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Model değiştir</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Haftalık Limiti Kullanmaya Başlayın</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Aboneliği Ücretsiz Deneyin</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">Abone ol</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as &apos;2 days&apos; or &apos;5 hours&apos;">%1$s sonra sıfırlanır</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d gün</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d gün</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d saat</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d saat</item>
     </plurals>
 </resources>

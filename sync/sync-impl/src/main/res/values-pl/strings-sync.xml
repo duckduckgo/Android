@@ -376,7 +376,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Funkcja Sync &amp; Backup jest kompleksowo szyfrowana na wszystkich Twoich urządzeniach.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Sprawdź drugie urządzenie</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Sprawdź drugie urządzenie.</string>
     <string name="sync_simplified_pairing_headline_recovery">Odzyskiwanie danych</string>
     <string name="sync_simplified_pairing_body">Łączenie...</string>
 

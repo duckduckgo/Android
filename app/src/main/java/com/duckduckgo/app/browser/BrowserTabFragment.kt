@@ -722,7 +722,7 @@ class BrowserTabFragment :
 
     var messageFromPreviousTab: Message? = null
 
-    // One-shot input-screen mode this tab should land on (e.g. "New Search" → Search), set by whoever
+    // One-shot input-screen mode this tab should land on (e.g. "New Tab" → Search), set by whoever
     // opened the tab and handed to the viewmodel in loadData. Not persisted: only meaningful for the
     // tab's initial launch within this process.
     var inputModeTarget: InputMode? = null
@@ -836,7 +836,7 @@ class BrowserTabFragment :
     private val chatMenuPopup by lazy {
         PopupMenu(layoutInflater, com.duckduckgo.duckchat.impl.R.layout.popup_chat_menu).apply {
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewChat)) {
-                viewModel.openNewDuckChat(omnibar.viewMode)
+                viewModel.openNewDuckChatFromChatMenu()
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewVoiceChat)) {
                 duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
@@ -845,9 +845,9 @@ class BrowserTabFragment :
                 viewModel.openNewImageDuckChat(omnibar.viewMode)
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)) {
-                // With the native sidebar this entry is relabelled "New Search": open the new tab with
-                // its input screen surfaced on the Search tab. The target is threaded to the new tab
-                // itself rather than armed globally, so it can't be consumed by another tab.
+                // With the native sidebar this entry opens the new tab with its input screen surfaced on
+                // the Search tab. The target is threaded to the new tab itself rather than armed globally,
+                // so it can't be consumed by another tab.
                 viewModel.recordPendingNewTabOpenedExit()
                 browserActivity?.launchNewTab(
                     browserMode = BrowserMode.REGULAR,
@@ -1501,6 +1501,15 @@ class BrowserTabFragment :
                                 put("platform", "android")
                                 put("modelId", modelId)
                             },
+                        ),
+                    )
+                },
+                onStartUsingWeeklyLimit = {
+                    contentScopeScripts.sendSubscriptionEvent(
+                        SubscriptionEventData(
+                            featureName = "aiChat",
+                            subscriptionName = "submitStartUsingWeeklyLimitAction",
+                            params = JSONObject().apply { put("platform", "android") },
                         ),
                     )
                 },
@@ -2211,7 +2220,11 @@ class BrowserTabFragment :
             viewModel.areFavoritesDisplayed
                 .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                 .collectLatest { hasFavorites ->
-                    binding.includeNewBrowserTab.topNtpOutlineStroke.isVisible = hasFavorites
+                    // The native input hides this stroke while it is open, and favorites can load after
+                    // that, so honour the hide here instead of drawing a divider over the input's edge.
+                    if (!nativeInputManager.isNativeInputShown()) {
+                        binding.includeNewBrowserTab.topNtpOutlineStroke.isVisible = hasFavorites
+                    }
                     binding.includeNewBrowserTab.bottomNtpOutlineStroke.isVisible = hasFavorites && omnibarRepository.omnibarType != OmnibarType.SPLIT
                 }
         }
@@ -2704,7 +2717,12 @@ class BrowserTabFragment :
                     viewModel.autoCompleteSuggestionsGone()
                 }
                 binding.autoCompleteSuggestionsList.gone()
-                nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
+                // Skip Duck.ai for the same reason launchTabSwitcher does: the widget is that tab's
+                // persistent chat input, and tearing it down restores the default omnibar, so the
+                // chat would be sitting behind an address bar when the user comes back to it.
+                if (omnibar.viewMode != DuckAI) {
+                    nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
+                }
 
                 if (swipingTabsFeature.isEnabled) {
                     browserActivity?.launchNewTab(it.query, it.sourceTabId)
@@ -3982,9 +4000,6 @@ class BrowserTabFragment :
 
                 override fun onPlusButtonPressed(anchor: View) {
                     val activity = activity ?: return
-                    // Only offer "New Fire Tab" to users whose feature flag + WebView profile
-                    // support actually allow Fire Mode. Re-checked on each open so a WebView/flag
-                    // change is reflected without rebuilding the menu.
                     chatMenuPopup.contentView
                         .findViewById<View>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)
                         .isVisible = fireModeAvailability.isAvailable()
@@ -3995,13 +4010,7 @@ class BrowserTabFragment :
                     chatMenuPopup.contentView
                         .findViewById<PopupMenuItemView>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)
                         .setPrimaryText(
-                            getString(
-                                if (nativeSidebarEnabled) {
-                                    com.duckduckgo.browser.ui.R.string.chatMenuPopupNewSearch
-                                } else {
-                                    com.duckduckgo.browser.ui.R.string.chatMenuPopupNewTab
-                                },
-                            ),
+                            getString(com.duckduckgo.browser.ui.R.string.chatMenuPopupNewTab),
                         )
                     chatMenuPopup.showAnchoredView(activity, binding.rootView, anchor)
                 }

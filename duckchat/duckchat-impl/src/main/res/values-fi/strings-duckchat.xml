@@ -255,8 +255,8 @@
     <string name="duck_ai_chat_history_action_new">Uusi</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Lataa keskustelut</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Lataus valmis %1$d keskustelulle</item>
-        <item quantity="other">Lataus valmis %1$d keskustelulle</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Lataus valmis %1$d keskustelulle</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Lataus valmis %1$d keskustelulle</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Avaa ylivuotovalikko</string>
     <string name="duck_ai_chat_history_select_all">Valitse kaikki</string>
@@ -282,6 +282,11 @@
     <string name="native_input_chat_duck_mode_hint">Vastaa…</string>
 
     <!-- Model Picker -->
+    <string name="duckAiModelPickerLabelEverydayUse" instruction="Subline under a model in the Duck.ai model picker, describing what that model suits.">Paras jokapäiväiseen käyttöön</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster" instruction="Subline under a model in the Duck.ai model picker. &apos;Limits&apos; means the user&apos;s usage allowance, which this model consumes more quickly.">Vankka, mutta saavuttaa rajat nopeammin</string>
+    <string name="duckAiModelPickerTryFreeTrial" instruction="Header above the locked models in the Duck.ai model picker, shown when the user can still start a free trial.">Kokeile maksutta</string>
+    <string name="duckAiModelPickerSubscriberExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when unlocking them requires a paid subscription.">Vain tilaajille</string>
+    <string name="duckAiModelPickerProExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when they require the Pro plan specifically. &apos;Pro&apos; is the plan name and stays untranslated.">Vain Pro-versioille</string>
     <string name="duckAiModelPickerPlusModels">Plus</string>
     <string name="duckAiModelPickerProModels">Pro</string>
 
@@ -366,7 +371,32 @@
 
     <!-- Prefix on the Duck.ai attachment chip for a text selection -->
     <plurals name="duckAiTextSelectionWordCount">
-        <item quantity="one">%1$d sana</item>
-        <item quantity="other">%1$d sanaa</item>
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d sana</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d sanaa</item>
+    </plurals>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model&apos;s short name">%1$s käyttää rajoja jopa 2–5 kertaa nopeammin kuin perusmallit.</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Hylkää</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">%1$d%% päivittäisestä rajasta</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">%1$d%% viikoittaisesta rajasta</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Päivittäinen raja saavutettu</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Viikoittainen raja saavutettu</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Viikoittainen käyttöraja saavutettu</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Edistyneiden tekoälymallien raja saavutettu</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Vaihda mallia</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Aloita viikkorajoituksen käyttö</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Kokeile tilausta maksutta</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">Tilaa</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as &apos;2 days&apos; or &apos;5 hours&apos;">Nollautuu %1$s kuluttua</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d päivä</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d päivää</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d tunti</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d tuntia</item>
     </plurals>
 </resources>

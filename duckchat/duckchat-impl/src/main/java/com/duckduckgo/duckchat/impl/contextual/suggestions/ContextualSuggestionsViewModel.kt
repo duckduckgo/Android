@@ -23,6 +23,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
+import com.duckduckgo.duckchat.impl.wideevents.SelectionSubmissionAction
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,6 +43,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
     private val duckChatFeature: DuckChatFeature,
     private val dispatchers: DispatcherProvider,
     private val duckChatPixels: DuckChatPixels,
+    private val selectionJourney: DuckAiSelectionJourneyWideEvent,
 ) : ViewModel() {
 
     data class ViewState(
@@ -60,6 +63,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
     private var isSmart: Boolean = false
     private var suggestionsVisible = false
     private var textSelectionCount: Int = 0
+    private var textSelectionsTabId: String? = null
     private var otherAttachmentCount: Int = 0
     private var lastInput: ResolvePageSuggestionsInput? = null
 
@@ -82,6 +86,14 @@ class ContextualSuggestionsViewModel @Inject constructor(
 
     fun onSuggestionSelected(suggestionId: String) {
         duckChatPixels.reportContextualSuggestionSelected(suggestionId, pageType.pixelValue)
+        when (suggestionId) {
+            "summarize-selection" -> reportSuggestionSelected(SelectionSubmissionAction.SUMMARIZE)
+            "translate-selection" -> reportSuggestionSelected(SelectionSubmissionAction.TRANSLATE)
+        }
+    }
+
+    private fun reportSuggestionSelected(action: SelectionSubmissionAction) {
+        textSelectionsTabId?.let { selectionJourney.onSuggestionSelected(it, action) }
     }
 
     fun currentPageType(): SuggestionsPageType = pageType
@@ -111,9 +123,11 @@ class ContextualSuggestionsViewModel @Inject constructor(
     fun onAttachmentsChanged(
         textSelections: Int,
         otherAttachments: Int,
+        textSelectionsTabId: String? = null,
     ) {
         val modeChanged = (textSelectionCount > 0) != (textSelections > 0)
         textSelectionCount = textSelections
+        this.textSelectionsTabId = textSelectionsTabId
         otherAttachmentCount = otherAttachments
         if (!modeChanged) {
             _viewState.update { it.copy(suggestions = visibleSuggestions()) }
@@ -215,6 +229,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
         } else if (!suggestionsVisible) {
             suggestionsVisible = true
             duckChatPixels.reportContextualSuggestionsViewed(isSmart, pageType.pixelValue)
+            if (textSelectionCount > 0) textSelectionsTabId?.let { selectionJourney.onSuggestionsViewed(it) }
         }
     }
 

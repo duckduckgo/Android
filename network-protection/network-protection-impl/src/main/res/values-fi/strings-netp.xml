@@ -89,8 +89,8 @@
     <string name="netpManagementManageItemExclusion">Poissuljetut sovellukset</string>
     <string name="netpManagementManageItemExclusionSubtitleEmpty">Ei mitään</string>
     <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
-        <item quantity="one">%1$d sovellus</item>
-        <item quantity="other">%1$d sovellusta</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d sovellus</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d sovellusta</item>
     </plurals>
     <string name="netpManagementVpnSettings">VPN-asetukset</string>
 
@@ -242,14 +242,14 @@
     <string name="netpAutoExcludePromptTitle">Haluatko sulkea pois sovellukset, jotka eivät ole yhteensopivia VPN-verkkojen kanssa?</string>
     <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">Löysimme %1$s, kun VPN on yhdistetty.</string>
     <plurals name="netpAutoExcludeAppLabel">
-        <item quantity="one">%1$d uusi sovellus, joka ei ole yhteensopiva VPN-verkkojen kanssa. Sulje tämä sovellus pois käyttääksesi VPN-verkkoa.</item>
-        <item quantity="other">%1$d uutta sovellusta, jotka eivät ole yhteensopivia VPN-verkkojen kanssa. Sulje nämä sovellukset pois käyttääksesi VPN-verkkoa.</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d uusi sovellus, joka ei ole yhteensopiva VPN-verkkojen kanssa. Sulje tämä sovellus pois käyttääksesi VPN-verkkoa.</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d uutta sovellusta, jotka eivät ole yhteensopivia VPN-verkkojen kanssa. Sulje nämä sovellukset pois käyttääksesi VPN-verkkoa.</item>
     </plurals>
 
     <string name="netpAutoExcludePromptExcludeAllTitle">Haluatko sulkea pois kaikki sovellukset, jotka eivät ole yhteensopivia VPN-verkkojen kanssa?</string>
     <plurals name="netpAutoExcludeAllAppLabel">
-        <item quantity="one">%1$d muu sovellus, joka ei ole yhteensopiva VPN-verkkojen kanssa. Sulje tämä sovellus pois käyttääksesi VPN-verkkoa.</item>
-        <item quantity="other">%1$d muuta sovellusta, jotka eivät ole yhteensopivia VPN-verkkojen kanssa. Sulje nämä sovellukset pois käyttääksesi VPN-verkkoa.</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d muu sovellus, joka ei ole yhteensopiva VPN-verkkojen kanssa. Sulje tämä sovellus pois käyttääksesi VPN-verkkoa.</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d muuta sovellusta, jotka eivät ole yhteensopivia VPN-verkkojen kanssa. Sulje nämä sovellukset pois käyttääksesi VPN-verkkoa.</item>
     </plurals>
     <string name="netpAutoExcludePromptOptionEnable">Sulje automaattisesti pois yhteensopimattomat sovellukset</string>
     <string name="netpAutoExcludePromptActionAdd">Sulje pois sovellukset</string>

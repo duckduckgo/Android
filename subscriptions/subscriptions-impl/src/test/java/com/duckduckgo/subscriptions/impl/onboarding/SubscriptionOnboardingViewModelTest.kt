@@ -30,7 +30,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLE
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.SKIPPED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingPlanProvider.Companion.SUBSCRIPTION_ONBOARDING_PLAN_ID
-import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -41,6 +41,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class SubscriptionOnboardingViewModelTest {
 
@@ -48,9 +49,10 @@ class SubscriptionOnboardingViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private val orchestrator = FakeOrchestrator()
-    private val stepStore = SubscriptionOnboardingStepStore(FakeSharedPreferencesProvider())
+    private val onboardingStore = SubscriptionOnboardingStore(FakeSharedPreferencesProvider())
     private val controller = RealSubscriptionOnboardingController()
-    private val planProvider = SubscriptionOnboardingPlanProvider(emptyPluginPoint(), stepStore)
+    private val planProvider = SubscriptionOnboardingPlanProvider(emptyPluginPoint(), onboardingStore)
+    private val handoffState = SubscriptionOnboardingHandoffState()
 
     private class FakeOrchestrator : LinearOnboardingOrchestrator {
         val stateFlow = MutableStateFlow<LinearOnboardingState>(LinearOnboardingState.NotStarted)
@@ -62,11 +64,11 @@ class SubscriptionOnboardingViewModelTest {
         }
     }
 
-    private fun createViewModel() = SubscriptionOnboardingViewModel(orchestrator, planProvider, stepStore, controller)
+    private fun createViewModel() = SubscriptionOnboardingViewModel(orchestrator, planProvider, onboardingStore, controller, handoffState)
 
     @Test
     fun whenInProgressOnActivityStepThenShowsStepWithCanGoBack() = runTest {
-        val stepPlugin: SubscriptionOnboardingStepPlugin = mock()
+        val stepPlugin = stepPluginMock()
         orchestrator.stateFlow.value = inProgressState(canGoBack = true, stepPlugin = stepPlugin)
         val testee = createViewModel()
         testee.start()
@@ -76,8 +78,33 @@ class SubscriptionOnboardingViewModelTest {
             assertTrue(command is SubscriptionOnboardingViewModel.Command.ShowStep)
             command as SubscriptionOnboardingViewModel.Command.ShowStep
             assertEquals(stepPlugin, command.stepPlugin)
-            assertTrue(command.canGoBack)
         }
+        assertTrue(testee.toolbarState.value.canGoBack)
+        assertTrue(testee.toolbarState.value.showNavigationIcon)
+    }
+
+    @Test
+    fun whenInProgressOnActivityStepThenToolbarShowsStepTitle() = runTest {
+        val stepPlugin = stepPluginMock()
+        whenever(stepPlugin.titleResId).thenReturn(TITLE_RES_ID)
+        orchestrator.stateFlow.value = inProgressState(stepPlugin = stepPlugin)
+        val testee = createViewModel()
+        testee.start()
+        advanceUntilIdle()
+
+        assertEquals(TITLE_RES_ID, testee.toolbarState.value.titleResId)
+    }
+
+    @Test
+    fun whenHandoffThenStepShownWithoutNavigationIcon() = runTest {
+        handoffState.isHandoff = true
+        orchestrator.stateFlow.value = inProgressState(canGoBack = false, stepPlugin = stepPluginMock())
+        val testee = createViewModel()
+        testee.start()
+
+        advanceUntilIdle()
+
+        assertFalse(testee.toolbarState.value.showNavigationIcon)
     }
 
     @Test
@@ -112,7 +139,7 @@ class SubscriptionOnboardingViewModelTest {
         controller.onStepFinished("welcome", COMPLETED)
         advanceUntilIdle()
 
-        assertTrue(stepStore.isCompleted("welcome"))
+        assertTrue(onboardingStore.isStepCompleted("welcome"))
         assertTrue(orchestrator.events.contains(SubscriptionOnboardingEvent.StepFinished("welcome", COMPLETED)))
     }
 
@@ -126,8 +153,34 @@ class SubscriptionOnboardingViewModelTest {
         controller.onStepFinished("welcome", SKIPPED)
         advanceUntilIdle()
 
-        assertFalse(stepStore.isCompleted("welcome"))
+        assertFalse(onboardingStore.isStepCompleted("welcome"))
         assertTrue(orchestrator.events.contains(SubscriptionOnboardingEvent.StepFinished("welcome", SKIPPED)))
+    }
+
+    @Test
+    fun whenStepFinishedWithHandoffThenHandoffStateIsSet() = runTest {
+        orchestrator.stateFlow.value = inProgressState()
+        val testee = createViewModel()
+        testee.start()
+        advanceUntilIdle()
+
+        controller.onStepFinished("duck_ai", COMPLETED) { }
+        advanceUntilIdle()
+
+        assertTrue(handoffState.isHandoff)
+    }
+
+    @Test
+    fun whenStepFinishedWithoutHandoffThenHandoffStateStaysUnset() = runTest {
+        orchestrator.stateFlow.value = inProgressState()
+        val testee = createViewModel()
+        testee.start()
+        advanceUntilIdle()
+
+        controller.onStepFinished("welcome", COMPLETED)
+        advanceUntilIdle()
+
+        assertFalse(handoffState.isHandoff)
     }
 
     @Test
@@ -156,6 +209,81 @@ class SubscriptionOnboardingViewModelTest {
     }
 
     @Test
+    fun whenStepRefusesBackNavigationThenShownWithoutBackAndBackFinishesToSettings() = runTest {
+        orchestrator.stateFlow.value = inProgressState(
+            canGoBack = true,
+            stepPlugin = stepPluginMock(allowsBackNavigation = false),
+        )
+        val testee = createViewModel()
+        testee.start()
+
+        testee.commands.test {
+            assertTrue(awaitItem() is SubscriptionOnboardingViewModel.Command.ShowStep)
+            assertFalse(testee.toolbarState.value.canGoBack)
+
+            controller.onBack()
+            assertEquals(SubscriptionOnboardingViewModel.Command.FinishToSettings, awaitItem())
+        }
+        assertFalse(orchestrator.events.contains(SubscriptionOnboardingEvent.BackPressed))
+    }
+
+    @Test
+    fun whenStepFinishesWithHandoffThenNextStepIsShownBeforeHandoffRunsAndFinishes() = runTest {
+        orchestrator.stateFlow.value = inProgressState()
+        val testee = createViewModel()
+        testee.start()
+        advanceUntilIdle()
+
+        var handoffRan = false
+        testee.commands.test {
+            awaitItem()
+
+            controller.onStepFinished("duck_ai", COMPLETED) { handoffRan = true }
+            advanceUntilIdle()
+            assertFalse(handoffRan)
+
+            // Advancing re-emits InProgress for the next step, which is what arms the hand-off.
+            orchestrator.stateFlow.value = inProgressState(canGoBack = true)
+            assertTrue(awaitItem() is SubscriptionOnboardingViewModel.Command.ShowStep)
+            assertFalse(handoffRan)
+
+            advanceUntilIdle()
+            val command = awaitItem()
+            assertTrue(command is SubscriptionOnboardingViewModel.Command.RunHandoff)
+            assertFalse(handoffRan)
+            (command as SubscriptionOnboardingViewModel.Command.RunHandoff).action()
+            assertTrue(handoffRan)
+        }
+    }
+
+    @Test
+    fun whenBackTappedDuringHandoffThenBackIsIgnoredAndHandoffStillRuns() = runTest {
+        orchestrator.stateFlow.value = inProgressState()
+        val testee = createViewModel()
+        testee.start()
+        advanceUntilIdle()
+
+        var handoffRan = false
+        testee.commands.test {
+            awaitItem()
+
+            controller.onStepFinished("duck_ai", COMPLETED) { handoffRan = true }
+            advanceUntilIdle()
+            // Advancing re-emits InProgress for the next step, which is what arms the hand-off.
+            orchestrator.stateFlow.value = inProgressState(canGoBack = true)
+            assertTrue(awaitItem() is SubscriptionOnboardingViewModel.Command.ShowStep)
+
+            // Back is ignored while the hand-off is in flight, so it emits nothing and the hand-off still runs.
+            controller.onBack()
+            advanceUntilIdle()
+            val command = awaitItem()
+            assertTrue(command is SubscriptionOnboardingViewModel.Command.RunHandoff)
+            (command as SubscriptionOnboardingViewModel.Command.RunHandoff).action()
+            assertTrue(handoffRan)
+        }
+    }
+
+    @Test
     fun whenExitThenFinishes() = runTest {
         val testee = createViewModel()
         testee.start()
@@ -169,7 +297,7 @@ class SubscriptionOnboardingViewModelTest {
 
     private fun inProgressState(
         canGoBack: Boolean = false,
-        stepPlugin: SubscriptionOnboardingStepPlugin = mock(),
+        stepPlugin: SubscriptionOnboardingStepPlugin = stepPluginMock(),
     ): InProgress {
         val plan = LinearOnboardingPlan(
             id = SUBSCRIPTION_ONBOARDING_PLAN_ID,
@@ -187,6 +315,17 @@ class SubscriptionOnboardingViewModelTest {
             currentStepIndex = 0,
             canGoBack = canGoBack,
         )
+    }
+
+    // Mockito returns false for an unstubbed Boolean, so back navigation has to be stubbed back to the
+    // interface default.
+    private fun stepPluginMock(allowsBackNavigation: Boolean = true): SubscriptionOnboardingStepPlugin =
+        mock<SubscriptionOnboardingStepPlugin>().also {
+            whenever(it.allowsBackNavigation).thenReturn(allowsBackNavigation)
+        }
+
+    private companion object {
+        const val TITLE_RES_ID = 42
     }
 
     private fun emptyPluginPoint() = object : PluginPoint<SubscriptionOnboardingStepPlugin> {

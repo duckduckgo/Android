@@ -58,4 +58,10 @@
     <string name="browserMenuForward">Eteenpäin</string>
     <string name="browserMenuRefresh">Päivitä</string>
     <string name="browserMenuFireTabsData">Poista välilehdet ja tiedot</string>
+
+    <!-- Duck.ai tab + menu -->
+    <string name="chatMenuPopupNewVoiceChat">Uusi äänikeskustelu</string>
+    <string name="chatMenuPopupNewImage">Uusi kuva</string>
+    <string name="chatMenuPopupNewTab">Uusi välilehti</string>
+    <string name="chatMenuPopupNewFireTab">Uusi Fire-välilehti</string>
 </resources>

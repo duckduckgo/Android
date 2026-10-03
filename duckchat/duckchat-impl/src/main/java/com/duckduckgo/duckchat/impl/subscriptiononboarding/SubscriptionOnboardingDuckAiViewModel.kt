@@ -31,6 +31,7 @@ import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.UserTier
 import com.duckduckgo.duckchat.impl.subscriptiononboarding.SubscriptionOnboardingDuckAiStepPlugin.Companion.DUCK_AI_STEP_ID
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.SKIPPED
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -79,8 +80,8 @@ class SubscriptionOnboardingDuckAiViewModel @Inject constructor(
             duckAiModelManager.modelState.value.models.firstOrNull { it.id == selectedId }?.let {
                 duckAiModelManager.selectModel(it)
             }
-            duckChat.openDuckChat(SUBSCRIPTION_ONBOARDING)
-            controller.exitOnboarding()
+            val duckAi = duckChat
+            controller.onStepFinished(DUCK_AI_STEP_ID, COMPLETED) { duckAi.openDuckChat(SUBSCRIPTION_ONBOARDING) }
         }
     }
 

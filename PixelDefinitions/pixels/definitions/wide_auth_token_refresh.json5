@@ -45,11 +45,6 @@
                 "enum": ["true", "false", ""]
             },
             {
-                "key": "feature.data.ext.serialization_enabled",
-                "description": "Whether refreshes were being serialized across processes with a cross-process lock, i.e. the value of the serializeTokenRefresh flag when the refresh started.",
-                "type": "boolean"
-            },
-            {
                 "key": "feature.data.ext.lock_outcome",
                 "description": "Outcome of acquiring the cross-process refresh lock. 'timeout' means another process held it for longer than the wait limit; the refresh then proceeds unserialized.",
                 "enum": ["acquired", "timeout", "error"]

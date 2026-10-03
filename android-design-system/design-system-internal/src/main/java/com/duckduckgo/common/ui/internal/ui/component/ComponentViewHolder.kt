@@ -79,6 +79,7 @@ import com.duckduckgo.common.ui.compose.listitem.DaxListItemIconBackground
 import com.duckduckgo.common.ui.compose.listitem.DaxListItemIconSize
 import com.duckduckgo.common.ui.compose.listitem.DaxListItemTrailingIconSize
 import com.duckduckgo.common.ui.compose.listitem.DaxOneLineListItem
+import com.duckduckgo.common.ui.compose.listitem.DaxSectionHeader
 import com.duckduckgo.common.ui.compose.listitem.DaxSettingsListItem
 import com.duckduckgo.common.ui.compose.listitem.DaxTwoLineListItem
 import com.duckduckgo.common.ui.compose.message.DaxAppTPBannerDisabled
@@ -643,6 +644,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
     class HeaderSectionComponentViewHolder(
         parent: ViewGroup,
+        private val isDarkTheme: Boolean,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_section_header_item)) {
         override fun bind(component: Component) {
             view.findViewById<SectionHeaderListItem>(R.id.sectionHeaderItemTitle).apply {
@@ -651,6 +653,10 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             view.findViewById<SectionHeaderListItem>(R.id.sectionHeaderWithOverflow).apply {
                 setOverflowMenuClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
                 revertUpperCaseTitleText()
+            }
+            val snackbar = ShowcaseSnackbar(view, component.name)
+            view.setupThemedComposeView(id = R.id.composeSectionHeader, isDarkTheme = isDarkTheme) {
+                ComposeSectionHeader(snackbar)
             }
         }
     }
@@ -1150,7 +1156,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.SEARCH_BAR -> SearchBarComponentViewHolder(parent)
                 Component.MENU_ITEM -> MenuItemComponentViewHolder(parent)
                 Component.POPUP_MENU_ITEM -> PopupMenuItemComponentViewHolder(parent)
-                Component.SECTION_HEADER_LIST_ITEM -> HeaderSectionComponentViewHolder(parent)
+                Component.SECTION_HEADER_LIST_ITEM -> HeaderSectionComponentViewHolder(parent, isDarkTheme)
                 Component.SINGLE_LINE_LIST_ITEM -> OneLineListItemComponentViewHolder(parent, isDarkTheme)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent, isDarkTheme)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent, isDarkTheme)
@@ -1186,6 +1192,19 @@ private class ShowcaseSnackbar(
     fun switch(checked: Boolean) = show("Switch checked: $checked")
 
     private fun show(message: String) = Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show()
+}
+
+@Composable
+private fun ComposeSectionHeader(snackbar: ShowcaseSnackbar) {
+    Column {
+        ComposeCaption()
+        DaxSectionHeader(title = "Section Header")
+        DaxSectionHeader(
+            title = "Section Header with Overflow Menu",
+            overflowMenuClickListener = { snackbar.trailingIcon() },
+            overflowMenuContentDescription = "Overflow menu",
+        )
+    }
 }
 
 @Composable

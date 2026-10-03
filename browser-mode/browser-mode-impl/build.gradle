@@ -43,7 +43,6 @@ dependencies {
     implementation project(path: ':browser-mode-api')
     implementation project(path: ':common-utils')
     implementation project(path: ':di')
-    implementation project(path: ':feature-toggles-api')
 
     implementation Google.dagger
     implementation KotlinX.coroutines.core
@@ -57,5 +56,4 @@ dependencies {
     testImplementation Testing.robolectric
     testImplementation AndroidX.test.ext.junit
     testImplementation project(':common-test')
-    testImplementation project(':feature-toggles-test')
 }

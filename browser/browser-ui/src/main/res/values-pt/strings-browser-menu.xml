@@ -58,4 +58,10 @@
     <string name="browserMenuForward">Avançar</string>
     <string name="browserMenuRefresh">Atualizar</string>
     <string name="browserMenuFireTabsData">Eliminar separadores e dados</string>
+
+    <!-- Duck.ai tab + menu -->
+    <string name="chatMenuPopupNewVoiceChat">Novo chat de voz</string>
+    <string name="chatMenuPopupNewImage">Nova imagem</string>
+    <string name="chatMenuPopupNewTab">Novo separador</string>
+    <string name="chatMenuPopupNewFireTab">Novo separador Fire</string>
 </resources>

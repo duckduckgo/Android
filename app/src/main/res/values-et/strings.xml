@@ -63,8 +63,8 @@
     <string name="undoSnackbarAction">Võta tagasi</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Jälgija blokeeritud</item>
-        <item quantity="other">Jälgijat blokeeritud</item>
+        <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">Jälgija blokeeritud</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">Jälgijat blokeeritud</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -223,7 +223,7 @@
     <string name="dataClearingDescription">Andmete kustutamine aitab kaitsta sinu privaatsust veebis. Andmete käsitsi kustutamiseks kasuta nuppu Fire Button või seadista automaatne kustutamine.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d sait välistati kustutamisest</item>
-        <item quantity="other">%1$d saiti välistati kustutamisest</item>
+        <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d saiti välistati kustutamisest</item>
     </plurals>
     <string name="dataClearingAutomaticClearingOn">Sees</string>
     <string name="dataClearingAutomaticClearingOff">Väljas</string>
@@ -250,8 +250,8 @@
     <string name="singleTabFireDialogSubtitleSiteData">Saidi andmete kustutamine võib sind kontodelt välja logida.</string>
     <string name="singleTabFireDialogSubtitleDownloads">See tühistab pooleliolevad allalaadimised.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">%1$d vahekaart ja selle andmed kustutatud</item>
-        <item quantity="other">%1$d vahekaarti ja nende andmed kustutatud</item>
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">%1$d vahekaart ja selle andmed kustutatud</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">%1$d vahekaarti ja nende andmed kustutatud</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Saidi andmeid ei saanud kustutada. Värskendage WebView\'d.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Saidi andmeid ei saanud vea tõttu kustutada.</string>
@@ -766,12 +766,12 @@
     <string name="onboardingSerpDaxDialogButton">Sain aru!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Järgmisena proovi mõnda saiti külastada!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
-        <item quantity="one"><![CDATA[ ja <b>veel %1$d teine</b> üritas sind siin jälgida. Ma blokeerisin need!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile.]]></item>
-        <item quantity="other"><![CDATA[ ja <b>veel %1$d teist</b> üritasid sind siin jälgida. Ma blokeerisin need!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile.]]></item>
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[ ja <b>veel %1$d teine</b> üritas sind siin jälgida. Ma blokeerisin need!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile.]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[ ja <b>veel %1$d teist</b> üritasid sind siin jälgida. Ma blokeerisin need!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile.]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ üritas sind siin jälgida. Ma blokeerisin selle!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile. ️]]></item>
-        <item quantity="other"><![CDATA[ üritasid sind siin jälgida. Ma blokeerisin need!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile.]]></item>
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[ üritas sind siin jälgida. Ma blokeerisin selle!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile. ️]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[ üritasid sind siin jälgida. Ma blokeerisin need!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile.]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Sain aru!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Tühjendage oma sirvimistegevus hetkega <b>Fire Button</b> abil.<br/><br/>Proovige! 🔥]]></string>
@@ -977,9 +977,6 @@
     <string name="preOnboardingImportErrorRetry">Proovi uuesti</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Lisa mind oma lemmikute reale.</string>
-    <string name="preOnboardingAddToDockBody">Leia oma avakuvalt DuckDuckGo ikoon. Seejärel vajuta ja lohista see oma kohale. See ongi kõik!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Sain aru!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Alusta privaatset AI-vestlust Duck.ai-ga või lülita sisse, et otsida kaitstud sirvimist.<br/><br/>Saad Duck.ai\'t kasutada kõikjal, kus näed vestluse ikooni]]></string>

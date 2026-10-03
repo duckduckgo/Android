@@ -137,6 +137,8 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val isProgressBarUpgradeEnabled = progressBarUpgradeFeature.behaviourUpdate().isEnabled()
     private val isProgressBarIndeterminateEnabled =
         isProgressBarUpgradeEnabled && progressBarUpgradeFeature.indeterminateFallback().isEnabled()
+    private val isAnimationUpdateEnabled =
+        isProgressBarUpgradeEnabled && progressBarUpgradeFeature.animationConfigUpdate().isEnabled()
     private val addressBarRebrandToggle = appBrandDesignUpdateToggles.addressBar()
     private var isSetFavouriteEasterEggLogoFeatureEnabled: Boolean = false
 
@@ -153,6 +155,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             isProgressBarUpgradeEnabled = isProgressBarUpgradeEnabled,
             isProgressBarIndeterminateEnabled = isProgressBarIndeterminateEnabled,
             isAddressBarRebrandEnabled = addressBarRebrandToggle.isEnabled(),
+            isAnimationUpdateEnabled = isAnimationUpdateEnabled,
         ),
     )
 
@@ -275,6 +278,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val isProgressBarIndeterminateEnabled: Boolean = false,
         val enabledState: EnabledState = EnabledState.ALL,
         val isAddressBarRebrandEnabled: Boolean = false,
+        val isAnimationUpdateEnabled: Boolean = false,
     ) {
         /**
          * The Duck.ai entry icon shows the chevron-down (contextual sheet) variant when the native

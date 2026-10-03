@@ -23,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.AIChatModel
@@ -75,9 +76,13 @@ class ModelPickerViewModel @Inject constructor(
     private val duckAiChatStore: DuckAiChatStore,
     private val effectiveModelProvider: EffectiveModelProvider,
     private val duckChatFeature: DuckChatFeature,
+    private val duckChatInternal: DuckChatInternal,
 ) : ViewModel() {
 
     val state: StateFlow<ModelState> = modelManager.modelState
+
+    /** FE recovery "Switch Model" events, carrying the target tabId. The view filters to its own tab. */
+    val showPickerEvents: Flow<String> = duckChatInternal.showModelPickerEvents
 
     private val currentChat = MutableStateFlow<DuckAiChat?>(null)
 

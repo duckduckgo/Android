@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Package visibility: without this, the query for credential exporters returns nothing on Android 11+. -->
+    <queries>
+        <intent>
+            <action android:name="androidx.identitycredentials.action.IMPORT_CREDENTIALS" />
+            <data android:scheme="content" android:mimeType="application/octet-stream" />
+        </intent>
+        <intent>
+            <action android:name="androidx.identitycredentials.action.IMPORT_CREDENTIALS" />
+            <data android:scheme="content" />
+        </intent>
+    </queries>
+
+</manifest>

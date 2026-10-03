@@ -18,6 +18,7 @@ package com.duckduckgo.app.generalsettings.showonapplaunch.store
 
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,9 +40,17 @@ class FakeShowOnAppLaunchOptionDataStore(defaultOption: ShowOnAppLaunchOption? =
 
     override suspend fun hasOptionSelected(): Boolean = optionSelected
 
+    var setShowOnAppLaunchOptionCallCount = 0
+        private set
+
     override suspend fun setShowOnAppLaunchOption(showOnAppLaunchOption: ShowOnAppLaunchOption) {
+        setShowOnAppLaunchOptionCallCount++
         optionSelected = true
         currentOptionStateFlow.value = showOnAppLaunchOption
+        if (showOnAppLaunchOption is SpecificPage) {
+            resolvedPageUrl = null
+            showOnAppLaunchTabId = null
+        }
     }
 
     override suspend fun setSpecificPageUrl(url: String) {

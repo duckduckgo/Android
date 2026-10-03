@@ -59,13 +59,13 @@
                 "key": "feature.data.ext.session_duration_ms_bucketed",
                 "type": "string",
                 "description": "Duration from foreground to session end, bucketed (lower end of bucket, in ms)",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.time_to_first_interaction_ms_bucketed",
                 "type": "string",
                 "description": "Time from session start to the first user interaction with the landing surface, including a successful terminal action; absent if the session ends without interaction. Bucketed (lower end of bucket, in ms)",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.focused",
@@ -110,6 +110,8 @@
                     "browsing_menu_ntp",
                     "browsing_menu_webpage",
                     "tab_switcher",
+                    "tab_switcher_existing_chat",
+                    "return_to_chat_card",
                     "chat_history_new_chat",
                     "chat_history_open_chat",
                     "voice",

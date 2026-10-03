@@ -18,12 +18,7 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import app.cash.turbine.test
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewModel.Command.ShowTimeoutDialog
-import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
-import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
-import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
-import com.duckduckgo.app.generalsettings.showonapplaunch.store.FakeShowOnAppLaunchOptionDataStore
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -32,8 +27,10 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
-import kotlinx.coroutines.flow.flowOf
+import com.duckduckgo.settings.api.AfterInactivityReturnDestination
+import com.duckduckgo.settings.api.AfterInactivitySettings
+import com.duckduckgo.settings.api.AfterInactivitySettingsDataProvider
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -43,7 +40,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 class ShowOnAppLaunchViewModelTest {
 
@@ -51,27 +47,19 @@ class ShowOnAppLaunchViewModelTest {
     val coroutineTestRule = CoroutineTestRule()
 
     private lateinit var testee: ShowOnAppLaunchViewModel
-    private lateinit var fakeDataStore: FakeShowOnAppLaunchOptionDataStore
     private val dispatcherProvider: DispatcherProvider = coroutineTestRule.testDispatcherProvider
     private val fakeBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
-    private val settingsDataStore: SettingsDataStore = mock()
+    private val providerSettings = MutableStateFlow<AfterInactivitySettings>(AfterInactivitySettings.LastUsedTab)
+    private val fakeProvider = FakeAfterInactivitySettingsDataProvider(providerSettings)
     private val pixel: Pixel = mock()
-    private val ntpAfterIdleManager: NtpAfterIdleManager = mock()
 
     @Before
     fun setup() {
-        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(null)
-        whenever(ntpAfterIdleManager.returnToLastTabEnabled).thenReturn(flowOf(true))
-        fakeDataStore = FakeShowOnAppLaunchOptionDataStore(LastOpenedTab)
         testee = ShowOnAppLaunchViewModel(
             dispatcherProvider,
-            fakeDataStore,
-            FakeUrlConverter(),
+            fakeProvider,
             fakeBrowserConfigFeature,
-            settingsDataStore,
             pixel,
-            ntpAfterIdleManager,
-            RealIdleThresholdResolver(fakeBrowserConfigFeature),
         )
     }
 
@@ -79,48 +67,92 @@ class ShowOnAppLaunchViewModelTest {
     fun whenViewModelInitializedThenInitialStateIsCorrect() = runTest {
         testee.viewState.test {
             val initialState = awaitItem()
-            assertEquals(LastOpenedTab, initialState.selectedOption)
-            assertEquals("https://duckduckgo.com", initialState.specificPageUrl)
+            assertEquals(AfterInactivitySettings.LastUsedTab, initialState.selectedOption)
+            assertEquals("https://duckduckgo.com/", initialState.specificPageUrl)
         }
     }
 
     @Test
     fun whenShowOnAppLaunchOptionChangedThenStateIsUpdated() = runTest {
-        testee.onShowOnAppLaunchOptionChanged(NewTabPage)
+        testee.onShowOnAppLaunchOptionChanged(AfterInactivityReturnDestination.NewTabPage())
+
         testee.viewState.test {
             val updatedState = awaitItem()
-            assertEquals(NewTabPage, updatedState.selectedOption)
+            assertEquals(AfterInactivitySettings.NewTabPage(300L, true), updatedState.selectedOption)
         }
     }
 
     @Test
-    fun whenSpecificPageUrlSetThenStateIsUpdated() = runTest {
+    fun whenShowOnAppLaunchOptionChangedThenProviderReceivesDestination() = runTest {
+        testee.onShowOnAppLaunchOptionChanged(AfterInactivityReturnDestination.NewTabPage())
+
+        assertEquals(listOf(AfterInactivityReturnDestination.NewTabPage()), fakeProvider.destinations)
+    }
+
+    @Test
+    fun whenLaunchOptionChangedToLastOpenedTabThenPixelsFired() = runTest {
+        testee.onShowOnAppLaunchOptionChanged(AfterInactivityReturnDestination.LastUsedTab)
+
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_LAST_OPENED_TAB, type = Count)
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_LAST_OPENED_TAB_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenLaunchOptionChangedToNewTabPageThenPixelsFired() = runTest {
+        testee.onShowOnAppLaunchOptionChanged(AfterInactivityReturnDestination.NewTabPage())
+
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_NEW_TAB_PAGE, type = Count)
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_NEW_TAB_PAGE_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenLaunchOptionChangedToSpecificPageThenPixelsFired() = runTest {
+        testee.onShowOnAppLaunchOptionChanged(AfterInactivityReturnDestination.SpecificPage(url = "https://example.com"))
+
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_SPECIFIC_PAGE, type = Count)
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_SPECIFIC_PAGE_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenSpecificPageUrlSetWhileSpecificPageSelectedThenStateIsUpdated() = runTest {
         val newUrl = "https://example.com"
 
-        testee.setSpecificPageUrl(newUrl)
         testee.viewState.test {
+            awaitItem()
+            providerSettings.value = specificPage(url = "https://old.example/")
+            awaitItem()
+
+            testee.setSpecificPageUrl(newUrl)
+
             val updatedState = awaitItem()
             assertEquals(newUrl, updatedState.specificPageUrl)
         }
     }
 
     @Test
+    fun whenSpecificPageUrlSetWhileAnotherOptionSelectedThenProviderNotCalled() = runTest {
+        providerSettings.value = AfterInactivitySettings.LastUsedTab
+
+        testee.setSpecificPageUrl("https://example.com")
+
+        assertTrue(fakeProvider.destinations.isEmpty())
+    }
+
+    @Test
     fun whenMultipleOptionsChangedThenStateIsUpdatedCorrectly() = runTest {
-        testee.onShowOnAppLaunchOptionChanged(NewTabPage)
-        testee.onShowOnAppLaunchOptionChanged(LastOpenedTab)
+        testee.onShowOnAppLaunchOptionChanged(AfterInactivityReturnDestination.NewTabPage())
+        testee.onShowOnAppLaunchOptionChanged(AfterInactivityReturnDestination.LastUsedTab)
+
         testee.viewState.test {
             val updatedState = awaitItem()
-            assertEquals(LastOpenedTab, updatedState.selectedOption)
+            assertEquals(AfterInactivitySettings.LastUsedTab, updatedState.selectedOption)
         }
     }
 
     @Test
     fun whenShowNTPAfterIdleReturnDisabledThenViewStateFalse() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(false))
-        testee = ShowOnAppLaunchViewModel(
-            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
-            RealIdleThresholdResolver(fakeBrowserConfigFeature),
-        )
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -131,10 +163,7 @@ class ShowOnAppLaunchViewModelTest {
     @Test
     fun whenShowNTPAfterIdleReturnEnabledThenViewStateTrue() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
-        testee = ShowOnAppLaunchViewModel(
-            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
-            RealIdleThresholdResolver(fakeBrowserConfigFeature),
-        )
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -142,15 +171,10 @@ class ShowOnAppLaunchViewModelTest {
         }
     }
 
-    // --- selectedIdleThresholdSeconds resolution ---
-
     @Test
-    fun whenNoSettingsAndNoUserPrefThenSelectedIsDefaultFiveMinutes() = runTest {
+    fun whenNoSettingsObservedYetThenSelectedIsDefaultFiveMinutes() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
-        testee = ShowOnAppLaunchViewModel(
-            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
-            RealIdleThresholdResolver(fakeBrowserConfigFeature),
-        )
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -159,14 +183,10 @@ class ShowOnAppLaunchViewModelTest {
     }
 
     @Test
-    fun whenRCDefaultSetThenSelectedIsRCDefault() = runTest {
-        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(
-            Toggle.State(true, settings = """{"defaultIdleThresholdSeconds":60}"""),
-        )
-        testee = ShowOnAppLaunchViewModel(
-            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
-            RealIdleThresholdResolver(fakeBrowserConfigFeature),
-        )
+    fun whenNewTabPageSettingsObservedThenSelectedIsEffectiveTimeout() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
+        providerSettings.value = newTabPage(effectiveTimeoutSeconds = 60L)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -175,124 +195,217 @@ class ShowOnAppLaunchViewModelTest {
     }
 
     @Test
-    fun whenUserPreferenceSetThenSelectedIsUserPreference() = runTest {
-        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(0L)
-        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(
-            Toggle.State(true, settings = """{"defaultIdleThresholdSeconds":300}"""),
-        )
-        testee = ShowOnAppLaunchViewModel(
-            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
-            RealIdleThresholdResolver(fakeBrowserConfigFeature),
-        )
+    fun whenLastUsedTabSelectedAfterATimeoutWasObservedThenDefaultTimeoutIsUsed() = runTest {
+        // The timeout row is hidden for LastUsedTab, so its value is never shown to the user and
+        // does not need to be remembered across option switches.
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
+        providerSettings.value = newTabPage(effectiveTimeoutSeconds = 60L)
+
+        providerSettings.value = AfterInactivitySettings.LastUsedTab
 
         testee.viewState.test {
+            val state = awaitItem()
+            assertEquals(FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_SECONDS, state.selectedIdleThresholdSeconds)
+        }
+    }
+
+    @Test
+    fun whenLastUsedTabSelectedThenTimeoutRowIsHidden() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
+        providerSettings.value = AfterInactivitySettings.LastUsedTab
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.showAfterInactivityTimeout)
+        }
+    }
+
+    @Test
+    fun whenNewTabPageSelectedThenTimeoutRowIsShown() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
+        providerSettings.value = newTabPage()
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.showAfterInactivityTimeout)
+        }
+    }
+
+    @Test
+    fun whenSpecificPageSelectedThenTimeoutRowIsShown() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
+        providerSettings.value = specificPage()
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.showAfterInactivityTimeout)
+        }
+    }
+
+    @Test
+    fun whenShowNTPAfterIdleReturnDisabledThenTimeoutRowIsHiddenRegardlessOfOption() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(false))
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
+        providerSettings.value = newTabPage()
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.showAfterInactivityTimeout)
+        }
+    }
+
+    @Test
+    fun whenTimeoutSelectedForNewTabPageThenProviderReceivesNewTabPageDestination() = runTest {
+        testee.viewState.test {
+            awaitItem()
+            providerSettings.value = newTabPage()
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.onTimeoutSelected(60L)
+
+        assertEquals(
+            listOf(AfterInactivityReturnDestination.NewTabPage(selectedTimeoutSeconds = 60L)),
+            fakeProvider.destinations,
+        )
+    }
+
+    @Test
+    fun whenTimeoutSelectedForSpecificPageThenProviderReceivesSpecificPageDestinationRetainingUrl() = runTest {
+        testee.viewState.test {
+            awaitItem()
+            providerSettings.value = specificPage(url = "https://kept.example/")
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.onTimeoutSelected(60L)
+
+        assertEquals(
+            listOf(AfterInactivityReturnDestination.SpecificPage(url = "https://kept.example/", selectedTimeoutSeconds = 60L)),
+            fakeProvider.destinations,
+        )
+    }
+
+    @Test
+    fun whenTimeoutSelectedWhileLastUsedTabSelectedThenProviderNotCalled() = runTest {
+        providerSettings.value = AfterInactivitySettings.LastUsedTab
+
+        testee.onTimeoutSelected(60L)
+
+        assertTrue(fakeProvider.destinations.isEmpty())
+    }
+
+    @Test
+    fun whenTimeoutSelectedThenSavesPreferenceAndFiresPixel() = runTest {
+        testee.viewState.test {
+            awaitItem()
+            providerSettings.value = newTabPage()
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.onTimeoutSelected(60L)
+
+        verify(pixel).fire(SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED, mapOf("selectedSeconds" to "60"))
+    }
+
+    @Test
+    fun whenTimeoutSelectedThenViewStateUpdated() = runTest {
+        testee.viewState.test {
+            awaitItem()
+            providerSettings.value = newTabPage()
+            awaitItem()
+
+            testee.onTimeoutSelected(0L)
+
             val state = awaitItem()
             assertEquals(0L, state.selectedIdleThresholdSeconds)
         }
     }
 
     @Test
-    fun whenSettingsHaveInvalidJsonThenDefaultsUsed() = runTest {
-        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(
-            Toggle.State(true, settings = """invalid"""),
-        )
-        testee = ShowOnAppLaunchViewModel(
-            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
-            RealIdleThresholdResolver(fakeBrowserConfigFeature),
-        )
-
+    fun whenReturnToLastTabToggledOffWhileNewTabPageSelectedThenProviderReceivesDestination() = runTest {
         testee.viewState.test {
-            val state = awaitItem()
-            assertEquals(300L, state.selectedIdleThresholdSeconds)
+            awaitItem()
+            providerSettings.value = newTabPage()
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
         }
-    }
 
-    // --- onTimeoutSelected ---
-
-    @Test
-    fun whenTimeoutSelectedThenSavesPreferenceAndFiresPixel() = runTest {
-        testee.onTimeoutSelected(60L)
-        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-
-        verify(settingsDataStore).userSelectedIdleThresholdSeconds = 60L
-        verify(pixel).fire(SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED, mapOf("selectedSeconds" to "60"))
-    }
-
-    @Test
-    fun whenTimeoutSelectedThenIdleTimeoutSelectedNotified() = runTest {
-        testee.onTimeoutSelected(300L)
-        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-
-        verify(ntpAfterIdleManager).onIdleTimeoutSelected(300L)
-    }
-
-    @Test
-    fun whenReturnToLastTabToggledOffThenSettingPersistedAndDisabledPixelsFired() = runTest {
         testee.onReturnToLastTabToggled(false)
-        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(ntpAfterIdleManager).setReturnToLastTabEnabled(false)
-        verify(pixel).fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_DISABLED, type = Count)
-        verify(pixel).fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_DISABLED_DAILY, type = Daily())
+        assertEquals(
+            listOf(AfterInactivityReturnDestination.NewTabPage(returnToLastTabShortcutEnabled = false)),
+            fakeProvider.destinations,
+        )
+    }
+
+    @Test
+    fun whenReturnToLastTabToggledOnWhileNewTabPageSelectedThenProviderReceivesDestination() = runTest {
+        testee.viewState.test {
+            awaitItem()
+            providerSettings.value = newTabPage()
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.onReturnToLastTabToggled(true)
+
+        assertEquals(
+            listOf(AfterInactivityReturnDestination.NewTabPage(returnToLastTabShortcutEnabled = true)),
+            fakeProvider.destinations,
+        )
+    }
+
+    @Test
+    fun whenReturnToLastTabToggledWhileNotNewTabPageSelectedThenProviderNotCalled() = runTest {
+        providerSettings.value = AfterInactivitySettings.LastUsedTab
+
+        testee.onReturnToLastTabToggled(true)
+
+        assertTrue(fakeProvider.destinations.isEmpty())
     }
 
     @Test
     fun whenReturnToLastTabToggledOnThenSettingPersistedAndEnabledPixelsFired() = runTest {
-        testee.onReturnToLastTabToggled(true)
-        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+        testee.viewState.test {
+            awaitItem()
+            providerSettings.value = newTabPage()
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
 
-        verify(ntpAfterIdleManager).setReturnToLastTabEnabled(true)
+        testee.onReturnToLastTabToggled(true)
+
         verify(pixel).fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_ENABLED, type = Count)
         verify(pixel).fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_ENABLED_DAILY, type = Daily())
     }
 
     @Test
-    fun whenLaunchOptionChangedToNewTabPageThenPixelsFired() = runTest {
-        testee.onShowOnAppLaunchOptionChanged(NewTabPage)
-        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-
-        verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_NEW_TAB_PAGE, type = Count)
-        verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_NEW_TAB_PAGE_DAILY, type = Daily())
-    }
-
-    @Test
-    fun whenLaunchOptionChangedToLastOpenedTabThenPixelsFired() = runTest {
-        testee.onShowOnAppLaunchOptionChanged(LastOpenedTab)
-        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-
-        verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_LAST_OPENED_TAB, type = Count)
-        verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_LAST_OPENED_TAB_DAILY, type = Daily())
-    }
-
-    @Test
-    fun whenLaunchOptionChangedToSpecificPageThenPixelsFired() = runTest {
-        testee.onShowOnAppLaunchOptionChanged(SpecificPage("example.com"))
-        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-
-        verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_SPECIFIC_PAGE, type = Count)
-        verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_SPECIFIC_PAGE_DAILY, type = Daily())
-    }
-
-    @Test
-    fun whenTimeoutSelectedThenViewStateUpdated() = runTest {
-        testee.onTimeoutSelected(0L)
-        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-
+    fun whenReturnToLastTabToggledOffThenSettingPersistedAndDisabledPixelsFired() = runTest {
         testee.viewState.test {
-            val state = awaitItem()
-            assertEquals(0L, state.selectedIdleThresholdSeconds)
+            awaitItem()
+            providerSettings.value = newTabPage()
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
         }
-    }
 
-    // --- idleThresholdOptions ---
+        testee.onReturnToLastTabToggled(false)
+
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_DISABLED, type = Count)
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_DISABLED_DAILY, type = Daily())
+    }
 
     @Test
     fun whenViewStateCreatedThenDefaultOptionsExposed() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
-        testee = ShowOnAppLaunchViewModel(
-            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
-            RealIdleThresholdResolver(fakeBrowserConfigFeature),
-        )
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -300,15 +413,11 @@ class ShowOnAppLaunchViewModelTest {
         }
     }
 
-    // --- onTimeoutRowClicked command ---
-
     @Test
     fun whenTimeoutRowClickedThenEmitsShowTimeoutDialogCommand() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
-        testee = ShowOnAppLaunchViewModel(
-            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
-            RealIdleThresholdResolver(fakeBrowserConfigFeature),
-        )
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
+        providerSettings.value = newTabPage(effectiveTimeoutSeconds = 300L)
 
         testee.commands.test {
             testee.onTimeoutRowClicked()
@@ -320,10 +429,43 @@ class ShowOnAppLaunchViewModelTest {
         }
     }
 
-    private class FakeUrlConverter : UrlConverter {
+    private fun newTabPage(
+        effectiveTimeoutSeconds: Long = 300L,
+        returnToLastTabShortcutEnabled: Boolean = true,
+    ) = AfterInactivitySettings.NewTabPage(
+        effectiveTimeoutSeconds = effectiveTimeoutSeconds,
+        returnToLastTabShortcutEnabled = returnToLastTabShortcutEnabled,
+    )
 
-        override fun convertUrl(url: String?): String {
-            return url ?: "https://duckduckgo.com"
+    private fun specificPage(
+        url: String = "https://duckduckgo.com/",
+        effectiveTimeoutSeconds: Long = 300L,
+    ) = AfterInactivitySettings.SpecificPage(
+        url = url,
+        effectiveTimeoutSeconds = effectiveTimeoutSeconds,
+    )
+
+    private class FakeAfterInactivitySettingsDataProvider(
+        override val settings: MutableStateFlow<AfterInactivitySettings>,
+    ) : AfterInactivitySettingsDataProvider {
+        val destinations = mutableListOf<AfterInactivityReturnDestination>()
+        private var effectiveTimeoutSeconds = 300L
+        private var shortcutEnabled = true
+
+        override suspend fun setDestination(destination: AfterInactivityReturnDestination) {
+            destinations += destination
+            settings.value = when (destination) {
+                AfterInactivityReturnDestination.LastUsedTab -> AfterInactivitySettings.LastUsedTab
+                is AfterInactivityReturnDestination.NewTabPage -> {
+                    effectiveTimeoutSeconds = destination.selectedTimeoutSeconds ?: effectiveTimeoutSeconds
+                    shortcutEnabled = destination.returnToLastTabShortcutEnabled ?: shortcutEnabled
+                    AfterInactivitySettings.NewTabPage(effectiveTimeoutSeconds, shortcutEnabled)
+                }
+                is AfterInactivityReturnDestination.SpecificPage -> {
+                    effectiveTimeoutSeconds = destination.selectedTimeoutSeconds ?: effectiveTimeoutSeconds
+                    AfterInactivitySettings.SpecificPage(destination.url, effectiveTimeoutSeconds)
+                }
+            }
         }
     }
 }

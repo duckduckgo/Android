@@ -227,7 +227,7 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         if (!isRebrandUpdate) return
 
         val shown = dialog ?: return
-        shown.window?.setLayout(cardWidth(), WindowManager.LayoutParams.WRAP_CONTENT)
+        shown.window?.setLayout(context.rebrandDialogCardWidth(), WindowManager.LayoutParams.WRAP_CONTENT)
         shown.window?.decorView?.addOnAttachStateChangeListener(
             object : View.OnAttachStateChangeListener {
                 override fun onViewAttachedToWindow(view: View) = Unit
@@ -238,12 +238,6 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             },
         )
         registerConfigurationCallback()
-    }
-
-    private fun cardWidth(): Int {
-        val maxWidth = context.resources.getDimensionPixelSize(R.dimen.rebrandDialogMaxWidth)
-        val margin = context.resources.getDimensionPixelSize(R.dimen.keyline_5)
-        return minOf(maxWidth, context.resources.displayMetrics.widthPixels - margin * 2)
     }
 
     /**
@@ -298,9 +292,7 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         if (headerImageDrawableId > 0) {
             binding.stackedAlertDialogImage.setImageResource(headerImageDrawableId)
             if (isRebrandUpdate) {
-                val inset = context.resources.getDimensionPixelSize(R.dimen.rebrandDialogIconInset)
-                binding.stackedAlertDialogImage.setBackgroundResource(R.drawable.background_dialog_icon_circular)
-                binding.stackedAlertDialogImage.setPadding(inset, inset, inset, inset)
+                binding.stackedAlertDialogImage.applyRebrandHeaderIconStyle()
                 binding.stackedAlertDialogTitle.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                     topMargin = context.resources.getDimensionPixelSize(R.dimen.keyline_4)
                 }

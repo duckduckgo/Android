@@ -163,7 +163,11 @@ class SubscriptionWebViewViewModel @Inject constructor(
                             JSONObject(PURCHASE_COMPLETED_JSON),
                         ),
                         isFreeTrial = it.isFreeTrial,
-                        launchOnboarding = subscriptionsFeature.onboardingSubscriptionExperiment().isEnabled(),
+                        launchOnboarding = if (it.isFreeTrial) {
+                            subscriptionsFeature.onboardingSubscriptionExperiment().isEnabled()
+                        } else {
+                            subscriptionsFeature.onboardingSubscriptionExperimentMonthly().isEnabled()
+                        },
                     )
                 }
                 is CurrentPurchase.InProgress, CurrentPurchase.PreFlowInProgress -> InProgress

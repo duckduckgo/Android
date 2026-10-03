@@ -46,10 +46,10 @@
     <string name="atp_OnInitialNotification">"Защита от слежки включена и блокирует попытки отслеживания во всех приложениях"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Выполняется поиск трекеров... бип-бип"</string>
     <plurals name="atp_OnNotification">
-        <item quantity="one"><![CDATA[ Пресечены попытки отслеживания <b>в %1$d приложении</b> (за последний час).]]></item>
+        <item quantity="one" instruction="Placeholder is a number"><![CDATA[ Пресечены попытки отслеживания <b>в %1$d приложении</b> (за последний час).]]></item>
         <item quantity="few"><![CDATA[ Пресечены попытки отслеживания <b>в %1$d приложениях</b> (за последний час).]]></item>
         <item quantity="many"><![CDATA[ Пресечены попытки отслеживания <b>в %1$d приложениях</b> (за последний час).]]></item>
-        <item quantity="other"><![CDATA[ Пресечены попытки отслеживания <b>в %1$d приложении</b> (за последний час).]]></item>
+        <item quantity="other" instruction="Placeholder is a number"><![CDATA[ Пресечены попытки отслеживания <b>в %1$d приложении</b> (за последний час).]]></item>
     </plurals>
     <string name="atp_DisabledNotification">Защита от слежки выключена. Нажмите для возобновления защиты.</string>
     <string name="atp_RevokedNotification">Приложение VPN отключило защиту от слежки. Нажмите, чтобы включить ее.</string>
@@ -61,17 +61,17 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ Пресечены <b>попытки отслеживания (%1$d) в %2$d приложениях, включая %3$s</b> (за последний день).]]></string>
 
     <plurals name="atp_DailyTopCompanyNotification">
-        <item quantity="one"><![CDATA[Компания %1$s пыталась отследить вас <b>через %2$d приложение</b> (за последний день). <b>Подробнее...</b>]]></item>
+        <item quantity="one" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[Компания %1$s пыталась отследить вас <b>через %2$d приложение</b> (за последний день). <b>Подробнее...</b>]]></item>
         <item quantity="few"><![CDATA[Компания %1$s пыталась отследить вас <b>через %2$d приложения</b> (за последний день). <b>Подробнее...</b>]]></item>
         <item quantity="many"><![CDATA[Компания %1$s пыталась отследить вас <b>через %2$d приложений</b> (за последний день). <b>Подробнее...</b>]]></item>
-        <item quantity="other"><![CDATA[Компания %1$s пыталась отследить вас <b>через %2$d приложения</b> (за последний день). <b>Подробнее...</b>]]></item>
+        <item quantity="other" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[Компания %1$s пыталась отследить вас <b>через %2$d приложения</b> (за последний день). <b>Подробнее...</b>]]></item>
     </plurals>
 
     <plurals name="atp_DailyCompanyBlockedNotification">
-        <item quantity="one"><![CDATA[Больше всего попыток отслеживания пресечено в <b>%1$s</b> (за последний день).]]></item>
+        <item quantity="one" instruction="Placeholder is the name of an app"><![CDATA[Больше всего попыток отслеживания пресечено в <b>%1$s</b> (за последний день).]]></item>
         <item quantity="few"><![CDATA[Больше всего попыток отслеживания пресечено в <b>%1$s</b> и <b>%2$s</b> (за последний день).]]></item>
         <item quantity="many"><![CDATA[Больше всего попыток отслеживания пресечено в <b>%1$s</b> и <b>%2$s</b> (за последний день).]]></item>
-        <item quantity="other"><![CDATA[Больше всего попыток отслеживания пресечено в <b>%1$s</b> и <b>%2$s</b> (за последний день).]]></item>
+        <item quantity="other" instruction="Both placeholders are the name of an app"><![CDATA[Больше всего попыток отслеживания пресечено в <b>%1$s</b> и <b>%2$s</b> (за последний день).]]></item>
     </plurals>
 
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Заблокировано <b>%1$s %2$d раз в %3$s</b> (за последний день).]]></string>
@@ -91,10 +91,10 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[Функция App Tracking Protection пресекла <b>попытки отслеживания (%1$d) в %2$s</b> и %3$d других приложениях (за последнюю неделю).]]></string>
 
     <plurals name="atp_WeeklyCompanyTeaserNotification">
-        <item quantity="one"><![CDATA[Заблокировано <b>%1$s в %2$d приложении — %3$s</b> (за последнюю неделю).]]></item>
+        <item quantity="one" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Заблокировано <b>%1$s в %2$d приложении — %3$s</b> (за последнюю неделю).]]></item>
         <item quantity="few"><![CDATA[Заблокировано <b>%1$s в %2$d приложениях, включая %3$s</b> (за последнюю неделю).]]></item>
         <item quantity="many"><![CDATA[Заблокировано <b>%1$s в %2$d приложениях, включая %3$s</b> (за последнюю неделю).]]></item>
-        <item quantity="other"><![CDATA[Заблокировано <b>%1$s в %2$d приложениях, включая %3$s</b> (за последнюю неделю).]]></item>
+        <item quantity="other" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of one of the apps where it happened"><![CDATA[Заблокировано <b>%1$s в %2$d приложениях, включая %3$s</b> (за последнюю неделю).]]></item>
     </plurals>
 
     <string name="atp_EnableCTA">Включить защиту от слежки</string>
@@ -281,16 +281,16 @@
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">
-        <item quantity="one">%1$d попытка. Обычно собирает:</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d попытка. Обычно собирает:</item>
         <item quantity="few">%1$d попытки. Обычно собирает:</item>
         <item quantity="many">%1$d попыток. Обычно собирает:</item>
-        <item quantity="other">Попыток: %1$d. Обычно собирает:</item>
+        <item quantity="other" instruction="Placeholder is a number">Попыток: %1$d. Обычно собирает:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">DuckDuckGo пресек %1$d попытку отслеживания</item>
+        <item quantity="one" instruction="Placeholder is a number">DuckDuckGo пресек %1$d попытку отслеживания</item>
         <item quantity="few">DuckDuckGo пресек %1$d попытки отслеживания</item>
         <item quantity="many">DuckDuckGo пресек %1$d попыток отслеживания</item>
-        <item quantity="other">DuckDuckGo пресек попытки отслеживания (%1$d)</item>
+        <item quantity="other" instruction="Placeholder is a number">DuckDuckGo пресек попытки отслеживания (%1$d)</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Сообщить о проблеме с приложением</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Показать еще %1$d</string>

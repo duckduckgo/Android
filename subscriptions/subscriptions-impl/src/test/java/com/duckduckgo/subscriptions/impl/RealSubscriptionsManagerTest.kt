@@ -106,7 +106,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import retrofit2.HttpException
@@ -130,11 +129,7 @@ class RealSubscriptionsManagerTest {
     private val authDataStore: FakeSubscriptionsDataStore = FakeSubscriptionsDataStore()
     private val serpPromo = FakeSerpPromo()
 
-    @SuppressLint("DenyListedApi")
     private val subscriptionsFeature: SubscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
-        .apply {
-            serializeTokenRefresh().setRawStoredState(State(true))
-        }
     private val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo, { subscriptionsFeature })
     private val playBillingManager: PlayBillingManager = mock()
     private val context: Context = mock()
@@ -1300,22 +1295,6 @@ class RealSubscriptionsManagerTest {
         verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenDetected()
         verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenSignedOut()
         verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenRecovered()
-    }
-
-    @Test
-    @SuppressLint("DenyListedApi")
-    fun whenSerializeTokenRefreshDisabledThenRefreshDoesNotUseCrossProcessLock() = runTest {
-        subscriptionsFeature.serializeTokenRefresh().setRawStoredState(State(false))
-        givenUserIsSignedIn()
-        givenAccessTokenIsExpired()
-        givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
-
-        val result = subscriptionsManager.getAccessToken()
-
-        assertTrue(result is AccessTokenResult.Success)
-        verifyNoInteractions(crossProcessLock)
-        verify(tokenRefreshWideEvent).onStart(any(), eq(false))
-        verify(tokenRefreshWideEvent, never()).onCrossProcessLockAcquired(any())
     }
 
     @Test

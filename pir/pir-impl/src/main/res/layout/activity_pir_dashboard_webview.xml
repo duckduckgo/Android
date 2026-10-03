@@ -14,31 +14,43 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <FrameLayout
-        android:id="@+id/webViewContainer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar"
+        android:visibility="gone" />
 
-        <WebView
-            android:id="@+id/pirWebView"
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <FrameLayout
+            android:id="@+id/webViewContainer"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+            <WebView
+                android:id="@+id/pirWebView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </FrameLayout>
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/manualConfigWarning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/daxColorAccentYellow"
+            android:padding="@dimen/keyline_2"
+            android:text="@string/pirDashboardManualConfigWarning"
+            android:textColor="?attr/daxColorSecondaryText"
+            android:visibility="gone" />
 
     </FrameLayout>
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/manualConfigWarning"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/daxColorAccentYellow"
-        android:padding="@dimen/keyline_2"
-        android:text="@string/pirDashboardManualConfigWarning"
-        android:textColor="?attr/daxColorSecondaryText"
-        android:visibility="gone" />
-
-</FrameLayout>
+</LinearLayout>

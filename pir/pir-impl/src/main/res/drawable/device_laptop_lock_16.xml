@@ -1,0 +1,32 @@
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+    <path
+        android:fillColor="?attr/daxColorPrimaryIcon"
+        android:pathData="M5.125,0.881C3.399,0.881 2,2.28 2,4.006V9.289L0.496,11.26C-0.634,12.741 0.422,14.875 2.284,14.875H7.05C7.437,14.875 7.75,14.562 7.75,14.175V13.625H2.284C1.456,13.625 0.987,12.677 1.489,12.018L2.934,10.125H8.654C8.687,10.102 8.721,10.08 8.755,10.059C8.776,9.643 8.865,9.245 9.01,8.875H3.25V4.006C3.25,2.97 4.09,2.131 5.125,2.131H10.875C11.911,2.131 12.75,2.97 12.75,4.006V6.508C12.825,6.513 12.899,6.52 12.972,6.529C13.473,6.592 14,6.247 14,5.742V4.006C14,2.28 12.601,0.881 10.875,0.881H5.125Z" />
+    <path
+        android:fillColor="?attr/daxColorPrimaryIcon"
+        android:pathData="M7.75,11.852C7.75,11.5 7.837,11.167 7.991,10.875H3.625C3.28,10.875 3,11.155 3,11.5C3,11.845 3.28,12.125 3.625,12.125H7.75V11.852Z" />
+    <path
+        android:fillColor="?attr/daxColorPrimaryIcon"
+        android:fillType="evenOdd"
+        android:pathData="M10,10.25C10,8.869 11.119,7.75 12.5,7.75C13.881,7.75 15,8.869 15,10.25V11H15.148C15.618,11 16,11.382 16,11.852V15.148C16,15.618 15.618,16 15.148,16H9.852C9.382,16 9,15.618 9,15.148V11.852C9,11.382 9.382,11 9.852,11H10V10.25ZM13.75,10.25V11H11.25V10.25C11.25,9.56 11.81,9 12.5,9C13.191,9 13.75,9.56 13.75,10.25Z" />
+</vector>

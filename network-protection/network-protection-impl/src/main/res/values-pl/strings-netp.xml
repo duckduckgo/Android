@@ -89,10 +89,10 @@
     <string name="netpManagementManageItemExclusion">Wykluczone aplikacje</string>
     <string name="netpManagementManageItemExclusionSubtitleEmpty">Brak</string>
     <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
-        <item quantity="one">%1$d aplikacja</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d aplikacja</item>
         <item quantity="few">%1$d aplikacje</item>
         <item quantity="many">%1$d aplikacji</item>
-        <item quantity="other">%1$d aplikacji</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d aplikacji</item>
     </plurals>
     <string name="netpManagementVpnSettings">Ustawienia VPN</string>
 
@@ -244,18 +244,18 @@
     <string name="netpAutoExcludePromptTitle">Czy chcesz wykluczyć aplikacje, które nie są zgodne z sieciami VPN?</string>
     <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">Znaleźliśmy %1$s, gdy VPN jest połączony.</string>
     <plurals name="netpAutoExcludeAppLabel">
-        <item quantity="one">%1$d nowa aplikacja, która nie jest zgodna z sieciami VPN. Wyklucz tę aplikację, aby móc z nich korzystać</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d nowa aplikacja, która nie jest zgodna z sieciami VPN. Wyklucz tę aplikację, aby móc z nich korzystać</item>
         <item quantity="few">%1$d nowych aplikacji, które nie są zgodna z sieciami VPN. Wyklucz te aplikacje, aby móc z nich korzystać</item>
         <item quantity="many">%1$d nowych aplikacji, które nie są zgodne z sieciami VPN. Wyklucz te aplikacje, aby móc z nich korzystać</item>
-        <item quantity="other">%1$d nowych aplikacji, które nie są zgodne z sieciami VPN. Wyklucz te aplikacje, aby móc z nich korzystać</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d nowych aplikacji, które nie są zgodne z sieciami VPN. Wyklucz te aplikacje, aby móc z nich korzystać</item>
     </plurals>
 
     <string name="netpAutoExcludePromptExcludeAllTitle">Czy chcesz wykluczyć wszystkie aplikacje, które nie są zgodne z sieciami VPN?</string>
     <plurals name="netpAutoExcludeAllAppLabel">
-        <item quantity="one">%1$d inna aplikacja, która nie jest zgodna z sieciami VPN. Wyklucz tę aplikację, aby móc z nich korzystać</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d inna aplikacja, która nie jest zgodna z sieciami VPN. Wyklucz tę aplikację, aby móc z nich korzystać</item>
         <item quantity="few">%1$d innych aplikacji, które nie są zgodne z sieciami VPN. Wyklucz te aplikacje, aby móc z nich korzystać</item>
         <item quantity="many">%1$d innych aplikacji, które nie są zgodne z sieciami VPN. Wyklucz te aplikacje, aby móc z nich korzystać</item>
-        <item quantity="other">%1$d inna aplikacja, która nie jest zgodna z sieciami VPN. Wyklucz tę aplikację, aby móc z nich korzystać</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d inna aplikacja, która nie jest zgodna z sieciami VPN. Wyklucz tę aplikację, aby móc z nich korzystać</item>
     </plurals>
     <string name="netpAutoExcludePromptOptionEnable">Automatycznie wyklucz niezgodne aplikacje</string>
     <string name="netpAutoExcludePromptActionAdd">Wyklucz aplikacje</string>
