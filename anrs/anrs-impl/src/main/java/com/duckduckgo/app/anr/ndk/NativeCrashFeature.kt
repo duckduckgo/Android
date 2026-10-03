@@ -57,6 +57,9 @@ interface NativeCrashFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun useCrashpad(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun uploadMinidumps(): Toggle
 }
 
 @ContributesBinding(AppScope::class)
