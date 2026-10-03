@@ -6,8 +6,6 @@ import com.gradle.develocity.agent.gradle.test.ImportJUnitXmlReports
 plugins {
     id 'com.android.application'
 
-    id 'kotlin-android'
-    id 'kotlin-kapt'
     id 'com.google.devtools.ksp'
     id 'com.squareup.anvil'
     id 'androidx.room'
@@ -15,6 +13,11 @@ plugins {
 }
 apply from: '../versioning.gradle'
 apply from: "$rootDir/code-formatting.gradle"
+
+def diFramework = findProperty('ddg.di') ?: 'AnvilDagger'
+if (diFramework != 'Metro') {
+    apply plugin: 'com.android.legacy-kapt'
+}
 
 ext {
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
@@ -31,7 +34,6 @@ android {
         versionCode buildVersionCode()
         versionName buildVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        archivesBaseName = "duckduckgo-$versionName"
         vectorDrawables.useSupportLibrary = true
         sourceSets {
             androidTest.assets.srcDirs += files("$projectDir/schemas")
@@ -151,7 +153,7 @@ android {
         }
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             manifestPlaceholders = [
                     appIcon     : "@mipmap/ic_launcher_red",
                     appIconRound: "@mipmap/ic_launcher_red_round"
@@ -213,13 +215,12 @@ android {
     }
 
     // Conditional source set: swap DI graph creation based on ddg.di property
-    def diFramework = findProperty('ddg.di') ?: 'AnvilDagger'
     sourceSets {
         main {
             if (diFramework == 'Metro') {
-                java.srcDirs += 'src/metro/java'
+                kotlin.srcDirs += 'src/metro/java'
             } else {
-                java.srcDirs += 'src/anvilDagger/java'
+                kotlin.srcDirs += 'src/anvilDagger/java'
             }
         }
     }
@@ -229,6 +230,17 @@ android {
             useLegacyPackaging = true
         }
     }
+}
+
+if (diFramework != 'Metro') {
+    // Required for legacy-kapt
+    configurations.matching { it.name.startsWith("kapt") && it.name != "kapt" }.configureEach {
+        extendsFrom(configurations.kapt)
+    }
+}
+
+base {
+    archivesName = "duckduckgo-${buildVersionName()}"
 }
 
 androidComponents {
@@ -295,12 +307,10 @@ fladle {
     configs {
         privacyTests {
             privacyTestDefaults(it)
-            flankVersion.set("21.+")
             testTargets.set(["annotation com.duckduckgo.espresso.PrivacyTest"])
         }
         internalPrivacyTests {
             privacyTestDefaults(it)
-            flankVersion.set("21.+")
             testTargets.set(["annotation com.duckduckgo.espresso.InternalPrivacyTest"])
             debugApk.set(project.layout.buildDirectory.file("outputs/apk/internal/debug/duckduckgo-${buildVersionName()}-internal-debug.apk").map { it.asFile.absolutePath })
             instrumentationApk.set(project.layout.buildDirectory.file("outputs/apk/androidTest/internal/debug/duckduckgo-${buildVersionName()}-internal-debug-androidTest.apk").map { it.asFile.absolutePath })
@@ -643,10 +653,12 @@ dependencies {
     implementation AndroidX.work.rxJava2
 
     // Dagger
-    kapt Google.dagger.compiler
-    // Dagger 2.57+ reads Kotlin @Metadata via an external kotlin-metadata-jvm; it must track the
-    // project Kotlin version so it understands the current metadata format.
-    kapt "org.jetbrains.kotlin:kotlin-metadata-jvm:_"
+    if (diFramework != 'Metro') {
+        kapt Google.dagger.compiler
+        // Dagger 2.57+ reads Kotlin @Metadata via an external kotlin-metadata-jvm; it must track the
+        // project Kotlin version so it understands the current metadata format.
+        kapt "org.jetbrains.kotlin:kotlin-metadata-jvm:_"
+    }
     implementation Google.dagger
 
     // Glide

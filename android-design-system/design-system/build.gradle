@@ -16,7 +16,6 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
     id 'com.squareup.anvil'
     id 'com.google.devtools.ksp'
     id 'org.jetbrains.kotlin.plugin.compose'
@@ -51,9 +50,9 @@ dependencies {
     ksp project(':anvil-ksp')
 
     if (rootProject.ext.proprietaryFontAvailable) {
-        implementation "com.duckduckgo:ddg-proprietary-fonts:1.0.2"
+        api "com.duckduckgo:ddg-proprietary-fonts:1.0.2"
     } else {
-        implementation project(':fonts')
+        api project(':fonts')
     }
 
     implementation project(path: ':common-utils')
