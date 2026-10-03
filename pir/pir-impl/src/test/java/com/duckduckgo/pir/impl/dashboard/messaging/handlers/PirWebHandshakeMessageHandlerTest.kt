@@ -147,8 +147,8 @@ class PirWebHandshakeMessageHandlerTest {
         assertTrue(callbackData.params.has("success"))
         assertEquals(true, callbackData.params.getBoolean("success"))
 
-        assertTrue(callbackData.params.has("userData"))
-        val userData = callbackData.params.getJSONObject("userData")
+        assertTrue(callbackData.params.has("userdata"))
+        val userData = callbackData.params.getJSONObject("userdata")
 
         assertTrue(userData.has("isAuthenticatedUser"))
         assertEquals(isAuthenticated, userData.getBoolean("isAuthenticatedUser"))

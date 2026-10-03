@@ -24,6 +24,10 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.checker.DisabledReason
+import com.duckduckgo.pir.impl.checker.PirEligibility
+import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
@@ -32,9 +36,11 @@ import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
+import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
@@ -55,6 +61,9 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
     private val currentTimeProvider: CurrentTimeProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val jobRecordUpdater: JobRecordUpdater,
+    private val pirWorkHandler: PirWorkHandler,
+    private val pirRemoteFeatures: PirRemoteFeatures,
+    private val pirFreemiumDataStore: PirFreemiumDataStore,
 ) : PirWebJsMessageHandler() {
 
     override val message = PirDashboardWebMessages.SAVE_PROFILE
@@ -101,6 +110,10 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
             } else {
                 PirExecutionType.MANUAL_INITIAL
             }
+
+            // must be stored before the scan starts, as the scan service resolves eligibility again
+            // and a free user is only allowed to scan once activated
+            storeFreemiumActivation()
 
             // start the initial scan at this point as startScanAndOptOut message is not reliable
             startAndScheduleInitialScan(executionType)
@@ -177,6 +190,23 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
             if (profileQueriesToUpdate.isNotEmpty()) {
                 jobRecordUpdater.removeScanJobRecordsWithNoMatchesForProfiles(profileQueriesToUpdate.map { it.id })
             }
+        }
+    }
+
+    /**
+     * A user without a subscription who saves a profile is activating freemium PIR, which is what
+     * later grants them scan-only runs. Any other disabled reason (e.g. an unavailable repository)
+     * says nothing about the subscription, so it must not activate.
+     */
+    private suspend fun storeFreemiumActivation() {
+        if (!pirRemoteFeatures.freemium().isEnabled()) return
+
+        val eligibility = pirWorkHandler.canRunPir().firstOrNull()
+        val isUnsubscribed = (eligibility as? PirEligibility.Disabled)?.reason == DisabledReason.SUBSCRIPTION_EXPIRED
+
+        if (isUnsubscribed) {
+            logcat { "PIR-WEB: PirWebSaveProfileMessageHandler: activating freemium" }
+            pirFreemiumDataStore.didActivate = true
         }
     }
 

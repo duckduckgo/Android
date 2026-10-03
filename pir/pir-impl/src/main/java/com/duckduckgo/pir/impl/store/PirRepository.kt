@@ -702,8 +702,9 @@ class RealPirRepository(
         profileQueriesToUpdate: List<ProfileQuery>,
         profileQueryIdsToDelete: List<Long>,
     ): Boolean = withContext(dispatcherProvider.io()) {
+        val dao = userProfileDao() ?: return@withContext false
         try {
-            userProfileDao()?.updateUserProfiles(
+            dao.updateUserProfiles(
                 profilesToAdd = profileQueriesToAdd.map { query -> query.toUserProfile() },
                 profilesToUpdate = profileQueriesToUpdate.map { query -> query.toUserProfile() },
                 profileIdsToDelete = profileQueryIdsToDelete,
