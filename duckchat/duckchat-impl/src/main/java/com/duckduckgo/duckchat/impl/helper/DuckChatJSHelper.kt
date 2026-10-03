@@ -47,6 +47,7 @@ import com.duckduckgo.duckchat.impl.models.AIChatAttachmentUsage
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
+import com.duckduckgo.duckchat.impl.terms.DuckAiTermsRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
@@ -131,6 +132,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val editPromptSessionStore: EditPromptSessionStore,
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
     private val duckAiSessionCallback: DuckAiSessionCallback,
+    private val termsRepository: DuckAiTermsRepository,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -174,7 +176,7 @@ class RealDuckChatJSHelper @Inject constructor(
 
             METHOD_GET_AI_CHAT_NATIVE_PROMPT ->
                 id?.let {
-                    getAIChatNativePrompt(featureName, method, it)
+                    getAIChatNativePrompt(featureName, method, it, browserMode)
                 }
 
             METHOD_OPEN_AI_CHAT -> {
@@ -399,6 +401,7 @@ class RealDuckChatJSHelper @Inject constructor(
 
         val params = JSONObject().apply {
             put(PLATFORM, ANDROID)
+            if (duckChatFeature.nativeToSConsent().isEnabled()) put(TERMS_ACCEPTED, true)
             put("tool", "query")
             put(
                 "query",
@@ -509,14 +512,18 @@ class RealDuckChatJSHelper @Inject constructor(
             else -> 5
         }
 
-    private fun getAIChatNativePrompt(
+    private suspend fun getAIChatNativePrompt(
         featureName: String,
         method: String,
         id: String,
+        browserMode: BrowserMode,
     ): JsCallbackData {
         val pending = pendingNativePromptStore.consume()
+        val termsAccepted = pending != null && duckChatFeature.nativeToSConsent().isEnabled()
+        if (termsAccepted) termsRepository.markTermsAccepted(browserMode)
         val jsonPayload = JSONObject().apply {
             put(PLATFORM, ANDROID)
+            if (termsAccepted) put(TERMS_ACCEPTED, true)
             if (pending != null) {
                 put("tool", "query")
                 put(
@@ -775,6 +782,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_PAGE_CONTEXT = "supportsPageContext"
         private const val SUPPORTS_SUGGESTIONS = "supportsSuggestions"
         private const val SUPPORTS_MULTIPLE_PAGE_CONTEXT = "supportsMultipleContexts"
+        private const val TERMS_ACCEPTED = "termsAccepted"
         private const val SUPPORTS_NATIVE_STORAGE = "supportsNativeStorage"
         private const val SUPPORTS_NATIVE_USAGE_WARNINGS = "supportsNativeUsageWarnings"
         private const val SUPPORTS_SUBSCRIPTION = "supportsSubscription"
