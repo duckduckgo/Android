@@ -374,4 +374,29 @@
         <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d mot</item>
         <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d mots</item>
     </plurals>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model&apos;s short name">%1$s atteint les limites d’utilisation jusqu’à 2 à 5 fois plus vite que les modèles de base.</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Ignorer</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">%1$d %% de la limite quotidienne</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">%1$d %% de la limite hebdomadaire</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Limite quotidienne atteinte</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Limite hebdomadaire atteinte</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Limite d\'utilisation hebdomadaire atteinte</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Limite de modèles d\'IA avancés atteinte</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Changer de modèle</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Commencer à utiliser la limite hebdomadaire</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Essayer l\'abonnement gratuitement</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">S\'abonner</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as &apos;2 days&apos; or &apos;5 hours&apos;">Réinitialisation dans %1$s</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d jour</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d jours</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d heure</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d heures</item>
+    </plurals>
 </resources>
