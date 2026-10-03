@@ -20,6 +20,8 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 
+enum class PirFreemiumFirstScanResult { NO_MATCHES, MATCHES_FOUND }
+
 interface PirFreemiumDataStore {
     /**
      * Whether the user has activated freemium PIR by saving a profile through the dashboard.
@@ -29,8 +31,17 @@ interface PirFreemiumDataStore {
     /** First-write-wins. Anchors the bounded window during which a free user still gets background scans. */
     val firstProfileSavedTimestamp: Long
 
+    /**
+     * The outcome of the first scan that completed normally, or null if none has.
+     * Moves to [PirFreemiumFirstScanResult.MATCHES_FOUND] if a later scan finds a match, e.g. on a broker that errored first time.
+     */
+    val firstScanResult: PirFreemiumFirstScanResult?
+
     /** No-op once [didActivate] is already true, so the timestamp it is paired with can never be re-anchored. */
     fun activate(timestampMillis: Long)
+
+    /** Only moves forward: a no-op once [PirFreemiumFirstScanResult.MATCHES_FOUND] has been recorded. */
+    fun recordFirstScanResult(result: PirFreemiumFirstScanResult)
 
     fun reset()
 }
@@ -52,6 +63,11 @@ internal class RealPirFreemiumDataStore(
     override val firstProfileSavedTimestamp: Long
         get() = preferences.getLong(KEY_FIRST_PROFILE_SAVED_TIMESTAMP, 0L)
 
+    override val firstScanResult: PirFreemiumFirstScanResult?
+        get() = preferences.getString(KEY_FIRST_SCAN_RESULT, null)?.let { stored ->
+            PirFreemiumFirstScanResult.entries.firstOrNull { it.name == stored }
+        }
+
     override fun activate(timestampMillis: Long) {
         if (didActivate) return
 
@@ -62,10 +78,20 @@ internal class RealPirFreemiumDataStore(
         }
     }
 
+    override fun recordFirstScanResult(result: PirFreemiumFirstScanResult) {
+        if (firstScanResult == PirFreemiumFirstScanResult.MATCHES_FOUND) return
+
+        // committed synchronously as the scan (:pir) writes it and Settings (:main) reads it
+        preferences.edit(commit = true) {
+            putString(KEY_FIRST_SCAN_RESULT, result.name)
+        }
+    }
+
     override fun reset() {
         preferences.edit(commit = true) {
             putBoolean(KEY_DID_ACTIVATE, false)
             putLong(KEY_FIRST_PROFILE_SAVED_TIMESTAMP, 0L)
+            remove(KEY_FIRST_SCAN_RESULT)
         }
     }
 
@@ -73,5 +99,6 @@ internal class RealPirFreemiumDataStore(
         private const val FILENAME = "com.duckduckgo.pir.freemium.v1"
         private const val KEY_DID_ACTIVATE = "KEY_DID_ACTIVATE"
         private const val KEY_FIRST_PROFILE_SAVED_TIMESTAMP = "KEY_FIRST_PROFILE_SAVED_TIMESTAMP"
+        private const val KEY_FIRST_SCAN_RESULT = "KEY_FIRST_SCAN_RESULT"
     }
 }
