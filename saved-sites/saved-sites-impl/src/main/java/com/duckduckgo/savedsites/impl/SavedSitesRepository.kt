@@ -116,7 +116,15 @@ class RealSavedSitesRepository(
         return if (rootFolder != null) {
             val rootFolderItem = BookmarkFolderItem(0, rootFolder, rootFolder.id == selectedFolderId)
             val folders = mutableListOf(rootFolderItem)
-            val folderDepth = traverseFolderWithDepth(1, folders, SavedSitesNames.BOOKMARKS_ROOT, selectedFolderId = selectedFolderId, currentFolder)
+            val folderDepth =
+                traverseFolderWithDepth(
+                    1,
+                    folders,
+                    SavedSitesNames.BOOKMARKS_ROOT,
+                    selectedFolderId = selectedFolderId,
+                    currentFolder,
+                    mutableSetOf(SavedSitesNames.BOOKMARKS_ROOT),
+                )
             if (currentFolder != null) {
                 folderDepth.filterNot { it.bookmarkFolder == currentFolder }
             } else {
@@ -145,11 +153,13 @@ class RealSavedSitesRepository(
         folderId: String,
         selectedFolderId: String,
         currentFolder: BookmarkFolder?,
+        visitedFolderIds: MutableSet<String>,
     ): List<BookmarkFolderItem> {
         getFolders(folderId).map {
-            if (it.id != currentFolder?.id) {
+            // folder relations can form a loop, so a folder already on this branch is never descended into again
+            if (it.id != currentFolder?.id && visitedFolderIds.add(it.id)) {
                 folders.add(BookmarkFolderItem(depth, it, it.id == selectedFolderId))
-                traverseFolderWithDepth(depth + 1, folders, it.id, selectedFolderId = selectedFolderId, currentFolder)
+                traverseFolderWithDepth(depth + 1, folders, it.id, selectedFolderId = selectedFolderId, currentFolder, visitedFolderIds)
             }
         }
         return folders
@@ -169,7 +179,7 @@ class RealSavedSitesRepository(
     override fun getFolderBranch(folder: BookmarkFolder): FolderBranch {
         val bookmarks = mutableListOf<Bookmark>()
         val folders = mutableListOf(folder)
-        val folderContent = traverseBranch(bookmarks, folders, folder.id)
+        val folderContent = traverseBranch(bookmarks, folders, folder.id, mutableSetOf(folder.id))
         return FolderBranch(folderContent.first, folderContent.second)
     }
 
@@ -177,12 +187,15 @@ class RealSavedSitesRepository(
         bookmarks: MutableList<Bookmark>,
         folders: MutableList<BookmarkFolder>,
         folderId: String,
+        visitedFolderIds: MutableSet<String>,
     ): Pair<List<Bookmark>, List<BookmarkFolder>> {
         val folderContent = folderContent(folderId)
         bookmarks.addAll(folderContent.first)
-        folders.addAll(folderContent.second)
-        folderContent.second.forEach {
-            traverseBranch(bookmarks, folders, it.id)
+        // folder relations can form a loop, so a folder already on this branch is never descended into again
+        val unvisitedFolders = folderContent.second.filter { visitedFolderIds.add(it.id) }
+        folders.addAll(unvisitedFolders)
+        unvisitedFolders.forEach {
+            traverseBranch(bookmarks, folders, it.id, visitedFolderIds)
         }
         return Pair(bookmarks, folders)
     }
@@ -434,6 +447,8 @@ class RealSavedSitesRepository(
             type = FOLDER,
         )
         savedSitesEntitiesDao.insert(entity)
+        // a folder has a single parent, so re-inserting one has to replace its relation instead of adding a second
+        savedSitesRelationsDao.deleteRelationByEntity(folder.id)
         savedSitesRelationsDao.insert(Relation(folderId = folder.parentId, entityId = folder.id))
         savedSitesEntitiesDao.updateModified(folder.parentId, folder.lastModified ?: DatabaseDateFormatter.iso8601())
         return folder
