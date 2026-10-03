@@ -132,4 +132,36 @@ class SubscriptionPixelSenderImplTest {
             parameters = mapOf("origin" to "funnel_appsettings_android"),
         )
     }
+
+    @Test
+    fun whenReportPirFreemiumImpressionThenFiresImpressionPixel() {
+        testee.reportAppSettingsPirFreemiumImpression()
+
+        verify(pixel).fire(
+            pixelName = "m_privacy-pro_app-settings_pir-freemium_impression_c",
+            type = Count,
+        )
+    }
+
+    @Test
+    fun whenReportPirFreemiumClickBeforeFirstScanThenCtaStateIsStartFreeScan() {
+        testee.reportAppSettingsPirFreemiumClick(PirFreemiumCtaState.START_FREE_SCAN)
+
+        verify(pixel).fire(
+            pixelName = "m_privacy-pro_app-settings_pir-freemium_click_c",
+            type = Count,
+            parameters = mapOf("cta_state" to "start_free_scan"),
+        )
+    }
+
+    @Test
+    fun whenReportPirFreemiumClickAfterFirstScanThenCtaStateIsViewScanResults() {
+        testee.reportAppSettingsPirFreemiumClick(PirFreemiumCtaState.VIEW_SCAN_RESULTS)
+
+        verify(pixel).fire(
+            pixelName = "m_privacy-pro_app-settings_pir-freemium_click_c",
+            type = Count,
+            parameters = mapOf("cta_state" to "view_scan_results"),
+        )
+    }
 }
