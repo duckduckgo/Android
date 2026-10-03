@@ -26,6 +26,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.checker.PirEligibility
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
+import com.duckduckgo.pir.impl.checker.runModeOrNull
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import com.duckduckgo.pir.impl.scheduling.PirJobsRunner
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
@@ -69,7 +70,11 @@ class PirScheduledScanRemoteWorker(
                 return Result.success()
             }
 
-            val result = pirJobsRunner.runEligibleJobs(context.applicationContext, PirExecutionType.SCHEDULED)
+            val runMode = eligibility.runModeOrNull ?: run {
+                logcat { "PIR-WORKER ($this}: No eligibility emission, cannot resolve run mode!" }
+                return Result.failure()
+            }
+            val result = pirJobsRunner.runEligibleJobs(context.applicationContext, PirExecutionType.SCHEDULED, runMode)
 
             if (result.isSuccess) {
                 logcat { "PIR-WORKER ($this}: Successfully completed!" }

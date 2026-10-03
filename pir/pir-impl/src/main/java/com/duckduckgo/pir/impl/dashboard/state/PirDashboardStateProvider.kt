@@ -47,9 +47,13 @@ abstract class PirDashboardStateProvider(
         return extractedProfilesFromBrokers + extractedProfilesFromMirrorSites
     }
 
-    suspend fun getBrokersAndMirrorSitesWithProgressStatus(): List<DashboardBrokerWithStatus> {
+    /**
+     * @param scannableBrokerNames when non-null, restricts the result to these brokers on top of the active-broker
+     * filter below. Callers pass the same set used for their denominator so a numerator can never exceed it.
+     */
+    suspend fun getBrokersAndMirrorSitesWithProgressStatus(scannableBrokerNames: Set<String>? = null): List<DashboardBrokerWithStatus> {
         val currentTime = currentTimeProvider.currentTimeMillis()
-        val inProgressAndCompletedBrokers = getInProgressAndCompletedBrokers()
+        val inProgressAndCompletedBrokers = getInProgressAndCompletedBrokers(scannableBrokerNames)
         val mirrorSiteBrokers = inProgressAndCompletedBrokers.getMirrorSites(currentTime)
 
         return (inProgressAndCompletedBrokers + mirrorSiteBrokers).sortedBy {
@@ -57,14 +61,14 @@ abstract class PirDashboardStateProvider(
         }
     }
 
-    private suspend fun getInProgressAndCompletedBrokers(): List<DashboardBrokerWithStatus> {
+    private suspend fun getInProgressAndCompletedBrokers(scannableBrokerNames: Set<String>? = null): List<DashboardBrokerWithStatus> {
         // Only consider active brokers and ignore removed ones
         val activeBrokerMap = pirRepository.getAllActiveBrokerObjects().associateBy { it.name }
         val activeBrokerOptOutUrls = pirRepository.getAllBrokerOptOutUrls()
 
         // Take all scan jobs that is for an active broker, this automatically remove INVALID jobs - which should be the case of removed profiles
         val validScanJobMap = pirSchedulingRepository.getAllValidScanJobRecords().filter {
-            it.brokerName in activeBrokerMap.keys
+            it.brokerName in activeBrokerMap.keys && (scannableBrokerNames == null || it.brokerName in scannableBrokerNames)
         }.groupBy {
             it.brokerName
         }

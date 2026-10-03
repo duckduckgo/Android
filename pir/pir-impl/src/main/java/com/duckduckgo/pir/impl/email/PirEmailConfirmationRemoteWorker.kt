@@ -25,7 +25,10 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.checker.PirEligibility
+import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
+import com.duckduckgo.pir.impl.checker.runModeOrNull
+import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
 import kotlinx.coroutines.flow.firstOrNull
 import logcat.logcat
@@ -48,6 +51,9 @@ class PirEmailConfirmationRemoteWorker(
     @Inject
     lateinit var pirFeatureDataCleaner: PirFeatureDataCleaner
 
+    @Inject
+    lateinit var pirScanScheduler: PirScanScheduler
+
     override suspend fun doRemoteWork(): Result {
         logcat { "PIR-WORKER ($this}: doRemoteWork ${Process.myPid()}" }
         return try {
@@ -57,6 +63,21 @@ class PirEmailConfirmationRemoteWorker(
                 pirWorkHandler.cancelWork(CancellationReason.fromDisabledReason(eligibility.reason))
                 pirFeatureDataCleaner.removeAllData()
                 return Result.failure()
+            }
+
+            val runMode = eligibility.runModeOrNull
+            if (runMode == null) {
+                // Unresolved, not disabled: skip this run only, or one empty emission would cancel a
+                // paying subscriber's confirmation work forever since nothing else reschedules it.
+                logcat { "PIR-WORKER ($this}: Eligibility unresolved this run, skipping without cancelling" }
+                return Result.success()
+            }
+
+            if (runMode != PirRunMode.SCAN_AND_OPT_OUT) {
+                // A lapsed subscriber falls back to SCAN_ONLY still holding this worker from when they paid.
+                logcat { "PIR-WORKER ($this}: Scan-only user, retiring email confirmation work" }
+                pirScanScheduler.cancelScheduledEmailConfirmation()
+                return Result.success()
             }
 
             val result = pirEmailConfirmationJobsRunner.runEligibleJobs(context.applicationContext)
