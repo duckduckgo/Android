@@ -59,6 +59,7 @@ import com.duckduckgo.subscriptions.impl.billing.RetryPolicy
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
 import com.duckduckgo.subscriptions.impl.billing.retry
 import com.duckduckgo.subscriptions.impl.notification.VpnReminderNotificationScheduler
+import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboardingExperiments
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AccessToken
@@ -281,8 +282,11 @@ class RealSubscriptionsManager @Inject constructor(
     private val subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent,
     private val vpnReminderNotificationScheduler: VpnReminderNotificationScheduler,
     private val featureTogglesInventory: FeatureTogglesInventory,
+    private val subscriptionOnboardingExperiments: SubscriptionOnboardingExperiments,
 ) : SubscriptionsManager {
     private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
+
+    private var pendingOnboardingEnrollmentIsFreeTrial: Boolean? = null
 
     private val _currentPurchaseState = MutableSharedFlow<CurrentPurchase>()
     override val currentPurchaseState = _currentPurchaseState.asSharedFlow().onSubscription { emitCurrentPurchaseValues() }
@@ -408,6 +412,8 @@ class RealSubscriptionsManager @Inject constructor(
         origin: String?,
     ) = withContext(dispatcherProvider.io()) {
         try {
+            pendingOnboardingEnrollmentIsFreeTrial = null
+
             val currentSubscription = authRepository.getSubscription()
             if (currentSubscription == null || !currentSubscription.isActive()) {
                 _currentPurchaseState.emit(CurrentPurchase.Failure("No active subscription found for switch"))
@@ -536,6 +542,11 @@ class RealSubscriptionsManager @Inject constructor(
         purchaseToken: String,
     ) {
         _currentPurchaseState.emit(CurrentPurchase.InProgress)
+
+        pendingOnboardingEnrollmentIsFreeTrial?.let { isFreeTrial ->
+            subscriptionOnboardingExperiments.enroll(isFreeTrial)
+            pendingOnboardingEnrollmentIsFreeTrial = null
+        }
 
         val confirmationBody = buildConfirmationBody(packageName, purchaseToken)
         var retryCompleted = false
@@ -1078,6 +1089,8 @@ class RealSubscriptionsManager @Inject constructor(
     ) {
         try {
             _currentPurchaseState.emit(CurrentPurchase.PreFlowInProgress)
+
+            pendingOnboardingEnrollmentIsFreeTrial = offerId in SubscriptionsConstants.LIST_OF_FREE_TRIAL_OFFERS
 
             subscriptionPurchaseWideEvent.onPurchaseFlowStarted(
                 subscriptionIdentifier = offerId ?: planId,

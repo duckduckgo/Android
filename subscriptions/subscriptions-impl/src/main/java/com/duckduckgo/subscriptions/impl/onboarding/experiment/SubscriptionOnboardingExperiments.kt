@@ -26,19 +26,12 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-/**
- * Picks and enrolls the right native-subscription-onboarding experiment based on the purchase type, and
- * answers whether the user is in the treatment cohort (i.e. should see the native onboarding).
- *
- * - Free-trial purchases enroll [SubscriptionsFeature.subscriptionOnboardingFreeTrialsOct2026].
- * - Paid purchases enroll [SubscriptionsFeature.subscriptionOnboardingPaidSubsOct2026].
- *
- * Only the experiment matching the purchase type is enrolled, so the cohorts stay clean.
- */
 interface SubscriptionOnboardingExperiments {
 
-    /** Enrolls the experiment for this purchase and returns true if the user landed in the treatment cohort. */
-    suspend fun enrollAndIsTreatment(isFreeTrial: Boolean): Boolean
+    /**
+     * Enrolls the experiment matching this purchase type, assigning a cohort.
+     */
+    suspend fun enroll(isFreeTrial: Boolean)
 
     /** Whether the user is already enrolled in the treatment cohort of either experiment (no new enrollment). */
     suspend fun isTreatment(): Boolean
@@ -51,10 +44,10 @@ class RealSubscriptionOnboardingExperiments @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : SubscriptionOnboardingExperiments {
 
-    override suspend fun enrollAndIsTreatment(isFreeTrial: Boolean): Boolean = withContext(dispatcherProvider.io()) {
-        val experiment = experimentFor(isFreeTrial)
-        experiment.enroll()
-        experiment.isEnrolledAndEnabled(TREATMENT)
+    override suspend fun enroll(isFreeTrial: Boolean) {
+        withContext(dispatcherProvider.io()) {
+            experimentFor(isFreeTrial).enroll()
+        }
     }
 
     override suspend fun isTreatment(): Boolean = withContext(dispatcherProvider.io()) {

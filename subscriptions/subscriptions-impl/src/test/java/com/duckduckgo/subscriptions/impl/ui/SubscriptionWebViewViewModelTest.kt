@@ -100,7 +100,7 @@ class SubscriptionWebViewViewModelTest {
     fun setup() = runTest {
         whenever(networkProtectionAccessState.getScreenForCurrentState()).thenReturn(NetworkProtectionManagementScreenNoParams)
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
-        runBlocking { whenever(subscriptionOnboardingExperiments.enrollAndIsTreatment(any())).thenReturn(false) }
+        runBlocking { whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(false) }
         viewModel = SubscriptionWebViewViewModel(
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             subscriptionsManager = subscriptionsManager,
@@ -188,26 +188,26 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
-    fun whenFreeTrialPurchaseInTreatmentThenLaunchOnboarding() = runTest {
-        whenever(subscriptionOnboardingExperiments.enrollAndIsTreatment(true)).thenReturn(true)
+    fun whenPurchaseInTreatmentThenLaunchOnboarding() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
         assertLaunchOnboarding(isFreeTrial = true, expected = true)
     }
 
     @Test
-    fun whenFreeTrialPurchaseInControlThenDoNotLaunchOnboarding() = runTest {
-        whenever(subscriptionOnboardingExperiments.enrollAndIsTreatment(true)).thenReturn(false)
+    fun whenPurchaseInControlThenDoNotLaunchOnboarding() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(false)
         assertLaunchOnboarding(isFreeTrial = true, expected = false)
     }
 
     @Test
     fun whenPaidPurchaseInTreatmentThenLaunchOnboarding() = runTest {
-        whenever(subscriptionOnboardingExperiments.enrollAndIsTreatment(false)).thenReturn(true)
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
         assertLaunchOnboarding(isFreeTrial = false, expected = true)
     }
 
     @Test
     fun whenPaidPurchaseInControlThenDoNotLaunchOnboarding() = runTest {
-        whenever(subscriptionOnboardingExperiments.enrollAndIsTreatment(false)).thenReturn(false)
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(false)
         assertLaunchOnboarding(isFreeTrial = false, expected = false)
     }
 
