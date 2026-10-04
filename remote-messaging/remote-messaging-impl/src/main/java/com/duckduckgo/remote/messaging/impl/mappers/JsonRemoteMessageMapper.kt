@@ -24,6 +24,7 @@ import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
 import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
 import com.duckduckgo.remote.messaging.api.Content.CardsList
 import com.duckduckgo.remote.messaging.api.Content.Medium
+import com.duckduckgo.remote.messaging.api.Content.NextStepsItems
 import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.Content.PromoSingleAction
 import com.duckduckgo.remote.messaging.api.Content.Small
@@ -38,6 +39,7 @@ import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.BIG_SINGLE_AC
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.BIG_TWO_ACTION
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.CARDS_LIST
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.MEDIUM
+import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.NEXT_STEPS_ITEMS
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.PROMO_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.SMALL
 import com.duckduckgo.remote.messaging.impl.models.asJsonFormat
@@ -109,6 +111,13 @@ private val cardsListMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Co
     )
 }
 
+private val nextStepsItemsMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Content = { jsonContent, actionMappers ->
+    NextStepsItems(
+        titleText = jsonContent.titleText.failIfEmpty(),
+        listItems = jsonContent.listItems.toListItems(actionMappers),
+    )
+}
+
 private fun List<JsonListItem>?.toListItems(actionMappers: Set<MessageActionMapperPlugin>): List<CardItem> {
     return this?.mapNotNull { jsonItem ->
         itemMappers[jsonItem.type]?.invoke(jsonItem, actionMappers)
@@ -116,17 +125,25 @@ private fun List<JsonListItem>?.toListItems(actionMappers: Set<MessageActionMapp
 }
 
 private val twoLineListItemMapper: (JsonListItem, Set<MessageActionMapperPlugin>) -> CardItem = { jsonItem, actionMappers ->
-    CardItem.ListItem(
-        id = jsonItem.id.failIfEmpty(),
-        type = jsonItem.type.toCardItemType(),
-        titleText = jsonItem.titleText.failIfEmpty(),
-        descriptionText = jsonItem.descriptionText.orEmpty().failIfEmpty(),
-        placeholder = jsonItem.placeholder.orEmpty().asPlaceholder(),
-        primaryAction = jsonItem.primaryAction?.toAction(actionMappers),
-        primaryActionText = jsonItem.primaryActionText.orEmpty(),
-        matchingRules = jsonItem.matchingRules.orEmpty(),
-        exclusionRules = jsonItem.exclusionRules.orEmpty(),
-        imageUrl = jsonItem.imageUrl,
+    jsonItem.toListItem(actionMappers)
+}
+
+private val nextStepItemMapper: (JsonListItem, Set<MessageActionMapperPlugin>) -> CardItem = { jsonItem, actionMappers ->
+    jsonItem.toListItem(actionMappers)
+}
+
+private fun JsonListItem.toListItem(actionMappers: Set<MessageActionMapperPlugin>): CardItem.ListItem {
+    return CardItem.ListItem(
+        id = id.failIfEmpty(),
+        type = type.toCardItemType(),
+        titleText = titleText.failIfEmpty(),
+        descriptionText = descriptionText.orEmpty().failIfEmpty(),
+        placeholder = placeholder.orEmpty().asPlaceholder(),
+        primaryAction = primaryAction?.toAction(actionMappers),
+        primaryActionText = primaryActionText.orEmpty(),
+        matchingRules = matchingRules.orEmpty(),
+        exclusionRules = exclusionRules.orEmpty(),
+        imageUrl = imageUrl,
     )
 }
 
@@ -143,6 +160,7 @@ private val itemMappers = mapOf(
     CardItemType.TWO_LINE_LIST_ITEM.jsonValue to twoLineListItemMapper,
     CardItemType.FEATURED_TWO_LINE_SINGLE_ACTION_LIST_ITEM.jsonValue to twoLineListItemMapper,
     CardItemType.LIST_SECTION_TITLE.jsonValue to sectionTitleMapper,
+    CardItemType.NEXT_STEP_ITEM.jsonValue to nextStepItemMapper,
 )
 
 // plugin point?
@@ -153,6 +171,7 @@ private val messageMappers = mapOf(
     Pair(BIG_TWO_ACTION.jsonValue, bigMessageTwoActionMapper),
     Pair(PROMO_SINGLE_ACTION.jsonValue, promoSingleActionMapper),
     Pair(CARDS_LIST.jsonValue, cardsListMapper),
+    Pair(NEXT_STEPS_ITEMS.jsonValue, nextStepsItemsMapper),
 )
 
 fun List<JsonRemoteMessage>.mapToRemoteMessage(
@@ -284,25 +303,32 @@ private fun Content.localize(translations: JsonContentTranslations): Content {
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
             primaryActionText = translations.primaryActionText.takeUnless { it.isEmpty() } ?: this.primaryActionText,
-            listItems = listItems.map { item ->
-                when (item) {
-                    is CardItem.ListItem -> {
-                        val translatedItem = item.localize(translations)
-                        item.copy(
-                            titleText = translatedItem?.title.takeUnless { it.isNullOrEmpty() } ?: item.titleText,
-                            descriptionText = translatedItem?.description.takeUnless { it.isNullOrEmpty() } ?: item.descriptionText,
-                            primaryActionText = translatedItem?.primaryAction.takeUnless { it.isNullOrEmpty() } ?: item.primaryActionText,
-                        )
-                    }
-                    is CardItem.SectionTitle -> {
-                        val translatedItem = item.localize(translations)
-                        item.copy(
-                            titleText = translatedItem?.title.takeUnless { it.isNullOrEmpty() } ?: item.titleText,
-                        )
-                    }
-                }
-            },
+            listItems = listItems.localize(translations),
         )
+
+        is NextStepsItems -> this.copy(
+            titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
+            listItems = listItems.localize(translations),
+        )
+    }
+}
+
+private fun List<CardItem>.localize(translations: JsonContentTranslations): List<CardItem> = map { item ->
+    when (item) {
+        is CardItem.ListItem -> {
+            val translatedItem = item.localize(translations)
+            item.copy(
+                titleText = translatedItem?.title.takeUnless { it.isNullOrEmpty() } ?: item.titleText,
+                descriptionText = translatedItem?.description.takeUnless { it.isNullOrEmpty() } ?: item.descriptionText,
+                primaryActionText = translatedItem?.primaryAction.takeUnless { it.isNullOrEmpty() } ?: item.primaryActionText,
+            )
+        }
+        is CardItem.SectionTitle -> {
+            val translatedItem = item.localize(translations)
+            item.copy(
+                titleText = translatedItem?.title.takeUnless { it.isNullOrEmpty() } ?: item.titleText,
+            )
+        }
     }
 }
 

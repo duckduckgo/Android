@@ -117,10 +117,14 @@ class GlideRemoteMessageImageStore(
     }
 
     private suspend fun fetchAndStoreCardItemImages(message: RemoteMessage?) {
-        val cardsList = message?.content as? Content.CardsList ?: return
+        val listItems = when (val content = message?.content) {
+            is Content.CardsList -> content.listItems
+            is Content.NextStepsItems -> content.listItems
+            else -> return
+        }
 
         clearAllCardItemImages()
-        val itemsWithImages = cardsList.listItems
+        val itemsWithImages = listItems
             .filterIsInstance<CardItem.ListItem>()
             .filter { !it.imageUrl.isNullOrEmpty() }
 
@@ -178,6 +182,7 @@ class GlideRemoteMessageImageStore(
             is Content.BigTwoActions -> this.imageUrl
             is Content.PromoSingleAction -> this.imageUrl
             is Content.CardsList -> this.imageUrl
+            is Content.NextStepsItems -> null
         }
     }
 

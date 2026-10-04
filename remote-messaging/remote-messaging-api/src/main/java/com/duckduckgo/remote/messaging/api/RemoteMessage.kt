@@ -115,6 +115,11 @@ sealed class Content(val messageType: MessageType) {
         val imageUrl: String? = null,
     ) : Content(MessageType.CARDS_LIST)
 
+    data class NextStepsItems(
+        val titleText: String,
+        val listItems: List<CardItem>,
+    ) : Content(MessageType.NEXT_STEPS_ITEMS)
+
     enum class MessageType {
         SMALL,
         MEDIUM,
@@ -122,6 +127,7 @@ sealed class Content(val messageType: MessageType) {
         BIG_TWO_ACTION,
         PROMO_SINGLE_ACTION,
         CARDS_LIST,
+        NEXT_STEPS_ITEMS,
     }
 
     enum class Placeholder(val jsonValue: String) {
@@ -227,4 +233,5 @@ enum class CardItemType(val jsonValue: String) {
     TWO_LINE_LIST_ITEM("two_line_list_item"),
     LIST_SECTION_TITLE("section_title"),
     FEATURED_TWO_LINE_SINGLE_ACTION_LIST_ITEM("featured_two_line_single_action_list_item"),
+    NEXT_STEP_ITEM("setup_item"),
 }

@@ -151,6 +151,34 @@ object JsonRemoteMessageOM {
         imageUrl = imageUrl,
     )
 
+    fun nextStepsItemsJsonContent(
+        titleText: String = "Complete your setup",
+        listItems: List<JsonListItem> = listOf(
+            JsonListItem(
+                id = "setup_default_browser",
+                type = "setup_item",
+                titleText = "Set as default browser",
+                descriptionText = "Open links in DuckDuckGo",
+                placeholder = "Announce",
+                primaryAction = jsonMessageAction(type = "defaultBrowser", value = ""),
+                primaryActionText = "Set as default",
+            ),
+            JsonListItem(
+                id = "setup_add_widget",
+                type = "setup_item",
+                titleText = "Add widget",
+                descriptionText = "Search from your home screen",
+                placeholder = "Radar",
+                primaryAction = jsonMessageAction(),
+                primaryActionText = "Add widget",
+            ),
+        ),
+    ) = JsonContent(
+        messageType = "next_steps_items",
+        titleText = titleText,
+        listItems = listItems,
+    )
+
     fun emptyJsonContent(messageType: String = "") = JsonContent(messageType = messageType)
 
     fun aJsonMessage(
