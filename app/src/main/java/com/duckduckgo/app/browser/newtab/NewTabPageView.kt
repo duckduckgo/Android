@@ -264,14 +264,23 @@ class NewTabPageView @JvmOverloads constructor(
     }
 
     private fun showNextStepsSection(newMessage: Boolean) {
-        val shouldRender = newMessage || binding.nextStepsContainer.isGone
-        binding.nextStepsContainer.show()
-        if (binding.nextStepsContainer.childCount == 0 && nextStepsSectionJob?.isActive != true) {
-            nextStepsSectionJob = findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
-                nextSteps.provideSectionView(context)?.let { binding.nextStepsContainer.addView(it) }
+        if (binding.nextStepsContainer.childCount == 0) {
+            inflateNextStepsSection()
+        } else {
+            val wasHidden = binding.nextStepsContainer.isGone
+            binding.nextStepsContainer.show()
+            if (newMessage || wasHidden) {
+                viewModel.onMessageShown()
             }
         }
-        if (shouldRender) {
+    }
+
+    private fun inflateNextStepsSection() {
+        if (nextStepsSectionJob?.isActive == true) return
+        nextStepsSectionJob = findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+            val section = nextSteps.provideSectionView(context) ?: return@launch
+            binding.nextStepsContainer.addView(section)
+            binding.nextStepsContainer.show()
             viewModel.onMessageShown()
         }
     }
