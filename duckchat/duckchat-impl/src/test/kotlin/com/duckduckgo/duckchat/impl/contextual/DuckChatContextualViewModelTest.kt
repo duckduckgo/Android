@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.impl.DuckChatInternal
@@ -37,6 +38,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.duckchat.impl.terms.DuckAiTermsConsent
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -57,6 +59,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -80,6 +83,7 @@ class DuckChatContextualViewModelTest {
     private val sessionTimeoutProvider = FakeDuckChatContextualSessionTimeoutProvider()
     private val duckChatPixels: DuckChatPixels = mock()
     private val duckChatFeature: DuckChatFeature = mock()
+    private val termsConsent: DuckAiTermsConsent = mock()
     private val contextualFireButtonToggle: Toggle = mock()
     private val contextualSuggestedPromptsToggle: Toggle = mock()
     private val modelManager: com.duckduckgo.duckchat.impl.models.DuckAiModelManager = mock()
@@ -444,6 +448,8 @@ class DuckChatContextualViewModelTest {
                     contextualNativeInputManager = contextualNativeInputManager,
                     chatHistoryRepository = chatHistoryRepository,
                     context = context,
+                    termsConsent = termsConsent,
+                    browserMode = BrowserMode.REGULAR,
                 )
 
             val tabId = "tab-1"
@@ -851,6 +857,8 @@ class DuckChatContextualViewModelTest {
                     contextualNativeInputManager = contextualNativeInputManager,
                     chatHistoryRepository = chatHistoryRepository,
                     context = context,
+                    termsConsent = termsConsent,
+                    browserMode = BrowserMode.REGULAR,
                 )
 
             val serializedPageData =
@@ -892,6 +900,8 @@ class DuckChatContextualViewModelTest {
                     contextualNativeInputManager = contextualNativeInputManager,
                     chatHistoryRepository = chatHistoryRepository,
                     context = context,
+                    termsConsent = termsConsent,
+                    browserMode = BrowserMode.REGULAR,
                 )
 
             val serializedPageData =
@@ -2661,6 +2671,15 @@ class DuckChatContextualViewModelTest {
         }
     }
 
+    @Test
+    fun `when prompt sent then the terms consent is carried on the event`() = runTest {
+        testee.currentPageContext = ""
+
+        testee.onPromptSent("Hello Duck.ai")
+
+        verify(termsConsent).carry(any(), eq(BrowserMode.REGULAR))
+    }
+
     private fun buildViewModel() = DuckChatContextualViewModel(
         dispatchers = coroutineRule.testDispatcherProvider,
         duckChat = duckChat,
@@ -2675,6 +2694,8 @@ class DuckChatContextualViewModelTest {
         contextualNativeInputManager = contextualNativeInputManager,
         chatHistoryRepository = chatHistoryRepository,
         context = context,
+        termsConsent = termsConsent,
+        browserMode = BrowserMode.REGULAR,
     )
 
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {

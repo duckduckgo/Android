@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.contextual
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.impl.DuckChatInternal
@@ -30,6 +31,7 @@ import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.ChatType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.duckchat.impl.terms.DuckAiTermsConsent
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelection
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
@@ -78,6 +80,7 @@ class DuckChatContextualWebViewViewModelTest {
     private val duckChatPixels: DuckChatPixels = mock()
     private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
     private val duckChatFeature: DuckChatFeature = mock()
+    private val termsConsent: DuckAiTermsConsent = mock()
     private val contextualFireButtonToggle: Toggle = mock()
     private val modelManager: com.duckduckgo.duckchat.impl.models.DuckAiModelManager = mock()
     private val chatHistoryRepository: ChatHistoryRepository = mock()
@@ -738,6 +741,14 @@ class DuckChatContextualWebViewViewModelTest {
         }
     }
 
+    @Test
+    fun `when prompt sent then the terms consent is carried on the event`() = runTest {
+        testee.onPromptSent("Hello Duck.ai")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(termsConsent).carry(any(), eq(BrowserMode.REGULAR))
+    }
+
     private fun buildViewModel() = DuckChatContextualWebViewViewModel(
         dispatchers = coroutineRule.testDispatcherProvider,
         duckChat = duckChat,
@@ -753,6 +764,8 @@ class DuckChatContextualWebViewViewModelTest {
         chatHistoryRepository = chatHistoryRepository,
         contextualEntryPromptStore = contextualEntryPromptStore,
         textSelectionRepository = textSelectionRepository,
+        termsConsent = termsConsent,
+        browserMode = BrowserMode.REGULAR,
     )
 
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {

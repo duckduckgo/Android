@@ -24,6 +24,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -44,6 +45,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.duckchat.impl.terms.DuckAiTermsConsent
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -81,6 +83,8 @@ class DuckChatContextualViewModel @Inject constructor(
     private val contextualNativeInputManager: ContextualNativeInputManager,
     private val chatHistoryRepository: ChatHistoryRepository,
     private val context: Context,
+    private val termsConsent: DuckAiTermsConsent,
+    private val browserMode: BrowserMode,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -537,6 +541,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 )
                 pageContext?.let { put("pageContext", it) }
             }
+        termsConsent.carry(params, browserMode)
 
         return SubscriptionEventData(
             featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
