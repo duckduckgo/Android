@@ -839,23 +839,23 @@ class BrowserTabFragment :
                 viewModel.openNewDuckChatFromChatMenu()
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewVoiceChat)) {
-                duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+                viewModel.openNewVoiceChatFromChatMenu()
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewImage)) {
-                viewModel.openNewImageDuckChat(omnibar.viewMode)
+                viewModel.openNewImageDuckChatFromChatMenu()
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)) {
                 // With the native sidebar this entry opens the new tab with its input screen surfaced on
                 // the Search tab. The target is threaded to the new tab itself rather than armed globally,
                 // so it can't be consumed by another tab.
-                viewModel.recordPendingNewTabOpenedExit()
+                viewModel.onNewTabFromChatMenuSelected()
                 browserActivity?.launchNewTab(
                     browserMode = BrowserMode.REGULAR,
                     inputModeTarget = if (duckAiFeatureState.nativeDuckAiSidebar.value) InputMode.SEARCH else null,
                 )
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)) {
-                viewModel.recordPendingFireTabOpenedExit()
+                viewModel.onNewFireTabFromChatMenuSelected()
                 browserActivity?.launchNewTab(browserMode = BrowserMode.FIRE)
             }
         }
@@ -4000,9 +4000,6 @@ class BrowserTabFragment :
 
                 override fun onPlusButtonPressed(anchor: View) {
                     val activity = activity ?: return
-                    // Only offer "New Fire Tab" to users whose feature flag + WebView profile
-                    // support actually allow Fire Mode. Re-checked on each open so a WebView/flag
-                    // change is reflected without rebuilding the menu.
                     chatMenuPopup.contentView
                         .findViewById<View>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)
                         .isVisible = fireModeAvailability.isAvailable()

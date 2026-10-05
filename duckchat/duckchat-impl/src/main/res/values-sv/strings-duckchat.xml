@@ -374,4 +374,29 @@
         <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d ord</item>
         <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d ord</item>
     </plurals>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model&apos;s short name">%1$s förbrukar gränserna upp till 2–5 gånger snabbare än basmodeller.</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Avvisa</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">%1$d%% av den dagliga gränsen</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">%1$d%% av veckogränsen</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Daglig gräns uppnådd</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Veckogräns uppnådd</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Veckogränsen för användning har nåtts</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Gränsen för avancerade AI-modeller har nåtts</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Byt modell</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Börja använda veckogränsen</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Prova abonnemang gratis</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">Prenumerera</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as &apos;2 days&apos; or &apos;5 hours&apos;">Återställs om %1$s</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d dag</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d dagar</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d timme</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d timmar</item>
+    </plurals>
 </resources>

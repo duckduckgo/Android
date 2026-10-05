@@ -977,9 +977,6 @@
     <string name="preOnboardingImportErrorRetry">Yritä uudelleen</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Lisää minut suosikkirivillesi.</string>
-    <string name="preOnboardingAddToDockBody">Etsi DuckDuckGo-kuvake aloitusnäytöltäsi. Paina ja vedä se sitten paikalleen. Siinä kaikki!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Selvä!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Aloita yksityinen tekoälykeskustelu Duck.ai:n kanssa tai siirry suojatun selaamisen hakuun.<br/><br/>Voit käyttää Duck.ai:ta mistä tahansa, missä näet chat-kuvakkeen]]></string>

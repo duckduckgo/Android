@@ -977,9 +977,6 @@
     <string name="preOnboardingImportErrorRetry">Probeer het opnieuw</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Voeg me toe aan je favorietenrij.</string>
-    <string name="preOnboardingAddToDockBody">Zoek het DuckDuckGo-pictogram op je beginscherm. Houd het vervolgens ingedrukt en sleep het naar zijn plaats. Dat is alles!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Ik snap het!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Start een privé AI-chat met Duck.ai of schakel over naar Zoeken voor beschermd browsen.<br/><br/>Je kunt Duck.ai gebruiken vanaf elke plek waar je het chatpictogram ziet.]]></string>

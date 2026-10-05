@@ -378,4 +378,33 @@
         <item quantity="many">%1$d riječi</item>
         <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d riječi</item>
     </plurals>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model&apos;s short name">%1$s troši uporabna ograničenja do 2 do 5 puta brže od osnovnih modela.</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Odbaci</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">%1$d %% dnevnog ograničenja</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">%1$d %% tjednog ograničenja</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Dosegnuto je dnevno ograničenje</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Dosegnuto je tjedno ograničenje</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Dosegnuto je tjedno ograničenje korištenja</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Dosegnuto je ograničenje za napredne AI modele</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Prebacivanje na drugi model</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Počni koristiti tjedno ograničenje</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Besplatno isprobaj pretplatu</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">Pretplati se</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as &apos;2 days&apos; or &apos;5 hours&apos;">Resetira se za %1$s</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d dan</item>
+        <item quantity="few">%1$d dana</item>
+        <item quantity="many">%1$d dana</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d dana</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d sat</item>
+        <item quantity="few">%1$d sata</item>
+        <item quantity="many">%1$d sati</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d sati</item>
+    </plurals>
 </resources>

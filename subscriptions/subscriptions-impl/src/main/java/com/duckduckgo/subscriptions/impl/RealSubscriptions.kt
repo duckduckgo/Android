@@ -356,13 +356,21 @@ interface SubscriptionsFeature {
     fun schedulePaywallNotSeenPixels(): Toggle
 
     /**
-     * When enabled, showing a native subscription onboarding purchase
+     * When enabled, shows the native subscription onboarding after a free-trial purchase
      * instead of redirecting the FE to /welcome.
      *
      * TODO: Change for experiment framework
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun onboardingSubscriptionExperiment(): Toggle
+
+    /**
+     * When enabled, shows the native subscription onboarding after a non-free-trial purchase
+     *
+     * TODO: Change for experiment framework
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun onboardingSubscriptionExperimentMonthly(): Toggle
 
     /**
      * Controls the experiment attribution sent with purchase confirmation.

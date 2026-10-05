@@ -36,20 +36,14 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionOnboardingBinding
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingViewModel.Command
+import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingViewModel.ToolbarState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
-/**
- * Hosts the native subscription onboarding flow. It observes the orchestrator-driven state exposed by
- * [SubscriptionOnboardingViewModel] and swaps the current step's Fragment (supplied by the step's
- * [SubscriptionOnboardingStepPlugin], which may live in another module) into the container. Steps report
- * back through [SubscriptionOnboardingController].
- */
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SubscriptionOnboardingScreenWithEmptyParams::class, screenName = "subscriptions.onboarding")
 class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
@@ -105,6 +99,11 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
 
+        viewModel.toolbarState
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { renderToolbar(it) }
+            .launchIn(lifecycleScope)
+
         viewModel.start()
     }
 
@@ -128,9 +127,9 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun showStep(command: Command.ShowStep) {
-        if (command.showNavigationIcon) {
-            val navIcon = if (command.canGoBack) {
+    private fun renderToolbar(state: ToolbarState) {
+        if (state.showNavigationIcon) {
+            val navIcon = if (state.canGoBack) {
                 com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24
             } else {
                 com.duckduckgo.mobile.android.R.drawable.ic_close_24
@@ -139,7 +138,10 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
         } else {
             binding.includeToolbar.toolbar.navigationIcon = null
         }
-        supportActionBar?.title = command.stepPlugin.titleResId?.let { getString(it) } ?: ""
+        supportActionBar?.title = state.titleResId?.let { getString(it) } ?: ""
+    }
+
+    private fun showStep(command: Command.ShowStep) {
         supportFragmentManager.commit {
             replace(binding.subscriptionOnboardingContainer.id, command.stepPlugin.createFragment(), command.stepPlugin.stepId)
         }
