@@ -42,7 +42,6 @@ class RealPirFreemium @Inject constructor(
 ) : PirFreemium {
 
     override suspend fun getPirFreemiumState(): PirFreemiumState = withContext(dispatcherProvider.io()) {
-        // Read from Settings, which is opened constantly: a failure hides the promo rather than taking the screen down.
         try {
             resolveState()
         } catch (e: CancellationException) {
@@ -60,11 +59,13 @@ class RealPirFreemium @Inject constructor(
     }
 
     private suspend fun isEligible(): Boolean {
-        if (!pirRemoteFeatures.pirBeta().isEnabled()) return false
+        if (!pirRemoteFeatures.pirBeta().isEnabled()) {
+            return false
+        }
 
-        // Freemium is for non-subscribers only: a signed-in user always gets paid PIR, and this is also
-        // what keeps the freemium promo and the paid PIR settings row mutually exclusive.
-        if (subscriptions.isSignedIn()) return false
+        if (subscriptions.isSignedIn()) {
+            return false
+        }
 
         return pirRemoteFeatures.freemium().isEnabled() && meetsLocaleRequirement()
     }

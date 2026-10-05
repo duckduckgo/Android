@@ -56,10 +56,8 @@ class PirFreemiumSettingViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
-    // Survives configuration change with the ViewModel, so rotation doesn't inflate the funnel denominator.
     private var impressionFired = false
 
-    // Resolved on resume rather than create, so returning from a completed scan flips the call to action.
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         viewModelScope.launch {
