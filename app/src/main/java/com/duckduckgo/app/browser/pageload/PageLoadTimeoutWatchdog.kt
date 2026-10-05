@@ -16,9 +16,10 @@
 
 package com.duckduckgo.app.browser.pageload
 
+import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Event
 import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Phase
-import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Timeout
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -33,14 +34,15 @@ import kotlinx.coroutines.launch
 /**
  * Per-tab detector for main-frame loads that hang before any content is visible.
  *
- * It only observes: a timeout is reported on [timeouts] and the load itself is never stopped.
+ * It only observes: a timeout, and a later recovery of the same load, are reported on [events] and the load itself is never stopped.
  * Must be called from the main thread.
  */
 interface PageLoadTimeoutWatchdog {
     /**
-     * Emits when all timeout conditions are respected for a page load.
+     * Emits [Event.TimedOut] when all timeout conditions are respected for a page load, then [Event.Recovered] at most once
+     * if that same load shows content or finishes on its own.
      */
-    val timeouts: Flow<Timeout>
+    val events: Flow<Event>
 
     /**
      * The engine requested the main-frame document at [url]. Every navigation produces exactly one such request,
@@ -83,7 +85,10 @@ interface PageLoadTimeoutWatchdog {
      */
     fun onNavigatedAway()
 
-    data class Timeout(val phase: Phase)
+    sealed interface Event {
+        data class TimedOut(val phase: Phase) : Event
+        data class Recovered(val elapsedSinceTimeoutMs: Long) : Event
+    }
 
     enum class Phase { NOT_COMMITTED, COMMITTED_NO_CONTENT }
 }
@@ -92,6 +97,7 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
     @Assisted private val scope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
     private val rxBytesProvider: RxBytesProvider,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : PageLoadTimeoutWatchdog {
 
     @AssistedFactory
@@ -103,14 +109,15 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
 
     private data class Snapshot(val committed: Boolean, val rxBytes: Long)
 
-    private val timeoutChannel = Channel<Timeout>(Channel.BUFFERED)
-    override val timeouts: Flow<Timeout> = timeoutChannel.receiveAsFlow()
+    private val eventChannel = Channel<Event>(Channel.BUFFERED)
+    override val events: Flow<Event> = eventChannel.receiveAsFlow()
 
     private val watchJob = ConflatedJob()
     private var state = State.IDLE
     private var url: String? = null
     private var committed = false
     private var pendingRedirectUrl: String? = null
+    private var timedOutAt = 0L
 
     override fun onMainFrameRequest(url: String) {
         if (url.isWeb()) arm(url, committed = false) else disarm()
@@ -144,9 +151,9 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
         }
     }
 
-    override fun onFirstContentVisible(url: String) = disarmIfCurrent(url)
+    override fun onFirstContentVisible(url: String) = onLoadProgressed(url)
 
-    override fun onFinished(url: String) = disarmIfCurrent(url)
+    override fun onFinished(url: String) = onLoadProgressed(url)
 
     override fun onEngineError() = disarm()
 
@@ -167,8 +174,12 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
         pendingRedirectUrl = null
     }
 
-    private fun disarmIfCurrent(url: String) {
-        if (state != State.IDLE && isCurrent(url)) disarm()
+    private fun onLoadProgressed(url: String) {
+        if (state == State.IDLE || !isCurrent(url)) return
+        if (state == State.TIMED_OUT) {
+            eventChannel.trySend(Event.Recovered(currentTimeProvider.elapsedRealtime() - timedOutAt))
+        }
+        disarm()
     }
 
     // Signals of a superseded load carry its URL, so they are told apart by comparing it with the latest URL of the current navigation.
@@ -193,7 +204,8 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
     private fun timeOut() {
         state = State.TIMED_OUT
         val phase = if (committed) Phase.COMMITTED_NO_CONTENT else Phase.NOT_COMMITTED
-        timeoutChannel.trySend(Timeout(phase))
+        timedOutAt = currentTimeProvider.elapsedRealtime()
+        eventChannel.trySend(Event.TimedOut(phase))
     }
 
     private fun snapshot() = Snapshot(committed, rxBytesProvider.uidRxBytes())

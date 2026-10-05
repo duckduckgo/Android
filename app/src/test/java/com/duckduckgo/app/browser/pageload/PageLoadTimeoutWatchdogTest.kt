@@ -16,10 +16,13 @@
 
 package com.duckduckgo.app.browser.pageload
 
+import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Event
+import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Event.Recovered
+import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Event.TimedOut
 import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Phase.COMMITTED_NO_CONTENT
 import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Phase.NOT_COMMITTED
-import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Timeout
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -30,6 +33,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import java.time.LocalDateTime
 
 class PageLoadTimeoutWatchdogTest {
 
@@ -37,12 +41,12 @@ class PageLoadTimeoutWatchdogTest {
     val coroutineRule = CoroutineTestRule(StandardTestDispatcher())
 
     private val rx = FakeRxBytesProvider()
-    private val timeouts = mutableListOf<Timeout>()
+    private val timeouts = mutableListOf<Event>()
 
     private fun watchdogTest(block: suspend TestScope.(PageLoadTimeoutWatchdog) -> Unit) =
         coroutineRule.testScope.runTest {
-            val watchdog = RealPageLoadTimeoutWatchdog(backgroundScope, coroutineRule.testDispatcherProvider, rx)
-            backgroundScope.launch { watchdog.timeouts.toList(timeouts) }
+            val watchdog = RealPageLoadTimeoutWatchdog(backgroundScope, coroutineRule.testDispatcherProvider, rx, VirtualTimeProvider())
+            backgroundScope.launch { watchdog.events.toList(timeouts) }
             runCurrent()
             block(watchdog)
         }
@@ -104,7 +108,7 @@ class PageLoadTimeoutWatchdogTest {
         assertTrue(timeouts.isEmpty())
 
         advanceToMs(45_000)
-        assertEquals(listOf(Timeout(NOT_COMMITTED)), timeouts)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
     }
 
     @Test
@@ -115,7 +119,7 @@ class PageLoadTimeoutWatchdogTest {
         assertTrue(timeouts.isEmpty())
 
         advanceToMs(45_000)
-        assertEquals(listOf(Timeout(NOT_COMMITTED)), timeouts)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
 
         advanceToSeconds(60)
         assertEquals(1, timeouts.size)
@@ -144,7 +148,7 @@ class PageLoadTimeoutWatchdogTest {
         assertTrue(timeouts.isEmpty())
 
         advanceToMs(60_000)
-        assertEquals(listOf(Timeout(COMMITTED_NO_CONTENT)), timeouts)
+        assertEquals(listOf(TimedOut(COMMITTED_NO_CONTENT)), timeouts)
     }
 
     @Test
@@ -181,7 +185,7 @@ class PageLoadTimeoutWatchdogTest {
         assertTrue(timeouts.isEmpty())
 
         advanceToMs(45_000)
-        assertEquals(listOf(Timeout(COMMITTED_NO_CONTENT)), timeouts)
+        assertEquals(listOf(TimedOut(COMMITTED_NO_CONTENT)), timeouts)
     }
 
     @Test
@@ -195,7 +199,7 @@ class PageLoadTimeoutWatchdogTest {
         assertTrue(timeouts.isEmpty())
 
         advanceToMs(75_000)
-        assertEquals(listOf(Timeout(COMMITTED_NO_CONTENT)), timeouts)
+        assertEquals(listOf(TimedOut(COMMITTED_NO_CONTENT)), timeouts)
     }
 
     @Test
@@ -208,7 +212,7 @@ class PageLoadTimeoutWatchdogTest {
 
         advanceToSeconds(45)
 
-        assertEquals(listOf(Timeout(COMMITTED_NO_CONTENT)), timeouts)
+        assertEquals(listOf(TimedOut(COMMITTED_NO_CONTENT)), timeouts)
     }
 
     @Test
@@ -237,7 +241,7 @@ class PageLoadTimeoutWatchdogTest {
         assertTrue(timeouts.isEmpty())
 
         advanceToMs(50_000)
-        assertEquals(listOf(Timeout(NOT_COMMITTED)), timeouts)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
     }
 
     @Test
@@ -250,7 +254,7 @@ class PageLoadTimeoutWatchdogTest {
         assertTrue(timeouts.isEmpty())
 
         advanceToMs(85_000)
-        assertEquals(listOf(Timeout(NOT_COMMITTED)), timeouts)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
     }
 
     @Test
@@ -271,7 +275,7 @@ class PageLoadTimeoutWatchdogTest {
         assertTrue(timeouts.isEmpty())
 
         advanceToMs(45_000)
-        assertEquals(listOf(Timeout(NOT_COMMITTED)), timeouts)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
     }
 
     @Test
@@ -307,7 +311,7 @@ class PageLoadTimeoutWatchdogTest {
         assertTrue(timeouts.isEmpty())
 
         advanceToSeconds(45)
-        assertEquals(listOf(Timeout(COMMITTED_NO_CONTENT)), timeouts)
+        assertEquals(listOf(TimedOut(COMMITTED_NO_CONTENT)), timeouts)
     }
 
     @Test
@@ -335,7 +339,7 @@ class PageLoadTimeoutWatchdogTest {
         assertEquals(1, timeouts.size)
 
         advanceToMs(95_000)
-        assertEquals(listOf(Timeout(NOT_COMMITTED), Timeout(NOT_COMMITTED)), timeouts)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED), TimedOut(NOT_COMMITTED)), timeouts)
     }
 
     @Test
@@ -361,7 +365,7 @@ class PageLoadTimeoutWatchdogTest {
         assertTrue(timeouts.isEmpty())
 
         advanceToMs(55_000)
-        assertEquals(listOf(Timeout(COMMITTED_NO_CONTENT)), timeouts)
+        assertEquals(listOf(TimedOut(COMMITTED_NO_CONTENT)), timeouts)
     }
 
     @Test
@@ -388,7 +392,7 @@ class PageLoadTimeoutWatchdogTest {
         assertTrue(timeouts.isEmpty())
 
         advanceToMs(47_000)
-        assertEquals(listOf(Timeout(NOT_COMMITTED)), timeouts)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
     }
 
     @Test
@@ -411,6 +415,102 @@ class PageLoadTimeoutWatchdogTest {
         advanceToSeconds(120)
 
         assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
+    fun whenContentBecomesVisibleAfterTimeoutThenRecoveredWithElapsedTime() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        advanceToSeconds(45)
+        advanceToSeconds(52)
+
+        watchdog.onFirstContentVisible(URL)
+        runCurrent()
+
+        assertEquals(listOf(TimedOut(NOT_COMMITTED), Recovered(7_000)), timeouts)
+    }
+
+    @Test
+    fun whenPageFinishesAfterTimeoutThenRecoveredWithElapsedTime() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        advanceToSeconds(1)
+        watchdog.onCommitted(URL)
+        advanceToSeconds(45)
+        advanceToSeconds(100)
+
+        watchdog.onFinished(URL)
+        runCurrent()
+
+        assertEquals(listOf(TimedOut(COMMITTED_NO_CONTENT), Recovered(55_000)), timeouts)
+    }
+
+    @Test
+    fun whenNewRequestFollowsTimeoutThenNoRecovered() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        advanceToSeconds(45)
+
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenEngineErrorFollowsTimeoutThenNoRecovered() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        advanceToSeconds(45)
+
+        watchdog.onEngineError()
+        watchdog.onFinished(URL)
+
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenNavigatedAwayFollowsTimeoutThenNoRecovered() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        advanceToSeconds(45)
+
+        watchdog.onNavigatedAway()
+        watchdog.onFinished(URL)
+
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenContentVisibleAndFinishedAfterTimeoutThenRecoveredOnlyOnce() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        advanceToSeconds(45)
+
+        watchdog.onFirstContentVisible(URL)
+        watchdog.onFinished(URL)
+        advanceToSeconds(300)
+
+        assertEquals(1, timeouts.filterIsInstance<Recovered>().size)
+    }
+
+    @Test
+    fun whenDifferentUrlFinishesAfterTimeoutThenNoRecovered() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        advanceToSeconds(45)
+
+        watchdog.onFinished(OTHER_URL)
+
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenPageLoadsWithoutTimeoutThenNoRecovered() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        advanceToSeconds(2)
+        watchdog.onFinished(URL)
+
+        assertTrue(timeouts.isEmpty())
+    }
+
+    private inner class VirtualTimeProvider : CurrentTimeProvider {
+        override fun elapsedRealtime(): Long = coroutineRule.testScope.testScheduler.currentTime
+        override fun currentTimeMillis(): Long = elapsedRealtime()
+        override fun localDateTimeNow(): LocalDateTime = LocalDateTime.MIN
     }
 
     private class FakeRxBytesProvider : RxBytesProvider {

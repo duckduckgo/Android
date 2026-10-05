@@ -64,6 +64,8 @@ import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.browser.pageload.PageLoadTimeoutPixels
+import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Event
 import com.duckduckgo.app.browser.pageload.PageLoadTraceMarker
 import com.duckduckgo.app.browser.pageload.PageLoadTracer
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
@@ -149,6 +151,7 @@ class BrowserWebViewClient @Inject constructor(
     private val pageLoadTracer: PageLoadTracer,
     private val browserMode: BrowserMode,
     pageLoadTimeoutWatchdogFactory: RealPageLoadTimeoutWatchdog.Factory,
+    private val pageLoadTimeoutPixels: PageLoadTimeoutPixels,
 ) : WebViewClient() {
     var webViewClientListener: WebViewClientListener? = null
     var clientProvider: ClientBrandHintProvider? = null
@@ -197,7 +200,15 @@ class BrowserWebViewClient @Inject constructor(
 
     init {
         pageLoadTimeoutsJob += appCoroutineScope.launch(dispatcherProvider.main()) {
-            pageLoadTimeoutWatchdog.timeouts.collect { webViewClientListener?.onPageLoadTimeout() }
+            pageLoadTimeoutWatchdog.events.collect { event ->
+                when (event) {
+                    is Event.TimedOut -> {
+                        pageLoadTimeoutPixels.fireTimeoutShown(event.phase)
+                        webViewClientListener?.onPageLoadTimeout()
+                    }
+                    is Event.Recovered -> pageLoadTimeoutPixels.fireTimeoutRecovered(event.elapsedSinceTimeoutMs)
+                }
+            }
         }
     }
 
@@ -1154,6 +1165,8 @@ enum class WebViewPixelName(override val pixelName: String) : Pixel.PixelName {
     WEB_PAGE_LOADED("m_web_view_page_loaded"),
     WEB_PAGE_PAINTED("m_web_view_page_painted"),
     WEB_VIEW_FORCED_RECOMPOSITE("m_web_view_forced_recomposite"),
+    WEB_PAGE_LOAD_TIMEOUT_SHOWN("m_page_load_timeout_shown"),
+    WEB_PAGE_LOAD_TIMEOUT_RECOVERED("m_page_load_timeout_recovered"),
 }
 
 enum class WebViewErrorResponse(

@@ -62,8 +62,9 @@ import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.browser.pageload.PageLoadTimeoutPixels
+import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Event
 import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Phase
-import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Timeout
 import com.duckduckgo.app.browser.pageload.PageLoadTracer
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.pageload.RealPageLoadTimeoutWatchdog
@@ -189,7 +190,8 @@ class BrowserWebViewClientTest {
     private val mockDuckChat: DuckChat = mock()
     private val pageLoadWideEvent: PageLoadWideEvent = mock()
     private val mockAppSchemeInterceptionFeature: AppSchemeInterceptionFeature = mock()
-    private val pageLoadTimeouts = MutableSharedFlow<Timeout>(extraBufferCapacity = 1)
+    private val mockPageLoadTimeoutPixels: PageLoadTimeoutPixels = mock()
+    private val pageLoadTimeouts = MutableSharedFlow<Event>(extraBufferCapacity = 1)
     private val mockPageLoadTimeoutWatchdog: RealPageLoadTimeoutWatchdog = mock()
     private val mockPageLoadTimeoutWatchdogFactory: RealPageLoadTimeoutWatchdog.Factory = mock()
     private val appSchemeInterceptionEnabledFlow = MutableStateFlow(true)
@@ -211,7 +213,7 @@ class BrowserWebViewClientTest {
             whenever(forceRecompositeToggle.isEnabled()).thenReturn(true)
             whenever(forceRecompositeToggle.enabled()).thenReturn(forceRecompositeEnabledFlow)
             whenever(mockForceWebViewRecompositeFeature.self()).thenReturn(forceRecompositeToggle)
-            whenever(mockPageLoadTimeoutWatchdog.timeouts).thenReturn(pageLoadTimeouts)
+            whenever(mockPageLoadTimeoutWatchdog.events).thenReturn(pageLoadTimeouts)
             whenever(mockPageLoadTimeoutWatchdogFactory.create(any())).thenReturn(mockPageLoadTimeoutWatchdog)
             testee =
                 BrowserWebViewClient(
@@ -255,6 +257,7 @@ class BrowserWebViewClientTest {
                     },
                     BrowserMode.REGULAR,
                     mockPageLoadTimeoutWatchdogFactory,
+                    mockPageLoadTimeoutPixels,
                 )
             testee.webViewClientListener = listener
             whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -2441,15 +2444,31 @@ class BrowserWebViewClientTest {
 
     @Test
     fun whenPageLoadTimesOutThenListenerIsNotified() {
-        pageLoadTimeouts.tryEmit(Timeout(Phase.NOT_COMMITTED))
+        pageLoadTimeouts.tryEmit(Event.TimedOut(Phase.NOT_COMMITTED))
 
         verify(listener).onPageLoadTimeout()
     }
 
     @Test
+    fun whenPageLoadTimesOutThenShownPixelFiredWithPhase() {
+        pageLoadTimeouts.tryEmit(Event.TimedOut(Phase.COMMITTED_NO_CONTENT))
+
+        verify(mockPageLoadTimeoutPixels).fireTimeoutShown(Phase.COMMITTED_NO_CONTENT)
+    }
+
+    @Test
+    fun whenTimedOutPageRecoversThenRecoveredPixelFiredAndListenerNotNotified() {
+        pageLoadTimeouts.tryEmit(Event.Recovered(12_000))
+
+        verify(mockPageLoadTimeoutPixels).fireTimeoutRecovered(12_000)
+        verify(mockPageLoadTimeoutPixels, never()).fireTimeoutShown(any())
+        verify(listener, never()).onPageLoadTimeout()
+    }
+
+    @Test
     fun whenClientIsDestroyedThenWatchdogIsDisarmedAndTimeoutsAreNoLongerReported() {
         testee.destroy()
-        pageLoadTimeouts.tryEmit(Timeout(Phase.NOT_COMMITTED))
+        pageLoadTimeouts.tryEmit(Event.TimedOut(Phase.NOT_COMMITTED))
 
         verify(mockPageLoadTimeoutWatchdog).onNavigatedAway()
         verify(listener, never()).onPageLoadTimeout()
