@@ -35,14 +35,6 @@ class OnboardingDecorationFitCorrector(
     // TODO: remove when onboardingImprovementsV2 flag is removed
     var enabled: Boolean = false
 
-    /**
-     * Whether a card anchored above a decoration also reserves the part of its bottom inset the decoration does not
-     * cover. Only the config-driven renderer needs it: its undecorated band anchors the card on screens the legacy
-     * renderer pinned to the parent bottom, so otherwise the card cannot clear an inset taller than the band, i.e.
-     * the keyboard.
-     */
-    var reservesInsetAboveDecoration: Boolean = false
-
     private var decoration: View? = null
     private var minHeightPx = 0
     private var maxHeightPx = 0
@@ -92,7 +84,7 @@ class OnboardingDecorationFitCorrector(
         if (deco == null) return !syncCardClamp()
         if (deco.isGone) return true
         if (BrandDesignUpdateOnboardingLayoutHelper.isInScrollableContainer(dialog, root)) return true
-        if (reservesInsetAboveDecoration && syncCardClamp()) return false
+        if (syncCardClamp()) return false
 
         val viewport = cardContainer.parent as? View ?: return true
 
@@ -150,15 +142,12 @@ class OnboardingDecorationFitCorrector(
         decorationShown: Boolean,
     ): Int {
         if (!enabled) return 0
-        if (params.bottomToBottom == ConstraintLayout.LayoutParams.PARENT_ID) {
-            // On the legacy path a shown decoration exceeds any bar inset and covers it for the card;
-            // reserving the inset then would feed dialogSpace and hide that very decoration. On the
-            // config-driven path a decoration that leaves the card bottom-anchored sits beside or over
-            // it, covering nothing below it, so the card still has to clear the inset — the keyboard.
-            if (decorationShown && !reservesInsetAboveDecoration) return 0
-            return cardBottomInsetPx()
-        }
-        val deco = decoration?.takeIf { decorationShown && reservesInsetAboveDecoration } ?: return 0
+        // A decoration that leaves the card bottom-anchored sits beside or over it, covering nothing below it,
+        // so the card still has to clear the inset — the keyboard.
+        if (params.bottomToBottom == ConstraintLayout.LayoutParams.PARENT_ID) return cardBottomInsetPx()
+        // A card anchored above a decoration reserves the part of its bottom inset the decoration does not cover:
+        // the undecorated band can be shorter than an inset like the keyboard.
+        val deco = decoration?.takeIf { decorationShown } ?: return 0
         return (cardBottomInsetPx() - roomBelowCard(deco)).coerceAtLeast(0)
     }
 
