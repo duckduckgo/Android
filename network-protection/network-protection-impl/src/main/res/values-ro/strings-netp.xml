@@ -89,9 +89,9 @@
     <string name="netpManagementManageItemExclusion">Aplicații excluse</string>
     <string name="netpManagementManageItemExclusionSubtitleEmpty">Niciuna</string>
     <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
-        <item quantity="one">%1$d aplicație</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d aplicație</item>
         <item quantity="few">%1$d aplicații</item>
-        <item quantity="other">%1$d de aplicații</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d de aplicații</item>
     </plurals>
     <string name="netpManagementVpnSettings">Setări VPN</string>
 
@@ -243,16 +243,16 @@
     <string name="netpAutoExcludePromptTitle">Vrei să excluzi aplicațiile care nu sunt compatibile cu VPN-urile?</string>
     <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">Am găsit %1$s în timp ce VPN-ul este conectat.</string>
     <plurals name="netpAutoExcludeAppLabel">
-        <item quantity="one">%1$d aplicație nouă care nu este compatibilă cu VPN-urile. Exclude această aplicație pentru a o folosi</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d aplicație nouă care nu este compatibilă cu VPN-urile. Exclude această aplicație pentru a o folosi</item>
         <item quantity="few">%1$d aplicații noi care nu sunt compatibile cu VPN-urile. Exclude aceste aplicații pentru a le folosi</item>
-        <item quantity="other">%1$d de aplicații noi care nu sunt compatibile cu VPN-urile. Exclude aceste aplicații pentru a le folosi</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d de aplicații noi care nu sunt compatibile cu VPN-urile. Exclude aceste aplicații pentru a le folosi</item>
     </plurals>
 
     <string name="netpAutoExcludePromptExcludeAllTitle">Vrei să excluzi toate aplicațiile care nu sunt compatibile cu VPN-urile?</string>
     <plurals name="netpAutoExcludeAllAppLabel">
-        <item quantity="one">%1$d altă aplicație care nu este compatibilă cu VPN-urile. Exclude această aplicație pentru a o folosi</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d altă aplicație care nu este compatibilă cu VPN-urile. Exclude această aplicație pentru a o folosi</item>
         <item quantity="few">%1$d alte aplicații care nu sunt compatibile cu VPN-urile. Exclude aceste aplicații pentru a le folosi</item>
-        <item quantity="other">%1$d de alte aplicații care nu sunt compatibile cu VPN-urile. Exclude aceste aplicații pentru a le folosi</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d de alte aplicații care nu sunt compatibile cu VPN-urile. Exclude aceste aplicații pentru a le folosi</item>
     </plurals>
     <string name="netpAutoExcludePromptOptionEnable">Exclude automat aplicațiile incompatibile</string>
     <string name="netpAutoExcludePromptActionAdd">Exclude aplicațiile</string>

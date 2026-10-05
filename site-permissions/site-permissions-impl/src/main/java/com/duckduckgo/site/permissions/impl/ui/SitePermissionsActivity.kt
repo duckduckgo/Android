@@ -25,6 +25,7 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
@@ -32,6 +33,8 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.site.permissions.impl.R
 import com.duckduckgo.site.permissions.impl.databinding.ActivitySitePermissionsBinding
+import com.duckduckgo.site.permissions.impl.feature.SitePermissionsDialogRedesignFeature
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.SitePermissionSetting
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command.LaunchWebsiteAllowed
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar
@@ -55,9 +58,14 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
+    @Inject
+    lateinit var sitePermissionsDialogRedesignFeature: SitePermissionsDialogRedesignFeature
+
     private val viewModel: SitePermissionsViewModel by bindViewModel()
     private val binding: ActivitySitePermissionsBinding by viewBinding()
     private lateinit var adapter: SitePermissionsAdapter
+    private var permissionDialog: DaxAlertDialog? = null
+    private var pendingPermissionSetting: SitePermissionSetting? = null
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -78,6 +86,22 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
         setupRecyclerView()
         observeViewModel()
         viewModel.allowedSites()
+        savedInstanceState?.takeIf { it.containsKey(KEY_PENDING_PERMISSION) }?.let {
+            showPermissionDialog(SitePermissionSetting(it.getInt(KEY_PENDING_PERMISSION), it.getBoolean(KEY_PENDING_ASK_ENABLED)))
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        pendingPermissionSetting?.let {
+            outState.putInt(KEY_PENDING_PERMISSION, it.text)
+            outState.putBoolean(KEY_PENDING_ASK_ENABLED, it.askEnabled)
+        }
+    }
+
+    override fun onDestroy() {
+        permissionDialog?.dismiss()
+        super.onDestroy()
     }
 
     private fun configureEdgeToEdgeInsets() {
@@ -138,11 +162,33 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
             lifecycleOwner = this,
             faviconManager = faviconManager,
             appBrandDesignUpdateToggles = appBrandDesignUpdateToggles,
+            permissionSettingsRedesign = sitePermissionsDialogRedesignFeature.permissionSettingsRedesign().isEnabled(),
+            onPermissionSettingClicked = { showPermissionDialog(it) },
         )
         binding.recycler.adapter = adapter
     }
 
+    private fun showPermissionDialog(setting: SitePermissionSetting) {
+        pendingPermissionSetting = setting
+        permissionDialog = showGlobalPermissionDialog(
+            context = this,
+            permission = setting.text,
+            askEnabled = setting.askEnabled,
+            onSelectionChanged = { pendingPermissionSetting = setting.copy(askEnabled = it) },
+            onDismissed = {
+                pendingPermissionSetting = null
+                permissionDialog = null
+            },
+            onSave = { viewModel.permissionToggleSelected(it, setting.text) },
+        )
+    }
+
     private fun launchWebsiteAllowed(domain: String) {
         startActivity(PermissionsPerWebsiteActivity.intent(this, domain))
+    }
+
+    companion object {
+        private const val KEY_PENDING_PERMISSION = "pendingPermission"
+        private const val KEY_PENDING_ASK_ENABLED = "pendingAskEnabled"
     }
 }

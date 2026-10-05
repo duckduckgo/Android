@@ -58,4 +58,10 @@
     <string name="browserMenuForward">Dalej</string>
     <string name="browserMenuRefresh">Odśwież</string>
     <string name="browserMenuFireTabsData">Usuń karty i dane</string>
+
+    <!-- Duck.ai tab + menu -->
+    <string name="chatMenuPopupNewVoiceChat">Nowy czat głosowy</string>
+    <string name="chatMenuPopupNewImage">Nowy obraz</string>
+    <string name="chatMenuPopupNewTab">Nowa karta</string>
+    <string name="chatMenuPopupNewFireTab">Nowa karta Fire</string>
 </resources>

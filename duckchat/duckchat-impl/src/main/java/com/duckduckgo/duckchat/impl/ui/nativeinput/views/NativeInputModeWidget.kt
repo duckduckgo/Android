@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
@@ -77,11 +78,17 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.ChatState
+import com.duckduckgo.duckchat.impl.DuckChatConstants.DUCK_AI_FEATURE_PAGE
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterCoordinator
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterDockLayout
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterDraft
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterHost
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterView
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
@@ -92,6 +99,7 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.EditPromptScreenParams
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.tabs.TabLayout
@@ -130,6 +138,9 @@ interface NativeInputWidget {
 
     /** Fired when the user picks a model in the model-change flow (→ submitChangeModelAction). */
     var onChangeModelSubmitted: ((modelId: String) -> Unit)?
+
+    /** Fired when the user asks to start using the weekly allowance (→ submitStartUsingWeeklyLimitAction). */
+    var onStartUsingWeeklyLimit: (() -> Unit)?
 
     var onCustomizeResponsesClicked: (() -> Unit)?
     val isModelMenuVisible: Boolean
@@ -189,6 +200,7 @@ interface NativeInputWidget {
     fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, forceImageGeneration: Boolean = false)
     fun configureContextual(tabId: String)
     fun configureForEdit(sessionId: String)
+    fun setFooterSuppressed(suppressed: Boolean)
     fun adoptEditAttachments(images: List<SubmittedImage>, files: List<SubmittedFile>)
     fun isWidgetBottom(): Boolean
     fun setWidgetPosition(isBottom: Boolean)
@@ -261,7 +273,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : ConstraintLayout(context, attrs, defStyle), NativeInputWidget, NativeInputHost {
+) : ConstraintLayout(context, attrs, defStyle), NativeInputWidget, NativeInputHost, NativeInputFooterHost {
 
     @Inject
     lateinit var pixel: Pixel
@@ -281,6 +293,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     @Inject
     lateinit var chatSuggestionsBinder: NativeInputChatSuggestionsBinder
+
+    @Inject
+    lateinit var footerCoordinator: NativeInputFooterCoordinator
 
     @Inject
     lateinit var nativeInputStateProvider: NativeInputStateProvider
@@ -345,8 +360,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var voiceSearchAvailable: Boolean = false
     private var voiceChatAvailable: Boolean = false
     private var widgetRoot: View? = null
+    private var footerHost: NativeInputFooterView? = null
     override var onStopTapped: (() -> Unit)? = null
     override var onChangeModelSubmitted: ((modelId: String) -> Unit)? = null
+    override var onStartUsingWeeklyLimit: (() -> Unit)? = null
     override var onCustomizeResponsesClicked: (() -> Unit)? = null
     override var onImageClick: (() -> Unit)? = null
     override var onVoiceSearchClick: (() -> Unit)? = null
@@ -450,8 +467,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override var text: String
         get() = inputField.text.toString()
         set(value) {
-            inputField.setText(value)
-            inputField.setSelection(value.length)
+            // URL restore when the Search tab is picked should work even while the composer is blocked.
+            nativeInputBlock.runUnblocked { inputField.setText(value) }
+            inputField.setSelection(inputField.length())
         }
 
     // Installed in onAttachedToWindow (after DI) and removed in onDetachedFromWindow, so we
@@ -632,6 +650,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     fun printNewLine() {
+        if (nativeInputBlock.isBlocked) return
         val currentText = inputField.text.toString()
         val selectionStart = inputField.selectionStart
         val selectionEnd = inputField.selectionEnd
@@ -681,6 +700,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
             duckChatInternal.setInputQuery(currentInputQuery())
         }
         setupPlugins()
+        viewModel.setFooterInputFocused(inputField.hasFocus())
+        bindFooter()
         applyPendingAttachmentState()
         observeModelPickerEnabledSource()
         observeChatIdSource()
@@ -768,6 +789,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
             duckChatInternal.setSelectedMode(InputMode.SEARCH)
             duckChatInternal.setInputQuery("")
         }
+        viewModel.setFooterInputFocused(false)
+        footerHost?.unbind()
         super.onDetachedFromWindow()
         chatStateJob?.cancel()
         chatStateJob = null
@@ -867,6 +890,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
      */
     private fun hookEditorActionPixels() {
         inputField.setOnEditorActionListener { _, actionId, keyEvent ->
+            if (nativeInputBlock.isBlocked) return@setOnEditorActionListener true
             val isHardwareEnter =
                 (keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER || keyEvent?.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER) &&
                     keyEvent.action == KeyEvent.ACTION_DOWN
@@ -885,6 +909,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateBottomRowVisibility()
         applyVerticalPaddingForFocus()
         inputField.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            viewModel.setFooterInputFocused(hasFocus)
             // Toggle visibility is intentionally NOT updated here: it's owned by applyState
             // (state-driven) and by NativeInputManager.setToggleVisible (keyboard-visibility
             // driven on duck.ai). Re-evaluating it from the focus listener would race with
@@ -1598,6 +1623,29 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
+    override fun setFooterSuppressed(suppressed: Boolean) {
+        footerHost?.setExitAnimationRunning(suppressed)
+    }
+
+    private fun bindFooter() {
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        footerHost = findFooterHost()
+        footerHost?.bind(scope, footerCoordinator.state(context, viewModel.footerContext, this), ::setFooterInputBlocked)
+    }
+
+    /** The footer host is a sibling of this widget's card inside the nearest [NativeInputFooterDockLayout]. */
+    private fun findFooterHost(): NativeInputFooterView? {
+        var ancestor = parent
+        while (ancestor != null && ancestor !is NativeInputFooterDockLayout) {
+            ancestor = ancestor.parent
+        }
+        val dock = ancestor as? NativeInputFooterDockLayout ?: return null
+        return (0 until dock.childCount)
+            .map(dock::getChildAt)
+            .filterIsInstance<NativeInputFooterView>()
+            .firstOrNull()
+    }
+
     override fun adoptEditAttachments(
         images: List<SubmittedImage>,
         files: List<SubmittedFile>,
@@ -2057,19 +2105,69 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private var interactionLocked = false
+    private var existingInteractionLocked = false
+    private var lockDimsWholeWidget = false
+    private val nativeInputBlock = NativeInputBlock(
+        widget = this,
+        inputField = inputField,
+        dimmedRowIds = listOf(R.id.inputModeWidgetCardContent, R.id.inputModeWidgetBottomRow),
+        toggleRowId = R.id.inputModeSwitchRow,
+        dimAlpha = LOCKED_ALPHA,
+    )
 
     // Dims only this (transparent) widget, never the parent card surface, so the bar stays
     // colour-uniform with the page. Touch interception covers the plugin containers too.
     override fun setInteractionLocked(locked: Boolean) {
-        if (interactionLocked == locked) return
+        existingInteractionLocked = locked
+        updateInteractionLock()
+    }
+
+    override fun draft(): NativeInputFooterDraft = NativeInputFooterDraft(
+        hasImages = attachmentViewModel?.getImageAttachments()?.isNotEmpty() == true,
+        fileMimeTypes = attachmentViewModel?.getFileAttachments()?.map { it.mimeType }.orEmpty(),
+        selectedTool = viewModel.getSelectedTool(),
+    )
+
+    override fun selectModel(modelId: String) {
+        viewModel.selectModelById(modelId)
+        if (viewModel.hasActiveChat()) onChangeModelSubmitted?.invoke(modelId)
+    }
+
+    override fun startUsingWeeklyLimit() {
+        onStartUsingWeeklyLimit?.invoke()
+    }
+
+    override fun openSubscriptionPurchase(origin: String) {
+        globalActivityStarter.start(context, SubscriptionPurchase(origin = origin, featurePage = DUCK_AI_FEATURE_PAGE))
+    }
+
+    internal fun setFooterInputBlocked(blocked: Boolean) {
+        nativeInputBlock.set(blocked)
+        updateInteractionLock()
+    }
+
+    private fun updateInteractionLock() {
+        val locked = existingInteractionLocked || nativeInputBlock.isBlocked
+        val wholeWidget = existingInteractionLocked
+        if (interactionLocked == locked && lockDimsWholeWidget == wholeWidget) return
         interactionLocked = locked
-        alpha = if (locked) LOCKED_ALPHA else 1f
-        if (locked) {
+        lockDimsWholeWidget = wholeWidget
+        alpha = if (locked && wholeWidget) LOCKED_ALPHA else 1f
+        nativeInputBlock.setRowsDimmed(locked && !wholeWidget)
+        if (locked && wholeWidget) {
             clearInputFocus()
         }
     }
 
-    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean = interactionLocked || super.onInterceptTouchEvent(ev)
+    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
+        if (!interactionLocked) return super.onInterceptTouchEvent(ev)
+        if (!lockDimsWholeWidget && ev != null && nativeInputBlock.allowsTouch(ev)) return super.onInterceptTouchEvent(ev)
+        return true
+    }
+
+    // An intercepted tap must also be consumed here, otherwise it would pass to whatever sits behind the widget
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(event: MotionEvent?): Boolean = interactionLocked || super.onTouchEvent(event)
 
     companion object {
         private const val MAX_LINES = 5

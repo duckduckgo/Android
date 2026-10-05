@@ -39,9 +39,7 @@ class AfterIdleMessageTriggerProvider @Inject constructor(
 ) {
 
     fun activeTrigger(): Flow<MessageTrigger?> {
-        val rolloutEnabled = androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled() &&
-            androidBrowserConfigFeature.ntpAsDefaultAfterIdleReturn().isEnabled()
-        if (!rolloutEnabled) return flowOf(null)
+        if (!androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) return flowOf(null)
 
         return ntpAfterIdleManager.isAfterIdleReturn.map { afterIdle ->
             if (afterIdle && escapeHatchTargetResolver.resolve() != null) MessageTrigger.AFTER_IDLE else null

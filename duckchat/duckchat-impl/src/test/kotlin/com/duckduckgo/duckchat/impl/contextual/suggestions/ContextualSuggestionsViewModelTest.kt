@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.contextual.suggestions
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -49,12 +50,14 @@ class ContextualSuggestionsViewModelTest {
     private val duckChatFeature: DuckChatFeature = mock()
     private val suggestedPromptsToggle: Toggle = mock()
     private val duckChatPixels: DuckChatPixels = mock()
+    private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
 
     private val viewModel = ContextualSuggestionsViewModel(
         suggestedPromptsProvider = suggestedPromptsProvider,
         duckChatFeature = duckChatFeature,
         dispatchers = coroutineRule.testDispatcherProvider,
         duckChatPixels = duckChatPixels,
+        selectionJourney = selectionJourney,
     )
 
     @Before
@@ -454,6 +457,30 @@ class ContextualSuggestionsViewModelTest {
         viewModel.onAttachmentsChanged(textSelections = 1, otherAttachments = 0)
 
         assertEquals(selectionSuggestions, viewModel.viewState.value.suggestions)
+    }
+
+    @Test
+    fun whenSelectionSuggestionsShownThenJourneyToldTheyWereViewed() = runTest {
+        val selectionSuggestions = listOf(
+            ContextualSuggestedPrompt("summarize-selection", "Summarize this selection", "Summarize this selection.", "summary"),
+        )
+        whenever(suggestedPromptsProvider.resolveTextSelectionSuggestions(any())).thenReturn(selectionSuggestions)
+
+        viewModel.onAttachmentsChanged(textSelections = 1, otherAttachments = 0, textSelectionsTabId = "tab-1")
+
+        verify(selectionJourney).onSuggestionsViewed("tab-1")
+    }
+
+    @Test
+    fun whenSelectionSuggestionsResolvedButHiddenThenJourneyNotToldTheyWereViewed() = runTest {
+        val selectionSuggestions = listOf(
+            ContextualSuggestedPrompt("summarize-selection", "Summarize this selection", "Summarize this selection.", "summary"),
+        )
+        whenever(suggestedPromptsProvider.resolveTextSelectionSuggestions(any())).thenReturn(selectionSuggestions)
+
+        viewModel.onAttachmentsChanged(textSelections = 1, otherAttachments = 1, textSelectionsTabId = "tab-1")
+
+        verify(selectionJourney, never()).onSuggestionsViewed(any())
     }
 
     @Test

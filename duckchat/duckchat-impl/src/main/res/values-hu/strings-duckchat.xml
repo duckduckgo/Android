@@ -255,8 +255,8 @@
     <string name="duck_ai_chat_history_action_new">Új</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Csevegések letöltése</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">%1$d csevegés letöltése befejeződött</item>
-        <item quantity="other">%1$d csevegés letöltése befejeződött</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">%1$d csevegés letöltése befejeződött</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">%1$d csevegés letöltése befejeződött</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Túlfolyó menü megnyitása</string>
     <string name="duck_ai_chat_history_select_all">Összes kijelölése</string>
@@ -282,6 +282,11 @@
     <string name="native_input_chat_duck_mode_hint">Válasz…</string>
 
     <!-- Model Picker -->
+    <string name="duckAiModelPickerLabelEverydayUse" instruction="Subline under a model in the Duck.ai model picker, describing what that model suits.">Ideális mindennapi használatra</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster" instruction="Subline under a model in the Duck.ai model picker. &apos;Limits&apos; means the user&apos;s usage allowance, which this model consumes more quickly.">Megbízható, de hamarabb éri el a limitet</string>
+    <string name="duckAiModelPickerTryFreeTrial" instruction="Header above the locked models in the Duck.ai model picker, shown when the user can still start a free trial.">Ingyenes próba</string>
+    <string name="duckAiModelPickerSubscriberExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when unlocking them requires a paid subscription.">Csak előfizetőknek</string>
+    <string name="duckAiModelPickerProExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when they require the Pro plan specifically. &apos;Pro&apos; is the plan name and stays untranslated.">Csak a Pro csomagban</string>
     <string name="duckAiModelPickerPlusModels">Plus</string>
     <string name="duckAiModelPickerProModels">Pro</string>
 
@@ -366,7 +371,32 @@
 
     <!-- Prefix on the Duck.ai attachment chip for a text selection -->
     <plurals name="duckAiTextSelectionWordCount">
-        <item quantity="one">%1$d szó</item>
-        <item quantity="other">%1$d szó</item>
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d szó</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d szó</item>
+    </plurals>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model&apos;s short name">A(z) %1$s akár 2–5-ször gyorsabban éri el a használati limiteket, mint az alapvető modellek.</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Bezárás</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">A napi limit %1$d%%-a</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">A heti limit %1$d%%-a</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Napi limit elérve</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Heti limit elérve</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Elérted a heti használati limitet</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Elérted a fejlett AI-modellekre vonatkozó limitet</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Másik modellre váltás</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Heti limit felhasználásának megkezdése</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Próbáld ki az előfizetést ingyen</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">Előfizetés</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as &apos;2 days&apos; or &apos;5 hours&apos;">Visszaállítás %1$s múlva</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d nap</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d nap</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d óra</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d óra</item>
     </plurals>
 </resources>

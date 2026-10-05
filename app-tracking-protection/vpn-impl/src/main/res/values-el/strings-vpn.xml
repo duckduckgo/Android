@@ -46,8 +46,8 @@
     <string name="atp_OnInitialNotification">"Η App Tracking Protection είναι ενεργοποιημένη και εμποδίζει τις προσπάθειες παρακολούθησης στις εφαρμογές σας"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Σάρωση για παρακολούθηση δραστηριοτήτων…μπιπ… μπιπ"</string>
     <plurals name="atp_OnNotification">
-        <item quantity="one"><![CDATA[ Προσπάθειες παρακολούθησης που έχουν αποκλειστεί <b>σε %1$d εφαρμογή</b> (την προηγούμενη ώρα).]]></item>
-        <item quantity="other"><![CDATA[ Προσπάθειες παρακολούθησης που έχουν αποκλειστεί <b>σε %1$d εφαρμογές</b> (την προηγούμενη ώρα).]]></item>
+        <item quantity="one" instruction="Placeholder is a number"><![CDATA[ Προσπάθειες παρακολούθησης που έχουν αποκλειστεί <b>σε %1$d εφαρμογή</b> (την προηγούμενη ώρα).]]></item>
+        <item quantity="other" instruction="Placeholder is a number"><![CDATA[ Προσπάθειες παρακολούθησης που έχουν αποκλειστεί <b>σε %1$d εφαρμογές</b> (την προηγούμενη ώρα).]]></item>
     </plurals>
     <string name="atp_DisabledNotification">Η Προστασία παρακολούθησης από εφαρμογές απενεργοποιήθηκε. Πατήστε για να συνεχίσετε τον αποκλεισμό προσπαθειών παρακολούθησης.</string>
     <string name="atp_RevokedNotification">Μια εφαρμογή VPN στη συσκευή σας απενεργοποίησε την Προστασία παρακολούθησης από εφαρμογές. Πατήστε για να την ενεργοποιήσετε ξανά.</string>
@@ -59,13 +59,13 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ Η Προστασία παρακολούθησης από εφαρμογές απέκλεισε <b>%1$d προσπάθειες παρακολούθησης σε %2$d εφαρμογές, συμπεριλαμβανομένης της %3$s</b> (την προηγούμενη μέρα).]]></string>
 
     <plurals name="atp_DailyTopCompanyNotification">
-        <item quantity="one"><![CDATA[Η %1$s επιχείρησε να σας παρακολουθήσει <b>σε %2$d εφαρμογή</b> (την προηγούμενη μέρα). <b>Δείτε περισσότερα</b>]]></item>
-        <item quantity="other"><![CDATA[Η %1$s επιχείρησε να σας παρακολουθήσει <b>σε %2$d εφαρμογές</b> (την προηγούμενη μέρα). <b>Δείτε περισσότερα</b>]]></item>
+        <item quantity="one" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[Η %1$s επιχείρησε να σας παρακολουθήσει <b>σε %2$d εφαρμογή</b> (την προηγούμενη μέρα). <b>Δείτε περισσότερα</b>]]></item>
+        <item quantity="other" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[Η %1$s επιχείρησε να σας παρακολουθήσει <b>σε %2$d εφαρμογές</b> (την προηγούμενη μέρα). <b>Δείτε περισσότερα</b>]]></item>
     </plurals>
 
     <plurals name="atp_DailyCompanyBlockedNotification">
-        <item quantity="one"><![CDATA[Η Προστασία παρακολούθησης από εφαρμογές απέκλεισε τις περισσότερες προσπάθειες παρακολούθησης σε <b>%1$s</b> (την προηγούμενη μέρα).]]></item>
-        <item quantity="other"><![CDATA[Η Προστασία παρακολούθησης από εφαρμογές απέκλεισε τις περισσότερες προσπάθειες παρακολούθησης σε <b>%1$s</b>και <b>%2$s</b> (την προηγούμενη μέρα).]]></item>
+        <item quantity="one" instruction="Placeholder is the name of an app"><![CDATA[Η Προστασία παρακολούθησης από εφαρμογές απέκλεισε τις περισσότερες προσπάθειες παρακολούθησης σε <b>%1$s</b> (την προηγούμενη μέρα).]]></item>
+        <item quantity="other" instruction="Both placeholders are the name of an app"><![CDATA[Η Προστασία παρακολούθησης από εφαρμογές απέκλεισε τις περισσότερες προσπάθειες παρακολούθησης σε <b>%1$s</b>και <b>%2$s</b> (την προηγούμενη μέρα).]]></item>
     </plurals>
 
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Η Προστασία παρακολούθησης από εφαρμογές απέκλεισε την <b>%1$s %2$d φορά στην %3$s</b> (την προηγούμενη μέρα).]]></string>
@@ -85,8 +85,8 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[Η Προστασία παρακολούθησης από εφαρμογές απέκλεισε <b>%1$d προσπάθειες παρακολούθησης στην %2$s</b> και %3$d ακόμη εφαρμογές (την προηγούμενη βδομάδα).]]></string>
 
     <plurals name="atp_WeeklyCompanyTeaserNotification">
-        <item quantity="one"><![CDATA[Η Προστασία παρακολούθησης από εφαρμογές απέκλεισε την <b>%1$s στην εφαρμογή %2$d, %3$s</b> (την προηγούμενη βδομάδα).]]></item>
-        <item quantity="other"><![CDATA[Η Προστασία παρακολούθησης από εφαρμογές απέκλεισε την <b>%1$s σε %2$d εφαρμογές, συμπεριλαμβανομένης της %3$s</b> (την προηγούμενη βδομάδα).]]></item>
+        <item quantity="one" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Η Προστασία παρακολούθησης από εφαρμογές απέκλεισε την <b>%1$s στην εφαρμογή %2$d, %3$s</b> (την προηγούμενη βδομάδα).]]></item>
+        <item quantity="other" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of one of the apps where it happened"><![CDATA[Η Προστασία παρακολούθησης από εφαρμογές απέκλεισε την <b>%1$s σε %2$d εφαρμογές, συμπεριλαμβανομένης της %3$s</b> (την προηγούμενη βδομάδα).]]></item>
     </plurals>
 
     <string name="atp_EnableCTA">Ενεργοποίηση της Προστασίας παρακολούθησης από εφαρμογές</string>
@@ -269,12 +269,12 @@
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">
-        <item quantity="one">%1$d προσπάθεια. Είναι γνωστό ότι συλλέγει:</item>
-        <item quantity="other">%1$d προσπάθειες. Είναι γνωστό ότι συλλέγει:</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d προσπάθεια. Είναι γνωστό ότι συλλέγει:</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d προσπάθειες. Είναι γνωστό ότι συλλέγει:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">Το DuckDuckGo απέκλεισε %1$d προσπάθεια παρακολούθησης</item>
-        <item quantity="other">Το DuckDuckGo απέκλεισε %1$d προσπάθειες παρακολούθησης</item>
+        <item quantity="one" instruction="Placeholder is a number">Το DuckDuckGo απέκλεισε %1$d προσπάθεια παρακολούθησης</item>
+        <item quantity="other" instruction="Placeholder is a number">Το DuckDuckGo απέκλεισε %1$d προσπάθειες παρακολούθησης</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Αναφέρετε ένα πρόβλημα με αυτήν την εφαρμογή</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Εμφάνιση %1$d ακόμα</string>

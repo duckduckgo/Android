@@ -57,6 +57,7 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ReasoningResolver
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
@@ -88,6 +89,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -350,6 +352,46 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val widgetConfig = MutableStateFlow(WidgetConfig())
 
     private val activeTabId = MutableStateFlow<String?>(null)
+    private val footerInputFocused = MutableStateFlow(false)
+    private val footerPromptSubmissions = MutableStateFlow(0)
+
+    val footerContext: StateFlow<NativeInputFooterContext> = combine(
+        widgetConfig,
+        activeTabId,
+        footerInputFocused,
+        footerPromptSubmissions,
+    ) { config, tabId, inputFocused, promptSubmissions ->
+        val selection = config.toggleSelection ?: NativeInputState.defaultToggleFor(config.inputContext)
+        NativeInputFooterContext(
+            isDuckAiSelected = selection == NativeInputState.ToggleSelection.DUCK_AI,
+            isEditing = tabId?.startsWith(EDIT_STATE_KEY_PREFIX) == true,
+            browserMode = browserMode,
+            isInputFocused = inputFocused,
+            inputContext = config.inputContext,
+            promptSubmissions = promptSubmissions,
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = NativeInputFooterContext(
+            isDuckAiSelected = false,
+            isEditing = false,
+            browserMode = browserMode,
+            isInputFocused = false,
+            inputContext = NativeInputState.InputContext.BROWSER,
+        ),
+    )
+
+    fun setFooterInputFocused(focused: Boolean) {
+        footerInputFocused.value = focused
+    }
+
+    fun selectModelById(modelId: String) {
+        val model = modelManager.modelState.value.models.firstOrNull { it.id == modelId } ?: return
+        viewModelScope.launch { modelManager.selectModel(model) }
+    }
+
+    fun hasActiveChat(): Boolean = currentInputState()?.chatId != null
 
     private val baseState: Flow<NativeInputState> = combine(
         duckAiFeatureState.showSettings,
@@ -510,6 +552,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
      * Called when a prompt is submitted
      * */
     fun onPromptSubmitted() {
+        footerPromptSubmissions.value += 1
         // A prompt submitted while still in the recovery window means the user sent a prompt after
         // recovering the chat's model — report it before the window is cleared below.
         val tabId = activeTabId.value

@@ -281,6 +281,11 @@
     <string name="native_input_chat_duck_mode_hint">Reply…</string>
 
     <!-- Model Picker -->
+    <string name="duckAiModelPickerLabelEverydayUse" instruction="Subline under a model in the Duck.ai model picker, describing what that model suits.">Best for everyday use</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster" instruction="Subline under a model in the Duck.ai model picker. 'Limits' means the user's usage allowance, which this model consumes more quickly.">Solid but hits limits sooner</string>
+    <string name="duckAiModelPickerTryFreeTrial" instruction="Header above the locked models in the Duck.ai model picker, shown when the user can still start a free trial.">Try for Free</string>
+    <string name="duckAiModelPickerSubscriberExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when unlocking them requires a paid subscription.">Subscriber Exclusive</string>
+    <string name="duckAiModelPickerProExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when they require the Pro plan specifically. 'Pro' is the plan name and stays untranslated.">Pro Plan Exclusive</string>
     <string name="duckAiModelPickerPlusModels">Plus</string>
     <string name="duckAiModelPickerProModels">Pro</string>
 
@@ -367,5 +372,30 @@
     <plurals name="duckAiTextSelectionWordCount">
         <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d word</item>
         <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d words</item>
+    </plurals>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model's short name">%1$s uses limits up to 2–5x faster than basic models.</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Dismiss</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">%1$d%% of daily limit</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">%1$d%% of weekly limit</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Daily limit reached</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Weekly limit reached</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Weekly usage limit reached</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Advanced AI models limit reached</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Switch Model</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Start Using Weekly Limit</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Try Subscription for Free</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">Subscribe</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as '2 days' or '5 hours'">Resets in %1$s</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d day</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d days</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d hour</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d hours</item>
     </plurals>
 </resources>

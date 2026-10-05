@@ -171,6 +171,8 @@ android {
     productFlavors {
         internal {
             dimension "store"
+            // use a separate proguard file for internal
+            proguardFiles 'proguard-rules-internal.pro'
         }
         fdroid {
             dimension "store"
@@ -225,6 +227,15 @@ android {
         jniLibs {
             // this is required so the handler exists as a real file on disk
             useLegacyPackaging = true
+        }
+    }
+}
+
+androidComponents {
+    // only minify (enable R8) for internal release builds
+    beforeVariants(selector().withBuildType("release")) { variantBuilder ->
+        if (variantBuilder.productFlavors.any { it.second == "internal" }) {
+            variantBuilder.minifyEnabled = true
         }
     }
 }
@@ -494,6 +505,12 @@ dependencies {
     implementation project(':web-compat-store')
 
     implementation project(':event-hub-impl')
+
+    implementation project(':credential-exchange-api')
+
+    internalImplementation project(':credential-exchange-impl')
+    playImplementation project(':credential-exchange-impl')
+    fdroidImplementation project(':credential-exchange-dummy-impl')
 
     implementation project(':subscriptions-api')
 

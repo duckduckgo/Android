@@ -63,10 +63,10 @@
     <string name="undoSnackbarAction">Prekliči spremembe</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Blokiran sledilnik</item>
+        <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">Blokiran sledilnik</item>
         <item quantity="two">Blokirana sledilnika</item>
         <item quantity="few">Blokirani sledilniki</item>
-        <item quantity="other">Blokiranih sledilnikov</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">Blokiranih sledilnikov</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -227,7 +227,7 @@
         <item quantity="one">%1$d lokacija, izključena iz čiščenja</item>
         <item quantity="two">%1$d lokaciji, izključeni iz čiščenja</item>
         <item quantity="few">%1$d lokacije, izključene iz čiščenja</item>
-        <item quantity="other">%1$d lokacij, izključenih iz čiščenja</item>
+        <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d lokacij, izključenih iz čiščenja</item>
     </plurals>
     <string name="dataClearingAutomaticClearingOn">Vključeno</string>
     <string name="dataClearingAutomaticClearingOff">Izklopljeno</string>
@@ -254,10 +254,10 @@
     <string name="singleTabFireDialogSubtitleSiteData">Brisanje podatkov o spletnem mestu vas lahko odjavi iz računov.</string>
     <string name="singleTabFireDialogSubtitleDownloads">S tem boste preklicali prenose v teku.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">%1$d zavihek in njegovi podatki so izbrisani</item>
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">%1$d zavihek in njegovi podatki so izbrisani</item>
         <item quantity="two">%1$d zavihka in njihovi podatki so izbrisani</item>
         <item quantity="few">%1$d zavihki in njihovi podatki so izbrisani</item>
-        <item quantity="other">%1$d zavihkov in njihovi podatki so izbrisani</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">%1$d zavihkov in njihovi podatki so izbrisani</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Podatkov spletnega mesta ni bilo mogoče izbrisati. Posodobite WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Podatkov spletnega mesta ni bilo mogoče izbrisati zaradi napake.</string>
@@ -798,16 +798,16 @@
     <string name="onboardingSerpDaxDialogButton">Razumem!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Nato obiščite spletno mesto!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
-        <item quantity="one"><![CDATA[ in <b>še %1$d</b> sta vam poskušala tukaj slediti. Blokiral sem ju!<br/><br/>☝️ Za več informacij se dotaknite ščita.]]></item>
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[ in <b>še %1$d</b> sta vam poskušala tukaj slediti. Blokiral sem ju!<br/><br/>☝️ Za več informacij se dotaknite ščita.]]></item>
         <item quantity="two"><![CDATA[ in <b>še %1$d</b> so vam poskušali tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij se dotaknite ščita.]]></item>
         <item quantity="few"><![CDATA[ in <b>še %1$d</b> so vam poskušali tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij se dotaknite ščita.]]></item>
-        <item quantity="other"><![CDATA[ in <b>še %1$d </b> vam je poskušalo tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij se dotaknite ščita.]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[ in <b>še %1$d </b> vam je poskušalo tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij se dotaknite ščita.]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ vam je poskušal tukaj slediti. Blokiral sem ga!<br/><br/>☝️ Za več informacij tapnite ščit.️]]></item>
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[ vam je poskušal tukaj slediti. Blokiral sem ga!<br/><br/>☝️ Za več informacij tapnite ščit.️]]></item>
         <item quantity="two"><![CDATA[ sta vam poskušala tukaj slediti. Blokiral sem ju!<br/><br/>☝️ Za več informacij tapnite ščit.️]]></item>
         <item quantity="few"><![CDATA[ so vam poskušali tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij tapnite ščit.️]]></item>
-        <item quantity="other"><![CDATA[ vam je poskušalo tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij tapnite ščit.️]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[ vam je poskušalo tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij tapnite ščit.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Razumem!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Takoj počistite svojo dejavnost brskanja z gumbom <b>Fire Button</b>.<br/><br/>Poskusite! 🔥]]></string>
@@ -1013,9 +1013,6 @@
     <string name="preOnboardingImportErrorRetry">Poskusi znova</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Dodajte me v vrstico priljubljenih.</string>
-    <string name="preOnboardingAddToDockBody">Poiščite ikono DuckDuckGo na domačem zaslonu. Nato jo pritisnite in povlecite na želeno mesto. To je to!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Razumem!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Začnite zasebni klepet z umetno inteligenco z Duck.ai ali preklopite na iskanje za zaščiteno brskanje.<br/><br/>Duck.ai lahko uporabljate kjer koli, kjer vidite ikono klepeta]]></string>

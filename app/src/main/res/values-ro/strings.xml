@@ -63,9 +63,9 @@
     <string name="undoSnackbarAction">Anulează</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Instrument de urmărire blocat</item>
+        <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">Instrument de urmărire blocat</item>
         <item quantity="few">Instrumente de urmărire blocate</item>
-        <item quantity="other">Instrumente de urmărire blocate</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">Instrumente de urmărire blocate</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -225,7 +225,7 @@
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d site exclus de la ștergere</item>
         <item quantity="few">%1$d site-uri excluse de la ștergere</item>
-        <item quantity="other">%1$d site-uri excluse de la ștergere</item>
+        <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d site-uri excluse de la ștergere</item>
     </plurals>
     <string name="dataClearingAutomaticClearingOn">Activat</string>
     <string name="dataClearingAutomaticClearingOff">Dezactivat</string>
@@ -252,9 +252,9 @@
     <string name="singleTabFireDialogSubtitleSiteData">Ștergerea datelor de pe site te poate deconecta de la conturi.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Aceasta va anula descărcările în desfășurare.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">%1$d filă și datele aferente au fost șterse</item>
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">%1$d filă și datele aferente au fost șterse</item>
         <item quantity="few">%1$d file și datele aferente au fost șterse</item>
-        <item quantity="other">%1$d file și datele aferente au fost șterse</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">%1$d file și datele aferente au fost șterse</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Datele site-ului nu au putut fi șterse. Actualizează WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Datele site-ului nu au putut fi șterse din cauza unei erori.</string>
@@ -782,14 +782,14 @@
     <string name="onboardingSerpDaxDialogButton">Am înțeles!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Apoi, încearcă să vizitezi un site!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
-        <item quantity="one"><![CDATA[ și <b>încă %1$d</b> încerca să te urmărească aici. L-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[ și <b>încă %1$d</b> încerca să te urmărească aici. L-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
         <item quantity="few"><![CDATA[ și <b>încă %1$d</b> încercau să te urmărească aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
-        <item quantity="other"><![CDATA[ și <b>încă %1$d</b> încercau să te urmărească aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[ și <b>încă %1$d</b> încercau să te urmărească aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ încerca să te urmărească aici. L-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[ încerca să te urmărească aici. L-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
         <item quantity="few"><![CDATA[ încercau să te urmărească până aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
-        <item quantity="other"><![CDATA[ încercau să te urmărească până aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[ încercau să te urmărească până aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Am înțeles!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Șterge-ți instantaneu activitatea de navigare cu <b>Fire Button</b>.<br/><br/>Încearcă! 🔥]]></string>
@@ -995,9 +995,6 @@
     <string name="preOnboardingImportErrorRetry">Încearcă din nou</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Adaugă-mă în șirul tău de preferințe.</string>
-    <string name="preOnboardingAddToDockBody">Găsește pictograma DuckDuckGo pe ecranul de pornire. Apoi apasă și trage în poziție. Gata!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Am înțeles!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Începe o conversație privată cu IA cu Duck.ai sau comută la Căutare pentru navigare protejată.<br/><br/>Poți folosi Duck.ai de oriunde vezi pictograma de chat]]></string>

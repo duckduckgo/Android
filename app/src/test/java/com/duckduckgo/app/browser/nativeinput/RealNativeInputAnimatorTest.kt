@@ -34,10 +34,12 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class RealNativeInputAnimatorTest {
@@ -136,6 +138,30 @@ class RealNativeInputAnimatorTest {
         assertTrue(card.shapeAppearanceModel.topLeftCornerSize is RelativeCornerSize)
         verify(card, never()).radius = any()
         assertEquals(72, params.height)
+    }
+
+    @Test
+    fun whenInitWithLargerOmnibarRadiusThenVisibleCardMatchesOmnibarHeight() {
+        val params = LinearLayout.LayoutParams(0, WRAP_CONTENT, 1f)
+        var compatPadding = 49
+        val card = mock<MaterialCardView> {
+            on { layoutParams } doReturn params
+            on { shapeAppearanceModel } doReturn ShapeAppearanceModel.builder().setAllCornerSizes(72f).build()
+            on { radius } doReturn 72f
+            on { paddingLeft } doAnswer { compatPadding }
+            on { paddingTop } doAnswer { compatPadding }
+            on { paddingRight } doAnswer { compatPadding }
+            on { paddingBottom } doAnswer { compatPadding }
+        }
+        doAnswer { compatPadding = 70 }.whenever(card).radius = 144f
+        val omnibarCard = mock<MaterialCardView> {
+            on { radius } doReturn 144f
+        }
+
+        testee.init(card, omnibarCard, omnibarWidth = 636, omnibarHeight = 132, isBottom = false)
+
+        assertEquals(132, params.height - card.paddingTop - card.paddingBottom)
+        assertEquals(636, params.width - card.paddingLeft - card.paddingRight)
     }
 
     @Test

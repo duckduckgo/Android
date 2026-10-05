@@ -255,10 +255,10 @@
     <string name="duck_ai_chat_history_action_new">Nové</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Stiahnutie četov</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Sťahovanie %1$d četu je dokončené</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Sťahovanie %1$d četu je dokončené</item>
         <item quantity="few">Sťahovanie pre %1$d čety je dokončené</item>
         <item quantity="many">Sťahovanie pre %1$d četov je dokončené</item>
-        <item quantity="other">Sťahovanie pre %1$d chatov je dokončené</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Sťahovanie pre %1$d chatov je dokončené</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Otvoriť rozšírenú ponuku</string>
     <string name="duck_ai_chat_history_select_all">Vybrať všetko</string>
@@ -284,6 +284,11 @@
     <string name="native_input_chat_duck_mode_hint">Odpovedať…</string>
 
     <!-- Model Picker -->
+    <string name="duckAiModelPickerLabelEverydayUse" instruction="Subline under a model in the Duck.ai model picker, describing what that model suits.">Najlepší na každodenné použitie</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster" instruction="Subline under a model in the Duck.ai model picker. &apos;Limits&apos; means the user&apos;s usage allowance, which this model consumes more quickly.">Je robustný, ale skôr vyčerpá limity</string>
+    <string name="duckAiModelPickerTryFreeTrial" instruction="Header above the locked models in the Duck.ai model picker, shown when the user can still start a free trial.">Vyskúšaj ho zadarmo</string>
+    <string name="duckAiModelPickerSubscriberExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when unlocking them requires a paid subscription.">Exkluzívne pre predplatiteľov</string>
+    <string name="duckAiModelPickerProExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when they require the Pro plan specifically. &apos;Pro&apos; is the plan name and stays untranslated.">Exkluzívne pre plán Pro</string>
     <string name="duckAiModelPickerPlusModels">Plus</string>
     <string name="duckAiModelPickerProModels">Pro</string>
 
@@ -368,9 +373,38 @@
 
     <!-- Prefix on the Duck.ai attachment chip for a text selection -->
     <plurals name="duckAiTextSelectionWordCount">
-        <item quantity="one">%1$d slovo</item>
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d slovo</item>
         <item quantity="few">%1$d slová</item>
         <item quantity="many">%1$d slov</item>
-        <item quantity="other">%1$d slov</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d slov</item>
+    </plurals>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model&apos;s short name">%1$s čerpá limity až 2–5× rýchlejšie ako základné modely.</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Odmietnuť</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">%1$d%% z denného limitu</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">%1$d%% z týždenného limitu</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Bol dosiahnutý denný limit</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Bol dosiahnutý týždenný limit</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Bol dosiahnutý týždenný limit používania</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Bol dosiahnutý limit pre pokročilé modely umelej inteligencie</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Model prepínača</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Začni používať týždenný limit</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Vyskúšaj predplatné zadarmo</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">Prihlásiť sa na odber</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as &apos;2 days&apos; or &apos;5 hours&apos;">Obnoví sa za %1$s</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d deň</item>
+        <item quantity="few">%1$d dni</item>
+        <item quantity="many">%1$d dní</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d dní</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d hodinu</item>
+        <item quantity="few">%1$d hodiny</item>
+        <item quantity="many">%1$d hodín</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d hodín</item>
     </plurals>
 </resources>

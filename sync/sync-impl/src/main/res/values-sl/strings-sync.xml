@@ -376,7 +376,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Sync &amp; Backup je šifriran v celoti v vseh vaših napravah.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Preveri drugo napravo</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Preverite drugo napravo.</string>
     <string name="sync_simplified_pairing_headline_recovery">Obnovitev podatkov</string>
     <string name="sync_simplified_pairing_body">Povezovanje ...</string>
 

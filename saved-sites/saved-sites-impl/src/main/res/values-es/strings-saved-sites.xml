@@ -73,12 +73,12 @@
     <string name="bookmarkFolderDeleteDialogMessage">"¿Seguro que deseas eliminar "</string>
     <string name="bookmarkFolderEmpty">Vacío</string>
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s y %3$d artículo?</item>
-        <item quantity="other">%1$s%2$s y %3$d artículos?</item>
+        <item quantity="one" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s y %3$d artículo?</item>
+        <item quantity="other" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s y %3$d artículos?</item>
     </plurals>
     <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d artículo</item>
-        <item quantity="other">%1$d artículos</item>
+        <item quantity="one" instruction="Placeholder is the number of items">%1$d artículo</item>
+        <item quantity="other" instruction="Placeholder is the number of items">%1$d artículos</item>
     </plurals>
 
     <!-- Bookmarks -->
@@ -93,8 +93,8 @@
     <string name="removeFromFavorites">Eliminar de favoritos</string>
     <string name="addToFavoritesMenu">Añadir a favoritos</string>
     <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">¿Seguro que deseas eliminar esta carpeta y %1$d elemento?</item>
-        <item quantity="other">¿Seguro que deseas eliminar esta carpeta y %1$d elementos?</item>
+        <item quantity="one" instruction="%1$d is the number of items inside the folder">¿Seguro que deseas eliminar esta carpeta y %1$d elemento?</item>
+        <item quantity="other" instruction="%1$d is the number of items inside the folder">¿Seguro que deseas eliminar esta carpeta y %1$d elementos?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">¿Seguro que deseas eliminar tu marcador para &lt;b&gt;%1$s&lt;/b&gt;?</string>
 

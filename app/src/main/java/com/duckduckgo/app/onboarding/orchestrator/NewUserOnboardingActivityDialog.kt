@@ -37,7 +37,6 @@ sealed interface NewUserOnboardingActivityDialog {
     data object AiComparisonChart : NewUserOnboardingActivityDialog
     data class SegmentedComparisonChart(val chart: ComparisonChartConfig) : NewUserOnboardingActivityDialog
     data object DefaultBrowserPrompt : NewUserOnboardingActivityDialog
-    data object AddToDock : NewUserOnboardingActivityDialog
     data object WidgetPrompt : NewUserOnboardingActivityDialog
 
     data object AddWidget : NewUserOnboardingActivityDialog

@@ -20,9 +20,8 @@
     <string name="devSettingsSubtitle">Features useful for devs and debugging</string>
     <string name="devSettingsScreenPrivacySection">Privacy</string>
     <string name="devSettingsScreenGeneralSection">General</string>
-    <string name="devSettingsScreenTdsVersion">TDS version</string>
-    <string name="devSettingsScreenTdsVersionSubtitle">Use next TDS version</string>
-    <string name="devSettingsScreenTdsWait">Please wait while we download the tds version</string>
+    <string name="devSettingsScreenResetTds">Reset tracker data (TDS)</string>
+    <string name="devSettingsScreenResetTdsSubtitle">Clear the stored TDS and download it again</string>
     <string name="devStartupTracing">Start-up tracing</string>
     <string name="devStartupTracingByline">Enable/disable start-up tracing</string>
     <string name="devSettingsTriggerAnr">Trigger ANR</string>

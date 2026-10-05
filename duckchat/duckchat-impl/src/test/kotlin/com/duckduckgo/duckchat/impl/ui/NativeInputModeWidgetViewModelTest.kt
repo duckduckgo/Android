@@ -143,7 +143,7 @@ class NativeInputModeWidgetViewModelTest {
     private val realNativeInputStateStore = RealNativeInputStateStore(
         dagger.Lazy { tabRepositoryProvider },
         browserModeStateHolder,
-        RealTextSelectionRepository(),
+        RealTextSelectionRepository(dagger.Lazy { mock() }, mock()),
     )
     private val nativeInputStatePublisher: NativeInputStatePublisher = realNativeInputStateStore
     private val nativeInputStateProvider: NativeInputStateProvider = realNativeInputStateStore
@@ -183,7 +183,10 @@ class NativeInputModeWidgetViewModelTest {
         testee.configure(tabId = "test-tab", isDuckAiMode = false, isBottom = false)
     }
 
-    private fun createViewModel(plugins: List<NativeInputPlugin> = emptyList()): NativeInputModeWidgetViewModel {
+    private fun createViewModel(
+        plugins: List<NativeInputPlugin> = emptyList(),
+        browserMode: BrowserMode = BrowserMode.REGULAR,
+    ): NativeInputModeWidgetViewModel {
         fakePlugins = plugins
         return NativeInputModeWidgetViewModel(
             duckChatInternal = duckChatInternal,
@@ -194,7 +197,7 @@ class NativeInputModeWidgetViewModelTest {
             chatSuggestionsReader = chatSuggestionsReader,
             nativeInputPlugins = fakePluginPoint,
             autoCompleteFactory = autoCompleteFactory,
-            browserMode = BrowserMode.REGULAR,
+            browserMode = browserMode,
             autoCompleteSettings = autoCompleteSettings,
             duckAiChatHistoryFeature = duckAiChatHistoryFeature,
             duckChatFeature = duckChatFeature,
@@ -759,6 +762,45 @@ class NativeInputModeWidgetViewModelTest {
         val plugins = viewModel.plugins.value
         assertEquals(1, plugins.size)
         assertEquals(42, plugins[0].containerId)
+    }
+
+    @Test
+    fun whenDuckAiIsSelectedThenFooterContextReportsDuckAi() = runTest {
+        testee.setToggleSelection(NativeInputState.ToggleSelection.DUCK_AI)
+
+        assertTrue(testee.footerContext.first { it.isDuckAiSelected }.isDuckAiSelected)
+    }
+
+    @Test
+    fun whenConfiguredForEditThenFooterContextReportsEditing() = runTest {
+        testee.configureForEdit(sessionId = "session-1")
+
+        assertTrue(testee.footerContext.first { it.isEditing }.isEditing)
+    }
+
+    @Test
+    fun whenBrowserModeIsFireThenFooterContextReportsFireMode() = runTest {
+        val viewModel = createViewModel(browserMode = BrowserMode.FIRE)
+
+        assertEquals(BrowserMode.FIRE, viewModel.footerContext.value.browserMode)
+    }
+
+    @Test
+    fun whenPromptsAreSubmittedThenFooterContextCountsThemAndCarriesTheInputContext() = runTest {
+        testee.onPromptSubmitted()
+        testee.onPromptSubmitted()
+
+        assertEquals(2, testee.footerContext.value.promptSubmissions)
+        assertEquals(NativeInputState.InputContext.BROWSER, testee.footerContext.value.inputContext)
+    }
+
+    @Test
+    fun whenInputFocusChangesThenFooterContextReportsFocus() = runTest {
+        testee.setFooterInputFocused(true)
+        assertTrue(testee.footerContext.value.isInputFocused)
+
+        testee.setFooterInputFocused(false)
+        assertFalse(testee.footerContext.value.isInputFocused)
     }
 
     @Test
