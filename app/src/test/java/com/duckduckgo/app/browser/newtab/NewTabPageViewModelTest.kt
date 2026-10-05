@@ -172,6 +172,68 @@ class NewTabPageViewModelTest {
     }
 
     @Test
+    fun whenNextStepsMessageIsActiveAndOnboardingCompleteThenShowNextStepsIsTrue() = runTest {
+        val remoteMessage = aNextStepsMessage()
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            val state = expectMostRecentItem()
+            assertTrue(state.showNextSteps)
+            assertFalse(state.shouldShowLogo)
+        }
+    }
+
+    @Test
+    fun whenNextStepsMessageIsActiveAndOnboardingNotCompleteThenShowNextStepsIsFalse() = runTest {
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(aNextStepsMessage()))
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            assertFalse(expectMostRecentItem().showNextSteps)
+        }
+    }
+
+    @Test
+    fun whenNextStepsMessageClaimIsRefusedThenShowNextStepsIsFalseAndLogoIsShown() = runTest {
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(aNextStepsMessage()))
+        whenever(mockPromptsCoordinator.tryClaim(PromptType.NTP_CARD)).thenReturn(false)
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            val state = expectMostRecentItem()
+            assertFalse(state.showNextSteps)
+            assertTrue(state.shouldShowLogo)
+        }
+    }
+
+    @Test
+    fun whenActiveMessageIsNotNextStepsThenShowNextStepsIsFalse() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            assertFalse(expectMostRecentItem().showNextSteps)
+        }
+    }
+
+    private fun aNextStepsMessage() = RemoteMessage(
+        id = "android_complete_your_setup",
+        content = Content.NextStepsItems(titleText = "Complete your setup", listItems = emptyList()),
+        matchingRules = emptyList(),
+        exclusionRules = emptyList(),
+        surfaces = listOf(Surface.NEW_TAB_PAGE),
+    )
+
+    @Test
     fun whenShownMessageLeavesTheScreenThenClaimIsDone() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         val messages = MutableSharedFlow<RemoteMessage?>(replay = 1)

@@ -34,7 +34,8 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
@@ -71,7 +72,12 @@ class NextStepsItemsViewModel @Inject constructor(
     }
 
     fun onFrontCardDismissed() {
-        _viewState.update { state -> state.copy(items = state.items.drop(1)) }
+        val remaining = _viewState.updateAndGet { state -> state.copy(items = state.items.drop(1)) }
+        if (remaining.items.isEmpty()) {
+            remaining.message?.let { message ->
+                viewModelScope.launch { remoteMessageModel.onMessageDismissed(message) }
+            }
+        }
     }
 
     private fun RemoteMessage.isNextStepsForNewTabPage(): Boolean =

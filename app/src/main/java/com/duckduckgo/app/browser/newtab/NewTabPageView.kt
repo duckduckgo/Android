@@ -76,6 +76,7 @@ import com.duckduckgo.nextsteps.api.NextSteps
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.SharePromoLinkIntentFactory
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -156,6 +157,7 @@ class NewTabPageView @JvmOverloads constructor(
 
     private var lastSelectedMode: InputMode? = null
     private var logoAnimator: ValueAnimator? = null
+    private var nextStepsSectionJob: Job? = null
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         if (ev.actionMasked == MotionEvent.ACTION_DOWN && ntpEngagementTracker.shouldReportEngagement()) {
@@ -195,7 +197,6 @@ class NewTabPageView @JvmOverloads constructor(
             .onEach { mode -> updateLogoForMode(mode) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
-        attachNextStepsSection()
         disableViewStateSaving()
     }
 
@@ -207,6 +208,8 @@ class NewTabPageView @JvmOverloads constructor(
         conflatedCommandJob.cancel()
         conflatedNativeInputJob.cancel()
         conflatedChatModeJob.cancel()
+        nextStepsSectionJob?.cancel()
+        nextStepsSectionJob = null
         logoAnimator?.cancel()
         logoAnimator = null
         lastSelectedMode = null
@@ -260,10 +263,16 @@ class NewTabPageView @JvmOverloads constructor(
         }
     }
 
-    private fun attachNextStepsSection() {
-        if (binding.nextStepsContainer.childCount > 0) return
-        findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
-            nextSteps.provideSectionView(context)?.let { binding.nextStepsContainer.addView(it) }
+    private fun showNextStepsSection(newMessage: Boolean) {
+        val shouldRender = newMessage || binding.nextStepsContainer.isGone
+        binding.nextStepsContainer.show()
+        if (binding.nextStepsContainer.childCount == 0 && nextStepsSectionJob?.isActive != true) {
+            nextStepsSectionJob = findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+                nextSteps.provideSectionView(context)?.let { binding.nextStepsContainer.addView(it) }
+            }
+        }
+        if (shouldRender) {
+            viewModel.onMessageShown()
         }
     }
 
@@ -294,16 +303,20 @@ class NewTabPageView @JvmOverloads constructor(
         binding.fireTabEmptyState.root.gone()
         binding.indonesiaNewTabSectionView.show()
         binding.appTrackingProtectionStateView.show()
-        binding.nextStepsContainer.show()
 
         if (viewState.shouldShowLogo) {
             homeBackgroundLogo.showLogo()
         } else {
             homeBackgroundLogo.hideLogo()
         }
-        if (viewState.message != null && viewState.onboardingComplete) {
+        if (viewState.showNextSteps) {
+            binding.messageCta.gone()
+            showNextStepsSection(viewState.newMessage)
+        } else if (viewState.message != null && viewState.onboardingComplete) {
+            binding.nextStepsContainer.gone()
             showRemoteMessage(viewState.message, viewState.messageImageFilePath, viewState.newMessage)
         } else {
+            binding.nextStepsContainer.gone()
             binding.messageCta.gone()
             if (viewState.lowPriorityMessage != null) {
                 showLowPriorityMessage(viewState.lowPriorityMessage)

@@ -30,7 +30,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class NextStepsItemsViewModelTest {
@@ -112,6 +115,7 @@ class NextStepsItemsViewModelTest {
         testee.onFrontCardDismissed()
 
         assertEquals(listOf(addWidgetItem), testee.viewState.value.items)
+        verify(remoteMessageModel, never()).onMessageDismissed(any())
     }
 
     @Test
@@ -122,8 +126,23 @@ class NextStepsItemsViewModelTest {
 
         testee.onFrontCardDismissed()
         testee.onFrontCardDismissed()
+        advanceUntilIdle()
 
         assertEquals(emptyList<CardItem.ListItem>(), testee.viewState.value.items)
+    }
+
+    @Test
+    fun `when last card is dismissed then the message is dismissed in RMF`() = runTest {
+        val message = aMessage(content = nextStepsContent())
+        activeMessage.value = message
+        testee.onStart(mock())
+        advanceUntilIdle()
+
+        testee.onFrontCardDismissed()
+        testee.onFrontCardDismissed()
+        advanceUntilIdle()
+
+        verify(remoteMessageModel).onMessageDismissed(message)
     }
 
     private val defaultBrowserItem = CardItem.ListItem(

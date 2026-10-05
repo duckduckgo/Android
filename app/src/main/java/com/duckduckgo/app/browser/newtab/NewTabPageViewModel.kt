@@ -38,6 +38,7 @@ import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
 import com.duckduckgo.promptscoordinator.api.PromptType
 import com.duckduckgo.promptscoordinator.api.PromptsCoordinator
 import com.duckduckgo.remote.messaging.api.Action
+import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.Surface
@@ -108,6 +109,7 @@ class NewTabPageViewModel @AssistedInject constructor(
         private val hasLowPriorityMessage = lowPriorityMessage != null
 
         val showFireTabEmptyState = isFireMode
+        val showNextSteps = onboardingComplete && message?.content is Content.NextStepsItems
         val shouldShowLogo = !isFireMode && !isLoadingContent && !hasContentThatDisplacesHomeLogo && showDaxLogo
         val hasContent = isFireMode ||
             isLoadingContent ||
