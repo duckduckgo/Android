@@ -58,4 +58,10 @@
     <string name="browserMenuForward">Frem</string>
     <string name="browserMenuRefresh">Opdater</string>
     <string name="browserMenuFireTabsData">Slet faner og data</string>
+
+    <!-- Duck.ai tab + menu -->
+    <string name="chatMenuPopupNewVoiceChat">Ny stemmechat</string>
+    <string name="chatMenuPopupNewImage">Nyt billede</string>
+    <string name="chatMenuPopupNewTab">Ny fane</string>
+    <string name="chatMenuPopupNewFireTab">Ny Fire-fane</string>
 </resources>

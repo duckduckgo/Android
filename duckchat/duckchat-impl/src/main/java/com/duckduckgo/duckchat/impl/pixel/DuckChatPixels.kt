@@ -173,6 +173,10 @@ interface DuckChatPixels {
     fun reportContextualPageContextRemovedNative()
     fun reportContextualPageContextRemovedFrontend()
     fun reportContextualPageContextAutoAttached()
+    fun reportContextualSelectionAttached()
+    fun reportContextualSelectionLimitReached()
+    fun reportContextualSelectionRemoved()
+    fun reportContextualPromptSubmittedWithSelections(count: Int)
     fun reportContextualPromptSubmittedWithContextNative()
     fun reportContextualPromptSubmittedWithoutContextNative()
     fun reportContextualPageContextCollectionEmpty()
@@ -821,6 +825,41 @@ class RealDuckChatPixels @Inject constructor(
         }
     }
 
+    override fun reportContextualSelectionAttached() {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SELECTION_ATTACHED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SELECTION_ATTACHED_DAILY,
+        )
+    }
+
+    override fun reportContextualSelectionLimitReached() {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SELECTION_LIMIT_REACHED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SELECTION_LIMIT_REACHED_DAILY,
+        )
+    }
+
+    override fun reportContextualSelectionRemoved() {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SELECTION_REMOVED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SELECTION_REMOVED_DAILY,
+        )
+    }
+
+    override fun reportContextualPromptSubmittedWithSelections(count: Int) {
+        val bucket = when (count) {
+            1 -> "1"
+            2 -> "2"
+            in 3..5 -> "3-5"
+            else -> return
+        }
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_SELECTIONS_COUNT,
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_SELECTIONS_DAILY,
+            mapOf(DuckChatPixelParameters.SELECTION_COUNT to bucket),
+        )
+    }
+
     override fun reportContextualFloatingInputPromotedToSheet() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_PROMOTED_TO_SHEET_COUNT)
@@ -1378,6 +1417,14 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY("m_product_telemetry_surface_usage_duck_ai_daily"),
     PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE("m_product_telemetry_surface_usage_keyboard_active"),
     PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY("m_product_telemetry_surface_usage_keyboard_active_daily"),
+    DUCK_CHAT_CONTEXTUAL_SELECTION_ATTACHED_COUNT("m_aichat_contextual_selection_attached_count"),
+    DUCK_CHAT_CONTEXTUAL_SELECTION_ATTACHED_DAILY("m_aichat_contextual_selection_attached_daily"),
+    DUCK_CHAT_CONTEXTUAL_SELECTION_LIMIT_REACHED_COUNT("m_aichat_contextual_selection_limit_reached_count"),
+    DUCK_CHAT_CONTEXTUAL_SELECTION_LIMIT_REACHED_DAILY("m_aichat_contextual_selection_limit_reached_daily"),
+    DUCK_CHAT_CONTEXTUAL_SELECTION_REMOVED_COUNT("m_aichat_contextual_selection_removed_count"),
+    DUCK_CHAT_CONTEXTUAL_SELECTION_REMOVED_DAILY("m_aichat_contextual_selection_removed_daily"),
+    DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_SELECTIONS_COUNT("m_aichat_contextual_prompt_submitted_with_selections_count"),
+    DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_SELECTIONS_DAILY("m_aichat_contextual_prompt_submitted_with_selections_daily"),
     DUCK_CHAT_CONTEXTUAL_SHEET_OPENED_COUNT("m_aichat_contextual_sheet_opened_count"),
     DUCK_CHAT_CONTEXTUAL_SHEET_OPENED_DAILY("m_aichat_contextual_sheet_opened_daily"),
     DUCK_CHAT_CONTEXTUAL_SHEET_DISMISSED_COUNT("m_aichat_contextual_sheet_dismissed_count"),
@@ -1590,6 +1637,17 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_UNIFIED_INPUT_PICKER_UPSELL_SHOWN("m_aichat_unified_input_picker_upsell_shown"),
     DUCK_CHAT_MODEL_LABEL_UNKNOWN_DAILY("m_aichat_model_label_unknown_daily"),
     DUCK_CHAT_UNIFIED_INPUT_REASONING_EFFORT_PICKER_SHOWN("m_aichat_unified_input_reasoning_effort_picker_shown"),
+
+    // Items of the Duck.ai "+" menu in the omnibar, which is only offered in Duck.ai view mode.
+    // "New chat" there is already covered by DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED.
+    DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_COUNT("m_aichat_omnibar_menu_new_voice_chat_tapped_count"),
+    DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_DAILY("m_aichat_omnibar_menu_new_voice_chat_tapped_daily"),
+    DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_COUNT("m_aichat_omnibar_menu_new_image_tapped_count"),
+    DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_DAILY("m_aichat_omnibar_menu_new_image_tapped_daily"),
+    DUCK_CHAT_OMNIBAR_MENU_NEW_TAB_TAPPED_COUNT("m_aichat_omnibar_menu_new_tab_tapped_count"),
+    DUCK_CHAT_OMNIBAR_MENU_NEW_TAB_TAPPED_DAILY("m_aichat_omnibar_menu_new_tab_tapped_daily"),
+    DUCK_CHAT_OMNIBAR_MENU_NEW_FIRE_TAB_TAPPED_COUNT("m_aichat_omnibar_menu_new_fire_tab_tapped_count"),
+    DUCK_CHAT_OMNIBAR_MENU_NEW_FIRE_TAB_TAPPED_DAILY("m_aichat_omnibar_menu_new_fire_tab_tapped_daily"),
 }
 
 object DuckChatPixelParameters {
@@ -1600,6 +1658,7 @@ object DuckChatPixelParameters {
     const val HAS_PROMPT = "has_prompt"
     const val WAS_USED_BEFORE = "was_used_before"
     const val SUGGESTION_ID = "suggestionId"
+    const val SELECTION_COUNT = "selection_count"
     const val PAGE_TYPE = "pageType"
 
     /** What the user was looking at when a prompt was submitted. Distinct from [PAGE_TYPE], which classifies contextual suggestions. */
@@ -1736,6 +1795,14 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SHEET_OPENED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SHEET_DISMISSED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SHEET_DISMISSED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SELECTION_ATTACHED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SELECTION_ATTACHED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SELECTION_LIMIT_REACHED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SELECTION_LIMIT_REACHED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SELECTION_REMOVED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SELECTION_REMOVED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_SELECTIONS_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_SELECTIONS_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SESSION_RESTORED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SESSION_RESTORED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_EXPANDED_COUNT.pixelName to PixelParameter.removeAtb(),
@@ -1872,6 +1939,14 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_HISTORY_NEW_CHAT_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_TAB_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_TAB_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_FIRE_TAB_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_FIRE_TAB_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
             "m_duck-ai_native-storage_" to PixelParameter.removeAtb(),
             // Prefix: covers every m_aichat_unified_input_* pixel (tools, submit, model/reasoning,
             // upsell, attachments, voice, stop) AND the app-side chat_header_upgrade_tapped, which

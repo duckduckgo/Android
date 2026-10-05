@@ -81,13 +81,7 @@ class ShowOnAppLaunchOptionPrefsDataStore @Inject constructor(
     }
 
     private fun defaultShowOnAppLaunchOption(): ShowOnAppLaunchOption =
-        if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled() &&
-            androidBrowserConfigFeature.ntpAsDefaultAfterIdleReturn().isEnabled()
-        ) {
-            NewTabPage
-        } else {
-            LastOpenedTab
-        }
+        if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) NewTabPage else LastOpenedTab
 
     override val specificPageUrlFlow: Flow<String> = store.data.map { preferences ->
         preferences[stringPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_URL)] ?: DEFAULT_SPECIFIC_PAGE_URL

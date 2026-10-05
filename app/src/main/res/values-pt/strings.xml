@@ -63,8 +63,8 @@
     <string name="undoSnackbarAction">Anular</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Rastreador bloqueado</item>
-        <item quantity="other">Rastreadores bloqueados</item>
+        <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">Rastreador bloqueado</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">Rastreadores bloqueados</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -223,7 +223,7 @@
     <string name="dataClearingDescription">Eliminar os teus dados pode ajudar a proteger a tua privacidade online. Utiliza o Fire Button para eliminar dados manualmente ou configura a eliminação automática.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d site excluído da limpeza</item>
-        <item quantity="other">%1$d sites excluídos da limpeza</item>
+        <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d sites excluídos da limpeza</item>
     </plurals>
     <string name="dataClearingAutomaticClearingOn">Ligado</string>
     <string name="dataClearingAutomaticClearingOff">Desligado</string>
@@ -250,8 +250,8 @@
     <string name="singleTabFireDialogSubtitleSiteData">Eliminar dados do site pode terminar a tua sessão nas contas.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Esta ação vai cancelar as transferências em curso.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">%1$d separador e respetivos dados eliminados</item>
-        <item quantity="other">%1$d separadores e respetivos dados eliminados</item>
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">%1$d separador e respetivos dados eliminados</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">%1$d separadores e respetivos dados eliminados</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Não foi possível apagar os dados do site. Atualiza o WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Não foi possível apagar os dados do site devido a um erro.</string>
@@ -766,12 +766,12 @@
     <string name="onboardingSerpDaxDialogButton">Entendi!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Em seguida, experimenta visitar um site!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
-        <item quantity="one"><![CDATA[ e <b>mais %1$d</b> estavam tentar rastrear-te aqui. Eu bloqueei-os!<br/><br/>☝️ Toca no escudo para obteres mais informações.️]]></item>
-        <item quantity="other"><![CDATA[ e <b>mais %1$d</b> estavam a tentar rastrear-te aqui. Eu bloqueei-os!<br/><br/>☝️ Toca no escudo para obteres mais informações.]]></item>
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[ e <b>mais %1$d</b> estavam tentar rastrear-te aqui. Eu bloqueei-os!<br/><br/>☝️ Toca no escudo para obteres mais informações.️]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[ e <b>mais %1$d</b> estavam a tentar rastrear-te aqui. Eu bloqueei-os!<br/><br/>☝️ Toca no escudo para obteres mais informações.]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ estavam a tentar rastrear-te aqui. Eu bloqueei-o!<br/><br/>☝️ Toca no escudo para obteres mais informações.️]]></item>
-        <item quantity="other"><![CDATA[ estavam a tentar rastrear-te aqui. Eu bloqueei-os!<br/><br/>☝️ Toca no escudo para obteres mais informações.️]]></item>
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[ estavam a tentar rastrear-te aqui. Eu bloqueei-o!<br/><br/>☝️ Toca no escudo para obteres mais informações.️]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[ estavam a tentar rastrear-te aqui. Eu bloqueei-os!<br/><br/>☝️ Toca no escudo para obteres mais informações.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Entendi!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Limpa instantaneamente a tua atividade de navegação com o <b>Fire Button</b>.<br/><br/>Experimenta! 🔥]]></string>
@@ -977,9 +977,6 @@
     <string name="preOnboardingImportErrorRetry">Tentar novamente</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Adiciona-me à tua linha de favoritos.</string>
-    <string name="preOnboardingAddToDockBody">Encontra o ícone do DuckDuckGo no ecrã inicial. Em seguida, prime e arrasta para o lugar certo. Está feito!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Entendi!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Inicia um chat privado de IA com o Duck.ai ou muda para \"Pesquisar\" para uma navegação protegida.<br/><br/>Podes usar o Duck.ai em qualquer lugar onde vejas o ícone de chat]]></string>

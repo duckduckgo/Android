@@ -21,6 +21,14 @@
     android:clipToPadding="false"
     android:orientation="vertical">
 
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:text="@string/dsShowcaseCaptionView"
+        app:typography="caption" />
+
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/sectionHeaderItemTitle"
         android:layout_width="match_parent"
@@ -33,5 +41,11 @@
         android:layout_height="wrap_content"
         app:showOverflowMenu="true"
         app:primaryText="Section Header with Overflow Menu" />
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/composeSectionHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_3" />
 
 </LinearLayout>

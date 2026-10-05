@@ -513,8 +513,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     APP_VERSION_AT_SEARCH_TIME("app_version_at_search_time"),
 
-    BLOCKLIST_TDS_FAILURE("blocklist_experiment_tds_download_failure"),
-
     SET_AS_DEFAULT_SYSTEM_DIALOG_IMPRESSION("m_set-as-default_system-dialog_impression"),
     SET_AS_DEFAULT_SYSTEM_DIALOG_CLICK("m_set-as-default_system-dialog_click"),
     SET_AS_DEFAULT_SYSTEM_DIALOG_DISMISSED("m_set-as-default_system-dialog_dismissed"),

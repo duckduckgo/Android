@@ -57,6 +57,7 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ReasoningResolver
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
@@ -88,6 +89,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -168,6 +170,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private var pendingChatId: String? = null
     private var hasPendingChatId = false
     private var pendingInteractionLock: InteractionLock? = null
+    private var pendingModelPickerEnabled: Boolean? = null
     private var pendingDuckAiFireButtonHighlighted: Boolean? = null
 
     init {
@@ -194,13 +197,6 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     }
 
     /**
-     * Events asking the widget to open the model picker (e.g. for the FE recovery flow) for the related tabId.
-     */
-    val showModelPickerEvents: Flow<Unit> = duckChatInternal.showModelPickerEvents
-        .filter { it == activeTabId.value }
-        .map { }
-
-    /**
      * Edit-screen requests for this widget's tab. Both the omnibar and the contextual sheet widget can
      * be configured with the same tabId, so the surface has to match too or both would launch.
      */
@@ -212,6 +208,35 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     fun setModelPickerEnabled(enabled: Boolean) {
         _modelPickerEnabled.value = enabled
+        val tabId = activeTabId.value
+        if (tabId == null) {
+            // configure hasn't run yet — buffer until activeTabId is known, replayed in configure.
+            // The source is distinctUntilChanged, so a dropped value is never re-emitted (e.g. an
+            // existing chat's initial `false` would be lost and the picker would stay enabled).
+            pendingModelPickerEnabled = enabled
+            return
+        }
+        nativeInputStatePublisher.update(tabId) { it.copy(modelPickerEnabled = enabled) }
+    }
+
+    fun setHasText(hasText: Boolean) {
+        val tabId = activeTabId.value ?: return
+        nativeInputStatePublisher.update(tabId) { it.copy(hasText = hasText) }
+    }
+
+    fun setAttachmentState(hasAttachments: Boolean, limitExceeded: Boolean) {
+        val tabId = activeTabId.value ?: return
+        nativeInputStatePublisher.update(tabId) { it.copy(hasAttachments = hasAttachments, attachmentLimitExceeded = limitExceeded) }
+    }
+
+    fun setVoiceSearchAvailable(available: Boolean) {
+        val tabId = activeTabId.value ?: return
+        nativeInputStatePublisher.update(tabId) { it.copy(voiceSearchAvailable = available) }
+    }
+
+    fun setVoiceChatAvailable(available: Boolean) {
+        val tabId = activeTabId.value ?: return
+        nativeInputStatePublisher.update(tabId) { it.copy(voiceChatAvailable = available) }
     }
 
     // currentChat can briefly hold the previous chat while a getChatById lookup is in flight.
@@ -327,6 +352,46 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val widgetConfig = MutableStateFlow(WidgetConfig())
 
     private val activeTabId = MutableStateFlow<String?>(null)
+    private val footerInputFocused = MutableStateFlow(false)
+    private val footerPromptSubmissions = MutableStateFlow(0)
+
+    val footerContext: StateFlow<NativeInputFooterContext> = combine(
+        widgetConfig,
+        activeTabId,
+        footerInputFocused,
+        footerPromptSubmissions,
+    ) { config, tabId, inputFocused, promptSubmissions ->
+        val selection = config.toggleSelection ?: NativeInputState.defaultToggleFor(config.inputContext)
+        NativeInputFooterContext(
+            isDuckAiSelected = selection == NativeInputState.ToggleSelection.DUCK_AI,
+            isEditing = tabId?.startsWith(EDIT_STATE_KEY_PREFIX) == true,
+            browserMode = browserMode,
+            isInputFocused = inputFocused,
+            inputContext = config.inputContext,
+            promptSubmissions = promptSubmissions,
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = NativeInputFooterContext(
+            isDuckAiSelected = false,
+            isEditing = false,
+            browserMode = browserMode,
+            isInputFocused = false,
+            inputContext = NativeInputState.InputContext.BROWSER,
+        ),
+    )
+
+    fun setFooterInputFocused(focused: Boolean) {
+        footerInputFocused.value = focused
+    }
+
+    fun selectModelById(modelId: String) {
+        val model = modelManager.modelState.value.models.firstOrNull { it.id == modelId } ?: return
+        viewModelScope.launch { modelManager.selectModel(model) }
+    }
+
+    fun hasActiveChat(): Boolean = currentInputState()?.chatId != null
 
     private val baseState: Flow<NativeInputState> = combine(
         duckAiFeatureState.showSettings,
@@ -356,12 +421,6 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     val submitEnabled: Flow<Boolean> = activeTabId.filterNotNull()
         .flatMapLatest { tabId -> nativeInputStateProvider.stateForTab(tabId) }
         .map { it.submitEnabled }
-        .distinctUntilChanged()
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val modelChangeMode: Flow<Boolean> = activeTabId.filterNotNull()
-        .flatMapLatest { tabId -> nativeInputStateProvider.stateForTab(tabId) }
-        .map { it.modelChangeMode }
         .distinctUntilChanged()
 
     // interactionLock / duckAiFireButtonHighlighted live in the per-tab provider state (written by
@@ -493,6 +552,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
      * Called when a prompt is submitted
      * */
     fun onPromptSubmitted() {
+        footerPromptSubmissions.value += 1
         // A prompt submitted while still in the recovery window means the user sent a prompt after
         // recovering the chat's model — report it before the window is cleared below.
         val tabId = activeTabId.value
@@ -564,6 +624,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         pendingInteractionLock?.let { lock ->
             pendingInteractionLock = null
             nativeInputStatePublisher.update(tabId) { it.copy(interactionLock = lock) }
+        }
+        pendingModelPickerEnabled?.let { enabled ->
+            pendingModelPickerEnabled = null
+            nativeInputStatePublisher.update(tabId) { it.copy(modelPickerEnabled = enabled) }
         }
         pendingDuckAiFireButtonHighlighted?.let { highlighted ->
             pendingDuckAiFireButtonHighlighted = null

@@ -255,8 +255,8 @@
     <string name="duck_ai_chat_history_action_new">Нов</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Изтегляне на чатове</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Завършено изтегляне на %1$d чат</item>
-        <item quantity="other">Завършено изтегляне на %1$d чата</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Завършено изтегляне на %1$d чат</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Завършено изтегляне на %1$d чата</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Отваряне на менюто с допълнителни опции</string>
     <string name="duck_ai_chat_history_select_all">Избиране на всички</string>
@@ -282,6 +282,11 @@
     <string name="native_input_chat_duck_mode_hint">Отговор…</string>
 
     <!-- Model Picker -->
+    <string name="duckAiModelPickerLabelEverydayUse" instruction="Subline under a model in the Duck.ai model picker, describing what that model suits.">Най-подходящ за ежедневна употреба</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster" instruction="Subline under a model in the Duck.ai model picker. &apos;Limits&apos; means the user&apos;s usage allowance, which this model consumes more quickly.">Стабилен, но достига лимитите по-бързо</string>
+    <string name="duckAiModelPickerTryFreeTrial" instruction="Header above the locked models in the Duck.ai model picker, shown when the user can still start a free trial.">Пробвайте безплатно</string>
+    <string name="duckAiModelPickerSubscriberExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when unlocking them requires a paid subscription.">Ексклузивно за абонати</string>
+    <string name="duckAiModelPickerProExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when they require the Pro plan specifically. &apos;Pro&apos; is the plan name and stays untranslated.">Ексклузивно за план Pro</string>
     <string name="duckAiModelPickerPlusModels">Плюс</string>
     <string name="duckAiModelPickerProModels">Pro</string>
 
@@ -366,7 +371,32 @@
 
     <!-- Prefix on the Duck.ai attachment chip for a text selection -->
     <plurals name="duckAiTextSelectionWordCount">
-        <item quantity="one">%1$d дума</item>
-        <item quantity="other">%1$d думи</item>
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d дума</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d думи</item>
+    </plurals>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model&apos;s short name">%1$s изразходва лимитите до 2–5 пъти по-бързо от основните модели.</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Отказване</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">%1$d%% от дневния лимит</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">%1$d%% от седмичния лимит</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Достигнат дневен лимит</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Достигнат седмичен лимит</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Достигнат седмичен лимит за ползване</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Достигнат лимит за усъвършенствани AI модели</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Превключване на модела</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Започнете да използвате седмичен лимит</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Изпробвайте абонамента безплатно</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">Абонамент</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as &apos;2 days&apos; or &apos;5 hours&apos;">Нулира се след %1$s</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d ден</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d дни</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d час</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d часа</item>
     </plurals>
 </resources>

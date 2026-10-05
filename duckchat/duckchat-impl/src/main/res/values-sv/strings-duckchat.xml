@@ -255,8 +255,8 @@
     <string name="duck_ai_chat_history_action_new">Ny</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Ladda ner chattar</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Nedladdning klar för %1$d chatt</item>
-        <item quantity="other">Nedladdning klar för %1$d chattar</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Nedladdning klar för %1$d chatt</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Nedladdning klar för %1$d chattar</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Öppna överflödesmeny</string>
     <string name="duck_ai_chat_history_select_all">Välj alla</string>
@@ -282,6 +282,11 @@
     <string name="native_input_chat_duck_mode_hint">Svara…</string>
 
     <!-- Model Picker -->
+    <string name="duckAiModelPickerLabelEverydayUse" instruction="Subline under a model in the Duck.ai model picker, describing what that model suits.">Perfekt för vardagsbruk</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster" instruction="Subline under a model in the Duck.ai model picker. &apos;Limits&apos; means the user&apos;s usage allowance, which this model consumes more quickly.">Stabil men når gränser tidigare</string>
+    <string name="duckAiModelPickerTryFreeTrial" instruction="Header above the locked models in the Duck.ai model picker, shown when the user can still start a free trial.">Prova gratis</string>
+    <string name="duckAiModelPickerSubscriberExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when unlocking them requires a paid subscription.">Exklusivt för abonnenter</string>
+    <string name="duckAiModelPickerProExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when they require the Pro plan specifically. &apos;Pro&apos; is the plan name and stays untranslated.">Exklusivt för Pro-planen</string>
     <string name="duckAiModelPickerPlusModels">Plus</string>
     <string name="duckAiModelPickerProModels">Pro</string>
 
@@ -366,7 +371,32 @@
 
     <!-- Prefix on the Duck.ai attachment chip for a text selection -->
     <plurals name="duckAiTextSelectionWordCount">
-        <item quantity="one">%1$d ord</item>
-        <item quantity="other">%1$d ord</item>
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d ord</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d ord</item>
+    </plurals>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model&apos;s short name">%1$s förbrukar gränserna upp till 2–5 gånger snabbare än basmodeller.</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Avvisa</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">%1$d%% av den dagliga gränsen</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">%1$d%% av veckogränsen</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Daglig gräns uppnådd</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Veckogräns uppnådd</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Veckogränsen för användning har nåtts</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Gränsen för avancerade AI-modeller har nåtts</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Byt modell</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Börja använda veckogränsen</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Prova abonnemang gratis</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">Prenumerera</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as &apos;2 days&apos; or &apos;5 hours&apos;">Återställs om %1$s</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d dag</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d dagar</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d timme</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d timmar</item>
     </plurals>
 </resources>

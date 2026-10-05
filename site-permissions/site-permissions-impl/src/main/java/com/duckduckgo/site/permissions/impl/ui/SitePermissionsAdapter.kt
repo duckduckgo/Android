@@ -36,18 +36,21 @@ import com.duckduckgo.common.ui.view.setEnabledOpacity
 import com.duckduckgo.site.permissions.impl.R
 import com.duckduckgo.site.permissions.impl.databinding.ViewSitePermissionsDescriptionBinding
 import com.duckduckgo.site.permissions.impl.databinding.ViewSitePermissionsEmptyListBinding
+import com.duckduckgo.site.permissions.impl.databinding.ViewSitePermissionsSettingBinding
 import com.duckduckgo.site.permissions.impl.databinding.ViewSitePermissionsSiteBinding
 import com.duckduckgo.site.permissions.impl.databinding.ViewSitePermissionsTitleBinding
 import com.duckduckgo.site.permissions.impl.databinding.ViewSitePermissionsToggleBinding
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.Divider
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.EmptySites
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.SiteAllowedItem
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.SitePermissionSetting
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.SitePermissionToggle
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.SitePermissionsDescription
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.SitePermissionsHeader
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsListViewType.DESCRIPTION
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsListViewType.DIVIDER
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsListViewType.HEADER
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionsListViewType.SETTING
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsListViewType.SITES_EMPTY
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsListViewType.SITE_ALLOWED_ITEM
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsListViewType.TOGGLE
@@ -58,6 +61,8 @@ class SitePermissionsAdapter(
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
     private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
+    private val permissionSettingsRedesign: Boolean,
+    private val onPermissionSettingClicked: (SitePermissionSetting) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var items: List<SitePermissionListItem> = listOf()
@@ -73,10 +78,14 @@ class SitePermissionsAdapter(
         val listItems = mutableListOf<SitePermissionListItem>()
         listItems.add(SitePermissionsDescription())
         listItems.add(SitePermissionsHeader(R.string.sitePermissionsSettingsEnablePermissionTitle))
-        listItems.add(SitePermissionToggle(R.string.sitePermissionsSettingsLocation, isLocationEnabled))
-        listItems.add(SitePermissionToggle(R.string.sitePermissionsSettingsCamera, isCameraEnabled))
-        listItems.add(SitePermissionToggle(R.string.sitePermissionsSettingsMicrophone, isMicEnabled))
-        listItems.add(SitePermissionToggle(R.string.sitePermissionsSettingsDRM, isDrmEnabled))
+        listOf(
+            R.string.sitePermissionsSettingsLocation to isLocationEnabled,
+            R.string.sitePermissionsSettingsCamera to isCameraEnabled,
+            R.string.sitePermissionsSettingsMicrophone to isMicEnabled,
+            R.string.sitePermissionsSettingsDRM to isDrmEnabled,
+        ).forEach { (text, enabled) ->
+            listItems.add(if (permissionSettingsRedesign) SitePermissionSetting(text, enabled) else SitePermissionToggle(text, enabled))
+        }
         listItems.add(Divider())
         listItems.add(SitePermissionsHeader(R.string.sitePermissionsSettingsAllowedSitesTitle))
         if (sites.isEmpty()) {
@@ -109,6 +118,11 @@ class SitePermissionsAdapter(
                 SitePermissionToggleViewHolder(binding)
             }
 
+            SETTING -> {
+                val binding = ViewSitePermissionsSettingBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                SitePermissionSettingViewHolder(binding)
+            }
+
             DIVIDER -> {
                 val view = HorizontalDivider(parent.context)
                 SitePermissionsDividerViewHolder(view)
@@ -136,6 +150,7 @@ class SitePermissionsAdapter(
                 viewModel.permissionToggleSelected(isChecked, item.text)
             }
 
+            is SitePermissionSetting -> (holder as SitePermissionSettingViewHolder).bind(item) { onPermissionSettingClicked(item) }
             is SiteAllowedItem -> (holder as SiteViewHolder).bind(item)
             else -> {}
         }
@@ -239,6 +254,24 @@ class SitePermissionsAdapter(
         }
     }
 
+    class SitePermissionSettingViewHolder(val binding: ViewSitePermissionsSettingBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(
+            item: SitePermissionSetting,
+            onClick: () -> Unit,
+        ) {
+            with(binding.sitePermissionSetting) {
+                setPrimaryText(context.getString(item.text))
+                setSecondaryText(
+                    context.getString(
+                        if (item.askEnabled) R.string.permissionSettingsAskEachTime else R.string.sitePermissionsDialogNeverAllowButton,
+                    ),
+                )
+                GlobalPermission.from(item.text)?.let { setLeadingIconResource(it.icon) }
+                setClickListener(onClick)
+            }
+        }
+    }
+
     class SiteViewHolder(
         private val binding: ViewSitePermissionsSiteBinding,
         private val viewModel: SitePermissionsViewModel,
@@ -269,6 +302,11 @@ sealed class SitePermissionListItem(val viewType: SitePermissionsListViewType) {
         val enable: Boolean,
     ) : SitePermissionListItem(TOGGLE)
 
+    data class SitePermissionSetting(
+        @StringRes val text: Int,
+        val askEnabled: Boolean,
+    ) : SitePermissionListItem(SETTING)
+
     class Divider : SitePermissionListItem(DIVIDER)
     data class SiteAllowedItem(val domain: String) : SitePermissionListItem(SITE_ALLOWED_ITEM)
     class EmptySites : SitePermissionListItem(SITES_EMPTY)
@@ -278,6 +316,7 @@ enum class SitePermissionsListViewType {
     DESCRIPTION,
     HEADER,
     TOGGLE,
+    SETTING,
     DIVIDER,
     SITE_ALLOWED_ITEM,
     SITES_EMPTY,

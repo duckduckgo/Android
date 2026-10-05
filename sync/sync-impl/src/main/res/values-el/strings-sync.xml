@@ -376,7 +376,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Το Sync &amp; Backup είναι κρυπτογραφημένο από άκρο σε άκρο σε όλες τις συσκευές σας.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Έλεγξε την άλλη συσκευή σου</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Έλεγξε την άλλη συσκευή σας.</string>
     <string name="sync_simplified_pairing_headline_recovery">Γίνεται ανάκτηση δεδομένων</string>
     <string name="sync_simplified_pairing_body">Σύνδεση...</string>
 

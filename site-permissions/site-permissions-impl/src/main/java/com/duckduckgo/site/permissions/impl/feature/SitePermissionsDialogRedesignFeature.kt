@@ -30,4 +30,12 @@ interface SitePermissionsDialogRedesignFeature {
     @InternalAlwaysEnabled
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
+
+    @InternalAlwaysEnabled
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun singleTabBurnClearing(): Toggle
+
+    @InternalAlwaysEnabled
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun permissionSettingsRedesign(): Toggle
 }

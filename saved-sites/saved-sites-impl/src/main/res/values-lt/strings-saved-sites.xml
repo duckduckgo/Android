@@ -75,16 +75,16 @@
     <string name="bookmarkFolderDeleteDialogMessage">"Ar tikrai norite ištrinti "</string>
     <string name="bookmarkFolderEmpty">Tuščia</string>
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s ir %3$d prekė?</item>
+        <item quantity="one" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s ir %3$d prekė?</item>
         <item quantity="few">%1$s%2$s ir %3$d prekės?</item>
         <item quantity="many">%1$s%2$s ir %3$d prekės?</item>
-        <item quantity="other">%1$s%2$s ir %3$d prekės?</item>
+        <item quantity="other" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s ir %3$d prekės?</item>
     </plurals>
     <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d prekė</item>
+        <item quantity="one" instruction="Placeholder is the number of items">%1$d prekė</item>
         <item quantity="few">%1$d prekės</item>
         <item quantity="many">%1$d prekės</item>
-        <item quantity="other">%1$d prekės</item>
+        <item quantity="other" instruction="Placeholder is the number of items">%1$d prekės</item>
     </plurals>
 
     <!-- Bookmarks -->
@@ -99,10 +99,10 @@
     <string name="removeFromFavorites">Pašalinti iš adresyno</string>
     <string name="addToFavoritesMenu">Pridėti prie mėgstamų</string>
     <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">Ar tikrai norite ištrinti šį aplanką ir %1$d elementą?</item>
+        <item quantity="one" instruction="%1$d is the number of items inside the folder">Ar tikrai norite ištrinti šį aplanką ir %1$d elementą?</item>
         <item quantity="few">Ar tikrai norite ištrinti šį aplanką ir %1$d elementus?</item>
         <item quantity="many">Ar tikrai norite ištrinti šį aplanką ir %1$d elemento?</item>
-        <item quantity="other">Ar tikrai norite ištrinti šį aplanką ir %1$d elementų?</item>
+        <item quantity="other" instruction="%1$d is the number of items inside the folder">Ar tikrai norite ištrinti šį aplanką ir %1$d elementų?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Ar tikrai norite ištrinti &lt;b&gt;%1$s&lt;/b&gt; žymę?</string>
 
