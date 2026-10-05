@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl.settings.views
+package com.duckduckgo.pir.impl.freemium.settings
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -23,10 +23,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.pir.api.freemium.PirFreemium
-import com.duckduckgo.pir.api.freemium.PirFreemiumEntryPoint
-import com.duckduckgo.subscriptions.impl.pixels.PirFreemiumCtaState
-import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
+import com.duckduckgo.pir.impl.freemium.PirFreemium
+import com.duckduckgo.pir.impl.freemium.PirFreemiumState
+import com.duckduckgo.pir.impl.pixels.PirFreemiumCtaState
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -41,10 +41,10 @@ import javax.inject.Inject
 @ContributesViewModel(ViewScope::class)
 class PirFreemiumSettingViewModel @Inject constructor(
     private val pirFreemium: PirFreemium,
-    private val pixelSender: SubscriptionPixelSender,
+    private val pixelSender: PirPixelSender,
 ) : ViewModel(), DefaultLifecycleObserver {
 
-    data class ViewState(val entryPoint: PirFreemiumEntryPoint = PirFreemiumEntryPoint.HIDDEN)
+    data class ViewState(val freemiumState: PirFreemiumState = PirFreemiumState.NOT_ELIGIBLE)
 
     sealed class Command {
         data object OpenPirDashboard : Command()
@@ -63,25 +63,24 @@ class PirFreemiumSettingViewModel @Inject constructor(
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         viewModelScope.launch {
-            val entryPoint = pirFreemium.getSettingsEntryPoint()
-            _viewState.update { it.copy(entryPoint = entryPoint) }
+            val freemiumState = pirFreemium.getPirFreemiumState()
+            _viewState.update { it.copy(freemiumState = freemiumState) }
 
-            if (entryPoint != PirFreemiumEntryPoint.HIDDEN && !impressionFired) {
+            if (freemiumState != PirFreemiumState.NOT_ELIGIBLE && !impressionFired) {
                 impressionFired = true
-                pixelSender.reportAppSettingsPirFreemiumImpression()
+                pixelSender.reportFreemiumSettingsEntryPointImpression()
             }
         }
     }
 
     fun onEntryPointClicked() {
-        val entryPoint = _viewState.value.entryPoint
-        val ctaState = when (entryPoint) {
-            PirFreemiumEntryPoint.HIDDEN -> return
-            PirFreemiumEntryPoint.START_FREE_SCAN -> PirFreemiumCtaState.START_FREE_SCAN
-            PirFreemiumEntryPoint.VIEW_SCAN_RESULTS -> PirFreemiumCtaState.VIEW_SCAN_RESULTS
+        val ctaState = when (_viewState.value.freemiumState) {
+            PirFreemiumState.NOT_ELIGIBLE -> return
+            PirFreemiumState.ELIGIBLE -> PirFreemiumCtaState.START_FREE_SCAN
+            PirFreemiumState.USED -> PirFreemiumCtaState.VIEW_SCAN_RESULTS
         }
 
-        pixelSender.reportAppSettingsPirFreemiumClick(ctaState)
+        pixelSender.reportFreemiumSettingsEntryPointClicked(ctaState)
         viewModelScope.launch { command.send(Command.OpenPirDashboard) }
     }
 }

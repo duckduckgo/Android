@@ -20,8 +20,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.api.freemium.PirFreemium
-import com.duckduckgo.pir.api.freemium.PirFreemiumEntryPoint
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -43,29 +41,29 @@ class RealPirFreemium @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : PirFreemium {
 
-    override suspend fun getSettingsEntryPoint(): PirFreemiumEntryPoint = withContext(dispatcherProvider.io()) {
-        // Settings is opened constantly: a failure anywhere in resolution hides the promo rather than taking the screen down.
+    override suspend fun getPirFreemiumState(): PirFreemiumState = withContext(dispatcherProvider.io()) {
+        // Read from Settings, which is opened constantly: a failure hides the promo rather than taking the screen down.
         try {
-            resolveEntryPoint()
+            resolveState()
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            logcat(ERROR) { "PIR-FREEMIUM: Failed to resolve entry point eligibility: $e" }
-            PirFreemiumEntryPoint.HIDDEN
+            logcat(ERROR) { "PIR-FREEMIUM: Failed to resolve freemium state: $e" }
+            PirFreemiumState.NOT_ELIGIBLE
         }
     }
 
-    private suspend fun resolveEntryPoint(): PirFreemiumEntryPoint = when {
-        !canShowEntryPoint() -> PirFreemiumEntryPoint.HIDDEN
-        pirFreemiumDataStore.firstScanResult == null -> PirFreemiumEntryPoint.START_FREE_SCAN
-        else -> PirFreemiumEntryPoint.VIEW_SCAN_RESULTS
+    private suspend fun resolveState(): PirFreemiumState = when {
+        !isEligible() -> PirFreemiumState.NOT_ELIGIBLE
+        pirFreemiumDataStore.firstScanResult == null -> PirFreemiumState.ELIGIBLE
+        else -> PirFreemiumState.USED
     }
 
-    private suspend fun canShowEntryPoint(): Boolean {
+    private suspend fun isEligible(): Boolean {
         if (!pirRemoteFeatures.pirBeta().isEnabled()) return false
 
         // Freemium is for non-subscribers only: a signed-in user always gets paid PIR, and this is also
-        // what keeps the promo and the paid PIR row mutually exclusive.
+        // what keeps the freemium promo and the paid PIR settings row mutually exclusive.
         if (subscriptions.isSignedIn()) return false
 
         return pirRemoteFeatures.freemium().isEnabled() && meetsLocaleRequirement()

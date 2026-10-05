@@ -162,16 +162,6 @@ enum class SubscriptionPixel(
         type = Count,
         includedParameters = setOf(ATB, APP_VERSION),
     ),
-    APP_SETTINGS_PIR_FREEMIUM_IMPRESSION(
-        baseName = "m_privacy-pro_app-settings_pir-freemium_impression",
-        type = Count,
-        includedParameters = setOf(ATB, APP_VERSION),
-    ),
-    APP_SETTINGS_PIR_FREEMIUM_CLICK(
-        baseName = "m_privacy-pro_app-settings_pir-freemium_click",
-        type = Count,
-        includedParameters = setOf(ATB, APP_VERSION),
-    ),
     APP_SETTINGS_IDTR_CLICK(
         baseName = "m_privacy-pro_app-settings_identity-theft-restoration_click",
         type = Count,
@@ -381,7 +371,6 @@ object SubscriptionPixelParameter {
     const val PRIVACY_DASHBOARD_EVER_OPENED = "privacy_dashboard_opened"
     const val SUBSCRIPTION_PROMO_SHOWN = "subscription_promo_shown"
     const val FREE_TRIAL = "free_trial"
-    const val PIR_FREEMIUM_CTA_STATE = "cta_state"
 }
 
 internal val PixelType.pixelNameSuffix: String

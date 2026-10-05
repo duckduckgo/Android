@@ -57,6 +57,8 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_LOW_MEMORY
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_START_FAILED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FREEMIUM_SETTINGS_ENTRY_POINT_CLICKED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FREEMIUM_SETTINGS_ENTRY_POINT_IMPRESSION
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_DURATION
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_INCOMPLETE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERACTION_DAU
@@ -703,6 +705,10 @@ interface PirPixelSender {
         executionType: PirExecutionType,
         didCrash: Boolean,
     )
+
+    fun reportFreemiumSettingsEntryPointImpression()
+
+    fun reportFreemiumSettingsEntryPointClicked(ctaState: PirFreemiumCtaState)
 }
 
 @ContributesBinding(AppScope::class)
@@ -1657,6 +1663,14 @@ class RealPirPixelSender @Inject constructor(
         enqueueFire(PIR_SCAN_RENDERER_GONE, params)
     }
 
+    override fun reportFreemiumSettingsEntryPointImpression() {
+        fire(PIR_FREEMIUM_SETTINGS_ENTRY_POINT_IMPRESSION)
+    }
+
+    override fun reportFreemiumSettingsEntryPointClicked(ctaState: PirFreemiumCtaState) {
+        fire(PIR_FREEMIUM_SETTINGS_ENTRY_POINT_CLICKED, mapOf(PARAM_KEY_CTA_STATE to ctaState.paramValue))
+    }
+
     private fun usageParams(): Map<String, String> = mapOf(
         // hardcoded values for now until we support freemium
         PARAM_KEY_IS_AUTHENTICATED to "true",
@@ -1757,5 +1771,6 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_SCAN_TRIGGER = "scan_trigger"
         private const val PARAM_KEY_NOTIFICATIONS_PERMISSION = "notifications_permission_granted"
         private const val PARAM_KEY_DID_CRASH = "did_crash"
+        private const val PARAM_KEY_CTA_STATE = "cta_state"
     }
 }

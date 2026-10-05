@@ -30,8 +30,6 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_G
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_IDTR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_PARTNER_BENEFITS_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_PIR_CLICK
-import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_PIR_FREEMIUM_CLICK
-import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_PIR_FREEMIUM_IMPRESSION
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_RESTORE_PURCHASE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_DETECTED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_RECOVERED
@@ -123,8 +121,6 @@ interface SubscriptionPixelSender {
     fun reportOnboardingDuckAiClick()
     fun reportSubscriptionSettingsShown()
     fun reportAppSettingsPirClick()
-    fun reportAppSettingsPirFreemiumImpression()
-    fun reportAppSettingsPirFreemiumClick(ctaState: PirFreemiumCtaState)
     fun reportAppSettingsIdtrClick()
     fun reportAppSettingsGetSubscriptionClick()
     fun reportAppSettingsRestorePurchaseClick()
@@ -285,12 +281,6 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportAppSettingsPirClick() =
         fire(APP_SETTINGS_PIR_CLICK)
-
-    override fun reportAppSettingsPirFreemiumImpression() =
-        fire(APP_SETTINGS_PIR_FREEMIUM_IMPRESSION)
-
-    override fun reportAppSettingsPirFreemiumClick(ctaState: PirFreemiumCtaState) =
-        fire(APP_SETTINGS_PIR_FREEMIUM_CLICK, mapOf(SubscriptionPixelParameter.PIR_FREEMIUM_CTA_STATE to ctaState.paramValue))
 
     override fun reportAppSettingsIdtrClick() =
         fire(APP_SETTINGS_IDTR_CLICK)

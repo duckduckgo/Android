@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl.settings.views
+package com.duckduckgo.pir.impl.freemium.settings
 
 import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.pir.api.freemium.PirFreemium
-import com.duckduckgo.pir.api.freemium.PirFreemiumEntryPoint.HIDDEN
-import com.duckduckgo.pir.api.freemium.PirFreemiumEntryPoint.START_FREE_SCAN
-import com.duckduckgo.pir.api.freemium.PirFreemiumEntryPoint.VIEW_SCAN_RESULTS
-import com.duckduckgo.subscriptions.impl.pixels.PirFreemiumCtaState
-import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.settings.views.PirFreemiumSettingViewModel.Command.OpenPirDashboard
+import com.duckduckgo.pir.impl.freemium.PirFreemium
+import com.duckduckgo.pir.impl.freemium.PirFreemiumState.ELIGIBLE
+import com.duckduckgo.pir.impl.freemium.PirFreemiumState.NOT_ELIGIBLE
+import com.duckduckgo.pir.impl.freemium.PirFreemiumState.USED
+import com.duckduckgo.pir.impl.freemium.settings.PirFreemiumSettingViewModel.Command.OpenPirDashboard
+import com.duckduckgo.pir.impl.pixels.PirFreemiumCtaState
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -44,7 +44,7 @@ class PirFreemiumSettingViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val pirFreemium: PirFreemium = mock()
-    private val pixelSender: SubscriptionPixelSender = mock()
+    private val pixelSender: PirPixelSender = mock()
     private val lifecycleOwner: LifecycleOwner = mock()
 
     private lateinit var testee: PirFreemiumSettingViewModel
@@ -55,42 +55,42 @@ class PirFreemiumSettingViewModelTest {
     }
 
     @Test
-    fun whenEligibleAndNoScanCompletedThenStateIsStartFreeScan() = runTest {
-        whenever(pirFreemium.getSettingsEntryPoint()).thenReturn(START_FREE_SCAN)
+    fun whenEligibleThenStateIsEligible() = runTest {
+        whenever(pirFreemium.getPirFreemiumState()).thenReturn(ELIGIBLE)
 
         testee.onResume(lifecycleOwner)
 
         testee.viewState.test {
-            assertEquals(START_FREE_SCAN, expectMostRecentItem().entryPoint)
+            assertEquals(ELIGIBLE, expectMostRecentItem().freemiumState)
         }
     }
 
     @Test
-    fun whenScanCompletedThenStateIsViewScanResults() = runTest {
-        whenever(pirFreemium.getSettingsEntryPoint()).thenReturn(VIEW_SCAN_RESULTS)
+    fun whenUsedThenStateIsUsed() = runTest {
+        whenever(pirFreemium.getPirFreemiumState()).thenReturn(USED)
 
         testee.onResume(lifecycleOwner)
 
         testee.viewState.test {
-            assertEquals(VIEW_SCAN_RESULTS, expectMostRecentItem().entryPoint)
+            assertEquals(USED, expectMostRecentItem().freemiumState)
         }
     }
 
     @Test
-    fun whenNotEligibleThenStateIsHiddenAndNoImpressionFired() = runTest {
-        whenever(pirFreemium.getSettingsEntryPoint()).thenReturn(HIDDEN)
+    fun whenNotEligibleThenStateIsNotEligibleAndNoImpressionFired() = runTest {
+        whenever(pirFreemium.getPirFreemiumState()).thenReturn(NOT_ELIGIBLE)
 
         testee.onResume(lifecycleOwner)
 
         testee.viewState.test {
-            assertEquals(HIDDEN, expectMostRecentItem().entryPoint)
+            assertEquals(NOT_ELIGIBLE, expectMostRecentItem().freemiumState)
         }
-        verify(pixelSender, never()).reportAppSettingsPirFreemiumImpression()
+        verify(pixelSender, never()).reportFreemiumSettingsEntryPointImpression()
     }
 
     @Test
     fun whenClickedThenClickPixelFiredAndDashboardOpened() = runTest {
-        whenever(pirFreemium.getSettingsEntryPoint()).thenReturn(START_FREE_SCAN)
+        whenever(pirFreemium.getPirFreemiumState()).thenReturn(ELIGIBLE)
         testee.onResume(lifecycleOwner)
 
         testee.commands().test {
@@ -98,36 +98,46 @@ class PirFreemiumSettingViewModelTest {
 
             assertEquals(OpenPirDashboard, awaitItem())
         }
-        verify(pixelSender).reportAppSettingsPirFreemiumClick(PirFreemiumCtaState.START_FREE_SCAN)
+        verify(pixelSender).reportFreemiumSettingsEntryPointClicked(PirFreemiumCtaState.START_FREE_SCAN)
+    }
+
+    @Test
+    fun whenUsedAndClickedThenClickPixelCarriesViewScanResults() = runTest {
+        whenever(pirFreemium.getPirFreemiumState()).thenReturn(USED)
+        testee.onResume(lifecycleOwner)
+
+        testee.onEntryPointClicked()
+
+        verify(pixelSender).reportFreemiumSettingsEntryPointClicked(PirFreemiumCtaState.VIEW_SCAN_RESULTS)
     }
 
     @Test
     fun whenResumedRepeatedlyThenImpressionFiredOnlyOnce() = runTest {
-        whenever(pirFreemium.getSettingsEntryPoint()).thenReturn(START_FREE_SCAN)
+        whenever(pirFreemium.getPirFreemiumState()).thenReturn(ELIGIBLE)
 
         testee.onResume(lifecycleOwner)
         testee.onResume(lifecycleOwner)
         testee.onResume(lifecycleOwner)
 
-        verify(pixelSender, times(1)).reportAppSettingsPirFreemiumImpression()
+        verify(pixelSender, times(1)).reportFreemiumSettingsEntryPointImpression()
     }
 
     @Test
     fun whenUserSignsInWhileSettingsOpenThenRowHidesOnNextResume() = runTest {
-        whenever(pirFreemium.getSettingsEntryPoint()).thenReturn(START_FREE_SCAN)
+        whenever(pirFreemium.getPirFreemiumState()).thenReturn(ELIGIBLE)
         testee.onResume(lifecycleOwner)
 
-        whenever(pirFreemium.getSettingsEntryPoint()).thenReturn(HIDDEN)
+        whenever(pirFreemium.getPirFreemiumState()).thenReturn(NOT_ELIGIBLE)
         testee.onResume(lifecycleOwner)
 
         testee.viewState.test {
-            assertEquals(HIDDEN, expectMostRecentItem().entryPoint)
+            assertEquals(NOT_ELIGIBLE, expectMostRecentItem().freemiumState)
         }
     }
 
     @Test
-    fun whenStateIsHiddenThenClickIsIgnored() = runTest {
-        whenever(pirFreemium.getSettingsEntryPoint()).thenReturn(HIDDEN)
+    fun whenNotEligibleThenClickIsIgnored() = runTest {
+        whenever(pirFreemium.getPirFreemiumState()).thenReturn(NOT_ELIGIBLE)
         testee.onResume(lifecycleOwner)
 
         testee.onEntryPointClicked()
@@ -136,8 +146,8 @@ class PirFreemiumSettingViewModelTest {
     }
 
     @Test
-    fun whenStateIsHiddenThenNoCommandEmitted() = runTest {
-        whenever(pirFreemium.getSettingsEntryPoint()).thenReturn(HIDDEN)
+    fun whenNotEligibleThenNoCommandEmitted() = runTest {
+        whenever(pirFreemium.getPirFreemiumState()).thenReturn(NOT_ELIGIBLE)
         testee.onResume(lifecycleOwner)
 
         testee.commands().test {
