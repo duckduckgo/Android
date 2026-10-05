@@ -78,7 +78,6 @@ interface RequestInterceptor {
 
     fun onPageStarted(url: String)
 
-    @WorkerThread
     fun shouldOverrideUrlLoading(
         webViewClientListener: WebViewClientListener?,
         url: Uri,
