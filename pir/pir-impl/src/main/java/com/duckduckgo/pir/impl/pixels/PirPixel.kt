@@ -350,6 +350,14 @@ enum class PirPixel(
         baseName = "m_dbp_scan_renderer-gone",
         types = setOf(Count, Daily()),
     ),
+    PIR_FREEMIUM_SETTINGS_ENTRY_POINT_IMPRESSION(
+        baseName = "m_dbp_freemium_settings_entry_point_impression",
+        type = Count,
+    ),
+    PIR_FREEMIUM_SETTINGS_ENTRY_POINT_CLICKED(
+        baseName = "m_dbp_freemium_settings_entry_point_clicked",
+        type = Count,
+    ),
     ;
 
     constructor(

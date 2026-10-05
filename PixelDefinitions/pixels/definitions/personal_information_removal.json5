@@ -2222,6 +2222,28 @@
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_dbp_freemium_settings_entry_point_impression": {
+        "description": "Fired once per Settings visit when the Freemium PIR entry point is shown. Denominator for the Freemium PIR settings funnel.",
+        "owners": ["landomen"],
+        "triggers": ["other"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_dbp_freemium_settings_entry_point_clicked": {
+        "description": "Fired when the Freemium PIR entry point in Settings is tapped. Numerator for the Freemium PIR settings funnel.",
+        "owners": ["landomen"],
+        "triggers": ["other"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "cta_state",
+                "description": "Which call to action the entry point was showing when tapped.",
+                "type": "string",
+                "enum": ["start_free_scan", "view_scan_results"]
+            }
+        ]
+    },
     "wide_pir-initial-scan": {
         "description": "Wide event tracking the lifecycle of a manually-triggered PIR run (initial scan or post-profile-edit), covering scan progress in 10% increments, scan completion, and the follow-on opt-out scheduling phase. Used to measure end-to-end success rate, drop-off, and per-phase latency.",
         "owners": ["karlenDimla", "landomen"],

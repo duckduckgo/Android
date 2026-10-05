@@ -20,9 +20,6 @@
     <string name="pirStorageUnavailableDialogTitle">Temporary issue with Personal Information Removal</string>
     <string name="pirStorageUnavailableDialogMessage">Please restart the DuckDuckGo app and try again.</string>
     <string name="pirStorageUnavailableDialogButton">Got It</string>
-    <string name="pirFreemiumSettingSubtitle">Find your personal info on sites that sell it.</string>
-    <string name="pirFreemiumSettingStartScan">Start Free Scan</string>
-    <string name="pirFreemiumSettingViewResults">View Scan Results</string>
     <string name="planTierNamePlus">Plus</string>
     <string name="planTierNamePro">Pro</string>
 

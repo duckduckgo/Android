@@ -14,30 +14,30 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.api.freemium
+package com.duckduckgo.pir.impl.freemium
 
 /**
- * What the Freemium PIR entry point should show, if anything.
+ * Where the user stands with Freemium PIR, independent of any one surface that presents it.
  */
-enum class PirFreemiumEntryPoint {
-    /** The user is not eligible, or is signed in, and must not see the free surface. */
-    HIDDEN,
+enum class PirFreemiumState {
+    /** Freemium PIR must not be offered: a gate is closed, or the user is signed in. */
+    NOT_ELIGIBLE,
 
-    /** Eligible, and no scan has completed yet. */
-    START_FREE_SCAN,
+    /** Eligible, and no free scan has completed yet. */
+    ELIGIBLE,
 
-    /** Eligible, and a scan has completed — with or without matches. */
-    VIEW_SCAN_RESULTS,
+    /**
+     * Eligible, and a free scan has completed — with or without matches. Activation alone (a saved
+     * profile whose scan is still running) is still [ELIGIBLE].
+     */
+    USED,
 }
 
 interface PirFreemium {
 
     /**
-     * Resolves whether the Freemium PIR entry point may be shown, and which call to action it
-     * should carry.
-     *
      * Runs on the IO thread by default. Never throws: any failure other than cancellation resolves to
-     * [PirFreemiumEntryPoint.HIDDEN].
+     * [PirFreemiumState.NOT_ELIGIBLE].
      */
-    suspend fun getSettingsEntryPoint(): PirFreemiumEntryPoint
+    suspend fun getPirFreemiumState(): PirFreemiumState
 }

@@ -21,10 +21,10 @@ import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.pir.api.freemium.PirFreemiumEntryPoint.HIDDEN
-import com.duckduckgo.pir.api.freemium.PirFreemiumEntryPoint.START_FREE_SCAN
-import com.duckduckgo.pir.api.freemium.PirFreemiumEntryPoint.VIEW_SCAN_RESULTS
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.freemium.PirFreemiumState.ELIGIBLE
+import com.duckduckgo.pir.impl.freemium.PirFreemiumState.NOT_ELIGIBLE
+import com.duckduckgo.pir.impl.freemium.PirFreemiumState.USED
 import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirFreemiumFirstScanResult.MATCHES_FOUND
 import com.duckduckgo.pir.impl.store.PirFreemiumFirstScanResult.NO_MATCHES
@@ -69,78 +69,86 @@ class RealPirFreemiumTest {
     }
 
     @Test
-    fun whenAllGatesPassAndNoScanCompletedThenStartFreeScan() = runTest {
-        assertEquals(START_FREE_SCAN, testee.getSettingsEntryPoint())
+    fun whenAllGatesPassAndNoScanCompletedThenEligible() = runTest {
+        assertEquals(ELIGIBLE, testee.getPirFreemiumState())
     }
 
     @Test
-    fun whenPirRolloutIsOffThenHidden() = runTest {
+    fun whenPirRolloutIsOffThenNotEligible() = runTest {
         pirRemoteFeatures.pirBeta().setRawStoredState(State(enable = false))
 
-        assertEquals(HIDDEN, testee.getSettingsEntryPoint())
+        assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
     }
 
     @Test
-    fun whenFreemiumFlagIsOffThenHidden() = runTest {
+    fun whenFreemiumFlagIsOffThenNotEligible() = runTest {
         pirRemoteFeatures.freemium().setRawStoredState(State(enable = false))
 
-        assertEquals(HIDDEN, testee.getSettingsEntryPoint())
+        assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
     }
 
     @Test
-    fun whenUserIsSignedInThenHidden() = runTest {
+    fun whenUserIsSignedInThenNotEligible() = runTest {
         whenever(subscriptions.isSignedIn()).thenReturn(true)
 
-        assertEquals(HIDDEN, testee.getSettingsEntryPoint())
+        assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
     }
 
     @Test
-    fun whenScanFoundMatchesThenViewScanResults() = runTest {
+    fun whenScanFoundMatchesThenUsed() = runTest {
         whenever(dataStore.firstScanResult).thenReturn(MATCHES_FOUND)
 
-        assertEquals(VIEW_SCAN_RESULTS, testee.getSettingsEntryPoint())
+        assertEquals(USED, testee.getPirFreemiumState())
     }
 
     @Test
-    fun whenScanFoundNothingThenStillViewScanResults() = runTest {
+    fun whenScanFoundNothingThenStillUsed() = runTest {
         whenever(dataStore.firstScanResult).thenReturn(NO_MATCHES)
 
-        assertEquals(VIEW_SCAN_RESULTS, testee.getSettingsEntryPoint())
+        assertEquals(USED, testee.getPirFreemiumState())
     }
 
     @Test
-    fun whenLocaleHasNoCountryCodeThenHidden() = runTest {
+    fun whenScanCompletedButUserSignedInSinceThenNotEligible() = runTest {
+        whenever(dataStore.firstScanResult).thenReturn(MATCHES_FOUND)
+        whenever(subscriptions.isSignedIn()).thenReturn(true)
+
+        assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
+    }
+
+    @Test
+    fun whenLocaleHasNoCountryCodeThenNotEligible() = runTest {
         whenever(appBuildConfig.deviceLocale).thenReturn(Locale("en"))
 
-        assertEquals(HIDDEN, testee.getSettingsEntryPoint())
+        assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
     }
 
     @Test
-    fun whenLocaleIsNonUsThenHidden() = runTest {
+    fun whenLocaleIsNonUsThenNotEligible() = runTest {
         whenever(appBuildConfig.deviceLocale).thenReturn(Locale.GERMANY)
 
-        assertEquals(HIDDEN, testee.getSettingsEntryPoint())
+        assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
     }
 
     @Test
-    fun whenLocaleIsNonUsButBuildIsInternalThenStartFreeScan() = runTest {
+    fun whenLocaleIsNonUsButBuildIsInternalThenEligible() = runTest {
         whenever(appBuildConfig.deviceLocale).thenReturn(Locale.GERMANY)
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
 
-        assertEquals(START_FREE_SCAN, testee.getSettingsEntryPoint())
+        assertEquals(ELIGIBLE, testee.getPirFreemiumState())
     }
 
     @Test
-    fun whenSignedInCheckThrowsThenHidden() = runTest {
+    fun whenSignedInCheckThrowsThenNotEligible() = runTest {
         whenever(subscriptions.isSignedIn()).thenThrow(RuntimeException("backend unavailable"))
 
-        assertEquals(HIDDEN, testee.getSettingsEntryPoint())
+        assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
     }
 
     @Test
-    fun whenFirstScanResultReadThrowsThenHidden() = runTest {
+    fun whenFirstScanResultReadThrowsThenNotEligible() = runTest {
         whenever(dataStore.firstScanResult).thenThrow(RuntimeException("corrupted preferences"))
 
-        assertEquals(HIDDEN, testee.getSettingsEntryPoint())
+        assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
     }
 }

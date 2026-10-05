@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl.settings.views
+package com.duckduckgo.pir.impl.freemium.settings
 
 import android.content.Context
 import android.util.AttributeSet
@@ -32,14 +32,14 @@ import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
-import com.duckduckgo.pir.api.freemium.PirFreemiumEntryPoint.HIDDEN
-import com.duckduckgo.pir.api.freemium.PirFreemiumEntryPoint.START_FREE_SCAN
-import com.duckduckgo.pir.api.freemium.PirFreemiumEntryPoint.VIEW_SCAN_RESULTS
-import com.duckduckgo.subscriptions.impl.R
-import com.duckduckgo.subscriptions.impl.databinding.ViewPirFreemiumSettingsBinding
-import com.duckduckgo.subscriptions.impl.settings.views.PirFreemiumSettingViewModel.Command
-import com.duckduckgo.subscriptions.impl.settings.views.PirFreemiumSettingViewModel.Command.OpenPirDashboard
-import com.duckduckgo.subscriptions.impl.settings.views.PirFreemiumSettingViewModel.ViewState
+import com.duckduckgo.pir.impl.R
+import com.duckduckgo.pir.impl.databinding.ViewPirFreemiumSettingsBinding
+import com.duckduckgo.pir.impl.freemium.PirFreemiumState.ELIGIBLE
+import com.duckduckgo.pir.impl.freemium.PirFreemiumState.NOT_ELIGIBLE
+import com.duckduckgo.pir.impl.freemium.PirFreemiumState.USED
+import com.duckduckgo.pir.impl.freemium.settings.PirFreemiumSettingViewModel.Command
+import com.duckduckgo.pir.impl.freemium.settings.PirFreemiumSettingViewModel.Command.OpenPirDashboard
+import com.duckduckgo.pir.impl.freemium.settings.PirFreemiumSettingViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -95,15 +95,15 @@ class PirFreemiumSettingView @JvmOverloads constructor(
     }
 
     private fun renderView(viewState: ViewState) {
-        when (viewState.entryPoint) {
-            HIDDEN -> binding.pirFreemiumContainer.isGone = true
+        when (viewState.freemiumState) {
+            NOT_ELIGIBLE -> binding.pirFreemiumContainer.isGone = true
 
-            START_FREE_SCAN -> {
+            ELIGIBLE -> {
                 binding.pirFreemiumContainer.isVisible = true
                 binding.pirFreemiumCta.setText(R.string.pirFreemiumSettingStartScan)
             }
 
-            VIEW_SCAN_RESULTS -> {
+            USED -> {
                 binding.pirFreemiumContainer.isVisible = true
                 binding.pirFreemiumCta.setText(R.string.pirFreemiumSettingViewResults)
             }
