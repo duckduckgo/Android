@@ -117,13 +117,13 @@ class GlideRemoteMessageImageStore(
     }
 
     private suspend fun fetchAndStoreCardItemImages(message: RemoteMessage?) {
-        val listItems = when (val content = message?.content) {
-            is Content.CardsList -> content.listItems
-            is Content.NextStepsItems -> content.listItems
+        val (listItems, imagesDir) = when (val content = message?.content) {
+            is Content.CardsList -> content.listItems to CARD_ITEM_IMAGES_DIR
+            is Content.NextStepsItems -> content.listItems to NEXT_STEP_ITEM_IMAGES_DIR
             else -> return
         }
 
-        clearAllCardItemImages()
+        clearItemImages(imagesDir)
         val itemsWithImages = listItems
             .filterIsInstance<CardItem.ListItem>()
             .filter { !it.imageUrl.isNullOrEmpty() }
@@ -133,7 +133,7 @@ class GlideRemoteMessageImageStore(
         withContext(dispatcherProvider.io()) {
             itemsWithImages.map { item ->
                 async {
-                    val targetFile = getCardItemImageFile(item.id)
+                    val targetFile = File(context.filesDir, "$imagesDir/${item.id}.png")
                     targetFile.parentFile?.mkdirs()
                     downloadImageToFile(item.imageUrl.orEmpty(), targetFile)
                 }
@@ -141,12 +141,12 @@ class GlideRemoteMessageImageStore(
         }
     }
 
-    private suspend fun clearAllCardItemImages() {
+    private suspend fun clearItemImages(imagesDir: String) {
         withContext(dispatcherProvider.io()) {
             runCatching {
-                val dir = File(context.filesDir, CARD_ITEM_IMAGES_DIR)
+                val dir = File(context.filesDir, imagesDir)
                 if (dir.exists()) {
-                    logcat { "RMF: Clearing all card item images" }
+                    logcat { "RMF: Clearing all item images in $imagesDir" }
                     dir.deleteRecursively()
                 }
             }.onFailure {
@@ -189,5 +189,6 @@ class GlideRemoteMessageImageStore(
     companion object {
         private const val REMOTE_IMAGE_FILE_PREFIX = "active_message_remote_image"
         private const val CARD_ITEM_IMAGES_DIR = "rmf_card_item_images"
+        private const val NEXT_STEP_ITEM_IMAGES_DIR = "rmf_next_step_item_images"
     }
 }
