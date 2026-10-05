@@ -23,10 +23,6 @@ package com.duckduckgo.nextsteps.api
 interface NextSteps {
     /**
      * Enrols the user in the next steps experiment and assigns a cohort.
-     *
-     * Call it once, when a new user starts onboarding and after the privacy config has been persisted,
-     * otherwise the remote cohort weights are not available yet. Reinstalls and users for whom the
-     * feature is remotely disabled are never enrolled.
      */
     suspend fun enroll()
 }
