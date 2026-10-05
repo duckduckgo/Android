@@ -427,10 +427,10 @@ class DuckDuckGoAppLinksHandlerTest {
     }
 
     @Test
-    fun whenNoGestureAndNotTrustedCallerButIsInAlwaysTriggerListThenLaunchAppLink() {
+    fun whenNoGestureAndNotTrustedCallerAndIsInAlwaysTriggerListThenReturnFalseAndDoNotLaunch() {
         testee.isAUserQuery = false
         testee.previousUrl = "foo.com"
-        assertTrue(
+        assertFalse(
             testee.handleAppLink(
                 isForMainFrame = true,
                 appLink = AppLink(uriString = "app.digid.nl/something"),
@@ -441,16 +441,16 @@ class DuckDuckGoAppLinksHandlerTest {
                 appLinksEnabled = true,
             ),
         )
-        assertEquals("app.digid.nl/something", testee.previousUrl)
-        verify(mockCallback).invoke()
+        assertEquals("foo.com", testee.previousUrl)
+        verifyNoInteractions(mockCallback)
     }
 
     @Test
-    fun whenNoGestureAndSameDomainAndHasTriggeredButIsInAlwaysTriggerListThenLaunchAppLink() {
+    fun whenNoGestureAndSameDomainAndHasTriggeredAndIsInAlwaysTriggerListThenReturnFalseAndDoNotLaunch() {
         testee.isAUserQuery = false
         testee.hasTriggeredForDomain = true
         testee.previousUrl = "digid.nl/something"
-        assertTrue(
+        assertFalse(
             testee.handleAppLink(
                 isForMainFrame = true,
                 appLink = AppLink(uriString = "app.digid.nl/something"),
@@ -461,8 +461,8 @@ class DuckDuckGoAppLinksHandlerTest {
                 appLinksEnabled = true,
             ),
         )
-        assertEquals("app.digid.nl/something", testee.previousUrl)
-        verify(mockCallback).invoke()
+        assertEquals("digid.nl/something", testee.previousUrl)
+        verifyNoInteractions(mockCallback)
     }
 
     @Test

@@ -48,7 +48,8 @@ interface AppLinksHandler {
     fun isTrustedCaller(appLink: AppLink, callerPackage: String?): Boolean
 
     /**
-     * True when the app link's domain always launches its app, bypassing the usual user-gesture and prompt requirements.
+     * True when the app link's domain always launches its app: it skips the once-per-domain rule and, in custom tabs,
+     * the prompt. It does not bypass the user-gesture requirement.
      *
      * @param appLink the app link being evaluated.
      */
@@ -64,8 +65,9 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
     var isAUserQuery = false
     var hasTriggeredForDomain = false
 
-    // Domains exempt from every suppression rule below  as they launch on repeat navigations to the same
-    // domain, and without a user gesture.
+    // Their sites hand off to these App Link domains from the same domain on every attempt (digid.nl -> app.digid.nl),
+    // and the App Link page itself isn't meant to load in the browser, so same-domain navigations to them skip the
+    // once-per-domain rule and halt the web navigation.
     private val alwaysTriggerList = listOf("app.digid.nl")
 
     override fun handleAppLink(
@@ -87,7 +89,7 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
         // HTTP navigations shouldn't launch apps unless started with a user gesture. That is unless
         // the "trusted-caller" carve-out applies - if an app opens a Custom Tab, App Links that
         // point back to that same app should be allowed even without user interaction.
-        if (!isAlwaysTriggerDomain && androidBrowserConfigFeature.customTabEndlessLoopFix().isEnabled()) {
+        if (androidBrowserConfigFeature.customTabEndlessLoopFix().isEnabled()) {
             if (!hasGesture && !isTrustedCaller(appLink, clientPackage)) {
                 return false
             }
