@@ -24,7 +24,6 @@ import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-// Priority is relative to the plugins in subscriptions-impl: 550 renders after ProSettings (500), i.e. below "I Have a Subscription".
 @ContributesMultibinding(scope = ActivityScope::class)
 @PriorityKey(550)
 class PirFreemiumSettings @Inject constructor() : ProSettingsPlugin {

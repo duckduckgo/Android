@@ -27,8 +27,7 @@ enum class PirFreemiumState {
     ELIGIBLE,
 
     /**
-     * Eligible, and a free scan has completed — with or without matches. Activation alone (a saved
-     * profile whose scan is still running) is still [ELIGIBLE].
+     * Eligible, and a free scan has completed — with or without matches.
      */
     USED,
 }
