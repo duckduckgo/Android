@@ -24,6 +24,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.nextsteps.impl.NextStepsItemsExperimentToggles.Cohorts
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -104,6 +105,41 @@ class RealNextStepsTest {
         testee.enroll()
 
         assertFalse(toggles.nextStepsItemsExperiment().isEnrolled())
+    }
+
+    @Test
+    fun `when kill switch is off then no section view is provided`() = runTest {
+        givenKillSwitch(enabled = false)
+        givenCohortEnabled(Cohorts.STACKED_CARDS)
+        toggles.nextStepsItemsExperiment().enroll()
+
+        assertNull(testee.provideSectionView(mock()))
+    }
+
+    @Test
+    fun `when user is not enrolled then no section view is provided`() = runTest {
+        givenKillSwitch(enabled = true)
+        givenCohortEnabled(Cohorts.STACKED_CARDS)
+
+        assertNull(testee.provideSectionView(mock()))
+    }
+
+    @Test
+    fun `when user is in control cohort then no section view is provided`() = runTest {
+        givenKillSwitch(enabled = true)
+        givenCohortEnabled(Cohorts.CONTROL)
+        toggles.nextStepsItemsExperiment().enroll()
+
+        assertNull(testee.provideSectionView(mock()))
+    }
+
+    @Test
+    fun `when user is in check list cohort then no section view is provided yet`() = runTest {
+        givenKillSwitch(enabled = true)
+        givenCohortEnabled(Cohorts.CHECK_LIST)
+        toggles.nextStepsItemsExperiment().enroll()
+
+        assertNull(testee.provideSectionView(mock()))
     }
 
     private suspend fun givenKillSwitch(enabled: Boolean) {

@@ -72,6 +72,7 @@ import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreen
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.duckduckgo.newtabpage.api.interactions.HatchInteractionsPlugin
+import com.duckduckgo.nextsteps.api.NextSteps
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.SharePromoLinkIntentFactory
 import dagger.android.support.AndroidSupportInjection
@@ -133,6 +134,9 @@ class NewTabPageView @JvmOverloads constructor(
     @Inject
     lateinit var ntpEngagementTracker: NtpEngagementTracker
 
+    @Inject
+    lateinit var nextSteps: NextSteps
+
     private val binding: ViewNewTabBinding by viewBinding()
 
     private val homeBackgroundLogo by lazy { HomeBackgroundLogo(binding.ddgLogo) }
@@ -191,6 +195,7 @@ class NewTabPageView @JvmOverloads constructor(
             .onEach { mode -> updateLogoForMode(mode) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
+        attachNextStepsSection()
         disableViewStateSaving()
     }
 
@@ -255,6 +260,13 @@ class NewTabPageView @JvmOverloads constructor(
         }
     }
 
+    private fun attachNextStepsSection() {
+        if (binding.nextStepsContainer.childCount > 0) return
+        findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+            nextSteps.provideSectionView(context)?.let { binding.nextStepsContainer.addView(it) }
+        }
+    }
+
     private fun updateLogoMargin(nativeInputEnabled: Boolean) {
         val baseMargin = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.homeTabDdgLogoTopMargin)
         val extraMargin = if (nativeInputEnabled) 48.toPx() else 0
@@ -275,12 +287,14 @@ class NewTabPageView @JvmOverloads constructor(
             binding.appTrackingProtectionStateView.gone()
             binding.ddgLogo.gone()
             binding.messageCta.gone()
+            binding.nextStepsContainer.gone()
             binding.focusedFavourites.gone()
             return
         }
         binding.fireTabEmptyState.root.gone()
         binding.indonesiaNewTabSectionView.show()
         binding.appTrackingProtectionStateView.show()
+        binding.nextStepsContainer.show()
 
         if (viewState.shouldShowLogo) {
             homeBackgroundLogo.showLogo()

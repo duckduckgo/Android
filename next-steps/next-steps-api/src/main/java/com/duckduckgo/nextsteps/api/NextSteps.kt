@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.duckduckgo.nextsteps.api
+
+import android.content.Context
+import android.view.View
 
 /**
  * Entry point to the "Complete your setup" next steps feature: enrols the user in the experiment
@@ -25,4 +27,10 @@ interface NextSteps {
      * Enrols the user in the next steps experiment and assigns a cohort.
      */
     suspend fun enroll()
+
+    /**
+     * The view that renders the active next steps message for this user's cohort, or null when the
+     * user is not enrolled in a treatment cohort.
+     */
+    suspend fun provideSectionView(context: Context): View?
 }
