@@ -27,6 +27,7 @@ import android.webkit.RenderProcessGoneDetail
 import android.webkit.SslErrorHandler
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient.ERROR_FAILED_SSL_HANDSHAKE
 import android.webkit.WebViewClient.ERROR_HOST_LOOKUP
@@ -61,8 +62,11 @@ import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Phase
+import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Timeout
 import com.duckduckgo.app.browser.pageload.PageLoadTracer
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
+import com.duckduckgo.app.browser.pageload.RealPageLoadTimeoutWatchdog
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -185,6 +189,9 @@ class BrowserWebViewClientTest {
     private val mockDuckChat: DuckChat = mock()
     private val pageLoadWideEvent: PageLoadWideEvent = mock()
     private val mockAppSchemeInterceptionFeature: AppSchemeInterceptionFeature = mock()
+    private val pageLoadTimeouts = MutableSharedFlow<Timeout>(extraBufferCapacity = 1)
+    private val mockPageLoadTimeoutWatchdog: RealPageLoadTimeoutWatchdog = mock()
+    private val mockPageLoadTimeoutWatchdogFactory: RealPageLoadTimeoutWatchdog.Factory = mock()
     private val appSchemeInterceptionEnabledFlow = MutableStateFlow(true)
     private val mockForceWebViewRecompositeFeature: ForceWebViewRecompositeFeature = mock()
     private val forceRecompositeEnabledFlow = MutableStateFlow(true)
@@ -204,6 +211,8 @@ class BrowserWebViewClientTest {
             whenever(forceRecompositeToggle.isEnabled()).thenReturn(true)
             whenever(forceRecompositeToggle.enabled()).thenReturn(forceRecompositeEnabledFlow)
             whenever(mockForceWebViewRecompositeFeature.self()).thenReturn(forceRecompositeToggle)
+            whenever(mockPageLoadTimeoutWatchdog.timeouts).thenReturn(pageLoadTimeouts)
+            whenever(mockPageLoadTimeoutWatchdogFactory.create(any())).thenReturn(mockPageLoadTimeoutWatchdog)
             testee =
                 BrowserWebViewClient(
                     webViewHttpAuthStore,
@@ -245,6 +254,7 @@ class BrowserWebViewClientTest {
                         override fun endAsyncSection(name: String, cookie: Int) = Unit
                     },
                     BrowserMode.REGULAR,
+                    mockPageLoadTimeoutWatchdogFactory,
                 )
             testee.webViewClientListener = listener
             whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -2220,6 +2230,229 @@ class BrowserWebViewClientTest {
 
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
         verifyNoInteractions(listener)
+    }
+
+    @Test
+    fun whenOnPageFinishedCalledThenWatchdogIsToldTheMainFrameFinished() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(10)
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+
+        verify(mockPageLoadTimeoutWatchdog).onFinished(EXAMPLE_URL)
+    }
+
+    @Test
+    fun whenOnPageStartedCalledThenWatchdogIsToldTheNavigationCommitted() {
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+
+        verify(mockPageLoadTimeoutWatchdog).onCommitted(EXAMPLE_URL)
+    }
+
+    @Test
+    fun whenOnPageCommitVisibleCalledThenWatchdogIsToldContentIsVisible() {
+        testee.onPageCommitVisible(webView, EXAMPLE_URL)
+
+        verify(mockPageLoadTimeoutWatchdog).onFirstContentVisible(EXAMPLE_URL)
+    }
+
+    private fun verifyWatchdogNotTold() {
+        verify(mockPageLoadTimeoutWatchdog, never()).onMainFrameRequest(any())
+        verify(mockPageLoadTimeoutWatchdog, never()).onRedirect(any())
+        verify(mockPageLoadTimeoutWatchdog, never()).onNavigationCancelled(any())
+        verify(mockPageLoadTimeoutWatchdog, never()).onCommitted(any())
+        verify(mockPageLoadTimeoutWatchdog, never()).onFirstContentVisible(any())
+        verify(mockPageLoadTimeoutWatchdog, never()).onFinished(any())
+    }
+
+    @Test
+    fun whenOnPageStartedCalledWithoutUrlThenWatchdogIsNotTold() {
+        testee.onPageStarted(webView, null, null)
+
+        verify(mockPageLoadTimeoutWatchdog, never()).onCommitted(any())
+    }
+
+    @Test
+    fun whenOnPageFinishedCalledWithoutUrlThenWatchdogIsNotTold() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(10)
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+
+        testee.onPageFinished(mockWebView, null)
+
+        verify(mockPageLoadTimeoutWatchdog, never()).onFinished(any())
+    }
+
+    @Test
+    fun whenMainFrameNavigationIsNotOverriddenThenWatchdogIsNotTold() {
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.isRedirect).thenReturn(false)
+        whenever(specialUrlDetector.determineType(initiatingUrl = anyOrNull(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Web(EXAMPLE_URL))
+
+        assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+
+        verifyWatchdogNotTold()
+    }
+
+    @Test
+    fun whenMainFrameNavigationIsOverriddenThenWatchdogIsNotTold() {
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.isRedirect).thenReturn(false)
+        whenever(specialUrlDetector.determineType(initiatingUrl = anyOrNull(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Telephone("123"))
+
+        assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+
+        verifyWatchdogNotTold()
+    }
+
+    @Test
+    fun whenMainFrameRedirectIsNotOverriddenThenWatchdogIsToldItIsARedirectAndNotCancelled() {
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.isRedirect).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = anyOrNull(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Web(EXAMPLE_URL))
+
+        assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+
+        verify(mockPageLoadTimeoutWatchdog).onRedirect(EXAMPLE_URL)
+        verify(mockPageLoadTimeoutWatchdog, never()).onNavigationCancelled(any())
+    }
+
+    @Test
+    fun whenMainFrameRedirectIsOverriddenThenWatchdogIsToldItWasCancelled() {
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.isRedirect).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = anyOrNull(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Telephone("123"))
+
+        assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+
+        verify(mockPageLoadTimeoutWatchdog).onRedirect(EXAMPLE_URL)
+        verify(mockPageLoadTimeoutWatchdog).onNavigationCancelled(EXAMPLE_URL)
+    }
+
+    @Test
+    fun whenSubFrameNavigationThenWatchdogIsNotToldAnything() {
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+        whenever(webResourceRequest.isRedirect).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = anyOrNull(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Web(EXAMPLE_URL))
+
+        testee.shouldOverrideUrlLoading(webView, webResourceRequest)
+
+        verifyWatchdogNotTold()
+    }
+
+    @Test
+    fun whenDoUpdateVisitedHistoryCalledThenWatchdogIsNotTold() {
+        testee.doUpdateVisitedHistory(webView, EXAMPLE_URL, false)
+
+        verifyWatchdogNotTold()
+    }
+
+    @Test
+    fun whenMainFrameErrorReceivedThenWatchdogIsDisarmed() {
+        whenever(webResourceError.errorCode).thenReturn(ERROR_UNKNOWN)
+        whenever(webResourceError.description).thenReturn("net::ERR_UNKNOWN")
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+
+        testee.onReceivedError(webView, webResourceRequest, webResourceError)
+
+        verify(mockPageLoadTimeoutWatchdog).onEngineError()
+    }
+
+    @Test
+    fun whenSubFrameErrorReceivedThenWatchdogIsNotDisarmed() {
+        whenever(webResourceError.errorCode).thenReturn(ERROR_UNKNOWN)
+        whenever(webResourceError.description).thenReturn("net::ERR_UNKNOWN")
+        whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+
+        testee.onReceivedError(webView, webResourceRequest, webResourceError)
+
+        verify(mockPageLoadTimeoutWatchdog, never()).onEngineError()
+    }
+
+    @Test
+    fun whenMainFrameHttpErrorReceivedThenWatchdogIsDisarmed() {
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+
+        testee.onReceivedHttpError(webView, webResourceRequest, WebResourceResponse("text/html", "UTF-8", 500, "error", emptyMap(), null))
+
+        verify(mockPageLoadTimeoutWatchdog).onEngineError()
+    }
+
+    @Test
+    fun whenSubFrameHttpErrorReceivedThenWatchdogIsNotDisarmed() {
+        whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+
+        testee.onReceivedHttpError(webView, webResourceRequest, WebResourceResponse("text/html", "UTF-8", 500, "error", emptyMap(), null))
+
+        verify(mockPageLoadTimeoutWatchdog, never()).onEngineError()
+    }
+
+    @Test
+    fun whenRenderProcessGoneThenWatchdogIsDisarmed() {
+        testee.onRenderProcessGone(webView, mock())
+
+        verify(mockPageLoadTimeoutWatchdog).onEngineError()
+    }
+
+    @Test
+    fun whenUntrustedSslErrorReceivedThenWatchdogIsDisarmed() {
+        val sslError = SslError(SslError.SSL_EXPIRED, aRSASslCertificate(), EXAMPLE_URL)
+
+        testee.onReceivedSslError(webView, aHandler(), sslError)
+
+        verify(mockPageLoadTimeoutWatchdog).onEngineError()
+    }
+
+    @Test
+    fun whenMainFrameRequestIsInterceptedThenWatchdogIsToldTheRequestedUrl() {
+        whenever(webResourceRequest.method).thenReturn("GET")
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+
+        testee.shouldInterceptRequest(webView, webResourceRequest)
+
+        verify(mockPageLoadTimeoutWatchdog).onMainFrameRequest(EXAMPLE_URL)
+    }
+
+    @Test
+    fun whenSubFrameRequestIsInterceptedThenWatchdogIsNotTold() {
+        whenever(webResourceRequest.method).thenReturn("GET")
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+
+        testee.shouldInterceptRequest(webView, webResourceRequest)
+
+        verify(mockPageLoadTimeoutWatchdog, never()).onMainFrameRequest(any())
+    }
+
+    @Test
+    fun whenPageLoadTimesOutThenListenerIsNotified() {
+        pageLoadTimeouts.tryEmit(Timeout(Phase.NOT_COMMITTED))
+
+        verify(listener).onPageLoadTimeout()
+    }
+
+    @Test
+    fun whenClientIsDestroyedThenWatchdogIsDisarmedAndTimeoutsAreNoLongerReported() {
+        testee.destroy()
+        pageLoadTimeouts.tryEmit(Timeout(Phase.NOT_COMMITTED))
+
+        verify(mockPageLoadTimeoutWatchdog).onNavigatedAway()
+        verify(listener, never()).onPageLoadTimeout()
     }
 
     @Test

@@ -46,6 +46,8 @@ interface WebViewClientListener {
      */
     fun onMainFrameLoadStarted(navigationId: Long)
 
+    fun onPageLoadTimeout()
+
     fun progressChanged(
         newProgress: Int,
         webViewNavigationState: WebViewNavigationState,

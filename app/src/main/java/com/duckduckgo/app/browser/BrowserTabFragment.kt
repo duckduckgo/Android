@@ -5310,6 +5310,7 @@ class BrowserTabFragment :
         privacyProSkippedOnboardingBottomSheet?.dismiss()
         browserAutofill.removeJsInterface()
         destroyWebView()
+        webViewClient.destroy()
         super.onDestroy()
     }
 
