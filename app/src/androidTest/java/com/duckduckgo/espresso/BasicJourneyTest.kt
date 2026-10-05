@@ -40,8 +40,6 @@ class BasicJourneyTest {
 
     @Test @UserJourney
     fun browser_openPopUp() {
-        dismissWidgetPromoIfPresent()
-
         // since we use a fake toolbar, we want to wait until the real one is visible
         onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
 
