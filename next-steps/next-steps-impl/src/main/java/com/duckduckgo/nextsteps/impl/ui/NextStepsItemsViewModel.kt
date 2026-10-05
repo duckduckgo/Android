@@ -15,9 +15,6 @@
  */
 package com.duckduckgo.nextsteps.impl.ui
 
-import android.annotation.SuppressLint
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -38,12 +35,11 @@ import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
 class NextStepsItemsViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val remoteMessageModel: RemoteMessageModel,
-) : ViewModel(), DefaultLifecycleObserver {
+) : ViewModel() {
 
     data class ViewState(
         val message: RemoteMessage? = null,
@@ -54,9 +50,7 @@ class NextStepsItemsViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
-    override fun onStart(owner: LifecycleOwner) {
-        super.onStart(owner)
-
+    init {
         remoteMessageModel.observeActiveMessages()
             .map { message -> message?.takeIf { it.isNextStepsForNewTabPage() } }
             .flowOn(dispatchers.io())

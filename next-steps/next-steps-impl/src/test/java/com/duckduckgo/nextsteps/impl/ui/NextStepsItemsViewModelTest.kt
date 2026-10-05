@@ -28,6 +28,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -46,14 +47,18 @@ class NextStepsItemsViewModelTest {
         whenever(it.observeActiveMessages()).thenReturn(activeMessage)
     }
 
-    private val testee = NextStepsItemsViewModel(
-        dispatchers = coroutineRule.testDispatcherProvider,
-        remoteMessageModel = remoteMessageModel,
-    )
+    private lateinit var testee: NextStepsItemsViewModel
+
+    @Before
+    fun setUp() {
+        testee = NextStepsItemsViewModel(
+            dispatchers = coroutineRule.testDispatcherProvider,
+            remoteMessageModel = remoteMessageModel,
+        )
+    }
 
     @Test
     fun `when no active message then state is empty`() = runTest {
-        testee.onStart(mock())
         advanceUntilIdle()
 
         assertNull(testee.viewState.value.message)
@@ -64,7 +69,6 @@ class NextStepsItemsViewModelTest {
     fun `when active message is not next steps then state is empty`() = runTest {
         activeMessage.value = aMessage(content = Content.Small(titleText = "title", descriptionText = "description"))
 
-        testee.onStart(mock())
         advanceUntilIdle()
 
         assertNull(testee.viewState.value.message)
@@ -74,7 +78,6 @@ class NextStepsItemsViewModelTest {
     fun `when next steps message targets another surface then state is empty`() = runTest {
         activeMessage.value = aMessage(content = nextStepsContent(), surfaces = listOf(Surface.MODAL))
 
-        testee.onStart(mock())
         advanceUntilIdle()
 
         assertNull(testee.viewState.value.message)
@@ -85,7 +88,6 @@ class NextStepsItemsViewModelTest {
         val message = aMessage(content = nextStepsContent())
         activeMessage.value = message
 
-        testee.onStart(mock())
         advanceUntilIdle()
 
         assertEquals(message, testee.viewState.value.message)
@@ -96,7 +98,6 @@ class NextStepsItemsViewModelTest {
     @Test
     fun `when active message is cleared then state is emptied`() = runTest {
         activeMessage.value = aMessage(content = nextStepsContent())
-        testee.onStart(mock())
         advanceUntilIdle()
 
         activeMessage.value = null
@@ -109,7 +110,6 @@ class NextStepsItemsViewModelTest {
     @Test
     fun `when front card is dismissed then the next item moves to the front`() = runTest {
         activeMessage.value = aMessage(content = nextStepsContent())
-        testee.onStart(mock())
         advanceUntilIdle()
 
         testee.onFrontCardDismissed()
@@ -121,7 +121,6 @@ class NextStepsItemsViewModelTest {
     @Test
     fun `when last card is dismissed then no items are left`() = runTest {
         activeMessage.value = aMessage(content = nextStepsContent())
-        testee.onStart(mock())
         advanceUntilIdle()
 
         testee.onFrontCardDismissed()
@@ -135,7 +134,6 @@ class NextStepsItemsViewModelTest {
     fun `when last card is dismissed then the message is dismissed in RMF`() = runTest {
         val message = aMessage(content = nextStepsContent())
         activeMessage.value = message
-        testee.onStart(mock())
         advanceUntilIdle()
 
         testee.onFrontCardDismissed()

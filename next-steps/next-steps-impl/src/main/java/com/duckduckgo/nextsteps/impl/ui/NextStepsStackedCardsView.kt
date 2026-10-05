@@ -77,8 +77,6 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
         super.onAttachedToWindow()
 
         val lifecycleOwner = findViewTreeLifecycleOwner()!!
-        lifecycleOwner.lifecycle.addObserver(viewModel)
-
         conflatedStateJob += viewModel.viewState
             .onEach { render(it) }
             .launchIn(lifecycleOwner.lifecycleScope)
@@ -86,7 +84,6 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         conflatedStateJob.cancel()
-        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
         super.onDetachedFromWindow()
     }
 
