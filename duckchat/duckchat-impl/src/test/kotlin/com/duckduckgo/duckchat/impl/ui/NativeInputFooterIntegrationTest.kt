@@ -364,12 +364,16 @@ class NativeInputFooterIntegrationTest {
         )
     }
 
+    // Every test plugin is its own category, as real plugins are unless they opt into a shared one.
+    private var nextCategory = 0
+
     private fun plugin(
         priority: Int,
         view: View,
         state: Flow<NativeInputFooterState>,
     ): NativeInputFooterPlugin = object : NativeInputFooterPlugin {
         override val priority: Int = priority
+        override val category: String = "test-category-${nextCategory++}"
 
         override fun createFooter(
             context: Context,

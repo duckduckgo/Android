@@ -158,15 +158,116 @@ class NativeInputFooterCoordinatorTest {
         }
     }
 
+    @Test
+    fun whenFootersShareACategoryThenOnlyTheHighestPriorityOneShows() = runTest {
+        val top: View = mock()
+        val other: View = mock()
+        val testee = coordinator(
+            plugin(priority = 100, footer = footer(view = other, visible = true), category = "usage"),
+            plugin(priority = 50, footer = footer(view = top, visible = true), category = "usage"),
+        )
+
+        testee.state(context, hostContext, FakeNativeInputFooterHost()).test {
+            assertEquals(listOf(top), awaitItem().rows)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenFootersHaveDifferentCategoriesThenTheyStackInPriorityOrder() = runTest {
+        val first: View = mock()
+        val second: View = mock()
+        val testee = coordinator(
+            plugin(priority = 50, footer = footer(view = second, visible = true), category = "usage"),
+            plugin(priority = 10, footer = footer(view = first, visible = true), category = "terms"),
+        )
+
+        testee.state(context, hostContext, FakeNativeInputFooterHost()).test {
+            assertEquals(listOf(first, second), awaitItem().rows)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTheTopFooterOfACategoryIsHiddenThenTheNextOneShows() = runTest {
+        val next: View = mock()
+        val testee = coordinator(
+            plugin(priority = 50, footer = footer(view = mock(), visible = false), category = "usage"),
+            plugin(priority = 100, footer = footer(view = next, visible = true), category = "usage"),
+        )
+
+        testee.state(context, hostContext, FakeNativeInputFooterHost()).test {
+            assertEquals(listOf(next), awaitItem().rows)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTheTopFooterOfACategoryReturnsThenItReplacesTheLowerOne() = runTest {
+        val topState = MutableStateFlow(NativeInputFooterState(visible = false))
+        val top: View = mock()
+        val lower: View = mock()
+        val testee = coordinator(
+            plugin(priority = 50, footer = footer(view = top, state = topState), category = "usage"),
+            plugin(priority = 100, footer = footer(view = lower, visible = true), category = "usage"),
+        )
+
+        testee.state(context, hostContext, FakeNativeInputFooterHost()).test {
+            assertEquals(listOf(lower), awaitItem().rows)
+
+            topState.value = NativeInputFooterState(visible = true)
+
+            assertEquals(listOf(top), awaitItem().rows)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAFooterIsSuppressedByItsCategoryThenItsComposerBlockIsIgnored() = runTest {
+        val testee = coordinator(
+            plugin(priority = 50, footer = footer(view = mock(), visible = true, blocksComposer = false), category = "usage"),
+            plugin(priority = 100, footer = footer(view = mock(), visible = true, blocksComposer = true), category = "usage"),
+        )
+
+        testee.state(context, hostContext, FakeNativeInputFooterHost()).test {
+            assertFalse(awaitItem().blocksComposer)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPluginsDoNotDeclareACategoryThenTheyStack() = runTest {
+        val first: View = mock()
+        val second: View = mock()
+        val testee = NativeInputFooterCoordinator(
+            FakeActivePluginPoint(
+                listOf(
+                    UndeclaredCategoryPluginA(priority = 10, footer = footer(view = first, visible = true)),
+                    UndeclaredCategoryPluginB(priority = 20, footer = footer(view = second, visible = true)),
+                ),
+            ),
+        )
+
+        testee.state(context, hostContext, FakeNativeInputFooterHost()).test {
+            assertEquals(listOf(first, second), awaitItem().rows)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun coordinator(vararg plugins: NativeInputFooterPlugin): NativeInputFooterCoordinator {
         return NativeInputFooterCoordinator(FakeActivePluginPoint(plugins.toList()))
     }
 
+    // Each test plugin gets a category of its own unless a test says otherwise, as real plugins do by default.
+    private var nextCategory = 0
+
     private fun plugin(
         priority: Int,
         footer: NativeInputFooter,
+        category: String = "test-category-${nextCategory++}",
     ): NativeInputFooterPlugin = object : NativeInputFooterPlugin {
         override val priority: Int = priority
+        override val category: String = category
 
         override fun createFooter(
             context: Context,
@@ -203,6 +304,22 @@ class NativeInputFooterCoordinatorTest {
         override val view: View
             get() = viewProvider()
     }
+
+    // Plugins that keep the default category, which is derived from their class.
+    private abstract class DefaultCategoryPlugin(
+        override val priority: Int,
+        private val footer: NativeInputFooter,
+    ) : NativeInputFooterPlugin {
+        override fun createFooter(
+            context: Context,
+            hostContext: StateFlow<NativeInputFooterContext>,
+            host: NativeInputFooterHost,
+        ): NativeInputFooter = footer
+    }
+
+    private class UndeclaredCategoryPluginA(priority: Int, footer: NativeInputFooter) : DefaultCategoryPlugin(priority, footer)
+
+    private class UndeclaredCategoryPluginB(priority: Int, footer: NativeInputFooter) : DefaultCategoryPlugin(priority, footer)
 
     private class FakeActivePluginPoint(
         private val plugins: Collection<NativeInputFooterPlugin>,

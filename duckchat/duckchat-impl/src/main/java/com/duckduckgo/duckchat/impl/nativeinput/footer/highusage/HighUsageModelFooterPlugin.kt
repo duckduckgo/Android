@@ -28,6 +28,7 @@ import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterState
+import com.duckduckgo.duckchat.impl.nativeinput.footer.USAGE_NOTICE_FOOTER_CATEGORY
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningExposure
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningMeasurements
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
@@ -61,6 +62,7 @@ class HighUsageModelFooterPlugin @Inject constructor(
 ) : NativeInputFooterPlugin {
 
     override val priority: Int = 100
+    override val category: String = USAGE_NOTICE_FOOTER_CATEGORY
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun createFooter(

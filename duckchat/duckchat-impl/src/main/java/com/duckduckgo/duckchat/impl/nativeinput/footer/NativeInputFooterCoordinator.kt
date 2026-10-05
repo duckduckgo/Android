@@ -37,13 +37,19 @@ class NativeInputFooterCoordinator @Inject constructor(
         val rows: List<View> get() = footers.map { it.view }
     }
 
+    private class Entry(
+        val priority: Int,
+        val category: String,
+        val footer: NativeInputFooter,
+    )
+
     fun state(
         context: Context,
         hostContext: StateFlow<NativeInputFooterContext>,
         host: NativeInputFooterHost,
     ): Flow<State> = flow {
         val footers = plugins.getPlugins()
-            .map { plugin -> plugin.priority to plugin.createFooter(context, hostContext, host) }
+            .map { plugin -> Entry(plugin.priority, plugin.category, plugin.createFooter(context, hostContext, host)) }
 
         if (footers.isEmpty()) {
             emit(State())
@@ -51,14 +57,18 @@ class NativeInputFooterCoordinator @Inject constructor(
         }
 
         emitAll(
-            combine(footers.map { it.second.state }) { states ->
-                val visible = states.indices
+            combine(footers.map { it.footer.state }) { states ->
+                // One footer per category, the highest priority among the visible ones; the rest stack in priority order.
+                val shown = states.indices
                     .filter { states[it].visible }
-                    .sortedBy { footers[it].first }
+                    .groupBy { footers[it].category }
+                    .values
+                    .map { sameCategory -> sameCategory.minBy { footers[it].priority } }
+                    .sortedBy { footers[it].priority }
 
                 State(
-                    footers = visible.map { footers[it].second },
-                    blocksComposer = visible.any { states[it].blocksComposer },
+                    footers = shown.map { footers[it].footer },
+                    blocksComposer = shown.any { states[it].blocksComposer },
                 )
             },
         )
