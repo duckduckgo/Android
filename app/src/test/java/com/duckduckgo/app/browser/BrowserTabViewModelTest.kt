@@ -196,7 +196,6 @@ import com.duckduckgo.app.cta.ui.DaxSerpBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxSiteSuggestionsBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxTrackersBlockedBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxTryASearchBrandDesignUpdateBubbleCta
-import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxDuckAiFireButtonCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxMainNetworkCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxSerpCta
@@ -4188,16 +4187,6 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenCtaShownThenFirePixel() =
-        runTest {
-            val cta = HomePanelCta.AddWidgetAutoOnboarding
-            testee.ctaViewState.value = CtaViewState(cta = cta)
-
-            testee.onCtaShown()
-            verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
-        }
-
-    @Test
     fun whenRefreshCtaIfCtaAlreadyShownForCurrentPageThenReturnNull() =
         runTest {
             setBrowserShowing(isBrowsing = true)
@@ -4304,22 +4293,6 @@ class BrowserTabViewModelTest {
         isOmnibarBottom = false,
         segmentedPathWithAiInput = segmentedPath,
     )
-
-    @Test
-    fun whenUserClickedAddWidgetCtaButtonThenLaunchAddWidgetCommand() {
-        val cta = HomePanelCta.AddWidgetAutoOnboarding
-        setCta(cta)
-        testee.onUserClickCtaOkButton(cta)
-        assertCommandIssued<Command.LaunchAddWidgetOnboarding>()
-    }
-
-    @Test
-    fun whenUserClickedLegacyAddWidgetCtaButtonThenLaunchAddWidgetCommand() {
-        val cta = HomePanelCta.AddWidgetInstructions
-        setCta(cta)
-        testee.onUserClickCtaOkButton(cta)
-        assertCommandIssued<Command.LaunchAddWidgetOnboarding>()
-    }
 
     @Test
     fun whenUserClickedLearnMoreExperimentBubbleCtaButtonThenLaunchSubscription() {
@@ -4515,18 +4488,6 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenShowAddWidgetModalCtaAndMaliciousSiteWarningShowingThenNotShown() =
-        runTest {
-            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
-            testee.browserViewState.value = browserViewState().copy(browserShowing = false, maliciousSiteBlocked = true)
-
-            val shown = testee.showAddWidgetPromo(supportsAutomaticAdd = true)
-
-            assertFalse(shown)
-            assertNull(testee.ctaViewState.value?.cta)
-        }
-
-    @Test
     fun whenShowSubscriptionPromoModalCtaWhileBrowsingAndCtaSlotOccupiedThenStillShown() =
         runTest {
             whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
@@ -4544,60 +4505,6 @@ class BrowserTabViewModelTest {
 
             assertTrue(shown)
             assertTrue(testee.ctaViewState.value?.cta is SubscriptionPromoModalCta)
-        }
-
-    @Test
-    fun whenShowAddWidgetModalCtaWhileBrowsingThenNotShown() =
-        runTest {
-            loadUrl(exampleUrl, isBrowserShowing = true)
-            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = false)
-
-            val shown = testee.showAddWidgetPromo(supportsAutomaticAdd = true)
-
-            assertFalse(shown)
-            assertFalse(testee.ctaViewState.value?.cta is HomePanelCta.AddWidgetAutoOnboarding)
-        }
-
-    @Test
-    fun whenShowAddWidgetModalCtaOnNewTabPageThenAccepted() =
-        runTest {
-            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
-            setBrowserShowing(false)
-
-            val shown = testee.showAddWidgetPromo(supportsAutomaticAdd = true)
-
-            assertTrue(shown)
-        }
-
-    @Test
-    fun whenShowAddWidgetModalCtaOnNewTabPageButCtaSlotOccupiedThenDeclined() =
-        runTest {
-            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
-            setBrowserShowing(false)
-            setCta(SubscriptionPromoModalCta(isFreeTrialCopy = false, flow = SubscriptionPromoFlow.NUDGE))
-
-            val shown = testee.showAddWidgetPromo(supportsAutomaticAdd = true)
-
-            assertFalse(shown)
-            assertTrue(testee.ctaViewState.value?.cta is SubscriptionPromoModalCta)
-        }
-
-    @Test
-    fun whenUserDismissedCtaThenFirePixel() =
-        runTest {
-            val cta = HomePanelCta.AddWidgetAutoOnboarding
-            setCta(cta)
-            testee.onUserDismissedCta(cta)
-            verify(mockPixel).fire(cta.cancelPixel!!, cta.pixelCancelParameters())
-        }
-
-    @Test
-    fun whenUserDismissedCtaThenRegisterInDatabase() =
-        runTest {
-            val cta = HomePanelCta.AddWidgetAutoOnboarding
-            setCta(cta)
-            testee.onUserDismissedCta(cta)
-            verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
         }
 
     @Test

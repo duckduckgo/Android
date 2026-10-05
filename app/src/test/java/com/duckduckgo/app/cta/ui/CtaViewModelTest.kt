@@ -293,24 +293,6 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenCtaShownAndCtaIsNotDaxThenPixelIsFired() = runTest {
-        testee.onCtaShown(HomePanelCta.AddWidgetAutoOnboarding)
-        verify(mockPixel).fire(eq(WIDGET_CTA_SHOWN), any(), any(), eq(Count))
-    }
-
-    @Test
-    fun whenCtaLaunchedPixelIsFired() = runTest {
-        testee.onUserClickCtaOkButton(HomePanelCta.AddWidgetAutoOnboarding)
-        verify(mockPixel).fire(eq(WIDGET_CTA_LAUNCHED), any(), any(), eq(Count))
-    }
-
-    @Test
-    fun whenCtaDismissedThenCancelPixelIsFired() = runTest {
-        testee.onUserDismissedCta(HomePanelCta.AddWidgetAutoOnboarding)
-        verify(mockPixel).fire(eq(WIDGET_CTA_DISMISSED), any(), any(), eq(Count))
-    }
-
-    @Test
     fun whenOnboardingCtaDismissedViaCloseBtnThenPixelIsFired() = runTest {
         val testCta = DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
 
@@ -326,12 +308,6 @@ class CtaViewModelTest {
         testee.onUserDismissedCta(testCta)
 
         verify(mockPixel, never()).fire(eq(ONBOARDING_DAX_CTA_DISMISS_BUTTON), any(), any(), eq(Count))
-    }
-
-    @Test
-    fun whenNonSurveyCtaDismissedCtaThenDatabaseNotified() = runTest {
-        testee.onUserDismissedCta(HomePanelCta.AddWidgetAutoOnboarding)
-        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.ADD_WIDGET))
     }
 
     @Test

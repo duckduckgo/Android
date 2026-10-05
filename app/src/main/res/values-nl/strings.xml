@@ -327,11 +327,6 @@
     <string name="surveyLoadingErrorText">Onze enquête kan momenteel niet worden geladen.\nProbeer het later opnieuw.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Probeer onze zoekwidget!</string>
-    <string name="addWidgetCtaDescription">Voeg onze zoekwidget toe aan je startscherm voor snelle en gemakkelijke toegang.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Widget toevoegen</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Laat zien</string>
-    <string name="addWidgetCtaDismissButton">Negeren</string>
     <string name="addWidgetInstructionsActivityTitle">Widget toevoegen</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Druk lang op je startscherm en open dan het widgets-menu.</string>
@@ -867,9 +862,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Probeer onze widget op het startscherm!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Voeg onze zoekwidget toe aan je startscherm voor snelle en gemakkelijke toegang.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Widget toevoegen</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Niet nu</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Zoek in DuckDuckGo</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Startschermwidget</string>

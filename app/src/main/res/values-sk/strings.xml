@@ -333,11 +333,6 @@
     <string name="surveyLoadingErrorText">Prieskum sa momentálne nenačítava.\nSkúste to znova neskôr.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Vyskúšajte našu miniaplikáciu Vyhľadávanie.</string>
-    <string name="addWidgetCtaDescription">Na rýchly a jednoduchý prístup si pridajte miniaplikáciu vyhľadávania na domovskú obrazovku.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Pridať miniaplikáciu</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Zobraziť</string>
-    <string name="addWidgetCtaDismissButton">Odmietnuť</string>
     <string name="addWidgetInstructionsActivityTitle">Pridať miniaplikáciu</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Dlhým stlačením domovskej obrazovky otvorte ponuku miniaplikácií.</string>
@@ -903,9 +898,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Vyskúšaj náš widget na úvodnej obrazovke!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Na rýchly a jednoduchý prístup si pridajte miniaplikáciu vyhľadávania na domovskú obrazovku.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Pridať miniaplikáciu</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Teraz nie</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Vyhľadať v DuckDuckGo</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Miniaplikácia úvodnej obrazovky</string>

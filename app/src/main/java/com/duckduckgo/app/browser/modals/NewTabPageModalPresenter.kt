@@ -34,9 +34,6 @@ interface NewTabPageModalPresenter {
         flow: SubscriptionPromoFlow,
         isFreeTrialCopy: Boolean,
     ): Boolean
-
-    /** Shows the Add Widget promo. Valid only on the New Tab Page. */
-    suspend fun showAddWidgetPromo(supportsAutomaticAdd: Boolean): Boolean
 }
 
 /**

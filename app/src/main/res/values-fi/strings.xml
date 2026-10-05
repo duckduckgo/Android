@@ -327,11 +327,6 @@
     <string name="surveyLoadingErrorText">Kyselyä ei voida ladata tällä hetkellä.\nYritä myöhemmin uudelleen.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Kokeile haku-widgetiämme!</string>
-    <string name="addWidgetCtaDescription">Lisää haku-widgetimme aloitusnäytöllesi, josta löydät sen nopeasti ja helposti.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Lisää widget</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Näytä minulle</string>
-    <string name="addWidgetCtaDismissButton">Hylkää</string>
     <string name="addWidgetInstructionsActivityTitle">Lisää widget</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Paina aloitusnäyttöä pitkään ja avaa sitten widget-valikko.</string>
@@ -867,9 +862,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Kokeile aloitusnäytön widgetiä!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Lisää haku-widgetimme aloitusnäytöllesi, josta löydät sen nopeasti ja helposti.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Lisää widget</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ei nyt</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Hae DuckDuckGosta</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Aloitusnäytön widget</string>

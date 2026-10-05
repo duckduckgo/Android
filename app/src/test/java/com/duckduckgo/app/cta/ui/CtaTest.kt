@@ -71,42 +71,6 @@ class CtaTest {
     }
 
     @Test
-    fun whenCtaIsAddWidgetAutoReturnEmptyOkParameters() {
-        val testee = HomePanelCta.AddWidgetAutoOnboarding
-        assertTrue(testee.pixelOkParameters().isEmpty())
-    }
-
-    @Test
-    fun whenCtaIsAddWidgetAutoReturnEmptyCancelParameters() {
-        val testee = HomePanelCta.AddWidgetAutoOnboarding
-        assertTrue(testee.pixelCancelParameters().isEmpty())
-    }
-
-    @Test
-    fun whenCtaIsAddWidgetAutoReturnEmptyShownParameters() {
-        val testee = HomePanelCta.AddWidgetAutoOnboarding
-        assertTrue(testee.pixelShownParameters().isEmpty())
-    }
-
-    @Test
-    fun whenCtaIsAddWidgetInstructionsReturnEmptyOkParameters() {
-        val testee = HomePanelCta.AddWidgetInstructions
-        assertTrue(testee.pixelOkParameters().isEmpty())
-    }
-
-    @Test
-    fun whenCtaIsAddWidgetInstructionsReturnEmptyCancelParameters() {
-        val testee = HomePanelCta.AddWidgetInstructions
-        assertTrue(testee.pixelCancelParameters().isEmpty())
-    }
-
-    @Test
-    fun whenCtaIsAddWidgetInstructionsReturnEmptyShownParameters() {
-        val testee = HomePanelCta.AddWidgetInstructions
-        assertTrue(testee.pixelShownParameters().isEmpty())
-    }
-
-    @Test
     fun whenCtaIsBubbleTypeReturnCorrectCancelParameters() {
         val testee = DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
         val value = testee.pixelCancelParameters()

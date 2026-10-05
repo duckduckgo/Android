@@ -186,7 +186,6 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.dialogs.AutomaticFireproofDialogOptions
 import com.duckduckgo.app.browser.ui.dialogs.LaunchInExternalAppOptions
-import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.HomeScreenWidgetBottomSheetDialog
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
@@ -213,8 +212,6 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
-import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboarding
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.cta.ui.PrivacyProSkippedOnboardingBottomSheetDialog
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
@@ -237,8 +234,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
-import com.duckduckgo.app.widget.AddWidgetLauncher
-import com.duckduckgo.app.widget.AddWidgetSource
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
@@ -292,7 +287,6 @@ import com.duckduckgo.browsermode.api.WebViewModeInitializer
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.menu.PopupMenu
-import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.DaxDialog
@@ -301,7 +295,6 @@ import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
-import com.duckduckgo.common.ui.view.dialog.PromoBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.fadeTransitionConfig
@@ -556,9 +549,6 @@ class BrowserTabFragment :
     lateinit var appTheme: BrowserAppTheme
 
     @Inject
-    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
-
-    @Inject
     lateinit var accessibilitySettingsDataStore: AccessibilitySettingsDataStore
 
     @Inject
@@ -570,9 +560,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
-
-    @Inject
-    lateinit var addWidgetLauncher: AddWidgetLauncher
 
     @Inject
     lateinit var downloadsFileActions: DownloadsFileActions
@@ -733,9 +720,6 @@ class BrowserTabFragment :
 
     private var bottomSheetMenu: BrowserMenuBottomSheet? = null
     private var pdfDownloadTooltipPopup: PdfDownloadTooltipPopup? = null
-    private lateinit var ctaBottomSheet: PromoBottomSheetDialog
-    private lateinit var widgetBottomSheetDialog: HomeScreenWidgetBottomSheetDialog
-    private val widgetBottomSheetDialogJob: ConflatedJob = ConflatedJob()
     private var privacyProSkippedOnboardingBottomSheet: PrivacyProSkippedOnboardingBottomSheetDialog? = null
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
@@ -2971,8 +2955,6 @@ class BrowserTabFragment :
 
             is Command.LaunchPlayStore -> launchPlayStore(it.appPackage)
             is Command.SubmitUrl -> submitQuery(it.url)
-            is Command.LaunchAddWidgetOnboarding ->
-                addWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt = true, source = AddWidgetSource.HOME_SCREEN_PROMPT)
             is Command.LaunchDefaultBrowser -> launchDefaultBrowser()
             is Command.LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()
             is Command.RequiresAuthentication -> showAuthenticationDialog(it.request)
@@ -5273,7 +5255,6 @@ class BrowserTabFragment :
         val orientationChanged = lastOrientation != newConfig.orientation
         lastOrientation = newConfig.orientation
 
-        renderer.renderHomeCta()
         recreateBrowserMenu()
         viewModel.onConfigurationChanged(orientationChanged)
         if (orientationChanged) {
@@ -5323,7 +5304,6 @@ class BrowserTabFragment :
         dismissAppLinkSnackBar()
         supervisorJob.cancel()
         dismissBrowserMenu()
-        widgetBottomSheetDialogJob?.cancel()
         loginDetectionDialog?.dismiss()
         automaticFireproofDialog?.dismiss()
         privacyProSkippedOnboardingBottomSheet?.dismiss()
@@ -5625,7 +5605,6 @@ class BrowserTabFragment :
         const val KEYBOARD_DELAY = 200L
         private const val NAVIGATION_DELAY = 100L
         private const val BOTTOM_SHEET_MENU_DELAY = 300L
-        private const val WIDGET_PROMPT_DELAY = 200L
         private const val CHECK_IF_ABOUT_BLANK_DELAY = 200L
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
@@ -6392,7 +6371,6 @@ class BrowserTabFragment :
             instantShow: Boolean = false,
         ) {
             when (configuration) {
-                is HomePanelCta -> showBottomSheetCta(configuration)
                 is SubscriptionPromoModalCta -> showPrivacyProSkippedOnboardingBottomSheet(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta ->
@@ -6587,94 +6565,6 @@ class BrowserTabFragment :
             )
         }
 
-        private fun showBottomSheetCta(configuration: HomePanelCta) {
-            widgetBottomSheetDialogJob += viewLifecycleOwner.lifecycleScope.launch {
-                delay(WIDGET_PROMPT_DELAY)
-                if (configuration is AddWidgetAutoOnboarding) {
-                    showHomeWidgetPrompt(configuration)
-                } else {
-                    showHomeCta(configuration)
-                }
-            }
-        }
-
-        private fun showHomeWidgetPrompt(configuration: HomePanelCta) {
-            hideDaxCta()
-            val isAddressBarRebrandEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled()
-
-            if (!::widgetBottomSheetDialog.isInitialized) {
-                widgetBottomSheetDialog =
-                    HomeScreenWidgetBottomSheetDialog(
-                        context = requireContext(),
-                        isLightModeEnabled = appTheme.isLightModeEnabled(),
-                        isAddressBarRebrandEnabled = isAddressBarRebrandEnabled,
-                        edgeToEdgeProvider = edgeToEdgeProvider,
-                    )
-                widgetBottomSheetDialog.eventListener =
-                    object : HomeScreenWidgetBottomSheetDialog.EventListener {
-                        override fun onShown() {
-                            viewModel.onCtaShown()
-                        }
-
-                        override fun onCanceled() {
-                            viewModel.onUserClickCtaSecondaryButton(configuration)
-                        }
-
-                        override fun onAddWidgetButtonClicked() {
-                            viewModel.onUserClickCtaOkButton(configuration)
-                        }
-
-                        override fun onNotNowButtonClicked() {
-                            viewModel.onUserClickCtaSecondaryButton(configuration)
-                        }
-                    }
-                widgetBottomSheetDialog.show()
-            } else {
-                if (!widgetBottomSheetDialog.isShowing) {
-                    widgetBottomSheetDialog.show()
-                }
-            }
-        }
-
-        private fun showHomeCta(configuration: HomePanelCta) {
-            hideDaxCta()
-
-            if (!::ctaBottomSheet.isInitialized) {
-                ctaBottomSheet =
-                    PromoBottomSheetDialog
-                        .Builder(requireContext())
-                        .setIcon(configuration.image)
-                        .setTitle(getString(configuration.title))
-                        .setContent(getString(configuration.description))
-                        .setPrimaryButton(getString(configuration.okButton))
-                        .setSecondaryButton(getString(configuration.dismissButton))
-                        .addEventListener(
-                            object : PromoBottomSheetDialog.EventListener() {
-                                override fun onPrimaryButtonClicked() {
-                                    super.onPrimaryButtonClicked()
-                                    viewModel.onUserClickCtaOkButton(configuration)
-                                }
-
-                                override fun onSecondaryButtonClicked() {
-                                    super.onSecondaryButtonClicked()
-                                    viewModel.onUserClickCtaSecondaryButton(configuration)
-                                }
-
-                                override fun onBottomSheetDismissed() {
-                                    super.onBottomSheetDismissed()
-                                    viewModel.onUserClickCtaSecondaryButton(configuration)
-                                }
-                            },
-                        ).build()
-                ctaBottomSheet.show()
-            } else {
-                if (!ctaBottomSheet.isShowing) {
-                    ctaBottomSheet.show()
-                }
-            }
-            viewModel.onCtaShown()
-        }
-
         fun recreateNewTabPageContent() {
             newBrowserTab.newTabContainerLayout.removeAllViews()
             addNewTabPageContent()
@@ -6724,19 +6614,6 @@ class BrowserTabFragment :
                 cta.hideOnboardingCta(binding)
             } else {
                 OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta.hideContainer(binding)
-            }
-        }
-
-        fun renderHomeCta() {
-            if (::ctaBottomSheet.isInitialized) {
-                if (ctaBottomSheet.isShowing) {
-                    // the bottom sheet might be visible but not fully expanded
-                    val bottomSheet = ctaBottomSheet.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-                    if (bottomSheet != null) {
-                        val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
-                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                    }
-                }
             }
         }
 

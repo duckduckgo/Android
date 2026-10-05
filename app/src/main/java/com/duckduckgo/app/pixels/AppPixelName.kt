@@ -92,12 +92,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     DEFAULT_BROWSER_UNSET("m_db_u"),
     DEFAULT_BROWSER_DIALOG_NOT_SHOWN("m_dbd_ns"),
 
-    WIDGET_CTA_SHOWN("m_wc_s"),
-    WIDGET_CTA_LAUNCHED("m_wc_l"),
-    WIDGET_CTA_DISMISSED("m_wc_d"),
-    WIDGET_LEGACY_CTA_SHOWN("m_wlc_s"),
-    WIDGET_LEGACY_CTA_LAUNCHED("m_wlc_l"),
-    WIDGET_LEGACY_CTA_DISMISSED("m_wlc_d"),
     WIDGETS_ADDED(pixelName = "m_w_a"),
     WIDGETS_DELETED(pixelName = "m_w_d"),
     FAVORITE_WIDGET_CONFIGURATION_SHOWN(pixelName = "m_sfw_cs"),

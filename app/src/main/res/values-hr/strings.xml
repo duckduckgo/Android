@@ -333,11 +333,6 @@
     <string name="surveyLoadingErrorText">Anketa se trenutačno ne učitava.\nPokušaj ponovno kasnije.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Isprobaj naš widget za pretraživanje!</string>
-    <string name="addWidgetCtaDescription">Dodaj naš widget za pretraživanje na početni zaslon za brz i jednostavan pristup.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Dodaj widget</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Pokaži mi</string>
-    <string name="addWidgetCtaDismissButton">Odbaci</string>
     <string name="addWidgetInstructionsActivityTitle">Dodaj widget</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Dugim pritiskom pritisni početni zaslon, a zatim otvori izbornik widgeta.</string>
@@ -903,9 +898,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Probaj naš widget za početni zaslon!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Dodaj naš widget za pretraživanje na početni zaslon za brz i jednostavan pristup.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Dodaj widget</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ne sad</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Pretraži DuckDuckGo</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Widget za početni zaslon</string>

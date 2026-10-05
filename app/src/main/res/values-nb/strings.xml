@@ -327,11 +327,6 @@
     <string name="surveyLoadingErrorText">Spørreundersøkelsen vår laster ikke for øyeblikket.\nPrøv igjen senere.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Prøv søke-widgeten vår!</string>
-    <string name="addWidgetCtaDescription">Legg søke-widgeten vår til på startskjermen for rask og enkel tilgang.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Legg til widget</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Vis meg</string>
-    <string name="addWidgetCtaDismissButton">Avvis</string>
     <string name="addWidgetInstructionsActivityTitle">Legg til widget</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Trykk lenge på startskjermen og åpne deretter widget-menyen.</string>
@@ -867,9 +862,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Prøv startskjerm-widgeten vår!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Legg søke-widgeten vår til på startskjermen for rask og enkel tilgang.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Legg til widget</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ikke nå</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Søk med DuckDuckGo</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Startskjerm-widget</string>

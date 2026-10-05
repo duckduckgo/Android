@@ -327,11 +327,6 @@
     <string name="surveyLoadingErrorText">Unsere Umfrage kann derzeit nicht geladen werden.\nBitte versuche es zu einem späteren Zeitpunkt erneut.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Probiere unser Such-Widget aus!</string>
-    <string name="addWidgetCtaDescription">Füge unser Such-Widget für einen schnellen und einfachen Zugriff zu deinem Startbildschirm hinzu.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Widget hinzufügen</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Anzeigen</string>
-    <string name="addWidgetCtaDismissButton">Verwerfen</string>
     <string name="addWidgetInstructionsActivityTitle">Widget hinzufügen</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Drücke lange auf eine Stelle auf deinem Startbildschirm, woraufhin sich das Widget-Menü öffnet.</string>
@@ -867,9 +862,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Probiere unser Startbildschirm-Widget aus!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Füge unser Such-Widget für einen schnellen und einfachen Zugriff zu deinem Startbildschirm hinzu.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Widget hinzufügen</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Jetzt nicht</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Mit DuckDuckGo suchen</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Widget für Startbildschirm</string>
