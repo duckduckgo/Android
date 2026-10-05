@@ -57,18 +57,14 @@ class OnboardingViewModel @Inject constructor(
     val viewState = _viewState.asStateFlow()
 
     suspend fun initializePages() {
-        val renderer = withContext(dispatchers.io()) { resolveRenderer() }
-        when (renderer) {
-            OnboardingRenderer.ConfigDriven -> pageLayoutManager.buildConfigDrivenPageBlueprints()
-            OnboardingRenderer.BrandDesignUpdate -> pageLayoutManager.buildBrandDesignUpdatePageBlueprints()
-            OnboardingRenderer.Legacy -> pageLayoutManager.buildPageBlueprints()
+        val brandDesignUpdateEnabled = withContext(dispatchers.io()) {
+            onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
         }
-    }
-
-    private fun resolveRenderer(): OnboardingRenderer = when {
-        !onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled() -> OnboardingRenderer.Legacy
-        onboardingBrandDesignUpdateToggles.configDrivenDialogs().isEnabled() -> OnboardingRenderer.ConfigDriven
-        else -> OnboardingRenderer.BrandDesignUpdate
+        if (brandDesignUpdateEnabled) {
+            pageLayoutManager.buildConfigDrivenPageBlueprints()
+        } else {
+            pageLayoutManager.buildPageBlueprints()
+        }
     }
 
     fun pageCount(): Int {
@@ -158,6 +154,4 @@ class OnboardingViewModel @Inject constructor(
         DUCK_AI_FOCUSED,
         DEFAULT_WITHOUT_INTRO_CTA,
     }
-
-    private enum class OnboardingRenderer { Legacy, BrandDesignUpdate, ConfigDriven }
 }

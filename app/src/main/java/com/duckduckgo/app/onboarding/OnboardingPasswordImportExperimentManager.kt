@@ -69,7 +69,7 @@ class OnboardingPasswordImportExperimentManagerImpl @Inject constructor(
      */
     private suspend fun checkPrerequisites() =
         toggles.self().isEnabled() &&
-            onboardingBrandDesignUpdateToggles.configDrivenDialogs().isEnabled() &&
+            onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled() &&
             !appBuildConfig.isAppReinstall() &&
             importPasswordsFromGoogle.isSupported()
 }
