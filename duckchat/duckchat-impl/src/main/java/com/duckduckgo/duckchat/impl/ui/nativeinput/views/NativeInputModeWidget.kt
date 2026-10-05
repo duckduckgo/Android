@@ -1672,11 +1672,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
         // condition (not an early return) so a bottom Duck.ai frame still reaches the reset below.
         val isBrowserSearchOnly = state.inputContext == NativeInputState.InputContext.BROWSER && !state.toggleVisible
         if (state.isBottom) {
-            if (isBrowserSearchOnly && appBrandDesignUpdateToggles.addressBar().isEnabled()) {
-                card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.rebrandInputRadius)
-            } else {
-                card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
+            val radius = when {
+                !isBrowserSearchOnly -> com.duckduckgo.mobile.android.R.dimen.extraLargeShapeCornerRadius
+                appBrandDesignUpdateToggles.addressBar().isEnabled() -> com.duckduckgo.mobile.android.R.dimen.rebrandInputRadius
+                else -> com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius
             }
+            card.radius = card.resources.getDimension(radius)
         }
         if (isBrowserSearchOnly && !state.isBottom) {
             val targetTopMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginTop)

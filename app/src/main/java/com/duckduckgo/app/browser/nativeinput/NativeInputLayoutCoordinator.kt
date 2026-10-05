@@ -26,8 +26,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.R
-import com.google.android.material.card.MaterialCardView
-import com.duckduckgo.mobile.android.R as CommonR
 
 class NativeInputLayoutCoordinator(
     private val rootView: ViewGroup,
@@ -81,32 +79,6 @@ class NativeInputLayoutCoordinator(
         ).apply {
             gravity = Gravity.TOP
         }
-    }
-
-    fun applyBottomCardCorners(widgetView: View, isBottom: Boolean) {
-        if (!isBottom) return
-        val card = widgetView.findViewById<MaterialCardView?>(R.id.inputModeWidgetCard) ?: return
-        val radius = card.resources.getDimension(CommonR.dimen.extraLargeShapeCornerRadius)
-        card.shapeAppearanceModel =
-            card.shapeAppearanceModel
-                .toBuilder()
-                .setTopLeftCornerSize(radius)
-                .setTopRightCornerSize(radius)
-                .setBottomLeftCornerSize(0f)
-                .setBottomRightCornerSize(0f)
-                .build()
-    }
-
-    fun applyBottomCardShape(widgetView: View, isBottom: Boolean) {
-        if (!isBottom) return
-        applyBottomCardCorners(widgetView, isBottom)
-        val card = widgetView.findViewById<MaterialCardView?>(R.id.inputModeWidgetCard) ?: return
-        val params = card.layoutParams as? ViewGroup.MarginLayoutParams ?: return
-        params.width = ViewGroup.LayoutParams.MATCH_PARENT
-        params.marginStart = 0
-        params.marginEnd = 0
-        params.bottomMargin = 0
-        card.layoutParams = params
     }
 
     fun configureAutocompleteLayout(widgetView: View, isBottom: Boolean) {
