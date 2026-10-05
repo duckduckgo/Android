@@ -16,7 +16,7 @@
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <corners
-        android:topLeftRadius="@dimen/onboardingBottomSheetCornerRadius"
-        android:topRightRadius="@dimen/onboardingBottomSheetCornerRadius" />
+        android:topLeftRadius="?attr/daxOnboardingSheetRadius"
+        android:topRightRadius="?attr/daxOnboardingSheetRadius" />
     <solid android:color="?attr/daxColorWindow" />
 </shape>

@@ -48,7 +48,10 @@ class ShowOnAppLaunchViewModelTest {
 
     private lateinit var testee: ShowOnAppLaunchViewModel
     private val dispatcherProvider: DispatcherProvider = coroutineTestRule.testDispatcherProvider
-    private val fakeBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+    private val fakeBrowserConfigFeature = FakeFeatureToggleFactory.create(
+        AndroidBrowserConfigFeature::class.java,
+        ioDispatcher = coroutineTestRule.testDispatcher,
+    )
     private val providerSettings = MutableStateFlow<AfterInactivitySettings>(AfterInactivitySettings.LastUsedTab)
     private val fakeProvider = FakeAfterInactivitySettingsDataProvider(providerSettings)
     private val pixel: Pixel = mock()

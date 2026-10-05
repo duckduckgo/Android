@@ -47,6 +47,10 @@ interface AppBrandDesignUpdateToggles {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun theme(): Toggle
 
+    /** Gates the radius changes separately so the rest of the brand design update can roll out independently. */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun radius(): Toggle
+
     /**
      * Gates the address bar radius, Lotties: shield, cookies, ad-blocking and Duck Player
      * assets, the 40dp shield icon box, and the home screen widget search bar, previews, and promo artwork.

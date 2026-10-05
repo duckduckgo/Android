@@ -30,11 +30,11 @@
 
         <ImageView
             android:id="@+id/close"
-            android:layout_width="@dimen/messageCtaCloseButtonSize"
-            android:layout_height="@dimen/messageCtaCloseButtonSize"
-            android:background="?selectableItemBackground"
+            android:layout_width="?attr/daxMessageCtaCloseButtonSize"
+            android:layout_height="?attr/daxMessageCtaCloseButtonSize"
+            android:background="?attr/daxMessageCtaCloseButtonBackground"
             android:contentDescription="@string/closeButtonContentDescription"
-            android:padding="@dimen/keyline_2"
+            android:scaleType="center"
             android:src="@drawable/ic_close_24"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

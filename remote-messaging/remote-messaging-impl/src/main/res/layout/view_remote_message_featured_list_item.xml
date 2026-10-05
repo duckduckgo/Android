@@ -30,7 +30,7 @@
         android:layout_marginStart="@dimen/keyline_5"
         android:layout_marginEnd="@dimen/keyline_5"
         android:background="?attr/daxColorWindow"
-        app:cardCornerRadius="12dp"
+        app:cardCornerRadius="?attr/daxWhatsNewCardRadius"
         app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
