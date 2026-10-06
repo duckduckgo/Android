@@ -99,7 +99,12 @@ class SubmitButtonView @JvmOverloads constructor(
                 )
                 button.isEnabled = state.enabled
                 button.alpha = if (state.enabled) ENABLED_ALPHA else DISABLED_ALPHA
-                askPossible = state.askPossible
+                if (askPossible != state.askPossible) {
+                    askPossible = state.askPossible
+                    // The row sizes itself from worst-case widths, which just changed. Without this the first layout
+                    // runs before the reservation is known and is not redone until something else changes.
+                    requestLayout()
+                }
                 button.isVisible = !state.askLabel
                 askButton.isVisible = state.askLabel
                 askButton.isEnabled = state.enabled

@@ -134,6 +134,18 @@ class AdaptiveBottomRowLayoutTest {
         assertEquals(0, row.model.level)
     }
 
+    @Test
+    fun whenAContainerHoldsNoCompactableControlThenItsWidthStillCounts() {
+        val without = row(100, intArrayOf(300, 40, 40), intArrayOf(80, 80, 40), 100)
+        val with = row(100, intArrayOf(300, 40, 40), intArrayOf(80, 80, 40), 100, extraFixedWidth = 200)
+
+        without.measureWithWidth(700)
+        with.measureWithWidth(700)
+
+        assertEquals(0, without.model.level)
+        assertEquals(1, with.model.level)
+    }
+
     private class Row(
         val layout: AdaptiveBottomRowLayout,
         val model: FakeControl,
@@ -155,6 +167,7 @@ class AdaptiveBottomRowLayoutTest {
         endFixedWidth: Int,
         modelWorstCase: IntArray = modelWidths,
         modelVisible: Boolean = true,
+        extraFixedWidth: Int = 0,
     ): Row {
         val layout = AdaptiveBottomRowLayout(context)
         val start = LinearLayout(context)
@@ -162,12 +175,26 @@ class AdaptiveBottomRowLayoutTest {
         val tools = FakeControl(context, toolsWidths)
         val model = FakeControl(context, modelWidths, modelWorstCase).apply { if (!modelVisible) visibility = View.GONE }
         start.addView(FakeControl(context, intArrayOf(startWidth)))
+        if (extraFixedWidth > 0) start.addView(FixedView(context, extraFixedWidth))
         start.addView(tools)
         end.addView(model)
         end.addView(FakeControl(context, intArrayOf(endFixedWidth)))
         layout.addView(start, FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT))
         layout.addView(end, FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT))
         return Row(layout, model, tools)
+    }
+
+    // A control that is not compactable, like the attach button: it takes its width at every level.
+    private class FixedView(
+        context: Context,
+        private val widthPx: Int,
+    ) : View(context) {
+        override fun onMeasure(
+            widthMeasureSpec: Int,
+            heightMeasureSpec: Int,
+        ) {
+            setMeasuredDimension(widthPx, 10)
+        }
     }
 
     private class FakeControl(

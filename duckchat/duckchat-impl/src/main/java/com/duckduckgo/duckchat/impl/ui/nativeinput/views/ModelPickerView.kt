@@ -97,6 +97,7 @@ class ModelPickerView @JvmOverloads constructor(
     private var lastNativeInputState: NativeInputState? = null
     private var compactLevel = AdaptiveBottomRowLayout.LEVEL_FULL
     private var chipLabelText: String? = null
+    private var chipChrome: Float? = null
     private var chipIconJob: Job? = null
     private val chipSize = resources.getDimension(R.dimen.nativeInputButtonSize)
     private val defaultPaddings by lazy {
@@ -259,7 +260,23 @@ class ModelPickerView @JvmOverloads constructor(
         val longestName = if (isAttachedToWindow) viewModel.state.value.models.maxOfOrNull { it.shortName }.orEmpty() else ""
         val textWidth = chip.paint.measureText(longestName.ifEmpty { chipLabelText.orEmpty() })
         val closeIconWidth = defaults.closeIconStart + defaults.closeIconSize + defaults.closeIconEnd
-        return (defaults.chipStart + defaults.textStart + textWidth + defaults.textEnd + closeIconWidth + defaults.chipEnd).toInt() + margin
+        val estimatedChrome = defaults.chipStart + defaults.textStart + defaults.textEnd + closeIconWidth + defaults.chipEnd
+        return ((chipChrome ?: estimatedChrome) + textWidth).toInt() + margin
+    }
+
+    // Once the chip has shown its text, the real width around the label is known, which is more exact than the paddings.
+    override fun onLayout(
+        changed: Boolean,
+        left: Int,
+        top: Int,
+        right: Int,
+        bottom: Int,
+    ) {
+        super.onLayout(changed, left, top, right, bottom)
+        val label = chip.text?.toString().orEmpty()
+        if (compactLevel == AdaptiveBottomRowLayout.LEVEL_FULL && label.isNotEmpty() && chip.width > 0) {
+            chipChrome = chip.width - chip.paint.measureText(label)
+        }
     }
 
     override fun hasPendingRecoverySelection(): Boolean = viewModel.hasPendingRecoverySelection()

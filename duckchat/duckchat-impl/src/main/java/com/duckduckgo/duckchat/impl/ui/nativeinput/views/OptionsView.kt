@@ -174,9 +174,10 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         applyMergedState()
     }
 
-    // The tools button plus a mode chip at full size; at the top level only the chip, standing in for both.
+    // The tools button, plus the mode chip when one is active. At the top level the chip alone stands in for both.
     override fun worstCaseWidth(level: Int): Int {
         val button = resources.getDimensionPixelSize(R.dimen.nativeInputButtonSize)
+        if (childCount <= 1) return button
         val space = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
         val chipPadding = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
         val chipIcon = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_5)
