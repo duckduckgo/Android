@@ -28,6 +28,7 @@ import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.LiveData
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.cash.turbine.test
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
@@ -44,13 +45,18 @@ import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.NativeInputEventListener
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
+import com.duckduckgo.duckchat.store.impl.DuckAiChat
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -83,6 +89,7 @@ class RealNativeInputManagerTest {
     private val nativeInputEventListener: NativeInputEventListener = mock()
     private val edgeToEdgeProvider: EdgeToEdgeProvider = mock()
     private val edgeToEdgeHandler = EdgeToEdgeHandler()
+    private val duckAiChatStore: DuckAiChatStore = mock()
     private val nativeInputStateBugKillSwitch = FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java)
     private val nativeInputUrlClearingFeature = FakeFeatureToggleFactory.create(NativeInputUrlClearingFeature::class.java)
     private val nativeInputOmnibarFeature = FakeFeatureToggleFactory.create(NativeInputOmnibarFeature::class.java)
@@ -118,6 +125,7 @@ class RealNativeInputManagerTest {
             nativeInputEventListener,
             edgeToEdgeProvider,
             edgeToEdgeHandler,
+            duckAiChatStore,
         )
     }
 
@@ -386,10 +394,10 @@ class RealNativeInputManagerTest {
     fun whenTypedSubmissionFollowsSuccessfulDuckAiVoiceSubmissionThenTypedSubmissionUsesAddressBarPromptEntryPoint() {
         val entryPoints = mutableListOf<DuckChatEntryPoint>()
         val onSubmitted = { _: String, entryPoint: DuckChatEntryPoint -> entryPoints += entryPoint }
-        showVoiceTestWidget(onSubmitted)
+        showVoiceTestWidget(onDuckAiQuerySubmitted = onSubmitted)
         testee.handleDuckAiVoiceResult("voice query")
 
-        val widget = showVoiceTestWidget(onSubmitted)
+        val widget = showVoiceTestWidget(onDuckAiQuerySubmitted = onSubmitted)
         widget.selectChatTab()
         widget.submitMessage("typed query")
 
@@ -399,7 +407,47 @@ class RealNativeInputManagerTest {
         )
     }
 
-    private fun showVoiceTestWidget(onDuckAiQuerySubmitted: (String, DuckChatEntryPoint) -> Unit): TestNativeInputWidget {
+    @Test
+    fun whenUrlChatIdIsVoiceOnlyOrUnstoredThenPublishedChatIdIsNull() = runTest {
+        whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
+        val voice = DuckAiChat(chatId = "voice", title = "t", model = "voice-mode", lastEdit = "now", pinned = false, isVoice = true)
+        val text = DuckAiChat(chatId = "text", title = "t", model = "m", lastEdit = "now", pinned = false)
+        whenever(duckAiChatStore.hasMigrated()).thenReturn(true)
+        whenever(duckAiChatStore.getChatsFlow()).thenReturn(flowOf(listOf(voice, text)))
+        val widget = showVoiceTestWidget(
+            currentTabUrl = flowOf(
+                "https://duck.ai/?chatID=voice",
+                "https://duck.ai/?chatID=text",
+                "https://duck.ai/?chatID=unstored",
+                "https://duck.ai/",
+            ),
+        ) { _, _ -> }
+
+        widget.chatIdSource!!.test {
+            assertNull(awaitItem())
+            assertEquals("text", awaitItem())
+            assertNull(awaitItem())
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun whenStoreNotMigratedThenPublishedChatIdComesFromUrl() = runTest {
+        whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
+        whenever(duckAiChatStore.hasMigrated()).thenReturn(false)
+        val widget = showVoiceTestWidget(currentTabUrl = flowOf("https://duck.ai/?chatID=unstored", "https://duck.ai/")) { _, _ -> }
+
+        widget.chatIdSource!!.test {
+            assertEquals("unstored", awaitItem())
+            assertNull(awaitItem())
+            awaitComplete()
+        }
+    }
+
+    private fun showVoiceTestWidget(
+        currentTabUrl: Flow<String?> = emptyFlow(),
+        onDuckAiQuerySubmitted: (String, DuckChatEntryPoint) -> Unit,
+    ): TestNativeInputWidget {
         whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(true))
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(true))
         whenever(duckAiFeatureState.showVoiceSearchToggle).thenReturn(MutableStateFlow(false))
@@ -420,7 +468,7 @@ class RealNativeInputManagerTest {
             layoutInflater = layoutInflater,
             lifecycleOwner = lifecycleOwner,
             tabs = mock<LiveData<List<TabEntity>>>(),
-            currentTabUrl = emptyFlow(),
+            currentTabUrl = currentTabUrl,
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = {},
                 onSearchSubmitted = {},
@@ -465,6 +513,11 @@ class RealNativeInputManagerTest {
     ) : View(context), NativeInputWidget by delegate {
         private var chatTabSelected = false
         private var onChatSubmitted: ((String) -> Unit)? = null
+        var chatIdSource: Flow<String?>? = null
+
+        override fun bindChatIdSource(source: Flow<String?>) {
+            chatIdSource = source
+        }
 
         override var text: String = ""
         override var nextDuckAiEntryPoint: DuckChatEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
