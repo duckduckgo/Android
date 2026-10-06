@@ -32,9 +32,6 @@ class OnboardingDecorationFitCorrector(
     private val cardBottomInsetPx: () -> Int = { 0 },
 ) {
 
-    // TODO: remove when onboardingImprovementsV2 flag is removed
-    var enabled: Boolean = false
-
     private var decoration: View? = null
     private var minHeightPx = 0
     private var maxHeightPx = 0
@@ -76,10 +73,6 @@ class OnboardingDecorationFitCorrector(
         val deco = decoration
         val decorationShown = deco != null && !deco.isGone
         if (syncCardBottomInset(decorationShown)) return false
-
-        // While onboardingImprovementsV2 is off the corrector stays inert: syncCardBottomInset above
-        // has already reverted any reserved inset, and the shrink/hide logic below must not run.
-        if (!enabled) return true
 
         if (deco == null) return !syncCardClamp()
         if (deco.isGone) return true
@@ -141,7 +134,6 @@ class OnboardingDecorationFitCorrector(
         params: ConstraintLayout.LayoutParams,
         decorationShown: Boolean,
     ): Int {
-        if (!enabled) return 0
         // A decoration that leaves the card bottom-anchored sits beside or over it, covering nothing below it,
         // so the card still has to clear the inset — the keyboard.
         if (params.bottomToBottom == ConstraintLayout.LayoutParams.PARENT_ID) return cardBottomInsetPx()
