@@ -654,7 +654,8 @@
       "pageObserver",
       "hover",
       "tabSuspension",
-      "textSelection"
+      "textSelection",
+      "chromeWebstorePatching"
     ],
     "apple-ai-clear": ["duckAiDataClearing"],
     "apple-ai-history": ["duckAiChatHistory"],
