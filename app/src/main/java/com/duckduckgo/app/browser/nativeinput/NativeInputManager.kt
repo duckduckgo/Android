@@ -29,11 +29,14 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import android.view.ViewOutlineProvider
 import android.webkit.ValueCallback
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import androidx.core.net.toUri
 import androidx.core.view.doOnAttach
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -333,8 +336,7 @@ class RealNativeInputManager @Inject constructor(
     override fun isNativeInputShown(): Boolean {
         if (!::rootView.isInitialized) return false
         return widgetRoot != null ||
-            rootView.findViewById<View?>(R.id.inputModeTopRoot) != null ||
-            rootView.findViewById<View?>(R.id.inputModeBottomRoot) != null
+            rootView.findViewById<View?>(R.id.inputModeRoot) != null
     }
 
     override fun isChatTabSelected(): Boolean {
@@ -391,8 +393,7 @@ class RealNativeInputManager @Inject constructor(
     override fun hideNativeInput(animate: Boolean, isNavigation: Boolean): Boolean {
         if (!::rootView.isInitialized) return false
 
-        val widgetView = rootView.findViewById<View?>(R.id.inputModeTopRoot)
-            ?: rootView.findViewById(R.id.inputModeBottomRoot)
+        val widgetView = rootView.findViewById<View?>(R.id.inputModeRoot)
             ?: return false
 
         // Do not require isNativeInputFieldEnabled: teardown must still run after the setting flips
@@ -818,11 +819,7 @@ class RealNativeInputManager @Inject constructor(
     private fun removeWidget(): Boolean {
         animator.cancelAnimation()
         var removed = false
-        rootView.findViewById<View?>(R.id.inputModeTopRoot)?.let {
-            rootView.removeView(it)
-            removed = true
-        }
-        rootView.findViewById<View?>(R.id.inputModeBottomRoot)?.let {
+        rootView.findViewById<View?>(R.id.inputModeRoot)?.let {
             rootView.removeView(it)
             removed = true
         }
@@ -853,13 +850,65 @@ class RealNativeInputManager @Inject constructor(
     }
 
     private fun createWidgetView(layoutInflater: LayoutInflater, isBottom: Boolean): View {
-        val layoutRes =
-            if (isBottom) {
-                R.layout.input_mode_widget_card_view_bottom
-            } else {
-                R.layout.input_mode_widget_card_view
+        val view = layoutInflater.inflate(R.layout.input_mode_widget_card_view, rootView, false)
+        applyPositionChrome(view, isBottom)
+        return view
+    }
+
+    /**
+     * One layout serves both positions; the per-position chrome that used to live in the two wrapper
+     * XMLs is set here from [isBottom]: the row's side paddings, the card's background/elevation/
+     * compat-padding/resting margins, the input field's content padding, and the inline nav buttons'
+     * gravity and margins. The card's shape and horizontal insets stay state-driven inside the widget
+     * (applyOmnibarShape); the leading fire is gated on bottom by the widget itself.
+     */
+    private fun applyPositionChrome(view: View, isBottom: Boolean) {
+        val card = view.findViewById<MaterialCardView>(R.id.inputModeWidgetCard) ?: return
+        val widget = view.findViewById<View>(R.id.inputModeWidget) ?: return
+        val buttons = view.findViewById<View>(R.id.inlineNavButtonsContainer) ?: return
+        // The card sits in the row LinearLayout, nested inside the footer dock, so reach it via the card
+        // rather than the root's first child (which is the dock).
+        val row = card.parent as View
+        val footer = view.findViewById<View>(R.id.nativeInputFooter)
+        val res = view.resources
+        val keyline1 = res.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
+        val keyline2 = res.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
+        footer?.updateLayoutParams<MarginLayoutParams> { bottomMargin = if (isBottom) keyline2 else 0 }
+        // Resolve the card background against the card's own context, not the root's: the card carries the
+        // daxInputModeCardThemeOverlay (android:theme), which in a Fire Tab remaps daxColorSurface/Window to
+        // the fire card colour. Reading it off the root would paint the non-fire colour.
+        if (isBottom) {
+            row.setPaddingRelative(keyline2, 0, keyline1, 0)
+            card.setCardBackgroundColor(card.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorWindow))
+            card.cardElevation = 3f.toPx()
+            card.setUseCompatPadding(false)
+            card.updateLayoutParams<MarginLayoutParams> {
+                topMargin = keyline2
+                bottomMargin = keyline2
             }
-        return layoutInflater.inflate(layoutRes, rootView, false)
+            widget.setPaddingRelative(keyline1, keyline2, keyline1, keyline2)
+            buttons.updateLayoutParams<LinearLayout.LayoutParams> {
+                gravity = Gravity.BOTTOM
+                marginStart = (-8f).toPx().toInt()
+                bottomMargin = (-2f).toPx().toInt()
+            }
+        } else {
+            row.setPaddingRelative(0, 0, 0, 0)
+            card.setCardBackgroundColor(card.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface))
+            card.cardElevation = 6f.toPx()
+            card.setUseCompatPadding(true)
+            card.updateLayoutParams<MarginLayoutParams> {
+                topMargin = (-9f).toPx().toInt()
+            }
+            val vertical = 4f.toPx().toInt()
+            widget.setPaddingRelative(keyline1, vertical, keyline1, vertical)
+            buttons.updateLayoutParams<LinearLayout.LayoutParams> {
+                gravity = Gravity.TOP
+                marginStart = (-12f).toPx().toInt()
+                marginEnd = keyline1
+                topMargin = (-2f).toPx().toInt()
+            }
+        }
     }
 
     private fun createNavBarView(layoutInflater: LayoutInflater): View {

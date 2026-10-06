@@ -135,11 +135,11 @@ class RealNativeInputManagerTest {
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(false))
         whenever(omnibar.viewMode).thenReturn(Omnibar.ViewMode.DuckAI)
         testee.init(omnibar, rootView, lifecycleOwner)
-        rootView.addView(View(context).apply { id = R.id.inputModeTopRoot })
+        rootView.addView(View(context).apply { id = R.id.inputModeRoot })
 
         showNativeInput()
 
-        assertNull(rootView.findViewById<View?>(R.id.inputModeTopRoot))
+        assertNull(rootView.findViewById<View?>(R.id.inputModeRoot))
     }
 
     @Test
@@ -147,11 +147,11 @@ class RealNativeInputManagerTest {
         whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(false))
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(false))
         testee.init(omnibar, rootView, lifecycleOwner)
-        rootView.addView(View(context).apply { id = R.id.inputModeTopRoot })
+        rootView.addView(View(context).apply { id = R.id.inputModeRoot })
 
         showNativeInput()
 
-        assertNotNull(rootView.findViewById<View?>(R.id.inputModeTopRoot))
+        assertNotNull(rootView.findViewById<View?>(R.id.inputModeRoot))
     }
 
     @Test
@@ -159,11 +159,11 @@ class RealNativeInputManagerTest {
         whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(true))
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(false))
         testee.init(omnibar, rootView, lifecycleOwner)
-        rootView.addView(View(context).apply { id = R.id.inputModeTopRoot })
+        rootView.addView(View(context).apply { id = R.id.inputModeRoot })
 
         inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_ONLY
 
-        assertNull(rootView.findViewById<View?>(R.id.inputModeTopRoot))
+        assertNull(rootView.findViewById<View?>(R.id.inputModeRoot))
     }
 
     @Test
@@ -173,11 +173,11 @@ class RealNativeInputManagerTest {
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(nativeChatInputEnabled)
         whenever(omnibar.viewMode).thenReturn(Omnibar.ViewMode.DuckAI)
         testee.init(omnibar, rootView, lifecycleOwner)
-        rootView.addView(View(context).apply { id = R.id.inputModeTopRoot })
+        rootView.addView(View(context).apply { id = R.id.inputModeRoot })
 
         nativeChatInputEnabled.value = false
 
-        assertNull(rootView.findViewById<View?>(R.id.inputModeTopRoot))
+        assertNull(rootView.findViewById<View?>(R.id.inputModeRoot))
     }
 
     @Test
@@ -186,7 +186,7 @@ class RealNativeInputManagerTest {
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(false))
         whenever(omnibar.viewMode).thenReturn(Omnibar.ViewMode.DuckAI)
         testee.init(omnibar, rootView, lifecycleOwner)
-        rootView.addView(View(context).apply { id = R.id.inputModeTopRoot })
+        rootView.addView(View(context).apply { id = R.id.inputModeRoot })
         rootView.addView(View(context).apply { id = R.id.inputModeWidgetNavLayout })
 
         showNativeInput()
