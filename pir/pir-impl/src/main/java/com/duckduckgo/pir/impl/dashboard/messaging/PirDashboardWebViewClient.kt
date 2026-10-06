@@ -31,11 +31,6 @@ class PirDashboardWebViewClient @Inject constructor(
     private val purchaseUrlRouter: PirFreemiumPurchaseUrlRouter,
 ) : WebViewClient() {
 
-    interface Listener {
-        fun onSubscriptionPurchaseRequested(route: NativePurchaseFlow)
-    }
-
-    /** Set by the hosting Activity in setupWebView and cleared in cleanupWebView. */
     var listener: Listener? = null
 
     override fun shouldOverrideUrlLoading(
@@ -51,5 +46,9 @@ class PirDashboardWebViewClient @Inject constructor(
             }
             NotHandled -> false
         }
+    }
+
+    interface Listener {
+        fun onSubscriptionPurchaseRequested(route: NativePurchaseFlow)
     }
 }

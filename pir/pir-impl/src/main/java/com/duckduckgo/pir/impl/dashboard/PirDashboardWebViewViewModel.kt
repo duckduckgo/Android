@@ -64,8 +64,7 @@ class PirDashboardWebViewViewModel @Inject constructor(
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
     init {
-        // The dashboard handshakes isAuthenticatedUser once, at load. A purchase completed while it
-        // is alive has to be picked up by reloading, which re-runs that handshake.
+        // The dashboard needs to be reloaded on purchase
         subscriptions.getSubscriptionStatusFlow()
             .map { it != UNKNOWN }
             .distinctUntilChanged()
@@ -84,9 +83,10 @@ class PirDashboardWebViewViewModel @Inject constructor(
     }
 
     fun onSubscriptionPurchaseRequested(route: NativePurchaseFlow) {
-        // The CTA stays tappable while the purchase screen opens, and a replayed second request would
-        // put the paywall back on top of the dashboard the user was just returned to.
-        if (purchaseFlowOutstanding) return
+        // Prevent duplicate taps on the CTA and navigation
+        if (purchaseFlowOutstanding) {
+            return
+        }
         purchaseFlowOutstanding = true
 
         viewModelScope.launch {

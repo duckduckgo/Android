@@ -24,33 +24,29 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
+interface PirFreemiumPurchaseUrlRouter {
+
+    /**
+     * Decides how a navigation requested by the dashboard web UI should be handled.
+     */
+    fun route(uri: Uri): PirPurchaseRoute
+}
+
 /**
  * How a URL the PIR dashboard web UI asks to navigate to should be handled.
  */
 sealed interface PirPurchaseRoute {
 
     /**
-     * The URL is the subscription purchase flow. Carries the parameters the native flow is started
-     * with, which are this module's own constants — never values read off the intercepted URL.
+     * The URL is the subscription purchase flow.
      */
     data class NativePurchaseFlow(
         val origin: String,
         val featurePage: String,
     ) : PirPurchaseRoute
 
-    /** Not a purchase URL. The dashboard WebView loads it as it would have before. */
+    /** Not a purchase URL. The dashboard WebView loads it as is. */
     data object NotHandled : PirPurchaseRoute
-}
-
-interface PirFreemiumPurchaseUrlRouter {
-
-    /**
-     * Decides how a navigation requested by the dashboard web UI should be handled.
-     *
-     * Pure and side-effect free: the caller owns the navigation, so the decision can be tested on
-     * its own. Never throws.
-     */
-    fun route(uri: Uri): PirPurchaseRoute
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -67,12 +63,8 @@ class RealPirFreemiumPurchaseUrlRouter @Inject constructor(
         }
 
     private fun isPurchaseUrl(uri: Uri): Boolean = runCatching {
-        // The host is checked first and for every path, so a purchase path on another host can never
-        // reach the native flow. iOS applies this check on only one of its two interception paths.
         if (uri.host?.toTldPlusOne() != SUBSCRIPTIONS_ETLD) return@runCatching false
 
-        // Subscriptions.isSubscriptionUrl matches single-segment paths only, so on its own it misses
-        // /subscriptions/plans and /pro/plans. It is still consulted for remote-config paywall paths.
         uri.path?.trimEnd('/') in PURCHASE_PATHS || subscriptions.isSubscriptionUrl(uri)
     }.getOrDefault(false)
 
@@ -80,6 +72,6 @@ class RealPirFreemiumPurchaseUrlRouter @Inject constructor(
         const val SUBSCRIPTIONS_ETLD = "duckduckgo.com"
         const val FREE_SCAN_ORIGIN = "funnel_freescan_android"
         const val PIR_FEATURE_PAGE = "pir"
-        val PURCHASE_PATHS = setOf("/subscriptions", "/subscriptions/plans", "/pro", "/pro/plans")
+        val PURCHASE_PATHS: Set<String> = setOf("/subscriptions", "/subscriptions/plans", "/pro", "/pro/plans")
     }
 }
