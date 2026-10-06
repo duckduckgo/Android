@@ -20,34 +20,21 @@ import android.text.SpannedString
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.FrameLayout
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.view.addClickableSpan
-import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.impl.R
-import com.google.android.material.card.MaterialCardView
 
 class TermsFooterView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : MaterialCardView(context, attrs, defStyleAttr) {
+) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val message: DaxTextView
 
     init {
-        val cornerRadius = resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
-        shapeAppearanceModel = shapeAppearanceModel.toBuilder()
-            .setTopLeftCornerSize(0f)
-            .setTopRightCornerSize(0f)
-            .setBottomLeftCornerSize(cornerRadius)
-            .setBottomRightCornerSize(cornerRadius)
-            .build()
-        cardElevation = resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_0)
-        setCardBackgroundColor(context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface))
-        strokeColor = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorOmnibarAccent)
-        strokeWidth = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarOutlineWidth)
-        useCompatPadding = false
         LayoutInflater.from(context).inflate(R.layout.view_terms_footer, this, true)
         message = findViewById(R.id.termsFooterMessage)
     }

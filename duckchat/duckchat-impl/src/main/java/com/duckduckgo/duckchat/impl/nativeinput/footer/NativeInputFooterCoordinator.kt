@@ -29,12 +29,19 @@ import javax.inject.Inject
 class NativeInputFooterCoordinator @Inject constructor(
     private val plugins: ActivePluginPoint<NativeInputFooterPlugin>,
 ) {
+    /** [footers] are the visible footers, highest priority (lowest value) first. */
     data class State(
-        val footer: NativeInputFooter? = null,
+        val footers: List<NativeInputFooter> = emptyList(),
         val blocksComposer: Boolean = false,
     ) {
-        val view: View? get() = footer?.view
+        val rows: List<View> get() = footers.map { it.view }
     }
+
+    private class Entry(
+        val priority: Int,
+        val category: String,
+        val footer: NativeInputFooter,
+    )
 
     fun state(
         context: Context,
@@ -42,7 +49,7 @@ class NativeInputFooterCoordinator @Inject constructor(
         host: NativeInputFooterHost,
     ): Flow<State> = flow {
         val footers = plugins.getPlugins()
-            .map { plugin -> plugin.priority to plugin.createFooter(context, hostContext, host) }
+            .map { plugin -> Entry(plugin.priority, plugin.category, plugin.createFooter(context, hostContext, host)) }
 
         if (footers.isEmpty()) {
             emit(State())
@@ -50,19 +57,19 @@ class NativeInputFooterCoordinator @Inject constructor(
         }
 
         emitAll(
-            combine(footers.map { it.second.state }) { states ->
-                val selectedIndex = states.indices
+            combine(footers.map { it.footer.state }) { states ->
+                // One footer per category, the highest priority among the visible ones; the rest stack in priority order.
+                val shown = states.indices
                     .filter { states[it].visible }
-                    .minByOrNull { footers[it].first }
+                    .groupBy { footers[it].category }
+                    .values
+                    .map { sameCategory -> sameCategory.minBy { footers[it].priority } }
+                    .sortedBy { footers[it].priority }
 
-                if (selectedIndex == null) {
-                    State()
-                } else {
-                    State(
-                        footer = footers[selectedIndex].second,
-                        blocksComposer = states[selectedIndex].blocksComposer,
-                    )
-                }
+                State(
+                    footers = shown.map { footers[it].footer },
+                    blocksComposer = shown.any { states[it].blocksComposer },
+                )
             },
         )
     }
