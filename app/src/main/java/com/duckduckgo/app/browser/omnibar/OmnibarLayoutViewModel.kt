@@ -92,7 +92,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -160,17 +159,15 @@ class OmnibarLayoutViewModel @Inject constructor(
         combine(
             _viewState,
             tabRepository.flowTabs,
-            flow { emit(addressBarTrackersAnimationManager.isFeatureEnabled()) },
             addressBarTrackersAnimationManager.softwareRenderingModeEnabled,
             browserMenuHighlight.shouldShowHighlightForMode(mode),
-        ) { state, tabs, isAddressBarTrackersAnimationEnabled, useSoftwareRenderingMode, showHighlight ->
+        ) { state, tabs, useSoftwareRenderingMode, showHighlight ->
             state.copy(
                 shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
                 tabCount = tabs.size,
                 hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
                 showBrowserMenuHighlight = showHighlight,
                 viewMode = getViewMode(state),
-                isAddressBarTrackersAnimationEnabled = isAddressBarTrackersAnimationEnabled,
                 useSoftwareRenderingMode = useSoftwareRenderingMode,
             )
         }
@@ -269,7 +266,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showDuckAISidebar: Boolean = false,
         val isNativeInputEnabled: Boolean = false,
         val isNativeChatInputEnabled: Boolean = false,
-        val isAddressBarTrackersAnimationEnabled: Boolean = false,
         val useSoftwareRenderingMode: Boolean = false,
         val isProgressBarUpgradeEnabled: Boolean = false,
         val isProgressBarIndeterminateEnabled: Boolean = false,
@@ -323,7 +319,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         data class StartTrackersAnimation(
             val entities: List<Entity>?,
             val isCustomTab: Boolean,
-            val isAddressBarTrackersAnimationEnabled: Boolean,
             val useSoftwareRenderingMode: Boolean,
         ) : Command()
 
@@ -1112,7 +1107,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 Command.StartTrackersAnimation(
                                     entities = decoration.entities,
                                     isCustomTab = viewState.value.viewMode is CustomTab,
-                                    isAddressBarTrackersAnimationEnabled = viewState.value.isAddressBarTrackersAnimationEnabled,
                                     useSoftwareRenderingMode = viewState.value.useSoftwareRenderingMode,
                                 ),
                             )
