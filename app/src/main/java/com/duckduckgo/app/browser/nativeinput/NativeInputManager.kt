@@ -237,6 +237,7 @@ class RealNativeInputManager @Inject constructor(
     private var deferredRootBackground: Drawable? = null
 
     private var cachedUrl: String? = null
+    private var isOnNewDuckAiChat: Boolean = true
 
     private val interactionLockSource = MutableStateFlow(InteractionLock.Unlocked)
     private val duckAiFireButtonHighlightSource = MutableStateFlow(false)
@@ -943,6 +944,12 @@ class RealNativeInputManager @Inject constructor(
             val chatIdFlow = currentTabUrl.map { extractDuckAiChatId(it) }
             // Picker tied to whether the current tab is a Duck.ai page that already has a chatId (existing chat) or new chat.
             bindModelPickerEnabledSource(chatIdFlow.map { it == null })
+            chatIdFlow
+                .onEach {
+                    isOnNewDuckAiChat = it == null
+                    updateVoiceButtons(this)
+                }
+                .launchIn(lifecycleOwner.lifecycleScope)
             bindChatIdSource(chatIdFlow)
             bindCurrentUrlSource(currentTabUrl)
             bindInteractionLockSource(interactionLockSource)
@@ -984,6 +991,7 @@ class RealNativeInputManager @Inject constructor(
     private fun updateVoiceButtons(widget: NativeInputWidget) {
         val state = computeVoiceButtonAvailability(
             isOnActiveDuckChat = omnibarController.isDuckAiMode(),
+            isNewDuckAiChat = isOnNewDuckAiChat,
             isVoiceSearchDeviceAvailable = voiceSearchAvailability.isVoiceSearchAvailable,
             isVoiceSearchDuckAiEnabled = duckAiFeatureState.showVoiceSearchToggle.value,
             isVoiceChatEntryEnabled = duckAiFeatureState.showVoiceChatEntry.value,
@@ -1618,8 +1626,9 @@ internal data class VoiceButtonAvailability(
  * Pure decision logic for which voice entry points the unified input should expose.
  *
  * Rules:
- * - On an active Duck.ai chat page, voice chat is suppressed (you're already in the chat). Voice
- *   search is offered only if both the device supports it and the Duck.ai voice-search flag is on.
+ * - On an active Duck.ai chat page, voice chat is offered only on a new chat (voice can't resume an
+ *   existing text chat yet). Voice search is offered only if both the device supports it and the
+ *   Duck.ai voice-search flag is on.
  * - Otherwise (NTP / search omnibar with the Search↔Duck.ai toggle):
  *   - Search tab: voice search if device-available.
  *   - Duck.ai tab: voice search if device-available AND [isVoiceSearchDuckAiEnabled]; voice chat
@@ -1628,6 +1637,7 @@ internal data class VoiceButtonAvailability(
  */
 internal fun computeVoiceButtonAvailability(
     isOnActiveDuckChat: Boolean,
+    isNewDuckAiChat: Boolean,
     isVoiceSearchDeviceAvailable: Boolean,
     isVoiceSearchDuckAiEnabled: Boolean,
     isVoiceChatEntryEnabled: Boolean,
@@ -1636,7 +1646,7 @@ internal fun computeVoiceButtonAvailability(
     if (isOnActiveDuckChat) {
         return VoiceButtonAvailability(
             voiceSearchAvailable = isVoiceSearchDeviceAvailable && isVoiceSearchDuckAiEnabled,
-            voiceChatAvailable = false,
+            voiceChatAvailable = isNewDuckAiChat && isVoiceChatEntryEnabled,
         )
     }
     return VoiceButtonAvailability(
