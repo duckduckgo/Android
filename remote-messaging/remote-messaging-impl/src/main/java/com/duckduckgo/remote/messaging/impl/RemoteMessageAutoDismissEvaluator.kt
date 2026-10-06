@@ -22,7 +22,6 @@ import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixels
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity
 import com.squareup.anvil.annotations.ContributesBinding
-import logcat.logcat
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -70,12 +69,7 @@ class RealRemoteMessageAutoDismissEvaluator @Inject constructor(
         val threshold = displayConditions?.dismissAfterUniqueDailyImpressions?.takeIf { it > 0 } ?: return false
         val today = currentTimeProvider.localDateTimeNow().toLocalDate().toEpochDay()
         // the last active day stays visible until that day is over
-        val completed = entity.uniqueImpressionDays >= threshold && entity.lastImpressionDay != today
-        logcat(tag = "RadoiuC") {
-            "activeDays check $id: activeDays=${entity.uniqueImpressionDays}/$threshold lastImpressionDay=${entity.lastImpressionDay} " +
-                "today=$today -> dismiss=$completed"
-        }
-        return completed
+        return entity.uniqueImpressionDays >= threshold && entity.lastImpressionDay != today
     }
 
     private fun RemoteMessage.hasReachedImpressionCap(impressions: Int): Boolean {

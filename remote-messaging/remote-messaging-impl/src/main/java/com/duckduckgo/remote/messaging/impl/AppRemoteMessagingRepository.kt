@@ -29,7 +29,6 @@ import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.map
-import logcat.logcat
 
 interface RemoteMessagingRepository {
     fun getMessageById(id: String): RemoteMessage?
@@ -79,11 +78,6 @@ class AppRemoteMessagingRepository(
         val now = currentTimeProvider.currentTimeMillis()
         val today = currentTimeProvider.localDateTimeNow().toLocalDate().toEpochDay()
         val isNewActiveDay = messageEntity.lastImpressionDay != today
-        logcat(tag = "RadoiuC") {
-            "markAsShown ${remoteMessage.id}: today=$today lastImpressionDay=${messageEntity.lastImpressionDay} " +
-                "newActiveDay=$isNewActiveDay activeDays=${messageEntity.uniqueImpressionDays + if (isNewActiveDay) 1 else 0} " +
-                "impressions=${messageEntity.impressions + 1}"
-        }
         // Stamp the first-shown timestamp on the first impression only.
         remoteMessagesDao.insert(
             messageEntity.copy(

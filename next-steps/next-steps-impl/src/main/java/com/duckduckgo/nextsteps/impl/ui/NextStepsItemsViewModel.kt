@@ -34,7 +34,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
-import logcat.logcat
 import javax.inject.Inject
 
 @ContributesViewModel(ViewScope::class)
@@ -73,7 +72,6 @@ class NextStepsItemsViewModel @Inject constructor(
     fun onFrontCardDismissed() {
         val dismissedId = _viewState.value.items.firstOrNull()?.id ?: return
         val remaining = _viewState.updateAndGet { state -> state.copy(items = state.items.drop(1)) }
-        logcat(tag = "RadoiuC") { "front card dismissed: $dismissedId, new front=${remaining.items.firstOrNull()?.id}" }
         itemsStore.addDismissedItemId(dismissedId)
         if (remaining.items.isEmpty()) {
             remaining.message?.let { dismissMessage(it) }
@@ -95,14 +93,8 @@ class NextStepsItemsViewModel @Inject constructor(
         }
 
         val visible = ordered.rotatedIfDue()
-        if (visible != ordered) {
-            logcat(tag = "RadoiuC") { "front card rotated on load: ${ordered.map { it.id }} -> ${visible.map { it.id }}" }
-        }
         itemsStore.saveItemOrder(visible.map { it.id })
-        visible.firstOrNull()?.let { front ->
-            itemsStore.incrementFrontImpressions(front.id)
-            logcat(tag = "RadoiuC") { "impression reported for front=${front.id} count=${itemsStore.frontImpressions(front.id)}" }
-        }
+        visible.firstOrNull()?.let { itemsStore.incrementFrontImpressions(it.id) }
         return visible
     }
 
