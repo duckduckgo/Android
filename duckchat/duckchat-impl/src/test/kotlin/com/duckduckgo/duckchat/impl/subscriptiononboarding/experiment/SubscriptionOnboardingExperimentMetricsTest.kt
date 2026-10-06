@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.subscriptiononboarding
+package com.duckduckgo.duckchat.impl.subscriptiononboarding.experiment
 
 import com.duckduckgo.feature.toggles.api.ConversionWindow
 import com.duckduckgo.feature.toggles.api.FakeMetricsPixelExtension

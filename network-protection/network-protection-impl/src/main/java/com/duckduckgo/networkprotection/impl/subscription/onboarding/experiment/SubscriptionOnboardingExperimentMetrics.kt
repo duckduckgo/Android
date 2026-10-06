@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.subscriptiononboarding
+package com.duckduckgo.networkprotection.impl.subscription.onboarding.experiment
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.ConversionWindow
@@ -26,17 +26,9 @@ import com.duckduckgo.feature.toggles.api.send
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-/**
- * Duck.ai side of the subscription onboarding experiment metrics. Fires when the user turns off AI features
- * while enrolled in either onboarding experiment, so the behaviour is comparable across cohorts.
- *
- * The experiments are declared in the subscriptions feature, which this module cannot depend on, so the
- * toggles are resolved through the inventory by name. Firing against both experiments is safe: the one the
- * user is not enrolled in has no assigned cohort and is dropped.
- */
 interface SubscriptionOnboardingExperimentMetrics {
 
-    suspend fun fireAiFeaturesDisabled()
+    suspend fun fireVpnActivated()
 }
 
 @ContributesBinding(AppScope::class)
@@ -44,16 +36,30 @@ class RealSubscriptionOnboardingExperimentMetrics @Inject constructor(
     private val inventory: FeatureTogglesInventory,
 ) : SubscriptionOnboardingExperimentMetrics {
 
-    override suspend fun fireAiFeaturesDisabled() {
+    override suspend fun fireVpnActivated() {
         experimentToggles().forEach { toggle ->
-            MetricsPixel(
-                metric = "ai_features_disabled",
-                type = MetricType.NORMAL,
-                value = "1",
-                toggle = toggle,
-                conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 1)),
-            ).send()
+            fire(toggle, metric = "vpnActivated_d1", window = ConversionWindow(lowerWindow = 0, upperWindow = 1))
+            when (toggle.featureName().name) {
+                FREE_TRIALS_EXPERIMENT ->
+                    fire(toggle, metric = "vpnActivated_d2_7", window = ConversionWindow(lowerWindow = 2, upperWindow = 7))
+                PAID_SUBS_EXPERIMENT ->
+                    fire(toggle, metric = "vpnActivated_d2_30", window = ConversionWindow(lowerWindow = 2, upperWindow = 30))
+            }
         }
+    }
+
+    private suspend fun fire(
+        toggle: Toggle,
+        metric: String,
+        window: ConversionWindow,
+    ) {
+        MetricsPixel(
+            metric = metric,
+            type = MetricType.NORMAL,
+            value = "1",
+            toggle = toggle,
+            conversionWindow = listOf(window),
+        ).send()
     }
 
     private suspend fun experimentToggles(): List<Toggle> =
@@ -61,9 +67,8 @@ class RealSubscriptionOnboardingExperimentMetrics @Inject constructor(
 
     private companion object {
         const val PRIVACY_PRO_FEATURE_NAME = "privacyPro"
-        val EXPERIMENT_NAMES = setOf(
-            "subscriptionOnboardingFreeTrialsOct2026",
-            "subscriptionOnboardingPaidSubsOct2026",
-        )
+        const val FREE_TRIALS_EXPERIMENT = "subscriptionOnboardingFreeTrialsOct2026"
+        const val PAID_SUBS_EXPERIMENT = "subscriptionOnboardingPaidSubsOct2026"
+        val EXPERIMENT_NAMES = setOf(FREE_TRIALS_EXPERIMENT, PAID_SUBS_EXPERIMENT)
     }
 }
