@@ -15,14 +15,21 @@
  */
 package com.duckduckgo.duckchat.impl.nativeinput.footer.terms
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.text.Spanned
+import android.text.style.ClickableSpan
 import android.view.ContextThemeWrapper
+import android.widget.TextView
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.nativeinput.footer.FakeNativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
@@ -31,14 +38,21 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.robolectric.Robolectric
+import org.robolectric.Shadows.shadowOf
 
 @RunWith(AndroidJUnit4::class)
 class TermsFooterPluginTest {
@@ -54,7 +68,8 @@ class TermsFooterPluginTest {
     private val termsRepository: DuckAiTermsRepository = mock()
     private val feature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java, ioDispatcher = coroutineRule.testDispatcher)
     private val hostContext = MutableStateFlow(duckAiContext())
-    private val testee = TermsFooterPlugin(termsRepository, feature)
+    private val browserNav: BrowserNav = mock()
+    private val testee = TermsFooterPlugin(termsRepository, feature, browserNav)
 
     @Before
     fun setUp() {
@@ -113,6 +128,22 @@ class TermsFooterPluginTest {
             hostContext.value = duckAiContext(isInputFocused = false)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenALinkIsTappedThenItOpensInANewTab() {
+        // The footer is built with the input widget's context, which wraps an Activity.
+        val activity = Robolectric.buildActivity(Activity::class.java).create().get()
+        activity.setTheme(com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Light)
+        whenever(browserNav.openInNewTab(any(), any(), anyOrNull())).thenReturn(Intent("open-in-new-tab"))
+        val footer = testee.createFooter(activity, hostContext, FakeNativeInputFooterHost())
+        val message = footer.view.findViewById<TextView>(R.id.termsFooterMessage).text as Spanned
+        val link = message.getSpans(0, message.length, ClickableSpan::class.java).first()
+
+        link.onClick(footer.view)
+
+        verify(browserNav).openInNewTab(any(), eq("https://duckduckgo.com/duckai/privacy-terms"), anyOrNull())
+        assertEquals("open-in-new-tab", shadowOf(activity).nextStartedActivity.action)
     }
 
     private fun duckAiContext(
