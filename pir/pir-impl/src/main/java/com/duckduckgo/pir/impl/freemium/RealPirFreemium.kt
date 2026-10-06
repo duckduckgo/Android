@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -56,7 +57,7 @@ class RealPirFreemium @Inject constructor(
     }
 
     private suspend fun isEligible(): Boolean {
-        if (subscriptions.isSignedIn()) {
+        if (subscriptions.getSubscriptionStatus() != UNKNOWN) {
             return false
         }
 
