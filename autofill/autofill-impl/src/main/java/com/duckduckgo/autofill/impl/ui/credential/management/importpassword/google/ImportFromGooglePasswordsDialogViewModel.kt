@@ -23,6 +23,8 @@ import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.InBrowserPromo
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
+import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportResult
+import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangePasswordImporter
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.BrowserPromoPreImport
@@ -30,11 +32,17 @@ import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goog
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.Importing
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.PreImport
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.credentialexchange.api.CredentialExchangeResult
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
 
@@ -45,6 +53,7 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     private val importPasswordsPixelSender: ImportPasswordsPixelSender,
     private val autofillStore: InternalAutofillStore,
     private val promptExposureReporter: PromptExposureReporter,
+    private val credentialExchangePasswordImporter: CredentialExchangePasswordImporter,
 ) : ViewModel() {
 
     fun onImportFlowFinishedSuccessfully() {
@@ -58,24 +67,65 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
             when (it) {
                 is ImportResult.InProgress -> {
                     logcat { "Import in progress" }
-                    _viewState.value = ViewState(viewMode = Importing)
+                    _viewState.value = viewState.value.copy(viewMode = Importing)
                 }
 
                 is ImportResult.Finished -> {
                     logcat { "Import finished: ${it.savedCredentials} imported. ${it.numberSkipped} skipped." }
-                    _viewState.value = ViewState(viewMode = ViewMode.ImportSuccess(it))
+                    _viewState.value = viewState.value.copy(viewMode = ViewMode.ImportSuccess(it))
                 }
             }
         }
     }
 
     fun onImportFlowFinishedWithError() {
-        _viewState.value = ViewState(viewMode = ViewMode.ImportError)
+        _viewState.value = viewState.value.copy(viewMode = ViewMode.ImportError)
+    }
+
+    fun onImportButtonClicked() {
+        sendStartImportCommand(viewState.value.usesCredentialExchange)
+    }
+
+    fun onDirectImportRequested() {
+        viewModelScope.launch {
+            sendStartImportCommand(credentialExchangePasswordImporter.isSupported())
+        }
+    }
+
+    private fun sendStartImportCommand(useCredentialExchange: Boolean) {
+        if (!useCredentialExchange) {
+            command.trySend(Command.StartWebFlow)
+            return
+        }
+        if (credentialExchangeInProgress) return
+        credentialExchangeInProgress = true
+        command.trySend(Command.StartCredentialExchange)
+    }
+
+    fun onCredentialExchangeFinished(
+        result: CredentialExchangeResult,
+        importSource: AutofillImportLaunchSource,
+        canShowPreImportDialog: Boolean,
+    ) {
+        credentialExchangeInProgress = false
+        viewModelScope.launch {
+            when (val converted = credentialExchangePasswordImporter.convertAndDeduplicate(result)) {
+                is CredentialExchangeImportResult.Success -> {
+                    credentialImporter.import(converted.credentials, converted.originalCount, importSource)
+                    onImportFlowFinishedSuccessfully()
+                }
+                is CredentialExchangeImportResult.Cancelled -> onImportFlowCancelledByUser(canShowPreImportDialog)
+                is CredentialExchangeImportResult.Failure -> {
+                    logcat(WARN) { "Credential exchange failed (${converted.reason}), falling back to web flow" }
+                    command.trySend(Command.StartWebFlow)
+                }
+            }
+        }
     }
 
     fun onImportFlowCancelledByUser(canShowPreImportDialog: Boolean) {
         if (!canShowPreImportDialog) {
-            _viewState.value = ViewState(viewMode = ViewMode.FlowTerminated)
+            _viewState.value = viewState.value.copy(viewMode = ViewMode.FlowTerminated)
         }
     }
 
@@ -96,7 +146,11 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
         if (importSource == AutofillImportLaunchSource.InBrowserPromo) {
             promptExposureReporter.reportPromptShown(IMPORT_PASSWORDS_GOOGLE_PROMPT_ID)
         }
-        _viewState.value = viewState.value.copy(viewMode = viewMode)
+
+        viewModelScope.launch {
+            val usesCredentialExchange = credentialExchangePasswordImporter.isSupported()
+            _viewState.value = viewState.value.copy(viewMode = viewMode, usesCredentialExchange = usesCredentialExchange)
+        }
     }
 
     fun onInBrowserPromoDismissed() {
@@ -110,7 +164,19 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState: StateFlow<ViewState> = _viewState
 
-    data class ViewState(val viewMode: ViewMode = DeterminingFirstView)
+    private val command = Channel<Command>(1, DROP_OLDEST)
+    private var credentialExchangeInProgress = false
+    fun commands(): Flow<Command> = command.receiveAsFlow()
+
+    data class ViewState(
+        val viewMode: ViewMode = DeterminingFirstView,
+        val usesCredentialExchange: Boolean = false,
+    )
+
+    sealed interface Command {
+        data object StartWebFlow : Command
+        data object StartCredentialExchange : Command
+    }
 
     sealed interface ViewMode {
         data object DeterminingFirstView : ViewMode
