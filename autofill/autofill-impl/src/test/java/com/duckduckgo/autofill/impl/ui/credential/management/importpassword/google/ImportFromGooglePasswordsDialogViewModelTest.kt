@@ -8,6 +8,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.Finished
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.InProgress
+import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportResult
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangePasswordImporter
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
@@ -53,6 +54,7 @@ class ImportFromGooglePasswordsDialogViewModelTest {
     private val autofillStore: InternalAutofillStore = mock()
     private val promptExposureReporter: PromptExposureReporter = mock()
     private val credentialExchangePasswordImporter: CredentialExchangePasswordImporter = mock()
+    private val webViewCapabilityChecker: ImportGooglePasswordsCapabilityChecker = mock()
     private val testee = ImportFromGooglePasswordsDialogViewModel(
         credentialImporter = credentialImporter,
         dispatchers = coroutineTestRule.testDispatcherProvider,
@@ -60,12 +62,14 @@ class ImportFromGooglePasswordsDialogViewModelTest {
         autofillStore = autofillStore,
         promptExposureReporter = promptExposureReporter,
         credentialExchangePasswordImporter = credentialExchangePasswordImporter,
+        webViewCapabilityChecker = webViewCapabilityChecker,
     )
 
     @Before
     fun setup() = runTest {
         whenever(credentialImporter.getImportStatus()).thenReturn(emptyFlow())
         whenever(credentialExchangePasswordImporter.isSupported()).thenReturn(false)
+        whenever(webViewCapabilityChecker.webViewCapableOfImporting()).thenReturn(true)
     }
 
     @Test
@@ -315,6 +319,21 @@ class ImportFromGooglePasswordsDialogViewModelTest {
             assertEquals(Command.StartWebFlow, awaitItem())
         }
         verify(credentialImporter, never()).import(any(), any(), any())
+    }
+
+    @Test
+    fun whenCredentialExchangeFailsAndWebViewCannotImportThenErrorShownAndNoWebFlow() = runTest {
+        whenever(webViewCapabilityChecker.webViewCapableOfImporting()).thenReturn(false)
+        val failure = CredentialExchangeResult.Failure(CredentialExchangeFailure.NO_EXPORTER_AVAILABLE)
+        whenever(credentialExchangePasswordImporter.convertAndDeduplicate(failure))
+            .thenReturn(CredentialExchangeImportResult.Failure(CredentialExchangeFailure.NO_EXPORTER_AVAILABLE))
+
+        testee.commands().test {
+            testee.onCredentialExchangeFinished(failure, TEST_SOURCE, canShowPreImportDialog = true)
+            advanceUntilIdle()
+            expectNoEvents()
+        }
+        assertTrue(testee.viewState.value.viewMode is ViewMode.ImportError)
     }
 
     private fun TestScope.showPreImportPrompt() {

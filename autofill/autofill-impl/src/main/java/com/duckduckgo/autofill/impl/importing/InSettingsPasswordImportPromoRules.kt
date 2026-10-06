@@ -17,7 +17,7 @@
 package com.duckduckgo.autofill.impl.importing
 
 import com.duckduckgo.autofill.api.AutofillFeature
-import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
+import com.duckduckgo.autofill.impl.importing.capability.PasswordImportAvailability
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -38,7 +38,7 @@ class RealInSettingsPasswordImportPromoRules @Inject constructor(
     private val autofillStore: InternalAutofillStore,
     private val dispatchers: DispatcherProvider,
     private val autofillFeature: AutofillFeature,
-    private val importPasswordCapabilityChecker: ImportGooglePasswordsCapabilityChecker,
+    private val passwordImportAvailability: PasswordImportAvailability,
 ) : InSettingsPasswordImportPromoRules {
 
     override suspend fun canShowPromo(): Boolean {
@@ -67,7 +67,7 @@ class RealInSettingsPasswordImportPromoRules @Inject constructor(
                 },
             ) ?: return@withContext false
 
-            if (importPasswordCapabilityChecker.webViewCapableOfImporting().not()) {
+            if (passwordImportAvailability.canImport().not()) {
                 return@withContext false
             }
 
