@@ -62,6 +62,7 @@ import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.browser.pageload.PageLoadFeature
 import com.duckduckgo.app.browser.pageload.PageLoadTimeoutPixels
 import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Event
 import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Phase
@@ -92,7 +93,9 @@ import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentSco
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
@@ -192,6 +195,7 @@ class BrowserWebViewClientTest {
     private val mockAppSchemeInterceptionFeature: AppSchemeInterceptionFeature = mock()
     private val mockPageLoadTimeoutPixels: PageLoadTimeoutPixels = mock()
     private val pageLoadTimeouts = MutableSharedFlow<Event>(extraBufferCapacity = 1)
+    private val pageLoadFeature = FakeFeatureToggleFactory.create(PageLoadFeature::class.java)
     private val mockPageLoadTimeoutWatchdog: RealPageLoadTimeoutWatchdog = mock()
     private val mockPageLoadTimeoutWatchdogFactory: RealPageLoadTimeoutWatchdog.Factory = mock()
     private val appSchemeInterceptionEnabledFlow = MutableStateFlow(true)
@@ -213,6 +217,8 @@ class BrowserWebViewClientTest {
             whenever(forceRecompositeToggle.isEnabled()).thenReturn(true)
             whenever(forceRecompositeToggle.enabled()).thenReturn(forceRecompositeEnabledFlow)
             whenever(mockForceWebViewRecompositeFeature.self()).thenReturn(forceRecompositeToggle)
+            pageLoadFeature.pageLoadTimeoutWatchdog().setRawStoredState(State(enable = true))
+            pageLoadFeature.pageLoadTimeoutError().setRawStoredState(State(enable = true))
             whenever(mockPageLoadTimeoutWatchdog.events).thenReturn(pageLoadTimeouts)
             whenever(mockPageLoadTimeoutWatchdogFactory.create(any())).thenReturn(mockPageLoadTimeoutWatchdog)
             testee =
@@ -258,6 +264,7 @@ class BrowserWebViewClientTest {
                     BrowserMode.REGULAR,
                     mockPageLoadTimeoutWatchdogFactory,
                     mockPageLoadTimeoutPixels,
+                    pageLoadFeature,
                 )
             testee.webViewClientListener = listener
             whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -2462,6 +2469,63 @@ class BrowserWebViewClientTest {
 
         verify(mockPageLoadTimeoutPixels).fireTimeoutRecovered(12_000)
         verify(mockPageLoadTimeoutPixels, never()).fireTimeoutShown(any())
+        verify(listener, never()).onPageLoadTimeout()
+    }
+
+    @Test
+    fun whenWatchdogToggleOffThenMainFrameRequestDoesNotFeedWatchdog() {
+        pageLoadFeature.pageLoadTimeoutWatchdog().setRawStoredState(State(enable = false))
+        whenever(webResourceRequest.method).thenReturn("GET")
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+
+        testee.shouldInterceptRequest(webView, webResourceRequest)
+
+        verify(mockPageLoadTimeoutWatchdog, never()).onMainFrameRequest(any())
+    }
+
+    @Test
+    fun whenWatchdogToggleOffThenCommitDoesNotFeedWatchdog() {
+        pageLoadFeature.pageLoadTimeoutWatchdog().setRawStoredState(State(enable = false))
+
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+
+        verify(mockPageLoadTimeoutWatchdog, never()).onCommitted(any())
+    }
+
+    @Test
+    fun whenWatchdogToggleOffThenNothingArmsTheWatchdogAndNoTimeoutIsReported() {
+        pageLoadFeature.pageLoadTimeoutWatchdog().setRawStoredState(State(enable = false))
+        whenever(webResourceRequest.method).thenReturn("GET")
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+
+        testee.shouldInterceptRequest(webView, webResourceRequest)
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+
+        verify(mockPageLoadTimeoutWatchdog, never()).onMainFrameRequest(any())
+        verify(mockPageLoadTimeoutWatchdog, never()).onCommitted(any())
+        verifyNoInteractions(mockPageLoadTimeoutPixels)
+        verify(listener, never()).onPageLoadTimeout()
+    }
+
+    @Test
+    fun whenErrorToggleOffThenTimeoutFiresShownPixelButDoesNotNotifyListener() {
+        pageLoadFeature.pageLoadTimeoutError().setRawStoredState(State(enable = false))
+
+        pageLoadTimeouts.tryEmit(Event.TimedOut(Phase.NOT_COMMITTED))
+
+        verify(mockPageLoadTimeoutPixels).fireTimeoutShown(Phase.NOT_COMMITTED)
+        verify(listener, never()).onPageLoadTimeout()
+    }
+
+    @Test
+    fun whenErrorToggleOffThenRecoveredStillFiresRecoveredPixel() {
+        pageLoadFeature.pageLoadTimeoutError().setRawStoredState(State(enable = false))
+
+        pageLoadTimeouts.tryEmit(Event.Recovered(12_000))
+
+        verify(mockPageLoadTimeoutPixels).fireTimeoutRecovered(12_000)
         verify(listener, never()).onPageLoadTimeout()
     }
 

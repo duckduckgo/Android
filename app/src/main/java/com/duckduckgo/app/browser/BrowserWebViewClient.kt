@@ -64,6 +64,7 @@ import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.browser.pageload.PageLoadFeature
 import com.duckduckgo.app.browser.pageload.PageLoadTimeoutPixels
 import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Event
 import com.duckduckgo.app.browser.pageload.PageLoadTraceMarker
@@ -152,6 +153,7 @@ class BrowserWebViewClient @Inject constructor(
     private val browserMode: BrowserMode,
     pageLoadTimeoutWatchdogFactory: RealPageLoadTimeoutWatchdog.Factory,
     private val pageLoadTimeoutPixels: PageLoadTimeoutPixels,
+    private val pageLoadFeature: PageLoadFeature,
 ) : WebViewClient() {
     var webViewClientListener: WebViewClientListener? = null
     var clientProvider: ClientBrandHintProvider? = null
@@ -204,7 +206,9 @@ class BrowserWebViewClient @Inject constructor(
                 when (event) {
                     is Event.TimedOut -> {
                         pageLoadTimeoutPixels.fireTimeoutShown(event.phase)
-                        webViewClientListener?.onPageLoadTimeout()
+                        if (pageLoadFeature.pageLoadTimeoutError().isEnabled()) {
+                            webViewClientListener?.onPageLoadTimeout()
+                        }
                     }
                     is Event.Recovered -> pageLoadTimeoutPixels.fireTimeoutRecovered(event.elapsedSinceTimeoutMs)
                 }
@@ -629,7 +633,7 @@ class BrowserWebViewClient @Inject constructor(
         }
 
         lastInterceptedAppSchemeUrl = null
-        url?.let { pageLoadTimeoutWatchdog.onCommitted(it) }
+        if (url != null && pageLoadFeature.pageLoadTimeoutWatchdog().isEnabled()) pageLoadTimeoutWatchdog.onCommitted(url)
 
         var wideEventNavigation: Pair<String, Long>? = null
         url?.let {
@@ -899,7 +903,7 @@ class BrowserWebViewClient @Inject constructor(
                     loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
                 }
                 // The request waits here, so this always runs before the load can commit.
-                if (request.isForMainFrame) {
+                if (request.isForMainFrame && pageLoadFeature.pageLoadTimeoutWatchdog().isEnabled()) {
                     pageLoadTimeoutWatchdog.onMainFrameRequest(request.url.toString())
                 }
                 webView.url
