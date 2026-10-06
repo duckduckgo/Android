@@ -43,10 +43,13 @@ class DuckDuckGoAppLinksHandlerTest {
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature =
         FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
+    private val appLinksHandOffFeature: AppLinksHandOffFeature = FakeFeatureToggleFactory.create(AppLinksHandOffFeature::class.java)
+
     @Before
     fun setup() {
         androidBrowserConfigFeature.customTabEndlessLoopFix().setRawStoredState(State(true))
-        testee = DuckDuckGoAppLinksHandler(androidBrowserConfigFeature)
+        appLinksHandOffFeature.self().setRawStoredState(State(true))
+        testee = DuckDuckGoAppLinksHandler(androidBrowserConfigFeature, appLinksHandOffFeature)
         testee.previousUrl = "example.com"
     }
 
@@ -567,6 +570,54 @@ class DuckDuckGoAppLinksHandlerTest {
     fun whenAppLinkHasNoTargetPackageThenIsNotHandOff() {
         testee.updateCurrentPage(url = "https://digid.nl/inloggen_app", appLink = null)
         assertFalse(testee.isHandOff(AppLink(uriString = "https://app.digid.nl/digid-app")))
+    }
+
+    @Test
+    fun whenHandOffDetectionDisabledAndAlwaysTriggerDomainOnSameDomainThenLaunchAppLinkAndHaltWebNavigation() {
+        appLinksHandOffFeature.self().setRawStoredState(State(false))
+        testee.updateCurrentPage(url = "https://digid.nl/inloggen_app", appLink = null)
+        testee.hasTriggeredForDomain = true
+        testee.previousUrl = "https://digid.nl/inloggen_app"
+        assertTrue(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                appLink = appLink("https://app.digid.nl/digid-app", DIGID_PACKAGE),
+                hasGesture = true,
+                clientPackage = null,
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = false,
+                appLinksEnabled = true,
+            ),
+        )
+        verify(mockCallback).invoke()
+    }
+
+    @Test
+    fun whenHandOffDetectionDisabledAndSameSiteLinkToANewAppAlreadyTriggeredForDomainThenReturnFalseAndDoNotLaunch() {
+        appLinksHandOffFeature.self().setRawStoredState(State(false))
+        testee.updateCurrentPage(url = "https://example.com/page", appLink = null)
+        testee.hasTriggeredForDomain = true
+        testee.previousUrl = "https://example.com/page"
+        assertFalse(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                appLink = appLink("https://app.example.com/login", "com.example.auth"),
+                hasGesture = true,
+                clientPackage = null,
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = false,
+                appLinksEnabled = true,
+            ),
+        )
+        verifyNoInteractions(mockCallback)
+    }
+
+    @Test
+    fun whenHandOffDetectionDisabledThenOnlyAlwaysTriggerDomainsAreHandOffs() {
+        appLinksHandOffFeature.self().setRawStoredState(State(false))
+        testee.updateCurrentPage(url = "https://example.com/page", appLink = null)
+        assertTrue(testee.isHandOff(appLink("https://app.digid.nl/digid-app", DIGID_PACKAGE)))
+        assertFalse(testee.isHandOff(appLink("https://app.example.com/login", "com.example.auth")))
     }
 
     private fun appLink(uriString: String, packageName: String) = AppLink(uriString = uriString, appIntent = Intent().setPackage(packageName))

@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.applinks
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
+import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -57,7 +58,8 @@ interface AppLinksHandler {
     /**
      * True when the app link sends the user from the current page to an app that can't open that page, on the same site
      * (e.g. digid.nl -> app.digid.nl). Hand-offs launch on every attempt, halt the web navigation, and open without a
-     * prompt in custom tabs. They still need a user gesture.
+     * prompt in custom tabs. They still need a user gesture. While [AppLinksHandOffFeature] is disabled, only the built-in
+     * always-trigger domains count.
      *
      * @param appLink the app link being evaluated.
      */
@@ -67,6 +69,7 @@ interface AppLinksHandler {
 @ContributesBinding(AppScope::class)
 class DuckDuckGoAppLinksHandler @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val appLinksHandOffFeature: AppLinksHandOffFeature,
 ) : AppLinksHandler {
 
     var previousUrl: String? = null
@@ -74,6 +77,10 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
     var hasTriggeredForDomain = false
     private var currentPageUrl: String? = null
     private var currentPageAppPackage: String? = null
+
+    // Used instead of hand-off detection while it's disabled. Their sites hand off to these App Link domains from the same
+    // domain on every attempt (digid.nl -> app.digid.nl), and the App Link page itself isn't meant to load in the browser.
+    private val alwaysTriggerList = listOf("app.digid.nl")
 
     override fun handleAppLink(
         isForMainFrame: Boolean,
@@ -98,22 +105,25 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
         }
 
         val urlString = appLink.uriString
+        val detectsHandOffs = appLinksHandOffFeature.self().isEnabled()
 
         // Like Chrome's same-host rule: moving between pages one app can open is browsing, so the once-per-domain rule
         // applies, but a link to an app that can't open the current page is a hand-off with no useful web page behind it.
-        if (isHandOff(appLink)) {
+        if (detectsHandOffs && isHandOff(appLink)) {
             previousUrl = urlString
             launchAppLink()
             hasTriggeredForDomain = true
             return true
         }
 
+        val isAlwaysTriggerDomain = !detectsHandOffs && isAlwaysTriggerDomain(appLink)
         previousUrl?.let {
             if (isSameOrSubdomain(it, urlString)) {
-                if (isAUserQuery || !hasTriggeredForDomain) {
+                if (isAUserQuery || !hasTriggeredForDomain || isAlwaysTriggerDomain) {
                     previousUrl = urlString
                     launchAppLink()
                     hasTriggeredForDomain = true
+                    if (isAlwaysTriggerDomain) return true
                 }
                 return false
             }
@@ -156,10 +166,14 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
     }
 
     override fun isHandOff(appLink: AppLink): Boolean {
+        if (!appLinksHandOffFeature.self().isEnabled()) return isAlwaysTriggerDomain(appLink)
+
         val pageUrl = currentPageUrl ?: return false
         val targetPackage = appLink.targetPackage() ?: return false
         return targetPackage != currentPageAppPackage && isSameOrSubdomain(pageUrl, appLink.uriString)
     }
+
+    private fun isAlwaysTriggerDomain(appLink: AppLink): Boolean = alwaysTriggerList.contains(appLink.uriString.extractDomain())
 
     private fun AppLink.targetPackage(): String? = appIntent?.component?.packageName ?: appIntent?.`package`
 }
