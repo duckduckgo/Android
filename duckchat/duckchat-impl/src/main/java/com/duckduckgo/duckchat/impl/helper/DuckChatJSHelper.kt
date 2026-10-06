@@ -22,6 +22,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.FireMode
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.ui.view.encodeBitmapToBase64
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -52,6 +54,8 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
+import com.duckduckgo.duckchat.store.impl.DuckAiChat
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -65,6 +69,9 @@ import kotlinx.coroutines.withTimeoutOrNull
 import logcat.logcat
 import org.json.JSONArray
 import org.json.JSONObject
+import java.time.Duration
+import java.time.Instant
+import java.time.format.DateTimeParseException
 import java.util.concurrent.atomic.AtomicReference
 import java.util.regex.Pattern
 import javax.inject.Inject
@@ -133,6 +140,8 @@ class RealDuckChatJSHelper @Inject constructor(
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
     private val duckAiSessionCallback: DuckAiSessionCallback,
     private val termsRepository: DuckAiTermsRepository,
+    @RegularMode private val regularChatStore: DuckAiChatStore,
+    @FireMode private val fireChatStore: DuckAiChatStore,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -172,6 +181,11 @@ class RealDuckChatJSHelper @Inject constructor(
             METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES ->
                 id?.let {
                     getAIChatNativeConfigValues(featureName, method, it, mode, browserMode)
+                }
+
+            METHOD_GET_AI_CHATS ->
+                id?.let {
+                    getAIChats(featureName, method, it, data, browserMode)
                 }
 
             METHOD_GET_AI_CHAT_NATIVE_PROMPT ->
@@ -467,6 +481,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 duckChat.isNativeStorageEnabled() &&
                 duckChatFeature.duckAiUsageWarnings().isEnabled()
         }
+        val supportsHomePageChatSuggestions = supportsHomePageChatSuggestions(browserMode)
         val jsonPayload =
             JSONObject().apply {
                 put(PLATFORM, ANDROID)
@@ -492,10 +507,71 @@ class RealDuckChatJSHelper @Inject constructor(
                 )
                 put(SUPPORTS_SUGGESTIONS, supportsSuggestions)
                 put(SUPPORTS_SUBSCRIPTION, supportsSubscription)
+                put(SUPPORTS_HOMEPAGE_CHAT_SUGGESTIONS, supportsHomePageChatSuggestions)
                 put(INSTALL_TYPE, if (appBuildConfig.isAppReinstall()) INSTALL_TYPE_RETURNING else INSTALL_TYPE_NEW)
                 getInstallAgeBucket()?.let { put(INSTALL_AGE, it) }
             }.also { logcat { "DuckChat-Sync: getAIChatNativeConfigValues $it" } }
         return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
+    private fun chatStoreFor(browserMode: BrowserMode): DuckAiChatStore = when (browserMode) {
+        BrowserMode.REGULAR -> regularChatStore
+        BrowserMode.FIRE -> fireChatStore
+    }
+
+    private suspend fun supportsHomePageChatSuggestions(browserMode: BrowserMode): Boolean = withContext(dispatcherProvider.io()) {
+        duckChatFeature.homepageChatSuggestions().isEnabled() &&
+            duckChat.isNativeStorageEnabled() &&
+            duckChatFeature.useNativeStorageChatData().isEnabled() &&
+            chatStoreFor(browserMode).hasMigrated()
+    }
+
+    /**
+     * Same contract as the other native apps: every pinned chat, then recent chats newest first, capped at
+     * `maxChats`. Without a query, recent chats are limited to the last week. Never returns message content.
+     */
+    private suspend fun getAIChats(
+        featureName: String,
+        method: String,
+        id: String,
+        data: JSONObject?,
+        browserMode: BrowserMode,
+    ): JsCallbackData {
+        val chats = JSONArray()
+        if (supportsHomePageChatSuggestions(browserMode)) {
+            val query = data?.optString(GET_AI_CHATS_QUERY).orEmpty().trim()
+            val maxChats = (data?.optInt(GET_AI_CHATS_MAX_CHATS, DEFAULT_MAX_CHATS) ?: DEFAULT_MAX_CHATS).coerceIn(1, MAX_CHATS_LIMIT)
+            val recentCutoff = Instant.now().minus(Duration.ofDays(RECENT_CHATS_DAYS))
+            val all = withContext(dispatcherProvider.io()) {
+                runCatching { chatStoreFor(browserMode).getChats() }
+                    .onFailure { logcat { "Duck.ai: getAIChats failed to read chats: ${it.message}" } }
+                    .getOrDefault(emptyList())
+            }.filter { query.isEmpty() || it.title.contains(query, ignoreCase = true) }
+            val byNewest = compareByDescending<DuckAiChat> { it.lastEditInstant() }
+            val pinned = all.filter { it.pinned }.sortedWith(byNewest)
+            val recent = all
+                .filter { !it.pinned && (query.isNotEmpty() || (it.lastEditInstant() ?: Instant.MIN) >= recentCutoff) }
+                .sortedWith(byNewest)
+                .take(maxChats)
+            (pinned + recent).forEach { chat ->
+                chats.put(
+                    JSONObject().apply {
+                        put("chatId", chat.chatId)
+                        put("title", chat.title)
+                        put("pinned", chat.pinned)
+                        put("lastEdit", chat.lastEdit.ifEmpty { null } ?: JSONObject.NULL)
+                        put("model", chat.model.ifEmpty { null } ?: JSONObject.NULL)
+                    },
+                )
+            }
+        }
+        return JsCallbackData(JSONObject().put(GET_AI_CHATS_CHATS, chats), featureName, method, id)
+    }
+
+    private fun DuckAiChat.lastEditInstant(): Instant? = try {
+        Instant.parse(lastEdit)
+    } catch (_: DateTimeParseException) {
+        null
     }
 
     // Bucketed install age for the Duck.ai prompt pixel; null when there's no valid age (timestamp
@@ -750,6 +826,13 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val METHOD_SHOW_MODEL_PICKER = "showModelPicker"
         const val METHOD_GET_PAGE_CONTEXT = "getAIChatPageContext"
         const val METHOD_OPEN_KEYBOARD = "openKeyboard"
+        private const val METHOD_GET_AI_CHATS = "getAIChats"
+        private const val GET_AI_CHATS_QUERY = "query"
+        private const val GET_AI_CHATS_MAX_CHATS = "maxChats"
+        private const val GET_AI_CHATS_CHATS = "chats"
+        private const val DEFAULT_MAX_CHATS = 5
+        private const val MAX_CHATS_LIMIT = 20
+        private const val RECENT_CHATS_DAYS = 7L
         private const val METHOD_EDIT_PROMPT = "editPrompt"
         private const val METHOD_CANCEL_EDIT = "cancelEdit"
 
@@ -786,6 +869,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_NATIVE_STORAGE = "supportsNativeStorage"
         private const val SUPPORTS_NATIVE_USAGE_WARNINGS = "supportsNativeUsageWarnings"
         private const val SUPPORTS_SUBSCRIPTION = "supportsSubscription"
+        private const val SUPPORTS_HOMEPAGE_CHAT_SUGGESTIONS = "supportsHomePageChatSuggestions"
         private const val INSTALL_TYPE = "installType"
         private const val INSTALL_TYPE_NEW = "new"
         private const val INSTALL_TYPE_RETURNING = "returning"
