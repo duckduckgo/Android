@@ -20,6 +20,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.nextsteps.impl.NextStepsItemsStore
 import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
@@ -33,12 +34,14 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
+import logcat.logcat
 import javax.inject.Inject
 
 @ContributesViewModel(ViewScope::class)
 class NextStepsItemsViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val remoteMessageModel: RemoteMessageModel,
+    private val itemsStore: NextStepsItemsStore,
 ) : ViewModel() {
 
     data class ViewState(
@@ -53,27 +56,67 @@ class NextStepsItemsViewModel @Inject constructor(
     init {
         remoteMessageModel.observeActiveMessages()
             .map { message -> message?.takeIf { it.isNextStepsForNewTabPage() } }
+            .map { message -> message to visibleItems(message) }
             .flowOn(dispatchers.io())
-            .onEach { message ->
+            .onEach { (message, items) ->
                 val content = message?.content as? Content.ActionableItems
                 _viewState.value = ViewState(
                     message = message,
                     title = content?.titleText.orEmpty(),
-                    items = content?.listItems?.filterIsInstance<CardItem.ListItem>().orEmpty(),
+                    items = items,
                 )
+                if (message != null && items.isEmpty()) dismissMessage(message)
             }
             .launchIn(viewModelScope)
     }
 
     fun onFrontCardDismissed() {
+        val dismissedId = _viewState.value.items.firstOrNull()?.id ?: return
         val remaining = _viewState.updateAndGet { state -> state.copy(items = state.items.drop(1)) }
+        logcat(tag = "RadoiuC") { "front card dismissed: $dismissedId, new front=${remaining.items.firstOrNull()?.id}" }
+        itemsStore.addDismissedItemId(dismissedId)
         if (remaining.items.isEmpty()) {
-            remaining.message?.let { message ->
-                viewModelScope.launch { remoteMessageModel.onMessageDismissed(message) }
-            }
+            remaining.message?.let { dismissMessage(it) }
         }
+    }
+
+    private fun visibleItems(message: RemoteMessage?): List<CardItem.ListItem> {
+        val configItems = (message?.content as? Content.ActionableItems)?.listItems?.filterIsInstance<CardItem.ListItem>()
+            ?: return emptyList()
+        val dismissedIds = itemsStore.dismissedItemIds()
+        val onScreenOrder = _viewState.value.items.map { it.id }
+        val order = onScreenOrder.ifEmpty { itemsStore.itemOrder() }
+        val ordered = configItems
+            .filter { it.id !in dismissedIds }
+            .sortedBy { item -> order.indexOf(item.id).takeIf { it >= 0 } ?: Int.MAX_VALUE }
+
+        if (onScreenOrder.isNotEmpty()) {
+            return ordered
+        }
+
+        val visible = ordered.rotatedIfDue()
+        if (visible != ordered) {
+            logcat(tag = "RadoiuC") { "front card rotated on load: ${ordered.map { it.id }} -> ${visible.map { it.id }}" }
+        }
+        itemsStore.saveItemOrder(visible.map { it.id })
+        visible.firstOrNull()?.let { front ->
+            itemsStore.incrementFrontImpressions(front.id)
+            logcat(tag = "RadoiuC") { "impression reported for front=${front.id} count=${itemsStore.frontImpressions(front.id)}" }
+        }
+        return visible
+    }
+
+    private fun List<CardItem.ListItem>.rotatedIfDue(): List<CardItem.ListItem> =
+        if (size > 1 && itemsStore.frontImpressions(first().id) >= ROTATION_IMPRESSIONS) drop(1) + first() else this
+
+    private fun dismissMessage(message: RemoteMessage) {
+        viewModelScope.launch { remoteMessageModel.onMessageDismissed(message) }
     }
 
     private fun RemoteMessage.isNextStepsForNewTabPage(): Boolean =
         content is Content.ActionableItems && surfaces.contains(Surface.NEW_TAB_PAGE)
+
+    private companion object {
+        const val ROTATION_IMPRESSIONS = 5
+    }
 }

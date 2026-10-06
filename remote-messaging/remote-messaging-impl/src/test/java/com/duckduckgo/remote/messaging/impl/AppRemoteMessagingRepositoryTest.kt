@@ -49,6 +49,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -58,6 +59,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 
 // TODO: when pattern established, refactor objects to use (create module https://app.asana.com/0/0/1201807285420697/f)
@@ -89,6 +91,11 @@ class AppRemoteMessagingRepositoryTest {
         currentTimeProvider,
         autoDismissEvaluator,
     )
+
+    @Before
+    fun setUp() {
+        whenever(currentTimeProvider.localDateTimeNow()).thenReturn(LocalDate.ofEpochDay(0).atTime(12, 0))
+    }
 
     @After
     fun after() {
@@ -601,6 +608,54 @@ class AppRemoteMessagingRepositoryTest {
         assertEquals(Status.DISMISSED, dao.messagesById("id")?.status)
         // mirrors dismissMessage(): invalidate so the next eligible message is scheduled
         verify(remoteMessagingConfigRepository).invalidate()
+    }
+
+    @Test
+    fun whenShownSeveralTimesOnTheSameDayThenItCountsAsOneActiveDay() = runTest {
+        onDay(100)
+        testee.activeMessage(aRemoteMessage("id"))
+
+        repeat(3) { testee.markAsShown(aRemoteMessage("id")) }
+
+        assertEquals(1, dao.messagesById("id")?.uniqueImpressionDays)
+        assertEquals(3, dao.messagesById("id")?.impressions)
+    }
+
+    @Test
+    fun whenShownOnDifferentDaysThenEachDayCountsAsAnActiveDay() = runTest {
+        testee.activeMessage(aRemoteMessage("id"))
+
+        onDay(100)
+        testee.markAsShown(aRemoteMessage("id"))
+        onDay(101)
+        testee.markAsShown(aRemoteMessage("id"))
+
+        assertEquals(2, dao.messagesById("id")?.uniqueImpressionDays)
+    }
+
+    @Test
+    fun whenActiveDaysReachedThenMessageStaysThatDayAndIsDismissedOnALaterDay() = runTest {
+        testee.activeMessage(
+            aRemoteMessageWithDisplayConditions(
+                "id",
+                DisplayConditions(trigger = null, dismissAfterDaysShown = null, dismissAfterUniqueDailyImpressions = 2),
+            ),
+        )
+        onDay(100)
+        testee.markAsShown(aRemoteMessage("id"))
+        onDay(101)
+        testee.markAsShown(aRemoteMessage("id"))
+
+        assertEquals("id", testee.message()?.id)
+
+        onDay(102)
+        assertNull(testee.message())
+        assertEquals(Status.DISMISSED, dao.messagesById("id")?.status)
+        verify(remoteMessagingConfigRepository).invalidate()
+    }
+
+    private fun onDay(epochDay: Long) {
+        whenever(currentTimeProvider.localDateTimeNow()).thenReturn(LocalDate.ofEpochDay(epochDay).atTime(12, 0))
     }
 
     @Test

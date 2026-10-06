@@ -22,6 +22,7 @@ import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixels
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity
 import com.squareup.anvil.annotations.ContributesBinding
+import logcat.logcat
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -48,7 +49,10 @@ class RealRemoteMessageAutoDismissEvaluator @Inject constructor(
         remoteMessage: RemoteMessage,
         entity: RemoteMessageEntity,
     ): Boolean {
-        if (!remoteMessage.isExpired(entity.firstShownDate) && !remoteMessage.hasReachedImpressionCap(entity.impressions)) {
+        if (!remoteMessage.isExpired(entity.firstShownDate) &&
+            !remoteMessage.hasReachedImpressionCap(entity.impressions) &&
+            !remoteMessage.hasCompletedActiveDays(entity)
+        ) {
             return false
         }
         remoteMessagingPixels.fireRemoteMessageAutoDismissedPixel(remoteMessage)
@@ -60,6 +64,18 @@ class RealRemoteMessageAutoDismissEvaluator @Inject constructor(
         val firstShown = firstShownDate ?: return false
         val elapsedDays = TimeUnit.MILLISECONDS.toDays(currentTimeProvider.currentTimeMillis() - firstShown)
         return elapsedDays >= threshold
+    }
+
+    private fun RemoteMessage.hasCompletedActiveDays(entity: RemoteMessageEntity): Boolean {
+        val threshold = displayConditions?.dismissAfterUniqueDailyImpressions?.takeIf { it > 0 } ?: return false
+        val today = currentTimeProvider.localDateTimeNow().toLocalDate().toEpochDay()
+        // the last active day stays visible until that day is over
+        val completed = entity.uniqueImpressionDays >= threshold && entity.lastImpressionDay != today
+        logcat(tag = "RadoiuC") {
+            "activeDays check $id: activeDays=${entity.uniqueImpressionDays}/$threshold lastImpressionDay=${entity.lastImpressionDay} " +
+                "today=$today -> dismiss=$completed"
+        }
+        return completed
     }
 
     private fun RemoteMessage.hasReachedImpressionCap(impressions: Int): Boolean {

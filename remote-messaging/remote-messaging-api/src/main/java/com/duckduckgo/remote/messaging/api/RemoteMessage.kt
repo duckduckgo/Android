@@ -55,6 +55,7 @@ data class DisplayConditions(
     val trigger: MessageTrigger?,
     val dismissAfterDaysShown: Int?,
     val maxImpressions: Int? = null,
+    val dismissAfterUniqueDailyImpressions: Int? = null,
 )
 
 /**
