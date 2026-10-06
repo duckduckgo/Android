@@ -75,9 +75,18 @@ class RealWgServerApiTest {
                 address = "10.64.169.158/32",
                 location = "Newark, US",
                 gateway = "1.2.3.4",
+                advertisedPorts = listOf(443, 51820),
             ),
             productionApi.registerPublicKey("testpublickey"),
         )
+    }
+
+    @Test
+    fun whenServerOmitsPortsThenAdvertisedPortsIsEmpty() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
+        internalWgServerDebugProvider.selectedServer = "egress.euw"
+
+        assertEquals(emptyList<Int>(), internalApi.registerPublicKey("testpublickey")!!.advertisedPorts)
     }
 
     @Test
@@ -93,6 +102,7 @@ class RealWgServerApiTest {
                 address = "10.64.169.158/32",
                 location = "Rotterdam, NL",
                 gateway = "1.2.3.4",
+                advertisedPorts = listOf(443),
             ),
             internalApi.registerPublicKey("testpublickey"),
         )
@@ -111,6 +121,7 @@ class RealWgServerApiTest {
                 address = "10.64.169.158/32",
                 location = null,
                 gateway = "1.2.3.4",
+                advertisedPorts = emptyList(),
             ),
             internalApi.registerPublicKey("testpublickey"),
         )
@@ -128,6 +139,7 @@ class RealWgServerApiTest {
                 address = "10.64.169.158/32",
                 location = "Newark, US",
                 gateway = "1.2.3.4",
+                advertisedPorts = listOf(443, 51820),
             ),
             internalApi.registerPublicKey("testpublickey"),
         )
@@ -175,6 +187,7 @@ class RealWgServerApiTest {
                 address = "10.64.169.158/32",
                 location = "Rotterdam, NL",
                 gateway = "1.2.3.4",
+                advertisedPorts = listOf(443),
             ),
             productionApi.registerPublicKey("testpublickey"),
         )
@@ -194,6 +207,7 @@ class RealWgServerApiTest {
                 address = "10.64.169.158/32",
                 location = "Des Moines, US",
                 gateway = "1.2.3.4",
+                advertisedPorts = emptyList(),
             ),
             productionApi.registerPublicKey("testpublickey"),
         )
@@ -215,6 +229,7 @@ class RealWgServerApiTest {
                 address = "10.64.169.158/32",
                 location = "Rotterdam, NL",
                 gateway = "1.2.3.4",
+                advertisedPorts = listOf(443),
             ),
             internalApi.registerPublicKey("testpublickey"),
         )
