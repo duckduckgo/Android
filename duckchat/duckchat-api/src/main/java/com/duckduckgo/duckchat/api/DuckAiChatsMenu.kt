@@ -19,17 +19,26 @@ package com.duckduckgo.duckchat.api
 import android.view.View
 
 /**
- * Duck.ai chats menu: New Chat, the most recent chats of the host activity's browser mode, and View all chats.
- * View all is handled by the Duck.ai feature; the host decides how to open a new or selected chat.
+ * Duck.ai chats menu: New Chat, recent chats, and View all chats.
  */
 interface DuckAiChatsMenu {
 
     /**
-     * Loads the recent chats for the host activity's browser mode and shows the menu anchored to [anchorView].
+     * Loads the chats menu for the host activity's browser mode and shows the menu anchored to [anchorView],
      */
     suspend fun show(
         anchorView: View,
+        options: Options,
         listener: Listener,
+    )
+
+    /**
+     * @param showNewChat whether the menu offers New Chat.
+     * @param showRecentChatsHeader whether the recent chats are titled with a header.
+     */
+    data class Options(
+        val showNewChat: Boolean = true,
+        val showRecentChatsHeader: Boolean = true,
     )
 
     interface Listener {

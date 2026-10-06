@@ -40,6 +40,7 @@ class RealDuckAiChatsMenu @Inject constructor(
 
     override suspend fun show(
         anchorView: View,
+        options: DuckAiChatsMenu.Options,
         listener: DuckAiChatsMenu.Listener,
     ) {
         val recentChats = withContext(dispatchers.io()) {
@@ -50,11 +51,11 @@ class RealDuckAiChatsMenu @Inject constructor(
         DuckAiChatsPopupMenu(
             layoutInflater = activity.layoutInflater,
             recentChats = recentChats,
-            onNewChat = listener::onNewChatSelected,
+            onNewChat = if (options.showNewChat) listener::onNewChatSelected else null,
             onOpenDuckAi = null,
             onRecentChat = { chatId -> listener.onChatSelected(duckChat.buildChatUrl(chatId)) },
             onViewAllChats = { globalActivityStarter.start(activity, DuckChatHistoryNoParams) },
-            showRecentChatsHeader = false,
+            showRecentChatsHeader = options.showRecentChatsHeader,
         ).show(activity, activity.window.decorView, anchorView)
     }
 
