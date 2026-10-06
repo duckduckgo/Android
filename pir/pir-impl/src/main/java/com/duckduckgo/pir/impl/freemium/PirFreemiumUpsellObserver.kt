@@ -23,6 +23,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.GRACE_PERIOD
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
@@ -35,8 +36,7 @@ import javax.inject.Inject
 
 /**
  * Reports that a user who ran a free scan went on to hold a subscription, from whichever surface they
- * bought it — matching iOS, whose equivalent pixel is guarded only on activation and fires for a
- * purchase made from any entry point.
+ * bought it.
  */
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -54,9 +54,6 @@ class PirFreemiumUpsellObserver @Inject constructor(
         appCoroutineScope.launch(dispatcherProvider.io()) {
             subscriptions.getSubscriptionStatusFlow()
                 .filter { it in ACTIVE_STATUSES }
-                // The pixel is unique per install and the pixel layer owns that bookkeeping, so this
-                // re-evaluates the condition on every launch rather than trying to catch the single
-                // moment the subscription became active — which a process death could otherwise lose.
                 .collect {
                     if (pirFreemiumDataStore.didActivate) {
                         pirPixelSender.reportFreemiumUpsell()
@@ -66,6 +63,6 @@ class PirFreemiumUpsellObserver @Inject constructor(
     }
 
     private companion object {
-        val ACTIVE_STATUSES = setOf(AUTO_RENEWABLE, NOT_AUTO_RENEWABLE, GRACE_PERIOD)
+        val ACTIVE_STATUSES: Set<SubscriptionStatus> = setOf(AUTO_RENEWABLE, NOT_AUTO_RENEWABLE, GRACE_PERIOD)
     }
 }
