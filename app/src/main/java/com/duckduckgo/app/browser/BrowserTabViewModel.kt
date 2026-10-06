@@ -2424,6 +2424,7 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             clearPreviousAppLink()
         }
+        appLinksHandler.updateCurrentPage(url, urlType as? AppLink)
     }
 
     private suspend fun updateLoadingStatePrivacy(domain: String) {
@@ -4113,7 +4114,7 @@ class BrowserTabViewModel @Inject constructor(
                     finishCustomTabOnLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
                 )
             }
-            inCustomTab && appLinksHandler.isAlwaysTriggerDomain(appLink) -> command.value = OpenAppLink(appLink)
+            inCustomTab && appLinksHandler.isHandOff(appLink) -> command.value = OpenAppLink(appLink)
             appSettingsPreferencesStore.showAppLinksPrompt -> command.value = ShowAppLinkPrompt(appLink)
             else -> command.value = OpenAppLink(appLink)
         }
@@ -5411,6 +5412,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onHomeShown() {
         clearPreviousAppLink()
+        appLinksHandler.updateCurrentPage(url = null, appLink = null)
         viewModelScope.launch(dispatchers.io()) {
             if (faviconsFetchingPrompt.shouldShow() && savedSitesRepository.hasFavorites()) {
                 withContext(dispatchers.main()) {

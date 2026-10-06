@@ -256,24 +256,47 @@ class DuckDuckGoAppLinksHandlerTest {
     }
 
     @Test
-    fun whenAppLinkIsSameOrSubdomainAndIsInAlwaysTriggerListThenReturnFalseAndSetPreviousUrlAndLaunchAppLink() {
+    fun whenAppLinkIsHandOffThenLaunchAppLinkAndHaltWebNavigationEvenIfAlreadyTriggeredForDomain() {
+        testee.updateCurrentPage(url = "https://digid.nl/inloggen_app", appLink = null)
         testee.isAUserQuery = false
         testee.hasTriggeredForDomain = true
-        testee.previousUrl = "digid.nl/something"
+        testee.previousUrl = "https://digid.nl/inloggen_app"
         assertTrue(
             testee.handleAppLink(
                 isForMainFrame = true,
-                appLink = AppLink(uriString = "app.digid.nl/something"),
+                appLink = appLink("https://app.digid.nl/digid-app", DIGID_PACKAGE),
                 hasGesture = true,
                 clientPackage = null,
                 launchAppLink = mockCallback,
-                shouldHaltWebNavigation = true,
+                shouldHaltWebNavigation = false,
                 appLinksEnabled = true,
             ),
         )
         assertTrue(testee.hasTriggeredForDomain)
-        assertEquals("app.digid.nl/something", testee.previousUrl)
+        assertEquals("https://app.digid.nl/digid-app", testee.previousUrl)
         verify(mockCallback).invoke()
+    }
+
+    @Test
+    fun whenAppLinkTargetsTheAppThatOpensTheCurrentPageAndAlreadyTriggeredForDomainThenReturnFalseAndDoNotLaunch() {
+        val currentPage = appLink("https://www.amazon.com/s?k=lamp", AMAZON_PACKAGE)
+        testee.updateCurrentPage(url = currentPage.uriString, appLink = currentPage)
+        testee.isAUserQuery = false
+        testee.hasTriggeredForDomain = true
+        testee.previousUrl = currentPage.uriString
+        assertFalse(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                appLink = appLink("https://www.amazon.com/dp/B0C1234567", AMAZON_PACKAGE),
+                hasGesture = true,
+                clientPackage = null,
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = false,
+                appLinksEnabled = true,
+            ),
+        )
+        assertEquals(currentPage.uriString, testee.previousUrl)
+        verifyNoInteractions(mockCallback)
     }
 
     @Test
@@ -427,13 +450,14 @@ class DuckDuckGoAppLinksHandlerTest {
     }
 
     @Test
-    fun whenNoGestureAndNotTrustedCallerAndIsInAlwaysTriggerListThenReturnFalseAndDoNotLaunch() {
+    fun whenNoGestureAndNotTrustedCallerAndHandOffThenReturnFalseAndDoNotLaunch() {
+        testee.updateCurrentPage(url = "https://digid.nl/inloggen_app", appLink = null)
         testee.isAUserQuery = false
-        testee.previousUrl = "foo.com"
+        testee.previousUrl = "https://digid.nl/inloggen_app"
         assertFalse(
             testee.handleAppLink(
                 isForMainFrame = true,
-                appLink = AppLink(uriString = "app.digid.nl/something"),
+                appLink = appLink("https://app.digid.nl/digid-app", DIGID_PACKAGE),
                 hasGesture = false,
                 clientPackage = null,
                 launchAppLink = mockCallback,
@@ -441,45 +465,7 @@ class DuckDuckGoAppLinksHandlerTest {
                 appLinksEnabled = true,
             ),
         )
-        assertEquals("foo.com", testee.previousUrl)
-        verifyNoInteractions(mockCallback)
-    }
-
-    @Test
-    fun whenNoGestureAndSameDomainAndHasTriggeredAndIsInAlwaysTriggerListThenReturnFalseAndDoNotLaunch() {
-        testee.isAUserQuery = false
-        testee.hasTriggeredForDomain = true
-        testee.previousUrl = "digid.nl/something"
-        assertFalse(
-            testee.handleAppLink(
-                isForMainFrame = true,
-                appLink = AppLink(uriString = "app.digid.nl/something"),
-                hasGesture = false,
-                clientPackage = null,
-                launchAppLink = mockCallback,
-                shouldHaltWebNavigation = true,
-                appLinksEnabled = true,
-            ),
-        )
-        assertEquals("digid.nl/something", testee.previousUrl)
-        verifyNoInteractions(mockCallback)
-    }
-
-    @Test
-    fun whenNoGestureAndNotTrustedCallerAndParentOfAlwaysTriggerDomainThenReturnFalseAndDoNotLaunch() {
-        testee.isAUserQuery = false
-        testee.previousUrl = "foo.com"
-        assertFalse(
-            testee.handleAppLink(
-                isForMainFrame = true,
-                appLink = AppLink(uriString = "digid.nl/something"),
-                hasGesture = false,
-                clientPackage = null,
-                launchAppLink = mockCallback,
-                shouldHaltWebNavigation = true,
-                appLinksEnabled = true,
-            ),
-        )
+        assertEquals("https://digid.nl/inloggen_app", testee.previousUrl)
         verifyNoInteractions(mockCallback)
     }
 
@@ -546,12 +532,48 @@ class DuckDuckGoAppLinksHandlerTest {
     }
 
     @Test
-    fun whenDomainInAlwaysTriggerListThenIsAlwaysTriggerDomainReturnsTrue() {
-        assertTrue(testee.isAlwaysTriggerDomain(AppLink(uriString = "https://app.digid.nl/path")))
+    fun whenNoAppOpensTheCurrentPageAndAppLinkIsOnTheSameSiteThenIsHandOff() {
+        testee.updateCurrentPage(url = "https://digid.nl/inloggen_app", appLink = null)
+        assertTrue(testee.isHandOff(appLink("https://app.digid.nl/digid-app", DIGID_PACKAGE)))
     }
 
     @Test
-    fun whenDomainNotInAlwaysTriggerListThenIsAlwaysTriggerDomainReturnsFalse() {
-        assertFalse(testee.isAlwaysTriggerDomain(AppLink(uriString = "https://example.com/path")))
+    fun whenTheSameAppOpensTheCurrentPageThenIsNotHandOff() {
+        val currentPage = appLink("https://www.amazon.com/s?k=lamp", AMAZON_PACKAGE)
+        testee.updateCurrentPage(url = currentPage.uriString, appLink = currentPage)
+        assertFalse(testee.isHandOff(appLink("https://www.amazon.com/dp/B0C1234567", AMAZON_PACKAGE)))
+    }
+
+    @Test
+    fun whenADifferentAppOpensTheCurrentPageThenIsHandOff() {
+        val currentPage = appLink("https://example.com/page", "com.example.web")
+        testee.updateCurrentPage(url = currentPage.uriString, appLink = currentPage)
+        assertTrue(testee.isHandOff(appLink("https://app.example.com/login", "com.example.auth")))
+    }
+
+    @Test
+    fun whenAppLinkIsOnAnotherSiteThenIsNotHandOff() {
+        testee.updateCurrentPage(url = "https://duckduckgo.com/?q=cats", appLink = null)
+        assertFalse(testee.isHandOff(appLink("https://www.youtube.com/watch?v=abc", YOUTUBE_PACKAGE)))
+    }
+
+    @Test
+    fun whenThereIsNoCurrentPageThenIsNotHandOff() {
+        testee.updateCurrentPage(url = null, appLink = null)
+        assertFalse(testee.isHandOff(appLink("https://app.digid.nl/digid-app", DIGID_PACKAGE)))
+    }
+
+    @Test
+    fun whenAppLinkHasNoTargetPackageThenIsNotHandOff() {
+        testee.updateCurrentPage(url = "https://digid.nl/inloggen_app", appLink = null)
+        assertFalse(testee.isHandOff(AppLink(uriString = "https://app.digid.nl/digid-app")))
+    }
+
+    private fun appLink(uriString: String, packageName: String) = AppLink(uriString = uriString, appIntent = Intent().setPackage(packageName))
+
+    private companion object {
+        const val DIGID_PACKAGE = "nl.rijksoverheid.digid.pub"
+        const val AMAZON_PACKAGE = "com.amazon.mShop.android.shopping"
+        const val YOUTUBE_PACKAGE = "com.google.android.youtube"
     }
 }

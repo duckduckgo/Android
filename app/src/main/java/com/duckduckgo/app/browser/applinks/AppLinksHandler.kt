@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser.applinks
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
-import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -48,12 +47,21 @@ interface AppLinksHandler {
     fun isTrustedCaller(appLink: AppLink, callerPackage: String?): Boolean
 
     /**
-     * True when the app link's domain always launches its app: it skips the once-per-domain rule and, in custom tabs,
-     * the prompt. It does not bypass the user-gesture requirement.
+     * Records the page that navigations start from, used by [isHandOff].
+     *
+     * @param url the url of the current page, or null when no page is shown.
+     * @param appLink the app link for [url] when an app can open it, or null otherwise.
+     */
+    fun updateCurrentPage(url: String?, appLink: AppLink?)
+
+    /**
+     * True when the app link sends the user from the current page to an app that can't open that page, on the same site
+     * (e.g. digid.nl -> app.digid.nl). Hand-offs launch on every attempt, halt the web navigation, and open without a
+     * prompt in custom tabs. They still need a user gesture.
      *
      * @param appLink the app link being evaluated.
      */
-    fun isAlwaysTriggerDomain(appLink: AppLink): Boolean
+    fun isHandOff(appLink: AppLink): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -64,11 +72,8 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
     var previousUrl: String? = null
     var isAUserQuery = false
     var hasTriggeredForDomain = false
-
-    // Their sites hand off to these App Link domains from the same domain on every attempt (digid.nl -> app.digid.nl),
-    // and the App Link page itself isn't meant to load in the browser, so same-domain navigations to them skip the
-    // once-per-domain rule and halt the web navigation.
-    private val alwaysTriggerList = listOf("app.digid.nl")
+    private var currentPageUrl: String? = null
+    private var currentPageAppPackage: String? = null
 
     override fun handleAppLink(
         isForMainFrame: Boolean,
@@ -83,9 +88,6 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
             return false
         }
 
-        val urlString = appLink.uriString
-        val isAlwaysTriggerDomain = isAlwaysTriggerDomain(appLink)
-
         // HTTP navigations shouldn't launch apps unless started with a user gesture. That is unless
         // the "trusted-caller" carve-out applies - if an app opens a Custom Tab, App Links that
         // point back to that same app should be allowed even without user interaction.
@@ -95,13 +97,23 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
             }
         }
 
+        val urlString = appLink.uriString
+
+        // Like Chrome's same-host rule: moving between pages one app can open is browsing, so the once-per-domain rule
+        // applies, but a link to an app that can't open the current page is a hand-off with no useful web page behind it.
+        if (isHandOff(appLink)) {
+            previousUrl = urlString
+            launchAppLink()
+            hasTriggeredForDomain = true
+            return true
+        }
+
         previousUrl?.let {
             if (isSameOrSubdomain(it, urlString)) {
-                if (isAUserQuery || !hasTriggeredForDomain || isAlwaysTriggerDomain) {
+                if (isAUserQuery || !hasTriggeredForDomain) {
                     previousUrl = urlString
                     launchAppLink()
                     hasTriggeredForDomain = true
-                    if (isAlwaysTriggerDomain) return true
                 }
                 return false
             }
@@ -134,11 +146,20 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
     }
 
     override fun isTrustedCaller(appLink: AppLink, callerPackage: String?): Boolean {
-        val targetPackage = appLink.appIntent?.component?.packageName ?: appLink.appIntent?.`package`
+        val targetPackage = appLink.targetPackage()
         return targetPackage != null && callerPackage == targetPackage
     }
 
-    override fun isAlwaysTriggerDomain(appLink: AppLink): Boolean {
-        return alwaysTriggerList.contains(appLink.uriString.extractDomain())
+    override fun updateCurrentPage(url: String?, appLink: AppLink?) {
+        currentPageUrl = url
+        currentPageAppPackage = appLink?.targetPackage()
     }
+
+    override fun isHandOff(appLink: AppLink): Boolean {
+        val pageUrl = currentPageUrl ?: return false
+        val targetPackage = appLink.targetPackage() ?: return false
+        return targetPackage != currentPageAppPackage && isSameOrSubdomain(pageUrl, appLink.uriString)
+    }
+
+    private fun AppLink.targetPackage(): String? = appIntent?.component?.packageName ?: appIntent?.`package`
 }
