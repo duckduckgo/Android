@@ -66,14 +66,19 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -184,6 +189,7 @@ interface NativeInputManager {
     fun setDuckAiTierVisible(visible: Boolean)
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ContributesBinding(FragmentScope::class)
 class RealNativeInputManager @Inject constructor(
     private val duckChat: DuckChat,
@@ -200,6 +206,7 @@ class RealNativeInputManager @Inject constructor(
     private val nativeInputEventListener: NativeInputEventListener,
     private val edgeToEdgeProvider: EdgeToEdgeProvider,
     private val edgeToEdgeHandler: EdgeToEdgeHandler,
+    private val duckAiChatStore: DuckAiChatStore,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -941,6 +948,15 @@ class RealNativeInputManager @Inject constructor(
             // Per-tab chatId (null on new chats) published into NativeInputState for
             // consumers (reasoning picker, submission) to resolve per-chat state.
             val chatIdFlow = currentTabUrl.map { extractDuckAiChatId(it) }
+                .distinctUntilChanged()
+                .flatMapLatest { chatId ->
+                    if (chatId == null || !duckAiChatStore.hasMigrated()) {
+                        flowOf(chatId)
+                    } else {
+                        duckAiChatStore.getChatsFlow().map { chats -> chatId.takeIf { chats.any { it.chatId == chatId && !it.isVoice } } }
+                    }
+                }
+                .distinctUntilChanged()
             // Picker tied to whether the current tab is a Duck.ai page that already has a chatId (existing chat) or new chat.
             bindModelPickerEnabledSource(chatIdFlow.map { it == null })
             bindChatIdSource(chatIdFlow)
