@@ -28,6 +28,7 @@ dependencies {
 
     testImplementation Testing.junit4
     testImplementation 'org.junit.vintage:junit-vintage-engine:_'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:_'
     testImplementation "dev.zacsweers.kctfork:core:0.11.1"
     testImplementation "dev.zacsweers.kctfork:ksp:0.11.1"
     testImplementation "com.google.devtools.ksp:symbol-processing-api:_"

@@ -700,6 +700,7 @@ dependencies {
     testImplementation project(':vpn-api-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation 'org.junit.vintage:junit-vintage-engine:_'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:_'
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.core
