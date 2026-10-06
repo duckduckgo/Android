@@ -114,6 +114,11 @@ class SubscriptionOnboardingViewModel @Inject constructor(
                 val step = state.currentStep
                 if (step is SubscriptionOnboardingActivityStep) {
                     canGoBack = state.canGoBack && step.stepPlugin.allowsBackNavigation
+                    _toolbarState.value = ToolbarState(
+                        titleResId = step.stepPlugin.titleResId,
+                        canGoBack = canGoBack,
+                        showNavigationIcon = !handoffState.isHandoff,
+                    )
                     _commands.send(Command.ShowStep(step.stepPlugin))
                     fireStepShown(step.stepPlugin.stepId)
                     scheduleHandoffIfPending()
