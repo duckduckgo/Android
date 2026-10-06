@@ -1492,6 +1492,15 @@ class BrowserTabFragment :
                         ),
                     )
                 },
+                onInputFocusChanged = { focused ->
+                    contentScopeScripts.sendSubscriptionEvent(
+                        SubscriptionEventData(
+                            featureName = "aiChat",
+                            subscriptionName = "submitNativeInputFocused",
+                            params = JSONObject().put("focused", focused),
+                        ),
+                    )
+                },
                 onChangeModelSubmitted = { modelId ->
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(

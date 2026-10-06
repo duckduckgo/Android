@@ -239,6 +239,7 @@ class RealContextualNativeInputManager @Inject constructor(
         widget.bindModelPickerEnabledSource(modelPickerEnabled)
         widget.hideMainButtons()
         widget.onStopTapped = ::sendStopEvent
+        widget.onInputFocusChanged = ::sendInputFocusedEvent
         widget.onVoiceChatClick = onVoiceChatRequested
         widget.onVoiceSearchClick = onVoiceSearchRequested
         widget.bindAttachmentCallbacks(
@@ -321,6 +322,16 @@ class RealContextualNativeInputManager @Inject constructor(
                 featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
                 subscriptionName = "submitStartUsingWeeklyLimitAction",
                 params = JSONObject().put("platform", "android"),
+            ),
+        )
+    }
+
+    private fun sendInputFocusedEvent(focused: Boolean) {
+        jsMessaging?.sendSubscriptionEvent(
+            SubscriptionEventData(
+                featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
+                subscriptionName = "submitNativeInputFocused",
+                params = JSONObject().put("focused", focused),
             ),
         )
     }

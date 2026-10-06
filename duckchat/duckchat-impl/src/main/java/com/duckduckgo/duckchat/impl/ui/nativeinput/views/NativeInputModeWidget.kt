@@ -130,6 +130,9 @@ interface NativeInputWidget {
     var onClearTextTapped: (() -> Unit)?
     var onFireButtonTapped: (() -> Unit)?
     var onStopTapped: (() -> Unit)?
+
+    /** Fired when the input field gains or loses focus (→ submitNativeInputFocused). */
+    var onInputFocusChanged: ((focused: Boolean) -> Unit)?
     var onVoiceSearchClick: (() -> Unit)?
     var onVoiceChatClick: (() -> Unit)?
     var onImageClick: (() -> Unit)?
@@ -362,6 +365,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var widgetRoot: View? = null
     private var footerHost: NativeInputFooterView? = null
     override var onStopTapped: (() -> Unit)? = null
+    override var onInputFocusChanged: ((focused: Boolean) -> Unit)? = null
     override var onChangeModelSubmitted: ((modelId: String) -> Unit)? = null
     override var onStartUsingWeeklyLimit: (() -> Unit)? = null
     override var onCustomizeResponsesClicked: (() -> Unit)? = null
@@ -910,6 +914,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         applyVerticalPaddingForFocus()
         inputField.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
             viewModel.setFooterInputFocused(hasFocus)
+            onInputFocusChanged?.invoke(hasFocus)
             // Toggle visibility is intentionally NOT updated here: it's owned by applyState
             // (state-driven) and by NativeInputManager.setToggleVisible (keyboard-visibility
             // driven on duck.ai). Re-evaluating it from the focus listener would race with

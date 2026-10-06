@@ -113,6 +113,8 @@ class NativeInputCallbacks(
     val onChatSuggestionDelete: (chatUrl: String) -> Unit = {},
     val onClearAutocomplete: () -> Unit,
     val onStopTapped: () -> Unit,
+    /** Input gained or lost focus (→ submitNativeInputFocused). */
+    val onInputFocusChanged: (focused: Boolean) -> Unit = {},
     val onFireButtonPressed: () -> Unit = {},
     val onTabSwitcherPressed: () -> Unit = {},
     val onBrowserMenuPressed: () -> Unit = {},
@@ -968,6 +970,7 @@ class RealNativeInputManager @Inject constructor(
     ) {
         widgetFrom(widgetView)?.apply {
             onStopTapped = callbacks.onStopTapped
+            onInputFocusChanged = callbacks.onInputFocusChanged
             onFireButtonTapped = callbacks.onFireButtonPressed
             onCustomizeResponsesClicked = callbacks.onCustomizeResponsesClicked
             bindTabCount(lifecycleOwner, tabs.map { it.size })
