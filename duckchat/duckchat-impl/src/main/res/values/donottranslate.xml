@@ -44,4 +44,7 @@
     <!-- Duck.ai on/off, shown in the onboarding Duck.ai state choice -->
     <string name="duckChatOnboardingDuckAiStateOn">Turn Duck.ai On</string>
     <string name="duckChatOnboardingDuckAiStateOff">Keep Duck.ai Off</string>
+
+    <!-- Duck.ai ToS consent footer -->
+    <string name="duckChatTermsFooterMessage" instruction="Disclaimer under the Duck.ai input. The two annotated phrases are tappable links to the Terms of Service and the Privacy Policy.">By sending a prompt you agree to our <annotation type="terms_link">Terms of Service</annotation> and <annotation type="privacy_link">Privacy Policy</annotation>.</string>
 </resources>
