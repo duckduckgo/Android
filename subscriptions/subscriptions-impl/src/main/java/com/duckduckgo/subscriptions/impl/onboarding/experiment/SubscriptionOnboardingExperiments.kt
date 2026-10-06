@@ -29,7 +29,7 @@ import javax.inject.Inject
 interface SubscriptionOnboardingExperiments {
 
     /**
-     * Enrolls the experiment matching this purchase type, assigning a cohort.
+     * Enrolls the experiment matching the purchase type, assigning a cohort.
      */
     suspend fun enroll(isFreeTrial: Boolean)
 

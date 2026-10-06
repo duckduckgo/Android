@@ -16,16 +16,6 @@
 
 package com.duckduckgo.subscriptions.impl.pixels
 
-/**
- * Clickthrough-rate pixels for the native subscription onboarding steps, as defined by the onboarding
- * experiments. The wire name embeds the action and step name
- * (`m_subscription_onboarding_step_{shown|completed|skipped}_{stepName}`) because the experiment analysis
- * queries those exact names.
- *
- * [Step] maps the stable plugin `stepId` (which may be owned by another feature module, so it is matched by
- * string rather than by an import) to the step name used in the pixel. The completion step is impressions
- * only, so it has no completed/skipped variant.
- */
 object SubscriptionOnboardingStepPixels {
 
     private const val PREFIX = "m_subscription_onboarding_step"

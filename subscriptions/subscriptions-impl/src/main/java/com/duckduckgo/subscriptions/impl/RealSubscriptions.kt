@@ -357,15 +357,13 @@ interface SubscriptionsFeature {
     fun schedulePaywallNotSeenPixels(): Toggle
 
     /**
-     * Experiment for free-trial purchases: control keeps the current FE /welcome page, treatment shows the
-     * native subscription onboarding. Enrolled on a successful free-trial purchase.
+     * Experiment for free-trial purchases
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun subscriptionOnboardingFreeTrialsOct2026(): Toggle
 
     /**
-     * Experiment for paid (non-free-trial) purchases: control keeps the current FE /welcome page, treatment
-     * shows the native subscription onboarding. Enrolled on a successful paid purchase.
+     * Experiment for paid (non-free-trial) purchases
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun subscriptionOnboardingPaidSubsOct2026(): Toggle
