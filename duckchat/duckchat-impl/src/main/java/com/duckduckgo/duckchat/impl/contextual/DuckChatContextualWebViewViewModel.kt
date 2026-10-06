@@ -20,6 +20,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -35,6 +36,7 @@ import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.duckchat.impl.terms.DuckAiTermsConsent
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.SelectionTerminalReason
@@ -82,6 +84,8 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     private val chatHistoryRepository: ChatHistoryRepository,
     private val contextualEntryPromptStore: ContextualEntryPromptStore,
     private val textSelectionRepository: TextSelectionRepository,
+    private val termsConsent: DuckAiTermsConsent,
+    private val browserMode: BrowserMode,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -525,6 +529,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
                 pageContext?.let { put("pageContext", it) }
                 selectionsJson?.let { put("selections", it) }
             }
+        termsConsent.carry(params, browserMode)
 
         return SubscriptionEventData(
             featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,

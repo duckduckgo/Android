@@ -65,35 +65,29 @@ class AdaptiveBottomRowLayout @JvmOverloads constructor(
         if (!measuring) super.requestLayout()
     }
 
-    // What the groups need at [level] if every control took its worst-case width: the measured groups, with each
-    // control's current contribution swapped for its worst case. The result does not depend on what is selected,
-    // typed or active, so the same screen always gets the same layout.
+    // What the row needs at [level]: the containers that hold no compactable control, as they are, plus every control's
+    // worst case. Nothing here reads what is currently selected, typed or active, so the same screen always gets the
+    // same layout, and nothing depends on a measure that may be out of date.
     private fun neededWidth(
         groups: List<View>,
         controls: List<CompactableControl>,
         level: Int,
         heightMeasureSpec: Int,
     ): Int {
-        val measured = groups.sumOf { it.naturalWidth(heightMeasureSpec) }
-        val current = controls.sumOf { contributionOf(it as View, groups) }
-        val worstCase = controls.sumOf { it.worstCaseWidth(level) }
-        return measured - current + worstCase + minGap
+        val fixed = groups.sumOf { group -> fixedWidthOf(group as ViewGroup, heightMeasureSpec) }
+        return fixed + controls.sumOf { it.worstCaseWidth(level) } + minGap
     }
 
-    // A control sits in a container that is a direct child of one of the two groups; the container's visibility and
-    // margins decide how much room the control takes right now.
-    private fun contributionOf(
-        control: View,
-        groups: List<View>,
-    ): Int {
-        var container: View = control
-        while (groups.none { it === container.parent }) {
-            container = container.parent as? View ?: return 0
-        }
-        if (container.visibility == GONE) return 0
-        val params = container.layoutParams as? MarginLayoutParams
-        return container.measuredWidth + (params?.marginStart ?: 0) + (params?.marginEnd ?: 0)
-    }
+    private fun fixedWidthOf(
+        group: ViewGroup,
+        heightMeasureSpec: Int,
+    ): Int = (0 until group.childCount)
+        .map(group::getChildAt)
+        .filter { it.visibility != GONE && !holdsControl(it) }
+        .sumOf { it.naturalWidth(heightMeasureSpec) }
+
+    private fun holdsControl(view: View): Boolean =
+        view is CompactableControl || (view is ViewGroup && (0 until view.childCount).any { holdsControl(view.getChildAt(it)) })
 
     private fun View.naturalWidth(heightMeasureSpec: Int): Int {
         measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), heightMeasureSpec)

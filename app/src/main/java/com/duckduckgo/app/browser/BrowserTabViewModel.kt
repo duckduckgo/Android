@@ -5231,7 +5231,7 @@ class BrowserTabViewModel @Inject constructor(
                             unblockDuckAiOnboardingCta()
                         }
                     }
-                    duckChatJSHelper.consumeTabContextPromptOnHandoff(method)?.let { event ->
+                    duckChatJSHelper.consumeTabContextPromptOnHandoff(method, browserMode)?.let { event ->
                         // There is a pending tab context prompt waiting to be sent
                         withContext(dispatchers.main()) {
                             _subscriptionEventDataChannel.send(event)

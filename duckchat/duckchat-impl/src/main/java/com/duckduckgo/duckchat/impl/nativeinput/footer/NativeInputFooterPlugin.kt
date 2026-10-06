@@ -69,18 +69,21 @@ interface NativeInputFooterHost {
     fun openSubscriptionPurchase(origin: String)
 }
 
-/** Category shared by the usage notices, which are mutually exclusive: at most one of them shows at a time. */
-const val USAGE_NOTICE_FOOTER_CATEGORY = "usageNotice"
+/** Groups of footers of which at most one shows at a time. */
+enum class FooterCategory {
+    /** The usage limit and high usage notices. */
+    USAGE_NOTICE,
+}
 
 interface NativeInputFooterPlugin : ActivePlugin {
     val priority: Int
 
     /**
      * Footers in the same category are mutually exclusive: only the visible one with the highest priority shows.
-     * Defaults to a category of its own, so a footer stacks with the others unless it opts into a shared one.
+     * Null, the default, means no category: the footer never excludes another and stacks with the rest.
      */
-    val category: String
-        get() = javaClass.name
+    val category: FooterCategory?
+        get() = null
 
     fun createFooter(
         context: Context,

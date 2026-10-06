@@ -45,7 +45,7 @@ import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_C
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_GET_PAGE_CONTEXT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
-import com.duckduckgo.duckchat.impl.terms.DuckAiTermsRepository
+import com.duckduckgo.duckchat.impl.terms.DuckAiTermsConsent
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
@@ -122,7 +122,7 @@ class RealDuckChatJSHelperTest {
     private val mockBrowserInteractionsPlugin: BrowserInteractionsPlugin = mock()
     private val mockBrowserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
     private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
-    private val mockTermsRepository: DuckAiTermsRepository = mock()
+    private val mockTermsConsent: DuckAiTermsConsent = mock()
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
@@ -143,7 +143,7 @@ class RealDuckChatJSHelperTest {
         editPromptSessionStore = mockEditPromptSessionStore,
         browserInteractionsPlugins = mockBrowserInteractionsPlugins,
         duckAiSessionCallback = mockDuckAiSessionCallback,
-        termsRepository = mockTermsRepository,
+        termsConsent = mockTermsConsent,
     )
 
     init {
@@ -2405,12 +2405,23 @@ class RealDuckChatJSHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
+    fun whenConsumingTheHandoffPromptThenTheTermsConsentIsCarriedOnTheEvent() {
+        mockDuckChatFeature.chatTabAttachments().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockPendingTabContextStore.consume()).thenReturn(PendingTabContext("prompt", emptyList()))
+
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData", BrowserMode.REGULAR)
+
+        verify(mockTermsConsent).carry(eq(result!!.params), eq(BrowserMode.REGULAR))
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
     fun whenConsumeTabContextPromptOnHandoffWithHandoffMethodAndFeatureEnabledThenReturnsEvent() = runTest {
         mockDuckChatFeature.chatTabAttachments().setRawStoredState(Toggle.State(enable = true))
         val pageContext = JSONObject("""{"title":"Example","url":"https://example.com"}""")
         whenever(mockPendingTabContextStore.consume()).thenReturn(PendingTabContext("hello", listOf(pageContext)))
 
-        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData")
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData", BrowserMode.REGULAR)
 
         assertNotNull(result)
         assertEquals(DUCK_CHAT_FEATURE_NAME, result!!.featureName)
@@ -2422,7 +2433,7 @@ class RealDuckChatJSHelperTest {
 
     @Test
     fun whenConsumeTabContextPromptOnHandoffWithOtherMethodThenReturnsNull() {
-        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeConfigValues")
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeConfigValues", BrowserMode.REGULAR)
 
         assertNull(result)
         verify(mockPendingTabContextStore, never()).consume()
@@ -2434,14 +2445,14 @@ class RealDuckChatJSHelperTest {
         mockDuckChatFeature.chatTabAttachments().setRawStoredState(Toggle.State(enable = true))
         whenever(mockPendingTabContextStore.consume()).thenReturn(null)
 
-        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData")
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData", BrowserMode.REGULAR)
 
         assertNull(result)
     }
 
     @Test
     fun whenConsumeTabContextPromptOnHandoffWithFeatureDisabledThenReturnsNull() {
-        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData")
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData", BrowserMode.REGULAR)
 
         assertNull(result)
         verify(mockPendingTabContextStore, never()).consume()
@@ -2494,36 +2505,21 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativePromptWithPendingPromptAndToSFlagOnThenTermsAcceptedAndStored() = runTest {
-        mockDuckChatFeature.nativeToSConsent().setRawStoredState(Toggle.State(enable = true))
+    fun whenGetAIChatNativePromptWithPendingPromptThenTheTermsConsentIsCarriedOnThePayload() = runTest {
         whenever(mockPendingNativePromptStore.consume()).thenReturn(PendingNativePrompt("test prompt", null, null))
 
         val result = testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext)
 
-        assertTrue(result!!.params.getBoolean("termsAccepted"))
-        verify(mockTermsRepository).markTermsAccepted(any())
+        verify(mockTermsConsent).carry(eq(result!!.params), any())
     }
 
     @Test
-    fun whenGetAIChatNativePromptWithPendingPromptAndToSFlagOffThenTermsAcceptedOmitted() = runTest {
-        mockDuckChatFeature.nativeToSConsent().setRawStoredState(Toggle.State(enable = false))
-        whenever(mockPendingNativePromptStore.consume()).thenReturn(PendingNativePrompt("test prompt", null, null))
-
-        val result = testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext)
-
-        assertFalse(result!!.params.has("termsAccepted"))
-        verify(mockTermsRepository, never()).markTermsAccepted(any())
-    }
-
-    @Test
-    fun whenGetAIChatNativePromptWithNoPendingPromptAndToSFlagOnThenTermsAcceptedOmitted() = runTest {
-        mockDuckChatFeature.nativeToSConsent().setRawStoredState(Toggle.State(enable = true))
+    fun whenGetAIChatNativePromptWithNoPendingPromptThenTheTermsConsentIsNotCarried() = runTest {
         whenever(mockPendingNativePromptStore.consume()).thenReturn(null)
 
-        val result = testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext)
+        testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext)
 
-        assertFalse(result!!.params.has("termsAccepted"))
-        verify(mockTermsRepository, never()).markTermsAccepted(any())
+        verify(mockTermsConsent, never()).carry(any(), any())
     }
 
     @Test

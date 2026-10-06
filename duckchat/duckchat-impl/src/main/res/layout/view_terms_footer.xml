@@ -21,9 +21,7 @@
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingStart="@dimen/keyline_4"
-    android:paddingEnd="@dimen/keyline_4"
-    android:paddingBottom="@dimen/keyline_2">
+    android:padding="@dimen/keyline_4">
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/termsFooterMessage"
