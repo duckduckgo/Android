@@ -884,7 +884,6 @@ class BrowserTabViewModelTest {
             whenever(mockDuckChatInputModeState.inputModeCapability).thenReturn(mockInputModeCapability)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
-            runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false) }
             whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
 
             ctaViewModel =
@@ -6152,7 +6151,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenPrivacyOnIsFalse() {
-        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
         whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
         whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
         loadUrl("https://example.com")
@@ -6161,7 +6159,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserPreferenceDisabledThenTrackersAnimationDisabled() {
-        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
         whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
         whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
         loadUrl("https://example.com")
@@ -6170,7 +6167,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserPreferenceEnabledAndPrivacyProtectionActiveThenTrackersAnimationEnabled() {
-        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
         whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
         whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
         whenever(mockContentBlocking.isAnException("example.com")).thenReturn(false)
@@ -6180,7 +6176,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserPreferenceDisabledEvenWithPrivacyProtectionActiveThenTrackersAnimationDisabled() {
-        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
         whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
         whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
         whenever(mockContentBlocking.isAnException("example.com")).thenReturn(false)
@@ -6190,7 +6185,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserPreferenceEnabledButPrivacyProtectionDisabledThenTrackersAnimationDisabled() {
-        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
         whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
         whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
         whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
@@ -6200,7 +6194,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserPreferenceDisabledAndPrivacyProtectionDisabledThenTrackersAnimationDisabled() {
-        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
         whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
         whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
         whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
@@ -10454,9 +10447,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenAutoConsentPopupHandledWithFeatureToggleEnabledAndTrackersBlockedThenEnqueueCookiesAnimation() {
-        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
-
+    fun whenAutoConsentPopupHandledWithTrackersBlockedThenEnqueueCookiesAnimation() {
         testee.browserViewState.value =
             testee.browserViewState.value?.copy(
                 browserShowing = true,
@@ -10476,9 +10467,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenAutoConsentPopupHandledWithFeatureToggleDisabledThenShowAutoconsentAnimation() {
-        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false) }
-
+    fun whenAutoConsentPopupHandledWithNoTrackersBlockedThenShowAutoconsentAnimation() {
         givenCurrentSite("https://example.com")
         testee.browserViewState.value =
             testee.browserViewState.value?.copy(
@@ -10493,9 +10482,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenAutoConsentPopupHandledWithFeatureToggleEnabledButNoTrackersThenShowAutoconsentAnimation() {
-        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
-
+    fun whenAutoConsentPopupHandledWithNoTrackersThenShowAutoconsentAnimation() {
         testee.browserViewState.value =
             testee.browserViewState.value?.copy(
                 browserShowing = true,
@@ -10558,7 +10545,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenLoadingUrlWithTrackersAnimationEnabledThenLastAnimatedUrlIsUpdatedImmediately() = runTest {
-        whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
         whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
 
         loadUrl("https://www.example.com")

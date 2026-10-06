@@ -935,10 +935,6 @@ class BrowserTabViewModel @Inject constructor(
         navigationAwareLoginDetector.loginEventLiveData.observeForever(loginDetectionObserver)
         showPulseAnimation.observeForever(fireButtonAnimation)
 
-        viewModelScope.launch {
-            addressBarTrackersAnimationManager.fetchFeatureState()
-        }
-
         observeSyncStatusChangesForDuckChat()
         observeSubscriptionChangesForDuckChat()
 
@@ -2429,29 +2425,20 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun updateLoadingStatePrivacy(domain: String) {
         val privacyProtectionDisabled = isPrivacyProtectionDisabled(domain)
         withContext(dispatchers.main()) {
-            // TODO when removing the flag we should tidy this logic up
-            if (addressBarTrackersAnimationManager.isFeatureEnabled()) {
-                val site = site
-                val isTrackersAnimationEnabled = isTrackersAnimationEnabled(
-                    privacyProtectionDisabled = privacyProtectionDisabled,
-                    maliciousSiteBlocked = currentBrowserViewState().maliciousSiteBlocked,
-                    site = site,
-                    previousUrl = previousUrl,
-                )
+            val site = site
+            val isTrackersAnimationEnabled = isTrackersAnimationEnabled(
+                privacyProtectionDisabled = privacyProtectionDisabled,
+                maliciousSiteBlocked = currentBrowserViewState().maliciousSiteBlocked,
+                site = site,
+                previousUrl = previousUrl,
+            )
 
-                previousUrl = site?.url
+            previousUrl = site?.url
 
-                loadingViewState.value = currentLoadingViewState().copy(
-                    trackersAnimationEnabled = isTrackersAnimationEnabled,
-                    url = site?.url ?: "",
-                )
-            } else {
-                loadingViewState.value =
-                    currentLoadingViewState().copy(
-                        trackersAnimationEnabled = !(privacyProtectionDisabled || currentBrowserViewState().maliciousSiteBlocked),
-                        url = site?.url ?: "",
-                    )
-            }
+            loadingViewState.value = currentLoadingViewState().copy(
+                trackersAnimationEnabled = isTrackersAnimationEnabled,
+                url = site?.url ?: "",
+            )
         }
     }
 
@@ -6058,13 +6045,10 @@ class BrowserTabViewModel @Inject constructor(
                 autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ANIMATION_SHOWN_DAILY)
             }
             if (adBlockingAnimationClaimed) return // ad-blocking badge is exclusive: suppress the animation, but the pixel above still fires
-            // TODO remove launch once address bar trackers animation is enabled permanently
-            viewModelScope.launch {
-                if (addressBarTrackersAnimationManager.isFeatureEnabled() && trackersCount().isNotEmpty()) {
-                    command.value = Command.EnqueueCookiesAnimation(isCosmetic)
-                } else {
-                    command.value = ShowAutoconsentAnimation(isCosmetic)
-                }
+            if (trackersCount().isNotEmpty()) {
+                command.value = Command.EnqueueCookiesAnimation(isCosmetic)
+            } else {
+                command.value = ShowAutoconsentAnimation(isCosmetic)
             }
         }
     }
