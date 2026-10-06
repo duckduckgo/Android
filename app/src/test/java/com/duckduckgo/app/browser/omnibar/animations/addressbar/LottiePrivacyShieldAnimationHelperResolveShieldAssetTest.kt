@@ -20,7 +20,6 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.global.model.PrivacyShield
@@ -41,11 +40,9 @@ import org.mockito.kotlin.whenever
 
 class LottiePrivacyShieldAnimationHelperResolveShieldAssetTest {
 
-    private val addressBarTrackersAnimationManager = mock<AddressBarTrackersAnimationManager>()
     private val customTabShieldDrawableFactory = mock<CustomTabShieldDrawableFactory>()
     private val testee = LottiePrivacyShieldAnimationHelper(
         appTheme = mock<AppTheme>(),
-        addressBarTrackersAnimationManager = addressBarTrackersAnimationManager,
         omnibarRepository = mock<OmnibarRepository>(),
         customTabShieldDrawableFactory = customTabShieldDrawableFactory,
     )
@@ -71,7 +68,6 @@ class LottiePrivacyShieldAnimationHelperResolveShieldAssetTest {
         val holder: LottieAnimationView = mock()
         val context: Context = mock()
         val drawable: Drawable = mock()
-        whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
         whenever(holder.context).thenReturn(context)
         whenever(customTabShieldDrawableFactory.create(any(), eq(R.drawable.shield_alert_24), eq(true))).thenReturn(drawable)
 
@@ -91,7 +87,6 @@ class LottiePrivacyShieldAnimationHelperResolveShieldAssetTest {
         val holder: LottieAnimationView = mock()
         val context: Context = mock()
         val drawable: Drawable = mock()
-        whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
         whenever(holder.context).thenReturn(context)
         whenever(customTabShieldDrawableFactory.create(any(), eq(R.drawable.shield_alert_24), eq(false))).thenReturn(drawable)
 
@@ -109,8 +104,6 @@ class LottiePrivacyShieldAnimationHelperResolveShieldAssetTest {
     @Test
     fun whenBrandIconsEnabledAndNormalBrowserThenUseStaticShieldWithoutCustomTabTint() = runTest {
         val holder: LottieAnimationView = mock()
-        whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-
         testee.setAnimationView(
             holder = holder,
             privacyShield = UNPROTECTED,
@@ -128,7 +121,6 @@ class LottiePrivacyShieldAnimationHelperResolveShieldAssetTest {
         val context: Context = mock()
         val drawable: Drawable = mock()
         val customTab = ViewMode.CustomTab(0, "example.com", "example.com")
-        whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
         whenever(holder.context).thenReturn(context)
         whenever(customTabShieldDrawableFactory.create(any(), eq(R.drawable.shield_alert_24), eq(false))).thenReturn(drawable)
 
@@ -159,26 +151,14 @@ class LottiePrivacyShieldAnimationHelperResolveShieldAssetTest {
     }
 
     @Test
-    fun whenBrandIconsDisabledAndProtectedThenLegacyTrackersShieldUnboxed() {
+    fun whenBrandIconsDisabledAndProtectedThenTrackersShieldRegardlessOfTheme() {
         assertEquals(
             R.raw.address_bar_trackers_animation_shield to false,
             resolve(PROTECTED, brandIconsEnabled = false),
         )
-    }
-
-    @Test
-    fun whenBrandIconsDisabledAndTrackersAnimationDisabledThenLegacyProtectedShieldLight() {
         assertEquals(
-            R.raw.protected_shield to false,
-            resolve(PROTECTED, brandIconsEnabled = false, trackersAnimationEnabled = false),
-        )
-    }
-
-    @Test
-    fun whenBrandIconsDisabledAndTrackersAnimationDisabledThenLegacyProtectedShieldDark() {
-        assertEquals(
-            R.raw.dark_protected_shield to false,
-            resolve(PROTECTED, isLightMode = false, brandIconsEnabled = false, trackersAnimationEnabled = false),
+            R.raw.address_bar_trackers_animation_shield to false,
+            resolve(PROTECTED, isLightMode = false, brandIconsEnabled = false),
         )
     }
 
@@ -231,7 +211,7 @@ class LottiePrivacyShieldAnimationHelperResolveShieldAssetTest {
     }
 
     @Test
-    fun whenUnknownThenNoAssetRegardlessOfGate() {
+    fun whenUnknownThenNoAsset() {
         assertNull(resolve(UNKNOWN))
         assertNull(resolve(UNKNOWN, brandIconsEnabled = false))
     }
@@ -241,6 +221,5 @@ class LottiePrivacyShieldAnimationHelperResolveShieldAssetTest {
         isLightMode: Boolean = true,
         isLegacyCustomTab: Boolean = false,
         brandIconsEnabled: Boolean = true,
-        trackersAnimationEnabled: Boolean = true,
-    ) = testee.resolveShieldAsset(privacyShield, isLightMode, isLegacyCustomTab, brandIconsEnabled, trackersAnimationEnabled)
+    ) = testee.resolveShieldAsset(privacyShield, isLightMode, isLegacyCustomTab, brandIconsEnabled)
 }

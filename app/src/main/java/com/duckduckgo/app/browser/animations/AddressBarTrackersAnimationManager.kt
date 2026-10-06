@@ -16,29 +16,15 @@
 
 package com.duckduckgo.app.browser.animations
 
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import javax.inject.Inject
 
 interface AddressBarTrackersAnimationManager {
-    /**
-     * Eagerly fetches and caches the feature state from the feature toggle.
-     * This should be called proactively to ensure the state is available without delay.
-     */
-    suspend fun fetchFeatureState()
-
-    /**
-     * Returns the cached feature state if available, otherwise fetches and caches it.
-     * @return true if the feature is enabled, false otherwise
-     */
-    suspend fun isFeatureEnabled(): Boolean
-
     /**
      * Observes the software rendering mode kill-switch.
      * If the emitted value is true, the shield animation should use Lottie's SOFTWARE render mode; otherwise the default.
@@ -62,26 +48,11 @@ interface AddressBarTrackersAnimationManager {
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class, AddressBarTrackersAnimationManager::class)
 class RealAddressBarTrackersAnimationManager @Inject constructor(
-    private val addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle,
-    private val dispatcherProvider: DispatcherProvider,
+    addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle,
 ) : AddressBarTrackersAnimationManager {
-
-    private var cachedFeatureState: Boolean? = null
 
     override val softwareRenderingModeEnabled: Flow<Boolean> =
         addressBarTrackersAnimationFeatureToggle.softwareRenderingMode().enabled()
-
-    override suspend fun fetchFeatureState() {
-        withContext(dispatcherProvider.io()) {
-            cachedFeatureState = addressBarTrackersAnimationFeatureToggle.feature().isEnabled()
-        }
-    }
-
-    override suspend fun isFeatureEnabled(): Boolean = withContext(dispatcherProvider.io()) {
-        cachedFeatureState ?: addressBarTrackersAnimationFeatureToggle.feature().isEnabled().also {
-            cachedFeatureState = it
-        }
-    }
 
     override fun shouldShowAnimation(currentUrl: String?, lastAnimatedUrl: String?): Boolean {
         if (currentUrl == null) {

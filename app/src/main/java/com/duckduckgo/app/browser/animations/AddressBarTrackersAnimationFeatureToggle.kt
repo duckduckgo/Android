@@ -31,10 +31,6 @@ interface AddressBarTrackersAnimationFeatureToggle {
     fun self(): Toggle
 
     @Toggle.InternalAlwaysEnabled
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun feature(): Toggle
-
-    @Toggle.InternalAlwaysEnabled
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun softwareRenderingMode(): Toggle
 }

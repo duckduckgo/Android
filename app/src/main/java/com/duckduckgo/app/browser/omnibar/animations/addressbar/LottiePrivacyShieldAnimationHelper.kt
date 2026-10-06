@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser.omnibar.animations.addressbar
 import androidx.annotation.RawRes
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.global.model.PrivacyShield
@@ -31,7 +30,6 @@ import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.runBlocking
 import logcat.logcat
 import javax.inject.Inject
 import kotlin.to
@@ -40,7 +38,6 @@ import kotlin.to
 @SingleInstanceIn(AppScope::class)
 class LottiePrivacyShieldAnimationHelper @Inject internal constructor(
     private val appTheme: AppTheme,
-    private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     private val omnibarRepository: OmnibarRepository,
     private val customTabShieldDrawableFactory: CustomTabShieldDrawableFactory,
 ) : PrivacyShieldAnimationHelper {
@@ -54,14 +51,11 @@ class LottiePrivacyShieldAnimationHelper @Inject internal constructor(
     ): Boolean {
         val isLegacyCustomTab = viewMode is ViewMode.CustomTab && !omnibarRepository.isNewCustomTabEnabled
         val isLightMode = useLightAnimation ?: appTheme.isLightModeEnabled()
-        val trackersAnimationEnabled = runBlocking { addressBarTrackersAnimationManager.isFeatureEnabled() }
-
         val (assetRes, boxed) = resolveShieldAsset(
             privacyShield,
             isLightMode,
             isLegacyCustomTab,
             isAddressBarRebrandEnabled,
-            trackersAnimationEnabled,
         )
             ?: return false
         val isStatic = when (privacyShield) {
@@ -109,7 +103,6 @@ class LottiePrivacyShieldAnimationHelper @Inject internal constructor(
         isLightMode: Boolean,
         isLegacyCustomTab: Boolean,
         brandIconsEnabled: Boolean,
-        trackersAnimationEnabled: Boolean,
     ): Pair<Int, Boolean>? {
         if (privacyShield == UNKNOWN) return null
 
@@ -123,7 +116,7 @@ class LottiePrivacyShieldAnimationHelper @Inject internal constructor(
         }
 
         return when (privacyShield) {
-            PROTECTED -> legacyProtectedShield(isLightMode, isLegacyCustomTab, trackersAnimationEnabled) to false
+            PROTECTED -> legacyProtectedShield(isLightMode, isLegacyCustomTab) to false
             UNPROTECTED -> (if (isLightMode) R.raw.unprotected_shield else R.raw.dark_unprotected_shield) to false
             MALICIOUS -> (if (isLightMode) R.raw.alert_red else R.raw.alert_red_dark) to false
             UNKNOWN -> null
@@ -134,12 +127,9 @@ class LottiePrivacyShieldAnimationHelper @Inject internal constructor(
     private fun legacyProtectedShield(
         isLightMode: Boolean,
         isLegacyCustomTab: Boolean,
-        trackersAnimationEnabled: Boolean,
     ): Int = when {
         isLegacyCustomTab && isLightMode -> R.raw.protected_shield_custom_tab
         isLegacyCustomTab -> R.raw.dark_protected_shield_custom_tab
-        trackersAnimationEnabled -> R.raw.address_bar_trackers_animation_shield
-        isLightMode -> R.raw.protected_shield
-        else -> R.raw.dark_protected_shield
+        else -> R.raw.address_bar_trackers_animation_shield
     }
 }

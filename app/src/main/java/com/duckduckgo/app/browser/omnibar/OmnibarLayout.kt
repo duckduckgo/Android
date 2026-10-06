@@ -767,7 +767,6 @@ class OmnibarLayout @JvmOverloads constructor(
                 startTrackersAnimation(
                     command.entities,
                     command.isCustomTab,
-                    command.isAddressBarTrackersAnimationEnabled,
                     command.useSoftwareRenderingMode,
                 )
             }
@@ -1003,12 +1002,9 @@ class OmnibarLayout @JvmOverloads constructor(
 
         isScrollingEnabled = viewState.scrollingEnabled
 
-        if (viewState.isAddressBarTrackersAnimationEnabled) {
-            shieldIconPulseAnimationContainer.updateLayoutParams {
-                (this as MarginLayoutParams).apply {
-                    // TODO when the animation is made permanent we should add this adjustment to the actual layout
-                    marginStart = 1.toPx()
-                }
+        shieldIconPulseAnimationContainer.updateLayoutParams {
+            (this as MarginLayoutParams).apply {
+                marginStart = 1.toPx()
             }
         }
 
@@ -1229,55 +1225,32 @@ class OmnibarLayout @JvmOverloads constructor(
     private fun startTrackersAnimation(
         events: List<Entity>?,
         isCustomTab: Boolean,
-        isAddressBarTrackersAnimationEnabled: Boolean,
         useSoftwareRenderingMode: Boolean,
     ) {
         if (!isCustomTab) {
-            if (isAddressBarTrackersAnimationEnabled) {
-                animatorHelper.startAddressBarTrackersAnimation(
-                    context = context,
-                    addressBarTrackersBlockedAnimationShieldIcon = addressBarTrackersBlockedAnimationShieldIcon,
-                    sceneRoot = sceneRoot,
-                    animatedIconBackgroundView = animatedIconBackgroundView,
-                    omnibarViews = omnibarViews(),
-                    shieldViews = shieldViews(),
-                    entities = events,
-                    useSoftwareRenderingMode = useSoftwareRenderingMode,
-                )
-            } else {
-                animatorHelper.startTrackersAnimation(
-                    context = context,
-                    shieldAnimationView = shieldIcon,
-                    trackersAnimationView = trackersAnimation,
-                    omnibarViews = omnibarViews(),
-                    entities = events,
-                    useLightAnimation = if (browserMode == BrowserMode.FIRE) false else null,
-                )
-            }
+            animatorHelper.startAddressBarTrackersAnimation(
+                context = context,
+                addressBarTrackersBlockedAnimationShieldIcon = addressBarTrackersBlockedAnimationShieldIcon,
+                sceneRoot = sceneRoot,
+                animatedIconBackgroundView = animatedIconBackgroundView,
+                omnibarViews = omnibarViews(),
+                shieldViews = shieldViews(),
+                entities = events,
+                useSoftwareRenderingMode = useSoftwareRenderingMode,
+            )
         } else if (omnibarRepository.isNewCustomTabEnabled) {
             val animationBackgroundColor = calculateAnimationBackgroundColor(customTabToolbarColor)
-            if (isAddressBarTrackersAnimationEnabled) {
-                animatorHelper.startAddressBarTrackersAnimation(
-                    context = context,
-                    addressBarTrackersBlockedAnimationShieldIcon = newCustomTabToolbarContainer.addressBarTrackersBlockedAnimationShieldIcon,
-                    sceneRoot = newCustomTabToolbarContainer.customTabSceneRoot,
-                    animatedIconBackgroundView = newCustomTabToolbarContainer.animatedIconBackgroundView,
-                    omnibarViews = customTabViews(),
-                    shieldViews = customTabShieldViews(),
-                    entities = events,
-                    customBackgroundColor = animationBackgroundColor,
-                    useSoftwareRenderingMode = useSoftwareRenderingMode,
-                )
-            } else {
-                animatorHelper.startTrackersAnimation(
-                    context = context,
-                    shieldAnimationView = newCustomTabToolbarContainer.customTabShieldIcon,
-                    trackersAnimationView = newCustomTabToolbarContainer.trackersAnimation,
-                    omnibarViews = customTabViews(),
-                    entities = events,
-                    useLightAnimation = isColorLight(animationBackgroundColor),
-                )
-            }
+            animatorHelper.startAddressBarTrackersAnimation(
+                context = context,
+                addressBarTrackersBlockedAnimationShieldIcon = newCustomTabToolbarContainer.addressBarTrackersBlockedAnimationShieldIcon,
+                sceneRoot = newCustomTabToolbarContainer.customTabSceneRoot,
+                animatedIconBackgroundView = newCustomTabToolbarContainer.animatedIconBackgroundView,
+                omnibarViews = customTabViews(),
+                shieldViews = customTabShieldViews(),
+                entities = events,
+                customBackgroundColor = animationBackgroundColor,
+                useSoftwareRenderingMode = useSoftwareRenderingMode,
+            )
         }
     }
 

@@ -117,7 +117,6 @@ import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
-import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
@@ -223,7 +222,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchScreenNoParams
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
-import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
@@ -695,9 +693,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var browserMenuViewStateFactory: BrowserMenuViewStateFactory
-
-    @Inject
-    lateinit var addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager
 
     @Inject
     lateinit var addressDisplayFormatter: AddressDisplayFormatter
@@ -6158,9 +6153,7 @@ class BrowserTabFragment :
                 } else {
                     if (viewState.progress == MAX_PROGRESS) {
                         lifecycleScope.launch {
-                            if (addressBarTrackersAnimationManager.isFeatureEnabled()) {
-                                viewModel.refreshCta()
-                            }
+                            viewModel.refreshCta()
                         }
                     }
                 }
@@ -6189,14 +6182,8 @@ class BrowserTabFragment :
                     lastSeenBrowserViewState?.browserShowing == true &&
                     lastSeenBrowserViewState?.maliciousSiteBlocked == false
                 ) {
-                    val site = viewModel.siteLiveData.value
-                    val events = site?.orderedTrackerBlockedEntities()
-                    activity?.let { activity ->
-                        if (addressBarTrackersAnimationManager.isFeatureEnabled()) {
-                            viewModel.onStartTrackersAnimation()
-                        } else {
-                            omnibar.startTrackersAnimation(events)
-                        }
+                    if (activity != null) {
+                        viewModel.onStartTrackersAnimation()
                     }
                 }
             }
