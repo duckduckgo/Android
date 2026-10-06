@@ -41,4 +41,13 @@ interface NativeInputOmnibarFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun nativeInputSearchOnly(): Toggle
+
+    /**
+     * @return `true` when opening a new, empty Duck.ai chat tab should focus its native input and
+     * raise the keyboard. Tabs opened with a prompt, in voice mode, or onto an existing conversation
+     * are unaffected.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun focusInputOnNewDuckAiChat(): Toggle
 }

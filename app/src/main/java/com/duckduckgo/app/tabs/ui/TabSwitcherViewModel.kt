@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.nativeinput.DuckAiNewChatFocusStore
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.promo.FireTabsPromos
@@ -116,6 +117,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val omnibarRepository: OmnibarRepository,
     private val tabTitleResolver: TabTitleResolver,
     private val duckAiSessionCallback: DuckAiSessionCallback,
+    private val duckAiNewChatFocusStore: DuckAiNewChatFocusStore,
     @param:AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val fireTabsPromos: FireTabsPromos,
     private val remoteMessageModel: RemoteMessageModel,
@@ -676,6 +678,7 @@ class TabSwitcherViewModel @Inject constructor(
 
             val url = duckChat.getDuckChatUrl("", false)
             duckChat.reportDuckChatEntry(DuckChatEntryPoint.TAB_SWITCHER, opensNewTab = true, hasPrompt = false)
+            duckAiNewChatFocusStore.arm(url)
             tabRepository.add(url, true)
             command.value = Command.Close
         }

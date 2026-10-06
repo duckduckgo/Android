@@ -66,6 +66,7 @@ import com.duckduckgo.app.browser.mode.AppShortcutDuckAi
 import com.duckduckgo.app.browser.mode.BrowserLaunchSource
 import com.duckduckgo.app.browser.mode.DuckAiPinShortcut
 import com.duckduckgo.app.browser.mode.SearchWidgetDuckAi
+import com.duckduckgo.app.browser.nativeinput.DuckAiNewChatFocusStore
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.applyAddressBarRebrandRadius
@@ -172,6 +173,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
+
+    @Inject
+    lateinit var duckAiNewChatFocusStore: DuckAiNewChatFocusStore
 
     @Inject
     lateinit var appShortcutDataClearer: AppShortcutDataClearer
@@ -1125,6 +1129,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         // Falls back to NTP otherwise.
         val returnTabId = sourceTabId ?: currentTab?.tabId
         val fullScreenUrl = url ?: duckChat.getDuckChatUrl("", false)
+        duckAiNewChatFocusStore.arm(fullScreenUrl)
         if (swipingTabsFeature.isEnabled) {
             launchNewTab(query = fullScreenUrl, skipHome = false, sourceTabId = returnTabId)
         } else {

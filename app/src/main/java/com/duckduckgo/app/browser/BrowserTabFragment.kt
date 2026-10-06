@@ -156,6 +156,7 @@ import com.duckduckgo.app.browser.menu.VpnMenuStore
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
+import com.duckduckgo.app.browser.nativeinput.DuckAiNewChatFocusStore
 import com.duckduckgo.app.browser.nativeinput.NativeInputCallbacks
 import com.duckduckgo.app.browser.nativeinput.NativeInputManager
 import com.duckduckgo.app.browser.navigation.bar.BrowserNavigationBarViewIntegration
@@ -442,6 +443,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var nativeInputManager: NativeInputManager
+
+    @Inject
+    lateinit var duckAiNewChatFocusStore: DuckAiNewChatFocusStore
 
     @Inject
     lateinit var browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>
@@ -1369,7 +1373,12 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showNativeInput(query: String = "", forceImageGeneration: Boolean = false, textSelection: String? = null) {
+    private fun showNativeInput(
+        query: String = "",
+        forceImageGeneration: Boolean = false,
+        textSelection: String? = null,
+        focusInput: Boolean = false,
+    ) {
         nativeInputManager.showNativeInput(
             tabId = tabId,
             layoutInflater = layoutInflater,
@@ -1380,6 +1389,7 @@ class BrowserTabFragment :
             initialInputMode = viewModel.consumeInitialInputMode(),
             forceImageGeneration = forceImageGeneration,
             textSelection = textSelection,
+            focusInput = focusInput,
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = { text -> onUserEnteredText(text) },
                 onClearAutocomplete = {
@@ -2425,7 +2435,16 @@ class BrowserTabFragment :
         browserNavigationBarIntegration.configureDuckAIViewMode()
         val forceImageGeneration = !nativeInputManager.isNativeInputShown() &&
             (browserActivity?.consumeDuckChatForceImageGeneration() ?: false)
-        showNativeInput(forceImageGeneration = forceImageGeneration, textSelection = browserActivity?.consumePendingDuckChatTextSelection())
+        // Background tabs reach here too — Command.EnableDuckAIFullScreen is emitted for any tab that
+        // loads a Duck.ai page, not just the selected one — so only the active tab may claim the
+        // one-shot. Without this, a background tab restoring its WebView mid-launch would both steal
+        // the flag from the tab being opened and raise the IME off-screen.
+        val focusInput = viewModel.isActiveTab() && duckAiNewChatFocusStore.consume()
+        showNativeInput(
+            forceImageGeneration = forceImageGeneration,
+            textSelection = browserActivity?.consumePendingDuckChatTextSelection(),
+            focusInput = focusInput,
+        )
     }
 
     private fun showMaliciousWarning(
@@ -2684,6 +2703,9 @@ class BrowserTabFragment :
                     nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
                 }
 
+                // Covers the browsing-menu New chat, which opens its Duck.ai tab here rather than
+                // through BrowserActivity.launchDuckAi. No-ops for every other new-tab query.
+                duckAiNewChatFocusStore.arm(it.query)
                 if (swipingTabsFeature.isEnabled) {
                     browserActivity?.launchNewTab(it.query, it.sourceTabId)
                 } else {

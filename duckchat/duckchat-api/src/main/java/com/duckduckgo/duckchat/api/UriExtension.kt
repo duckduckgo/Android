@@ -26,3 +26,17 @@ fun Uri.toChatIdOrNull(duckChat: DuckChat): String? {
     if (!duckChat.isDuckChatUrl(this)) return null
     return getQueryParameter("chatID")?.takeIf { it.isNotBlank() }
 }
+
+/**
+ * Whether this [Uri] is a Duck.ai URL for a new, empty chat: carrying no prompt (`q`), no alternate
+ * mode such as voice (`mode`), and no conversation started yet (`chatID`). False for non-Duck.ai URLs.
+ *
+ * Every Duck.ai link carries plumbing parameters of its own, so emptiness is decided on the absence
+ * of those three rather than on an empty query string.
+ */
+fun Uri.isNewDuckChatUrl(duckChat: DuckChat): Boolean {
+    if (!duckChat.isDuckChatUrl(this)) return false
+    if (!getQueryParameter("q").isNullOrBlank()) return false
+    if (!getQueryParameter("mode").isNullOrBlank()) return false
+    return toChatIdOrNull(duckChat) == null
+}

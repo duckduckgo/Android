@@ -159,6 +159,7 @@ interface NativeInputManager {
         initialInputMode: InputMode? = null,
         forceImageGeneration: Boolean = false,
         textSelection: String? = null,
+        focusInput: Boolean = false,
     )
 
     fun hideNativeInput(animate: Boolean = true, isNavigation: Boolean = false): Boolean
@@ -331,6 +332,9 @@ class RealNativeInputManager @Inject constructor(
 
     private fun isSearchOnlyRestoreEnabled(): Boolean =
         nativeInputOmnibarFeature.self().isEnabled() && nativeInputOmnibarFeature.nativeInputSearchOnly().isEnabled()
+
+    private fun isFocusOnNewDuckAiChatEnabled(): Boolean =
+        nativeInputOmnibarFeature.self().isEnabled() && nativeInputOmnibarFeature.focusInputOnNewDuckAiChat().isEnabled()
 
     override fun isNativeInputShown(): Boolean {
         if (!::rootView.isInitialized) return false
@@ -614,6 +618,7 @@ class RealNativeInputManager @Inject constructor(
         initialInputMode: InputMode?,
         forceImageGeneration: Boolean,
         textSelection: String?,
+        focusInput: Boolean,
     ) {
         if (!isNativeInputFieldEnabled) return
 
@@ -683,7 +688,7 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         bindUrlCaching(widgetView)
-        attachWidget(widgetView, navBarView, isBottom, tabId, forceImageGeneration, textSelection)
+        attachWidget(widgetView, navBarView, isBottom, tabId, forceImageGeneration, textSelection, focusInput)
         // Bottom omnibar: slide the nav bar in with open. Top omnibar: snap the bar so the enter
         // morph can run from the omnibar while the buttons appear without animating — a concurrent
         // top slide fights that morph (and was only needed for bottom chrome).
@@ -1335,6 +1340,7 @@ class RealNativeInputManager @Inject constructor(
         tabId: String,
         forceImageGeneration: Boolean,
         textSelection: String?,
+        focusInput: Boolean,
     ) {
         // Inflated from a ?attr/actionBarSize height, so layoutParams carries the resolved nav bar height.
         val navBarHeightPx = navBarView?.layoutParams?.height?.takeIf { it > 0 } ?: 0
@@ -1383,10 +1389,21 @@ class RealNativeInputManager @Inject constructor(
         // finishes before the enter morph.
         pendingEnterOwnsAnimating = enterStarted
 
-        if (forceImageGeneration) {
+        // Duck.ai mode never runs the enter morph, so onEnterComplete's focus never fires here. Image
+        // generation and a newly opened empty chat both want the input live immediately, so raise it on
+        // attach instead — guarded so a since-replaced widget is a no-op.
+        if (forceImageGeneration || (focusInput && isFocusOnNewDuckAiChatEnabled())) {
+            val seedFocusedLayout = omnibarController.isDuckAiMode()
             widgetView.doOnAttach {
-                if (widgetRoot === widgetView) {
-                    widgetFrom(widgetView)?.focusInput(rootView.context as? Activity)
+                if (widgetRoot !== widgetView) return@doOnAttach
+                widgetFrom(widgetView)?.apply {
+                    // Without the enter morph nothing has applied the focused-state layout, and the
+                    // widget's own state usually hasn't arrived yet either, so the card would be measured
+                    // collapsed and then over-filled — the input renders clipped. Seed that layout the
+                    // same way the morph does, before the focus, so the first measure is the final size.
+                    if (seedFocusedLayout) beginEnterAnimationPreview(isBottom, inputModeCapability)
+                    focusInput(rootView.context as? Activity)
+                    if (seedFocusedLayout) endEnterAnimationPreview()
                 }
             }
         }

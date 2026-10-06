@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.nativeinput
 
+import android.app.Activity
 import android.content.Context
 import android.net.Uri
 import android.view.LayoutInflater
@@ -69,6 +70,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.mock
@@ -76,6 +78,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.robolectric.Robolectric
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -640,6 +643,76 @@ class RealNativeInputManagerTest {
             query = "",
             callbacks = mock<NativeInputCallbacks>(),
             forceImageGeneration = false,
+        )
+    }
+
+    @Test
+    fun whenDuckAiTabOpensNewChatThenInputFocused() {
+        val widget: NativeInputWidget = mock()
+        showDuckAiTestWidget(widget, focusInput = true, focusFlagEnabled = true)
+
+        verify(widget).focusInput(anyOrNull())
+    }
+
+    @Test
+    fun whenDuckAiTabOpensNewChatButFocusFlagDisabledThenInputNotFocused() {
+        val widget: NativeInputWidget = mock()
+        showDuckAiTestWidget(widget, focusInput = true, focusFlagEnabled = false)
+
+        verify(widget, never()).focusInput(anyOrNull())
+    }
+
+    @Test
+    fun whenDuckAiTabOpensWithoutFocusRequestThenInputNotFocused() {
+        val widget: NativeInputWidget = mock()
+        showDuckAiTestWidget(widget, focusInput = false, focusFlagEnabled = true)
+
+        verify(widget, never()).focusInput(anyOrNull())
+    }
+
+    private fun showDuckAiTestWidget(
+        delegate: NativeInputWidget,
+        focusInput: Boolean,
+        focusFlagEnabled: Boolean,
+    ) {
+        nativeInputOmnibarFeature.self().setRawStoredState(State(enable = focusFlagEnabled))
+        nativeInputOmnibarFeature.focusInputOnNewDuckAiChat().setRawStoredState(State(enable = focusFlagEnabled))
+        whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(true))
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(true))
+        whenever(duckAiFeatureState.showVoiceSearchToggle).thenReturn(MutableStateFlow(false))
+        whenever(duckAiFeatureState.showVoiceChatEntry).thenReturn(MutableStateFlow(false))
+        whenever(omnibar.viewMode).thenReturn(Omnibar.ViewMode.DuckAI)
+        whenever(omnibar.getText()).thenReturn("")
+        testee.init(omnibar, rootView, lifecycleOwner)
+
+        if (rootView.findViewById<View?>(R.id.includeNewBrowserTab) == null) {
+            rootView.addView(FrameLayout(context).apply { id = R.id.includeNewBrowserTab })
+        }
+
+        // doOnAttach only fires for a view that reaches a window, so the manager's root has to be
+        // live before the widget is added to it.
+        Robolectric.buildActivity(Activity::class.java).setup().get().setContentView(rootView)
+
+        val widget = TestNativeInputWidget(context, delegate).apply { id = R.id.inputModeWidget }
+        val widgetView = FrameLayout(context).apply { addView(widget) }
+        val layoutInflater: LayoutInflater = mock()
+        whenever(layoutInflater.inflate(any<Int>(), any<ViewGroup>(), any<Boolean>())).thenReturn(widgetView)
+        testee.showNativeInput(
+            tabId = "tab",
+            layoutInflater = layoutInflater,
+            lifecycleOwner = lifecycleOwner,
+            tabs = mock<LiveData<List<TabEntity>>>(),
+            currentTabUrl = emptyFlow(),
+            callbacks = NativeInputCallbacks(
+                onSearchTextChanged = {},
+                onSearchSubmitted = {},
+                onDuckAiChatSubmitted = { _, _, _, _, _, _, _ -> },
+                onChatSuggestionSelected = {},
+                onClearAutocomplete = {},
+                onStopTapped = {},
+            ),
+            forceImageGeneration = false,
+            focusInput = focusInput,
         )
     }
 

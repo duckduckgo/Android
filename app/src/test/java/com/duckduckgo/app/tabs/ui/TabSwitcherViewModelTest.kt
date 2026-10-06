@@ -26,6 +26,7 @@ import androidx.lifecycle.liveData
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.nativeinput.DuckAiNewChatFocusStore
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.fire.promo.FireTabsPromos
 import com.duckduckgo.app.pixels.AppPixelName
@@ -178,6 +179,7 @@ class TabSwitcherViewModelTest {
     private val mockTabTitleResolver: TabTitleResolver = mock()
 
     private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
+    private val duckAiNewChatFocusStore: DuckAiNewChatFocusStore = mock()
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
 
@@ -253,6 +255,7 @@ class TabSwitcherViewModelTest {
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
             mockDuckAiSessionCallback,
+            duckAiNewChatFocusStore,
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
@@ -978,6 +981,17 @@ class TabSwitcherViewModelTest {
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.Close, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun `when Duck Chat menu item clicked then new chat armed for input focus`() = runTest {
+        whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
+        val duckChatURL = "https://duck.ai/chat?native-input=true&duckai=5"
+        whenever(duckChatMock.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
+
+        testee.onDuckAIButtonClicked()
+
+        verify(duckAiNewChatFocusStore).arm(duckChatURL)
     }
 
     @Test
@@ -2305,6 +2319,7 @@ class TabSwitcherViewModelTest {
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
             mockDuckAiSessionCallback,
+            duckAiNewChatFocusStore,
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
@@ -2351,6 +2366,7 @@ class TabSwitcherViewModelTest {
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
             mockDuckAiSessionCallback,
+            duckAiNewChatFocusStore,
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
@@ -2426,6 +2442,7 @@ class TabSwitcherViewModelTest {
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
             mockDuckAiSessionCallback,
+            duckAiNewChatFocusStore,
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
