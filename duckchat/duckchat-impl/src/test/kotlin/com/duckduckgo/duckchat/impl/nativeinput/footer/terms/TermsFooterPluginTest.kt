@@ -21,6 +21,7 @@ import android.content.Intent
 import android.text.Spanned
 import android.text.style.ClickableSpan
 import android.view.ContextThemeWrapper
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -128,6 +129,38 @@ class TermsFooterPluginTest {
             hostContext.value = duckAiContext(isInputFocused = false)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenFooterIsCreatedThenItShowsTheLegalCopyNamingTheAskButton() {
+        val footer = testee.createFooter(context, hostContext, FakeNativeInputFooterHost())
+        val message = footer.view.findViewById<TextView>(R.id.termsFooterMessage).text
+
+        assertEquals(
+            "DuckDuckGo anonymizes your chats. By clicking 'Ask' you agree to our Privacy Policy & Terms of Service.",
+            message.toString(),
+        )
+    }
+
+    @Test
+    fun whenFooterIsCreatedThenPrivacyPolicyAndTermsOfServiceAreLinks() {
+        val footer = testee.createFooter(context, hostContext, FakeNativeInputFooterHost())
+        val message = footer.view.findViewById<TextView>(R.id.termsFooterMessage).text as Spanned
+
+        val linked = message.getSpans(0, message.length, ClickableSpan::class.java)
+            .sortedBy { message.getSpanStart(it) }
+            .map { message.subSequence(message.getSpanStart(it), message.getSpanEnd(it)).toString() }
+
+        assertEquals(listOf("Privacy Policy", "Terms of Service"), linked)
+    }
+
+    @Test
+    fun whenFooterIsCreatedThenItHasTheSamePaddingOnEverySide() {
+        val footer = testee.createFooter(context, hostContext, FakeNativeInputFooterHost())
+        val row = (footer.view as ViewGroup).getChildAt(0)
+
+        val padding = context.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_4)
+        assertEquals(listOf(padding, padding, padding, padding), listOf(row.paddingStart, row.paddingTop, row.paddingEnd, row.paddingBottom))
     }
 
     @Test
