@@ -98,7 +98,6 @@ class EmbellishmentControllerImpl(
     )
 
     init {
-        fitCorrector.enabled = true
         fitCorrector.attach()
     }
 
