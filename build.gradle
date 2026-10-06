@@ -1,6 +1,5 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 import static de.fayard.refreshVersions.core.Versions.versionFor
-import static com.gradle.develocity.agent.gradle.test.JUnitXmlDialect.*
 import com.gradle.develocity.agent.gradle.test.ImportJUnitXmlReports
 
 buildscript {
@@ -24,6 +23,7 @@ buildscript {
     }
     dependencies {
         classpath(Android.tools.build.gradlePlugin)
+        classpath "com.android.tools.build:gradle-kotlin:${versionFor(project, Android.tools.build.gradlePlugin)}"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -37,7 +37,6 @@ plugins {
     id 'com.squareup.anvil' apply false
     id 'org.jetbrains.dokka'
     id 'com.osacky.fulladle'
-    id 'org.jetbrains.kotlin.android' apply false
     id 'org.jetbrains.kotlin.plugin.compose' apply false
     id 'com.google.devtools.ksp' apply false
     id 'com.diffplug.spotless' apply false
@@ -149,7 +148,7 @@ subprojects {
                     }
 
                     if (dependency instanceof ProjectDependency) {
-                        def dependencyPath = dependency.dependencyProject.path
+                        def dependencyPath = dependency.path
                         if (dependencyPath == projectPath) continue
                         // internal modules have to use internalImplementation
                         // when a non internal configuration is built (i.e. PlayDebug) no internal dependencies should be found
@@ -221,7 +220,7 @@ subprojects {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         }
     }
-    pluginManager.withPlugin('org.jetbrains.kotlin.android') {
+    pluginManager.withPlugin('com.android.base') {
         kotlin {
             jvmToolchain(21)
         }
@@ -290,14 +289,10 @@ if (diFramework == 'Metro') {
                             !it.name.contains("anvil")
                         })
                     }
-                    // Disable KAPT tasks — Metro replaces Dagger
-                    tasks.matching { it.name.contains("kapt") || it.name.contains("Kapt") }.configureEach {
-                        enabled = false
-                    }
                 }
             }
         }
-        pluginManager.withPlugin('org.jetbrains.kotlin.android', applyMetro)
+        pluginManager.withPlugin('com.android.base', applyMetro)
         pluginManager.withPlugin('org.jetbrains.kotlin.jvm', applyMetro)
     }
 }
@@ -359,10 +354,7 @@ fladle {
             debugApk.set(project.provider {
                 def dir = rootProject.file("app/build/outputs/apk/internal/release")
                 def apks = dir.exists() ? (dir.listFiles() ?: []).findAll { it.name.endsWith("-internal-release.apk") } : []
-                if (apks.isEmpty()) {
-                    throw new GradleException("No internalRelease APK in $dir — run :app:assembleInternalRelease first")
-                }
-                apks.first().absolutePath
+                apks.isEmpty() ? new File(dir, "missing-internal-release.apk").absolutePath : apks.first().absolutePath
             })
             instrumentationApk.set(rootProject.file("macrobenchmark/build/outputs/apk/release/macrobenchmark-release.apk").absolutePath)
             additionalTestApks.set([])
@@ -380,21 +372,22 @@ fladle {
     }
 }
 
-afterEvaluate {
-    // Export Firebase Test Lab (Flank) tests to Develocity
-    tasks.matching { it.name.startsWith("execFlank") }.names.each {
-        ImportJUnitXmlReports.register(
-                tasks,
-                tasks.named(it),
-                ANDROID_FIREBASE
-        ).configure {
-            // Import FullJUnitReport.xml, not JUnitReport.xml. fullJunitResult=true makes
-            // Flank emit this extra report carrying the flaky markers (failure nodes on
-            // passed-after-retry tests) that the ANDROID_FIREBASE dialect needs to detect
-            // flaky tests; the plain JUnitReport.xml has no such markers (imports fine but
-            // always reports 0 flaky).
-            reports.setFrom(file("build/fladle/fladleResults/FullJUnitReport.xml"))
+tasks.matching { it.name == "execFlankPerfTests" }.configureEach {
+    doFirst {
+        if (!file(config.debugApk.get()).exists()) {
+            throw new GradleException("No internalRelease APK in app/build/outputs/apk/internal/release — run :app:assembleInternalRelease first")
         }
+    }
+}
+
+afterEvaluate {
+    // Import FullJUnitReport.xml, not JUnitReport.xml. fullJunitResult=true makes
+    // Flank emit this extra report carrying the flaky markers (failure nodes on
+    // passed-after-retry tests) that the ANDROID_FIREBASE dialect needs to detect
+    // flaky tests; the plain JUnitReport.xml has no such markers (imports fine but
+    // always reports 0 flaky).
+    tasks.withType(ImportJUnitXmlReports).matching { it.name.startsWith("execFlank") }.configureEach {
+        reports.setFrom(file("build/fladle/fladleResults/FullJUnitReport.xml"))
     }
 }
 
@@ -413,4 +406,3 @@ tasks.register('aiConfigCheck') {
     }
 }
 
-apply plugin: 'android-reporting'
