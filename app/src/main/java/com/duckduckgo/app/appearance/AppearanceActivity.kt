@@ -207,7 +207,6 @@ class AppearanceActivity : DuckDuckGoActivity() {
                         viewState.isTrackersCountInTabSwitcherEnabled,
                         showTrackersCountInTabSwitcher,
                     )
-                    binding.showTrackersCountInAddressBar.isVisible = viewState.shouldShowAddressBarTrackersAnimationItem
                     binding.showTrackersCountInAddressBar.quietlySetIsChecked(
                         viewState.isAddressBarTrackersAnimationEnabled,
                         showTrackersCountInAddressBar,
