@@ -29,6 +29,9 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.content.res.Configuration
+import android.graphics.Rect
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.LayerDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -80,6 +83,7 @@ import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -215,6 +219,7 @@ import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboarding
+import com.duckduckgo.app.cta.ui.KeyboardFollowingCallback
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.cta.ui.PrivacyProSkippedOnboardingBottomSheetDialog
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
@@ -6052,6 +6057,7 @@ class BrowserTabFragment :
         private var lastSeenCtaViewState: CtaViewState? = null
         private var lastSeenPrivacyShieldViewState: PrivacyShieldViewState? = null
         private var brandDesignFitLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
+        private var brandDesignKeyboardCallback: KeyboardFollowingCallback? = null
 
         fun renderPrivacyShield(viewState: PrivacyShieldViewState) {
             renderIfChanged(viewState, lastSeenPrivacyShieldViewState) {
@@ -6445,9 +6451,51 @@ class BrowserTabFragment :
             removeBrandDesignFitListener()
             val listener = ViewTreeObserver.OnGlobalLayoutListener {
                 (lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.applyFit()
+                if (brandDesignKeyboardCallback?.isAnimating != true) clipWavingDaxAtCover()
             }
             brandDesignFitLayoutListener = listener
             brandDesignDialogScrollView.viewTreeObserver.addOnGlobalLayoutListener(listener)
+            if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
+                var imeCta: DaxBubbleCta.BrandDesignUpdateBubbleCta? = null
+                // The tab shrinks before the keyboard arrives, briefly uncovering what's behind it.
+                var restoreBehindTab: (() -> Unit)? = null
+                val callback = KeyboardFollowingCallback(
+                    views = {
+                        listOfNotNull<View>(
+                            brandDesignDialogScrollView.findViewById(R.id.wavingDax),
+                            newBrowserTab.rebrandBrowserBackground,
+                        )
+                    },
+                    layoutBottomInset = { (binding.rootView.layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin ?: 0 },
+                    reflowParent = { brandDesignDialogScrollView.parent as? ViewGroup },
+                    onStarted = {
+                        imeCta = (lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.also { it.onImeAnimationStarted() }
+                        val behindTab = binding.rootView.parent as? View
+                        val fill = newBrowserTab.newTabLayout.background as? ColorDrawable
+                        val insets = ViewCompat.getRootWindowInsets(binding.rootView)
+                        if (insets?.isVisible(WindowInsetsCompat.Type.ime()) == false && behindTab != null && fill != null) {
+                            val previous = behindTab.background
+                            val gestureBar = insets.getInsets(
+                                WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout(),
+                            ).bottom
+                            val layers = listOfNotNull(previous, ColorDrawable(fill.color))
+                            behindTab.background = LayerDrawable(layers.toTypedArray()).apply {
+                                setLayerInset(layers.lastIndex, 0, 0, 0, gestureBar)
+                            }
+                            restoreBehindTab = { behindTab.background = previous }
+                        }
+                    },
+                    onEnded = {
+                        imeCta?.onImeAnimationEnded()
+                        imeCta = null
+                        restoreBehindTab?.invoke()
+                        restoreBehindTab = null
+                        clipWavingDaxAtCover()
+                    },
+                )
+                brandDesignKeyboardCallback = callback
+                ViewCompat.setWindowInsetsAnimationCallback(brandDesignDialogScrollView, callback)
+            }
         }
 
         fun removeBrandDesignFitListener() {
@@ -6455,7 +6503,29 @@ class BrowserTabFragment :
                 brandDesignDialogScrollView.viewTreeObserver.removeOnGlobalLayoutListener(it)
             }
             brandDesignFitLayoutListener = null
+            brandDesignKeyboardCallback?.restore()
+            brandDesignKeyboardCallback = null
+            ViewCompat.setWindowInsetsAnimationCallback(brandDesignDialogScrollView, null)
+            brandDesignDialogScrollView.findViewById<View>(R.id.wavingDax)?.clipBounds = null
         }
+
+        // Dax is pushed below the content so his legs sit under the bottom bar, or under the gesture bar scrim with the
+        // address bar at the top. Neither covers him, so cut him off where they start. The clip moves with Dax, so it
+        // also holds while he rides the keyboard and the bar jumps ahead of him.
+        private fun clipWavingDaxAtCover() {
+            val dax = brandDesignDialogScrollView.findViewById<View>(R.id.wavingDax) ?: return
+            val coverTop = if (omnibar.omnibarType == OmnibarType.SINGLE_BOTTOM) {
+                val bar = binding.rootView.rootView.findViewById<View>(R.id.inputModeWidgetCard)?.takeIf { it.isShown }
+                    ?: omnibar.omnibarView as? View ?: return
+                bar.windowY()
+            } else {
+                binding.rootView.windowY() + binding.rootView.height
+            }
+            val visibleHeight = coverTop - dax.windowY()
+            dax.clipBounds = if (visibleHeight in 0 until dax.height) Rect(0, 0, dax.width, visibleHeight) else null
+        }
+
+        private fun View.windowY(): Int = IntArray(2).also(::getLocationInWindow)[1]
 
         fun reapplyBubbleForOrientation() {
             (lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.onOrientationChanged()
