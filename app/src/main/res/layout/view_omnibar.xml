@@ -445,6 +445,7 @@
                 android:id="@+id/shieldIconPulseAnimationContainer"
                 android:layout_width="74dp"
                 android:layout_height="match_parent"
+                android:layout_marginStart="1dp"
                 android:paddingTop="@dimen/omnibarCardMarginTop"
                 android:paddingBottom="@dimen/omnibarCardMarginBottom"
                 app:layout_constraintBottom_toBottomOf="parent"

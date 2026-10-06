@@ -1002,12 +1002,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
         isScrollingEnabled = viewState.scrollingEnabled
 
-        shieldIconPulseAnimationContainer.updateLayoutParams {
-            (this as MarginLayoutParams).apply {
-                marginStart = 1.toPx()
-            }
-        }
-
         renderTabIcon(viewState)
         renderPulseAnimation(viewState)
 
