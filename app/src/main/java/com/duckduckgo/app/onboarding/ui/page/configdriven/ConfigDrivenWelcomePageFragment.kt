@@ -28,7 +28,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewGroupCompat
 import androidx.core.view.WindowInsetsCompat
@@ -55,7 +54,6 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.ContentControll
 import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.DialogRenderEngine
 import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.EmbellishmentControllerImpl
 import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.StepIndicatorControllerImpl
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupAddressBarPositionBottomSheet
 import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupSearchOptionsBottomSheet
 import com.duckduckgo.app.onboardingquicksetup.ui.RemoveWidgetInstructionsBottomSheet
@@ -161,8 +159,6 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        applyLayoutOverrides()
-
         ViewGroupCompat.installCompatInsetsDispatch(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.daxDialogCta.root) { v, windowInsets ->
             val insets = windowInsets.getInsets(
@@ -261,25 +257,6 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
             viewLifecycleOwner,
         ) { _, _ ->
             viewModel.syncQuickSetupSwitches()
-        }
-    }
-
-    /**
-     * The shared layout holds the values from before [OnboardingBrandDesignUpdateToggles.onboardingImprovementsV2],
-     * which that flag flips at runtime. This renderer only ever runs with those improvements on.
-     *
-     * Both [ConstraintLayout.LayoutParams.constrainedHeight] flags have to go: the card wraps a `ScrollView`, and
-     * inside a wrap_content parent ConstraintLayout resolves the wrap before `constraintWidth_max` narrows the
-     * card, so the card keeps a height measured for text that will wrap and scrolls with room to spare. The
-     * corrector puts the flag back on the card root once the card genuinely overflows.
-     */
-    private fun applyLayoutOverrides() {
-        binding.bottomWingAnimation.adjustViewBounds = true
-        binding.daxDialogCta.cardView.updateLayoutParams<ConstraintLayout.LayoutParams> {
-            constrainedHeight = false
-        }
-        binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
-            constrainedHeight = false
         }
     }
 
