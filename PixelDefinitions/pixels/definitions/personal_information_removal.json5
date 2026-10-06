@@ -380,7 +380,7 @@
         ]
     },
     "m_dbp_freemium_upsell_u": {
-        "description": "Fired once per install when a subscription purchase completes for a user who had activated Freemium PIR, i.e. the free scan converted.",
+        "description": "Fired once per install when a user who had activated Freemium PIR is first seen holding an active subscription, bought from any entry point. Matches the iOS pixel of the same name, which is also guarded only on activation and fires for a purchase from any surface. One known difference from iOS when comparing the two funnels: Android derives this from subscription status rather than a purchase event, so a user who restores a pre-existing subscription is counted here but not on iOS. On both platforms a lapsed subscriber who re-subscribes is counted, because activation is permitted while a subscription is expired.",
         "owners": ["landomen"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],

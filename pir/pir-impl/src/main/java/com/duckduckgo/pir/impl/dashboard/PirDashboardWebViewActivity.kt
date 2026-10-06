@@ -46,7 +46,6 @@ import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebViewClient
 import com.duckduckgo.pir.impl.dashboard.purchase.PirPurchaseRoute.NativePurchaseFlow
 import com.duckduckgo.pir.impl.databinding.ActivityPirDashboardWebviewBinding
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
-import com.duckduckgo.subscriptions.api.SubscriptionPurchaseCompletion
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -204,11 +203,7 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
 
             is Command.LaunchSubscriptionPurchase -> globalActivityStarter.start(
                 this,
-                SubscriptionPurchase(
-                    origin = command.origin,
-                    featurePage = command.featurePage,
-                    completion = SubscriptionPurchaseCompletion.RETURN_TO_CALLER,
-                ),
+                SubscriptionPurchase(origin = command.origin, featurePage = command.featurePage),
             )
         }
     }

@@ -79,7 +79,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
-import com.duckduckgo.subscriptions.api.SubscriptionPurchaseCompletion
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
@@ -93,7 +92,6 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.appendFunnelOriginParam
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
 import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
-import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingActivity
 import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
@@ -138,7 +136,6 @@ data class SubscriptionsWebViewActivityWithParams(
     val toolbarConfig: ToolbarConfig = DaxSubscription,
     val origin: String? = null,
     val launchPixel: String? = null,
-    val completion: SubscriptionPurchaseCompletion = SubscriptionPurchaseCompletion.GO_TO_SETTINGS,
 ) : ActivityParams {
 
     sealed class ToolbarConfig : Serializable {
@@ -384,7 +381,6 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             return SubscriptionsWebViewActivityWithParams(
                 url = subscriptionsUrlProvider.buyUrl,
                 origin = subscriptionPurchaseActivityParams.origin,
-                completion = subscriptionPurchaseActivityParams.completion,
             ).let { webViewActivityWithParams ->
                 if (subscriptionPurchaseActivityParams.featurePage.isNullOrBlank().not()) {
                     val urlWithParams = runCatching {
@@ -697,7 +693,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                     override fun onPositiveButtonClicked() {
                         when {
                             launchOnboarding -> {
-                                startSubscriptionOnboarding()
+                                globalActivityStarter.start(this@SubscriptionsWebViewActivity, SubscriptionOnboardingScreenWithEmptyParams)
                                 finish()
                             }
                             subscriptionEventData != null -> {
@@ -755,31 +751,15 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     }
 
     private fun finishToSettings() {
-        when (purchaseFlowExit(params.completion, isActivateUrl = params.url == subscriptionsUrlProvider.activateUrl)) {
-            PurchaseFlowExit.ActivateResult -> setResult(RESULT_OK)
-            // The screen that started the purchase is still beneath us, so stacking Settings on top
-            // of it would take the user somewhere they did not come from.
-            PurchaseFlowExit.ReturnToCaller -> Unit
-            PurchaseFlowExit.GoToSettings -> globalActivityStarter.startIntent(this, SettingsScreenNoParams)?.let { intent ->
+        if (params.url == subscriptionsUrlProvider.activateUrl) {
+            setResult(RESULT_OK)
+        } else {
+            globalActivityStarter.startIntent(this, SettingsScreenNoParams)?.let { intent ->
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 startActivity(intent)
             }
         }
         finish()
-    }
-
-    // Onboarding owns the back stack once it starts, and its own exit goes to Settings with
-    // CLEAR_TOP — which would destroy the caller this purchase was asked to return to.
-    private fun startSubscriptionOnboarding() {
-        val returnToCaller = purchaseFlowExit(
-            params.completion,
-            isActivateUrl = params.url == subscriptionsUrlProvider.activateUrl,
-        ) == PurchaseFlowExit.ReturnToCaller
-
-        globalActivityStarter.startIntent(this, SubscriptionOnboardingScreenWithEmptyParams)?.let { intent ->
-            intent.putExtra(SubscriptionOnboardingActivity.EXTRA_RETURN_TO_CALLER, returnToCaller)
-            startActivity(intent)
-        }
     }
 
     private fun hasCompletedPurchaseFlow(): Boolean =

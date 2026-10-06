@@ -55,12 +55,6 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
-    /**
-     * Set when onboarding was started from a purchase that must return to its own caller. Onboarding's
-     * normal exit clears the task above Settings, which would destroy that caller.
-     */
-    private val returnToCaller by lazy { intent.getBooleanExtra(EXTRA_RETURN_TO_CALLER, false) }
-
     private val viewModel: SubscriptionOnboardingViewModel by bindViewModel()
     private val binding: ActivitySubscriptionOnboardingBinding by viewBinding()
 
@@ -118,7 +112,7 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
                 command.action()
                 finish()
             }
-            is Command.FinishToSettings -> if (returnToCaller) finish() else finishToSettings()
+            is Command.FinishToSettings -> finishToSettings()
             is Command.Finish -> finish()
         }
     }
@@ -149,9 +143,5 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
             startActivity(intent)
         }
         finish()
-    }
-
-    companion object {
-        const val EXTRA_RETURN_TO_CALLER = "extra_return_to_caller"
     }
 }
