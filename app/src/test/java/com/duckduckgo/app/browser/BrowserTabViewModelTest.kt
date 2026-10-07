@@ -5895,11 +5895,11 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenAppLinkClickedInCustomTabAndAlwaysTriggerDomainAndCloseTabFeatureEnabledThenOpenAppLinkDoesNotRequestFinish() {
+    fun whenAppLinkClickedInCustomTabAndHandOffAndCloseTabFeatureEnabledThenOpenAppLinkDoesNotRequestFinish() {
         fakeCustomTabsFeature.closeTabAfterTrustedCallerNavigation().setRawStoredState(State(enable = true))
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
         whenever(mockAppLinksHandler.isTrustedCaller(eq(urlType), eq("com.example.app"))).thenReturn(false)
-        whenever(mockAppLinksHandler.isAlwaysTriggerDomain(eq(urlType))).thenReturn(true)
+        whenever(mockAppLinksHandler.isHandOff(eq(urlType))).thenReturn(true)
         testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.app")
         testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), appLinkCaptor.capture())
@@ -5910,11 +5910,11 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenAppLinkClickedInCustomTabAndAlwaysTriggerDomainThenOpenAppLinkDirectlyEvenWhenPromptEnabled() {
+    fun whenAppLinkClickedInCustomTabAndHandOffThenOpenAppLinkDirectlyEvenWhenPromptEnabled() {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
         whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
         whenever(mockAppLinksHandler.isTrustedCaller(eq(urlType), eq("com.example.app"))).thenReturn(false)
-        whenever(mockAppLinksHandler.isAlwaysTriggerDomain(eq(urlType))).thenReturn(true)
+        whenever(mockAppLinksHandler.isHandOff(eq(urlType))).thenReturn(true)
         testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.app")
         testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), appLinkCaptor.capture())
@@ -6408,6 +6408,7 @@ class BrowserTabViewModelTest {
         whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(appLink)
         loadUrl(url = "www.example.com", isBrowserShowing = true)
         assertEquals(appLink, browserViewState().previousAppLink)
+        verify(mockAppLinksHandler, atLeastOnce()).updateCurrentPage("www.example.com", appLink)
     }
 
     @Test
@@ -6415,6 +6416,7 @@ class BrowserTabViewModelTest {
         whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.Web("www.example.com"))
         loadUrl(url = "www.example.com", isBrowserShowing = true)
         assertNull(browserViewState().previousAppLink)
+        verify(mockAppLinksHandler, atLeastOnce()).updateCurrentPage("www.example.com", null)
     }
 
     @Test
