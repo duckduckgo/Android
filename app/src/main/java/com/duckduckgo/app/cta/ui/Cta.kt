@@ -112,7 +112,7 @@ interface Cta {
     fun shouldDropAddressBarFocusWhenShown(): Boolean = false
 }
 
-sealed class OnboardingDaxDialogCta(
+abstract class ContextualDaxDialogCta(
     override val ctaId: CtaId,
     @StringRes open val description: Int?,
     @StringRes open val buttonText: Int?,
@@ -123,6 +123,9 @@ sealed class OnboardingDaxDialogCta(
     override var ctaPixelParam: String,
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
+    open val isLightTheme: Boolean,
+    open val deviceInfo: DeviceInfo,
+    @DrawableRes open val backgroundRes: Int = 0,
 ) : Cta,
     DaxCta {
     override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
@@ -131,321 +134,231 @@ sealed class OnboardingDaxDialogCta(
 
     override fun pixelShownParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam))
 
-    abstract fun hideOnboardingCta(binding: FragmentBrowserTabBinding)
-
-    /**
-     * Base class for the brand-design rebrand of [OnboardingDaxDialogCta]. Owns the render
-     * pipeline so subclasses only need to declare their active content include and populate it.
-     *
-     * Mirrors the structure of [DaxBubbleCta] but targets the
-     * contextual in-browser dialog layout (`include_onboarding_in_context_dax_dialog.xml`).
-     *
-     * Subclasses supply:
-     *  - [activeIncludeId]: the id of the single content-include slot to show for this CTA
-     *  - [configureContentViews]: populate title, description, and the active include's children
-     *  - [setOnPrimaryCtaClicked] / [setOnSecondaryCtaClicked] / [setOnOptionClicked]: override only
-     *    for the buttons the subclass actually renders.
-     */
-
     interface ShowsWingBottom
 
-    abstract class ContextualDaxDialogCta(
-        ctaId: CtaId,
-        @StringRes description: Int?,
-        @StringRes buttonText: Int?,
-        shownPixel: Pixel.PixelName?,
-        okPixel: Pixel.PixelName?,
-        cancelPixel: Pixel.PixelName?,
-        closePixel: Pixel.PixelName?,
-        ctaPixelParam: String,
-        onboardingStore: OnboardingStore,
-        appInstallStore: AppInstallStore,
-        open val isLightTheme: Boolean,
-        open val deviceInfo: DeviceInfo,
-        @DrawableRes open val backgroundRes: Int = 0,
-    ) : OnboardingDaxDialogCta(
-        ctaId = ctaId,
-        description = description,
-        buttonText = buttonText,
-        shownPixel = shownPixel,
-        okPixel = okPixel,
-        cancelPixel = cancelPixel,
-        closePixel = closePixel,
-        ctaPixelParam = ctaPixelParam,
-        onboardingStore = onboardingStore,
-        appInstallStore = appInstallStore,
+    open val backgroundFillSpec: BackgroundFillSpec? = null
+
+    protected var ctaView: View? = null
+
+    private var runningFadeIn: AnimatorSet? = null
+    private var runningFadeOut: AnimatorSet? = null
+    private var arrowDepthAnimator: ValueAnimator? = null
+    private var cardContainer: TouchInterceptingLinearLayout? = null
+
+    private var isAnimating: Boolean = false
+        set(value) {
+            field = value
+            cardContainer?.interceptChildTouches = value
+        }
+
+    /**
+     * Id of the content-include slot this CTA renders (e.g. [R.id.contextualBrandDesignPrimaryCtaContent]).
+     * `null` means the CTA renders only title + description, with no in-card content slot.
+     */
+    open val activeIncludeId: Int? = null
+
+    abstract val showArrow: Boolean
+
+    /**
+     * Whether the persistent top-right dismiss button is shown for this CTA. Defaults to true.
+     * Override to `false` for CTAs that have no in-dialog dismissal affordance — for instance,
+     * a contextual prompt that the user is expected to resolve by interacting with a target
+     * UI element outside the card (e.g. the fire button in the toolbar).
+     */
+    open val showDismiss: Boolean = true
+
+    /**
+     * Populate the card with subclass-specific content: set title/description text, configure
+     * option buttons, etc. Called before the card fade-in begins so all text is set while views
+     * have `alpha=0` to avoid visible growth.
+     *
+     * Primary-CTA button text is applied by the base class from [buttonText] before this runs;
+     * subclasses do not need to set it.
+     */
+    abstract fun configureContentViews(view: View)
+
+    /**
+     * Hook invoked exactly once after the typing animation has fully settled (natural end or
+     * tap-to-skip). Default is a no-op.
+     *
+     * **Only override when this CTA must trigger the privacy-shield highlight that the trackers
+     * CTA triggers.** The fragment unconditionally passes
+     * [onTypingAnimationFinished] so the highlight gating lives here, in the subclass — not at
+     * the call site. Overriding for any other reason will incorrectly fire the privacy-shield
+     * highlight from a non-trackers CTA.
+     */
+    protected open fun onTypingAnimationSettled(onTypingAnimationFinished: () -> Unit) {
+        // No-op by default — see kdoc for the override contract.
+    }
+
+    fun hideOnboardingCta(binding: FragmentBrowserTabBinding) {
+        cancelRunningAnimations()
+        hideContainer(binding)
+        ctaView = null
+        cardContainer = null
+    }
+
+    private fun cancelRunningAnimations() {
+        isAnimating = false
+        runningFadeIn?.removeAllListeners()
+        runningFadeIn?.cancel()
+        runningFadeIn = null
+        runningFadeOut?.removeAllListeners()
+        runningFadeOut?.cancel()
+        runningFadeOut = null
+        arrowDepthAnimator?.removeAllUpdateListeners()
+        arrowDepthAnimator?.cancel()
+        arrowDepthAnimator = null
+        wingPlayInGeneration++
+        ctaView?.animate()?.cancel()
+        ctaView?.let { bannerFor(it)?.cancel() }
+        ctaView?.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
+            ?.cancelAnimation()
+    }
+
+    fun showOnboardingCta(
+        binding: FragmentBrowserTabBinding,
+        onPrimaryCtaClicked: () -> Unit,
+        onSecondaryCtaClicked: () -> Unit,
+        onTypingAnimationFinished: () -> Unit,
+        onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+        onDismissCtaClicked: () -> Unit,
+        instantShow: Boolean,
     ) {
+        val container = binding.includeOnboardingInContextDaxDialogBrandDesign.root
+        val isContentTransition = isContentTransition(container)
+        ctaView = container
 
-        open val backgroundFillSpec: BackgroundFillSpec? = null
+        cancelRunningAnimations()
 
-        protected var ctaView: View? = null
-
-        private var runningFadeIn: AnimatorSet? = null
-        private var runningFadeOut: AnimatorSet? = null
-        private var arrowDepthAnimator: ValueAnimator? = null
-        private var cardContainer: TouchInterceptingLinearLayout? = null
-
-        private var isAnimating: Boolean = false
-            set(value) {
-                field = value
-                cardContainer?.interceptChildTouches = value
-            }
-
-        /**
-         * Id of the content-include slot this CTA renders (e.g. [R.id.contextualBrandDesignPrimaryCtaContent]).
-         * `null` means the CTA renders only title + description, with no in-card content slot.
-         */
-        open val activeIncludeId: Int? = null
-
-        abstract val showArrow: Boolean
-
-        /**
-         * Whether the persistent top-right dismiss button is shown for this CTA. Defaults to true.
-         * Override to `false` for CTAs that have no in-dialog dismissal affordance — for instance,
-         * a contextual prompt that the user is expected to resolve by interacting with a target
-         * UI element outside the card (e.g. the fire button in the toolbar).
-         */
-        open val showDismiss: Boolean = true
-
-        /**
-         * Populate the card with subclass-specific content: set title/description text, configure
-         * option buttons, etc. Called before the card fade-in begins so all text is set while views
-         * have `alpha=0` to avoid visible growth.
-         *
-         * Primary-CTA button text is applied by the base class from [buttonText] before this runs;
-         * subclasses do not need to set it.
-         */
-        abstract fun configureContentViews(view: View)
-
-        /**
-         * Hook invoked exactly once after the typing animation has fully settled (natural end or
-         * tap-to-skip). Default is a no-op.
-         *
-         * **Only override when this CTA must trigger the privacy-shield highlight that the trackers
-         * CTA triggers.** The fragment unconditionally passes
-         * [onTypingAnimationFinished] so the highlight gating lives here, in the subclass — not at
-         * the call site. Overriding for any other reason will incorrectly fire the privacy-shield
-         * highlight from a non-trackers CTA.
-         */
-        protected open fun onTypingAnimationSettled(onTypingAnimationFinished: () -> Unit) {
-            // No-op by default — see kdoc for the override contract.
+        if (instantShow) {
+            showInstantly(
+                container = container,
+                onPrimaryCtaClicked = onPrimaryCtaClicked,
+                onSecondaryCtaClicked = onSecondaryCtaClicked,
+                onSuggestedOptionClicked = onSuggestedOptionClicked,
+                onDismissCtaClicked = onDismissCtaClicked,
+                onTypingAnimationFinished = onTypingAnimationFinished,
+            )
+            return
         }
 
-        override fun hideOnboardingCta(binding: FragmentBrowserTabBinding) {
-            cancelRunningAnimations()
-            hideContainer(binding)
-            ctaView = null
-            cardContainer = null
+        val titleView = container.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
+        val descriptionView = container.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)
+        val dismissButton = container.findViewById<ImageView>(R.id.contextualBrandDesignDismissButton)
+        val cardContainer = container.findViewById<TouchInterceptingLinearLayout>(R.id.contextualBrandDesignCardContainer)
+        val cardView = container.findViewById<DaxOnboardingBubbleCardView>(R.id.contextualBrandDesignCardView)
+        val targetDepth = if (showArrow && !container.isPhoneLandscape()) 1f else 0f
+        this.cardContainer = cardContainer
+        isAnimating = true
+
+        val activeInclude: View? = activeIncludeId?.let { container.findViewById(it) }
+
+        val notifySettled = {
+            if (isAnimating) {
+                isAnimating = false
+                onTypingAnimationSettled(onTypingAnimationFinished)
+            }
         }
 
-        private fun cancelRunningAnimations() {
-            isAnimating = false
-            runningFadeIn?.removeAllListeners()
-            runningFadeIn?.cancel()
-            runningFadeIn = null
-            runningFadeOut?.removeAllListeners()
-            runningFadeOut?.cancel()
-            runningFadeOut = null
-            arrowDepthAnimator?.removeAllUpdateListeners()
-            arrowDepthAnimator?.cancel()
-            arrowDepthAnimator = null
-            wingPlayInGeneration++
-            ctaView?.animate()?.cancel()
-            ctaView?.let { bannerFor(it)?.cancel() }
-            ctaView?.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
-                ?.cancelAnimation()
-        }
-
-        fun showOnboardingCta(
-            binding: FragmentBrowserTabBinding,
-            onPrimaryCtaClicked: () -> Unit,
-            onSecondaryCtaClicked: () -> Unit,
-            onTypingAnimationFinished: () -> Unit,
-            onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
-            onDismissCtaClicked: () -> Unit,
-            instantShow: Boolean,
-        ) {
-            val container = binding.includeOnboardingInContextDaxDialogBrandDesign.root
-            val isContentTransition = isContentTransition(container)
-            ctaView = container
-
-            cancelRunningAnimations()
-
-            if (instantShow) {
-                showInstantly(
-                    container = container,
-                    onPrimaryCtaClicked = onPrimaryCtaClicked,
-                    onSecondaryCtaClicked = onSecondaryCtaClicked,
-                    onSuggestedOptionClicked = onSuggestedOptionClicked,
-                    onDismissCtaClicked = onDismissCtaClicked,
-                    onTypingAnimationFinished = onTypingAnimationFinished,
-                )
-                return
-            }
-
-            val titleView = container.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
-            val descriptionView = container.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)
-            val dismissButton = container.findViewById<ImageView>(R.id.contextualBrandDesignDismissButton)
-            val cardContainer = container.findViewById<TouchInterceptingLinearLayout>(R.id.contextualBrandDesignCardContainer)
-            val cardView = container.findViewById<DaxOnboardingBubbleCardView>(R.id.contextualBrandDesignCardView)
-            val targetDepth = if (showArrow && !container.isPhoneLandscape()) 1f else 0f
-            this.cardContainer = cardContainer
-            isAnimating = true
-
-            val activeInclude: View? = activeIncludeId?.let { container.findViewById(it) }
-
-            val notifySettled = {
-                if (isAnimating) {
-                    isAnimating = false
-                    onTypingAnimationSettled(onTypingAnimationFinished)
-                }
-            }
-
-            val typeAndFadeIn = {
-                bannerFor(container)?.slideIn()
-                startWingBottomPlayIn(container)
-                val daxTitle = titleView.text?.toString().orEmpty()
-                val startContentFadeIn = {
-                    val animators = mutableListOf<Animator>(
-                        ObjectAnimator.ofFloat(descriptionView, View.ALPHA, 1f)
-                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                    )
-                    activeInclude?.let {
-                        animators += ObjectAnimator.ofFloat(it, View.ALPHA, 1f)
-                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
-                    }
-                    // Dismiss button is persistent: fade it in only if it isn't already fully shown,
-                    // which covers both the first-show path (alpha=0) and the case where a previous
-                    // animation was cancelled mid-flight leaving it at a fractional alpha.
-                    if (dismissButton.alpha < 1f) {
-                        animators += ObjectAnimator.ofFloat(dismissButton, View.ALPHA, 1f)
-                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
-                    }
-                    val currentDepth = cardView.arrowDepthFraction
-                    if (targetDepth != currentDepth) {
-                        arrowDepthAnimator = ValueAnimator.ofFloat(currentDepth, targetDepth).apply {
-                            duration = DIALOG_CONTENT_FADE_IN_DURATION
-                            interpolator = FastOutSlowInInterpolator()
-                            addUpdateListener { cardView.setArrowDepthFraction(it.animatedValue as Float) }
-                        }
-                        animators.add(arrowDepthAnimator!!)
-                    }
-                    runningFadeIn = AnimatorSet().apply {
-                        playTogether(animators.toList())
-                        addListener(object : AnimatorListenerAdapter() {
-                            override fun onAnimationEnd(animation: Animator) {
-                                notifySettled()
-                            }
-                        })
-                        start()
-                    }
-                }
-                if (daxTitle.isEmpty()) {
-                    startContentFadeIn()
-                } else {
-                    titleView.alpha = 1f
-                    titleView.text = ""
-
-                    titleView.typingDelayInMs = TYPING_DELAY_MS
-                    titleView.delayAfterAnimationInMs = TYPING_POST_DELAY_MS
-                    titleView.startTypingAnimation(daxTitle, true) {
-                        startContentFadeIn()
-                    }
-                }
-            }
-
-            if (isContentTransition) {
-                // Content transition: fade out old description + any visible content include, then swap in the new
-                val allContentIncludes = getAllContentIncludes(container)
-                val fadeOutAnimators = mutableListOf<Animator>(
-                    ObjectAnimator.ofFloat(descriptionView, View.ALPHA, 0f)
+        val typeAndFadeIn = {
+            bannerFor(container)?.slideIn()
+            startWingBottomPlayIn(container)
+            val daxTitle = titleView.text?.toString().orEmpty()
+            val startContentFadeIn = {
+                val animators = mutableListOf<Animator>(
+                    ObjectAnimator.ofFloat(descriptionView, View.ALPHA, 1f)
                         .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                 )
-                allContentIncludes.forEach { include ->
-                    if (include.isVisible && include.alpha > 0f) {
-                        fadeOutAnimators += ObjectAnimator.ofFloat(include, View.ALPHA, 0f)
-                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
-                    }
-                }
-                bannerFor(container)?.slideOut()?.let { fadeOutAnimators += it }
-                if (container.alpha < 1f) {
-                    fadeOutAnimators += ObjectAnimator.ofFloat(container, View.ALPHA, 1f)
+                activeInclude?.let {
+                    animators += ObjectAnimator.ofFloat(it, View.ALPHA, 1f)
                         .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
                 }
-                runningFadeOut = AnimatorSet().apply {
-                    playTogether(fadeOutAnimators.toList())
+                // Dismiss button is persistent: fade it in only if it isn't already fully shown,
+                // which covers both the first-show path (alpha=0) and the case where a previous
+                // animation was cancelled mid-flight leaving it at a fractional alpha.
+                if (dismissButton.alpha < 1f) {
+                    animators += ObjectAnimator.ofFloat(dismissButton, View.ALPHA, 1f)
+                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
+                }
+                val currentDepth = cardView.arrowDepthFraction
+                if (targetDepth != currentDepth) {
+                    arrowDepthAnimator = ValueAnimator.ofFloat(currentDepth, targetDepth).apply {
+                        duration = DIALOG_CONTENT_FADE_IN_DURATION
+                        interpolator = FastOutSlowInInterpolator()
+                        addUpdateListener { cardView.setArrowDepthFraction(it.animatedValue as Float) }
+                    }
+                    animators.add(arrowDepthAnimator!!)
+                }
+                runningFadeIn = AnimatorSet().apply {
+                    playTogether(animators.toList())
                     addListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator) {
-                            applyContent(container, isContentTransition = true)
-                            if (isAnimating) {
-                                typeAndFadeIn()
-                            }
+                            notifySettled()
                         }
                     })
                     start()
                 }
+            }
+            if (daxTitle.isEmpty()) {
+                startContentFadeIn()
             } else {
-                applyContent(container, isContentTransition = false)
-                container.show()
-                container.animate().alpha(1f).setDuration(DIALOG_FADE_IN_DURATION).setStartDelay(DIALOG_FADE_IN_START_DELAY)
-                    .withEndAction {
+                titleView.alpha = 1f
+                titleView.text = ""
+
+                titleView.typingDelayInMs = TYPING_DELAY_MS
+                titleView.delayAfterAnimationInMs = TYPING_POST_DELAY_MS
+                titleView.startTypingAnimation(daxTitle, true) {
+                    startContentFadeIn()
+                }
+            }
+        }
+
+        if (isContentTransition) {
+            // Content transition: fade out old description + any visible content include, then swap in the new
+            val allContentIncludes = getAllContentIncludes(container)
+            val fadeOutAnimators = mutableListOf<Animator>(
+                ObjectAnimator.ofFloat(descriptionView, View.ALPHA, 0f)
+                    .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+            )
+            allContentIncludes.forEach { include ->
+                if (include.isVisible && include.alpha > 0f) {
+                    fadeOutAnimators += ObjectAnimator.ofFloat(include, View.ALPHA, 0f)
+                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
+                }
+            }
+            bannerFor(container)?.slideOut()?.let { fadeOutAnimators += it }
+            if (container.alpha < 1f) {
+                fadeOutAnimators += ObjectAnimator.ofFloat(container, View.ALPHA, 1f)
+                    .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
+            }
+            runningFadeOut = AnimatorSet().apply {
+                playTogether(fadeOutAnimators.toList())
+                addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        applyContent(container, isContentTransition = true)
                         if (isAnimating) {
                             typeAndFadeIn()
                         }
                     }
+                })
+                start()
             }
-
-            // Tap-to-skip: any tap on the dialog area (card or surrounding backdrop) ends running
-            // animations and snaps all content visible — the whole screen is the skip surface,
-            // not just the card.
-            container.setOnClickListener {
-                snapToFinished(
-                    container = container,
-                    titleView = titleView,
-                    descriptionView = descriptionView,
-                    dismissButton = dismissButton,
-                    activeInclude = activeInclude,
-                    cardContainer = cardContainer,
-                    alreadySettled = !isAnimating,
-                    contentFadeInAnimator = runningFadeIn,
-                    fadeOutAnimator = runningFadeOut,
-                    onSettled = { notifySettled() },
-                )
-            }
-
-            setOnPrimaryCtaClicked(onPrimaryCtaClicked)
-            setOnSecondaryCtaClicked(onSecondaryCtaClicked)
-            setOnOptionClicked(onSuggestedOptionClicked)
-            setOnDismissCtaClicked(onDismissCtaClicked)
+        } else {
+            applyContent(container, isContentTransition = false)
+            container.show()
+            container.animate().alpha(1f).setDuration(DIALOG_FADE_IN_DURATION).setStartDelay(DIALOG_FADE_IN_START_DELAY)
+                .withEndAction {
+                    if (isAnimating) {
+                        typeAndFadeIn()
+                    }
+                }
         }
 
-        private fun showInstantly(
-            container: View,
-            onPrimaryCtaClicked: () -> Unit,
-            onSecondaryCtaClicked: () -> Unit,
-            onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
-            onDismissCtaClicked: () -> Unit,
-            onTypingAnimationFinished: () -> Unit,
-        ) {
-            val titleView = container.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
-            val descriptionView = container.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)
-            val dismissButton = container.findViewById<ImageView>(R.id.contextualBrandDesignDismissButton)
-            val cardContainer = container.findViewById<TouchInterceptingLinearLayout>(R.id.contextualBrandDesignCardContainer)
-            val activeInclude: View? = activeIncludeId?.let { container.findViewById(it) }
-
-            applyContent(container, isContentTransition = false)
-            container.alpha = 1f
-            container.show()
-
-            bannerFor(container)?.snapToFinalPosition()
-
-            // No animation to skip — clear any stale tap-to-skip listener from a prior animated show.
-            container.setOnClickListener(null)
-            setOnPrimaryCtaClicked(onPrimaryCtaClicked)
-            setOnSecondaryCtaClicked(onSecondaryCtaClicked)
-            setOnOptionClicked(onSuggestedOptionClicked)
-            setOnDismissCtaClicked(onDismissCtaClicked)
-
+        // Tap-to-skip: any tap on the dialog area (card or surrounding backdrop) ends running
+        // animations and snaps all content visible — the whole screen is the skip surface,
+        // not just the card.
+        container.setOnClickListener {
             snapToFinished(
                 container = container,
                 titleView = titleView,
@@ -453,402 +366,446 @@ sealed class OnboardingDaxDialogCta(
                 dismissButton = dismissButton,
                 activeInclude = activeInclude,
                 cardContainer = cardContainer,
-                alreadySettled = false,
-                contentFadeInAnimator = null,
-                fadeOutAnimator = null,
-                onSettled = { onTypingAnimationSettled(onTypingAnimationFinished) },
+                alreadySettled = !isAnimating,
+                contentFadeInAnimator = runningFadeIn,
+                fadeOutAnimator = runningFadeOut,
+                onSettled = { notifySettled() },
             )
         }
 
-        /**
-         * Per-show content setup: reset shared state, populate text via [configureContentViews],
-         * and stage the background. Used by all three show paths (first-show, content transition,
-         * rotation re-inflate). What follows is path-specific: animate, snap, or animate-after-fadeout.
-         */
-        private fun applyContent(container: View, isContentTransition: Boolean) {
-            val titleView = container.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
-            val hiddenTitle = container.findViewById<DaxTextView>(R.id.contextualBrandDesignHiddenTitle)
-            val activeInclude: View? = activeIncludeId?.let { container.findViewById(it) }
+        setOnPrimaryCtaClicked(onPrimaryCtaClicked)
+        setOnSecondaryCtaClicked(onSecondaryCtaClicked)
+        setOnOptionClicked(onSuggestedOptionClicked)
+        setOnDismissCtaClicked(onDismissCtaClicked)
+    }
 
-            resetSharedViewState(container, isContentTransition = isContentTransition)
-            resetAllIncludesExcept(container, activeInclude)
-            applyPrimaryCtaText(container)
-            applyDismissButtonVisibility(container)
-            configureContentViews(container)
-            applyWingBottomState(container)
-            hiddenTitle.text = titleView.text
-            applyTitleSlotVisibility(container, titleView)
-            bannerFor(container)?.show()
-            applyOptionsContentHeight(container)
+    private fun showInstantly(
+        container: View,
+        onPrimaryCtaClicked: () -> Unit,
+        onSecondaryCtaClicked: () -> Unit,
+        onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+        onDismissCtaClicked: () -> Unit,
+        onTypingAnimationFinished: () -> Unit,
+    ) {
+        val titleView = container.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
+        val descriptionView = container.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)
+        val dismissButton = container.findViewById<ImageView>(R.id.contextualBrandDesignDismissButton)
+        val cardContainer = container.findViewById<TouchInterceptingLinearLayout>(R.id.contextualBrandDesignCardContainer)
+        val activeInclude: View? = activeIncludeId?.let { container.findViewById(it) }
+
+        applyContent(container, isContentTransition = false)
+        container.alpha = 1f
+        container.show()
+
+        bannerFor(container)?.snapToFinalPosition()
+
+        // No animation to skip — clear any stale tap-to-skip listener from a prior animated show.
+        container.setOnClickListener(null)
+        setOnPrimaryCtaClicked(onPrimaryCtaClicked)
+        setOnSecondaryCtaClicked(onSecondaryCtaClicked)
+        setOnOptionClicked(onSuggestedOptionClicked)
+        setOnDismissCtaClicked(onDismissCtaClicked)
+
+        snapToFinished(
+            container = container,
+            titleView = titleView,
+            descriptionView = descriptionView,
+            dismissButton = dismissButton,
+            activeInclude = activeInclude,
+            cardContainer = cardContainer,
+            alreadySettled = false,
+            contentFadeInAnimator = null,
+            fadeOutAnimator = null,
+            onSettled = { onTypingAnimationSettled(onTypingAnimationFinished) },
+        )
+    }
+
+    /**
+     * Per-show content setup: reset shared state, populate text via [configureContentViews],
+     * and stage the background. Used by all three show paths (first-show, content transition,
+     * rotation re-inflate). What follows is path-specific: animate, snap, or animate-after-fadeout.
+     */
+    private fun applyContent(container: View, isContentTransition: Boolean) {
+        val titleView = container.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
+        val hiddenTitle = container.findViewById<DaxTextView>(R.id.contextualBrandDesignHiddenTitle)
+        val activeInclude: View? = activeIncludeId?.let { container.findViewById(it) }
+
+        resetSharedViewState(container, isContentTransition = isContentTransition)
+        resetAllIncludesExcept(container, activeInclude)
+        applyPrimaryCtaText(container)
+        applyDismissButtonVisibility(container)
+        configureContentViews(container)
+        applyWingBottomState(container)
+        hiddenTitle.text = titleView.text
+        applyTitleSlotVisibility(container, titleView)
+        bannerFor(container)?.show()
+        applyOptionsContentHeight(container)
+    }
+
+    private fun stripWingForPhoneLandscape(wing: LottieAnimationView) {
+        if (wing.isAnimating) wing.cancelAnimation()
+        wing.isVisible = false
+    }
+
+    internal fun applyWingBottomState(container: View) {
+        wingPlayInGeneration++
+        val wing = container.findViewById<LottieAnimationView>(R.id.wingBottom) ?: return
+        if (container.isPhoneLandscape()) {
+            stripWingForPhoneLandscape(wing)
+            return
         }
-
-        private fun stripWingForPhoneLandscape(wing: LottieAnimationView) {
-            if (wing.isAnimating) wing.cancelAnimation()
-            wing.isVisible = false
+        (wing.layoutParams as? ConstraintLayout.LayoutParams)?.let { lp ->
+            lp.startToStart =
+                if (wing.isTablet()) R.id.contextualBrandDesignCardView else ConstraintLayout.LayoutParams.PARENT_ID
+            wing.layoutParams = lp
         }
-
-        internal fun applyWingBottomState(container: View) {
-            wingPlayInGeneration++
-            val wing = container.findViewById<LottieAnimationView>(R.id.wingBottom) ?: return
-            if (container.isPhoneLandscape()) {
-                stripWingForPhoneLandscape(wing)
-                return
+        val showsWing = this is ShowsWingBottom
+        when {
+            showsWing && !wing.isVisible -> {
+                // Stage only; [startWingBottomPlayIn] kicks off playback after the banner slides in.
+                wing.setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
+                wing.progress = 0f
+                wing.isVisible = true
             }
-            (wing.layoutParams as? ConstraintLayout.LayoutParams)?.let { lp ->
-                lp.startToStart =
-                    if (wing.isTablet()) R.id.contextualBrandDesignCardView else ConstraintLayout.LayoutParams.PARENT_ID
-                wing.layoutParams = lp
-            }
-            val showsWing = this is ShowsWingBottom
-            when {
-                showsWing && !wing.isVisible -> {
-                    // Stage only; [startWingBottomPlayIn] kicks off playback after the banner slides in.
-                    wing.setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
-                    wing.progress = 0f
-                    wing.isVisible = true
+            showsWing && wing.isVisible -> {
+                // Persist across same-wing transitions: snap to resting and clear any in-flight
+                // animator. Covers a settled wing from the previous wing CTA (no visible change),
+                // an in-flight exit from a non-wing predecessor (whose end-listener would otherwise
+                // hide the wing), and an in-flight play-in we don't want to restart.
+                if (wing.isAnimating) {
+                    wing.removeAllAnimatorListeners()
+                    wing.cancelAnimation()
                 }
-                showsWing && wing.isVisible -> {
-                    // Persist across same-wing transitions: snap to resting and clear any in-flight
-                    // animator. Covers a settled wing from the previous wing CTA (no visible change),
-                    // an in-flight exit from a non-wing predecessor (whose end-listener would otherwise
-                    // hide the wing), and an in-flight play-in we don't want to restart.
-                    if (wing.isAnimating) {
-                        wing.removeAllAnimatorListeners()
-                        wing.cancelAnimation()
+                wing.setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
+                wing.progress = WING_STOP_PROGRESS
+            }
+            !showsWing && wing.isVisible -> {
+                wing.setMinAndMaxProgress(WING_STOP_PROGRESS, 1f)
+                wing.progress = WING_STOP_PROGRESS
+                wing.addAnimatorListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        wing.isVisible = false
+                        wing.removeAnimatorListener(this)
                     }
-                    wing.setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
-                    wing.progress = WING_STOP_PROGRESS
-                }
-                !showsWing && wing.isVisible -> {
-                    wing.setMinAndMaxProgress(WING_STOP_PROGRESS, 1f)
-                    wing.progress = WING_STOP_PROGRESS
-                    wing.addAnimatorListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator) {
-                            wing.isVisible = false
-                            wing.removeAnimatorListener(this)
-                        }
-                    })
+                })
+                wing.playAnimation()
+            }
+            else -> wing.isVisible = false
+        }
+    }
+
+    internal fun startWingBottomPlayIn(container: View) {
+        if (this !is ShowsWingBottom) return
+        val wing = container.findViewById<LottieAnimationView>(R.id.wingBottom) ?: return
+        if (container.isPhoneLandscape()) {
+            stripWingForPhoneLandscape(wing)
+            return
+        }
+        // Frame-based comparison instead of `progress >= WING_STOP_PROGRESS`: Lottie's
+        // [LottieDrawable.setMaxFrame] adds a fixed `+0.99f` offset after truncating the
+        // requested max frame to int, so `setMinAndMaxProgress(0f, 0.5f)` on a composition
+        // whose `endFrame` isn't an even integer (the wing's is `89.99`) leaves the animator
+        // max at `44.99` — read back as `progress ≈ 0.4999`, never quite `>= 0.5`. The int
+        // truncation of `wing.maxFrame` and `wing.frame` cancels that offset out.
+        val stopFrame = wing.maxFrame.toInt()
+        if (!wing.isVisible || wing.isAnimating || wing.frame >= stopFrame) return
+        val generation = wingPlayInGeneration
+        wing.postDelayed(
+            {
+                if (wingPlayInGeneration != generation) return@postDelayed
+                if (wing.isVisible && !wing.isAnimating && wing.frame < stopFrame) {
                     wing.playAnimation()
                 }
-                else -> wing.isVisible = false
-            }
-        }
-
-        internal fun startWingBottomPlayIn(container: View) {
-            if (this !is ShowsWingBottom) return
-            val wing = container.findViewById<LottieAnimationView>(R.id.wingBottom) ?: return
-            if (container.isPhoneLandscape()) {
-                stripWingForPhoneLandscape(wing)
-                return
-            }
-            // Frame-based comparison instead of `progress >= WING_STOP_PROGRESS`: Lottie's
-            // [LottieDrawable.setMaxFrame] adds a fixed `+0.99f` offset after truncating the
-            // requested max frame to int, so `setMinAndMaxProgress(0f, 0.5f)` on a composition
-            // whose `endFrame` isn't an even integer (the wing's is `89.99`) leaves the animator
-            // max at `44.99` — read back as `progress ≈ 0.4999`, never quite `>= 0.5`. The int
-            // truncation of `wing.maxFrame` and `wing.frame` cancels that offset out.
-            val stopFrame = wing.maxFrame.toInt()
-            if (!wing.isVisible || wing.isAnimating || wing.frame >= stopFrame) return
-            val generation = wingPlayInGeneration
-            wing.postDelayed(
-                {
-                    if (wingPlayInGeneration != generation) return@postDelayed
-                    if (wing.isVisible && !wing.isAnimating && wing.frame < stopFrame) {
-                        wing.playAnimation()
-                    }
-                },
-                WING_PLAY_IN_DELAY,
-            )
-        }
-
-        private fun snapWingBottomToResting(container: View) {
-            if (this !is ShowsWingBottom) return
-            val wing = container.findViewById<LottieAnimationView>(R.id.wingBottom) ?: return
-            if (container.isPhoneLandscape()) {
-                stripWingForPhoneLandscape(wing)
-                return
-            }
-            if (wing.isAnimating) wing.cancelAnimation()
-            wing.setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
-            wing.progress = WING_STOP_PROGRESS
-            wing.isVisible = true
-        }
-
-        private fun applyOptionsContentHeight(container: View) {
-            if (activeIncludeId != R.id.contextualBrandDesignOptionsContent) return
-            val resources = container.resources
-            val capHeight = resources.getBoolean(R.bool.capContextualOptionsHeight)
-            container.findViewById<View>(R.id.contextualBrandDesignOptionsContent)
-                ?.updateLayoutParams {
-                    height = if (capHeight) {
-                        resources.getDimensionPixelSize(R.dimen.contextualOptionsCappedHeight)
-                    } else {
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                    }
-                }
-        }
-
-        /**
-         * Snaps title/description/dismiss/active-include to their final visible state.
-         *
-         * Split out as a testable helper so unit tests can exercise the state machine
-         * (title-before-animation, mid-animation, post-animation, rapid double-tap).
-         */
-        internal fun snapToFinished(
-            container: View,
-            titleView: DaxTypeAnimationTextView,
-            descriptionView: DaxTextView,
-            dismissButton: ImageView,
-            activeInclude: View?,
-            cardContainer: TouchInterceptingLinearLayout,
-            alreadySettled: Boolean,
-            contentFadeInAnimator: AnimatorSet?,
-            fadeOutAnimator: AnimatorSet?,
-            onSettled: () -> Unit,
-        ) {
-            this.cardContainer = cardContainer
-            isAnimating = false
-            fadeOutAnimator?.let { if (it.isRunning) it.cancel() }
-            titleView.finishAnimation()
-            // If typing hasn't started yet (tap during initial fade-in), set title directly
-            // so we don't show an empty title. Restore alpha to 1 for CTAs that do have a title;
-            // empty-title CTAs are unaffected visually since there is no text to render.
-            val hiddenTitle = container.findViewById<DaxTextView>(R.id.contextualBrandDesignHiddenTitle)
-            if (!titleView.hasAnimationStarted()) {
-                titleView.text = hiddenTitle.text
-            }
-            if (!hiddenTitle.text.isNullOrEmpty()) {
-                titleView.alpha = 1f
-            }
-            descriptionView.alpha = 1f
-            dismissButton.alpha = 1f
-            activeInclude?.alpha = 1f
-            container.alpha = 1f
-            bannerFor(container)?.snapToFinalPosition()
-            contentFadeInAnimator?.let { if (it.isRunning) it.end() }
-            container.findViewById<DaxOnboardingBubbleCardView>(R.id.contextualBrandDesignCardView)
-                ?.setArrowDepthFraction(if (showArrow && !container.isPhoneLandscape()) 1f else 0f)
-            snapWingBottomToResting(container)
-            if (!alreadySettled) {
-                onSettled()
-            }
-        }
-
-        private fun applyPrimaryCtaText(container: View) {
-            val text = buttonText ?: return
-            container.findViewById<DaxButton>(R.id.contextualBrandDesignPrimaryCta)?.setText(text)
-        }
-
-        private fun applyDismissButtonVisibility(container: View) {
-            container.findViewById<View>(R.id.contextualBrandDesignDismissButton)?.isVisible = showDismiss
-        }
-
-        // GONE (not INVISIBLE) so the FrameLayout's marginBottom drops out of the LinearLayout
-        // flow, leaving the description sitting at the card's top padding.
-        private fun applyTitleSlotVisibility(container: View, titleView: DaxTypeAnimationTextView) {
-            val titleIsEmpty = titleView.text?.toString().orEmpty().isEmpty()
-            container.findViewById<View>(R.id.contextualBrandDesignTitleSlot)?.visibility =
-                if (titleIsEmpty) View.GONE else View.VISIBLE
-        }
-
-        private fun bannerFor(container: View): BackgroundBanner? {
-            val view = container.findViewById<OnboardingFillImageView>(R.id.contextualBrandDesignBackground) ?: return null
-            val fillHeightPx = backgroundFillSpec?.heightDpFor(deviceInfo.isTablet())?.toPx(view.context)?.toInt() ?: 0
-            val maxHeightFraction = backgroundFillSpec?.maxHeightFraction ?: 1f
-            return BackgroundBanner(view, backgroundRes, fillHeightPx, maxHeightFraction)
-        }
-
-        /**
-         * Slide-up banner that sits behind the contextual card. Scoped to a single CTA show:
-         * construct per-call and discard. State is read from the view (visibility, translationY)
-         * so callers don't need to thread flags through.
-         */
-        internal class BackgroundBanner(
-            private val view: OnboardingFillImageView,
-            @DrawableRes private val res: Int,
-            private val fillHeightPx: Int,
-            private val maxHeightFraction: Float,
-        ) {
-            val isShowing: Boolean get() = view.isVisible
-
-            /** Stage the banner offscreen, ready for [slideIn] to bring it up. */
-            fun show() {
-                if (res == 0) return
-                view.setImageResource(res)
-                if (fillHeightPx > 0) {
-                    view.setFillHeight(fillHeightPx, maxHeightFraction)
-                } else {
-                    view.clearFill()
-                }
-                view.visibility = View.VISIBLE
-                view.doOnPreDraw { it.translationY = offScreenY() }
-            }
-
-            /**
-             * Snap the banner to its final on-screen position. Registers in the same pre-draw
-             * pass as [show]'s offscreen offset; the later registration wins so the banner lands
-             * fully on-screen on the first frame (used by the instantShow path on rotation).
-             */
-            fun snapToFinalPosition() {
-                if (res == 0) return
-                view.doOnPreDraw { it.translationY = 0f }
-            }
-
-            fun slideIn() {
-                if (!isShowing) return
-                view.animate()
-                    .translationY(0f)
-                    .setDuration(SLIDE_DURATION)
-                    .setInterpolator(AccelerateDecelerateInterpolator())
-                    .start()
-            }
-
-            fun slideOut(): Animator? {
-                if (!isShowing || res == 0) return null
-                return ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, offScreenY())
-                    .setDuration(SLIDE_DURATION)
-            }
-
-            fun cancel() {
-                view.animate().cancel()
-            }
-
-            private fun offScreenY(): Float {
-                val parent = view.parent as? View
-                return if (parent != null) (parent.height - view.top).toFloat() else view.height.toFloat()
-            }
-
-            companion object {
-                private const val SLIDE_DURATION = 300L
-            }
-        }
-
-        /**
-         * True when the brand-design layout is already mounted from a previous CTA. Drives shared-view
-         * persistence (e.g. the dismiss button) so a content swap doesn't snap them to alpha=0.
-         */
-        internal fun isContentTransition(container: View): Boolean =
-            container.alpha > 0f && container.isVisible
-
-        /**
-         * Reset every mutable property shared views may carry over from a previous CTA. Called at
-         * the start of both first-show and mid-transition flows.
-         *
-         * Title alpha resets to 0 — subclasses that render a title set it to 1 via [typeAndFadeIn]
-         * before the typing animation runs. CTAs with no title leave the title view at alpha=0 so
-         * an empty typing animation never plays.
-         *
-         * The dismiss button is a persistent UI control: on first-show ([isContentTransition] = false)
-         * it is reset to alpha=0 so the post-typing fade-in reveals it together with the description;
-         * on a content transition the dialog stays on screen so the dismiss button must remain
-         * visible — we leave its alpha untouched.
-         */
-        internal fun resetSharedViewState(container: View, isContentTransition: Boolean) {
-            // Skip on content transitions so the slide-out animator can drive the banner off-screen.
-            if (!isContentTransition) {
-                container.findViewById<View>(R.id.contextualBrandDesignBackground)?.visibility = View.GONE
-            }
-            container.findViewById<View>(R.id.contextualBrandDesignTitleSlot)?.visibility = View.VISIBLE
-            container.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)?.apply {
-                alpha = 0f
-                text = ""
-            }
-            container.findViewById<DaxTextView>(R.id.contextualBrandDesignHiddenTitle)?.apply {
-                // Hidden title is android:visibility="invisible" in XML — alpha is not rendered.
-                // It acts as a text cache for snapToFinished before the typing animation starts.
-                text = ""
-            }
-            container.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)?.apply {
-                alpha = 0f
-                text = ""
-            }
-            if (!isContentTransition) {
-                container.findViewById<View>(R.id.contextualBrandDesignDismissButton)?.alpha = 0f
-                container.findViewById<DaxOnboardingBubbleCardView>(R.id.contextualBrandDesignCardView)
-                    ?.setArrowDepthFraction(0f)
-            }
-            container.findViewById<View>(R.id.wavingDax)?.visibility = View.GONE
-        }
-
-        protected open val allContentIncludeIds: List<Int> = listOf(
-            R.id.contextualBrandDesignPrimaryCtaContent,
-            R.id.contextualBrandDesignOptionsContent,
-            R.id.contextualBrandDesignNoCtaContent,
+            },
+            WING_PLAY_IN_DELAY,
         )
+    }
 
-        /** Returns all content-include slots in the card. Used to hide inactive includes. */
-        internal fun getAllContentIncludes(view: View): List<View> =
-            allContentIncludeIds.mapNotNull { view.findViewById(it) }
+    private fun snapWingBottomToResting(container: View) {
+        if (this !is ShowsWingBottom) return
+        val wing = container.findViewById<LottieAnimationView>(R.id.wingBottom) ?: return
+        if (container.isPhoneLandscape()) {
+            stripWingForPhoneLandscape(wing)
+            return
+        }
+        if (wing.isAnimating) wing.cancelAnimation()
+        wing.setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
+        wing.progress = WING_STOP_PROGRESS
+        wing.isVisible = true
+    }
 
-        internal fun resetAllIncludesExcept(view: View, active: View?) {
-            getAllContentIncludes(view).forEach { include ->
-                if (active != null && include == active) {
-                    include.show()
-                    include.alpha = 0f
+    private fun applyOptionsContentHeight(container: View) {
+        if (activeIncludeId != R.id.contextualBrandDesignOptionsContent) return
+        val resources = container.resources
+        val capHeight = resources.getBoolean(R.bool.capContextualOptionsHeight)
+        container.findViewById<View>(R.id.contextualBrandDesignOptionsContent)
+            ?.updateLayoutParams {
+                height = if (capHeight) {
+                    resources.getDimensionPixelSize(R.dimen.contextualOptionsCappedHeight)
                 } else {
-                    include.gone()
+                    ViewGroup.LayoutParams.WRAP_CONTENT
                 }
             }
-        }
+    }
 
-        /** No-op by default. Subclasses with a primary CTA button override this. */
-        open fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {
-            // No-op.
+    /**
+     * Snaps title/description/dismiss/active-include to their final visible state.
+     *
+     * Split out as a testable helper so unit tests can exercise the state machine
+     * (title-before-animation, mid-animation, post-animation, rapid double-tap).
+     */
+    internal fun snapToFinished(
+        container: View,
+        titleView: DaxTypeAnimationTextView,
+        descriptionView: DaxTextView,
+        dismissButton: ImageView,
+        activeInclude: View?,
+        cardContainer: TouchInterceptingLinearLayout,
+        alreadySettled: Boolean,
+        contentFadeInAnimator: AnimatorSet?,
+        fadeOutAnimator: AnimatorSet?,
+        onSettled: () -> Unit,
+    ) {
+        this.cardContainer = cardContainer
+        isAnimating = false
+        fadeOutAnimator?.let { if (it.isRunning) it.cancel() }
+        titleView.finishAnimation()
+        // If typing hasn't started yet (tap during initial fade-in), set title directly
+        // so we don't show an empty title. Restore alpha to 1 for CTAs that do have a title;
+        // empty-title CTAs are unaffected visually since there is no text to render.
+        val hiddenTitle = container.findViewById<DaxTextView>(R.id.contextualBrandDesignHiddenTitle)
+        if (!titleView.hasAnimationStarted()) {
+            titleView.text = hiddenTitle.text
         }
-
-        /** No-op by default. Subclasses with a secondary CTA button override this. */
-        open fun setOnSecondaryCtaClicked(onButtonClicked: () -> Unit) {
-            // No-op.
+        if (!hiddenTitle.text.isNullOrEmpty()) {
+            titleView.alpha = 1f
         }
-
-        /** No-op by default. Subclasses with option buttons override this. */
-        open fun setOnOptionClicked(onOptionClicked: ((DaxDialogIntroOption) -> Unit)?) {
-            // No-op.
+        descriptionView.alpha = 1f
+        dismissButton.alpha = 1f
+        activeInclude?.alpha = 1f
+        container.alpha = 1f
+        bannerFor(container)?.snapToFinalPosition()
+        contentFadeInAnimator?.let { if (it.isRunning) it.end() }
+        container.findViewById<DaxOnboardingBubbleCardView>(R.id.contextualBrandDesignCardView)
+            ?.setArrowDepthFraction(if (showArrow && !container.isPhoneLandscape()) 1f else 0f)
+        snapWingBottomToResting(container)
+        if (!alreadySettled) {
+            onSettled()
         }
+    }
 
-        private fun setOnDismissCtaClicked(onButtonClicked: () -> Unit) {
-            ctaView?.findViewById<View>(R.id.contextualBrandDesignDismissButton)?.setOnClickListener {
-                onButtonClicked.invoke()
+    private fun applyPrimaryCtaText(container: View) {
+        val text = buttonText ?: return
+        container.findViewById<DaxButton>(R.id.contextualBrandDesignPrimaryCta)?.setText(text)
+    }
+
+    private fun applyDismissButtonVisibility(container: View) {
+        container.findViewById<View>(R.id.contextualBrandDesignDismissButton)?.isVisible = showDismiss
+    }
+
+    // GONE (not INVISIBLE) so the FrameLayout's marginBottom drops out of the LinearLayout
+    // flow, leaving the description sitting at the card's top padding.
+    private fun applyTitleSlotVisibility(container: View, titleView: DaxTypeAnimationTextView) {
+        val titleIsEmpty = titleView.text?.toString().orEmpty().isEmpty()
+        container.findViewById<View>(R.id.contextualBrandDesignTitleSlot)?.visibility =
+            if (titleIsEmpty) View.GONE else View.VISIBLE
+    }
+
+    private fun bannerFor(container: View): BackgroundBanner? {
+        val view = container.findViewById<OnboardingFillImageView>(R.id.contextualBrandDesignBackground) ?: return null
+        val fillHeightPx = backgroundFillSpec?.heightDpFor(deviceInfo.isTablet())?.toPx(view.context)?.toInt() ?: 0
+        val maxHeightFraction = backgroundFillSpec?.maxHeightFraction ?: 1f
+        return BackgroundBanner(view, backgroundRes, fillHeightPx, maxHeightFraction)
+    }
+
+    /**
+     * Slide-up banner that sits behind the contextual card. Scoped to a single CTA show:
+     * construct per-call and discard. State is read from the view (visibility, translationY)
+     * so callers don't need to thread flags through.
+     */
+    internal class BackgroundBanner(
+        private val view: OnboardingFillImageView,
+        @DrawableRes private val res: Int,
+        private val fillHeightPx: Int,
+        private val maxHeightFraction: Float,
+    ) {
+        val isShowing: Boolean get() = view.isVisible
+
+        /** Stage the banner offscreen, ready for [slideIn] to bring it up. */
+        fun show() {
+            if (res == 0) return
+            view.setImageResource(res)
+            if (fillHeightPx > 0) {
+                view.setFillHeight(fillHeightPx, maxHeightFraction)
+            } else {
+                view.clearFill()
             }
+            view.visibility = View.VISIBLE
+            view.doOnPreDraw { it.translationY = offScreenY() }
         }
 
-        protected fun View.isTablet(): Boolean = deviceInfo.isTablet()
+        /**
+         * Snap the banner to its final on-screen position. Registers in the same pre-draw
+         * pass as [show]'s offscreen offset; the later registration wins so the banner lands
+         * fully on-screen on the first frame (used by the instantShow path on rotation).
+         */
+        fun snapToFinalPosition() {
+            if (res == 0) return
+            view.doOnPreDraw { it.translationY = 0f }
+        }
 
-        protected fun View.isPhoneLandscape(): Boolean =
-            !deviceInfo.isTablet() &&
-                context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        fun slideIn() {
+            if (!isShowing) return
+            view.animate()
+                .translationY(0f)
+                .setDuration(SLIDE_DURATION)
+                .setInterpolator(AccelerateDecelerateInterpolator())
+                .start()
+        }
+
+        fun slideOut(): Animator? {
+            if (!isShowing || res == 0) return null
+            return ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, offScreenY())
+                .setDuration(SLIDE_DURATION)
+        }
+
+        fun cancel() {
+            view.animate().cancel()
+        }
+
+        private fun offScreenY(): Float {
+            val parent = view.parent as? View
+            return if (parent != null) (parent.height - view.top).toFloat() else view.height.toFloat()
+        }
 
         companion object {
-            private const val DIALOG_FADE_IN_DURATION = 400L
-            private const val DIALOG_FADE_IN_START_DELAY = 200L
-            private const val DIALOG_CONTENT_FADE_IN_DURATION = 200L
-            private const val TYPING_DELAY_MS = 20L
-            private const val TYPING_POST_DELAY_MS = 20L
-            private const val WING_STOP_PROGRESS = 0.5f
-            private const val WING_PLAY_IN_DELAY = 300L
+            private const val SLIDE_DURATION = 300L
+        }
+    }
 
-            // Shared across CTA instances because the fragment swaps contextual CTAs without
-            // calling hideOnboardingCta on the previous one — a per-instance ref couldn't
-            // reach the pending runnable posted on the shared wingBottom view.
-            private var wingPlayInGeneration = 0
+    /**
+     * True when the brand-design layout is already mounted from a previous CTA. Drives shared-view
+     * persistence (e.g. the dismiss button) so a content swap doesn't snap them to alpha=0.
+     */
+    internal fun isContentTransition(container: View): Boolean =
+        container.alpha > 0f && container.isVisible
 
-            /**
-             * Cancels the title typing animation and hides the brand-design root, without
-             * touching the AnimatorSet state owned by a CTA instance. Used by the fragment as
-             * a no-instance fallback and by [hideOnboardingCta] after instance-level cleanup.
-             */
-            internal fun hideContainer(binding: FragmentBrowserTabBinding) {
-                val root = binding.includeOnboardingInContextDaxDialogBrandDesign.root
-                root.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
-                    ?.cancelAnimation()
-                root.gone()
+    /**
+     * Reset every mutable property shared views may carry over from a previous CTA. Called at
+     * the start of both first-show and mid-transition flows.
+     *
+     * Title alpha resets to 0 — subclasses that render a title set it to 1 via [typeAndFadeIn]
+     * before the typing animation runs. CTAs with no title leave the title view at alpha=0 so
+     * an empty typing animation never plays.
+     *
+     * The dismiss button is a persistent UI control: on first-show ([isContentTransition] = false)
+     * it is reset to alpha=0 so the post-typing fade-in reveals it together with the description;
+     * on a content transition the dialog stays on screen so the dismiss button must remain
+     * visible — we leave its alpha untouched.
+     */
+    internal fun resetSharedViewState(container: View, isContentTransition: Boolean) {
+        // Skip on content transitions so the slide-out animator can drive the banner off-screen.
+        if (!isContentTransition) {
+            container.findViewById<View>(R.id.contextualBrandDesignBackground)?.visibility = View.GONE
+        }
+        container.findViewById<View>(R.id.contextualBrandDesignTitleSlot)?.visibility = View.VISIBLE
+        container.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)?.apply {
+            alpha = 0f
+            text = ""
+        }
+        container.findViewById<DaxTextView>(R.id.contextualBrandDesignHiddenTitle)?.apply {
+            // Hidden title is android:visibility="invisible" in XML — alpha is not rendered.
+            // It acts as a text cache for snapToFinished before the typing animation starts.
+            text = ""
+        }
+        container.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)?.apply {
+            alpha = 0f
+            text = ""
+        }
+        if (!isContentTransition) {
+            container.findViewById<View>(R.id.contextualBrandDesignDismissButton)?.alpha = 0f
+            container.findViewById<DaxOnboardingBubbleCardView>(R.id.contextualBrandDesignCardView)
+                ?.setArrowDepthFraction(0f)
+        }
+        container.findViewById<View>(R.id.wavingDax)?.visibility = View.GONE
+    }
+
+    protected open val allContentIncludeIds: List<Int> = listOf(
+        R.id.contextualBrandDesignPrimaryCtaContent,
+        R.id.contextualBrandDesignOptionsContent,
+        R.id.contextualBrandDesignNoCtaContent,
+    )
+
+    /** Returns all content-include slots in the card. Used to hide inactive includes. */
+    internal fun getAllContentIncludes(view: View): List<View> =
+        allContentIncludeIds.mapNotNull { view.findViewById(it) }
+
+    internal fun resetAllIncludesExcept(view: View, active: View?) {
+        getAllContentIncludes(view).forEach { include ->
+            if (active != null && include == active) {
+                include.show()
+                include.alpha = 0f
+            } else {
+                include.gone()
             }
         }
     }
 
+    /** No-op by default. Subclasses with a primary CTA button override this. */
+    open fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {
+        // No-op.
+    }
+
+    /** No-op by default. Subclasses with a secondary CTA button override this. */
+    open fun setOnSecondaryCtaClicked(onButtonClicked: () -> Unit) {
+        // No-op.
+    }
+
+    /** No-op by default. Subclasses with option buttons override this. */
+    open fun setOnOptionClicked(onOptionClicked: ((DaxDialogIntroOption) -> Unit)?) {
+        // No-op.
+    }
+
+    private fun setOnDismissCtaClicked(onButtonClicked: () -> Unit) {
+        ctaView?.findViewById<View>(R.id.contextualBrandDesignDismissButton)?.setOnClickListener {
+            onButtonClicked.invoke()
+        }
+    }
+
+    protected fun View.isTablet(): Boolean = deviceInfo.isTablet()
+
+    protected fun View.isPhoneLandscape(): Boolean =
+        !deviceInfo.isTablet() &&
+            context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
     companion object {
         const val SERP = "duckduckgo"
         val mainTrackerNetworks = listOf("Facebook", "Google")
+
+        private const val DIALOG_FADE_IN_DURATION = 400L
+        private const val DIALOG_FADE_IN_START_DELAY = 200L
+        private const val DIALOG_CONTENT_FADE_IN_DURATION = 200L
+        private const val TYPING_DELAY_MS = 20L
+        private const val TYPING_POST_DELAY_MS = 20L
+        private const val WING_STOP_PROGRESS = 0.5f
+        private const val WING_PLAY_IN_DELAY = 300L
+
+        // Shared across CTA instances because the fragment swaps contextual CTAs without
+        // calling hideOnboardingCta on the previous one — a per-instance ref couldn't
+        // reach the pending runnable posted on the shared wingBottom view.
+        private var wingPlayInGeneration = 0
+
+        /**
+         * Cancels the title typing animation and hides the brand-design root, without
+         * touching the AnimatorSet state owned by a CTA instance. Used by the fragment as
+         * a no-instance fallback and by [hideOnboardingCta] after instance-level cleanup.
+         */
+        internal fun hideContainer(binding: FragmentBrowserTabBinding) {
+            val root = binding.includeOnboardingInContextDaxDialogBrandDesign.root
+            root.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
+                ?.cancelAnimation()
+            root.gone()
+        }
     }
 }
 

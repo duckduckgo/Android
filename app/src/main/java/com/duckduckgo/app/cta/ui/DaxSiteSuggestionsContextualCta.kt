@@ -39,7 +39,7 @@ data class DaxSiteSuggestionsContextualCta(
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
-) : OnboardingDaxDialogCta.ContextualDaxDialogCta(
+) : ContextualDaxDialogCta(
     ctaId = CtaId.DAX_INTRO_VISIT_SITE,
     description = R.string.onboardingSitesDaxDialogDescription,
     buttonText = null,

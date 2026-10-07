@@ -258,6 +258,7 @@ import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Acti
 import com.duckduckgo.app.browser.webview.SCAM_PROTECTION_LEARN_MORE_URL
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
+import com.duckduckgo.app.cta.ui.ContextualDaxDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
@@ -274,7 +275,6 @@ import com.duckduckgo.app.cta.ui.DaxTrackersBlockedContextualCta
 import com.duckduckgo.app.cta.ui.DaxTryASearchBubbleCta
 import com.duckduckgo.app.cta.ui.DaxVisitSiteOptionsBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.cta.ui.SubscriptionPromoFlow
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -1529,7 +1529,7 @@ class BrowserTabViewModel @Inject constructor(
 
         val cta = currentCtaViewState().cta
 
-        if (cta is OnboardingDaxDialogCta) {
+        if (cta is ContextualDaxDialogCta) {
             onDismissOnboardingDaxDialog(cta)
         }
 
@@ -3947,7 +3947,7 @@ class BrowserTabViewModel @Inject constructor(
         val onboardingCommand =
             when (cta) {
                 is HomePanelCta.AddWidgetInstructions, is HomePanelCta.AddWidgetAutoOnboarding -> LaunchAddWidgetOnboarding
-                is OnboardingDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
+                is ContextualDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
                 is DaxBubbleCta -> {
                     onDaxBubbleCtaOkButtonClicked(cta)
                     null
@@ -3996,7 +3996,7 @@ class BrowserTabViewModel @Inject constructor(
             ctaViewModel.onUserDismissedCta(cta, viaCloseBtn = true)
             if (cta is DaxBubbleCta) {
                 command.value = HideOnboardingDaxBubbleCta(cta)
-            } else if (cta is OnboardingDaxDialogCta) {
+            } else if (cta is ContextualDaxDialogCta) {
                 command.value = HideOnboardingDaxDialog(cta)
                 if (cta is DaxTrackersBlockedContextualCta) {
                     if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
@@ -5477,7 +5477,7 @@ class BrowserTabViewModel @Inject constructor(
         return null
     }
 
-    private fun onOnboardingCtaOkButtonClicked(onboardingCta: OnboardingDaxDialogCta): Command? {
+    private fun onOnboardingCtaOkButtonClicked(onboardingCta: ContextualDaxDialogCta): Command? {
         val shouldDismiss = when (onboardingCta) {
             is DaxDuckAiFireButtonContextualCta -> false
             else -> true
@@ -5572,7 +5572,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun onDismissOnboardingDaxDialog(cta: OnboardingDaxDialogCta) {
+    private fun onDismissOnboardingDaxDialog(cta: ContextualDaxDialogCta) {
         onUserDismissedCta(cta)
         command.value = HideOnboardingDaxDialog(cta)
     }
@@ -5594,7 +5594,7 @@ class BrowserTabViewModel @Inject constructor(
 
         if (cta is DaxFireButtonContextualCta) {
             onUserDismissedCta(cta)
-            command.value = HideOnboardingDaxDialog(cta as OnboardingDaxDialogCta)
+            command.value = HideOnboardingDaxDialog(cta as ContextualDaxDialogCta)
         }
 
         if (currentBrowserViewState().fireButton.isHighlighted()) {
@@ -5620,7 +5620,7 @@ class BrowserTabViewModel @Inject constructor(
         if (cta != null) {
             ctaViewModel.onContextualSiteLinkTapped(cta)
         }
-        if (cta is OnboardingDaxDialogCta) {
+        if (cta is ContextualDaxDialogCta) {
             onDismissOnboardingDaxDialog(cta)
         }
     }

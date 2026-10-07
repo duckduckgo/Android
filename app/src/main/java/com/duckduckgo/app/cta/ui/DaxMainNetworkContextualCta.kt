@@ -39,7 +39,7 @@ data class DaxMainNetworkContextualCta(
     val siteHost: String,
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
-) : OnboardingDaxDialogCta.ContextualDaxDialogCta(
+) : ContextualDaxDialogCta(
     ctaId = CtaId.DAX_DIALOG_NETWORK,
     description = null,
     buttonText = R.string.daxDialogGotIt,

@@ -19,7 +19,7 @@ package com.duckduckgo.app.cta.ui
 import android.view.View
 import android.view.ViewTreeObserver
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.ContextualDaxDialogCta.BackgroundBanner
+import com.duckduckgo.app.cta.ui.ContextualDaxDialogCta.BackgroundBanner
 import com.duckduckgo.app.onboarding.ui.view.OnboardingFillImageView
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull

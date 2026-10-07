@@ -117,7 +117,7 @@ class ContextualDaxDialogCtaTest {
 
     @Test
     fun hideContainer_hidesBrandDesignRoot() {
-        OnboardingDaxDialogCta.ContextualDaxDialogCta.hideContainer(browserTabBinding)
+        ContextualDaxDialogCta.hideContainer(browserTabBinding)
 
         verify(container).visibility = View.GONE
     }
@@ -463,7 +463,7 @@ class ContextualDaxDialogCtaTest {
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
         override val deviceInfo: DeviceInfo,
-    ) : OnboardingDaxDialogCta.ContextualDaxDialogCta(
+    ) : ContextualDaxDialogCta(
         ctaId = CtaId.DAX_DIALOG_SERP,
         description = null,
         buttonText = null,
@@ -512,7 +512,7 @@ class ContextualDaxDialogCtaTest {
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
         override val deviceInfo: DeviceInfo,
-    ) : OnboardingDaxDialogCta.ContextualDaxDialogCta(
+    ) : ContextualDaxDialogCta(
         ctaId = CtaId.DAX_DIALOG_TRACKERS_FOUND,
         description = null,
         buttonText = null,
@@ -526,7 +526,7 @@ class ContextualDaxDialogCtaTest {
         isLightTheme = true,
         deviceInfo = deviceInfo,
     ),
-        OnboardingDaxDialogCta.ShowsWingBottom {
+        ContextualDaxDialogCta.ShowsWingBottom {
 
         var settledInvocations: Int = 0
 

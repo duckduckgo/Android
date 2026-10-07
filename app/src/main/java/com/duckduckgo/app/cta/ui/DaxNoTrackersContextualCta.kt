@@ -33,7 +33,7 @@ data class DaxNoTrackersContextualCta(
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
-) : OnboardingDaxDialogCta.ContextualDaxDialogCta(
+) : ContextualDaxDialogCta(
     ctaId = CtaId.DAX_DIALOG_OTHER,
     description = R.string.daxNonSerpCtaText,
     buttonText = R.string.daxDialogGotIt,
@@ -48,7 +48,7 @@ data class DaxNoTrackersContextualCta(
     deviceInfo = deviceInfo,
     backgroundRes = R.drawable.bg_onboarding_trackers_blocked,
 ),
-    OnboardingDaxDialogCta.ShowsWingBottom {
+    ContextualDaxDialogCta.ShowsWingBottom {
     override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
 
     override val showArrow: Boolean = true

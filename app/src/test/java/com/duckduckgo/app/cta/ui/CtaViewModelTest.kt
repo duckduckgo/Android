@@ -716,7 +716,7 @@ class CtaViewModelTest {
             brokenSitePromptUrl = null,
         )
 
-        assertFalse(value is OnboardingDaxDialogCta)
+        assertFalse(value is ContextualDaxDialogCta)
     }
 
     @Test

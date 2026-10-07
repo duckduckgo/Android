@@ -251,7 +251,7 @@ class DaxDuckAiFireButtonContextualCtaTest {
         assertEquals(R.id.contextualBrandDesignPrimaryCtaContent, cta.activeIncludeId)
         assertFalse(cta.showDismiss)
         assertTrue(cta.showArrow)
-        assertTrue(cta is OnboardingDaxDialogCta.ShowsWingBottom)
+        assertTrue(cta is ContextualDaxDialogCta.ShowsWingBottom)
     }
 
     private fun newBrandDesignCta() = DaxDuckAiFireButtonContextualCta(
