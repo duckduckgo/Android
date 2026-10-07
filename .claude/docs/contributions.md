@@ -48,7 +48,7 @@ An API Proposal is an Asana task in the [Android Proposals project](https://app.
 
 ## Creating PRs
 
-This repository uses [GitHub stacked PRs](https://gh.io/stacks) (`gh stack`) for stacked work. Graphite is no longer used — don't run `gt` or the Graphite MCP.
+This repository uses [GitHub stacked PRs](https://gh.io/stacks) (`gh stack`) for stacked work.
 
 - `gh stack init` to start a stack on top of `develop` (or `gh stack init <branch>...` to stack existing branches)
 - `gh stack add <branch>` to add a new branch on top of the current stack
