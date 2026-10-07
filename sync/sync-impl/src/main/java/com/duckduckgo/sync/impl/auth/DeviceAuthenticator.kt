@@ -67,12 +67,6 @@ interface DeviceAuthenticator {
      */
     fun launchDeviceAuthEnrollment(context: Context)
 
-    sealed class AuthResult {
-        data object Success : AuthResult()
-        data object UserCancelled : AuthResult()
-        data class Error(val reason: String) : AuthResult()
-    }
-
     data class AuthConfiguration(
         val requireUserAction: Boolean = false,
         val displayTextResource: Int = R.string.sync_auth_text_for_access,

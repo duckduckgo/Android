@@ -18,7 +18,6 @@
 package com.duckduckgo.sync.impl.auth
 
 import android.content.Context
-import android.os.Build
 import androidx.annotation.StringRes
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
@@ -26,10 +25,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Error
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Success
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.UserCancelled
+import com.duckduckgo.sync.impl.auth.AuthLauncher.AuthResult
 import com.squareup.anvil.annotations.ContributesBinding
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
@@ -55,6 +51,12 @@ interface AuthLauncher {
         fragmentActivity: FragmentActivity,
         onResult: (AuthResult) -> Unit,
     ): BiometricPrompt
+
+    sealed class AuthResult {
+        data object Success : AuthResult()
+        data object UserCancelled : AuthResult()
+        data class Error(val reason: String) : AuthResult()
+    }
 }
 
 @ContributesBinding(AppScope::class)
@@ -97,9 +99,9 @@ class RealAuthLauncher @Inject constructor(
             logcat { "onAuthenticationError: ($errorCode) $errString" }
 
             if (errorCode == BiometricPrompt.ERROR_USER_CANCELED) {
-                onResult(UserCancelled)
+                onResult(AuthResult.UserCancelled)
             } else {
-                onResult(Error(String.format("(%d) %s", errorCode, errString)))
+                onResult(AuthResult.Error(String.format("(%d) %s", errorCode, errString)))
             }
         }
 
@@ -107,7 +109,7 @@ class RealAuthLauncher @Inject constructor(
             super.onAuthenticationSucceeded(result)
             logcat { "onAuthenticationSucceeded ${result.authenticationType}" }
             deviceAuthorizationGracePeriod.recordSuccessfulAuthorization()
-            onResult(Success)
+            onResult(AuthResult.Success)
         }
 
         override fun onAuthenticationFailed() {
@@ -122,7 +124,7 @@ class RealAuthLauncher @Inject constructor(
 
         // https://developer.android.com/reference/kotlin/androidx/biometric/BiometricPrompt.PromptInfo.Builder#setallowedauthenticators
         // BIOMETRIC_STRONG | DEVICE_CREDENTIAL is unsupported on API 28-29. Setting an unsupported value on an affected Android version will result in an error when calling build().
-        return if (appBuildConfig.sdkInt != Build.VERSION_CODES.Q && appBuildConfig.sdkInt != Build.VERSION_CODES.P) {
+        return if (appBuildConfig.sdkInt != 29 && appBuildConfig.sdkInt != 28) {
             biometricPromptInfoBuilder.setAllowedAuthenticators(
                 BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL,
             )
