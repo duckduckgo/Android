@@ -42,16 +42,21 @@ tags:
           id: "inputScreenSearchOnlyContainer"
       - tapOn: "Done"
 
-      - tapOn:
-          id: "quickSetupSwitchRowSwitch"
-          childOf:
-            id: "setDefaultBrowserItem"
       - runFlow:
           when:
-            visible: "set as default"
+            visible:
+              id: "setDefaultBrowserItem"
           commands:
-            - tapOn: "duckduckgo"
-            - tapOn: "set as default"
+            - tapOn:
+                id: "quickSetupSwitchRowSwitch"
+                childOf:
+                  id: "setDefaultBrowserItem"
+            - runFlow:
+                when:
+                  visible: "set as default"
+                commands:
+                  - tapOn: "duckduckgo"
+                  - tapOn: "set as default"
 
       - tapOn: "Start Browsing"
       - assertVisible:
