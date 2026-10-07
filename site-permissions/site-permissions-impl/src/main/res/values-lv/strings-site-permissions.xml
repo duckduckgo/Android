@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Vietne \"%1$s\" vēlas piekļūt tavai kamerai</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Vietne \"%1$s\" vēlas piekļūt tavam mikrofonam</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Vietne \"%1$s\" vēlas piekļūt tavai kamerai un mikrofonam</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">“%1$s” vēlas piekļūt tavai atrašanās vietai šajā vietnē</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">“%1$s” vēlas piekļūt tavai kamerai šajā vietnē</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">“%1$s” vēlas piekļūt tavam mikrofonam šajā vietnē</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">“%1$s” vēlas piekļūt tavai kamerai un mikrofonam šajā vietnē</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">“%1$s” vēlas piekļūt tavai digitālā satura tiesību pārvaldības (DRM) programmatūrai šajā vietnē</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Ja neatļausi, vietnē esošos videoklipus, iespējams, nevarēs atskaņot, taču šai vietnei nebūs piekļuves DRM programmatūras nodrošinātajiem ierīču identifikatoriem.</string>
 
     <!-- Reminder dialog -->
