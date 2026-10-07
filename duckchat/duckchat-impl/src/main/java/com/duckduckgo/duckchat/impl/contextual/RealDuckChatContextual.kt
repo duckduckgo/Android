@@ -62,6 +62,9 @@ class RealDuckChatContextual @Inject constructor(
         textSelection: String?,
         showChatSurface: () -> Unit,
     ) {
+        // Every caller already gates on contextual mode, so this is a backstop. Falling back to
+        // showChatSurface() would open the contextual sheet — the very thing the mode disables.
+        if (!duckChatInternal.isDuckChatContextualModeEnabled()) return
         if (anchor == null) {
             showChatSurface()
             return

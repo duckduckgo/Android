@@ -26,6 +26,7 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelecti
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyNoInteractions
@@ -57,6 +58,22 @@ class RealDuckChatContextualTest {
         globalActivityStarter,
         textSelectionRepository,
     )
+
+    @Before
+    fun setup() {
+        whenever(duckChatInternal.isDuckChatContextualModeEnabled()).thenReturn(true)
+    }
+
+    @Test
+    fun whenContextualModeDisabledThenNothingIsShown() = runTest {
+        whenever(duckChatInternal.isDuckChatContextualModeEnabled()).thenReturn(false)
+        var askAboutPageCount = 0
+
+        testee.launch("tabId", sourceUrl = null, anchor = anchor) { askAboutPageCount++ }
+
+        assertEquals(0, askAboutPageCount)
+        verifyNoInteractions(browserNav)
+    }
 
     @Test
     fun whenAnchorNullThenAskAboutPageInvokedDirectly() = runTest {
