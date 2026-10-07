@@ -16,8 +16,6 @@
 
 package com.duckduckgo.pir.impl.freemium
 
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirRemoteFeatures
@@ -37,7 +35,6 @@ class RealPirFreemium @Inject constructor(
     private val pirRemoteFeatures: PirRemoteFeatures,
     private val subscriptions: Subscriptions,
     private val pirFreemiumDataStore: PirFreemiumDataStore,
-    private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
 ) : PirFreemium {
 
@@ -59,21 +56,10 @@ class RealPirFreemium @Inject constructor(
     }
 
     private suspend fun isEligible(): Boolean {
-        if (!pirRemoteFeatures.pirBeta().isEnabled()) {
-            return false
-        }
-
         if (subscriptions.isSignedIn()) {
             return false
         }
 
-        return pirRemoteFeatures.freemium().isEnabled() && meetsLocaleRequirement()
-    }
-
-    private fun meetsLocaleRequirement(): Boolean =
-        appBuildConfig.deviceLocale.country.equals(US_COUNTRY_CODE, ignoreCase = true) || appBuildConfig.isInternalBuild()
-
-    private companion object {
-        private const val US_COUNTRY_CODE = "US"
+        return pirRemoteFeatures.freemium().isEnabled()
     }
 }

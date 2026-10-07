@@ -16,8 +16,6 @@
 
 package com.duckduckgo.pir.impl.freemium
 
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -36,7 +34,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import java.util.Locale
 
 class RealPirFreemiumTest {
 
@@ -46,24 +43,19 @@ class RealPirFreemiumTest {
     private val pirRemoteFeatures = FakeFeatureToggleFactory.create(PirRemoteFeatures::class.java)
     private val subscriptions: Subscriptions = mock()
     private val dataStore: PirFreemiumDataStore = mock()
-    private val appBuildConfig: AppBuildConfig = mock()
 
     private lateinit var testee: RealPirFreemium
 
     @Before
     fun setUp() = runTest {
-        pirRemoteFeatures.pirBeta().setRawStoredState(State(enable = true))
         pirRemoteFeatures.freemium().setRawStoredState(State(enable = true))
         whenever(subscriptions.isSignedIn()).thenReturn(false)
         whenever(dataStore.firstScanResult).thenReturn(null)
-        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.US)
-        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
 
         testee = RealPirFreemium(
             pirRemoteFeatures = pirRemoteFeatures,
             subscriptions = subscriptions,
             pirFreemiumDataStore = dataStore,
-            appBuildConfig = appBuildConfig,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
         )
     }
@@ -71,13 +63,6 @@ class RealPirFreemiumTest {
     @Test
     fun whenAllGatesPassAndNoScanCompletedThenEligible() = runTest {
         assertEquals(ELIGIBLE, testee.getPirFreemiumState())
-    }
-
-    @Test
-    fun whenPirRolloutIsOffThenNotEligible() = runTest {
-        pirRemoteFeatures.pirBeta().setRawStoredState(State(enable = false))
-
-        assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
     }
 
     @Test
@@ -114,28 +99,6 @@ class RealPirFreemiumTest {
         whenever(subscriptions.isSignedIn()).thenReturn(true)
 
         assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
-    }
-
-    @Test
-    fun whenLocaleHasNoCountryCodeThenNotEligible() = runTest {
-        whenever(appBuildConfig.deviceLocale).thenReturn(Locale("en"))
-
-        assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
-    }
-
-    @Test
-    fun whenLocaleIsNonUsThenNotEligible() = runTest {
-        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.GERMANY)
-
-        assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
-    }
-
-    @Test
-    fun whenLocaleIsNonUsButBuildIsInternalThenEligible() = runTest {
-        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.GERMANY)
-        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
-
-        assertEquals(ELIGIBLE, testee.getPirFreemiumState())
     }
 
     @Test
