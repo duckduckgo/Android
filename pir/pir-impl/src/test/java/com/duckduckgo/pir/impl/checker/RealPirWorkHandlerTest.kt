@@ -85,8 +85,9 @@ class RealPirWorkHandlerTest {
     }
 
     @Test
-    fun whenPirBetaDisabledThenCanRunPirDisabledWithFeatureDisabled() = runTest {
+    fun whenPirBetaAndFreemiumDisabledThenCanRunPirDisabledWithFeatureDisabled() = runTest {
         whenever(pirBetaToggle.isEnabled()).thenReturn(false)
+        whenever(freemiumToggle.isEnabled()).thenReturn(false)
 
         pirWorkHandler.canRunPir().test {
             assertEquals(PirEligibility.Disabled(DisabledReason.FEATURE_DISABLED), awaitItem())
@@ -358,14 +359,40 @@ class RealPirWorkHandlerTest {
     }
 
     @Test
-    fun whenPirBetaDisabledAndFreemiumActivatedThenCanRunPirDisabledWithFeatureDisabled() = runTest {
+    fun whenPirBetaDisabledAndFreemiumEnabledAndActivatedAndNoSubscriptionThenCanRunPirEnabledWithScanOnly() = runTest {
         whenever(pirBetaToggle.isEnabled()).thenReturn(false)
         whenever(freemiumToggle.isEnabled()).thenReturn(true)
         whenever(pirFreemiumDataStore.didActivate).thenReturn(true)
+        givenSubscription(SubscriptionStatus.INACTIVE)
 
         pirWorkHandler.canRunPir().test {
-            assertEquals(PirEligibility.Disabled(DisabledReason.FEATURE_DISABLED), awaitItem())
-            awaitComplete()
+            assertEquals(PirEligibility.Enabled(PirRunMode.SCAN_ONLY), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPirBetaDisabledAndFreemiumEnabledButNotActivatedThenCanRunPirDisabledWithSubscriptionExpired() = runTest {
+        whenever(pirBetaToggle.isEnabled()).thenReturn(false)
+        whenever(freemiumToggle.isEnabled()).thenReturn(true)
+        whenever(pirFreemiumDataStore.didActivate).thenReturn(false)
+        givenSubscription(SubscriptionStatus.INACTIVE)
+
+        pirWorkHandler.canRunPir().test {
+            assertEquals(PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPirBetaDisabledButFreemiumEnabledAndPirEntitledThenCanRunPirEnabledWithScanAndOptOut() = runTest {
+        whenever(pirBetaToggle.isEnabled()).thenReturn(false)
+        whenever(freemiumToggle.isEnabled()).thenReturn(true)
+        givenSubscription(SubscriptionStatus.AUTO_RENEWABLE, setOf(pirEntitlement))
+
+        pirWorkHandler.canRunPir().test {
+            assertEquals(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT), awaitItem())
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
