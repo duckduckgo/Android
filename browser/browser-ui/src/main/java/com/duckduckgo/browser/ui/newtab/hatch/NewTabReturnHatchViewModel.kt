@@ -90,7 +90,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
         val showTabsButton: Boolean = false,
         val showAfterInactivityEntry: Boolean = false,
         val afterInactivityDestinationSummary: AfterInactivityDestinationSummary =
-            AfterInactivityDestinationSummary.TextRes(R.string.hatchMenuAfterInactivityDestinationNewTabPage),
+            AfterInactivityDestinationSummary.TextRes(R.string.hatchMenuAfterInactivityOpenNewTab),
     )
 
     sealed class Command {
@@ -277,8 +277,8 @@ class NewTabReturnHatchViewModel @Inject constructor(
     }
 
     private fun AfterInactivitySettings.destinationSummary(): AfterInactivityDestinationSummary = when (this) {
-        AfterInactivitySettings.LastUsedTab -> AfterInactivityDestinationSummary.TextRes(R.string.hatchMenuAfterInactivityDestinationLastOpenedTab)
-        is AfterInactivitySettings.NewTabPage -> AfterInactivityDestinationSummary.TextRes(R.string.hatchMenuAfterInactivityDestinationNewTabPage)
+        AfterInactivitySettings.LastUsedTab -> AfterInactivityDestinationSummary.TextRes(R.string.hatchMenuAfterInactivityLastUsedTab)
+        is AfterInactivitySettings.NewTabPage -> AfterInactivityDestinationSummary.TextRes(R.string.hatchMenuAfterInactivityOpenNewTab)
         is AfterInactivitySettings.SpecificPage -> AfterInactivityDestinationSummary.Url(url)
     }
 }

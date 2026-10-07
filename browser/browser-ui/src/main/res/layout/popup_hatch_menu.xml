@@ -26,19 +26,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_return_24"
-        app:primaryText="@string/hatchMenuReturnTab" />
-
-    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-        app:defaultPadding="false"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        app:primaryText="@string/hatchMenuReturnToLastUsedTab" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/hatchMenuCloseTab"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/hatchMenuCloseTab"
-        app:leadingIcon="@drawable/ic_close_24"
+        app:primaryText="@string/hatchMenuCloseLastUsedTab"
+        app:leadingIcon="@drawable/ic_close_outline_16"
         app:leadingIconTint="?daxColorDestructive"
         app:primaryTextType="destructive" />
 
@@ -53,19 +48,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_settings_24"
+        app:leadingIconSize="small"
         app:primaryText="@string/hatchMenuAfterInactivitySettings" />
-
-    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-        android:id="@+id/hatchMenuAfterInactivityBottomDivider"
-        app:defaultPadding="false"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/hatchMenuHideShortcut"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_eye_closed_24"
-        app:primaryText="@string/hatchMenuHideShortcut" />
+        app:primaryText="@string/hatchMenuHideReturnToShortcut" />
 
 </LinearLayout>
