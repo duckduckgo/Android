@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Webbplatsen ”%1$s” vill få åtkomst till din kamera</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Webbplatsen ”%1$s” vill få åtkomst till din mikrofon</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Webbplatsen ”%1$s” vill få åtkomst till din kamera och mikrofon</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" vill få åtkomst till din plats på den här webbplatsen</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" vill komma åt kameran på den här webbplatsen</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">”%1$s” vill ha åtkomst till din mikrofon på den här webbplatsen</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">”%1$s” vill ha åtkomst till din kamera och mikrofon på den här webbplatsen</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">”%1$s” vill ha åtkomst till din Digital Rights Management-programvara (DRM) på den här webbplatsen</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Om du inte tillåter kan videor på webbplatsen bli ospelbara, men denna webbplats kommer inte att ha åtkomst till enhetsidentifierare som tillhandahålls av DRM-programvara.</string>
 
     <!-- Reminder dialog -->
