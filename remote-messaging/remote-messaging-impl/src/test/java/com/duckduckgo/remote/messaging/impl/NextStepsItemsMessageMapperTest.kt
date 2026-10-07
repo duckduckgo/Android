@@ -84,6 +84,26 @@ class NextStepsItemsMessageMapperTest {
     }
 
     @Test
+    fun whenListItemTypeIsNotNextStepItemThenItemIsDropped() {
+        val unsupportedItems = listOf("two_line_list_item", "featured_two_line_single_action_list_item", "section_title").map { type ->
+            JsonListItem(
+                id = type,
+                type = type,
+                titleText = "Title",
+                descriptionText = "Description",
+                placeholder = "Announce",
+                primaryAction = JsonMessageAction(type = "url", value = "https://example.com", additionalParameters = null),
+            )
+        }
+        val listItems = unsupportedItems + nextStepsItemsJsonContent().listItems.orEmpty()
+        val jsonMessages = listOf(aJsonMessage(id = "next_steps", content = nextStepsItemsJsonContent(listItems = listItems)))
+
+        val content = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins).first().content as Content.NextStepsItems
+
+        assertEquals(nextStepListItems(), content.listItems)
+    }
+
+    @Test
     fun whenNextStepsItemsMessageWithEmptyListItemsThenReturnEmptyList() {
         val jsonMessages = listOf(aJsonMessage(id = "next_steps", content = nextStepsItemsJsonContent(listItems = emptyList())))
 

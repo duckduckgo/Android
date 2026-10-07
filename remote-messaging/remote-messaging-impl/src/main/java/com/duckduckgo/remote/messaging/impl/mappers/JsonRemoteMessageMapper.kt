@@ -106,7 +106,7 @@ private val cardsListMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Co
         placeholder = jsonContent.placeholder.asPlaceholder(),
         primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
         primaryAction = jsonContent.primaryAction!!.toAction(actionMappers),
-        listItems = jsonContent.listItems.toListItems(actionMappers),
+        listItems = jsonContent.listItems.toListItems(actionMappers, CARDS_LIST_ITEM_TYPES),
         imageUrl = jsonContent.imageUrl,
     )
 }
@@ -114,13 +114,29 @@ private val cardsListMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Co
 private val nextStepsItemsMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Content = { jsonContent, actionMappers ->
     NextStepsItems(
         titleText = jsonContent.titleText.failIfEmpty(),
-        listItems = jsonContent.listItems.toListItems(actionMappers),
+        listItems = jsonContent.listItems.toListItems(actionMappers, NEXT_STEPS_ITEM_TYPES),
     )
 }
 
-private fun List<JsonListItem>?.toListItems(actionMappers: Set<MessageActionMapperPlugin>): List<CardItem> {
+private val CARDS_LIST_ITEM_TYPES = setOf(
+    CardItemType.TWO_LINE_LIST_ITEM,
+    CardItemType.FEATURED_TWO_LINE_SINGLE_ACTION_LIST_ITEM,
+    CardItemType.LIST_SECTION_TITLE,
+)
+
+private val NEXT_STEPS_ITEM_TYPES = setOf(CardItemType.NEXT_STEP_ITEM)
+
+private fun List<JsonListItem>?.toListItems(
+    actionMappers: Set<MessageActionMapperPlugin>,
+    allowedTypes: Set<CardItemType>,
+): List<CardItem> {
+    val allowedJsonValues = allowedTypes.map { it.jsonValue }.toSet()
     return this?.mapNotNull { jsonItem ->
-        itemMappers[jsonItem.type]?.invoke(jsonItem, actionMappers)
+        if (jsonItem.type in allowedJsonValues) {
+            itemMappers[jsonItem.type]?.invoke(jsonItem, actionMappers)
+        } else {
+            null
+        }
     } ?: emptyList()
 }
 
