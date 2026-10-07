@@ -45,6 +45,7 @@ dependencies {
     implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.appCompat
     implementation AndroidX.core.ktx
+    implementation AndroidX.recyclerView
     implementation Google.dagger
     implementation Google.android.material
     implementation Square.retrofit2.converter.moshi
