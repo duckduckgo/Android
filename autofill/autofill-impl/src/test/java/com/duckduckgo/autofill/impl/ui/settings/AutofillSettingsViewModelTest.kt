@@ -8,7 +8,7 @@ import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.AutofillSettings
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
-import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
+import com.duckduckgo.autofill.impl.importing.capability.PasswordImportAvailability
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN
@@ -49,7 +49,7 @@ class AutofillSettingsViewModelTest {
     private val pixel: Pixel = mock()
     private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
     private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
-    private val importGooglePasswordsCapabilityChecker: ImportGooglePasswordsCapabilityChecker = mock()
+    private val passwordImportAvailability: PasswordImportAvailability = mock()
     private val deviceAuthenticator: DeviceAuthenticator = mock()
     private val launchSource = AutofillScreenLaunchSource.SettingsActivity
 
@@ -59,7 +59,7 @@ class AutofillSettingsViewModelTest {
         dispatchers = coroutineTestRule.testDispatcherProvider,
         neverSavedSiteRepository = neverSavedSiteRepository,
         autofillFeature = autofillFeature,
-        importGooglePasswordsCapabilityChecker = importGooglePasswordsCapabilityChecker,
+        passwordImportAvailability = passwordImportAvailability,
         deviceAuthenticator = deviceAuthenticator,
     )
 
@@ -70,7 +70,7 @@ class AutofillSettingsViewModelTest {
             whenever(mockStore.getCredentialCount()).thenReturn(flowOf(Result.success(0)))
             whenever(neverSavedSiteRepository.neverSaveListCount()).thenReturn(emptyFlow())
             whenever(deviceAuthenticator.isAuthenticationRequiredForAutofill()).thenReturn(true)
-            whenever(importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()).thenReturn(true)
+            whenever(passwordImportAvailability.canImport()).thenReturn(true)
             whenever(mockStore.autofillAvailable()).thenReturn(true)
             autofillFeature.self().setRawStoredState(State(enable = true))
             autofillFeature.canImportFromGooglePasswordManager().setRawStoredState(State(enable = true))
@@ -110,7 +110,7 @@ class AutofillSettingsViewModelTest {
 
     @Test
     fun whenScreenRendersIfImportButtonNotAvailableThenPixelIsNotSent() = runTest {
-        whenever(importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()).thenReturn(false)
+        whenever(passwordImportAvailability.canImport()).thenReturn(false)
         testee.viewState(launchSource).test {
             awaitItem()
             verify(pixel, times(0)).fire(pixel = eq(AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN), any(), any(), any())
@@ -252,7 +252,7 @@ class AutofillSettingsViewModelTest {
 
     @Test
     fun whenImportGooglePasswordsFeatureDisabledDueToWebViewNotSupportedThenViewStateReflectsThat() = runTest {
-        whenever(importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()).thenReturn(false)
+        whenever(passwordImportAvailability.canImport()).thenReturn(false)
         testee.viewState(launchSource).test {
             assertFalse(awaitItem().canImportFromGooglePasswords)
             cancelAndIgnoreRemainingEvents()

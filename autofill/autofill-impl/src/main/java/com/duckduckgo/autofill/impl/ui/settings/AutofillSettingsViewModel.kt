@@ -25,7 +25,7 @@ import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.impl.asString
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
-import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
+import com.duckduckgo.autofill.impl.importing.capability.PasswordImportAvailability
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN
@@ -61,7 +61,7 @@ class AutofillSettingsViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
     private val autofillFeature: AutofillFeature,
-    private val importGooglePasswordsCapabilityChecker: ImportGooglePasswordsCapabilityChecker,
+    private val passwordImportAvailability: PasswordImportAvailability,
     private val deviceAuthenticator: DeviceAuthenticator,
 ) : ViewModel() {
 
@@ -136,8 +136,8 @@ class AutofillSettingsViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             val canImport = kotlin.runCatching {
                 val gpmImport = autofillFeature.self().isEnabled() && autofillFeature.canImportFromGooglePasswordManager().isEnabled()
-                val webViewSupportsImportingPasswords = importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()
-                return@runCatching gpmImport && webViewSupportsImportingPasswords
+                val canImportPasswords = passwordImportAvailability.canImport()
+                return@runCatching gpmImport && canImportPasswords
             }.getOrDefault(false)
             _viewState.value = _viewState.value.copy(canImportFromGooglePasswords = canImport)
             if (canImport && !importGooglePasswordButtonShownPixelSent) {

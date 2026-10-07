@@ -23,10 +23,13 @@ import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.InBrowserPromo
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
+import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportResult
+import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportResult.Failure
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangePasswordImporter
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.Command.StartWebFlow
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.BrowserPromoPreImport
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.DeterminingFirstView
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.Importing
@@ -54,6 +57,7 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     private val autofillStore: InternalAutofillStore,
     private val promptExposureReporter: PromptExposureReporter,
     private val credentialExchangePasswordImporter: CredentialExchangePasswordImporter,
+    private val webViewCapabilityChecker: ImportGooglePasswordsCapabilityChecker,
 ) : ViewModel() {
 
     fun onImportFlowFinishedSuccessfully() {
@@ -115,11 +119,21 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
                     onImportFlowFinishedSuccessfully()
                 }
                 is CredentialExchangeImportResult.Cancelled -> onImportFlowCancelledByUser(canShowPreImportDialog)
-                is CredentialExchangeImportResult.Failure -> {
-                    logcat(WARN) { "Credential exchange failed (${converted.reason}), falling back to web flow" }
-                    command.trySend(Command.StartWebFlow)
-                }
+                is Failure -> onExchangeCredentialsFailure(converted)
             }
+        }
+    }
+
+    /**
+     * When there's a failure in the exchange credentials flow, we fallback to the web-based flow if that's supported
+     */
+    private suspend fun onExchangeCredentialsFailure(failure: Failure) {
+        if (webViewCapabilityChecker.webViewCapableOfImporting()) {
+            logcat(WARN) { "Credential exchange failed (${failure.reason}), falling back to web flow" }
+            command.trySend(StartWebFlow)
+        } else {
+            logcat(WARN) { "Credential exchange failed (${failure.reason}), web flow not supported" }
+            onImportFlowFinishedWithError()
         }
     }
 

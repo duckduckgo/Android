@@ -17,7 +17,7 @@
 package com.duckduckgo.autofill.impl.importing.promo
 
 import com.duckduckgo.autofill.api.AutofillFeature
-import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
+import com.duckduckgo.autofill.impl.importing.capability.PasswordImportAvailability
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -40,7 +40,7 @@ class RealImportInPasswordsVisibilityTest {
 
     private val internalAutofillStore: InternalAutofillStore = mock()
     private val autofillFeature: AutofillFeature = mock()
-    private val importPasswordCapabilityChecker: ImportGooglePasswordsCapabilityChecker = mock()
+    private val passwordImportAvailability: PasswordImportAvailability = mock()
     private val appCoroutineScope: CoroutineScope = coroutineTestRule.testScope
     private val dispatcherProvider = coroutineTestRule.testDispatcherProvider
 
@@ -198,7 +198,7 @@ class RealImportInPasswordsVisibilityTest {
         testee = RealImportInPasswordsVisibility(
             internalAutofillStore = internalAutofillStore,
             autofillFeature = autofillFeature,
-            importGooglePasswordsCapabilityChecker = importPasswordCapabilityChecker,
+            passwordImportAvailability = passwordImportAvailability,
             appCoroutineScope = appCoroutineScope,
             dispatcherProvider = dispatcherProvider,
         )
@@ -219,7 +219,7 @@ class RealImportInPasswordsVisibilityTest {
     }
 
     private suspend fun setupWebViewCapabilities(capable: Boolean = true) {
-        whenever(importPasswordCapabilityChecker.webViewCapableOfImporting()).thenReturn(capable)
+        whenever(passwordImportAvailability.canImport()).thenReturn(capable)
     }
 
     private fun setupAutofillStore(
