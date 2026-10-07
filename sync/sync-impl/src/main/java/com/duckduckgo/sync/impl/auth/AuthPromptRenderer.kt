@@ -158,6 +158,7 @@ class RealAuthPromptRenderer @Inject constructor(
         val forceDismiss: () -> Unit,
     )
 
+    @SuppressLint("InlinedApi")
     private fun launchAuthEnrollment() {
         when {
             buildConfig.manufacturer.equals("Xiaomi", ignoreCase = true) -> {
@@ -166,7 +167,6 @@ class RealAuthPromptRenderer @Inject constructor(
             }
 
             buildConfig.sdkInt >= 30 -> {
-                @SuppressLint("InlinedApi")
                 Settings.ACTION_BIOMETRIC_ENROLL.safeLaunchSettingsActivity(tryFallback = true)
             }
 
