@@ -37,12 +37,24 @@ import javax.inject.Inject
 
 interface AuthLauncher {
 
+    /**
+     * Starts a new authentication session and shows the prompt.
+     */
     fun launch(
         @StringRes featureTitleText: Int,
         @StringRes featureAuthText: Int,
         fragmentActivity: FragmentActivity,
         onResult: (AuthResult) -> Unit,
-    )
+    ): BiometricPrompt
+
+    /**
+     * Routes the results of an authentication already running in [fragmentActivity] to [onResult], without starting a new one.
+     * Use it when the activity is recreated while the prompt is showing.
+     */
+    fun attach(
+        fragmentActivity: FragmentActivity,
+        onResult: (AuthResult) -> Unit,
+    ): BiometricPrompt
 }
 
 @ContributesBinding(AppScope::class)
@@ -57,14 +69,21 @@ class RealAuthLauncher @Inject constructor(
         @StringRes featureAuthText: Int,
         fragmentActivity: FragmentActivity,
         onResult: (AuthResult) -> Unit,
-    ) {
-        val prompt = BiometricPrompt(
+    ): BiometricPrompt {
+        val prompt = attach(fragmentActivity, onResult)
+        prompt.authenticate(getPromptInfo(titleText = featureTitleText, featureAuthText = featureAuthText))
+        return prompt
+    }
+
+    override fun attach(
+        fragmentActivity: FragmentActivity,
+        onResult: (AuthResult) -> Unit,
+    ): BiometricPrompt {
+        return BiometricPrompt(
             fragmentActivity,
             ContextCompat.getMainExecutor(context),
             getCallBack(onResult),
         )
-
-        prompt.authenticate(getPromptInfo(titleText = featureTitleText, featureAuthText = featureAuthText))
     }
 
     private fun getCallBack(
