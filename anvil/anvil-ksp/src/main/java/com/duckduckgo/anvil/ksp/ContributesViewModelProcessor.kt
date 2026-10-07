@@ -50,7 +50,7 @@ class ContributesViewModelProcessor(
     companion object {
         private const val CONTRIBUTES_VIEW_MODEL = "com.duckduckgo.anvil.annotations.ContributesViewModel"
         private const val JAVAX_INJECT = "javax.inject.Inject"
-        private const val SINGLE_INSTANCE_IN = "dagger.SingleInstanceIn"
+        private val SCOPE_ANNOTATIONS = setOf("dagger.SingleInstanceIn", "dev.zacsweers.metro.SingleIn")
 
         private val CONTRIBUTES_MULTIBINDING_CLASS = ClassName("com.squareup.anvil.annotations", "ContributesMultibinding")
         private val VIEW_MODEL_FACTORY_PLUGIN_CLASS = ClassName("com.duckduckgo.common.utils.plugins.view_model", "ViewModelFactoryPlugin")
@@ -80,10 +80,10 @@ class ContributesViewModelProcessor(
     private fun processClass(classDeclaration: KSClassDeclaration) {
         val annotation = classDeclaration.findAnnotation(CONTRIBUTES_VIEW_MODEL) ?: return
 
-        // Validation: must not be annotated with @SingleInstanceIn
-        if (classDeclaration.findAnnotation(SINGLE_INSTANCE_IN) != null) {
+        // Validation: must not be annotated with a singleton scope annotation
+        if (SCOPE_ANNOTATIONS.any { classDeclaration.findAnnotation(it) != null }) {
             logger.error(
-                "${classDeclaration.qualifiedName?.asString()} cannot be annotated with @SingleInstanceIn",
+                "${classDeclaration.qualifiedName?.asString()} cannot be annotated with @SingleIn",
                 classDeclaration,
             )
             return
