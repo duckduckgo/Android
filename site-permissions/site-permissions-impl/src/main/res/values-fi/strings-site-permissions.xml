@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\"-verkkosivusto haluaa käyttää kameraasi</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Sivusto \"%1$s\" haluaa käyttää mikrofonia</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\"-verkkosivusto haluaa käyttää kameraasi ja mikrofoniasi</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" haluaa käyttää sijaintiasi tällä verkkosivustolla</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" haluaa käyttää kameraasi tällä verkkosivustolla</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" haluaa käyttää mikrofoniasi tällä verkkosivustolla</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" haluaa käyttää kameraasi ja mikrofoniasi tällä verkkosivustolla</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" haluaa käyttää DRM-ohjelmistoasi (Digital Rights Management) tällä verkkosivustolla</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Jos et salli, sivustolla olevia videoita ei ehkä voida toistaa, mutta tämä sivusto ei voi käyttää DRM-ohjelmiston tarjoamia laitetunnisteita.</string>
 
     <!-- Reminder dialog -->
