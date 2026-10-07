@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Interneto svetainė „%1$s“ nori pasiekti tavo kamerą</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Interneto svetainė „%1$s“ nori pasiekti tavo mikrofoną</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Interneto svetainė „%1$s“ nori pasiekti tavo kamerą ir mikrofoną</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ nori gauti prieigą prie jūsų vietovės šioje interneto svetainėje</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ nori gauti prieigą prie jūsų kameros šioje interneto svetainėje</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ nori gauti prieigą prie jūsų mikrofono šioje interneto svetainėje</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ nori gauti prieigą prie jūsų kameros ir mikrofono šioje interneto svetainėje</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ nori gauti prieigą prie jūsų skaitmeninių teisių valdymo (angl. „Digital Rights Management“, DRM) programinės įrangos šioje interneto svetainėje</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Jei neleisi, vaizdo įrašai svetainėje gali nebeveikti, tačiau ši svetainė neturės prieigos prie įrenginio identifikatorių, kuriuos teikia DRM programinė įranga.</string>
 
     <!-- Reminder dialog -->
