@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Le site Web \"%1$s\" souhaite accéder à ton appareil photo</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Le site Web « %1$s » souhaite accéder à votre micro</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Le site Web « %1$s » souhaite accéder à votre appareil photo et à votre micro</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">« %1$s » souhaite accéder à votre position sur ce site Web</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">« %1$s » souhaite accéder à votre appareil photo sur ce site Web</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">« %1$s » souhaite accéder à votre micro sur ce site Web</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">« %1$s » souhaite accéder à votre appareil photo et à votre micro sur ce site Web</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">« %1$s » souhaite accéder à votre logiciel de gestion des droits numériques (DRM) sur ce site Web</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Si tu n’autorises pas, les vidéos sur le site pourraient ne pas être lues, mais ce site n’aura pas accès aux identifiants d’appareil fournis par le logiciel DRM.</string>
 
     <!-- Reminder dialog -->
