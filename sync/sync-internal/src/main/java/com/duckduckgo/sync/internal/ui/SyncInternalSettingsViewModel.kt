@@ -48,6 +48,9 @@ import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncDeviceIds
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.auth.AuthPrompt
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator2
+import com.duckduckgo.sync.impl.auth.DeviceAuthorizationGracePeriod
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.autorestore.SyncRecoveryPersistentStorageKey
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
@@ -65,11 +68,13 @@ import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.Rea
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ShowMessage
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ShowQR
 import com.duckduckgo.sync.store.*
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -103,6 +108,8 @@ constructor(
     private val syncDeviceIds: SyncDeviceIds,
     private val exchangeV2QrCode: ExchangeV2QrCode,
     private val syncCodeDispatcher: SyncCodeDispatcher,
+    private val deviceAuthenticator: DeviceAuthenticator2,
+    private val gracePeriod: DeviceAuthorizationGracePeriod,
     @field:SuppressLint("StaticFieldLeak") private val context: Context,
 ) : ViewModel() {
 
@@ -110,6 +117,9 @@ constructor(
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(): Flow<ViewState> = viewState.onStart { getConnectedDevices() }
     fun commands(): Flow<Command> = command.receiveAsFlow()
+    val authPrompts: StateFlow<AuthPrompt?> = deviceAuthenticator.currentPrompt
+    private var authJob: Job? = null
+    private val authLog = mutableListOf<String>()
 
     data class ViewState(
         val userId: String = "",
@@ -156,6 +166,7 @@ constructor(
         val canUsePatchEndpointForLegacyDeviceRenameEnabled: Boolean = false,
         val migrationStatusText: String = "",
         val migrationResult: String = "",
+        val authenticateResult: String = "",
     )
 
     sealed class BlockStoreValue {
@@ -183,6 +194,26 @@ constructor(
             refreshBlockStoreValue()
         }
         observeTestSyncWarningState()
+    }
+
+    fun onAuthenticateClicked() {
+        if (authJob?.isActive == true) return
+        authLog.clear()
+        authJob = viewModelScope.launch {
+            appendAuthLog("Authenticating…")
+            val response = deviceAuthenticator.authenticate(DeviceAuthenticator2.Request()) { event -> appendAuthLog("Event: $event") }
+            appendAuthLog("Response: $response")
+        }
+    }
+
+    fun onInvalidateGracePeriodClicked() {
+        gracePeriod.invalidate()
+        appendAuthLog("Grace period invalidated")
+    }
+
+    private fun appendAuthLog(line: String) {
+        authLog += "${System.currentTimeMillis().toLogTimestamp()} $line"
+        viewState.update { it.copy(authenticateResult = authLog.joinToString("\n")) }
     }
 
     fun onResume() {
