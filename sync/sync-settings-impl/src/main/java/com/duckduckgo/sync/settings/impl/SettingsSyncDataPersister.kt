@@ -28,7 +28,7 @@ import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResoluti
 import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
 import com.duckduckgo.sync.settings.api.SyncableSetting
 import com.duckduckgo.sync.settings.impl.SettingsSyncDataPersister.Adapters.Companion.updatesAdapter
-import com.squareup.anvil.annotations.*
+import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.*
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.flow.firstOrNull
