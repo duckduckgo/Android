@@ -18,28 +18,39 @@ package com.duckduckgo.sync.impl.ui.setup
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.auth.AuthPrompt
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Request
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AnotherDevicePromptOption
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import logcat.LogPriority.WARN
+import logcat.logcat
 
-@ContributesViewModel(ActivityScope::class)
-class SyncThisDeviceViewModel @Inject constructor(
+class SyncThisDeviceViewModel @AssistedInject constructor(
+    @Assisted private val isAuthRequired: Boolean,
+    private val deviceAuthenticator: DeviceAuthenticator,
     private val syncAccountRepository: SyncAccountRepository,
     private val syncPixels: SyncPixels,
     private val dispatchers: DispatcherProvider,
@@ -51,6 +62,10 @@ class SyncThisDeviceViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
+    val authPrompts: StateFlow<AuthPrompt?> = deviceAuthenticator.currentPrompt
+
+    private var syncThisDeviceJob: Job? = null
+
     init {
         syncPixels.fireSyncAnotherDevicePromptShown()
         viewModelScope.launch {
@@ -59,10 +74,13 @@ class SyncThisDeviceViewModel @Inject constructor(
     }
 
     fun syncThisDevice(launchSource: String?) {
+        if (syncThisDeviceJob?.isActive == true) return
         syncPixels.fireSyncAnotherDevicePromptOptionTapped(AnotherDevicePromptOption.THIS_DEVICE_ONLY)
-        _viewState.update { it.copy(isSyncing = true) }
 
-        viewModelScope.launch(dispatchers.io()) {
+        syncThisDeviceJob = viewModelScope.launch(dispatchers.io()) {
+            if (!authenticate()) return@launch
+
+            _viewState.update { it.copy(isSyncing = true) }
             syncSetupWideEvent.onSyncEnabled()
 
             suspend fun getDeviceAndFinish() {
@@ -106,7 +124,9 @@ class SyncThisDeviceViewModel @Inject constructor(
     fun onSyncWithAnotherDeviceClicked() {
         syncPixels.fireSyncAnotherDevicePromptOptionTapped(AnotherDevicePromptOption.WITH_ANOTHER_DEVICE)
         viewModelScope.launch {
-            _commands.send(Command.SyncWithAnotherDevice)
+            if (authenticate()) {
+                _commands.send(Command.SyncWithAnotherDevice)
+            }
         }
     }
 
@@ -119,6 +139,33 @@ class SyncThisDeviceViewModel @Inject constructor(
     fun onErrorDismissed() {
         viewModelScope.launch {
             _commands.send(Command.AbortSyncing)
+        }
+    }
+
+    private suspend fun authenticate(): Boolean {
+        if (!isAuthRequired) return true
+        val response = deviceAuthenticator.authenticate(Request()) { event ->
+            viewModelScope.launch {
+                when (event) {
+                    Event.EnrollmentNeeded -> syncSetupWideEvent.onDeviceAuthNotEnrolled()
+                    Event.EnrollmentShown -> syncSetupWideEvent.onEnrollDeviceAuthDialogShown()
+                    Event.VerificationShown -> Unit
+                }
+            }
+        }
+        return when (response) {
+            is Response.Allowed -> {
+                syncSetupWideEvent.onUserAuthSuccess()
+                true
+            }
+
+            is Response.Cancelled -> false
+
+            is Response.Failed -> {
+                logcat(WARN) { "Sync: device authentication failed: ${response.reason}" }
+                _commands.send(Command.ShowAuthError)
+                false
+            }
         }
     }
 
@@ -139,5 +186,23 @@ class SyncThisDeviceViewModel @Inject constructor(
             @StringRes val message: Int,
             val reason: String? = "",
         ) : Command
+
+        data object ShowAuthError : Command
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(isAuthRequired: Boolean): SyncThisDeviceViewModel
+
+        class Provider(
+            private val assistedFactory: Factory,
+            private val isAuthRequired: Boolean,
+        ) : ViewModelProvider.Factory {
+
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return assistedFactory.create(isAuthRequired) as T
+            }
+        }
     }
 }
