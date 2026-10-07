@@ -52,7 +52,7 @@ interface DeviceAuthenticator2 {
      * Calls are serialized, so at most one prompt is pending at a time. Cancelling the call clears [currentPrompt], which
      * dismisses the shown prompt.
      *
-     * @param onEvent reports what is shown to the user while the call is in progress
+     * @param onEvent reports progress of authentication process while the call is active
      */
     suspend fun authenticate(
         request: Request,
@@ -146,13 +146,12 @@ class RealDeviceAuthenticator2 @Inject constructor(
         onEvent: (Event) -> Unit,
     ): Response {
         return mutex.withLock {
-            val hasValidDeviceAuthentication = hasValidDeviceAuthentication()
             when {
                 !buildConfig.isAuthRequired -> {
                     Response.Allowed.NotRequiredForBuild
                 }
 
-                !hasValidDeviceAuthentication -> {
+                !hasValidDeviceAuthentication() -> {
                     showEnrollment(request, onEvent)
                 }
 
