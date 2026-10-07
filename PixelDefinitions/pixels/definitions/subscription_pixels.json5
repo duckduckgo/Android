@@ -48,7 +48,7 @@
             }
         ]
     },
-    "m_subscription_onboarding_step_shown": {
+    "subscription_onboarding_step_shown": {
         "description": "Fired when a native subscription onboarding step screen is shown",
         "owners": ["nalcalag"],
         "triggers": ["other"],
@@ -62,7 +62,7 @@
         ],
         "parameters": ["appVersion", "freeTrial"]
     },
-    "m_subscription_onboarding_step_completed": {
+    "subscription_onboarding_step_completed": {
         "description": "Fired when a native subscription onboarding step is completed by the user",
         "owners": ["nalcalag"],
         "triggers": ["other"],
@@ -76,7 +76,7 @@
         ],
         "parameters": ["appVersion", "freeTrial"]
     },
-    "m_subscription_onboarding_step_skipped": {
+    "subscription_onboarding_step_skipped": {
         "description": "Fired when a native subscription onboarding step is skipped by the user",
         "owners": ["nalcalag"],
         "triggers": ["other"],

@@ -18,7 +18,7 @@ package com.duckduckgo.subscriptions.impl.pixels
 
 object SubscriptionOnboardingStepPixels {
 
-    private const val PREFIX = "m_subscription_onboarding_step"
+    private const val PREFIX = "subscription_onboarding_step"
 
     enum class Action(val wireName: String) {
         SHOWN("shown"),
