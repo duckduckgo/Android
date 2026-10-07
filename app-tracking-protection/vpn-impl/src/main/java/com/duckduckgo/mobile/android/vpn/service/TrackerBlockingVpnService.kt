@@ -89,7 +89,6 @@ import kotlin.system.exitProcess
 
 @InjectWith(
     scope = VpnScope::class,
-    delayGeneration = true,
 )
 class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), VpnSocketProtector {
 

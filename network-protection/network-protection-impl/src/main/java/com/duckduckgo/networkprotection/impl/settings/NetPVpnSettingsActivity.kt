@@ -50,7 +50,6 @@ import kotlin.math.absoluteValue
 
 @InjectWith(
     scope = ActivityScope::class,
-    delayGeneration = true, // VpnSettingPlugin can be contributed from other modules
 )
 @ContributeToActivityStarter(NetPVpnSettingsScreenNoParams::class, screenName = "vpn.settings")
 class NetPVpnSettingsActivity : DuckDuckGoActivity() {
