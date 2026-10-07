@@ -22,45 +22,25 @@ import com.duckduckgo.android_crashkit.CrashpadConfig
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import org.json.JSONObject
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class DefaultCrashpadInitializer @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
-    private val nativeCrashFeature: NativeCrashFeature,
 ) : CrashpadInitializer {
 
     override fun initialize(
         extraAnnotations: Map<String, String>,
         onCrash: (() -> Unit)?,
     ): Boolean {
-        val uploadUrl = uploadUrl()
         return Crashpad.init(
             context,
             platform = "Android",
             version = "${appBuildConfig.versionName}-${appBuildConfig.flavor}",
             osVersion = "Android SDK ${appBuildConfig.sdkInt}",
             extraAnnotations = extraAnnotations,
-            config = CrashpadConfig(
-                uploadUrl = uploadUrl,
-                uploadsEnabled = uploadUrl.isNotEmpty(),
-                onCrash = onCrash,
-            ),
+            config = CrashpadConfig(onCrash = onCrash),
         )
-    }
-
-    internal fun uploadUrl(): String {
-        val toggle = nativeCrashFeature.uploadMinidumps()
-        if (!toggle.isEnabled()) return ""
-        return runCatching {
-            val settings = toggle.getSettings() ?: return@runCatching ""
-            JSONObject(settings).optString(SETTINGS_KEY_UPLOAD_URL)
-        }.getOrDefault("")
-    }
-
-    companion object {
-        private const val SETTINGS_KEY_UPLOAD_URL = "uploadUrl"
     }
 }

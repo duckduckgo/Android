@@ -24,11 +24,13 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.feature.toggles.api.Toggle
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
@@ -51,6 +53,10 @@ class NativeCrashInitTest {
     private val mockLifecycleOwner: LifecycleOwner = mock()
     private val mockToggle: Toggle = mock()
     private val mockEnabledToggle: Toggle = mock()
+    private val mockMinidumpUploader: MinidumpUploader = mock()
+
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
 
     @Before
     fun setup() {
@@ -192,6 +198,27 @@ class NativeCrashInitTest {
         verify(mockPixel, never()).enqueueFire(eq(APPLICATION_CRASH_NATIVE), any(), any(), any())
     }
 
+    // ── Minidump upload ───────────────────────────────────────────────────────
+
+    @Test
+    fun `pending minidumps uploaded after Crashpad init in main process`() {
+        buildNativeCrashInit(isMainProcess = true).onCreate(mockLifecycleOwner)
+        verify(mockMinidumpUploader).uploadPending(any())
+    }
+
+    @Test
+    fun `pending minidumps not uploaded from secondary process`() {
+        buildNativeCrashInit(isMainProcess = false).onVpnProcessCreated()
+        verify(mockMinidumpUploader, never()).uploadPending(any())
+    }
+
+    @Test
+    fun `pending minidumps not uploaded when Crashpad init fails`() {
+        whenever(mockCrashpadInitializer.initialize(any(), anyOrNull())).thenReturn(false)
+        buildNativeCrashInit(isMainProcess = true).onCreate(mockLifecycleOwner)
+        verify(mockMinidumpUploader, never()).uploadPending(any())
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private fun captureOnCrash(processName: String = "com.example"): (() -> Unit)? {
@@ -217,6 +244,9 @@ class NativeCrashInitTest {
         pixel = mockPixel,
         processName = processName,
         crashpadInitializer = mockCrashpadInitializer,
+        minidumpUploader = mockMinidumpUploader,
+        appCoroutineScope = coroutineRule.testScope,
+        dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
     @Test

@@ -45,6 +45,7 @@ dependencies {
     implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
     implementation Square.okio
+    implementation Square.okHttp3.okHttp
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
     implementation AndroidX.room.rxJava2
@@ -57,6 +58,7 @@ dependencies {
     testImplementation AndroidX.test.ext.junit
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.robolectric
+    testImplementation Square.okHttp3.mockWebServer
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
