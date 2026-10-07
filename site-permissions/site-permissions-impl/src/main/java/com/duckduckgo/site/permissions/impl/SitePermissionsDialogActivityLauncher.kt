@@ -144,6 +144,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     R.string.sitePermissionsMicAndCameraDialogTitle,
                     R.string.sitePermissionsMicAndCameraDialogSubtitle,
                     R.string.sitePermissionsTieredMicAndCameraDialogTitle,
+                    R.string.sitePermissionsTieredThirdPartyMicAndCameraDialogTitle,
                     CommonR.drawable.ic_video_24,
                     url,
                     SitePermissionsPixelValues.CAMERA_AND_MICROPHONE,
@@ -161,6 +162,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                         R.string.sitePermissionsMicDialogTitle,
                         R.string.sitePermissionsMicDialogSubtitle,
                         R.string.sitePermissionsTieredMicDialogTitle,
+                        R.string.sitePermissionsTieredThirdPartyMicDialogTitle,
                         CommonR.drawable.ic_microphone_24,
                         url,
                         SitePermissionsPixelValues.MICROPHONE,
@@ -176,6 +178,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     R.string.sitePermissionsCameraDialogTitle,
                     R.string.sitePermissionsCameraDialogSubtitle,
                     R.string.sitePermissionsTieredCameraDialogTitle,
+                    R.string.sitePermissionsTieredThirdPartyCameraDialogTitle,
                     CommonR.drawable.ic_video_24,
                     url,
                     SitePermissionsPixelValues.CAMERA,
@@ -208,10 +211,10 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         val isDdgSite = domain == "duckduckgo.com"
 
         if (sitePermissionsDialogRedesignFeature.self().isEnabled()) {
-            val titleRes = if (isDdgSite) {
-                R.string.sitePermissionsTieredDdgLocationDialogTitle
-            } else {
-                R.string.sitePermissionsTieredLocationDialogTitle
+            val titleRes = when {
+                isDdgSite -> R.string.sitePermissionsTieredDdgLocationDialogTitle
+                isThirdParty -> R.string.sitePermissionsTieredThirdPartyLocationDialogTitle
+                else -> R.string.sitePermissionsTieredLocationDialogTitle
             }
             showTieredSitePermissionsDialog(
                 iconRes = CommonR.drawable.ic_location_24,
@@ -269,6 +272,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         @StringRes titleRes: Int,
         @StringRes messageRes: Int,
         @StringRes tieredTitleRes: Int,
+        @StringRes tieredThirdPartyTitleRes: Int,
         @DrawableRes tieredIconRes: Int,
         url: String,
         pixelType: String,
@@ -279,7 +283,10 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         if (sitePermissionsDialogRedesignFeature.self().isEnabled()) {
             showTieredSitePermissionsDialog(
                 iconRes = tieredIconRes,
-                title = String.format(activity.getString(tieredTitleRes), url.websiteFromGeoLocationsApiOrigin()),
+                title = String.format(
+                    activity.getString(if (isThirdParty) tieredThirdPartyTitleRes else tieredTitleRes),
+                    url.websiteFromGeoLocationsApiOrigin(),
+                ),
                 messageRes = null,
                 pixelType = pixelType,
                 faviconUrl = null,
@@ -412,7 +419,12 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             sendDialogImpressionPixel(SitePermissionsPixelValues.DRM)
             showTieredSitePermissionsDialog(
                 iconRes = CommonR.drawable.ic_video_player_24,
-                title = String.format(activity.getString(R.string.drmSitePermissionDialogTitle), title),
+                title = String.format(
+                    activity.getString(
+                        if (isThirdParty) R.string.sitePermissionsTieredThirdPartyDrmDialogTitle else R.string.drmSitePermissionDialogTitle,
+                    ),
+                    title,
+                ),
                 messageRes = R.string.sitePermissionsTieredDrmDialogSubtitle,
                 pixelType = SitePermissionsPixelValues.DRM,
                 faviconUrl = url,
