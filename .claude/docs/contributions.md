@@ -48,11 +48,12 @@ An API Proposal is an Asana task in the [Android Proposals project](https://app.
 
 ## Creating PRs
 
-Use Graphite (`gt`) to create and submit pull requests. Prefer the GT MCP when it is available; otherwise run `gt` from the terminal:
+This repository uses [GitHub stacked PRs](https://gh.io/stacks) (`gh stack`) for stacked work. Graphite is no longer used — don't run `gt` or the Graphite MCP.
 
-- `gt create` to start a new branch in the stack
-- `gt submit` to open a PR for the first time
-- `gt submit --stack --update-only` to push subsequent updates — `--update-only` ensures Graphite only updates existing PRs and never opens a new one by accident
+- `gh stack init` to start a stack on top of `develop` (or `gh stack init <branch>...` to stack existing branches)
+- `gh stack add <branch>` to add a new branch on top of the current stack
+- `gh stack submit` to push all branches and create or update their PRs — pass `--auto` in non-interactive environments
+- `gh stack sync` / `gh stack rebase` to keep the stack up to date with the remote and `develop`
 
-Only fall back to manual `gh` commands when Graphite is not available in the environment. In that case, open the PR with `gh api repos/duckduckgo/Android/pulls --method POST` — do not use `gh pr create`, which fails with a Projects Classic deprecation warning.
+For a single PR that isn't part of a stack, push the branch and open the PR with `gh api repos/duckduckgo/Android/pulls --method POST` — do not use `gh pr create`, which fails with a Projects Classic deprecation warning.
 
