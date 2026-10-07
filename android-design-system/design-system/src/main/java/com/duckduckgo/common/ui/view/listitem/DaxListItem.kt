@@ -190,6 +190,18 @@ abstract class DaxListItem(
         leadingIconContainer.layoutParams.height = backgroundSize
     }
 
+    /** Sets how the leading icon is aligned vertically against the rest of the item */
+    fun setLeadingIconVerticalAlignment(alignment: VerticalAlignment) {
+        val anchor = when (alignment) {
+            VerticalAlignment.Center -> LayoutParams.PARENT_ID
+            VerticalAlignment.PrimaryText -> primaryText.id
+        }
+        val params = leadingIconContainer.layoutParams as LayoutParams
+        params.topToTop = anchor
+        params.bottomToBottom = anchor
+        leadingIconContainer.layoutParams = params
+    }
+
     /** Returns the binding of the leading icon */
     fun leadingIcon() = leadingIcon
 
@@ -313,6 +325,22 @@ abstract class DaxListItem(
                     None -> android.R.color.transparent
                     Circular -> R.drawable.list_item_image_circular_background
                     Rounded -> R.drawable.list_item_image_round_background
+                }
+            }
+        }
+    }
+
+    enum class VerticalAlignment {
+        Center,
+        PrimaryText,
+        ;
+
+        companion object {
+            fun from(value: Int): VerticalAlignment {
+                // same order as attrs-lists.xml
+                return when (value) {
+                    1 -> PrimaryText
+                    else -> Center
                 }
             }
         }

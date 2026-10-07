@@ -14,36 +14,49 @@
   ~ limitations under the License.
   -->
 
-<com.duckduckgo.pir.impl.freemium.settings.SelectableLinearLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/pirFreemiumContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground"
     android:orientation="vertical"
     android:visibility="gone"
     tools:visibility="visible">
 
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-        android:id="@+id/pirFreemiumPromo"
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.duckduckgo.pir.impl.freemium.settings.SelectableLinearLayout
+        android:id="@+id/pirFreemiumContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/identity_blocked_pir_color_24"
-        app:primaryText="@string/pirFeatureName"
-        app:primaryTextTruncated="false"
-        app:secondaryText="@string/pirFreemiumSettingSubtitle" />
+        android:background="?attr/selectableItemBackground"
+        android:orientation="vertical">
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/pirFreemiumCta"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="56dp"
-        android:layout_marginTop="@dimen/keyline_3"
-        android:layout_marginBottom="@dimen/keyline_3"
-        app:textType="primary"
-        app:typography="body1"
-        tools:text="@string/pirFreemiumSettingStartScan" />
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/pirFreemiumPromo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:leadingIcon="@drawable/identity_blocked_pir_color_24"
+            app:leadingIconVerticalAlignment="primary_text"
+            app:primaryText="@string/pirFeatureName"
+            app:primaryTextTruncated="false"
+            app:secondaryText="@string/pirFreemiumSettingSubtitle" />
 
-</com.duckduckgo.pir.impl.freemium.settings.SelectableLinearLayout>
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/pirFreemiumCta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="56dp"
+            android:layout_marginTop="@dimen/keyline_3"
+            android:layout_marginBottom="@dimen/keyline_3"
+            android:textColor="?attr/daxColorAccentBlue"
+            app:typography="body1"
+            tools:text="@string/pirFreemiumSettingStartScan" />
+
+    </com.duckduckgo.pir.impl.freemium.settings.SelectableLinearLayout>
+
+</LinearLayout>

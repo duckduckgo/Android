@@ -119,6 +119,12 @@ class TwoLineListItem @JvmOverloads constructor(
 
             setLeadingIconSize(leadingIconSize, leadingIconBackground)
 
+            setLeadingIconVerticalAlignment(
+                VerticalAlignment.from(
+                    getInt(R.styleable.TwoLineListItem_leadingIconVerticalAlignment, VerticalAlignment.Center.ordinal),
+                ),
+            )
+
             if (hasValue(R.styleable.TwoLineListItem_primaryTextColorOverlay)) {
                 setPrimaryTextColorStateList(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))
             }

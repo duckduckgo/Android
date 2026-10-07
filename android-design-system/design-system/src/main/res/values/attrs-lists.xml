@@ -59,6 +59,12 @@
         <!-- Extra Large 40dp -->
         <enum name="extra_large" value="3" />
     </attr>
+    <attr name="leadingIconVerticalAlignment">
+        <!-- Centred against the whole item (default) -->
+        <enum name="center" value="0" />
+        <!-- Centred against the primary text, so a wrapping title keeps the icon beside it -->
+        <enum name="primary_text" value="1" />
+    </attr>
     <attr name="trailingIconSize">
         <!-- Small 16dp -->
         <enum name="small" value="0" />
@@ -102,6 +108,7 @@
         <attr name="leadingIcon"/>
         <attr name="leadingIconBackground"/>
         <attr name="leadingIconSize"/>
+        <attr name="leadingIconVerticalAlignment"/>
         <attr name="trailingIcon"/>
         <attr name="trailingIconSize"/>
         <attr name="pillIcon"/>
