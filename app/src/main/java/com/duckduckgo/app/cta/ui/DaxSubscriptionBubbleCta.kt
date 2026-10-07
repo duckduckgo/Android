@@ -40,7 +40,7 @@ data class DaxSubscriptionBubbleCta(
     val isCustomAiOnboardingFlow: Boolean,
     val isFreeTrialCopy: Boolean,
     val segmentedPath: DownloadReasonSelection?,
-) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
+) : DaxBubbleCta(
     ctaId = CtaId.DAX_INTRO_PRIVACY_PRO,
     title = R.string.onboardingPrivacyProDaxDialogTitle,
     description = if (isCustomAiOnboardingFlow || segmentedPath == DownloadReasonSelection.AI_CHAT) {

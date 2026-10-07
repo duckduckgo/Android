@@ -5718,7 +5718,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun setBrowserBackground(lightModeEnabled: Boolean) {
         val cta = ctaViewState.value?.cta
-        if (cta is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
+        if (cta is DaxBubbleCta) {
             command.value = SetBrowserBackground(
                 cta.backgroundRes,
                 useRebrandBackground = true,

@@ -37,7 +37,7 @@ data class DaxDuckAiEndBubbleCta(
     override val deviceInfo: DeviceInfo,
     val isCustomAiOnboardingFlow: Boolean,
     val segmentedPath: DownloadReasonSelection?,
-) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
+) : DaxBubbleCta(
     ctaId = CtaId.DAX_DUCK_AI_END,
     title = R.string.onboardingDuckAiEndCtaTitle,
     description = when {

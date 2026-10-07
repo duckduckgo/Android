@@ -49,7 +49,7 @@ abstract class OptionsBubbleCta(
     isLightTheme: Boolean,
     deviceInfo: DeviceInfo,
     showArrow: Boolean,
-) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
+) : DaxBubbleCta(
     ctaId = ctaId,
     title = title,
     description = description,

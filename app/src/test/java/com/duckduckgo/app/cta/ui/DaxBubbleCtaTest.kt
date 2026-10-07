@@ -46,7 +46,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
-class BrandDesignUpdateBubbleCtaTest {
+class DaxBubbleCtaTest {
 
     private val container: View = mock()
     private val dax: LottieAnimationView = mock()
@@ -351,17 +351,17 @@ class BrandDesignUpdateBubbleCtaTest {
         assertEquals(R.string.onboardingPrivacyProDaxDialogDescription, cta.description)
     }
 
-    private inner class TestableBubbleCta : DaxBubbleCta.BrandDesignUpdateBubbleCta(
+    private inner class TestableBubbleCta : DaxBubbleCta(
         ctaId = CtaId.DAX_END,
         title = R.string.onboardingEndDaxDialogTitle,
         description = R.string.onboardingEndDaxDialogDescription,
         shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         ctaPixelParam = Pixel.PixelValues.DAX_END_CTA,
-        onboardingStore = this@BrandDesignUpdateBubbleCtaTest.onboardingStore,
-        appInstallStore = this@BrandDesignUpdateBubbleCtaTest.appInstallStore,
+        onboardingStore = this@DaxBubbleCtaTest.onboardingStore,
+        appInstallStore = this@DaxBubbleCtaTest.appInstallStore,
         isLightTheme = true,
-        deviceInfo = this@BrandDesignUpdateBubbleCtaTest.mockDeviceInfo,
+        deviceInfo = this@DaxBubbleCtaTest.mockDeviceInfo,
     ) {
         override val activeIncludeIds: List<Int> = listOf(R.id.primaryCta)
         override val showArrow: Boolean = false
@@ -374,17 +374,17 @@ class BrandDesignUpdateBubbleCtaTest {
     }
 
     private inner class WavingDaxBubbleCta :
-        DaxBubbleCta.BrandDesignUpdateBubbleCta(
+        DaxBubbleCta(
             ctaId = CtaId.DAX_END,
             title = R.string.onboardingEndDaxDialogTitle,
             description = R.string.onboardingEndDaxDialogDescription,
             shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
             okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
             ctaPixelParam = Pixel.PixelValues.DAX_END_CTA,
-            onboardingStore = this@BrandDesignUpdateBubbleCtaTest.onboardingStore,
-            appInstallStore = this@BrandDesignUpdateBubbleCtaTest.appInstallStore,
+            onboardingStore = this@DaxBubbleCtaTest.onboardingStore,
+            appInstallStore = this@DaxBubbleCtaTest.appInstallStore,
             isLightTheme = true,
-            deviceInfo = this@BrandDesignUpdateBubbleCtaTest.mockDeviceInfo,
+            deviceInfo = this@DaxBubbleCtaTest.mockDeviceInfo,
         ),
         DaxBubbleCta.ShowsWavingDax {
         override val activeIncludeIds: List<Int> = listOf(R.id.primaryCta)
