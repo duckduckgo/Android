@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" web sitesi kamerana erişmek istiyor</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">\"%1$s\" web sitesi mikrofonuna erişmek istiyor</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" web sitesi kamerana ve mikrofonuna erişmek istiyor</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" bu web sitesinde konumuna erişmek istiyor</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" bu web sitesinde kamerana erişmek istiyor</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" bu web sitesinde mikrofonuna erişmek istiyor</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" bu web sitesinde kamerana ve mikrofonuna erişmek istiyor</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" bu web sitesinde Dijital Haklar Yönetimi (DRM) yazılımına erişmek istiyor</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">İzin vermezsen sitedeki videolar oynatılamaz duruma gelebilir ancak bu site, DRM yazılımı tarafından sağlanan cihaz tanımlayıcılarına erişemez.</string>
 
     <!-- Reminder dialog -->
