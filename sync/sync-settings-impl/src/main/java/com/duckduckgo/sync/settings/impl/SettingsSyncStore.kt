@@ -19,8 +19,8 @@ package com.duckduckgo.sync.settings.impl
 import android.content.*
 import androidx.core.content.*
 import com.duckduckgo.di.scopes.*
-import com.squareup.anvil.annotations.*
-import dagger.*
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import javax.inject.*
 
 interface SettingsSyncStore {
