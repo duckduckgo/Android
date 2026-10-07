@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Уебсайтът „%1$s“ иска достъп до камерата</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Уебсайтът „%1$s“ иска достъп до микрофона</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Уебсайтът „%1$s“ иска достъп до камерата и микрофона</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ иска достъп до местоположението ти на този уебсайт</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ иска достъп до камерата на този уебсайт</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ иска достъп до микрофона ти на този уебсайт</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ иска достъп до камерата и микрофона ти на този уебсайт</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ иска достъп до софтуера за управление на цифровите права (DRM) на този уебсайт</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Ако не разрешите достъп, има вероятност видеоклиповете на сайта да не могат да бъдат възпроизвеждани, но този сайт няма да има достъп до идентификатори на устройства, предоставени от софтуера за DRM.</string>
 
     <!-- Reminder dialog -->
