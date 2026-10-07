@@ -62,7 +62,7 @@ class RealDuckChatContextual @Inject constructor(
         textSelection: String?,
         showChatSurface: () -> Unit,
     ) {
-        if (anchor == null || !duckChatInternal.isContextualSheetRedesignEnabled()) {
+        if (anchor == null) {
             showChatSurface()
             return
         }
@@ -102,17 +102,9 @@ class RealDuckChatContextual @Inject constructor(
     }
 
     override fun createChatSurface(tabId: String): Fragment {
-        return if (duckChatInternal.isContextualSheetRedesignEnabled()) {
-            DuckChatContextualWebViewFragment().apply {
-                arguments = Bundle().apply {
-                    putString(DuckChatContextualWebViewFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
-                }
-            }
-        } else {
-            DuckChatContextualFragment().apply {
-                arguments = Bundle().apply {
-                    putString(DuckChatContextualFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
-                }
+        return DuckChatContextualWebViewFragment().apply {
+            arguments = Bundle().apply {
+                putString(DuckChatContextualWebViewFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
             }
         }
     }

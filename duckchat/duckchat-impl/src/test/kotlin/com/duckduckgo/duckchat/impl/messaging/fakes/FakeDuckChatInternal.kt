@@ -201,8 +201,6 @@ class FakeDuckChatInternal(
 
     override fun isDuckChatContextualModeEnabled(): Boolean = false
 
-    override fun isContextualSheetRedesignEnabled(): Boolean = false
-
     override fun isContextualMenuAllChatsEnabled(): Boolean = false
 
     override fun resolvedTogglePosition(): NativeInputState.ToggleSelection = NativeInputState.ToggleSelection.SEARCH
