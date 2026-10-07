@@ -130,7 +130,7 @@ class RealDeviceAuthenticator2 @Inject constructor(
         return mutex.withLock {
             val hasValidDeviceAuthentication = hasValidDeviceAuthentication()
             when {
-                !buildConfig.isAuthRequired && !hasValidDeviceAuthentication -> {
+                !buildConfig.isAuthRequired -> {
                     Response.Allowed(isAuthenticated = false)
                 }
 
