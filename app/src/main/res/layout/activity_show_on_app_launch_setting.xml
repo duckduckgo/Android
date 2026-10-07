@@ -37,6 +37,22 @@
             android:orientation="vertical"
             android:paddingTop="@dimen/keyline_4">
 
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/afterInactivityTimeoutRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/afterInactivityTimeoutRowTitle"
+                tools:secondaryText="5 minutes"
+                tools:visibility="visible" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/afterInactivityTimeoutDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -76,20 +92,15 @@
                 android:layout_marginEnd="@dimen/keyline_4"
                 android:hint="URL"
                 android:paddingBottom="@dimen/keyline_2"
-                android:visibility="gone"
                 app:type="single_line"
-                tools:ignore="HardcodedText"
-                tools:visibility="visible" />
+                tools:ignore="HardcodedText" />
 
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/afterInactivityTimeoutRow"
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/returnToLastTabDivider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:primaryText="@string/afterInactivityTimeoutRowTitle"
-                tools:secondaryText="5 minutes"
                 tools:visibility="visible" />
-
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/returnToLastTabToggle"
