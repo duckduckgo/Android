@@ -52,6 +52,7 @@ class ShowOnAppLaunchViewModelTest {
         AndroidBrowserConfigFeature::class.java,
         ioDispatcher = coroutineTestRule.testDispatcher,
     )
+    private val fakeShowOnAppLaunchFeature = FakeFeatureToggleFactory.create(ShowOnAppLaunchFeature::class.java)
     private val providerSettings = MutableStateFlow<AfterInactivitySettings>(AfterInactivitySettings.LastUsedTab)
     private val fakeProvider = FakeAfterInactivitySettingsDataProvider(providerSettings)
     private val pixel: Pixel = mock()
@@ -62,6 +63,7 @@ class ShowOnAppLaunchViewModelTest {
             dispatcherProvider,
             fakeProvider,
             fakeBrowserConfigFeature,
+            fakeShowOnAppLaunchFeature,
             pixel,
         )
     }
@@ -155,7 +157,7 @@ class ShowOnAppLaunchViewModelTest {
     @Test
     fun whenShowNTPAfterIdleReturnDisabledThenViewStateFalse() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(false))
-        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, fakeShowOnAppLaunchFeature, pixel)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -166,7 +168,7 @@ class ShowOnAppLaunchViewModelTest {
     @Test
     fun whenShowNTPAfterIdleReturnEnabledThenViewStateTrue() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
-        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, fakeShowOnAppLaunchFeature, pixel)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -177,7 +179,7 @@ class ShowOnAppLaunchViewModelTest {
     @Test
     fun whenNoSettingsObservedYetThenSelectedIsDefaultFiveMinutes() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
-        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, fakeShowOnAppLaunchFeature, pixel)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -188,7 +190,7 @@ class ShowOnAppLaunchViewModelTest {
     @Test
     fun whenNewTabPageSettingsObservedThenSelectedIsEffectiveTimeout() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
-        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, fakeShowOnAppLaunchFeature, pixel)
         providerSettings.value = newTabPage(effectiveTimeoutSeconds = 60L)
 
         testee.viewState.test {
@@ -202,7 +204,7 @@ class ShowOnAppLaunchViewModelTest {
         // The timeout row is hidden for LastUsedTab, so its value is never shown to the user and
         // does not need to be remembered across option switches.
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
-        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, fakeShowOnAppLaunchFeature, pixel)
         providerSettings.value = newTabPage(effectiveTimeoutSeconds = 60L)
 
         providerSettings.value = AfterInactivitySettings.LastUsedTab
@@ -216,7 +218,7 @@ class ShowOnAppLaunchViewModelTest {
     @Test
     fun whenLastUsedTabSelectedThenTimeoutRowIsHidden() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
-        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, fakeShowOnAppLaunchFeature, pixel)
         providerSettings.value = AfterInactivitySettings.LastUsedTab
 
         testee.viewState.test {
@@ -228,7 +230,7 @@ class ShowOnAppLaunchViewModelTest {
     @Test
     fun whenNewTabPageSelectedThenTimeoutRowIsShown() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
-        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, fakeShowOnAppLaunchFeature, pixel)
         providerSettings.value = newTabPage()
 
         testee.viewState.test {
@@ -240,7 +242,7 @@ class ShowOnAppLaunchViewModelTest {
     @Test
     fun whenSpecificPageSelectedThenTimeoutRowIsShown() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
-        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, fakeShowOnAppLaunchFeature, pixel)
         providerSettings.value = specificPage()
 
         testee.viewState.test {
@@ -252,12 +254,34 @@ class ShowOnAppLaunchViewModelTest {
     @Test
     fun whenShowNTPAfterIdleReturnDisabledThenTimeoutRowIsHiddenRegardlessOfOption() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(false))
-        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, fakeShowOnAppLaunchFeature, pixel)
         providerSettings.value = newTabPage()
 
         testee.viewState.test {
             val state = awaitItem()
             assertFalse(state.showAfterInactivityTimeout)
+        }
+    }
+
+    @Test
+    fun whenAfterInactivitySettingsLayoutDisabledThenViewStateFalse() = runTest {
+        fakeShowOnAppLaunchFeature.afterInactivitySettingsLayout().setRawStoredState(Toggle.State(false))
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, fakeShowOnAppLaunchFeature, pixel)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.useRedesignedAfterInactivityLayout)
+        }
+    }
+
+    @Test
+    fun whenAfterInactivitySettingsLayoutEnabledThenViewStateTrue() = runTest {
+        fakeShowOnAppLaunchFeature.afterInactivitySettingsLayout().setRawStoredState(Toggle.State(true))
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, fakeShowOnAppLaunchFeature, pixel)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.useRedesignedAfterInactivityLayout)
         }
     }
 
@@ -408,7 +432,7 @@ class ShowOnAppLaunchViewModelTest {
     @Test
     fun whenViewStateCreatedThenDefaultOptionsExposed() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
-        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, fakeShowOnAppLaunchFeature, pixel)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -419,7 +443,7 @@ class ShowOnAppLaunchViewModelTest {
     @Test
     fun whenTimeoutRowClickedThenEmitsShowTimeoutDialogCommand() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
-        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, pixel)
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeProvider, fakeBrowserConfigFeature, fakeShowOnAppLaunchFeature, pixel)
         providerSettings.value = newTabPage(effectiveTimeoutSeconds = 300L)
 
         testee.commands.test {

@@ -25,15 +25,20 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.newtabpage.api.EscapeHatchTarget
 import com.duckduckgo.newtabpage.api.EscapeHatchTargetResolver
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
+import com.duckduckgo.settings.api.AfterInactivitySettings
+import com.duckduckgo.settings.api.AfterInactivitySettingsDataProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -63,6 +68,7 @@ class NewTabReturnHatchViewModelTest {
     private val inputModeCapabilityFlow = MutableStateFlow(NativeInputState.InputMode.SEARCH_AND_DUCK_AI)
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val mockNtpAfterIdleManager: NtpAfterIdleManager = mock()
+    private val mockAfterInactivitySettingsDataProvider: AfterInactivitySettingsDataProvider = mock()
     private val mockPixel: Pixel = mock()
     private val tabsFlow = MutableStateFlow<List<TabEntity>>(emptyList())
     private val mockResolver: EscapeHatchTargetResolver = mock()
@@ -77,7 +83,11 @@ class NewTabReturnHatchViewModelTest {
     private val afterIdleReturnFlow = MutableStateFlow(false)
     private val nativeInputEnabledFlow = MutableStateFlow(true)
     private val navBarEnabledFlow = MutableStateFlow(false)
-    private val returnToLastTabEnabledFlow = MutableStateFlow(true)
+    private val providerSettings = MutableStateFlow<AfterInactivitySettings>(newTabPageSettings(returnToLastTabShortcutEnabled = true))
+    private val fakeNewTabReturnHatchFeature = FakeFeatureToggleFactory.create(
+        NewTabReturnHatchFeature::class.java,
+        ioDispatcher = coroutinesTestRule.testDispatcher,
+    )
 
     private lateinit var testee: NewTabReturnHatchViewModel
 
@@ -86,10 +96,11 @@ class NewTabReturnHatchViewModelTest {
         whenever(mockTabRepository.flowTabs).thenReturn(tabsFlow)
         whenever(mockFireTabRepository.flowTabs).thenReturn(fireTabsFlow)
         whenever(mockNtpAfterIdleManager.isAfterIdleReturn).thenReturn(afterIdleReturnFlow)
-        whenever(mockNtpAfterIdleManager.returnToLastTabEnabled).thenReturn(returnToLastTabEnabledFlow)
+        whenever(mockAfterInactivitySettingsDataProvider.settings).thenReturn(providerSettings)
         whenever(mockDuckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputEnabledFlow)
         whenever(mockDuckChat.observeNativeInputNavBarEnabled()).thenReturn(navBarEnabledFlow)
         whenever(mockDuckChatInputModeState.inputModeCapability).thenReturn(inputModeCapabilityFlow)
+        fakeNewTabReturnHatchFeature.afterInactivityEntry().setRawStoredState(Toggle.State(enable = true))
 
         testee = NewTabReturnHatchViewModel(
             currentTabRepository = mockTabRepository,
@@ -99,6 +110,8 @@ class NewTabReturnHatchViewModelTest {
             duckChatInputModeState = mockDuckChatInputModeState,
             duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
             ntpAfterIdleManager = mockNtpAfterIdleManager,
+            afterInactivitySettingsDataProvider = mockAfterInactivitySettingsDataProvider,
+            newTabReturnHatchFeature = fakeNewTabReturnHatchFeature,
             escapeHatchTargetResolver = mockResolver,
             pixel = mockPixel,
         )
@@ -113,6 +126,11 @@ class NewTabReturnHatchViewModelTest {
         afterIdleReturnFlow.value = false
         afterIdleReturnFlow.value = true
     }
+
+    private fun newTabPageSettings(returnToLastTabShortcutEnabled: Boolean) = AfterInactivitySettings.NewTabPage(
+        effectiveTimeoutSeconds = 300L,
+        returnToLastTabShortcutEnabled = returnToLastTabShortcutEnabled,
+    )
 
     @Test
     fun whenReturnFromIdleWithTabThenViewStateShowsTab() = runTest {
@@ -142,11 +160,24 @@ class NewTabReturnHatchViewModelTest {
     @Test
     fun whenReturnToLastTabDisabledThenHatchHiddenEvenWithTab() = runTest {
         val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
-        returnToLastTabEnabledFlow.value = false
+        providerSettings.value = newTabPageSettings(returnToLastTabShortcutEnabled = false)
 
         testee.viewState.test {
             returnFromIdleWith(tab)
 
+            assertFalse(expectMostRecentItem().shouldShow)
+        }
+    }
+
+    @Test
+    fun whenProviderDisablesShortcutThenHatchIsHiddenEvenWithTab() = runTest {
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+
+        testee.viewState.test {
+            returnFromIdleWith(tab)
+            assertTrue(expectMostRecentItem().shouldShow)
+
+            providerSettings.value = newTabPageSettings(returnToLastTabShortcutEnabled = false)
             assertFalse(expectMostRecentItem().shouldShow)
         }
     }
@@ -168,6 +199,68 @@ class NewTabReturnHatchViewModelTest {
             val state = expectMostRecentItem()
             assertEquals("", state.tabId)
             assertFalse(state.shouldShow)
+        }
+    }
+
+    @Test
+    fun whenProviderDestinationChangesThenViewStateUpdatesAfterInactivitySummary() = runTest {
+        testee.viewState.test {
+            assertEquals(
+                NewTabReturnHatchViewModel.AfterInactivityDestinationSummary.TextRes(R.string.hatchMenuAfterInactivityDestinationNewTabPage),
+                awaitItem().afterInactivityDestinationSummary,
+            )
+
+            providerSettings.value = AfterInactivitySettings.LastUsedTab
+            assertEquals(
+                NewTabReturnHatchViewModel.AfterInactivityDestinationSummary.TextRes(R.string.hatchMenuAfterInactivityDestinationLastOpenedTab),
+                awaitItem().afterInactivityDestinationSummary,
+            )
+
+            providerSettings.value = AfterInactivitySettings.SpecificPage(
+                url = "https://example.com/",
+                effectiveTimeoutSeconds = 600L,
+            )
+            assertEquals(
+                NewTabReturnHatchViewModel.AfterInactivityDestinationSummary.Url("https://example.com/"),
+                awaitItem().afterInactivityDestinationSummary,
+            )
+        }
+    }
+
+    @Test
+    fun whenAfterInactivityEntryFeatureEnabledThenViewStateShowsEntry() = runTest {
+        fakeNewTabReturnHatchFeature.afterInactivityEntry().setRawStoredState(Toggle.State(enable = true))
+
+        testee.viewState.test {
+            assertTrue(awaitItem().showAfterInactivityEntry)
+        }
+    }
+
+    @Test
+    fun whenAfterInactivityEntryFeatureDisabledThenViewStateHidesEntry() = runTest {
+        fakeNewTabReturnHatchFeature.afterInactivityEntry().setRawStoredState(Toggle.State(enable = false))
+
+        testee.viewState.test {
+            assertFalse(awaitItem().showAfterInactivityEntry)
+        }
+    }
+
+    @Test
+    fun whenProviderUsesLastUsedTabOrSpecificPageThenHatchIsHiddenEvenWithTab() = runTest {
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+
+        testee.viewState.test {
+            returnFromIdleWith(tab)
+            assertTrue(expectMostRecentItem().shouldShow)
+
+            providerSettings.value = AfterInactivitySettings.LastUsedTab
+            assertFalse(expectMostRecentItem().shouldShow)
+
+            providerSettings.value = AfterInactivitySettings.SpecificPage(
+                url = "https://example.com/",
+                effectiveTimeoutSeconds = 300L,
+            )
+            assertFalse(expectMostRecentItem().shouldShow)
         }
     }
 
