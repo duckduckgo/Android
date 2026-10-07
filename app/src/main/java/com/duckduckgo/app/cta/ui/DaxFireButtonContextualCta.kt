@@ -32,7 +32,7 @@ data class DaxFireButtonContextualCta(
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
-) : OnboardingDaxDialogCta.ContextualDaxDialogCta(
+) : ContextualDaxDialogCta(
     ctaId = CtaId.DAX_FIRE_BUTTON,
     description = R.string.onboardingFireButtonDaxDialogDescription,
     buttonText = R.string.onboardingFireButtonDaxDialogOkButton,
@@ -47,7 +47,7 @@ data class DaxFireButtonContextualCta(
     deviceInfo = deviceInfo,
     backgroundRes = R.drawable.bg_onboarding_fire_button,
 ),
-    OnboardingDaxDialogCta.ShowsWingBottom {
+    ContextualDaxDialogCta.ShowsWingBottom {
     override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
 
     override val showArrow: Boolean = true

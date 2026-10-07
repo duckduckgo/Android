@@ -39,7 +39,7 @@ data class DaxTrackersBlockedContextualCta(
     val settingsDataStore: SettingsDataStore,
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
-) : OnboardingDaxDialogCta.ContextualDaxDialogCta(
+) : ContextualDaxDialogCta(
     ctaId = CtaId.DAX_DIALOG_TRACKERS_FOUND,
     description = null,
     buttonText = R.string.onboardingTrackersBlockedDaxDialogButton,
@@ -54,7 +54,7 @@ data class DaxTrackersBlockedContextualCta(
     deviceInfo = deviceInfo,
     backgroundRes = R.drawable.bg_onboarding_trackers_blocked,
 ),
-    OnboardingDaxDialogCta.ShowsWingBottom {
+    ContextualDaxDialogCta.ShowsWingBottom {
     override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
 
     override val showArrow: Boolean = true

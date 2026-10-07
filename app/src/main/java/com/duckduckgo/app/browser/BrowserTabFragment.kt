@@ -206,6 +206,7 @@ import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
 import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
+import com.duckduckgo.app.cta.ui.ContextualDaxDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
@@ -213,7 +214,6 @@ import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonContextualCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboarding
-import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.cta.ui.PrivacyProSkippedOnboardingBottomSheetDialog
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -4397,7 +4397,7 @@ class BrowserTabFragment :
         faviconPrompt.show()
     }
 
-    private fun hideOnboardingDaxDialog(onboardingCta: OnboardingDaxDialogCta) {
+    private fun hideOnboardingDaxDialog(onboardingCta: ContextualDaxDialogCta) {
         onboardingCta.hideOnboardingCta(binding)
     }
 
@@ -6313,7 +6313,7 @@ class BrowserTabFragment :
 
         fun reinflateContextualBrandDesignDialog() {
             if (!isAdded) return
-            val cta = lastSeenCtaViewState?.cta as? OnboardingDaxDialogCta.ContextualDaxDialogCta ?: return
+            val cta = lastSeenCtaViewState?.cta as? ContextualDaxDialogCta ?: return
 
             val existingRoot = daxDialogInContextBrandDesign.root
             if (!existingRoot.isVisible) return
@@ -6343,7 +6343,7 @@ class BrowserTabFragment :
                 is HomePanelCta -> showBottomSheetCta(configuration)
                 is SubscriptionPromoModalCta -> showPrivacyProSkippedOnboardingBottomSheet(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
-                is OnboardingDaxDialogCta.ContextualDaxDialogCta ->
+                is ContextualDaxDialogCta ->
                     showOnboardingDialogCta(configuration, instantShow = instantShow)
                 is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)
             }
@@ -6441,7 +6441,7 @@ class BrowserTabFragment :
 
         @SuppressLint("ClickableViewAccessibility")
         private fun showOnboardingDialogCta(
-            configuration: OnboardingDaxDialogCta.ContextualDaxDialogCta,
+            configuration: ContextualDaxDialogCta,
             instantShow: Boolean = false,
         ) {
             hideNewTab()
@@ -6607,11 +6607,11 @@ class BrowserTabFragment :
         }
 
         private fun hideDaxCta() {
-            val cta = lastSeenCtaViewState?.cta as? OnboardingDaxDialogCta.ContextualDaxDialogCta
+            val cta = lastSeenCtaViewState?.cta as? ContextualDaxDialogCta
             if (cta != null) {
                 cta.hideOnboardingCta(binding)
             } else {
-                OnboardingDaxDialogCta.ContextualDaxDialogCta.hideContainer(binding)
+                ContextualDaxDialogCta.hideContainer(binding)
             }
         }
 

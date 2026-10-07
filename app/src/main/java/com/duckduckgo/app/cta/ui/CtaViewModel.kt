@@ -340,7 +340,7 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun getFireDialogCta(): OnboardingDaxDialogCta? {
+    suspend fun getFireDialogCta(): ContextualDaxDialogCta? {
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() || daxDialogFireEducationShown() || hideTips()) return@withContext null
             if (tooManyTabsOpenForFireEducation()) return@withContext null
@@ -353,7 +353,7 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun getSiteSuggestionsDialogCta(): OnboardingDaxDialogCta? {
+    suspend fun getSiteSuggestionsDialogCta(): ContextualDaxDialogCta? {
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() || !canShowDaxIntroVisitSiteCta()) return@withContext null
             DaxSiteSuggestionsContextualCta(
@@ -365,7 +365,7 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun getEndStaticDialogCta(): OnboardingDaxDialogCta? {
+    suspend fun getEndStaticDialogCta(): ContextualDaxDialogCta? {
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() && daxDialogEndShown()) return@withContext null
             DaxEndContextualCta(
@@ -548,7 +548,7 @@ class CtaViewModel @Inject constructor(
             if (it.entity != null) {
                 it.entity?.let { entity ->
                     if (!daxDialogNetworkShown() && !daxDialogTrackersFoundShown() &&
-                        OnboardingDaxDialogCta.mainTrackerNetworks.any { mainNetwork -> entity.displayName.contains(mainNetwork) }
+                        ContextualDaxDialogCta.mainTrackerNetworks.any { mainNetwork -> entity.displayName.contains(mainNetwork) }
                     ) {
                         return DaxMainNetworkContextualCta(
                             onboardingStore = onboardingStore,
@@ -659,7 +659,7 @@ class CtaViewModel @Inject constructor(
 
     private fun duckAiEndShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DUCK_AI_END)
 
-    private fun isSerpUrl(url: String): Boolean = url.contains(OnboardingDaxDialogCta.SERP)
+    private fun isSerpUrl(url: String): Boolean = url.contains(ContextualDaxDialogCta.SERP)
 
     private suspend fun daxOnboardingActive(): Boolean = userStageStore.daxOnboardingActive()
 

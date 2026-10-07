@@ -33,7 +33,7 @@ data class DaxSerpContextualCta(
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
-) : OnboardingDaxDialogCta.ContextualDaxDialogCta(
+) : ContextualDaxDialogCta(
     ctaId = CtaId.DAX_DIALOG_SERP,
     description = R.string.onboardingSerpDaxDialogBrandDesignDescription,
     buttonText = R.string.onboardingSerpDaxDialogButton,

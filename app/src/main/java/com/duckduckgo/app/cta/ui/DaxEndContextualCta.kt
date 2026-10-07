@@ -33,7 +33,7 @@ data class DaxEndContextualCta(
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
-) : OnboardingDaxDialogCta.ContextualDaxDialogCta(
+) : ContextualDaxDialogCta(
     ctaId = CtaId.DAX_END,
     description = R.string.onboardingEndDaxDialogDescription,
     buttonText = R.string.onboardingEndDaxDialogButton,
