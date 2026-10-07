@@ -17,7 +17,9 @@
 package com.duckduckgo.site.permissions.impl.ui
 
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.text.HtmlCompat
+import androidx.core.text.htmlEncode
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -38,8 +40,8 @@ import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.SitePermis
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command.LaunchWebsiteAllowed
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command.ShowRemovedSiteConfirmationSnackbar
 import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.PermissionsPerWebsiteActivity
-import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -66,6 +68,9 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
     private lateinit var adapter: SitePermissionsAdapter
     private var permissionDialog: DaxAlertDialog? = null
     private var pendingPermissionSetting: SitePermissionSetting? = null
+    private val websitePermissionsLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        PermissionsPerWebsiteActivity.removedUrl(result.data)?.let { viewModel.removeSiteSelected(it) }
+    }
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -128,22 +133,23 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
 
     private fun processCommand(command: Command) {
         when (command) {
-            is ShowRemovedAllConfirmationSnackbar -> showRemovedAllSnackbar(command.removedSitePermissions)
+            is ShowRemovedAllConfirmationSnackbar -> showRemovedSitesSnackbar(getString(R.string.sitePermissionsRemoveAllWebsitesSnackbarText)) {
+                viewModel.onSnackBarUndoRemoveAllWebsites(command.removedSitePermissions)
+            }
             is LaunchWebsiteAllowed -> launchWebsiteAllowed(command.domain)
+            is ShowRemovedSiteConfirmationSnackbar -> showRemovedSitesSnackbar(
+                getString(R.string.permissionsRemovedForSiteSnackbar, command.domain.htmlEncode()),
+            ) { viewModel.onSnackBarUndoRemoveSite(command) }
         }
     }
 
-    private fun showRemovedAllSnackbar(
-        removedSitePermissions: List<SitePermissionsEntity>,
+    private fun showRemovedSitesSnackbar(
+        html: String,
+        onUndo: () -> Unit,
     ) {
-        val message = HtmlCompat.fromHtml(getString(R.string.sitePermissionsRemoveAllWebsitesSnackbarText), HtmlCompat.FROM_HTML_MODE_LEGACY)
-        Snackbar.make(
-            binding.root,
-            message,
-            Snackbar.LENGTH_LONG,
-        ).setAction(com.duckduckgo.mobile.android.R.string.undo) {
-            viewModel.onSnackBarUndoRemoveAllWebsites(removedSitePermissions)
-        }.show()
+        Snackbar.make(binding.root, HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY), Snackbar.LENGTH_LONG)
+            .setAction(com.duckduckgo.mobile.android.R.string.undo) { onUndo() }
+            .show()
     }
 
     private fun updateList(
@@ -184,7 +190,7 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
     }
 
     private fun launchWebsiteAllowed(domain: String) {
-        startActivity(PermissionsPerWebsiteActivity.intent(this, domain))
+        websitePermissionsLauncher.launch(PermissionsPerWebsiteActivity.intent(this, domain))
     }
 
     companion object {
