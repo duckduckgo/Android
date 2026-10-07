@@ -40,6 +40,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 @Suppress("DeferredResultUnused")
+@OptIn(ExperimentalCoroutinesApi::class)
 class RealDeviceAuthenticator2Test {
 
     private var supportsStrongAuthentication = true
@@ -103,7 +104,7 @@ class RealDeviceAuthenticator2Test {
             onClosed()
         }
 
-        assertEquals(Response.EnrollmentClosed, response.await())
+        assertEquals(Response.Cancelled.EnrollmentClosed, response.await())
         assertNull(testee.currentPrompt.value)
     }
 
@@ -135,7 +136,7 @@ class RealDeviceAuthenticator2Test {
             onVerified()
         }
 
-        assertEquals(Response.Allowed(isAuthenticated = true), response.await())
+        assertEquals(Response.Allowed.UserAuthenticated, response.await())
         assertNull(testee.currentPrompt.value)
     }
 
@@ -148,7 +149,7 @@ class RealDeviceAuthenticator2Test {
             onCancelled()
         }
 
-        assertEquals(Response.Cancelled, response.await())
+        assertEquals(Response.Cancelled.VerificationDismissed, response.await())
         assertNull(testee.currentPrompt.value)
     }
 
@@ -181,7 +182,7 @@ class RealDeviceAuthenticator2Test {
 
         val response = testee.authenticate(Request())
 
-        assertEquals(Response.Allowed(isAuthenticated = true), response)
+        assertEquals(Response.Allowed.WithinGracePeriod, response)
         assertNull(testee.currentPrompt.value)
     }
 
@@ -220,7 +221,7 @@ class RealDeviceAuthenticator2Test {
             onVerified()
         }
 
-        assertEquals(Response.Cancelled, response.await())
+        assertEquals(Response.Cancelled.VerificationDismissed, response.await())
         assertTrue(gracePeriod.isAuthRequired())
     }
 
@@ -242,11 +243,11 @@ class RealDeviceAuthenticator2Test {
 
         assertEquals(firstPrompt, testee.currentPrompt.value)
         withPrompt<Verify> { onCancelled() }
-        assertEquals(Response.Cancelled, first.await())
+        assertEquals(Response.Cancelled.VerificationDismissed, first.await())
 
         assertNotEquals(firstPrompt, testee.currentPrompt.value)
         withPrompt<Verify> { onVerified() }
-        assertEquals(Response.Allowed(isAuthenticated = true), second.await())
+        assertEquals(Response.Allowed.UserAuthenticated, second.await())
     }
 
     @Test
@@ -286,21 +287,19 @@ class RealDeviceAuthenticator2Test {
     fun `when auth is not required then allow without authentication`() = runTest {
         isAuthRequired = false
 
-        val response = testee.authenticate(Request())
+        val response = testee.authenticate(Request()) { authEvents += it }
 
-        assertEquals(Response.Allowed(isAuthenticated = false), response)
+        assertEquals(Response.Allowed.NotRequiredForBuild, response)
         assertNull(testee.currentPrompt.value)
         assertTrue(authEvents.isEmpty())
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun TestScope.authenticateAsync(): Deferred<Response> {
         val response = backgroundScope.async { testee.authenticate(Request()) { authEvents += it } }
         runCurrent()
         return response
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private inline fun <reified T : AuthPrompt> TestScope.withPrompt(block: T.() -> Unit) {
         val prompt = testee.currentPrompt.value
         assertIs<T>(prompt)

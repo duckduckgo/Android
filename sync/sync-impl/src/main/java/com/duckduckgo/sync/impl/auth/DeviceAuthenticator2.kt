@@ -87,28 +87,46 @@ interface DeviceAuthenticator2 {
     sealed interface Response {
         /**
          * The user may proceed.
-         *
-         * @property isAuthenticated false only when the device has no screen lock and the build doesn't require
-         * authentication, so the user proceeds without having authenticated. This never happens in production: only UI tests
-         * that skip device authentication turn the requirement off, through [SyncBuildConfig.isAuthRequired].
          */
-        data class Allowed(val isAuthenticated: Boolean) : Response
+        sealed interface Allowed : Response {
+            /**
+             * The user answered the verification prompt.
+             */
+            data object UserAuthenticated : Allowed
+
+            /**
+             * The user authenticated recently enough that we don't ask again.
+             */
+            data object WithinGracePeriod : Allowed
+
+            /**
+             * The build doesn't require authentication, so the user proceeds without having authenticated. This never happens
+             * in production: only UI tests that skip device authentication turn the requirement off, through
+             * [SyncBuildConfig.isAuthRequired].
+             */
+            data object NotRequiredForBuild : Allowed
+        }
 
         /**
-         * The user dismissed the verification prompt.
+         * The user left a prompt without authenticating.
          */
-        data object Cancelled : Response
+        sealed interface Cancelled : Response {
+            /**
+             * The user dismissed the verification prompt.
+             */
+            data object VerificationDismissed : Cancelled
+
+            /**
+             * The device has no screen lock and the user closed the enrollment prompt. The user may have set up a screen lock
+             * in the meantime, so the caller can authenticate again.
+             */
+            data object EnrollmentClosed : Cancelled
+        }
 
         /**
          * Verification ended with an error.
          */
         data class Failed(val reason: String) : Response
-
-        /**
-         * The device has no screen lock and the user closed the enrollment prompt. The user may have set up a screen lock in
-         * the meantime, so the caller can authenticate again.
-         */
-        data object EnrollmentClosed : Response
     }
 }
 
@@ -131,7 +149,7 @@ class RealDeviceAuthenticator2 @Inject constructor(
             val hasValidDeviceAuthentication = hasValidDeviceAuthentication()
             when {
                 !buildConfig.isAuthRequired -> {
-                    Response.Allowed(isAuthenticated = false)
+                    Response.Allowed.NotRequiredForBuild
                 }
 
                 !hasValidDeviceAuthentication -> {
@@ -143,7 +161,7 @@ class RealDeviceAuthenticator2 @Inject constructor(
                 }
 
                 else -> {
-                    Response.Allowed(isAuthenticated = true)
+                    Response.Allowed.WithinGracePeriod
                 }
             }
         }
@@ -163,7 +181,7 @@ class RealDeviceAuthenticator2 @Inject constructor(
                 continuation = continuation,
             )
         }
-        return Response.EnrollmentClosed
+        return Response.Cancelled.EnrollmentClosed
     }
 
     private suspend fun showVerification(
@@ -181,11 +199,11 @@ class RealDeviceAuthenticator2 @Inject constructor(
         return when (result) {
             is VerifyResponse.Verified -> {
                 gracePeriod.recordSuccessfulAuthorization()
-                Response.Allowed(isAuthenticated = true)
+                Response.Allowed.UserAuthenticated
             }
 
             is VerifyResponse.Cancelled -> {
-                Response.Cancelled
+                Response.Cancelled.VerificationDismissed
             }
 
             is VerifyResponse.Error -> {
