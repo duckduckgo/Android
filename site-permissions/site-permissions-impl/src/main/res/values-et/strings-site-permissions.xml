@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Veebisait „%1$s“ soovib juurdepääsu sinu kaamerale</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Veebisait „%1$s“ soovib juurdepääsu sinu mikrofonile</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Veebisait „%1$s“ soovib juurdepääsu kaamerale ja mikrofonile</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ soovib sellel veebisaidil juurdepääsu sinu asukohale</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ soovib sellel veebisaidil juurdepääsu sinu kaamerale</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ soovib sellel veebisaidil juurdepääsu sinu mikrofonile</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ soovib sellel veebisaidil juurdepääsu sinu kaamerale ja mikrofonile</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ soovib sellel veebisaidil juurdepääsu sinu digitaalõiguste halduse (DRM) tarkvarale</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Kui keeldud, võivad saidil videod muutuda mängitamatuks, kuid sellel saidil puudub juurdepääs DRM-tarkvara pakutavatele seadme identifikaatoritele.</string>
 
     <!-- Reminder dialog -->
