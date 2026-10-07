@@ -31,6 +31,9 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.view.MessageCta
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
@@ -48,6 +51,7 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.sync.api.engine.SyncEngine
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -86,6 +90,13 @@ class NewTabPageViewModelTest {
     private val mockCtaViewModel: CtaViewModel = mock()
     private val mockPromptsCoordinator: PromptsCoordinator = mock()
     private val mockPromptExposureReporter: PromptExposureReporter = mock()
+    private val mockDuckChat: DuckChat = mock {
+        on { observeHasChatSuggestions() } doReturn flowOf(false)
+        on { observeChatSuggestionsUserSettingEnabled() } doReturn flowOf(true)
+    }
+    private val mockDuckChatInputModeState: DuckChatInputModeState = mock {
+        on { displayedMode } doReturn MutableStateFlow(InputMode.SEARCH)
+    }
 
     private lateinit var testee: NewTabPageViewModel
 
@@ -125,6 +136,11 @@ class NewTabPageViewModelTest {
             ctaViewModel = mockCtaViewModel,
             promptsCoordinator = mockPromptsCoordinator,
             promptExposureReporter = mockPromptExposureReporter,
+            nextStepsInputFocusVisibilityHandler = NextStepsInputFocusVisibilityHandler(
+                savedSitesRepository = mockSavedSitesRepository,
+                duckChat = mockDuckChat,
+                duckChatInputModeState = mockDuckChatInputModeState,
+            ),
             browserMode = browserMode,
         )
     }

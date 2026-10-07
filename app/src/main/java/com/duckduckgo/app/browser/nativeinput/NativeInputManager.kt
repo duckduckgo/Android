@@ -46,6 +46,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
+import com.duckduckgo.app.browser.omnibar.RealOmnibarFocusState
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -209,6 +210,7 @@ class RealNativeInputManager @Inject constructor(
     private val nativeInputEventListener: NativeInputEventListener,
     private val edgeToEdgeHandler: EdgeToEdgeHandler,
     private val duckAiChatStore: DuckAiChatStore,
+    private val omnibarFocusState: RealOmnibarFocusState,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -222,6 +224,10 @@ class RealNativeInputManager @Inject constructor(
     private var duckAiToolbarHidden: Boolean = false
     private var floatingSubmitContainer: View? = null
     private var widgetRoot: View? = null
+        set(value) {
+            field = value
+            omnibarFocusState.onFocusChanged(value != null)
+        }
     private var navBarRoot: View? = null
     private var navBarShown: Boolean? = null
 

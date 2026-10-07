@@ -175,6 +175,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.*
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
+import com.duckduckgo.app.browser.omnibar.RealOmnibarFocusState
 import com.duckduckgo.app.browser.pdf.BubbleTooltipDrawable
 import com.duckduckgo.app.browser.pdf.DdgPdfViewerFragment
 import com.duckduckgo.app.browser.pdf.PdfDownloadTooltipPopup
@@ -444,6 +445,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var nativeInputManager: NativeInputManager
+
+    @Inject
+    lateinit var omnibarFocusState: RealOmnibarFocusState
 
     @Inject
     lateinit var browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>
@@ -4195,6 +4199,7 @@ class BrowserTabFragment :
         hasFocus: Boolean,
         query: String,
     ) {
+        omnibarFocusState.onFocusChanged(hasFocus)
         viewModel.triggerAutocomplete(query, hasFocus, false)
         if (hasFocus) {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_SHOWN_DAILY, type = Daily())

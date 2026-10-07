@@ -87,6 +87,7 @@ class NewTabPageViewModel @AssistedInject constructor(
     private val ctaViewModel: CtaViewModel,
     private val promptsCoordinator: PromptsCoordinator,
     private val promptExposureReporter: PromptExposureReporter,
+    private val nextStepsInputFocusVisibilityHandler: NextStepsInputFocusVisibilityHandler,
     browserMode: BrowserMode,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -100,6 +101,7 @@ class NewTabPageViewModel @AssistedInject constructor(
         val onboardingComplete: Boolean = false,
         val favourites: List<Favorite>? = null,
         val lowPriorityMessage: LowPriorityMessage? = null,
+        val hideNextStepsForInput: Boolean = false,
     ) {
 
         private val isLoadingContent = favourites == null
@@ -149,6 +151,17 @@ class NewTabPageViewModel @AssistedInject constructor(
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
+
+    init {
+        nextStepsInputFocusVisibilityHandler.shouldHideNextSteps
+            .flowOn(dispatchers.io())
+            .onEach { hide -> _viewState.update { it.copy(hideNextStepsForInput = hide) } }
+            .launchIn(viewModelScope)
+    }
+
+    fun onOmnibarFocusChanged(isFocused: Boolean) {
+        nextStepsInputFocusVisibilityHandler.onInputFocusChanged(isFocused)
+    }
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)

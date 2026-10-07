@@ -23,12 +23,18 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import android.transition.ChangeBounds
+import android.transition.Slide
+import android.transition.TransitionManager
+import android.transition.TransitionSet
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.widget.LinearLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -54,6 +60,7 @@ import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.OmnibarFocusState
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
@@ -138,6 +145,9 @@ class NewTabPageView @JvmOverloads constructor(
     @Inject
     lateinit var nextSteps: NextSteps
 
+    @Inject
+    lateinit var omnibarFocusState: OmnibarFocusState
+
     private val binding: ViewNewTabBinding by viewBinding()
 
     private val homeBackgroundLogo by lazy { HomeBackgroundLogo(binding.ddgLogo) }
@@ -154,10 +164,12 @@ class NewTabPageView @JvmOverloads constructor(
     private val conflatedCommandJob = ConflatedJob()
     private val conflatedNativeInputJob = ConflatedJob()
     private val conflatedChatModeJob = ConflatedJob()
+    private val conflatedOmnibarFocusJob = ConflatedJob()
 
     private var lastSelectedMode: InputMode? = null
     private var logoAnimator: ValueAnimator? = null
     private var nextStepsSectionJob: Job? = null
+    private var nextStepsHiddenByInput = false
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         if (ev.actionMasked == MotionEvent.ACTION_DOWN && ntpEngagementTracker.shouldReportEngagement()) {
@@ -197,6 +209,10 @@ class NewTabPageView @JvmOverloads constructor(
             .onEach { mode -> updateLogoForMode(mode) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
+        conflatedOmnibarFocusJob += omnibarFocusState.isFocused
+            .onEach { viewModel.onOmnibarFocusChanged(it) }
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
+
         disableViewStateSaving()
     }
 
@@ -208,6 +224,8 @@ class NewTabPageView @JvmOverloads constructor(
         conflatedCommandJob.cancel()
         conflatedNativeInputJob.cancel()
         conflatedChatModeJob.cancel()
+        conflatedOmnibarFocusJob.cancel()
+        TransitionManager.endTransitions(binding.root)
         nextStepsSectionJob?.cancel()
         nextStepsSectionJob = null
         logoAnimator?.cancel()
@@ -250,6 +268,7 @@ class NewTabPageView @JvmOverloads constructor(
     private companion object {
         private const val LOGO_ANIMATION_DURATION_MS = 350L
         private const val LOGO_MAX_FRAME = 15
+        private const val NEXT_STEPS_TRANSITION_DURATION_MS = 250L
     }
 
     private fun disableViewStateSaving() {
@@ -263,14 +282,33 @@ class NewTabPageView @JvmOverloads constructor(
         }
     }
 
-    private fun showNextStepsSection(newMessage: Boolean) {
-        if (binding.nextStepsContainer.childCount == 0) {
-            inflateNextStepsSection()
-        } else {
-            val wasHidden = binding.nextStepsContainer.isGone
-            binding.nextStepsContainer.show()
-            if (newMessage || wasHidden) {
-                viewModel.onMessageShown()
+    private fun showNextStepsSection(
+        newMessage: Boolean,
+        hiddenByInput: Boolean,
+    ) {
+        val inputVisibilityChanged = hiddenByInput != nextStepsHiddenByInput
+        nextStepsHiddenByInput = hiddenByInput
+        when {
+            binding.nextStepsContainer.childCount == 0 -> inflateNextStepsSection()
+            // Showing it again once the input releases the space is not a new impression.
+            inputVisibilityChanged -> {
+                setNextStepsHiddenAnimated(hiddenByInput)
+                if (newMessage) {
+                    viewModel.onMessageShown()
+                }
+            }
+            hiddenByInput -> {
+                binding.nextStepsContainer.gone()
+                if (newMessage) {
+                    viewModel.onMessageShown()
+                }
+            }
+            else -> {
+                val wasHidden = binding.nextStepsContainer.isGone
+                binding.nextStepsContainer.show()
+                if (newMessage || wasHidden) {
+                    viewModel.onMessageShown()
+                }
             }
         }
     }
@@ -280,10 +318,25 @@ class NewTabPageView @JvmOverloads constructor(
         nextStepsSectionJob = findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
             val section = nextSteps.provideSectionView(context) ?: return@launch
             binding.nextStepsContainer.addView(section)
-            binding.nextStepsContainer.show()
+            binding.nextStepsContainer.isGone = nextStepsHiddenByInput
             viewModel.onMessageShown()
         }
     }
+
+    private fun setNextStepsHiddenAnimated(hide: Boolean) {
+        if (binding.root.isLaidOut) {
+            TransitionManager.beginDelayedTransition(binding.root, nextStepsTransition())
+        }
+        binding.nextStepsContainer.isGone = hide
+    }
+
+    // ChangeBounds moves the favourites by their bounds instead of relaying out the page every frame.
+    private fun nextStepsTransition() = TransitionSet()
+        .addTransition(ChangeBounds().excludeTarget(binding.nextStepsContainer, true))
+        .addTransition(Slide(Gravity.TOP).addTarget(binding.nextStepsContainer))
+        .setOrdering(TransitionSet.ORDERING_TOGETHER)
+        .setDuration(NEXT_STEPS_TRANSITION_DURATION_MS)
+        .setInterpolator(FastOutSlowInInterpolator())
 
     private fun updateLogoMargin(nativeInputEnabled: Boolean) {
         val baseMargin = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.homeTabDdgLogoTopMargin)
@@ -320,7 +373,7 @@ class NewTabPageView @JvmOverloads constructor(
         }
         if (viewState.showNextSteps) {
             binding.messageCta.gone()
-            showNextStepsSection(viewState.newMessage)
+            showNextStepsSection(viewState.newMessage, viewState.hideNextStepsForInput)
         } else if (viewState.message != null && viewState.onboardingComplete) {
             binding.nextStepsContainer.gone()
             showRemoteMessage(viewState.message, viewState.messageImageFilePath, viewState.newMessage)
