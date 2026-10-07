@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Website \"%1$s\" wil toegang tot je camera</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">De website \"%1$s\" wil toegang tot je microfoon</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Website \'%1$s\' wil toegang tot je camera en microfoon</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" wil op deze website toegang tot je locatie</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" wil op deze website toegang tot je camera</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" wil op deze website toegang tot je microfoon</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\'%1$s\' wil toegang tot je camera en microfoon op deze website</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" wil op deze website toegang tot je DRM-software (Digital Rights Management)</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Als je dit niet toestaat, kunnen video\'s op de site mogelijk niet worden afgespeeld, maar deze site heeft geen toegang tot apparaat-ID\'s die door DRM-software worden verstrekt.</string>
 
     <!-- Reminder dialog -->
