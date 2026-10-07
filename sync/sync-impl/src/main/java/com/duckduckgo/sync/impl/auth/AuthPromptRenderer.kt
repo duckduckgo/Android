@@ -41,7 +41,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 /**
- * Renders prompts published by [DeviceAuthenticator2.currentPrompt] in the current activity.
+ * Renders prompts published by [DeviceAuthenticator.currentPrompt] in the current activity.
  */
 interface AuthPromptRenderer {
     /**

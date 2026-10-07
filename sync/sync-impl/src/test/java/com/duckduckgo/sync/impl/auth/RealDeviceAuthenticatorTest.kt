@@ -19,9 +19,9 @@ package com.duckduckgo.sync.impl.auth
 import com.duckduckgo.sync.impl.SyncBuildConfig
 import com.duckduckgo.sync.impl.auth.AuthPrompt.Enroll
 import com.duckduckgo.sync.impl.auth.AuthPrompt.Verify
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator2.Event
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator2.Request
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator2.Response
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Request
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
@@ -41,7 +41,7 @@ import kotlin.contracts.contract
 
 @Suppress("DeferredResultUnused")
 @OptIn(ExperimentalCoroutinesApi::class)
-class RealDeviceAuthenticator2Test {
+class RealDeviceAuthenticatorTest {
 
     private var supportsStrongAuthentication = true
     private var supportsLegacyAuthentication = true
@@ -66,7 +66,7 @@ class RealDeviceAuthenticator2Test {
 
     private val authEvents = mutableListOf<Event>()
 
-    private val testee = RealDeviceAuthenticator2(
+    private val testee = RealDeviceAuthenticator(
         deviceAuthChecker = deviceAuthChecker,
         gracePeriod = gracePeriod,
         buildConfig = buildConfig,

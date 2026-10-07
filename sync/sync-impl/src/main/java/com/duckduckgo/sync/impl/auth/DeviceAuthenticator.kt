@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,134 +16,264 @@
 
 package com.duckduckgo.sync.impl.auth
 
-import android.annotation.SuppressLint
-import android.content.ActivityNotFoundException
-import android.content.Context
-import android.content.Intent
-import android.os.Build
-import android.provider.Settings
-import androidx.annotation.UiThread
-import androidx.fragment.app.FragmentActivity
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import androidx.annotation.StringRes
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.impl.BuildConfig
 import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthConfiguration
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult
+import com.duckduckgo.sync.impl.SyncBuildConfig
+import com.duckduckgo.sync.impl.auth.AuthPrompt.Enroll
+import com.duckduckgo.sync.impl.auth.AuthPrompt.Verify
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Request
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
 import com.squareup.anvil.annotations.ContributesBinding
-import logcat.LogPriority.WARN
-import logcat.asLog
-import logcat.logcat
+import kotlinx.coroutines.CancellableContinuation
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
+import kotlin.coroutines.resume
 
+/**
+ * Decides whether and how the user has to authenticate.
+ */
 interface DeviceAuthenticator {
     /**
-     * This method can be used to check if the user's device has a valid device authentication enrolled (Fingerprint, PIN, pattern or password).
+     * The prompt the UI should show, or null when there is nothing to show. Render it with [AuthPromptRenderer].
      */
-    fun hasValidDeviceAuthentication(): Boolean
+    val currentPrompt: StateFlow<AuthPrompt?>
 
     /**
-     * Launches a device authentication flow from a [fragmentActivity]. [onResult] can be used to
-     * communicate back to the feature the result of the flow.
+     * Checks whether the user has to authenticate and, when they do, publishes a prompt on [currentPrompt] and suspends until
+     * it is answered.
+     *
+     * Calls are serialized, so at most one prompt is pending at a time. Cancelling the call clears [currentPrompt], which
+     * dismisses the shown prompt.
+     *
+     * @param onEvent reports progress of authentication process while the call is active
      */
-    @UiThread
-    fun authenticate(
-        fragmentActivity: FragmentActivity,
-        config: AuthConfiguration = AuthConfiguration(),
-        onResult: (AuthResult) -> Unit,
+    suspend fun authenticate(
+        request: Request,
+        onEvent: (Event) -> Unit = {},
+    ): Response
+
+    data class Request(
+        @StringRes val verifyPromptTitle: Int = R.string.sync_biometric_prompt_title,
+        @StringRes val verifyPromptMessage: Int = R.string.sync_auth_text_for_access,
+        @StringRes val enrollPromptTitle: Int = R.string.sync_simplified_settings_require_passcode_dialog_title,
+        @StringRes val enrollPromptMessage: Int = R.string.sync_simplified_settings_require_passcode_dialog_body,
+        @StringRes val enrollPromptCta: Int = R.string.sync_simplified_settings_require_passcode_dialog_primary_button,
     )
 
-    /**
-     * Returns true if the user has to authenticate to use sync. This is always true in production.
-     *
-     * When running some specific UI tests, this can be set to false with a build flag to allow us to have increased test coverage.
-     */
-    fun isAuthenticationRequired(): Boolean {
-        return BuildConfig.AUTH_REQUIRED
+    sealed interface Event {
+        /**
+         * The device has no screen lock, so [authenticate] is about to show [AuthPrompt.Enroll].
+         */
+        data object EnrollmentNeeded : Event
+
+        /**
+         * [AuthPrompt.Enroll] is on screen.
+         */
+        data object EnrollmentShown : Event
+
+        /**
+         * [AuthPrompt.Verify] is on screen.
+         */
+        data object VerificationShown : Event
     }
 
-    /**
-     * Launches the device authentication enrollment screen from system settings.
-     */
-    fun launchDeviceAuthEnrollment(context: Context)
+    sealed interface Response {
+        /**
+         * The user may proceed.
+         */
+        sealed interface Allowed : Response {
+            /**
+             * The user answered the verification prompt.
+             */
+            data object UserAuthenticated : Allowed
 
-    data class AuthConfiguration(
-        val requireUserAction: Boolean = false,
-        val displayTextResource: Int = R.string.sync_auth_text_for_access,
-        val displayTitleResource: Int = R.string.sync_biometric_prompt_title,
-    )
+            /**
+             * The user authenticated recently enough that we don't ask again.
+             */
+            data object WithinGracePeriod : Allowed
+
+            /**
+             * The build doesn't require authentication, so the user proceeds without having authenticated. This never happens
+             * in production: only UI tests that skip device authentication turn the requirement off, through
+             * [SyncBuildConfig.isAuthRequired].
+             */
+            data object NotRequiredForBuild : Allowed
+        }
+
+        /**
+         * The user left a prompt without authenticating.
+         */
+        sealed interface Cancelled : Response {
+            /**
+             * The user dismissed the verification prompt.
+             */
+            data object VerificationDismissed : Cancelled
+
+            /**
+             * The device has no screen lock and the user closed the enrollment prompt. The user may have set up a screen lock
+             * in the meantime, so the caller can authenticate again.
+             */
+            data object EnrollmentClosed : Cancelled
+        }
+
+        /**
+         * Verification ended with an error.
+         */
+        data class Failed(val reason: String) : Response
+    }
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(AppScope::class, boundType = DeviceAuthenticator::class)
 class RealDeviceAuthenticator @Inject constructor(
     private val deviceAuthChecker: SupportedDeviceAuthChecker,
-    private val appBuildConfig: AppBuildConfig,
-    private val authLauncher: AuthLauncher,
-    private val autofillAuthGracePeriod: DeviceAuthorizationGracePeriod,
+    private val gracePeriod: DeviceAuthorizationGracePeriod,
+    private val buildConfig: SyncBuildConfig,
 ) : DeviceAuthenticator {
+    private val mutex = Mutex()
+    private val _currentPrompt = MutableStateFlow<AuthPrompt?>(null)
 
-    override fun hasValidDeviceAuthentication(): Boolean {
+    override val currentPrompt: StateFlow<AuthPrompt?> = _currentPrompt.asStateFlow()
+
+    override suspend fun authenticate(
+        request: Request,
+        onEvent: (Event) -> Unit,
+    ): Response {
+        return mutex.withLock {
+            when {
+                !buildConfig.isAuthRequired -> {
+                    Response.Allowed.NotRequiredForBuild
+                }
+
+                !hasValidDeviceAuthentication() -> {
+                    showEnrollment(request, onEvent)
+                }
+
+                gracePeriod.isAuthRequired() -> {
+                    showVerification(request, onEvent)
+                }
+
+                else -> {
+                    Response.Allowed.WithinGracePeriod
+                }
+            }
+        }
+    }
+
+    private suspend fun showEnrollment(
+        request: Request,
+        onEvent: (Event) -> Unit,
+    ): Response {
+        onEvent(Event.EnrollmentNeeded)
+        showPrompt { continuation ->
+            EnrollPrompt(
+                title = request.enrollPromptTitle,
+                message = request.enrollPromptMessage,
+                cta = request.enrollPromptCta,
+                notifyShown = { onEvent(Event.EnrollmentShown) },
+                continuation = continuation,
+            )
+        }
+        return Response.Cancelled.EnrollmentClosed
+    }
+
+    private suspend fun showVerification(
+        request: Request,
+        onEvent: (Event) -> Unit,
+    ): Response {
+        val result = showPrompt { continuation ->
+            VerifyPrompt(
+                title = request.verifyPromptTitle,
+                message = request.verifyPromptMessage,
+                notifyShown = { onEvent(Event.VerificationShown) },
+                continuation = continuation,
+            )
+        }
+        return when (result) {
+            is VerifyResponse.Verified -> {
+                gracePeriod.recordSuccessfulAuthorization()
+                Response.Allowed.UserAuthenticated
+            }
+
+            is VerifyResponse.Cancelled -> {
+                Response.Cancelled.VerificationDismissed
+            }
+
+            is VerifyResponse.Error -> {
+                Response.Failed(result.reason)
+            }
+        }
+    }
+
+    private suspend fun <R> showPrompt(create: (CancellableContinuation<R>) -> AuthPrompt): R {
+        return try {
+            suspendCancellableCoroutine { continuation ->
+                _currentPrompt.value = create(continuation)
+            }
+        } finally {
+            _currentPrompt.value = null
+        }
+    }
+
+    private fun hasValidDeviceAuthentication(): Boolean {
         // https://developer.android.com/reference/androidx/biometric/BiometricManager#canAuthenticate(int)
         // BIOMETRIC_STRONG | DEVICE_CREDENTIAL is unsupported on API 28-29
-        return if (appBuildConfig.sdkInt != Build.VERSION_CODES.Q && appBuildConfig.sdkInt != Build.VERSION_CODES.P) {
+        return if (buildConfig.sdkInt !in setOf(28, 29)) {
             deviceAuthChecker.supportsStrongAuthentication()
         } else {
             deviceAuthChecker.supportsLegacyAuthentication()
         }
     }
 
-    @UiThread
-    override fun authenticate(
-        fragmentActivity: FragmentActivity,
-        config: AuthConfiguration,
-        onResult: (AuthResult) -> Unit,
-    ) {
-        if (config.requireUserAction || autofillAuthGracePeriod.isAuthRequired()) {
-            authLauncher.launch(
-                featureTitleText = config.displayTitleResource,
-                featureAuthText = config.displayTextResource,
-                fragmentActivity = fragmentActivity,
-                onResult = onResult,
-            )
-        } else {
-            onResult(AuthResult.Success)
+    private class VerifyPrompt(
+        override val title: Int,
+        override val message: Int,
+        notifyShown: () -> Unit,
+        private val continuation: CancellableContinuation<VerifyResponse>,
+    ) : ReportShownOnce(notifyShown), Verify {
+        override fun onVerified() = resume(VerifyResponse.Verified)
+
+        override fun onCancelled() = resume(VerifyResponse.Cancelled)
+
+        override fun onError(reason: String) = resume(VerifyResponse.Error(reason))
+
+        private fun resume(result: VerifyResponse) {
+            if (continuation.isActive) continuation.resume(result)
         }
     }
 
-    @SuppressLint("InlinedApi", "DEPRECATION")
-    override fun launchDeviceAuthEnrollment(context: Context) {
-        when {
-            appBuildConfig.manufacturer == "Xiaomi" -> {
-                // Issue on Xiaomi: https://stackoverflow.com/questions/68484485/intent-action-fingerprint-enroll-on-redmi-results-in-exception
-                SYSTEM_SETTINGS_ACTION.safeLaunchSettingsActivity(context, tryFallback = false)
-            }
-
-            appBuildConfig.sdkInt >= Build.VERSION_CODES.R -> {
-                Settings.ACTION_BIOMETRIC_ENROLL.safeLaunchSettingsActivity(context, tryFallback = true)
-            }
-
-            else -> {
-                Settings.ACTION_FINGERPRINT_ENROLL.safeLaunchSettingsActivity(context, tryFallback = true)
-            }
+    private class EnrollPrompt(
+        override val title: Int,
+        override val message: Int,
+        override val cta: Int,
+        notifyShown: () -> Unit,
+        private val continuation: CancellableContinuation<Unit>,
+    ) : ReportShownOnce(notifyShown), Enroll {
+        override fun onClosed() {
+            if (continuation.isActive) continuation.resume(Unit)
         }
     }
 
-    /**
-     * Attempt to launch the given activity.
-     * If it fails because the activity wasn't found, try launching the main settings activity if tryFallback=true.
-     */
-    private fun String.safeLaunchSettingsActivity(context: Context, tryFallback: Boolean) {
-        try {
-            context.startActivity(Intent(this))
-        } catch (e: ActivityNotFoundException) {
-            logcat(WARN) { "${e.asLog()}. Trying fallback? $tryFallback" }
-            if (tryFallback) {
-                SYSTEM_SETTINGS_ACTION.safeLaunchSettingsActivity(context, tryFallback = false)
-            }
+    // A recreated activity shows the same prompt again, so we report only the first time it appears.
+    private abstract class ReportShownOnce(private val notifyShown: () -> Unit) {
+        private var reported = false
+
+        fun onShown() {
+            if (reported) return
+            reported = true
+            notifyShown()
         }
     }
 
-    companion object {
-        private const val SYSTEM_SETTINGS_ACTION = Settings.ACTION_SETTINGS
+    private sealed interface VerifyResponse {
+        data object Verified : VerifyResponse
+        data object Cancelled : VerifyResponse
+        data class Error(val reason: String) : VerifyResponse
     }
 }

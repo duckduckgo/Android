@@ -49,7 +49,7 @@ import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncDeviceIds
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.auth.AuthPrompt
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator2
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.auth.DeviceAuthorizationGracePeriod
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.autorestore.SyncRecoveryPersistentStorageKey
@@ -108,7 +108,7 @@ constructor(
     private val syncDeviceIds: SyncDeviceIds,
     private val exchangeV2QrCode: ExchangeV2QrCode,
     private val syncCodeDispatcher: SyncCodeDispatcher,
-    private val deviceAuthenticator: DeviceAuthenticator2,
+    private val deviceAuthenticator: DeviceAuthenticator,
     private val gracePeriod: DeviceAuthorizationGracePeriod,
     @field:SuppressLint("StaticFieldLeak") private val context: Context,
 ) : ViewModel() {
@@ -201,7 +201,7 @@ constructor(
         authLog.clear()
         authJob = viewModelScope.launch {
             appendAuthLog("Authenticating…")
-            val response = deviceAuthenticator.authenticate(DeviceAuthenticator2.Request()) { event -> appendAuthLog("Event: $event") }
+            val response = deviceAuthenticator.authenticate(DeviceAuthenticator.Request()) { event -> appendAuthLog("Event: $event") }
             appendAuthLog("Response: $response")
         }
     }
