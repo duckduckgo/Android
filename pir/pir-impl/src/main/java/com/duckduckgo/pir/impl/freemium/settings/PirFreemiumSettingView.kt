@@ -84,7 +84,7 @@ class PirFreemiumSettingView @JvmOverloads constructor(
             .launchIn(coroutineScope)
 
         binding.pirFreemiumPromo.isClickable = true
-        binding.pirFreemiumContainer.setOnClickListener { viewModel.onEntryPointClicked() }
+        binding.pirFreemiumContent.setOnClickListener { viewModel.onEntryPointClicked() }
     }
 
     override fun onDetachedFromWindow() {
