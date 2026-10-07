@@ -137,7 +137,7 @@ sealed class OnboardingDaxDialogCta(
      * Base class for the brand-design rebrand of [OnboardingDaxDialogCta]. Owns the render
      * pipeline so subclasses only need to declare their active content include and populate it.
      *
-     * Mirrors the structure of [DaxBubbleCta.BrandDesignUpdateBubbleCta] but targets the
+     * Mirrors the structure of [DaxBubbleCta] but targets the
      * contextual in-browser dialog layout (`include_onboarding_in_context_dax_dialog.xml`).
      *
      * Subclasses supply:
@@ -860,7 +860,7 @@ data class BackgroundFillSpec(
     fun heightDpFor(isTablet: Boolean): Float = if (isTablet) tabletFillHeightDp else fillHeightDp
 }
 
-sealed class DaxBubbleCta(
+abstract class DaxBubbleCta(
     override val ctaId: CtaId,
     @StringRes open val title: Int,
     @StringRes open val description: Int,
@@ -873,6 +873,8 @@ sealed class DaxBubbleCta(
     override var ctaPixelParam: String,
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
+    open val isLightTheme: Boolean,
+    open val deviceInfo: DeviceInfo,
 ) : Cta,
     ViewCta,
     DaxCta {
@@ -888,16 +890,6 @@ sealed class DaxBubbleCta(
         ctaView?.findViewById<MaterialButton>(R.id.secondaryCta)?.setOnClickListener {
             onButtonClicked.invoke()
         }
-    }
-
-    open fun setOnDismissCtaClicked(onButtonClicked: () -> Unit) {
-        // No-op by default. Brand-design subclasses wire their own dismiss control.
-    }
-
-    open fun setOnOptionClicked(
-        onOptionClicked: (DaxDialogIntroOption, index: Int?) -> Unit,
-    ) {
-        // No-op by default. Brand-design subclasses with option buttons override this.
     }
 
     override val markAsReadOnShow: Boolean = true
@@ -944,420 +936,393 @@ sealed class DaxBubbleCta(
         val bottomTranslationYDp: Float get() = translationYDp + maxHeightDp
     }
 
-    abstract class BrandDesignUpdateBubbleCta(
-        ctaId: CtaId,
-        @StringRes title: Int,
-        @StringRes description: Int,
-        options: List<DaxDialogIntroOption>? = null,
-        @DrawableRes backgroundRes: Int = 0,
-        shownPixel: Pixel.PixelName?,
-        okPixel: Pixel.PixelName?,
-        ctaPixelParam: String,
-        onboardingStore: OnboardingStore,
-        appInstallStore: AppInstallStore,
-        open val isLightTheme: Boolean,
-        open val deviceInfo: DeviceInfo,
-    ) : DaxBubbleCta(
-        ctaId = ctaId,
-        title = title,
-        description = description,
-        options = options,
-        backgroundRes = backgroundRes,
-        shownPixel = shownPixel,
-        okPixel = okPixel,
-        ctaPixelParam = ctaPixelParam,
-        onboardingStore = onboardingStore,
-        appInstallStore = appInstallStore,
+    open val backgroundFillSpec: BackgroundFillSpec? = null
+
+    protected fun View.isTablet(): Boolean = deviceInfo.isTablet()
+
+    protected fun View.isPhoneLandscape(): Boolean =
+        !deviceInfo.isTablet() &&
+            context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    companion object {
+        private const val DIALOG_FADE_IN_DURATION = 400L
+        private const val DIALOG_CONTENT_FADE_IN_DURATION = 200L
+        private const val HEADER_IMAGE_FADE_IN_DURATION = 300L
+        private const val ARROW_DEPTH_ANIMATION_DURATION = 200L
+        private const val TYPING_DELAY_MS = 20L
+        private const val TYPING_POST_DELAY_MS = 20L
+        private const val DISMISS_BORDER_WIDTH_DP = 1.5f
+    }
+
+    abstract val activeIncludeIds: List<Int>
+
+    abstract val showArrow: Boolean
+
+    abstract fun configureContentViews(view: View)
+
+    protected open fun decorateDescription(context: Context, text: CharSequence): CharSequence = text
+
+    private var cardContainer: TouchInterceptingLinearLayout? = null
+
+    private var isAnimating: Boolean = false
+        set(value) {
+            field = value
+            cardContainer?.interceptChildTouches = value
+        }
+
+    private var contentFadeInAnimator: AnimatorSet? = null
+    private var fadeOutAnimator: AnimatorSet? = null
+    private var arrowDepthAnimator: ValueAnimator? = null
+
+    private val wavingDaxController: WavingDaxController? by lazy {
+        if (this is ShowsWavingDax) {
+            WavingDaxController(showArrow, deviceInfo, wavingDaxSpec)
+        } else {
+            null
+        }
+    }
+
+    protected fun resolveOnboardingContext(context: Context): Context {
+        val themeRes = if (isLightTheme) {
+            DesignSystemR.style.Theme_DuckDuckGo_Light_Onboarding
+        } else {
+            DesignSystemR.style.Theme_DuckDuckGo_Dark_Onboarding
+        }
+        return ContextThemeWrapper(context, themeRes)
+    }
+
+    private fun styleDismissButton(button: ImageView) {
+        val themedContext = resolveOnboardingContext(button.context)
+        val bgColor = themedContext.getColorFromAttr(DesignSystemR.attr.onboardingSurfaceTertiary)
+        val borderColor = themedContext.getColorFromAttr(DesignSystemR.attr.onboardingAccentAltPrimary)
+        val iconColor = themedContext.getColorFromAttr(DesignSystemR.attr.onboardingIconsPrimary)
+
+        button.background = GradientDrawable().apply {
+            shape = GradientDrawable.OVAL
+            setColor(bgColor)
+            setStroke(DISMISS_BORDER_WIDTH_DP.toPx().toInt(), borderColor)
+        }
+        ImageViewCompat.setImageTintList(button, ColorStateList.valueOf(iconColor))
+    }
+
+    private fun getAllContentIncludes(view: View): List<View> = listOfNotNull(
+        view.findViewById<View>(R.id.optionsContent),
+        view.findViewById<View>(R.id.primaryCta),
+        view.findViewById<View>(R.id.secondaryCta),
+    )
+
+    internal fun applyWavingDaxState(container: View, showsWavingDax: ShowsWavingDax?) {
+        container.findViewById<LottieAnimationView>(R.id.wavingDax)?.let { dax ->
+            if (showsWavingDax != null && !container.isPhoneLandscape()) {
+                showsWavingDax.configureWavingDax(
+                    dax = dax,
+                    deviceInfo = deviceInfo,
+                )
+                dax.isInvisible = true
+            } else {
+                dax.isGone = true
+            }
+        }
+    }
+
+    /**
+     * The fin depth [showCta] should apply, or null when the controller owns the fin (waving-Dax
+     * CTAs in portrait/tablet). The null case mirrors the controller's portrait/tablet ownership
+     * guard, so [showCta] and the controller can never both write the fin.
+     */
+    private fun showCtaFinTarget(container: View): Float? {
+        if (this is ShowsWavingDax && !container.isPhoneLandscape()) return null
+        return if (showArrow && !container.isPhoneLandscape()) 1f else 0f
+    }
+
+    fun applyFit() {
+        val container = ctaView ?: return
+        wavingDaxController?.applyFit(container)
+    }
+
+    fun onOrientationChanged() {
+        val container = ctaView ?: return
+        val cardView = container.findViewById<DaxOnboardingBubbleCardView>(R.id.brandDesignCardView) ?: return
+
+        applyWavingDaxState(container, this as? ShowsWavingDax)
+        cardView.setArrowDepthFraction(showCtaFinTarget(container) ?: 0f)
+        wavingDaxController?.reset()
+        container.post { applyFit() }
+    }
+
+    private fun resetAllIncludesExcept(view: View, active: List<View>) {
+        getAllContentIncludes(view).forEach { include ->
+            if (active.contains(include)) {
+                include.show()
+                include.alpha = 0f
+            } else {
+                include.gone()
+            }
+        }
+    }
+
+    override fun showCta(
+        container: View,
+        onTypingAnimationFinished: () -> Unit,
     ) {
+        ctaView = container
 
-        open val backgroundFillSpec: BackgroundFillSpec? = null
+        cancelRunningAnimations()
+        wavingDaxController?.reset()
+        val isContentTransition = container.alpha > 0f && container.isVisible // card already visible from previous CTA
 
-        protected fun View.isTablet(): Boolean = deviceInfo.isTablet()
+        val cardView = container.findViewById<DaxOnboardingBubbleCardView>(R.id.brandDesignCardView)
 
-        protected fun View.isPhoneLandscape(): Boolean =
-            !deviceInfo.isTablet() &&
-                context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        val daxTitle = container.context.getString(title)
+        val daxDescription = container.context.getString(description).preventWidows()
+        val descriptionText = decorateDescription(container.context, daxDescription.html(container.context))
 
-        companion object {
-            private const val DIALOG_FADE_IN_DURATION = 400L
-            private const val DIALOG_CONTENT_FADE_IN_DURATION = 200L
-            private const val HEADER_IMAGE_FADE_IN_DURATION = 300L
-            private const val ARROW_DEPTH_ANIMATION_DURATION = 200L
-            private const val TYPING_DELAY_MS = 20L
-            private const val TYPING_POST_DELAY_MS = 20L
-            private const val DISMISS_BORDER_WIDTH_DP = 1.5f
+        val titleView = container.findViewById<DaxTypeAnimationTextView>(R.id.brandDesignTitle)
+        val hiddenTitle = container.findViewById<DaxTextView>(R.id.brandDesignHiddenTitle)
+        val descriptionView = container.findViewById<DaxTextView>(R.id.brandDesignDescription)
+        val dismissButton = container.findViewById<ImageView>(R.id.brandDesignDismissButton)
+        val headerImage = container.findViewById<ImageView>(R.id.brandDesignHeaderImage)
+        styleDismissButton(dismissButton)
+        cardContainer = container.findViewById<TouchInterceptingLinearLayout>(R.id.brandDesignCardContainer)
+        isAnimating = true
+
+        val activeIncludes = activeIncludeIds.map {
+            container.findViewById<View>(it)
         }
 
-        abstract val activeIncludeIds: List<Int>
-
-        abstract val showArrow: Boolean
-
-        abstract fun configureContentViews(view: View)
-
-        protected open fun decorateDescription(context: Context, text: CharSequence): CharSequence = text
-
-        private var cardContainer: TouchInterceptingLinearLayout? = null
-
-        private var isAnimating: Boolean = false
-            set(value) {
-                field = value
-                cardContainer?.interceptChildTouches = value
-            }
-
-        private var contentFadeInAnimator: AnimatorSet? = null
-        private var fadeOutAnimator: AnimatorSet? = null
-        private var arrowDepthAnimator: ValueAnimator? = null
-
-        private val wavingDaxController: WavingDaxController? by lazy {
-            if (this is ShowsWavingDax) {
-                WavingDaxController(showArrow, deviceInfo, wavingDaxSpec)
-            } else {
-                null
-            }
+        // Hides the header between CTAs; subclasses that use it re-enable
+        // visibility inside configureContentViews().
+        val resetHeaderState = {
+            headerImage?.isVisible = false
+            headerImage?.alpha = 0f
         }
 
-        protected fun resolveOnboardingContext(context: Context): Context {
-            val themeRes = if (isLightTheme) {
-                DesignSystemR.style.Theme_DuckDuckGo_Light_Onboarding
-            } else {
-                DesignSystemR.style.Theme_DuckDuckGo_Dark_Onboarding
-            }
-            return ContextThemeWrapper(context, themeRes)
+        val resetTextAlignment = {
+            titleView.gravity = Gravity.START
+            hiddenTitle.gravity = Gravity.START
+            descriptionView.gravity = Gravity.START
         }
 
-        private fun styleDismissButton(button: ImageView) {
-            val themedContext = resolveOnboardingContext(button.context)
-            val bgColor = themedContext.getColorFromAttr(DesignSystemR.attr.onboardingSurfaceTertiary)
-            val borderColor = themedContext.getColorFromAttr(DesignSystemR.attr.onboardingAccentAltPrimary)
-            val iconColor = themedContext.getColorFromAttr(DesignSystemR.attr.onboardingIconsPrimary)
+        val wavingDax = this as? ShowsWavingDax
 
-            button.background = GradientDrawable().apply {
-                shape = GradientDrawable.OVAL
-                setColor(bgColor)
-                setStroke(DISMISS_BORDER_WIDTH_DP.toPx().toInt(), borderColor)
-            }
-            ImageViewCompat.setImageTintList(button, ColorStateList.valueOf(iconColor))
-        }
+        // Helper: type title then fade in content
+        val typeAndFadeIn = {
+            hiddenTitle.text = daxTitle.html(container.context)
+            descriptionView.text = descriptionText
 
-        private fun getAllContentIncludes(view: View): List<View> = listOfNotNull(
-            view.findViewById<View>(R.id.optionsContent),
-            view.findViewById<View>(R.id.primaryCta),
-            view.findViewById<View>(R.id.secondaryCta),
-        )
+            val startTyping = {
+                titleView.alpha = 1f
+                titleView.text = ""
 
-        internal fun applyWavingDaxState(container: View, showsWavingDax: ShowsWavingDax?) {
-            container.findViewById<LottieAnimationView>(R.id.wavingDax)?.let { dax ->
-                if (showsWavingDax != null && !container.isPhoneLandscape()) {
-                    showsWavingDax.configureWavingDax(
-                        dax = dax,
-                        deviceInfo = deviceInfo,
+                titleView.typingDelayInMs = TYPING_DELAY_MS
+                titleView.delayAfterAnimationInMs = TYPING_POST_DELAY_MS
+                titleView.startTypingAnimation(daxTitle, true) {
+                    val animators = mutableListOf<Animator>(
+                        ObjectAnimator.ofFloat(descriptionView, View.ALPHA, 1f)
+                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                        ObjectAnimator.ofFloat(dismissButton, View.ALPHA, 1f)
+                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                     )
-                    dax.isInvisible = true
-                } else {
-                    dax.isGone = true
-                }
-            }
-        }
-
-        /**
-         * The fin depth [showCta] should apply, or null when the controller owns the fin (waving-Dax
-         * CTAs in portrait/tablet). The null case mirrors the controller's portrait/tablet ownership
-         * guard, so [showCta] and the controller can never both write the fin.
-         */
-        private fun showCtaFinTarget(container: View): Float? {
-            if (this is ShowsWavingDax && !container.isPhoneLandscape()) return null
-            return if (showArrow && !container.isPhoneLandscape()) 1f else 0f
-        }
-
-        fun applyFit() {
-            val container = ctaView ?: return
-            wavingDaxController?.applyFit(container)
-        }
-
-        fun onOrientationChanged() {
-            val container = ctaView ?: return
-            val cardView = container.findViewById<DaxOnboardingBubbleCardView>(R.id.brandDesignCardView) ?: return
-
-            applyWavingDaxState(container, this as? ShowsWavingDax)
-            cardView.setArrowDepthFraction(showCtaFinTarget(container) ?: 0f)
-            wavingDaxController?.reset()
-            container.post { applyFit() }
-        }
-
-        private fun resetAllIncludesExcept(view: View, active: List<View>) {
-            getAllContentIncludes(view).forEach { include ->
-                if (active.contains(include)) {
-                    include.show()
-                    include.alpha = 0f
-                } else {
-                    include.gone()
-                }
-            }
-        }
-
-        override fun showCta(
-            container: View,
-            onTypingAnimationFinished: () -> Unit,
-        ) {
-            ctaView = container
-
-            cancelRunningAnimations()
-            wavingDaxController?.reset()
-            val isContentTransition = container.alpha > 0f && container.isVisible // card already visible from previous CTA
-
-            val cardView = container.findViewById<DaxOnboardingBubbleCardView>(R.id.brandDesignCardView)
-
-            val daxTitle = container.context.getString(title)
-            val daxDescription = container.context.getString(description).preventWidows()
-            val descriptionText = decorateDescription(container.context, daxDescription.html(container.context))
-
-            val titleView = container.findViewById<DaxTypeAnimationTextView>(R.id.brandDesignTitle)
-            val hiddenTitle = container.findViewById<DaxTextView>(R.id.brandDesignHiddenTitle)
-            val descriptionView = container.findViewById<DaxTextView>(R.id.brandDesignDescription)
-            val dismissButton = container.findViewById<ImageView>(R.id.brandDesignDismissButton)
-            val headerImage = container.findViewById<ImageView>(R.id.brandDesignHeaderImage)
-            styleDismissButton(dismissButton)
-            cardContainer = container.findViewById<TouchInterceptingLinearLayout>(R.id.brandDesignCardContainer)
-            isAnimating = true
-
-            val activeIncludes = activeIncludeIds.map {
-                container.findViewById<View>(it)
-            }
-
-            // Hides the header between CTAs; subclasses that use it re-enable
-            // visibility inside configureContentViews().
-            val resetHeaderState = {
-                headerImage?.isVisible = false
-                headerImage?.alpha = 0f
-            }
-
-            val resetTextAlignment = {
-                titleView.gravity = Gravity.START
-                hiddenTitle.gravity = Gravity.START
-                descriptionView.gravity = Gravity.START
-            }
-
-            val wavingDax = this as? ShowsWavingDax
-
-            // Helper: type title then fade in content
-            val typeAndFadeIn = {
-                hiddenTitle.text = daxTitle.html(container.context)
-                descriptionView.text = descriptionText
-
-                val startTyping = {
-                    titleView.alpha = 1f
-                    titleView.text = ""
-
-                    titleView.typingDelayInMs = TYPING_DELAY_MS
-                    titleView.delayAfterAnimationInMs = TYPING_POST_DELAY_MS
-                    titleView.startTypingAnimation(daxTitle, true) {
-                        val animators = mutableListOf<Animator>(
-                            ObjectAnimator.ofFloat(descriptionView, View.ALPHA, 1f)
-                                .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                            ObjectAnimator.ofFloat(dismissButton, View.ALPHA, 1f)
+                    activeIncludes.forEach {
+                        animators.add(
+                            ObjectAnimator.ofFloat(it, View.ALPHA, 1f)
                                 .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                         )
-                        activeIncludes.forEach {
-                            animators.add(
-                                ObjectAnimator.ofFloat(it, View.ALPHA, 1f)
-                                    .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                            )
-                        }
-                        // Read depth live: the first-show arm synchronously sets it before this lambda runs,
-                        // so a value captured at function entry would animate from a stale snapshot.
-                        val targetDepth = showCtaFinTarget(container)
-                        if (targetDepth != null) {
-                            val currentDepth = cardView.arrowDepthFraction
-                            if (targetDepth != currentDepth) {
-                                arrowDepthAnimator = ValueAnimator.ofFloat(currentDepth, targetDepth).apply {
-                                    duration = ARROW_DEPTH_ANIMATION_DURATION
-                                    interpolator = FastOutSlowInInterpolator()
-                                    addUpdateListener { cardView.setArrowDepthFraction(it.animatedValue as Float) }
-                                }
-                                animators.add(arrowDepthAnimator!!)
+                    }
+                    // Read depth live: the first-show arm synchronously sets it before this lambda runs,
+                    // so a value captured at function entry would animate from a stale snapshot.
+                    val targetDepth = showCtaFinTarget(container)
+                    if (targetDepth != null) {
+                        val currentDepth = cardView.arrowDepthFraction
+                        if (targetDepth != currentDepth) {
+                            arrowDepthAnimator = ValueAnimator.ofFloat(currentDepth, targetDepth).apply {
+                                duration = ARROW_DEPTH_ANIMATION_DURATION
+                                interpolator = FastOutSlowInInterpolator()
+                                addUpdateListener { cardView.setArrowDepthFraction(it.animatedValue as Float) }
                             }
-                        }
-                        contentFadeInAnimator = AnimatorSet().apply {
-                            playTogether(animators.toList())
-                            addListener(object : AnimatorListenerAdapter() {
-                                override fun onAnimationEnd(animation: Animator) {
-                                    if (isAnimating) {
-                                        isAnimating = false
-                                        onTypingAnimationFinished()
-                                    }
-                                }
-                            })
-                            start()
+                            animators.add(arrowDepthAnimator!!)
                         }
                     }
-                }
-
-                if (headerImage?.isVisible == true) {
-                    headerImage.animate()
-                        .alpha(1f)
-                        .setDuration(HEADER_IMAGE_FADE_IN_DURATION)
-                        .withEndAction {
-                            // cancel() invokes withEndAction; skip typing when snapToFinished has
-                            // already set the final state.
-                            if (isAnimating) {
-                                startTyping()
+                    contentFadeInAnimator = AnimatorSet().apply {
+                        playTogether(animators.toList())
+                        addListener(object : AnimatorListenerAdapter() {
+                            override fun onAnimationEnd(animation: Animator) {
+                                if (isAnimating) {
+                                    isAnimating = false
+                                    onTypingAnimationFinished()
+                                }
                             }
-                        }
-                } else {
-                    startTyping()
+                        })
+                        start()
+                    }
                 }
             }
 
-            val applySettledState = {
-                hiddenTitle.text = daxTitle.html(container.context)
-                descriptionView.text = descriptionText
-                if (!titleView.hasAnimationStarted()) {
-                    titleView.text = daxTitle.html(container.context)
-                }
-                titleView.alpha = 1f
-                descriptionView.alpha = 1f
-                dismissButton.alpha = 1f
-                activeIncludes.forEach {
-                    it.alpha = 1f
-                }
-                if (headerImage?.isVisible == true) {
-                    headerImage.alpha = 1f
-                }
-                showCtaFinTarget(container)?.let { cardView.setArrowDepthFraction(it) }
-            }
-
-            if (isContentTransition) {
-                // Content transition: fade out title + description + visible includes, then swap and animate new
-                val allContentIncludes = getAllContentIncludes(container)
-                val fadeOutAnimators = mutableListOf<Animator>(
-                    ObjectAnimator.ofFloat(titleView, View.ALPHA, 0f)
-                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                    ObjectAnimator.ofFloat(descriptionView, View.ALPHA, 0f)
-                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                )
-                // Fade out any currently visible content include
-                allContentIncludes.forEach { include ->
-                    if (include.isVisible && include.alpha > 0f) {
-                        fadeOutAnimators += ObjectAnimator.ofFloat(include, View.ALPHA, 0f)
-                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
-                    }
-                }
-                container.findViewById<LottieAnimationView>(R.id.wavingDax)?.let { dax ->
-                    if (dax.isVisible && dax.alpha > 0f && (wavingDax == null || wavingDax.restartWavingDax)) {
-                        fadeOutAnimators += ObjectAnimator.ofFloat(dax, View.ALPHA, 0f)
-                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
-                    }
-                }
-                fadeOutAnimator = AnimatorSet().apply {
-                    playTogether(fadeOutAnimators.toList())
-                    addListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator) {
-                            // After fade-out: hide old includes, show new one.
-                            // Note: do NOT call clearDialog() here — it would re-zero the dismiss
-                            // button alpha causing a flicker. Instead, selectively reset content only.
-                            resetAllIncludesExcept(container, activeIncludes)
-                            resetHeaderState()
-                            resetTextAlignment()
-                            configureContentViews(container)
-                            applyWavingDaxState(container, wavingDax)
-                            // Blank the title so typing (or snapped settled state) shows new text, not stale.
-                            titleView.text = ""
-                            if (!isAnimating) {
-                                applySettledState()
-                            } else {
-                                typeAndFadeIn()
-                            }
-                        }
-                    })
-                    start()
-                }
-            } else {
-                clearDialog()
-                resetAllIncludesExcept(container, activeIncludes)
-                hiddenTitle.text = daxTitle.html(container.context)
-                descriptionView.text = descriptionText
-                resetHeaderState()
-                resetTextAlignment()
-                configureContentViews(container)
-                applyWavingDaxState(container, wavingDax)
-                cardView.setArrowDepthFraction(showCtaFinTarget(container) ?: 0f)
-                container.show()
-                container.animate().alpha(1f).setDuration(DIALOG_FADE_IN_DURATION).setStartDelay(200L)
+            if (headerImage?.isVisible == true) {
+                headerImage.animate()
+                    .alpha(1f)
+                    .setDuration(HEADER_IMAGE_FADE_IN_DURATION)
                     .withEndAction {
+                        // cancel() invokes withEndAction; skip typing when snapToFinished has
+                        // already set the final state.
                         if (isAnimating) {
+                            startTyping()
+                        }
+                    }
+            } else {
+                startTyping()
+            }
+        }
+
+        val applySettledState = {
+            hiddenTitle.text = daxTitle.html(container.context)
+            descriptionView.text = descriptionText
+            if (!titleView.hasAnimationStarted()) {
+                titleView.text = daxTitle.html(container.context)
+            }
+            titleView.alpha = 1f
+            descriptionView.alpha = 1f
+            dismissButton.alpha = 1f
+            activeIncludes.forEach {
+                it.alpha = 1f
+            }
+            if (headerImage?.isVisible == true) {
+                headerImage.alpha = 1f
+            }
+            showCtaFinTarget(container)?.let { cardView.setArrowDepthFraction(it) }
+        }
+
+        if (isContentTransition) {
+            // Content transition: fade out title + description + visible includes, then swap and animate new
+            val allContentIncludes = getAllContentIncludes(container)
+            val fadeOutAnimators = mutableListOf<Animator>(
+                ObjectAnimator.ofFloat(titleView, View.ALPHA, 0f)
+                    .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                ObjectAnimator.ofFloat(descriptionView, View.ALPHA, 0f)
+                    .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+            )
+            // Fade out any currently visible content include
+            allContentIncludes.forEach { include ->
+                if (include.isVisible && include.alpha > 0f) {
+                    fadeOutAnimators += ObjectAnimator.ofFloat(include, View.ALPHA, 0f)
+                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
+                }
+            }
+            container.findViewById<LottieAnimationView>(R.id.wavingDax)?.let { dax ->
+                if (dax.isVisible && dax.alpha > 0f && (wavingDax == null || wavingDax.restartWavingDax)) {
+                    fadeOutAnimators += ObjectAnimator.ofFloat(dax, View.ALPHA, 0f)
+                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
+                }
+            }
+            fadeOutAnimator = AnimatorSet().apply {
+                playTogether(fadeOutAnimators.toList())
+                addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        // After fade-out: hide old includes, show new one.
+                        // Note: do NOT call clearDialog() here — it would re-zero the dismiss
+                        // button alpha causing a flicker. Instead, selectively reset content only.
+                        resetAllIncludesExcept(container, activeIncludes)
+                        resetHeaderState()
+                        resetTextAlignment()
+                        configureContentViews(container)
+                        applyWavingDaxState(container, wavingDax)
+                        // Blank the title so typing (or snapped settled state) shows new text, not stale.
+                        titleView.text = ""
+                        if (!isAnimating) {
+                            applySettledState()
+                        } else {
                             typeAndFadeIn()
                         }
                     }
+                })
+                start()
             }
-
-            // Tap-to-skip: end running animations and snap all content visible
-            fun snapToFinished() {
-                // Set the flag before cancelling animators; cancel() fires end callbacks
-                // (fadeOutAnimator.onAnimationEnd / headerImage withEndAction) which read it.
-                val wasAnimating = isAnimating
-                isAnimating = false
-                titleView.finishAnimation()
-                headerImage?.animate()?.cancel()
-                val pendingFadeOut = fadeOutAnimator
-                if (pendingFadeOut?.isRunning == true) {
-                    // cancel() fires onAnimationEnd synchronously, which applies settled state via the branch above.
-                    pendingFadeOut.cancel()
-                } else {
-                    applySettledState()
+        } else {
+            clearDialog()
+            resetAllIncludesExcept(container, activeIncludes)
+            hiddenTitle.text = daxTitle.html(container.context)
+            descriptionView.text = descriptionText
+            resetHeaderState()
+            resetTextAlignment()
+            configureContentViews(container)
+            applyWavingDaxState(container, wavingDax)
+            cardView.setArrowDepthFraction(showCtaFinTarget(container) ?: 0f)
+            container.show()
+            container.animate().alpha(1f).setDuration(DIALOG_FADE_IN_DURATION).setStartDelay(200L)
+                .withEndAction {
+                    if (isAnimating) {
+                        typeAndFadeIn()
+                    }
                 }
-                contentFadeInAnimator?.let { if (it.isRunning) it.end() }
-                showCtaFinTarget(container)?.let { cardView.setArrowDepthFraction(it) }
-                if (wasAnimating) {
-                    onTypingAnimationFinished()
-                }
-            }
-            cardContainer?.setOnClickListener { snapToFinished() }
         }
 
-        fun cancelRunningAnimations() {
+        // Tap-to-skip: end running animations and snap all content visible
+        fun snapToFinished() {
+            // Set the flag before cancelling animators; cancel() fires end callbacks
+            // (fadeOutAnimator.onAnimationEnd / headerImage withEndAction) which read it.
+            val wasAnimating = isAnimating
             isAnimating = false
-            contentFadeInAnimator?.removeAllListeners()
-            contentFadeInAnimator?.cancel()
-            contentFadeInAnimator = null
-            fadeOutAnimator?.removeAllListeners()
-            fadeOutAnimator?.cancel()
-            fadeOutAnimator = null
-            arrowDepthAnimator?.removeAllUpdateListeners()
-            arrowDepthAnimator?.cancel()
-            arrowDepthAnimator = null
-            ctaView?.let { wavingDaxController?.cancel(it) }
-            ctaView?.animate()?.cancel()
-        }
-
-        internal fun clearDialog() {
-            ctaView?.let { view ->
-                view.findViewById<DaxTypeAnimationTextView>(R.id.brandDesignTitle)?.apply {
-                    alpha = 1f
-                    text = ""
-                }
-                view.findViewById<DaxTextView>(R.id.brandDesignDescription)?.alpha = 0f
-                view.findViewById<View>(R.id.brandDesignDismissButton)?.alpha = 0f
-                // Hide all content includes — include-level alpha/gone is sufficient;
-                // children don't need individual alpha management since the parent
-                // include's alpha controls their composite visibility.
-                getAllContentIncludes(view).forEach { include ->
-                    include.alpha = 0f
-                    include.gone()
-                }
+            titleView.finishAnimation()
+            headerImage?.animate()?.cancel()
+            val pendingFadeOut = fadeOutAnimator
+            if (pendingFadeOut?.isRunning == true) {
+                // cancel() fires onAnimationEnd synchronously, which applies settled state via the branch above.
+                pendingFadeOut.cancel()
+            } else {
+                applySettledState()
+            }
+            contentFadeInAnimator?.let { if (it.isRunning) it.end() }
+            showCtaFinTarget(container)?.let { cardView.setArrowDepthFraction(it) }
+            if (wasAnimating) {
+                onTypingAnimationFinished()
             }
         }
+        cardContainer?.setOnClickListener { snapToFinished() }
+    }
 
-        override fun setOnDismissCtaClicked(onButtonClicked: () -> Unit) {
-            ctaView?.findViewById<View>(R.id.brandDesignDismissButton)?.setOnClickListener {
-                onButtonClicked.invoke()
+    fun cancelRunningAnimations() {
+        isAnimating = false
+        contentFadeInAnimator?.removeAllListeners()
+        contentFadeInAnimator?.cancel()
+        contentFadeInAnimator = null
+        fadeOutAnimator?.removeAllListeners()
+        fadeOutAnimator?.cancel()
+        fadeOutAnimator = null
+        arrowDepthAnimator?.removeAllUpdateListeners()
+        arrowDepthAnimator?.cancel()
+        arrowDepthAnimator = null
+        ctaView?.let { wavingDaxController?.cancel(it) }
+        ctaView?.animate()?.cancel()
+    }
+
+    internal fun clearDialog() {
+        ctaView?.let { view ->
+            view.findViewById<DaxTypeAnimationTextView>(R.id.brandDesignTitle)?.apply {
+                alpha = 1f
+                text = ""
+            }
+            view.findViewById<DaxTextView>(R.id.brandDesignDescription)?.alpha = 0f
+            view.findViewById<View>(R.id.brandDesignDismissButton)?.alpha = 0f
+            // Hide all content includes — include-level alpha/gone is sufficient;
+            // children don't need individual alpha management since the parent
+            // include's alpha controls their composite visibility.
+            getAllContentIncludes(view).forEach { include ->
+                include.alpha = 0f
+                include.gone()
             }
         }
+    }
 
-        override fun setOnOptionClicked(
-            onOptionClicked: (DaxDialogIntroOption, index: Int?) -> Unit,
-        ) {
-            // No-op by default. Subclasses with option buttons override this.
+    fun setOnDismissCtaClicked(onButtonClicked: () -> Unit) {
+        ctaView?.findViewById<View>(R.id.brandDesignDismissButton)?.setOnClickListener {
+            onButtonClicked.invoke()
         }
+    }
+
+    open fun setOnOptionClicked(
+        onOptionClicked: (DaxDialogIntroOption, index: Int?) -> Unit,
+    ) {
+        // No-op by default. Subclasses with option buttons override this.
     }
 
     data class DaxDialogIntroOption(

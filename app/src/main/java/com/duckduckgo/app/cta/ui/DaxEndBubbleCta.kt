@@ -43,7 +43,7 @@ data class DaxEndBubbleCta(
     override val deviceInfo: DeviceInfo,
     val isOmnibarBottom: Boolean,
     val segmentedPathWithAiInput: DownloadReasonSelection?,
-) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
+) : DaxBubbleCta(
     ctaId = CtaId.DAX_END,
     title = when (segmentedPathWithAiInput) {
         SEARCH -> R.string.searchPathWithToggleEnabledContextualEndTitle

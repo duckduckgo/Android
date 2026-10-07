@@ -4418,7 +4418,7 @@ class BrowserTabFragment :
     }
 
     private fun hideDaxBubbleCta(cta: DaxBubbleCta?) {
-        (cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.cancelRunningAnimations()
+        (cta as? DaxBubbleCta)?.cancelRunningAnimations()
         renderer.removeBrandDesignFitListener()
         newBrowserTab.browserBackground.setImageResource(0)
         val wasBrandDesign = newBrowserTab.rebrandBrowserBackground.isVisible
@@ -6342,14 +6342,14 @@ class BrowserTabFragment :
             when (configuration) {
                 is HomePanelCta -> showBottomSheetCta(configuration)
                 is SubscriptionPromoModalCta -> showPrivacyProSkippedOnboardingBottomSheet(configuration)
-                is DaxBubbleCta.BrandDesignUpdateBubbleCta -> showDaxOnboardingBubbleCta(configuration)
+                is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta.ContextualDaxDialogCta ->
                     showOnboardingDialogCta(configuration, instantShow = instantShow)
                 is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)
             }
         }
 
-        private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta.BrandDesignUpdateBubbleCta) {
+        private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideNewTab()
             brandDesignDialogScrollView.show()
             val container = daxDialogIntroBubble.daxCtaContainer
@@ -6387,7 +6387,7 @@ class BrowserTabFragment :
         fun configureBrandDesignFitListener() {
             removeBrandDesignFitListener()
             val listener = ViewTreeObserver.OnGlobalLayoutListener {
-                (lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.applyFit()
+                (lastSeenCtaViewState?.cta as? DaxBubbleCta)?.applyFit()
             }
             brandDesignFitLayoutListener = listener
             brandDesignDialogScrollView.viewTreeObserver.addOnGlobalLayoutListener(listener)
@@ -6401,7 +6401,7 @@ class BrowserTabFragment :
         }
 
         fun reapplyBubbleForOrientation() {
-            (lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.onOrientationChanged()
+            (lastSeenCtaViewState?.cta as? DaxBubbleCta)?.onOrientationChanged()
         }
 
         private fun showPrivacyProSkippedOnboardingBottomSheet(configuration: SubscriptionPromoModalCta) {
