@@ -63,7 +63,7 @@ class LocalPrivacyConfigObserverTest {
 
             testee.onCreate(lifecycleOwner)
 
-            verify(mockPrivacyConfigPersister).persistPrivacyConfig(any(), eq(null))
+            verify(mockPrivacyConfigPersister).persistPrivacyConfig(any(), eq(null), eq(null))
         }
 
     private fun givenLocalPrivacyConfigFileExists() {

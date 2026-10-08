@@ -4,6 +4,57 @@ Internal-only module with dev tools for testing the remote privacy config integr
 
 > **Note:** Patches only work in `internal` builds (`installInternalDebug` / `installInternalRelease`). They are silently ignored in `play` and `fdroid` builds.
 
+## Load a privacy config with adb
+
+The manifest receiver is available only in the `internal` flavor and requires
+`android.permission.DUMP`. Send an explicit broadcast from `adb shell`:
+
+```bash
+adb shell am broadcast --include-stopped-packages \
+  -a com.duckduckgo.privacy.config.internal.SET_URL \
+  -p com.duckduckgo.mobile.android.debug \
+  --es url http://10.0.2.2:8080/android-config.json
+```
+
+Use `--include-stopped-packages` when the app has been force-stopped or has never
+been launched. Substitute the installed package name for other internal builds.
+HTTP and HTTPS URLs with a host are accepted; invalid URLs leave settings unchanged.
+The receiver queues one immediate load, enables the developer override, and resets
+the stored version and ETag before downloading. Commands are processed in order.
+There is no command retry, polling, or new periodic work; the existing hourly
+worker is unchanged. The override setting remains until another command or a
+manual Developer Settings change.
+
+Serve `generated/v5/android-config.json` from `duckduckgo/privacy-configuration`
+(after running `node index.js`) with `Cache-Control: no-store` so subsequent commands
+fetch your latest file. `10.0.2.2` is the Android emulator's host address.
+
+On debuggable builds, wait for persistence with:
+
+```bash
+adb logcat | grep CONFIG_OVERRIDE_APPLIED
+```
+
+Each actual persistence while an override is active emits one message:
+
+```text
+CONFIG_OVERRIDE_APPLIED stage=config version=<config version> etag=<etag> source=<override URL>
+```
+
+The ETag is empty if the server omits it. Broadcast completion means the command
+was queued; the marker means the config was persisted. A failed load emits no
+marker and keeps the selected override for the next command or manual load.
+
+Clear the override and immediately load the default config:
+
+```bash
+adb shell am broadcast --include-stopped-packages \
+  -a com.duckduckgo.privacy.config.internal.RESET \
+  -p com.duckduckgo.mobile.android.debug
+```
+
+RESET emits no override marker because the override is no longer active.
+
 ## Local remote config patches
 
 Patches are JSON files in [JSON Patch format](https://jsonpatch.com/) applied at runtime after the remote config is fetched, overriding values from the server. Multiple patches are applied in the order listed — if two patches modify the same path, the last one wins; a failing patch is skipped without aborting the rest.

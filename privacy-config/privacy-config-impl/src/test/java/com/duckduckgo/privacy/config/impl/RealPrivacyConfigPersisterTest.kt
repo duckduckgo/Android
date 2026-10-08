@@ -258,6 +258,21 @@ class RealPrivacyConfigPersisterTest {
             assertEquals(1, callback.persistCallCount)
         }
 
+    @Test
+    fun whenPersistedThenNotifyWithStoredMetadataExactlyOnce() = runTest {
+        testee.persistPrivacyConfig(getJsonPrivacyConfig(), "local-etag")
+        assertEquals(listOf(2L to "local-etag"), callback.persistedConfigs)
+        testee.persistPrivacyConfig(getJsonPrivacyConfig(), "local-etag")
+        assertEquals(listOf(2L to "local-etag"), callback.persistedConfigs)
+    }
+
+    @Test
+    fun whenOlderConfigSkippedThenDoNotNotifyWithMetadata() = runTest {
+        privacyRepository.insert(PrivacyConfig(version = 3, readme = "", eTag = "", timestamp = ""))
+        testee.persistPrivacyConfig(getJsonPrivacyConfig(), "local-etag")
+        assertEquals(emptyList<Pair<Long, String?>>(), callback.persistedConfigs)
+    }
+
     private fun getJsonPrivacyConfig(): JsonPrivacyConfig {
         return JsonPrivacyConfig(
             version = 2,
@@ -329,6 +344,11 @@ class RealPrivacyConfigPersisterTest {
     internal class FakePrivacyConfigCallbackPlugin : PrivacyConfigCallbackPlugin {
         internal var downloadCallCount = 0
         internal var persistCallCount = 0
+        val persistedConfigs = mutableListOf<Pair<Long, String?>>()
+
+        override fun onPrivacyConfigPersisted(version: Long, eTag: String?, source: String?) {
+            persistedConfigs.add(version to eTag)
+        }
 
         override fun onPrivacyConfigDownloaded() {
             downloadCallCount++
