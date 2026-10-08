@@ -248,13 +248,8 @@ subprojects {
 subprojects {
     plugins.withId('dev.zacsweers.metro') {
         metro {
-            enableKClassToClassMapKeyInterop.set(true)
             interop {
-                includeDaggerAnnotations.set(true)
-                includeJavaxAnnotations.set(true)
-                includeAnvilAnnotations.set(true)
-                enableDaggerRuntimeInterop.set(true)
-                enableDaggerAnvilInterop.set(true)
+                includeJavax()
             }
         }
         dependencies {
