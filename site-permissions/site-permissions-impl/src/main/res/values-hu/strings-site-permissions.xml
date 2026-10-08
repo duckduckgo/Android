@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">A(z) „%1$s” webhely hozzá akar férni a kamerádhoz</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">A(z) „%1$s” webhely hozzá akar férni a mikrofonodhoz</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">A(z) „%1$s” webhely hozzá akar férni a kamerádhoz és a mikrofonodhoz</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">A(z) „%1$s” hozzá szeretne férni a tartózkodási helyedhez ezen a webhelyen</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">A(z) „%1$s” hozzá szeretne férni a kamerádhoz ezen a webhelyen</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">A(z) „%1$s” hozzá szeretne férni a mikrofonodhoz ezen a webhelyen</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">A(z) „%1$s” hozzá szeretne férni a kamerádhoz és a mikrofonodhoz ezen a webhelyen</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">A(z) „%1$s” hozzá szeretne férni a digitális jogkezelő (DRM) szoftveredhez ezen a webhelyen</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Ha nem engedélyezed, előfordulhat, hogy a webhelyen lévő videók nem lesznek lejátszhatók, de ez a webhely nem fog hozzáférni a DRM-szoftver által biztosított eszközazonosítókhoz.</string>
 
     <!-- Reminder dialog -->
