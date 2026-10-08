@@ -54,7 +54,7 @@
             android:layout_height="@dimen/nextStepsCloseButtonSize"
             android:background="@drawable/background_next_steps_close_button"
             android:contentDescription="@string/closeButtonContentDescription"
-            android:padding="@dimen/nextStepsCloseButtonPadding"
+            android:padding="@dimen/keyline_1"
             android:src="@drawable/ic_close_16"
             app:layout_constraintBottom_toBottomOf="@id/sectionTitle"
             app:layout_constraintEnd_toEndOf="parent"
