@@ -21,6 +21,7 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewPropertyAnimator
 import android.widget.FrameLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -31,6 +32,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.Omnibar
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -50,6 +52,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -66,7 +69,11 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -124,6 +131,149 @@ class RealNativeInputManagerTest {
             edgeToEdgeHandler,
             duckAiChatStore,
         )
+    }
+
+    @Test
+    fun whenExitIsCancelledThenNextDismissalCompletes() {
+        val fade = givenDismissibleWidget()
+        givenOmnibarCard()
+        val onCancel = argumentCaptor<() -> Unit>()
+        val onComplete = argumentCaptor<() -> Unit>()
+        testee.hideNativeInput(isNavigation = true)
+        verify(animator).animateExit(any(), any(), any(), any(), any(), onCancel.capture(), any())
+
+        onCancel.firstValue.invoke()
+        testee.hideNativeInput(isNavigation = true)
+
+        verify(animator, times(2)).animateExit(any(), any(), any(), any(), any(), any(), onComplete.capture())
+        onComplete.lastValue.invoke()
+        val endAction = argumentCaptor<Runnable>()
+        verify(fade).withEndAction(endAction.capture())
+        endAction.firstValue.run()
+        assertNull(rootView.findViewById<View?>(R.id.inputModeRoot))
+        verify(omnibar, times(2)).show()
+    }
+
+    @Test
+    fun whenCancelledExitBelongsToReplacedWidgetThenNewDismissalRemainsGuarded() {
+        givenDismissibleWidget()
+        givenOmnibarCard()
+        val onCancel = argumentCaptor<() -> Unit>()
+        testee.hideNativeInput(isNavigation = true)
+        verify(animator).animateExit(any(), any(), any(), any(), any(), onCancel.capture(), any())
+        testee.hideNativeInput(animate = false, isNavigation = true)
+        givenDismissibleWidget()
+        testee.hideNativeInput(isNavigation = true)
+        clearInvocations(omnibar)
+
+        onCancel.firstValue.invoke()
+        testee.onKeyboardVisibilityChanged(true)
+
+        verify(omnibar, never()).hide()
+    }
+
+    private fun givenOmnibarCard() {
+        val omnibarView: OmnibarLayout = mock()
+        val card: MaterialCardView = mock()
+        whenever(card.width).thenReturn(100)
+        whenever(omnibarView.context).thenReturn(context)
+        whenever(omnibarView.findViewById<View?>(R.id.omniBarContainerShadow)).thenReturn(card)
+        whenever(omnibar.omnibarView).thenReturn(omnibarView)
+    }
+
+    @Test
+    fun whenKeyboardAppearsDuringDismissalFadeThenToolbarIsNotHidden() {
+        givenDismissibleWidget()
+        assertTrue(testee.isNativeInputEnabled())
+        assertTrue(rootView.findViewById<View>(R.id.inputModeWidget) is NativeInputWidget)
+        testee.onKeyboardVisibilityChanged(true)
+        verify(omnibar).hide()
+        testee.hideNativeInput(isNavigation = true)
+        clearInvocations(omnibar)
+
+        testee.onKeyboardVisibilityChanged(true)
+
+        verify(omnibar, never()).hide()
+    }
+
+    @Test
+    fun whenDismissalFadeCompletesThenWidgetIsRemovedAndToolbarIsShown() {
+        val fade = givenDismissibleWidget()
+        testee.hideNativeInput(isNavigation = true)
+        val endAction = argumentCaptor<Runnable>()
+        verify(fade).withEndAction(endAction.capture())
+        clearInvocations(omnibar)
+
+        endAction.firstValue.run()
+
+        assertNull(rootView.findViewById<View?>(R.id.inputModeRoot))
+        verify(omnibar).show()
+    }
+
+    @Test
+    fun whenOldDismissalCompletesAfterWidgetReplacementThenReplacementIsPreserved() {
+        val fade = givenDismissibleWidget()
+        testee.hideNativeInput(isNavigation = true)
+        val endAction = argumentCaptor<Runnable>()
+        verify(fade).withEndAction(endAction.capture())
+        rootView.removeView(rootView.findViewById(R.id.inputModeRoot))
+        val replacement = FrameLayout(context).apply { id = R.id.inputModeRoot }
+        rootView.addView(replacement)
+        clearInvocations(omnibar)
+
+        endAction.firstValue.run()
+
+        assertEquals(replacement, rootView.findViewById(R.id.inputModeRoot))
+        verify(omnibar, never()).show()
+    }
+
+    private fun givenDismissibleWidget(): ViewPropertyAnimator {
+        whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(true))
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(false))
+        whenever(omnibar.viewMode).thenReturn(Omnibar.ViewMode.NewTab)
+        testee.init(omnibar, rootView, lifecycleOwner)
+        val fade: ViewPropertyAnimator = mock(defaultAnswer = org.mockito.Answers.RETURNS_SELF)
+        val card = object : FrameLayout(context) {
+            override fun animate(): ViewPropertyAnimator = fade
+        }.apply { id = R.id.inputModeWidgetCard }
+        card.addView(TestNativeInputWidget(context).apply { id = R.id.inputModeWidget })
+        rootView.addView(
+            FrameLayout(context).apply {
+                id = R.id.inputModeRoot
+                addView(card)
+            },
+        )
+        return fade
+    }
+
+    @Test
+    fun whenImmediateDismissalInterruptsFadeThenOldCallbackDoesNothing() {
+        val fade = givenDismissibleWidget()
+        testee.hideNativeInput(isNavigation = true)
+        val endAction = argumentCaptor<Runnable>()
+        verify(fade).withEndAction(endAction.capture())
+
+        testee.hideNativeInput(animate = false, isNavigation = true)
+
+        assertNull(rootView.findViewById<View?>(R.id.inputModeRoot))
+        clearInvocations(omnibar)
+        endAction.firstValue.run()
+        verify(omnibar, never()).show()
+    }
+
+    @Test
+    fun whenNewInputOpensAfterDismissalThenKeyboardCanHideToolbar() {
+        val fade = givenDismissibleWidget()
+        testee.hideNativeInput(isNavigation = true)
+        val endAction = argumentCaptor<Runnable>()
+        verify(fade).withEndAction(endAction.capture())
+        endAction.firstValue.run()
+        rootView.addView(TestNativeInputWidget(context).apply { id = R.id.inputModeWidget })
+        clearInvocations(omnibar)
+
+        testee.onKeyboardVisibilityChanged(true)
+
+        verify(omnibar).hide()
     }
 
     @Test
