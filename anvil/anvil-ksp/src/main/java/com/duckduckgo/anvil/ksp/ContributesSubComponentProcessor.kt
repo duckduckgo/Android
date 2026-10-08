@@ -48,16 +48,14 @@ class ContributesSubComponentProcessor(
     companion object {
         private const val INJECT_WITH = "com.duckduckgo.anvil.annotations.InjectWith"
 
-        private val CONTRIBUTES_TO_CLASS = ClassName("com.squareup.anvil.annotations", "ContributesTo")
-        private val MERGE_SUBCOMPONENT_CLASS = ClassName("com.squareup.anvil.annotations", "MergeSubcomponent")
-        private val CONTRIBUTES_SUBCOMPONENT_CLASS = ClassName("com.squareup.anvil.annotations", "ContributesSubcomponent")
-        private val CONTRIBUTES_SUBCOMPONENT_FACTORY_CLASS = ClassName("com.squareup.anvil.annotations", "ContributesSubcomponent", "Factory")
-        private val SUBCOMPONENT_FACTORY_CLASS = ClassName("dagger", "Subcomponent", "Factory")
-        private val BINDS_INSTANCE_CLASS = ClassName("dagger", "BindsInstance")
-        private val BINDS_CLASS = ClassName("dagger", "Binds")
-        private val MODULE_CLASS = ClassName("dagger", "Module")
-        private val INTO_MAP_CLASS = ClassName("dagger.multibindings", "IntoMap")
-        private val CLASS_KEY_CLASS = ClassName("dagger.multibindings", "ClassKey")
+        private val CONTRIBUTES_TO_CLASS = ClassName("dev.zacsweers.metro", "ContributesTo")
+        private val GRAPH_EXTENSION_CLASS = ClassName("dev.zacsweers.metro", "GraphExtension")
+        private val GRAPH_EXTENSION_FACTORY_CLASS = ClassName("dev.zacsweers.metro", "GraphExtension", "Factory")
+        private val PROVIDES_CLASS = ClassName("dev.zacsweers.metro", "Provides")
+        private val BINDS_CLASS = ClassName("dev.zacsweers.metro", "Binds")
+        private val BINDING_CONTAINER_CLASS = ClassName("dev.zacsweers.metro", "BindingContainer")
+        private val INTO_MAP_CLASS = ClassName("dev.zacsweers.metro", "IntoMap")
+        private val CLASS_KEY_CLASS = ClassName("dev.zacsweers.metro", "ClassKey")
         private val ANDROID_INJECTOR_CLASS = ClassName("dagger.android", "AndroidInjector")
         private val ANDROID_INJECTOR_FACTORY_CLASS = ClassName("dagger.android", "AndroidInjector", "Factory")
 
@@ -156,16 +154,11 @@ class ContributesSubComponentProcessor(
         val parentScope = getParentScope(scopeClassName)
         val subComponentClassName = ClassName(packageName, subComponentName)
 
-        // Always use @ContributesSubcomponent (with parentScope) instead of @MergeSubcomponent.
-        // Metro's interop recognizes @ContributesSubcomponent and establishes the parent-child
-        // scope relationship. @MergeSubcomponent doesn't carry parentScope and Metro can't
-        // determine the hierarchy.
-        val subComponentAnnotation = AnnotationSpec.builder(CONTRIBUTES_SUBCOMPONENT_CLASS)
+        val subComponentAnnotation = AnnotationSpec.builder(GRAPH_EXTENSION_CLASS)
             .addMember("scope = %T::class", scopeClassName)
-            .addMember("parentScope = %T::class", parentScope)
             .build()
 
-        val factoryAnnotation = AnnotationSpec.builder(CONTRIBUTES_SUBCOMPONENT_FACTORY_CLASS).build()
+        val factoryAnnotation = AnnotationSpec.builder(GRAPH_EXTENSION_FACTORY_CLASS).build()
 
         // Factory interface
         val factoryType = TypeSpec.interfaceBuilder("Factory")
@@ -178,7 +171,7 @@ class ContributesSubComponentProcessor(
                     .addModifiers(KModifier.OVERRIDE, KModifier.ABSTRACT)
                     .addParameter(
                         ParameterSpec.builder("instance", classType)
-                            .addAnnotation(BINDS_INSTANCE_CLASS)
+                            .addAnnotation(PROVIDES_CLASS)
                             .build(),
                     )
                     .returns(subComponentClassName)
@@ -237,7 +230,7 @@ class ContributesSubComponentProcessor(
         }
 
         val typeSpec = TypeSpec.classBuilder(moduleName)
-            .addAnnotation(AnnotationSpec.builder(MODULE_CLASS).build())
+            .addAnnotation(AnnotationSpec.builder(BINDING_CONTAINER_CLASS).build())
             .addAnnotation(
                 AnnotationSpec.builder(CONTRIBUTES_TO_CLASS)
                     .addMember("scope = %T::class", parentScope)
