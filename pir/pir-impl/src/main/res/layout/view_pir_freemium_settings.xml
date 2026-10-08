@@ -41,7 +41,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:leadingIcon="@drawable/identity_blocked_pir_color_24"
-            app:leadingIconVerticalAlignment="primary_text"
             app:primaryText="@string/pirFeatureName"
             app:primaryTextTruncated="false"
             app:secondaryText="@string/pirFreemiumSettingSubtitle" />
