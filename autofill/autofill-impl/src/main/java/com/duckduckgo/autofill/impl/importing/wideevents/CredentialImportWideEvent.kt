@@ -33,14 +33,14 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
@@ -76,21 +76,11 @@ class RealCredentialImportWideEvent @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : CredentialImportWideEvent {
 
-    // a single consumer keeps the calls in order
-    private val pending = Channel<suspend () -> Unit>(Channel.UNLIMITED)
+    // a single thread plus a fair mutex keeps the calls in order, even when an action suspends
+    private val serialDispatcher = dispatchers.io().limitedParallelism(1)
+    private val mutex = Mutex()
     private var cachedFlowId: Long? = null
     private var importCompletionJob: Job? = null
-
-    private val consumer = appCoroutineScope.launch(dispatchers.io(), start = CoroutineStart.LAZY) {
-        for (action in pending) {
-            try {
-                action()
-            } catch (e: Exception) {
-                currentCoroutineContext().ensureActive()
-                logcat(WARN) { "Credential import wide event failed: ${e.message}" }
-            }
-        }
-    }
 
     override fun onImportStarted(source: AutofillImportLaunchSource, usesCredentialExchange: Boolean) = enqueue {
         importCompletionJob?.cancel()
@@ -178,15 +168,23 @@ class RealCredentialImportWideEvent @Inject constructor(
     }
 
     private fun enqueue(action: suspend () -> Unit) {
-        pending.trySend(action)
-        consumer.start()
+        appCoroutineScope.launch(serialDispatcher) {
+            mutex.withLock {
+                try {
+                    action()
+                } catch (e: Exception) {
+                    currentCoroutineContext().ensureActive()
+                    logcat(WARN) { "Credential import wide event failed: ${e.message}" }
+                }
+            }
+        }
     }
 
     private fun finishWhenImportCompletes(flowId: Long) {
         importCompletionJob?.cancel()
 
         importCompletionJob = appCoroutineScope.launch(dispatchers.io()) {
-            val result = credentialImporter.getImportStatus().filterIsInstance<Finished>().first()
+            val result = credentialImporter.getImportStatus().filterIsInstance<Finished>().firstOrNull() ?: return@launch
 
             enqueue {
                 // a new attempt may have started while this import was saving

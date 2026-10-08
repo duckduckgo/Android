@@ -28,6 +28,8 @@ import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsW
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.credentialexchange.api.CredentialExchangeFailure
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -45,7 +47,7 @@ import org.mockito.kotlin.whenever
 class RealCredentialImportWideEventTest {
 
     @get:Rule
-    val coroutineRule = CoroutineTestRule()
+    val coroutineRule = CoroutineTestRule(StandardTestDispatcher())
 
     private val wideEventClient: WideEventClient = mock()
     private val importStatus = MutableSharedFlow<ImportResult>(replay = 1)
@@ -68,6 +70,7 @@ class RealCredentialImportWideEventTest {
     @Test
     fun whenImportStartedWithCredentialExchangeThenFlowStartedWithCredentialExchange() = runTest {
         testee.onImportStarted(SOURCE, usesCredentialExchange = true)
+        advanceUntilIdle()
 
         verify(wideEventClient).flowStart(
             name = "credential-import",
@@ -85,6 +88,7 @@ class RealCredentialImportWideEventTest {
     @Test
     fun whenImportStartedWithWebFlowThenFlowStartedWithWebFlow() = runTest {
         testee.onImportStarted(SOURCE, usesCredentialExchange = false)
+        advanceUntilIdle()
 
         verify(wideEventClient).flowStart(
             name = "credential-import",
@@ -103,6 +107,7 @@ class RealCredentialImportWideEventTest {
         whenever(wideEventClient.getFlowIds(any())).thenReturn(Result.success(listOf(7L, 8L)))
 
         testee.onImportStarted(SOURCE, usesCredentialExchange = true)
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(wideEventId = 7L, status = FlowStatus.Unknown)
         verify(wideEventClient).flowFinish(wideEventId = 8L, status = FlowStatus.Unknown)
@@ -113,6 +118,7 @@ class RealCredentialImportWideEventTest {
         testee.onImportStarted(SOURCE, usesCredentialExchange = true)
 
         testee.onCredentialExchangeSucceeded("com.x8bit.bitwarden")
+        advanceUntilIdle()
 
         verify(wideEventClient).flowStep(
             wideEventId = FLOW_ID,
@@ -127,6 +133,7 @@ class RealCredentialImportWideEventTest {
         testee.onImportStarted(SOURCE, usesCredentialExchange = true)
 
         testee.onCredentialExchangeSucceeded("com.example.passwords")
+        advanceUntilIdle()
 
         verify(wideEventClient).flowStep(
             wideEventId = FLOW_ID,
@@ -141,6 +148,7 @@ class RealCredentialImportWideEventTest {
         testee.onImportStarted(SOURCE, usesCredentialExchange = true)
 
         testee.onCredentialExchangeSucceeded(null)
+        advanceUntilIdle()
 
         verify(wideEventClient).flowStep(
             wideEventId = FLOW_ID,
@@ -155,6 +163,7 @@ class RealCredentialImportWideEventTest {
         testee.onImportStarted(SOURCE, usesCredentialExchange = true)
 
         testee.onCredentialExchangeFellBackToWebFlow(CredentialExchangeFailure.NO_EXPORTER_AVAILABLE, exporterPackageName = null)
+        advanceUntilIdle()
 
         verify(wideEventClient).flowStep(
             wideEventId = FLOW_ID,
@@ -174,6 +183,7 @@ class RealCredentialImportWideEventTest {
         testee.onImportStarted(SOURCE, usesCredentialExchange = true)
 
         testee.onCredentialExchangeFellBackToWebFlow(CredentialExchangeFailure.MALFORMED_PAYLOAD, "com.dashlane")
+        advanceUntilIdle()
 
         verify(wideEventClient).flowStep(
             wideEventId = FLOW_ID,
@@ -193,6 +203,7 @@ class RealCredentialImportWideEventTest {
         testee.onImportStarted(SOURCE, usesCredentialExchange = true)
 
         testee.onCredentialExchangeFailed(CredentialExchangeFailure.NO_EXPORTER_AVAILABLE, exporterPackageName = null)
+        advanceUntilIdle()
 
         verify(wideEventClient).flowStep(
             wideEventId = FLOW_ID,
@@ -212,6 +223,7 @@ class RealCredentialImportWideEventTest {
         testee.onImportStarted(SOURCE, usesCredentialExchange = true)
 
         testee.onCredentialExchangeCancelled()
+        advanceUntilIdle()
 
         inOrder(wideEventClient) {
             verify(wideEventClient).intervalEnd(wideEventId = FLOW_ID, key = "total_duration_ms_bucketed")
@@ -224,6 +236,7 @@ class RealCredentialImportWideEventTest {
         testee.onImportStarted(SOURCE, usesCredentialExchange = false)
 
         testee.onWebFlowSucceeded()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowStep(
             wideEventId = FLOW_ID,
@@ -238,6 +251,7 @@ class RealCredentialImportWideEventTest {
         testee.onImportStarted(SOURCE, usesCredentialExchange = false)
 
         testee.onWebFlowCancelled()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(
             wideEventId = FLOW_ID,
@@ -251,6 +265,7 @@ class RealCredentialImportWideEventTest {
         testee.onImportStarted(SOURCE, usesCredentialExchange = false)
 
         testee.onWebFlowFailed(ErrorParsingCsv)
+        advanceUntilIdle()
 
         inOrder(wideEventClient) {
             verify(wideEventClient).flowStep(wideEventId = FLOW_ID, stepName = "webflow", success = false)
@@ -263,6 +278,7 @@ class RealCredentialImportWideEventTest {
         testee.onImportStarted(SOURCE, usesCredentialExchange = false)
 
         testee.onWebFlowFailed(WebViewCrash)
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(wideEventId = FLOW_ID, status = FlowStatus.Failure("webview_crash"), metadata = emptyMap())
     }
@@ -273,6 +289,7 @@ class RealCredentialImportWideEventTest {
         testee.onCredentialExchangeSucceeded("com.x8bit.bitwarden")
 
         importStatus.emit(ImportResult.Finished(savedCredentials = 0, numberSkipped = 2, source = SOURCE))
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(
             wideEventId = FLOW_ID,
@@ -287,6 +304,7 @@ class RealCredentialImportWideEventTest {
         testee.onWebFlowSucceeded()
 
         importStatus.emit(ImportResult.Finished(savedCredentials = 2, numberSkipped = 0, source = SOURCE))
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(
             wideEventId = FLOW_ID,
@@ -301,6 +319,7 @@ class RealCredentialImportWideEventTest {
         testee.onCredentialExchangeSucceeded(null)
 
         importStatus.emit(ImportResult.InProgress)
+        advanceUntilIdle()
 
         verify(wideEventClient, never()).flowFinish(any(), any(), any())
     }
@@ -309,10 +328,12 @@ class RealCredentialImportWideEventTest {
     fun whenNewAttemptStartsBeforeImportFinishesThenNewFlowNotFinishedAsSuccess() = runTest {
         testee.onImportStarted(SOURCE, usesCredentialExchange = true)
         testee.onCredentialExchangeSucceeded(null)
+        advanceUntilIdle()
         whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(SECOND_FLOW_ID))
         testee.onImportStarted(SOURCE, usesCredentialExchange = false)
 
         importStatus.emit(ImportResult.Finished(savedCredentials = 1, numberSkipped = 0, source = SOURCE))
+        advanceUntilIdle()
 
         verify(wideEventClient, never()).flowFinish(any(), eq(FlowStatus.Success), any())
     }
@@ -324,6 +345,7 @@ class RealCredentialImportWideEventTest {
         importStatus.emit(ImportResult.Finished(savedCredentials = 1, numberSkipped = 0, source = SOURCE))
 
         importStatus.emit(ImportResult.Finished(savedCredentials = 1, numberSkipped = 0, source = SOURCE))
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(any(), any(), any())
     }
@@ -333,6 +355,7 @@ class RealCredentialImportWideEventTest {
         whenever(wideEventClient.getFlowIds(any())).thenReturn(Result.success(listOf(3L, 4L)))
 
         testee.onWebFlowSucceeded()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowStep(wideEventId = 4L, stepName = "webflow", success = true, metadata = mapOf("last_step" to "importing"))
     }
@@ -340,6 +363,7 @@ class RealCredentialImportWideEventTest {
     @Test
     fun whenNoFlowOpenThenNothingRecorded() = runTest {
         testee.onWebFlowCancelled()
+        advanceUntilIdle()
 
         verify(wideEventClient).getFlowIds("credential-import")
         verifyNoMoreInteractions(wideEventClient)
