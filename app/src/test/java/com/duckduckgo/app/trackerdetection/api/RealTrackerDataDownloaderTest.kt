@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.trackerdetection.api
 
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
+import com.duckduckgo.app.trackerdetection.db.TrackerDetectionDatabase
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
 import com.duckduckgo.common.test.FileUtilities.loadText
 import okhttp3.Headers
@@ -42,20 +42,20 @@ class RealTrackerDataDownloaderTest {
 
     private val mockTrackerListService: TrackerListService = mock()
     private val mockTrackerDataLoader: TrackerDataLoader = mock()
-    private val mockAppDatabase: AppDatabase = mock()
+    private val mockTrackerDetectionDatabase: TrackerDetectionDatabase = mock()
 
     private val testee = RealTrackerDataDownloader(
         trackerListService = mockTrackerListService,
         binaryDataStore = mock(),
         trackerDataLoader = mockTrackerDataLoader,
-        appDatabase = mockAppDatabase,
+        trackerDetectionDatabase = mockTrackerDetectionDatabase,
         metadataDao = mock(),
         moshi = TrackerDetectionJsonModule.moshi,
     )
 
     @Before
     fun setup() {
-        doAnswer { it.getArgument<Runnable>(0).run() }.whenever(mockAppDatabase).runInTransaction(any<Runnable>())
+        doAnswer { it.getArgument<Runnable>(0).run() }.whenever(mockTrackerDetectionDatabase).runInTransaction(any<Runnable>())
     }
 
     @Test
@@ -70,7 +70,7 @@ class RealTrackerDataDownloaderTest {
 
     @Test
     fun whenTdsBodyStartsWithUtf8BomThenBodyIsParsed() {
-        givenTdsBody("﻿$MINIMAL_TDS")
+        givenTdsBody("$MINIMAL_TDS")
 
         testee.downloadTds().blockingAwait()
 

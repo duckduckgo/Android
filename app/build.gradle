@@ -403,6 +403,7 @@ dependencies {
     implementation project(':sqlcipher-loader-api')
     implementation project(':sqlcipher-loader-impl')
     implementation project(':tracker-detection-api')
+    implementation project(':tracker-detection-impl')
     internalImplementation project(':privacy-config-internal')
 
     implementation project(':anrs-api')

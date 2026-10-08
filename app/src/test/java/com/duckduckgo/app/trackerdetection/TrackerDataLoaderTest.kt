@@ -18,7 +18,6 @@ package com.duckduckgo.app.trackerdetection
 
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.api.TdsJson
 import com.duckduckgo.app.trackerdetection.api.TdsJsonEntity
 import com.duckduckgo.app.trackerdetection.api.TdsJsonTracker
@@ -27,6 +26,7 @@ import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
+import com.duckduckgo.app.trackerdetection.db.TrackerDetectionDatabase
 import com.duckduckgo.app.trackerdetection.model.TdsMetadata
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
@@ -60,7 +60,7 @@ class TrackerDataLoaderTest {
     private val mockTdsCnameEntityDao: TdsCnameEntityDao = mock()
     private val mockTdsMetadataDao: TdsMetadataDao = mock()
     private val mockContext: Context = mock()
-    private val mockAppDatabase: AppDatabase = mock()
+    private val mockTrackerDetectionDatabase: TrackerDetectionDatabase = mock()
     private val mockUrlToTypeMapper: UrlToTypeMapper = mock()
     private val mockEntityLookupRefresher: EntityLookupRefresher = mock()
     private val mockCloakedCnameRefresher: CloakedCnameRefresher = mock()
@@ -79,7 +79,7 @@ class TrackerDataLoaderTest {
             tdsCnameEntityDao = mockTdsCnameEntityDao,
             tdsMetadataDao = mockTdsMetadataDao,
             context = mockContext,
-            appDatabase = mockAppDatabase,
+            trackerDetectionDatabase = mockTrackerDetectionDatabase,
             moshi = Moshi.Builder().build(),
             urlToTypeMapper = mockUrlToTypeMapper,
             entityLookupRefresher = mockEntityLookupRefresher,
@@ -99,7 +99,7 @@ class TrackerDataLoaderTest {
 
         testee.persistTds("eTag", tdsJson)
 
-        verify(mockAppDatabase).runInTransaction(runnableCaptor.capture())
+        verify(mockTrackerDetectionDatabase).runInTransaction(runnableCaptor.capture())
         runnableCaptor.firstValue.run()
 
         verify(mockTdsMetadataDao).tdsDownloadSuccessful(tdsMetaDataCaptor.capture())

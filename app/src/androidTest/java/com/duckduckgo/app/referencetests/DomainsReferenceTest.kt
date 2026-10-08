@@ -33,7 +33,6 @@ import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.fakes.FakeMaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.fakes.UserAgentFake
 import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
@@ -53,6 +52,7 @@ import com.duckduckgo.app.trackerdetection.api.TdsJson
 import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
+import com.duckduckgo.app.trackerdetection.db.TrackerDetectionDatabase
 import com.duckduckgo.app.trackerdetection.flags.OptimizeCnameDetectionRCWrapper
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -92,7 +92,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
     var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var entityLookup: EntityLookup
-    private lateinit var db: AppDatabase
+    private lateinit var db: TrackerDetectionDatabase
     private lateinit var trackerDetector: TrackerDetector
     private lateinit var trackerDetectorClientProvider: TrackerDetectorClientProvider
     private lateinit var tdsEntityDao: TdsEntityDao
@@ -242,7 +242,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
     }
 
     private fun initialiseTds() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, TrackerDetectionDatabase::class.java)
             .allowMainThreadQueries()
             .build()
 

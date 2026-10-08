@@ -87,12 +87,8 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
  */
 @Database(
     exportSchema = true,
-    version = 64,
+    version = 65,
     entities = [
-        TdsTracker::class,
-        TdsEntity::class,
-        TdsDomainEntity::class,
-        TdsCnameEntity::class,
         UserAllowListedDomain::class,
         NetworkLeaderboardEntry::class,
         SitesVisitedEntity::class,
@@ -110,7 +106,6 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         AppEnjoymentEntity::class,
         Notification::class,
         PrivacyProtectionCountsEntity::class,
-        TdsMetadata::class,
         UserStage::class,
         FireproofWebsiteEntity::class,
         UserEventEntity::class,
@@ -131,9 +126,6 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
     DismissedCta.IdTypeConverter::class,
     AppEnjoymentTypeConverter::class,
     PromptCountConverter::class,
-    ActionTypeConverter::class,
-    RuleTypeConverter::class,
-    CategoriesTypeConverter::class,
     StageTypeConverter::class,
     UserEventTypeConverter::class,
     LocationPermissionTypeConverter::class,
@@ -143,10 +135,6 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 )
 abstract class AppDatabase : RoomDatabase() {
 
-    abstract fun tdsTrackerDao(): TdsTrackerDao
-    abstract fun tdsEntityDao(): TdsEntityDao
-    abstract fun tdsDomainEntityDao(): TdsDomainEntityDao
-    abstract fun tdsCnameEntityDao(): TdsCnameEntityDao
     abstract fun userAllowListDao(): UserAllowListDao
     abstract fun networkLeaderboardDao(): NetworkLeaderboardDao
     abstract fun tabsDao(): TabsDao
@@ -163,7 +151,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun appEnjoymentDao(): AppEnjoymentDao
     abstract fun notificationDao(): NotificationDao
     abstract fun privacyProtectionCountsDao(): PrivacyProtectionCountDao
-    abstract fun tdsDao(): TdsMetadataDao
     abstract fun userStageDao(): UserStageDao
     abstract fun fireproofWebsiteDao(): FireproofWebsiteDao
     abstract fun locationPermissionsDao(): LocationPermissionsDao
@@ -800,6 +787,20 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
     }
 
     /**
+     * The TDS cache tables moved to tracker_detection.db (TrackerDetectionDatabase). They hold no user data:
+     * TrackerDataLoader repopulates the new database from the bundled tds.json and the next download refreshes it.
+     */
+    private val MIGRATION_64_TO_65: Migration = object : Migration(64, 65) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DROP TABLE IF EXISTS `tds_tracker`")
+            database.execSQL("DROP TABLE IF EXISTS `tds_entity`")
+            database.execSQL("DROP TABLE IF EXISTS `tds_domain_entity`")
+            database.execSQL("DROP TABLE IF EXISTS `tds_cname_entity`")
+            database.execSQL("DROP TABLE IF EXISTS `tdsMetadata`")
+        }
+    }
+
+    /**
      * WARNING ⚠️
      * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
      * When updating the bookmarks table, you will need to update this creation script in order to properly maintain the above
@@ -882,6 +883,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_61_TO_62,
             MIGRATION_62_TO_63,
             MIGRATION_63_TO_64,
+            MIGRATION_64_TO_65,
         )
 
     @Deprecated(
