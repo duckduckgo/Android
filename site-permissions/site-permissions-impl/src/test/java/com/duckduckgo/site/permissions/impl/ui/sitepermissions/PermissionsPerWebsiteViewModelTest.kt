@@ -18,8 +18,11 @@ package com.duckduckgo.site.permissions.impl.ui.sitepermissions
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.site.permissions.impl.R
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
+import com.duckduckgo.site.permissions.impl.feature.SitePermissionsDialogRedesignFeature
 import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.PermissionsPerWebsiteViewModel
 import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.GoBackToSitePermissions
 import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.ShowPermissionSettingSelectionDialog
@@ -45,8 +48,12 @@ class PermissionsPerWebsiteViewModelTest {
 
     private val mockSitePermissionsRepository: SitePermissionsRepository = mock()
 
+    private val sitePermissionsDialogRedesignFeature = FakeFeatureToggleFactory.create(SitePermissionsDialogRedesignFeature::class.java)
+
     private val viewModel = PermissionsPerWebsiteViewModel(
         sitePermissionsRepository = mockSitePermissionsRepository,
+        sitePermissionsDialogRedesignFeature = sitePermissionsDialogRedesignFeature,
+        dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
     private val domain = "domain.com"
@@ -62,6 +69,53 @@ class PermissionsPerWebsiteViewModelTest {
             val permissions = awaitItem().websitePermissions
             assertEquals(4, permissions.size)
         }
+    }
+
+    @Test
+    fun whenExplicitPermissionsOnlyThenOnlyPermissionsWithASettingAreShown() = runTest {
+        sitePermissionsDialogRedesignFeature.explicitPermissionsOnly().setRawStoredState(Toggle.State(true))
+        loadAskForPermissionsPrefs()
+        loadWebsitePermissionsSettings(
+            cameraSetting = SitePermissionAskSettingType.ALLOW_ALWAYS.name,
+            micSetting = SitePermissionAskSettingType.ASK_EVERY_TIME.name,
+            locationSetting = null,
+            drmSetting = null,
+        )
+
+        viewModel.websitePermissionSettings(domain)
+
+        viewModel.viewState.test {
+            val permissions = awaitItem().websitePermissions
+            assertEquals(listOf(R.string.sitePermissionsSettingsCamera, R.string.sitePermissionsSettingsMicrophone), permissions.map { it.title })
+        }
+    }
+
+    @Test
+    fun whenNotExplicitPermissionsOnlyThenUnsetPermissionsAreShownAsAsk() = runTest {
+        loadAskForPermissionsPrefs()
+        loadWebsitePermissionsSettings(locationSetting = null)
+
+        viewModel.websitePermissionSettings(domain)
+
+        viewModel.viewState.test {
+            assertEquals(ASK, awaitItem().websitePermissions[0].setting)
+        }
+    }
+
+    @Test
+    fun whenPermissionSettingIsChangedThenOnlyThatPermissionIsSaved() = runTest {
+        loadAskForPermissionsPrefs()
+        loadWebsitePermissionsSettings(cameraSetting = null, micSetting = null, locationSetting = null, drmSetting = null)
+
+        viewModel.websitePermissionSettings(domain)
+        viewModel.onPermissionSettingSelected(
+            WebsitePermissionSetting(0, R.string.sitePermissionsSettingsCamera, WebsitePermissionSettingOption.DENY),
+            domain,
+        )
+
+        verify(mockSitePermissionsRepository).savePermission(
+            SitePermissionsEntity(domain, askCameraSetting = SitePermissionAskSettingType.DENY_ALWAYS.name),
+        )
     }
 
     @Test
@@ -215,10 +269,10 @@ class PermissionsPerWebsiteViewModelTest {
     }
 
     private fun loadWebsitePermissionsSettings(
-        cameraSetting: String = SitePermissionAskSettingType.ASK_EVERY_TIME.name,
-        micSetting: String = SitePermissionAskSettingType.ASK_EVERY_TIME.name,
-        locationSetting: String = SitePermissionAskSettingType.ASK_EVERY_TIME.name,
-        drmSetting: String = SitePermissionAskSettingType.ASK_EVERY_TIME.name,
+        cameraSetting: String? = SitePermissionAskSettingType.ASK_EVERY_TIME.name,
+        micSetting: String? = SitePermissionAskSettingType.ASK_EVERY_TIME.name,
+        locationSetting: String? = SitePermissionAskSettingType.ASK_EVERY_TIME.name,
+        drmSetting: String? = SitePermissionAskSettingType.ASK_EVERY_TIME.name,
     ) {
         val testSitePermissionEntity = SitePermissionsEntity(domain, cameraSetting, micSetting, drmSetting, locationSetting)
         mockSitePermissionsRepository.stub { onBlocking { getSitePermissionsForWebsite(domain) }.thenReturn(testSitePermissionEntity) }

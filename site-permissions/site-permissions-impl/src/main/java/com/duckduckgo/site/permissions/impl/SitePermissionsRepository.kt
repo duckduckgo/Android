@@ -27,6 +27,7 @@ import com.duckduckgo.site.permissions.impl.drm.DrmPolicyManager
 import com.duckduckgo.site.permissions.impl.drm.DrmSessionStore
 import com.duckduckgo.site.permissions.impl.drmblock.DrmBlock
 import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
+import com.duckduckgo.site.permissions.impl.feature.SitePermissionsDialogRedesignFeature
 import com.duckduckgo.site.permissions.impl.feature.isCentralPolicyEnabled
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
@@ -38,6 +39,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -78,6 +81,7 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     private val drmSessionStore: DrmSessionStore,
     private val drmPolicyFeature: DrmPolicyFeature,
     private val drmPolicyManager: Lazy<DrmPolicyManager>,
+    private val sitePermissionsDialogRedesignFeature: SitePermissionsDialogRedesignFeature,
 ) : SitePermissionsRepository {
 
     override var askCameraEnabled: Boolean
@@ -189,8 +193,8 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     override fun sitePermissionGranted(url: String, tabId: String, permission: String) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             val domain = url.extractDomain() ?: url
-            val existingPermission = sitePermissionsDao.getSitePermissionsByDomain(domain)
-            if (existingPermission == null) {
+            val explicitPermissionsOnly = sitePermissionsDialogRedesignFeature.explicitPermissionsOnly().isEnabled()
+            if (!explicitPermissionsOnly && sitePermissionsDao.getSitePermissionsByDomain(domain) == null) {
                 sitePermissionsDao.insert(SitePermissionsEntity(domain = domain))
             }
             val sitePermissionAllowed = SitePermissionAllowedEntity(
@@ -204,7 +208,13 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     }
 
     override fun sitePermissionsWebsitesFlow(): Flow<List<SitePermissionsEntity>> {
-        return sitePermissionsDao.getAllSitesPermissionsAsFlow()
+        return sitePermissionsDao.getAllSitesPermissionsAsFlow().map { sites ->
+            if (sitePermissionsDialogRedesignFeature.explicitPermissionsOnly().isEnabled()) {
+                sites.filterNot { it.hasNoSettings() }
+            } else {
+                sites
+            }
+        }.flowOn(dispatcherProvider.io())
     }
 
     override fun sitePermissionsForAllWebsites(): List<SitePermissionsEntity> {
@@ -301,3 +311,6 @@ class SitePermissionsRepositoryImpl @Inject constructor(
         }
     }
 }
+
+private fun SitePermissionsEntity.hasNoSettings(): Boolean =
+    askCameraSetting == null && askMicSetting == null && askDrmSetting == null && askLocationSetting == null

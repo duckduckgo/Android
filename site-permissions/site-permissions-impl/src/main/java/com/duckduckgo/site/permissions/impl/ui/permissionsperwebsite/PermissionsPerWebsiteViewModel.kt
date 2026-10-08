@@ -19,9 +19,11 @@ package com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.site.permissions.impl.R
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
+import com.duckduckgo.site.permissions.impl.feature.SitePermissionsDialogRedesignFeature
 import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.GoBackToSitePermissions
 import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.ShowPermissionSettingSelectionDialog
 import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.WebsitePermissionSettingOption.ASK
@@ -33,12 +35,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class PermissionsPerWebsiteViewModel @Inject constructor(
     private val sitePermissionsRepository: SitePermissionsRepository,
+    private val sitePermissionsDialogRedesignFeature: SitePermissionsDialogRedesignFeature,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -46,6 +51,9 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
 
     private val _commands = Channel<Command>()
     val commands: Flow<Command> = _commands.receiveAsFlow()
+
+    private var sitePermissions: SitePermissionsEntity? = null
+    private var hideUnsetPermissions = false
 
     data class ViewState(
         val websitePermissions: List<WebsitePermissionSetting> = listOf(),
@@ -58,7 +66,11 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
 
     fun websitePermissionSettings(url: String) {
         viewModelScope.launch {
+            hideUnsetPermissions = withContext(dispatcherProvider.io()) {
+                sitePermissionsDialogRedesignFeature.explicitPermissionsOnly().isEnabled()
+            }
             val websitePermissionsSettings = sitePermissionsRepository.getSitePermissionsForWebsite(url)
+            sitePermissions = websitePermissionsSettings
             val websitePermissions = convertToWebsitePermissionSettings(websitePermissionsSettings)
             logcat { "Permissions: websitePermissionsSettings for $url $websitePermissionsSettings" }
             logcat { "Permissions: websitePermissions for $url $websitePermissions" }
@@ -70,57 +82,46 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
     private fun convertToWebsitePermissionSettings(
         sitePermissionsEntity: SitePermissionsEntity?,
     ): List<WebsitePermissionSetting> {
-        var locationSetting = WebsitePermissionSettingOption.mapToWebsitePermissionSetting(sitePermissionsEntity?.askLocationSetting)
-        if (locationSetting == ASK && !sitePermissionsRepository.askLocationEnabled) {
-            locationSetting = ASK_DISABLED
-        }
-
-        var cameraSetting = WebsitePermissionSettingOption.mapToWebsitePermissionSetting(sitePermissionsEntity?.askCameraSetting)
-        if (cameraSetting == ASK && !sitePermissionsRepository.askCameraEnabled) {
-            cameraSetting = ASK_DISABLED
-        }
-
-        var micSetting = WebsitePermissionSettingOption.mapToWebsitePermissionSetting(sitePermissionsEntity?.askMicSetting)
-        if (micSetting == ASK && !sitePermissionsRepository.askMicEnabled) {
-            micSetting = ASK_DISABLED
-        }
-
-        var drmSetting = WebsitePermissionSettingOption.mapToWebsitePermissionSetting(sitePermissionsEntity?.askDrmSetting)
-        if (drmSetting == ASK && !sitePermissionsRepository.askDrmEnabled) {
-            drmSetting = ASK_DISABLED
-        }
-
-        return getSettingsList(locationSetting, cameraSetting, micSetting, drmSetting)
-    }
-
-    private fun getSettingsList(
-        locationSetting: WebsitePermissionSettingOption,
-        cameraSetting: WebsitePermissionSettingOption,
-        micSetting: WebsitePermissionSettingOption,
-        drmSetting: WebsitePermissionSettingOption,
-    ): List<WebsitePermissionSetting> {
-        return listOf(
-            WebsitePermissionSetting(
+        return listOfNotNull(
+            websitePermissionSetting(
                 com.duckduckgo.mobile.android.R.drawable.ic_location_24,
                 R.string.sitePermissionsSettingsLocation,
-                locationSetting,
+                sitePermissionsEntity?.askLocationSetting,
+                sitePermissionsRepository.askLocationEnabled,
             ),
-            WebsitePermissionSetting(
+            websitePermissionSetting(
                 com.duckduckgo.mobile.android.R.drawable.ic_video_24,
                 R.string.sitePermissionsSettingsCamera,
-                cameraSetting,
+                sitePermissionsEntity?.askCameraSetting,
+                sitePermissionsRepository.askCameraEnabled,
             ),
-            WebsitePermissionSetting(
+            websitePermissionSetting(
                 com.duckduckgo.mobile.android.R.drawable.ic_microphone_24,
                 R.string.sitePermissionsSettingsMicrophone,
-                micSetting,
+                sitePermissionsEntity?.askMicSetting,
+                sitePermissionsRepository.askMicEnabled,
             ),
-            WebsitePermissionSetting(
+            websitePermissionSetting(
                 com.duckduckgo.mobile.android.R.drawable.ic_video_player_24,
                 R.string.sitePermissionsSettingsDRM,
-                drmSetting,
+                sitePermissionsEntity?.askDrmSetting,
+                sitePermissionsRepository.askDrmEnabled,
             ),
         )
+    }
+
+    private fun websitePermissionSetting(
+        icon: Int,
+        title: Int,
+        storedSetting: String?,
+        askEnabled: Boolean,
+    ): WebsitePermissionSetting? {
+        if (storedSetting == null && hideUnsetPermissions) return null
+        var setting = WebsitePermissionSettingOption.mapToWebsitePermissionSetting(storedSetting)
+        if (setting == ASK && !askEnabled) {
+            setting = ASK_DISABLED
+        }
+        return WebsitePermissionSetting(icon, title, setting)
     }
 
     fun permissionSettingSelected(setting: WebsitePermissionSetting) {
@@ -140,64 +141,21 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
         editedPermissionSetting: WebsitePermissionSetting,
         url: String,
     ) {
-        var askLocationSetting = viewState.value.websitePermissions[0].setting
-        var askCameraSetting = viewState.value.websitePermissions[1].setting
-        var askMicSetting = viewState.value.websitePermissions[2].setting
-        var askDrmSetting = viewState.value.websitePermissions[3].setting
-
-        when (editedPermissionSetting.title) {
-            R.string.sitePermissionsSettingsLocation -> {
-                askLocationSetting = when (editedPermissionSetting.setting == ASK && !sitePermissionsRepository.askLocationEnabled) {
-                    true -> ASK_DISABLED
-                    false -> editedPermissionSetting.setting
-                }
-            }
-
-            R.string.sitePermissionsSettingsCamera -> {
-                askCameraSetting = when (editedPermissionSetting.setting == ASK && !sitePermissionsRepository.askCameraEnabled) {
-                    true -> ASK_DISABLED
-                    false -> editedPermissionSetting.setting
-                }
-            }
-
-            R.string.sitePermissionsSettingsMicrophone -> {
-                askMicSetting = when (editedPermissionSetting.setting == ASK && !sitePermissionsRepository.askMicEnabled) {
-                    true -> ASK_DISABLED
-                    false -> editedPermissionSetting.setting
-                }
-            }
-
-            R.string.sitePermissionsSettingsDRM -> {
-                askDrmSetting = when (editedPermissionSetting.setting == ASK && !sitePermissionsRepository.askDrmEnabled) {
-                    true -> ASK_DISABLED
-                    false -> editedPermissionSetting.setting
-                }
-            }
+        val current = sitePermissions ?: SitePermissionsEntity(domain = url)
+        val newSetting = editedPermissionSetting.setting.toSitePermissionSettingEntityType().name
+        val updated = when (editedPermissionSetting.title) {
+            R.string.sitePermissionsSettingsLocation -> current.copy(askLocationSetting = newSetting)
+            R.string.sitePermissionsSettingsCamera -> current.copy(askCameraSetting = newSetting)
+            R.string.sitePermissionsSettingsMicrophone -> current.copy(askMicSetting = newSetting)
+            R.string.sitePermissionsSettingsDRM -> current.copy(askDrmSetting = newSetting)
+            else -> return
         }
+        sitePermissions = updated
 
-        updateSitePermissionsSetting(askCameraSetting, askMicSetting, askDrmSetting, askLocationSetting, url)
-
-        _viewState.value = _viewState.value.copy(
-            websitePermissions = getSettingsList(askLocationSetting, askCameraSetting, askMicSetting, askDrmSetting),
-        )
-    }
-
-    private fun updateSitePermissionsSetting(
-        askCameraSetting: WebsitePermissionSettingOption,
-        askMicSetting: WebsitePermissionSettingOption,
-        askDrmSetting: WebsitePermissionSettingOption,
-        askLocationSetting: WebsitePermissionSettingOption,
-        url: String,
-    ) {
-        val sitePermissionsEntity = SitePermissionsEntity(
-            domain = url,
-            askCameraSetting = askCameraSetting.toSitePermissionSettingEntityType().name,
-            askMicSetting = askMicSetting.toSitePermissionSettingEntityType().name,
-            askDrmSetting = askDrmSetting.toSitePermissionSettingEntityType().name,
-            askLocationSetting = askLocationSetting.toSitePermissionSettingEntityType().name,
-        )
         viewModelScope.launch {
-            sitePermissionsRepository.savePermission(sitePermissionsEntity)
+            sitePermissionsRepository.savePermission(updated)
         }
+
+        _viewState.value = _viewState.value.copy(websitePermissions = convertToWebsitePermissionSettings(updated))
     }
 }
