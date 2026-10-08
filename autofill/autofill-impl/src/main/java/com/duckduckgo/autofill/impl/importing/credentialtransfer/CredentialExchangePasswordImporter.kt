@@ -48,10 +48,14 @@ sealed interface CredentialExchangeImportResult {
     data class Success(
         val credentials: List<LoginCredentials>,
         val originalCount: Int,
+        val exporterPackageName: String?,
     ) : CredentialExchangeImportResult
 
     data object Cancelled : CredentialExchangeImportResult
-    data class Failure(val reason: CredentialExchangeFailure) : CredentialExchangeImportResult
+    data class Failure(
+        val reason: CredentialExchangeFailure,
+        val exporterPackageName: String? = null,
+    ) : CredentialExchangeImportResult
 }
 
 @ContributesBinding(AppScope::class)
@@ -70,9 +74,10 @@ class RealCredentialExchangePasswordImporter @Inject constructor(
             is CredentialExchangeResult.Success -> CredentialExchangeImportResult.Success(
                 credentials = convertAndDeduplicate(result.credentials),
                 originalCount = result.credentials.size,
+                exporterPackageName = result.exporterPackageName,
             )
             is CredentialExchangeResult.Cancelled -> CredentialExchangeImportResult.Cancelled
-            is CredentialExchangeResult.Failure -> CredentialExchangeImportResult.Failure(result.reason)
+            is CredentialExchangeResult.Failure -> CredentialExchangeImportResult.Failure(result.reason, result.exporterPackageName)
         }
     }
 
