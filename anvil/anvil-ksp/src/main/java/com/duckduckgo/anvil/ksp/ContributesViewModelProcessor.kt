@@ -51,7 +51,7 @@ class ContributesViewModelProcessor(
     companion object {
         private const val CONTRIBUTES_VIEW_MODEL = "com.duckduckgo.anvil.annotations.ContributesViewModel"
         private const val JAVAX_INJECT = "javax.inject.Inject"
-        private val SCOPE_ANNOTATIONS = setOf("dagger.SingleInstanceIn", "dev.zacsweers.metro.SingleIn")
+        private val SCOPE_ANNOTATIONS = setOf("dev.zacsweers.metro.SingleIn")
 
         private val CONTRIBUTES_INTO_SET_CLASS = ClassName("dev.zacsweers.metro", "ContributesIntoSet")
         private val VIEW_MODEL_FACTORY_PLUGIN_CLASS = ClassName("com.duckduckgo.common.utils.plugins.view_model", "ViewModelFactoryPlugin")

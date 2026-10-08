@@ -57,7 +57,7 @@ annotation class ContributesActivePlugin(
      * The priority for the plugin.
      * Lower priority values mean the associated plugin comes first in the list of plugins.
      *
-     * This is equivalent to the [PriorityKey] annotation we use with [ContributesMultibinding] for normal plugins.
+     * This is equivalent to the [PriorityKey] annotation we use with `@ContributesIntoMap` for normal plugins.
      * The [ContributesActivePlugin] coalesce both
      */
     val priority: Int = 0,

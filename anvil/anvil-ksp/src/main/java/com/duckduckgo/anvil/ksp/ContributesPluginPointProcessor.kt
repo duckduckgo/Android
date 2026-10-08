@@ -52,7 +52,7 @@ class ContributesPluginPointProcessor(
         private const val CONTRIBUTES_PLUGIN_POINT = "com.duckduckgo.anvil.annotations.ContributesPluginPoint"
 
         private val INJECT_CLASS = ClassName("javax.inject", "Inject")
-        private val MODULE_CLASS = ClassName("dev.zacsweers.metro", "BindingContainer")
+        private val BINDING_CONTAINER_CLASS = ClassName("dev.zacsweers.metro", "BindingContainer")
         private val BINDS_CLASS = ClassName("dev.zacsweers.metro", "Binds")
         private val MULTIBINDS_CLASS = ClassName("dev.zacsweers.metro", "Multibinds")
         private val CONTRIBUTES_TO_CLASS = ClassName("dev.zacsweers.metro", "ContributesTo")
@@ -225,7 +225,7 @@ class ContributesPluginPointProcessor(
             .build()
 
         val typeSpec = TypeSpec.classBuilder(moduleClassName)
-            .addAnnotation(MODULE_CLASS)
+            .addAnnotation(BINDING_CONTAINER_CLASS)
             .addAnnotation(
                 AnnotationSpec.builder(CONTRIBUTES_TO_CLASS)
                     .addMember("scope = %T::class", scopeClassName)

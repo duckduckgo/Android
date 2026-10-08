@@ -59,6 +59,10 @@ class ContributesRemoteFeatureProcessor(
         private val CONTRIBUTES_BINDING = ClassName("dev.zacsweers.metro", "ContributesBinding")
         private val CONTRIBUTES_TO = ClassName("dev.zacsweers.metro", "ContributesTo")
         private val BINDING = ClassName("dev.zacsweers.metro", "binding")
+        private val SINGLE_IN = ClassName("dev.zacsweers.metro", "SingleIn")
+        private val BINDING_CONTAINER = ClassName("dev.zacsweers.metro", "BindingContainer")
+        private val PROVIDES = ClassName("dev.zacsweers.metro", "Provides")
+        private val INTO_SET = ClassName("dev.zacsweers.metro", "IntoSet")
 
         // Feature toggles API
         private val PRIVACY_FEATURE_PLUGIN = ClassName("com.duckduckgo.privacy.config.api", "PrivacyFeaturePlugin")
@@ -86,12 +90,8 @@ class ContributesRemoteFeatureProcessor(
         // Variant manager
         private val VARIANT_MANAGER = ClassName("com.duckduckgo.experiments.api", "VariantManager")
 
-        // Metro
-        private val SINGLE_IN = ClassName("dev.zacsweers.metro", "SingleIn")
-        private val BINDING_CONTAINER = ClassName("dev.zacsweers.metro", "BindingContainer")
-        private val PROVIDES = ClassName("dev.zacsweers.metro", "Provides")
+        // Kotlin and javax.inject
         private val LAZY = ClassName("kotlin", "Lazy")
-        private val INTO_SET = ClassName("dev.zacsweers.metro", "IntoSet")
         private val INJECT = ClassName("javax.inject", "Inject")
 
         // Android
