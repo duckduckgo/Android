@@ -6042,10 +6042,12 @@ class BrowserTabViewModel @Inject constructor(
                 autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ANIMATION_SHOWN_DAILY)
             }
             if (adBlockingAnimationClaimed) return // ad-blocking badge is exclusive: suppress the animation, but the pixel above still fires
-            if (trackersCount().isNotEmpty()) {
-                command.value = Command.EnqueueCookiesAnimation(isCosmetic)
-            } else {
-                command.value = ShowAutoconsentAnimation(isCosmetic)
+            viewModelScope.launch {
+                if (trackersCount().isNotEmpty()) {
+                    command.value = Command.EnqueueCookiesAnimation(isCosmetic)
+                } else {
+                    command.value = ShowAutoconsentAnimation(isCosmetic)
+                }
             }
         }
     }
