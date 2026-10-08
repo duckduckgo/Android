@@ -86,4 +86,7 @@
     <string name="pirDevResetFreemiumStateDone">Freemium PIR state and scan data cleared.</string>
     <string name="pirDevForceFreemiumEligibility">Force Freemium PIR eligibility</string>
     <string name="pirDevForceFreemiumEligibilityDescription">Offer the free scan even where Play has no plans with PIR. Still requires no subscription and the freemium flag on.</string>
+    <string name="pirDevSimulateFreeScanMatches">Simulate free scan: records found</string>
+    <string name="pirDevSimulateFreeScanNoMatches">Simulate free scan: no records</string>
+    <string name="pirDevSimulateFreeScanDone">Free scan result set. Download the RMF config to re-evaluate messages.</string>
 </resources>
