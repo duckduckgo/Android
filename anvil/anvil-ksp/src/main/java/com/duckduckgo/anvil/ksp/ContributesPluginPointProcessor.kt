@@ -52,10 +52,10 @@ class ContributesPluginPointProcessor(
         private const val CONTRIBUTES_PLUGIN_POINT = "com.duckduckgo.anvil.annotations.ContributesPluginPoint"
 
         private val INJECT_CLASS = ClassName("javax.inject", "Inject")
-        private val MODULE_CLASS = ClassName("dagger", "Module")
-        private val BINDS_CLASS = ClassName("dagger", "Binds")
-        private val MULTIBINDS_CLASS = ClassName("dagger.multibindings", "Multibinds")
-        private val CONTRIBUTES_TO_CLASS = ClassName("com.squareup.anvil.annotations", "ContributesTo")
+        private val MODULE_CLASS = ClassName("dev.zacsweers.metro", "BindingContainer")
+        private val BINDS_CLASS = ClassName("dev.zacsweers.metro", "Binds")
+        private val MULTIBINDS_CLASS = ClassName("dev.zacsweers.metro", "Multibinds")
+        private val CONTRIBUTES_TO_CLASS = ClassName("dev.zacsweers.metro", "ContributesTo")
         private val PLUGIN_POINT_CLASS = ClassName("com.duckduckgo.common.utils.plugins", "PluginPoint")
         private val DAGGER_SET_CLASS = ClassName("com.duckduckgo.di", "DaggerSet")
         private val DAGGER_MAP_CLASS = ClassName("com.duckduckgo.di", "DaggerMap")
@@ -206,13 +206,13 @@ class ContributesPluginPointProcessor(
         val pluginPointType = PLUGIN_POINT_CLASS.parameterizedBy(pluginClassName)
 
         val bindSetEmptyFun = FunSpec.builder("bindSetEmpty${simpleName}_PluginPoint")
-            .addAnnotation(MULTIBINDS_CLASS)
+            .addAnnotation(AnnotationSpec.builder(MULTIBINDS_CLASS).addMember("allowEmpty = true").build())
             .addModifiers(KModifier.ABSTRACT)
             .returns(setType)
             .build()
 
         val bindMapEmptyFun = FunSpec.builder("bindMapEmpty${simpleName}_PluginPoint")
-            .addAnnotation(MULTIBINDS_CLASS)
+            .addAnnotation(AnnotationSpec.builder(MULTIBINDS_CLASS).addMember("allowEmpty = true").build())
             .addModifiers(KModifier.ABSTRACT)
             .returns(mapType)
             .build()

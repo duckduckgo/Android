@@ -23,6 +23,7 @@ import com.tschuchort.compiletesting.configureKsp
 import com.tschuchort.compiletesting.sourcesGeneratedBySymbolProcessor
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
@@ -309,6 +310,51 @@ class ContributesActivePluginPointProcessorTest {
         val generated = result.findGeneratedSource("MyPlugin_ActivePlugin.kt")
         val golden = loadGolden("ActivePlugin_Basic.kt")
         assertEquals(golden, generated)
+    }
+
+    @Test
+    fun `active plugin with priority contributes into the priority map`() {
+        val pluginPoint = SourceFile.kotlin(
+            "TestActivePluginPoint.kt",
+            """
+            package com.test
+            import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
+            import com.duckduckgo.common.utils.plugins.ActivePlugin
+            import com.duckduckgo.di.scopes.AppScope
+
+            @ContributesActivePluginPoint(
+                scope = AppScope::class,
+                featureName = "pluginPointTestPlugin",
+            )
+            interface TestActivePluginBase : ActivePlugin
+            """.trimIndent(),
+        )
+        val plugin = SourceFile.kotlin(
+            "MyPlugin.kt",
+            """
+            package com.test
+            import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+            import com.duckduckgo.di.scopes.AppScope
+            import javax.inject.Inject
+
+            @ContributesActivePlugin(
+                scope = AppScope::class,
+                boundType = TestActivePluginBase::class,
+                featureName = "pluginMyPlugin",
+                parentFeatureName = "pluginPointTestPlugin",
+                priority = 100,
+            )
+            class MyPlugin @Inject constructor() : TestActivePluginBase {
+                override suspend fun isActive(): Boolean = true
+            }
+            """.trimIndent(),
+        )
+
+        val generated = compile(pluginPoint, plugin, *allStubs).findGeneratedSource("MyPlugin_ActivePlugin.kt")
+
+        assertTrue(generated.contains("@ContributesIntoMap("))
+        assertTrue(generated.contains("@PriorityKey(100)"))
+        assertFalse(generated.contains("ContributesIntoSet"))
     }
 
     @Test
