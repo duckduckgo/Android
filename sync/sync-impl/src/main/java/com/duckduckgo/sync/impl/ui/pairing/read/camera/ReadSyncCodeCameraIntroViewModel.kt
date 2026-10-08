@@ -140,12 +140,15 @@ class ReadSyncCodeCameraIntroViewModel @Inject constructor(
     }
 
     private suspend fun requestCameraActivation() {
-        if (viewState.value.viewMode == ViewMode.Camera) {
+        val state = viewState.value
+        if (state.showCameraPreview) {
             // An active camera means the permission is granted. This is where we report grants
             // that skip the permission dialog: a permission granted before this screen opened or
             // one granted from the system settings.
             reportCameraPermissionState(isGranted = true)
             _command.send(ResumeCamera)
+        }
+        if (state.viewMode == ViewMode.Camera) {
             _command.send(ExpandScannerCutout)
         }
     }
@@ -177,7 +180,10 @@ class ReadSyncCodeCameraIntroViewModel @Inject constructor(
         val animationFinished: Boolean = false,
         val isImprovedSyncEnabled: Boolean = false,
         val viewMode: ViewMode = ViewMode.Intro,
-    )
+    ) {
+        val showCameraPreview: Boolean
+            get() = viewMode == ViewMode.Camera || (isImprovedSyncEnabled && viewMode == ViewMode.Intro)
+    }
 
     enum class ViewMode {
         Loading,
