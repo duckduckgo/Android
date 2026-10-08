@@ -47,4 +47,9 @@ tags:
           text: "You've got this!"
       - assertVisible:
           text: "Start a private AI chat with Duck.ai or toggle to Search for protected.browsing.*"
+      - runFlow:
+          when:
+            notVisible: "High five!"
+          commands:
+            - hideKeyboard
       - tapOn: "High five!"
