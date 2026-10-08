@@ -33,9 +33,7 @@ import com.duckduckgo.common.ui.view.listitem.DaxListItem
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import dev.zacsweers.metro.HasMemberInjections
 import kotlinx.coroutines.flow.launchIn
@@ -54,9 +52,6 @@ abstract class BaseAdBlockingSettingsActivity : DuckDuckGoActivity() {
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     protected abstract val toolbar: Toolbar
@@ -71,16 +66,8 @@ abstract class BaseAdBlockingSettingsActivity : DuckDuckGoActivity() {
 
     protected open val learnMoreScreenTitle: Int = R.string.ad_blocking_settings_title
 
-    private val edgeToEdgeEnabled: Boolean by lazy { edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS) }
-
     private val blockAdsToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         viewModel.onBlockAdsToggled(isChecked)
-    }
-
-    protected fun maybeEnableEdgeToEdge() {
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
     }
 
     protected fun configure() {
@@ -89,9 +76,7 @@ abstract class BaseAdBlockingSettingsActivity : DuckDuckGoActivity() {
         duckPlayerEntry.setClickListener { viewModel.onDuckPlayerClicked() }
         duckPlayerDescription.setOnClickListener { viewModel.onDuckPlayerClicked() }
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         observeViewModel()
     }

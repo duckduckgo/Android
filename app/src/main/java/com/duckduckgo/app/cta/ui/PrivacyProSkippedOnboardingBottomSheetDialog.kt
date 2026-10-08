@@ -39,10 +39,9 @@ import com.google.android.material.R as MaterialR
 class PrivacyProSkippedOnboardingBottomSheetDialog(
     private val context: Context,
     private val isFreeTrialCopy: Boolean,
-    private val edgeToEdgeEnabled: Boolean,
 ) : BottomSheetDialog(
     context,
-    if (edgeToEdgeEnabled) CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge else 0,
+    CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge,
 ) {
 
     private val binding: BottomSheetPrivacyProSkippedOnboardingBinding =
@@ -52,9 +51,7 @@ class PrivacyProSkippedOnboardingBottomSheetDialog(
 
     init {
         setContentView(binding.root)
-        if (edgeToEdgeEnabled) {
-            binding.root.applyBottomSystemBarInsetPadding()
-        }
+        binding.root.applyBottomSystemBarInsetPadding()
         this.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         this.behavior.isDraggable = false
 

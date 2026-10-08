@@ -28,9 +28,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleChoiceViewModel.Command
@@ -54,8 +52,6 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var metadataReporter: ReportBreakageMetadataReporter
 
-    @Inject lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
     @Inject lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val binding: ActivityReportBreakageCategorySingleChoiceBinding by viewBinding()
@@ -68,10 +64,7 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.VPN)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         // The value should never be "unknown" we just do this because getParcelableExtra returns
         // nullable
@@ -88,9 +81,7 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
         setupToolbar(toolbar)
         setupViews()
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
     }
 
     private fun configureEdgeToEdgeInsets() {

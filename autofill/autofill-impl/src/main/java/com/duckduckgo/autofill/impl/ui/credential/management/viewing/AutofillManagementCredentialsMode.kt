@@ -69,9 +69,7 @@ import com.duckduckgo.common.ui.view.text.DaxTextInput
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R.dimen
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -113,9 +111,6 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
     @Inject
     lateinit var stringBuilder: AutofillManagementStringBuilder
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -183,9 +178,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.AUTOFILL)) {
-            edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.root)
-        }
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.root)
         requireActivity().addMenuProvider(this)
         observeViewModel()
         configureUiEventHandlers()

@@ -46,7 +46,7 @@ class AdBlockingSettingsActivity : BaseAdBlockingSettingsActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        maybeEnableEdgeToEdge()
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
         configure()
     }

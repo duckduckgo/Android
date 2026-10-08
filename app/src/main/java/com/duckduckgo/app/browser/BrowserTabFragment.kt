@@ -320,9 +320,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.KeyboardVisibilityUtil
 import com.duckduckgo.common.utils.device.isTablet
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.showKeyboard
@@ -704,9 +702,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var clipboardInteractor: ClipboardInteractor
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -1232,17 +1227,15 @@ class BrowserTabFragment :
 
         disableViewStateSaving()
 
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
-            edgeToEdgeHandler.applyNavigationBarInsetsAsMargin(binding.rootView)
-            val hasBottomBar = !tabDisplayedInCustomTabScreen &&
-                (omnibar.omnibarType == OmnibarType.SPLIT || omnibar.omnibarType == OmnibarType.SINGLE_BOTTOM)
-            if (hasBottomBar) {
-                edgeToEdgeHandler.applyNavigationBarScrim(
-                    binding.rootView,
-                    requireContext().getColorFromAttr(com.duckduckgo.mobile.android.R.attr.preferredNavigationBarColor),
-                    coverGestureNav = true,
-                )
-            }
+        edgeToEdgeHandler.applyNavigationBarInsetsAsMargin(binding.rootView)
+        val hasBottomBar = !tabDisplayedInCustomTabScreen &&
+            (omnibar.omnibarType == OmnibarType.SPLIT || omnibar.omnibarType == OmnibarType.SINGLE_BOTTOM)
+        if (hasBottomBar) {
+            edgeToEdgeHandler.applyNavigationBarScrim(
+                binding.rootView,
+                requireContext().getColorFromAttr(com.duckduckgo.mobile.android.R.attr.preferredNavigationBarColor),
+                coverGestureNav = true,
+            )
         }
 
         if (savedInstanceState == null) {
@@ -1685,10 +1678,6 @@ class BrowserTabFragment :
                 customTabToolbarColor,
             )
 
-            if (!edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
-                requireActivity().window.navigationBarColor = customTabToolbarColor
-                requireActivity().window.statusBarColor = customTabToolbarColor
-            }
             // Update status bar icon colors based on toolbar color luminance
             updateStatusBarIconColors(customTabToolbarColor)
 
@@ -1788,7 +1777,6 @@ class BrowserTabFragment :
                 pixel.fire(AppPixelName.BROWSING_MENU_USED_UNIQUE, type = Unique())
                 pixel.fire(AppPixelName.BROWSING_MENU_USED, type = Count)
             },
-            edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
             topInContextSections = topInContextSections.getPlugins(),
             currentUrl = viewModel.url?.toUri(),
         )
@@ -5542,7 +5530,6 @@ class BrowserTabFragment :
                         viewModel.historicalPageSelected(stackIndex)
                     }
                 },
-                edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
             ).show()
         }
     }
@@ -6480,7 +6467,6 @@ class BrowserTabFragment :
             privacyProSkippedOnboardingBottomSheet = PrivacyProSkippedOnboardingBottomSheetDialog(
                 context = requireContext(),
                 isFreeTrialCopy = configuration.isFreeTrialCopy,
-                edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
             ).also { dialog ->
                 dialog.eventListener = object : PrivacyProSkippedOnboardingBottomSheetDialog.EventListener {
                     override fun onShown() {
@@ -6608,7 +6594,6 @@ class BrowserTabFragment :
                         context = requireContext(),
                         isLightModeEnabled = appTheme.isLightModeEnabled(),
                         isAddressBarRebrandEnabled = isAddressBarRebrandEnabled,
-                        edgeToEdgeProvider = edgeToEdgeProvider,
                     )
                 widgetBottomSheetDialog.eventListener =
                     object : HomeScreenWidgetBottomSheetDialog.EventListener {
