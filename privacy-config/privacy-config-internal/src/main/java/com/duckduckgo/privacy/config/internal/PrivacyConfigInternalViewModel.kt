@@ -23,14 +23,12 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.privacy.config.api.PRIVACY_REMOTE_CONFIG_URL
-import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader.ConfigDownloadResult.Error
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader.ConfigDownloadResult.Success
 import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalViewModel.Command.ConfigDownloaded
 import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalViewModel.Command.ConfigError
 import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalViewModel.Command.Loading
 import com.duckduckgo.privacy.config.internal.store.DevPrivacyConfigSettingsDataStore
-import com.duckduckgo.privacy.config.store.PrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -45,7 +43,7 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class PrivacyConfigInternalViewModel @Inject constructor(
     private val privacyConfigRepository: PrivacyConfigRepository,
-    private val downloader: PrivacyConfigDownloader,
+    private val loader: PrivacyConfigInternalLoader,
     private val store: DevPrivacyConfigSettingsDataStore,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
@@ -76,8 +74,7 @@ class PrivacyConfigInternalViewModel @Inject constructor(
     fun download() {
         viewModelScope.launch(dispatcherProvider.io()) {
             sendCommand(Loading)
-            privacyConfigRepository.insert(PrivacyConfig(version = -1, readme = "", eTag = "", timestamp = ""))
-            when (val result = downloader.download()) {
+            when (val result = loader.load()) {
                 is Success -> {
                     sendCommand(ConfigDownloaded(getCurrentUrl()))
                     emitLatestConfig()
