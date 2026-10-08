@@ -92,6 +92,26 @@ interface WgTunnelConfig {
     fun clearWgConfig()
 
     fun setWgConfig(config: Config)
+
+    /**
+     * @return the last successful port that was used
+     */
+    fun getRememberedPort(): Long
+
+    /**
+     * @param port the port to remember as successful
+     */
+    fun setRememberedPort(port: Long)
+
+    /**
+     * @return all ports advertised by the current server
+     */
+    fun getAdvertisedPorts(): List<Long>
+
+    /**
+     * @return the server's default port
+     */
+    fun getServerDefaultPort(): Long
 }
 
 @ContributesBinding(
@@ -115,6 +135,22 @@ class RealWgTunnelConfig @Inject constructor(
 
     override fun setWgConfig(config: Config) {
         wgTunnelStore.wireguardConfig = config
+    }
+
+    override fun getRememberedPort(): Long {
+        return wgTunnelStore.rememberedPort
+    }
+
+    override fun setRememberedPort(port: Long) {
+        wgTunnelStore.rememberedPort = port
+    }
+
+    override fun getAdvertisedPorts(): List<Long> {
+        return wgTunnelStore.advertisedPorts
+    }
+
+    override fun getServerDefaultPort(): Long {
+        return wgTunnelStore.serverDefaultPort
     }
 }
 
@@ -218,6 +254,11 @@ class RealWgTunnel @Inject constructor(
             logcat(ERROR) { "Error registering public key" }
         }.getOrThrow()
 
+        // Store port information
+        wgTunnelStore.advertisedPorts = serverData.ports
+        val defaultPort = serverData.publicEndpoint.substringAfterLast(":").toLongOrNull() ?: 0L
+        wgTunnelStore.serverDefaultPort = defaultPort
+
         return Config.Builder()
             .setInterface(
                 Interface.Builder()
@@ -283,10 +324,34 @@ class WgTunnelStore constructor(
             prefs.edit(commit = true) { putLong(KEY_WG_PRIVATE_KEY_LAST_UPDATE, value) }
         }
 
+    var rememberedPort: Long
+        get() = prefs.getLong(KEY_REMEMBERED_PORT, 0L)
+        set(value) {
+            prefs.edit(commit = true) { putLong(KEY_REMEMBERED_PORT, value) }
+        }
+
+    var advertisedPorts: List<Long>
+        get() {
+            val portsString = prefs.getString(KEY_ADVERTISED_PORTS, null)
+            return portsString?.split(",")?.mapNotNull { it.toLongOrNull() } ?: emptyList()
+        }
+        set(value) {
+            prefs.edit(commit = true) { putString(KEY_ADVERTISED_PORTS, value.joinToString(",")) }
+        }
+
+    var serverDefaultPort: Long
+        get() = prefs.getLong(KEY_SERVER_DEFAULT_PORT, 0L)
+        set(value) {
+            prefs.edit(commit = true) { putLong(KEY_SERVER_DEFAULT_PORT, value) }
+        }
+
     companion object {
         private const val FILENAME = "com.duckduckgo.vpn.tunnel.config.v1"
         private const val KEY_WG_CONFIG = "wg_config_key"
         private const val KEY_WG_PRIVATE_KEY_LAST_UPDATE = "wg_private_key_last_update"
+        private const val KEY_REMEMBERED_PORT = "wg_remembered_port"
+        private const val KEY_ADVERTISED_PORTS = "wg_advertised_ports"
+        private const val KEY_SERVER_DEFAULT_PORT = "wg_server_default_port"
     }
 }
 
