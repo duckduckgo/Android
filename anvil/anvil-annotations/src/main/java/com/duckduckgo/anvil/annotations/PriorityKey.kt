@@ -19,7 +19,7 @@ package com.duckduckgo.anvil.annotations
 import dev.zacsweers.metro.MapKey
 
 /**
- * Use [PriorityKey] in combination with @ContributesMultibinding when contributing a plugin and want
+ * Use [PriorityKey] in combination with @ContributesIntoMap when contributing a plugin and want
  * to assign a priority to the instance.
  * Lower priority values mean the associated plugin comes first in the list of plugins.
  * When two plugins have the same priority the priority is resolved sorting by class instance fully qualified name
