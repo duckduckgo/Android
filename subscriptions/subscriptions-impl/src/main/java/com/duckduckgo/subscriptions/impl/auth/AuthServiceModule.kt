@@ -18,9 +18,9 @@ package com.duckduckgo.subscriptions.impl.auth
 
 import android.annotation.SuppressLint
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import okhttp3.Dns
 import okhttp3.OkHttpClient
@@ -28,7 +28,7 @@ import retrofit2.Retrofit
 import javax.inject.Named
 import javax.inject.Provider
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object AuthServiceModule {
     @SuppressLint("NoRetrofitCreateMethodCallDetector")

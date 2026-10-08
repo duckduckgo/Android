@@ -25,10 +25,10 @@ import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.GET_OTHER_DEVICES_SCR
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_ACTIVATING
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_DISABLED
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_ENABLED
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.IntoSet
+import dev.zacsweers.metro.Provides
 import javax.inject.Inject
 
 class SyncDesktopAppPromotionInteractionHandler @Inject constructor(
@@ -62,7 +62,7 @@ class SyncDesktopAppPromotionInteractionHandler @Inject constructor(
     }
 }
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object SyncDesktopAppPromotionInteractionHandlerModule {
 

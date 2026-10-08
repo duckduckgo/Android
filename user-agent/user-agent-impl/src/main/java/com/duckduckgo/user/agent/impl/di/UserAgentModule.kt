@@ -32,15 +32,15 @@ import com.duckduckgo.user.agent.store.UserAgentDatabase
 import com.duckduckgo.user.agent.store.UserAgentFeatureToggleRepository
 import com.duckduckgo.user.agent.store.UserAgentFeatureToggleStore
 import com.duckduckgo.user.agent.store.UserAgentRepository
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
 
 @ContributesTo(AppScope::class)
-@Module
+@BindingContainer
 class UserAgentModule {
     @SingleIn(AppScope::class)
     @Provides

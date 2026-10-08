@@ -24,7 +24,6 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
@@ -62,7 +61,7 @@ class RealNativeInputStateStore @Inject constructor(
     @Suppress("DenyListedApi")
     override val state: Flow<NativeInputState> by lazy {
         browserModeStateHolder.currentMode
-            .flatMapLatest { mode -> tabRepositoryProvider.get().forMode(mode).flowSelectedTab }
+            .flatMapLatest { mode -> tabRepositoryProvider.value.forMode(mode).flowSelectedTab }
             .filterNotNull()
             .map { it.tabId }
             .distinctUntilChanged()

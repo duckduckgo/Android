@@ -30,7 +30,6 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_MONTHLY_PLU
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_MONTHLY_PRO_PLANS
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.repository.isActive
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
@@ -319,7 +318,7 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        subscriptionsFeature.get().sendSubscriptionSwitchWideEvent().isEnabled()
+        subscriptionsFeature.value.sendSubscriptionSwitchWideEvent().isEnabled()
     }
 
     private suspend fun getCurrentWideEventId(): Long? {

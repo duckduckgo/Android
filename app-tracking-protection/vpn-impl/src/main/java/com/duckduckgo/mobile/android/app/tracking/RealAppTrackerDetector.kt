@@ -32,9 +32,9 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.AppTrackerRecorde
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerType
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
 
@@ -129,7 +129,7 @@ class RealAppTrackerDetector constructor(
 }
 
 @ContributesTo(scope = VpnScope::class)
-@Module
+@BindingContainer
 object AppTrackerDetectorModule {
     @Provides
     fun provideAppTrackerDetectorModule(

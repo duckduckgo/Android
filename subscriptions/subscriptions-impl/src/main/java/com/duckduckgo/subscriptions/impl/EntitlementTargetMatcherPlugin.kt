@@ -19,7 +19,6 @@ package com.duckduckgo.subscriptions.impl
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.Subscriptions
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
@@ -32,7 +31,7 @@ class EntitlementTargetMatcherPlugin @Inject constructor(
     override fun matchesTargetProperty(target: Toggle.State.Target): Boolean {
         return target.entitlement?.let { entitlement ->
             runBlocking {
-                subscriptions.get().getEntitlementStatus().firstOrNull()?.any { it.value.lowercase() == entitlement.lowercase() } ?: false
+                subscriptions.value.getEntitlementStatus().firstOrNull()?.any { it.value.lowercase() == entitlement.lowercase() } ?: false
             }
         } ?: true
     }

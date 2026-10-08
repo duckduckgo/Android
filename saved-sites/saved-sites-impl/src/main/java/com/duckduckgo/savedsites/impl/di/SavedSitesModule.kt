@@ -45,13 +45,13 @@ import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.savedsites.store.SavedSitesSettingsSharedPrefStore
 import com.duckduckgo.savedsites.store.SavedSitesSettingsStore
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.*
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class SavedSitesModule {
 

@@ -21,14 +21,14 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import javax.inject.Qualifier
 
 @ContributesTo(AppScope::class)
-@Module
+@BindingContainer
 object ImportPasswordsViaDesktopSyncDataStoreModule {
 
     private val Context.importPasswordsDesktopSyncStore: DataStore<Preferences> by preferencesDataStore(

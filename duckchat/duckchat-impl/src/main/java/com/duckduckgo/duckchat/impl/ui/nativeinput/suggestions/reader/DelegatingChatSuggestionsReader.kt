@@ -23,7 +23,6 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.RealChatSuggestionsStore
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
@@ -53,7 +52,7 @@ class DelegatingChatSuggestionsReader @Inject constructor(
         if (activeReader != null && activeReader !== reader) tearDown()
         activeReader = reader
         logcat { "DuckAI chat suggestions: using ${if (reader === nativeReader) "native store" else "WebView"} reader" }
-        pixels.get().reportNativeStorageReaderUsed(native = reader === nativeReader)
+        pixels.value.reportNativeStorageReaderUsed(native = reader === nativeReader)
         val result = reader.fetchSuggestions(query)
         suggestionsStore.setHasChatSuggestions(result.isNotEmpty())
         return@withContext result

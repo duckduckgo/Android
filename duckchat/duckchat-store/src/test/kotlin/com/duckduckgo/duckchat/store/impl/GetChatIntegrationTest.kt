@@ -27,7 +27,6 @@ import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeDatabase
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessaging
-import dagger.Lazy
 import org.json.JSONObject
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -62,7 +61,7 @@ class GetChatIntegrationTest {
             settings = mock(),
             chats = db.chatsDao(),
             fileMeta = mock(),
-            filesDirLazy = Lazy { File("") },
+            filesDirLazy = lazy { File("") },
         )
         val storageProvider = mock<BrowserModeDataProvider<DuckAiBridgeStorage>>().also {
             whenever(it.forMode(any())).thenReturn(storage)

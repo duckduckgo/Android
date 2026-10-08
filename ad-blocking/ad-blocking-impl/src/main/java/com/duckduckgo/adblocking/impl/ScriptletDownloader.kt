@@ -18,7 +18,6 @@ package com.duckduckgo.adblocking.impl
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -40,7 +39,7 @@ class RealScriptletDownloader @Inject constructor(
     override suspend fun download(url: String): Result<ByteArray> = withContext(dispatchers.io()) {
         runCatching {
             val request = Request.Builder().url(url).build()
-            okHttpClient.get().newCall(request).execute().use { response ->
+            okHttpClient.value.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) {
                     throw IOException("Scriptlet download failed for $url: HTTP ${response.code}")
                 }

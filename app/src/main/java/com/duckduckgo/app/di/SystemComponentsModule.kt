@@ -34,15 +34,15 @@ import com.duckduckgo.app.systemsearch.InstalledDeviceAppLookup
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Binds
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.Binds
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.IntoSet
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object SystemComponentsModule {
 
@@ -93,7 +93,7 @@ object SystemComponentsModule {
     }
 }
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 abstract class SystemComponentsModuleBindings {
     @Binds

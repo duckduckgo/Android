@@ -52,14 +52,14 @@ import com.duckduckgo.sync.store.SyncStore
 import com.duckduckgo.sync.store.SyncUnavailableSharedPrefsStore
 import com.duckduckgo.sync.store.SyncUnavailableStore
 import com.journeyapps.barcodescanner.BarcodeEncoder
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Qualifier
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object SyncStoreModule {
 

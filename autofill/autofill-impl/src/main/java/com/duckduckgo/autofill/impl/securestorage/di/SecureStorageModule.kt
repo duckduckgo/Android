@@ -29,14 +29,14 @@ import com.duckduckgo.autofill.store.keys.RealSecureStorageKeyStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object SecureStorageModule {
 
@@ -64,7 +64,7 @@ object SecureStorageModule {
         )
 }
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object SecureStorageKeyModule {
     @Provides

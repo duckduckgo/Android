@@ -30,9 +30,9 @@ import com.duckduckgo.browsermode.api.FireMode
 import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.ActivityScope
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 
 /**
@@ -45,7 +45,7 @@ import dev.zacsweers.metro.SingleIn
  * instance resolves the right mode — and anything derived from it — at construction time.
  */
 @ContributesTo(ActivityScope::class)
-@Module
+@BindingContainer
 class BrowserModeActivityModule {
     /**
      * The activity's [BrowserMode] is captured **once** at activity-component creation

@@ -25,7 +25,6 @@ import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.browsermode.api.profileName
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority
@@ -47,7 +46,7 @@ class DefaultCookieManagerProvider @Inject constructor(
 
     override fun forMode(mode: BrowserMode): CookieManager? = when (mode) {
         BrowserMode.REGULAR -> defaultManager()
-        BrowserMode.FIRE -> if (fireModeAvailability.get().isAvailable()) fireManager() else defaultManager()
+        BrowserMode.FIRE -> if (fireModeAvailability.value.isAvailable()) fireManager() else defaultManager()
     }
 
     private fun fireManager(): CookieManager? {

@@ -31,7 +31,6 @@ import com.duckduckgo.browsermode.api.FireMode
 import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
@@ -361,7 +360,7 @@ class RealBadUrlErrorPageWideEvent @Inject constructor(
 
     private suspend fun isRecordingEnabled(): Boolean = withContext(dispatchers.io()) {
         // Suggest redirect feature conditions to be removed once we remove its feature flag
-        badUrlErrorPageWideEventFeature.get().self().isEnabled() &&
+        badUrlErrorPageWideEventFeature.value.self().isEnabled() &&
             suggestRedirectFeature.self().isEnabled() &&
             suggestRedirectFeature.suggestRedirect().isEnabled()
     }

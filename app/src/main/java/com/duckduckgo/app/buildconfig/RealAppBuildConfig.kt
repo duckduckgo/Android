@@ -28,7 +28,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
@@ -82,7 +81,7 @@ class RealAppBuildConfig @Inject constructor(
         get() = Locale.getDefault()
 
     override val variantName: String?
-        get() = variantManager.get().getVariantKey()
+        get() = variantManager.value.getVariantKey()
 
     override suspend fun isAppReinstall(): Boolean = withContext(dispatcherProvider.io()) {
         return@withContext kotlin.runCatching {

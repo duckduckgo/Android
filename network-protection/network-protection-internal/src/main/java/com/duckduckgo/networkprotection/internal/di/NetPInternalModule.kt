@@ -19,12 +19,12 @@ package com.duckduckgo.networkprotection.internal.di
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.store.remote_config.*
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object NetPInternalModule {
 

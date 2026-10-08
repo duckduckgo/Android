@@ -102,17 +102,17 @@ import com.duckduckgo.request.interception.api.RequestBlocklist
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.tracker.detection.api.TrackerDetector
 import com.duckduckgo.user.agent.api.UserAgentProvider
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.IntoSet
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
 import javax.inject.Qualifier
 import kotlin.time.Duration.Companion.milliseconds
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class BrowserModule {
 

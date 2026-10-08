@@ -31,7 +31,6 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.ContentScopeOptimizations
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
@@ -382,7 +381,7 @@ class RealPageLoadWideEvent @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        androidBrowserConfigFeature.get().sendPageLoadWideEvent().isEnabled()
+        androidBrowserConfigFeature.value.sendPageLoadWideEvent().isEnabled()
     }
 
     private inner class PageLoadState(

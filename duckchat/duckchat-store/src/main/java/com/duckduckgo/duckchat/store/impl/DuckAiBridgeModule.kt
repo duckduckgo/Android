@@ -27,10 +27,9 @@ import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeDatabase
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingsDao
 import com.duckduckgo.duckchat.store.impl.store.FireModeDuckAiDatabase
-import dagger.Lazy
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import java.io.File
 
@@ -40,7 +39,7 @@ import java.io.File
  * so each DAO and the chat-files directory are qualified with `@RegularMode` / `@FireMode`. Consumers either
  * inject a qualified [DuckAiBridgeStorage] directly or resolve one via `BrowserModeDataProvider<DuckAiBridgeStorage>`.
  */
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object DuckAiBridgeModule {
 

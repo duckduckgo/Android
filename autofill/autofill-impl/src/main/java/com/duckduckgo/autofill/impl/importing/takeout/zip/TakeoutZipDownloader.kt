@@ -22,7 +22,6 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -58,7 +57,7 @@ class RealTakeoutZipDownloader @Inject constructor(
             val tempFile = createTempZipFile()
             val request = constructRequestBuilder(url, userAgent).build()
 
-            okHttpClient.get().newCall(request).execute().use { response ->
+            okHttpClient.value.newCall(request).execute().use { response ->
                 if (response.isSuccessful) {
                     downloadToFile(response, tempFile)
                     Uri.fromFile(tempFile)

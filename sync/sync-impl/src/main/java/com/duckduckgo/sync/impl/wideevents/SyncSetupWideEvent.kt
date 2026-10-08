@@ -30,7 +30,6 @@ import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.UI_VERSION_V2
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_FLOW_VERSION
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_UI_VERSION
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEventImpl.Companion.STEP_DEVICE_AUTH_NOT_ENROLLED
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
@@ -68,7 +67,7 @@ class SyncSetupWideEventImpl @Inject constructor(
     private var cachedFlowId: Long? = null
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        syncFeature.get().sendSyncSetupWideEvent().isEnabled()
+        syncFeature.value.sendSyncSetupWideEvent().isEnabled()
     }
 
     private suspend fun getCurrentWideEventId(): Long? {
@@ -255,7 +254,7 @@ class SyncSetupWideEventImpl @Inject constructor(
     private fun uiMetadata(): Map<String, String> = mapOf(SYNC_SETUP_UI_VERSION to UI_VERSION_V2)
 
     private fun flowMetadata(): Map<String, String> = buildMap {
-        val feature = syncFeature.get()
+        val feature = syncFeature.value
         val flowVersion = if (feature.canUseV2ConnectFlow().isEnabled()) {
             if (feature.canUseExchangeV2Point1().isEnabled()) {
                 FLOW_VERSION_V2_1

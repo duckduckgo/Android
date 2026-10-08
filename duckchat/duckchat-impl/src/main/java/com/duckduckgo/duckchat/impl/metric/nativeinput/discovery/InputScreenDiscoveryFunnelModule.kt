@@ -21,9 +21,9 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import javax.inject.Qualifier
 
 private val Context.inputScreenDiscoveryFunnelDataStore: DataStore<Preferences> by preferencesDataStore(
@@ -33,7 +33,7 @@ private val Context.inputScreenDiscoveryFunnelDataStore: DataStore<Preferences> 
 @Qualifier
 annotation class InputScreenDiscoveryFunnelStore
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object InputScreenDiscoveryFunnelModule {
     @Provides

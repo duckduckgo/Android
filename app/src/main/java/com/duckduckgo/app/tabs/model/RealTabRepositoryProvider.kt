@@ -21,8 +21,8 @@ import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.FireMode
 import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Binds
-import dagger.Module
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.Binds
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
@@ -44,7 +44,7 @@ class RealTabRepositoryProvider @Inject constructor(
 }
 
 @ContributesTo(AppScope::class)
-@Module
+@BindingContainer
 abstract class RealTabRepositoryProviderModule {
     @Binds
     abstract fun bindTabRepositoryProvider(impl: RealTabRepositoryProvider): BrowserModeDataProvider<TabRepository>

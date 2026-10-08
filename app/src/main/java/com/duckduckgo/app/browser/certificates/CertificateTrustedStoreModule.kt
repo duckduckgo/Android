@@ -24,12 +24,12 @@ import com.duckduckgo.app.browser.certificates.rootstore.LetsEncryptR3
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStoreImpl
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class CertificateTrustedStoreModule {
     @Provides

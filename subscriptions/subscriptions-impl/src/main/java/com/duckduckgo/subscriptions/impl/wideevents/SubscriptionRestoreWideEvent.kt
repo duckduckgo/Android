@@ -24,7 +24,6 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
@@ -145,7 +144,7 @@ class SubscriptionRestoreWideEventImpl @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        subscriptionsFeature.get().sendSubscriptionRestoreWideEvent().isEnabled()
+        subscriptionsFeature.value.sendSubscriptionRestoreWideEvent().isEnabled()
     }
 
     private suspend fun getCurrentWideEventId(): Long? {

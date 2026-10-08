@@ -25,12 +25,12 @@ import com.duckduckgo.history.impl.store.ALL_MIGRATIONS
 import com.duckduckgo.history.impl.store.HistoryDataStore
 import com.duckduckgo.history.impl.store.HistoryDatabase
 import com.duckduckgo.history.impl.store.SharedPreferencesHistoryDataStore
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class HistoryModule {
 

@@ -19,10 +19,9 @@ package com.duckduckgo.subscriptions.impl.services
 import android.annotation.SuppressLint
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Lazy
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -31,7 +30,7 @@ import java.io.File
 import javax.inject.Named
 import javax.inject.Qualifier
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class SubscriptionNetworkModule {
 
@@ -62,7 +61,7 @@ class SubscriptionNetworkModule {
         @SubscriptionCachedClient customClient: Lazy<OkHttpClient>,
     ): SubscriptionsCachedService {
         val customRetrofit = retrofit.newBuilder()
-            .callFactory { customClient.get().newCall(it) }
+            .callFactory { customClient.value.newCall(it) }
             .build()
 
         return customRetrofit.create(SubscriptionsCachedService::class.java)

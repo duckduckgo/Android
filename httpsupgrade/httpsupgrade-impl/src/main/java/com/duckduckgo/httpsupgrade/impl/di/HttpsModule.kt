@@ -33,12 +33,12 @@ import com.duckduckgo.httpsupgrade.impl.HttpsUpgradeService
 import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpecDao
 import com.duckduckgo.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.httpsupgrade.store.HttpsUpgradeDatabase
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object HttpsModule {
 

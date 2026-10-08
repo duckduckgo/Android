@@ -25,13 +25,13 @@ import com.duckduckgo.contentscopescripts.impl.features.navigatorinterface.store
 import com.duckduckgo.contentscopescripts.impl.features.navigatorinterface.store.NavigatorInterfaceRepository
 import com.duckduckgo.contentscopescripts.impl.features.navigatorinterface.store.RealNavigatorInterfaceRepository
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object NavigatorInterfaceModule {
 

@@ -21,9 +21,9 @@ import androidx.room.Room
 import com.duckduckgo.app.anrs.store.CrashDatabase
 import com.duckduckgo.app.anrs.store.UncaughtExceptionDao
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import javax.inject.Qualifier
 
@@ -31,7 +31,7 @@ import javax.inject.Qualifier
 @Qualifier
 private annotation class InternalApi
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object CrashModule {
     @Provides

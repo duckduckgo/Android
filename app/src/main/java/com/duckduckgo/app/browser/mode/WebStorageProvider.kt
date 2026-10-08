@@ -25,8 +25,8 @@ import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.browsermode.api.profileName
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Binds
-import dagger.Module
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.Binds
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
@@ -50,7 +50,7 @@ class WebStorageProvider @Inject constructor(
 }
 
 @ContributesTo(AppScope::class)
-@Module
+@BindingContainer
 abstract class WebStorageProviderModule {
     @Binds
     abstract fun bindWebStorageProvider(impl: WebStorageProvider): BrowserModeDataProvider<WebStorage>

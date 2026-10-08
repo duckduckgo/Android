@@ -26,13 +26,13 @@ import com.duckduckgo.elementhiding.store.ALL_MIGRATIONS
 import com.duckduckgo.elementhiding.store.ElementHidingDatabase
 import com.duckduckgo.elementhiding.store.ElementHidingRepository
 import com.duckduckgo.elementhiding.store.RealElementHidingRepository
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object ElementHidingModule {
 

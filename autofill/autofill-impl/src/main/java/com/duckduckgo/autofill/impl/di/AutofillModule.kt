@@ -43,13 +43,13 @@ import com.duckduckgo.data.store.api.DatabaseProvider
 import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import com.duckduckgo.autofill.store.ALL_MIGRATIONS as AutofillMigrations
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class AutofillModule {
 

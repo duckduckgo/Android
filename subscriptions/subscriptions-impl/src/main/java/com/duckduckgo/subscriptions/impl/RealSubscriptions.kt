@@ -52,7 +52,6 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithPara
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
@@ -86,7 +85,7 @@ class RealSubscriptions @Inject constructor(
     override fun getEntitlementStatus(): Flow<List<Product>> {
         return subscriptionsManager.entitlements.map { list ->
             withContext(dispatcherProvider.io()) {
-                if (subscriptionsFeature.get().duckAiPlus().isEnabled().not()) {
+                if (subscriptionsFeature.value.duckAiPlus().isEnabled().not()) {
                     list.filterNot { entitlement -> entitlement == DuckAiPlus }
                 } else {
                     list
@@ -100,7 +99,7 @@ class RealSubscriptions @Inject constructor(
         val isActive = subscriptionsManager.subscriptionStatus().isActiveOrWaiting()
         val isEligible = subscriptionsManager.getSubscriptionOffer().isNotEmpty()
 
-        if (!subscriptionsFeature.get().allowPurchase().isEnabled()) {
+        if (!subscriptionsFeature.value.allowPurchase().isEnabled()) {
             return isActive
         }
 
@@ -162,9 +161,9 @@ class RealSubscriptions @Inject constructor(
     }
 
     private fun optimizedPaywallFeaturePage(uri: Uri): String? {
-        if (!subscriptionsFeature.get().performanceOptimizedPaywalls().isEnabled()) return null
+        if (!subscriptionsFeature.value.performanceOptimizedPaywalls().isEnabled()) return null
         val path = uri.path ?: return null
-        return paywallPathProvider.get().getFeaturePage(path)
+        return paywallPathProvider.value.getFeaturePage(path)
     }
 
     override suspend fun isFreeTrialEligible(): Boolean {
@@ -184,7 +183,7 @@ class RealSubscriptions @Inject constructor(
             .mapNotNull { feature -> Product.entries.firstOrNull { it.value == feature } }
             .let {
                 withContext(dispatcherProvider.io()) {
-                    if (subscriptionsFeature.get().duckAiPlus().isEnabled().not()) {
+                    if (subscriptionsFeature.value.duckAiPlus().isEnabled().not()) {
                         it.filterNot { feature -> feature == DuckAiPlus }
                     } else {
                         it

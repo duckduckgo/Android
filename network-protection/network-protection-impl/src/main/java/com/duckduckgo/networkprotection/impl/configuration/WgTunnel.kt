@@ -28,10 +28,10 @@ import com.wireguard.config.InetNetwork
 import com.wireguard.config.Interface
 import com.wireguard.config.Peer
 import com.wireguard.crypto.KeyPair
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.binding
 import logcat.LogPriority.ERROR
 import logcat.asLog
@@ -291,7 +291,7 @@ class WgTunnelStore constructor(
     }
 }
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object WgTunnelStoreModule {
     @Provides

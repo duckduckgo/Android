@@ -35,7 +35,6 @@ import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionsAllowedDao
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -113,7 +112,7 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     override suspend fun isDrmEnabledForSite(url: String): Boolean {
         if (withContext(dispatcherProvider.io()) { drmPolicyFeature.isCentralPolicyEnabled() }) {
             // "Permitted or promptable" rather than "granted" — this feeds the breakage report's drmEnabled field.
-            return drmPolicyManager.get().decide(url).action != DrmPolicyAction.DENY
+            return drmPolicyManager.value.decide(url).action != DrmPolicyAction.DENY
         }
 
         val domain = url.extractDomain() ?: url

@@ -34,12 +34,12 @@ import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
 import com.duckduckgo.networkprotection.store.db.AutoExcludeDao
 import com.duckduckgo.networkprotection.store.db.NetPDatabase
 import com.duckduckgo.networkprotection.store.remote_config.NetPConfigTogglesDao
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object DataModule {
     @Provides
@@ -83,7 +83,7 @@ object DataModule {
     }
 }
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object NetPBreakageCategoriesModule {
     @Provides
@@ -111,7 +111,7 @@ object NetPBreakageCategoriesModule {
     }
 }
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object NetPDataStoreModule {
     @Provides

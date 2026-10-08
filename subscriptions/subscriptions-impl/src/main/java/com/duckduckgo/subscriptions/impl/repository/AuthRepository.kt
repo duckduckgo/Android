@@ -39,9 +39,9 @@ import com.duckduckgo.subscriptions.impl.toStatus
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Moshi.Builder
 import com.squareup.moshi.Types
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -77,7 +77,7 @@ interface AuthRepository {
     suspend fun getPendingPlans(): List<PendingPlan>
 }
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object AuthRepositoryModule {
     @Provides
@@ -86,7 +86,7 @@ object AuthRepositoryModule {
         dispatcherProvider: DispatcherProvider,
         sharedPreferencesProvider: SharedPreferencesProvider,
         serpPromo: SerpPromo,
-        subscriptionsFeature: dagger.Lazy<SubscriptionsFeature>,
+        subscriptionsFeature: Lazy<SubscriptionsFeature>,
     ): AuthRepository {
         return RealAuthRepository(SubscriptionsEncryptedDataStore(sharedPreferencesProvider), dispatcherProvider, serpPromo, subscriptionsFeature)
     }
@@ -96,7 +96,7 @@ internal class RealAuthRepository constructor(
     private val subscriptionsDataStore: SubscriptionsDataStore,
     private val dispatcherProvider: DispatcherProvider,
     private val serpPromo: SerpPromo,
-    private val subscriptionsFeature: dagger.Lazy<SubscriptionsFeature>,
+    private val subscriptionsFeature: Lazy<SubscriptionsFeature>,
 ) : AuthRepository {
 
     private val moshi = Builder().build()
@@ -292,7 +292,7 @@ internal class RealAuthRepository constructor(
     }
 
     override suspend fun getFeatures(basePlanId: String): Set<String> = withContext(dispatcherProvider.io()) {
-        if (subscriptionsFeature.get().tierMessagingEnabled().isEnabled()) {
+        if (subscriptionsFeature.value.tierMessagingEnabled().isEnabled()) {
             // When flag is ON, try v2 first
             val v2Features = getFeaturesV2(basePlanId)
             if (v2Features.isNotEmpty()) {

@@ -20,12 +20,12 @@ import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.anrs.store.AnrsDatabase
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object AnrModule {
     @Provides

@@ -29,10 +29,10 @@ import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.wireguard.crypto.KeyPair
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -112,7 +112,7 @@ fun interface DeviceLockedChecker {
     fun isDeviceLocked(): Boolean
 }
 
-@Module
+@BindingContainer
 @ContributesTo(VpnScope::class)
 object DeviceLockedCheckerModule {
 

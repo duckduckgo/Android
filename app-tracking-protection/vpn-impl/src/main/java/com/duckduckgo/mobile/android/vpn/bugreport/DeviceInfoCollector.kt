@@ -23,10 +23,10 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.di.BatteryOptimizationState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Provider
@@ -49,7 +49,7 @@ class DeviceInfoCollector @Inject constructor(
     }
 }
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object DeviceInfoCollectorModule {
     // this convenience class is just to allow testing

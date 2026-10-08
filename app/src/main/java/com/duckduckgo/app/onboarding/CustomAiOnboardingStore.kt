@@ -23,7 +23,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.referral.api.AppInstallationReferrerStateListener
 import com.duckduckgo.referral.api.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
 import com.duckduckgo.referral.api.ReferrerParserPlugin
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
@@ -88,7 +87,7 @@ class CustomAiOnboardingStoreImpl @Inject constructor(
     override suspend fun resolve() = resolveMutex.withLock {
         withContext(dispatcherProvider.io()) {
             // Ensure the install referrer (and therefore the processing function) has resolved before reading.
-            withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) { referrerStateListener.get().waitForReferrerCode() }
+            withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) { referrerStateListener.value.waitForReferrerCode() }
             val referrerExists = preferences.getBoolean(PREFS_KEY_REFERRER_PARAM_PRESENT, false)
 
             val customAiOnboardingEnabled = customAiOnboardingFeature.self().isEnabled()

@@ -26,13 +26,13 @@ import com.duckduckgo.webcompat.store.ALL_MIGRATIONS
 import com.duckduckgo.webcompat.store.RealWebCompatRepository
 import com.duckduckgo.webcompat.store.WebCompatDatabase
 import com.duckduckgo.webcompat.store.WebCompatRepository
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object WebCompatModule {
 

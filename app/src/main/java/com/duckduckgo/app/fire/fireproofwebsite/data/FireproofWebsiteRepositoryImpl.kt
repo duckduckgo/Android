@@ -23,7 +23,6 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
@@ -103,7 +102,7 @@ class FireproofWebsiteRepositoryImpl @Inject constructor(
 
     override suspend fun removeFireproofWebsite(fireproofWebsiteEntity: FireproofWebsiteEntity) {
         withContext(dispatchers.io()) {
-            faviconManager.get().deletePersistedFavicon(fireproofWebsiteEntity.domain)
+            faviconManager.value.deletePersistedFavicon(fireproofWebsiteEntity.domain)
             fireproofWebsiteDao.delete(fireproofWebsiteEntity)
         }
     }

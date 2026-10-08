@@ -25,10 +25,9 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.squareup.moshi.Moshi
-import dagger.Lazy
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
@@ -47,7 +46,7 @@ import java.net.SocketAddress
 import java.net.URI
 import javax.inject.Named
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class NetworkModule {
 
@@ -119,7 +118,7 @@ class NetworkModule {
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Url.API)
-            .callFactory { okHttpClient.get().newCall(it) }
+            .callFactory { okHttpClient.value.newCall(it) }
             .addConverterFactory(ScalarsConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(MoshiConverterFactory.create(moshi))
@@ -135,7 +134,7 @@ class NetworkModule {
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Url.API)
-            .callFactory { okHttpClient.get().newCall(it) }
+            .callFactory { okHttpClient.value.newCall(it) }
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
