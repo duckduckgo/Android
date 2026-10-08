@@ -169,13 +169,13 @@ class FailureRecoveryHandler @Inject constructor(
         val result = portProbingCoordinator.probeAndSelect(config, wgTunnelConfig)
             ?: return false.also { logcat { "Failure recovery port probe: skipping (not enough ports)" } }
 
-        // Only restart if DIFFERENT port responded
-        return if (result.probedPort != null && result.portChanged) {
-            logcat { "Failure recovery port probe: port ${result.selectedPort} responded, switching" }
+        // Switch if selected port is different (even if no probe succeeded - selector falls back to default)
+        return if (result.portChanged) {
+            logcat { "Failure recovery port probe: switching to port ${result.selectedPort}" }
             wgTunnelConfig.setWgConfig(config.replacingEndpointPort(result.selectedPort))
             true
         } else {
-            logcat { "Failure recovery port probe: current port still works or nothing responded" }
+            logcat { "Failure recovery port probe: keeping current port ${result.selectedPort}" }
             false
         }
     }
