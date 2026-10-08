@@ -1645,6 +1645,133 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
+    fun `test feature disabled when app version is above maxSupportedVersion`() = runTest {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(3)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "maxSupportedVersion": 2
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertEquals(2, testFeature.self().getRawStoredState()?.maxSupportedVersion)
+        assertFalse(testFeature.self().isEnabled())
+
+        whenever(appBuildConfig.versionCode).thenReturn(2)
+        assertTrue(testFeature.self().isEnabled())
+    }
+
+    @Test
+    fun `test sub-feature disabled when app version is above maxSupportedVersion`() = runTest {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(3)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "maxSupportedVersion": 2
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertEquals(2, testFeature.fooFeature().getRawStoredState()?.maxSupportedVersion)
+        assertFalse(testFeature.fooFeature().isEnabled())
+
+        whenever(appBuildConfig.versionCode).thenReturn(2)
+        assertTrue(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
+    fun `test sub-feature enabled only within minSupportedVersion and maxSupportedVersion range`() = runTest {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "minSupportedVersion": 2,
+                                "maxSupportedVersion": 3
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        whenever(appBuildConfig.versionCode).thenReturn(1)
+        assertFalse(testFeature.fooFeature().isEnabled())
+        whenever(appBuildConfig.versionCode).thenReturn(2)
+        assertTrue(testFeature.fooFeature().isEnabled())
+        whenever(appBuildConfig.versionCode).thenReturn(3)
+        assertTrue(testFeature.fooFeature().isEnabled())
+        whenever(appBuildConfig.versionCode).thenReturn(4)
+        assertFalse(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
+    fun `test cohort not assigned when remote feature is enabled and maxSupportedVersion not matching`() = runTest {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(3)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "state": "enabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "maxSupportedVersion": 2,
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        assertFalse(testFeature.fooFeature().enroll())
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+    }
+
+    @Test
     fun `test feature with multiple targets matching`() = runTest {
         val feature = generatedFeatureNewInstance()
 
