@@ -141,6 +141,7 @@ sealed class Content(val messageType: MessageType) {
         SPLIT_BAR_SETTINGS("SplitBarSettings"),
         BOOKMARKS_IMPORT("BookmarksImport"),
         NEW_TAB_OPTIONS("NewTabOptions"),
+        PIR("PIR"),
         ;
 
         companion object {
