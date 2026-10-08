@@ -1872,6 +1872,9 @@ class BrowserTabFragment :
             onMenuItemClicked(fireMenuItem) {
                 onFireButtonPressed()
             }
+            onMenuItemClicked(internalFeedbackMenuItem) {
+                viewModel.onInternalFeedbackSelected()
+            }
         }
         if (!tabDisplayedInCustomTabScreen) {
             bottomSheetMenu?.placeDuckAiSection(atTop = omnibar.viewMode == DuckAI)
