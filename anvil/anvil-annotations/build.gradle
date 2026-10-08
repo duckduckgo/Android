@@ -31,7 +31,7 @@ kotlin {
 }
 
 dependencies {
-    implementation Google.dagger
+    implementation "dev.zacsweers.metro:runtime:_"
     api Square.retrofit2.converter.moshi
     api "com.squareup.moshi:moshi-kotlin:_"
     api project(':privacy-config-api') // needed for ContributesRemoteFeature

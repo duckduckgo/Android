@@ -16,7 +16,7 @@
 
 package com.duckduckgo.anvil.annotations
 
-import dagger.MapKey
+import dev.zacsweers.metro.MapKey
 
 /**
  * Use [PriorityKey] in combination with @ContributesMultibinding when contributing a plugin and want
