@@ -824,8 +824,8 @@
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Uygulama Başlatıldığında Göster</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab">Son Açılan Sekme</string>
-    <string name="showOnAppLaunchOptionNewTabPage">Yeni Sekme Sayfası</string>
+    <string name="showOnAppLaunchOptionLastUsedTab">Son Kullanılan Sekme</string>
+    <string name="showOnAppLaunchOptionOpenNewTab">Yeni Sekme Sayfası</string>
     <string name="showOnAppLaunchOptionSpecificPage">Belirli Bir Sayfa</string>
 
     <!-- Privacy Dashboard -->
