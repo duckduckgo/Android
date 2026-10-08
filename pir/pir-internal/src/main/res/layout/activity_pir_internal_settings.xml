@@ -94,6 +94,14 @@
                 android:layout_height="wrap_content"
                 android:text="@string/pirDevResetFreemiumState" />
 
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/pirForceFreemiumEligibility"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/pirDevForceFreemiumEligibility"
+                app:secondaryText="@string/pirDevForceFreemiumEligibilityDescription"
+                app:showSwitch="true" />
+
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -26,6 +26,10 @@ import com.duckduckgo.pir.impl.freemium.PirFreemiumState.USED
 import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirFreemiumFirstScanResult.MATCHES_FOUND
 import com.duckduckgo.pir.impl.store.PirFreemiumFirstScanResult.NO_MATCHES
+import com.duckduckgo.subscriptions.api.Product.ITR
+import com.duckduckgo.subscriptions.api.Product.NetP
+import com.duckduckgo.subscriptions.api.Product.PIR
+import com.duckduckgo.subscriptions.api.Product.ROW_ITR
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.test.runTest
@@ -44,6 +48,7 @@ class RealPirFreemiumTest {
     private val pirRemoteFeatures = FakeFeatureToggleFactory.create(PirRemoteFeatures::class.java)
     private val subscriptions: Subscriptions = mock()
     private val dataStore: PirFreemiumDataStore = mock()
+    private val debugSettings: PirFreemiumDebugSettings = mock()
 
     private lateinit var testee: RealPirFreemium
 
@@ -52,12 +57,15 @@ class RealPirFreemiumTest {
         pirRemoteFeatures.freemium().setRawStoredState(State(enable = true))
         whenever(subscriptions.isSignedIn()).thenReturn(false)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
+        whenever(subscriptions.isEligible()).thenReturn(true)
+        whenever(subscriptions.getPurchasableProducts()).thenReturn(setOf(NetP, PIR, ITR))
         whenever(dataStore.firstScanResult).thenReturn(null)
 
         testee = RealPirFreemium(
             pirRemoteFeatures = pirRemoteFeatures,
             subscriptions = subscriptions,
             pirFreemiumDataStore = dataStore,
+            pirFreemiumDebugSettings = debugSettings,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
         )
     }
@@ -69,6 +77,54 @@ class RealPirFreemiumTest {
 
     @Test
     fun whenFreemiumFlagIsOffThenNotEligible() = runTest {
+        pirRemoteFeatures.freemium().setRawStoredState(State(enable = false))
+
+        assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
+    }
+
+    @Test
+    fun whenUserCannotPurchaseSubscriptionThenNotEligible() = runTest {
+        whenever(subscriptions.isEligible()).thenReturn(false)
+
+        assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
+    }
+
+    @Test
+    fun whenOfferedPlansDoNotIncludePirThenNotEligible() = runTest {
+        whenever(subscriptions.getPurchasableProducts()).thenReturn(setOf(NetP, ROW_ITR))
+
+        assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
+    }
+
+    @Test
+    fun whenEligibilityForcedThenEligibleWherePirCannotBePurchased() = runTest {
+        whenever(debugSettings.isEligibilityForced).thenReturn(true)
+        whenever(subscriptions.isEligible()).thenReturn(false)
+        whenever(subscriptions.getPurchasableProducts()).thenReturn(setOf(NetP, ROW_ITR))
+
+        assertEquals(ELIGIBLE, testee.getPirFreemiumState())
+    }
+
+    @Test
+    fun whenEligibilityForcedAfterAFreeScanThenUsed() = runTest {
+        whenever(debugSettings.isEligibilityForced).thenReturn(true)
+        whenever(subscriptions.getPurchasableProducts()).thenReturn(setOf(NetP, ROW_ITR))
+        whenever(dataStore.firstScanResult).thenReturn(NO_MATCHES)
+
+        assertEquals(USED, testee.getPirFreemiumState())
+    }
+
+    @Test
+    fun whenEligibilityForcedButUserHasSubscriptionThenNotEligible() = runTest {
+        whenever(debugSettings.isEligibilityForced).thenReturn(true)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+
+        assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
+    }
+
+    @Test
+    fun whenEligibilityForcedButFreemiumFlagIsOffThenNotEligible() = runTest {
+        whenever(debugSettings.isEligibilityForced).thenReturn(true)
         pirRemoteFeatures.freemium().setRawStoredState(State(enable = false))
 
         assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
