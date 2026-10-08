@@ -17,7 +17,7 @@
 package com.duckduckgo.app.onboarding.store
 
 import android.content.Context
-import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
+import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import org.junit.Assert.assertEquals

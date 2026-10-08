@@ -1,0 +1,308 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.app.onboarding.ui.page.welcome
+
+import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
+import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
+import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
+import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
+
+class DialogConfigResolver @Inject constructor(
+    private val onboardingStore: OnboardingStore,
+) {
+
+    fun resolve(
+        dialog: NewUserOnboardingActivityDialog,
+        isCustomAiFlow: Boolean,
+    ): DialogConfig? = when (dialog) {
+        NewUserOnboardingActivityDialog.ComparisonChart -> comparisonChart(ComparisonChartConfig.Browser(isCustomAiCopy = isCustomAiFlow))
+
+        NewUserOnboardingActivityDialog.AiComparisonChart -> comparisonChart(ComparisonChartConfig.Ai)
+
+        is NewUserOnboardingActivityDialog.SegmentedComparisonChart -> comparisonChart(
+            chart = dialog.chart,
+            showEmbellishment = false,
+        )
+
+        NewUserOnboardingActivityDialog.DownloadReason -> DialogConfig(
+            background = OnboardingBackground.Horizon,
+            embellishment = Embellishment.BottomWing,
+            cardArrow = CardArrowConfig.AtEnd,
+            content = ContentConfig.DownloadReason(
+                title = TextConfig.Resource(R.string.downloadReasonTitle),
+                body = TextConfig.Resource(R.string.downloadReasonBody),
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.downloadReasonPrimaryCta),
+                action = CtaAction.Submit,
+            ),
+        )
+
+        is NewUserOnboardingActivityDialog.AddressBarPosition -> DialogConfig(
+            background = OnboardingBackground.Island,
+            embellishment = Embellishment.BobbingDax,
+            cardArrow = CardArrowConfig.AtEnd,
+            content = ContentConfig.AddressBar(
+                title = TextConfig.Resource(R.string.preOnboardingAddressBarTitle),
+                initialPosition = OmnibarType.SINGLE_TOP,
+                showSplitOption = dialog.showSplitOption,
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingAddressBarOkButton),
+                action = CtaAction.Submit,
+            ),
+        )
+
+        NewUserOnboardingActivityDialog.Initial -> welcome(
+            content = welcomeContent(isCustomAiFlow),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingDaxDialog1ButtonBrandDesign),
+                action = CtaAction.Emit(NewUserOnboardingEvent.ContinueClicked),
+            ),
+        )
+
+        NewUserOnboardingActivityDialog.InitialReinstallUser -> welcome(
+            content = welcomeContent(isCustomAiFlow),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingDaxDialog1ButtonBrandDesign),
+                action = CtaAction.Emit(NewUserOnboardingEvent.ContinueClicked),
+            ),
+            secondaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingDaxDialog1SecondaryButton),
+                action = CtaAction.Emit(NewUserOnboardingEvent.SkipRequested),
+            ),
+        )
+
+        NewUserOnboardingActivityDialog.SyncRestore -> welcome(
+            content = ContentConfig.Welcome(
+                title = TextConfig.Resource(R.string.syncRestoreDialogBrandDesignTitle),
+                body1 = TextConfig.Resource(R.string.syncRestoreDialogBrandDesignBody1),
+                body2 = null,
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.syncRestoreDialogPrimaryCta),
+                action = CtaAction.Emit(NewUserOnboardingEvent.RestoreRequested),
+            ),
+            secondaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.syncRestoreDialogSecondaryCta),
+                action = CtaAction.Emit(NewUserOnboardingEvent.SkipRequested),
+            ),
+        )
+
+        NewUserOnboardingActivityDialog.WidgetPrompt -> DialogConfig(
+            background = OnboardingBackground.Horizon,
+            embellishment = Embellishment.LeftWing,
+            cardArrow = CardArrowConfig.AtEnd,
+            content = ContentConfig.WidgetPrompt(
+                title = TextConfig.Resource(R.string.experimentHomeScreenWidgetBottomSheetDialogTitle),
+                body = TextConfig.Resource(R.string.experimentHomeScreenWidgetBottomSheetDialogSubTitle),
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingWidgetPromptPrimaryCta),
+                action = CtaAction.Emit(NewUserOnboardingEvent.AddWidgetRequested),
+            ),
+            secondaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.experimentHomeScreenWidgetBottomSheetDialogGhostButton),
+                action = CtaAction.Emit(NewUserOnboardingEvent.WidgetPromptSkipped),
+            ),
+        )
+
+        is NewUserOnboardingActivityDialog.InputScreen -> DialogConfig(
+            background = dialog.background,
+            embellishment = dialog.embellishment,
+            cardArrow = CardArrowConfig.AtEnd,
+            content = ContentConfig.InputScreen(
+                title = TextConfig.Resource(R.string.preOnboardingInputScreenTitleUpdated),
+                description = TextConfig.Resource(R.string.preOnboardingInputScreenDescription),
+                initialWithAi = true,
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingInputScreenButton),
+                action = CtaAction.Submit,
+            ),
+        )
+
+        is NewUserOnboardingActivityDialog.InputScreenPreview -> DialogConfig(
+            background = OnboardingBackground.Shoreline,
+            embellishment = Embellishment.None,
+            cardArrow = CardArrowConfig.Hidden,
+            content = ContentConfig.InputScreenPreview(
+                title = TextConfig.Resource(dialog.titleRes),
+                isSearchDefault = dialog.isSearchDefault,
+                showModeToggle = dialog.showModeToggle,
+                searchSuggestions = onboardingStore.getSearchOptions(),
+                chatSuggestions = onboardingStore.getChatSuggestions(),
+            ),
+        )
+
+        is NewUserOnboardingActivityDialog.QuickSetup -> DialogConfig(
+            background = OnboardingBackground.Horizon,
+            embellishment = Embellishment.BottomWing,
+            cardArrow = CardArrowConfig.AtEnd,
+            content = ContentConfig.QuickSetup(
+                title = TextConfig.Resource(R.string.preOnboardingReinstallQuickSetupTitle),
+                showSplitOption = dialog.showSplitOption,
+                hideSetDefaultBrowserRow = dialog.hideSetDefaultBrowserRow,
+                hideAddWidgetRow = dialog.hideAddWidgetRow,
+                hideAddressBarRow = dialog.hideAddressBarRow,
+                initialAddressBarPosition = OmnibarType.SINGLE_TOP,
+                initialWithAi = true,
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(
+                    if (isCustomAiFlow) R.string.preOnboardingDaxDialog3ButtonCustomAi else R.string.preOnboardingReinstallStartBrowsing,
+                ),
+                action = CtaAction.Submit,
+            ),
+        )
+
+        is NewUserOnboardingActivityDialog.PreferenceSelector -> DialogConfig(
+            background = OnboardingBackground.Clouds,
+            embellishment = Embellishment.LeftWing,
+            cardArrow = CardArrowConfig.AtStart,
+            content = ContentConfig.PreferenceSelector(
+                title = TextConfig.Resource(dialog.titleRes),
+                rows = dialog.rows,
+                caption = dialog.caption?.let { TextConfig.Resource(it) },
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingInputScreenButton),
+                action = CtaAction.Submit,
+            ),
+        )
+
+        is NewUserOnboardingActivityDialog.SingleChoice -> DialogConfig(
+            background = OnboardingBackground.Clouds,
+            embellishment = Embellishment.LeftWing,
+            cardArrow = CardArrowConfig.AtStart,
+            content = ContentConfig.SingleChoice(
+                title = TextConfig.Resource(dialog.title),
+                body = TextConfig.Resource(dialog.body),
+                rows = dialog.options,
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingInputScreenButton),
+                action = CtaAction.Submit,
+            ),
+        )
+
+        is NewUserOnboardingActivityDialog.TogglePosition -> DialogConfig(
+            background = OnboardingBackground.Horizon,
+            embellishment = Embellishment.BottomWing,
+            cardArrow = CardArrowConfig.AtEnd,
+            content = ContentConfig.TogglePosition(
+                title = TextConfig.Resource(R.string.aiPathTogglePositionTitle),
+                pictogramLightRes = CommonR.drawable.toggle_ai_chat_default_lighttheme,
+                pictogramDarkRes = CommonR.drawable.toggle_ai_chat_default_darktheme,
+                pictogramCaption = TextConfig.Resource(R.string.aiPathTogglePositionPictogramCaption),
+                options = dialog.options,
+            ),
+        )
+
+        is NewUserOnboardingActivityDialog.DuckAiState -> DialogConfig(
+            background = OnboardingBackground.Horizon,
+            embellishment = Embellishment.BottomWing,
+            cardArrow = CardArrowConfig.AtEnd,
+            content = ContentConfig.DuckAiState(
+                title = TextConfig.Resource(R.string.noAiPathDuckAiStateTitle),
+                body = TextConfig.Resource(R.string.noAiPathDuckAiStateBody),
+                options = dialog.options,
+            ),
+        )
+
+        NewUserOnboardingActivityDialog.ImportPasswords -> DialogConfig(
+            background = OnboardingBackground.IslandWithHorizon,
+            embellishment = Embellishment.RightWing,
+            cardArrow = CardArrowConfig.AtStartMirrored,
+            content = ContentConfig.ImportPasswords(
+                title = TextConfig.Resource(R.string.preOnboardingImportPasswordsTitle),
+                body = TextConfig.Resource(R.string.preOnboardingImportPasswordsBody),
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingImportPasswordsPrimaryCta),
+                action = CtaAction.Emit(NewUserOnboardingEvent.PasswordImportRequested),
+            ),
+            secondaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingWidgetPromptSecondaryCta),
+                action = CtaAction.Emit(NewUserOnboardingEvent.PasswordImportSkipped),
+            ),
+        )
+
+        is NewUserOnboardingActivityDialog.ImportComplete -> DialogConfig(
+            background = OnboardingBackground.IslandWithHorizon,
+            embellishment = Embellishment.RightWing,
+            cardArrow = CardArrowConfig.AtStartMirrored,
+            content = ContentConfig.ImportComplete(
+                title = TextConfig.Resource(R.string.preOnboardingImportCompleteTitle),
+                parsingTitle = TextConfig.Resource(R.string.preOnboardingImportCompleteParsingTitle),
+                parsingBody = TextConfig.Resource(R.string.preOnboardingImportCompleteParsingBody),
+                failedTitle = TextConfig.Resource(R.string.preOnboardingImportCompleteFailedTitle),
+                failedRow = TextConfig.Resource(R.string.preOnboardingImportCompleteFailed),
+                result = dialog.result,
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingImportCompleteCta),
+                action = CtaAction.Emit(NewUserOnboardingEvent.ContinueClicked),
+            ),
+        )
+
+        is NewUserOnboardingActivityDialog.IntroAnimation,
+        NewUserOnboardingActivityDialog.NotificationPermission,
+        NewUserOnboardingActivityDialog.DefaultBrowserPrompt,
+        NewUserOnboardingActivityDialog.AddWidget,
+        NewUserOnboardingActivityDialog.ImportPasswordsLaunch,
+        -> null // command-only: no card to render
+    }
+
+    private fun comparisonChart(chart: ComparisonChartConfig, showEmbellishment: Boolean = true) = DialogConfig(
+        background = OnboardingBackground.Horizon,
+        embellishment = if (showEmbellishment) Embellishment.BottomWing else Embellishment.None,
+        cardArrow = if (showEmbellishment) CardArrowConfig.AtEnd else CardArrowConfig.Hidden,
+        content = ContentConfig.ComparisonChart(title = TextConfig.Resource(chart.titleRes), config = chart),
+        primaryCta = CtaConfig(
+            text = TextConfig.Resource(chart.primaryCtaTextRes),
+            action = CtaAction.Emit(NewUserOnboardingEvent.ContinueClicked),
+        ),
+    )
+
+    private fun welcome(
+        content: ContentConfig.Welcome,
+        primaryCta: CtaConfig,
+        secondaryCta: CtaConfig? = null,
+    ) = DialogConfig(
+        background = OnboardingBackground.Pond,
+        embellishment = Embellishment.WalkingDax,
+        cardArrow = CardArrowConfig.AtStart,
+        cardEntry = CardEntry.AfterBackgroundTransition,
+        content = content,
+        primaryCta = primaryCta,
+        secondaryCta = secondaryCta,
+    )
+
+    private fun welcomeContent(isCustomAiFlow: Boolean) = ContentConfig.Welcome(
+        title = TextConfig.Resource(R.string.preOnboardingWelcomeDialogTitle),
+        body1 = TextConfig.Resource(
+            if (isCustomAiFlow) R.string.preOnboardingWelcomeDialogBodyCustomAi else R.string.preOnboardingWelcomeDialogBody1,
+        ),
+        body2 = if (isCustomAiFlow) null else TextConfig.Resource(R.string.preOnboardingWelcomeDialogBody2),
+    )
+}

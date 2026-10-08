@@ -122,10 +122,10 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun whenInitializePagesCalledThenBuildConfigDrivenPageBlueprints() = runTest {
+    fun whenInitializePagesCalledThenBuildPageBlueprints() = runTest {
         testee.initializePages()
 
-        verify(pageLayout).buildConfigDrivenPageBlueprints()
+        verify(pageLayout).buildPageBlueprints()
     }
 
     private fun configureSkipperFlow() = runTest {

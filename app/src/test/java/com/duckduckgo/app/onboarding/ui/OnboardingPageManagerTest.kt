@@ -19,7 +19,7 @@ package com.duckduckgo.app.onboarding.ui
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
-import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenWelcomePageFragment
+import com.duckduckgo.app.onboarding.ui.page.welcome.WelcomePageFragment
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -34,7 +34,7 @@ class OnboardingPageManagerTest {
     private val onboardingPageBuilder: OnboardingPageBuilder = mock()
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog = mock()
-    private val configDrivenWelcomePage: ConfigDrivenWelcomePageFragment = mock()
+    private val welcomePage: WelcomePageFragment = mock()
     private val brandDesignDefaultBrowserPage: DefaultBrowserPage = mock()
 
     @Before
@@ -47,70 +47,70 @@ class OnboardingPageManagerTest {
     }
 
     @Test
-    fun whenBuildConfigDrivenPageBlueprintsAndDDGIsNotDefaultBrowserThenExpectedPagesAreTwo() {
+    fun whenBuildPageBlueprintsAndDDGIsNotDefaultBrowserThenExpectedPagesAreTwo() {
         configureDeviceSupportsDefaultBrowser()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
-        whenever(onboardingPageBuilder.buildConfigDrivenWelcomePage())
-            .thenReturn(configDrivenWelcomePage)
+        whenever(onboardingPageBuilder.buildWelcomePage())
+            .thenReturn(welcomePage)
         whenever(onboardingPageBuilder.buildDefaultBrowserPage())
             .thenReturn(brandDesignDefaultBrowserPage)
 
-        testee.buildConfigDrivenPageBlueprints()
+        testee.buildPageBlueprints()
 
         assertEquals(2, testee.pageCount())
-        assertTrue(testee.buildPage(0) is ConfigDrivenWelcomePageFragment)
+        assertTrue(testee.buildPage(0) is WelcomePageFragment)
         assertTrue(testee.buildPage(1) is DefaultBrowserPage)
     }
 
     @Test
-    fun whenBuildConfigDrivenPageBlueprintsAndDDGIsDefaultBrowserThenSinglePage() {
+    fun whenBuildPageBlueprintsAndDDGIsDefaultBrowserThenSinglePage() {
         configureDeviceSupportsDefaultBrowser()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
-        whenever(onboardingPageBuilder.buildConfigDrivenWelcomePage())
-            .thenReturn(configDrivenWelcomePage)
+        whenever(onboardingPageBuilder.buildWelcomePage())
+            .thenReturn(welcomePage)
 
-        testee.buildConfigDrivenPageBlueprints()
+        testee.buildPageBlueprints()
 
         assertEquals(1, testee.pageCount())
-        assertTrue(testee.buildPage(0) is ConfigDrivenWelcomePageFragment)
+        assertTrue(testee.buildPage(0) is WelcomePageFragment)
     }
 
     @Test
-    fun whenBuildConfigDrivenPageBlueprintsAndShouldShowRoleDialogThenSinglePage() {
+    fun whenBuildPageBlueprintsAndShouldShowRoleDialogThenSinglePage() {
         configureDeviceSupportsDefaultBrowser()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-        whenever(onboardingPageBuilder.buildConfigDrivenWelcomePage())
-            .thenReturn(configDrivenWelcomePage)
+        whenever(onboardingPageBuilder.buildWelcomePage())
+            .thenReturn(welcomePage)
 
-        testee.buildConfigDrivenPageBlueprints()
+        testee.buildPageBlueprints()
 
         assertEquals(1, testee.pageCount())
-        assertTrue(testee.buildPage(0) is ConfigDrivenWelcomePageFragment)
+        assertTrue(testee.buildPage(0) is WelcomePageFragment)
     }
 
     @Test
-    fun whenBuildConfigDrivenPageBlueprintsAndDeviceUnsupportedThenSinglePage() {
+    fun whenBuildPageBlueprintsAndDeviceUnsupportedThenSinglePage() {
         configureDeviceDoesNotSupportDefaultBrowser()
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
-        whenever(onboardingPageBuilder.buildConfigDrivenWelcomePage())
-            .thenReturn(configDrivenWelcomePage)
+        whenever(onboardingPageBuilder.buildWelcomePage())
+            .thenReturn(welcomePage)
 
-        testee.buildConfigDrivenPageBlueprints()
+        testee.buildPageBlueprints()
 
         assertEquals(1, testee.pageCount())
-        assertTrue(testee.buildPage(0) is ConfigDrivenWelcomePageFragment)
+        assertTrue(testee.buildPage(0) is WelcomePageFragment)
     }
 
     @Test
     fun whenBuildPagePositionIsPastEndThenReturnsNull() {
         configureDeviceDoesNotSupportDefaultBrowser()
-        whenever(onboardingPageBuilder.buildConfigDrivenWelcomePage())
-            .thenReturn(configDrivenWelcomePage)
+        whenever(onboardingPageBuilder.buildWelcomePage())
+            .thenReturn(welcomePage)
 
-        testee.buildConfigDrivenPageBlueprints()
+        testee.buildPageBlueprints()
 
         assertNull(testee.buildPage(1))
     }
@@ -121,11 +121,11 @@ class OnboardingPageManagerTest {
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
 
-        testee.buildConfigDrivenPageBlueprints()
+        testee.buildPageBlueprints()
         assertEquals(2, testee.pageCount())
 
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-        testee.buildConfigDrivenPageBlueprints()
+        testee.buildPageBlueprints()
         assertEquals(1, testee.pageCount())
     }
 
