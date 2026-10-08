@@ -165,7 +165,7 @@ class NativeCrashInitTest {
     }
 
     @Test
-    fun `onCrash pixel params include version, process name, and customTab`() {
+    fun `onCrash pixel params include version, process name, customTab and webview`() {
         whenever(mockAppBuildConfig.versionName).thenReturn("5.0.0")
         whenever(mockAppBuildConfig.flavor).thenReturn(BuildFlavor.FDROID)
         whenever(mockCustomTabDetector.isCustomTab()).thenReturn(true)
@@ -175,7 +175,15 @@ class NativeCrashInitTest {
 
         verify(mockPixel).enqueueFire(
             eq(APPLICATION_CRASH_NATIVE),
-            eq(mapOf("v" to "5.0.0-FDROID", "pn" to "com.example:vpn", "customTab" to "true")),
+            eq(
+                mapOf(
+                    "v" to "5.0.0-FDROID",
+                    "pn" to "com.example:vpn",
+                    "customTab" to "true",
+                    "webViewPackage" to "com.google.android.webview",
+                    "webViewVersion" to "120",
+                ),
+            ),
             any(),
             any(),
         )
