@@ -64,6 +64,13 @@ class CameraScannerOverlayView @JvmOverloads constructor(
             invalidate()
         }
 
+    var isCutoutVisible: Boolean = true
+        set(value) {
+            if (field == value) return
+            field = value
+            invalidate()
+        }
+
     override fun onSizeChanged(
         w: Int,
         h: Int,
@@ -75,8 +82,12 @@ class CameraScannerOverlayView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        canvas.drawPath(scrimPath, scrimPaint)
-        canvas.drawPath(armPath, armPaint)
+        if (isCutoutVisible) {
+            canvas.drawPath(scrimPath, scrimPaint)
+            canvas.drawPath(armPath, armPaint)
+        } else {
+            canvas.drawPaint(scrimPaint)
+        }
     }
 
     private fun rebuildGeometry() {

@@ -27,6 +27,7 @@ import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewPropertyAnimator
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.core.os.BundleCompat
@@ -35,6 +36,7 @@ import androidx.core.view.OneShotPreDrawListener
 import androidx.core.view.doOnLayout
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -42,6 +44,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.toPx
@@ -108,6 +111,15 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
 
     private var resetAnimationListener: OneShotPreDrawListener? = null
     private var cutoutAnimator: ValueAnimator? = null
+    private var introFadeOutAnimator: ViewPropertyAnimator? = null
+
+    // The flag is resolved before the view model sends any command, so this stays stable for every animation call.
+    private val introAnimation: LottieAnimationView
+        get() = if (animationViewModel.viewState.value.isImprovedSyncEnabled) {
+            binding.includeIntroV2.introAnimation
+        } else {
+            binding.includeIntro.introAnimation
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -142,17 +154,17 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
 
     override fun onPause() {
         binding.includeCamera.barcodeView.pause()
-        binding.includeIntro.introAnimation.pauseAnimation()
+        introAnimation.pauseAnimation()
 
         // onPause can fire while the view is still on screen so rewinding immediately
         // would show a visible jump. By the next pre-draw the view is guaranteed
         // to be off-screen, so the rewind is never seen.
         resetAnimationListener?.removeListener()
-        resetAnimationListener = binding.includeIntro.introAnimation.doOnPreDraw {
+        resetAnimationListener = introAnimation.doOnPreDraw {
             resetAnimationListener = null
-            val binding = _binding ?: return@doOnPreDraw
+            if (_binding == null) return@doOnPreDraw
             if (!animationViewModel.viewState.value.animationFinished) {
-                binding.includeIntro.introAnimation.progress = 0f
+                introAnimation.progress = 0f
             }
         }
 
@@ -171,6 +183,8 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
     override fun onDestroyView() {
         cutoutAnimator?.cancel()
         cutoutAnimator = null
+        introFadeOutAnimator?.cancel()
+        introFadeOutAnimator = null
         resetAnimationListener = null
         _binding = null
         super.onDestroyView()
@@ -191,15 +205,22 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
     }
 
     private fun renderIntroAnimationViewState(viewState: ViewState) {
-        binding.includeIntro.root.isVisible = viewState.viewMode == ViewMode.Intro
+        binding.includeIntro.root.isVisible = viewState.viewMode == ViewMode.Intro && !viewState.isImprovedSyncEnabled
+        renderIntroOverCamera(isVisible = viewState.viewMode == ViewMode.Intro && viewState.isImprovedSyncEnabled)
+
         binding.includeNoPermission.root.isVisible = viewState.viewMode == ViewMode.NoCameraPermission && !viewState.isImprovedSyncEnabled
         binding.includeNoPermission2.root.isVisible = viewState.viewMode == ViewMode.NoCameraPermission && viewState.isImprovedSyncEnabled
-        binding.includeCamera.root.isVisible = viewState.viewMode == ViewMode.Camera
+
         binding.includeNoHardware.root.isVisible = viewState.viewMode == ViewMode.NoCameraAvailable
+
+        val isCameraMode = viewState.viewMode == ViewMode.Camera
+        binding.includeCamera.root.isVisible = viewState.showCameraPreview
+        binding.includeCamera.scannerHeader.isInvisible = !isCameraMode
+        binding.includeCamera.scannerOverlay.isCutoutVisible = isCameraMode
 
         val isAnimationFinished = viewState.animationFinished
         if (isAnimationFinished) {
-            binding.includeIntro.introAnimation.progress = 1f
+            introAnimation.progress = 1f
         }
         binding.includeIntro.readyToScanSecondaryButton.isGone = isAnimationFinished
         binding.includeIntro.readyToScanPrimaryButton.isVisible = isAnimationFinished
@@ -210,7 +231,7 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
             PlayIntroAnimation -> {
                 resetAnimationListener?.removeListener()
                 resetAnimationListener = null
-                binding.includeIntro.introAnimation.playAnimation()
+                introAnimation.playAnimation()
             }
 
             RequestCameraPermission -> {
@@ -235,37 +256,65 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
         }
     }
 
-    private fun configureIntroAnimation() {
-        binding.includeIntro.introAnimation.addAnimatorListener(
-            object : AnimatorListenerAdapter() {
-                private var cancelled = false
+    private fun renderIntroOverCamera(isVisible: Boolean) {
+        val intro = binding.includeIntroV2.root
+        when {
+            isVisible -> {
+                introFadeOutAnimator?.cancel()
+                introFadeOutAnimator = null
+                intro.alpha = 1f
+                intro.isVisible = true
+            }
 
-                override fun onAnimationStart(animation: Animator) {
-                    cancelled = false
-                }
-
-                override fun onAnimationCancel(animation: Animator) {
-                    cancelled = true
-                }
-
-                override fun onAnimationEnd(animation: Animator) {
-                    if (!cancelled) {
-                        animationViewModel.onAnimationFinished()
+            intro.isVisible && introFadeOutAnimator == null -> {
+                introFadeOutAnimator = intro.animate()
+                    .alpha(0f)
+                    .setDuration(INTRO_FADE_OUT_DURATION_MS)
+                    .withEndAction {
+                        introFadeOutAnimator = null
+                        intro.isGone = true
+                        intro.alpha = 1f
                     }
+                    .apply { start() }
+            }
+        }
+    }
+
+    private fun configureIntroAnimation() {
+        binding.includeIntro.introAnimation.addAnimatorListener(createIntroAnimationListener())
+        binding.includeIntroV2.introAnimation.addAnimatorListener(createIntroAnimationListener())
+    }
+
+    private fun createIntroAnimationListener(): Animator.AnimatorListener {
+        return object : AnimatorListenerAdapter() {
+            private var cancelled = false
+
+            override fun onAnimationStart(animation: Animator) {
+                cancelled = false
+            }
+
+            override fun onAnimationCancel(animation: Animator) {
+                cancelled = true
+            }
+
+            override fun onAnimationEnd(animation: Animator) {
+                if (!cancelled) {
+                    animationViewModel.onAnimationFinished()
                 }
-            },
-        )
+            }
+        }
     }
 
     private fun configureReadyToScanButtons() {
         val listener = View.OnClickListener {
-            if (binding.includeIntro.introAnimation.isAnimating) {
-                binding.includeIntro.introAnimation.cancelAnimation()
+            if (introAnimation.isAnimating) {
+                introAnimation.cancelAnimation()
             }
             animationViewModel.onScanButtonClicked()
         }
         binding.includeIntro.readyToScanSecondaryButton.setOnClickListener(listener)
         binding.includeIntro.readyToScanPrimaryButton.setOnClickListener(listener)
+        binding.includeIntroV2.gotItButton.setOnClickListener(listener)
     }
 
     private fun configureGoToSettingsButton() {
@@ -290,7 +339,11 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
             }
 
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                binding.includeCamera.barcodeView.decodeSingle { barcode ->
+                binding.includeCamera.barcodeView.decodeContinuous { barcode ->
+                    // The improved flow runs the camera behind the intro, but we don't want to pick up a code
+                    // until the user has seen the instructions.
+                    if (animationViewModel.viewState.value.viewMode != ViewMode.Camera) return@decodeContinuous
+                    binding.includeCamera.barcodeView.stopDecoding()
                     syncCodeViewModel.processScannedCode(barcode.text)
                 }
                 try {
@@ -357,5 +410,7 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
 
         private const val CUTOUT_ANIMATION_START_DELAY_MS = 100L
         private const val CUTOUT_ANIMATION_DURATION_MS = 450L
+
+        private const val INTRO_FADE_OUT_DURATION_MS = 200L
     }
 }
