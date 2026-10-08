@@ -20,12 +20,12 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.httpsupgrade.impl.HttpsFalsePositivesJsonAdapter
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.Moshi
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object JsonModule {
 

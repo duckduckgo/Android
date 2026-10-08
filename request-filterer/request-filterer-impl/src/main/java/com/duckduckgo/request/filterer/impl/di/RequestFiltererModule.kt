@@ -30,13 +30,13 @@ import com.duckduckgo.request.filterer.store.RequestFiltererDatabase
 import com.duckduckgo.request.filterer.store.RequestFiltererFeatureToggleRepository
 import com.duckduckgo.request.filterer.store.RequestFiltererFeatureToggleStore
 import com.duckduckgo.request.filterer.store.RequestFiltererRepository
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object RequestFiltererModule {
 

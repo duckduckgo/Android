@@ -29,7 +29,6 @@ import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.interactions.HatchInteractionsPlugin
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
@@ -334,7 +333,7 @@ class RealReturnSessionWideEvent @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        returnSessionWideEventFeature.get().self().isEnabled()
+        returnSessionWideEventFeature.value.self().isEnabled()
     }
 
     private class SessionState(

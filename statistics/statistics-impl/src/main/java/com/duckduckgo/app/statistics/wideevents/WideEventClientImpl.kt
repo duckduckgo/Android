@@ -20,7 +20,6 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient.Companion.SAMPLE
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -156,7 +155,7 @@ class WideEventClientImpl @Inject constructor(
 
     private suspend fun isFeatureEnabled(): Boolean =
         withContext(dispatcherProvider.io()) {
-            wideEventFeature.get().self().isEnabled()
+            wideEventFeature.value.self().isEnabled()
         }
 }
 

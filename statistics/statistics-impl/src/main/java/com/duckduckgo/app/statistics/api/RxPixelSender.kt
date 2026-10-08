@@ -31,7 +31,6 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelRequiringAtbPlugin
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
@@ -207,7 +206,7 @@ class RxPixelSender @Inject constructor(
     }
 
     private fun shouldSendAtb(pixelName: String): Boolean {
-        if (!pixelSenderFeature.get().self().isEnabled()) return true
+        if (!pixelSenderFeature.value.self().isEnabled()) return true
         return pixelsRequiringAtb.any { pixelName.startsWith(it) }
     }
 

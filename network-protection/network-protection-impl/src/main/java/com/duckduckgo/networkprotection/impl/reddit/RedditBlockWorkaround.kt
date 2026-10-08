@@ -25,10 +25,10 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.asLog
@@ -134,7 +134,7 @@ interface CookieJar {
 @Qualifier
 private annotation class InternalApi
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object CookieManagerWrapperModule {
     @Provides

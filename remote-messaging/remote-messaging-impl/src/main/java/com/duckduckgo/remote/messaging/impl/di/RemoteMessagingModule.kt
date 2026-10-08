@@ -45,13 +45,13 @@ import com.duckduckgo.remote.messaging.store.RemoteMessagingCohortStoreImpl
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import com.duckduckgo.remote.messaging.store.RemoteMessagingDatabase
 import com.duckduckgo.remote.messaging.store.RemoteMessagingDatabase.Companion.ALL_MIGRATIONS
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.IntoSet
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object DomainModule {
 
@@ -73,7 +73,7 @@ object DomainModule {
     }
 }
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object DataSourceModule {
 

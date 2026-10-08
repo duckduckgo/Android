@@ -31,13 +31,13 @@ import com.duckduckgo.voice.store.SharedPreferencesVoiceSearchDataStore
 import com.duckduckgo.voice.store.VoiceSearchDataStore
 import com.duckduckgo.voice.store.VoiceSearchDatabase
 import com.duckduckgo.voice.store.VoiceSearchRepository
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object VoiceSearchModule {
     @SingleIn(AppScope::class)

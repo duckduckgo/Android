@@ -26,13 +26,13 @@ import com.duckduckgo.breakagereporting.impl.BreakageReportingRepository
 import com.duckduckgo.breakagereporting.impl.RealBreakageReportingRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object BreakageReportingModule {
 

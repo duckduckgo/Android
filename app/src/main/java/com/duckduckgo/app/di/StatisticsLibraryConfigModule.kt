@@ -20,12 +20,12 @@ import com.duckduckgo.app.statistics.config.DefaultStatisticsLibraryConfig
 import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object StatisticsLibraryConfigModule {
     @Provides

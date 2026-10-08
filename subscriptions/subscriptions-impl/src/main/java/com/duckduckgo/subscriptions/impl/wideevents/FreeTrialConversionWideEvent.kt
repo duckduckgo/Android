@@ -26,7 +26,6 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.Subscription
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
@@ -186,7 +185,7 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        subscriptionsFeature.get().sendFreeTrialConversionWideEvent().isEnabled()
+        subscriptionsFeature.value.sendFreeTrialConversionWideEvent().isEnabled()
     }
 
     private suspend fun getCurrentWideEventId(): Long? {

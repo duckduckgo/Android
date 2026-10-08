@@ -439,7 +439,6 @@ import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
-import dagger.Lazy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -4926,17 +4925,17 @@ class BrowserTabViewModel @Inject constructor(
             when {
                 // 400 errors
                 statusCode == HTTP_STATUS_CODE_BAD_REQUEST_ERROR ->
-                    httpErrorPixels.get().updateCountPixel(
+                    httpErrorPixels.value.updateCountPixel(
                         HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY,
                     )
                 // all 4xx errors apart from 400
                 statusCode / 100 == HTTP_STATUS_CODE_CLIENT_ERROR_PREFIX ->
-                    httpErrorPixels.get().updateCountPixel(
+                    httpErrorPixels.value.updateCountPixel(
                         HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_4XX_DAILY,
                     )
                 // all 5xx errors
                 statusCode / 100 == HTTP_STATUS_CODE_SERVER_ERROR_PREFIX ->
-                    httpErrorPixels.get().update5xxCountPixel(
+                    httpErrorPixels.value.update5xxCountPixel(
                         HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY,
                         statusCode,
                     )
@@ -5705,7 +5704,7 @@ class BrowserTabViewModel @Inject constructor(
         URLUtil.isNetworkUrl(text) || URLUtil.isAssetUrl(text) || URLUtil.isFileUrl(text) || URLUtil.isContentUrl(text)
 
     fun onNewTabShown() {
-        newTabPixels.get().fireNewTabDisplayed()
+        newTabPixels.value.fireNewTabDisplayed()
     }
 
     fun handleMenuRefreshAction() {

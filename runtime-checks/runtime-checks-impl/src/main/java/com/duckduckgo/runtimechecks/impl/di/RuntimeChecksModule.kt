@@ -26,13 +26,13 @@ import com.duckduckgo.runtimechecks.store.ALL_MIGRATIONS
 import com.duckduckgo.runtimechecks.store.RealRuntimeChecksRepository
 import com.duckduckgo.runtimechecks.store.RuntimeChecksDatabase
 import com.duckduckgo.runtimechecks.store.RuntimeChecksRepository
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object RuntimeChecksModule {
 

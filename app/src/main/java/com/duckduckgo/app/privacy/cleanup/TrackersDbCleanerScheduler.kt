@@ -31,10 +31,10 @@ import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.IntoSet
+import dev.zacsweers.metro.Provides
 import kotlinx.coroutines.CoroutineScope
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
@@ -43,7 +43,7 @@ import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class TrackersDbCleanerSchedulerModule {
 

@@ -19,12 +19,12 @@ package com.duckduckgo.app.di
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(
     scope = AppScope::class,
     replaces = [CoroutinesModule::class],

@@ -20,12 +20,12 @@ import android.app.Application
 import android.content.Context
 import com.duckduckgo.app.global.currentProcessName
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object ApplicationModule {
 
@@ -34,7 +34,7 @@ object ApplicationModule {
     fun provideContext(application: Application): Context = application
 }
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object ProcessNameModule {
 

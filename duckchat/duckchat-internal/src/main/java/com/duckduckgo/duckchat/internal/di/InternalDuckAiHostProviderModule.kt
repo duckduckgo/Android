@@ -20,12 +20,12 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.DuckAiHostProviderModule
 import com.duckduckgo.duckchat.internal.InternalDuckAiHostProvider
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(
     scope = AppScope::class,
     replaces = [DuckAiHostProviderModule::class],

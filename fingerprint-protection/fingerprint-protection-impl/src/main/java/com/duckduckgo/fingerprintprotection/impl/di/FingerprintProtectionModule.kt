@@ -36,13 +36,13 @@ import com.duckduckgo.fingerprintprotection.store.features.fingerprintingtempora
 import com.duckduckgo.fingerprintprotection.store.features.fingerprintingtemporarystorage.RealFingerprintingTemporaryStorageRepository
 import com.duckduckgo.fingerprintprotection.store.seed.FingerprintProtectionSeedRepository
 import com.duckduckgo.fingerprintprotection.store.seed.RealFingerprintProtectionSeedRepository
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object FingerprintProtectionModule {
 

@@ -28,13 +28,12 @@ import com.duckduckgo.app.global.db.MigrationsProvider
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.appbuildconfig.api.*
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Lazy
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 
-@Module(includes = [DaoModule::class])
+@BindingContainer(includes = [DaoModule::class])
 @ContributesTo(AppScope::class)
 object DatabaseModule {
 

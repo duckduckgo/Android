@@ -22,7 +22,6 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
@@ -199,7 +198,7 @@ class AuthClientImpl @Inject constructor(
 
     override suspend fun getJwks(): String {
         val useCache = withContext(dispatchers.io()) {
-            subscriptionsFeature.get().authApiV2JwksCache().isEnabled()
+            subscriptionsFeature.value.authApiV2JwksCache().isEnabled()
         }
 
         return if (useCache) {

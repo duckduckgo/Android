@@ -24,7 +24,6 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
@@ -116,7 +115,7 @@ class InputScreenOnboardingWideEventImpl @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        duckChatFeature.get().sendInputScreenOnboardingWideEvent().isEnabled()
+        duckChatFeature.value.sendInputScreenOnboardingWideEvent().isEnabled()
     }
 
     private suspend fun getCurrentWideEventId(): Long? {

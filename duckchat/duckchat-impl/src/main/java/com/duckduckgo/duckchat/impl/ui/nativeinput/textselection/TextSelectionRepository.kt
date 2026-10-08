@@ -20,7 +20,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.SelectionTerminalReason
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -76,11 +75,11 @@ class RealTextSelectionRepository @Inject constructor(
         val isAttached = selections.any { it.text == selection.text }
         when {
             selections.size > countBefore -> {
-                duckChatPixels.get().reportContextualSelectionAttached()
+                duckChatPixels.value.reportContextualSelectionAttached()
                 selectionJourney.onSelectionAttached(tabId, selections.size)
             }
             !isAttached -> {
-                duckChatPixels.get().reportContextualSelectionLimitReached()
+                duckChatPixels.value.reportContextualSelectionLimitReached()
                 getLimitFlow(tabId).value = true
             }
         }
@@ -98,7 +97,7 @@ class RealTextSelectionRepository @Inject constructor(
         val selections = flow.updateAndGet { current -> current.filterNot { it.id == id } }
         if (selections.size < countBefore) {
             getLimitFlow(tabId).value = false
-            duckChatPixels.get().reportContextualSelectionRemoved()
+            duckChatPixels.value.reportContextualSelectionRemoved()
             selectionJourney.onSelectionRemoved(tabId, selections.size)
         }
     }

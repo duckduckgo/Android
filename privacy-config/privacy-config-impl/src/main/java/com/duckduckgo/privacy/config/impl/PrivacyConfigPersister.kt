@@ -34,10 +34,10 @@ import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
@@ -157,7 +157,7 @@ fun PluginPoint<PrivacyFeaturePlugin>.signature(): Int {
 private annotation class PluginVariantManager
 
 @ContributesTo(AppScope::class)
-@Module
+@BindingContainer
 object VariantManagerPluginModule {
     @Provides
     @PluginVariantManager

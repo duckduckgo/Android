@@ -27,10 +27,9 @@ import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSitesDatabas
 import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSitesDatabase.Companion.ALL_MIGRATIONS
 import com.duckduckgo.malicioussiteprotection.impl.data.network.MaliciousSiteDatasetService
 import com.duckduckgo.malicioussiteprotection.impl.data.network.MaliciousSiteService
-import dagger.Lazy
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -41,7 +40,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 import javax.inject.Named
 import javax.inject.Qualifier
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class MaliciousSiteModule {
 
@@ -119,7 +118,7 @@ class MaliciousSiteModule {
         @InternalDatasetClient customClient: Lazy<OkHttpClient>,
     ): MaliciousSiteDatasetService {
         val customRetrofit = retrofit.newBuilder()
-            .callFactory { customClient.get().newCall(it) }
+            .callFactory { customClient.value.newCall(it) }
             .build()
 
         return customRetrofit.create(MaliciousSiteDatasetService::class.java)
@@ -133,7 +132,7 @@ class MaliciousSiteModule {
         @InternalClient customClient: Lazy<OkHttpClient>,
     ): MaliciousSiteService {
         val customRetrofit = retrofit.newBuilder()
-            .callFactory { customClient.get().newCall(it) }
+            .callFactory { customClient.value.newCall(it) }
             .build()
 
         return customRetrofit.create(MaliciousSiteService::class.java)

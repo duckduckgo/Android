@@ -32,7 +32,6 @@ import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.vpn.network.api.*
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
@@ -125,7 +124,7 @@ class NgVpnNetworkStack @Inject constructor(
 
         return Result.success(
             VpnTunnelConfig(
-                mtu = vpnNetwork.get().mtu(),
+                mtu = vpnNetwork.value.mtu(),
                 addresses = mapOf(
                     InetAddress.getByName("10.0.0.2") to 32,
                     InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1") to 128, // Add IPv6 Unique Local Address

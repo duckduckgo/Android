@@ -23,13 +23,13 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchUrlConverterImpl
 import com.duckduckgo.app.generalsettings.showonapplaunch.UrlConverter
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import javax.inject.Qualifier
 
 @ContributesTo(AppScope::class)
-@Module
+@BindingContainer
 object ShowOnAppLaunchDataStoreModule {
 
     private val Context.showOnAppLaunchDataStore: DataStore<Preferences> by preferencesDataStore(

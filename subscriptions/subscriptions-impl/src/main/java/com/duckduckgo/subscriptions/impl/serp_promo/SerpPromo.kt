@@ -25,12 +25,11 @@ import com.duckduckgo.cookies.api.setCookieForAllModes
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
-import dagger.Lazy
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.binding
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -61,7 +60,7 @@ class RealSerpPromo @Inject constructor(
 ) : SerpPromo, MainProcessLifecycleObserver {
 
     override suspend fun injectCookie(cookieValue: String?) {
-        if (!subscriptionsFeature.get().serpPromoCookie().isEnabled()) return
+        if (!subscriptionsFeature.value.serpPromoCookie().isEnabled()) return
 
         withContext(dispatcherProvider.io()) {
             synchronized(cookieManager) {
@@ -75,9 +74,9 @@ class RealSerpPromo @Inject constructor(
 
     override fun onStart(owner: LifecycleOwner) {
         owner.lifecycleScope.launch(dispatcherProvider.io()) {
-            if (subscriptionsFeature.get().serpPromoCookie().isEnabled()) {
+            if (subscriptionsFeature.value.serpPromoCookie().isEnabled()) {
                 kotlin.runCatching {
-                    val accessToken = subscriptions.get().getAccessToken() ?: ""
+                    val accessToken = subscriptions.value.getAccessToken() ?: ""
                     injectCookie(accessToken)
                 }
             }
@@ -98,7 +97,7 @@ interface CookieManagerWrapper {
 @Qualifier
 private annotation class InternalApi
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object CookieManagerWrapperModule {
     @Provides

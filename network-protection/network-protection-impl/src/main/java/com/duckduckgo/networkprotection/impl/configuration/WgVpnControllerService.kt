@@ -18,10 +18,9 @@ package com.duckduckgo.networkprotection.impl.configuration
 
 import android.annotation.SuppressLint
 import com.duckduckgo.di.scopes.VpnScope
-import dagger.Lazy
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import okhttp3.Dns
 import okhttp3.OkHttpClient
@@ -34,7 +33,7 @@ import retrofit2.http.Path
 import javax.inject.Named
 import javax.inject.Qualifier
 
-@Module
+@BindingContainer
 @ContributesTo(scope = VpnScope::class)
 object WgVpnControllerServiceModule {
 
@@ -62,7 +61,7 @@ object WgVpnControllerServiceModule {
         @WgInternalApi customClient: Lazy<OkHttpClient>,
     ): WgVpnControllerService {
         return retrofit.newBuilder()
-            .callFactory { customClient.get().newCall(it) }
+            .callFactory { customClient.value.newCall(it) }
             .build()
             .create(WgVpnControllerService::class.java)
     }

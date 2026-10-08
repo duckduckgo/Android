@@ -20,7 +20,6 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import java.util.concurrent.atomic.AtomicReference
@@ -42,7 +41,7 @@ class RealDuckAiTabSessionRepository @Inject constructor(
 
     override fun tryClaimEntryPointSource(tabId: String, url: String?) {
         val source = pendingEntryPointSource.get() ?: return
-        if (url == null || !duckChat.get().isDuckChatUrl(url.toUri())) return
+        if (url == null || !duckChat.value.isDuckChatUrl(url.toUri())) return
         // Only the call that actually matches consumes the pending value, so an unrelated tab
         // creation/navigation racing in between never steals or clears it from the real target.
         if (!pendingEntryPointSource.compareAndSet(source, null)) return

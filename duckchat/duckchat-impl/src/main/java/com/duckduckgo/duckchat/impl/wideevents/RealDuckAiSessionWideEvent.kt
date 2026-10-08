@@ -29,7 +29,6 @@ import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
@@ -345,7 +344,7 @@ class RealDuckAiSessionWideEvent @Inject constructor(
         }
     }
 
-    private fun isFeatureDisabled(): Boolean = !duckChatFeature.get().sendDuckAiSessionWideEvent().isEnabled()
+    private fun isFeatureDisabled(): Boolean = !duckChatFeature.value.sendDuckAiSessionWideEvent().isEnabled()
 
     private fun computeTabState(tabId: String?, url: String?): TabState {
         val nonBlankUrl = url?.takeIf { it.isNotBlank() }

@@ -23,7 +23,6 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.RealChatSuggestionsStore
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.Toggle
-import dagger.Lazy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -59,7 +58,7 @@ class DelegatingChatSuggestionsReaderTest {
             webViewReader,
             store,
             feature,
-            Lazy { pixels },
+            lazy { pixels },
             historyStore,
             coroutineTestRule.testDispatcherProvider,
         )

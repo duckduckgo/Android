@@ -23,7 +23,6 @@ import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatsDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaEntity
-import dagger.Lazy
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.test.runTest
@@ -61,7 +60,7 @@ class RealDuckAiChatStoreTest {
     @Before
     fun setup() {
         filesDir = Files.createTempDirectory("duck_ai_test").toFile()
-        val storage = RealDuckAiBridgeStorage(settings = mock(), chats = chatsDao, fileMeta = fileMetaDao, filesDirLazy = Lazy { filesDir })
+        val storage = RealDuckAiBridgeStorage(settings = mock(), chats = chatsDao, fileMeta = fileMetaDao, filesDirLazy = lazy { filesDir })
         store = RealDuckAiChatStore(storage, coroutineTestRule.testDispatcherProvider, migrationPrefs)
     }
 

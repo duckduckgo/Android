@@ -24,7 +24,6 @@ import com.duckduckgo.experiments.impl.ExperimentFiltersManagerImpl.ExperimentFi
 import com.duckduckgo.experiments.impl.ExperimentFiltersManagerImpl.ExperimentFilterType.LOCALE
 import com.duckduckgo.experiments.impl.ExperimentFiltersManagerImpl.ExperimentFilterType.SUBSCRIPTION_ELIGIBLE
 import com.duckduckgo.subscriptions.api.Subscriptions
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.runBlocking
 import java.util.Locale
@@ -64,7 +63,7 @@ class ExperimentFiltersManagerImpl @Inject constructor(
             filters[ANDROID_VERSION] = entity.filters!!.androidVersion.contains(userAndroidVersion)
         }
         if (entity.filters?.privacyProEligible != null) {
-            val isEligible = runBlocking(dispatcherProvider.io()) { subscriptions.get().isEligible() }
+            val isEligible = runBlocking(dispatcherProvider.io()) { subscriptions.value.isEligible() }
             filters[SUBSCRIPTION_ELIGIBLE] = entity.filters?.privacyProEligible == isEligible
         }
 

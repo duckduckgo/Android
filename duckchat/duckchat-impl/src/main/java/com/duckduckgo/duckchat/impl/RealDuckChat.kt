@@ -59,7 +59,6 @@ import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import dagger.Lazy
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
@@ -835,7 +834,7 @@ class RealDuckChat @Inject constructor(
         // Lets the tab that ends up hosting this entry attribute itself once it's created/navigated,
         // so a later prompt submission in it can carry this same entry point as its `source`.
         duckAiTabSessionRepository.setPendingEntryPointSource(entryPoint.toPixelValue())
-        duckChatPixels.get().sendDuckChatEntryPixel(
+        duckChatPixels.value.sendDuckChatEntryPixel(
             entryPoint = entryPoint,
             opensNewTab = opensNewTab,
             hasPrompt = hasPrompt,

@@ -32,13 +32,13 @@ import com.duckduckgo.cookies.store.RealCookiesFeatureToggleStore
 import com.duckduckgo.cookies.store.contentscopescripts.ContentScopeScriptsCookieRepository
 import com.duckduckgo.cookies.store.contentscopescripts.RealContentScopeScriptsCookieRepository
 import com.duckduckgo.di.scopes.AppScope
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object CookiesModule {
 
