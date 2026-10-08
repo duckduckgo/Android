@@ -26,26 +26,6 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 interface BrowserTrackersAnimatorHelper {
 
     /**
-     * This method takes [entities] to create an animation in [trackersAnimationView].
-     * Then it plays both animations, [shieldAnimationView] and [trackersAnimationView], at the same time.
-     * When the animations starts, views in [omnibarViews] will fade out. When animation finishes, view in [omnibarViews] will fade in.
-     *
-     * @param shieldAnimationView holder of the privacy shield animation.
-     * @param trackersAnimationView holder of the trackers animations.
-     * @param omnibarViews are the views that should be hidden while the animation is running
-     * @param entities are the tracker entities detected on the current site
-     * @param useLightAnimation if specified, determines whether to use light (true) or dark (false) animation variant. If null, uses system theme.
-     */
-    fun startTrackersAnimation(
-        context: Context,
-        shieldAnimationView: LottieAnimationView,
-        trackersAnimationView: LottieAnimationView,
-        omnibarViews: List<View>,
-        entities: List<Entity>?,
-        useLightAnimation: Boolean? = null,
-    )
-
-    /**
      * This method starts the address bar trackers animation.
      * When the animation starts, views in [omnibarViews] and [shieldViews] will fade out.
      * When animation finishes, view in [omnibarViews] and [shieldViews] will fade in.
