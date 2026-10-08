@@ -188,6 +188,8 @@ interface NativeInputManager {
 
     /** Hide/show the subscription-tier indicator in the Duck.ai header (hidden during the onboarding lock). */
     fun setDuckAiTierVisible(visible: Boolean)
+
+    fun onKeyboardAnimationChanged(isAnimating: Boolean)
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -1400,6 +1402,10 @@ class RealNativeInputManager @Inject constructor(
 
     override fun setDuckAiTierVisible(visible: Boolean) {
         if (::omnibarController.isInitialized) omnibarController.setTierVisible(visible)
+    }
+
+    override fun onKeyboardAnimationChanged(isAnimating: Boolean) {
+        if (::layoutCoordinator.isInitialized) layoutCoordinator.setImeAnimating(isAnimating)
     }
 
     private fun suppressShadow(view: View) {

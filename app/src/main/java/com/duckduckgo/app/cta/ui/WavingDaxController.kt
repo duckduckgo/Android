@@ -41,6 +41,7 @@ internal class WavingDaxController(
     private var fitArrowAnimator: ValueAnimator? = null
     private var lastDaxFits: Boolean? = null
     private var container: View? = null
+    private var imeAnimating = false
     private val fitRunnable = Runnable { container?.let { decideFit(it) } }
 
     fun applyFit(container: View) {
@@ -48,6 +49,7 @@ internal class WavingDaxController(
         container.removeCallbacks(fitRunnable)
         if (improvementsV2Enabled) {
             val height = computeDaxFitHeight(container)
+            if (deferFitDuringIme(container, height)) return
             if (height == null) {
                 applyFitResult(container, false)
             } else {
@@ -69,8 +71,18 @@ internal class WavingDaxController(
         fitArrowAnimator?.cancel()
         fitArrowAnimator = null
         lastDaxFits = null
+        imeAnimating = false
         container.removeCallbacks(fitRunnable)
         this.container = null
+    }
+
+    fun onImeAnimationStarted() {
+        imeAnimating = true
+    }
+
+    fun onImeAnimationEnded() {
+        imeAnimating = false
+        container?.let { applyFit(it) }
     }
 
     fun reset() {
@@ -92,6 +104,19 @@ internal class WavingDaxController(
         maxHeightPx = maxHeightPx,
     )
 
+    // The Dax rides the keyboard edge mid-animation, so growing it then would push it into the card.
+    internal fun deferFitDuringIme(
+        imeAnimating: Boolean,
+        daxVisible: Boolean,
+        currentHeightPx: Int,
+        newHeightPx: Int?,
+    ): Boolean = imeAnimating && newHeightPx != null && (!daxVisible || newHeightPx > currentHeightPx)
+
+    private fun deferFitDuringIme(container: View, height: Int?): Boolean {
+        val dax = container.findViewById<LottieAnimationView>(R.id.wavingDax) ?: return false
+        return deferFitDuringIme(imeAnimating, dax.isVisible, dax.layoutParams.height, height)
+    }
+
     // TODO: remove when onboardingImprovementsV2 flag is removed
     internal fun daxFits(
         daxTop: Int,
@@ -111,6 +136,7 @@ internal class WavingDaxController(
     private fun decideFit(container: View) {
         if (improvementsV2Enabled) {
             val height = computeDaxFitHeight(container)
+            if (deferFitDuringIme(container, height)) return
             if (height == null) {
                 applyFitResult(container, false)
                 return
