@@ -26,11 +26,14 @@ import com.duckduckgo.installation.impl.installer.samsungstore.SamsungStoreInsta
 import com.duckduckgo.installation.impl.installer.samsungstore.SamsungStoreInstallAttribution.Companion.SAMSUNG_STORE_PACKAGE
 import com.duckduckgo.installation.impl.installer.samsungstore.SamsungStoreInstallAttribution.Companion.VARIANT
 import com.duckduckgo.referral.api.AppReferrer
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeoutOrNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -85,6 +88,19 @@ class SamsungStoreInstallAttributionTest {
 
         verify(appReferrer).setOriginAttributeCampaign(ORIGIN)
         verifyNoInteractions(variantManager)
+    }
+
+    @Test
+    fun whenTimedOutBeforeReinstallCheckCompletesThenNothingIsTagged() = runTest {
+        whenever(installSourceExtractor.extract()).thenReturn(SAMSUNG_STORE_PACKAGE)
+        whenever(appBuildConfig.isAppReinstall()).doSuspendableAnswer {
+            delay(2_000)
+            false
+        }
+
+        withTimeoutOrNull(1_500) { testee.beforeAtbInit() }
+
+        verifyNoInteractions(variantManager, appReferrer)
     }
 
     @Test

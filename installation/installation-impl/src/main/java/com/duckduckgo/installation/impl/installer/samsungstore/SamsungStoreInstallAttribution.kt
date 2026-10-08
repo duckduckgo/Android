@@ -57,9 +57,11 @@ class SamsungStoreInstallAttribution @Inject constructor(
         val source = runCatching { installSourceExtractor.extract() }.getOrNull()
         if (source != SAMSUNG_STORE_PACKAGE) return@withContext
 
+        val isReinstall = appBuildConfig.isAppReinstall()
+
         appReferrer.setOriginAttributeCampaign(ORIGIN)
 
-        if (appBuildConfig.isAppReinstall()) {
+        if (isReinstall) {
             logcat(INFO) { "Galaxy Store returning user; origin set, variant left as ru" }
             return@withContext
         }
