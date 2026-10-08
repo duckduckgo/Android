@@ -788,6 +788,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private var autoCompleteJob = ConflatedJob()
     private var serpLogoJob = ConflatedJob()
+    private var favouriteSerpLogoUrl: String? = null
     private var pdfDownloadJob = ConflatedJob()
     private var suggestRedirectJob = ConflatedJob()
 
@@ -1001,6 +1002,7 @@ class BrowserTabViewModel @Inject constructor(
         serpLogos.favouriteSerpEasterEggLogoUrlFlow
             .flowOn(dispatchers.io())
             .onEach { favouriteUrl ->
+                favouriteSerpLogoUrl = favouriteUrl
                 val currentUrl = url
                 if (currentUrl != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentUrl)) {
                     if (favouriteUrl != null) {
@@ -2320,7 +2322,9 @@ class BrowserTabViewModel @Inject constructor(
                 queryOrFullUrl = omnibarTextForUrl(url, true),
                 omnibarText = omnibarTextForUrl(url, isFullUrlEnabled.value),
                 forceExpand = true,
-                serpLogo = null,
+                serpLogo = favouriteSerpLogoUrl
+                    ?.takeIf { duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url) }
+                    ?.let { SerpLogo.EasterEgg(logoUrl = it, isFavourite = true) },
             )
         val currentBrowserViewState = currentBrowserViewState()
         val domain = site?.domain

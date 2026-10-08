@@ -11375,6 +11375,17 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenFavouriteLogoSetAndSerpLoadsAfterNonSerpPageThenFavouriteShownBeforePageFinishes() = runTest {
+        val favouriteUrl = "https://example.com/favourite-logo.png"
+        favouriteLogoFlow.value = favouriteUrl
+        loadUrl("https://example.com/page")
+
+        loadUrl("https://duckduckgo.com/?q=test")
+
+        assertEquals(SerpLogo.EasterEgg(logoUrl = favouriteUrl, isFavourite = true), omnibarViewState().serpLogo)
+    }
+
+    @Test
     fun whenNoFavouriteLogoSetThenExtractSerpLogoIssued() = runTest {
         favouriteLogoFlow.value = null
 
