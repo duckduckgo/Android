@@ -746,10 +746,6 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Операционная система вашего устройства не доверяет сертификату безопасности сайта %1$s. Возможно, неверно задана конфигурация сайта, соединение перехвачено злоумышленником либо неправильно настроены системные часы.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Привет!<br/><br/>Быстрый и надежный браузер заказывали?]]></string>
-    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Поехали!</string>
-    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1ButtonBrandDesign">Итак, начнем!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Мы уже это проходили</string>
     <string name="preOnboardingDaxDialog2Title">Защита включена</string>
@@ -777,8 +773,6 @@
     <string name="highlightsPreOnboardingAddressBarOption2Description">Легко использовать</string>
     <string name="onboardingSearchDaxDialogTitle">Попробуйте поискать!</string>
     <string name="onboardingSearchDaxDialogDescription">Ваши поисковые запросы в DuckDuckGo всегда конфиденциальны.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"как сказать «утка» на английском?"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"как сказать «утка» по-испански"</string>
     <string name="onboardingSearchQueryOption1">как сказать «утка» на английском?</string>
     <string name="onboardingSearchQueryOption1English">как сказать «утка» по-испански</string>
     <string name="onboardingSearchDaxDialogOption2">актерский состав аватара</string>

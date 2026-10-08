@@ -714,10 +714,6 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Das Sicherheitszertifikat für %1$s wird vom Betriebssystem deines Geräts als nicht vertrauenswürdig eingestuft. Es ist möglich, dass die Website falsch konfiguriert ist, ein Angreifer deine Verbindung kompromittiert hat oder deine Systemuhr falsch ist.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hallo.<br/><br/>Bereit für einen schnelleren Browser, der dich auch noch schützt?]]></string>
-    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Machen wir das!</string>
-    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1ButtonBrandDesign">Los geht\'s!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Ich war schon einmal hier</string>
     <string name="preOnboardingDaxDialog2Title">Schutz aktiviert!</string>
@@ -745,8 +741,6 @@
     <string name="highlightsPreOnboardingAddressBarOption2Description">Leicht erreichbar</string>
     <string name="onboardingSearchDaxDialogTitle">Suche ausprobieren!</string>
     <string name="onboardingSearchDaxDialogDescription">Deine Suchen über DuckDuckGo sind immer privat.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"wie sagt man Ente auf Englisch"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"wie sagt man „Ente“ auf Spanisch"</string>
     <string name="onboardingSearchQueryOption1">wie sagt man Ente auf Englisch</string>
     <string name="onboardingSearchQueryOption1English">wie sagt man „Ente“ auf Spanisch</string>
     <string name="onboardingSearchDaxDialogOption2">Besetzung von Avatar</string>

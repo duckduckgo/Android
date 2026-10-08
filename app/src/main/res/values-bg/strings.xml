@@ -714,10 +714,6 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Операционната система на Вашето устройство не се доверява на сертификата за сигурност за %1$s. Възможно е уебсайтът да е конфигуриран грешно, хакер да е компрометирал връзката Ви или системният Ви часовник да е неправилно настроен.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Здравейте.<br/><br/>Готови ли сте за по-бърз браузър, който ви осигурява защита?]]></string>
-    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Да го направим!</string>
-    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1ButtonBrandDesign">Да започваме!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Вече знам за това</string>
     <string name="preOnboardingDaxDialog2Title">Защитите са активирани!</string>
@@ -745,8 +741,6 @@
     <string name="highlightsPreOnboardingAddressBarOption2Description">По-лесен достъп</string>
     <string name="onboardingSearchDaxDialogTitle">Опитайте търсене!</string>
     <string name="onboardingSearchDaxDialogDescription">Търсенето в DuckDuckGo винаги е поверително.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"как се нарича патицата на английски"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"как се казва „патица“ на испански"</string>
     <string name="onboardingSearchQueryOption1">как се нарича патицата на английски</string>
     <string name="onboardingSearchQueryOption1English">как се казва „патица“ на испански</string>
     <string name="onboardingSearchDaxDialogOption2">актьори в аватар</string>

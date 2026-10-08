@@ -714,10 +714,6 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">O sistema operativo do teu dispositivo não confia no certificado de segurança de %1$s. É possível que o site esteja mal configurado, que um invasor tenha comprometido a tua ligação ou que o teu relógio do sistema esteja incorreto.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Olá!<br/><br/>Pronto para um navegador mais rápido que te mantém protegido?]]></string>
-    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Vamos lá!</string>
-    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1ButtonBrandDesign">Vamos começar!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Já estive aqui antes</string>
     <string name="preOnboardingDaxDialog2Title">Proteções ativadas!</string>
@@ -745,8 +741,6 @@
     <string name="highlightsPreOnboardingAddressBarOption2Description">Fácil de aceder</string>
     <string name="onboardingSearchDaxDialogTitle">Tente uma pesquisa!</string>
     <string name="onboardingSearchDaxDialogDescription">As tuas pesquisas no DuckDuckGo são sempre privadas.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"como dizer pato em inglês"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"como dizer pato em espanhol"</string>
     <string name="onboardingSearchQueryOption1">como dizer pato em inglês</string>
     <string name="onboardingSearchQueryOption1English">como dizer pato em espanhol</string>
     <string name="onboardingSearchDaxDialogOption2">elenco de avatar</string>

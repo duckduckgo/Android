@@ -746,10 +746,6 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Operativni sustav tvog uređaja ne vjeruje sigurnosnom certifikatu za %1$s. Moguće je da je web-mjesto pogrešno konfigurirano, da je napadač ugrozio tvoju vezu ili da je sat tvog sustava netočan.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Bok.<br/><br/>Jesi li spreman za brži preglednik koji te štiti?]]></string>
-    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Učinimo to!</string>
-    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1ButtonBrandDesign">Započnimo!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Već sam bio ovdje</string>
     <string name="preOnboardingDaxDialog2Title">Zaštite su aktivirane!</string>
@@ -777,8 +773,6 @@
     <string name="highlightsPreOnboardingAddressBarOption2Description">Lako dostupno</string>
     <string name="onboardingSearchDaxDialogTitle">Isprobajte pretragu!</string>
     <string name="onboardingSearchDaxDialogDescription">Tvoja su DuckDuckGo pretraživanja uvijek privatna.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"kako se kaže patka na engleskom"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"kako se kaže \"patka\" na španjolskom"</string>
     <string name="onboardingSearchQueryOption1">kako se kaže patka na engleskom</string>
     <string name="onboardingSearchQueryOption1English">kako se kaže \"patka\" na španjolskom</string>
     <string name="onboardingSearchDaxDialogOption2">uloge u filmu Avatar</string>

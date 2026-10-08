@@ -11,8 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="start|center_vertical"
-        app:icon="@drawable/ic_find_search_16"
-        tools:text="@string/onboardingSearchDaxDialogOption1" />
+        app:icon="@drawable/ic_find_search_16" />
 
     <com.duckduckgo.app.onboarding.ui.view.OnboardingSelectionButton
         android:id="@+id/brandDesignOption2"
