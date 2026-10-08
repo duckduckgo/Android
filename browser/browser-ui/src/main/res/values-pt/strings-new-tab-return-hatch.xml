@@ -21,9 +21,12 @@
     <string name="newTabReturnHatchFireTabTitle">Último separador Fire utilizado</string>
     <string name="newTabReturnHatchTabClosed">Separador fechado</string>
     <string name="newTabReturnHatchUndo">Anular</string>
-    <string name="hatchMenuReturnTab">Regressar ao separador</string>
+    <string name="hatchMenuReturnToLastUsedTab">Regressar ao último separador utilizado</string>
     <string name="hatchMenuAfterInactivitySettings">Após inatividade</string>
-    <string name="hatchMenuCloseTab">Fechar separador</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Abrir novo separador</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Último separador utilizado</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="&apos;%1$s&apos; is the menu row label (&apos;After Inactivity&apos;) and &apos;%2$s&apos; is the current destination, e.g. &apos;After Inactivity, Open New Tab&apos;">%1$s, %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Fechar o último separador utilizado</string>
     <string name="hatchMenuBurnTab">Eliminar separador</string>
-    <string name="hatchMenuHideShortcut">Ocultar atalho</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="&apos;Return to&apos; refers to this menu&apos;s own &apos;Return to…&apos; label shown above this item">Ocultar atalho de \"Regressar a\"</string>
 </resources>
