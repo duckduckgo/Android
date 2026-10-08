@@ -160,8 +160,9 @@ class TermsFooterPluginTest {
         val row = (footer.view as ViewGroup).getChildAt(0)
 
         val horizontal = context.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_4)
-        val vertical = context.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_3)
+        val vertical = context.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
         assertEquals(listOf(horizontal, vertical, horizontal, vertical), listOf(row.paddingStart, row.paddingTop, row.paddingEnd, row.paddingBottom))
+        assertEquals(context.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_7), row.minimumHeight)
     }
 
     @Test
