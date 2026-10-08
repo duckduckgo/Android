@@ -63,7 +63,6 @@ dependencies {
     implementation Square.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation "com.squareup.moshi:moshi-adapters:_"
-    implementation Google.dagger
     implementation AndroidX.core.ktx
     implementation AndroidX.recyclerView
     implementation AndroidX.appCompat

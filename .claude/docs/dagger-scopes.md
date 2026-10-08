@@ -1,7 +1,7 @@
 # Dagger scope hierarchy and injection crashes
 
 The hierarchy determines what dependencies each scope can access, where its factory lookup happens,
-and which `HasDaggerInjector` performs the injection. It is encoded implicitly in the Anvil-generated
+and which `HasDaggerInjector` performs the injection. It is encoded implicitly in the KSP-generated
 `_SubComponent` files — this diagram is the source of truth:
 
 ```
@@ -25,7 +25,7 @@ DuckDuckGoApplication [HasDaggerInjector]
 `ReceiverScope`, `ServiceScope` and `VpnScope` factories are looked up through
 `DuckDuckGoApplication.injectorFactoryMap`.
 
-The parent scope follows from the scope passed to `@InjectWith`; Anvil generates the `ParentComponent`
+The parent scope follows from the scope passed to `@InjectWith`; our KSP codegen generates the `ParentComponent`
 and its `@ContributesTo`. You never set it manually.
 
 ## Debugging "could not find dagger component"
@@ -34,8 +34,3 @@ and its `@ContributesTo`. You never set it manually.
   `@InjectWith(FragmentScope::class)` or `@InjectWith(ViewScope::class)`.
 - Crash in a Receiver/Service injection → check `DuckDuckGoApplication.injectorFactoryMap`; the class
   is missing `@InjectWith(ReceiverScope::class)` or `@InjectWith(ServiceScope::class)`.
-
-## Member injection into a transitively-typed field
-
-Anvil reporting `Couldn't resolve ClassReference … File is unknown` for an `@Inject` field means the
-field's type is only available transitively. Add the module that declares it as a direct dependency.

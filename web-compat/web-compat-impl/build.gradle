@@ -41,9 +41,6 @@ dependencies {
     implementation AndroidX.room.rxJava2
     testImplementation AndroidX.room.testing
 
-    // Dagger
-    implementation Google.dagger
-
     implementation KotlinX.coroutines.core
 
     testImplementation(KotlinX.coroutines.test) {

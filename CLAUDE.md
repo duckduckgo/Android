@@ -6,8 +6,7 @@ providing built-in search, tracker blocking, HTTPS enforcement and other privacy
 **Versions** (SDK levels, Kotlin, Gradle, libraries) live in the build files — don't restate them here:
 `min_sdk` / `target_sdk` / `compile_sdk` in `build.gradle`, `version.kotlin` in `versions.properties`,
 and the Gradle version in `gradle/wrapper/gradle-wrapper.properties`.
-**Build:** AGP via refreshVersions. DI is **Metro** (Anvil/Dagger annotations are still
-read through Metro interop while they are migrated; see `build.gradle`).
+**Build:** AGP via refreshVersions. DI is **Metro** (KSP generators in `:anvil-ksp`; see `.claude/docs/architecture.md`).
 **Toolchain:** Kotlin JVM target 17; building requires **JDK 21** (Metro compiler plugin).
 
 Notable libraries: Room, Retrofit/OkHttp/Moshi, Coroutines, Jetpack Compose (selective), WorkManager,
@@ -42,7 +41,7 @@ what you remember of it.
 
 | Read | When |
 |---|---|
-| `.claude/docs/architecture.md` | **planning or implementing** any new code, refactoring, or module changes — `-api`/`-impl` structure, Dagger/Anvil scopes, navigation, coroutine job patterns |
+| `.claude/docs/architecture.md` | **planning or implementing** any new code, refactoring, or module changes — `-api`/`-impl` structure, DI scopes, navigation, coroutine job patterns |
 | `.claude/docs/android-design-system.md` | **planning or implementing** any UI — which ADS component to use, colors, spacing; raw Android/Material widgets are lint-blocked |
 | `.claude/docs/contributions.md` | **planning** a change that touches a `-api` surface or spans multiple modules — it needs an approved API Proposal and/or Tech Design, and that has to be raised before implementation, not at PR time. Also read it when naming a branch, writing a commit, or opening a PR |
 | `.claude/docs/lateinit-hazards.md` | writing or reviewing any `lateinit var`, especially `@Inject lateinit var` in a View |

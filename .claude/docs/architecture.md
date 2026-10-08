@@ -2,7 +2,7 @@
 
 ## Core Principle: Decoupling Over Everything
 
-Features communicate through `-api` modules only. An `-impl` module must never depend on another `-impl` module. If two features need to interact, one exposes an interface in its `-api`, the other injects it. This is non-negotiable — it prevents circular dependencies and keeps the Dagger graph clean.
+Features communicate through `-api` modules only. An `-impl` module must never depend on another `-impl` module. If two features need to interact, one exposes an interface in its `-api`, the other injects it. This is non-negotiable — it prevents circular dependencies and keeps the Metro graph clean.
 
 ---
 
@@ -19,7 +19,7 @@ my-feature/
 - `my-feature-impl` depends on `my-feature-api`
 - `my-feature-impl` depends on other features' `-api` modules only — never their `-impl`
 - `settings.gradle` auto-discovers modules 2 levels deep — no manual `include` needed
-- New `-impl` modules must be added to `app/build.gradle` to enter the Dagger graph
+- New `-impl` modules must be added to `app/build.gradle` to enter the Metro graph
 - UI resources (layouts, drawables, strings) live inside the `-impl` module, not a separate UI module
 - String resource files are named by feature: `strings-my-feature.xml` (not `strings.xml`)
 
@@ -30,7 +30,7 @@ Enforced in the root `build.gradle`. Violations fail the build.
 | Rule | Detail |
 |---|---|
 | API modules cannot use Metro | No `dev.zacsweers.metro` plugin in `-api` modules |
-| API modules cannot depend on Dagger | Except `:feature-toggles-api` and `:settings-api` |
+| No module can depend on Dagger or Anvil | Metro is the DI framework |
 | API modules cannot depend on other APIs | Except `:feature-toggles-api`, `:navigation-api`, `:js-messaging-api` |
 | API modules cannot depend on `:di` | DI wiring belongs in `-impl` |
 | Only `:app` depends on `-impl` modules | Features communicate through `-api` only |
@@ -45,7 +45,7 @@ Enforced in the root `build.gradle`. Violations fail the build.
 The `lint-rules` module fails the build on these (UI/design-system rules are covered separately):
 
 - Hardcoded coroutine dispatchers — inject them instead
-- `@Singleton` — use `@SingleInstanceIn`
+- `@Singleton` — use `@SingleIn`
 - Extending `Fragment` directly — use `DuckDuckGoFragment`
 - `lifecycleScope` inside a Fragment — use `viewLifecycleOwner.lifecycleScope`
 - Registering lifecycle observers directly — drive state from a ViewModel
@@ -58,7 +58,7 @@ The `lint-rules` module fails the build on these (UI/design-system rules are cov
 
 ---
 
-## Dependency Injection (Anvil / Dagger)
+## Dependency Injection (Metro)
 
 ### Scopes
 
@@ -72,25 +72,25 @@ The `lint-rules` module fails the build on these (UI/design-system rules are cov
 | `ServiceScope` | `Service` implementations |
 | `VpnScope` | VPN-process-specific services and receivers |
 
-Use `@SingleInstanceIn(AppScope::class)` — **not** `@Singleton` (javax). `@Singleton` conflicts with AppComponent's scope.
+Use `@SingleIn(AppScope::class)` — **not** `@Singleton` (javax). `@Singleton` conflicts with AppComponent's scope.
 
 ### Common annotations
 
 ```kotlin
 // Singleton binding
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealFoo @Inject constructor(...) : Foo
 
-// Override an existing binding (higher rank wins)
-@ContributesBinding(AppScope::class, rank = 1)
+// Override another binding of the same type (highest priority wins; default Int.MIN_VALUE)
+@ContributesBinding(AppScope::class, priority = Int.MAX_VALUE)
 
 // ViewModel
 @ContributesViewModel(FragmentScope::class)
 class FooViewModel @Inject constructor(...) : ViewModel()
 
-// Plugin contribution (multibinding)
-@ContributesMultibinding(AppScope::class)
+// Plugin contribution (multibinding). For an ordered plugin, use @ContributesIntoMap with @PriorityKey(n) instead
+@ContributesIntoSet(AppScope::class)
 class MyPlugin @Inject constructor(...) : SomePlugin
 
 // Remote feature flag

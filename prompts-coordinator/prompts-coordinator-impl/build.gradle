@@ -50,9 +50,6 @@ dependencies {
     implementation project(':di')
     api AndroidX.dataStore.preferences
 
-    // Dagger
-    implementation Google.dagger
-
     implementation AndroidX.lifecycle.common
     implementation AndroidX.lifecycle.process
 

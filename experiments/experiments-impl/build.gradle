@@ -49,8 +49,6 @@ dependencies {
 
     implementation KotlinX.coroutines.core
 
-    implementation Google.dagger
-
     implementation Square.retrofit2.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
 

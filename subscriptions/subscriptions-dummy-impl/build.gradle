@@ -31,7 +31,6 @@ dependencies {
     implementation project(':common-utils')
 
     implementation KotlinX.coroutines.android
-    implementation Google.dagger
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

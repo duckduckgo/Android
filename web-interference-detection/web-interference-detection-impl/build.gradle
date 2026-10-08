@@ -34,8 +34,6 @@ dependencies {
 
     api AndroidX.dataStore.preferences
 
-    implementation Google.dagger
-
     implementation KotlinX.coroutines.core
 
     testImplementation(KotlinX.coroutines.test) {

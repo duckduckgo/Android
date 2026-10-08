@@ -32,7 +32,6 @@ dependencies {
     implementation "com.squareup.logcat:logcat:_"
     implementation "com.duckduckgo.netguard:netguard-android:_"
 
-    implementation Google.dagger
     implementation AndroidX.core.ktx
 
     // Testing dependencies

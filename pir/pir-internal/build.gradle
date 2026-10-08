@@ -37,6 +37,5 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation AndroidX.webkit
     implementation Google.android.material
-    implementation Google.dagger
     implementation AndroidX.room.runtime
 }

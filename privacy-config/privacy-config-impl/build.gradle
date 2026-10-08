@@ -53,7 +53,6 @@ dependencies {
 
     implementation Square.retrofit2.converter.moshi
     implementation Square.okHttp3.okHttp
-    implementation Google.dagger
     implementation AndroidX.core.ktx
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2

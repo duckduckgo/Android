@@ -28,7 +28,6 @@ dependencies {
 
     implementation AndroidX.activity
     implementation AndroidX.appCompat
-    implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
 
     // Testing dependencies

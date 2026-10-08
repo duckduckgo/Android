@@ -44,7 +44,6 @@ dependencies {
     implementation project(':broken-site-api')
     api AndroidX.dataStore.preferences
 
-    implementation Google.dagger
     implementation AndroidX.appCompat
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx

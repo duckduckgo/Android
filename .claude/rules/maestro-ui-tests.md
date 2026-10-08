@@ -42,7 +42,7 @@ Maestro tests can be run individually by supplying the filename or folder (to ru
 - the flag is `--include-tags`; `--tag` and `--tags` are not valid Maestro flags
 
 ## Troubleshooting
-- If you encounter Dagger build errors at compile time, try the more expensive build step of including `--no-build-cache clean` after `.gradlew` and before the other build commands.
+- If you encounter Metro build errors at compile time, try the more expensive build step of including `--no-build-cache clean` after `.gradlew` and before the other build commands.
 
 ## Maestro Development Guidelines
 

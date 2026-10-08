@@ -59,7 +59,6 @@ dependencies {
     implementation project(':content-scope-scripts-api')
     implementation project(':js-messaging-api')
 
-    implementation Google.dagger
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
     implementation "com.squareup.logcat:logcat:_"

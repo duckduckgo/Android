@@ -62,10 +62,6 @@ dependencies {
     implementation AndroidX.lifecycle.liveDataKtx
     implementation AndroidX.work.runtimeKtx
 
-    // Dagger
-    compileOnly "org.glassfish:javax.annotation:10.0-b28"
-    implementation Google.dagger
-
     implementation KotlinX.coroutines.core
     testImplementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023

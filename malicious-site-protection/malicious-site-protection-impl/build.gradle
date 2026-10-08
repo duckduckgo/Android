@@ -49,7 +49,6 @@ dependencies {
     implementation KotlinX.coroutines.android
     implementation AndroidX.core.ktx
     implementation AndroidX.work.runtimeKtx
-    implementation Google.dagger
 
     implementation project(path: ':common-utils')
 
