@@ -120,13 +120,13 @@ class WgVpnNetworkStackTest {
         wgConfig = Config.parse(BufferedReader(StringReader(wgQuickConfig)))
 
         wgVpnNetworkStack = WgVpnNetworkStack(
-            { wgProtocol },
-            { wgTunnel },
-            { wgTunnelConfig },
-            { networkProtectionRepository },
+            lazy { wgProtocol },
+            lazy { wgTunnel },
+            lazy { wgTunnelConfig },
+            lazy { networkProtectionRepository },
             netPDefaultConfigProvider,
             currentTimeProvider,
-            { netpPixels },
+            lazy { netpPixels },
             privateDnsProvider,
             mock(),
             netPSettingsLocalConfig,

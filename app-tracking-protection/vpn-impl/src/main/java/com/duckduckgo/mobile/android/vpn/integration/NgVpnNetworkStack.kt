@@ -291,7 +291,7 @@ class NgVpnNetworkStack @Inject constructor(
 
     private fun Lazy<VpnNetwork>.safeGet(): Result<VpnNetwork> {
         return runCatching {
-            get()
+            value
         }.onFailure {
             logcat(ERROR) { it.asLog() }
             Result.failure<VpnNetwork>(it)

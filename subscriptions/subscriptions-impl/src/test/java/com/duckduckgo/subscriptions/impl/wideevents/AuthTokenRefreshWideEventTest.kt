@@ -63,9 +63,9 @@ class AuthTokenRefreshWideEventTest {
 
         authWideEvent = AuthTokenRefreshWideEventImpl(
             wideEventClient = wideEventClient,
-            subscriptionsFeature = { subscriptionsFeature },
+            subscriptionsFeature = lazy { subscriptionsFeature },
             dispatchers = coroutineRule.testDispatcherProvider,
-            networkProtectionState = { networkProtectionState },
+            networkProtectionState = lazy { networkProtectionState },
             processName = "main",
         )
     }

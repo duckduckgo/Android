@@ -61,7 +61,7 @@ class SyncSetupWideEventImplTest {
 
         wideEvent = SyncSetupWideEventImpl(
             wideEventClient = wideEventClient,
-            syncFeature = { syncFeature },
+            syncFeature = lazy { syncFeature },
             dispatchers = coroutineRule.testDispatcherProvider,
             buildConfig = buildConfig,
         )
