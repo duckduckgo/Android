@@ -356,7 +356,6 @@ class OmnibarLayout @JvmOverloads constructor(
     internal val fireIconImageView: ImageView by lazy { findViewById(R.id.fireIconImageView) }
     internal val placeholder: View by lazy { findViewById(R.id.placeholder) }
     internal val voiceSearchButton: ImageView by lazy { findViewById(R.id.voiceSearchButton) }
-    internal val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
     internal val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
     internal val omniBarButtonTransitionSet: TransitionSet by lazy {
         TransitionSet().apply {
@@ -1604,7 +1603,6 @@ class OmnibarLayout @JvmOverloads constructor(
         findInPage.findIcon.isSaveEnabled = false
 
         newCustomTabToolbarContainer.customTabCloseIcon.isSaveEnabled = false
-        newCustomTabToolbarContainer.trackersAnimation.isSaveEnabled = false
         newCustomTabToolbarContainer.customTabShieldIcon.isSaveEnabled = false
         newCustomTabToolbarContainer.addressBarTrackersBlockedAnimationShieldIcon.isSaveEnabled = false
         newCustomTabToolbarContainer.customTabDuckPlayerIcon.isSaveEnabled = false
