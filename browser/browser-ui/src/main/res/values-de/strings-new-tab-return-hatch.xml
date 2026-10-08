@@ -21,9 +21,12 @@
     <string name="newTabReturnHatchFireTabTitle">Zuletzt verwendeter Fire-Tab</string>
     <string name="newTabReturnHatchTabClosed">Tab geschlossen</string>
     <string name="newTabReturnHatchUndo">Rückgängig machen</string>
-    <string name="hatchMenuReturnTab">Zurück zum Tab</string>
+    <string name="hatchMenuReturnToLastUsedTab">Zurück zum zuletzt verwendeten Tab</string>
     <string name="hatchMenuAfterInactivitySettings">Nach Inaktivität</string>
-    <string name="hatchMenuCloseTab">Tab schließen</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Neuen Tab öffnen</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Zuletzt verwendeter Tab</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="&apos;%1$s&apos; is the menu row label (&apos;After Inactivity&apos;) and &apos;%2$s&apos; is the current destination, e.g. &apos;After Inactivity, Open New Tab&apos;">%1$s, %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Zuletzt verwendeten Tab schließen</string>
     <string name="hatchMenuBurnTab">Tab löschen</string>
-    <string name="hatchMenuHideShortcut">Shortcut ausblenden</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="&apos;Return to&apos; refers to this menu&apos;s own &apos;Return to…&apos; label shown above this item">Verknüpfung „Zurück zu“ ausblenden</string>
 </resources>
