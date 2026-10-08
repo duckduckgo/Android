@@ -824,8 +824,8 @@
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Megjelenítés az alkalmazás indításakor</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab">Utoljára megnyitott lap</string>
-    <string name="showOnAppLaunchOptionNewTabPage">„Új lap” oldal</string>
+    <string name="showOnAppLaunchOptionLastUsedTab">Utoljára használt lap</string>
+    <string name="showOnAppLaunchOptionOpenNewTab">„Új lap” oldal</string>
     <string name="showOnAppLaunchOptionSpecificPage">Speciális oldal</string>
 
     <!-- Privacy Dashboard -->
