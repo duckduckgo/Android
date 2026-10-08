@@ -76,12 +76,14 @@ class ContributesActivePluginPointProcessor(
 
         private val APP_SCOPE_FQ = "com.duckduckgo.di.scopes.AppScope"
 
-        // Anvil/Dagger annotations
+        // Metro and project annotations
         private val CONTRIBUTES_PLUGIN_POINT = ClassName("com.duckduckgo.anvil.annotations", "ContributesPluginPoint")
         private val CONTRIBUTES_REMOTE_FEATURE = ClassName("com.duckduckgo.anvil.annotations", "ContributesRemoteFeature")
-        private val CONTRIBUTES_MULTIBINDING = ClassName("com.squareup.anvil.annotations", "ContributesMultibinding")
-        private val CONTRIBUTES_BINDING = ClassName("com.squareup.anvil.annotations", "ContributesBinding")
-        private val CONTRIBUTES_TO = ClassName("com.squareup.anvil.annotations", "ContributesTo")
+        private val CONTRIBUTES_INTO_SET = ClassName("dev.zacsweers.metro", "ContributesIntoSet")
+        private val CONTRIBUTES_INTO_MAP = ClassName("dev.zacsweers.metro", "ContributesIntoMap")
+        private val CONTRIBUTES_BINDING = ClassName("dev.zacsweers.metro", "ContributesBinding")
+        private val CONTRIBUTES_TO = ClassName("dev.zacsweers.metro", "ContributesTo")
+        private val BINDING = ClassName("dev.zacsweers.metro", "binding")
         private val PRIORITY_KEY = ClassName("com.duckduckgo.anvil.annotations", "PriorityKey")
         private val REMOTE_FEATURE_STORE_NAMED = ClassName("com.duckduckgo.feature.toggles.api", "RemoteFeatureStoreNamed")
 
@@ -105,9 +107,9 @@ class ContributesActivePluginPointProcessor(
         private val MOSHI = ClassName("com.squareup.moshi", "Moshi")
         private val JSON_ADAPTER = ClassName("com.squareup.moshi", "JsonAdapter")
 
-        // Dagger
-        private val MODULE = ClassName("dagger", "Module")
-        private val BINDS = ClassName("dagger", "Binds")
+        // Metro
+        private val MODULE = ClassName("dev.zacsweers.metro", "BindingContainer")
+        private val BINDS = ClassName("dev.zacsweers.metro", "Binds")
         private val INJECT = ClassName("javax.inject", "Inject")
         private val SUPPRESS = ClassName("kotlin", "Suppress")
     }
@@ -683,20 +685,15 @@ class ContributesActivePluginPointProcessor(
             // Active plugin wrapper
             .addType(
                 TypeSpec.classBuilder(pluginClassName).apply {
+                    val keyed = priority != null && priority != 0
                     addAnnotation(
-                        AnnotationSpec.builder(CONTRIBUTES_MULTIBINDING)
+                        AnnotationSpec.builder(if (keyed) CONTRIBUTES_INTO_MAP else CONTRIBUTES_INTO_SET)
                             .addMember("scope = %T::class", scopeClassName)
-                            .addMember("boundType = %T::class", boundTypeClassName)
+                            .addMember("binding = %T<%T>()", BINDING, boundTypeClassName)
                             .build(),
                     )
-                    priority?.let { p ->
-                        if (p != 0) {
-                            addAnnotation(
-                                AnnotationSpec.builder(PRIORITY_KEY)
-                                    .addMember("%L", p.toString())
-                                    .build(),
-                            )
-                        }
+                    if (keyed) {
+                        addAnnotation(AnnotationSpec.builder(PRIORITY_KEY).addMember("%L", priority.toString()).build())
                     }
                     primaryConstructor(
                         FunSpec.constructorBuilder()
