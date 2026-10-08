@@ -32,7 +32,6 @@ import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.Subscription
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
-import javax.inject.Provider
 
 interface NetPNotificationActions {
     fun getReportIssueNotificationAction(context: Context): NotificationCompat.Action
@@ -42,7 +41,7 @@ interface NetPNotificationActions {
 @ContributesBinding(AppScope::class)
 class RealNetPNotificationActions @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
-    @NetpBreakageCategories private val breakageCategories: Provider<List<AppBreakageCategory>>,
+    @NetpBreakageCategories private val breakageCategories: () -> List<AppBreakageCategory>,
     private val subscriptionUnifiedFeedback: SubscriptionUnifiedFeedback,
 ) : NetPNotificationActions {
     override fun getReportIssueNotificationAction(context: Context): NotificationCompat.Action {
@@ -58,7 +57,7 @@ class RealNetPNotificationActions @Inject constructor(
                     launchFrom = "netp",
                     appName = "",
                     appPackageId = "",
-                    breakageCategories = breakageCategories.get(),
+                    breakageCategories = breakageCategories(),
                 ),
             )
         }

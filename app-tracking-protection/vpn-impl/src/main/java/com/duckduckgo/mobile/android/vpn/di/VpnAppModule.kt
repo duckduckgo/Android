@@ -33,7 +33,6 @@ import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.sync.Mutex
-import javax.inject.Provider
 import javax.inject.Qualifier
 
 @BindingContainer
@@ -42,7 +41,7 @@ object VpnAppModule {
     @Provides
     fun provideVpnDatabaseCallbackProvider(
         context: Context,
-        vpnDatabase: Provider<VpnDatabase>,
+        vpnDatabase: () -> VpnDatabase,
         dispatcherProvider: DispatcherProvider,
         @AppCoroutineScope coroutineScope: CoroutineScope,
         @AppTpBlocklistUpdateMutex mutex: Mutex,

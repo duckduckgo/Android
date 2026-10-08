@@ -37,7 +37,6 @@ import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Provider
 
 interface VpnFeatureRemover {
     fun manuallyRemoveFeature()
@@ -51,8 +50,8 @@ class DefaultVpnFeatureRemover @Inject constructor(
     private val notificationManager: NotificationManagerCompat,
     private val vpnDatabase: VpnDatabase,
     private val appTrackerBlockingRepository: AppTrackerBlockingStatsRepository,
-    // we use the Provider to avoid a cycle dependency
-    private val workManagerProvider: Provider<WorkManager>,
+    // we inject a provider function to avoid a cycle dependency
+    private val workManagerProvider: () -> WorkManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : VpnFeatureRemover {
@@ -68,7 +67,7 @@ class DefaultVpnFeatureRemover @Inject constructor(
     }
 
     private fun disableNotificationReminders() {
-        val workManager = workManagerProvider.get()
+        val workManager = workManagerProvider()
         workManager.cancelAllWorkByTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
         workManager.cancelAllWorkByTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
         workManager.cancelAllWorkByTag(WORKER_VPN_DAILY_NOTIFICATION_NAME)

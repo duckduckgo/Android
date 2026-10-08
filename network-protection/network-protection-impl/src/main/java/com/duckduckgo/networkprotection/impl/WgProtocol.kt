@@ -29,7 +29,6 @@ import logcat.LogPriority.ERROR
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
-import javax.inject.Provider
 
 interface WgProtocol {
     fun startWg(
@@ -47,7 +46,7 @@ interface WgProtocol {
 class RealWgProtocol @Inject constructor(
     private val goBackend: GoBackend,
     private val appBuildConfig: AppBuildConfig,
-    private val socketProtector: Provider<VpnSocketProtector>,
+    private val socketProtector: () -> VpnSocketProtector,
 ) : WgProtocol {
     private var wgTunnel: Int = -1
 
@@ -82,8 +81,8 @@ class RealWgProtocol @Inject constructor(
             Result.failure(java.lang.IllegalStateException("Wireguard failed to connect to backend"))
         } else {
             logcat { "Protecting V4 and V6 wg-sockets" }
-            socketProtector.get().protect(goBackend.wgGetSocketV4(wgTunnel))
-            socketProtector.get().protect(goBackend.wgGetSocketV6(wgTunnel))
+            socketProtector().protect(goBackend.wgGetSocketV4(wgTunnel))
+            socketProtector().protect(goBackend.wgGetSocketV6(wgTunnel))
             Result.success(Unit)
         }
     }

@@ -32,6 +32,7 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.LambdaTypeName
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
@@ -55,7 +56,6 @@ class ContributesViewModelProcessor(
         private val CONTRIBUTES_INTO_SET_CLASS = ClassName("dev.zacsweers.metro", "ContributesIntoSet")
         private val VIEW_MODEL_FACTORY_PLUGIN_CLASS = ClassName("com.duckduckgo.common.utils.plugins.view_model", "ViewModelFactoryPlugin")
         private val VIEW_MODEL_CLASS = ClassName("androidx.lifecycle", "ViewModel")
-        private val PROVIDER_CLASS = ClassName("javax.inject", "Provider")
         private val INJECT_CLASS = ClassName("javax.inject", "Inject")
     }
 
@@ -127,8 +127,8 @@ class ContributesViewModelProcessor(
 
         val vmClassName = classDeclaration.toClassName()
 
-        // Build constructor with Provider<ViewModel> parameter
-        val providerType = PROVIDER_CLASS.parameterizedBy(vmClassName)
+        // Build constructor with () -> ViewModel parameter
+        val providerType = LambdaTypeName.get(returnType = vmClassName)
 
         val viewModelProviderProperty = PropertySpec.builder("viewModelProvider", providerType)
             .addModifiers(KModifier.PRIVATE)
@@ -155,7 +155,7 @@ class ContributesViewModelProcessor(
                 """
                     with(modelClass) {
                         return when {
-                            isAssignableFrom(%T::class.java) -> (viewModelProvider.get() as T)
+                            isAssignableFrom(%T::class.java) -> (viewModelProvider() as T)
                             else -> null
                         }
                     }
