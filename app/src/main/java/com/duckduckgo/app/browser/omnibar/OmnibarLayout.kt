@@ -243,6 +243,9 @@ class OmnibarLayout @JvmOverloads constructor(
     private var customTabToolbarColor: Int = 0
     private var lastAnimatedLogoUrl: String? = null
     private var easterEggLogoAnimator: ObjectAnimator? = null
+    private val playEasterEggLogoWiggle = Runnable {
+        easterEggLogoAnimator = SerpEasterEggLogoAnimator.playWiggle(daxIcon)
+    }
 
     private val omnibarCardShadow: MaterialCardView by lazy { findViewById(R.id.omniBarContainerShadow) }
     private val omnibarCardView: MaterialCardView by lazy { findViewById(R.id.omniBarContainer) }
@@ -773,6 +776,7 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             is Command.EasterEggLogoClicked -> {
+                cancelEasterEggLogoAnimation()
                 onLogoClicked(command.url)
             }
 
@@ -1217,6 +1221,7 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun cancelEasterEggLogoAnimation() {
+        daxIcon.removeCallbacks(playEasterEggLogoWiggle)
         easterEggLogoAnimator?.cancel()
         easterEggLogoAnimator = null
         daxIcon.rotation = 0f
@@ -1800,12 +1805,7 @@ class OmnibarLayout @JvmOverloads constructor(
         ): Boolean {
             if (!leadingIconState.isFavourite && logoUrl != lastAnimatedLogoUrl) {
                 lastAnimatedLogoUrl = logoUrl
-                daxIcon.postDelayed(
-                    {
-                        easterEggLogoAnimator = SerpEasterEggLogoAnimator.playWiggle(daxIcon)
-                    },
-                    EASTER_EGG_ANIMATION_DELAY_MS,
-                )
+                daxIcon.postDelayed(playEasterEggLogoWiggle, EASTER_EGG_ANIMATION_DELAY_MS)
             }
             return false
         }
