@@ -145,7 +145,7 @@ class NextStepsItemsViewModelTest {
 
     private val defaultBrowserItem = CardItem.ListItem(
         id = "setup_default_browser",
-        type = CardItemType.NEXT_STEP_ITEM,
+        type = CardItemType.ONE_ACTION_ITEM,
         titleText = "Browse privately by default",
         descriptionText = "Search privately every time with DuckDuckGo as your default browser",
         placeholder = Content.Placeholder.ANNOUNCE,
@@ -157,7 +157,7 @@ class NextStepsItemsViewModelTest {
 
     private val addWidgetItem = defaultBrowserItem.copy(id = "setup_add_widget", titleText = "Try our Home screen widget")
 
-    private fun nextStepsContent() = Content.NextStepsItems(
+    private fun nextStepsContent() = Content.ActionableItems(
         titleText = "Complete your setup",
         listItems = listOf(defaultBrowserItem, addWidgetItem),
     )

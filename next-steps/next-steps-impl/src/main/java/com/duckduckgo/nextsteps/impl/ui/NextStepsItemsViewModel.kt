@@ -55,7 +55,7 @@ class NextStepsItemsViewModel @Inject constructor(
             .map { message -> message?.takeIf { it.isNextStepsForNewTabPage() } }
             .flowOn(dispatchers.io())
             .onEach { message ->
-                val content = message?.content as? Content.NextStepsItems
+                val content = message?.content as? Content.ActionableItems
                 _viewState.value = ViewState(
                     message = message,
                     title = content?.titleText.orEmpty(),
@@ -75,5 +75,5 @@ class NextStepsItemsViewModel @Inject constructor(
     }
 
     private fun RemoteMessage.isNextStepsForNewTabPage(): Boolean =
-        content is Content.NextStepsItems && surfaces.contains(Surface.NEW_TAB_PAGE)
+        content is Content.ActionableItems && surfaces.contains(Surface.NEW_TAB_PAGE)
 }

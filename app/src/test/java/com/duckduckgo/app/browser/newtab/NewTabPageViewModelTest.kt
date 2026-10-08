@@ -227,7 +227,7 @@ class NewTabPageViewModelTest {
 
     private fun aNextStepsMessage() = RemoteMessage(
         id = "android_complete_your_setup",
-        content = Content.NextStepsItems(titleText = "Complete your setup", listItems = emptyList()),
+        content = Content.ActionableItems(titleText = "Complete your setup", listItems = emptyList()),
         matchingRules = emptyList(),
         exclusionRules = emptyList(),
         surfaces = listOf(Surface.NEW_TAB_PAGE),
