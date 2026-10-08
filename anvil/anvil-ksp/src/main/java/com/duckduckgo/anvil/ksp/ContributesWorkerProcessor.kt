@@ -51,7 +51,7 @@ class ContributesWorkerProcessor(
         private const val CONTRIBUTES_WORKER = "com.duckduckgo.anvil.annotations.ContributesWorker"
         private const val JAVAX_INJECT = "javax.inject.Inject"
 
-        private val CONTRIBUTES_MULTIBINDING_CLASS = ClassName("com.squareup.anvil.annotations", "ContributesMultibinding")
+        private val CONTRIBUTES_INTO_SET_CLASS = ClassName("dev.zacsweers.metro", "ContributesIntoSet")
         private val WORKER_INJECTOR_PLUGIN_CLASS = ClassName("com.duckduckgo.common.utils.plugins.worker", "WorkerInjectorPlugin")
         private val LISTENABLE_WORKER_CLASS = ClassName("androidx.work", "ListenableWorker")
         private val PROVIDER_CLASS = ClassName("javax.inject", "Provider")
@@ -144,7 +144,7 @@ class ContributesWorkerProcessor(
         // Build class
         val typeSpec = TypeSpec.classBuilder(pluginName)
             .addAnnotation(
-                AnnotationSpec.builder(CONTRIBUTES_MULTIBINDING_CLASS)
+                AnnotationSpec.builder(CONTRIBUTES_INTO_SET_CLASS)
                     .addMember("%T::class", scopeClassName)
                     .build(),
             )
