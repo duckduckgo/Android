@@ -170,6 +170,8 @@ class PermissionsPerWebsiteViewModelTest {
                 domain,
                 websitePermissionSetting.setting.toSitePermissionSettingEntityType().name,
                 websitePermissionSetting.setting.toSitePermissionSettingEntityType().name,
+                websitePermissionSetting.setting.toSitePermissionSettingEntityType().name,
+                websitePermissionSetting.setting.toSitePermissionSettingEntityType().name,
             )
         viewModel.onPermissionSettingSelected(websitePermissionSetting, domain)
 
