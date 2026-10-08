@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Ο ιστότοπος «%1$s» θέλει να αποκτήσει πρόσβαση στην κάμερά σου</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Ο ιστότοπος «%1$s» επιθυμεί να αποκτήσει πρόσβαση στο μικρόφωνό σου</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Ο ιστότοπος «%1$s» θέλει να αποκτήσει πρόσβαση στην κάμερα και στο μικρόφωνό σου</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">Ο ιστότοπος «%1$s» θέλει να αποκτήσει πρόσβαση στην τοποθεσία σου σε αυτόν τον ιστότοπο</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">Ο ιστότοπος \"%1$s\" θέλει να αποκτήσει πρόσβαση στην κάμερά σου σε αυτόν τον ιστότοπο</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">Ο ιστότοπος «%1$s» θέλει να αποκτήσει πρόσβαση στο μικρόφωνό σου σε αυτόν τον ιστότοπο</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">Ο ιστότοπος «%1$s» θέλει να αποκτήσει πρόσβαση στην κάμερα και στο μικρόφωνό σου σε αυτόν τον ιστότοπο</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">Ο ιστότοπος «%1$s» θέλει να αποκτήσει πρόσβαση στο λογισμικό διαχείρισης ψηφιακών δικαιωμάτων (DRM) σου σε αυτόν τον ιστότοπο</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Αν δεν το επιτρέψεις, η αναπαραγωγή των βίντεο στον ιστότοπο ενδέχεται να μην είναι δυνατή, αλλά αυτός ο ιστότοπος δεν θα έχει πρόσβαση στα αναγνωριστικά συσκευών που παρέχονται από το λογισμικό DRM.</string>
 
     <!-- Reminder dialog -->
