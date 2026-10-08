@@ -116,17 +116,14 @@ class RealSubscriptions @Inject constructor(
     }
 
     override suspend fun getAvailableProducts(): Set<Product> {
-        return subscriptionsManager.getFeatures()
-            .mapNotNull { feature -> Product.entries.firstOrNull { it.value == feature } }
-            .let {
-                withContext(dispatcherProvider.io()) {
-                    if (subscriptionsFeature.get().duckAiPlus().isEnabled().not()) {
-                        it.filterNot { feature -> feature == DuckAiPlus }
-                    } else {
-                        it
-                    }
-                }
-            }.toSet()
+        return toEnabledProducts(subscriptionsManager.getFeatures())
+    }
+
+    override suspend fun getPurchasableProducts(): Set<Product> {
+        val offeredFeatures = subscriptionsManager.getSubscriptionOffer()
+            .flatMap { offer -> offer.entitlements }
+            .map { entitlement -> entitlement.product }
+        return toEnabledProducts(offeredFeatures)
     }
 
     override fun launchSubscription(context: Context, uri: Uri?) {
@@ -180,6 +177,20 @@ class RealSubscriptions @Inject constructor(
 
     override suspend fun getCurrentEntitlements(): Set<Entitlement> {
         return subscriptionsManager.getCurrentEntitlements()
+    }
+
+    private suspend fun toEnabledProducts(features: Collection<String>): Set<Product> {
+        return features
+            .mapNotNull { feature -> Product.entries.firstOrNull { it.value == feature } }
+            .let {
+                withContext(dispatcherProvider.io()) {
+                    if (subscriptionsFeature.get().duckAiPlus().isEnabled().not()) {
+                        it.filterNot { feature -> feature == DuckAiPlus }
+                    } else {
+                        it
+                    }
+                }
+            }.toSet()
     }
 
     private fun buildSubscriptionUrl(uri: Uri?): String {

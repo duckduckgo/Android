@@ -67,6 +67,18 @@ interface Subscriptions {
     suspend fun getAvailableProducts(): Set<Product>
 
     /**
+     * Returns the products included in the subscription plans the store currently offers the user. Plans differ by
+     * region, so a product such as [Product.PIR] may not be offered everywhere.
+     *
+     * This does not check whether the user is allowed to purchase; use [isEligible] for that.
+     *
+     * You DO NOT need to set any dispatcher to call this suspend function.
+     *
+     * @return the products in the currently offered plans, or an empty set when no plans are offered
+     */
+    suspend fun getPurchasableProducts(): Set<Product>
+
+    /**
      * @return `true` if the given URL can be handled internally or `false` otherwise
      */
     fun shouldLaunchSubscriptionForUrl(url: String): Boolean
