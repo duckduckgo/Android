@@ -24,10 +24,10 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.settings.CUSTOM_DNS_HEADER_PRIORITY
 import com.duckduckgo.networkprotection.impl.settings.VpnSettingPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoMap(ActivityScope::class)
 @PriorityKey(CUSTOM_DNS_HEADER_PRIORITY)
 class VpnCustomDnsHeaderView @Inject constructor() : VpnSettingPlugin {
     override fun getView(context: Context): View {

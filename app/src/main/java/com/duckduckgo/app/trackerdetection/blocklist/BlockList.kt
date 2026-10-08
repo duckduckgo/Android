@@ -30,7 +30,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
@@ -174,7 +174,7 @@ interface BlockList {
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class BlockListPixelsPlugin @Inject constructor(private val inventory: FeatureTogglesInventory) : MetricsPixelPlugin {
 
     override suspend fun getMetrics(): List<MetricsPixel> {
@@ -203,7 +203,7 @@ class BlockListPixelsPlugin @Inject constructor(private val inventory: FeatureTo
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class BlockListPrivacyConfigCallbackPlugin @Inject constructor(
     private val inventory: FeatureTogglesInventory,
     private val trackerDataDownloader: TrackerDataDownloader,

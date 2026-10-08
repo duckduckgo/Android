@@ -19,9 +19,9 @@ package com.duckduckgo.httpsupgrade.impl.di
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.httpsupgrade.api.HttpsEmbeddedDataPersister
 import com.duckduckgo.httpsupgrade.impl.EmptyHttpsEmbeddedDataPersister
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dev.zacsweers.metro.ContributesTo
 
 @Module
 @ContributesTo(AppScope::class)

@@ -27,8 +27,8 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.user.agent.api.UserAgentInterceptor
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.user.agent.store.UserAgentFeatureName
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
@@ -41,7 +41,7 @@ import javax.inject.Provider
  * Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Safari/537.36
  */
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealUserAgentProvider @Inject constructor(
     @Named("defaultUserAgent") private val defaultUserAgent: Provider<String>,
     device: DeviceInfo,

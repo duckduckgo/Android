@@ -36,14 +36,14 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.GRACE_PERIOD
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.flow.firstOrNull
 import org.json.JSONObject
 import java.net.Inet4Address
 import java.net.NetworkInterface
 import javax.inject.Inject
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoSet(ActivityScope::class)
 class NetPStateCollector @Inject constructor(
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
     private val wgTunnelConfig: WgTunnelConfig,

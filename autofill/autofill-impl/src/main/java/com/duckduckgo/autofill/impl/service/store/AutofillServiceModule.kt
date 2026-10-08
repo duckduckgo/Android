@@ -22,10 +22,10 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Qualifier
 
 @Module
@@ -37,7 +37,7 @@ class AutofillServiceModule {
     )
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @AutofillServiceDataStore
     fun providesAutofillServiceStore(context: Context): DataStore<Preferences> {
         return context.autofillServiceStore

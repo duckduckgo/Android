@@ -29,9 +29,9 @@ import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersRepository
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import dagger.WrongScope
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -40,7 +40,7 @@ import javax.inject.Inject
 
 @WrongScope("This should be one instance per BrowserTabFragment", FragmentScope::class)
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealTrackingParameters @Inject constructor(
     private val trackingParametersRepository: TrackingParametersRepository,
     private val featureToggle: FeatureToggle,

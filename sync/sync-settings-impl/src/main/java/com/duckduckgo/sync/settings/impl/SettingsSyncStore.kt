@@ -19,8 +19,8 @@ package com.duckduckgo.sync.settings.impl
 import android.content.*
 import androidx.core.content.*
 import com.duckduckgo.di.scopes.*
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.*
 
 interface SettingsSyncStore {
@@ -30,7 +30,7 @@ interface SettingsSyncStore {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealSettingsSyncStore @Inject constructor(private val context: Context) : SettingsSyncStore {
     override var serverModifiedSince: String
         get() = preferences.getString(KEY_MODIFIED_SINCE, "0") ?: "0"

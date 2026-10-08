@@ -20,12 +20,12 @@ import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
 import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.user.agent.api.UserAgentInterceptor
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class InternalUAInterceptor @Inject constructor(
     private val devSettingsDataStore: DevSettingsDataStore,
     @Named("defaultUserAgent") private val defaultUserAgent: Provider<String>,

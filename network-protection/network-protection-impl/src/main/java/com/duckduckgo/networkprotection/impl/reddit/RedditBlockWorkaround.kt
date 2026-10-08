@@ -25,10 +25,10 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.squareup.anvil.annotations.ContributesMultibinding
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.ContributesTo
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.asLog
@@ -40,7 +40,7 @@ private const val HTTPS_WWW_REDDIT_COM = ".reddit.com"
 private const val REDDIT_SESSION_ = "reddit_session=;"
 private const val REDDIT_SESSION_EXPIRED_ = "reddit_session=; Expires=Wed, 21 Oct 2015 07:28:00 GMT" // random date
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class RedditBlockWorkaround @Inject constructor(
     private val networkProtectionState: NetworkProtectionState,
     private val dispatcherProvider: DispatcherProvider,

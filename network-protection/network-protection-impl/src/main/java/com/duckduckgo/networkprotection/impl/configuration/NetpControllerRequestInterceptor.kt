@@ -22,7 +22,8 @@ import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.BuildConfig
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
 import okhttp3.Interceptor
@@ -31,9 +32,9 @@ import okhttp3.Response
 import retrofit2.Invocation
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = ApiInterceptorPlugin::class,
+    binding = binding<ApiInterceptorPlugin>(),
 )
 class NetpControllerRequestInterceptor @Inject constructor(
     private val appBuildConfig: AppBuildConfig,

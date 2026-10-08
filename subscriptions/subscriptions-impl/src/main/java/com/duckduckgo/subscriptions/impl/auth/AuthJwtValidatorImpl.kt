@@ -19,7 +19,7 @@ package com.duckduckgo.subscriptions.impl.auth
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.model.Entitlement
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import io.jsonwebtoken.Claims
 import java.util.*
 import javax.inject.Inject

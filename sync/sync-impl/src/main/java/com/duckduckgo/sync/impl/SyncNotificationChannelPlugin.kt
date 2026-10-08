@@ -21,10 +21,10 @@ import com.duckduckgo.app.notification.model.Channel
 import com.duckduckgo.app.notification.model.NotificationPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.SYNC_NOTIFICATION_CHANNEL_ID
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SyncNotificationChannelPlugin @Inject constructor() : NotificationPlugin {
     override fun getChannels(): List<Channel> {
         return listOf(

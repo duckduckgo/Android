@@ -21,17 +21,17 @@ import com.duckduckgo.app.widget.ui.AppWidgetCapabilities
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.widget.SearchAndFavoritesGridCalculator
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 
 @Module
 @ContributesTo(AppScope::class)
 object WidgetModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun widgetCapabilities(context: Context): WidgetCapabilities = AppWidgetCapabilities(context)
 
     @Provides

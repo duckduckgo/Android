@@ -44,8 +44,8 @@ import com.duckduckgo.networkprotection.internal.feature.unsafe_wifi.UnsafeWifiD
 import com.duckduckgo.networkprotection.internal.feature.unsafe_wifi.UnsafeWifiDetectionSettingView.State.Enable
 import com.duckduckgo.networkprotection.internal.feature.unsafe_wifi.UnsafeWifiDetectionSettingView.State.Idle
 import com.duckduckgo.networkprotection.internal.feature.unsafe_wifi.UnsafeWifiDetectionViewModel.Factory
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
@@ -137,7 +137,7 @@ class UnsafeWifiDetectionSettingView @JvmOverloads constructor(
     }
 }
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoMap(ActivityScope::class)
 @PriorityKey(UNSAFE_WIFI_DETECTION_PRIORITY)
 class UnsafeWifiDetectionSettingViewPlugin @Inject constructor(
     private val appBuildConfig: AppBuildConfig,

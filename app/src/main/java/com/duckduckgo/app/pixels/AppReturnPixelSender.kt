@@ -47,9 +47,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -67,9 +68,9 @@ interface AppReturnPixelSender {
     fun isLaunchByFireAction(): Boolean
 }
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = AppReturnPixelSender::class)
-@ContributesMultibinding(AppScope::class, boundType = MainProcessLifecycleObserver::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<AppReturnPixelSender>())
+@ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
 class RealAppReturnPixelSender @Inject constructor(
     private val pixel: Provider<Pixel>,
     private val settingsDataStore: SettingsDataStore,

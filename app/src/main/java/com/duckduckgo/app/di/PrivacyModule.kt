@@ -53,12 +53,12 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.preferences.api.SitePreferencesDataClearer
 import com.duckduckgo.sync.api.DeviceSyncState
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 
 @Module
 @ContributesTo(AppScope::class)
@@ -119,14 +119,14 @@ object PrivacyModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @IntoSet
     fun dataClearerForegroundAppRestartPixelObserver(
         dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel,
     ): MainProcessLifecycleObserver = dataClearerForegroundAppRestartPixel
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun appCacheCleaner(
         context: Context,
         fileDeleter: FileDeleter,

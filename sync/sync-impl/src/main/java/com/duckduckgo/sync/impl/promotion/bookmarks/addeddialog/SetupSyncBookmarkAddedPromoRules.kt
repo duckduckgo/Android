@@ -22,7 +22,7 @@ import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType
 import com.duckduckgo.sync.impl.promotion.SyncPromotionFeature
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject

@@ -18,8 +18,8 @@ package com.duckduckgo.contentscopescripts.impl
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import javax.inject.Inject
@@ -28,7 +28,7 @@ interface WebViewCompatContentScopeJSReader {
     suspend fun getContentScopeJS(): String
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealWebViewCompatContentScopeJSReader @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,

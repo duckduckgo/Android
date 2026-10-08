@@ -26,17 +26,17 @@ import com.duckduckgo.runtimechecks.store.ALL_MIGRATIONS
 import com.duckduckgo.runtimechecks.store.RealRuntimeChecksRepository
 import com.duckduckgo.runtimechecks.store.RuntimeChecksDatabase
 import com.duckduckgo.runtimechecks.store.RuntimeChecksRepository
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
 @Module
 @ContributesTo(AppScope::class)
 object RuntimeChecksModule {
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideRuntimeChecksDatabase(context: Context): RuntimeChecksDatabase {
         return Room.databaseBuilder(context, RuntimeChecksDatabase::class.java, "runtime_checks.db")
@@ -46,7 +46,7 @@ object RuntimeChecksModule {
             .build()
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideRuntimeChecksRepository(
         database: RuntimeChecksDatabase,

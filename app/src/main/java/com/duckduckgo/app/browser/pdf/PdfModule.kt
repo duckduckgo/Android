@@ -17,10 +17,10 @@
 package com.duckduckgo.app.browser.pdf
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 import okhttp3.OkHttpClient
 import javax.inject.Qualifier
 
@@ -33,7 +33,7 @@ annotation class PdfOkHttpClient
 object PdfModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @PdfOkHttpClient
     fun providePdfOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder().build()

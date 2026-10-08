@@ -23,10 +23,10 @@ import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin.Companion.RMF_SETTINGS_PRIO_KEY
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.remote.messaging.internal.feature.RMFInternalScreens.InternalSettings
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoMap(AppScope::class)
 @PriorityKey(RMF_SETTINGS_PRIO_KEY)
 class InternalSettingsActivity @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,

@@ -57,12 +57,13 @@ import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.sync.api.DeviceSyncState
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -449,12 +450,12 @@ data class DuckChatSettingJson(
     val sessionTimeoutMinutes: Int,
 )
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = DuckChat::class)
-@ContributesBinding(AppScope::class, boundType = DuckAiFeatureState::class)
-@ContributesBinding(AppScope::class, boundType = DuckChatInternal::class)
-@ContributesBinding(AppScope::class, boundType = DuckChatInputModeState::class)
-@ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<DuckChat>())
+@ContributesBinding(AppScope::class, binding = binding<DuckAiFeatureState>())
+@ContributesBinding(AppScope::class, binding = binding<DuckChatInternal>())
+@ContributesBinding(AppScope::class, binding = binding<DuckChatInputModeState>())
+@ContributesIntoSet(AppScope::class, binding = binding<PrivacyConfigCallbackPlugin>())
 class RealDuckChat @Inject constructor(
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
     private val addressBarPickerAttributionRepository: AddressBarPickerAttributionRepository,

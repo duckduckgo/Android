@@ -26,17 +26,17 @@ import com.duckduckgo.app.trackerdetection.db.TrackerDetectionDatabase
 import com.duckduckgo.data.store.api.DatabaseProvider
 import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 
 @Module
 @ContributesTo(AppScope::class)
 object TrackerDetectionDatabaseModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideTrackerDetectionDatabase(databaseProvider: DatabaseProvider): TrackerDetectionDatabase {
         return databaseProvider.buildRoomDatabase(
             TrackerDetectionDatabase::class.java,

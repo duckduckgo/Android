@@ -23,11 +23,11 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingCompletionSummaryRow
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
 
 /** Duck.ai step of the subscription onboarding, contributed from `duckchat-impl`. */
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoMap(AppScope::class)
 @PriorityKey(300)
 class SubscriptionOnboardingDuckAiStepPlugin @Inject constructor(
     private val duckChat: DuckChat,

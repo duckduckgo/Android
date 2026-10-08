@@ -26,14 +26,14 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.runBlocking
 import logcat.LogPriority
 import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class GetSyncStatusHandler @Inject constructor(
     private val syncStatusHelper: SyncStatusHelper,
     private val duckAiHostProvider: DuckAiHostProvider,

@@ -19,10 +19,10 @@ package com.duckduckgo.app.statistics
 import com.duckduckgo.app.di.StatisticsLibraryConfigModule
 import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 
 @Module
 @ContributesTo(
@@ -31,7 +31,7 @@ import dagger.SingleInstanceIn
 )
 class InternalStatisticsLibraryConfigModule {
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideStatisticsLibraryConfig(): StatisticsLibraryConfig {
         return object : StatisticsLibraryConfig {
             override fun shouldFirePixelsAsDev(): Boolean {

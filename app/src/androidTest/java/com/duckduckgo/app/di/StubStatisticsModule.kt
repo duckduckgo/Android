@@ -34,11 +34,11 @@ import com.duckduckgo.common.utils.device.ContextDeviceInfo
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 import io.reactivex.Single
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
@@ -115,7 +115,7 @@ class StubStatisticsModule {
 
     @Provides
     @IntoSet
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun atbInitializer(
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         statisticsDataStore: StatisticsDataStore,

@@ -19,13 +19,13 @@ package com.duckduckgo.sync.settings.impl
 import com.duckduckgo.common.utils.formatters.time.SyncDateProvider
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.sync.settings.api.SyncSettingsListener
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class AppSyncSettingsListener @Inject constructor(
     private val syncMetadataDao: SettingsSyncMetadataDao,

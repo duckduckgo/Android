@@ -22,9 +22,10 @@ import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSign
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.concurrent.CopyOnWriteArrayList
@@ -36,13 +37,13 @@ interface EmailProtectionInContextFeatureRepository {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = EmailProtectionInContextFeatureRepository::class,
+    binding = binding<EmailProtectionInContextFeatureRepository>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = PrivacyConfigCallbackPlugin::class,
+    binding = binding<PrivacyConfigCallbackPlugin>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealEmailProtectionInContextFeatureRepository @Inject constructor(
     private val feature: EmailProtectionInContextSignupFeature,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,

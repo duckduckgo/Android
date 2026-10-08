@@ -17,8 +17,9 @@
 package com.duckduckgo.downloads.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import logcat.logcat
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -33,9 +34,9 @@ interface UrlFileDownloadCallManager {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = UrlFileDownloadCallManager::class,
+    binding = binding<UrlFileDownloadCallManager>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealUrlFileDownloadCallManager @Inject constructor() : UrlFileDownloadCallManager {
     private val callsMap = ConcurrentHashMap<Long, Call<ResponseBody>>()
 

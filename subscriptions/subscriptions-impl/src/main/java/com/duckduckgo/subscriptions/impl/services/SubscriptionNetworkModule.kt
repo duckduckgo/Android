@@ -19,11 +19,11 @@ package com.duckduckgo.subscriptions.impl.services
 import android.annotation.SuppressLint
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -41,7 +41,7 @@ class SubscriptionNetworkModule {
 
     @Provides
     @SubscriptionCachedClient
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideSubscriptionsCustomCacheHttpClient(
         context: Context,
         @Named("api") okHttpClient: OkHttpClient,
@@ -55,7 +55,7 @@ class SubscriptionNetworkModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @SuppressLint("NoRetrofitCreateMethodCallDetector")
     fun providesSubscriptionsCachedService(
         @Named(value = "api") retrofit: Retrofit,

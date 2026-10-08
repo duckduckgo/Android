@@ -19,13 +19,13 @@ package com.duckduckgo.duckchat.internal.testseeder
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.testseeder.api.TestSeederKey
 import com.duckduckgo.testseeder.api.TestSeederPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
 // Native input is now controlled by the `nativeInputField` feature flag (default
 // true), not a user setting. This plugin is retained so existing Maestro flows
 // can keep passing `nativeInputToggle` without erroring; it's a no-op.
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class NativeInputToggleSeederPlugin @Inject constructor() : TestSeederPlugin {
 
     override val handledKeys = setOf(TestSeederKey.NATIVE_INPUT_TOGGLE.key)

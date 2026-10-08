@@ -37,11 +37,12 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
@@ -98,8 +99,8 @@ class ScriptletDownloadWorker(
     }
 }
 
-@ContributesMultibinding(scope = AppScope::class, boundType = MainProcessLifecycleObserver::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(scope = AppScope::class, binding = binding<MainProcessLifecycleObserver>())
+@SingleIn(AppScope::class)
 class ScriptletDownloadWorkerScheduler @Inject constructor(
     private val workManager: WorkManager,
     private val configProvider: AdBlockingExtensionConfigProvider,

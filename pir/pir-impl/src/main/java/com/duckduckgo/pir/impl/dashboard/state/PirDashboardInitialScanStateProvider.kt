@@ -29,8 +29,9 @@ import com.duckduckgo.pir.impl.scan.PirForegroundScanServiceMonitor
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
@@ -90,9 +91,9 @@ interface PirDashboardInitialScanStateProvider {
 
 @ContributesBinding(
     scope = ActivityScope::class,
-    boundType = PirDashboardInitialScanStateProvider::class,
+    binding = binding<PirDashboardInitialScanStateProvider>(),
 )
-@SingleInstanceIn(ActivityScope::class)
+@SingleIn(ActivityScope::class)
 class RealPirDashboardInitialScanStateProvider @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val currentTimeProvider: CurrentTimeProvider,

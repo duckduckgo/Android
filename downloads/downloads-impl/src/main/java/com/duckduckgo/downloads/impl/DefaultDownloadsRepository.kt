@@ -22,15 +22,15 @@ import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadEntity
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.downloads.store.DownloadsDatabase
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class DefaultDownloadsRepository @Inject constructor(
     private val downloadsDatabase: DownloadsDatabase,
     private val urlFileDownloadCallManager: UrlFileDownloadCallManager,

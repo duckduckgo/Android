@@ -18,7 +18,7 @@ package com.duckduckgo.sync.impl
 
 import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.INFO
 import logcat.logcat
 import retrofit2.HttpException

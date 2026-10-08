@@ -18,8 +18,8 @@ package com.duckduckgo.autofill.impl.store
 
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import javax.inject.Inject
@@ -34,7 +34,7 @@ sealed class AutofillEffect {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class DefaultAutofillEffectDispatcher @Inject constructor() : AutofillEffectDispatcher {
     private val _effects = MutableSharedFlow<AutofillEffect>(extraBufferCapacity = 1)
     override val effects: SharedFlow<AutofillEffect> = _effects

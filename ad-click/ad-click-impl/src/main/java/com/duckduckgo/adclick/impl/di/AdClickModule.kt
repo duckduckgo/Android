@@ -30,10 +30,10 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
 @Module
@@ -41,7 +41,7 @@ import kotlinx.coroutines.CoroutineScope
 class AdClickModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideAdClickDatabase(context: Context): AdClickDatabase {
         return Room.databaseBuilder(context, AdClickDatabase::class.java, "adclick.db")
             .addMigrations(*ALL_MIGRATIONS)
@@ -50,7 +50,7 @@ class AdClickModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideAdClickAttributionRepository(
         database: AdClickDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
@@ -61,7 +61,7 @@ class AdClickModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideAdClickExemptionsDatabase(context: Context): AdClickExemptionsDatabase {
         return Room.databaseBuilder(context, AdClickExemptionsDatabase::class.java, "adclick_exemptions.db")
             .fallbackToDestructiveMigration()
@@ -69,7 +69,7 @@ class AdClickModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideAdClickData(
         database: AdClickExemptionsDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,

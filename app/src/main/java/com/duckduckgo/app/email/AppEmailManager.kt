@@ -29,9 +29,10 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -44,9 +45,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.*
 
-@ContributesMultibinding(scope = AppScope::class, boundType = BrowserFeatureStateReporterPlugin::class)
-@ContributesBinding(scope = AppScope::class, boundType = EmailManager::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(scope = AppScope::class, binding = binding<BrowserFeatureStateReporterPlugin>())
+@ContributesBinding(scope = AppScope::class, binding = binding<EmailManager>())
+@SingleIn(AppScope::class)
 class AppEmailManager @Inject constructor(
     private val emailService: EmailService,
     private val emailDataStore: EmailDataStore,

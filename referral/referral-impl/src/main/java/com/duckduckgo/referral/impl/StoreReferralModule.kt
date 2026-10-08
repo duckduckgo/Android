@@ -19,18 +19,18 @@ package com.duckduckgo.referral.impl
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.referral.api.AppInstallationReferrerStateListener
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 
 @Module
 @ContributesTo(AppScope::class)
 object StoreReferralModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun appInstallationReferrerStateListener(
         referrerStateListener: EmptyReferrerStateListener,
     ): AppInstallationReferrerStateListener = referrerStateListener

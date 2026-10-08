@@ -30,10 +30,10 @@ import com.duckduckgo.browsermode.api.FireMode
 import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.ActivityScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 
 /**
  * Provides the activity-frozen [BrowserMode] binding, intentionally scoped to [ActivityScope] only
@@ -49,7 +49,7 @@ import dagger.SingleInstanceIn
 class BrowserModeActivityModule {
     /**
      * The activity's [BrowserMode] is captured **once** at activity-component creation
-     * (`@SingleInstanceIn(ActivityScope::class)` on [provideActivityBrowserMode]) and reused for
+     * (`@SingleIn(ActivityScope::class)` on [provideActivityBrowserMode]) and reused for
      * every unqualified [TabRepository] resolution within that activity. This guarantees a frozen
      * mode for the activity's lifetime even if [BrowserModeStateHolder.currentMode] changes
      * mid-construction — the activity recreates on real mode changes, so the next instance
@@ -62,7 +62,7 @@ class BrowserModeActivityModule {
      */
     @Suppress("DenyListedApi")
     @Provides
-    @SingleInstanceIn(ActivityScope::class)
+    @SingleIn(ActivityScope::class)
     fun provideActivityBrowserMode(
         activity: AppCompatActivity,
         browserModeStateHolder: BrowserModeStateHolder,

@@ -33,17 +33,17 @@ import com.duckduckgo.httpsupgrade.impl.HttpsUpgradeService
 import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpecDao
 import com.duckduckgo.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.httpsupgrade.store.HttpsUpgradeDatabase
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 
 @Module
 @ContributesTo(AppScope::class)
 object HttpsModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideAppDatabase(databaseProvider: DatabaseProvider): HttpsUpgradeDatabase {
         return databaseProvider.buildRoomDatabase(
             HttpsUpgradeDatabase::class.java,
@@ -62,7 +62,7 @@ object HttpsModule {
     fun provideHttpsBloomFilterSpecDao(database: HttpsUpgradeDatabase): HttpsBloomFilterSpecDao = database.httpsBloomFilterSpecDao()
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideHttpsBloomFilterFactory(
         dao: HttpsBloomFilterSpecDao,
         binaryDataStore: BinaryDataStore,
@@ -75,7 +75,7 @@ object HttpsModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideHttpsUpgradeDataDownloader(
         service: HttpsUpgradeService,
         httpsUpgrader: HttpsUpgrader,

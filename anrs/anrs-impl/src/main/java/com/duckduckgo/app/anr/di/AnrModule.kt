@@ -20,16 +20,16 @@ import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.anrs.store.AnrsDatabase
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 
 @Module
 @ContributesTo(AppScope::class)
 object AnrModule {
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideAnrDatabase(context: Context): AnrsDatabase {
         return Room.databaseBuilder(context, AnrsDatabase::class.java, "anr_database.db")
             .addMigrations(*AnrsDatabase.ALL_MIGRATIONS.toTypedArray())

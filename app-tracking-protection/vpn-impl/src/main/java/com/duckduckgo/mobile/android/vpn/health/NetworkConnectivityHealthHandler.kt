@@ -29,7 +29,7 @@ import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.connectivity.VpnConnectivityLossListenerPlugin
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -46,7 +46,7 @@ import javax.inject.Provider
 // We use an IP address instead of a domain name to skip DNS resolution
 private const val PROBED_ADDRESS = "1.1.1.1"
 
-@ContributesMultibinding(VpnScope::class)
+@ContributesIntoSet(VpnScope::class)
 class NetworkConnectivityHealthHandler @Inject constructor(
     private val context: Context,
     private val pixel: DeviceShieldPixels,

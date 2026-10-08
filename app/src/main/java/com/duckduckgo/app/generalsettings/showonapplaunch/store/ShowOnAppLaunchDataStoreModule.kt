@@ -23,9 +23,9 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchUrlConverterImpl
 import com.duckduckgo.app.generalsettings.showonapplaunch.UrlConverter
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dev.zacsweers.metro.ContributesTo
 import javax.inject.Qualifier
 
 @ContributesTo(AppScope::class)

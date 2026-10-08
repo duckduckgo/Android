@@ -18,7 +18,7 @@ package com.duckduckgo.app.trackerdetection.flags
 
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface CachedEntityLookupRCWrapper {

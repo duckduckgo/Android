@@ -18,10 +18,10 @@ package com.duckduckgo.autofill.sync
 
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.api.SyncMessagePlugin
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.ContributesTo
 
 /**
  * This module provides the [SyncMessagePlugin]s that are used by the Sync feature.

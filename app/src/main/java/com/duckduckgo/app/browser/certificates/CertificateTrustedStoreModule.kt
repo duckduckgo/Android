@@ -24,22 +24,22 @@ import com.duckduckgo.app.browser.certificates.rootstore.LetsEncryptR3
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStoreImpl
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 
 @Module
 @ContributesTo(AppScope::class)
 class CertificateTrustedStoreModule {
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun trustedCertificateStore(
         letsEncryptCertificateProvider: LetsEncryptCertificateProvider,
     ): TrustedCertificateStore = TrustedCertificateStoreImpl(letsEncryptCertificateProvider)
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun letsEncryptCertificateProvider(
         context: Context,
     ): LetsEncryptCertificateProvider = LetsEncryptCertificateProviderImpl(
@@ -52,7 +52,7 @@ class CertificateTrustedStoreModule {
     )
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun trustedSitesRepository(): BypassedSSLCertificatesRepository {
         return RealBypassedSSLCertificatesRepository()
     }

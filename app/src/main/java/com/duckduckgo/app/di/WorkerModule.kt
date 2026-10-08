@@ -23,17 +23,17 @@ import androidx.work.WorkerFactory
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 
 @Module
 @ContributesTo(AppScope::class)
 object WorkerModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun workManager(
         context: Context,
         workerFactory: WorkerFactory,
@@ -46,7 +46,7 @@ object WorkerModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun workerFactory(
         workerInjectorPluginPoint: PluginPoint<WorkerInjectorPlugin>,
     ): WorkerFactory {

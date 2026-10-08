@@ -33,7 +33,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.repository.isActive
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -98,9 +99,9 @@ class PaywallNotSeenWorker(
  * Uses [ExistingWorkPolicy.KEEP] so re-scheduling on subsequent app starts is a no-op while
  * the work is still pending. The worker itself guards against double-firing via [PaywallMetricsDataStore].
  */
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class PaywallNotSeenScheduler @Inject constructor(
     private val workManager: WorkManager,

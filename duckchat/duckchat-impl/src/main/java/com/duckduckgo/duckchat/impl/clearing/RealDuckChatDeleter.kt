@@ -34,8 +34,8 @@ import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleterJsMessaging.Companio
 import com.duckduckgo.duckchat.impl.feature.DuckAiDataClearingFeature
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Mutex
@@ -59,7 +59,7 @@ interface DuckChatDeleter {
     suspend fun deleteAllChats(): Boolean
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDuckChatDeleter @Inject constructor(
     private val context: Context,

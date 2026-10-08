@@ -32,9 +32,9 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.AppTrackerRecorde
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerType
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dev.zacsweers.metro.ContributesTo
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
 

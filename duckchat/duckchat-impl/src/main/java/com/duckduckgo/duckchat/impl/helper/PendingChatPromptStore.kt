@@ -17,8 +17,8 @@
 package com.duckduckgo.duckchat.impl.helper
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import org.json.JSONObject
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
@@ -34,7 +34,7 @@ interface PendingTabContextStore {
     fun clear()
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealPendingTabContextStore @Inject constructor() : PendingTabContextStore {
 

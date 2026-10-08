@@ -26,10 +26,10 @@ import com.duckduckgo.adblocking.impl.store.AdBlockingExtensionDatabase
 import com.duckduckgo.data.store.api.DatabaseProvider
 import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Qualifier
 
 @Module
@@ -40,7 +40,7 @@ object AdBlockingExtensionModule {
         name = "ad_blocking",
     )
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideAdBlockingExtensionDatabase(databaseProvider: DatabaseProvider): AdBlockingExtensionDatabase {
         return databaseProvider.buildRoomDatabase(
@@ -57,7 +57,7 @@ object AdBlockingExtensionModule {
     fun provideAdBlockingExtensionDao(database: AdBlockingExtensionDatabase): AdBlockingExtensionDao =
         database.adBlockingExtensionDao()
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     @AdBlockingPreferences
     fun provideAdBlockingDataStore(context: Context): DataStore<Preferences> =

@@ -36,15 +36,15 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.NotificationActionRepor
 import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
-@ContributesMultibinding(VpnScope::class)
-@SingleInstanceIn(VpnScope::class)
+@ContributesIntoSet(VpnScope::class)
+@SingleIn(VpnScope::class)
 class AppTpEnabledNotificationContentPlugin @Inject constructor(
     private val context: Context,
     private val resources: Resources,

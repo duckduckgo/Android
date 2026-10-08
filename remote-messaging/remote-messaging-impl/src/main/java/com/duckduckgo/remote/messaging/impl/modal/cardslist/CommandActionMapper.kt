@@ -30,7 +30,7 @@ import com.duckduckgo.remote.messaging.api.Action.Url
 import com.duckduckgo.remote.messaging.api.Action.UrlInContext
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command
 import com.duckduckgo.survey.api.SurveyParameterManager
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 import kotlin.text.orEmpty
 import kotlin.text.split

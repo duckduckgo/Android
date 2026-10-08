@@ -36,13 +36,13 @@ import com.duckduckgo.subscriptions.impl.serp_promo.SerpPromo
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsEncryptedDataStore
 import com.duckduckgo.subscriptions.impl.toStatus
-import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Moshi.Builder
 import com.squareup.moshi.Types
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import java.time.Instant
@@ -81,7 +81,7 @@ interface AuthRepository {
 @ContributesTo(AppScope::class)
 object AuthRepositoryModule {
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideAuthRepository(
         dispatcherProvider: DispatcherProvider,
         sharedPreferencesProvider: SharedPreferencesProvider,

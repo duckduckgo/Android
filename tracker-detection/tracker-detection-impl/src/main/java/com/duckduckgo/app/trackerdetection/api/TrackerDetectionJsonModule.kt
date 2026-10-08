@@ -17,11 +17,11 @@
 package com.duckduckgo.app.trackerdetection.api
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Qualifier
 
 @Qualifier
@@ -40,7 +40,7 @@ object TrackerDetectionJsonModule {
         .build()
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @TrackerDetectionMoshi
     fun trackerDetectionMoshi(): Moshi = moshi
 }

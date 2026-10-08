@@ -21,10 +21,10 @@ import com.duckduckgo.contentscopescripts.impl.features.messagebridge.store.Mess
 import com.duckduckgo.contentscopescripts.impl.features.messagebridge.store.MessageBridgeRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class MessageBridgeFeaturePlugin @Inject constructor(
     private val messageBridgeRepository: MessageBridgeRepository,
 ) : PrivacyFeaturePlugin {

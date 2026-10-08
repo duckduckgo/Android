@@ -5,15 +5,15 @@ import androidx.core.net.toUri
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.di.scopes.ActivityScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface AddressDisplayFormatter {
     fun getShortUrl(url: String?): String
 }
 
-@SingleInstanceIn(ActivityScope::class)
+@SingleIn(ActivityScope::class)
 @ContributesBinding(ActivityScope::class)
 class RealAddressDisplayFormatter @Inject constructor(
     private val context: Context,

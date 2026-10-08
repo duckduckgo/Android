@@ -32,7 +32,8 @@ import com.duckduckgo.sync.impl.SyncBuildConfig
 import com.duckduckgo.sync.impl.auth.AuthLauncher.AuthResult
 import com.duckduckgo.sync.impl.auth.AuthPrompt.Enroll
 import com.duckduckgo.sync.impl.auth.AuthPrompt.Verify
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
@@ -50,7 +51,7 @@ interface AuthPromptRenderer {
     fun bind(prompts: Flow<AuthPrompt?>)
 }
 
-@ContributesBinding(ActivityScope::class, boundType = AuthPromptRenderer::class)
+@ContributesBinding(ActivityScope::class, binding = binding<AuthPromptRenderer>())
 class RealAuthPromptRenderer @Inject constructor(
     private val activity: AppCompatActivity,
     private val launcher: AuthLauncher,

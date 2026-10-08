@@ -23,10 +23,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.referral.api.AppInstallationReferrerStateListener
 import com.duckduckgo.referral.api.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
 import com.duckduckgo.referral.api.ReferrerParserPlugin
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -60,10 +61,10 @@ interface CustomAiOnboardingResolver {
     suspend fun resolve(): Boolean
 }
 
-@SingleInstanceIn(scope = AppScope::class)
-@ContributesBinding(scope = AppScope::class, boundType = CustomAiOnboardingStore::class)
-@ContributesBinding(scope = AppScope::class, boundType = CustomAiOnboardingResolver::class)
-@ContributesMultibinding(scope = AppScope::class, boundType = ReferrerParserPlugin::class)
+@SingleIn(scope = AppScope::class)
+@ContributesBinding(scope = AppScope::class, binding = binding<CustomAiOnboardingStore>())
+@ContributesBinding(scope = AppScope::class, binding = binding<CustomAiOnboardingResolver>())
+@ContributesIntoSet(scope = AppScope::class, binding = binding<ReferrerParserPlugin>())
 class CustomAiOnboardingStoreImpl @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val referrerStateListener: Lazy<AppInstallationReferrerStateListener>,

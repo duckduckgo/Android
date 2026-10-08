@@ -42,9 +42,9 @@ import com.duckduckgo.featuretoggles.internal.databinding.ActivityFeatureToggleI
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
@@ -273,7 +273,7 @@ object LaunchFeatureToggleInventoryActivityNoParams : ActivityParams {
     private fun readResolve(): Any = LaunchFeatureToggleInventoryActivityNoParams
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoMap(AppScope::class)
 @PriorityKey(InternalFeaturePlugin.FEATURE_INVENTORY_PRIO_KEY)
 class FeatureInventoryInternalFeaturePlugin @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,

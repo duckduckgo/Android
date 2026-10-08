@@ -21,17 +21,17 @@ import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.FireMode
 import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 /**
  * Resolves a per-mode [TabRepository]. Delegates to the [RegularMode] or [FireMode] repository
  * based on the active [BrowserMode].
  */
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealTabRepositoryProvider @Inject constructor(
     @RegularMode private val regularRepo: TabRepository,
     @FireMode private val fireRepo: TabRepository,

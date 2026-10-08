@@ -27,7 +27,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.api.SYNC_NOTIFICATION_CHANNEL_ID
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.sync.impl.R
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface SyncNotificationBuilder {

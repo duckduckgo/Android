@@ -36,10 +36,10 @@ import com.duckduckgo.common.ui.store.ThemingSharedPreferences
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.widget.AppWidgetThemePreferences
 import com.duckduckgo.widget.WidgetPreferences
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.ContributesTo
 
 @Module
 @ContributesTo(AppScope::class)

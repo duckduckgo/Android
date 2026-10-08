@@ -24,7 +24,7 @@ import com.duckduckgo.savedsites.api.models.*
 import com.duckduckgo.savedsites.impl.sync.*
 import com.duckduckgo.savedsites.store.*
 import com.duckduckgo.sync.api.*
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import io.reactivex.*
 import kotlinx.coroutines.flow.*
 import java.util.*
