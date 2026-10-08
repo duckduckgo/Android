@@ -42,7 +42,6 @@ class PirFreemiumAttributeMatcherPlugin @Inject constructor(
             }
 
             is PirFreemiumFirstScanResultJsonMatchingAttribute -> {
-                // No outcome yet must never match: a user whose scan is still running would be told nothing was found.
                 val firstScanResult = pirFreemiumDataStore.firstScanResult ?: return false
                 matchingAttribute.remoteValue.equals(firstScanResult.rmfValue, ignoreCase = true)
             }
@@ -51,7 +50,6 @@ class PirFreemiumAttributeMatcherPlugin @Inject constructor(
         }
     }
 
-    // Spelled out rather than derived from the enum names: the values are shared with the iOS config.
     private val PirFreemiumFirstScanResult.rmfValue: String
         get() = when (this) {
             PirFreemiumFirstScanResult.NO_MATCHES -> "noMatches"
