@@ -6455,48 +6455,46 @@ class BrowserTabFragment :
             }
             brandDesignFitLayoutListener = listener
             brandDesignDialogScrollView.viewTreeObserver.addOnGlobalLayoutListener(listener)
-            if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
-                var imeCta: DaxBubbleCta.BrandDesignUpdateBubbleCta? = null
-                // The tab shrinks before the keyboard arrives, briefly uncovering what's behind it.
-                var restoreBehindTab: (() -> Unit)? = null
-                val callback = KeyboardFollowingCallback(
-                    views = {
-                        listOfNotNull<View>(
-                            brandDesignDialogScrollView.findViewById(R.id.wavingDax),
-                            newBrowserTab.rebrandBrowserBackground,
-                        )
-                    },
-                    layoutBottomInset = { (binding.rootView.layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin ?: 0 },
-                    onStarted = {
-                        nativeInputManager.onKeyboardAnimationChanged(true)
-                        imeCta = (lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.also { it.onImeAnimationStarted() }
-                        val behindTab = binding.rootView.parent as? View
-                        val fill = newBrowserTab.newTabLayout.background as? ColorDrawable
-                        val insets = ViewCompat.getRootWindowInsets(binding.rootView)
-                        if (insets?.isVisible(WindowInsetsCompat.Type.ime()) == false && behindTab != null && fill != null) {
-                            val previous = behindTab.background
-                            val gestureBar = insets.getInsets(
-                                WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout(),
-                            ).bottom
-                            val layers = listOfNotNull(previous, ColorDrawable(fill.color))
-                            behindTab.background = LayerDrawable(layers.toTypedArray()).apply {
-                                setLayerInset(layers.lastIndex, 0, 0, 0, gestureBar)
-                            }
-                            restoreBehindTab = { behindTab.background = previous }
+            var imeCta: DaxBubbleCta.BrandDesignUpdateBubbleCta? = null
+            // The tab shrinks before the keyboard arrives, briefly uncovering what's behind it.
+            var restoreBehindTab: (() -> Unit)? = null
+            val callback = KeyboardFollowingCallback(
+                views = {
+                    listOfNotNull<View>(
+                        brandDesignDialogScrollView.findViewById(R.id.wavingDax),
+                        newBrowserTab.rebrandBrowserBackground,
+                    )
+                },
+                layoutBottomInset = { (binding.rootView.layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin ?: 0 },
+                onStarted = {
+                    nativeInputManager.onKeyboardAnimationChanged(true)
+                    imeCta = (lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.also { it.onImeAnimationStarted() }
+                    val behindTab = binding.rootView.parent as? View
+                    val fill = newBrowserTab.newTabLayout.background as? ColorDrawable
+                    val insets = ViewCompat.getRootWindowInsets(binding.rootView)
+                    if (insets?.isVisible(WindowInsetsCompat.Type.ime()) == false && behindTab != null && fill != null) {
+                        val previous = behindTab.background
+                        val gestureBar = insets.getInsets(
+                            WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout(),
+                        ).bottom
+                        val layers = listOfNotNull(previous, ColorDrawable(fill.color))
+                        behindTab.background = LayerDrawable(layers.toTypedArray()).apply {
+                            setLayerInset(layers.lastIndex, 0, 0, 0, gestureBar)
                         }
-                    },
-                    onEnded = {
-                        nativeInputManager.onKeyboardAnimationChanged(false)
-                        imeCta?.onImeAnimationEnded()
-                        imeCta = null
-                        restoreBehindTab?.invoke()
-                        restoreBehindTab = null
-                        clipWavingDaxAtCover()
-                    },
-                )
-                brandDesignKeyboardCallback = callback
-                ViewCompat.setWindowInsetsAnimationCallback(brandDesignDialogScrollView, callback)
-            }
+                        restoreBehindTab = { behindTab.background = previous }
+                    }
+                },
+                onEnded = {
+                    nativeInputManager.onKeyboardAnimationChanged(false)
+                    imeCta?.onImeAnimationEnded()
+                    imeCta = null
+                    restoreBehindTab?.invoke()
+                    restoreBehindTab = null
+                    clipWavingDaxAtCover()
+                },
+            )
+            brandDesignKeyboardCallback = callback
+            ViewCompat.setWindowInsetsAnimationCallback(brandDesignDialogScrollView, callback)
         }
 
         fun removeBrandDesignFitListener() {
