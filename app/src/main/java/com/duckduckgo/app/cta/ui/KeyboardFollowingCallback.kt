@@ -16,9 +16,7 @@
 
 package com.duckduckgo.app.cta.ui
 
-import android.animation.LayoutTransition
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsCompat
@@ -31,7 +29,6 @@ import androidx.core.view.WindowInsetsCompat
 internal class KeyboardFollowingCallback(
     private val views: () -> List<View>,
     private val layoutBottomInset: () -> Int,
-    private val reflowParent: () -> ViewGroup?,
     private val onStarted: () -> Unit,
     private val onEnded: () -> Unit,
 ) : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_CONTINUE_ON_SUBTREE) {
@@ -41,7 +38,6 @@ internal class KeyboardFollowingCallback(
         private set
     private var baseTranslations: Map<View, Float> = emptyMap()
     private var startBottom = 0
-    private val pausedTransitions = mutableSetOf<LayoutTransition>()
 
     override fun onPrepare(animation: WindowInsetsAnimationCompat) {
         if (!animation.isIme()) return
@@ -52,7 +48,6 @@ internal class KeyboardFollowingCallback(
             onStarted()
         }
         startBottom = rootBottomInset()
-        pauseReflow()
     }
 
     override fun onStart(
@@ -67,10 +62,7 @@ internal class KeyboardFollowingCallback(
         insets: WindowInsetsCompat,
         runningAnimations: MutableList<WindowInsetsAnimationCompat>,
     ): WindowInsetsCompat {
-        if (runningAnimations.any { it.isIme() }) {
-            pauseReflow()
-            translate(layoutBottomInset() - insets.getInsets(INSET_TYPES).bottom)
-        }
+        if (runningAnimations.any { it.isIme() }) translate(layoutBottomInset() - insets.getInsets(INSET_TYPES).bottom)
         return insets
     }
 
@@ -85,23 +77,12 @@ internal class KeyboardFollowingCallback(
         isAnimating = false
         runningImeAnimations = 0
         translate(0)
-        pausedTransitions.forEach { it.enableTransitionType(LayoutTransition.CHANGING) }
-        pausedTransitions.clear()
         baseTranslations = emptyMap()
         onEnded()
     }
 
     private fun translate(offsetPx: Int) {
         baseTranslations.forEach { (view, base) -> view.translationY = base + offsetPx }
-    }
-
-    // A CHANGING transition on the parent would animate the views' container through intermediate bounds as the
-    // tab resizes. Checked every frame because the transition can be installed mid-animation.
-    private fun pauseReflow() {
-        val transition = reflowParent()?.layoutTransition ?: return
-        if (!transition.isTransitionTypeEnabled(LayoutTransition.CHANGING)) return
-        transition.disableTransitionType(LayoutTransition.CHANGING)
-        pausedTransitions += transition
     }
 
     private fun rootBottomInset(): Int =

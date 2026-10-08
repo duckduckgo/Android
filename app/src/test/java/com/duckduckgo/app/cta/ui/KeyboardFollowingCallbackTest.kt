@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.cta.ui
 
-import android.animation.LayoutTransition
 import android.app.Activity
 import android.view.View
 import android.widget.FrameLayout
@@ -25,8 +24,6 @@ import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
@@ -35,9 +32,7 @@ import org.robolectric.Robolectric
 class KeyboardFollowingCallbackTest {
 
     private val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
-    private val parent = FrameLayout(activity).apply {
-        layoutTransition = LayoutTransition().apply { enableTransitionType(LayoutTransition.CHANGING) }
-    }
+    private val parent = FrameLayout(activity)
     private val dax = View(activity)
 
     init {
@@ -53,7 +48,6 @@ class KeyboardFollowingCallbackTest {
     private val callback = KeyboardFollowingCallback(
         views = { listOf(dax) },
         layoutBottomInset = { layoutInset },
-        reflowParent = { parent },
         onStarted = {},
         onEnded = { endedCount++ },
     )
@@ -65,16 +59,13 @@ class KeyboardFollowingCallbackTest {
         callback.onProgress(insets, mutableListOf(animation))
     }
 
-    private fun changingEnabled() = parent.layoutTransition.isTransitionTypeEnabled(LayoutTransition.CHANGING)
-
     @Test
-    fun whenAnimating_thenFollowsKeyboardAndPausesReflow() {
+    fun whenAnimating_thenFollowsKeyboard() {
         val animation = imeAnimation()
         callback.onPrepare(animation)
         progress(animation, imeBottom = 400)
 
         assertEquals(610f, dax.translationY)
-        assertFalse(changingEnabled())
     }
 
     @Test
@@ -86,7 +77,6 @@ class KeyboardFollowingCallbackTest {
         callback.restore()
 
         assertEquals(10f, dax.translationY)
-        assertTrue(changingEnabled())
         assertEquals(1, endedCount)
     }
 
@@ -100,11 +90,9 @@ class KeyboardFollowingCallbackTest {
 
         callback.onEnd(first)
         assertEquals(0, endedCount)
-        assertFalse(changingEnabled())
 
         callback.onEnd(second)
         assertEquals(10f, dax.translationY)
-        assertTrue(changingEnabled())
         assertEquals(1, endedCount)
     }
 

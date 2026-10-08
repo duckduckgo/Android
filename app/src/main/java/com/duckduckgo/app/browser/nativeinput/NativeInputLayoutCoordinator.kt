@@ -59,6 +59,8 @@ class NativeInputLayoutCoordinator(
     private var contentTransitionGroup: ViewGroup? = null
     private var suspendedContentTransition: LayoutTransition? = null
     private var isContentReflowSuspended: Boolean = false
+    private var isReflowSuspendRequested: Boolean = false
+    private var isImeAnimating: Boolean = false
 
     fun buildWidgetLayoutParams(isBottom: Boolean, topInsetPx: Int = 0): ViewGroup.LayoutParams {
         return CoordinatorLayout.LayoutParams(
@@ -221,7 +223,9 @@ class NativeInputLayoutCoordinator(
         // transition owner so begin/endNavBarSlide can suspend it.
         contentTransitionGroup = ntpGroup
         isContentReflowSuspended = false
+        isReflowSuspendRequested = false
         suspendedContentTransition = null
+        syncContentReflow()
         if (ntpGroup != null) {
             pendingContentLayoutTransition =
                 ntpGroup to
@@ -366,6 +370,7 @@ class NativeInputLayoutCoordinator(
                     contentTransitionGroup = null
                     suspendedContentTransition = null
                     isContentReflowSuspended = false
+                    isReflowSuspendRequested = false
                     targets.forEach { target ->
                         applyPadding(target.view, target.basePadding, deltaTop = 0, deltaBottom = 0)
                     }
@@ -421,18 +426,41 @@ class NativeInputLayoutCoordinator(
      * clock and lagging the driver. Idempotent; paired with [resumeContentReflow].
      */
     fun suspendContentReflow() {
-        if (isContentReflowSuspended) return
-        val group = contentTransitionGroup ?: return
-        isContentReflowSuspended = true
-        suspendedContentTransition = group.layoutTransition
-        group.layoutTransition = null
+        isReflowSuspendRequested = true
+        syncContentReflow()
     }
 
+    /**
+     * Ends a [suspendContentReflow]. Reflow stays suspended while the keyboard is still animating
+     * ([setImeAnimating]), so the keyboard ending can't re-enable it mid-exit and vice versa.
+     */
     fun resumeContentReflow() {
-        if (!isContentReflowSuspended) return
-        isContentReflowSuspended = false
-        contentTransitionGroup?.layoutTransition = suspendedContentTransition
-        suspendedContentTransition = null
+        isReflowSuspendRequested = false
+        syncContentReflow()
+    }
+
+    fun setImeAnimating(animating: Boolean) {
+        isImeAnimating = animating
+        syncContentReflow()
+    }
+
+    /**
+     * Single writer of the suspended state: the transition is parked while either a [suspendContentReflow] caller
+     * or the keyboard needs it off, and only reinstalled once both have ended. Called without a group (no widget attached)
+     * it no-ops; the next [configureContentOffset] re-applies the current reasons to the new group.
+     */
+    private fun syncContentReflow() {
+        val suspend = isReflowSuspendRequested || isImeAnimating
+        if (suspend == isContentReflowSuspended) return
+        val group = contentTransitionGroup ?: return
+        isContentReflowSuspended = suspend
+        if (suspend) {
+            suspendedContentTransition = group.layoutTransition
+            group.layoutTransition = null
+        } else {
+            group.layoutTransition = suspendedContentTransition
+            suspendedContentTransition = null
+        }
     }
 
     /**
@@ -462,7 +490,8 @@ class NativeInputLayoutCoordinator(
 
     fun enableContentLayoutTransition() {
         val (ntpGroup, transition) = pendingContentLayoutTransition ?: return
-        ntpGroup.layoutTransition = transition
+        // The enter often completes while the keyboard is still opening; hand it to the resume rather than install it mid-suspension.
+        if (isContentReflowSuspended) suspendedContentTransition = transition else ntpGroup.layoutTransition = transition
         pendingContentLayoutTransition = null
     }
 

@@ -6467,8 +6467,8 @@ class BrowserTabFragment :
                         )
                     },
                     layoutBottomInset = { (binding.rootView.layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin ?: 0 },
-                    reflowParent = { brandDesignDialogScrollView.parent as? ViewGroup },
                     onStarted = {
+                        nativeInputManager.onKeyboardAnimationChanged(true)
                         imeCta = (lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.also { it.onImeAnimationStarted() }
                         val behindTab = binding.rootView.parent as? View
                         val fill = newBrowserTab.newTabLayout.background as? ColorDrawable
@@ -6486,6 +6486,7 @@ class BrowserTabFragment :
                         }
                     },
                     onEnded = {
+                        nativeInputManager.onKeyboardAnimationChanged(false)
                         imeCta?.onImeAnimationEnded()
                         imeCta = null
                         restoreBehindTab?.invoke()
