@@ -48,6 +48,48 @@
             }
         ]
     },
+    "subscription_onboarding_step_shown": {
+        "description": "Fired when a native subscription onboarding step screen is shown",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": [
+            {
+                "description": "The onboarding step that was shown",
+                "type": "string"
+            },
+            "count_short",
+            "form_factor"
+        ],
+        "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_onboarding_step_completed": {
+        "description": "Fired when a native subscription onboarding step is completed by the user",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": [
+            {
+                "description": "The onboarding step that was completed",
+                "type": "string"
+            },
+            "count_short",
+            "form_factor"
+        ],
+        "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_onboarding_step_skipped": {
+        "description": "Fired when a native subscription onboarding step is skipped by the user",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": [
+            {
+                "description": "The onboarding step that was skipped",
+                "type": "string"
+            },
+            "count_short",
+            "form_factor"
+        ],
+        "parameters": ["appVersion", "freeTrial"]
+    },
     "subscription_webview_render_process_crash": {
         "description": "Fired when a render process crash is reported by the WebView that shows subscription pages.",
         "owners": ["lmac012"],
@@ -184,6 +226,13 @@
                 ]
             }
         ]
+    },
+    "m_privacy-pro_app-settings_partner-benefits_click": {
+        "description": "The user tapped 'Partner Benefits' (DuckDuckGo Subscription) in the app-wide Settings.",
+        "owners": ["Kyriakos-Georgiopoulos"],
+        "triggers": ["other"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion"]
     },
     "m_privacy-pro_app-settings_get_click": {
         "description": "The user tapped 'Get Subscription' (DuckDuckGo Subscription) in the app-wide Settings.",

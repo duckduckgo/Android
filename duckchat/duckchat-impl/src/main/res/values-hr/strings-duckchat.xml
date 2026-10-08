@@ -122,7 +122,6 @@
     <string name="duckAIContextualAutomaticContextMessage">Automatski pošalji sadržaj stranice Duck.ai-ju</string>
 
     <!-- Contextual sheet quick action -->
-    <string name="duckAIContextualPromptAskAboutPage">Pitaj o stranici</string>
 
     <!-- Contextual sheet suggested prompts; native copy for PageSuggestionsCatalog.json entries, keyed by catalog id -->
     <string name="duckAiSuggestionTranslatePageLabel" instruction="Suggested prompt chip: translate the current page">Prevedi ovu stranicu</string>
@@ -205,7 +204,6 @@
     <string name="duckAiSuggestionPersonBackgroundPrompt" instruction="Suggested prompt submitted text: summarize a person&apos;s background">Sažmi biografiju i značajan rad ove osobe.</string>
 
     <!-- Contextual sheet input hint -->
-    <string name="contextualSheetImprovedHint">Privatno pitaj bilo što</string>
     <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Nedavna čavrljanja</string>
 
     <!-- duck.ai contextual fire button -->
@@ -255,10 +253,10 @@
     <string name="duck_ai_chat_history_action_new">Novo</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Preuzmi čavrljanja</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Preuzimanje je dovršeno za %1$d čavrljanje</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Preuzimanje je dovršeno za %1$d čavrljanje</item>
         <item quantity="few">Preuzimanje je dovršeno za %1$d čavrljanja</item>
         <item quantity="many">Preuzimanje je dovršeno za %1$d čavrljanja</item>
-        <item quantity="other">Preuzimanje je dovršeno za %1$d čavrljanja</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Preuzimanje je dovršeno za %1$d čavrljanja</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Otvori izbornik prelijevanja</string>
     <string name="duck_ai_chat_history_select_all">Odaberi sve</string>
@@ -284,6 +282,11 @@
     <string name="native_input_chat_duck_mode_hint">Odgovori…</string>
 
     <!-- Model Picker -->
+    <string name="duckAiModelPickerLabelEverydayUse" instruction="Subline under a model in the Duck.ai model picker, describing what that model suits.">Najbolje za svakodnevnu uporabu</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster" instruction="Subline under a model in the Duck.ai model picker. &apos;Limits&apos; means the user&apos;s usage allowance, which this model consumes more quickly.">Pouzdano, ali prije doseže ograničenja</string>
+    <string name="duckAiModelPickerTryFreeTrial" instruction="Header above the locked models in the Duck.ai model picker, shown when the user can still start a free trial.">Isprobaj besplatno</string>
+    <string name="duckAiModelPickerSubscriberExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when unlocking them requires a paid subscription.">Ekskluzivno za pretplatnike</string>
+    <string name="duckAiModelPickerProExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when they require the Pro plan specifically. &apos;Pro&apos; is the plan name and stays untranslated.">Ekskluzivno za plan Pro</string>
     <string name="duckAiModelPickerPlusModels">Plus</string>
     <string name="duckAiModelPickerProModels">Pro</string>
 
@@ -344,10 +347,62 @@
     <string name="duckAiSettingsTitle">Postavke usluge Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutPage">Pitaj o stranici</string>
 
     <!-- Editing a message already sent to Duck.ai -->
     <string name="duck_ai_edit_prompt_title" instruction="Screen title: the user is editing a message they already sent to Duck.ai">Uredi poruku</string>
     <string name="duck_ai_edit_prompt_lose_responses_warning" instruction="Warning shown while editing a sent message: the answer Duck.ai already gave will be discarded and answered again">Uređivanjem će se odgovor zamijeniti novim.</string>
 
+    <string name="duckChatContextualAskAboutPage">Pitaj o stranici</string>
+    <string name="duckChatContextualAskAboutSearch">Nastavi u Duck.ai</string>
+    <string name="duckChatContextualOpenDuckAi">Otvori Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Sažmi ovaj odabir</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Sažmi ovaj odabir.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Prevedi ovaj odabir</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Prevedi ovaj odabir na %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Odabir teksta</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Možeš dodati do %1$d odabira teksta. Ukloni jedan da dodaš drugi.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Pitaj Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d riječ</item>
+        <item quantity="few">%1$d riječi</item>
+        <item quantity="many">%1$d riječi</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d riječi</item>
+    </plurals>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model&apos;s short name">%1$s troši uporabna ograničenja do 2 do 5 puta brže od osnovnih modela.</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Odbaci</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">%1$d %% dnevnog ograničenja</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">%1$d %% tjednog ograničenja</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Dosegnuto je dnevno ograničenje</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Dosegnuto je tjedno ograničenje</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Dosegnuto je tjedno ograničenje korištenja</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Dosegnuto je ograničenje za napredne AI modele</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Prebacivanje na drugi model</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Počni koristiti tjedno ograničenje</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Besplatno isprobaj pretplatu</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">Pretplati se</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as &apos;2 days&apos; or &apos;5 hours&apos;">Resetira se za %1$s</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d dan</item>
+        <item quantity="few">%1$d dana</item>
+        <item quantity="many">%1$d dana</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d dana</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d sat</item>
+        <item quantity="few">%1$d sata</item>
+        <item quantity="many">%1$d sati</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d sati</item>
+    </plurals>
 </resources>

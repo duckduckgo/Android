@@ -63,8 +63,8 @@
     <string name="undoSnackbarAction">Återställ</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Spårare har blockerats</item>
-        <item quantity="other">Spårare har blockerats</item>
+        <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">Spårare har blockerats</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">Spårare har blockerats</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -213,13 +213,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Hämta webbläsare för dator</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo för Mac och Windows</string>
-    <string name="getDesktopBrowserTitle">Skydda din personliga information på Mac och Windows också!</string>
-    <string name="getDesktopBrowserBody">För att ladda ner DuckDuckGo på Mac eller Windows, besök:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Dela nedladdningslänk</string>
-    <string name="getDesktopBrowserNoThanks">Nej tack</string>
     <string name="getDesktopBrowserHideItem">Dölj</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Länken har kopierats</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Skydd mot popup-fönster för cookies</string>
@@ -229,7 +223,7 @@
     <string name="dataClearingDescription">Att radera dina data kan bidra till att skydda din integritet online. Använd Fire Button för att radera data manuellt eller ställ in automatisk radering.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d webbplats undantas från rensning</item>
-        <item quantity="other">%1$d webbplatser undantas från rensning</item>
+        <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d webbplatser undantas från rensning</item>
     </plurals>
     <string name="dataClearingAutomaticClearingOn">På</string>
     <string name="dataClearingAutomaticClearingOff">Av</string>
@@ -256,8 +250,8 @@
     <string name="singleTabFireDialogSubtitleSiteData">Om du tar bort webbplatsdata kan du loggas ut från konton.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Detta kommer att avbryta pågående nerladdningar.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">%1$d flik och dess data raderades</item>
-        <item quantity="other">%1$d flikar och deras data raderades</item>
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">%1$d flik och dess data raderades</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">%1$d flikar och deras data raderades</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Webbplatsdata kunde inte raderas. Uppdatera WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Webbplatsdata kunde inte raderas på grund av ett fel.</string>
@@ -772,12 +766,12 @@
     <string name="onboardingSerpDaxDialogButton">Jag förstår!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Prova sedan att besöka en webbplats!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
-        <item quantity="one"><![CDATA[ och <b>%1$d till</b> försökte spåra dig här. Jag blockerade dem!<br/><br/>☝️ Tryck på skölden för mer information.️]]></item>
-        <item quantity="other"><![CDATA[ och <b>%1$d till</b> försökte spåra dig här. Jag blockerade dem!<br/><br/>☝️ Tryck på skölden för mer information.️]]></item>
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[ och <b>%1$d till</b> försökte spåra dig här. Jag blockerade dem!<br/><br/>☝️ Tryck på skölden för mer information.️]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[ och <b>%1$d till</b> försökte spåra dig här. Jag blockerade dem!<br/><br/>☝️ Tryck på skölden för mer information.️]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ försökte spåra dig här. Jag blockerade dem!<br/><br/>☝️ Tryck på skölden för mer information.️]]></item>
-        <item quantity="other"><![CDATA[ försökte spåra dig här. Jag blockerade dem!<br/><br/>☝️ Tryck på skölden för mer information.️]]></item>
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[ försökte spåra dig här. Jag blockerade dem!<br/><br/>☝️ Tryck på skölden för mer information.️]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[ försökte spåra dig här. Jag blockerade dem!<br/><br/>☝️ Tryck på skölden för mer information.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Jag förstår!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Rensa omedelbart din surfaktivitet med <b>Fire Button</b>.<br/><br/>Prova!️ 🔥]]></string>
@@ -966,10 +960,23 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Lägg till widget</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Hoppa över</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Importera lösenord från Google</string>
+    <string name="preOnboardingImportPasswordsBody">Google kan be dig att logga in eller ange ditt lösenord för att bekräfta åtgärden.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Importera från Google</string>
+    <string name="preOnboardingImportCompleteTitle">Importen är klar</string>
+    <string name="preOnboardingImportCompleteCta">Fortsätt</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Importerar lösenord</string>
+    <string name="preOnboardingImportCompleteParsingBody">Detta tar bara ett ögonblick.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Importen misslyckades</string>
+    <string name="preOnboardingImportCompleteFailed">Lösenordsimporten misslyckades</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Importerade lösenord: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Hoppade över (dubblett eller ogiltig): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Något gick fel</string>
+    <string name="preOnboardingImportErrorBody">Försök igen.</string>
+    <string name="preOnboardingImportErrorRetry">Försök igen</string>
+
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Lägg till mig i din favoritrad.</string>
-    <string name="preOnboardingAddToDockBody">Leta upp DuckDuckGo-ikonen på startskärmen. Tryck och dra den därefter på plats. Sedan är det klart!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Jag förstår!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Starta en privat AI-chatt med Duck.ai eller byt till Sök för skyddad surfning.<br/><br/>Du kan använda Duck.ai överallt där du ser chattikonen]]></string>
@@ -1003,4 +1010,11 @@
     <string name="singleTabFireDialogTitleFireMode">Ta bort Fire Tabs och deras data?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Det går inte att öppna filen. Sök efter en kompatibel app.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo kan inte läsa in den här sidan</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Internetanslutningen verkar vara offline.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">En server med det angivna värdnamnet kunde inte hittas.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Certifikatet för denna server är ogiltigt. Du kanske ansluter till en server som låtsas vara <b>%1$s</b>. Detta kan utgöra en risk för din konfidentiella information.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Menade du <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

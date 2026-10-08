@@ -37,7 +37,6 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsNewBinding
 import com.duckduckgo.app.browser.mode.InAppNavigation
-import com.duckduckgo.app.desktopbrowser.GetDesktopBrowserActivityParams
 import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedScreenNoParams
 import com.duckduckgo.app.firebutton.DataClearingSettingsScreenNoParams
 import com.duckduckgo.app.generalsettings.GeneralSettingsScreenNoParams
@@ -113,6 +112,7 @@ import kotlinx.coroutines.flow.onEach
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 private const val OTHER_PLATFORMS_URL = "https://duckduckgo.com/app"
 
@@ -303,6 +303,10 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureSettings() {
+        viewsPrivacy.vpnSetting.setLeadingIconResource(
+            resolveAppTpSettingsIcon(appBrandDesignUpdateToggles.pictograms().isEnabled()),
+        )
+
         if (proSettingsPlugin.isEmpty()) {
             viewsPro.gone()
         } else {
@@ -544,7 +548,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is LaunchOtherPlatforms -> launchActivityAndFinish(
                 BrowserActivity.intent(context = this, launchSource = InAppNavigation, queryExtra = OTHER_PLATFORMS_URL),
             )
-            is Command.LaunchGetDesktopBrowser -> launchScreen(GetDesktopBrowserActivityParams(source = GetDesktopBrowserActivityParams.Source.OTHER))
+            is Command.LaunchGetDesktopBrowser -> launchScreen(SettingsDesktopBrowserPromotionParams.forSettingsListItem())
             is Command.LaunchWhatsNew -> launchScreen(ModalSurfaceActivityFromMessageId(it.messageId, it.messageType, launchedFromSettings = true))
         }
     }
@@ -599,3 +603,6 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 }
+
+internal fun resolveAppTpSettingsIcon(isPictogramsEnabled: Boolean): Int =
+    if (isPictogramsEnabled) CommonR.drawable.homescreen_lock_color_24 else CommonR.drawable.lock_color_24

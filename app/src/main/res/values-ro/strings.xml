@@ -63,9 +63,9 @@
     <string name="undoSnackbarAction">Anulează</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Instrument de urmărire blocat</item>
+        <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">Instrument de urmărire blocat</item>
         <item quantity="few">Instrumente de urmărire blocate</item>
-        <item quantity="other">Instrumente de urmărire blocate</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">Instrumente de urmărire blocate</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -214,13 +214,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Obține browserul pentru desktop</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo pentru Mac și Windows</string>
-    <string name="getDesktopBrowserTitle">Protejează-ți informațiile personale și pe Mac și Windows!</string>
-    <string name="getDesktopBrowserBody">Pentru a descărca DuckDuckGo pe Mac sau Windows, vizitează:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Trimite linkul de descărcare</string>
-    <string name="getDesktopBrowserNoThanks">Nu, mulțumesc</string>
     <string name="getDesktopBrowserHideItem">Ascunde</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link copiat</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protecție pentru ferestre pop-up aferente modulelor cookie</string>
@@ -231,7 +225,7 @@
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d site exclus de la ștergere</item>
         <item quantity="few">%1$d site-uri excluse de la ștergere</item>
-        <item quantity="other">%1$d site-uri excluse de la ștergere</item>
+        <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d site-uri excluse de la ștergere</item>
     </plurals>
     <string name="dataClearingAutomaticClearingOn">Activat</string>
     <string name="dataClearingAutomaticClearingOff">Dezactivat</string>
@@ -258,9 +252,9 @@
     <string name="singleTabFireDialogSubtitleSiteData">Ștergerea datelor de pe site te poate deconecta de la conturi.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Aceasta va anula descărcările în desfășurare.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">%1$d filă și datele aferente au fost șterse</item>
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">%1$d filă și datele aferente au fost șterse</item>
         <item quantity="few">%1$d file și datele aferente au fost șterse</item>
-        <item quantity="other">%1$d file și datele aferente au fost șterse</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">%1$d file și datele aferente au fost șterse</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Datele site-ului nu au putut fi șterse. Actualizează WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Datele site-ului nu au putut fi șterse din cauza unei erori.</string>
@@ -788,14 +782,14 @@
     <string name="onboardingSerpDaxDialogButton">Am înțeles!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Apoi, încearcă să vizitezi un site!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
-        <item quantity="one"><![CDATA[ și <b>încă %1$d</b> încerca să te urmărească aici. L-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[ și <b>încă %1$d</b> încerca să te urmărească aici. L-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
         <item quantity="few"><![CDATA[ și <b>încă %1$d</b> încercau să te urmărească aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
-        <item quantity="other"><![CDATA[ și <b>încă %1$d</b> încercau să te urmărească aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[ și <b>încă %1$d</b> încercau să te urmărească aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ încerca să te urmărească aici. L-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[ încerca să te urmărească aici. L-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
         <item quantity="few"><![CDATA[ încercau să te urmărească până aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
-        <item quantity="other"><![CDATA[ încercau să te urmărească până aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[ încercau să te urmărească până aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Am înțeles!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Șterge-ți instantaneu activitatea de navigare cu <b>Fire Button</b>.<br/><br/>Încearcă! 🔥]]></string>
@@ -984,10 +978,23 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Adaugă widget</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Omite</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Importă parole din Google</string>
+    <string name="preOnboardingImportPasswordsBody">Google îți poate solicita să te conectezi sau să completezi parola pentru a confirma.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Importă din Google</string>
+    <string name="preOnboardingImportCompleteTitle">Import finalizat</string>
+    <string name="preOnboardingImportCompleteCta">Continuă</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Se importă parolele</string>
+    <string name="preOnboardingImportCompleteParsingBody">Acest lucru va dura doar un moment.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Importul nu a reușit</string>
+    <string name="preOnboardingImportCompleteFailed">Importarea parolelor nu a reușit</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Parole importate: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Omise (duplicate sau nevalide): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Ceva nu a funcționat corect</string>
+    <string name="preOnboardingImportErrorBody">Încearcă din nou.</string>
+    <string name="preOnboardingImportErrorRetry">Încearcă din nou</string>
+
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Adaugă-mă în șirul tău de preferințe.</string>
-    <string name="preOnboardingAddToDockBody">Găsește pictograma DuckDuckGo pe ecranul de pornire. Apoi apasă și trage în poziție. Gata!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Am înțeles!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Începe o conversație privată cu IA cu Duck.ai sau comută la Căutare pentru navigare protejată.<br/><br/>Poți folosi Duck.ai de oriunde vezi pictograma de chat]]></string>
@@ -1021,4 +1028,11 @@
     <string name="singleTabFireDialogTitleFireMode">Ștergi filele Fire și datele aferente?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Nu se poate deschide fișierul. Caută o aplicație compatibilă.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo nu poate încărca această pagină</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Se pare că nu ești conectat la internet.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Nu a putut fi găsit un server cu numele de gazdă specificat.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Certificatul pentru acest server este incorect. S-ar putea să te conectezi la un server care pretinde a fi <b>%1$s</b>, ceea ce ar putea pune în pericol informațiile tale confidențiale.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Voiai să scrii <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

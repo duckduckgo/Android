@@ -25,6 +25,8 @@ import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
@@ -43,6 +45,7 @@ import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_C
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_GET_PAGE_CONTEXT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
+import com.duckduckgo.duckchat.impl.terms.DuckAiTermsConsent
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
@@ -74,6 +77,7 @@ import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
@@ -116,9 +120,9 @@ class RealDuckChatJSHelperTest {
     }
     private val mockEditPromptSessionStore: EditPromptSessionStore = mock()
     private val mockBrowserInteractionsPlugin: BrowserInteractionsPlugin = mock()
-    private val mockBrowserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock {
-        on { getPlugins() } doReturn listOf(mockBrowserInteractionsPlugin)
-    }
+    private val mockBrowserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
+    private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
+    private val mockTermsConsent: DuckAiTermsConsent = mock()
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
@@ -138,7 +142,13 @@ class RealDuckChatJSHelperTest {
         subscriptions = mockSubscriptions,
         editPromptSessionStore = mockEditPromptSessionStore,
         browserInteractionsPlugins = mockBrowserInteractionsPlugins,
+        duckAiSessionCallback = mockDuckAiSessionCallback,
+        termsConsent = mockTermsConsent,
     )
+
+    init {
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(mockBrowserInteractionsPlugin))
+    }
     private val viewModel =
         object {
             val updatedPageContext: String =
@@ -332,6 +342,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
@@ -345,6 +356,75 @@ class RealDuckChatJSHelperTest {
         assertEquals(expected.method, result.method)
         assertEquals(expected.featureName, result.featureName)
         assertEquals(expected.params.toString(), result.params.toString())
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndAllUsageWarningGatesPassThenSupportsNativeUsageWarningsIsTrue() = runTest {
+        mockDuckChatFeature.duckAiUsageWarnings().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockDuckChat.isNativeChatInputEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isNativeStorageEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertTrue(result!!.params.getBoolean("supportsNativeUsageWarnings"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndUsageWarningsFlagDisabledThenSupportsNativeUsageWarningsIsFalse() = runTest {
+        mockDuckChatFeature.duckAiUsageWarnings().setRawStoredState(Toggle.State(enable = false))
+        whenever(mockDuckChat.isNativeChatInputEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isNativeStorageEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsNativeUsageWarnings"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndNativeStorageDisabledThenSupportsNativeUsageWarningsIsFalse() = runTest {
+        mockDuckChatFeature.duckAiUsageWarnings().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockDuckChat.isNativeChatInputEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isNativeStorageEnabled()).thenReturn(false)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsNativeUsageWarnings"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesInFireModeThenSupportsNativeUsageWarningsIsFalse() = runTest {
+        mockDuckChatFeature.duckAiUsageWarnings().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockDuckChat.isNativeChatInputEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isNativeStorageEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+            browserMode = BrowserMode.FIRE,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsNativeUsageWarnings"))
     }
 
     @Test
@@ -705,6 +785,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
@@ -804,6 +885,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
@@ -965,6 +1047,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", false)
             put("supportsPageContext", true)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
@@ -1069,6 +1152,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", false)
             put("supportsPageContext", true)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", true)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
@@ -1116,6 +1200,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
@@ -1163,6 +1248,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", true)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
@@ -1704,6 +1790,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
@@ -1748,6 +1835,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
@@ -1792,6 +1880,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", true)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
@@ -1837,6 +1926,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
@@ -1937,6 +2027,69 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenReportMetricWithSubmittedPromptInFullModeThenPromptSubmittedReported() = runTest {
+        val data = JSONObject(mapOf("metricName" to "userDidSubmitPrompt"))
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = data,
+            mode = Mode.FULL,
+            tabId = "tab-1",
+        )
+
+        verify(mockDuckAiSessionCallback).onPromptSubmitted("tab-1")
+    }
+
+    @Test
+    fun whenReportMetricWithSubmittedPromptInContextualModeThenPromptSubmittedNotReported() = runTest {
+        val data = JSONObject(mapOf("metricName" to "userDidSubmitPrompt"))
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = data,
+            mode = Mode.CONTEXTUAL,
+            tabId = "tab-1",
+        )
+
+        verify(mockDuckAiSessionCallback, never()).onPromptSubmitted(any())
+    }
+
+    @Test
+    fun whenCloseAiChatInFullModeThenPendingBackOrCloseExitRecordedBeforeClosing() = runTest {
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "closeAIChat",
+            id = "123",
+            data = null,
+            mode = Mode.FULL,
+            tabId = "tab-1",
+        )
+
+        val inOrder = inOrder(mockDuckAiSessionCallback, mockDuckChat)
+        inOrder.verify(mockDuckAiSessionCallback).onExitIntent("tab-1", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
+        inOrder.verify(mockDuckChat).closeDuckChat()
+    }
+
+    @Test
+    fun whenCloseAiChatInContextualModeThenNoPendingExitRecorded() = runTest {
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "closeAIChat",
+            id = "123",
+            data = null,
+            mode = Mode.CONTEXTUAL,
+            tabId = "tab-1",
+        )
+
+        verify(mockDuckAiSessionCallback, never()).onExitIntent(any(), any())
+        verify(mockDuckChat).closeDuckChat()
+    }
+
+    @Test
     fun whenReportMetricIsUnrelatedThenDoesNotNotifyBrowserInteractions() = runTest {
         val data = JSONObject(mapOf("metricName" to "userDidOpenHistory"))
 
@@ -2008,6 +2161,38 @@ class RealDuckChatJSHelperTest {
         )
 
         verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_CREATE_NEW_CHAT)
+    }
+
+    @Test
+    fun whenReportMetricWithCreateNewChatInFullModeThenNewChatCreatedReported() = runTest {
+        val data = JSONObject(mapOf("metricName" to "userDidCreateNewChat"))
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = data,
+            mode = Mode.FULL,
+            tabId = "tab-1",
+        )
+
+        verify(mockDuckAiSessionCallback).onNewChatCreated("tab-1")
+    }
+
+    @Test
+    fun whenReportMetricWithCreateNewChatInContextualModeThenNewChatCreatedNotReported() = runTest {
+        val data = JSONObject(mapOf("metricName" to "userDidCreateNewChat"))
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = data,
+            mode = Mode.CONTEXTUAL,
+            tabId = "tab-1",
+        )
+
+        verify(mockDuckAiSessionCallback, never()).onNewChatCreated(any())
     }
 
     @Test
@@ -2220,12 +2405,23 @@ class RealDuckChatJSHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
+    fun whenConsumingTheHandoffPromptThenTheTermsConsentIsCarriedOnTheEvent() {
+        mockDuckChatFeature.chatTabAttachments().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockPendingTabContextStore.consume()).thenReturn(PendingTabContext("prompt", emptyList()))
+
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData", BrowserMode.REGULAR)
+
+        verify(mockTermsConsent).carry(eq(result!!.params), eq(BrowserMode.REGULAR))
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
     fun whenConsumeTabContextPromptOnHandoffWithHandoffMethodAndFeatureEnabledThenReturnsEvent() = runTest {
         mockDuckChatFeature.chatTabAttachments().setRawStoredState(Toggle.State(enable = true))
         val pageContext = JSONObject("""{"title":"Example","url":"https://example.com"}""")
         whenever(mockPendingTabContextStore.consume()).thenReturn(PendingTabContext("hello", listOf(pageContext)))
 
-        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData")
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData", BrowserMode.REGULAR)
 
         assertNotNull(result)
         assertEquals(DUCK_CHAT_FEATURE_NAME, result!!.featureName)
@@ -2237,7 +2433,7 @@ class RealDuckChatJSHelperTest {
 
     @Test
     fun whenConsumeTabContextPromptOnHandoffWithOtherMethodThenReturnsNull() {
-        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeConfigValues")
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeConfigValues", BrowserMode.REGULAR)
 
         assertNull(result)
         verify(mockPendingTabContextStore, never()).consume()
@@ -2249,14 +2445,14 @@ class RealDuckChatJSHelperTest {
         mockDuckChatFeature.chatTabAttachments().setRawStoredState(Toggle.State(enable = true))
         whenever(mockPendingTabContextStore.consume()).thenReturn(null)
 
-        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData")
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData", BrowserMode.REGULAR)
 
         assertNull(result)
     }
 
     @Test
     fun whenConsumeTabContextPromptOnHandoffWithFeatureDisabledThenReturnsNull() {
-        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData")
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData", BrowserMode.REGULAR)
 
         assertNull(result)
         verify(mockPendingTabContextStore, never()).consume()
@@ -2306,6 +2502,24 @@ class RealDuckChatJSHelperTest {
         assertTrue(query.getBoolean("autoSubmit"))
         assertEquals("model", query.getString("modelId"))
         assertFalse(query.has("reasoningEffort"))
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithPendingPromptThenTheTermsConsentIsCarriedOnThePayload() = runTest {
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(PendingNativePrompt("test prompt", null, null))
+
+        val result = testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext)
+
+        verify(mockTermsConsent).carry(eq(result!!.params), any())
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithNoPendingPromptThenTheTermsConsentIsNotCarried() = runTest {
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(null)
+
+        testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext)
+
+        verify(mockTermsConsent, never()).carry(any(), any())
     }
 
     @Test

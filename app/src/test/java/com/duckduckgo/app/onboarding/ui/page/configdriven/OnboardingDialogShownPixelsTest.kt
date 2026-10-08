@@ -78,14 +78,13 @@ class OnboardingDialogShownPixelsTest {
 
     @Test
     fun `fires the search experience shown pixel for the input screen`() {
-        testee.fireFor(NewUserOnboardingActivityDialog.InputScreen)
+        testee.fireFor(NewUserOnboardingActivityDialog.InputScreen())
 
         verify(pixel).fire(AppPixelName.PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
     }
 
     @Test
     fun `fires nothing for the dialogs legacy had no shown pixel for`() {
-        testee.fireFor(NewUserOnboardingActivityDialog.AddToDock)
         testee.fireFor(NewUserOnboardingActivityDialog.WidgetPrompt)
         testee.fireFor(
             NewUserOnboardingActivityDialog.InputScreenPreview(
@@ -96,7 +95,20 @@ class OnboardingDialogShownPixelsTest {
         )
         testee.fireFor(NewUserOnboardingActivityDialog.DownloadReason)
         testee.fireFor(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedSearchPath))
-        testee.fireFor(NewUserOnboardingActivityDialog.PreferenceSelector(mapOf(OnboardingPreference.SEARCH_HISTORY to true)))
+        testee.fireFor(
+            NewUserOnboardingActivityDialog.PreferenceSelector(
+                titleRes = R.string.searchPathPreferenceSelectorTitle,
+                rows = listOf(
+                    ContentConfig.PreferenceSelector.Row(
+                        preference = OnboardingPreference.SEARCH_HISTORY,
+                        iconRes = null,
+                        primaryText = TextConfig.Literal("history"),
+                        secondaryText = null,
+                        initiallyEnabled = true,
+                    ),
+                ),
+            ),
+        )
         testee.fireFor(
             NewUserOnboardingActivityDialog.QuickSetup(
                 showSplitOption = true,

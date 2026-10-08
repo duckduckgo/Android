@@ -28,7 +28,7 @@ xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/edit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/newTabPageMenuEdit" />
+        app:primaryText="@string/savedSiteDialogTitleEdit" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/addRemoveFavorite"

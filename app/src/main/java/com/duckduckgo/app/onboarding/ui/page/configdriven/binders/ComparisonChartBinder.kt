@@ -59,6 +59,10 @@ class ComparisonChartBinder(
             width = config.headerLeftIconSizeDp.toPx(context).toInt()
             height = config.headerLeftIconSizeDp.toPx(context).toInt()
         }
+        binding.comparisonChartHeaderRightIcon.updateLayoutParams {
+            width = 31.5f.toPx(context).toInt()
+            height = 31.5f.toPx(context).toInt()
+        }
         if (Build.VERSION.SDK_INT >= 28) {
             binding.comparisonChartHeaderLeftIconCard.addBottomShadow()
             binding.comparisonChartHeaderRightIconCard.addBottomShadow()
@@ -137,7 +141,7 @@ class ComparisonChartBinder(
                             checkView.alpha = 1f
                             checkView.scaleX = 1f
                             checkView.scaleY = 1f
-                            checkView.setImageResource(CommonR.drawable.ic_check_green_24)
+                            checkView.setImageResource(CommonR.drawable.check_recolorable_24)
                         }
                     },
                 )

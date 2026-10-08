@@ -26,7 +26,7 @@ interface UserBrowserProperties {
 
     @Deprecated(
         message = "Use AppBuildConfig.isNewInstall() to check for new installs, " +
-            "or PackageInfo.firstInstallTime / lastUpdateTime if you need the actual timestamp.",
+            "or AppInstallTimeProvider if you need the actual timestamp.",
     )
     fun daysSinceInstalled(): Long
     suspend fun daysUsedSince(since: Date): Long

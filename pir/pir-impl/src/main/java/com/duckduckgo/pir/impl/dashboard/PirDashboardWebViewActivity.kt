@@ -28,6 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
@@ -35,7 +36,7 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.pir.api.dashboard.PirDashboardWebViewScreen
+import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command.SendJsEvent
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command.SendResponseToJs
@@ -77,6 +78,7 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        setupCloseToolbarIfNeeded()
         configureEdgeToEdgeInsets()
 
         setupWebView()
@@ -89,6 +91,19 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
     override fun onDestroy() {
         cleanupWebView()
         super.onDestroy()
+    }
+
+    private fun setupCloseToolbarIfNeeded() {
+        if (!intent.getBooleanExtra(EXTRA_SHOW_CLOSE_BUTTON, false)) return
+
+        binding.includeToolbar.appBarLayout.isVisible = true
+        setupToolbar(binding.includeToolbar.toolbar)
+        binding.includeToolbar.toolbar.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_close_24)
+        supportActionBar?.title = ""
+
+        val toolbarColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
+        binding.includeToolbar.appBarLayout.setBackgroundColor(toolbarColor)
+        binding.includeToolbar.toolbar.setBackgroundColor(toolbarColor)
     }
 
     private fun configureEdgeToEdgeInsets() {
@@ -180,5 +195,9 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
 
     private fun sendResponseToJs(data: JsCallbackData) {
         pirWebJsMessaging.onResponse(data)
+    }
+
+    companion object {
+        const val EXTRA_SHOW_CLOSE_BUTTON = "extra_show_close_button"
     }
 }

@@ -31,30 +31,29 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.menu.applyMenuRadiusClipping
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
 @SuppressLint("ViewConstructor")
-class OptionsView(context: Context, private val host: NativeInputHost) : LinearLayout(context) {
+class OptionsView(context: Context, private val host: NativeInputHost) : LinearLayout(context), CompactableControl {
 
     @Inject lateinit var viewModelFactory: ViewViewModelFactory
 
     @Inject lateinit var nativeInputStateProvider: NativeInputStateProvider
-
-    @Inject lateinit var duckChatFeature: DuckChatFeature
 
     private val viewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[OptionsViewModel::class.java]
@@ -91,7 +90,9 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     private var optionsButton: ImageView
     private var selectedToolJob: Job? = null
     private var nativeInputStateJob: Job? = null
+    private var visibleToolsJob: Job? = null
     private var lastNativeInputState: NativeInputState? = null
+    private var compactLevel = AdaptiveBottomRowLayout.LEVEL_FULL
 
     init {
         orientation = HORIZONTAL
@@ -105,6 +106,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         super.onAttachedToWindow()
         observeSelectedTool()
         observeNativeInputState()
+        observeVisibleTools()
     }
 
     override fun onDetachedFromWindow() {
@@ -113,6 +115,8 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         selectedToolJob = null
         nativeInputStateJob?.cancel()
         nativeInputStateJob = null
+        visibleToolsJob?.cancel()
+        visibleToolsJob = null
         lastNativeInputState = null
         dismissPopup()
     }
@@ -123,6 +127,16 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         selectedToolJob = viewModel.selectedTool
             .onEach { tool -> renderSelection(tool) }
             .launchIn(lifecycleOwner.lifecycleScope)
+    }
+
+    private fun observeVisibleTools() {
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        visibleToolsJob?.cancel()
+        visibleToolsJob = scope.launch {
+            launch { viewModel.visibleTools.collect { tools -> refreshOptionsButtonVisibility(tools) } }
+            // The model stopped supporting the selected tool, so drop it. The host owns the write.
+            launch { viewModel.toolSelectionCleared.collect { host.toolSelected(null) } }
+        }
     }
 
     private fun observeNativeInputState() {
@@ -144,25 +158,49 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     }
 
     private fun isCustomizeResponsesAvailable(): Boolean =
-        duckChatFeature.customizeResponses().isEnabled() &&
-            lastNativeInputState?.inputContext == NativeInputState.InputContext.DUCK_AI
+        lastNativeInputState?.inputContext == NativeInputState.InputContext.DUCK_AI
 
     private fun refreshOptionsButtonVisibility(visibleTools: Set<Tool> = viewModel.visibleTools.value) {
-        optionsButton.isVisible = visibleTools.isNotEmpty() || isCustomizeResponsesAvailable()
+        optionsButton.isVisible = (visibleTools.isNotEmpty() || isCustomizeResponsesAvailable()) && !isMergedWithChip()
+    }
+
+    // At the top compact level the active mode's chip stands in for the tools button: tapping it opens the
+    // tools menu, and the mode is turned off from there.
+    private fun isMergedWithChip(): Boolean = compactLevel >= AdaptiveBottomRowLayout.LEVEL_MERGED_TOOLS && childCount > 1
+
+    override fun setCompactLevel(level: Int) {
+        if (compactLevel == level) return
+        compactLevel = level
+        applyMergedState()
+    }
+
+    // The tools button, plus the mode chip when one is active. At the top level the chip alone stands in for both.
+    override fun worstCaseWidth(level: Int): Int {
+        val button = resources.getDimensionPixelSize(R.dimen.nativeInputButtonSize)
+        if (childCount <= 1) return button
+        val space = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
+        val chipPadding = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
+        val chipIcon = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_5)
+        val chipClose = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_4)
+        val mergedChip = space + chipPadding * 2 + chipIcon
+        if (level >= AdaptiveBottomRowLayout.LEVEL_MERGED_TOOLS) return mergedChip
+        return button + mergedChip + space + chipClose
+    }
+
+    private fun applyMergedState() {
+        refreshOptionsButtonVisibility()
+        val chip = getChildAt(1) ?: return
+        chip.findViewById<ImageView>(R.id.optionsChipClose)?.isVisible = !isMergedWithChip()
     }
 
     private fun renderSelection(tool: Tool?) {
         val matchingItem = tool?.let { selected -> menuItems.firstOrNull { it.tool == selected } }
         removeChip()
         if (matchingItem != null) addView(buildChip(matchingItem), 1)
+        applyMergedState()
         val show = viewModel.shouldShowPickers
         host.showModelPicker(show)
         host.showReasoningPicker(show)
-    }
-
-    fun clearSelection() {
-        if (!isAttachedToWindow) return
-        host.toolSelected(null)
     }
 
     override fun onVisibilityChanged(changedView: View, visibility: Int) {
@@ -174,20 +212,6 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
                 host.showReasoningPicker(false)
             }
         }
-    }
-
-    fun updateCapabilitiesFrom(picker: ModelPicker?) {
-        val visibleTools = buildSet {
-            if (picker?.isImageGenerationSupported() ?: true) add(Tool.IMAGE_GENERATION)
-            if (picker?.isWebSearchSupported() ?: true) add(Tool.WEB_SEARCH)
-        }
-
-        if (isAttachedToWindow) {
-            val selectionCleared = viewModel.updateVisibleTools(visibleTools)
-            if (selectionCleared) host.toolSelected(null)
-        }
-
-        refreshOptionsButtonVisibility(visibleTools)
     }
 
     private fun buildOptionsButton(): ImageView {
@@ -205,11 +229,12 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     private fun showMenu() {
         val container = LinearLayout(context).apply {
             orientation = VERTICAL
-            setBackgroundResource(com.duckduckgo.mobile.android.R.drawable.popup_menu_bg)
         }
         val popup = PopupWindow(
             ScrollView(context).apply {
                 addView(container)
+                setBackgroundResource(com.duckduckgo.mobile.android.R.drawable.popup_menu_bg)
+                applyMenuRadiusClipping()
                 isVerticalScrollBarEnabled = false
             },
             resources.getDimensionPixelSize(R.dimen.nativeInputMenuWidth),
@@ -286,14 +311,18 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         view.findViewById<ImageView>(R.id.optionsChipIcon).setImageResource(item.iconRes)
         view.contentDescription = context.getString(R.string.duckChatOptionsChipDismissContentDescription, context.getString(item.titleRes))
         view.setOnClickListener {
-            viewModel.onToolDeselectedByUser(item.tool)
-            host.toolSelected(null)
+            if (isMergedWithChip()) {
+                showMenu()
+            } else {
+                viewModel.onToolDeselectedByUser(item.tool)
+                host.toolSelected(null)
+            }
         }
         return view
     }
 
     private fun showAtPosition(popup: PopupWindow) {
-        val button = getChildAt(0) ?: this
+        val button = (0 until childCount).map(::getChildAt).firstOrNull { it.isVisible } ?: this
         val loc = IntArray(2).also { button.getLocationOnScreen(it) }
         val y = resources.displayMetrics.heightPixels - loc[1] + resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
         popup.showAtLocation(rootView, Gravity.BOTTOM or Gravity.START, loc[0], y)

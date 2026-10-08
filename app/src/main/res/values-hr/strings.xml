@@ -63,10 +63,10 @@
     <string name="undoSnackbarAction">Poništi</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Blokirani alat za praćenje</item>
+        <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">Blokirani alat za praćenje</item>
         <item quantity="few">Blokirana alata za praćenje</item>
         <item quantity="many">Blokiranih alata za praćenje</item>
-        <item quantity="other">Blokiranih alata za praćenje</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">Blokiranih alata za praćenje</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -215,13 +215,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Nabavi preglednik za PC</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo za Mac i Windows</string>
-    <string name="getDesktopBrowserTitle">Zaštiti svoje osobne podatke na Macu i Windowsima!</string>
-    <string name="getDesktopBrowserBody">Za preuzimanje DuckDuckGo na Mac ili Windows, posjeti:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Podijeli poveznicu za preuzimanje</string>
-    <string name="getDesktopBrowserNoThanks">Ne, hvala</string>
     <string name="getDesktopBrowserHideItem">Sakrij</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Poveznica je kopirana</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Zaštita od skočnih prozora kolačića</string>
@@ -233,7 +227,7 @@
         <item quantity="one">%1$d lokacija isključena iz brisanja</item>
         <item quantity="few">%1$d lokacije isključene iz brisanja</item>
         <item quantity="many">%1$d lokacija isključenih iz brisanja</item>
-        <item quantity="other">%1$d lokacija isključenih iz brisanja</item>
+        <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d lokacija isključenih iz brisanja</item>
     </plurals>
     <string name="dataClearingAutomaticClearingOn">Uključeno</string>
     <string name="dataClearingAutomaticClearingOff">Isključeno</string>
@@ -260,10 +254,10 @@
     <string name="singleTabFireDialogSubtitleSiteData">Brisanje podataka mrežnih lokacija može te odjaviti s računa.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Ovo će otkazati preuzimanja u tijeku.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">%1$d kartica i njihovi podaci izbrisani</item>
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">%1$d kartica i njihovi podaci izbrisani</item>
         <item quantity="few">%1$d kartice i njihovi podaci izbrisani</item>
         <item quantity="many">%1$d kartica i njihovi podaci izbrisani</item>
-        <item quantity="other">%1$d kartica i njihovi podaci izbrisani</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">%1$d kartica i njihovi podaci izbrisani</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Podaci mrežne lokacije nisu mogli biti izbrisani. Ažuriraj WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Podaci mrežne lokacije nisu mogli biti izbrisani zbog pogreške.</string>
@@ -804,16 +798,16 @@
     <string name="onboardingSerpDaxDialogButton">Shvaćam!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Nakon toga pokušaj posjetiti neko web-mjesto!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
-        <item quantity="one"><![CDATA[ I <b>još %1$d drugih</b> pokušavalo te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[ I <b>još %1$d drugih</b> pokušavalo te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
         <item quantity="few"><![CDATA[ I <b>još %1$d drugih</b> pokušavalo te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
         <item quantity="many"><![CDATA[ I <b>još %1$d drugih</b> pokušavalo te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
-        <item quantity="other"><![CDATA[ I <b>još %1$d drugih</b> pokušavalo te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[ I <b>još %1$d drugih</b> pokušavalo te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ pokušavali su te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[ pokušavali su te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
         <item quantity="few"><![CDATA[ pokušavali su te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
         <item quantity="many"><![CDATA[ pokušavali su te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
-        <item quantity="other"><![CDATA[ pokušavali su te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[ pokušavali su te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Shvaćam!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Odmah izbriši svoju aktivnost pregledavanja pomoću <b>Fire Buttona</b>.<br/><br/>Isprobaj ga! 🔥]]></string>
@@ -1002,10 +996,23 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Dodaj widget</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Preskoči</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Uvezi lozinke s Googlea</string>
+    <string name="preOnboardingImportPasswordsBody">Google te može tražiti da se prijaviš ili uneseš svoju lozinku za potvrdu.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Uvezi s Googlea</string>
+    <string name="preOnboardingImportCompleteTitle">Uvoz je završen</string>
+    <string name="preOnboardingImportCompleteCta">Nastavi</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Uvoz lozinki</string>
+    <string name="preOnboardingImportCompleteParsingBody">Ovo će potrajati samo trenutak.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Uvoz nije uspio</string>
+    <string name="preOnboardingImportCompleteFailed">Uvoz lozinke nije uspio</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Uvezene lozinke: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Preskočeno (duplicirano ili nevažeće): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Nešto nije bilo kako treba</string>
+    <string name="preOnboardingImportErrorBody">Pokušaj ponovno.</string>
+    <string name="preOnboardingImportErrorRetry">Pokušaj ponovno</string>
+
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Dodaj me u red omiljenih.</string>
-    <string name="preOnboardingAddToDockBody">Pronađi ikonu DuckDuckGo na početnom zaslonu. Zatim pritisni i povuci na mjesto. To je to!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Shvaćam!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Započni privatno AI čavrljanje uz Duck.ai ili prebaci na traženje za zaštićeno pregledavanje.<br/><br/>Duck.ai možeš koristiti na svakom mjestu na kojem je ikona za čavrljanje]]></string>
@@ -1039,4 +1046,11 @@
     <string name="singleTabFireDialogTitleFireMode">Želiš li izbrisati Fire kartice i njihove podatke?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Datoteka se ne može otvoriti. Provjerite postoji li kompatibilna aplikacija.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo ne može učitati ovu stranicu</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Čini se da internetska veza nije dostupna.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Nije bilo moguće pronaći poslužitelj s navedenim nazivom glavnog računala.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Certifikat za ovaj poslužitelj nije valjan. Možda se povezuješ s poslužiteljem koji se pretvara da je <b>%1$s</b>, što bi moglo ugroziti tvoje povjerljive podatke.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Jesi li mislio <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

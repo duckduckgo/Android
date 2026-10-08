@@ -63,8 +63,8 @@
     <string name="undoSnackbarAction">Ongedaan maken</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Tracker geblokkeerd</item>
-        <item quantity="other">Trackers geblokkeerd</item>
+        <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">Tracker geblokkeerd</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">Trackers geblokkeerd</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -213,13 +213,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Download de desktopbrowser</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo voor Mac en Windows</string>
-    <string name="getDesktopBrowserTitle">Bescherm je persoonlijke informatie ook op Mac en Windows!</string>
-    <string name="getDesktopBrowserBody">Om DuckDuckGo te downloaden op Mac of Windows, bezoek:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Downloadlink delen</string>
-    <string name="getDesktopBrowserNoThanks">Nee, bedankt</string>
     <string name="getDesktopBrowserHideItem">Verbergen</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link gekopieerd</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Bescherming tegen cookiepop-ups</string>
@@ -229,7 +223,7 @@
     <string name="dataClearingDescription">Het verwijderen van je gegevens kan helpen om je privacy online te beschermen. Gebruik de Fire Button om gegevens handmatig te verwijderen of stel in dat gegevens automatisch worden verwijderd.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d locatie uitgesloten van gegevensverwijdering</item>
-        <item quantity="other">%1$d locaties uitgesloten van gegevensverwijdering</item>
+        <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d locaties uitgesloten van gegevensverwijdering</item>
     </plurals>
     <string name="dataClearingAutomaticClearingOn">Aan</string>
     <string name="dataClearingAutomaticClearingOff">Uit</string>
@@ -256,8 +250,8 @@
     <string name="singleTabFireDialogSubtitleSiteData">Als je sitegegevens verwijdert, kun je uitloggen bij je accounts.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Hiermee worden lopende downloads geannuleerd.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">%1$d tabblad en bijbehorende gegevens verwijderd</item>
-        <item quantity="other">%1$d tabbladen en bijbehorende gegevens verwijderd</item>
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">%1$d tabblad en bijbehorende gegevens verwijderd</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">%1$d tabbladen en bijbehorende gegevens verwijderd</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">De sitegegevens kunnen niet worden verwijderd. Werk WebView bij.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">De sitegegevens kunnen niet worden verwijderd vanwege een fout.</string>
@@ -772,12 +766,12 @@
     <string name="onboardingSerpDaxDialogButton">Ik snap het!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Probeer nu een site te bezoeken!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
-        <item quantity="one"><![CDATA[ en nog <b>%1$d ander</b> probeerden je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer informatie.️]]></item>
-        <item quantity="other"><![CDATA[ en nog <b>%1$d anderen</b> probeerden je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer informatie.️]]></item>
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[ en nog <b>%1$d ander</b> probeerden je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer informatie.️]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[ en nog <b>%1$d anderen</b> probeerden je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer informatie.️]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ probeerde je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer info.️]]></item>
-        <item quantity="other"><![CDATA[ probeerden je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer info.️]]></item>
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[ probeerde je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer info.️]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[ probeerden je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer info.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Ik snap het!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Wis je browse-activiteit direct met de <b>Fire Button</b>.<br/><br/>Probeer het maar! 🔥]]></string>
@@ -966,10 +960,23 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Widget toevoegen</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Overslaan</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Wachtwoorden importeren van Google</string>
+    <string name="preOnboardingImportPasswordsBody">Google kan je vragen om in te loggen of je wachtwoord in te voeren ter bevestiging.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Importeren van Google</string>
+    <string name="preOnboardingImportCompleteTitle">Importeren voltooid</string>
+    <string name="preOnboardingImportCompleteCta">Doorgaan</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Wachtwoorden importeren...</string>
+    <string name="preOnboardingImportCompleteParsingBody">Dit duurt maar even.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Importeren mislukt</string>
+    <string name="preOnboardingImportCompleteFailed">Wachtwoord importeren mislukt</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Wachtwoorden geïmporteerd: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Overgeslagen (duplicaat of ongeldig): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Er is iets misgegaan</string>
+    <string name="preOnboardingImportErrorBody">Probeer het opnieuw.</string>
+    <string name="preOnboardingImportErrorRetry">Probeer het opnieuw</string>
+
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Voeg me toe aan je favorietenrij.</string>
-    <string name="preOnboardingAddToDockBody">Zoek het DuckDuckGo-pictogram op je beginscherm. Houd het vervolgens ingedrukt en sleep het naar zijn plaats. Dat is alles!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Ik snap het!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Start een privé AI-chat met Duck.ai of schakel over naar Zoeken voor beschermd browsen.<br/><br/>Je kunt Duck.ai gebruiken vanaf elke plek waar je het chatpictogram ziet.]]></string>
@@ -1003,4 +1010,11 @@
     <string name="singleTabFireDialogTitleFireMode">Fire-tabbladen en hun gegevens verwijderen?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Kan bestand niet openen. Kijk of er een compatibele app is.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo kan deze pagina niet laden</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">De internetverbinding lijkt offline te zijn.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Er kon geen server met de opgegeven hostnaam worden gevonden.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Het certificaat voor deze server is ongeldig. Je maakt mogelijk verbinding met een server die zich voordoet als <b>%1$s</b>, waardoor je vertrouwelijke informatie in gevaar kan komen.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Bedoelde je <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.duckduckgo.autofill.impl.importing
 
 import app.cash.turbine.test
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.PasswordManagementEmptyState
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
@@ -132,7 +133,7 @@ class CredentialImporterImplTest {
     }
 
     private suspend fun List<LoginCredentials>.import(originalListSize: Int = this.size) {
-        testee.import(this, originalListSize)
+        testee.import(this, originalListSize, PasswordManagementEmptyState)
     }
 
     private suspend fun assertResult(
@@ -143,6 +144,7 @@ class CredentialImporterImplTest {
             with(awaitItem() as ImportResult.Finished) {
                 assertEquals("Wrong number of duplicates in result", numberSkippedExpected, numberSkipped)
                 assertEquals("Wrong import size in result", importListSizeExpected, savedCredentials)
+                assertEquals("Wrong launch source in result", PasswordManagementEmptyState, source)
             }
         }
     }

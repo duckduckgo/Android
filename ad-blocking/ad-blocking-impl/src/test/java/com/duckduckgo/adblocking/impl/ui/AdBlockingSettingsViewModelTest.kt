@@ -90,8 +90,19 @@ class AdBlockingSettingsViewModelTest {
     }
 
     @Test
-    fun whenUserEnabledThenShowsConsentDescription() = runTest {
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.UserEnabled))
+    fun whenEnabledWithoutPixelConsentThenDoesNotShowConsentDescription() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.WithoutPixelConsent))
+
+        createViewModel().viewState.test {
+            val state = expectMostRecentItem()
+            assertTrue(state.isEnabled)
+            assertEquals(false, state.showConsentDescription)
+        }
+    }
+
+    @Test
+    fun whenEnabledWithPixelConsentThenShowsConsentDescription() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.WithPixelConsent))
 
         createViewModel().viewState.test {
             val state = expectMostRecentItem()
@@ -124,7 +135,7 @@ class AdBlockingSettingsViewModelTest {
 
     @Test
     fun whenEnabledThenDisabledUntilRelaunchFlagNotSet() = runTest {
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.UserEnabled))
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.WithPixelConsent))
 
         createViewModel().viewState.test {
             assertFalse(expectMostRecentItem().disabledUntilRelaunch)
@@ -195,7 +206,7 @@ class AdBlockingSettingsViewModelTest {
 
         createViewModel().onBlockAdsToggled(enabled = true)
 
-        verify(repository).setEnabled(true)
+        verify(repository).enable(withPixelConsent = true)
         verify(pixel).fire(AdBlockingPixelNames.AD_BLOCKING_ENABLED_DAILY, type = Pixel.PixelType.Daily())
         verify(pixel).fire(AdBlockingPixelNames.AD_BLOCKING_ENABLED_COUNT)
     }
@@ -212,11 +223,11 @@ class AdBlockingSettingsViewModelTest {
 
     @Test
     fun whenBlockAdsToggledOffThenFiresDisabledPixels() = runTest {
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.UserEnabled))
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.WithPixelConsent))
 
         createViewModel().onBlockAdsToggled(enabled = false)
 
-        verify(repository).setEnabled(false)
+        verify(repository).disable()
         verify(pixel).fire(AdBlockingPixelNames.AD_BLOCKING_DISABLED_DAILY, type = Pixel.PixelType.Daily())
         verify(pixel).fire(AdBlockingPixelNames.AD_BLOCKING_DISABLED_COUNT)
     }

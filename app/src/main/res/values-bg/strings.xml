@@ -63,8 +63,8 @@
     <string name="undoSnackbarAction">Отмяна</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Блокиран тракер</item>
-        <item quantity="other">Блокирани тракери</item>
+        <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">Блокиран тракер</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">Блокирани тракери</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -213,13 +213,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Вземете браузъра за работен плот</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo за Mac и Windows</string>
-    <string name="getDesktopBrowserTitle">Защитете личната си информация и на Mac, и на Windows!</string>
-    <string name="getDesktopBrowserBody">За да изтеглите DuckDuckGo за Mac или Windows, посетете:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Споделяне на връзка за изтегляне</string>
-    <string name="getDesktopBrowserNoThanks">Не, благодаря</string>
     <string name="getDesktopBrowserHideItem">Скрий</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Връзката е копирана</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Защита от изскачащи прозорци за бисквитки</string>
@@ -229,7 +223,7 @@
     <string name="dataClearingDescription">Изтриването на данните може да помогне за защитата на поверителността Ви онлайн. Използвайте Fire Button, за да изтриете данните ръчно или задайте автоматично изтриване.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d сайт е изключен от изчистване</item>
-        <item quantity="other">%1$d сайта са изключени от изчистване</item>
+        <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d сайта са изключени от изчистване</item>
     </plurals>
     <string name="dataClearingAutomaticClearingOn">Включен</string>
     <string name="dataClearingAutomaticClearingOff">Изключено</string>
@@ -256,8 +250,8 @@
     <string name="singleTabFireDialogSubtitleSiteData">Изтриването на данни от сайта може да те отпише от акаунтите.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Това ще отмени текущите изтегляния.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">%1$d раздел и данните му са изтрити</item>
-        <item quantity="other">%1$d раздела и данните им са изтрити</item>
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">%1$d раздел и данните му са изтрити</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">%1$d раздела и данните им са изтрити</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Данните от сайтовете не могат да бъдат изтрити. Актуализирайте WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Данните от сайтовете не могат да бъдат изтрити поради възникнала грешка.</string>
@@ -772,12 +766,12 @@
     <string name="onboardingSerpDaxDialogButton">Разбрах!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Сега опитайте да посетите някой сайт!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
-        <item quantity="one"><![CDATA[ и <b>%1$d друг</b> се опитваха да ви проследят тук. Блокирах ги!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
-        <item quantity="other"><![CDATA[ и <b>%1$d други</b> се опитваха да ви проследят тук. Блокирах ги!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[ и <b>%1$d друг</b> се опитваха да ви проследят тук. Блокирах ги!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[ и <b>%1$d други</b> се опитваха да ви проследят тук. Блокирах ги!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ се опита да ви проследи тук. Блокирах го!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
-        <item quantity="other"><![CDATA[ се опитваха да ви проследят тук. Блокирах ги!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[ се опита да ви проследи тук. Блокирах го!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[ се опитваха да ви проследят тук. Блокирах ги!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Разбрах!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Незабавно изчистване на дейностите при сърфиране с <b>Fire Button</b>.<br/><br/>Опитайте!️ 🔥]]></string>
@@ -966,10 +960,23 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Добавяне на приспособлението</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Пропускане</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Импортиране на пароли от Google</string>
+    <string name="preOnboardingImportPasswordsBody">Google може да Ви помоли да влезете или да въведете паролата си, за да потвърдите.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Импортиране от Google</string>
+    <string name="preOnboardingImportCompleteTitle">Импортирането е завършено</string>
+    <string name="preOnboardingImportCompleteCta">Продължаване</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Импортиране на пароли</string>
+    <string name="preOnboardingImportCompleteParsingBody">Това ще отнеме само няколко секунди.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Импортирането е неуспешно</string>
+    <string name="preOnboardingImportCompleteFailed">Импортирането на паролата е неуспешно</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Импортирани пароли: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Пропуснати (дублирани или невалидни): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Възникна някаква грешка</string>
+    <string name="preOnboardingImportErrorBody">Моля, опитайте отново.</string>
+    <string name="preOnboardingImportErrorRetry">Нов опит</string>
+
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Добавете ме към реда с любими.</string>
-    <string name="preOnboardingAddToDockBody">Намерете иконата на DuckDuckGo на началния екран. След това натиснете и плъзнете на място. Това е всичко!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Разбрах!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Започнете поверителен чат с AI с Duck.ai или превключете към „Търсене“ за защитено сърфиране.<br/><br/>Можете да използвате Duck.ai от всяко място, където видите иконата за чат]]></string>
@@ -1003,4 +1010,11 @@
     <string name="singleTabFireDialogTitleFireMode">Изтриване на разделите Fire и данните в тях?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Файлът не може да се отвори. Проверете за съвместимо приложение.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo не може да зареди тази страница</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Изглежда, че няма връзка с интернет.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Не може да бъде намерен сървър с посоченото име на хост.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Сертификатът за този сървър е невалиден. Възможно е да се свързвате със сървър, който се представя за <b>%1$s</b>, което може да изложи поверителната Ви информация на риск.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Може би имахте предвид <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

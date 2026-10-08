@@ -42,7 +42,26 @@
     <attr name="daxColorRebrandButtonDestructiveGhostContainerPressed" format="color" />
     <attr name="daxColorRebrandButtonDestructiveGhostText" format="color" />
     <attr name="daxColorRebrandAccentBlue" format="color" />
+    <attr name="daxColorStatusIndicatorOn" format="color" />
+    <attr name="daxColorStatusIndicatorOff" format="color" />
+    <attr name="daxColorRebrandStatusIndicatorOff" format="color" />
     <attr name="daxColorStatusRed" format="color" />
+    <attr name="daxContainerRadius" format="dimension" />
+    <attr name="daxDialogRadius" format="dimension" />
+    <attr name="daxSheetRadius" format="dimension" />
+    <attr name="daxLargeSheetRadius" format="dimension" />
+    <attr name="daxMenuRadius" format="dimension" />
+    <attr name="daxSearchBarRadius" format="dimension" />
+    <attr name="daxChipRadius" format="dimension" />
+    <attr name="daxDuckAiPromptRadius" format="dimension" />
+    <attr name="daxWhatsNewCardRadius" format="dimension" />
+    <attr name="daxMenuClipToOutline" format="boolean" />
+    <attr name="daxOnboardingSheetRadius" format="dimension" />
+    <attr name="daxInfoPanelRadius" format="dimension" />
+    <attr name="daxMessageCtaCloseButtonSize" format="dimension" />
+    <attr name="daxMessageCtaCloseButtonBackground" format="reference" />
+    <attr name="daxMessageCtaClipToPadding" format="boolean" />
+    <attr name="daxPillRadius" format="dimension" />
 
     <dimen name="rebrandButtonSmallHeight">48dp</dimen>
     <dimen name="rebrandButtonLargeHeight">56dp</dimen>
@@ -51,6 +70,9 @@
     <dimen name="rebrandButtonSmallVerticalInset">4dp</dimen>
     <dimen name="rebrandButtonLargeVerticalInset">6dp</dimen>
     <dimen name="rebrandInputRadius">48dp</dimen>
+    <dimen name="rebrandContainerRadius">28dp</dimen>
+    <dimen name="rebrandMessageCtaCloseButtonSize">48dp</dimen>
+    <dimen name="daxYellowPillCornerRadius">2dp</dimen>
 
     <style name="Typography.DuckDuckGo.Rebrand.Button" parent="Typography.DuckDuckGo">
         <item name="android:textSize">15sp</item>
@@ -156,10 +178,38 @@
         <item name="daxButtonLargeTopPadding">@dimen/rebrandButtonLargeTopPadding</item>
         <item name="daxButtonSmallVerticalInset">@dimen/rebrandButtonSmallVerticalInset</item>
         <item name="daxButtonLargeVerticalInset">@dimen/rebrandButtonLargeVerticalInset</item>
+        <item name="daxColorStatusIndicatorOn">@color/rb_green40</item>
+        <item name="daxColorStatusIndicatorOff">?attr/daxColorRebrandStatusIndicatorOff</item>
     </style>
 
     <style name="ThemeOverlay.Rebrand.AddressBarAnimation" parent="">
         <item name="cookiesAnimationRadius">@dimen/rebrandInputRadius</item>
+    </style>
+
+    <style name="ThemeOverlay.Rebrand.Radius" parent="">
+        <item name="snackbarStyle">@style/Widget.DuckDuckGo.Snackbar.Rebrand</item>
+        <item name="daxContainerRadius">@dimen/rebrandContainerRadius</item>
+        <item name="daxDialogRadius">@dimen/rebrandContainerRadius</item>
+        <item name="daxSheetRadius">@dimen/rebrandContainerRadius</item>
+        <item name="daxLargeSheetRadius">@dimen/rebrandContainerRadius</item>
+        <item name="daxMenuRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="daxSearchBarRadius">@dimen/rebrandInputRadius</item>
+        <item name="daxChipRadius">@dimen/pillShapeCornerRadius</item>
+        <item name="daxDuckAiPromptRadius">@dimen/pillShapeCornerRadius</item>
+        <item name="daxWhatsNewCardRadius">@dimen/rebrandContainerRadius</item>
+        <item name="daxMenuClipToOutline">true</item>
+        <item name="daxOnboardingSheetRadius">@dimen/rebrandContainerRadius</item>
+        <item name="daxInfoPanelRadius">@dimen/rebrandContainerRadius</item>
+        <item name="daxMessageCtaCloseButtonSize">@dimen/rebrandMessageCtaCloseButtonSize</item>
+        <item name="daxMessageCtaCloseButtonBackground">@drawable/selectable_message_cta_close_button_ripple</item>
+        <item name="daxMessageCtaClipToPadding">false</item>
+        <item name="daxPillRadius">@dimen/pillShapeCornerRadius</item>
+        <item name="daxInputModeCardDarkFireThemeOverlay">@style/ThemeOverlay.DuckDuckGo.InputModeCard.DarkFire.Radius</item>
+    </style>
+
+    <style name="ThemeOverlay.DuckDuckGo.InputModeCard.DarkFire.Radius" parent="ThemeOverlay.DuckDuckGo.InputModeCard.DarkFire">
+        <item name="daxMenuRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="daxMenuClipToOutline">true</item>
     </style>
 
 </resources>

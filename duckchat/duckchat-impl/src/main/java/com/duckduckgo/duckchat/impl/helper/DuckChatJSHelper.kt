@@ -27,6 +27,8 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
@@ -45,6 +47,7 @@ import com.duckduckgo.duckchat.impl.models.AIChatAttachmentUsage
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
+import com.duckduckgo.duckchat.impl.terms.DuckAiTermsConsent
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
@@ -92,7 +95,10 @@ interface DuckChatJSHelper {
 
     fun clearTabContextPromptEvent()
 
-    fun consumeTabContextPromptOnHandoff(method: String): SubscriptionEventData?
+    fun consumeTabContextPromptOnHandoff(
+        method: String,
+        browserMode: BrowserMode,
+    ): SubscriptionEventData?
 }
 
 enum class Mode {
@@ -128,6 +134,8 @@ class RealDuckChatJSHelper @Inject constructor(
     private val subscriptions: Subscriptions,
     private val editPromptSessionStore: EditPromptSessionStore,
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
+    private val duckAiSessionCallback: DuckAiSessionCallback,
+    private val termsConsent: DuckAiTermsConsent,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -171,7 +179,7 @@ class RealDuckChatJSHelper @Inject constructor(
 
             METHOD_GET_AI_CHAT_NATIVE_PROMPT ->
                 id?.let {
-                    getAIChatNativePrompt(featureName, method, it)
+                    getAIChatNativePrompt(featureName, method, it, browserMode)
                 }
 
             METHOD_OPEN_AI_CHAT -> {
@@ -186,6 +194,9 @@ class RealDuckChatJSHelper @Inject constructor(
             }
 
             METHOD_CLOSE_AI_CHAT -> {
+                if (mode == Mode.FULL && tabId.isNotEmpty()) {
+                    duckAiSessionCallback.onExitIntent(tabId, DuckAiSessionExitTrigger.BACK_OR_CLOSE)
+                }
                 duckChat.closeDuckChat()
                 null
             }
@@ -264,6 +275,12 @@ class RealDuckChatJSHelper @Inject constructor(
                     duckChatPixels.sendReportMetricPixel(it, modelTier, source)
                     if (it == USER_DID_SUBMIT_PROMPT || it == USER_DID_SUBMIT_FIRST_PROMPT) {
                         browserInteractionsPlugins.getPlugins().forEach { plugin -> plugin.onAiPromptSubmitted() }
+                        if (mode == Mode.FULL && tabId.isNotEmpty()) {
+                            duckAiSessionCallback.onPromptSubmitted(tabId)
+                        }
+                    }
+                    if (it == ReportMetric.USER_DID_CREATE_NEW_CHAT && mode == Mode.FULL && tabId.isNotEmpty()) {
+                        duckAiSessionCallback.onNewChatCreated(tabId)
                     }
                 }
                 null
@@ -380,13 +397,17 @@ class RealDuckChatJSHelper @Inject constructor(
         pendingTabContextStore.clear()
     }
 
-    override fun consumeTabContextPromptOnHandoff(method: String): SubscriptionEventData? {
+    override fun consumeTabContextPromptOnHandoff(
+        method: String,
+        browserMode: BrowserMode,
+    ): SubscriptionEventData? {
         if (!duckChatFeature.chatTabAttachments().isEnabled()) return null
         if (method != METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA) return null
         val pending = pendingTabContextStore.consume() ?: return null
 
         val params = JSONObject().apply {
             put(PLATFORM, ANDROID)
+            termsConsent.carry(this, browserMode)
             put("tool", "query")
             put(
                 "query",
@@ -446,6 +467,12 @@ class RealDuckChatJSHelper @Inject constructor(
                 mode == Mode.CONTEXTUAL &&
                 duckChatFeature.contextualSuggestedPrompts().isEnabled()
         }
+        val supportsNativeUsageWarnings = withContext(dispatcherProvider.io()) {
+            browserMode != BrowserMode.FIRE &&
+                duckChat.isNativeChatInputEnabled() &&
+                duckChat.isNativeStorageEnabled() &&
+                duckChatFeature.duckAiUsageWarnings().isEnabled()
+        }
         val jsonPayload =
             JSONObject().apply {
                 put(PLATFORM, ANDROID)
@@ -463,6 +490,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_CHAT_SYNC, duckChat.isChatSyncFeatureEnabled() && browserMode.isSyncable)
                 put(SUPPORTS_PAGE_CONTEXT, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
                 put(SUPPORTS_NATIVE_STORAGE, duckChat.isNativeStorageEnabled())
+                put(SUPPORTS_NATIVE_USAGE_WARNINGS, supportsNativeUsageWarnings)
                 put(
                     SUPPORTS_MULTIPLE_PAGE_CONTEXT,
                     duckChat.isDuckChatContextualModeEnabled() &&
@@ -494,11 +522,13 @@ class RealDuckChatJSHelper @Inject constructor(
         featureName: String,
         method: String,
         id: String,
+        browserMode: BrowserMode,
     ): JsCallbackData {
         val pending = pendingNativePromptStore.consume()
         val jsonPayload = JSONObject().apply {
             put(PLATFORM, ANDROID)
             if (pending != null) {
+                termsConsent.carry(this, browserMode)
                 put("tool", "query")
                 put(
                     "query",
@@ -757,6 +787,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_SUGGESTIONS = "supportsSuggestions"
         private const val SUPPORTS_MULTIPLE_PAGE_CONTEXT = "supportsMultipleContexts"
         private const val SUPPORTS_NATIVE_STORAGE = "supportsNativeStorage"
+        private const val SUPPORTS_NATIVE_USAGE_WARNINGS = "supportsNativeUsageWarnings"
         private const val SUPPORTS_SUBSCRIPTION = "supportsSubscription"
         private const val INSTALL_TYPE = "installType"
         private const val INSTALL_TYPE_NEW = "new"

@@ -1,0 +1,216 @@
+{
+    "sync_unified_devices_own_row_resolved_device_info": {
+        "description": "Fired daily when this device's row resolves using device_info while unified device-list reading is enabled",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync_unified_devices_own_row_resolved_legacy": {
+        "description": "Fired daily when this device's row falls back to its legacy encrypted name while unified reading and writing are enabled",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why this device's device_info could not be used",
+                "enum": ["not_published_yet", "blob_absent", "blob_decrypt_failed"]
+            }
+        ]
+    },
+    "sync_unified_devices_own_row_resolved_placeholder": {
+        "description": "Fired daily when this device's row cannot resolve through device_info or legacy fields",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why this device's device_info could not be used",
+                "enum": ["not_published_yet", "blob_absent", "blob_decrypt_failed"]
+            }
+        ]
+    },
+    "sync_unified_devices_account_info_key_unavailable": {
+        "description": "Fired daily when the account_info private key cannot be obtained for unified device-list reading",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the account_info private key could not be obtained",
+                "enum": ["no_key_on_server", "no_wrap_for_our_credential", "unwrap_failed", "keys_fetch_failed", "rate_limited"]
+            }
+        ]
+    },
+    "sync_unified_devices_other_row_device_info_failed_decryption": {
+        "description": "Fired daily when another device's present device_info cannot be decrypted",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "credential",
+                "type": "string",
+                "description": "Credential associated with the row whose device_info failed decryption",
+                "enum": ["ddg", "3party", "none"]
+            }
+        ]
+    },
+    "sync_unified_devices_other_row_resolved_placeholder": {
+        "description": "Fired daily when another device's row resolves as an unknown-device placeholder",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "credential",
+                "type": "string",
+                "description": "Credential associated with the placeholder row",
+                "enum": ["ddg", "3party", "none"]
+            }
+        ]
+    },
+    "sync_unified_devices_account_info_key_create_success": {
+        "description": "Fired when this device successfully registers a newly minted account_info key",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync_unified_devices_account_info_key_create_failed": {
+        "description": "Fired daily when this device cannot mint or register a new account_info key",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why account_info key creation failed",
+                "enum": ["mint_failed", "request_failed", "rate_limited"]
+            }
+        ]
+    },
+    "sync_unified_devices_account_info_key_wrap_success": {
+        "description": "Fired when this device successfully adds its credential wrap to an existing account_info key",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync_unified_devices_account_info_key_wrap_failed": {
+        "description": "Fired daily when this device cannot add its credential wrap to an existing account_info key",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why adding the account_info key wrap failed",
+                "enum": ["unwrap_failed", "request_failed", "rate_limited"]
+            }
+        ]
+    },
+    "sync_unified_devices_account_info_key_adopt_success": {
+        "description": "Fired when this device successfully adopts an account_info key registered by another client",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync_unified_devices_account_info_key_adopt_failed": {
+        "description": "Fired daily when this device cannot adopt an account_info key registered by another client",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why adopting the account_info key failed",
+                "enum": ["keys_fetch_failed", "rate_limited"]
+            }
+        ]
+    },
+    "sync_unified_devices_own_row_device_info_first_write_success": {
+        "description": "Fired when this device successfully writes its device_info for the first time",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync_unified_devices_own_row_device_info_first_write_failed": {
+        "description": "Fired daily when this device's first device_info write fails",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the first device_info write failed",
+                "enum": ["encrypt_failed", "request_failed", "rate_limited"]
+            }
+        ]
+    },
+    "sync_unified_devices_own_row_device_info_update_success": {
+        "description": "Fired when this device successfully writes device_info during a user rename",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync_unified_devices_own_row_device_info_update_failed": {
+        "description": "Fired daily when writing device_info during a user rename fails",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the device_info update failed",
+                "enum": ["encrypt_failed", "request_failed", "rate_limited"]
+            }
+        ]
+    },
+    "sync_unified_devices_own_row_device_info_repair_success": {
+        "description": "Fired when this device successfully repairs its missing or undecryptable device_info",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync_unified_devices_own_row_device_info_repair_failed": {
+        "description": "Fired daily when this device cannot repair its missing or undecryptable device_info",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the device_info repair failed",
+                "enum": ["encrypt_failed", "request_failed", "rate_limited"]
+            }
+        ]
+    }
+}

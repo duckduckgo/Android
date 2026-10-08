@@ -111,6 +111,35 @@ def is_ancestor(repo_path: str, ancestor: str, descendant: str) -> bool:
     return result.returncode == 0
 
 
+def collect_shipped_task_ids(repo_path: str, start_tag: str, url_prefix: str) -> set[str]:
+    """
+    Return Asana task IDs that already shipped in a public release tag at or
+    after the release immediately before `start_tag`.
+
+    Matches by task ID, not commit SHA, so a hotfix cherry-pick (which gets a
+    new SHA when merged back to develop) still counts as shipped once its
+    hotfix tag exists — even though the identical fix also reaches develop.
+    """
+    tags = get_public_release_tags(repo_path)
+
+    if start_tag not in tags:
+        # Unknown tag (e.g. a bad manual --start-tag) — bail rather than scan the whole repo.
+        return set()
+
+    prior_tag = get_public_release_tag_before(repo_path, start_tag)
+    candidate_tags = tags[tags.index(prior_tag):] if prior_tag else tags
+
+    shipped_task_ids: set[str] = set()
+    for previous_tag, tag in zip(candidate_tags, candidate_tags[1:]):
+        commits = get_commits_between(repo_path, previous_tag, tag)
+        links = extract_asana_task_links(commits, url_prefix)
+        shipped_task_ids.update(
+            extract_task_id_from_url(link.url) for link in links if link.url
+        )
+
+    return shipped_task_ids
+
+
 def get_public_release_tag_before(repo_path: str, current_tag: str) -> str | None:
     """
     Return the public release tag immediately before `current_tag` by semantic version.
@@ -286,6 +315,40 @@ def build_release_includes_html(task_links: List[AsanaTaskLink],
     return html
 
 
+def build_grafana_dashboard_url(base_url: str, release_tag: str) -> str:
+    """
+    Append a release tag to the Grafana dashboard base URL (its `var-Default` value),
+    deep-linking the dashboard to that release.
+    """
+    return f"{base_url}{release_tag}"
+
+
+def try_populate_grafana_link(notes: str, grafana_dashboard_base_url: str | None, release_tag: str) -> str:
+    """
+    Best-effort fill-in of the Grafana Release Dashboard placeholder with a deep link.
+
+    This must never block release task creation: if the base URL is missing, the
+    placeholder isn't found, or anything else goes wrong, the original placeholder
+    is left in place for the release DRI to fill in by hand.
+    """
+    if not grafana_dashboard_base_url:
+        log("No Grafana dashboard base URL provided; leaving placeholder for manual entry")
+        return notes
+
+    try:
+        grafana_url = build_grafana_dashboard_url(grafana_dashboard_base_url, release_tag)
+        updated_notes = notes.replace(
+            "&lt;Grafana Link&gt;",
+            f'<a href="{grafana_url}">Grafana</a>'
+        )
+        if updated_notes == notes:
+            log("Grafana Link placeholder not found in task notes; leaving as-is for manual entry")
+        return updated_notes
+    except Exception as e:
+        log(f"Failed to populate Grafana dashboard link, leaving placeholder for manual entry: {e}")
+        return notes
+
+
 def create_asana_release_task(client: asana.ApiClient,
                               workspace_id: str,
                               release_tag: str,
@@ -293,6 +356,7 @@ def create_asana_release_task(client: asana.ApiClient,
                               section_id: str,
                               project_id: str,
                               task_links: List[AsanaTaskLink],
+                              grafana_dashboard_base_url: str | None = None,
                               previous_release_links: List[AsanaTaskLink] = None,
                               previous_release_label: str = None) -> str:
     """
@@ -336,6 +400,9 @@ def create_asana_release_task(client: asana.ApiClient,
     if updated_notes == current_notes:
         # Fallback if pattern not found
         updated_notes = current_notes + replacement
+
+    # Fill in the Grafana Release Dashboard table cell (best-effort; see try_populate_grafana_link)
+    updated_notes = try_populate_grafana_link(updated_notes, grafana_dashboard_base_url, release_tag)
 
     # Update the task with the new notes
     log(f"Updating task with notes: {updated_notes}")

@@ -28,9 +28,6 @@ interface VoiceSearchRepository {
     fun isVoiceSearchUserEnabled(default: Boolean): Boolean
     fun voiceSearchUserEnabledFlow(default: Boolean): Flow<Boolean>
     fun setVoiceSearchUserEnabled(enabled: Boolean)
-    fun countVoiceSearchDismissed(): Int
-    fun dismissVoiceSearch()
-    fun resetVoiceSearchDismissed()
     fun getLastSelectedMode(): VoiceSearchMode
     fun setLastSelectedMode(mode: VoiceSearchMode)
 }
@@ -58,18 +55,6 @@ class RealVoiceSearchRepository constructor(
     override fun setVoiceSearchUserEnabled(enabled: Boolean) {
         dataStore.setVoiceSearchEnabled(enabled)
         voiceSearchStatusListener.voiceSearchStatusChanged()
-    }
-
-    override fun countVoiceSearchDismissed(): Int {
-        return dataStore.countVoiceSearchDismissed
-    }
-
-    override fun dismissVoiceSearch() {
-        dataStore.countVoiceSearchDismissed = dataStore.countVoiceSearchDismissed + 1
-    }
-
-    override fun resetVoiceSearchDismissed() {
-        dataStore.countVoiceSearchDismissed = 0
     }
 
     override fun getLastSelectedMode(): VoiceSearchMode {

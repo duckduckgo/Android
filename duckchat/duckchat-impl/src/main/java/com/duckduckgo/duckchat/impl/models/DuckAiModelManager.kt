@@ -17,19 +17,25 @@
 package com.duckduckgo.duckchat.impl.models
 
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.store.SelectedModel
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -45,6 +51,8 @@ data class ModelState(
     val selectedModelShortName: String? = null,
     val userTier: UserTier = UserTier.FREE,
     val isSubscriptionEligible: Boolean = false,
+    /** Whether the user can still start a free trial, which changes the gated section's header. */
+    val isFreeTrialEligible: Boolean = false,
     val attachmentLimits: AttachmentLimits = AttachmentLimits(),
     /** User's persisted global reasoning mode. Used for new chats. */
     val selectedReasoningMode: ReasoningMode? = null,
@@ -64,6 +72,12 @@ interface DuckAiModelManager {
 
     suspend fun selectModel(model: AIChatModel)
 
+    /**
+     * Pins the user to a provider rather than to one of its models, so they keep following the
+     * server-side default within it. Replaces any earlier [selectModel] pick.
+     */
+    suspend fun selectProvider(provider: ModelProvider)
+
     suspend fun selectReasoningMode(mode: ReasoningMode)
 
     suspend fun setChatScopedReasoningMode(mode: ReasoningMode?)
@@ -80,6 +94,9 @@ class RealDuckAiModelManager @Inject constructor(
     private val dataStore: DuckChatDataStore,
     private val subscriptions: Subscriptions,
     private val duckAiHostProvider: DuckAiHostProvider,
+    private val duckChatFeature: Lazy<DuckChatFeature>,
+    private val duckChatPixels: Lazy<DuckChatPixels>,
+    private val cookiesManager: CookieManagerProvider,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : DuckAiModelManager {
@@ -107,10 +124,15 @@ class RealDuckAiModelManager @Inject constructor(
             } catch (e: Exception) {
                 logcat { "Duck.ai Model Manager: failed to restore cached selection: ${e.message}" }
             }
-            subscriptions.getEntitlements()
+            // Status as well as entitlements: signing in or out changes whether the response carries
+            // model labels, and entitlements stay empty either way when there is no subscription.
+            combine(
+                subscriptions.getEntitlements(),
+                subscriptions.getSubscriptionStatusFlow(),
+            ) { entitlements, status -> entitlements to status }
                 .distinctUntilChanged()
                 .collect {
-                    logcat { "Duck.ai Model Manager: entitlements changed, re-fetching models" }
+                    logcat { "Duck.ai Model Manager: subscription state changed, re-fetching models" }
                     fetchModels()
                 }
         }
@@ -162,6 +184,13 @@ class RealDuckAiModelManager @Inject constructor(
                     logcat { "Duck.ai Model Manager: failed to resolve purchase eligibility, defaulting to not eligible: ${it.message}" }
                     false
                 }
+                val isFreeTrialEligible = runCatching {
+                    subscriptions.isFreeTrialEligible()
+                }.getOrElse {
+                    logcat { "Duck.ai Model Manager: failed to resolve free trial eligibility, defaulting to not eligible: ${it.message}" }
+                    false
+                }
+                reportUnknownLabels(response.models)
                 val models = response.models
                     .map { resolveModel(it, userTier) }
                     .filterNot { it.accessTier.isEmpty() && !it.isAccessible }
@@ -170,7 +199,10 @@ class RealDuckAiModelManager @Inject constructor(
                     }
                 val attachmentLimits = resolveAttachmentLimits(response.attachmentLimits, userTier)
                 stateMutex.withLock {
+                    // Selection is resolved before sorting so the derived default keeps following
+                    // endpoint order, and only the picker's display order changes.
                     val selectedModelId = resolveSelection(models)
+                    val displayModels = models.sortLabelledFirst()
                     val selectedModel = models.find { it.id == selectedModelId }
                     val available = ReasoningResolver.availableModes(
                         supported = selectedModel?.supportedReasoningEfforts.orEmpty(),
@@ -180,16 +212,17 @@ class RealDuckAiModelManager @Inject constructor(
                     val nextReasoningMode = validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
 
                     _modelState.value = _modelState.value.copy(
-                        models = models,
+                        models = displayModels,
                         selectedModelId = selectedModelId,
                         selectedModelShortName = selectedModel?.shortName,
                         userTier = userTier,
                         isSubscriptionEligible = isSubscriptionEligible,
+                        isFreeTrialEligible = isFreeTrialEligible,
                         attachmentLimits = attachmentLimits,
                         selectedReasoningMode = nextReasoningMode,
                         availableReasoningModes = available,
                     )
-                    logcat { "Duck.ai Model Manager: fetched ${models.size} models, tier=$userTier, selected=$selectedModelId" }
+                    logcat { "Duck.ai Model Manager: fetched ${displayModels.size} models, tier=$userTier, selected=$selectedModelId" }
                 }
             } catch (e: Exception) {
                 logcat { "Duck.ai Model Manager: failed to fetch models: ${e.message}" }
@@ -199,14 +232,33 @@ class RealDuckAiModelManager @Inject constructor(
 
     private suspend fun fetchModelsResponse(): AIChatModelsResponse {
         val url = DuckAiModelsService.modelsUrl(duckAiHostProvider.getHost())
-        return modelsService.getModels(url)
+        val cookies = if (duckAiHostProvider.isCustomHost()) {
+            cookiesManager.forMode(BrowserMode.REGULAR)?.getCookie(url)
+        } else {
+            null
+        }
+        return modelsService.getModels(url, authorizationHeader(), cookies)
+    }
+
+    // The picker sublines (model `label`) are only returned on an authenticated request, so the
+    // token rides along only while the updated pickers are the ones consuming it.
+    private suspend fun authorizationHeader(): String? {
+        if (!duckChatFeature.get().updatedPickers().isEnabled()) return null
+        return runCatching {
+            subscriptions.getAccessToken()?.takeUnless { it.isBlank() }?.let { "Bearer $it" }
+        }.getOrElse {
+            logcat { "Duck.ai Model Manager: failed to resolve access token, fetching models unauthenticated: ${it.message}" }
+            null
+        }
     }
 
     /**
-     * Only an explicit pick in [selectModel] is persisted. The default is re-derived from every
-     * response so that reordering the list, or promoting a new default, reaches users who never
-     * picked a model. A persisted pick that is gone from the response, or no longer accessible, is
-     * dropped rather than replaced, so we don't turn our fallback into a pick the user never made.
+     * Only an explicit pick in [selectModel] or [selectProvider] is persisted. The default is
+     * re-derived from every response so that reordering the list, or promoting a new default,
+     * reaches users who never picked a model. A persisted model pick that is gone from the response,
+     * or no longer accessible, is dropped rather than replaced, so we don't turn our fallback into a
+     * pick the user never made. A persisted provider is kept even when nothing matches, since the
+     * provider may return to the response later.
      */
     private suspend fun resolveSelection(models: List<AIChatModel>): String? {
         val persistedId = dataStore.getSelectedModel()?.id
@@ -215,10 +267,18 @@ class RealDuckAiModelManager @Inject constructor(
             if (persisted != null && persisted.isAccessible) return persistedId
             dataStore.setSelectedModel(null)
         }
+
+        val persistedProvider = ModelProvider.fromNameOrNull(dataStore.getSelectedProvider())
+        if (persistedProvider != null) {
+            val model = models.firstOrNull { it.provider == persistedProvider && it.isAccessible }
+            if (model != null) return model.id
+        }
+
         return models.firstOrNull { it.isAccessible }?.id
     }
 
     private companion object {
+        const val MAX_LABEL_LENGTH = 40
         const val PINNED_DEFAULT_MODEL_ID = "gpt-5.4-mini"
     }
 
@@ -226,21 +286,47 @@ class RealDuckAiModelManager @Inject constructor(
         withContext(dispatcherProvider.io()) {
             stateMutex.withLock {
                 dataStore.setSelectedModel(SelectedModel(model.id, model.shortName))
-                val available = ReasoningResolver.availableModes(
-                    supported = model.supportedReasoningEfforts,
-                    effortAccess = model.reasoningEffortAccess,
-                    isEligible = _modelState.value.isSubscriptionEligible,
-                )
-                val nextReasoningMode = validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
-                _modelState.value = _modelState.value.copy(
-                    selectedModelId = model.id,
-                    selectedModelShortName = model.shortName,
-                    selectedReasoningMode = nextReasoningMode,
-                    availableReasoningModes = available,
-                )
+                dataStore.setSelectedProvider(null)
+                publishSelection(modelId = model.id, model = model)
                 logcat { "Duck.ai Model Manager: selected model ${model.id} (${model.shortName})" }
             }
         }
+    }
+
+    override suspend fun selectProvider(provider: ModelProvider) {
+        withContext(dispatcherProvider.io()) {
+            stateMutex.withLock {
+                dataStore.setSelectedModel(null)
+                dataStore.setSelectedProvider(provider.name)
+
+                val models = _modelState.value.models
+                val selectedModelId = resolveSelection(models)
+                publishSelection(modelId = selectedModelId, model = models.find { it.id == selectedModelId })
+                logcat { "Duck.ai Model Manager: selected provider ${provider.name}, resolved model $selectedModelId" }
+            }
+        }
+    }
+
+    /**
+     * Publishes [modelId] as the current selection, re-deriving the reasoning modes [model] supports and
+     * keeping the persisted mode only while it stays available. Callers hold [stateMutex].
+     */
+    private suspend fun publishSelection(
+        modelId: String?,
+        model: AIChatModel?,
+    ) {
+        val available = ReasoningResolver.availableModes(
+            supported = model?.supportedReasoningEfforts.orEmpty(),
+            effortAccess = model?.reasoningEffortAccess.orEmpty(),
+            isEligible = _modelState.value.isSubscriptionEligible,
+        )
+        val nextReasoningMode = validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
+        _modelState.value = _modelState.value.copy(
+            selectedModelId = modelId,
+            selectedModelShortName = model?.shortName,
+            selectedReasoningMode = nextReasoningMode,
+            availableReasoningModes = available,
+        )
     }
 
     override suspend fun selectReasoningMode(mode: ReasoningMode) {
@@ -322,6 +408,31 @@ class RealDuckAiModelManager @Inject constructor(
         )
     }
 
+    /** Flags labels added after this version shipped, so we notice copy we cannot render. Models are
+     * re-fetched on every picker attach; the pixel's daily tag keeps that down to one report per label
+     * per day. */
+    private fun reportUnknownLabels(remote: List<RemoteAIChatModel>) {
+        remote.asSequence()
+            .mapNotNull { it.label }
+            .filter { ModelLabel.from(it) == ModelLabel.UNKNOWN }
+            .map { it.sanitisedLabel() }
+            .distinct()
+            .forEach { duckChatPixels.get().fireUnknownModelLabel(it) }
+    }
+
+    // The label is a backend-authored id, so keep the pixel to that shape rather than passing
+    // whatever arrives through verbatim.
+    private fun String.sanitisedLabel(): String = uppercase()
+        .filter { it.isLetterOrDigit() || it == '_' }
+        .take(MAX_LABEL_LENGTH)
+        .ifEmpty { "UNPARSEABLE" }
+
+    /** Labelled models lead the list, as the backend marks them as the ones to recommend. */
+    private suspend fun List<AIChatModel>.sortLabelledFirst(): List<AIChatModel> {
+        if (!duckChatFeature.get().updatedPickers().isEnabled()) return this
+        return sortedBy { if (it.label != null) 0 else 1 }
+    }
+
     private fun resolveModel(
         remote: RemoteAIChatModel,
         userTier: UserTier,
@@ -351,6 +462,7 @@ class RealDuckAiModelManager @Inject constructor(
                 ReasoningEffortAccess(effort = effort, accessTier = tiers, isAccessible = accessible)
             },
             supportedTools = remote.supportedTools.orEmpty().mapNotNull(Tool::from),
+            label = ModelLabel.from(remote.label),
         )
     }
 }

@@ -63,10 +63,10 @@
     <string name="undoSnackbarAction">Vrátit</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Tracker je zablokovaný</item>
+        <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">Tracker je zablokovaný</item>
         <item quantity="few">Trackery jsou zablokované</item>
         <item quantity="many">Trackery jsou zablokované</item>
-        <item quantity="other">Trackery jsou zablokované</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">Trackery jsou zablokované</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -215,13 +215,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Nainstalovat prohlížeč pro počítač</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo pro Mac a Windows</string>
-    <string name="getDesktopBrowserTitle">Chraň své osobní údaje i na Macu a Windows!</string>
-    <string name="getDesktopBrowserBody">DuckDuckGo pro Mac nebo Windows si můžeš stáhnout na:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Sdílet odkaz ke stažení</string>
-    <string name="getDesktopBrowserNoThanks">Ne, děkuji</string>
     <string name="getDesktopBrowserHideItem">Skrýt</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Odkaz se zkopíroval</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Ochrana před vyskakovacími okny ohledně cookies</string>
@@ -233,7 +227,7 @@
         <item quantity="one">%1$d web, kterého se vymazání netýká</item>
         <item quantity="few">%1$d weby, kterých se vymazání netýká</item>
         <item quantity="many">%1$d webu, kterého se vymazání netýká</item>
-        <item quantity="other">%1$d webů, kterých se vymazání netýká</item>
+        <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d webů, kterých se vymazání netýká</item>
     </plurals>
     <string name="dataClearingAutomaticClearingOn">Aktivní</string>
     <string name="dataClearingAutomaticClearingOff">Vypnout</string>
@@ -260,10 +254,10 @@
     <string name="singleTabFireDialogSubtitleSiteData">Když vymažeš data stránek, může dojít ke tvému odhlášení z účtů.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tím se zruší probíhající stahování.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">Došlo ke smazání %1$d karty a jejích dat</item>
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">Došlo ke smazání %1$d karty a jejích dat</item>
         <item quantity="few">Došlo ke smazání %1$d karet a jejich dat</item>
         <item quantity="many">Došlo ke smazání %1$d karet a jejich dat</item>
-        <item quantity="other">Došlo ke smazání %1$d karet a jejich dat</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">Došlo ke smazání %1$d karet a jejich dat</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Data webu se nepodařilo smazat. Aktualizuj WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Data webu se nepodařilo smazat kvůli chybě.</string>
@@ -804,16 +798,16 @@
     <string name="onboardingSerpDaxDialogButton">Mám to!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">A teď zkus přejít na nějaký web!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
-        <item quantity="one"><![CDATA[ a <b>%1$d další tracker</b> se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Další informace zobrazíš klepnutím na štít.️]]></item>
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[ a <b>%1$d další tracker</b> se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Další informace zobrazíš klepnutím na štít.️]]></item>
         <item quantity="few"><![CDATA[ a <b>%1$d další trackery</b> se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Další informace zobrazíš klepnutím na štít.️]]></item>
         <item quantity="many"><![CDATA[ a <b>%1$d dalšího trackeru</b> se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Další informace zobrazíš klepnutím na štít.️]]></item>
-        <item quantity="other"><![CDATA[ a <b>%1$d dalších trackerů</b> se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Další informace zobrazíš klepnutím na štít.️]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[ a <b>%1$d dalších trackerů</b> se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Další informace zobrazíš klepnutím na štít.️]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ se tě tady snaží sledovat. A tak jsem to zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[ se tě tady snaží sledovat. A tak jsem to zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>
         <item quantity="few"><![CDATA[ se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>
         <item quantity="many"><![CDATA[ se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>
-        <item quantity="other"><![CDATA[ se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[ se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Mám to!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Vcukuletu můžeš smazat svou aktivitu při prohlížení pomocí funkce <b>Fire Button</b>.<br/><br/>Zkus ji! 🔥]]></string>
@@ -1002,10 +996,23 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Přidat widget</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Přeskočit</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Import hesel z Googlu</string>
+    <string name="preOnboardingImportPasswordsBody">Google tě může požádat o přihlášení nebo potvrzení zadáním hesla.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Importovat z Googlu</string>
+    <string name="preOnboardingImportCompleteTitle">Import je hotový</string>
+    <string name="preOnboardingImportCompleteCta">Pokračovat</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Importování hesel</string>
+    <string name="preOnboardingImportCompleteParsingBody">Bude to trvat jen chvilku.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Import se nezdařil</string>
+    <string name="preOnboardingImportCompleteFailed">Import hesel se nezdařil</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Importovaných hesel: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Přeskočeno (duplicitní nebo neplatné): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Něco se pokazilo</string>
+    <string name="preOnboardingImportErrorBody">Zkus to znovu.</string>
+    <string name="preOnboardingImportErrorRetry">Zkus to znovu</string>
+
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Přidej si mě do řádku oblíbených.</string>
-    <string name="preOnboardingAddToDockBody">Najdi ikonu DuckDuckGo na ploše. Pak ji podrž a přetáhni na místo. A je to!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Chápu!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Začni soukromý chat s AI Duck.ai, nebo přepni na Vyhledávání a začni s chráněným prohlížením.<br/><br/>Duck.ai můžeš používat odkudkoli, kde vidíš ikonu chatu.]]></string>
@@ -1039,4 +1046,11 @@
     <string name="singleTabFireDialogTitleFireMode">Smazat karty Fire a jejich data?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Soubor nejde otevřít. Zkus vyhledat kompatibilní aplikaci.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo nemůže načíst tuto stránku</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Zdá se, že internetové připojení je offline.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Server se zadaným názvem hostitele nebyl nalezen.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Certifikát pro tento server není platný. Možná se dokonce připojuješ k serveru, který předstírá, že je <b>%1$s</b>. Tvoje důvěrné informace by mohly být ohrožené.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Nebo to mělo být <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

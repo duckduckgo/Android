@@ -25,6 +25,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -130,6 +131,48 @@ class RealAutoconsentSettingsDataStoreTest {
         assertTrue(dataStore.clickAcceptEnabled)
     }
 
+    @Test
+    fun whenOptInPromptShownCountNotStoredThenDefaultsToZero() {
+        assertEquals(0, createDataStore().optInPromptShownCount)
+    }
+
+    @Test
+    fun whenOptInPromptShownCountSetThenStoredValueMatches() {
+        val dataStore = createDataStore()
+        dataStore.optInPromptShownCount = 2
+
+        assertEquals(2, dataStore.optInPromptShownCount)
+        assertEquals(2, preferences().getInt(OPT_IN_PROMPT_SHOWN_COUNT_KEY, 0))
+    }
+
+    @Test
+    fun whenOptInPromptShownCountIncrementedThenSurvivesNewInstance() {
+        createDataStore().optInPromptShownCount++
+
+        assertEquals(1, createDataStore().optInPromptShownCount)
+    }
+
+    @Test
+    fun whenOptInPromptChoiceMadeNotStoredThenDefaultsToFalse() {
+        assertFalse(createDataStore().optInPromptChoiceMade)
+    }
+
+    @Test
+    fun whenOptInPromptChoiceMadeSetToTrueThenStoredValueIsTrue() {
+        val dataStore = createDataStore()
+        dataStore.optInPromptChoiceMade = true
+
+        assertTrue(dataStore.optInPromptChoiceMade)
+        assertTrue(preferences().getBoolean(OPT_IN_PROMPT_CHOICE_MADE_KEY, false))
+    }
+
+    @Test
+    fun whenOptInPromptChoiceMadeSetThenSurvivesNewInstance() {
+        createDataStore().optInPromptChoiceMade = true
+
+        assertTrue(createDataStore().optInPromptChoiceMade)
+    }
+
     private fun preferences() = context.getSharedPreferences(PREFS_FILENAME, Context.MODE_PRIVATE)
 
     private fun createDataStore(): RealAutoconsentSettingsDataStore {
@@ -145,5 +188,7 @@ class RealAutoconsentSettingsDataStoreTest {
         private const val PREFS_FILENAME = "com.duckduckgo.autoconsent.store.settings"
         private const val USER_SETTING_KEY = "AutoconsentUserSetting"
         private const val CLICK_ACCEPT_ENABLED_KEY = "AutoconsentClickAcceptEnabled"
+        private const val OPT_IN_PROMPT_SHOWN_COUNT_KEY = "AutoconsentOptInPromptShownCount"
+        private const val OPT_IN_PROMPT_CHOICE_MADE_KEY = "AutoconsentOptInPromptChoiceMade"
     }
 }

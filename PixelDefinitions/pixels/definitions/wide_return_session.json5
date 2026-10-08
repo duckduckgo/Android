@@ -59,13 +59,13 @@
                 "key": "feature.data.ext.session_duration_ms_bucketed",
                 "type": "string",
                 "description": "Duration from foreground to session end, bucketed (lower end of bucket, in ms)",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.time_to_first_interaction_ms_bucketed",
                 "type": "string",
                 "description": "Time from session start to the first user interaction with the landing surface, including a successful terminal action; absent if the session ends without interaction. Bucketed (lower end of bucket, in ms)",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.focused",
@@ -96,6 +96,38 @@
                 "key": "feature.data.ext.burn_tab_tapped",
                 "type": "boolean",
                 "description": "Whether the user tapped the burn-tab action on the escape hatch during the session"
+            },
+            {
+                "key": "feature.data.ext.source",
+                "type": "string",
+                "description": "The Duck.ai entry point that triggered the session's ai_prompt_submitted terminal. Omitted for every other status_reason or when unknown",
+                "enum": [
+                    "address_bar_prompt",
+                    "address_bar_icon",
+                    "address_bar_shortcut_chip",
+                    "address_bar_editing_state",
+                    "suggestion_ask_ai",
+                    "browsing_menu_ntp",
+                    "browsing_menu_webpage",
+                    "tab_switcher",
+                    "tab_switcher_existing_chat",
+                    "return_to_chat_card",
+                    "chat_history_new_chat",
+                    "chat_history_open_chat",
+                    "voice",
+                    "onboarding",
+                    "direct_url",
+                    "serp",
+                    "ddg_homepage",
+                    "icon_shortcut",
+                    "contextual_chat",
+                    "widget_quick_actions",
+                    "widget_favorite",
+                    "system_search",
+                    "digital_assistant",
+                    "deep_link_other",
+                    "paid_settings"
+                ]
             }
         ]
     }

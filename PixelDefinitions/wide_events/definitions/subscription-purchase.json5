@@ -1,0 +1,136 @@
+{
+    "android-subscription-purchase": {
+        "description": "Monitors the subscription purchase flow from initiation through confirmation",
+        "owners": ["lmac012", "cmonfortep"],
+        "meta": {
+            "type": "android-subscription-purchase",
+            "version": "0.0"
+        },
+        "feature": {
+            "name": "subscription-purchase",
+            "status": ["SUCCESS", "FAILURE", "CANCELLED", "UNKNOWN"],
+            "data": {
+                "ext": {
+                    "subscription_identifier": {
+                        "type": "string",
+                        "description": "Identifier of the subscription the user is purchasing (offer ID when present, otherwise plan ID)"
+                    },
+                    "free_trial_eligible": {
+                        "type": "string",
+                        "description": "Whether the user is eligible for a free trial at purchase start",
+                        "enum": ["true", "false"]
+                    },
+                    "use_query_purchases": {
+                        "type": "string",
+                        "description": "Value of the `useQueryPurchases` feature flag at flow start. When true, storeLogin() reads from PlayBillingManager.getLatestPurchase() (queryPurchases, active subscriptions only) and may surface the new NoActivePurchase / PurchaseInfoNotAvailable failure types. When false, the legacy purchaseHistory path is used.",
+                        "enum": ["true", "false"]
+                    },
+                    "creation_latency_ms_bucketed": {
+                        "type": "string",
+                        "description": "Duration of the account-creation step in milliseconds, bucketed using the lower bucket boundary",
+                        "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                    },
+                    "activation_latency_ms_bucketed": {
+                        "type": "string",
+                        "description": "Duration from billing flow purchase to subscription activation in milliseconds, bucketed using the lower bucket boundary",
+                        "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000", "1800000", "3600000", "14400000"]
+                    },
+                    "failure_reason": {
+                        "type": "string",
+                        "description": "Free-form failure reason. Only present on FAILURE events."
+                    },
+                    "missing_product_failure_reason": {
+                        "type": "string",
+                        "description": "Sub-classification of a missing-product-details failure. Only present when billing_flow_init fails for that reason.",
+                        "enum": ["no_products_loaded", "product_id_not_found", "offer_not_found"]
+                    },
+                    "requested_product_id": {
+                        "type": "string",
+                        "description": "Play product ID requested at billing_flow_init time. Diagnostic context for missing-product failures.",
+                        "enum": ["ddg_privacy_pro", "ddg_subscription_pro"]
+                    },
+                    "requested_plan_id": {
+                        "type": "string",
+                        "description": "Play basePlan ID requested at billing_flow_init time. Diagnostic context for missing-product failures.",
+                        "enum": [
+                            "ddg-privacy-pro-monthly-renews-us",
+                            "ddg-privacy-pro-monthly-renews-row",
+                            "ddg-privacy-pro-yearly-renews-us",
+                            "ddg-privacy-pro-yearly-renews-row",
+                            "ddg-subscription-pro-yearly-renews-us",
+                            "ddg-subscription-pro-monthly-renews-us",
+                            "ddg-subscription-pro-yearly-renews-row",
+                            "ddg-subscription-pro-monthly-renews-row"
+                        ]
+                    },
+                    "requested_offer_id": {
+                        "type": "string",
+                        "description": "Play offer ID requested at billing_flow_init time, or 'none' when no offer was requested. Diagnostic context for missing-product failures."
+                    },
+                    "loaded_products_count": {
+                        "type": "string",
+                        "description": "Number of products loaded from Play at the time of a missing-product-details failure.",
+                        "pattern": "^[0-9]+$"
+                    },
+                    "billing_client_ready": {
+                        "type": "string",
+                        "description": "Whether the Play billing client was ready at the time of a missing-product-details failure.",
+                        "enum": ["true", "false"]
+                    },
+                    "last_load_products_outcome": {
+                        "type": "string",
+                        "description": "Outcome of the most recent loadProducts() call before the missing-product-details failure. Distinguishes 'Play returned empty for this user' from 'loadProducts() failed with a Play BillingError we swallowed'. Format: 'never_attempted' (we never called Play, likely lifecycle issue), 'success_n=<count>' (Play replied success with this many products), 'failure_<BillingError>' (Play replied with this billing error enum).",
+                        "pattern": "^(never_attempted|success_n=\\d+|failure_[A-Z_]+)$",
+                        "examples": ["never_attempted", "success_n=0", "failure_BILLING_UNAVAILABLE"]
+                    },
+                    "step.refresh_subscription": {
+                        "type": "string",
+                        "description": "True if the refresh-subscription step succeeded, false if it failed",
+                        "enum": ["true", "false"]
+                    },
+                    "step.create_account": {
+                        "type": "string",
+                        "description": "True if the create-account step succeeded, false if it failed",
+                        "enum": ["true", "false"]
+                    },
+                    "step.billing_flow_init": {
+                        "type": "string",
+                        "description": "True if the billing-flow-init step succeeded, false if it failed",
+                        "enum": ["true", "false"]
+                    },
+                    "step.billing_flow_purchase": {
+                        "type": "string",
+                        "description": "True if the Play billing purchase step succeeded, false if it failed",
+                        "enum": ["true", "false"]
+                    },
+                    "step.confirm_purchase": {
+                        "type": "string",
+                        "description": "True if the BE purchase-confirmation step succeeded, false if it failed",
+                        "enum": ["true", "false"]
+                    }
+                }
+            }
+        },
+        "context": {
+            "name": [
+                "",
+                "funnel_addressbar_android__aitoggle",
+                "funnel_addressbar_android__modelpicker",
+                "funnel_addressbar_android__reasoningdropdown",
+                "funnel_appmenu_android",
+                "funnel_appsettings_android",
+                "funnel_duckai_android__freelabel",
+                "funnel_duckai_android__modelpicker",
+                "funnel_duckai_android__reasoningdropdown",
+                "funnel_duckai_android__switchmodel",
+                "funnel_modal_android__skippedonboardingupsell",
+                "funnel_modal_android__subscriptionnudge",
+                "funnel_onboarding_android",
+                "funnel_playstore",
+                "funnel_purchase_offer_page_android",
+                "funnel_restore_android__viewplans",
+                "funnel_subscriptionsettings_android__viewplans"
+            ]
+        }
+    }
+}

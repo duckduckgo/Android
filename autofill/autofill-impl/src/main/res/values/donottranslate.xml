@@ -15,5 +15,7 @@
   -->
 
 <resources>
-
+    <string name="importPasswordsChooseMethodDialogSubtitleDeviceAuth">Your device might ask you to enter your PIN, password, or pattern to confirm.</string>
+    <string name="passwords_import_promo_in_browser_title_device_auth">Import your passwords from Google to DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle_device_auth">Quickly and securely import your passwords to DuckDuckGo. Your device might ask you to enter your PIN, password, or pattern to confirm.</string>
 </resources>

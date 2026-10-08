@@ -25,13 +25,18 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection.AI_CHAT
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection.BLOCK_ADS
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection.NO_AI
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection.SEARCH
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.google.android.material.button.MaterialButton
 import com.duckduckgo.mobile.android.R as CommonR
 
-data class DaxEndBrandDesignUpdateBubbleCta(
+data class DaxEndBrandDesignUpdateBubbleCta constructor(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
@@ -39,18 +44,16 @@ data class DaxEndBrandDesignUpdateBubbleCta(
     override val onboardingImprovementsEnabled: Boolean,
     override val onboardingImprovementsV2Enabled: Boolean,
     val isOmnibarBottom: Boolean,
-    val isSegmentedSearchPathWithToggleEnabled: Boolean,
+    val segmentedPathWithAiInput: DownloadReasonSelection?,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_END,
-    title = if (isSegmentedSearchPathWithToggleEnabled) {
-        R.string.searchPathWithToggleEnabledContextualEndTitle
-    } else {
-        R.string.onboardingEndDaxDialogTitle
+    title = when (segmentedPathWithAiInput) {
+        SEARCH -> R.string.searchPathWithToggleEnabledContextualEndTitle
+        AI_CHAT, NO_AI, BLOCK_ADS, null -> R.string.onboardingEndDaxDialogTitle
     },
-    description = if (isSegmentedSearchPathWithToggleEnabled) {
-        R.string.searchPathWithToggleEnabledContextualEndDescription
-    } else {
-        R.string.onboardingEndDaxDialogDescription
+    description = when (segmentedPathWithAiInput) {
+        SEARCH -> R.string.searchPathWithToggleEnabledContextualEndDescription
+        AI_CHAT, NO_AI, BLOCK_ADS, null -> R.string.onboardingEndDaxDialogDescription
     },
     backgroundRes = CommonR.drawable.bg_onboarding_end,
     shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
@@ -67,7 +70,7 @@ data class DaxEndBrandDesignUpdateBubbleCta(
     override val backgroundFillSpec = BackgroundFillSpec(fillHeightDp = 280f, tabletFillHeightDp = 320f, maxHeightFraction = 0.3f)
     override val activeIncludeIds: List<Int> = listOfNotNull(
         R.id.primaryCta,
-        R.id.secondaryCta.takeIf { isSegmentedSearchPathWithToggleEnabled },
+        R.id.secondaryCta.takeIf { segmentedPathWithAiInput == SEARCH },
     )
     override val showArrow: Boolean = true
     override val wavingDaxSpec = WavingDaxSpec(
@@ -83,9 +86,9 @@ data class DaxEndBrandDesignUpdateBubbleCta(
 
     override fun configureContentViews(view: View) {
         val primaryCtaTextRes: Int
-        if (isSegmentedSearchPathWithToggleEnabled) {
+        if (segmentedPathWithAiInput == SEARCH) {
             view.findViewById<ImageView>(R.id.brandDesignHeaderImage)?.apply {
-                setImageResource(CommonR.drawable.ic_duckai)
+                setImageResource(CommonR.drawable.duckduckgo_duckai_96)
                 isVisible = true
             }
 
@@ -101,5 +104,5 @@ data class DaxEndBrandDesignUpdateBubbleCta(
         view.findViewById<MaterialButton>(R.id.primaryCta)?.setText(primaryCtaTextRes)
     }
 
-    override fun shouldDropAddressBarFocusWhenShown(): Boolean = isSegmentedSearchPathWithToggleEnabled
+    override fun shouldDropAddressBarFocusWhenShown(): Boolean = segmentedPathWithAiInput == SEARCH
 }

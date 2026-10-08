@@ -18,4 +18,5 @@ package com.duckduckgo.app.tabs.model
 
 interface TabAtomicOperations {
     suspend fun replaceTabWithNewTab(tabId: String, url: String? = null)
+    suspend fun deleteSelectedBlankTabAndSelectTarget(currentTabId: String, targetTabId: String): Boolean
 }

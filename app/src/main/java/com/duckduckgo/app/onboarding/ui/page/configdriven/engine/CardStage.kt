@@ -55,7 +55,8 @@ interface CardStage {
     /** Hides [contentTargets] and the visible CTAs so an entrance can fade them in. */
     fun prepareEntrance(contentTargets: List<View>)
 
-    fun fadeInContent(contentTargets: List<View>, animate: Boolean, onEnd: () -> Unit)
+    /** Fades [contentTargets] in, together with the visible CTAs unless [withCtas] is false. */
+    fun fadeInContent(contentTargets: List<View>, animate: Boolean, withCtas: Boolean = true, onEnd: () -> Unit)
 
     /** Ends whatever is in flight, running its continuation now rather than at its natural completion. */
     fun settle()
@@ -161,9 +162,10 @@ class CardStageImpl(private val binding: ContentOnboardingWelcomePageUpdateBindi
     override fun fadeInContent(
         contentTargets: List<View>,
         animate: Boolean,
+        withCtas: Boolean,
         onEnd: () -> Unit,
     ) {
-        val targets = contentTargets + ctaViews
+        val targets = if (withCtas) contentTargets + ctaViews else contentTargets
         if (!animate) {
             targets.forEach { it.alpha = 1f }
             onEnd()

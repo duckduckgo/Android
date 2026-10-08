@@ -80,6 +80,68 @@
             app:layout_constraintTop_toTopOf="@id/positiveFeedbackButton"
             tools:src="@drawable/button_sad_light_theme" />
 
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/positiveFeedbackBrandButton"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="34dp"
+            android:clickable="true"
+            android:contentDescription="@string/feedbackInitialDisambiguationHappyButtonContentDescription"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@id/negativeFeedbackBrandButton"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/subtitle"
+            app:cardBackgroundColor="?attr/daxColorSurface"
+            app:cardCornerRadius="@dimen/mediumShapeCornerRadius"
+            app:cardElevation="2dp"
+            app:strokeColor="?attr/daxColorLines"
+            app:strokeWidth="1dp">
+
+            <ImageView
+                android:id="@+id/positiveFeedbackBrandIcon"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no"
+                android:scaleType="fitCenter"
+                tools:src="@drawable/response_good_56" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/negativeFeedbackBrandButton"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginStart="28dp"
+            android:contentDescription="@string/feedbackInitialDisambiguationSadButtonContentDescription"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/positiveFeedbackBrandButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/positiveFeedbackBrandButton"
+            app:layout_constraintTop_toTopOf="@id/positiveFeedbackBrandButton"
+            app:cardBackgroundColor="?attr/daxColorSurface"
+            app:cardCornerRadius="@dimen/mediumShapeCornerRadius"
+            app:cardElevation="2dp"
+            app:strokeColor="?attr/daxColorLines"
+            app:strokeWidth="1dp">
+
+            <ImageView
+                android:id="@+id/negativeFeedbackBrandIcon"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no"
+                android:scaleType="fitCenter"
+                tools:src="@drawable/response_bad_56" />
+
+        </com.google.android.material.card.MaterialCardView>
+
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

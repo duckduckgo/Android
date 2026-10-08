@@ -26,7 +26,6 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.WindowManager
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.core.view.children
 import androidx.core.view.isVisible
@@ -35,6 +34,7 @@ import com.duckduckgo.app.bookmarks.BookmarkAddedDialogPlugin
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.BottomSheetAddBookmarkBinding
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.ConflatedJob
@@ -42,15 +42,11 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.shape.CornerFamily
-import com.google.android.material.shape.MaterialShapeDrawable
-import com.google.android.material.shape.ShapeAppearanceModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import logcat.logcat
 import com.duckduckgo.mobile.android.R as CommonR
-import com.google.android.material.R as MaterialR
 
 @SuppressLint("NoBottomSheetDialog")
 class BookmarkAddedConfirmationDialog(
@@ -85,7 +81,7 @@ class BookmarkAddedConfirmationDialog(
         window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
         behavior.isDraggable = false
-        roundCornersAlways(this)
+        setOnShowListener { setRoundCorners() }
         binding.bookmarksBottomSheetDialogTitle.text = getBookmarksBottomSheetTitle(context, bookmarkFolder)
 
         binding.setAsFavorite.setOnClickListener {
@@ -171,20 +167,6 @@ class BookmarkAddedConfirmationDialog(
     /** Sets event listener for the bottom sheet dialog */
     fun addEventListener(eventListener: EventListener) {
         listener = eventListener
-    }
-
-    // TODO: Use a style when bookmarks is moved to its own module
-    private fun roundCornersAlways(dialog: BottomSheetDialog) {
-        dialog.setOnShowListener { dialogInterface ->
-            val bottomSheetDialog = dialogInterface as BottomSheetDialog
-            val bottomSheet = bottomSheetDialog.findViewById<FrameLayout>(MaterialR.id.design_bottom_sheet)
-            bottomSheet?.background = MaterialShapeDrawable(
-                ShapeAppearanceModel.builder().apply {
-                    setTopLeftCorner(CornerFamily.ROUNDED, context.resources.getDimension(CommonR.dimen.dialogBorderRadius))
-                    setTopRightCorner(CornerFamily.ROUNDED, context.resources.getDimension(CommonR.dimen.dialogBorderRadius))
-                }.build(),
-            )
-        }
     }
 
     private companion object {

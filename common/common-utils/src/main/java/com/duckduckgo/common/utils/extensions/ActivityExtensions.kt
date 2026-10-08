@@ -34,7 +34,7 @@ import androidx.core.view.WindowInsetsControllerCompat
  * Deep links to the application App Info settings
  * @return `true` if it was able to deep link, otherwise `false`
  */
-fun AppCompatActivity.launchApplicationInfoSettings(): Boolean {
+fun Activity.launchApplicationInfoSettings(): Boolean {
     val intent = Intent().apply {
         action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
         data = Uri.parse("package:$packageName")

@@ -1,0 +1,118 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "Captures a post-idle session — NTP (with hatch) or LUT shown after an idle return — from surface shown to terminal user action or app background.",
+    "$comment": "{\"owners\":[\"GerardPaligot\"]}",
+    "type": "object",
+    "required": ["meta", "global", "feature", "app"],
+    "additionalProperties": false,
+    "properties": {
+        "meta": {
+            "type": "object",
+            "required": ["type", "version"],
+            "additionalProperties": false,
+            "properties": { "type": { "const": "android-post-idle-session" }, "version": { "const": "1.0.0" } }
+        },
+        "app": {
+            "type": "object",
+            "required": ["name", "version"],
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the application sending the event",
+                    "enum": ["DuckDuckGo Android"]
+                },
+                "version": {
+                    "type": "string",
+                    "description": "The version of the app sending the event. Release builds are X.Y.Z; internal and nightly builds append the build number and channel suffix.",
+                    "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+(-[a-z]+)?)?$"
+                },
+                "form_factor": { "type": "string", "description": "The form factor of the current device", "enum": ["phone", "tablet"] },
+                "dev_mode": { "type": "boolean", "description": "Whether the app is a debug build" }
+            }
+        },
+        "global": {
+            "type": "object",
+            "required": ["platform", "type", "sample_rate"],
+            "additionalProperties": false,
+            "properties": {
+                "platform": { "type": "string", "description": "The platform the app is running on", "enum": ["Android"] },
+                "type": { "type": "string", "description": "The type of software sending the event", "enum": ["app"] },
+                "sample_rate": {
+                    "type": "number",
+                    "description": "Sample rate for this event, between 0 and 1",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "is_first_daily_occurrence": {
+                    "type": "boolean",
+                    "description": "Whether this is the first event completed with this feature name and status in the current UTC calendar day"
+                }
+            }
+        },
+        "feature": {
+            "type": "object",
+            "required": ["name", "status", "data"],
+            "additionalProperties": false,
+            "properties": {
+                "name": { "type": "string", "description": "The feature name for this event", "enum": ["post_idle_session"] },
+                "status": {
+                    "type": "string",
+                    "description": "The terminal status of the flow",
+                    "enum": ["SUCCESS", "CANCELLED", "UNKNOWN"]
+                },
+                "data": {
+                    "type": "object",
+                    "required": ["ext"],
+                    "additionalProperties": false,
+                    "properties": {
+                        "ext": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "surface": { "type": "string", "description": "Which post-idle surface was shown", "enum": ["ntp", "lut"] },
+                                "status_reason": {
+                                    "type": "string",
+                                    "description": "Reason the session ended",
+                                    "enum": [
+                                        "bar_used",
+                                        "chat_selected",
+                                        "return_to_page_tapped",
+                                        "tab_switcher_selected",
+                                        "app_backgrounded",
+                                        "favorite_selected"
+                                    ]
+                                },
+                                "session_duration_ms_bucketed": {
+                                    "type": "string",
+                                    "description": "Duration from surface shown to session end, bucketed (lower end of bucket, in ms). -1 marks a negative interval caused by a wall-clock adjustment during measurement.",
+                                    "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                                },
+                                "time_to_first_interaction_ms_bucketed": {
+                                    "type": "string",
+                                    "description": "Duration from surface shown to the first non-terminal interaction (page_engaged, toggle_used, or back_pressed), bucketed (lower end of bucket, in ms). -1 marks a negative interval caused by a wall-clock adjustment during measurement.",
+                                    "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                                },
+                                "page_engaged": {
+                                    "type": "string",
+                                    "description": "Whether the user touched the page content during the session (NTP body or WebView)",
+                                    "enum": ["true", "false"]
+                                },
+                                "toggle_used": {
+                                    "type": "string",
+                                    "description": "Whether the user switched between search and Duck.ai modes during the session",
+                                    "enum": ["true", "false"]
+                                },
+                                "back_pressed": {
+                                    "type": "string",
+                                    "description": "Whether the user pressed back at least once during the session",
+                                    "enum": ["true", "false"]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -16,7 +16,9 @@
 
 package com.duckduckgo.subscriptions.impl.onboarding.features
 
+import android.Manifest
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.annotation.DrawableRes
 import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
@@ -48,6 +50,15 @@ class SubscriptionOnboardingFeatureInfoActivity : DuckDuckGoActivity() {
 
     private val binding: ActivitySubscriptionOnboardingFeatureInfoBinding by viewBinding()
 
+    private val summaryOfBenefitsFooter: SummaryOfBenefitsFooterView
+        get() = binding.subscriptionOnboardingFeatureInfoContent.findViewById(R.id.subscriptionOnboardingFeatureInfoLegalFooter)
+
+    private val writeStoragePermission = registerForActivityResult(RequestPermission()) { granted ->
+        if (granted) {
+            summaryOfBenefitsFooter.onWriteStoragePermissionGranted()
+        }
+    }
+
     private val feature: OnboardingFeature by lazy {
         val screenFeature = intent.getActivityParams(SubscriptionOnboardingFeatureInfoScreen::class.java)?.feature
             ?: SubscriptionOnboardingFeature.VPN
@@ -76,6 +87,12 @@ class SubscriptionOnboardingFeatureInfoActivity : DuckDuckGoActivity() {
         binding.subscriptionOnboardingFeatureInfoTitle.setText(feature.titleRes)
         binding.subscriptionOnboardingFeatureInfoDescription.setText(feature.descriptionRes)
         layoutInflater.inflate(feature.contentRes, binding.subscriptionOnboardingFeatureInfoContent, true)
+
+        if (feature == OnboardingFeature.ITR) {
+            summaryOfBenefitsFooter.onWriteStoragePermissionRequired = {
+                writeStoragePermission.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            }
+        }
 
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout, installScrim = false)

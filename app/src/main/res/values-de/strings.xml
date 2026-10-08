@@ -63,8 +63,8 @@
     <string name="undoSnackbarAction">Rückgängig machen</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Tracker blockiert</item>
-        <item quantity="other">Tracker blockiert</item>
+        <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">Tracker blockiert</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">Tracker blockiert</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -213,13 +213,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Desktop-Browser herunterladen</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo für Mac und Windows</string>
-    <string name="getDesktopBrowserTitle">Schütze deine persönlichen Daten auch auf Mac und Windows!</string>
-    <string name="getDesktopBrowserBody">Um DuckDuckGo auf Mac oder Windows herunterzuladen, besuche:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Download-Link teilen</string>
-    <string name="getDesktopBrowserNoThanks">Nein, danke</string>
     <string name="getDesktopBrowserHideItem">Ausblenden</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link kopiert</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Cookie-Pop-up-Schutz</string>
@@ -229,7 +223,7 @@
     <string name="dataClearingDescription">Das Löschen deiner Daten kann dazu beitragen, deinen Online-Datenschutz zu verbessern. Verwende den Fire Button, um Daten manuell zu löschen, oder richte die automatische Löschung ein.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d Website vom Löschen ausgeschlossen</item>
-        <item quantity="other">%1$d Websites vom Löschen ausgeschlossen</item>
+        <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d Websites vom Löschen ausgeschlossen</item>
     </plurals>
     <string name="dataClearingAutomaticClearingOn">Ein</string>
     <string name="dataClearingAutomaticClearingOff">Aus</string>
@@ -256,8 +250,8 @@
     <string name="singleTabFireDialogSubtitleSiteData">Das Löschen von Website-Daten kann dazu führen, dass du aus deinen Konten abgemeldet wirst.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Dadurch werden bereits gestartete Downloads abgebrochen.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">%1$d Tab und dessen Daten gelöscht</item>
-        <item quantity="other">%1$d Tabs und deren Daten gelöscht</item>
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">%1$d Tab und dessen Daten gelöscht</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">%1$d Tabs und deren Daten gelöscht</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Websitedaten konnten nicht gelöscht werden. Bitte aktualisiere WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Die Websitedaten konnten aufgrund eines Fehlers nicht gelöscht werden.</string>
@@ -772,12 +766,12 @@
     <string name="onboardingSerpDaxDialogButton">Verstanden.</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Versuche als nächstes, eine Website zu besuchen!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
-        <item quantity="one"><![CDATA[ und <b>%1$d weiteres Tracker-Netzwerk</b> hat versucht, dich hier zu tracken. Ich habe es blockiert!<br/><br/>☝️ Tippe auf das Schild, um weitere Informationen zu erhalten.]]></item>
-        <item quantity="other"><![CDATA[ und <b>%1$d weitere Tracker-Netzwerke</b> haben versucht, dich hier zu tracken. Ich habe sie blockiert!<br/><br/>☝️ Tippe auf das Schild, um weitere Informationen zu erhalten.]]></item>
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[ und <b>%1$d weiteres Tracker-Netzwerk</b> hat versucht, dich hier zu tracken. Ich habe es blockiert!<br/><br/>☝️ Tippe auf das Schild, um weitere Informationen zu erhalten.]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[ und <b>%1$d weitere Tracker-Netzwerke</b> haben versucht, dich hier zu tracken. Ich habe sie blockiert!<br/><br/>☝️ Tippe auf das Schild, um weitere Informationen zu erhalten.]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ haben versucht, dich hier zu tracken. Ich habe sie blockiert!<br/><br/>☝️ Tippe auf das Schild, um weitere Informationen zu erhalten.]]></item>
-        <item quantity="other"><![CDATA[ haben versucht, dich hier zu tracken. Ich habe sie blockiert!<br/><br/>☝️ Tippe auf das Schild, um weitere Informationen zu erhalten.]]></item>
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[ haben versucht, dich hier zu tracken. Ich habe sie blockiert!<br/><br/>☝️ Tippe auf das Schild, um weitere Informationen zu erhalten.]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[ haben versucht, dich hier zu tracken. Ich habe sie blockiert!<br/><br/>☝️ Tippe auf das Schild, um weitere Informationen zu erhalten.]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Verstanden.</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Lösche deine Browseraktivitäten sofort mit dem <b>Fire Button</b>.<br/><br/>Probier’s doch mal aus!️ 🔥]]></string>
@@ -966,10 +960,23 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Widget hinzufügen</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Überspringen</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Passwörter von Google importieren</string>
+    <string name="preOnboardingImportPasswordsBody">Google fordert dich eventuell auf, dich anzumelden oder dein Passwort zur Bestätigung einzugeben.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Von Google importieren</string>
+    <string name="preOnboardingImportCompleteTitle">Import abgeschlossen</string>
+    <string name="preOnboardingImportCompleteCta">Fortsetzen</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Importieren von Passwörtern</string>
+    <string name="preOnboardingImportCompleteParsingBody">Das wird nur einen Moment dauern.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Fehlgeschlagene Importe</string>
+    <string name="preOnboardingImportCompleteFailed">Passwortimport fehlgeschlagen</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Passwörter importiert: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Übersprungen (doppelt oder ungültig): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Etwas ist schiefgelaufen</string>
+    <string name="preOnboardingImportErrorBody">Bitte versuche es noch einmal.</string>
+    <string name="preOnboardingImportErrorRetry">Erneut versuchen</string>
+
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Füge mich zu deiner Favoritenzeile hinzu.</string>
-    <string name="preOnboardingAddToDockBody">Suche auf deinem Startbildschirm das DuckDuckGo-Symbol. Ziehe es an die richtige Stelle. Das war es schon!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Verstanden.</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Starte einen privaten KI-Chat mit Duck.ai oder wechsle zur Suche, um sicher zu browsen.<br/><br/>Du kannst Duck.ai von überall dort nutzen, wo du das Chat-Symbol siehst]]></string>
@@ -1003,4 +1010,11 @@
     <string name="singleTabFireDialogTitleFireMode">Fire-Tabs und deren Daten löschen?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Datei kann nicht geöffnet werden. Nach einer kompatiblen App suchen.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo kann diese Seite nicht laden</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Die Internetverbindung scheint offline zu sein.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Ein Server mit dem angegebenen Hostnamen konnte nicht gefunden werden.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Das Zertifikat für diesen Server ist ungültig. Möglicherweise stellst du eine Verbindung zu einem Server her, der vorgibt, <b>%1$s</b> zu sein, wodurch deine vertraulichen Daten in Gefahr sein könnten.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Meintest du <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

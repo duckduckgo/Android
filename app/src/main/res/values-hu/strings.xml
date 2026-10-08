@@ -63,8 +63,8 @@
     <string name="undoSnackbarAction">Visszavonás</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Nyomkövető blokkolva</item>
-        <item quantity="other">Nyomkövetők blokkolva</item>
+        <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">Nyomkövető blokkolva</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">Nyomkövetők blokkolva</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -213,13 +213,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Asztali böngésző letöltése</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo Mac és Windows rendszerre</string>
-    <string name="getDesktopBrowserTitle">Védd a személyes adataidat Mac és Windows rendszeren is!</string>
-    <string name="getDesktopBrowserBody">A DuckDuckGo Mac vagy Windows rendszerre történő letöltéséhez látogass el ide:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Letöltési link megosztása</string>
-    <string name="getDesktopBrowserNoThanks">Nem, köszönöm</string>
     <string name="getDesktopBrowserHideItem">Elrejtés</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link másolva</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Felugró sütiablak elleni védelem</string>
@@ -229,7 +223,7 @@
     <string name="dataClearingDescription">Az adatok törlése segíthet az online adatvédelemben. A Fire Button segítségével manuálisan törölhetők az adatok, illetve beállítható automatikus törlés is.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d webhely kizárva a törlésből</item>
-        <item quantity="other">%1$d webhely kizárva a törlésből</item>
+        <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d webhely kizárva a törlésből</item>
     </plurals>
     <string name="dataClearingAutomaticClearingOn">Be</string>
     <string name="dataClearingAutomaticClearingOff">Ki</string>
@@ -256,8 +250,8 @@
     <string name="singleTabFireDialogSubtitleSiteData">A webhelyadatok törlése kijelentkeztethet a fiókjaidból.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Ez megszakítja a folyamatban lévő letöltéseket.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">%1$d lap és adatai törölve</item>
-        <item quantity="other">%1$d lap és adataik törölve</item>
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">%1$d lap és adatai törölve</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">%1$d lap és adataik törölve</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Nem sikerült törölni a webhelyadatokat. Kérlek, frissítsd a WebView-t.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Egy hiba miatt nem sikerült törölni a webhelyadatokat.</string>
@@ -772,12 +766,12 @@
     <string name="onboardingSerpDaxDialogButton">Megvan!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">A következő lépésben próbálj meg ellátogatni egy webhelyre!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
-        <item quantity="one"><![CDATA[ és <b>további %1$d</b> próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
-        <item quantity="other"><![CDATA[ és <b>további %1$d</b> próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[ és <b>további %1$d</b> próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[ és <b>további %1$d</b> próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
-        <item quantity="other"><![CDATA[ próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[ próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[ próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Megvan!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Töröld azonnal böngészési tevékenységedet a <b>Fire Button</b> használatával.<br/><br/>Próbáld ki!️ 🔥]]></string>
@@ -966,10 +960,23 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Minialkalmazás hozzáadása</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Kihagyás</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Jelszavak importálása a Google-ból</string>
+    <string name="preOnboardingImportPasswordsBody">A Google megkérhet, hogy jelentkezz be, vagy a megerősítéshez add meg a jelszavad.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Importálás a Google-ból</string>
+    <string name="preOnboardingImportCompleteTitle">Importálás kész</string>
+    <string name="preOnboardingImportCompleteCta">Folytatás</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Jelszavak importálása</string>
+    <string name="preOnboardingImportCompleteParsingBody">Ez csak egy pillanatig tart.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Az importálás nem sikerült</string>
+    <string name="preOnboardingImportCompleteFailed">A jelszó importálása nem sikerült</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Importált jelszó: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Kihagyott (ismétlődő vagy érvénytelen): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Hiba történt</string>
+    <string name="preOnboardingImportErrorBody">Próbálkozz újra.</string>
+    <string name="preOnboardingImportErrorRetry">Próbálkozz újra</string>
+
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Adj hozzá a kedvencek sorához.</string>
-    <string name="preOnboardingAddToDockBody">Keresd meg a DuckDuckGo ikont a kezdőképernyőn. Ezután az ikont nyomva tartva húzd a helyére. Ennyi az egész!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Rendben!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Indíts privát MI-beszélgetést a Duck.ai-jal, vagy válts a Keresésre a védett böngészéshez.<br/><br/>A Duck.ai-t bárhol használhatod, ahol látod a beszélgetés ikonját]]></string>
@@ -1003,4 +1010,11 @@
     <string name="singleTabFireDialogTitleFireMode">Törlöd a Fire-lapokat és az adataikat?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">A fájl nem nyitható meg. Keress kompatibilis alkalmazást.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">A DuckDuckGo nem tudja betölteni ezt az oldalt</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Úgy tűnik, nincs internetkapcsolat.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">A megadott állomásnevű szerver nem található.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[A szerver tanúsítványa érvénytelen. Előfordulhat, hogy olyan szerverhez csatlakozol, amely megpróbál <b>%1$s</b> címűként viselkedni, veszélybe sodorva ezzel bizalmas adataidat.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Úgy érted, <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

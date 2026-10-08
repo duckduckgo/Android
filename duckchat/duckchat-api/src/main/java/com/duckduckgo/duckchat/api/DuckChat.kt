@@ -203,4 +203,12 @@ interface DuckChat {
      * attributed back to the picker.
      */
     suspend fun onAddressBarPickerDuckAiSelected()
+
+    /**
+     * Opens Duck.ai in a new chat tab from [entryPoint] with the image-generation tool preselected on
+     * the native input. When the currently selected model can't generate images, first switches the
+     * (global) model selection to an available image-capable model; falls back to a normal new chat when
+     * no accessible model supports image generation.
+     */
+    fun openDuckChatImageGeneration(entryPoint: DuckChatEntryPoint)
 }

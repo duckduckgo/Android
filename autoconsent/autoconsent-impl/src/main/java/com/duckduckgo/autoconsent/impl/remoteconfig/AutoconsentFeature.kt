@@ -65,4 +65,28 @@ interface AutoconsentFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun cookiePopUpPreferenceSetting(): Toggle
+
+    /**
+     * Gate for the Cookie Pop-up Protection opt-in prompt shown through the prompts coordinator.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun cookiePopUpOptInPrompt(): Toggle
+
+    /**
+     * Allows the Cookie Pop-up Protection opt-in prompt to be dismissed with the back button.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun cookiePopUpOptInPromptDismissible(): Toggle
+
+    /**
+     * Shows a close button on the Cookie Pop-up Protection opt-in prompt.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun cookiePopUpOptInPromptCloseButton(): Toggle
+
+    /**
+     * Gate for the V2 copy variant of the Cookie Pop-up Protection opt-in prompt shown when protection is already on.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun cookiePopUpOptInPromptPrimaryButtonV2(): Toggle
 }

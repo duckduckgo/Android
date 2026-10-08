@@ -16,7 +16,6 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
     id 'com.squareup.anvil'
     id 'com.google.devtools.ksp'
 }
@@ -56,6 +55,7 @@ dependencies {
     implementation project(':duckchat-api')
     implementation project(':new-tab-page-api')
     implementation project(':statistics-api')
+    implementation project(':settings-api')
     implementation project(':design-system')
     implementation "androidx.datastore:datastore-preferences:_"
 

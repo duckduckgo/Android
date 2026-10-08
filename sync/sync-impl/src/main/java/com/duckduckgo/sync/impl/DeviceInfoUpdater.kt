@@ -20,6 +20,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel
+import com.duckduckgo.sync.impl.pixels.toDeviceInfoWriteFailureReason
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -40,7 +43,16 @@ interface DeviceInfoUpdater {
      *
      * @return the server's device list as it stands after the update
      */
-    suspend fun setThisDeviceName(name: String): Result<List<DeviceV2>>
+    suspend fun setThisDeviceName(
+        name: String,
+        source: DeviceInfoUpdateSource? = null,
+    ): Result<List<DeviceV2>>
+}
+
+enum class DeviceInfoUpdateSource {
+    FIRST_WRITE,
+    UPDATE,
+    REPAIR,
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -54,12 +66,13 @@ class RealDeviceInfoUpdater @Inject constructor(
     private val accountInfoKeyManager: AccountInfoKeyManager,
     private val syncFeature: SyncFeature,
     private val dispatchers: DispatcherProvider,
+    private val syncPixels: SyncPixels,
 ) : DeviceInfoUpdater {
 
     private val mutex = Mutex()
 
-    override suspend fun setThisDeviceName(name: String): Result<List<DeviceV2>> = withContext(dispatchers.io()) {
-        mutex.withLock { setName(name) }
+    override suspend fun setThisDeviceName(name: String, source: DeviceInfoUpdateSource?): Result<List<DeviceV2>> = withContext(dispatchers.io()) {
+        mutex.withLock { setName(name, source) }
     }
 
     /**
@@ -68,7 +81,7 @@ class RealDeviceInfoUpdater @Inject constructor(
      * @param name The new device name
      * @return the server's device list as it stands after the update
      */
-    private suspend fun setName(name: String): Result<List<DeviceV2>> {
+    private suspend fun setName(name: String, source: DeviceInfoUpdateSource?): Result<List<DeviceV2>> {
         val includeDeviceInfo = syncFeature.canWriteDeviceInfo()
 
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
@@ -82,7 +95,12 @@ class RealDeviceInfoUpdater @Inject constructor(
             }
             when (val result = deviceInfoEncryptor.encrypt(name, type)) {
                 is Success -> result.data
-                is Error -> return result
+                is Error -> {
+                    source?.let {
+                        fireWriteFailure(it, UnifiedDeviceListPixel.DeviceInfoWriteFailureReason.ENCRYPT_FAILED)
+                    }
+                    return result
+                }
             }
         } else {
             null
@@ -103,10 +121,25 @@ class RealDeviceInfoUpdater @Inject constructor(
         ) {
             is Success -> {
                 syncStore.deviceName = name
+                if (includeDeviceInfo && source != null) {
+                    syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.writeSuccess(source))
+                }
                 Success(result.data.devicesV2)
             }
-            is Error -> result
+            is Error -> {
+                if (includeDeviceInfo && source != null) {
+                    fireWriteFailure(source, result.toDeviceInfoWriteFailureReason())
+                }
+                result
+            }
         }
+    }
+
+    private fun fireWriteFailure(
+        source: DeviceInfoUpdateSource,
+        reason: UnifiedDeviceListPixel.DeviceInfoWriteFailureReason,
+    ) {
+        syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.writeFailed(source, reason))
     }
 
     /**

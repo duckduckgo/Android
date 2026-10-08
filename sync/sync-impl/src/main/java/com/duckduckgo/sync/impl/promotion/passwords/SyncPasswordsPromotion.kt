@@ -44,7 +44,7 @@ import com.duckduckgo.sync.impl.promotion.SyncPromotions
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command.ReevalutePromo
-import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityWithSourceParams
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.cancel
@@ -131,7 +131,7 @@ class SyncPasswordsPromotionView @JvmOverloads constructor(
         with(binding.syncPromotion) {
             setMessage(
                 Message(
-                    topIllustration = R.drawable.ic_sync_ok_48,
+                    topIllustration = R.drawable.sync_check_56,
                     title = context.getString(R.string.syncPromoTitlePasswords),
                     subtitle = context.getString(R.string.syncPromoSubtitlePasswords),
                     action = context.getString(R.string.syncPromoPrimaryButton),

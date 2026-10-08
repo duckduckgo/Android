@@ -115,15 +115,6 @@
                     android:visibility="gone" />
 
                 <include
-                    android:id="@+id/addToDockContent"
-                    layout="@layout/include_brand_design_add_to_dock"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:visibility="gone" />
-
-                <include
                     android:id="@+id/widgetPromptContent"
                     layout="@layout/include_brand_design_widget_prompt"
                     android:layout_width="match_parent"
@@ -135,6 +126,51 @@
                 <include
                     android:id="@+id/preferenceSelectorContent"
                     layout="@layout/include_brand_design_preference_selector"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/singleChoiceContent"
+                    layout="@layout/include_brand_design_single_choice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/togglePositionContent"
+                    layout="@layout/include_brand_design_toggle_position"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/duckAiStateContent"
+                    layout="@layout/include_brand_design_duck_ai_state"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/importPasswordsContent"
+                    layout="@layout/include_brand_design_import_passwords"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/importCompleteContent"
+                    layout="@layout/include_brand_design_import_complete"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"

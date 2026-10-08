@@ -16,7 +16,6 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
     id 'com.squareup.anvil'
     id 'com.google.devtools.ksp'
 }
@@ -65,6 +64,7 @@ dependencies {
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation "androidx.test.ext:junit-ktx:_"
     testImplementation project(path: ':common-test')
+    testImplementation CashApp.turbine
     testImplementation project(path: ':data-store-test')
     testImplementation(KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"

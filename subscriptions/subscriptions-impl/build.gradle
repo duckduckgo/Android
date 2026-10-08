@@ -16,7 +16,6 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
     id 'com.squareup.anvil'
     id 'com.google.devtools.ksp'
 }
@@ -50,7 +49,6 @@ dependencies {
     implementation project(path: ':user-agent-api')
     implementation project(path: ':subscriptions-api')
     implementation project(path: ':settings-api')
-    implementation project(path: ':autofill-api')
     implementation project(path: ':network-protection-api')
     implementation project(path: ':internal-features-api')
     implementation project(path: ':macos-api')
@@ -77,6 +75,8 @@ dependencies {
     implementation "com.android.billingclient:billing:_"
     implementation "com.android.billingclient:billing-ktx:_"
     implementation "com.squareup.logcat:logcat:_"
+    implementation 'nl.dionsegijn:konfetti:1.2.5'
+    implementation "com.airbnb.android:lottie:_"
 
     implementation Google.dagger
     implementation AndroidX.core.ktx

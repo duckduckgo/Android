@@ -63,10 +63,10 @@
     <string name="undoSnackbarAction">Отменить</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">трекер заблокирован</item>
+        <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">трекер заблокирован</item>
         <item quantity="few">трекера заблокировано</item>
         <item quantity="many">трекеров заблокировано</item>
-        <item quantity="other">трекера заблокировано</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">трекера заблокировано</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -215,13 +215,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Скачать настольный браузер</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo для Mac и Windows</string>
-    <string name="getDesktopBrowserTitle">Защитите личную информацию на Mac и Windows!</string>
-    <string name="getDesktopBrowserBody">Скачивайте DuckDuckGo:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Поделиться ссылкой для загрузки</string>
-    <string name="getDesktopBrowserNoThanks">Нет, спасибо</string>
     <string name="getDesktopBrowserHideItem">Скрыть</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Ссылка скопирована</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Защита от всплывающих окон куки</string>
@@ -233,7 +227,7 @@
         <item quantity="one">%1$d сайт исключен из очистки</item>
         <item quantity="few">%1$d сайта исключено из очистки</item>
         <item quantity="many">%1$d сайтов исключено из очистки</item>
-        <item quantity="other">Исключено из очистки: %1$d</item>
+        <item quantity="other" instruction="Placeholder is the number of sites excluded">Исключено из очистки: %1$d</item>
     </plurals>
     <string name="dataClearingAutomaticClearingOn">вкл.</string>
     <string name="dataClearingAutomaticClearingOff">Выкл</string>
@@ -260,10 +254,10 @@
     <string name="singleTabFireDialogSubtitleSiteData">Удаление данных сайтов может сопровождаться выходом из учетных записей.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Текущие загрузки будут отменены.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">Удалена %1$d вкладка и ее данные</item>
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">Удалена %1$d вкладка и ее данные</item>
         <item quantity="few">Удалены %1$d вкладки и их данные</item>
         <item quantity="many">Удалено %1$d вкладок и их данные</item>
-        <item quantity="other">Удалены вкладки (%1$d) и их данные</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">Удалены вкладки (%1$d) и их данные</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Удалить данные сайта не удалось. Обновите WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Данные сайта не удалось удалить из-за ошибки.</string>
@@ -804,16 +798,16 @@
     <string name="onboardingSerpDaxDialogButton">Понятно</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">А теперь попробуйте посетить сайт!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
-        <item quantity="one"><![CDATA[ и еще <b>%1$d сервис</b> пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[ и еще <b>%1$d сервис</b> пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
         <item quantity="few"><![CDATA[ и еще <b>%1$d сервиса</b> пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
         <item quantity="many"><![CDATA[ и еще <b>%1$d сервисов</b> пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
-        <item quantity="other"><![CDATA[ и <b>другие сервисы (еще %1$d)</b> пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[ и <b>другие сервисы (еще %1$d)</b> пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ пытался вести за вами слежку, но мы его заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[ пытался вести за вами слежку, но мы его заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
         <item quantity="few"><![CDATA[ пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
         <item quantity="many"><![CDATA[ пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
-        <item quantity="other"><![CDATA[ пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[ пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Понятно</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Кнопка <b>Fire Button</b> моментально стирает из браузера данные о посещении сайтов.<br/><br/>Убедитесь сами! 🔥]]></string>
@@ -1002,10 +996,23 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Добавить виджет</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Пропустить</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Импортировать пароли из Google</string>
+    <string name="preOnboardingImportPasswordsBody">Google может попросить вас войти в систему или ввести пароль для подтверждения.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Импортировать из Google</string>
+    <string name="preOnboardingImportCompleteTitle">Импортирование завершено</string>
+    <string name="preOnboardingImportCompleteCta">Продолжить</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Импорт паролей</string>
+    <string name="preOnboardingImportCompleteParsingBody">Это займет совсем немного времени.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Не удалось импортировать</string>
+    <string name="preOnboardingImportCompleteFailed">Не удалось импортировать пароли</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Импортировано паролей: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Пропущено (дубликаты и недействительные): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Что-то пошло не так</string>
+    <string name="preOnboardingImportErrorBody">Повторите попытку.</string>
+    <string name="preOnboardingImportErrorRetry">Повторить попытку</string>
+
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Добавьте меня в строку избранного.</string>
-    <string name="preOnboardingAddToDockBody">Найдите значок DuckDuckGo на главном экране. Затем нажмите и перетащите виджет на нужное место. Готово!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Понятно</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Начните приватный чат с ИИ через Duck.ai или переключитесь на поиск для защищенного просмотра веб-страниц.<br/><br/>Duck.ai можно использовать в любом месте, где вы видите значок чата]]></string>
@@ -1039,4 +1046,11 @@
     <string name="singleTabFireDialogTitleFireMode">Удалить Fire-вкладки и их данные?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Не удается открыть файл. Попробуйте найти совместимое приложение.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo не удалось загрузить эту страницу</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Похоже, нет подключения к интернету.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Сервер с указанным именем хоста не найден.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Сертификат этого сервера недействителен. Возможно, вы пытаетесь подключиться к серверу, который выдает себя за <b>%1$s</b>, что ставит под угрозу вашу конфиденциальную информацию.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Возможно, вы искали: <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

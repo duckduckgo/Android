@@ -122,7 +122,6 @@
     <string name="duckAIContextualAutomaticContextMessage">Automātiski nosūtīt lapas saturu uz Duck.ai</string>
 
     <!-- Contextual sheet quick action -->
-    <string name="duckAIContextualPromptAskAboutPage">Jautā par lapu</string>
 
     <!-- Contextual sheet suggested prompts; native copy for PageSuggestionsCatalog.json entries, keyed by catalog id -->
     <string name="duckAiSuggestionTranslatePageLabel" instruction="Suggested prompt chip: translate the current page">Iztulko šo lapu</string>
@@ -205,7 +204,6 @@
     <string name="duckAiSuggestionPersonBackgroundPrompt" instruction="Suggested prompt submitted text: summarize a person&apos;s background">Apkopo šī cilvēka biogrāfiju un ievērojamākos darbus.</string>
 
     <!-- Contextual sheet input hint -->
-    <string name="contextualSheetImprovedHint">Jautā jebko privāti</string>
     <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Pēdējās tērzēšanas sarunas</string>
 
     <!-- duck.ai contextual fire button -->
@@ -256,8 +254,8 @@
     <string name="duck_ai_chat_history_action_download_selected_content_description">Lejupielādēt tērzēšanas</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
         <item quantity="zero">Pabeigta %1$d tērzēšanu lejupielāde</item>
-        <item quantity="one">Pabeigta %1$d tērzēšanas lejupielāde</item>
-        <item quantity="other">Pabeigta %1$d tērzēšanu lejupielāde</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Pabeigta %1$d tērzēšanas lejupielāde</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Pabeigta %1$d tērzēšanu lejupielāde</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Atvērt pārpildes izvēlni</string>
     <string name="duck_ai_chat_history_select_all">Atlasīt visus</string>
@@ -283,6 +281,11 @@
     <string name="native_input_chat_duck_mode_hint">Atbildēt…</string>
 
     <!-- Model Picker -->
+    <string name="duckAiModelPickerLabelEverydayUse" instruction="Subline under a model in the Duck.ai model picker, describing what that model suits.">Piemērotākais ikdienas lietošanai</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster" instruction="Subline under a model in the Duck.ai model picker. &apos;Limits&apos; means the user&apos;s usage allowance, which this model consumes more quickly.">Stabils, bet ātrāk sasniedz ierobežojumu</string>
+    <string name="duckAiModelPickerTryFreeTrial" instruction="Header above the locked models in the Duck.ai model picker, shown when the user can still start a free trial.">Izmēģini bez maksas</string>
+    <string name="duckAiModelPickerSubscriberExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when unlocking them requires a paid subscription.">Tikai abonentiem</string>
+    <string name="duckAiModelPickerProExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when they require the Pro plan specifically. &apos;Pro&apos; is the plan name and stays untranslated.">Ekskluzīvi Pro plānam</string>
     <string name="duckAiModelPickerPlusModels">Plus</string>
     <string name="duckAiModelPickerProModels">Pro</string>
 
@@ -343,10 +346,59 @@
     <string name="duckAiSettingsTitle">Duck.ai iestatījumi</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutPage">Jautā par lapu</string>
 
     <!-- Editing a message already sent to Duck.ai -->
     <string name="duck_ai_edit_prompt_title" instruction="Screen title: the user is editing a message they already sent to Duck.ai">Rediģēt ziņojumu</string>
     <string name="duck_ai_edit_prompt_lose_responses_warning" instruction="Warning shown while editing a sent message: the answer Duck.ai already gave will be discarded and answered again">Rediģējot atbildi, tā tiks aizstāta ar jaunu.</string>
 
+    <string name="duckChatContextualAskAboutPage">Jautā par lapu</string>
+    <string name="duckChatContextualAskAboutSearch">Turpināt Duck.ai</string>
+    <string name="duckChatContextualOpenDuckAi">Atvērt Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Apkopot šo fragmentu</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Apkopo šo fragmentu.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Tulkot šo fragmentu</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Iztulko šo fragmentu %1$s valodā.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Teksta fragments</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Vari pievienot līdz %1$d teksta fragmentiem. Noņem vienu, lai pievienotu citu.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Pajautā Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="zero">%1$d vārdu</item>
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d vārds</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d vārdi</item>
+    </plurals>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model&apos;s short name">%1$s patērē lietojuma limitu līdz pat 2–5 reizes ātrāk nekā pamata modeļi.</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Nerādīt</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">%1$d%% no dienas limita</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">%1$d%% no nedēļas limita</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Sasniegts dienas limits</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Sasniegts nedēļas limits</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Sasniegts nedēļas lietojuma limits</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Sasniegts uzlaboto MI modeļu limits</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Pārslēgt modeli</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Sākot lietot nedēļas limitu</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Izmēģināt abonementu bez maksas</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">Abonēt</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as &apos;2 days&apos; or &apos;5 hours&apos;">Tiks atiestatīts pēc %1$s</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="zero">%1$d dienu</item>
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d diena</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d dienas</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="zero">%1$d stundu</item>
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d stunda</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d stundas</item>
+    </plurals>
 </resources>

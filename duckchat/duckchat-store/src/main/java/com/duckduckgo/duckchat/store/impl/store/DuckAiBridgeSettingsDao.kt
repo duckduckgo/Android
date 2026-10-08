@@ -21,6 +21,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DuckAiBridgeSettingsDao {
@@ -29,6 +30,9 @@ interface DuckAiBridgeSettingsDao {
 
     @Query("SELECT * FROM duck_ai_settings WHERE `key` = :key")
     fun get(key: String): DuckAiBridgeSettingEntity?
+
+    @Query("SELECT * FROM duck_ai_settings WHERE `key` = :key")
+    fun observe(key: String): Flow<DuckAiBridgeSettingEntity?>
 
     @Query("SELECT * FROM duck_ai_settings")
     fun getAll(): List<DuckAiBridgeSettingEntity>

@@ -41,7 +41,7 @@ import com.duckduckgo.mobile.android.R
  * DuckDuckGo ghost alt button with transparent background.
  *
  * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1213826087792404
- * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=12110-29662&t=ZNNQ3qIoJQfTS14R-4
+ * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=12110-29662
  *
  * @param text The button label.
  * @param onClick Called when the button is clicked.

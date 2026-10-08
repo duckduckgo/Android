@@ -42,15 +42,15 @@ class BrowserLottieTrackersAnimatorHelperResolveAdBlockingIconTest {
     fun whenBrandIconsEnabledThenAdBlockingIconIsBrandUpdate() {
         assertEquals(
             R.drawable.video_player_color_24_brand_update,
-            testee.resolveAdBlockingIcon(R.drawable.ic_video_player_color_24, rebrandIconsEnabled = true),
+            testee.resolveAdBlockingIcon(R.drawable.video_player_color_24, rebrandIconsEnabled = true),
         )
     }
 
     @Test
     fun whenBrandIconsDisabledThenAdBlockingIconIsUnchanged() {
         assertEquals(
-            R.drawable.ic_video_player_color_24,
-            testee.resolveAdBlockingIcon(R.drawable.ic_video_player_color_24, rebrandIconsEnabled = false),
+            R.drawable.video_player_color_24,
+            testee.resolveAdBlockingIcon(R.drawable.video_player_color_24, rebrandIconsEnabled = false),
         )
     }
 }

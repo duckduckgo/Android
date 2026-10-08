@@ -35,12 +35,24 @@ class AppEnjoymentAppCreationObserver(
     private val promptTypeDecider: PromptTypeDecider,
     private val appCoroutineScope: CoroutineScope,
     private val preventDialogQueuingFeature: PreventFeedbackDialogQueuingFeature,
+    private val appRatingPromptModalFeature: AppRatingPromptModalFeature,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : MainProcessLifecycleObserver {
 
     @UiThread
     override fun onStart(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatchers.main()) {
+            val coordinatedByModalEvaluator = withContext(dispatchers.io()) {
+                appRatingPromptModalFeature.self().isEnabled()
+            }
+
+            if (coordinatedByModalEvaluator) {
+                // AppRatingPromptEvaluator owns the prompt now; deciding it here as well would emit
+                // it outside the coordinator and bypass modal arbitration.
+                logcat { "app enjoyment prompt is coordinated by the modal evaluator, nothing to do on app start" }
+                return@launch
+            }
+
             val shouldPreventQueueing = withContext(dispatchers.io()) {
                 preventDialogQueuingFeature.self().isEnabled()
             }

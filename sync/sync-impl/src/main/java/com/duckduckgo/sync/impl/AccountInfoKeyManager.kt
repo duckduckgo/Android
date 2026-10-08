@@ -22,6 +22,10 @@ import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
+import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel
+import com.duckduckgo.sync.impl.pixels.toAccountInfoKeyAdoptFailureReason
+import com.duckduckgo.sync.impl.pixels.toAccountInfoKeyCreateFailureReason
 import com.duckduckgo.sync.store.AccountInfoPublicKey
 import com.duckduckgo.sync.store.ScopedPassword
 import com.duckduckgo.sync.store.SyncStore
@@ -75,6 +79,8 @@ class RealAccountInfoKeyManager @Inject constructor(
     private val thirdPartyKeyWrapper: ThirdPartyKeyWrapper,
     private val thirdPartyCredentialManager: ThirdPartyCredentialManager,
     private val dispatchers: DispatcherProvider,
+    private val syncPixels: SyncPixels,
+    private val accountInfoDdgWrapRepairer: AccountInfoDdgWrapRepairer,
 ) : AccountInfoKeyManager {
 
     override suspend fun ensureKeyRegistered(): Result<AccountInfoKeyResult> = withContext(dispatchers.io()) {
@@ -85,7 +91,14 @@ class RealAccountInfoKeyManager @Inject constructor(
 
         val minted = when (val result = mintUnregistered(accountSecretKey)) {
             is Success -> result.data
-            is Error -> return@withContext result
+            is Error -> {
+                syncPixels.fireUnifiedDeviceListPixel(
+                    UnifiedDeviceListPixel.AccountInfoKeyCreateFailed(
+                        UnifiedDeviceListPixel.AccountInfoKeyCreateFailureReason.MINT_FAILED,
+                    ),
+                )
+                return@withContext result
+            }
         }
 
         val entries = when (val result = wrapForCredentials(minted)) {
@@ -98,6 +111,9 @@ class RealAccountInfoKeyManager @Inject constructor(
             is Success -> onSetIfAbsentSuccess(token, minted, entries.size, result.data)
             is Error -> {
                 logcat(ERROR) { "Sync-UnifiedDevices: setKeysIfAbsent failed: ${result.reason}" }
+                syncPixels.fireUnifiedDeviceListPixel(
+                    UnifiedDeviceListPixel.AccountInfoKeyCreateFailed(result.toAccountInfoKeyCreateFailureReason()),
+                )
                 result
             }
         }
@@ -162,37 +178,68 @@ class RealAccountInfoKeyManager @Inject constructor(
         return when (outcome) {
             SetKeysIfAbsentResult.Created -> {
                 logcat { "Sync-UnifiedDevices: our key won (kid=${minted.entry.kid})" }
+                syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.AccountInfoKeyCreateSuccess)
                 Success(
                     AccountInfoKeyResult(kid = minted.entry.kid, publicKey = minted.entry.publicKey, created = true, wrapsSent = wrapsSent),
                 )
             }
             is SetKeysIfAbsentResult.Existing -> {
+                val publicKeyToAdopt = outcome.publicKey
+                    ?: return adoptExistingFromServer(token, wrapsSent, outcome.kid)
                 logcat { "Sync-UnifiedDevices: another device's key won (kid=${outcome.kid}); adopting from response" }
-                Success(
-                    AccountInfoKeyResult(kid = outcome.kid, publicKey = outcome.publicKey, created = false, wrapsSent = wrapsSent),
-                )
+                finishAdopt(kid = outcome.kid, publicKey = publicKeyToAdopt, wrapsSent = wrapsSent)
             }
             SetKeysIfAbsentResult.ExistsFetchRequired -> adoptExistingFromServer(token, wrapsSent)
         }
     }
 
     /** The server has a key for this purpose but didn't return it (409, or a 200 shim); fetch and adopt it. */
-    private fun adoptExistingFromServer(token: String, wrapsSent: Int): Result<AccountInfoKeyResult> {
+    private fun adoptExistingFromServer(
+        token: String,
+        wrapsSent: Int,
+        expectedKid: String? = null,
+    ): Result<AccountInfoKeyResult> {
         logcat { "Sync-UnifiedDevices: key already exists on server; fetching to adopt" }
         return when (val result = syncApi.getProtectedKeys(token)) {
             is Success -> {
-                val existing = result.data.firstOrNull { it.purpose == SYNC_PURPOSE_ACCOUNT_INFO }
-                    ?: return Error(reason = "CreateAccountInfoKey: server reported an existing key but none was found on fetch")
-                logcat { "Sync-UnifiedDevices: adopted existing key (kid=${existing.kid})" }
-                Success(
-                    AccountInfoKeyResult(kid = existing.kid, publicKey = existing.publicKey, created = false, wrapsSent = wrapsSent),
-                )
+                val keyToAdopt = result.data.firstOrNull { entry ->
+                    entry.purpose == SYNC_PURPOSE_ACCOUNT_INFO &&
+                        entry.publicKey != null &&
+                        (expectedKid == null || entry.kid == expectedKid)
+                }
+                val publicKeyToAdopt = keyToAdopt?.publicKey
+                    ?: return Error(reason = "CreateAccountInfoKey: server reported an existing key but none was found on fetch").also {
+                        fireAdoptFailed(it)
+                    }
+                logcat { "Sync-UnifiedDevices: adopted existing key (kid=${keyToAdopt.kid})" }
+                finishAdopt(kid = keyToAdopt.kid, publicKey = publicKeyToAdopt, wrapsSent = wrapsSent, entries = result.data)
             }
             is Error -> {
                 logcat(ERROR) { "Sync-UnifiedDevices: failed to fetch keys to adopt existing: ${result.reason}" }
+                fireAdoptFailed(result)
                 result
             }
         }
+    }
+
+    /** Wrap repair is best-effort: a missing ddg wrap must not fail public-key adoption. */
+    private fun finishAdopt(
+        kid: String,
+        publicKey: RsaJwk,
+        wrapsSent: Int,
+        entries: List<ProtectedKeyEntry>? = null,
+    ): Result<AccountInfoKeyResult> {
+        accountInfoDdgWrapRepairer.repair(kid, entries)
+        syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.AccountInfoKeyAdoptSuccess)
+        return Success(
+            AccountInfoKeyResult(kid = kid, publicKey = publicKey, created = false, wrapsSent = wrapsSent),
+        )
+    }
+
+    private fun fireAdoptFailed(error: Error) {
+        syncPixels.fireUnifiedDeviceListPixel(
+            UnifiedDeviceListPixel.AccountInfoKeyAdoptFailed(error.toAccountInfoKeyAdoptFailureReason()),
+        )
     }
 
     private fun RsaJwk.toStoredKey(kid: String) = AccountInfoPublicKey(keyId = kid, modulus = n, exponent = e)

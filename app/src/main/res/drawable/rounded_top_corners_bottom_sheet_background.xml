@@ -17,7 +17,7 @@
 <shape
     xmlns:android="http://schemas.android.com/apk/res/android">
     <corners
-        android:topLeftRadius="@dimen/largeShapeCornerRadius"
-        android:topRightRadius="@dimen/largeShapeCornerRadius" />
+        android:topLeftRadius="?attr/daxLargeSheetRadius"
+        android:topRightRadius="?attr/daxLargeSheetRadius" />
     <solid android:color="?attr/daxColorWindow" />
 </shape>

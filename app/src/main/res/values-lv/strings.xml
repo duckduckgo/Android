@@ -64,8 +64,8 @@
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
         <item quantity="zero">Bloķētie izsekotāji</item>
-        <item quantity="one">Bloķētais izsekotājs</item>
-        <item quantity="other">Bloķētie izsekotāji</item>
+        <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">Bloķētais izsekotājs</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">Bloķētie izsekotāji</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -214,13 +214,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Iegūsti galddatora pārlūku</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo operētājsistēmām Mac un Windows</string>
-    <string name="getDesktopBrowserTitle">Aizsargā savu personisko informāciju arī Mac un Windows!</string>
-    <string name="getDesktopBrowserBody">Lai lejupielādētu DuckDuckGo operētājsistēmā Mac vai Windows, apmeklē:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Kopīgot lejupielādes saiti</string>
-    <string name="getDesktopBrowserNoThanks">Nē, paldies</string>
     <string name="getDesktopBrowserHideItem">Paslēpt</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Saite nokopēta</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Sīkfailu uznirstošo logu aizsardzība</string>
@@ -231,7 +225,7 @@
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="zero">%1$d vietas izslēgtas no tīrīšanas</item>
         <item quantity="one">%1$d vieta izslēgta no tīrīšanas</item>
-        <item quantity="other">%1$d vietas izslēgtas no tīrīšanas</item>
+        <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d vietas izslēgtas no tīrīšanas</item>
     </plurals>
     <string name="dataClearingAutomaticClearingOn">Ieslēgts</string>
     <string name="dataClearingAutomaticClearingOff">Izslēgts</string>
@@ -259,8 +253,8 @@
     <string name="singleTabFireDialogSubtitleDownloads">Tas atcels notiekošās lejupielādes.</string>
     <plurals name="tabsClearedSnackbarMessage">
         <item quantity="zero">%1$d cilnes un to dati izdzēsti</item>
-        <item quantity="one">%1$d cilne un tās dati izdzēsti</item>
-        <item quantity="other">%1$d cilnes un to dati izdzēsti</item>
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">%1$d cilne un tās dati izdzēsti</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">%1$d cilnes un to dati izdzēsti</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Vietnes datus nevarēja izdzēst. Lūdzu, atjaunini WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Vietnes datus nevarēja dzēst kļūdas dēļ.</string>
@@ -789,13 +783,13 @@
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Tagad pamēģini atvērt kādu vietni!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
         <item quantity="zero"><![CDATA[ un <b>vēl %1$d</b> mēģināja tevi šeit izsekot. Es tos bloķēju!<br/><br/>☝️ Pieskaries vairogam, lai uzzinātu vairāk.️]]></item>
-        <item quantity="one"><![CDATA[ un <b>vēl %1$d</b> mēģināja tevi šeit izsekot. Es tos bloķēju!<br/><br/>☝️ Pieskaries vairogam, lai uzzinātu vairāk.️]]></item>
-        <item quantity="other"><![CDATA[ un <b>vēl %1$d</b> mēģināja tevi šeit izsekot. Es tos bloķēju!<br/><br/>☝️ Pieskaries vairogam, lai uzzinātu vairāk.️]]></item>
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[ un <b>vēl %1$d</b> mēģināja tevi šeit izsekot. Es tos bloķēju!<br/><br/>☝️ Pieskaries vairogam, lai uzzinātu vairāk.️]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[ un <b>vēl %1$d</b> mēģināja tevi šeit izsekot. Es tos bloķēju!<br/><br/>☝️ Pieskaries vairogam, lai uzzinātu vairāk.️]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
         <item quantity="zero"><![CDATA[ mēģināja tevi šeit izsekot. Es tos bloķēju!<br/><br/>☝️ Pieskaries vairogam, lai uzzinātu vairāk.]]></item>
-        <item quantity="one"><![CDATA[ mēģināja tevi šeit izsekot. Es tos bloķēju!<br/><br/>☝️ Pieskaries vairogam, lai uzzinātu vairāk.]]></item>
-        <item quantity="other"><![CDATA[ mēģināja tevi šeit izsekot. Es tos bloķēju!<br/><br/>☝️ Pieskaries vairogam, lai uzzinātu vairāk. ️]]></item>
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[ mēģināja tevi šeit izsekot. Es tos bloķēju!<br/><br/>☝️ Pieskaries vairogam, lai uzzinātu vairāk.]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[ mēģināja tevi šeit izsekot. Es tos bloķēju!<br/><br/>☝️ Pieskaries vairogam, lai uzzinātu vairāk. ️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Sapratu!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Nekavējoties notīri savu pārlūkošanas vēsturi, izmantojot <b>Fire Button</b>.<br/><br/>Izmēģini! 🔥]]></string>
@@ -984,10 +978,23 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Pievienot logrīku</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Izlaist</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Importēt paroles no Google</string>
+    <string name="preOnboardingImportPasswordsBody">Lai apstiprinātu, Google var lūgt tevi pierakstīties vai ievadīt paroli.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Importēt no Google</string>
+    <string name="preOnboardingImportCompleteTitle">Importēšana pabeigta</string>
+    <string name="preOnboardingImportCompleteCta">Turpināt</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Paroļu importēšana</string>
+    <string name="preOnboardingImportCompleteParsingBody">Tas aizņems tikai mirkli.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Importēšana neizdevās</string>
+    <string name="preOnboardingImportCompleteFailed">Neizdevās importēt paroles</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Importētās paroles: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Izlaists (dublikāts vai nederīgs): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Radās kāda problēma</string>
+    <string name="preOnboardingImportErrorBody">Lūdzu, mēģini vēlreiz.</string>
+    <string name="preOnboardingImportErrorRetry">Mēģināt vēlreiz</string>
+
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Pievieno mani izlases joslai.</string>
-    <string name="preOnboardingAddToDockBody">Atrodi DuckDuckGo ikonu sākuma ekrānā. Pēc tam piespied un ievelc vietā. Tik vienkārši!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Sapratu!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Sāc privātu MI tērzēšanu ar Duck.ai vai pārslēdzies uz meklēšanu aizsargātai pārlūkošanai.<br/><br/>Tu vari izmantot Duck.ai no jebkuras vietas, kur redzi tērzēšanas ikonu.]]></string>
@@ -1021,4 +1028,11 @@
     <string name="singleTabFireDialogTitleFireMode">Vai dzēst Fire cilnes un to datus?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Nevar atvērt failu. Pārbaudīt saderīgu lietotni.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo nevar ielādēt šo lapu</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Šķiet, ka nav pieejams Interneta savienojums.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Neizdevās atrast serveri ar norādīto resursdatora nosaukumu.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Šī servera sertifikāts ir nederīgs. Tu, iespējams, veido savienojumu ar serveri, kas izliekas par <b>%1$s</b> un var pakļaut riskam tavu konfidenciālo informāciju.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Vai domāji <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

@@ -17,10 +17,13 @@
 package com.duckduckgo.duckchat.impl.nativeinput
 
 import android.content.Context
+import android.net.Uri
 import android.view.View
+import android.webkit.ValueCallback
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
 
 /**
  * Communication surface from a plugin back to the host widget. Plugins use it to act on the host
@@ -31,6 +34,12 @@ interface NativeInputHost {
     /** Submit the current input as a chat message; opens a new chat session if the input is empty. */
     fun submit()
 
+    /** `true` when the input carries nothing submittable, i.e. [submit] would start an empty chat. */
+    fun isInputEmpty(): Boolean
+
+    /** The tab the widget is currently configured for, or null before it has been configured. */
+    fun tabId(): String?
+
     /** Stop the active chat stream. Delegates to the host's [NativeInputWidget.onStopTapped] callback. */
     fun stop()
 
@@ -38,7 +47,22 @@ interface NativeInputHost {
     fun showModelPicker(showing: Boolean)
     fun showReasoningPicker(showing: Boolean)
 
-    fun attachmentChanged(hasAttachments: Boolean, limitExceeded: Boolean, supportsUpload: Boolean)
+    /** Focus the input field, expanding the bottom row so a plugin popup (e.g. the model picker) can anchor to it. */
+    fun requestInputFocus()
+
+    /** Clear the input field text (clear-text control). */
+    fun clearInput()
+
+    /** The send button was tapped. */
+    fun onSubmitClicked()
+
+    /** The in-field voice search microphone was tapped. */
+    fun onVoiceSearchClicked()
+
+    /** The voice chat button was tapped. */
+    fun onVoiceChatClicked()
+
+    fun attachmentChanged(hasStandaloneAttachments: Boolean, limitExceeded: Boolean, supportsUpload: Boolean)
 
     /**
      * Plugins call this whenever the user's tool selection changes. The widget routes this into
@@ -47,11 +71,49 @@ interface NativeInputHost {
      */
     fun toolSelected(tool: String?)
     fun customizeResponsesClicked()
+
+    /** The model menu opened. The host suppresses input teardown while it is up. */
+    fun modelMenuShown()
+
+    /**
+     * The model menu closed. [hasPendingRecoverySelection] is false when the user dismissed it without
+     * picking, which ends the FE model-change window.
+     */
+    fun modelMenuDismissed(hasPendingRecoverySelection: Boolean)
+
+    /** The user picked a model during the FE model-change recovery flow. */
+    fun changeModelSubmitted(modelId: String)
+
+    /** Ask the host to run the camera capture flow; the activity owns the result plumbing. */
+    fun requestCameraCapture(callback: ValueCallback<Array<Uri>>)
+
+    /** Ask the host to run the file picker for [mimeTypes]. */
+    fun requestFilePicker(callback: ValueCallback<Array<Uri>>, mimeTypes: List<String>)
+
+    /** The user chose to ask about the current page, offered only on the contextual surface. */
+    fun askAboutPage()
+
+    /** The user removed the page-context attachment. */
+    fun pageContextRemoved()
+
+    /** True when the host is the fullscreen edit-message surface, which offers a reduced control set. */
+    fun isEditSurface(): Boolean
+
+    /**
+     * True when the host is the contextual Duck.ai sheet. Asked of the host rather than read from
+     * `inputContext`, because the sheet shares its per-tab state slot with the omnibar widget and that
+     * slot can briefly carry BROWSER state.
+     */
+    fun isContextualSurface(): Boolean
 }
 
 interface NativeInputPlugin : ActivePlugin {
 
     val containerId: Int
+
+    /** The input contexts this plugin renders in. Defaults to all; narrow it to skip a plugin on a surface (e.g. start-chat is not shown in the contextual sheet). */
+    val supportedContexts: Set<InputContext>
+        get() = InputContext.entries.toSet()
 
     fun createView(context: Context, host: NativeInputHost): View
 }

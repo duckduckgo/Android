@@ -18,17 +18,21 @@ package com.duckduckgo.subscriptions.impl.onboarding.welcome
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.doOnLayout
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.FragmentSubscriptionOnboardingWelcomeBinding
+import com.duckduckgo.subscriptions.impl.onboarding.welcome.SubscriptionOnboardingWelcomeViewModel.Command
 import com.duckduckgo.subscriptions.impl.onboarding.welcome.SubscriptionOnboardingWelcomeViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -40,6 +44,9 @@ class SubscriptionOnboardingWelcomeFragment : DuckDuckGoFragment(R.layout.fragme
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
+    @Inject
+    lateinit var appTheme: AppTheme
+
     private val binding: FragmentSubscriptionOnboardingWelcomeBinding by viewBinding()
     private val viewModel: SubscriptionOnboardingWelcomeViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[SubscriptionOnboardingWelcomeViewModel::class.java]
@@ -47,6 +54,15 @@ class SubscriptionOnboardingWelcomeFragment : DuckDuckGoFragment(R.layout.fragme
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.subscriptionOnboardingWelcomeBackground.setImageResource(
+            if (appTheme.isLightModeEnabled()) {
+                R.drawable.onboarding_welcome_background
+            } else {
+                R.drawable.onboarding_welcome_background_dark
+            },
+        )
+
         binding.subscriptionOnboardingWelcomePrimaryButton.setOnClickListener {
             viewModel.onPrimaryCtaClicked()
         }
@@ -54,9 +70,27 @@ class SubscriptionOnboardingWelcomeFragment : DuckDuckGoFragment(R.layout.fragme
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach { render(it) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.commands
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.onScreenShown()
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            Command.LaunchConfetti -> binding.subscriptionOnboardingWelcomeKonfetti.doOnLayout {
+                binding.subscriptionOnboardingWelcomeKonfetti.launchOnboardingConfetti()
+            }
+        }
     }
 
     private fun render(viewState: ViewState) {
+        binding.subscriptionOnboardingWelcomeBanner.isVisible = viewState.isFreeTrial
+        if (!viewState.isFreeTrial) return
+
         binding.subscriptionOnboardingWelcomeBannerDescription.text =
             getString(R.string.subscriptionOnboardingWelcomeBannerDescription, viewState.formattedBillingDate)
 

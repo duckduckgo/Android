@@ -16,7 +16,6 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
     id 'com.squareup.anvil'
     id 'com.google.devtools.ksp'
 }
@@ -43,11 +42,11 @@ dependencies {
     implementation project(path: ':browser-mode-api')
     implementation project(path: ':common-utils')
     implementation project(path: ':di')
-    implementation project(path: ':feature-toggles-api')
 
     implementation Google.dagger
     implementation KotlinX.coroutines.core
     implementation AndroidX.webkit
+    implementation AndroidX.lifecycle.common
     implementation AndroidX.dataStore.preferences
     implementation "com.squareup.logcat:logcat:_"
 
@@ -57,5 +56,4 @@ dependencies {
     testImplementation Testing.robolectric
     testImplementation AndroidX.test.ext.junit
     testImplementation project(':common-test')
-    testImplementation project(':feature-toggles-test')
 }

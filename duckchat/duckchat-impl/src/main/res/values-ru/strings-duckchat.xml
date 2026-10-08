@@ -122,7 +122,6 @@
     <string name="duckAIContextualAutomaticContextMessage">Автоматически отправлять содержимое страницы в Duck.ai</string>
 
     <!-- Contextual sheet quick action -->
-    <string name="duckAIContextualPromptAskAboutPage">Задайте вопрос о странице</string>
 
     <!-- Contextual sheet suggested prompts; native copy for PageSuggestionsCatalog.json entries, keyed by catalog id -->
     <string name="duckAiSuggestionTranslatePageLabel" instruction="Suggested prompt chip: translate the current page">Переведи эту страницу</string>
@@ -205,7 +204,6 @@
     <string name="duckAiSuggestionPersonBackgroundPrompt" instruction="Suggested prompt submitted text: summarize a person&apos;s background">Расскажи вкратце об этом человеке и его известных работах.</string>
 
     <!-- Contextual sheet input hint -->
-    <string name="contextualSheetImprovedHint">Задавайте любые вопросы, сохраняя конфиденциальность</string>
     <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Последние чаты</string>
 
     <!-- duck.ai contextual fire button -->
@@ -255,10 +253,10 @@
     <string name="duck_ai_chat_history_action_new">Создать</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Скачать чаты</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Скачивание %1$d чата завершено</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Скачивание %1$d чата завершено</item>
         <item quantity="few">Скачивание %1$d чатов завершено</item>
         <item quantity="many">Скачивание %1$d чатов завершено</item>
-        <item quantity="other">Скачивание %1$d чата завершено</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Скачивание %1$d чата завершено</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Открыть раскрывающееся меню</string>
     <string name="duck_ai_chat_history_select_all">Выбрать все</string>
@@ -284,6 +282,11 @@
     <string name="native_input_chat_duck_mode_hint">Ответить…</string>
 
     <!-- Model Picker -->
+    <string name="duckAiModelPickerLabelEverydayUse" instruction="Subline under a model in the Duck.ai model picker, describing what that model suits.">Идеально подходит для повседневного использования</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster" instruction="Subline under a model in the Duck.ai model picker. &apos;Limits&apos; means the user&apos;s usage allowance, which this model consumes more quickly.">Надежная модель, но быстрее расходует лимит</string>
+    <string name="duckAiModelPickerTryFreeTrial" instruction="Header above the locked models in the Duck.ai model picker, shown when the user can still start a free trial.">Попробовать бесплатно</string>
+    <string name="duckAiModelPickerSubscriberExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when unlocking them requires a paid subscription.">Только для подписчиков</string>
+    <string name="duckAiModelPickerProExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when they require the Pro plan specifically. &apos;Pro&apos; is the plan name and stays untranslated.">Только в плане Pro</string>
     <string name="duckAiModelPickerPlusModels">Plus</string>
     <string name="duckAiModelPickerProModels">Pro</string>
 
@@ -344,10 +347,62 @@
     <string name="duckAiSettingsTitle">Настройки Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutPage">Задать вопрос о странице</string>
 
     <!-- Editing a message already sent to Duck.ai -->
     <string name="duck_ai_edit_prompt_title" instruction="Screen title: the user is editing a message they already sent to Duck.ai">Редактирование сообщения</string>
     <string name="duck_ai_edit_prompt_lose_responses_warning" instruction="Warning shown while editing a sent message: the answer Duck.ai already gave will be discarded and answered again">После редактирования текущий ответ будет заменен новым.</string>
 
+    <string name="duckChatContextualAskAboutPage">Задать вопрос о странице</string>
+    <string name="duckChatContextualAskAboutSearch">Продолжить в Duck.ai</string>
+    <string name="duckChatContextualOpenDuckAi">Открыть Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Кратко изложи выделенный фрагмент</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Кратко изложи выделенный фрагмент.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Переведи выделенный текст</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Переведи выделенный текст на %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Выделенный текст</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Можно добавить максимум %1$d выделенных фрагментов текста. Чтобы добавить фрагмент, удали один из ранее добавленных.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Спросить у Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d слово</item>
+        <item quantity="few">%1$d слова</item>
+        <item quantity="many">%1$d слов</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d сл.</item>
+    </plurals>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model&apos;s short name">%1$s расходует лимиты в 2–5 раз быстрее, чем базовые модели.</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Закрыть</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">Использовано %1$d%% дневного лимита</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">Использовано %1$d%% недельного лимита</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Достигнут дневной лимит</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Достигнут недельный лимит</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Достигнут недельный лимит использования</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Достигнут лимит использования продвинутых моделей ИИ</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Выбрать другую модель</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Начать использовать недельный лимит</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Попробовать подписку бесплатно</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">Оформить подписку</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as &apos;2 days&apos; or &apos;5 hours&apos;">Сброс через %1$s</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d день</item>
+        <item quantity="few">%1$d дня</item>
+        <item quantity="many">%1$d дней</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d дн.</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d час</item>
+        <item quantity="few">%1$d часа</item>
+        <item quantity="many">%1$d часов</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d ч.</item>
+    </plurals>
 </resources>

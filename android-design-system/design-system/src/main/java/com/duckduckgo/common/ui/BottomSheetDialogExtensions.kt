@@ -18,25 +18,33 @@ package com.duckduckgo.common.ui
 
 import android.view.View
 import android.widget.FrameLayout
+import androidx.annotation.AttrRes
+import androidx.annotation.DimenRes
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import com.duckduckgo.common.ui.view.getDimensionFromAttr
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
+import com.duckduckgo.mobile.android.R as CommonR
 
 /**
  * By default, when bottom sheet dialog is expanded, the corners become squared.
  * This function ensures that the bottom sheet dialog will have rounded corners even when in an expanded state.
  */
-fun BottomSheetDialog.setRoundCorners() {
+fun BottomSheetDialog.setRoundCorners(
+    @AttrRes radiusAttr: Int = CommonR.attr.daxSheetRadius,
+    @DimenRes fallbackRadius: Int = CommonR.dimen.dialogBorderRadius,
+) {
     val bottomSheet = this.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
 
     val shapeDrawable = MaterialShapeDrawable.createWithElevationOverlay(context)
+    val radius = context.getDimensionFromAttr(radiusAttr, fallbackRadius)
     shapeDrawable.shapeAppearanceModel = shapeDrawable.shapeAppearanceModel
         .toBuilder()
-        .setTopLeftCorner(CornerFamily.ROUNDED, context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.dialogBorderRadius))
-        .setTopRightCorner(CornerFamily.ROUNDED, context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.dialogBorderRadius))
+        .setTopLeftCorner(CornerFamily.ROUNDED, radius)
+        .setTopRightCorner(CornerFamily.ROUNDED, radius)
         .build()
     bottomSheet?.background = shapeDrawable
 }

@@ -19,6 +19,7 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -27,14 +28,13 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityShowOnAppLaunchSettingBinding
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchViewModel.Command.ShowTimeoutDialog
-import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
-import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
-import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.settings.api.AfterInactivityReturnDestination
+import com.duckduckgo.settings.api.AfterInactivitySettings
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -89,21 +89,21 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         binding.lastOpenedTabCheckListItem.setClickListener {
-            viewModel.onShowOnAppLaunchOptionChanged(LastOpenedTab)
+            viewModel.onShowOnAppLaunchOptionChanged(AfterInactivityReturnDestination.LastUsedTab)
         }
 
         binding.newTabCheckListItem.setClickListener {
-            viewModel.onShowOnAppLaunchOptionChanged(NewTabPage)
+            viewModel.onShowOnAppLaunchOptionChanged(AfterInactivityReturnDestination.NewTabPage())
         }
 
         binding.specificPageCheckListItem.setClickListener {
-            viewModel.onShowOnAppLaunchOptionChanged(SpecificPage(binding.specificPageUrlInput.text))
+            viewModel.onShowOnAppLaunchOptionChanged(AfterInactivityReturnDestination.SpecificPage(url = binding.specificPageUrlInput.text))
         }
 
         binding.specificPageUrlInput.addFocusChangedListener { _, hasFocus ->
             if (hasFocus) {
                 viewModel.onShowOnAppLaunchOptionChanged(
-                    SpecificPage(binding.specificPageUrlInput.text),
+                    AfterInactivityReturnDestination.SpecificPage(url = binding.specificPageUrlInput.text),
                 )
             }
         }
@@ -117,40 +117,51 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
         viewModel.viewState
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
+                applyRedesignedLayoutIfNeeded(viewState.useRedesignedAfterInactivityLayout)
+
                 when (viewState.selectedOption) {
-                    LastOpenedTab -> {
+                    AfterInactivitySettings.LastUsedTab -> {
                         uncheckNewTabCheckListItem()
-                        uncheckSpecificPageCheckListItem()
+                        uncheckSpecificPageCheckListItem(viewState.useRedesignedAfterInactivityLayout)
                         binding.lastOpenedTabCheckListItem.setChecked(true)
                     }
-                    NewTabPage -> {
+                    is AfterInactivitySettings.NewTabPage -> {
                         uncheckLastOpenedTabCheckListItem()
-                        uncheckSpecificPageCheckListItem()
+                        uncheckSpecificPageCheckListItem(viewState.useRedesignedAfterInactivityLayout)
                         binding.newTabCheckListItem.setChecked(true)
                     }
-                    is SpecificPage -> {
+                    is AfterInactivitySettings.SpecificPage -> {
                         uncheckLastOpenedTabCheckListItem()
                         uncheckNewTabCheckListItem()
                         with(binding) {
                             specificPageCheckListItem.setChecked(true)
                             specificPageUrlInput.isEnabled = true
+                            if (viewState.useRedesignedAfterInactivityLayout) {
+                                specificPageUrlInput.visibility = View.VISIBLE
+                            }
                         }
                     }
                 }
 
-                if (viewState.showNTPAfterIdleReturn) {
-                    setTitle(R.string.afterInactivityOptionTitle)
+                setTitle(if (viewState.showNTPAfterIdleReturn) R.string.afterInactivityOptionTitle else R.string.showOnAppLaunchOptionTitle)
+
+                if (viewState.showAfterInactivityTimeout) {
                     binding.afterInactivityTimeoutRow.setSecondaryText(viewState.selectedIdleThresholdSeconds.toTimeoutLabel())
                     binding.afterInactivityTimeoutRow.visibility = View.VISIBLE
-                    binding.afterInactivityTimeoutDivider.visibility = View.VISIBLE
+                    if (!viewState.useRedesignedAfterInactivityLayout) {
+                        binding.afterInactivityTimeoutDivider.visibility = View.VISIBLE
+                    }
                 } else {
-                    setTitle(R.string.showOnAppLaunchOptionTitle)
                     binding.afterInactivityTimeoutRow.visibility = View.GONE
-                    binding.afterInactivityTimeoutDivider.visibility = View.GONE
+                    if (!viewState.useRedesignedAfterInactivityLayout) {
+                        binding.afterInactivityTimeoutDivider.visibility = View.GONE
+                    }
                 }
 
-                val showReturnToLastTabToggle = viewState.showNTPAfterIdleReturn && viewState.selectedOption == NewTabPage
-                binding.returnToLastTabDivider.visibility = if (showReturnToLastTabToggle) View.VISIBLE else View.GONE
+                val showReturnToLastTabToggle = viewState.showNTPAfterIdleReturn && viewState.selectedOption is AfterInactivitySettings.NewTabPage
+                if (!viewState.useRedesignedAfterInactivityLayout) {
+                    binding.returnToLastTabDivider.visibility = if (showReturnToLastTabToggle) View.VISIBLE else View.GONE
+                }
                 binding.returnToLastTabToggle.visibility = if (showReturnToLastTabToggle) View.VISIBLE else View.GONE
                 binding.returnToLastTabToggle.quietlySetIsChecked(viewState.returnToLastTabEnabled) { _, isChecked ->
                     viewModel.onReturnToLastTabToggled(isChecked)
@@ -219,8 +230,22 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
         binding.newTabCheckListItem.setChecked(false)
     }
 
-    private fun uncheckSpecificPageCheckListItem() {
+    private fun uncheckSpecificPageCheckListItem(useRedesignedAfterInactivityLayout: Boolean) {
         binding.specificPageCheckListItem.setChecked(false)
         binding.specificPageUrlInput.isEnabled = false
+        if (useRedesignedAfterInactivityLayout) {
+            binding.specificPageUrlInput.visibility = View.GONE
+        }
+    }
+
+    private fun applyRedesignedLayoutIfNeeded(useRedesignedAfterInactivityLayout: Boolean) {
+        if (!useRedesignedAfterInactivityLayout) return
+
+        val parent = binding.afterInactivityTimeoutRow.parent as ViewGroup
+        parent.removeView(binding.afterInactivityTimeoutDivider)
+        parent.removeView(binding.returnToLastTabDivider)
+        parent.removeView(binding.afterInactivityTimeoutRow)
+        val insertIndex = parent.indexOfChild(binding.specificPageUrlInput) + 1
+        parent.addView(binding.afterInactivityTimeoutRow, insertIndex)
     }
 }

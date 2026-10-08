@@ -202,7 +202,7 @@ private fun DaxPageHeaderNoStatusPreview() {
             title = "Privacy Protection",
             subtitle = "Your privacy is our priority. We help you stay safe online with built-in tracking protection and private search.",
             body = "Privacy Pro is actively protecting you from trackers on the web and in apps.",
-            iconHeader = painterResource(R.drawable.ic_privacy_pro_128),
+            iconHeader = painterResource(R.drawable.subscription_128),
         )
     }
 }
@@ -215,7 +215,7 @@ private fun DaxPageHeaderPreview() {
             title = "Privacy Protection",
             subtitle = "Your privacy is our priority. We help you stay safe online with built-in tracking protection and private search.",
             body = "Privacy Pro is actively protecting you from trackers on the web and in apps.",
-            iconHeader = painterResource(R.drawable.ic_privacy_pro_128),
+            iconHeader = painterResource(R.drawable.subscription_128),
             status = Status.Off,
             learnMoreClick = { /*TODO*/ },
         )

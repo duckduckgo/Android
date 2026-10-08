@@ -49,7 +49,6 @@ class OnboardingDialogShownPixels @Inject constructor(private val pixel: Pixel) 
                 pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
             is NewUserOnboardingActivityDialog.InputScreenPreview,
             is NewUserOnboardingActivityDialog.QuickSetup,
-            NewUserOnboardingActivityDialog.AddToDock,
             NewUserOnboardingActivityDialog.WidgetPrompt,
             NewUserOnboardingActivityDialog.DownloadReason,
             is NewUserOnboardingActivityDialog.SegmentedComparisonChart,
@@ -58,6 +57,12 @@ class OnboardingDialogShownPixels @Inject constructor(private val pixel: Pixel) 
             NewUserOnboardingActivityDialog.DefaultBrowserPrompt,
             NewUserOnboardingActivityDialog.AddWidget,
             is NewUserOnboardingActivityDialog.PreferenceSelector,
+            is NewUserOnboardingActivityDialog.SingleChoice,
+            is NewUserOnboardingActivityDialog.TogglePosition,
+            is NewUserOnboardingActivityDialog.DuckAiState,
+            NewUserOnboardingActivityDialog.ImportPasswords,
+            is NewUserOnboardingActivityDialog.ImportComplete,
+            NewUserOnboardingActivityDialog.ImportPasswordsLaunch,
             -> Unit
         }
     }

@@ -36,7 +36,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizerImpl
-import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
+import com.duckduckgo.autofill.impl.importing.capability.PasswordImportAvailability
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_COPY_PASSWORD
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_COPY_USERNAME
@@ -132,7 +132,7 @@ class AutofillSettingsActivityScreenViewModelTest {
     private val autofillBreakageReportCanShowRules: AutofillBreakageReportCanShowRules = mock()
     private val autofillBreakageReportDataStore: AutofillSiteBreakageReportingDataStore = mock()
     private val urlMatcher = AutofillDomainNameUrlMatcher(UrlUnicodeNormalizerImpl())
-    private val importGooglePasswordsCapabilityChecker: ImportGooglePasswordsCapabilityChecker = mock()
+    private val passwordImportAvailability: PasswordImportAvailability = mock()
     private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
     private val autofillEffectDispatcher: AutofillEffectDispatcher = mock()
 
@@ -154,7 +154,7 @@ class AutofillSettingsActivityScreenViewModelTest {
         autofillBreakageReportSender = autofillBreakageReportSender,
         autofillBreakageReportDataStore = autofillBreakageReportDataStore,
         autofillBreakageReportCanShowRules = autofillBreakageReportCanShowRules,
-        importGooglePasswordsCapabilityChecker = importGooglePasswordsCapabilityChecker,
+        passwordImportAvailability = passwordImportAvailability,
         autofillFeature = autofillFeature,
         autofillEffectDispatcher = autofillEffectDispatcher,
     )
@@ -168,7 +168,7 @@ class AutofillSettingsActivityScreenViewModelTest {
             whenever(mockStore.getCredentialCount()).thenReturn(flowOf(Result.success(0)))
             whenever(neverSavedSiteRepository.neverSaveListCount()).thenReturn(emptyFlow())
             whenever(deviceAuthenticator.isAuthenticationRequiredForAutofill()).thenReturn(true)
-            whenever(importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()).thenReturn(true)
+            whenever(passwordImportAvailability.canImport()).thenReturn(true)
             whenever(autofillEffectDispatcher.effects).thenReturn(MutableSharedFlow())
             autofillFeature.self().setRawStoredState(State(enable = true))
             autofillFeature.canImportFromGooglePasswordManager().setRawStoredState(State(enable = true))
@@ -1040,7 +1040,7 @@ class AutofillSettingsActivityScreenViewModelTest {
 
     @Test
     fun whenImportGooglePasswordsFeatureDisabledDueToWebViewNotSupportedThenViewStateReflectsThat() = runTest {
-        whenever(importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()).thenReturn(false)
+        whenever(passwordImportAvailability.canImport()).thenReturn(false)
         testee.onViewCreated()
         testee.viewState.test {
             assertFalse(awaitItem().canImportFromGooglePasswords)

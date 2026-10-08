@@ -33,7 +33,9 @@ object EmbellishmentPlacement {
         Embellishment.WalkingDax -> Placement(anchorsCardOnPhone = true, biasPhone = 1f, biasTablet = 0.5f, drawsArtwork = true)
         Embellishment.BottomWing -> Placement(anchorsCardOnPhone = true, biasPhone = 0f, biasTablet = 0.5f, drawsArtwork = true)
         // The side decorations reserve no room on a phone, where the card runs down past them instead.
-        Embellishment.LeftWing -> Placement(anchorsCardOnPhone = false, biasPhone = 0f, biasTablet = 0.5f, drawsArtwork = true)
+        Embellishment.LeftWing,
+        Embellishment.RightWing,
+        -> Placement(anchorsCardOnPhone = false, biasPhone = 0f, biasTablet = 0.5f, drawsArtwork = true)
         Embellishment.BobbingDax -> Placement(anchorsCardOnPhone = false, biasPhone = 0f, biasTablet = 0.5f, drawsArtwork = true)
         Embellishment.None -> Placement(anchorsCardOnPhone = true, biasPhone = 0f, biasTablet = 0.5f, drawsArtwork = false)
     }

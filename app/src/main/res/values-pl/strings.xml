@@ -63,10 +63,10 @@
     <string name="undoSnackbarAction">Cofnij</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Zablokowano mechanizm śledzący</item>
+        <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">Zablokowano mechanizm śledzący</item>
         <item quantity="few">Zablokowano mechanizmy śledzące</item>
         <item quantity="many">Zablokowano mechanizmy śledzące</item>
-        <item quantity="other">Zablokowano mechanizmy śledzące</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">Zablokowano mechanizmy śledzące</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -215,13 +215,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Pobierz przeglądarkę komputerową</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo dla komputerów Mac i Windows</string>
-    <string name="getDesktopBrowserTitle">Chroń swoje dane osobowe także na Macu i Windowsie!</string>
-    <string name="getDesktopBrowserBody">Aby pobrać DuckDuckGo na komputer Mac lub Windows, odwiedź stronę:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Udostępnij link pobierania</string>
-    <string name="getDesktopBrowserNoThanks">Nie, dziękuję</string>
     <string name="getDesktopBrowserHideItem">Ukryj</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Skopiowano łącze</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Ochrona przed wyskakującymi okienkami dotyczącymi plików cookie</string>
@@ -233,7 +227,7 @@
         <item quantity="one">%1$d witryna wyłączona z czyszczenia</item>
         <item quantity="few">%1$d witryny wyłączone z czyszczenia</item>
         <item quantity="many">%1$d witryn wyłączonych z czyszczenia</item>
-        <item quantity="other">%1$d witryny wyłączonej z czyszczenia</item>
+        <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d witryny wyłączonej z czyszczenia</item>
     </plurals>
     <string name="dataClearingAutomaticClearingOn">Wł.</string>
     <string name="dataClearingAutomaticClearingOff">Wyłączone</string>
@@ -260,10 +254,10 @@
     <string name="singleTabFireDialogSubtitleSiteData">Usunięcie danych witryny może spowodować wylogowanie z kont.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Spowoduje to anulowanie trwającego pobierania.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">Usunięto %1$d kartę wraz z danymi</item>
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">Usunięto %1$d kartę wraz z danymi</item>
         <item quantity="few">Usunięto %1$d karty wraz z danymi</item>
         <item quantity="many">Usunięto %1$d kart wraz z danymi</item>
-        <item quantity="other">Usunięto %1$d karty wraz z danymi</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">Usunięto %1$d karty wraz z danymi</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Dane strony nie mogły zostać usunięte. Zaktualizuj WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Dane strony nie mogły zostać usunięte z powodu błędu.</string>
@@ -804,16 +798,16 @@
     <string name="onboardingSerpDaxDialogButton">Rozumiem!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Następnie spróbuj odwiedzić witrynę!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
-        <item quantity="one"><![CDATA[ i <b>jeszcze %1$d</b> mechanizm próbowały Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Stuknij tarczę, aby uzyskać więcej informacji.️]]></item>
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[ i <b>jeszcze %1$d</b> mechanizm próbowały Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Stuknij tarczę, aby uzyskać więcej informacji.️]]></item>
         <item quantity="few"><![CDATA[ i <b>jeszcze %1$d</b> mechanizmy próbowały Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Stuknij tarczę, aby uzyskać więcej informacji.️]]></item>
         <item quantity="many"><![CDATA[ i <b>jeszcze %1$d</b> mechanizmów próbowało Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Stuknij tarczę, aby uzyskać więcej informacji.️]]></item>
-        <item quantity="other"><![CDATA[ i <b>jeszcze %1$d mechanizmu</b> próbowało Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Stuknij tarczę, aby uzyskać więcej informacji.️]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[ i <b>jeszcze %1$d mechanizmu</b> próbowało Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Stuknij tarczę, aby uzyskać więcej informacji.️]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ próbował Cię tutaj śledzić. Został przeze mnie zablokowany!<br/><br/>☝️ Dotknij tarczy, aby uzyskać więcej informacji.️]]></item>
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[ próbował Cię tutaj śledzić. Został przeze mnie zablokowany!<br/><br/>☝️ Dotknij tarczy, aby uzyskać więcej informacji.️]]></item>
         <item quantity="few"><![CDATA[ próbowały Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Dotknij tarczy, aby uzyskać więcej informacji.️]]></item>
         <item quantity="many"><![CDATA[ próbowały Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Dotknij tarczy, aby uzyskać więcej informacji.️]]></item>
-        <item quantity="other"><![CDATA[ próbował Cię tutaj śledzić. Został przeze mnie zablokowany!<br/><br/>☝️ Dotknij tarczy, aby uzyskać więcej informacji.️]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[ próbował Cię tutaj śledzić. Został przeze mnie zablokowany!<br/><br/>☝️ Dotknij tarczy, aby uzyskać więcej informacji.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Rozumiem!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Natychmiast wyczyść swoją aktywność związaną z przeglądaniem za pomocą przycisku <b>Fire Button</b>.<br/><br/>Spróbuj!️ 🔥]]></string>
@@ -1002,10 +996,23 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Dodaj widżet</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Pomiń</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Importuj hasła z Google</string>
+    <string name="preOnboardingImportPasswordsBody">Google może poprosić o zalogowanie lub podanie hasła, aby potwierdzić.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Importuj z Google</string>
+    <string name="preOnboardingImportCompleteTitle">Import zakończony</string>
+    <string name="preOnboardingImportCompleteCta">Kontynuuj</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Importowanie haseł</string>
+    <string name="preOnboardingImportCompleteParsingBody">To zajmie tylko chwilę.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Nie udało się zaimportować</string>
+    <string name="preOnboardingImportCompleteFailed">Importowanie haseł nie powiodło się</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Zaimportowane hasła: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Pominięto (duplikat lub nieprawidłowy): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Wystąpił błąd</string>
+    <string name="preOnboardingImportErrorBody">Spróbuj ponownie.</string>
+    <string name="preOnboardingImportErrorRetry">Spróbuj ponownie</string>
+
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Dodaj mnie do wiersza ulubionych.</string>
-    <string name="preOnboardingAddToDockBody">Znajdź ikonę DuckDuckGo na ekranie głównym. Następnie naciśnij i przeciągnij w odpowiednie miejsce. Gotowe!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Rozumiem!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Rozpocznij prywatny czat AI z Duck.ai lub przełącz się na wyszukiwanie, aby bezpiecznie przeglądać internet.<br/><br/>Z Duck.ai możesz korzystać wszędzie tam, gdzie widzisz ikonę czatu]]></string>
@@ -1039,4 +1046,11 @@
     <string name="singleTabFireDialogTitleFireMode">Usunąć karty Fire i ich dane?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Nie można otworzyć pliku. Poszukaj zgodnej aplikacji.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo nie może wczytać tej strony</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Wygląda na to, że nie masz połączenia z internetem.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Nie można znaleźć serwera o podanej nazwie hosta.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Certyfikat tego serwera jest nieprawidłowy. Być może łączysz się z serwerem podszywającym się pod <b>%1$s</b>, co może narazić poufne informacje na niebezpieczeństwo.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Czy chodziło Ci o <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

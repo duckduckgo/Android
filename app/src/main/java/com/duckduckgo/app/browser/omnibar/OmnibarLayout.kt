@@ -1050,9 +1050,9 @@ class OmnibarLayout @JvmOverloads constructor(
         pageLoadProgressBar.setStallDetectionEnabled(viewState.isProgressBarIndeterminateEnabled)
         if (viewState.isLoading) {
             if (!pageLoadProgressBar.isStarted) {
-                pageLoadProgressBar.start()
+                pageLoadProgressBar.start(viewState.isAnimationUpdateEnabled)
             }
-            pageLoadProgressBar.onProgressUpdate(viewState.loadingProgress.toFloat())
+            pageLoadProgressBar.onProgressUpdate(progress = viewState.loadingProgress.toFloat())
         } else {
             if (pageLoadProgressBar.isStarted) {
                 pageLoadProgressBar.triggerCompletion()
@@ -1317,12 +1317,16 @@ class OmnibarLayout @JvmOverloads constructor(
                 useLightAnimation,
                 isAddressBarRebrandEnabled,
             )
-            if (boxed) {
+            val rebrandLayout = resolveRebrandPrivacyShieldLayout(privacyShieldState, isAddressBarRebrandEnabled)
+            if (boxed && rebrandLayout != null) {
+                val slotSize = rebrandLayout.slotSizeDp.toPx(context)
+                val contentInset = rebrandLayout.contentInsetDp.toPx(context)
                 shieldIconView.updateLayoutParams<MarginLayoutParams> {
-                    width = shieldIconBoxSize
-                    height = shieldIconBoxSize
-                    marginStart = 2.toPx(context)
+                    width = slotSize
+                    height = slotSize
+                    marginStart = 0
                 }
+                shieldIconView.setPadding(contentInset, contentInset, contentInset, contentInset)
                 shieldIconView.scaleType = ImageView.ScaleType.CENTER_INSIDE
             } else if (privacyShieldState != PrivacyShieldState.UNKNOWN) {
                 val isNewCustomTab =
@@ -1336,6 +1340,7 @@ class OmnibarLayout @JvmOverloads constructor(
                     height = LayoutParams.MATCH_PARENT
                     marginStart = 0
                 }
+                shieldIconView.setPadding(0, 0, 0, 0)
                 shieldIconView.scaleType =
                     if (isNewCustomTab) {
                         ImageView.ScaleType.MATRIX
@@ -1828,6 +1833,26 @@ internal fun shouldUseCustomTabToolbarColorForShield(
     isNewCustomTabEnabled && !isDefaultToolbarColor
 }
 
+internal data class RebrandPrivacyShieldLayout(
+    val slotSizeDp: Int,
+    val contentInsetDp: Int,
+)
+
+internal fun resolveRebrandPrivacyShieldLayout(
+    privacyShieldState: PrivacyShieldState,
+    isAddressBarRebrandEnabled: Boolean,
+): RebrandPrivacyShieldLayout? {
+    if (!isAddressBarRebrandEnabled) return null
+
+    return when (privacyShieldState) {
+        PrivacyShieldState.PROTECTED -> RebrandPrivacyShieldLayout(slotSizeDp = 44, contentInsetDp = 0)
+        PrivacyShieldState.UNPROTECTED,
+        PrivacyShieldState.MALICIOUS,
+        -> RebrandPrivacyShieldLayout(slotSizeDp = 44, contentInsetDp = 2)
+        PrivacyShieldState.UNKNOWN -> null
+    }
+}
+
 /**
  * Whether the fire icon should occupy the shared fire/+ leading slot in the omnibar.
  *
@@ -1856,5 +1881,5 @@ internal fun resolveDuckPlayerIcon(isAddressBarRebrandEnabled: Boolean): Int =
     if (isAddressBarRebrandEnabled) {
         R.drawable.video_player_color_24_brand_update
     } else {
-        R.drawable.ic_video_player_color_24
+        R.drawable.video_player_color_24
     }

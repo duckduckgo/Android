@@ -50,13 +50,9 @@ object Theming {
     object Constants {
         const val BROADCAST_THEME_CHANGED = "BROADCAST_THEME_CHANGED"
         val FIXED_THEME_ACTIVITIES = listOf(
-            "com.duckduckgo.sync.impl.ui.SyncLoginActivity",
-            "com.duckduckgo.sync.impl.ui.SyncConnectActivity",
-            "com.duckduckgo.sync.impl.ui.EnterCodeActivity",
-            "com.duckduckgo.sync.impl.ui.SyncWithAnotherDeviceActivity",
             "com.duckduckgo.autofill.impl.service.AutofillProviderFillSuggestionActivity",
-            "com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeActivity",
-            "com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeActivity",
+            "com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeActivity",
+            "com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeActivity",
         )
     }
 }
@@ -65,12 +61,16 @@ fun AppCompatActivity.applyTheme(
     theme: DuckDuckGoTheme,
     isFireMode: Boolean = false,
     applyBrandDesignUpdate: Boolean = false,
+    overlayStyleIds: List<Int> = emptyList(),
 ): BroadcastReceiver? {
     if (!FIXED_THEME_ACTIVITIES.contains(this.localClassName)) {
         setTheme(getThemeId(theme, isFireMode))
     }
     if (applyBrandDesignUpdate && this.theme.supportsRebrandOverlay()) {
         this.theme.applyStyle(R.style.ThemeOverlay_Rebrand, true)
+    }
+    if (this.theme.supportsRebrandOverlay()) {
+        overlayStyleIds.forEach { this.theme.applyStyle(it, true) }
     }
     return registerForThemeChangeBroadcast()
 }

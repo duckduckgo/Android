@@ -122,7 +122,6 @@
     <string name="duckAIContextualAutomaticContextMessage">Αυτόματη αποστολή περιεχομένου σελίδας στο Duck.ai</string>
 
     <!-- Contextual sheet quick action -->
-    <string name="duckAIContextualPromptAskAboutPage">Ρωτήστε για τη σελίδα</string>
 
     <!-- Contextual sheet suggested prompts; native copy for PageSuggestionsCatalog.json entries, keyed by catalog id -->
     <string name="duckAiSuggestionTranslatePageLabel" instruction="Suggested prompt chip: translate the current page">Μετάφρασε αυτή τη σελίδα</string>
@@ -205,7 +204,6 @@
     <string name="duckAiSuggestionPersonBackgroundPrompt" instruction="Suggested prompt submitted text: summarize a person&apos;s background">Συνόψισε το ιστορικό αυτού του ατόμου και το σημαντικό του έργο.</string>
 
     <!-- Contextual sheet input hint -->
-    <string name="contextualSheetImprovedHint">Ρωτήστε οτιδήποτε ιδιωτικά</string>
     <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Πρόσφατες συνομιλίες</string>
 
     <!-- duck.ai contextual fire button -->
@@ -255,8 +253,8 @@
     <string name="duck_ai_chat_history_action_new">Νέο</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Λήψη συνομιλιών</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Ολοκληρώθηκε η λήψη για %1$d συνομιλία</item>
-        <item quantity="other">Ολοκληρώθηκε η λήψη για %1$d συνομιλίες</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Ολοκληρώθηκε η λήψη για %1$d συνομιλία</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Ολοκληρώθηκε η λήψη για %1$d συνομιλίες</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Άνοιγμα μενού υπερχείλισης</string>
     <string name="duck_ai_chat_history_select_all">Επιλογή όλων</string>
@@ -282,6 +280,11 @@
     <string name="native_input_chat_duck_mode_hint">Απάντηση…</string>
 
     <!-- Model Picker -->
+    <string name="duckAiModelPickerLabelEverydayUse" instruction="Subline under a model in the Duck.ai model picker, describing what that model suits.">Το καλύτερο για καθημερινή χρήση</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster" instruction="Subline under a model in the Duck.ai model picker. &apos;Limits&apos; means the user&apos;s usage allowance, which this model consumes more quickly.">Δυνατό αλλά φτάνει στα όρια νωρίτερα</string>
+    <string name="duckAiModelPickerTryFreeTrial" instruction="Header above the locked models in the Duck.ai model picker, shown when the user can still start a free trial.">Δοκίμασέ το δωρεάν</string>
+    <string name="duckAiModelPickerSubscriberExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when unlocking them requires a paid subscription.">Αποκλειστικά για συνδρομητές</string>
+    <string name="duckAiModelPickerProExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when they require the Pro plan specifically. &apos;Pro&apos; is the plan name and stays untranslated.">Αποκλειστικά για το πρόγραμμα Pro</string>
     <string name="duckAiModelPickerPlusModels">Plus</string>
     <string name="duckAiModelPickerProModels">Pro</string>
 
@@ -342,10 +345,56 @@
     <string name="duckAiSettingsTitle">Ρυθμίσεις Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutPage">Ρώτα για τη σελίδα</string>
 
     <!-- Editing a message already sent to Duck.ai -->
     <string name="duck_ai_edit_prompt_title" instruction="Screen title: the user is editing a message they already sent to Duck.ai">Επεξεργασία μηνύματος</string>
     <string name="duck_ai_edit_prompt_lose_responses_warning" instruction="Warning shown while editing a sent message: the answer Duck.ai already gave will be discarded and answered again">Η επεξεργασία θα αντικαταστήσει την απάντηση με μια νέα.</string>
 
+    <string name="duckChatContextualAskAboutPage">Ρώτα για τη σελίδα</string>
+    <string name="duckChatContextualAskAboutSearch">Συνέχεια στο Duck.ai</string>
+    <string name="duckChatContextualOpenDuckAi">Άνοιξε το Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Συνόψιση αυτής την επιλογής</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Συνοψίστε αυτήν την επιλογή.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Μετάφραση αυτής της επιλογής</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Μετάφρασε αυτή την επιλογή στα %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Επιλογή κειμένου</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Μπορείς να προσθέσεις έως και %1$d επιλογές κειμένου. Αφαίρεσε μία για να προσθέσεις άλλη.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Ρωτήστε το Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d λέξη</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d λέξεις</item>
+    </plurals>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model&apos;s short name">Το %1$s χρησιμοποιεί τα όρια έως και 2–5x ταχύτερα από τα βασικά μοντέλα.</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Απόρριψη</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">%1$d%% του ημερήσιου ορίου</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">%1$d%% του εβδομαδιαίου ορίου</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Συμπληρώθηκε το ημερήσιο όριο</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Συμπληρώθηκε το εβδομαδιαίο όριο</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Συμπληρώθηκε το εβδομαδιαίο όριο χρήσης</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Συμπληρώθηκε το όριο για τα προηγμένα μοντέλα τεχνητής νοημοσύνης</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Αλλαγή μοντέλου</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Έναρξη χρήσης εβδομαδιαίου ορίου</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Δοκιμάστε τη συνδρομή δωρεάν</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">Εγγραφείτε</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as &apos;2 days&apos; or &apos;5 hours&apos;">Επαναφορά σε %1$s</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d ημέρα</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d ημέρες</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d ώρα</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d ώρες</item>
+    </plurals>
 </resources>

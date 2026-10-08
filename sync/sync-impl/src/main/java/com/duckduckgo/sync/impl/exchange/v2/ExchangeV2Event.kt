@@ -16,34 +16,19 @@
 
 package com.duckduckgo.sync.impl.exchange.v2
 
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
 
 /**
  * Observable events emitted by the v2 exchange runner. Downstream consumers
  * subscribe to the runner's event flow and react.
+ *
+ * Purely observational: the exchange runs to completion regardless of whether anyone is listening,
+ * so consumers (pixels, the pairing debug screen, UI) may drop events without affecting the protocol.
  */
 sealed interface ExchangeV2Event {
+    /** When the runner created the event, from its own clock, not when a consumer received it. */
     val timestampMs: Long
-
-    data class Transition(
-        override val timestampMs: Long,
-        val from: ExchangeV2State,
-        val to: ExchangeV2State,
-        val trigger: ExchangeV2Message?,
-        val localTrigger: LocalTrigger?,
-    ) : ExchangeV2Event
-
-    data class MessageSent(
-        override val timestampMs: Long,
-        val message: ExchangeV2Message,
-    ) : ExchangeV2Event
-
-    data class MessageRejected(
-        override val timestampMs: Long,
-        val message: ExchangeV2Message,
-        val state: ExchangeV2State,
-        val reason: RejectReason,
-    ) : ExchangeV2Event
 
     /**
      * Bootstrap completed: own channel created on the relay, ephemeral keypair generated.
@@ -57,7 +42,94 @@ sealed interface ExchangeV2Event {
     ) : ExchangeV2Event
 
     /**
-     * A transport or protocol-level failure during bootstrap / poll / send.
+     * The peer's advertised protocol version became known and both sides settled on [negotiatedVersion],
+     * the lower of [ourVersion] and [peerVersion], falling back to the baseline when the peer advertises
+     * something we can't parse. Emitted once per side, at the point named by [peerSource]: the Scanner
+     * learns the version from the linking code, the Presenter from the peer's hello.
+     */
+    data class VersionNegotiated(
+        override val timestampMs: Long,
+        val peerSource: PeerVersionSource,
+        val peerVersion: ExchangeProtocolVersion,
+        val ourVersion: ExchangeProtocolVersion,
+        val negotiatedVersion: ExchangeProtocolVersion,
+    ) : ExchangeV2Event
+
+    /**
+     * The runner auto-elected which side this device plays, with the inputs that drove the
+     * decision. Emitted just before the [Transition] carrying [LocalTrigger.RoleElected], which
+     * shows the outcome but not the reasoning. Carries no account identifiers: signed-in state
+     * is reduced to booleans.
+     */
+    data class RoleElected(
+        override val timestampMs: Long,
+        val role: Role,
+        val ownPairingRole: PairingRole?,
+        val ownSignedIn: Boolean,
+        val ownKind: String,
+        val peerKind: String?,
+        val peerSignedIn: Boolean,
+    ) : ExchangeV2Event
+
+    /**
+     * The state machine accepted a trigger and moved from [from] to [to]. Exactly one of [trigger] (an
+     * inbound peer message) and [localTrigger] (a user or runner decision) is set; an abort driven by a
+     * peer message arrives here rather than as [MessageRejected] whenever [from] was still active.
+     */
+    data class Transition(
+        override val timestampMs: Long,
+        val from: ExchangeV2State,
+        val to: ExchangeV2State,
+        val trigger: ExchangeV2Message?,
+        val localTrigger: LocalTrigger?,
+    ) : ExchangeV2Event
+
+    /**
+     * [message] was accepted by the relay for delivery to the peer. Says nothing about the peer having
+     * polled it: the relay accepts messages for a channel the peer has already abandoned.
+     */
+    data class MessageSent(
+        override val timestampMs: Long,
+        val message: ExchangeV2Message,
+    ) : ExchangeV2Event
+
+    /**
+     * An outbound message never reached the relay, whether sending failed or was skipped
+     * deliberately. The counterpart of [MessageSent] and just as observational: when the failure
+     * also ends the session, a separate [SessionError] follows. A failed teardown `bye` produces
+     * one too, but never a follow-up [SessionError], since `bye` is best-effort by contract.
+     * [messageType] is always set; [message] is null
+     * when sending failed before the message was built, see [NotSentReason.OwnChannelNotConfigured].
+     */
+    data class MessageNotSent(
+        override val timestampMs: Long,
+        val reason: NotSentReason,
+        val messageType: String,
+        val message: ExchangeV2Message?,
+    ) : ExchangeV2Event
+
+    data class MessageReceived(
+        override val timestampMs: Long,
+        val message: ExchangeV2Message,
+    ) : ExchangeV2Event
+
+    /**
+     * [message] was received but not acted on in [state]: an unknown message type dropped to keep
+     * the session alive, a known type above the session's negotiated protocol version dropped the same
+     * way, or a protocol violation aborting a session already in a terminal state (an abort
+     * from an active state surfaces as a [Transition] instead). See [RejectReason].
+     */
+    data class MessageRejected(
+        override val timestampMs: Long,
+        val message: ExchangeV2Message,
+        val state: ExchangeV2State,
+        val reason: RejectReason,
+    ) : ExchangeV2Event
+
+    /**
+     * A transport or protocol-level failure while bootstrapping, polling, or sending. Terminal: the runner tears the
+     * session down after emitting, and emits at most one per session. [message] is developer-facing text;
+     * [kind] is the value to branch on. [timeoutStage] is set only for [SessionErrorKind.SessionTimeout].
      */
     data class SessionError(
         override val timestampMs: Long,
@@ -65,17 +137,94 @@ sealed interface ExchangeV2Event {
         val kind: SessionErrorKind = SessionErrorKind.Unknown,
         val timeoutStage: TimeoutStage? = null,
     ) : ExchangeV2Event
+
+    /**
+     * The runner tore the session down and cleared all session state. Emitted once per session,
+     * at the end of every path that ends one. [lastState] is the state
+     * machine state at teardown, null when the session never got one. [byeReason] is the reason
+     * declared in the teardown `bye`, whether or not that message could actually be sent.
+     */
+    data class SessionEnded(
+        override val timestampMs: Long,
+        val lastState: ExchangeV2State?,
+        val byeReason: ExchangeV2Message.Bye.Reason,
+    ) : ExchangeV2Event
 }
 
-enum class RejectReason { ImplicitAbort, SameAccount, UnknownMessageDropped }
+/** Where the peer's advertised version was read from. See [ExchangeV2Event.VersionNegotiated]. */
+enum class PeerVersionSource {
+    /** Scanner side: parsed out of the linking code before any message is exchanged. */
+    LinkingCode,
 
+    /** Presenter side: taken from the peer's hello. */
+    HelloMessage,
+}
+
+/** Why an outbound message never reached the relay. See [ExchangeV2Event.MessageNotSent]. */
+sealed interface NotSentReason {
+    /** Sending was attempted without a bootstrapped session, so there was no channel pair to write over. */
+    data object OwnChannelNotConfigured : NotSentReason
+
+    /** The relay rejected the write with HTTP [code]. */
+    data class HttpError(val code: Int) : NotSentReason
+
+    /** Deliberate skip: the message requires a newer protocol than [negotiatedVersion], so the peer could not process it. */
+    data class TooHighProtocol(val negotiatedVersion: ExchangeProtocolVersion.V2) : NotSentReason
+}
+
+/** Why a received message was not acted on. See [ExchangeV2Event.MessageRejected]. */
+enum class RejectReason {
+    /** A known message type that the current state does not allow: a protocol violation, aborts the session. */
+    ImplicitAbort,
+
+    /** The peer turned out to be the same sync account as us, so there is nothing to pair. */
+    SameAccount,
+
+    /** An unrecognized message type, ignored so a newer peer's extra messages can't kill the session. */
+    UnknownMessageDropped,
+
+    /**
+     * A message requiring a newer protocol than the session negotiated; ignored, since a client
+     * genuinely capped at the negotiated version would not know the type and would drop it.
+     */
+    TooHighProtocolDropped,
+
+    /** The peer sent `bye` before the exchange completed. Not a protocol violation: the peer is simply gone. */
+    PeerLeft,
+}
+
+/**
+ * What went wrong in a [ExchangeV2Event.SessionError], as a bounded value consumers can branch on.
+ * Mapped to sync pixel error codes, so treat the entries as part of the telemetry contract.
+ */
 enum class SessionErrorKind {
+    /** No progress within the deadline for the current stage; the stage is carried in `timeoutStage`. */
     SessionTimeout,
+
+    /** A second hello arrived after negotiation had already started. */
     UnexpectedSecondHello,
+
+    /** A protocol violation that isn't covered by a more specific kind. Not currently emitted by the runner. */
     UnexpectedEvent,
+
+    /** An outbound message was attempted before the local session had the keys and channel ids it needs. */
     PairingSessionNotReady,
+
+    /** The relay could not create the channel, or reported ours or the peer's channel as gone. */
     RelayChannelUnavailable,
+
+    /** We failed to produce the recovery code to hand over, e.g. account creation failed. */
     RecoveryCodePreparationFailed,
+
+    /** The relay rejected our request as malformed. */
     MalformedRelayRequest,
+
+    /** An inbound envelope could not be decrypted; permanent for the session, since the poll cursor would re-pull the same bytes. */
+    MessageDecryptionFailed,
+
+    /** An inbound envelope requires a newer protocol version than this client supports. */
+    PeerProtocolTooNew,
+
+    /** Anything else, including generic transport failures. */
     Unknown,
 }

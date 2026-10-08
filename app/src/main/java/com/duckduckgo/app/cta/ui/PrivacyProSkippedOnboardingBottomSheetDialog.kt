@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat.getString
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.BottomSheetPrivacyProSkippedOnboardingBinding
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.ui.view.getDimensionFromAttr
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.preventWidows
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -88,10 +89,11 @@ class PrivacyProSkippedOnboardingBottomSheetDialog(
         val bottomSheet = bottomSheetDialog.findViewById<FrameLayout>(MaterialR.id.design_bottom_sheet)
 
         val shapeDrawable = MaterialShapeDrawable.createWithElevationOverlay(context)
+        val radius = bottomSheetDialog.context.getDimensionFromAttr(CommonR.attr.daxSheetRadius, CommonR.dimen.dialogBorderRadius)
         shapeDrawable.shapeAppearanceModel = shapeDrawable.shapeAppearanceModel
             .toBuilder()
-            .setTopLeftCorner(CornerFamily.ROUNDED, context.resources.getDimension(CommonR.dimen.dialogBorderRadius))
-            .setTopRightCorner(CornerFamily.ROUNDED, context.resources.getDimension(CommonR.dimen.dialogBorderRadius))
+            .setTopLeftCorner(CornerFamily.ROUNDED, radius)
+            .setTopRightCorner(CornerFamily.ROUNDED, radius)
             .build()
         bottomSheet?.background = shapeDrawable
     }

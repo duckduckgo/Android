@@ -53,7 +53,7 @@ class AdBlockingProtectionsSettingsEntryView @JvmOverloads constructor(
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val listItem = SettingsListItem(context).apply {
-        setLeadingIconResource(CommonR.drawable.ic_ads_blocked_color_24)
+        setLeadingIconResource(CommonR.drawable.ads_blocked_color_24)
         setPrimaryText(context.getString(R.string.ad_blocking_settings_title_v2))
         setStatus(true)
     }

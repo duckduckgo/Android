@@ -14,56 +14,89 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!--
+  Single wrapper for both omnibar positions. The manager (applyPositionChrome) sets the position-varying
+  bits in code from isBottom: the row's side paddings, the card's background/elevation/compat-padding/
+  resting margins, the input field's content padding, the inline nav buttons' gravity and margins, and the
+  footer's bottom margin. A LinearLayout with the card at weight=1 lets the card reclaim the trailing space
+  when the buttons go GONE, and honours the negative margins the omnibar's shape logic (applyOmnibarShape)
+  depends on, which a ConstraintLayout would clamp. The leading fire is present for both positions but stays
+  GONE until the widget shows it, which it only does in the bottom Duck.ai layout.
+-->
 <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NonCollapsingFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/inputModeTopRoot"
+    android:id="@+id/inputModeRoot"
+    android:background="?attr/daxColorToolbar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="top"
     android:clipChildren="false"
     android:clipToPadding="false">
 
-    <LinearLayout
+    <com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterDockLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clipChildren="false"
         android:clipToPadding="false"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
-        <!-- Negative top margin pulls the card up to account for the shadow -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/inputModeWidgetCard"
-            android:theme="?attr/daxInputModeCardThemeOverlay"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="-9dp"
-            android:layout_weight="1"
-            app:cardBackgroundColor="?attr/daxColorSurface"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="6dp"
-            app:cardUseCompatPadding="true">
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
-                android:id="@+id/inputModeWidget"
-                android:paddingHorizontal="@dimen/keyline_1"
-                android:paddingVertical="4dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.card.MaterialCardView>
+            <FrameLayout
+                android:id="@+id/inputFieldFireIconMenu"
+                android:layout_width="@dimen/toolbarIcon"
+                android:layout_height="@dimen/toolbarIcon"
+                android:layout_marginEnd="@dimen/keyline_2"
+                android:background="@drawable/selectable_item_rounded_corner_background"
+                android:visibility="gone">
 
-        <!-- Shared Fire/Tabs/Menu trio (see input_mode_nav_buttons). Hidden by default; the manager
-        (bindInlineNavButtons) drives its visibility. The native input is 4dp larger than the omnibar
-        vertically so we shift the buttons by -2dp so they remain centered with the omnibar -->
-        <include
-            android:id="@+id/inlineNavButtonsContainer"
-            layout="@layout/input_mode_nav_buttons"
-            android:layout_width="wrap_content"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_gravity="top"
-            android:layout_marginStart="-12dp"
-            android:layout_marginEnd="@dimen/keyline_1"
-            android:layout_marginTop="-2dp"
-            android:visibility="gone" />
-    </LinearLayout>
+                <ImageView
+                    android:id="@+id/inputFieldFireIconImageview"
+                    android:layout_width="@dimen/bottomNavIcon"
+                    android:layout_height="@dimen/bottomNavIcon"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/fireMenu"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_fire_24" />
+            </FrameLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/inputModeWidgetCard"
+                android:theme="?attr/daxInputModeCardThemeOverlay"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:cardBackgroundColor="?attr/daxColorSurface"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="6dp"
+                app:cardUseCompatPadding="true">
+
+                <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
+                    android:id="@+id/inputModeWidget"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/keyline_1"
+                    android:paddingVertical="4dp" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <include
+                android:id="@+id/inlineNavButtonsContainer"
+                layout="@layout/input_mode_nav_buttons"
+                android:layout_width="wrap_content"
+                android:layout_height="?attr/actionBarSize"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterView
+            android:id="@+id/nativeInputFooter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false" />
+    </com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterDockLayout>
 </com.duckduckgo.duckchat.impl.ui.nativeinput.views.NonCollapsingFrameLayout>

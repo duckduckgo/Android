@@ -40,16 +40,23 @@ import com.duckduckgo.common.utils.extensions.html
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
-// Wrap with the onboarding theme so the dialog's bottomSheetStyle can resolve ?attr/onboardingSurfaceBackdrop.
+// The full onboarding theme restores base radius values, so the enabled radius overlay must be reapplied afterward.
 // Night mode (not a light/dark flag) decides which onboarding theme applies, matching the onboarding content.
-private fun onboardingThemedContext(context: Context): Context {
+private fun onboardingThemedContext(
+    context: Context,
+    radiusOverlayEnabled: Boolean,
+): Context {
     val nightMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
     val themeRes = if (nightMode == Configuration.UI_MODE_NIGHT_YES) {
         com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Dark_Onboarding
     } else {
         com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Light_Onboarding
     }
-    return ContextThemeWrapper(context, themeRes)
+    return ContextThemeWrapper(context, themeRes).apply {
+        if (radiusOverlayEnabled) {
+            theme.applyStyle(com.duckduckgo.mobile.android.R.style.ThemeOverlay_Rebrand_Radius, true)
+        }
+    }
 }
 
 @SuppressLint("NoBottomSheetDialog")
@@ -57,8 +64,9 @@ class NewAddressBarPickerBottomSheetDialog(
     private val context: Context,
     private val isLightMode: Boolean,
     private val callback: NewAddressBarCallback?,
+    private val radiusOverlayEnabled: Boolean,
 ) : BottomSheetDialog(
-    onboardingThemedContext(context),
+    onboardingThemedContext(context, radiusOverlayEnabled),
     R.style.Widget_DuckDuckGo_BottomSheetDialog_NewAddressBarPicker_EdgeToEdge,
 ) {
 

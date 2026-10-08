@@ -31,8 +31,10 @@
 
     <attr name="daxIconTabSwitcher" format="reference"/>
     <attr name="daxDrawableTabPlaceholderPreview" format="reference"/>
+    <attr name="daxDrawableFireWindowPhone" format="reference"/>
 
     <attr name="daxOmnibarThemeOverlay" format="reference"/>
     <attr name="daxInputModeCardThemeOverlay" format="reference"/>
+    <attr name="daxInputModeCardDarkFireThemeOverlay" format="reference"/>
 
 </resources>

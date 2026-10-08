@@ -25,10 +25,12 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.StartChatViewModel.IconAction
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -59,6 +61,27 @@ class StartChatViewModelTest {
     }
 
     private val testee = StartChatViewModel(duckAiFeatureState, duckChatInternal, nativeInputStateProvider)
+
+    @Test
+    fun whenIconClickedWithEmptyInputAndMenuEnabledThenShowMenu() {
+        whenever(duckChatInternal.isContextualMenuAllChatsEnabled()).thenReturn(true)
+
+        assertEquals(IconAction.SHOW_MENU, testee.onIconClicked(inputEmpty = true))
+    }
+
+    @Test
+    fun whenIconClickedWithEmptyInputAndMenuDisabledThenSubmit() {
+        whenever(duckChatInternal.isContextualMenuAllChatsEnabled()).thenReturn(false)
+
+        assertEquals(IconAction.SUBMIT, testee.onIconClicked(inputEmpty = true))
+    }
+
+    @Test
+    fun whenIconClickedWithTypedInputThenSubmitEvenWithMenuEnabled() {
+        whenever(duckChatInternal.isContextualMenuAllChatsEnabled()).thenReturn(true)
+
+        assertEquals(IconAction.SUBMIT, testee.onIconClicked(inputEmpty = false))
+    }
 
     @Test
     fun whenSearchOnlyModeAndSearchToggleAndDuckAiEnabledThenVisible() = runTest {

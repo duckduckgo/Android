@@ -58,4 +58,10 @@
     <string name="browserMenuForward">Εμπρός</string>
     <string name="browserMenuRefresh">Ανανέωση</string>
     <string name="browserMenuFireTabsData">Διαγραφή καρτελών και δεδομένων</string>
+
+    <!-- Duck.ai tab + menu -->
+    <string name="chatMenuPopupNewVoiceChat">Νέα φωνητική συνομιλία</string>
+    <string name="chatMenuPopupNewImage">Νέα εικόνα</string>
+    <string name="chatMenuPopupNewTab">Νέα καρτέλα</string>
+    <string name="chatMenuPopupNewFireTab">Νέα καρτέλα Fire</string>
 </resources>

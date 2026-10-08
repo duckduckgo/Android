@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.nativeinput
 import android.app.Activity
 import android.content.res.Configuration
 import android.graphics.Outline
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.transition.ChangeBounds
 import android.transition.Fade
@@ -28,11 +29,14 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import android.view.ViewOutlineProvider
 import android.webkit.ValueCallback
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import androidx.core.net.toUri
 import androidx.core.view.doOnAttach
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -63,14 +67,19 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -88,11 +97,14 @@ class NativeInputCallbacks(
         selectedTool: String?,
         imagesJson: JSONArray?,
         filesJson: JSONArray?,
+        selectionsJson: JSONArray?,
     ) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
     val onDuckAiQuerySubmitted: (query: String, entryPoint: DuckChatEntryPoint) -> Unit = { _, _ -> },
     /** User picked a model in the native picker (→ submitChangeModelAction). */
     val onChangeModelSubmitted: (modelId: String) -> Unit = {},
+    /** User tapped "Start using weekly limit" on the usage card (→ submitStartUsingWeeklyLimitAction). */
+    val onStartUsingWeeklyLimit: () -> Unit = {},
     val onCustomizeResponsesClicked: () -> Unit = {},
     val onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit = {},
     val onChatHistoryShortcutClicked: () -> Unit = {},
@@ -145,6 +157,8 @@ interface NativeInputManager {
         query: String = "",
         callbacks: NativeInputCallbacks,
         initialInputMode: InputMode? = null,
+        forceImageGeneration: Boolean = false,
+        textSelection: String? = null,
     )
 
     fun hideNativeInput(animate: Boolean = true, isNavigation: Boolean = false): Boolean
@@ -176,6 +190,7 @@ interface NativeInputManager {
     fun setDuckAiTierVisible(visible: Boolean)
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ContributesBinding(FragmentScope::class)
 class RealNativeInputManager @Inject constructor(
     private val duckChat: DuckChat,
@@ -191,6 +206,7 @@ class RealNativeInputManager @Inject constructor(
     private val nativeInputOmnibarFeature: NativeInputOmnibarFeature,
     private val nativeInputEventListener: NativeInputEventListener,
     private val edgeToEdgeHandler: EdgeToEdgeHandler,
+    private val duckAiChatStore: DuckAiChatStore,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -225,8 +241,10 @@ class RealNativeInputManager @Inject constructor(
     // The NTP top stroke is driven by hasFavorites, so we save its visibility on attach and restore it
     // on detach rather than re-showing unconditionally (which would show it with no favorites present).
     private var savedTopNtpStrokeVisibility: Int? = null
+    private var deferredRootBackground: Drawable? = null
 
     private var cachedUrl: String? = null
+    private var isOnNewDuckAiChat: Boolean = true
 
     private val interactionLockSource = MutableStateFlow(InteractionLock.Unlocked)
     private val duckAiFireButtonHighlightSource = MutableStateFlow(false)
@@ -292,6 +310,9 @@ class RealNativeInputManager @Inject constructor(
                 refreshNavBarVisibility()
             }
             .launchIn(lifecycleOwner.lifecycleScope)
+        voiceSearchAvailability.observeVoiceSearchAvailability()
+            .onEach { widgetFrom(rootView)?.let { widget -> updateVoiceButtons(widget) } }
+            .launchIn(lifecycleOwner.lifecycleScope)
     }
 
     override fun isNativeInputEnabled(): Boolean = isNativeInputFieldEnabled
@@ -312,8 +333,7 @@ class RealNativeInputManager @Inject constructor(
     override fun isNativeInputShown(): Boolean {
         if (!::rootView.isInitialized) return false
         return widgetRoot != null ||
-            rootView.findViewById<View?>(R.id.inputModeTopRoot) != null ||
-            rootView.findViewById<View?>(R.id.inputModeBottomRoot) != null
+            rootView.findViewById<View?>(R.id.inputModeRoot) != null
     }
 
     override fun isChatTabSelected(): Boolean {
@@ -370,8 +390,7 @@ class RealNativeInputManager @Inject constructor(
     override fun hideNativeInput(animate: Boolean, isNavigation: Boolean): Boolean {
         if (!::rootView.isInitialized) return false
 
-        val widgetView = rootView.findViewById<View?>(R.id.inputModeTopRoot)
-            ?: rootView.findViewById(R.id.inputModeBottomRoot)
+        val widgetView = rootView.findViewById<View?>(R.id.inputModeRoot)
             ?: return false
 
         // Do not require isNativeInputFieldEnabled: teardown must still run after the setting flips
@@ -436,6 +455,10 @@ class RealNativeInputManager @Inject constructor(
 
         val isBottom = widgetFrom(widgetView)?.isWidgetBottom() ?: false
         isExiting = true
+        // The root keeps its height until removeWidget, so its opaque background would mask the content
+        // the exit has already reflowed back up, leaving it cut until the fade ends.
+        val rootBackground = widgetView.background
+        widgetView.background = null
         if (!omnibarController.isDuckAiMode() && card != null && omnibarCard != null && omnibarCard.width > 0) {
             layoutCoordinator.setWidgetAnimating(true)
             // Bottom: nav bar may already be sliding out on its own timeline. Top: bar stays put —
@@ -444,6 +467,7 @@ class RealNativeInputManager @Inject constructor(
             // otherwise it animates on the transition's own clock and the reset-to-base races, leaving
             // stale top padding.
             layoutCoordinator.suspendContentReflow()
+            widgetFrom(widgetView)?.setFooterSuppressed(true)
             animator.animateExit(
                 widgetCard = card,
                 widgetView = widgetView,
@@ -451,6 +475,8 @@ class RealNativeInputManager @Inject constructor(
                 isBottom = isBottom,
                 onUpdate = { layoutCoordinator.onWidgetAnimationFrame(card) },
                 onCancel = {
+                    widgetView.background = rootBackground
+                    widgetFrom(widgetView)?.setFooterSuppressed(false)
                     layoutCoordinator.setWidgetAnimating(false)
                     layoutCoordinator.resumeContentReflow()
                 },
@@ -580,6 +606,8 @@ class RealNativeInputManager @Inject constructor(
         query: String,
         callbacks: NativeInputCallbacks,
         initialInputMode: InputMode?,
+        forceImageGeneration: Boolean,
+        textSelection: String?,
     ) {
         if (!isNativeInputFieldEnabled) return
 
@@ -649,7 +677,7 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         bindUrlCaching(widgetView)
-        attachWidget(widgetView, navBarView, isBottom, tabId)
+        attachWidget(widgetView, navBarView, isBottom, tabId, forceImageGeneration, textSelection)
         // Bottom omnibar: slide the nav bar in with open. Top omnibar: snap the bar so the enter
         // morph can run from the omnibar while the buttons appear without animating — a concurrent
         // top slide fights that morph (and was only needed for bottom chrome).
@@ -707,6 +735,7 @@ class RealNativeInputManager @Inject constructor(
                     widget.saveLastUsedTogglePosition(isChat = true)
                     val imagesJson = widget.getImageAttachmentsJson()
                     val filesJson = widget.getFileAttachmentsJson()
+                    val selectionsJson = widget.getTextSelectionsJson()
                     widget.text = ""
                     widget.clearAttachments()
                     callbacks.onDuckAiChatSubmitted(
@@ -716,6 +745,7 @@ class RealNativeInputManager @Inject constructor(
                         widget.getSelectedTool(),
                         imagesJson,
                         filesJson,
+                        selectionsJson,
                     )
                     widget.clearSelectedTool()
                     widget.onPromptSubmitted()
@@ -729,6 +759,8 @@ class RealNativeInputManager @Inject constructor(
                 } else {
                     widget.saveLastUsedTogglePosition(isChat = true)
                     widget.storePendingPrompt(query)
+                    // Before the widget is removed below, so the footer can attribute the prompt to the card that was up.
+                    widget.onPromptSubmitted()
                     animator.cancelAnimation()
                     rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList)?.gone()
                     rootView.findViewById<View?>(R.id.focusedView)?.gone()
@@ -753,6 +785,7 @@ class RealNativeInputManager @Inject constructor(
             },
         )
         widget.onChangeModelSubmitted = { modelId -> callbacks.onChangeModelSubmitted(modelId) }
+        widget.onStartUsingWeeklyLimit = { callbacks.onStartUsingWeeklyLimit() }
         widget.onBack = {
             hideNativeInput()
         }
@@ -783,11 +816,7 @@ class RealNativeInputManager @Inject constructor(
     private fun removeWidget(): Boolean {
         animator.cancelAnimation()
         var removed = false
-        rootView.findViewById<View?>(R.id.inputModeTopRoot)?.let {
-            rootView.removeView(it)
-            removed = true
-        }
-        rootView.findViewById<View?>(R.id.inputModeBottomRoot)?.let {
+        rootView.findViewById<View?>(R.id.inputModeRoot)?.let {
             rootView.removeView(it)
             removed = true
         }
@@ -805,6 +834,7 @@ class RealNativeInputManager @Inject constructor(
             floatingSubmitContainer = null
         }
         if (removed) widgetRoot = null
+        deferredRootBackground = null
         savedTopNtpStrokeVisibility?.let { vis ->
             rootView.findViewById<View?>(R.id.topNtpOutlineStroke)?.visibility = vis
             savedTopNtpStrokeVisibility = null
@@ -817,13 +847,65 @@ class RealNativeInputManager @Inject constructor(
     }
 
     private fun createWidgetView(layoutInflater: LayoutInflater, isBottom: Boolean): View {
-        val layoutRes =
-            if (isBottom) {
-                R.layout.input_mode_widget_card_view_bottom
-            } else {
-                R.layout.input_mode_widget_card_view
+        val view = layoutInflater.inflate(R.layout.input_mode_widget_card_view, rootView, false)
+        applyPositionChrome(view, isBottom)
+        return view
+    }
+
+    /**
+     * One layout serves both positions; the per-position chrome that used to live in the two wrapper
+     * XMLs is set here from [isBottom]: the row's side paddings, the card's background/elevation/
+     * compat-padding/resting margins, the input field's content padding, and the inline nav buttons'
+     * gravity and margins. The card's shape and horizontal insets stay state-driven inside the widget
+     * (applyOmnibarShape); the leading fire is gated on bottom by the widget itself.
+     */
+    private fun applyPositionChrome(view: View, isBottom: Boolean) {
+        val card = view.findViewById<MaterialCardView>(R.id.inputModeWidgetCard) ?: return
+        val widget = view.findViewById<View>(R.id.inputModeWidget) ?: return
+        val buttons = view.findViewById<View>(R.id.inlineNavButtonsContainer) ?: return
+        // The card sits in the row LinearLayout, nested inside the footer dock, so reach it via the card
+        // rather than the root's first child (which is the dock).
+        val row = card.parent as View
+        val footer = view.findViewById<View>(R.id.nativeInputFooter)
+        val res = view.resources
+        val keyline1 = res.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
+        val keyline2 = res.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
+        footer?.updateLayoutParams<MarginLayoutParams> { bottomMargin = if (isBottom) keyline2 else 0 }
+        // Resolve the card background against the card's own context, not the root's: the card carries the
+        // daxInputModeCardThemeOverlay (android:theme), which in a Fire Tab remaps daxColorSurface/Window to
+        // the fire card colour. Reading it off the root would paint the non-fire colour.
+        if (isBottom) {
+            row.setPaddingRelative(keyline2, 0, keyline1, 0)
+            card.setCardBackgroundColor(card.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorWindow))
+            card.cardElevation = 3f.toPx()
+            card.setUseCompatPadding(false)
+            card.updateLayoutParams<MarginLayoutParams> {
+                topMargin = keyline2
+                bottomMargin = keyline2
             }
-        return layoutInflater.inflate(layoutRes, rootView, false)
+            widget.setPaddingRelative(keyline1, keyline2, keyline1, keyline2)
+            buttons.updateLayoutParams<LinearLayout.LayoutParams> {
+                gravity = Gravity.BOTTOM
+                marginStart = (-8f).toPx().toInt()
+                bottomMargin = (-2f).toPx().toInt()
+            }
+        } else {
+            row.setPaddingRelative(0, 0, 0, 0)
+            card.setCardBackgroundColor(card.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface))
+            card.cardElevation = 6f.toPx()
+            card.setUseCompatPadding(true)
+            card.updateLayoutParams<MarginLayoutParams> {
+                topMargin = (-9f).toPx().toInt()
+            }
+            val vertical = 4f.toPx().toInt()
+            widget.setPaddingRelative(keyline1, vertical, keyline1, vertical)
+            buttons.updateLayoutParams<LinearLayout.LayoutParams> {
+                gravity = Gravity.TOP
+                marginStart = (-12f).toPx().toInt()
+                marginEnd = keyline1
+                topMargin = (-2f).toPx().toInt()
+            }
+        }
     }
 
     private fun createNavBarView(layoutInflater: LayoutInflater): View {
@@ -913,8 +995,23 @@ class RealNativeInputManager @Inject constructor(
             // Per-tab chatId (null on new chats) published into NativeInputState for
             // consumers (reasoning picker, submission) to resolve per-chat state.
             val chatIdFlow = currentTabUrl.map { extractDuckAiChatId(it) }
+                .distinctUntilChanged()
+                .flatMapLatest { chatId ->
+                    if (chatId == null || !duckAiChatStore.hasMigrated()) {
+                        flowOf(chatId)
+                    } else {
+                        duckAiChatStore.getChatsFlow().map { chats -> chatId.takeIf { chats.any { it.chatId == chatId && !it.isVoice } } }
+                    }
+                }
+                .distinctUntilChanged()
             // Picker tied to whether the current tab is a Duck.ai page that already has a chatId (existing chat) or new chat.
             bindModelPickerEnabledSource(chatIdFlow.map { it == null })
+            chatIdFlow
+                .onEach {
+                    isOnNewDuckAiChat = it == null
+                    updateVoiceButtons(this)
+                }
+                .launchIn(lifecycleOwner.lifecycleScope)
             bindChatIdSource(chatIdFlow)
             bindCurrentUrlSource(currentTabUrl)
             bindInteractionLockSource(interactionLockSource)
@@ -956,6 +1053,7 @@ class RealNativeInputManager @Inject constructor(
     private fun updateVoiceButtons(widget: NativeInputWidget) {
         val state = computeVoiceButtonAvailability(
             isOnActiveDuckChat = omnibarController.isDuckAiMode(),
+            isNewDuckAiChat = isOnNewDuckAiChat,
             isVoiceSearchDeviceAvailable = voiceSearchAvailability.isVoiceSearchAvailable,
             isVoiceSearchDuckAiEnabled = duckAiFeatureState.showVoiceSearchToggle.value,
             isVoiceChatEntryEnabled = duckAiFeatureState.showVoiceChatEntry.value,
@@ -1223,7 +1321,14 @@ class RealNativeInputManager @Inject constructor(
         )
     }
 
-    private fun attachWidget(widgetView: View, navBarView: View?, isBottom: Boolean, tabId: String) {
+    private fun attachWidget(
+        widgetView: View,
+        navBarView: View?,
+        isBottom: Boolean,
+        tabId: String,
+        forceImageGeneration: Boolean,
+        textSelection: String?,
+    ) {
         // Inflated from a ?attr/actionBarSize height, so layoutParams carries the resolved nav bar height.
         val navBarHeightPx = navBarView?.layoutParams?.height?.takeIf { it > 0 } ?: 0
         this.navBarHeightPx = navBarHeightPx
@@ -1251,7 +1356,13 @@ class RealNativeInputManager @Inject constructor(
 
         widgetFrom(widgetView)?.apply {
             setWidgetRootView(widgetView)
-            configure(tabId = tabId, isDuckAiMode = omnibarController.isDuckAiMode(), isBottom = isBottom)
+            configure(
+                tabId = tabId,
+                isDuckAiMode = omnibarController.isDuckAiMode(),
+                isBottom = isBottom,
+                forceImageGeneration = forceImageGeneration,
+            )
+            textSelection?.let { bindTextSelections(tabId, it) }
         }
 
         applyWindowChrome(widgetView, isBottom)
@@ -1264,6 +1375,14 @@ class RealNativeInputManager @Inject constructor(
         // Stash so showNativeInput can avoid clearing isWidgetAnimating when the open slide
         // finishes before the enter morph.
         pendingEnterOwnsAnimating = enterStarted
+
+        if (forceImageGeneration) {
+            widgetView.doOnAttach {
+                if (widgetRoot === widgetView) {
+                    widgetFrom(widgetView)?.focusInput(rootView.context as? Activity)
+                }
+            }
+        }
     }
 
     override fun setInteractionLock(lock: InteractionLock) {
@@ -1289,16 +1408,21 @@ class RealNativeInputManager @Inject constructor(
 
     private fun applyWindowChrome(widgetView: View, isBottom: Boolean) {
         widgetView.translationZ = WIDGET_ELEVATION_DP.toPx()
+        // The root's opaque background gives it an outline to cast from, so its elevation draws a band
+        // along the widget's edges that reads as a divider. Keep the z-order, drop the shadow; the
+        // card inside still carries its own.
+        suppressShadow(widgetView)
+        // The stroke separates a top omnibar from the content below it. While the input is open the
+        // content scrolls under the input instead, so the stroke reads as a divider cutting it off.
+        rootView.findViewById<View?>(R.id.topNtpOutlineStroke)?.let {
+            if (savedTopNtpStrokeVisibility == null) savedTopNtpStrokeVisibility = it.visibility
+            it.gone()
+        }
         if (isBottom) {
             rootView.findViewById<View?>(R.id.navigationBar)?.gone()
             rootView.findViewById<View?>(R.id.bottomBrowserOutlineStroke)?.gone()
-            // The top outline strokes separate a top omnibar from content; with the input's nav bar at
-            // the top they just draw a hairline under the bar. Hide them, restored on close.
+            // With the input's nav bar at the top, this one just draws a hairline under the bar.
             rootView.findViewById<View?>(R.id.topBrowserOutlineStroke)?.gone()
-            rootView.findViewById<View?>(R.id.topNtpOutlineStroke)?.let {
-                if (savedTopNtpStrokeVisibility == null) savedTopNtpStrokeVisibility = it.visibility
-                it.gone()
-            }
             if (omnibarController.isBrowserMode()) {
                 widgetView.setBackgroundColor(
                     widgetView.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorBackground),
@@ -1309,12 +1433,15 @@ class RealNativeInputManager @Inject constructor(
                         com.duckduckgo.mobile.android.R.attr.daxColorDuckAiBackground,
                     ),
                 )
-                suppressShadow(widgetView)
             }
             rootView.findViewById<View?>(R.id.browserLayout)?.let {
                 it.setPadding(it.paddingLeft, it.paddingTop, it.paddingRight, 0)
             }
         }
+        // The root is at full height from the moment it attaches, so painting it now would mask the
+        // content while the card is still morphing out of the omnibar. Hold it until the morph lands.
+        deferredRootBackground = widgetView.background
+        widgetView.background = null
         layoutCoordinator.configureAutocompleteLayout(widgetView, isBottom)
         layoutCoordinator.configureContentOffset(widgetView, isBottom)
         widgetView.post { layoutCoordinator.applyForcedBottomTranslation(widgetView, isBottom) }
@@ -1347,6 +1474,7 @@ class RealNativeInputManager @Inject constructor(
                 }
             },
             onCancel = {
+                applyDeferredRootBackground(widgetView)
                 pendingEnterOwnsAnimating = false
                 layoutCoordinator.setWidgetAnimating(false)
                 widgetFrom(widgetView)?.let { widget ->
@@ -1365,7 +1493,15 @@ class RealNativeInputManager @Inject constructor(
         return true
     }
 
+    private fun applyDeferredRootBackground(widgetView: View) {
+        deferredRootBackground?.let {
+            widgetView.background = it
+            deferredRootBackground = null
+        }
+    }
+
     private fun onEnterComplete(widgetView: View) {
+        applyDeferredRootBackground(widgetView)
         layoutCoordinator.enableContentLayoutTransition()
         if (omnibarController.isDuckAiMode()) return
         if (widgetView.isAttachedToWindow) {
@@ -1550,8 +1686,9 @@ internal data class VoiceButtonAvailability(
  * Pure decision logic for which voice entry points the unified input should expose.
  *
  * Rules:
- * - On an active Duck.ai chat page, voice chat is suppressed (you're already in the chat). Voice
- *   search is offered only if both the device supports it and the Duck.ai voice-search flag is on.
+ * - On an active Duck.ai chat page, voice chat is offered only on a new chat (voice can't resume an
+ *   existing text chat yet). Voice search is offered only if both the device supports it and the
+ *   Duck.ai voice-search flag is on.
  * - Otherwise (NTP / search omnibar with the Search↔Duck.ai toggle):
  *   - Search tab: voice search if device-available.
  *   - Duck.ai tab: voice search if device-available AND [isVoiceSearchDuckAiEnabled]; voice chat
@@ -1560,6 +1697,7 @@ internal data class VoiceButtonAvailability(
  */
 internal fun computeVoiceButtonAvailability(
     isOnActiveDuckChat: Boolean,
+    isNewDuckAiChat: Boolean,
     isVoiceSearchDeviceAvailable: Boolean,
     isVoiceSearchDuckAiEnabled: Boolean,
     isVoiceChatEntryEnabled: Boolean,
@@ -1568,7 +1706,7 @@ internal fun computeVoiceButtonAvailability(
     if (isOnActiveDuckChat) {
         return VoiceButtonAvailability(
             voiceSearchAvailable = isVoiceSearchDeviceAvailable && isVoiceSearchDuckAiEnabled,
-            voiceChatAvailable = false,
+            voiceChatAvailable = isNewDuckAiChat && isVoiceChatEntryEnabled,
         )
     }
     return VoiceButtonAvailability(

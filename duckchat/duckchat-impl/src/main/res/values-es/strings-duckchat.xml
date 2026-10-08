@@ -122,7 +122,6 @@
     <string name="duckAIContextualAutomaticContextMessage">Envía automáticamente el contenido de la página a Duck.ai</string>
 
     <!-- Contextual sheet quick action -->
-    <string name="duckAIContextualPromptAskAboutPage">Preguntar sobre la página</string>
 
     <!-- Contextual sheet suggested prompts; native copy for PageSuggestionsCatalog.json entries, keyed by catalog id -->
     <string name="duckAiSuggestionTranslatePageLabel" instruction="Suggested prompt chip: translate the current page">Traducir esta página</string>
@@ -205,7 +204,6 @@
     <string name="duckAiSuggestionPersonBackgroundPrompt" instruction="Suggested prompt submitted text: summarize a person&apos;s background">Resume la trayectoria y el trabajo notable de esta persona.</string>
 
     <!-- Contextual sheet input hint -->
-    <string name="contextualSheetImprovedHint">Pregunta cualquier cosa en privado</string>
     <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Chats recientes</string>
 
     <!-- duck.ai contextual fire button -->
@@ -255,8 +253,8 @@
     <string name="duck_ai_chat_history_action_new">Nuevo</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Descargar chats</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Descarga finalizada para %1$d chat</item>
-        <item quantity="other">Descarga finalizada para %1$d chats</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Descarga finalizada para %1$d chat</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Descarga finalizada para %1$d chats</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Abrir menú de desbordamiento</string>
     <string name="duck_ai_chat_history_select_all">Seleccionar todo</string>
@@ -282,6 +280,11 @@
     <string name="native_input_chat_duck_mode_hint">Responder…</string>
 
     <!-- Model Picker -->
+    <string name="duckAiModelPickerLabelEverydayUse" instruction="Subline under a model in the Duck.ai model picker, describing what that model suits.">Ideal para el uso diario</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster" instruction="Subline under a model in the Duck.ai model picker. &apos;Limits&apos; means the user&apos;s usage allowance, which this model consumes more quickly.">Gran calidad, pero llega a los límites antes</string>
+    <string name="duckAiModelPickerTryFreeTrial" instruction="Header above the locked models in the Duck.ai model picker, shown when the user can still start a free trial.">Probar gratis</string>
+    <string name="duckAiModelPickerSubscriberExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when unlocking them requires a paid subscription.">Exclusivo para suscriptores</string>
+    <string name="duckAiModelPickerProExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when they require the Pro plan specifically. &apos;Pro&apos; is the plan name and stays untranslated.">Exclusivo del plan Pro</string>
     <string name="duckAiModelPickerPlusModels">Más</string>
     <string name="duckAiModelPickerProModels">Pro</string>
 
@@ -342,10 +345,56 @@
     <string name="duckAiSettingsTitle">Configuración de Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutPage">Preguntar sobre la página</string>
 
     <!-- Editing a message already sent to Duck.ai -->
     <string name="duck_ai_edit_prompt_title" instruction="Screen title: the user is editing a message they already sent to Duck.ai">Editar mensaje</string>
     <string name="duck_ai_edit_prompt_lose_responses_warning" instruction="Warning shown while editing a sent message: the answer Duck.ai already gave will be discarded and answered again">Al editar, se reemplazará la respuesta por una nueva.</string>
 
+    <string name="duckChatContextualAskAboutPage">Preguntar sobre la página</string>
+    <string name="duckChatContextualAskAboutSearch">Continuar en Duck.ai</string>
+    <string name="duckChatContextualOpenDuckAi">Abrir Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Resume esta selección</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Resume esta selección.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Traduce esta selección</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Traduce esta selección al %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Selección de texto</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Puedes añadir hasta %1$d selecciones de texto. Elimina una para añadir otra.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Pregúntale a Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d palabra</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d palabras</item>
+    </plurals>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model&apos;s short name">%1$s consume los límites hasta de 2 a 5 veces más rápido que los modelos básicos.</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Descartar</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">%1$d %% del límite diario</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">%1$d %% del límite semanal</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Se ha alcanzado el límite diario</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Se ha alcanzado el límite semanal</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Se ha alcanzado el límite de uso semanal</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Límite de modelos de IA avanzados alcanzado</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Cambiar modelo</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Empezar a usar el límite semanal</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Prueba la suscripción gratis</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">Subscríbete</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as &apos;2 days&apos; or &apos;5 hours&apos;">Se reinicia en %1$s</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d día</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d días</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d hora</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d horas</item>
+    </plurals>
 </resources>

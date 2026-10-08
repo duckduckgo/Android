@@ -51,6 +51,7 @@ import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
 import com.duckduckgo.app.browser.newtab.QuickAccessDragTouchItemListener
+import com.duckduckgo.app.browser.omnibar.applyAddressBarRebrandRadius
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppReturnPixelSender
@@ -157,6 +158,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private lateinit var voiceSearch: ImageView
     private lateinit var clearTextButton: ImageView
     private lateinit var shadowContainer: MaterialCardView
+    private lateinit var inputContainer: MaterialCardView
     private lateinit var logo: ImageView
     private lateinit var duckAi: ImageView
     private lateinit var omnibarDivider: View
@@ -179,6 +181,14 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         voiceSearch = if (isOmnibarAtTop) binding.voiceSearchButton else binding.voiceSearchButtonBottom
         clearTextButton = if (isOmnibarAtTop) binding.clearTextButton else binding.clearTextButtonBottom
         shadowContainer = if (isOmnibarAtTop) binding.omniBarContainerShadow else binding.omniBarContainerShadowBottom
+        inputContainer = if (isOmnibarAtTop) binding.omniBarContainer else binding.omniBarContainerBottom
+        applyAddressBarRebrandRadius(
+            isEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled(),
+            rebrandRadius = resources.getDimension(CommonR.dimen.rebrandInputRadius),
+            legacyRadius = resources.getDimension(CommonR.dimen.largeShapeCornerRadius),
+            shadowContainer,
+            inputContainer,
+        )
         logo = if (isOmnibarAtTop) binding.logo else binding.logoBottom
         duckAi = if (isOmnibarAtTop) binding.aiChatIconMenu else binding.aiChatIconMenuBottom
         omnibarDivider = if (isOmnibarAtTop) binding.verticalDivider else binding.verticalDividerBottom
@@ -243,7 +253,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             shadowColor = ContextCompat.getColor(this, CommonR.color.background_omnibar_shadow),
         )
 
-        viewModel.setLaunchedFromWidget(launchedFromAnyWidget(intent))
         viewModel.setLaunchedFromSearchOnlyWidget(launchedFromSearchOnlyWidget(intent))
 
         showKeyboard(omnibarTextInput)
@@ -270,7 +279,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
         viewModel.resetViewState()
         viewModel.setLaunchedFromSearchOnlyWidget(launchedFromSearchOnlyWidget(intent))
-        viewModel.setLaunchedFromWidget(launchedFromAnyWidget(intent))
         sendLaunchPixels(intent)
         if (launchedFromAssist(intent)) {
             handleDigitalAssistIntent()

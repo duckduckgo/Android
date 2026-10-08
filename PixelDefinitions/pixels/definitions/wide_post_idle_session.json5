@@ -47,14 +47,14 @@
             {
                 "key": "feature.data.ext.session_duration_ms_bucketed",
                 "type": "string",
-                "description": "Duration from surface shown to session end, bucketed (lower end of bucket, in ms)",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Duration from surface shown to session end, bucketed (lower end of bucket, in ms). -1 marks a negative interval caused by a wall-clock adjustment during measurement.",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.time_to_first_interaction_ms_bucketed",
                 "type": "string",
-                "description": "Duration from surface shown to the first non-terminal interaction (page_engaged, toggle_used, or back_pressed), bucketed (lower end of bucket, in ms)",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Duration from surface shown to the first non-terminal interaction (page_engaged, toggle_used, or back_pressed), bucketed (lower end of bucket, in ms). -1 marks a negative interval caused by a wall-clock adjustment during measurement.",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.page_engaged",

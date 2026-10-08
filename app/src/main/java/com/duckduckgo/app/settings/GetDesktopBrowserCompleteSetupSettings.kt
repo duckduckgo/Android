@@ -27,7 +27,6 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.desktopbrowser.GetDesktopBrowserActivityParams
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -61,7 +60,7 @@ class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
         return TwoLineListItem(context = activity).apply {
             setPrimaryText(activity.getString(R.string.getDesktopBrowserSettingItemTitle))
             setSecondaryText(activity.getString(R.string.getDesktopBrowserSettingItemSubtitleTitle))
-            setLeadingIconResource(CommonR.drawable.ic_device_laptop_install_color_24)
+            setLeadingIconResource(CommonR.drawable.device_laptop_install_color_24)
 
             configureOverflowMenu()
 
@@ -99,9 +98,7 @@ class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
 
                 val intent = globalActivityStarter.startIntent(
                     activity,
-                    GetDesktopBrowserActivityParams(
-                        source = GetDesktopBrowserActivityParams.Source.COMPLETE_SETUP,
-                    ),
+                    SettingsDesktopBrowserPromotionParams.forCompleteSetupCard(),
                 ) ?: return@launch
 
                 setOnClickListener {

@@ -8,24 +8,24 @@ import com.android.billingclient.api.ProductDetails.PricingPhase
 import com.android.billingclient.api.ProductDetails.PricingPhases
 import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.android.billingclient.api.Purchase
-import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FixedLocaleRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
-import com.duckduckgo.subscriptions.api.SubscriptionStatus.GRACE_PERIOD
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
-import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.api.model.Entitlement
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ADVANCED_SUBSCRIPTION
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PRO_PLAN_US
@@ -33,15 +33,15 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.NETP
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_US
-import com.duckduckgo.subscriptions.impl.auth2.AccessTokenClaims
-import com.duckduckgo.subscriptions.impl.auth2.AuthClient
-import com.duckduckgo.subscriptions.impl.auth2.AuthJwtValidator
-import com.duckduckgo.subscriptions.impl.auth2.BackgroundTokenRefresh
-import com.duckduckgo.subscriptions.impl.auth2.CrossProcessLock
-import com.duckduckgo.subscriptions.impl.auth2.PkceGenerator
-import com.duckduckgo.subscriptions.impl.auth2.PkceGeneratorImpl
-import com.duckduckgo.subscriptions.impl.auth2.RefreshTokenClaims
-import com.duckduckgo.subscriptions.impl.auth2.TokenPair
+import com.duckduckgo.subscriptions.impl.auth.AccessTokenClaims
+import com.duckduckgo.subscriptions.impl.auth.AuthClient
+import com.duckduckgo.subscriptions.impl.auth.AuthJwtValidator
+import com.duckduckgo.subscriptions.impl.auth.BackgroundTokenRefresh
+import com.duckduckgo.subscriptions.impl.auth.CrossProcessLock
+import com.duckduckgo.subscriptions.impl.auth.PkceGenerator
+import com.duckduckgo.subscriptions.impl.auth.PkceGeneratorImpl
+import com.duckduckgo.subscriptions.impl.auth.RefreshTokenClaims
+import com.duckduckgo.subscriptions.impl.auth.TokenPair
 import com.duckduckgo.subscriptions.impl.billing.LatestPurchaseResult
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
@@ -50,6 +50,7 @@ import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Failure
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Purchased
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
 import com.duckduckgo.subscriptions.impl.notification.VpnReminderNotificationScheduler
+import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboardingExperiments
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
@@ -57,20 +58,15 @@ import com.duckduckgo.subscriptions.impl.repository.FakeSubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.repository.RealAuthRepository
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.serp_promo.FakeSerpPromo
-import com.duckduckgo.subscriptions.impl.services.AccessTokenResponse
-import com.duckduckgo.subscriptions.impl.services.AccountResponse
 import com.duckduckgo.subscriptions.impl.services.ActiveOfferResponse
-import com.duckduckgo.subscriptions.impl.services.AuthService
+import com.duckduckgo.subscriptions.impl.services.ConfirmationBody
 import com.duckduckgo.subscriptions.impl.services.ConfirmationEntitlement
 import com.duckduckgo.subscriptions.impl.services.ConfirmationResponse
-import com.duckduckgo.subscriptions.impl.services.CreateAccountResponse
-import com.duckduckgo.subscriptions.impl.services.EntitlementResponse
+import com.duckduckgo.subscriptions.impl.services.ExperimentData
 import com.duckduckgo.subscriptions.impl.services.PendingPlanResponse
 import com.duckduckgo.subscriptions.impl.services.PortalResponse
-import com.duckduckgo.subscriptions.impl.services.StoreLoginResponse
 import com.duckduckgo.subscriptions.impl.services.SubscriptionResponse
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
-import com.duckduckgo.subscriptions.impl.services.ValidateTokenResponse
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.wideevents.AuthTokenRefreshWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.FreeTrialConversionWideEvent
@@ -99,22 +95,20 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
-import org.junit.Assume.assumeFalse
-import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import retrofit2.HttpException
@@ -124,9 +118,9 @@ import java.io.IOException
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
+import kotlin.coroutines.cancellation.CancellationException
 
-@RunWith(Parameterized::class)
-class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
+class RealSubscriptionsManagerTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
@@ -134,19 +128,12 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @get:Rule
     val fixedLocalRule = FixedLocaleRule()
 
-    private val authService: AuthService = mock()
     private val subscriptionsService: SubscriptionsService = mock()
     private val authDataStore: FakeSubscriptionsDataStore = FakeSubscriptionsDataStore()
     private val serpPromo = FakeSerpPromo()
 
-    @SuppressLint("DenyListedApi")
     private val subscriptionsFeature: SubscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
-        .apply {
-            authApiV2().setRawStoredState(State(authApiV2Enabled))
-            serializeTokenRefresh().setRawStoredState(State(true))
-        }
     private val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo, { subscriptionsFeature })
-    private val emailManager: EmailManager = mock()
     private val playBillingManager: PlayBillingManager = mock()
     private val context: Context = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
@@ -157,26 +144,31 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     private val subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent = mock()
     private val vpnReminderNotificationScheduler: VpnReminderNotificationScheduler = mock()
 
+    private var nativeToggles: List<Toggle> = emptyList()
+    private val featureTogglesInventory = object : FeatureTogglesInventory {
+        override suspend fun getAll(): List<Toggle> = nativeToggles
+        override suspend fun getAllTogglesForParent(name: String): List<Toggle> =
+            nativeToggles.filter { it.featureName().parentName == name }
+    }
+
     private val authClient: AuthClient = mock()
     private val pkceGenerator: PkceGenerator = PkceGeneratorImpl()
     private val authJwtValidator: AuthJwtValidator = mock()
     private val timeProvider = FakeTimeProvider()
     private val backgroundTokenRefresh: BackgroundTokenRefresh = mock()
     private val crossProcessLock: CrossProcessLock = mock()
+    private val subscriptionOnboardingExperiments: SubscriptionOnboardingExperiments = mock()
     private lateinit var subscriptionsManager: RealSubscriptionsManager
 
     @Before
     fun before() = runTest {
-        whenever(emailManager.getToken()).thenReturn(null)
         whenever(context.packageName).thenReturn("packageName")
         whenever(playBillingManager.purchaseState).thenReturn(flowOf())
         whenever(crossProcessLock.acquire(any(), any())).thenReturn(Result.success(FakeLockHandle()))
         subscriptionsManager = RealSubscriptionsManager(
-            authService,
             subscriptionsService,
             authRepository,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -194,6 +186,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
     }
 
@@ -212,7 +206,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenPurchaseStored()
         givenStoreLoginSucceeds()
         givenSubscriptionSucceedsWithEntitlements()
-        givenAccessTokenSucceeds()
         givenV2AccessTokenRefreshSucceeds()
 
         subscriptionsManager.recoverSubscriptionFromStore() as RecoverSubscriptionResult.Success
@@ -238,7 +231,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @Test
     fun whenRecoverSubscriptionFromStoreIfUserSignedInWithNotPurchasesThenReturnFailure() = runTest {
         givenUserIsSignedIn()
-        givenAccessTokenSucceeds()
 
         val result = subscriptionsManager.recoverSubscriptionFromStore()
 
@@ -246,11 +238,10 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
-    fun whenRecoverSubscriptionFromStoreIfValidateTokenSucceedsThenReturnExternalId() = runTest {
+    fun whenRecoverSubscriptionFromStoreIfStoreLoginSucceedsThenReturnExternalId() = runTest {
         givenPurchaseStored()
         givenStoreLoginSucceeds()
         givenSubscriptionSucceedsWithEntitlements()
-        givenAccessTokenSucceeds()
         givenV2AccessTokenRefreshSucceeds()
 
         subscriptionsManager.recoverSubscriptionFromStore() as RecoverSubscriptionResult.Success
@@ -264,7 +255,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenPurchaseStored()
         givenStoreLoginSucceeds()
         givenSubscriptionExists(EXPIRED)
-        givenAccessTokenSucceeds()
 
         val result = subscriptionsManager.recoverSubscriptionFromStore()
 
@@ -277,7 +267,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenActivePurchase()
         givenStoreLoginSucceeds()
         givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
-        givenAccessTokenSucceeds()
         givenV2AccessTokenRefreshSucceeds()
 
         val result = subscriptionsManager.recoverSubscriptionFromStore()
@@ -288,9 +277,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
-    fun whenRecoverSubscriptionFromStoreIfValidateTokenFailsReturnFailure() = runTest {
+    fun whenRecoverSubscriptionFromStoreIfNoPurchaseStoredThenReturnFailure() = runTest {
         givenUserIsSignedIn()
-        givenValidateTokenFails("failure")
 
         val result = subscriptionsManager.recoverSubscriptionFromStore()
 
@@ -303,7 +291,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenPurchaseStored()
         givenStoreLoginSucceeds()
         givenSubscriptionSucceedsWithoutEntitlements()
-        givenAccessTokenSucceeds()
 
         subscriptionsManager.recoverSubscriptionFromStore()
         subscriptionsManager.isSignedIn.test {
@@ -320,7 +307,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenActivePurchase()
         givenStoreLoginSucceeds()
         givenSubscriptionSucceedsWithEntitlements()
-        givenAccessTokenSucceeds()
         givenV2AccessTokenRefreshSucceeds()
 
         val result = subscriptionsManager.recoverSubscriptionFromStore()
@@ -361,7 +347,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenRefreshTokenWithUseQueryPurchasesAndNoActivePurchaseThenSignsOut() = runTest {
-        assumeTrue(authApiV2Enabled)
         givenUserIsSignedIn()
         givenSubscriptionExists()
         givenAccessTokenIsExpired()
@@ -381,7 +366,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenRefreshTokenWithUseQueryPurchasesAndPurchaseInfoUnknownThenDoesNotSignOut() = runTest {
-        assumeTrue(authApiV2Enabled)
         givenUserIsSignedIn()
         givenSubscriptionExists()
         givenAccessTokenIsExpired()
@@ -400,7 +384,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenRefreshTokenWithUseQueryPurchasesAndActivePurchaseThenRecoversTokens() = runTest {
-        assumeTrue(authApiV2Enabled)
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
         givenV2AccessTokenRefreshFails(errorCode = "invalid_token")
@@ -416,66 +399,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
-    fun whenFetchAndStoreAllDataIfUserNotSignedInThenReturnFalse() = runTest {
-        givenUserIsNotSignedIn()
-
-        val value = subscriptionsManager.fetchAndStoreAllData()
-
-        assertFalse(value)
-    }
-
-    @Test
-    fun whenFetchAndStoreAllDataIfTokenIsValidThenReturnSubscription() = runTest {
-        assumeFalse(authApiV2Enabled) // fetchAndStoreAllData() is deprecated and won't be used with auth v2 enabled
-
-        givenUserIsSignedIn()
-        givenSubscriptionSucceedsWithEntitlements()
-
-        subscriptionsManager.fetchAndStoreAllData()
-        assertEquals("1234", authDataStore.externalId)
-        assertTrue(authRepository.getEntitlements().firstOrNull { it.product == NetP.value } != null)
-    }
-
-    @Test
-    fun whenFetchAndStoreAllDataIfTokenIsValidThenReturnEmitEntitlements() = runTest {
-        assumeFalse(authApiV2Enabled) // fetchAndStoreAllData() is deprecated and won't be used with auth v2 enabled
-
-        givenUserIsSignedIn()
-        givenSubscriptionSucceedsWithEntitlements()
-
-        subscriptionsManager.fetchAndStoreAllData()
-        subscriptionsManager.entitlements.test {
-            assertTrue(awaitItem().size == 1)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenFetchAndStoreAllDataIfSubscriptionFailsThenReturnNull() = runTest {
-        givenUserIsSignedIn()
-        givenSubscriptionFails()
-
-        assertFalse(subscriptionsManager.fetchAndStoreAllData())
-    }
-
-    @Test
-    fun whenFetchAndStoreAllDataIfSubscriptionFailsWith401ThenSignOutAndReturnNull() = runTest {
-        assumeFalse(authApiV2Enabled) // fetchAndStoreAllData() is deprecated and won't be used with auth v2 enabled
-
-        givenUserIsSignedIn()
-        givenSubscriptionFails(httpResponseCode = 401)
-
-        val dataFetched = subscriptionsManager.fetchAndStoreAllData()
-
-        assertFalse(dataFetched)
-        assertFalse(subscriptionsManager.isSignedIn.first())
-        assertNull(subscriptionsManager.getSubscription())
-        assertNull(subscriptionsManager.getAccount())
-        assertNull(authRepository.getAuthToken())
-        assertNull(authRepository.getAccessToken())
-    }
-
-    @Test
     fun whenPurchaseFlowIfUserIsSignedInAndSubscriptionFailsWith401ThenSignOutAndCreateNewAccount() = runTest {
         givenUserIsSignedIn(accountExternalId = "5678")
         givenSubscriptionFails(httpResponseCode = 401)
@@ -484,13 +407,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
         purchase()
 
-        if (authApiV2Enabled) {
-            verify(authClient).authorize(any())
-            verify(authClient).createAccount(any())
-            verify(authClient).getTokens(any(), any(), any())
-        } else {
-            verify(authService).createAccount(any())
-        }
+        verify(authClient).authorize(any())
+        verify(authClient).createAccount(any())
+        verify(authClient).getTokens(any(), any(), any())
 
         assertNotEquals(accountExternalId, authDataStore.externalId)
     }
@@ -502,25 +421,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
         purchase()
 
-        if (authApiV2Enabled) {
-            verify(authClient).authorize(any())
-            verify(authClient).createAccount(any())
-            verify(authClient).getTokens(any(), any(), any())
-        } else {
-            verify(authService).createAccount(any())
-        }
-    }
-
-    @Test
-    fun whenPurchaseFlowIfUserNotSignedInAndNotPurchaseStoredAndSignedInEmailThenCreateAccountWithEmailToken() = runTest {
-        assumeFalse(authApiV2Enabled) // passing email token when creating account is no longer a thing in api v2
-
-        whenever(emailManager.getToken()).thenReturn("emailToken")
-        givenUserIsNotSignedIn()
-
-        purchase()
-
-        verify(authService).createAccount("Bearer emailToken")
+        verify(authClient).authorize(any())
+        verify(authClient).createAccount(any())
+        verify(authClient).getTokens(any(), any(), any())
     }
 
     @Test
@@ -540,8 +443,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     fun whenPurchaseFlowIfCreateAccountSucceedsThenBillingFlowUsesCorrectExternalId() = runTest {
         givenUserIsNotSignedIn()
         givenCreateAccountSucceeds()
-        givenValidateTokenSucceedsNoEntitlements()
-        givenAccessTokenSucceeds()
 
         purchase()
 
@@ -554,7 +455,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenPurchaseStored()
         givenStoreLoginSucceeds()
         givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
-        givenAccessTokenSucceeds()
 
         purchase()
 
@@ -567,7 +467,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenPurchaseStored()
         givenStoreLoginSucceeds()
         givenSubscriptionSucceedsWithEntitlements()
-        givenAccessTokenSucceeds()
 
         subscriptionsManager.currentPurchaseState.test {
             purchase()
@@ -594,18 +493,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
-    fun whenPurchaseFlowIfUserSignedInThenValidateToken() = runTest {
-        assumeFalse(authApiV2Enabled) // there is no /validate-token endpoint in v2 API
-
-        givenUserIsSignedIn()
-
-        purchase()
-
-        verify(authService).validateToken(any())
-    }
-
-    @Test
-    fun whenPurchaseFlowIfValidateTokenSucceedsThenBillingFlowUsesCorrectExternalIdAndEmitStates() = runTest {
+    fun whenPurchaseFlowIfUserSignedInThenBillingFlowUsesCorrectExternalIdAndEmitStates() = runTest {
         givenUserIsSignedIn()
         givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
 
@@ -614,6 +502,386 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
             verify(playBillingManager).launchBillingFlow(any(), any(), externalId = eq("1234"), isNull())
             assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurchaseConfirmedThenEveryAssignedExperimentIsSentToBackend() = runTest {
+        givenSubscriptionConcurrentExperimentsEnabled(true)
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        givenConfirmPurchaseSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase(
+                experiments = listOf(
+                    Experiment(name = "experimentOne", cohort = "control"),
+                    Experiment(name = "experimentTwo", cohort = "treatment"),
+                ),
+                legacyExperiment = Experiment(name = "legacyExperiment", cohort = "legacyCohort"),
+            )
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Success)
+
+            verify(subscriptionsService).confirm(
+                ConfirmationBody(
+                    packageName = "packageName",
+                    purchaseToken = "purchaseToken",
+                    experiments = listOf(
+                        ExperimentData(experimentName = "experimentOne", experimentCohort = "control"),
+                        ExperimentData(experimentName = "experimentTwo", experimentCohort = "treatment"),
+                    ),
+                ),
+            )
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenFreeTrialPurchaseConfirmedThenEnrollsOnboardingExperimentAsFreeTrialBeforeConfirm() = runTest {
+        givenSubscriptionConcurrentExperimentsEnabled(true)
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        givenConfirmPurchaseSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase(offerId = MONTHLY_FREE_TRIAL_OFFER_US)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Success)
+
+            inOrder(subscriptionOnboardingExperiments, subscriptionsService) {
+                verify(subscriptionOnboardingExperiments).enroll(true)
+                verify(subscriptionsService).confirm(any())
+            }
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPaidPurchaseConfirmedThenEnrollsOnboardingExperimentAsPaidBeforeConfirm() = runTest {
+        givenSubscriptionConcurrentExperimentsEnabled(true)
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        givenConfirmPurchaseSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase(offerId = null)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Success)
+
+            inOrder(subscriptionOnboardingExperiments, subscriptionsService) {
+                verify(subscriptionOnboardingExperiments).enroll(false)
+                verify(subscriptionsService).confirm(any())
+            }
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurchaseConfirmedWithConcurrentExperimentsDisabledThenLegacyFieldsAreSent() = runTest {
+        givenSubscriptionConcurrentExperimentsEnabled(false)
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        givenConfirmPurchaseSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase(
+                experiments = listOf(
+                    Experiment(name = "experimentOne", cohort = "control"),
+                    Experiment(name = "experimentTwo", cohort = "treatment"),
+                ),
+                legacyExperiment = Experiment(name = "legacyExperiment", cohort = "legacyCohort"),
+            )
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Success)
+
+            verify(subscriptionsService).confirm(
+                ConfirmationBody(
+                    packageName = "packageName",
+                    purchaseToken = "purchaseToken",
+                    experiments = null,
+                    experimentName = "legacyExperiment",
+                    experimentCohort = "legacyCohort",
+                ),
+            )
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurchaseConfirmedWithoutExperimentsThenExperimentsAreOmittedFromRequest() = runTest {
+        givenSubscriptionConcurrentExperimentsEnabled(false)
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        givenConfirmPurchaseSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase(experiments = emptyList())
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Success)
+
+            verify(subscriptionsService).confirm(
+                ConfirmationBody(
+                    packageName = "packageName",
+                    purchaseToken = "purchaseToken",
+                    experiments = null,
+                ),
+            )
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenFlagOffWithOnlyLegacyExperimentThenLegacyFieldsAreSent() = runTest {
+        assertExperimentConfirmation(
+            enabled = false,
+            legacyExperiment = Experiment("legacyExperiment", "control"),
+            expected = ConfirmationBody("packageName", "purchaseToken", experimentName = "legacyExperiment", experimentCohort = "control"),
+        )
+    }
+
+    @Test
+    fun whenFlagOffWithOnlyArrayExperimentsThenAttributionIsOmitted() = runTest {
+        assertExperimentConfirmation(
+            enabled = false,
+            experiments = listOf(Experiment("arrayExperiment", "control")),
+            expected = ConfirmationBody("packageName", "purchaseToken"),
+        )
+    }
+
+    @Test
+    fun whenFlagOnWithOnlyArrayExperimentsThenArrayIsSent() = runTest {
+        assertExperimentConfirmation(
+            enabled = true,
+            experiments = listOf(Experiment("arrayExperiment", "control")),
+            expected = ConfirmationBody("packageName", "purchaseToken", experiments = listOf(ExperimentData("arrayExperiment", "control"))),
+        )
+    }
+
+    @Test
+    fun whenFlagOnWithOnlyLegacyExperimentThenItIsSentInArray() = runTest {
+        assertExperimentConfirmation(
+            enabled = true,
+            legacyExperiment = Experiment("legacyExperiment", "control"),
+            expected = ConfirmationBody("packageName", "purchaseToken", experiments = listOf(ExperimentData("legacyExperiment", "control"))),
+        )
+    }
+
+    @Test
+    fun whenFlagOnWithoutExperimentsThenAttributionIsOmitted() = runTest {
+        assertExperimentConfirmation(
+            enabled = true,
+            expected = ConfirmationBody("packageName", "purchaseToken"),
+        )
+    }
+
+    @Test
+    fun whenFlagChangesDuringConfirmationRetriesThenOriginalAttributionIsKept() = runTest {
+        givenSubscriptionConcurrentExperimentsEnabled(true)
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        whenever(subscriptionsService.confirm(any())).thenAnswer {
+            givenSubscriptionConcurrentExperimentsEnabled(false)
+            throw IllegalStateException("Confirmation failed")
+        }
+        val purchaseStateFlow = MutableSharedFlow<PurchaseState>()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase(
+                experiments = listOf(Experiment("arrayExperiment", "control")),
+                legacyExperiment = Experiment("legacyExperiment", "treatment"),
+            )
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Waiting)
+
+            verify(subscriptionsService, times(3)).confirm(
+                ConfirmationBody("packageName", "purchaseToken", experiments = listOf(ExperimentData("arrayExperiment", "control"))),
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnlyNativeExperimentIsActiveThenItIsReported() = runTest {
+        nativeToggles = listOf(nativeExperiment(name = "nativeExperiment", cohort = "control"))
+
+        assertExperimentConfirmation(
+            enabled = true,
+            expected = ConfirmationBody(
+                "packageName",
+                "purchaseToken",
+                experiments = listOf(ExperimentData("nativeExperiment", "control")),
+            ),
+        )
+    }
+
+    @Test
+    fun whenPaywallAndNativeExperimentsAreActiveThenBothAreReported() = runTest {
+        nativeToggles = listOf(nativeExperiment(name = "nativeExperiment", cohort = "treatment"))
+
+        assertExperimentConfirmation(
+            enabled = true,
+            experiments = listOf(Experiment("paywallExperiment", "control")),
+            expected = ConfirmationBody(
+                "packageName",
+                "purchaseToken",
+                experiments = listOf(
+                    ExperimentData("paywallExperiment", "control"),
+                    ExperimentData("nativeExperiment", "treatment"),
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun whenPaywallAndNativeExperimentShareANameThenThePaywallCohortWins() = runTest {
+        nativeToggles = listOf(nativeExperiment(name = "sharedExperiment", cohort = "native"))
+
+        assertExperimentConfirmation(
+            enabled = true,
+            experiments = listOf(Experiment("sharedExperiment", "paywall")),
+            expected = ConfirmationBody(
+                "packageName",
+                "purchaseToken",
+                experiments = listOf(ExperimentData("sharedExperiment", "paywall")),
+            ),
+        )
+    }
+
+    @Test
+    fun whenNativeExperimentBelongsToAnotherFeatureThenItIsNotReported() = runTest {
+        nativeToggles = listOf(nativeExperiment(name = "unrelatedExperiment", cohort = "control", parent = "someOtherFeature"))
+
+        assertExperimentConfirmation(
+            enabled = true,
+            expected = ConfirmationBody("packageName", "purchaseToken"),
+        )
+    }
+
+    @Test
+    fun whenNativeExperimentLookupFailsThenPurchaseIsConfirmedWithoutAttribution() = runTest {
+        nativeToggles = listOf(failingNativeExperiment(IllegalStateException("Toggle store failure")))
+
+        assertExperimentConfirmation(
+            enabled = true,
+            experiments = listOf(Experiment("paywallExperiment", "control")),
+            expected = ConfirmationBody("packageName", "purchaseToken"),
+        )
+    }
+
+    @Test
+    fun whenCancelledWhileBuildingAttributionThenPurchaseIsNotConfirmed() = runTest {
+        nativeToggles = listOf(failingNativeExperiment(CancellationException("Purchase collector cancelled")))
+        givenSubscriptionConcurrentExperimentsEnabled(true)
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        val purchaseStateFlow = MutableSharedFlow<PurchaseState>()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase()
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+
+            expectNoEvents()
+            verify(subscriptionsService, never()).confirm(any())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    private fun nativeExperiment(
+        name: String,
+        cohort: String,
+        parent: String = PRIVACY_PRO_FEATURE_NAME,
+    ): Toggle = mock {
+        on { featureName() } doReturn Toggle.FeatureName(parentName = parent, name = name)
+        on { isEnabled() } doReturn true
+        onBlocking { getCohort() } doReturn State.Cohort(name = cohort, weight = 1)
+    }
+
+    private fun failingNativeExperiment(error: Throwable): Toggle = mock {
+        on { featureName() } doReturn Toggle.FeatureName(parentName = PRIVACY_PRO_FEATURE_NAME, name = "failingExperiment")
+        onBlocking { getCohort() } doThrow error
+    }
+
+    private suspend fun assertExperimentConfirmation(
+        enabled: Boolean,
+        expected: ConfirmationBody,
+        experiments: List<Experiment> = emptyList(),
+        legacyExperiment: Experiment? = null,
+    ) {
+        givenSubscriptionConcurrentExperimentsEnabled(enabled)
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        givenConfirmPurchaseSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+        val purchaseStateFlow = MutableSharedFlow<PurchaseState>()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase(experiments = experiments, legacyExperiment = legacyExperiment)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Success)
+
+            verify(subscriptionsService).confirm(expected)
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -634,11 +902,10 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @Test
     fun whenPurchaseFlowIfNullSubscriptionAndSignedInThenDoNotCreateAccount() = runTest {
         givenUserIsSignedIn()
-        givenValidateTokenFails("failure")
 
         purchase()
 
-        verify(authService, never()).createAccount(any())
+        verify(authClient, never()).createAccount(any())
     }
 
     @Test
@@ -646,20 +913,12 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenUserIsNotSignedIn()
         givenCreateAccountSucceeds()
         givenSubscriptionSucceedsWithoutEntitlements()
-        givenAccessTokenSucceeds()
 
         purchase()
-        if (authApiV2Enabled) {
-            assertEquals(FAKE_ACCESS_TOKEN_V2, authDataStore.accessTokenV2)
-            assertEquals(FAKE_REFRESH_TOKEN_V2, authDataStore.refreshTokenV2)
-            assertNull(authDataStore.accessToken)
-            assertNull(authDataStore.authToken)
-        } else {
-            assertNull(authDataStore.accessTokenV2)
-            assertNull(authDataStore.refreshTokenV2)
-            assertEquals("accessToken", authDataStore.accessToken)
-            assertEquals("authToken", authDataStore.authToken)
-        }
+        assertEquals(FAKE_ACCESS_TOKEN_V2, authDataStore.accessTokenV2)
+        assertEquals(FAKE_REFRESH_TOKEN_V2, authDataStore.refreshTokenV2)
+        assertNull(authDataStore.accessToken)
+        assertNull(authDataStore.authToken)
     }
 
     @Test
@@ -668,7 +927,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenPurchaseStored()
         givenStoreLoginSucceeds()
         givenSubscriptionSucceedsWithoutEntitlements()
-        givenAccessTokenSucceeds()
 
         purchase()
 
@@ -702,31 +960,13 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         verify(playBillingManager).launchBillingFlow(any(), any(), any(), isNull())
     }
 
-    @Test(expected = Exception::class)
-    fun whenExchangeTokenFailsTokenThenReturnThrow() = runTest {
-        givenAccessTokenFails()
-
-        subscriptionsManager.exchangeAuthToken("authToken")
-    }
-
-    @Test
-    fun whenExchangeTokenIfAccessTokenThenExchangeTokenAndStore() = runTest {
-        givenAccessTokenSucceeds()
-
-        val result = subscriptionsManager.exchangeAuthToken("authToken")
-        assertEquals("accessToken", authDataStore.accessToken)
-        assertEquals("accessToken", result)
-    }
-
     @Test
     fun whenSubscribedToSubscriptionStatusThenEmit() = runTest {
         whenever(playBillingManager.purchaseState).thenReturn(flowOf())
         val manager = RealSubscriptionsManager(
-            authService,
             subscriptionsService,
             authRepository,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -744,6 +984,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.subscriptionStatus.test {
@@ -758,11 +1000,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenSubscriptionExists()
         whenever(playBillingManager.purchaseState).thenReturn(flowOf())
         val manager = RealSubscriptionsManager(
-            authService,
             subscriptionsService,
             authRepository,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -780,6 +1020,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.subscriptionStatus.test {
@@ -798,11 +1040,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         whenever(playBillingManager.purchaseState).thenReturn(flowTest)
 
         val manager = RealSubscriptionsManager(
-            authService,
             subscriptionsService,
             authRepository,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -820,6 +1060,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.currentPurchaseState.test {
@@ -852,11 +1094,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         whenever(playBillingManager.purchaseState).thenReturn(flowTest)
 
         val manager = RealSubscriptionsManager(
-            authService,
             subscriptionsService,
             authRepository,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -874,6 +1114,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.currentPurchaseState.test {
@@ -895,18 +1137,15 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @Test
     fun whenPurchaseFailedThenPurchaseCheckedAndWaitingEmit() = runTest {
         givenUserIsSignedIn()
-        givenValidateTokenFails("failure")
         givenConfirmPurchaseFails()
 
         val flowTest: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
         whenever(playBillingManager.purchaseState).thenReturn(flowTest)
 
         val manager = RealSubscriptionsManager(
-            authService,
             subscriptionsService,
             authRepository,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -924,6 +1163,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.currentPurchaseState.test {
@@ -946,11 +1187,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         whenever(playBillingManager.purchaseState).thenReturn(flowTest)
 
         val manager = RealSubscriptionsManager(
-            authService,
             subscriptionsService,
             authRepository,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -968,6 +1207,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.currentPurchaseState.test {
@@ -983,11 +1224,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         whenever(playBillingManager.purchaseState).thenReturn(flowTest)
 
         val manager = RealSubscriptionsManager(
-            authService,
             subscriptionsService,
             authRepository,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -1005,6 +1244,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.currentPurchaseState.test {
@@ -1024,8 +1265,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
         assertTrue(result is AccessTokenResult.Success)
         val actualAccessToken = (result as AccessTokenResult.Success).accessToken
-        val expectedAccessToken = if (authApiV2Enabled) FAKE_ACCESS_TOKEN_V2 else "accessToken"
-        assertEquals(expectedAccessToken, actualAccessToken)
+        assertEquals(FAKE_ACCESS_TOKEN_V2, actualAccessToken)
     }
 
     @Test
@@ -1039,8 +1279,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenGetAccessTokenIfAccessTokenIsExpiredThenGetNewTokenAndReturnSuccess() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
         givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
@@ -1053,8 +1291,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenGetAccessTokenIfAccessTokenIsExpiredAndRefreshFailsThenGetNewTokenAndReturnFailure() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
         givenV2AccessTokenRefreshFails()
@@ -1066,8 +1302,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenGetAccessTokenIfAccessTokenIsExpiredAndRefreshFailsWithAuthErrorThenGetNewTokenUsingStoreLoginAndReturnSuccess() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
         givenV2AccessTokenRefreshFails(errorCode = "invalid_token")
@@ -1084,8 +1318,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenGetAccessTokenIfAccessTokenIsExpiredAndRefreshFailsWithAuthErrorAndStoreRecoveryNotPossibleThenSignOutAndReturnFailure() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         givenUserIsSignedIn()
         givenSubscriptionExists()
         givenAccessTokenIsExpired()
@@ -1107,8 +1339,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenGetAccessTokenIfAccessTokenIsExpiredAndRefreshFailsWithUnknownAccountErrorThenSignOutAndReturnFailure() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         givenUserIsSignedIn()
         givenSubscriptionExists()
         givenAccessTokenIsExpired()
@@ -1138,27 +1368,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
-    @SuppressLint("DenyListedApi")
-    fun whenSerializeTokenRefreshDisabledThenRefreshDoesNotUseCrossProcessLock() = runTest {
-        assumeTrue(authApiV2Enabled)
-
-        subscriptionsFeature.serializeTokenRefresh().setRawStoredState(State(false))
-        givenUserIsSignedIn()
-        givenAccessTokenIsExpired()
-        givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
-
-        val result = subscriptionsManager.getAccessToken()
-
-        assertTrue(result is AccessTokenResult.Success)
-        verifyNoInteractions(crossProcessLock)
-        verify(tokenRefreshWideEvent).onStart(any(), eq(false))
-        verify(tokenRefreshWideEvent, never()).onCrossProcessLockAcquired(any())
-    }
-
-    @Test
     fun whenRefreshSucceedsThenCrossProcessLockIsReleased() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         val lockHandle = FakeLockHandle()
         val acquireResult = Result.success(lockHandle)
         whenever(crossProcessLock.acquire(any(), any())).thenReturn(acquireResult)
@@ -1175,8 +1385,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenRefreshFailsThenCrossProcessLockIsReleased() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         val lockHandle = FakeLockHandle()
         whenever(crossProcessLock.acquire(any(), any())).thenReturn(Result.success(lockHandle))
         givenUserIsSignedIn()
@@ -1191,8 +1399,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenCrossProcessLockAcquisitionTimesOutThenRefreshStillRuns() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         val acquireResult = Result.failure<Closeable>(timeoutCancellationException())
         whenever(crossProcessLock.acquire(any(), any())).thenReturn(acquireResult)
         givenUserIsSignedIn()
@@ -1207,8 +1413,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenCrossProcessLockAcquisitionFailsThenRefreshStillRuns() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         val acquireResult = Result.failure<Closeable>(IOException())
         whenever(crossProcessLock.acquire(any(), any())).thenReturn(acquireResult)
         givenUserIsSignedIn()
@@ -1223,8 +1427,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenTokenRefreshesRunConcurrentlyThenTheyDoNotOverlap() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         givenUserIsSignedIn()
         givenValidateV2TokensSucceeds()
         whenever(authClient.getJwks()).thenReturn("fake jwks")
@@ -1249,8 +1451,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenCallerIsCancelledMidRefreshThenRefreshCompletes() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         givenUserIsSignedIn()
         givenValidateV2TokensSucceeds()
         whenever(authClient.getJwks()).thenReturn("fake jwks")
@@ -1276,8 +1476,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenGetAccessTokenIfSignedInWithV1ThenExchangesTokenForV2AndReturnsTrue() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         givenUserIsSignedIn(useAuthV2 = false)
         givenV1AccessTokenExchangeSuccess()
 
@@ -1293,9 +1491,35 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
-    fun whenGetAccessTokenIfSignedInWithV1AndMigrationToV2FailsOnUnknownAccountErrorThenSignsOut() = runTest {
-        assumeTrue(authApiV2Enabled)
+    fun whenSubscriptionIsRefreshedAndUserSignedInWithV1ThenMigratesToAuthV2() = runTest {
+        givenUserIsSignedIn(useAuthV2 = false)
+        givenV1AccessTokenExchangeSuccess()
 
+        whenever(subscriptionsService.subscription()).thenAnswer {
+            runBlocking { subscriptionsManager.getAccessToken() } // the auth interceptor triggers the v1 -> v2 migration
+
+            SubscriptionResponse(
+                productId = MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1234,
+                platform = "android",
+                status = "Auto-Renewable",
+                activeOffers = listOf(),
+            )
+        }
+
+        subscriptionsManager.refreshSubscriptionData()
+
+        assertEquals(FAKE_ACCESS_TOKEN_V2, authRepository.getAccessTokenV2()?.jwt)
+        assertEquals(FAKE_REFRESH_TOKEN_V2, authRepository.getRefreshTokenV2()?.jwt)
+        assertNull(authRepository.getAccessToken())
+        assertNull(authRepository.getAuthToken())
+        assertNotNull(subscriptionsManager.getSubscription())
+    }
+
+    @Test
+    fun whenGetAccessTokenIfSignedInWithV1AndMigrationToV2FailsOnUnknownAccountErrorThenSignsOut() = runTest {
         givenUserIsSignedIn(useAuthV2 = false)
         givenV1AccessTokenExchangeFailsWithInvalidTokenError()
 
@@ -1308,61 +1532,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         assertNull(authRepository.getAccount())
         assertNull(authRepository.getSubscription())
         verify(pixelSender).reportAuthV2MigrationFailureInvalidToken()
-    }
-
-    @Test
-    fun whenGetAuthTokenIfUserSignedInAndValidTokenThenReturnSuccess() = runTest {
-        assumeTrue(authApiV2Enabled) // getAuthToken() now only returns a token for auth v2 signed-in users
-        givenUserIsSignedIn()
-        givenValidateTokenSucceedsWithEntitlements()
-
-        val result = subscriptionsManager.getAuthToken()
-
-        assertTrue(result is AuthTokenResult.Success)
-
-        val actualAuthToken = (result as AuthTokenResult.Success).authToken
-        assertEquals(FAKE_ACCESS_TOKEN_V2, actualAuthToken)
-    }
-
-    @Test
-    fun whenGetAuthTokenIfUserNotSignedInThenReturnFailure() = runTest {
-        givenUserIsNotSignedIn()
-
-        val result = subscriptionsManager.getAuthToken()
-
-        assertTrue(result is AuthTokenResult.Failure)
-    }
-
-    @Test
-    fun whenGetSubscriptionThenReturnCorrectStatus() = runTest {
-        assumeFalse(authApiV2Enabled) // fetchAndStoreAllData() is deprecated and won't be used with auth v2 enabled
-
-        givenUserIsSignedIn()
-        givenValidateTokenSucceedsWithEntitlements()
-
-        givenSubscriptionSucceedsWithEntitlements("Auto-Renewable")
-        subscriptionsManager.fetchAndStoreAllData()
-        assertEquals(AUTO_RENEWABLE, subscriptionsManager.getSubscription()?.status)
-
-        givenSubscriptionSucceedsWithEntitlements("Not Auto-Renewable")
-        subscriptionsManager.fetchAndStoreAllData()
-        assertEquals(NOT_AUTO_RENEWABLE, subscriptionsManager.getSubscription()?.status)
-
-        givenSubscriptionSucceedsWithEntitlements("Grace Period")
-        subscriptionsManager.fetchAndStoreAllData()
-        assertEquals(GRACE_PERIOD, subscriptionsManager.getSubscription()?.status)
-
-        givenSubscriptionSucceedsWithEntitlements("Inactive")
-        subscriptionsManager.fetchAndStoreAllData()
-        assertEquals(INACTIVE, subscriptionsManager.getSubscription()?.status)
-
-        givenSubscriptionSucceedsWithEntitlements("Expired")
-        subscriptionsManager.fetchAndStoreAllData()
-        assertEquals(EXPIRED, subscriptionsManager.getSubscription()?.status)
-
-        givenSubscriptionSucceedsWithEntitlements("test")
-        subscriptionsManager.fetchAndStoreAllData()
-        assertEquals(UNKNOWN, subscriptionsManager.getSubscription()?.status)
     }
 
     @Test
@@ -1393,11 +1562,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         val mockRepo: AuthRepository = mock()
         whenever(playBillingManager.purchaseState).thenReturn(flowOf())
         val manager = RealSubscriptionsManager(
-            authService,
             subscriptionsService,
             mockRepo,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -1415,6 +1582,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
         manager.signOut()
         verify(mockRepo).setSubscription(null)
@@ -1446,11 +1615,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         whenever(playBillingManager.purchaseState).thenReturn(flowOf())
 
         val manager = RealSubscriptionsManager(
-            authService,
             subscriptionsService,
             authRepository,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -1468,6 +1635,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.subscriptionStatus.test {
@@ -1494,7 +1663,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @Test
     fun whenPurchaseIsSuccessfulThenPixelIsSent() = runTest {
         givenUserIsSignedIn()
-        givenValidateTokenSucceedsWithEntitlements()
         givenConfirmPurchaseSucceeds()
         givenV2AccessTokenRefreshSucceeds()
 
@@ -1515,7 +1683,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @Test
     fun whenPurchaseIsSuccessfulWithFreeTrialThenPixelIsSentWithFreeTrialTrue() = runTest {
         givenUserIsSignedIn()
-        givenValidateTokenSucceedsWithEntitlements()
         givenConfirmPurchaseSucceedsWithFreeTrial()
         givenV2AccessTokenRefreshSucceeds()
 
@@ -1538,7 +1705,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenPurchaseStored()
         givenStoreLoginSucceeds()
         givenSubscriptionSucceedsWithEntitlements()
-        givenAccessTokenSucceeds()
 
         subscriptionsManager.currentPurchaseState.test {
             purchase()
@@ -1556,7 +1722,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @Test
     fun whenPurchaseFailsThenPixelIsSent() = runTest {
         givenUserIsSignedIn()
-        givenValidateTokenFails("failure")
         givenConfirmPurchaseFails()
 
         whenever(playBillingManager.purchaseState).thenReturn(flowOf(Purchased("validateToken", "packageName")))
@@ -1802,11 +1967,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo, { subscriptionsFeature })
         whenever(playBillingManager.purchaseState).thenReturn(flowOf())
         subscriptionsManager = RealSubscriptionsManager(
-            authService,
             subscriptionsService,
             authRepository,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -1824,6 +1987,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         assertFalse(subscriptionsManager.canSupportEncryption())
@@ -1843,10 +2008,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenEntitlementsExistAndSubscriptionIsInactiveThenEntitlementsReturnsEmptyList() = runTest {
-        givenUserIsSignedIn()
-        givenSubscriptionSucceedsWithEntitlements(status = INACTIVE.statusName)
-
-        subscriptionsManager.fetchAndStoreAllData()
+        givenSubscriptionExists(status = INACTIVE)
 
         subscriptionsManager.entitlements.test {
             val entitlements = expectMostRecentItem()
@@ -1910,51 +2072,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
-    fun whenSignInV1ThenExchangesAuthTokenAndLoadsSubscription() = runTest {
-        givenAccessTokenSucceeds()
-        givenValidateTokenSucceedsWithEntitlements()
-        givenV1AccessTokenExchangeSuccess()
-        givenV2AccessTokenRefreshSucceeds()
-
-        whenever(subscriptionsService.subscription()).thenAnswer {
-            runBlocking { subscriptionsManager.getAccessToken() } // triggers v1 -> v2 migration if necessary
-
-            SubscriptionResponse(
-                productId = MONTHLY_PLAN_US,
-                billingPeriod = "Monthly",
-                startedAt = 1234,
-                expiresOrRenewsAt = 1234,
-                platform = "android",
-                status = "AUTO_RENEWABLE",
-                activeOffers = listOf(),
-            )
-        }
-
-        subscriptionsManager.signInV1("authToken")
-
-        assertTrue(subscriptionsManager.isSignedIn())
-        assertNotNull(subscriptionsManager.getSubscription())
-    }
-
-    @Test
-    fun whenSignInV1AndLoadingSubscriptionFailsThenSetsStatusToWaiting() = runTest {
-        assumeTrue(authApiV2Enabled)
-        givenAccessTokenSucceeds()
-        givenV1AccessTokenExchangeSuccess()
-        givenV2AccessTokenRefreshSucceeds()
-        givenSubscriptionFails()
-
-        subscriptionsManager.signInV1("authToken")
-
-        assertTrue(subscriptionsManager.isSignedIn())
-        assertNull(subscriptionsManager.getSubscription())
-        assertEquals(WAITING, subscriptionsManager.subscriptionStatus())
-    }
-
-    @Test
     fun whenValidateTokenFailsThenPixelIsSent() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
 
@@ -1972,8 +2090,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenStoringTokenFailsThenPixelIsSent() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
         givenV2AccessTokenRefreshSucceeds()
@@ -2000,7 +2116,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     private suspend fun givenSubscriptionSucceedsWithoutEntitlements(status: String = "Auto-Renewable") {
-        givenValidateTokenSucceedsNoEntitlements()
         whenever(subscriptionsService.subscription()).thenReturn(
             SubscriptionResponse(
                 productId = MONTHLY_PLAN_US,
@@ -2015,7 +2130,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     private suspend fun givenSubscriptionSucceedsWithEntitlements(status: String = "Auto-Renewable") {
-        givenValidateTokenSucceedsWithEntitlements()
         whenever(subscriptionsService.subscription()).thenReturn(
             SubscriptionResponse(
                 productId = MONTHLY_PLAN_US,
@@ -2038,7 +2152,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         authDataStore.refreshTokenV2ExpiresAt = null
     }
 
-    private fun givenUserIsSignedIn(useAuthV2: Boolean = authApiV2Enabled, accountExternalId: String = "1234") {
+    private fun givenUserIsSignedIn(useAuthV2: Boolean = true, accountExternalId: String = "1234") {
         if (useAuthV2) {
             authDataStore.accessTokenV2 = FAKE_ACCESS_TOKEN_V2
             authDataStore.accessTokenV2ExpiresAt = timeProvider.currentTime + Duration.ofHours(4)
@@ -2053,21 +2167,11 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     private suspend fun givenCreateAccountFails() {
         val exception = "account_failure".toResponseBody("text/json".toMediaTypeOrNull())
-        whenever(authService.createAccount(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
-
         whenever(authClient.authorize(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
         whenever(authClient.createAccount(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
     }
 
     private suspend fun givenCreateAccountSucceeds() {
-        whenever(authService.createAccount(any())).thenReturn(
-            CreateAccountResponse(
-                authToken = "authToken",
-                externalId = "1234",
-                status = "ok",
-            ),
-        )
-
         whenever(authClient.authorize(any())).thenReturn("fake session id")
         whenever(authClient.createAccount(any())).thenReturn("fake authorization code")
         whenever(authClient.getTokens(any(), any(), any()))
@@ -2086,75 +2190,10 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         authDataStore.expiresOrRenewsAt = 1000L
     }
 
-    private suspend fun givenValidateTokenFailsAndThenSucceeds(failure: String) {
-        val exception = failure.toResponseBody("text/json".toMediaTypeOrNull())
-        whenever(authService.validateToken(any()))
-            .thenThrow(HttpException(Response.error<String>(400, exception)))
-            .thenReturn(
-                ValidateTokenResponse(
-                    account = AccountResponse(
-                        email = "accessToken",
-                        externalId = "1234",
-                        entitlements = listOf(
-                            EntitlementResponse("id", "name", "testProduct"),
-                        ),
-                    ),
-                ),
-            )
-    }
-
-    private suspend fun givenValidateTokenFailsAndThenSucceedsWithNoEntitlements(failure: String) {
-        val exception = failure.toResponseBody("text/json".toMediaTypeOrNull())
-        whenever(authService.validateToken(any()))
-            .thenThrow(HttpException(Response.error<String>(400, exception)))
-            .thenReturn(
-                ValidateTokenResponse(
-                    account = AccountResponse(
-                        email = "accessToken",
-                        externalId = "1234",
-                        entitlements = listOf(),
-                    ),
-                ),
-            )
-    }
-
     private suspend fun givenStoreLoginFails() {
         val exception = "failure".toResponseBody("text/json".toMediaTypeOrNull())
-        whenever(authService.storeLogin(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
-
         whenever(authClient.authorize(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
         whenever(authClient.storeLogin(any(), any(), any())).thenThrow(HttpException(Response.error<String>(400, exception)))
-    }
-
-    private suspend fun givenValidateTokenSucceedsWithEntitlements() {
-        whenever(authService.validateToken(any())).thenReturn(
-            ValidateTokenResponse(
-                account = AccountResponse(
-                    email = "email",
-                    externalId = "1234",
-                    entitlements = listOf(
-                        EntitlementResponse("id", NetP.value, NetP.value),
-                    ),
-                ),
-            ),
-        )
-    }
-
-    private suspend fun givenValidateTokenSucceedsNoEntitlements() {
-        whenever(authService.validateToken(any())).thenReturn(
-            ValidateTokenResponse(
-                account = AccountResponse(
-                    email = "accessToken",
-                    externalId = "1234",
-                    entitlements = emptyList(),
-                ),
-            ),
-        )
-    }
-
-    private suspend fun givenValidateTokenFails(failure: String) {
-        val exception = failure.toResponseBody("text/json".toMediaTypeOrNull())
-        whenever(authService.validateToken(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
     }
 
     private suspend fun givenPurchaseStored() {
@@ -2183,15 +2222,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     private suspend fun givenStoreLoginSucceeds(newAccessToken: String = FAKE_ACCESS_TOKEN_V2) {
-        whenever(authService.storeLogin(any())).thenReturn(
-            StoreLoginResponse(
-                authToken = "authToken",
-                externalId = "1234",
-                email = "test@duck.com",
-                status = "ok",
-            ),
-        )
-
         whenever(authClient.authorize(any())).thenReturn("fake session id")
         whenever(authClient.storeLogin(any(), any(), any())).thenReturn("fake authorization code")
         whenever(authClient.getTokens(any(), any(), any()))
@@ -2214,15 +2244,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         whenever(authClient.authorize(any())).thenReturn("fake session id")
         val errorResponseBody = """{"error":"invalid_token"}""".toResponseBody("text/json".toMediaTypeOrNull())
         whenever(authClient.exchangeV1AccessToken(any(), any())).thenThrow(HttpException(Response.error<String>(400, errorResponseBody)))
-    }
-
-    private suspend fun givenAccessTokenSucceeds() {
-        whenever(authService.accessToken(any())).thenReturn(AccessTokenResponse("accessToken"))
-    }
-
-    private suspend fun givenAccessTokenFails() {
-        val exception = "account_failure".toResponseBody("text/json".toMediaTypeOrNull())
-        whenever(authService.accessToken(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
     }
 
     private suspend fun givenConfirmPurchaseFails() {
@@ -2576,6 +2597,11 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         subscriptionsFeature.blackFridayOffer2025().setRawStoredState(State(remoteEnableState = value))
     }
 
+    @SuppressLint("DenyListedApi")
+    private fun givenSubscriptionConcurrentExperimentsEnabled(value: Boolean) {
+        subscriptionsFeature.subscriptionConcurrentExperiments().setRawStoredState(State(remoteEnableState = value))
+    }
+
     @Test
     fun whenRefreshSubscriptionDataWithPendingPlansThenStoresPendingPlans() = runTest {
         givenUserIsSignedIn()
@@ -2660,15 +2686,14 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     private suspend fun purchase(
         planId: String = "",
         offerId: String? = null,
-        experimentName: String? = null,
-        experimentCohort: String? = null,
+        experiments: List<Experiment> = emptyList(),
+        legacyExperiment: Experiment? = null,
     ) {
         subscriptionsManager.purchase(
             mock(),
             planId = planId,
             offerId = offerId,
-            experimentCohort = experimentCohort,
-            experimentName = experimentName,
+            experiments = PurchaseExperiments(experiments = experiments, legacyExperiment = legacyExperiment),
             origin = null,
         )
     }
@@ -2717,10 +2742,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     private companion object {
-        @JvmStatic
-        @Parameterized.Parameters(name = "authApiV2Enabled={0}")
-        fun data(): Collection<Array<Boolean>> = listOf(arrayOf(true), arrayOf(false))
-
         const val FAKE_ACCESS_TOKEN_V2 = "fake access token"
         const val FAKE_REFRESH_TOKEN_V2 = "fake refresh token"
     }

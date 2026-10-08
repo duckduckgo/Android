@@ -22,14 +22,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.findFragment
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.view.PopupMenuItemView
+import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChatContextual
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -40,23 +48,48 @@ class RealDuckChatContextual @Inject constructor(
     private val contextualDataStore: DuckChatContextualDataStore,
     private val sessionTimeoutProvider: DuckChatContextualSessionTimeoutProvider,
     private val timeProvider: DuckChatContextualTimeProvider,
+    private val duckChatPixels: DuckChatPixels,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    private val contextualEntryPromptStore: ContextualEntryPromptStore,
+    private val globalActivityStarter: GlobalActivityStarter,
+    private val textSelectionRepository: TextSelectionRepository,
 ) : DuckChatContextual {
 
     override suspend fun launch(
         sourceTabId: String,
+        sourceUrl: String?,
         anchor: View?,
-        onAskAboutPage: () -> Unit,
+        textSelection: String?,
+        showChatSurface: () -> Unit,
     ) {
-        if (anchor == null || !duckChatInternal.isContextualSheetRedesignEnabled()) {
-            onAskAboutPage()
+        // Every caller already gates on contextual mode, so this is a backstop. Falling back to
+        // showChatSurface() would open the contextual sheet — the very thing the mode disables.
+        if (!duckChatInternal.isDuckChatContextualModeEnabled()) return
+        if (anchor == null) {
+            showChatSurface()
             return
         }
+        textSelection?.let { textSelectionRepository.add(sourceTabId, it, sourceUrl.orEmpty()) }
         if (hasChatInProgress(sourceTabId)) {
             // The sheet would reopen the existing chat for this tab, so skip the entry menu and open it directly.
-            onAskAboutPage()
-        } else {
-            showMenu(sourceTabId, anchor, onAskAboutPage)
+            showChatSurface()
+            return
         }
+        if (textSelectionRepository.selections(sourceTabId).value.isNotEmpty()) {
+            showEntryDialog(anchor, sourceTabId, showChatSurface)
+            return
+        }
+        if (sourceUrl == null && !duckChatInternal.isContextualMenuAllChatsEnabled()) {
+            // Nothing to ask about and no Chats entry, so a one-item menu would be worse than the
+            // caller's own fallback (opening Duck.ai).
+            showChatSurface()
+            return
+        }
+        val serpQuery = sourceUrl
+            ?.takeIf { duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it) }
+            ?.let { duckDuckGoUrlDetector.extractQuery(it) }
+            ?.takeIf { it.isNotBlank() }
+        showMenu(sourceTabId, anchor, sourceUrl, serpQuery, showChatSurface)
     }
 
     private suspend fun hasChatInProgress(tabId: String): Boolean {
@@ -71,10 +104,10 @@ class RealDuckChatContextual @Inject constructor(
         return timeProvider.currentTimeMillis() - lastClosedTimestamp <= timeoutMs
     }
 
-    override fun createSheet(tabId: String): Fragment {
-        return DuckChatContextualFragment().apply {
+    override fun createChatSurface(tabId: String): Fragment {
+        return DuckChatContextualWebViewFragment().apply {
             arguments = Bundle().apply {
-                putString(DuckChatContextualFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
+                putString(DuckChatContextualWebViewFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
             }
         }
     }
@@ -82,20 +115,86 @@ class RealDuckChatContextual @Inject constructor(
     private fun showMenu(
         sourceTabId: String,
         anchor: View,
+        sourceUrl: String?,
+        serpQuery: String?,
         onAskAboutPage: () -> Unit,
     ) {
         val activity = anchor.activity() ?: return
         val popup = PopupMenu(LayoutInflater.from(activity), R.layout.popup_contextual_chat_menu)
         val content = popup.contentView
-        popup.onMenuItemClicked(content.findViewById(R.id.contextualChatMenuNewChat)) { openNewChatTab(activity, sourceTabId) }
-        popup.onMenuItemClicked(content.findViewById(R.id.contextualChatMenuAskAboutPage)) { onAskAboutPage() }
+        popup.onMenuItemClicked(content.findViewById(R.id.contextualChatMenuNewChat)) {
+            duckChatPixels.reportContextualAddressBarMenuNewChatSelected()
+            openNewChatTab(activity, sourceTabId, sourceUrl)
+        }
+        val askItem = content.findViewById<PopupMenuItemView>(R.id.contextualChatMenuAskAboutPage)
+        if (sourceUrl == null) {
+            // No page open (NTP or a blank tab), so there is nothing to ask about.
+            askItem.gone()
+        } else if (serpQuery != null) {
+            askItem.setPrimaryText(activity.getString(R.string.duckChatContextualAskAboutSearch))
+            popup.onMenuItemClicked(askItem) {
+                duckChatPixels.reportContextualAddressBarMenuAskAboutSearchSelected()
+                openSearchChatInSheet(sourceTabId, serpQuery, onAskAboutPage)
+            }
+        } else {
+            popup.onMenuItemClicked(askItem) {
+                duckChatPixels.reportContextualAddressBarMenuAskAboutPageSelected()
+                textSelectionRepository.consume(sourceTabId)
+                showEntryDialog(anchor, sourceTabId, onAskAboutPage)
+            }
+        }
+        if (duckChatInternal.isContextualMenuAllChatsEnabled()) {
+            popup.onMenuItemClicked(content.findViewById(R.id.contextualChatMenuAllChats)) {
+                duckChatPixels.reportContextualAddressBarMenuAllChatsSelected()
+                globalActivityStarter.start(activity, DuckChatHistoryNoParams)
+            }
+        } else {
+            content.findViewById<View>(R.id.contextualChatMenuAllChats).gone()
+            content.findViewById<View>(R.id.contextualChatMenuAllChatsDivider).gone()
+        }
         popup.showAnchoredView(activity, anchor.rootView, anchor)
+        duckChatPixels.reportContextualAddressBarMenuShown()
     }
 
-    private fun openNewChatTab(activity: Activity, sourceTabId: String) {
+    private fun showEntryDialog(
+        anchor: View,
+        sourceTabId: String,
+        onAskAboutPage: () -> Unit,
+    ) {
+        // Attach the dialog to the host fragment (the one owning the anchor) so it shares the host's
+        // DuckChatContextualSharedViewModel — the same page-context plumbing the sheet uses.
+        val hostFragment = runCatching { anchor.findFragment<Fragment>() }.getOrNull()
+        val fragmentManager = hostFragment?.childFragmentManager
+        if (fragmentManager == null || fragmentManager.isStateSaved) {
+            // No fragment host to attach to; fall back to showing the sheet directly.
+            onAskAboutPage()
+            return
+        }
+        DuckChatContextualEntryDialog.newInstance(sourceTabId)
+            .show(fragmentManager, DuckChatContextualEntryDialog.TAG)
+    }
+
+    private fun openNewChatTab(activity: Activity, sourceTabId: String, sourceUrl: String?) {
         val url = duckChatInternal.getDuckChatUrl(query = "", autoPrompt = false)
-        duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.CONTEXTUAL_CHAT, opensNewTab = true, hasPrompt = false)
+        duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.ADDRESS_BAR_ICON, opensNewTab = sourceUrl != null, hasPrompt = false)
         browserNav.openInNewTab(activity, url, sourceTabId).also { activity.startActivity(it) }
+    }
+
+    private fun openSearchChatInSheet(
+        sourceTabId: String,
+        query: String,
+        showChatSurface: () -> Unit,
+    ) {
+        // Park the search terms as the entry prompt (no page context — a SERP has none) so the sheet
+        // opens straight into the chat and auto-submits them, mirroring the entry-dialog hand-off.
+        contextualEntryPromptStore.store(
+            ContextualEntryPrompt(
+                tabId = sourceTabId,
+                prompt = NativeInputPrompt(query, null, null, null, null, null),
+                serializedPageContext = null,
+            ),
+        )
+        showChatSurface()
     }
 
     private fun View.activity(): Activity? {

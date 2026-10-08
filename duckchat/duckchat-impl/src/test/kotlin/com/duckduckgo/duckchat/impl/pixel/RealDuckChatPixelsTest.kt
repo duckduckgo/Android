@@ -19,7 +19,10 @@ package com.duckduckgo.duckchat.impl.pixel
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
 import com.duckduckgo.duckchat.impl.ReportMetric
@@ -33,6 +36,8 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KE
 import com.duckduckgo.duckchat.impl.helper.DuckChatTermsOfServiceHandler
 import com.duckduckgo.duckchat.impl.helper.TermsAcceptanceResult
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_COUNT
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_AUTO_ATTACHED_COUNT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_AUTO_ATTACHED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_COLLECTION_EMPTY
@@ -68,6 +73,11 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_START_NEW_
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.feature.toggles.api.ConversionWindow
+import com.duckduckgo.feature.toggles.api.FakeMetricsPixelExtension
+import com.duckduckgo.feature.toggles.api.MetricType
+import com.duckduckgo.feature.toggles.api.MetricsPixel
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -96,12 +106,30 @@ class RealDuckChatPixelsTest {
     private val duckAiMetricCollector: DuckAiMetricCollector = mock()
     private val mockTermsOfServiceHandler: DuckChatTermsOfServiceHandler = mock()
     private val mockDuckAiTabSessionRepository: DuckAiTabSessionRepository = mock()
+    private val mockAppBuildConfig: AppBuildConfig = mock()
+    private val mockBrowserInteractionsPlugin: BrowserInteractionsPlugin = mock()
+    private val mockBrowserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
+    private val mockDuckAiNewChatMetricPixelsPlugin: DuckAiNewChatMetricPixelsPlugin = mock()
+    private val fakeMetricsPixelExtension = FakeMetricsPixelExtension()
+
+    private val newChatMetric = MetricsPixel(
+        metric = "duck_ai_new_chat",
+        value = "1",
+        conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 0)),
+        toggle = mock<Toggle>(),
+        type = MetricType.COUNT_WHEN_IN_WINDOW,
+    )
 
     private lateinit var testee: RealDuckChatPixels
 
     @Before
     fun setup() = runTest {
         whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(1)
+        whenever(mockDuckChatFeatureRepository.checkAndMarkFirstPromptSubmission()).thenReturn(false)
+        whenever(mockAppBuildConfig.isNewInstall()).thenReturn(false)
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(mockBrowserInteractionsPlugin))
+        whenever(mockDuckAiNewChatMetricPixelsPlugin.getMetrics()).thenReturn(listOf(newChatMetric))
+        fakeMetricsPixelExtension.register()
 
         testee = RealDuckChatPixels(
             pixel = mockPixel,
@@ -112,6 +140,10 @@ class RealDuckChatPixelsTest {
             duckAiMetricCollector = duckAiMetricCollector,
             termsOfServiceHandler = mockTermsOfServiceHandler,
             duckAiTabSessionRepository = mockDuckAiTabSessionRepository,
+            appBuildConfig = mockAppBuildConfig,
+            browserInteractionsPlugins = mockBrowserInteractionsPlugins,
+            duckAiNewChatMetricPixelsPlugin = mockDuckAiNewChatMetricPixelsPlugin,
+            duckAiSessionCallback = mock(),
         )
     }
 
@@ -132,6 +164,25 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
+    fun `when sendReportMetricPixel with USER_DID_SUBMIT_PROMPT as first prompt on new install then params include it`() = runTest {
+        whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.checkAndMarkFirstPromptSubmission()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(5)
+
+        testee.sendReportMetricPixel(USER_DID_SUBMIT_PROMPT)
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DUCK_CHAT_SEND_PROMPT_ONGOING_CHAT,
+            parameters = mapOf(
+                DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to "5",
+                DuckChatPixelParameters.FIRST_PROMPT_NEW_INSTALL to "true",
+            ),
+        )
+    }
+
+    @Test
     fun `when sendReportMetricPixel with USER_DID_SUBMIT_FIRST_PROMPT then fires correct pixel with session params`() = runTest {
         whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(10)
 
@@ -145,6 +196,25 @@ class RealDuckChatPixelsTest {
         )
         verify(statisticsUpdater).refreshDuckAiRetentionAtb(mapOf("modelTier" to null))
         verify(duckAiMetricCollector).onMessageSent()
+    }
+
+    @Test
+    fun `when sendReportMetricPixel with USER_DID_SUBMIT_FIRST_PROMPT as first prompt on new install then params include it`() = runTest {
+        whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.checkAndMarkFirstPromptSubmission()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(10)
+
+        testee.sendReportMetricPixel(USER_DID_SUBMIT_FIRST_PROMPT)
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DUCK_CHAT_START_NEW_CONVERSATION,
+            parameters = mapOf(
+                DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to "10",
+                DuckChatPixelParameters.FIRST_PROMPT_NEW_INSTALL to "true",
+            ),
+        )
     }
 
     @Test
@@ -190,6 +260,24 @@ class RealDuckChatPixelsTest {
             parameters = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to "25"),
         )
         verifyNoInteractions(statisticsUpdater)
+    }
+
+    @Test
+    fun `when sendReportMetricPixel with USER_DID_SUBMIT_FIRST_PROMPT then sends new chat experiment metrics`() = runTest {
+        testee.sendReportMetricPixel(USER_DID_SUBMIT_FIRST_PROMPT)
+
+        advanceUntilIdle()
+
+        assertEquals(listOf(newChatMetric), fakeMetricsPixelExtension.sentMetrics)
+    }
+
+    @Test
+    fun `when sendReportMetricPixel with another metric then sends no new chat experiment metrics`() = runTest {
+        testee.sendReportMetricPixel(USER_DID_SUBMIT_PROMPT)
+
+        advanceUntilIdle()
+
+        assertEquals(emptyList<MetricsPixel>(), fakeMetricsPixelExtension.sentMetrics)
     }
 
     @Test
@@ -302,6 +390,56 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
+    fun `when reportContextualPromptSubmittedWithContextNative then notifies BrowserInteractionsPlugin with contextual_chat source`() = runTest {
+        testee.reportContextualPromptSubmittedWithContextNative()
+
+        advanceUntilIdle()
+
+        verify(mockBrowserInteractionsPlugin).onAiPromptSubmitted(source = "contextual_chat")
+    }
+
+    @Test
+    fun `when reportContextualPromptSubmittedWithoutContextNative then notifies BrowserInteractionsPlugin with contextual_chat source`() = runTest {
+        testee.reportContextualPromptSubmittedWithoutContextNative()
+
+        advanceUntilIdle()
+
+        verify(mockBrowserInteractionsPlugin).onAiPromptSubmitted(source = "contextual_chat")
+    }
+
+    @Test
+    fun `when reportContextualPromptSubmittedWithContextNative then never includes first_prompt_new_install`() = runTest {
+        testee.reportContextualPromptSubmittedWithContextNative()
+
+        advanceUntilIdle()
+
+        val expectedParams = mapOf("page_type" to "contextual", "source" to "contextual_chat")
+        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_CONTEXT_NATIVE_COUNT, parameters = expectedParams)
+        verify(mockPixel).fire(
+            DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_CONTEXT_NATIVE_DAILY,
+            parameters = expectedParams,
+            type = Pixel.PixelType.Daily(),
+        )
+        verifyNoInteractions(mockAppBuildConfig)
+    }
+
+    @Test
+    fun `when reportContextualPromptSubmittedWithoutContextNative then never includes first_prompt_new_install`() = runTest {
+        testee.reportContextualPromptSubmittedWithoutContextNative()
+
+        advanceUntilIdle()
+
+        val expectedParams = mapOf("page_type" to "contextual", "source" to "contextual_chat")
+        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITHOUT_CONTEXT_NATIVE_COUNT, parameters = expectedParams)
+        verify(mockPixel).fire(
+            DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITHOUT_CONTEXT_NATIVE_DAILY,
+            parameters = expectedParams,
+            type = Pixel.PixelType.Daily(),
+        )
+        verifyNoInteractions(mockAppBuildConfig)
+    }
+
+    @Test
     fun `when reportContextualPageContextCollectionEmpty then fires count and daily`() = runTest {
         testee.reportContextualPageContextCollectionEmpty()
         verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_COLLECTION_EMPTY)
@@ -325,6 +463,16 @@ class RealDuckChatPixelsTest {
 
         verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DISABLED_COUNT)
         verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DISABLED_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualAddressBarMenuAllChatsSelected then fires count and daily`() = runTest {
+        testee.reportContextualAddressBarMenuAllChatsSelected()
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_COUNT)
+        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test

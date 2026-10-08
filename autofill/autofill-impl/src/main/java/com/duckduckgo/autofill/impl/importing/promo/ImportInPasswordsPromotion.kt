@@ -31,8 +31,11 @@ import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin.Call
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin.Companion.PRIORITY_KEY_IMPORT_PROMO
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ViewImportPasswordsPromoBinding
+import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangePasswordImporter
 import com.duckduckgo.autofill.impl.importing.promo.ImportInPasswordsPromotionViewModel.Command
 import com.duckduckgo.autofill.impl.importing.promo.ImportInPasswordsPromotionViewModel.Command.DismissImport
+import com.duckduckgo.autofill.impl.importing.resolvePasswordsKeychainAnimationAsset
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
 import com.duckduckgo.common.ui.view.show
@@ -54,6 +57,7 @@ import javax.inject.Inject
 @PriorityKey(PRIORITY_KEY_IMPORT_PROMO)
 class ImportInPasswordsPromotion @Inject constructor(
     private val importInPasswordsVisibility: ImportInPasswordsVisibility,
+    private val credentialExchangePasswordImporter: CredentialExchangePasswordImporter,
 ) : PasswordsScreenPromotionPlugin {
 
     override suspend fun getView(
@@ -62,7 +66,9 @@ class ImportInPasswordsPromotion @Inject constructor(
     ): View? {
         if (importInPasswordsVisibility.canShowImportInPasswords(numberSavedPasswords).not()) return null
         logcat { "Autofill: returning view for ImportInPasswordsPromotion" }
-        return ImportInPasswordsPromotionView(context)
+        return ImportInPasswordsPromotionView(context).apply {
+            usesCredentialExchange = credentialExchangePasswordImporter.isSupported()
+        }
     }
 }
 
@@ -82,6 +88,9 @@ class ImportInPasswordsPromotionView @JvmOverloads constructor(
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
+    @Inject
+    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
+
     private val binding: ViewImportPasswordsPromoBinding by viewBinding()
 
     private val viewModel: ImportInPasswordsPromotionViewModel by lazy {
@@ -89,6 +98,8 @@ class ImportInPasswordsPromotionView @JvmOverloads constructor(
     }
 
     private var job: ConflatedJob = ConflatedJob()
+
+    internal var usesCredentialExchange: Boolean = false
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
@@ -118,19 +129,33 @@ class ImportInPasswordsPromotionView @JvmOverloads constructor(
     }
 
     private fun showPromo() {
+        val isPictogramsEnabled = appBrandDesignUpdateToggles.pictograms().isEnabled()
+        val animationAsset = resolvePasswordsKeychainAnimationAsset(isPictogramsEnabled)
+
+        val subtitle = if (usesCredentialExchange) {
+            R.string.passwords_import_promo_subtitle_device_auth
+        } else {
+            R.string.passwords_import_promo_subtitle
+        }
+
         with(binding.importPromo) {
             setMessage(
                 Message(
-                    topAnimation = R.raw.anim_password_keys,
+                    topAnimation = animationAsset.animationRes,
                     title = context.getString(R.string.passwords_import_promo_title),
-                    subtitle = context.getString(R.string.passwords_import_promo_subtitle),
+                    subtitle = context.getString(subtitle),
                     action = context.getString(R.string.passwords_import_promo_action),
                     messageType = REMOTE_MESSAGE,
                 ),
             )
             onTopAnimationConfigured { view ->
-                view.repeatCount = 1
-                view.playAnimation()
+                animationAsset.staticRes?.let { staticRes ->
+                    view.cancelAnimation()
+                    view.setImageResource(staticRes)
+                } ?: run {
+                    view.repeatCount = 1
+                    view.playAnimation()
+                }
             }
             onPrimaryActionClicked {
                 viewModel.onUserClickedToImport()

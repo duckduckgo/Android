@@ -27,9 +27,18 @@ class ContentValueStore {
 
     private val states = mutableMapOf<LinearOnboardingStepId, MutableStateFlow<*>>()
 
-    @Suppress("UNCHECKED_CAST")
     fun <S : Any> contentState(
         stepId: LinearOnboardingStepId,
         content: Stateful<S>,
-    ): MutableStateFlow<S> = states.getOrPut(stepId) { MutableStateFlow(content.initialState()) } as MutableStateFlow<S>
+    ): MutableStateFlow<S> = contentState(stepId, content::initialState)
+
+    /**
+     * The same flow by step id alone, for a writer that has no config to hand: the view model pushes into a
+     * step's state before that step is current, so the binder finds the value already there when it binds.
+     */
+    @Suppress("UNCHECKED_CAST")
+    fun <S : Any> contentState(
+        stepId: LinearOnboardingStepId,
+        initialState: () -> S,
+    ): MutableStateFlow<S> = states.getOrPut(stepId) { MutableStateFlow(initialState()) } as MutableStateFlow<S>
 }

@@ -25,6 +25,8 @@ import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.device.DeviceInfo.FormFactor.PHONE
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -61,6 +63,7 @@ class QueryUrlConverterTest {
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val serpSettingsFeature: SerpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
     private val queryUrlPredictor: QueryUrlPredictor = mock()
+    private val mockDeviceInfo: DeviceInfo = mock()
     private val requestRewriter =
         DuckDuckGoRequestRewriter(
             DuckDuckGoUrlDetectorImpl(),
@@ -70,6 +73,7 @@ class QueryUrlConverterTest {
             duckChat,
             androidBrowserConfigFeature,
             serpSettingsFeature,
+            mockDeviceInfo,
         )
     private val testee: QueryUrlConverter = createTestee(useUrlPredictorEnabled = false)
 
@@ -78,6 +82,7 @@ class QueryUrlConverterTest {
         whenever(variantManager.getVariantKey()).thenReturn("")
         whenever(duckChat.isEnabled()).thenReturn(true)
         whenever(queryUrlPredictor.isReady()).thenReturn(true)
+        whenever(mockDeviceInfo.formFactor()).thenReturn(PHONE)
         androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(true))
     }
 

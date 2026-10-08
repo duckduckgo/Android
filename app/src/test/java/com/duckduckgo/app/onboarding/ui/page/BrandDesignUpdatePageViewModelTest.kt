@@ -36,6 +36,7 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrap
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingResult
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingStepIds
+import com.duckduckgo.app.onboarding.orchestrator.StepIndicatorMode
 import com.duckduckgo.app.onboarding.orchestrator.StepProgress
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command
@@ -709,14 +710,14 @@ class BrandDesignUpdatePageViewModelTest {
                 NewUserOnboardingActivityStep(
                     id = "ai_comparison_chart",
                     pixelName = null,
-                    showsStepIndicator = true,
+                    indicator = StepIndicatorMode.COUNTED,
                     transition = { LinearOnboardingTransition.Advance },
                     resolveDialog = { NewUserOnboardingActivityDialog.AiComparisonChart },
                 ),
                 NewUserOnboardingActivityStep(
                     id = "input_screen_preview",
                     pixelName = null,
-                    showsStepIndicator = true,
+                    indicator = StepIndicatorMode.COUNTED,
                     transition = recordAndStay,
                     resolveDialog = {
                         NewUserOnboardingActivityDialog.InputScreenPreview(
@@ -807,7 +808,7 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun `when input mode confirmed then emits with selection`() = runTest {
-        val testee = startAt(NewUserOnboardingActivityDialog.InputScreen)
+        val testee = startAt(NewUserOnboardingActivityDialog.InputScreen())
         advanceUntilIdle()
 
         testee.onInputScreenOptionSelected(withAi = false)
@@ -955,22 +956,13 @@ class BrandDesignUpdatePageViewModelTest {
 
     // endregion
 
-    // region Add to Dock / Widget prompt (orchestrator-driven flow)
-
-    private fun addToDockStep() =
-        NewUserOnboardingActivityStep(
-            id = NewUserOnboardingStepIds.ADD_TO_DOCK,
-            pixelName = null,
-            showsStepIndicator = true,
-            transition = { LinearOnboardingTransition.Stay },
-            resolveDialog = { NewUserOnboardingActivityDialog.AddToDock },
-        )
+    // region Widget prompt (orchestrator-driven flow)
 
     private fun widgetPromptStep() =
         NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.WIDGET_PROMPT,
             pixelName = null,
-            showsStepIndicator = true,
+            indicator = StepIndicatorMode.COUNTED,
             transition = { LinearOnboardingTransition.Stay },
             resolveDialog = { NewUserOnboardingActivityDialog.WidgetPrompt },
         )
@@ -989,19 +981,6 @@ class BrandDesignUpdatePageViewModelTest {
             currentPlan = LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(step)),
             currentStepIndex = 0,
         )
-
-    @Test
-    fun whenAddToDockPrimaryCtaThenContinueClickedEmitted() = runTest {
-        orchestratorState.value = inProgressOn(addToDockStep())
-        val testee = createViewModel()
-        advanceUntilIdle()
-        assertEquals(PreOnboardingDialogType.ADD_TO_DOCK, testee.viewState.value.currentDialog)
-
-        testee.onPrimaryCtaClicked()
-        advanceUntilIdle()
-
-        verify(mockOrchestrator).onEvent(NewUserOnboardingEvent.ContinueClicked)
-    }
 
     @Test
     fun whenWidgetPromptPrimaryThenAddWidgetRequestedEmitted() = runTest {
