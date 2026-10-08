@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
+import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
@@ -36,6 +37,7 @@ class RealPirFreemium @Inject constructor(
     private val pirRemoteFeatures: PirRemoteFeatures,
     private val subscriptions: Subscriptions,
     private val pirFreemiumDataStore: PirFreemiumDataStore,
+    private val pirFreemiumDebugSettings: PirFreemiumDebugSettings,
     private val dispatcherProvider: DispatcherProvider,
 ) : PirFreemium {
 
@@ -57,10 +59,11 @@ class RealPirFreemium @Inject constructor(
     }
 
     private suspend fun isEligible(): Boolean {
-        if (subscriptions.getSubscriptionStatus() != UNKNOWN) {
-            return false
-        }
-
-        return pirRemoteFeatures.freemium().isEnabled()
+        return pirRemoteFeatures.freemium().isEnabled() &&
+            subscriptions.getSubscriptionStatus() == UNKNOWN &&
+            (pirFreemiumDebugSettings.isEligibilityForced || canPurchasePir())
     }
+
+    private suspend fun canPurchasePir(): Boolean =
+        subscriptions.isEligible() && PIR in subscriptions.getPurchasableProducts()
 }

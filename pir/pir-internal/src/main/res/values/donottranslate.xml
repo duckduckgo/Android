@@ -84,4 +84,6 @@
     <string name="pirDevCustomUrlEmpty">URL cannot be empty</string>
     <string name="pirDevResetFreemiumState">Reset Freemium PIR State</string>
     <string name="pirDevResetFreemiumStateDone">Freemium PIR state and scan data cleared.</string>
+    <string name="pirDevForceFreemiumEligibility">Force Freemium PIR eligibility</string>
+    <string name="pirDevForceFreemiumEligibilityDescription">Offer the free scan even where Play has no plans with PIR. Still requires no subscription and the freemium flag on.</string>
 </resources>

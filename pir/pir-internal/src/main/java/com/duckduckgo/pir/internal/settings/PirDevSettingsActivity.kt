@@ -146,6 +146,11 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
                 }
             }
         }
+
+        binding.pirForceFreemiumEligibility.setIsChecked(pirInternalSettingsDataStore.isFreemiumEligibilityForced)
+        binding.pirForceFreemiumEligibility.setOnCheckedChangeListener { _, isChecked ->
+            pirInternalSettingsDataStore.isFreemiumEligibilityForced = isChecked
+        }
     }
 
     private fun bindViews() {
