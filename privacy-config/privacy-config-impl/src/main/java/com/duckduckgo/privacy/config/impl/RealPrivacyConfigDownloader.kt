@@ -28,7 +28,12 @@ import com.duckduckgo.privacy.config.impl.RealPrivacyConfigDownloader.DownloadEr
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigDownloader.DownloadError.EMPTY_CONFIG_ERROR
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigDownloader.DownloadError.STORE_ERROR
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
+import com.duckduckgo.privacy.config.store.PrivacyConfig
+import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import logcat.LogPriority.WARN
 import logcat.logcat
 import retrofit2.HttpException
@@ -41,7 +46,7 @@ interface PrivacyConfigDownloader {
      * @return [ConfigDownloadResult.Success] if remote config has been downloaded correctly or
      * [ConfigDownloadResult.Error] otherwise.
      */
-    suspend fun download(): ConfigDownloadResult
+    suspend fun download(force: Boolean = false): ConfigDownloadResult
 
     sealed class ConfigDownloadResult {
         data object Success : ConfigDownloadResult()
@@ -50,6 +55,7 @@ interface PrivacyConfigDownloader {
 }
 
 @WorkerThread
+@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealPrivacyConfigDownloader @Inject constructor(
     private val privacyConfigService: PrivacyConfigService,
@@ -57,9 +63,19 @@ class RealPrivacyConfigDownloader @Inject constructor(
     private val privacyConfigCallbacks: PluginPoint<PrivacyConfigCallbackPlugin>,
     private val pixel: Pixel,
     private val telemetry: PrivacyConfigDownloadTelemetry,
+    private val repository: PrivacyConfigRepository,
 ) : PrivacyConfigDownloader {
 
-    override suspend fun download(): PrivacyConfigDownloader.ConfigDownloadResult {
+    private val downloadMutex = Mutex()
+
+    override suspend fun download(force: Boolean): PrivacyConfigDownloader.ConfigDownloadResult = downloadMutex.withLock {
+        if (force) {
+            repository.insert(PrivacyConfig(version = -1, readme = "", eTag = "", timestamp = ""))
+        }
+        downloadConfig()
+    }
+
+    private suspend fun downloadConfig(): PrivacyConfigDownloader.ConfigDownloadResult {
         logcat { "Downloading privacy config" }
 
         telemetry.onDownloadStarted()
@@ -70,7 +86,8 @@ class RealPrivacyConfigDownloader @Inject constructor(
             val eTag = response.headers().extractETag()
             response.body()?.let {
                 runCatching {
-                    privacyConfigPersister.persistPrivacyConfig(it, eTag)
+                    val source = generateSequence(response.raw()) { raw -> raw.priorResponse }.last().request.url.toString()
+                    privacyConfigPersister.persistPrivacyConfig(it, eTag, source)
                     telemetry.onProcessFinished()
                     privacyConfigCallbacks.getPlugins().forEach { callback -> callback.onPrivacyConfigDownloaded() }
                 }.onFailure {

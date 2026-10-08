@@ -94,6 +94,14 @@ dependencies {
     implementation project(path: ':design-system')
     implementation project(path: ':browser-api')
 
+    testImplementation project(path: ':common-test')
+    testImplementation AndroidX.work.testing
+    testImplementation Testing.junit4
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation KotlinX.coroutines.test
+
+    implementation AndroidX.work.runtimeKtx
+
     implementation AndroidX.core.ktx
 
     implementation AndroidX.appCompat
