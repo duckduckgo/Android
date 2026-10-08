@@ -1,0 +1,131 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.networkprotection.impl.portprobing
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+
+class PortSelectorTest {
+
+    private lateinit var portSelector: PortSelector
+
+    @Before
+    fun setup() {
+        portSelector = RealPortSelector()
+    }
+
+    @Test
+    fun `selectPort uses default port when it responds`() {
+        val result = portSelector.selectPort(
+            probedPort = 443L,
+            currentPort = 443L,
+            serverDefaultPort = 443L,
+            advertisedPorts = listOf(443L, 51820L),
+        )
+
+        assertEquals(443L, result.selectedPort)
+        assertTrue(result.shouldRemember)
+    }
+
+    @Test
+    fun `selectPort uses fallback port when default does not respond`() {
+        val result = portSelector.selectPort(
+            probedPort = 51820L,
+            currentPort = 443L,
+            serverDefaultPort = 443L,
+            advertisedPorts = listOf(443L, 51820L),
+        )
+
+        assertEquals(51820L, result.selectedPort)
+        assertTrue(result.shouldRemember)
+    }
+
+    @Test
+    fun `selectPort keeps current port when nothing responds and current is advertised`() {
+        val result = portSelector.selectPort(
+            probedPort = null,
+            currentPort = 443L,
+            serverDefaultPort = 443L,
+            advertisedPorts = listOf(443L, 51820L),
+        )
+
+        assertEquals(443L, result.selectedPort)
+        assertFalse(result.shouldRemember)
+    }
+
+    @Test
+    fun `selectPort uses server default when nothing responds and current not advertised`() {
+        val result = portSelector.selectPort(
+            probedPort = null,
+            currentPort = 9999L,
+            serverDefaultPort = 443L,
+            advertisedPorts = listOf(443L, 51820L),
+        )
+
+        assertEquals(443L, result.selectedPort)
+        assertFalse(result.shouldRemember)
+    }
+
+    @Test
+    fun `orderCandidatePorts always puts server default first`() {
+        val orderedPorts = portSelector.orderCandidatePorts(
+            rememberedPort = 51820L,
+            serverDefaultPort = 443L,
+            advertisedPorts = listOf(443L, 51820L),
+        )
+
+        // Server default (443) is always first, even when 51820 was remembered
+        assertEquals(listOf(443L, 51820L), orderedPorts)
+    }
+
+    @Test
+    fun `orderCandidatePorts puts remembered port second when different from default`() {
+        val orderedPorts = portSelector.orderCandidatePorts(
+            rememberedPort = 51820L,
+            serverDefaultPort = 443L,
+            advertisedPorts = listOf(443L, 51820L, 8080L),
+        )
+
+        // Order: default (443), remembered (51820), remaining (8080)
+        assertEquals(listOf(443L, 51820L, 8080L), orderedPorts)
+    }
+
+    @Test
+    fun `orderCandidatePorts deduplicates ports`() {
+        val orderedPorts = portSelector.orderCandidatePorts(
+            rememberedPort = 443L,
+            serverDefaultPort = 443L,
+            advertisedPorts = listOf(443L, 51820L),
+        )
+
+        assertEquals(listOf(443L, 51820L), orderedPorts)
+    }
+
+    @Test
+    fun `orderCandidatePorts filters out zero ports`() {
+        val orderedPorts = portSelector.orderCandidatePorts(
+            rememberedPort = 0L,
+            serverDefaultPort = 443L,
+            advertisedPorts = listOf(443L, 0L, 51820L),
+        )
+
+        assertEquals(listOf(443L, 51820L), orderedPorts)
+    }
+}

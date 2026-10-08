@@ -124,7 +124,7 @@ data class Server(
     val hostnames: List<String>,
     val ips: List<String>,
     val port: Long,
-    val ports: List<Long>? = null,
+    val ports: List<Long> = emptyList(),
 )
 
 data class EligibleLocation(
