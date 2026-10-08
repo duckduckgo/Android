@@ -105,6 +105,8 @@ class FailureRecoveryHandlerTest {
             currentTimeProvider,
             networkProtectionPixels,
             coroutineTestRule.testDispatcherProvider,
+            org.mockito.kotlin.mock(), // vpnRemoteFeatures
+            org.mockito.kotlin.mock(), // portProbingCoordinator
         )
     }
 
