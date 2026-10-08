@@ -395,6 +395,8 @@ class RealNativeInputManager @Inject constructor(
 
         val widgetView = rootView.findViewById<View?>(R.id.inputModeRoot)
             ?: return false
+        if (isExiting && animate) return !omnibarController.isDuckAiMode()
+        isExiting = true
 
         // Do not require isNativeInputFieldEnabled: teardown must still run after the setting flips
         // off (and after a paused animated hide left the widget attached).
@@ -440,16 +442,13 @@ class RealNativeInputManager @Inject constructor(
         // If the card is full-width, it morphs back to the omnibar.
         if (!animate || (inlineNavButtonsShown && !navBarInteractionLatched)) {
             animator.cancelAnimation()
-            isExiting = false
             // Match animated exit: suspend LayoutTransition before resetting offsets so CHANGING
             // can't leave a leftover NTP gap (e.g. live switch to Search-only while UTI is open on
             // bottom omnibar with a nav-bar top inset).
             layoutCoordinator.suspendContentReflow()
             layoutCoordinator.updateNavBarInset(0)
             layoutCoordinator.resetContentOffsetToBase()
-            omnibarController.restore()
-            omnibarController.show()
-            removeWidget()
+            finishHide(widgetView)
             return !omnibarController.isDuckAiMode()
         }
 
@@ -457,7 +456,6 @@ class RealNativeInputManager @Inject constructor(
         val omnibarCard = omnibarController.getCardView()
 
         val isBottom = widgetFrom(widgetView)?.isWidgetBottom() ?: false
-        isExiting = true
         // The root keeps its height until removeWidget, so its opaque background would mask the content
         // the exit has already reflowed back up, leaving it cut until the fade ends.
         val rootBackground = widgetView.background
@@ -489,39 +487,42 @@ class RealNativeInputManager @Inject constructor(
                     // listeners re-apply the exit-end inset during the fade and race the detach reset,
                     // which is what left intermittent leftover space under the omnibar.
                     layoutCoordinator.resetContentOffsetToBase()
-                    isExiting = false
-                    onHide()
+                    onHide(widgetView)
                 },
             )
         } else {
-            isExiting = false
-            onHide()
+            onHide(widgetView)
         }
 
         return !omnibarController.isDuckAiMode()
     }
 
-    private fun onHide() {
+    private fun onHide(widgetView: View) {
+        if (rootView.findViewById<View?>(R.id.inputModeRoot) !== widgetView) return
         omnibarController.restore()
         omnibarController.show()
 
-        val widgetCard = rootView.findViewById<View?>(R.id.inputModeWidgetCard)
+        val widgetCard = widgetView.findViewById<View?>(R.id.inputModeWidgetCard)
         if (widgetCard != null) {
             (widgetCard as? MaterialCardView)?.cardElevation = 0f
-            val animatingRoot = widgetRoot
             widgetCard.animate()
                 .alpha(0f)
                 .setDuration(FADE_OUT_DURATION_MS)
                 .withEndAction {
                     widgetCard.alpha = 1f
-                    if (!nativeInputStateBugKillSwitch.self().isEnabled() || widgetRoot === animatingRoot) {
-                        removeWidget()
-                    }
+                    finishHide(widgetView)
                 }
                 .start()
         } else {
-            removeWidget()
+            finishHide(widgetView)
         }
+    }
+
+    private fun finishHide(widgetView: View) {
+        if (rootView.findViewById<View?>(R.id.inputModeRoot) !== widgetView) return
+        removeWidget()
+        omnibarController.restore()
+        omnibarController.show()
     }
 
     override fun onKeyboardVisibilityChanged(isVisible: Boolean) {
@@ -846,6 +847,7 @@ class RealNativeInputManager @Inject constructor(
         cachedUrl = null
         // Drop Fragment-scoped callback closures so they don't outlive the widget.
         lastCallbacks = null
+        isExiting = false
         return removed
     }
 
