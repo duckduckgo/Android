@@ -21,9 +21,12 @@
     <string name="newTabReturnHatchFireTabTitle">Posljednja korištena Fire kartica</string>
     <string name="newTabReturnHatchTabClosed">Kartica je zatvorena</string>
     <string name="newTabReturnHatchUndo">Poništi</string>
-    <string name="hatchMenuReturnTab">Povratak na karticu</string>
+    <string name="hatchMenuReturnToLastUsedTab">Povratak na posljednju korištenu karticu</string>
     <string name="hatchMenuAfterInactivitySettings">Nakon neaktivnosti</string>
-    <string name="hatchMenuCloseTab">Zatvori karticu</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Otvori novu karticu</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Posljednja korištena kartica</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="&apos;%1$s&apos; is the menu row label (&apos;After Inactivity&apos;) and &apos;%2$s&apos; is the current destination, e.g. &apos;After Inactivity, Open New Tab&apos;">%1$s, %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Zatvori posljednju korištenu karticu</string>
     <string name="hatchMenuBurnTab">Izbriši karticu</string>
-    <string name="hatchMenuHideShortcut">Sakrij prečac</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="&apos;Return to&apos; refers to this menu&apos;s own &apos;Return to…&apos; label shown above this item">Sakrij prečac „Povratak na”</string>
 </resources>
