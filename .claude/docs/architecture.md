@@ -29,7 +29,7 @@ Enforced in the root `build.gradle`. Violations fail the build.
 
 | Rule | Detail |
 |---|---|
-| API modules cannot use Anvil | No `com.squareup.anvil` plugin in `-api` modules |
+| API modules cannot use Metro | No `dev.zacsweers.metro` plugin in `-api` modules |
 | API modules cannot depend on Dagger | Except `:feature-toggles-api` and `:settings-api` |
 | API modules cannot depend on other APIs | Except `:feature-toggles-api`, `:navigation-api`, `:js-messaging-api` |
 | API modules cannot depend on `:di` | DI wiring belongs in `-impl` |
