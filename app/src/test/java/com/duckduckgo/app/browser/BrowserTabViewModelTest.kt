@@ -34,6 +34,8 @@ import android.webkit.WebBackForwardList
 import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebHistoryItem
 import android.webkit.WebView
+import androidx.arch.core.executor.ArchTaskExecutor
+import androidx.arch.core.executor.TaskExecutor
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
@@ -380,6 +382,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -393,10 +396,12 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.json.JSONObject
 import org.junit.After
 import org.junit.Assert.assertArrayEquals
@@ -10443,6 +10448,44 @@ class BrowserTabViewModelTest {
 
         testee.onAutoConsentPopUpHandled(true)
 
+        assertCommandIssued<ShowAutoconsentAnimation>()
+    }
+
+    @Test
+    fun whenAutoConsentPopupHandledOffMainThreadThenPostCommandOnMainThread() {
+        givenCurrentSite("https://example.com")
+        testee.browserViewState.value =
+            testee.browserViewState.value?.copy(
+                browserShowing = true,
+                maliciousSiteBlocked = false,
+                maliciousSiteStatus = null,
+            )
+        // Autoconsent reports from its JS bridge thread; restore LiveData's main-thread check and a queuing Main
+        // dispatcher so posting a command from that thread fails instead of passing silently.
+        val mainThread = Thread.currentThread()
+        ArchTaskExecutor.getInstance().setDelegate(
+            object : TaskExecutor() {
+                override fun executeOnDiskIO(runnable: Runnable) = runnable.run()
+                override fun postToMainThread(runnable: Runnable) = runnable.run()
+                override fun isMainThread() = Thread.currentThread() == mainThread
+            },
+        )
+        val mainDispatcher = StandardTestDispatcher(coroutineRule.testDispatcher.scheduler)
+        Dispatchers.setMain(mainDispatcher)
+
+        var backgroundFailure: Throwable? = null
+        val jsBridgeThread = Thread {
+            try {
+                testee.onAutoConsentPopUpHandled(false)
+            } catch (e: Throwable) {
+                backgroundFailure = e
+            }
+        }
+        jsBridgeThread.start()
+        jsBridgeThread.join()
+        mainDispatcher.scheduler.advanceUntilIdle()
+
+        assertNull(backgroundFailure)
         assertCommandIssued<ShowAutoconsentAnimation>()
     }
 
