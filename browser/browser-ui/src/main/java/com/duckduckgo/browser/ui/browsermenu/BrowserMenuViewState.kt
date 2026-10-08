@@ -48,6 +48,7 @@ sealed class BrowserMenuViewState {
         val isSSLError: Boolean = false,
         val canPrintPage: Boolean = false,
         val showDownloadPdfMenuItem: Boolean = false,
+        val showInternalFeedback: Boolean = false,
         val pageContextHeader: PageContextHeaderState = PageContextHeaderState.Hidden,
     ) : BrowserMenuViewState()
 
@@ -73,6 +74,7 @@ sealed class BrowserMenuViewState {
         val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
         val showAutofill: Boolean = false,
         val showDownloadDot: Boolean = false,
+        val showInternalFeedback: Boolean = false,
     ) : BrowserMenuViewState()
 
     data class DuckAi(

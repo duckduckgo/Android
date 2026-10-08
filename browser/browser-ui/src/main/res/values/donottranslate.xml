@@ -28,4 +28,5 @@
     <string name="duck_ai_tab_label">Duck.ai</string>
     <string name="duck_ai_tab_icon_content_description">Duck.ai icon</string>
     <string name="browserMenuChats">Chats</string>
+    <string name="browserMenuSendInternalFeedback">Send Internal Feedback</string>
 </resources>

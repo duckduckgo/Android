@@ -340,6 +340,21 @@
                 app:primaryText="@string/browserMenuRunningInDDG"
                 app:menuSize="medium"
                 tools:visibility="visible" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/internalFeedbackSectionDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:defaultPadding="true"
+                app:fullWidth="false" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:id="@+id/internalFeedbackMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_support_24"
+                app:menuSize="medium"
+                app:primaryText="@string/browserMenuSendInternalFeedback" />
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

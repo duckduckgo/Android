@@ -22,6 +22,8 @@ import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.browser.ui.browsermenu.BrowserMenuViewState
 import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
@@ -53,6 +55,7 @@ class RealBrowserMenuViewStateFactoryTest {
     private val voiceChatEntryFlow = MutableStateFlow(false)
     private val newDownloadState: NewDownloadState = mock()
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
+    private val appBuildConfig: AppBuildConfig = mock()
 
     private lateinit var testee: RealBrowserMenuViewStateFactory
 
@@ -60,7 +63,7 @@ class RealBrowserMenuViewStateFactoryTest {
     fun setup() {
         whenever(duckAiFeatureStateMock.showPopupMenuShortcut).thenReturn(popupMenuShortcutFlow)
         whenever(duckAiFeatureStateMock.showVoiceChatEntry).thenReturn(voiceChatEntryFlow)
-        testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock, newDownloadState, duckDuckGoUrlDetector)
+        testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock, newDownloadState, duckDuckGoUrlDetector, appBuildConfig)
     }
 
     @Test
@@ -721,4 +724,42 @@ class RealBrowserMenuViewStateFactoryTest {
 
         assertFalse((result as BrowserMenuViewState.Browser).showDownloadDot)
     }
+
+    @Test
+    fun `when internal build then browser menu shows internal feedback`() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+
+        assertTrue((createMenu(ViewMode.Browser("https://example.com")) as BrowserMenuViewState.Browser).showInternalFeedback)
+    }
+
+    @Test
+    fun `when not internal build then browser menu hides internal feedback`() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
+
+        assertFalse((createMenu(ViewMode.Browser("https://example.com")) as BrowserMenuViewState.Browser).showInternalFeedback)
+    }
+
+    @Test
+    fun `when internal build then new tab page menu shows internal feedback`() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+
+        assertTrue((createMenu(ViewMode.NewTab) as BrowserMenuViewState.NewTabPage).showInternalFeedback)
+    }
+
+    @Test
+    fun `when not internal build then new tab page menu hides internal feedback`() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
+
+        assertFalse((createMenu(ViewMode.NewTab) as BrowserMenuViewState.NewTabPage).showInternalFeedback)
+    }
+
+    private fun createMenu(omnibarViewMode: ViewMode): BrowserMenuViewState = testee.create(
+        omnibarViewMode = omnibarViewMode,
+        viewState = BrowserViewState(),
+        customTabsMode = false,
+        tabId = "tabId",
+        title = "title",
+        shortUrl = "example.com",
+        omnibarText = "https://example.com",
+    )
 }

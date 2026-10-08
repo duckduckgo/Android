@@ -12172,6 +12172,15 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenInternalFeedbackSelectedThenFormOpenedInNewTab() {
+        testee.onInternalFeedbackSelected()
+
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertEquals("https://internalapps.duckduckgo.com/internal-feedback/", query)
+        }
+    }
+
+    @Test
     fun whenDuckChatSettingsRequestedOutsideDuckAiThenSettingsUrlOpenedInNewTab() = runTest {
         val settingsUrl = "https://duck.ai?settings=open"
         whenever(mockDuckChat.getDuckChatSettingsUrl()).thenReturn(settingsUrl)

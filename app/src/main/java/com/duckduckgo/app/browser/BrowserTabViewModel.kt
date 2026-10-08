@@ -3411,6 +3411,10 @@ class BrowserTabViewModel @Inject constructor(
         command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site, reportFlow = reportFlow))
     }
 
+    fun onInternalFeedbackSelected() {
+        command.value = OpenInNewTab(INTERNAL_FEEDBACK_URL, tabId)
+    }
+
     fun onPrivacyProtectionMenuClicked(clickedFromCustomTab: Boolean = false) {
         val domain = site?.domain ?: return
         appCoroutineScope.launch(dispatchers.io()) {
@@ -6183,6 +6187,8 @@ class BrowserTabViewModel @Inject constructor(
         private const val CLIENT_SIDE_HIT_KEY = "clientSideHit"
 
         private const val ABOUT_BLANK = "about:blank"
+
+        private const val INTERNAL_FEEDBACK_URL = "https://internalapps.duckduckgo.com/internal-feedback/"
 
         // https://www.iso.org/iso-3166-country-codes.html
         private val PRINT_LETTER_FORMAT_COUNTRIES_ISO3166_2 =
