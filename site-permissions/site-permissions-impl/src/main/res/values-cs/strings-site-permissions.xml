@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Webová stránka \"%1$s\" chce získat přístup k tvému fotoaparátu</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Webová stránka \"%1$s\" chce získat přístup k tvému mikrofonu</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Webová stránka \"%1$s\" chce získat přístup k tvému fotoaparátu a mikrofonu</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ chce na tomto webu získat přístup ke tvé poloze</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" chce na tomto webu získat přístup ke kameře</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" chce na tomto webu získat přístup k mikrofonu</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" chce na tomto webu získat přístup ke kameře a mikrofonu</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ chce na tomto webu získat přístup k softwaru pro správu digitálních práv (DRM)</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Pokud to nepovolíš, může se stát, že nepůjdou přehrát videa na stránce, ale tento web nebude mít přístup k identifikátorům zařízení poskytovaným softwarem DRM.</string>
 
     <!-- Reminder dialog -->
