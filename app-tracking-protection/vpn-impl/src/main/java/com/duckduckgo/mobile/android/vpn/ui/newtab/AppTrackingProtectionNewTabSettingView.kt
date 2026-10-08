@@ -42,8 +42,8 @@ import com.duckduckgo.mobile.android.vpn.ui.newtab.AppTrackingProtectionNewTabSe
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -92,7 +92,7 @@ class AppTrackingProtectionNewTabSettingView @JvmOverloads constructor(
     }
 }
 
-@ContributesMultibinding(scope = ActivityScope::class)
+@ContributesIntoMap(scope = ActivityScope::class)
 @PriorityKey(NewTabPageSectionSettingsPlugin.APP_TRACKING_PROTECTION)
 class AppTrackingProtectionNewTabSettingViewPlugin @Inject constructor(
     private val vpnStore: VpnStore,

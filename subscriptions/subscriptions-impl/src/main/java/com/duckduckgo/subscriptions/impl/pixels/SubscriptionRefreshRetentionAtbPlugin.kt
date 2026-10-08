@@ -21,12 +21,12 @@ import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.repository.isActive
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SubscriptionRefreshRetentionAtbPlugin @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val subscriptionsManager: SubscriptionsManager,

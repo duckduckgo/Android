@@ -20,16 +20,16 @@ import android.app.Application
 import android.content.Context
 import com.duckduckgo.app.global.currentProcessName
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 
 @Module
 @ContributesTo(AppScope::class)
 object ApplicationModule {
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideContext(application: Application): Context = application
 }
@@ -38,7 +38,7 @@ object ApplicationModule {
 @ContributesTo(AppScope::class)
 object ProcessNameModule {
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     @ProcessName
     fun provideProcessName(context: Context): String {
@@ -52,7 +52,7 @@ object ProcessNameModule {
         }
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     @IsMainProcess
     fun providerIsMainProcess(@ProcessName processName: String): Boolean {

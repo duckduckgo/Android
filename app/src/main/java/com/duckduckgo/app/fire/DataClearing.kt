@@ -42,8 +42,9 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.history.api.NavigationHistory
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.firstOrNull
 import logcat.LogPriority.WARN
 import logcat.logcat
@@ -55,13 +56,13 @@ import javax.inject.Inject
  */
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = ManualDataClearing::class,
+    binding = binding<ManualDataClearing>(),
 )
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = AutomaticDataClearing::class,
+    binding = binding<AutomaticDataClearing>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class DataClearing @Inject constructor(
     private val fireDataStore: FireDataStore,
     private val clearDataAction: ClearDataAction,

@@ -20,10 +20,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.internal.SubscriptionsBaseUrl
 import com.duckduckgo.subscriptions.impl.internal.SubscriptionsBaseUrlModule
 import com.duckduckgo.subscriptions.internal.SubscriptionsInternalStore
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 
 @Module
 @ContributesTo(
@@ -32,7 +32,7 @@ import dagger.SingleInstanceIn
 )
 class InternalSubscriptionsBaseUrlModule {
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideSubscriptionsBaseUrl(
         store: SubscriptionsInternalStore,
     ): SubscriptionsBaseUrl {

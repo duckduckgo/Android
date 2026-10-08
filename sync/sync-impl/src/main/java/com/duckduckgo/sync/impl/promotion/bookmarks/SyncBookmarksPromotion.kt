@@ -43,14 +43,14 @@ import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksPromotionViewMo
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksPromotionViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksPromotionViewModel.Command.ReevalutePromo
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityWithSourceParams
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
-@ContributesMultibinding(scope = AppScope::class)
+@ContributesIntoSet(scope = AppScope::class)
 class SyncBookmarksPromotion @Inject constructor(
     private val syncPromotions: SyncPromotions,
 ) : BookmarksScreenPromotionPlugin {

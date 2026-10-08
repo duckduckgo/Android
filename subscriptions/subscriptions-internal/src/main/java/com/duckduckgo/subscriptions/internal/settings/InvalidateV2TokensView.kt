@@ -31,8 +31,8 @@ import com.duckduckgo.subscriptions.impl.auth.AuthClient
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.internal.SubsSettingPlugin
 import com.duckduckgo.subscriptions.internal.databinding.SubsSimpleViewBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -73,7 +73,7 @@ class InvalidateV2TokensView @JvmOverloads constructor(
     }
 }
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoSet(ActivityScope::class)
 class InvalidateV2TokensViewPlugin @Inject constructor() : SubsSettingPlugin {
     override fun getView(context: Context): View {
         return InvalidateV2TokensView(context)

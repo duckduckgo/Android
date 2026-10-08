@@ -17,9 +17,9 @@
 package com.duckduckgo.app.di
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dev.zacsweers.metro.ContributesTo
 import java.text.NumberFormat
 import javax.inject.Named
 

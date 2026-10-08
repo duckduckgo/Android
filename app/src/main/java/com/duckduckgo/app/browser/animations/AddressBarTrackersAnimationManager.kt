@@ -18,8 +18,9 @@ package com.duckduckgo.app.browser.animations
 
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.Flow
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import javax.inject.Inject
@@ -45,8 +46,8 @@ interface AddressBarTrackersAnimationManager {
     fun shouldShowAnimation(currentUrl: String?, lastAnimatedUrl: String?): Boolean
 }
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, AddressBarTrackersAnimationManager::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<AddressBarTrackersAnimationManager>())
 class RealAddressBarTrackersAnimationManager @Inject constructor(
     addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle,
 ) : AddressBarTrackersAnimationManager {

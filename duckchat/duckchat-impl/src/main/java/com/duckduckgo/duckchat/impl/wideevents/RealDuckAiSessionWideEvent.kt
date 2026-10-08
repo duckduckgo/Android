@@ -29,10 +29,11 @@ import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -52,9 +53,9 @@ import javax.inject.Inject
  * This class is the sole owner of the session's status/reason mapping and the only caller of
  * [WideEventClient.flowFinish].
  */
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = DuckAiSessionCallback::class)
-@ContributesMultibinding(AppScope::class, boundType = BrowserLifecycleObserver::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<DuckAiSessionCallback>())
+@ContributesIntoSet(AppScope::class, binding = binding<BrowserLifecycleObserver>())
 class RealDuckAiSessionWideEvent @Inject constructor(
     private val wideEventClient: WideEventClient,
     private val duckChat: DuckChat,

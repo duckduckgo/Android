@@ -18,7 +18,7 @@ package com.duckduckgo.autofill.impl.securestorage
 
 import android.security.keystore.KeyProperties
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.security.Key
 import javax.crypto.KeyGenerator
 import javax.crypto.spec.PBEKeySpec

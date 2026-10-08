@@ -19,11 +19,11 @@ package com.duckduckgo.referral.impl
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.referral.api.AppInstallationReferrerStateListener
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 
 @Module
 @ContributesTo(
@@ -33,7 +33,7 @@ import dagger.multibindings.IntoSet
 class PlayStoreReferralModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun appInstallationReferrerStateListener(
         playStoreAppReferrerStateListener: PlayStoreAppReferrerStateListener,
     ): AppInstallationReferrerStateListener = playStoreAppReferrerStateListener

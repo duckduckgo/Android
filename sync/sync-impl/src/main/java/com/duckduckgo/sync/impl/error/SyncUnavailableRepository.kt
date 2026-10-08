@@ -31,9 +31,10 @@ import com.duckduckgo.sync.impl.engine.SyncEngineLifecycle
 import com.duckduckgo.sync.impl.engine.SyncNotificationBuilder
 import com.duckduckgo.sync.impl.error.SchedulableErrorNotificationWorker.Companion.SYNC_ERROR_NOTIFICATION_TAG
 import com.duckduckgo.sync.store.SyncUnavailableStore
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import java.time.Instant
@@ -52,13 +53,13 @@ interface SyncUnavailableRepository {
 @Suppress("SameParameterValue")
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = SyncUnavailableRepository::class,
+    binding = binding<SyncUnavailableRepository>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = SyncEngineLifecycle::class,
+    binding = binding<SyncEngineLifecycle>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealSyncUnavailableRepository @Inject constructor(
     private val context: Context,
     private val syncUnavailableStore: SyncUnavailableStore,

@@ -19,8 +19,8 @@ package com.duckduckgo.daxprompts.impl.repository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.daxprompts.impl.store.DaxPromptsDataStore
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -29,7 +29,7 @@ interface DaxPromptsRepository {
     suspend fun getDaxPromptsBrowserComparisonShown(): Boolean
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDaxPromptsRepository @Inject constructor(
     private val daxPromptsDataStore: DaxPromptsDataStore,

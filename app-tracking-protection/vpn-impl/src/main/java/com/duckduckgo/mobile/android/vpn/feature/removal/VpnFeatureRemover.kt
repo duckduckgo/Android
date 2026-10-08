@@ -32,7 +32,8 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificatio
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationScheduler.Companion.WORKER_VPN_DAILY_NOTIFICATION_NAME
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationScheduler.Companion.WORKER_VPN_WEEKLY_NOTIFICATION_TAG
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -44,7 +45,7 @@ interface VpnFeatureRemover {
     suspend fun isFeatureRemoved(): Boolean
 }
 
-@ContributesBinding(scope = AppScope::class, boundType = VpnFeatureRemover::class)
+@ContributesBinding(scope = AppScope::class, binding = binding<VpnFeatureRemover>())
 class DefaultVpnFeatureRemover @Inject constructor(
     private val vpnStore: VpnStore,
     private val notificationManager: NotificationManagerCompat,

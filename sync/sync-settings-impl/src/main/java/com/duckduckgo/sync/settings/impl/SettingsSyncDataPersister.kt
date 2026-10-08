@@ -28,16 +28,17 @@ import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResoluti
 import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
 import com.duckduckgo.sync.settings.api.SyncableSetting
 import com.duckduckgo.sync.settings.impl.SettingsSyncDataPersister.Adapters.Companion.updatesAdapter
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.*
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.*
 
-@ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataPersister::class)
+@ContributesIntoSet(scope = AppScope::class, binding = binding<SyncableDataPersister>())
 class SettingsSyncDataPersister @Inject constructor(
     val syncableSettings: PluginPoint<SyncableSetting>,
     val settingsSyncMetadataDao: SettingsSyncMetadataDao,

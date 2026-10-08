@@ -17,7 +17,7 @@
 package com.duckduckgo.pir.impl.store.secure
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.security.SecureRandom
 import javax.inject.Inject
 

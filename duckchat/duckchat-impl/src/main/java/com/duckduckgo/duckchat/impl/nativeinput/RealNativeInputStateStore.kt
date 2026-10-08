@@ -24,9 +24,10 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
-import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,9 +41,9 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = NativeInputStateProvider::class)
-@ContributesBinding(AppScope::class, boundType = NativeInputStatePublisher::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<NativeInputStateProvider>())
+@ContributesBinding(AppScope::class, binding = binding<NativeInputStatePublisher>())
 class RealNativeInputStateStore @Inject constructor(
     // Lazy avoids a Dagger cycle: TabRepository's impl (TabDataRepository) injects
     // NativeInputStatePublisher to clearTab on tab eviction. Resolving the per-mode

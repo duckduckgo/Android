@@ -19,7 +19,7 @@ package com.duckduckgo.credentialexchange.impl
 import android.content.Context
 import androidx.credentials.providerevents.ProviderEventsManager
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface ProviderEventsManagerFactory {

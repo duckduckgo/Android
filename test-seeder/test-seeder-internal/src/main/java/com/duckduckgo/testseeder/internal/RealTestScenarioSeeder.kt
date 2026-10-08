@@ -22,12 +22,12 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.testseeder.api.TestScenarioSeeder
 import com.duckduckgo.testseeder.api.TestSeederKey
 import com.duckduckgo.testseeder.api.TestSeederPlugin
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealTestScenarioSeeder @Inject constructor(
     plugins: DaggerSet<TestSeederPlugin>,

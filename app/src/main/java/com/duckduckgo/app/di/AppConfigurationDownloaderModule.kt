@@ -23,9 +23,9 @@ import com.duckduckgo.app.survey.api.SurveyDownloader
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.httpsupgrade.api.HttpsUpgradeDataDownloader
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dev.zacsweers.metro.ContributesTo
 
 @Module
 @ContributesTo(AppScope::class)

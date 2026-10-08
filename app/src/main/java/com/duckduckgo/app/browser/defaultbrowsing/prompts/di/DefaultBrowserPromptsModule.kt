@@ -23,9 +23,9 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsAppUsageDao
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dev.zacsweers.metro.ContributesTo
 import javax.inject.Qualifier
 
 @ContributesTo(AppScope::class)

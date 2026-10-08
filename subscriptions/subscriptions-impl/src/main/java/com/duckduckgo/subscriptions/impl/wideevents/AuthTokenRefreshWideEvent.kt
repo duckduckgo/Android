@@ -42,9 +42,9 @@ import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Missi
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.NotYetValid
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Other
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Unsupported
-import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withContext
 import java.io.Closeable
@@ -82,7 +82,7 @@ interface AuthTokenRefreshWideEvent {
     suspend fun onFailure(e: Exception)
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class AuthTokenRefreshWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,

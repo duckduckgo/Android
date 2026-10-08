@@ -23,7 +23,7 @@ import com.duckduckgo.adclick.impl.Exemption
 import com.duckduckgo.adclick.impl.pixels.AdClickPixelParameters.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION_COUNT
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject

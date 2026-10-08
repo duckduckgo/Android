@@ -26,17 +26,17 @@ import com.duckduckgo.elementhiding.store.ALL_MIGRATIONS
 import com.duckduckgo.elementhiding.store.ElementHidingDatabase
 import com.duckduckgo.elementhiding.store.ElementHidingRepository
 import com.duckduckgo.elementhiding.store.RealElementHidingRepository
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
 @Module
 @ContributesTo(AppScope::class)
 object ElementHidingModule {
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideElementHidingDatabase(context: Context): ElementHidingDatabase {
         return Room.databaseBuilder(context, ElementHidingDatabase::class.java, "element_hiding.db")
@@ -46,7 +46,7 @@ object ElementHidingModule {
             .build()
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideElementHidingRepository(
         database: ElementHidingDatabase,

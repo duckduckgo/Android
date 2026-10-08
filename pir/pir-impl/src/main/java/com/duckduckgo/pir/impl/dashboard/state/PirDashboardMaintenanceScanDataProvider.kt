@@ -30,8 +30,9 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOu
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -84,9 +85,9 @@ interface PirDashboardMaintenanceScanDataProvider {
 
 @ContributesBinding(
     scope = ActivityScope::class,
-    boundType = PirDashboardMaintenanceScanDataProvider::class,
+    binding = binding<PirDashboardMaintenanceScanDataProvider>(),
 )
-@SingleInstanceIn(ActivityScope::class)
+@SingleIn(ActivityScope::class)
 class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val currentTimeProvider: CurrentTimeProvider,

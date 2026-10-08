@@ -28,19 +28,20 @@ import com.duckduckgo.privacy.config.impl.PrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.R
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @WorkerThread
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @PriorityKey(50)
-@ContributesMultibinding(
+@ContributesIntoMap(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class LocalPrivacyConfigObserver @Inject constructor(
     private val context: Context,

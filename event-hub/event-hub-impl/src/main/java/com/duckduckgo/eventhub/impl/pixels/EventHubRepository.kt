@@ -19,11 +19,11 @@ package com.duckduckgo.eventhub.impl.pixels
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.eventhub.impl.pixels.store.EventHubPixelStateDao
 import com.duckduckgo.eventhub.impl.pixels.store.EventHubPixelStateEntity
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface EventHubRepository {
@@ -35,7 +35,7 @@ interface EventHubRepository {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealEventHubRepository @Inject constructor(
     private val pixelStateDao: EventHubPixelStateDao,
 ) : EventHubRepository {

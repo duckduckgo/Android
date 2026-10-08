@@ -23,7 +23,7 @@ import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageNotice
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageNoticeBand
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageWindow
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import java.util.WeakHashMap
 import javax.inject.Inject
 
@@ -77,7 +77,7 @@ interface UsageWarningPixelSender {
  * time, so a new card ends the previous card's exposure whichever plugin owns it, and a prompt is never
  * attributed to two cards. Keys are weak so a measurement goes away with its widget.
  */
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class UsageWarningMeasurements @Inject constructor(
     private val sender: UsageWarningPixelSender,
 ) {

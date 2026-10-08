@@ -20,10 +20,10 @@ import com.duckduckgo.autofill.sync.*
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.MapKey
 
 @MapKey

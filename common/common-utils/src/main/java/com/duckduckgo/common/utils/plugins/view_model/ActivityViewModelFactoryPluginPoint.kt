@@ -19,10 +19,10 @@ package com.duckduckgo.common.utils.plugins.view_model
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.ActivityScope
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
-@SingleInstanceIn(ActivityScope::class)
+@SingleIn(ActivityScope::class)
 class ActivityViewModelFactoryPluginPoint @Inject constructor(
     private val injectorPlugins: DaggerSet<ViewModelFactoryPlugin>,
 ) : PluginPoint<ViewModelFactoryPlugin> {

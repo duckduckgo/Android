@@ -21,11 +21,11 @@ import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.common.ui.internal.ui.AppComponentsActivity
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoMap(AppScope::class)
 @PriorityKey(InternalFeaturePlugin.ADS_SETTINGS_PRIO_KEY)
 class ThemesPreviewInternalFeature @Inject constructor(private val context: Context) : InternalFeaturePlugin {
 

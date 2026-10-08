@@ -19,11 +19,11 @@ package com.duckduckgo.promptscoordinator.impl
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.promptscoordinator.api.ModalShownReporter
 import com.duckduckgo.promptscoordinator.impl.store.ModalEvaluatorCompletionStore
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealModalShownReporter @Inject constructor(
     private val completionStore: ModalEvaluatorCompletionStore,

@@ -18,10 +18,10 @@ package com.duckduckgo.subscriptions.impl.auth
 
 import android.annotation.SuppressLint
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 import okhttp3.Dns
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -33,7 +33,7 @@ import javax.inject.Provider
 object AuthServiceModule {
     @SuppressLint("NoRetrofitCreateMethodCallDetector")
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideAuthService(
         @Named("nonCaching") okHttpClient: Provider<OkHttpClient>,
         @Named("nonCaching") retrofit: Retrofit,

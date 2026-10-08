@@ -36,11 +36,11 @@ import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.promotion.SyncPromotions
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ContributesMultibinding(scope = ActivityScope::class)
+@ContributesIntoMap(scope = ActivityScope::class)
 @PriorityKey(BookmarkAddedDialogPlugin.PRIORITY_KEY_SETUP_SYNC)
 class SetupSyncBookmarkAddedPromo @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,

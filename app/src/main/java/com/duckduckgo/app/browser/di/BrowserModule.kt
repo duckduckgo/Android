@@ -102,11 +102,11 @@ import com.duckduckgo.request.interception.api.RequestBlocklist
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.tracker.detection.api.TrackerDetector
 import com.duckduckgo.user.agent.api.UserAgentProvider
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
 import javax.inject.Qualifier
@@ -134,7 +134,7 @@ class BrowserModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @IntoSet
     fun defaultBrowserObserver(
         defaultBrowserDetector: DefaultBrowserDetector,
@@ -238,13 +238,13 @@ class BrowserModule {
     @Provides
     fun databaseCleanerHelper(): DatabaseCleaner = DatabaseCleanerHelper()
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun gridViewColumnCalculator(context: Context): GridViewColumnCalculator {
         return GridViewColumnCalculator(context)
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun webViewPreviewPersister(
         context: Context,
@@ -254,7 +254,7 @@ class BrowserModule {
         return FileBasedWebViewPreviewPersister(context, fileDeleter, dispatchers)
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun faviconPersister(
         context: Context,
@@ -310,7 +310,7 @@ class BrowserModule {
         )
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun thirdPartyCookieManager(
         cookieManagerProvider: CookieManagerProvider,
@@ -322,13 +322,13 @@ class BrowserModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providePageLoadedPixelDao(appDatabase: AppDatabase): PageLoadedPixelDao {
         return appDatabase.pageLoadedPixelDao()
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providePagePaintedPixelDao(appDatabase: AppDatabase): PagePaintedPixelDao {
         return appDatabase.pagePaintedPixelDao()
     }
@@ -338,7 +338,7 @@ class BrowserModule {
     )
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @IndonesiaNewTabSection
     fun provideIndonesiaNewTabSectionDataStore(context: Context): DataStore<Preferences> {
         return context.indonesiaNewTabSectionDataStore
@@ -354,7 +354,7 @@ class BrowserModule {
         return HttpCodeSiteErrorHandlerImpl()
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideHostnameResolver(
         appBuildConfig: AppBuildConfig,

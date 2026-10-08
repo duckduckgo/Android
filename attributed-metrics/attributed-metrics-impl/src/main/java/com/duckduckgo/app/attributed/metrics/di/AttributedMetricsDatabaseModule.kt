@@ -21,16 +21,16 @@ import androidx.room.Room
 import com.duckduckgo.app.attributed.metrics.store.AttributedMetricsDatabase
 import com.duckduckgo.app.attributed.metrics.store.EventDao
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 
 @Module
 @ContributesTo(AppScope::class)
 class AttributedMetricsDatabaseModule {
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideAttributedMetricsDatabase(context: Context): AttributedMetricsDatabase =
         Room
             .databaseBuilder(
@@ -41,6 +41,6 @@ class AttributedMetricsDatabaseModule {
             .build()
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideEventDao(db: AttributedMetricsDatabase): EventDao = db.eventDao()
 }

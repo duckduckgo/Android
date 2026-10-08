@@ -21,12 +21,12 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SegmentedOnboardingSearchRetentionAtbPlugin @Inject constructor(
     private val onboardingStore: OnboardingStore,
     private val segmentedOnboardingExperimentMetrics: SegmentedOnboardingExperimentMetrics,

@@ -22,10 +22,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingCompletionSummaryRow
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoMap(AppScope::class)
 @PriorityKey(200)
 class SubscriptionOnboardingVpnStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {
 

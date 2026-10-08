@@ -23,9 +23,10 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -41,13 +42,13 @@ interface FireproofWebsiteRepository {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = FireproofRepository::class,
+    binding = binding<FireproofRepository>(),
 )
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = FireproofWebsiteRepository::class,
+    binding = binding<FireproofWebsiteRepository>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class FireproofWebsiteRepositoryImpl @Inject constructor(
     private val fireproofWebsiteDao: FireproofWebsiteDao,
     private val dispatchers: DispatcherProvider,

@@ -18,8 +18,8 @@ package com.duckduckgo.adblocking.impl
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request

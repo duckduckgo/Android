@@ -20,8 +20,8 @@ import android.net.Uri
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface PirFreemiumPurchaseUrlRouter {
@@ -49,7 +49,7 @@ sealed interface PirPurchaseRoute {
     data object NotHandled : PirPurchaseRoute
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealPirFreemiumPurchaseUrlRouter @Inject constructor(
     private val subscriptions: Subscriptions,

@@ -33,7 +33,7 @@ import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Missi
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.NotYetValid
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Other
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Unsupported
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import io.jsonwebtoken.ClaimJwtException
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.ExpiredJwtException

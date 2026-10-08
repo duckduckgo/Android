@@ -22,7 +22,7 @@ import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.common.PirJobConstants.DEFAULT_MAX_DETACHED_WEBVIEW_COUNT
 import com.duckduckgo.pir.impl.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT_CEILING
 import com.duckduckgo.pir.impl.common.PirJobConstants.MIN_DETACHED_WEBVIEW_COUNT
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import javax.inject.Inject

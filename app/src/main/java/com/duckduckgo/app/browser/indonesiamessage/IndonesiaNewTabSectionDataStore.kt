@@ -28,8 +28,8 @@ import com.duckduckgo.app.browser.indonesiamessage.RealIndonesiaNewTabSectionDat
 import com.duckduckgo.app.browser.indonesiamessage.RealIndonesiaNewTabSectionDataStore.Keys.SHOW_MESSAGE_COUNT
 import com.duckduckgo.app.browser.indonesiamessage.RealIndonesiaNewTabSectionDataStore.Keys.SHOW_MESSAGE_TIMESTAMP
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -47,7 +47,7 @@ interface IndonesiaNewTabSectionDataStore {
     suspend fun dismissMessage()
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealIndonesiaNewTabSectionDataStore @Inject constructor(
     @IndonesiaNewTabSection private val store: DataStore<Preferences>,

@@ -26,17 +26,17 @@ import com.duckduckgo.breakagereporting.impl.BreakageReportingRepository
 import com.duckduckgo.breakagereporting.impl.RealBreakageReportingRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
 @Module
 @ContributesTo(AppScope::class)
 object BreakageReportingModule {
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideBreakageReportingDatabase(context: Context): BreakageReportingDatabase {
         return Room.databaseBuilder(context, BreakageReportingDatabase::class.java, "breakage_reporting.db")
@@ -46,7 +46,7 @@ object BreakageReportingModule {
             .build()
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideBreakageReportingRepository(
         database: BreakageReportingDatabase,

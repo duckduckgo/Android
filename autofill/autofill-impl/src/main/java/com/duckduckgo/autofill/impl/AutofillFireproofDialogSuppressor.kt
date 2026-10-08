@@ -18,8 +18,8 @@ package com.duckduckgo.autofill.impl
 
 import com.duckduckgo.autofill.impl.time.TimeProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import java.util.concurrent.TimeUnit
@@ -31,7 +31,7 @@ interface AutofillFireproofDialogSuppressor {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealAutofillFireproofDialogSuppressor @Inject constructor(private val timeProvider: TimeProvider) : AutofillFireproofDialogSuppressor {
 
     private var autofillDialogShowing = false

@@ -28,18 +28,18 @@ import com.duckduckgo.app.global.db.MigrationsProvider
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.appbuildconfig.api.*
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 
 @Module(includes = [DaoModule::class])
 @ContributesTo(AppScope::class)
 object DatabaseModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideWebViewDatabaseProvider(context: Context): WebViewDatabaseProvider {
         return DefaultWebViewDatabaseProvider(context)
     }
@@ -53,7 +53,7 @@ object DatabaseModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideAppDatabase(
         context: Context,
         migrationsProvider: MigrationsProvider,
@@ -77,7 +77,7 @@ object DatabaseModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideFireModeDatabase(context: Context): FireModeDatabase {
         return Room.databaseBuilder(context, FireModeDatabase::class.java, "fire_mode.db")
             .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)

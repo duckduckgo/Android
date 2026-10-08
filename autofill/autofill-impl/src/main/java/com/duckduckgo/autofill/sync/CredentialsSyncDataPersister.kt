@@ -32,15 +32,16 @@ import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import com.duckduckgo.sync.api.engine.SyncableDataPersister
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.*
 
-@ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataPersister::class)
+@ContributesIntoSet(scope = AppScope::class, binding = binding<SyncableDataPersister>())
 class CredentialsSyncDataPersister @Inject constructor(
     private val credentialsSyncMetadata: CredentialsSyncMetadata,
     private val credentialsSyncStore: CredentialsSyncStore,

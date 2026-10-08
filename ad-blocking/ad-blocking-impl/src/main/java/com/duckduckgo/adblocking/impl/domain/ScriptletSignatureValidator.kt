@@ -17,8 +17,8 @@
 package com.duckduckgo.adblocking.impl.domain
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
@@ -44,7 +44,7 @@ interface ScriptletSignatureValidator {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealScriptletSignatureValidator @Inject constructor(
     publicKeyProvider: PublicKeyProvider,
 ) : ScriptletSignatureValidator {

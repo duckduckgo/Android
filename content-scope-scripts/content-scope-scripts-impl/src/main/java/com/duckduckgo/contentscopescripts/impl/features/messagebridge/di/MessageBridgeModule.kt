@@ -25,17 +25,17 @@ import com.duckduckgo.contentscopescripts.impl.features.messagebridge.store.Mess
 import com.duckduckgo.contentscopescripts.impl.features.messagebridge.store.MessageBridgeRepository
 import com.duckduckgo.contentscopescripts.impl.features.messagebridge.store.RealMessageBridgeRepository
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
 @Module
 @ContributesTo(AppScope::class)
 object MessageBridgeModule {
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideMessageBridgeDatabase(context: Context): MessageBridgeDatabase {
         return Room.databaseBuilder(context, MessageBridgeDatabase::class.java, "message_bridge.db")
@@ -45,7 +45,7 @@ object MessageBridgeModule {
             .build()
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideMessageBridgeRepository(
         database: MessageBridgeDatabase,

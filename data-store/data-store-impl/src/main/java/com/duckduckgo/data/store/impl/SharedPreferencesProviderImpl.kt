@@ -42,8 +42,8 @@ import com.duckduckgo.data.store.impl.DataStorePixelNames.DATA_STORE_MIGRATE_UNE
 import com.duckduckgo.di.scopes.AppScope
 import com.frybits.harmony.getHarmonySharedPreferences
 import com.frybits.harmony.secure.getEncryptedHarmonySharedPreferences
-import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN

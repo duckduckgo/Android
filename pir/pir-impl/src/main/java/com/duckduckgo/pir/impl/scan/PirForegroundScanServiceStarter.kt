@@ -19,7 +19,7 @@ package com.duckduckgo.pir.impl.scan
 import android.content.Context
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 /** Starts [PirForegroundScanService] to resume an interrupted initial scan from the dashboard. */

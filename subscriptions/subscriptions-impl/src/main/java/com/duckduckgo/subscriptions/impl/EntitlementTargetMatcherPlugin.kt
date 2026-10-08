@@ -19,13 +19,13 @@ package com.duckduckgo.subscriptions.impl
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.Lazy
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class EntitlementTargetMatcherPlugin @Inject constructor(
     private val subscriptions: Lazy<Subscriptions>,
 ) : Toggle.TargetMatcherPlugin {
