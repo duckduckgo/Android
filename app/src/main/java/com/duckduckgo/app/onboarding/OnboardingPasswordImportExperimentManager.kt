@@ -63,7 +63,7 @@ class OnboardingPasswordImportExperimentManagerImpl @Inject constructor(
 
     /**
      * Checked before enrolling, so users who could never reach the step are kept out of the experiment: it exists
-     * only in the config-driven onboarding, only for new installs, and only where the import flow is supported.
+     * only for new installs and only where the import flow is supported.
      */
     private suspend fun checkPrerequisites() =
         toggles.self().isEnabled() &&

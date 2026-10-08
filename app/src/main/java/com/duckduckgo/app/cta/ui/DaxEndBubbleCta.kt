@@ -25,11 +25,11 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
-import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection.AI_CHAT
-import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection.BLOCK_ADS
-import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection.NO_AI
-import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection.SEARCH
+import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
+import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection.AI_CHAT
+import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection.BLOCK_ADS
+import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection.NO_AI
+import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection.SEARCH
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.device.DeviceInfo

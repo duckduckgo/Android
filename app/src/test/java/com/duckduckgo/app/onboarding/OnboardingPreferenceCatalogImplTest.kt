@@ -17,8 +17,8 @@
 package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig.PreferenceSelector.Row
-import com.duckduckgo.app.onboarding.ui.page.configdriven.TextConfig
+import com.duckduckgo.app.onboarding.ui.page.welcome.ContentConfig.PreferenceSelector.Row
+import com.duckduckgo.app.onboarding.ui.page.welcome.TextConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
