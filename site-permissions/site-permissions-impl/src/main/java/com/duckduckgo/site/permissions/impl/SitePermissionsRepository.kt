@@ -197,13 +197,11 @@ class SitePermissionsRepositoryImpl @Inject constructor(
             if (!explicitPermissionsOnly && sitePermissionsDao.getSitePermissionsByDomain(domain) == null) {
                 sitePermissionsDao.insert(SitePermissionsEntity(domain = domain))
             }
-            val sitePermissionAllowed = SitePermissionAllowedEntity(
-                domain,
-                tabId,
-                permission,
-                System.currentTimeMillis(),
-            )
-            sitePermissionsAllowedDao.insert(sitePermissionAllowed)
+            val now = System.currentTimeMillis()
+            if (explicitPermissionsOnly) {
+                sitePermissionsAllowedDao.deleteAllowedBefore(now - SitePermissionAllowedEntity.EXPIRY_MILLIS)
+            }
+            sitePermissionsAllowedDao.insert(SitePermissionAllowedEntity(domain, tabId, permission, now))
         }
     }
 

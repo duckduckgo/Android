@@ -35,4 +35,9 @@ data class SitePermissionAllowedEntity(
         val diff = abs(now - this.allowedAt) / 3600000
         return diff <= 24
     }
+
+    companion object {
+        // allowedWithin24h() rounds down to whole hours, so a grant only expires once 25 hours have passed
+        const val EXPIRY_MILLIS = 25 * 3600000L
+    }
 }

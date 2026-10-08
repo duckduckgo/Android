@@ -38,6 +38,7 @@ import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEnti
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionsAllowedDao
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
@@ -292,6 +293,27 @@ class SitePermissionsRepositoryTest {
         repository.sitePermissionGranted(url, "tabId", PermissionRequest.RESOURCE_VIDEO_CAPTURE)
 
         verify(mockSitePermissionsAllowedDao).insert(any())
+    }
+
+    @Test
+    fun whenExplicitPermissionsOnlyAndUserGrantsSitePermissionThenDeleteExpiredAllowedEntities() = runTest {
+        sitePermissionsDialogRedesignFeature.explicitPermissionsOnly().setRawStoredState(Toggle.State(true))
+        setInitialSettings()
+        val before = System.currentTimeMillis()
+        repository.sitePermissionGranted(url, "tabId", PermissionRequest.RESOURCE_VIDEO_CAPTURE)
+
+        val cutoff = argumentCaptor<Long>()
+        verify(mockSitePermissionsAllowedDao).deleteAllowedBefore(cutoff.capture())
+        assertTrue(cutoff.firstValue >= before - SitePermissionAllowedEntity.EXPIRY_MILLIS)
+        assertTrue(cutoff.firstValue <= System.currentTimeMillis() - SitePermissionAllowedEntity.EXPIRY_MILLIS)
+    }
+
+    @Test
+    fun whenNotExplicitPermissionsOnlyAndUserGrantsSitePermissionThenKeepExpiredAllowedEntities() = runTest {
+        setInitialSettings()
+        repository.sitePermissionGranted(url, "tabId", PermissionRequest.RESOURCE_VIDEO_CAPTURE)
+
+        verify(mockSitePermissionsAllowedDao, never()).deleteAllowedBefore(any())
     }
 
     @Test

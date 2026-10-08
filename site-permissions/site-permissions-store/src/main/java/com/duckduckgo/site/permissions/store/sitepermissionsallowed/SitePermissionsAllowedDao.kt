@@ -44,6 +44,9 @@ interface SitePermissionsAllowedDao {
     @Query("delete from site_permission_allowed")
     fun deleteAll()
 
+    @Query("delete from site_permission_allowed where allowedAt < :cutoff")
+    fun deleteAllowedBefore(cutoff: Long): Int
+
     @Query("delete from site_permission_allowed where domain = :domain")
     fun deleteAllowedSitesForDomain(domain: String): Int
 }
