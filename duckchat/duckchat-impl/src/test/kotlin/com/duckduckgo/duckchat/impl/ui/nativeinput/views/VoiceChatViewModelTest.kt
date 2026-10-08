@@ -38,13 +38,13 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class SubmitButtonViewModelTest {
+class VoiceChatViewModelTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private val inputState = MutableStateFlow(duckAiState(hasText = true))
-    private val accepted = MutableStateFlow(false)
+    private val inputState = MutableStateFlow(emptyDuckAiState())
+    private val accepted = MutableStateFlow(true)
     private val nativeInputStateProvider: NativeInputStateProvider = mock {
         on { state } doReturn inputState
         on { stateForTab("edit") } doReturn inputState
@@ -52,105 +52,82 @@ class SubmitButtonViewModelTest {
     private val termsRepository: DuckAiTermsRepository = mock()
     private val feature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java, ioDispatcher = coroutineRule.testDispatcher)
 
-    private lateinit var testee: SubmitButtonViewModel
+    private lateinit var testee: VoiceChatViewModel
 
     @Before
     fun setUp() {
         whenever(termsRepository.observeTermsAccepted(BrowserMode.REGULAR)).thenReturn(accepted)
         feature.nativeToSConsent().setRawStoredState(Toggle.State(enable = true))
-        testee = SubmitButtonViewModel(nativeInputStateProvider, termsRepository, feature, BrowserMode.REGULAR)
+        testee = VoiceChatViewModel(nativeInputStateProvider, termsRepository, feature, BrowserMode.REGULAR)
     }
 
     @Test
-    fun whenTermsNotAcceptedAndThereIsInputThenAskLabelIsShown() = runTest {
-        testee.viewState(editTabId = null).test {
-            val state = awaitItem()
-
-            assertTrue(state.visible)
-            assertTrue(state.askLabel)
+    fun whenTermsAcceptedAndInputIsEmptyThenVoiceIsAvailable() = runTest {
+        testee.available(editTabId = null).test {
+            assertTrue(awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenTermsNotAcceptedAndInputIsEmptyThenAskLabelIsShownDisabled() = runTest {
-        inputState.value = duckAiState(hasText = false)
+    fun whenTermsNotAcceptedThenVoiceIsNotAvailable() = runTest {
+        accepted.value = false
 
-        testee.viewState(editTabId = null).test {
-            val state = awaitItem()
-
-            assertTrue(state.visible)
-            assertTrue(state.askLabel)
-            assertFalse(state.enabled)
-            assertTrue(state.askPossible)
+        testee.available(editTabId = null).test {
+            assertFalse(awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenTermsNotAcceptedOnTheSearchTabThenNoAskLabel() = runTest {
-        inputState.value = duckAiState(hasText = true).copy(toggleSelection = ToggleSelection.SEARCH)
+    fun whenTermsGetAcceptedThenVoiceBecomesAvailable() = runTest {
+        accepted.value = false
 
-        testee.viewState(editTabId = null).test {
-            val state = awaitItem()
-
-            assertFalse(state.visible)
-            assertFalse(state.askLabel)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenTermsAcceptedAndInputIsEmptyThenNoSubmitButton() = runTest {
-        accepted.value = true
-        inputState.value = duckAiState(hasText = false)
-
-        testee.viewState(editTabId = null).test {
-            val state = awaitItem()
-
-            assertFalse(state.visible)
-            assertFalse(state.askLabel)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenTermsGetAcceptedThenAskLabelGoesAway() = runTest {
-        testee.viewState(editTabId = null).test {
-            assertTrue(awaitItem().askLabel)
+        testee.available(editTabId = null).test {
+            assertFalse(awaitItem())
 
             accepted.value = true
 
-            assertFalse(awaitItem().askLabel)
+            assertTrue(awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenFlagIsOffThenAskLabelIsNeverShown() = runTest {
+    fun whenFlagIsOffThenVoiceIsAvailableEvenWithTermsNotAccepted() = runTest {
+        accepted.value = false
         feature.nativeToSConsent().setRawStoredState(Toggle.State(enable = false))
 
-        testee.viewState(editTabId = null).test {
-            val state = awaitItem()
-
-            assertFalse(state.askLabel)
-            assertFalse(state.askPossible)
+        testee.available(editTabId = null).test {
+            assertTrue(awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenOnTheEditSurfaceThenAskLabelIsNeverShown() = runTest {
-        testee.viewState(editTabId = "edit").test {
-            assertFalse(awaitItem().askLabel)
+    fun whenOnTheEditSurfaceThenVoiceIgnoresTheTerms() = runTest {
+        accepted.value = false
+
+        testee.available(editTabId = "edit").test {
+            assertTrue(awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }
 
-    private fun duckAiState(hasText: Boolean) = NativeInputState(
+    @Test
+    fun whenThereIsTextThenVoiceIsNotAvailable() = runTest {
+        inputState.value = emptyDuckAiState().copy(hasText = true)
+
+        testee.available(editTabId = null).test {
+            assertFalse(awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    private fun emptyDuckAiState() = NativeInputState(
         inputMode = InputMode.SEARCH_AND_DUCK_AI,
         inputContext = InputContext.DUCK_AI,
         toggleSelection = ToggleSelection.DUCK_AI,
-        hasText = hasText,
+        voiceChatAvailable = true,
     )
 }
