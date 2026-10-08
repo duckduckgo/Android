@@ -416,7 +416,6 @@ import java.io.File
 import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Named
-import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
 import kotlin.getValue
 
@@ -574,13 +573,13 @@ class BrowserTabFragment :
     lateinit var downloadsFileActions: DownloadsFileActions
 
     @Inject
-    lateinit var urlExtractingWebViewClient: Provider<UrlExtractingWebViewClient>
+    lateinit var urlExtractingWebViewClient: () -> UrlExtractingWebViewClient
 
     @Inject
-    lateinit var urlExtractor: Provider<DOMUrlExtractor>
+    lateinit var urlExtractor: () -> DOMUrlExtractor
 
     @Inject
-    lateinit var urlExtractorUserAgent: Provider<UserAgentProvider>
+    lateinit var urlExtractorUserAgent: () -> UserAgentProvider
 
     @Inject
     lateinit var voiceSearchLauncher: VoiceSearchLauncher
@@ -3335,12 +3334,12 @@ class BrowserTabFragment :
 
     private fun extractUrlFromAmpLink(initialUrl: String) {
         context?.let {
-            val client = urlExtractingWebViewClient.get()
+            val client = urlExtractingWebViewClient()
             client.urlExtractionListener = viewModel
 
             logcat { "AMP link detection: Creating WebView for URL extraction" }
             urlExtractingWebView =
-                UrlExtractingWebView(requireContext(), client, urlExtractorUserAgent.get(), urlExtractor.get(), webViewModeInitializer, browserMode)
+                UrlExtractingWebView(requireContext(), client, urlExtractorUserAgent(), urlExtractor(), webViewModeInitializer, browserMode)
 
             urlExtractingWebView?.urlExtractionListener = viewModel
 

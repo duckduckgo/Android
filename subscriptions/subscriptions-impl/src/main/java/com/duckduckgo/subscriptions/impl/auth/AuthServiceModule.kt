@@ -26,7 +26,6 @@ import okhttp3.Dns
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import javax.inject.Named
-import javax.inject.Provider
 
 @BindingContainer
 @ContributesTo(AppScope::class)
@@ -35,16 +34,16 @@ object AuthServiceModule {
     @Provides
     @SingleIn(AppScope::class)
     fun provideAuthService(
-        @Named("nonCaching") okHttpClient: Provider<OkHttpClient>,
+        @Named("nonCaching") okHttpClient: () -> OkHttpClient,
         @Named("nonCaching") retrofit: Retrofit,
         // This is to force the auth service calls to go outside the VPN
         // https://app.asana.com/1/137249556945/project/488551667048375/task/1212071195929229?focus=true
-        dns: Provider<Dns>,
+        dns: () -> Dns,
     ): AuthService {
         val okHttpClientWithoutRedirects = lazy {
-            okHttpClient.get().newBuilder()
+            okHttpClient().newBuilder()
                 .followRedirects(false)
-                .dns(dns.get())
+                .dns(dns())
                 .build()
         }
 

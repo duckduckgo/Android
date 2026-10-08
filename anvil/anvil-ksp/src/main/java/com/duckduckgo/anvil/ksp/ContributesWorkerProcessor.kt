@@ -32,8 +32,8 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.LambdaTypeName
 import com.squareup.kotlinpoet.ParameterSpec
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.ksp.KotlinPoetKspPreview
@@ -54,7 +54,6 @@ class ContributesWorkerProcessor(
         private val CONTRIBUTES_INTO_SET_CLASS = ClassName("dev.zacsweers.metro", "ContributesIntoSet")
         private val WORKER_INJECTOR_PLUGIN_CLASS = ClassName("com.duckduckgo.common.utils.plugins.worker", "WorkerInjectorPlugin")
         private val LISTENABLE_WORKER_CLASS = ClassName("androidx.work", "ListenableWorker")
-        private val PROVIDER_CLASS = ClassName("javax.inject", "Provider")
         private val INJECT_CLASS = ClassName("javax.inject", "Inject")
     }
 
@@ -95,11 +94,11 @@ class ContributesWorkerProcessor(
             .filter { prop -> prop.annotations.any { it.isAnnotation(JAVAX_INJECT) } }
             .toList()
 
-        // Build constructor properties (each wrapped in Provider<T>) and parameters
+        // Build constructor properties (each typed () -> T) and parameters
         data class PropAndParam(val property: PropertySpec, val parameter: ParameterSpec)
         val propsAndParams = injectProperties.map { prop ->
             val propType = prop.type.resolve().toTypeName()
-            val providerType = PROVIDER_CLASS.parameterizedBy(propType)
+            val providerType = LambdaTypeName.get(returnType = propType)
             val propName = prop.simpleName.asString()
 
             // Collect non-@Inject annotations for passthrough to the parameter only
@@ -177,7 +176,7 @@ class ContributesWorkerProcessor(
         sb.appendLine("if (worker is $workerClassName) {")
         for (prop in properties) {
             val name = prop.simpleName.asString()
-            sb.appendLine("    worker.$name = $name.get()")
+            sb.appendLine("    worker.$name = $name()")
         }
         sb.appendLine("    return true")
         sb.appendLine("}")

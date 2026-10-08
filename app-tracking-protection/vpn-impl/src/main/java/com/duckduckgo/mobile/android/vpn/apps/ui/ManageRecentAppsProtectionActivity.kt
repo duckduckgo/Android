@@ -56,7 +56,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Provider
 
 @InjectWith(ActivityScope::class)
 class ManageRecentAppsProtectionActivity :
@@ -73,7 +72,7 @@ class ManageRecentAppsProtectionActivity :
 
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
-    @Inject lateinit var reportBreakageContract: Provider<ReportBreakageContract>
+    @Inject lateinit var reportBreakageContract: () -> ReportBreakageContract
 
     @Inject lateinit var appBuildConfig: AppBuildConfig
 
@@ -93,7 +92,7 @@ class ManageRecentAppsProtectionActivity :
         super.onCreate(savedInstanceState)
         enableTransparentEdgeToEdge()
 
-        reportBreakage = registerForActivityResult(reportBreakageContract.get()) { result ->
+        reportBreakage = registerForActivityResult(reportBreakageContract()) { result ->
             if (!result.isEmpty()) {
                 Snackbar.make(binding.root, R.string.atp_ReportBreakageSent, LENGTH_LONG).show()
             }

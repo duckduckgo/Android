@@ -29,12 +29,11 @@ import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.Provides
 import org.json.JSONObject
 import javax.inject.Inject
-import javax.inject.Provider
 
 @ContributesIntoSet(ActivityScope::class)
 class DeviceInfoCollector @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
-    @BatteryOptimizationState private val isIgnoringBatteryOptimizations: Provider<Boolean>,
+    @BatteryOptimizationState private val isIgnoringBatteryOptimizations: () -> Boolean,
 ) : VpnStateCollectorPlugin {
     override val collectorName: String
         get() = "deviceInfo"
@@ -43,7 +42,7 @@ class DeviceInfoCollector @Inject constructor(
         return JSONObject().apply {
             put("buildFlavor", appBuildConfig.flavor.toString())
             put("os", appBuildConfig.sdkInt)
-            put("batteryOptimizations", (!isIgnoringBatteryOptimizations.get()).toString())
+            put("batteryOptimizations", (!isIgnoringBatteryOptimizations()).toString())
             put("man", appBuildConfig.manufacturer)
         }
     }

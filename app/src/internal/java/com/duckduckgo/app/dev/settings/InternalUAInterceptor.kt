@@ -23,12 +23,11 @@ import com.duckduckgo.user.agent.api.UserAgentInterceptor
 import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 import javax.inject.Named
-import javax.inject.Provider
 
 @ContributesIntoSet(AppScope::class)
 class InternalUAInterceptor @Inject constructor(
     private val devSettingsDataStore: DevSettingsDataStore,
-    @Named("defaultUserAgent") private val defaultUserAgent: Provider<String>,
+    @Named("defaultUserAgent") private val defaultUserAgent: () -> String,
 ) : UserAgentInterceptor {
 
     override fun intercept(userAgent: String): String {
@@ -37,7 +36,7 @@ class InternalUAInterceptor @Inject constructor(
         return when (devSettingsDataStore.selectedUA) {
             UAOverride.DEFAULT -> userAgent
             UAOverride.FIREFOX -> "Mozilla/5.0 (Android 11; Mobile; rv:94.0) Gecko/94.0 Firefox/94.0"
-            UAOverride.WEBVIEW -> defaultUserAgent.get()
+            UAOverride.WEBVIEW -> defaultUserAgent()
         }
     }
 }
