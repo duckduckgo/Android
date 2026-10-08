@@ -860,8 +860,8 @@
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Prikaži pri pokretanju aplikacije</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab">Posljednja otvorena kartica</string>
-    <string name="showOnAppLaunchOptionNewTabPage">Nova stranica kartice</string>
+    <string name="showOnAppLaunchOptionLastUsedTab">Posljednja korištena kartica</string>
+    <string name="showOnAppLaunchOptionOpenNewTab">Nova stranica kartice</string>
     <string name="showOnAppLaunchOptionSpecificPage">Specifična stranica</string>
 
     <!-- Privacy Dashboard -->
