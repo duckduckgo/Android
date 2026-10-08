@@ -127,6 +127,7 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
         configureIntroAnimation()
         configureReadyToScanButtons()
         configureGoToSettingsButton()
+        configureChangePermissionsButton()
         configureScanner()
         configureCutout()
 
@@ -191,7 +192,8 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
 
     private fun renderIntroAnimationViewState(viewState: ViewState) {
         binding.includeIntro.root.isVisible = viewState.viewMode == ViewMode.Intro
-        binding.includeNoPermission.root.isVisible = viewState.viewMode == ViewMode.NoCameraPermission
+        binding.includeNoPermission.root.isVisible = viewState.viewMode == ViewMode.NoCameraPermission && !viewState.isImprovedSyncEnabled
+        binding.includeNoPermission2.root.isVisible = viewState.viewMode == ViewMode.NoCameraPermission && viewState.isImprovedSyncEnabled
         binding.includeCamera.root.isVisible = viewState.viewMode == ViewMode.Camera
         binding.includeNoHardware.root.isVisible = viewState.viewMode == ViewMode.NoCameraAvailable
 
@@ -268,6 +270,12 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
 
     private fun configureGoToSettingsButton() {
         binding.includeNoPermission.goToPermissionsSettingsButton.setOnClickListener {
+            animationViewModel.onGoToPermissionSettingsClicked()
+        }
+    }
+
+    private fun configureChangePermissionsButton() {
+        binding.includeNoPermission2.changePermissionsButton.setOnClickListener {
             animationViewModel.onGoToPermissionSettingsClicked()
         }
     }
