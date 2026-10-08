@@ -16,13 +16,30 @@
 
 package com.duckduckgo.app.cta.ui
 
+import android.content.Context
+import android.content.res.Configuration
+import android.content.res.Resources
+import android.graphics.Rect
+import android.util.DisplayMetrics
+import android.view.View
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
+import com.airbnb.lottie.LottieAnimationView
+import com.duckduckgo.app.browser.R
+import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView
 import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.device.DeviceInfo.FormFactor
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class WavingDaxControllerTest {
 
@@ -32,7 +49,6 @@ class WavingDaxControllerTest {
         showArrow = true,
         deviceInfo = deviceInfo,
         wavingDaxSpec = testSpec,
-        improvementsV2Enabled = true,
     )
 
     @Test
@@ -65,71 +81,59 @@ class WavingDaxControllerTest {
         assertEquals(1f, controller.daxHorizontalScale(heightPx = 400, maxHeightPx = 0), 0f)
     }
 
-    // develop / V2-off daxFits tests
-
     @Test
-    fun daxFits_false_whenHeadIntrudesIntoCardBody() {
-        assertEquals(
-            false,
-            controller.daxFits(daxTop = 90, daxLeft = 0, daxRight = 40, cardBodyBottom = 100, finBottom = 130, finLeft = 50, finRight = 100),
+    fun applyFit_thenSettle_usesAvailableRoomSizing() {
+        val container: View = mock()
+        val cardView: DaxOnboardingBubbleCardView = mock()
+        val dax: LottieAnimationView = mock()
+        val resources: Resources = mock()
+        val context: Context = mock()
+        val layoutParams = ConstraintLayout.LayoutParams(0, 0)
+        val displayMetrics = DisplayMetrics().apply { density = 1f }
+        val configuration = Configuration().apply { orientation = Configuration.ORIENTATION_PORTRAIT }
+        val spec = DaxBubbleCta.WavingDaxSpec(
+            rotationDegrees = 0f,
+            translationXDp = -40f,
+            translationYDp = -150f,
+            minHeightDp = 400f,
+            maxHeightDp = 800f,
+            anchorToCardOnTablet = false,
         )
-    }
+        val controller = WavingDaxController(showArrow = false, deviceInfo = deviceInfo, wavingDaxSpec = spec)
 
-    @Test
-    fun daxFits_false_whenInFinBandAndOverlapsFinHorizontally() {
-        assertEquals(
-            false,
-            controller.daxFits(daxTop = 110, daxLeft = 60, daxRight = 90, cardBodyBottom = 100, finBottom = 130, finLeft = 50, finRight = 100),
-        )
-    }
+        whenever(deviceInfo.formFactor()).thenReturn(FormFactor.PHONE)
+        whenever(container.isShown).thenReturn(true)
+        whenever(container.context).thenReturn(context)
+        whenever(container.resources).thenReturn(resources)
+        whenever(context.resources).thenReturn(resources)
+        whenever(resources.configuration).thenReturn(configuration)
+        whenever(resources.displayMetrics).thenReturn(displayMetrics)
+        whenever(container.findViewById<LottieAnimationView>(R.id.wavingDax)).thenReturn(dax)
+        whenever(container.findViewById<DaxOnboardingBubbleCardView>(R.id.brandDesignCardView)).thenReturn(cardView)
+        whenever(cardView.height).thenReturn(500)
+        whenever(cardView.arrowDepthFraction).thenReturn(0f)
+        whenever(dax.resources).thenReturn(resources)
+        whenever(dax.layoutParams).thenReturn(layoutParams)
+        whenever(dax.visibility).thenReturn(View.INVISIBLE)
+        doAnswer { invocation ->
+            (invocation.arguments[0] as IntArray)[1] = 500
+            null
+        }.whenever(cardView).getLocationOnScreen(any())
+        doAnswer { invocation ->
+            (invocation.arguments[0] as Rect).bottom = 1508
+            null
+        }.whenever(container).getWindowVisibleDisplayFrame(any())
+        val settleRunnable = argumentCaptor<Runnable>()
+        whenever(container.postDelayed(settleRunnable.capture(), eq(100L))).thenReturn(true)
 
-    @Test
-    fun daxFits_true_whenInFinBandButHorizontallyClearOfFin() {
-        assertEquals(
-            true,
-            controller.daxFits(daxTop = 110, daxLeft = 0, daxRight = 40, cardBodyBottom = 100, finBottom = 130, finLeft = 50, finRight = 100),
-        )
-    }
+        controller.applyFit(container)
+        settleRunnable.firstValue.run()
 
-    @Test
-    fun daxFits_true_whenEntirelyBelowFinTip() {
-        assertEquals(
-            true,
-            controller.daxFits(daxTop = 140, daxLeft = 60, daxRight = 90, cardBodyBottom = 100, finBottom = 130, finLeft = 50, finRight = 100),
-        )
-    }
-
-    @Test
-    fun whenV2DisabledThenDaxFitsRotatedRectLogicUsed() {
-        val controller = WavingDaxController(
-            showArrow = true,
-            deviceInfo = deviceInfo,
-            wavingDaxSpec = testSpec,
-            improvementsV2Enabled = false,
-        )
-        // daxTop below cardBodyBottom and clear of the fin → fits
-        assertTrue(
-            controller.daxFits(
-                daxTop = 100,
-                daxLeft = 0,
-                daxRight = 10,
-                cardBodyBottom = 50,
-                finBottom = 40,
-                finLeft = 500,
-                finRight = 600,
-            ),
-        )
-        // daxTop intruding into the card body → does not fit
-        assertFalse(
-            controller.daxFits(
-                daxTop = 30,
-                daxLeft = 0,
-                daxRight = 10,
-                cardBodyBottom = 50,
-                finBottom = 40,
-                finLeft = 500,
-                finRight = 600,
-            ),
-        )
+        // Room-based sizing: 500px available height and proportional -25px peek.
+        assertEquals(500, layoutParams.height)
+        verify(dax, times(2)).translationX = -25f
+        verify(dax).setMinFrame(17)
+        verify(dax).progress = 0f
+        verify(dax).isVisible = true
     }
 }

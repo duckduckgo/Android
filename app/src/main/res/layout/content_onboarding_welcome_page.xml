@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2019 DuckDuckGo
+  ~ Copyright (c) 2026 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,71 +17,214 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/longDescriptionContainer"
+    android:id="@+id/onboardingWelcomePageContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:tag="onboardingDefaultBrowser"
+    android:background="?attr/onboardingSurfaceBackdrop"
+    android:clipChildren="false"
+    android:tag="onboardingWelcomePage"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
-    <ImageView
-        android:id="@+id/sceneBg"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        tools:srcCompat="@drawable/onboarding_background_small_light" />
-
-    <ImageView
-        android:id="@+id/foregroundImageView"
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/textGuideline"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginTop="64dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.500684" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/backgroundGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.44" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/logoAnimation"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="96dp"
+        android:layout_marginBottom="20dp"
+        android:importantForAccessibility="no"
+        android:transformPivotX="40dp"
+        android:transformPivotY="80dp"
+        app:layout_constraintBottom_toTopOf="@id/welcomeTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1"
+        app:lottie_loop="false"
+        app:lottie_rawRes="@raw/onboarding_launch_screen_logo"
+        tools:lottie_progress="0.99"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/welcomeTitle"
+        style="@style/Typography.DuckDuckGo.Onboarding.WelcomeTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:alpha="0"
+        android:gravity="center"
+        android:text="@string/onboardingWelcomeTitle"
+        app:layout_constraintBottom_toTopOf="@id/textGuideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_bias="1"
+        tools:alpha="1"
+        tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/duckAiIntroAnimation"
+        android:layout_width="wrap_content"
+        android:layout_height="90sp"
+        android:layout_marginTop="12dp"
         android:adjustViewBounds="true"
+        android:importantForAccessibility="no"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@id/welcomeTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:lottie_loop="false"
+        app:lottie_rawRes="@raw/onboarding_welcome_duck_ai_intro"
+        tools:lottie_progress="1"
+        tools:visibility="visible" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/backgroundPrimary"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/welcomeContent"
-        app:srcCompat="@drawable/onboarding_hike_foreground" />
+        app:layout_constraintTop_toTopOf="@id/backgroundGuideline"
+        app:layout_constraintVertical_bias="1"
+        app:lottie_loop="false"
+        app:lottie_rawRes="@raw/onboarding_launch_screen_background"
+        tools:lottie_progress="1"
+        tools:visibility="gone" />
 
-    <LinearLayout
-        android:id="@+id/welcomeContent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
+    <ImageView
+        android:id="@+id/backgroundSecondary"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/daxLogo"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="80dp"
-            app:srcCompat="@drawable/ic_dax_icon" />
-
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/welcomeTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="54dp"
-            android:layout_marginTop="@dimen/keyline_4"
-            android:layout_marginEnd="54dp"
-            android:gravity="center"
-            android:text="@string/onboardingWelcomeTitle"
-            app:typography="title" />
-    </LinearLayout>
+        app:layout_constraintTop_toTopOf="@id/backgroundGuideline"
+        app:layout_constraintVertical_bias="1"
+        tools:layout_constraintHeight_max="404dp"
+        tools:src="@drawable/onboarding_background_pond"
+        tools:visibility="visible" />
 
     <include
         android:id="@+id/daxDialogCta"
         layout="@layout/pre_onboarding_dax_dialog_cta"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="32dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:alpha="0"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/welcomeScreenWalkingDax"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.85"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_max="600dp" />
+        app:layout_constraintVertical_bias="1"
+        app:layout_constraintWidth_max="600dp"
+        tools:alpha="1"
+        tools:visibility="visible" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/welcomeScreenWalkingDax"
+        android:layout_width="wrap_content"
+        android:adjustViewBounds="true"
+        android:layout_height="274dp"
+        android:layout_marginBottom="104dp"
+        android:alpha="0"
+        android:translationX="-16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:lottie_rawRes="@raw/onboarding_welcome_screen_dax_walking"
+        tools:alpha="1"
+        tools:lottie_progress="1" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/bottomWingAnimation"
+        android:layout_width="wrap_content"
+        android:layout_height="199dp"
+        android:adjustViewBounds="true"
+        android:alpha="0"
+        android:visibility="gone"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:lottie_rawRes="@raw/onboarding_wing_bottom"
+        tools:alpha="1"
+        tools:lottie_progress="0.5"
+        tools:visibility="gone" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/bobbingDaxAnimation"
+        android:layout_width="wrap_content"
+        android:layout_height="156dp"
+        android:layout_marginBottom="52dp"
+        android:adjustViewBounds="true"
+        android:alpha="0"
+        android:visibility="gone"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/onboarding_address_bar_bobbing_dax"
+        tools:alpha="1"
+        tools:lottie_progress="0.5"
+        tools:visibility="visible" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/leftWingAnimation"
+        android:layout_width="wrap_content"
+        android:layout_height="196dp"
+        android:layout_marginBottom="52dp"
+        android:adjustViewBounds="true"
+        android:alpha="0"
+        android:visibility="gone"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:lottie_rawRes="@raw/onboarding_wing_left"
+        tools:alpha="1"
+        tools:lottie_progress="0.5"
+        tools:visibility="visible" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/rightWingAnimation"
+        android:layout_width="wrap_content"
+        android:layout_height="196dp"
+        android:layout_marginBottom="52dp"
+        android:adjustViewBounds="true"
+        android:alpha="0"
+        android:visibility="gone"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:lottie_rawRes="@raw/onboarding_wing_right"
+        tools:alpha="1"
+        tools:lottie_progress="0.5"
+        tools:visibility="visible" />
+
+    <Space
+        android:id="@+id/undecoratedBand"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

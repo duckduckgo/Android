@@ -24,7 +24,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrapper
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -48,7 +47,6 @@ class LaunchViewModel @Inject constructor(
     private val pixel: Pixel,
     private val testScenarioSeeder: TestScenarioSeeder,
     private val newUserOnboardingPlanBootstrapper: NewUserOnboardingPlanBootstrapper,
-    private val brandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
 ) : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -82,22 +80,18 @@ class LaunchViewModel @Inject constructor(
 
     suspend fun showOnboardingOrHome() {
         if (userStageStore.isNewUser()) {
-            if (brandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
-                val startState = newUserOnboardingPlanBootstrapper.startNewUserOnboardingPlan()
-                when (startState.currentStep.host) {
-                    LinearOnboardingHost.OnboardingActivity -> {
-                        command.value = Command.Onboarding
-                    }
-                    LinearOnboardingHost.BrowserActivity -> {
-                        command.value = Command.Home()
-                    }
-                    else -> {
-                        // extend to support initial hosts in the future
-                        throw IllegalArgumentException("unsupported initial onboarding host transition")
-                    }
+            val startState = newUserOnboardingPlanBootstrapper.startNewUserOnboardingPlan()
+            when (startState.currentStep.host) {
+                LinearOnboardingHost.OnboardingActivity -> {
+                    command.value = Command.Onboarding
                 }
-            } else {
-                command.value = Command.Onboarding
+                LinearOnboardingHost.BrowserActivity -> {
+                    command.value = Command.Home()
+                }
+                else -> {
+                    // extend to support initial hosts in the future
+                    throw IllegalArgumentException("unsupported initial onboarding host transition")
+                }
             }
         } else {
             command.value = Command.Home()

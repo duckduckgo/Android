@@ -18,7 +18,7 @@ package com.duckduckgo.app.onboarding.ui.page.configdriven.engine
 
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
-import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageUpdateBinding
+import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBinding
 
 /**
  * Owns the card-anchor axis: whether the dax card sits above the settled decoration or pinned to the parent
@@ -29,7 +29,7 @@ interface CardAnchorController {
 }
 
 class CardAnchorControllerImpl(
-    private val binding: ContentOnboardingWelcomePageUpdateBinding,
+    private val binding: ContentOnboardingWelcomePageBinding,
     private val resolver: CardAnchorResolver,
 ) : CardAnchorController {
 

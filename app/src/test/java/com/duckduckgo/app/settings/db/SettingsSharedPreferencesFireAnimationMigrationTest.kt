@@ -16,19 +16,15 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.feature.toggles.api.Toggle
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
@@ -37,11 +33,9 @@ class SettingsSharedPreferencesFireAnimationMigrationTest {
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
     private val prefs: SharedPreferences = context.getSharedPreferences(SettingsSharedPreferences.FILENAME, Context.MODE_PRIVATE)
 
-    private val mockToggles = mock<OnboardingBrandDesignUpdateToggles>()
-    private val lazyToggles = dagger.Lazy<OnboardingBrandDesignUpdateToggles> { mockToggles }
     private val mockAppBuildConfig = mock<AppBuildConfig>()
 
-    private val testee = SettingsSharedPreferences(context, mockAppBuildConfig, lazyToggles)
+    private val testee = SettingsSharedPreferences(context, mockAppBuildConfig)
 
     @Before
     fun setup() {
@@ -51,11 +45,6 @@ class SettingsSharedPreferencesFireAnimationMigrationTest {
     @After
     fun teardown() {
         prefs.edit { clear() }
-    }
-
-    private fun setFlag(on: Boolean) {
-        val toggle: Toggle = mock { on { isEnabled() } doReturn on }
-        whenever(mockToggles.fireAnimationUpdate()).thenReturn(toggle)
     }
 
     private fun primeFireAnimationPref(value: String) {
@@ -79,9 +68,7 @@ class SettingsSharedPreferencesFireAnimationMigrationTest {
     }
 
     @Test
-    fun whenNoSavedValueAndFlagOnThenGetterReturnsInfernoAndPrefsRemainAbsent() {
-        setFlag(on = true)
-
+    fun whenNoSavedValueThenGetterReturnsInfernoAndPrefsRemainAbsent() {
         val resolved = testee.selectedFireAnimation
 
         assertEquals(FireAnimation.Inferno, resolved)
@@ -89,43 +76,34 @@ class SettingsSharedPreferencesFireAnimationMigrationTest {
     }
 
     @Test
-    fun whenNoSavedValueAndFlagOffThenGetterReturnsHeroFireAndPrefsRemainAbsent() {
-        setFlag(on = false)
-
-        val resolved = testee.selectedFireAnimation
-
-        assertEquals(FireAnimation.HeroFire, resolved)
-        assertNull(storedFireAnimation())
-    }
-
-    @Test
-    fun whenSavedHeroFireAndFlagOnThenGetterReturnsHeroFire() {
+    fun whenSavedHeroFireThenGetterReturnsHeroFire() {
         primeFireAnimationPref("HERO_FIRE")
-        setFlag(on = true)
 
         assertEquals(FireAnimation.HeroFire, testee.selectedFireAnimation)
         assertEquals("HERO_FIRE", storedFireAnimation())
     }
 
     @Test
-    fun whenSavedInfernoAndFlagOffThenGetterReturnsHeroFireButPrefsKeepInferno() {
+    fun whenSavedInfernoThenGetterReturnsInfernoAndPrefsKeepInferno() {
         primeFireAnimationPref("INFERNO")
-        setFlag(on = false)
 
-        assertEquals(FireAnimation.HeroFire, testee.selectedFireAnimation)
+        assertEquals(FireAnimation.Inferno, testee.selectedFireAnimation)
         assertEquals("INFERNO", storedFireAnimation())
     }
 
     @Test
-    fun whenSavedHeroWaterThenGetterReturnsHeroWaterRegardlessOfFlag() {
+    fun whenSavedUnrecognisedValueThenGetterReturnsInfernoAndPrefsKeepValue() {
+        primeFireAnimationPref("NOT_A_FIRE_ANIMATION")
+
+        assertEquals(FireAnimation.Inferno, testee.selectedFireAnimation)
+        assertEquals("NOT_A_FIRE_ANIMATION", storedFireAnimation())
+    }
+
+    @Test
+    fun whenSavedHeroWaterThenGetterReturnsHeroWater() {
         primeFireAnimationPref("HERO_WATER")
 
-        setFlag(on = true)
         assertEquals(FireAnimation.HeroWater, testee.selectedFireAnimation)
-
-        setFlag(on = false)
-        assertEquals(FireAnimation.HeroWater, testee.selectedFireAnimation)
-
         assertEquals("HERO_WATER", storedFireAnimation())
     }
 }

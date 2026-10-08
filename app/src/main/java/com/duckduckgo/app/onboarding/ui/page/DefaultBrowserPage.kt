@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,42 +21,49 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
+import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.di.scopes.FragmentScope
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
-class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_default_browser) {
+class DefaultBrowserPage :
+    OnboardingPageFragment(R.layout.content_onboarding_default_browser) {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
     @Inject
-    lateinit var appBuildConfig: AppBuildConfig
+    lateinit var appTheme: AppTheme
 
     private var userTriedToSetDDGAsDefault = false
     private var userSelectedExternalBrowser = false
     private var toast: Toast? = null
 
     private var defaultCard: View? = null
-    private lateinit var headerImage: ImageView
     private lateinit var title: TextView
     private lateinit var subtitle: TextView
     private lateinit var primaryButton: DaxButton
@@ -66,17 +73,58 @@ class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_de
         ViewModelProvider(this, viewModelFactory).get(DefaultBrowserPageViewModel::class.java)
     }
 
+    override fun onGetLayoutInflater(savedInstanceState: Bundle?): LayoutInflater {
+        val inflater = super.onGetLayoutInflater(savedInstanceState)
+        val themeRes = if (appTheme.isLightModeEnabled()) {
+            CommonR.style.Theme_DuckDuckGo_Light_Onboarding
+        } else {
+            CommonR.style.Theme_DuckDuckGo_Dark_Onboarding
+        }
+        val contextThemeWrapper = ContextThemeWrapper(inflater.context, themeRes)
+        return inflater.cloneInContext(contextThemeWrapper)
+    }
+
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        headerImage = view.findViewById(R.id.defaultBrowserImage)
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            v.setPadding(insets.left, insets.top, insets.right, insets.bottom)
+            windowInsets
+        }
+
         title = view.findViewById(R.id.browserProtectionTitle)
         subtitle = view.findViewById(R.id.browserProtectionSubtitle)
         primaryButton = view.findViewById(R.id.launchSettingsButton)
         secondaryButton = view.findViewById(R.id.continueButton)
+
+        adaptHeaderImageToAvailableSpace(view)
+    }
+
+    private fun adaptHeaderImageToAvailableSpace(view: View) {
+        val image = view.findViewById<ImageView>(R.id.defaultBrowserImage) ?: return
+        val scroll = view.findViewById<NestedScrollView>(R.id.contentScroll) ?: return
+        val density = resources.displayMetrics.density
+        val minImageHeightPx = (HEADER_IMAGE_MIN_DP * density).toInt()
+        val designWidthPx = (HEADER_IMAGE_DESIGN_WIDTH_DP * density).toInt()
+        scroll.viewTreeObserver.addOnPreDrawListener {
+            // On wide screens (tablets) cap the image width to the design width so centerCrop
+            // doesn't scale the asset up vertically and clip the top and bottom.
+            if (scroll.width > designWidthPx && image.layoutParams.width != designWidthPx) {
+                image.updateLayoutParams { width = designWidthPx }
+                return@addOnPreDrawListener false
+            }
+            if (image.layoutParams.height == minImageHeightPx) return@addOnPreDrawListener true
+            if (!scroll.canScrollVertically(1)) return@addOnPreDrawListener true
+            image.scaleType = ImageView.ScaleType.FIT_CENTER
+            image.updateLayoutParams { height = minImageHeightPx }
+            false
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -140,16 +188,15 @@ class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_de
     }
 
     private fun setUiForDialog() {
-        headerImage.setImageResource(R.drawable.set_as_default_browser_illustration_dialog)
-        subtitle.setText(R.string.defaultBrowserDescriptionNoDefault)
+        // Both states share a single placeholder illustration; only the copy varies.
+        subtitle.text = getString(R.string.defaultBrowserDescriptionNoDefault).preventWidows()
         title.setText(R.string.onboardingDefaultBrowserTitle)
         primaryButton.setText(R.string.setAsDefaultBrowser)
         setButtonsBehaviour()
     }
 
     private fun setUiForSettings() {
-        headerImage.setImageResource(R.drawable.set_as_default_browser_illustration_settings)
-        subtitle.setText(R.string.onboardingDefaultBrowserDescription)
+        subtitle.text = getString(R.string.onboardingDefaultBrowserDescription).preventWidows()
         title.setText(R.string.onboardingDefaultBrowserTitle)
         primaryButton.setText(R.string.setAsDefaultBrowser)
         setButtonsBehaviour()
@@ -233,6 +280,8 @@ class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_de
     companion object {
         private const val DEFAULT_BROWSER_REQUEST_CODE_SETTINGS = 100
         private const val SAVED_STATE_LAUNCHED_DEFAULT = "SAVED_STATE_LAUNCHED_DEFAULT"
+        private const val HEADER_IMAGE_MIN_DP = 180
+        private const val HEADER_IMAGE_DESIGN_WIDTH_DP = 514
         const val DEFAULT_BROWSER_REQUEST_CODE_DIALOG = 101
         const val DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL = 102
     }

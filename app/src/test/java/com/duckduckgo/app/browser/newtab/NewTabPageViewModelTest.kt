@@ -21,17 +21,15 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
-import com.duckduckgo.app.cta.model.CtaId.DAX_END
+import com.duckduckgo.app.cta.model.CtaId.ADD_WIDGET
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.generalsettings.showonapplaunch.rmf.AfterIdleMessageTriggerProvider
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.view.MessageCta
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
@@ -58,7 +56,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -82,7 +79,6 @@ class NewTabPageViewModelTest {
     private val mockLowPriorityMessagingModel: LowPriorityMessagingModel = mock()
     private val mockAppTrackingProtection: AppTrackingProtection = mock()
     private val pixel: Pixel = mock()
-    private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockCtaViewModel: CtaViewModel = mock()
     private val mockPromptsCoordinator: PromptsCoordinator = mock()
     private val mockPromptExposureReporter: PromptExposureReporter = mock()
@@ -91,12 +87,12 @@ class NewTabPageViewModelTest {
 
     @Before
     fun setUp() = runTest {
-        val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(null))
         whenever(mockAfterIdleMessageTriggerProvider.activeTrigger()).thenReturn(flowOf(null))
         whenever(mockAppTrackingProtection.isEnabled()).thenReturn(false)
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(false)
+        whenever(mockDismissedCtaDao.exists(ADD_WIDGET)).thenReturn(false)
         // Default: the prompt surface is free, so RMF claims are granted.
         whenever(mockPromptsCoordinator.tryClaim(PromptType.NTP_CARD)).thenReturn(true)
 
@@ -121,7 +117,6 @@ class NewTabPageViewModelTest {
             lowPriorityMessagingModel = mockLowPriorityMessagingModel,
             appTrackingProtection = mockAppTrackingProtection,
             pixel = pixel,
-            onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             ctaViewModel = mockCtaViewModel,
             promptsCoordinator = mockPromptsCoordinator,
             promptExposureReporter = mockPromptExposureReporter,
@@ -287,7 +282,7 @@ class NewTabPageViewModelTest {
             onShown = {},
         )
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
-        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
         whenever(mockLowPriorityMessagingModel.getMessage()).thenReturn(lowPriorityMessage)
         whenever(mockPromptsCoordinator.tryClaim(PromptType.NTP_CARD)).thenReturn(false)
 
@@ -331,7 +326,6 @@ class NewTabPageViewModelTest {
     fun whenViewModelIsInitializedThenViewStateShouldEmitInitialState() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
-        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(false)
 
         testee.onStart(mockLifecycleOwner)
 
@@ -349,7 +343,6 @@ class NewTabPageViewModelTest {
     fun whenRemoteMessageAvailableAndOnboardingNotCompleteThenMessageNotShown() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
-        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(false)
 
         testee.onStart(mockLifecycleOwner)
 
@@ -367,7 +360,7 @@ class NewTabPageViewModelTest {
     fun whenRemoteMessageAvailableAndOnboardingCompleteThenMessageShown() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
-        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
 
         testee.onStart(mockLifecycleOwner)
 
@@ -383,13 +376,10 @@ class NewTabPageViewModelTest {
     }
 
     @Test
-    fun whenBrandDesignUpdateEnabledAndBubbleDaxDialogsNotCompleteThenOnboardingNotComplete() = runTest {
-        val mockEnabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+    fun whenBubbleDaxDialogsIncompleteAndNoOtherCompletionConditionThenOnboardingNotComplete() = runTest {
         whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(false)
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
-        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
 
         testee = createTestee()
         testee.onStart(mockLifecycleOwner)
@@ -402,9 +392,41 @@ class NewTabPageViewModelTest {
     }
 
     @Test
-    fun whenBrandDesignUpdateEnabledAndBubbleDaxDialogsCompleteThenOnboardingComplete() = runTest {
-        val mockEnabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+    fun whenHideTipsSetAndBubbleDaxDialogsIncompleteThenOnboardingComplete() = runTest {
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(false)
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
+
+        testee = createTestee()
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertTrue(it.onboardingComplete)
+            }
+        }
+    }
+
+    @Test
+    fun whenAddWidgetDismissedAndBubbleDaxDialogsIncompleteThenOnboardingComplete() = runTest {
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(false)
+        whenever(mockDismissedCtaDao.exists(ADD_WIDGET)).thenReturn(true)
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
+
+        testee = createTestee()
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertTrue(it.onboardingComplete)
+            }
+        }
+    }
+
+    @Test
+    fun whenBubbleDaxDialogsCompleteThenOnboardingComplete() = runTest {
         whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
@@ -424,7 +446,7 @@ class NewTabPageViewModelTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(mockRemoteMessageModel.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)).thenReturn("messageFile")
-        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
 
         testee.onStart(mockLifecycleOwner)
 
@@ -578,7 +600,7 @@ class NewTabPageViewModelTest {
             onShown = {},
         )
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
-        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
         whenever(mockLowPriorityMessagingModel.getMessage()).thenReturn(lowPriorityMessage)
 
         testee.onStart(mockLifecycleOwner)
@@ -608,7 +630,7 @@ class NewTabPageViewModelTest {
             onShown = {},
         )
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
-        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
         whenever(mockLowPriorityMessagingModel.getMessage()).thenReturn(lowPriorityMessage)
 
         testee.onStart(mockLifecycleOwner)
@@ -624,7 +646,7 @@ class NewTabPageViewModelTest {
 
     @Test
     fun `when onboarding finished and logo enabled, then show logo`() = runTest {
-        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
 
         testee.onStart(mockLifecycleOwner)
 
@@ -639,7 +661,7 @@ class NewTabPageViewModelTest {
     @Test
     fun `when onboarding finished and logo disabled, then hide logo and report no content`() = runTest {
         val testeeWithoutLogo = createTestee(showLogo = false)
-        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
 
         testeeWithoutLogo.onStart(mockLifecycleOwner)
 
@@ -654,7 +676,7 @@ class NewTabPageViewModelTest {
     @Test
     fun `when AppTP enabled, then show logo`() = runTest {
         whenever(mockAppTrackingProtection.isEnabled()).thenReturn(true)
-        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
 
         testee.onStart(mockLifecycleOwner)
 
@@ -670,7 +692,7 @@ class NewTabPageViewModelTest {
     fun `when AppTP enabled and logo disabled, then hide logo`() = runTest {
         val testeeWithoutLogo = createTestee(showLogo = false)
         whenever(mockAppTrackingProtection.isEnabled()).thenReturn(true)
-        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
 
         testeeWithoutLogo.onStart(mockLifecycleOwner)
 
@@ -686,7 +708,7 @@ class NewTabPageViewModelTest {
     fun `when onboarding complete and RMF available, then hide logo`() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
-        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
 
         testee.onStart(mockLifecycleOwner)
 
@@ -704,7 +726,7 @@ class NewTabPageViewModelTest {
             SavedSite.Favorite("1", "Test", "https://test.com", lastModified = "2024-01-01", 0),
         )
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(favorites))
-        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
         whenever(mockAppTrackingProtection.isEnabled()).thenReturn(false)
 
         testee.onStart(mockLifecycleOwner)
@@ -793,7 +815,7 @@ class NewTabPageViewModelTest {
     fun `when remote message available with MODAL surface then show logo, not the message`() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.MODAL))
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
-        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
 
         testee.onStart(mockLifecycleOwner)
 
@@ -809,7 +831,7 @@ class NewTabPageViewModelTest {
     fun `when remote message available with NEW_TAB_PAGE surface then show the message, not the logo`() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
-        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
 
         testee.onStart(mockLifecycleOwner)
 
@@ -824,7 +846,7 @@ class NewTabPageViewModelTest {
     @Test
     fun `when no remote message available then show the logo`() = runTest {
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(null))
-        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
 
         testee.onStart(mockLifecycleOwner)
 

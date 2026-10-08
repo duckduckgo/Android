@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2024 DuckDuckGo
+  ~ Copyright (c) 2026 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/daxCtaContainer"
@@ -22,282 +22,205 @@
     android:alpha="0"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:orientation="vertical"
-    tools:alpha="1">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/progressBarText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_4"
-            android:layout_marginEnd="@dimen/keyline_5"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:typography="body2"
-            tools:text="1/2" />
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="@android:style/Widget.ProgressBar.Horizontal"
-            android:layout_width="64dp"
-            android:layout_height="@dimen/keyline_1"
-            android:indeterminate="false"
-            android:max="2"
-            android:progress="1"
-            android:progressDrawable="@drawable/progress_progressbar_preonboarding"
-            app:layout_constraintEnd_toEndOf="@id/progressBarText"
-            app:layout_constraintTop_toBottomOf="@id/progressBarText" />
-
-        <ImageView
-            android:id="@+id/logo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_dax_icon" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    android:paddingTop="@dimen/preOnboardingDaxCtaPaddingTop"
+    android:visibility="invisible"
+    tools:alpha="1"
+    tools:visibility="visible">
 
     <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView
         android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/keyline_4"
-        android:layout_marginTop="28dp"
-        android:layout_marginBottom="@dimen/keyline_4"
-        app:arrowOffsetStart="6dp"
-        app:edgePosition="top"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/logo"
-        app:layout_constraintWidth_max="600dp">
+        android:layout_marginHorizontal="20dp"
+        app:arrowOffsetStart="96dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0">
 
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fadeScrollbars="false">
 
-            <LinearLayout
+            <com.duckduckgo.app.onboarding.ui.view.TouchInterceptingLinearLayout
                 android:id="@+id/cardContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:orientation="vertical"
+                android:paddingTop="28dp"
+                android:paddingBottom="20dp">
 
-                <FrameLayout
+                <include
+                    android:id="@+id/welcomeContent"
+                    layout="@layout/include_brand_design_dialog_welcome"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/keyline_5"
-                    android:layout_marginTop="@dimen/keyline_5">
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp" />
 
-                    <com.duckduckgo.common.ui.view.text.DaxTextView
-                        android:id="@+id/hiddenTextCta"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:visibility="invisible"
-                        app:typography="h2"
-                        tools:text="Hi there. Ready for a better, more private internet?"
-                        tools:visibility="visible" />
-
-                    <com.duckduckgo.common.ui.view.TypeAnimationTextView
-                        android:id="@+id/dialogTextCta"
-                        style="@style/Typography.DuckDuckGo.H2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:textColor="?attr/daxColorPrimaryText" />
-                </FrameLayout>
-
-                <com.duckduckgo.common.ui.view.text.DaxTextView
-                    android:id="@+id/descriptionCta"
+                <include
+                    android:id="@+id/downloadReasonContent"
+                    layout="@layout/include_brand_design_dialog_download_reason"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/keyline_5"
-                    android:layout_marginTop="@dimen/keyline_4"
-                    android:visibility="invisible"
-                    app:typography="body1"
-                    tools:text="Remember: you can delete all your tabs, history, and browsing data in two taps with the Fire Button 🔥"
-                    tools:visibility="visible" />
-
-                <ImageView
-                    android:id="@+id/daxDialogContentImage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginHorizontal="@dimen/keyline_5"
-                    android:layout_marginTop="@dimen/keyline_4"
-                    android:adjustViewBounds="true"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     android:visibility="gone" />
 
                 <include
-                    android:id="@+id/comparison_chart"
-                    layout="@layout/pre_onboarding_comparison_chart"
+                    android:id="@+id/comparisonChartContent"
+                    layout="@layout/include_brand_design_comparison_chart"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/keyline_5"
-                    android:layout_marginTop="@dimen/keyline_4"
-                    android:visibility="gone" />
-
-                <include
-                    android:id="@+id/comparison_chart_with_duck_ai"
-                    layout="@layout/pre_onboarding_comparison_chart_with_duck_ai"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/keyline_5"
-                    android:layout_marginTop="@dimen/keyline_4"
-                    android:visibility="gone" />
-
-                <include
-                    android:id="@+id/address_bar_position"
-                    layout="@layout/pre_onboarding_address_bar_position_horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/keyline_5"
-                    android:layout_marginTop="@dimen/keyline_4"
-                    android:layout_marginBottom="@dimen/keyline_2"
-                    android:visibility="gone" />
-
-                <LinearLayout
-                    android:id="@+id/duckAiInputScreenToggleContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_4"
-                    android:layout_marginHorizontal="40dp"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:visibility="gone">
-
-                    <LinearLayout
-                        android:id="@+id/duckAiInputScreenWithoutAiContainer"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:paddingTop="@dimen/keyline_6"
-                        android:paddingBottom="@dimen/keyline_2"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:id="@+id/duckAiInputScreenToggleWithoutAiImage"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:adjustViewBounds="true"
-                            android:scaleType="fitXY"
-                            android:foreground="@drawable/selectable_large_rounded_ripple"
-                            android:src="@drawable/searchbox_withoutai_active" />
-
-                        <com.duckduckgo.common.ui.view.text.DaxTextView
-                            android:id="@+id/duckAiInputScreenToggleWithoutAiCaption"
-                            android:layout_width="wrap_content"
-                            android:layout_height="0dp"
-                            android:layout_weight="1"
-                            android:layout_marginTop="6dp"
-                            android:gravity="center_horizontal"
-                            app:textType="primary"
-                            app:typography="caption" />
-
-                        <ImageView
-                            android:id="@+id/duckAiInputScreenToggleWithoutAiCheck"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:src="@drawable/ic_check_accent_24" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/duckAiInputScreenWithAiContainer"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:layout_marginStart="@dimen/inputScreenUserPrefToggleSpacing"
-                        android:paddingTop="@dimen/keyline_6"
-                        android:paddingBottom="@dimen/keyline_2"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:id="@+id/duckAiInputScreenToggleWithAiImage"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:adjustViewBounds="true"
-                            android:scaleType="fitXY"
-                            android:foreground="@drawable/selectable_large_rounded_ripple"
-                            android:src="@drawable/searchbox_withai_inactive" />
-
-                        <com.duckduckgo.common.ui.view.text.DaxTextView
-                            android:id="@+id/duckAiInputScreenToggleWithAiCaption"
-                            android:layout_width="wrap_content"
-                            android:layout_height="0dp"
-                            android:layout_weight="1"
-                            android:layout_marginTop="6dp"
-                            android:gravity="center_horizontal"
-                            app:textType="primary"
-                            app:typography="caption" />
-
-                        <ImageView
-                            android:id="@+id/duckAiInputScreenToggleWithAiCheck"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:src="@drawable/ic_shape_circle_24" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <com.duckduckgo.common.ui.view.text.DaxTextView
-                    android:id="@+id/duckAiInputScreenToggleDescription"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_6"
-                    android:layout_marginHorizontal="40dp"
-                    android:gravity="start"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     android:visibility="gone"
-                    app:textType="secondary"
-                    app:typography="caption" />
+                    tools:visibility="gone" />
 
                 <include
-                    android:id="@+id/input_screen_preview"
-                    layout="@layout/pre_onboarding_input_mode_demo"
+                    android:id="@+id/addressBarContent"
+                    layout="@layout/include_brand_design_address_bar_position"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/keyline_4"
-                    android:layout_marginTop="@dimen/keyline_5"
-                    android:layout_marginBottom="@dimen/keyline_4"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     android:visibility="gone" />
 
-                <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                <include
+                    android:id="@+id/inputScreenContent"
+                    layout="@layout/include_brand_design_input_screen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/inputScreenPreviewContent"
+                    layout="@layout/include_brand_design_input_screen_preview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/reinstallerQuickSetupContent"
+                    layout="@layout/include_brand_design_reinstaller_quick_setup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/widgetPromptContent"
+                    layout="@layout/include_brand_design_widget_prompt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/preferenceSelectorContent"
+                    layout="@layout/include_brand_design_preference_selector"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/singleChoiceContent"
+                    layout="@layout/include_brand_design_single_choice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/togglePositionContent"
+                    layout="@layout/include_brand_design_toggle_position"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/duckAiStateContent"
+                    layout="@layout/include_brand_design_duck_ai_state"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/importPasswordsContent"
+                    layout="@layout/include_brand_design_import_passwords"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/importCompleteContent"
+                    layout="@layout/include_brand_design_import_complete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonBrand
                     android:id="@+id/primaryCta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/keyline_5"
-                    android:layout_marginTop="@dimen/keyline_5"
-                    android:layout_marginBottom="@dimen/keyline_5"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="20dp"
                     android:alpha="0"
-                    android:text="@string/onboardingLetsDoItButton"
-                    app:daxButtonSize="large"
+                    android:text="@string/preOnboardingDaxDialog1ButtonBrandDesign"
+                    app:daxButtonBrandTypography="duckSans"
                     tools:alpha="1" />
 
                 <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
                     android:id="@+id/secondaryCta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/keyline_5"
-                    android:layout_marginTop="-22dp"
-                    android:layout_marginBottom="@dimen/keyline_5"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     android:alpha="0"
                     android:text="@string/preOnboardingDaxDialog1SecondaryButton"
-                    app:daxButtonSize="large"
-                    tools:alpha="1" />
+                    android:textAppearance="@style/Typography.DuckDuckGo.Rebrand.ButtonDuckSans"
+                    android:theme="@style/ThemeOverlay.Rebrand"
+                    android:visibility="gone"
+                    tools:alpha="1"
+                    tools:ignore="DeprecatedWidgetInXml,InvalidDaxButtonDuckSans,InvalidDaxButtonProperty"
+                    tools:visibility="visible" />
 
-            </LinearLayout>
+            </com.duckduckgo.app.onboarding.ui.view.TouchInterceptingLinearLayout>
+
         </ScrollView>
+
     </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView>
 
-</LinearLayout>
+    <com.duckduckgo.app.onboarding.ui.view.OnboardingStepIndicatorView
+        android:id="@+id/stepIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="58dp"
+        android:alpha="0"
+        android:translationZ="8dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:alpha="1"
+        tools:visibility="visible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

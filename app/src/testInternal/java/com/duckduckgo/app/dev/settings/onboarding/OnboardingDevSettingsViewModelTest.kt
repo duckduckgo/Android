@@ -26,6 +26,7 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -55,8 +56,13 @@ class OnboardingDevSettingsViewModelTest {
         CtaId.DAX_INTRO_PRIVACY_PRO,
     )
 
-    /** requiredCtas + ADD_WIDGET + DAX_INTRO_VISIT_SITE (matches ViewModel's visibleCtaIds()). */
-    private val allCtaIds = requiredCtas + listOf(CtaId.ADD_WIDGET, CtaId.DAX_INTRO_VISIT_SITE)
+    /** requiredCtas + all extra CTAs (matches ViewModel's visibleCtaIds()). */
+    private val allCtaIds = requiredCtas + listOf(
+        CtaId.DAX_INTRO_VISIT_SITE,
+        CtaId.DAX_DIALOG_NETWORK,
+        CtaId.DAX_DIALOG_OTHER,
+        CtaId.ADD_WIDGET,
+    )
 
     private val testee = OnboardingDevSettingsViewModel(
         userStageStore = userStageStore,
@@ -143,6 +149,9 @@ class OnboardingDevSettingsViewModelTest {
         whenever(ctaViewModel.requiredDaxOnboardingCtas()).thenReturn(requiredCtas)
         allCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(false) }
 
+        testee.start()
+        assertEquals(allCtaIds, testee.viewState.value.visibleCtaIds)
+
         testee.onOnboardingCompletedToggled(true)
 
         verify(userStageStore).moveToStage(AppStage.ESTABLISHED)
@@ -150,15 +159,18 @@ class OnboardingDevSettingsViewModelTest {
     }
 
     @Test
-    fun whenOnboardingCompletedToggledOffThenMoveToDaxOnboardingAndDeleteAllCtas() = runTest {
+    fun whenOnboardingCompletedToggledOffThenMoveToNewAndDeleteAllCtas() = runTest {
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(settingsDataStore.hideTips).thenReturn(false)
         whenever(ctaViewModel.requiredDaxOnboardingCtas()).thenReturn(requiredCtas)
         allCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(true) }
 
+        testee.start()
+        assertEquals(allCtaIds, testee.viewState.value.visibleCtaIds)
+
         testee.onOnboardingCompletedToggled(false)
 
-        verify(userStageStore).moveToStage(AppStage.DAX_ONBOARDING)
+        verify(userStageStore).moveToStage(AppStage.NEW)
         allCtaIds.forEach { ctaId -> verify(dismissedCtaDao).delete(ctaId) }
     }
 

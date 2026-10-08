@@ -46,7 +46,6 @@ import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_END
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_END_TRY_DUCK_AI
@@ -166,8 +165,6 @@ class CtaViewModelTest {
 
     private val mockDuckChat: DuckChat = mock()
 
-    private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
-
     private val mockOnboardingPixelSender: OnboardingPixelSender = mock()
 
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
@@ -200,7 +197,6 @@ class CtaViewModelTest {
             .allowMainThreadQueries()
             .build()
 
-        val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
         whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
         whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers()).thenReturn(mockDisabledToggle)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
@@ -217,10 +213,6 @@ class CtaViewModelTest {
         whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(emptySet())
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
         whenever(mockCustomAiOnboarding.isEnabled()).thenReturn(false)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovements()).thenReturn(mockEnabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovementsV2()).thenReturn(mockEnabledToggle)
-
         subscriptionPromoModalDecider = RealSubscriptionPromoModalDecider(
             extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
             appInstallStore = mockAppInstallStore,
@@ -250,7 +242,6 @@ class CtaViewModelTest {
             brokenSitePrompt = mockBrokenSitePrompt,
             subscriptionPromoCtaShownPlugins = mockSubscriptionPromoCtaShownPlugins,
             contextualCtaSuppressorPlugins = mockContextualCtaSuppressorPlugins,
-            onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             appTheme = mockAppTheme,
             deviceInfo = mockDeviceInfo,
             coroutineScope = coroutineRule.testScope,
@@ -269,7 +260,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenCtaShownAndCtaIsDaxAndCanNotSendPixelThenPixelIsNotFired() = runTest {
-        testee.onCtaShown(DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore))
+        testee.onCtaShown(DaxTryASearchBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo))
         verify(mockPixel, never()).fire(eq(SURVEY_CTA_SHOWN), any(), any(), eq(Count))
     }
 
@@ -288,7 +279,16 @@ class CtaViewModelTest {
     @Test
     fun whenCtaShownAndCtaIsDaxAndCanSendPixelThenPixelIsFired() = runTest {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("s:0")
-        testee.onCtaShown(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
+        testee.onCtaShown(
+            DaxEndBubbleCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mockDeviceInfo,
+                isOmnibarBottom = false,
+                segmentedPathWithAiInput = null,
+            ),
+        )
         verify(mockPixel, never()).fire(eq(SURVEY_CTA_SHOWN), any(), any(), eq(Count))
     }
 
@@ -312,7 +312,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenOnboardingCtaDismissedViaCloseBtnThenPixelIsFired() = runTest {
-        val testCta = DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
+        val testCta = DaxTryASearchBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
 
         testee.onUserDismissedCta(testCta, true)
 
@@ -321,7 +321,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenOnboardingCtaDismissedWithoutCloseBtnThenPixelIsNotFired() = runTest {
-        val testCta = DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
+        val testCta = DaxTryASearchBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
 
         testee.onUserDismissedCta(testCta)
 
@@ -338,7 +338,16 @@ class CtaViewModelTest {
     fun whenCtaDismissedAndUserHasPendingOnboardingCtasThenStageNotCompleted() = runTest {
         givenDaxOnboardingActive()
         givenShownDaxOnboardingCtas(emptyList())
-        testee.onUserDismissedCta(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
+        testee.onUserDismissedCta(
+            DaxEndBubbleCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mockDeviceInfo,
+                isOmnibarBottom = false,
+                segmentedPathWithAiInput = null,
+            ),
+        )
         verify(mockUserStageStore, times(0)).stageCompleted(any())
     }
 
@@ -346,25 +355,41 @@ class CtaViewModelTest {
     fun whenCtaDismissedAndAllDaxOnboardingCtasShownThenStageCompleted() = runTest {
         givenDaxOnboardingActive()
         givenShownDaxOnboardingCtas(requiredDaxOnboardingCtas)
-        testee.onUserDismissedCta(OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore))
+        testee.onUserDismissedCta(DaxSerpContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo))
         verify(mockUserStageStore).stageCompleted(AppStage.DAX_ONBOARDING)
     }
 
     @Test
     fun whenRegisterDaxBubbleIntroCtaThenDatabaseNotified() = runTest {
-        testee.onUserDismissedCta(DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore))
+        testee.onUserDismissedCta(DaxTryASearchBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO))
     }
 
     @Test
     fun whenRegisterDaxBubbleIntroVisitSiteCtaThenDatabaseNotified() = runTest {
-        testee.onUserDismissedCta(DaxBubbleCta.DaxIntroVisitSiteOptionsCta(mockOnboardingStore, mockAppInstallStore))
+        testee.onUserDismissedCta(
+            DaxVisitSiteOptionsBubbleCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mockDeviceInfo,
+            ),
+        )
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO_VISIT_SITE))
     }
 
     @Test
     fun whenRegisterDaxBubbleEndCtaThenDatabaseNotified() = runTest {
-        testee.onUserDismissedCta(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
+        testee.onUserDismissedCta(
+            DaxEndBubbleCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mockDeviceInfo,
+                isOmnibarBottom = false,
+                segmentedPathWithAiInput = null,
+            ),
+        )
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_END))
     }
 
@@ -372,7 +397,16 @@ class CtaViewModelTest {
     fun whenRegisterCtaAndUserHasPendingOnboardingCtasThenStageNotCompleted() = runTest {
         givenDaxOnboardingActive()
         givenShownDaxOnboardingCtas(emptyList())
-        testee.onUserDismissedCta(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
+        testee.onUserDismissedCta(
+            DaxEndBubbleCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mockDeviceInfo,
+                isOmnibarBottom = false,
+                segmentedPathWithAiInput = null,
+            ),
+        )
         verify(mockUserStageStore, times(0)).stageCompleted(any())
     }
 
@@ -380,7 +414,16 @@ class CtaViewModelTest {
     fun whenRegisterCtaAndAllDaxOnboardingCtasShownThenStageCompleted() = runTest {
         givenDaxOnboardingActive()
         givenShownDaxOnboardingCtas(requiredDaxOnboardingCtas)
-        testee.onUserDismissedCta(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
+        testee.onUserDismissedCta(
+            DaxEndBubbleCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mockDeviceInfo,
+                isOmnibarBottom = false,
+                segmentedPathWithAiInput = null,
+            ),
+        )
         verify(mockUserStageStore).stageCompleted(AppStage.DAX_ONBOARDING)
     }
 
@@ -520,9 +563,9 @@ class CtaViewModelTest {
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
-        ) as OnboardingDaxDialogCta
+        ) as DaxMainNetworkContextualCta
 
-        assertTrue(value is OnboardingDaxDialogCta.DaxMainNetworkCta)
+        assertTrue(value is DaxMainNetworkContextualCta)
     }
 
     @Test
@@ -535,33 +578,46 @@ class CtaViewModelTest {
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
-        ) as OnboardingDaxDialogCta
+        ) as DaxMainNetworkContextualCta
 
-        assertTrue(value is OnboardingDaxDialogCta.DaxMainNetworkCta)
+        assertTrue(value is DaxMainNetworkContextualCta)
     }
 
     @Test
     fun whenRefreshCtaWhileBrowsingThenReturnTrackersBlockedCta() = runTest {
         givenDaxOnboardingActive()
-        val trackingEvent = TrackingEvent(
-            documentUrl = "test.com",
-            trackerUrl = "test.com",
-            categories = null,
-            entity = TdsEntity("test", "test", 9.0),
-            surrogateId = null,
-            status = TrackerStatus.BLOCKED,
-            type = TrackerType.OTHER,
+        val lowerPrevalenceTracker = TdsEntity("test", "test", 1.0)
+        val higherPrevalenceTracker = TdsEntity("higher", "higher", 9.0)
+        val trackingEvents = listOf(
+            TrackingEvent(
+                documentUrl = "test.com",
+                trackerUrl = "test.com",
+                categories = null,
+                entity = lowerPrevalenceTracker,
+                surrogateId = null,
+                status = TrackerStatus.BLOCKED,
+                type = TrackerType.OTHER,
+            ),
+            TrackingEvent(
+                documentUrl = "higher.com",
+                trackerUrl = "higher.com",
+                categories = null,
+                entity = higherPrevalenceTracker,
+                surrogateId = null,
+                status = TrackerStatus.BLOCKED,
+                type = TrackerType.OTHER,
+            ),
         )
-        val site = site(url = "http://www.cnn.com", trackerCount = 1, events = listOf(trackingEvent))
+        val site = site(url = "http://www.cnn.com", trackerCount = 2, events = trackingEvents)
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
-        )
+        ) as DaxTrackersBlockedContextualCta
 
-        assertTrue(value is OnboardingDaxDialogCta.DaxTrackersBlockedCta)
+        assertEquals(listOf(higherPrevalenceTracker, lowerPrevalenceTracker), value.trackers)
     }
 
     @Test
@@ -585,7 +641,7 @@ class CtaViewModelTest {
             brokenSitePromptUrl = null,
         )
 
-        assertTrue(value is OnboardingDaxDialogCta.DaxTrackersBlockedCta)
+        assertTrue(value is DaxTrackersBlockedContextualCta)
     }
 
     @Test
@@ -600,7 +656,7 @@ class CtaViewModelTest {
             brokenSitePromptUrl = null,
         )
 
-        assertTrue(value is OnboardingDaxDialogCta.DaxNoTrackersCta)
+        assertTrue(value is DaxNoTrackersContextualCta)
     }
 
     @Test
@@ -615,7 +671,7 @@ class CtaViewModelTest {
             brokenSitePromptUrl = null,
         )
 
-        assertTrue(value is OnboardingDaxDialogCta.DaxSerpCta)
+        assertTrue(value is DaxSerpContextualCta)
     }
 
     @Test
@@ -630,7 +686,7 @@ class CtaViewModelTest {
             brokenSitePromptUrl = null,
         )
 
-        assertTrue(value is OnboardingDaxDialogCta.DaxNoTrackersCta)
+        assertTrue(value is DaxNoTrackersContextualCta)
     }
 
     @Test
@@ -645,7 +701,7 @@ class CtaViewModelTest {
             brokenSitePromptUrl = null,
         )
 
-        assertTrue(value is OnboardingDaxDialogCta.DaxNoTrackersCta)
+        assertTrue(value is DaxNoTrackersContextualCta)
     }
 
     @Test
@@ -660,7 +716,7 @@ class CtaViewModelTest {
             brokenSitePromptUrl = null,
         )
 
-        assertFalse(value is OnboardingDaxDialogCta)
+        assertFalse(value is ContextualDaxDialogCta)
     }
 
     @Test
@@ -677,7 +733,7 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
         )
-        assertFalse(value is OnboardingDaxDialogCta.DaxEndCta)
+        assertFalse(value is DaxEndContextualCta)
     }
 
     @Test
@@ -695,7 +751,7 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
         )
-        assertTrue(value is OnboardingDaxDialogCta.DaxEndCta)
+        assertTrue(value is DaxEndContextualCta)
     }
 
     @Test
@@ -710,7 +766,7 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
         )
-        assertTrue(value is DaxBubbleCta.DaxIntroSearchOptionsCta)
+        assertTrue(value is DaxTryASearchBubbleCta)
     }
 
     @Test
@@ -724,7 +780,7 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
         )
-        assertTrue(value is DaxBubbleCta.DaxIntroVisitSiteOptionsCta)
+        assertTrue(value is DaxVisitSiteOptionsBubbleCta)
     }
 
     @Test
@@ -740,7 +796,7 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
         )
-        assertTrue(value is DaxBubbleCta.DaxEndCta)
+        assertTrue(value is DaxEndBubbleCta)
     }
 
     @Test
@@ -942,15 +998,17 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
         )
-        assertTrue(value is DaxBubbleCta.DaxIntroSearchOptionsCta)
+        assertTrue(value is DaxTryASearchBubbleCta)
     }
 
     @Test
     fun whenRegisterDismissedDaxIntroVisitSiteCtaThenDatabaseNotified() = runTest {
         testee.onUserDismissedCta(
-            DaxBubbleCta.DaxIntroVisitSiteOptionsCta(
+            DaxVisitSiteOptionsBubbleCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mockDeviceInfo,
             ),
         )
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO_VISIT_SITE))
@@ -968,7 +1026,7 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
         )
-        assertTrue(value is DaxBubbleCta.DaxIntroVisitSiteOptionsCta)
+        assertTrue(value is DaxVisitSiteOptionsBubbleCta)
     }
 
     @Test
@@ -983,19 +1041,26 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
         )
-        assertFalse(value is DaxBubbleCta.DaxIntroVisitSiteOptionsCta)
+        assertFalse(value is DaxVisitSiteOptionsBubbleCta)
     }
 
     @Test
     fun whenCtaShownIfCtaIsNotMarkedAsReadOnShowThenCtaNotInsertedInDatabase() = runTest {
-        testee.onCtaShown(OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore))
+        testee.onCtaShown(DaxSerpContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo))
 
         verify(mockDismissedCtaDao, never()).insert(DismissedCta(CtaId.DAX_DIALOG_SERP))
     }
 
     @Test
     fun whenCtaShownIfCtaIsMarkedAsReadOnShowThenCtaInsertedInDatabase() = runTest {
-        testee.onCtaShown(OnboardingDaxDialogCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
+        testee.onCtaShown(
+            DaxEndContextualCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mockDeviceInfo,
+            ),
+        )
 
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_END))
     }
@@ -1018,7 +1083,7 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
         )
-        assertTrue(value is DaxBubbleCta.DaxSubscriptionCta)
+        assertTrue(value is DaxSubscriptionBubbleCta)
     }
 
     @Test
@@ -1040,8 +1105,8 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
         )
-        assertTrue(value is DaxBubbleCta.DaxSubscriptionCta)
-        assertTrue((value as DaxBubbleCta.DaxSubscriptionCta).isFreeTrialCopy)
+        assertTrue(value is DaxSubscriptionBubbleCta)
+        assertTrue((value as DaxSubscriptionBubbleCta).isFreeTrialCopy)
     }
 
     @Test
@@ -1101,8 +1166,6 @@ class CtaViewModelTest {
         whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
         whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
         whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockDisabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1110,7 +1173,7 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
         )
-        assertTrue(value is DaxBubbleCta.DaxSubscriptionCta)
+        assertTrue(value is DaxSubscriptionBubbleCta)
     }
 
     @Test
@@ -1149,8 +1212,7 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
         )
-        assertFalse(value is DaxBubbleCta.DaxSubscriptionCta)
-        assertFalse(value is DaxSubscriptionBrandDesignUpdateBubbleCta)
+        assertFalse(value is DaxSubscriptionBubbleCta)
     }
 
     @Test
@@ -1183,7 +1245,7 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
         )
-        assertFalse(value is DaxBubbleCta.DaxSubscriptionCta)
+        assertFalse(value is DaxSubscriptionBubbleCta)
     }
 
     @Test
@@ -1252,9 +1314,9 @@ class CtaViewModelTest {
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
-        ) as OnboardingDaxDialogCta
+        ) as DaxMainNetworkContextualCta
 
-        assertTrue(value is OnboardingDaxDialogCta.DaxMainNetworkCta)
+        assertTrue(value is DaxMainNetworkContextualCta)
     }
 
     @Test
@@ -1325,7 +1387,17 @@ class CtaViewModelTest {
 
     @Test
     fun whenDaxSubscriptionCtaIsShownThenSubscriptionPromoPluginsAreCalled() = runTest {
-        testee.onCtaShown(DaxBubbleCta.DaxSubscriptionCta(mockOnboardingStore, mockAppInstallStore, isFreeTrialCopy = false))
+        testee.onCtaShown(
+            DaxSubscriptionBubbleCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mockDeviceInfo,
+                isCustomAiOnboardingFlow = false,
+                isFreeTrialCopy = false,
+                segmentedPath = null,
+            ),
+        )
         verify(mockSubscriptionPromoCtaShownPlugin).onSubscriptionPromoCtaShown()
     }
 
@@ -1336,11 +1408,10 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenBrandDesignUpdateToggleEnabledThenReturnBrandDesignUpdateCta() = runTest {
+    fun whenSearchCtaAvailableThenReturnBrandDesignUpdateCta() = runTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(false)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)).thenReturn(true)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1348,30 +1419,13 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
         )
-        assertTrue(value is DaxTryASearchBrandDesignUpdateBubbleCta)
+        assertTrue(value is DaxTryASearchBubbleCta)
     }
 
     @Test
-    fun whenBrandDesignUpdateToggleDisabledThenReturnOldCta() = runTest {
-        givenDaxOnboardingActive()
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(false)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)).thenReturn(true)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
-
-        val value = testee.refreshCta(
-            coroutineRule.testDispatcher,
-            isBrowserShowing = false,
-            detectedRefreshPatterns = detectedRefreshPatterns,
-            brokenSitePromptUrl = null,
-        )
-        assertTrue(value is DaxBubbleCta.DaxIntroSearchOptionsCta)
-    }
-
-    @Test
-    fun whenBrandDesignUpdateToggleEnabledThenReturnVisitSiteBrandDesignUpdateCta() = runTest {
+    fun whenVisitSiteCtaAvailableThenReturnVisitSiteBrandDesignUpdateCta() = runTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1379,99 +1433,15 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
         )
-        assertTrue(value is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta)
+        assertTrue(value is DaxVisitSiteOptionsBubbleCta)
     }
 
     @Test
-    fun whenOnboardingImprovementsDisabledThenVisitSiteBrandCtaHasFlagFalse() = runTest {
-        givenDaxOnboardingActive()
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovements()).thenReturn(mockDisabledToggle)
-
-        val value = testee.refreshCta(
-            coroutineRule.testDispatcher,
-            isBrowserShowing = false,
-            detectedRefreshPatterns = detectedRefreshPatterns,
-            brokenSitePromptUrl = null,
-        )
-        assertTrue(value is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta)
-        assertFalse((value as DaxVisitSiteOptionsBrandDesignUpdateBubbleCta).onboardingImprovementsEnabled)
-    }
-
-    @Test
-    fun whenOnboardingImprovementsEnabledThenVisitSiteBrandCtaHasFlagTrue() = runTest {
-        givenDaxOnboardingActive()
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovements()).thenReturn(mockEnabledToggle)
-
-        val value = testee.refreshCta(
-            coroutineRule.testDispatcher,
-            isBrowserShowing = false,
-            detectedRefreshPatterns = detectedRefreshPatterns,
-            brokenSitePromptUrl = null,
-        )
-        assertTrue(value is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta)
-        assertTrue((value as DaxVisitSiteOptionsBrandDesignUpdateBubbleCta).onboardingImprovementsEnabled)
-    }
-
-    @Test
-    fun whenOnboardingImprovementsV2DisabledThenVisitSiteBrandCtaHasV2FlagFalse() = runTest {
-        givenDaxOnboardingActive()
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovementsV2()).thenReturn(mockDisabledToggle)
-
-        val value = testee.refreshCta(
-            coroutineRule.testDispatcher,
-            isBrowserShowing = false,
-            detectedRefreshPatterns = detectedRefreshPatterns,
-            brokenSitePromptUrl = null,
-        )
-        assertTrue(value is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta)
-        assertFalse((value as DaxVisitSiteOptionsBrandDesignUpdateBubbleCta).onboardingImprovementsV2Enabled)
-    }
-
-    @Test
-    fun whenOnboardingImprovementsV2EnabledThenVisitSiteBrandCtaHasV2FlagTrue() = runTest {
-        givenDaxOnboardingActive()
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovementsV2()).thenReturn(mockEnabledToggle)
-
-        val value = testee.refreshCta(
-            coroutineRule.testDispatcher,
-            isBrowserShowing = false,
-            detectedRefreshPatterns = detectedRefreshPatterns,
-            brokenSitePromptUrl = null,
-        )
-        assertTrue(value is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta)
-        assertTrue((value as DaxVisitSiteOptionsBrandDesignUpdateBubbleCta).onboardingImprovementsV2Enabled)
-    }
-
-    @Test
-    fun whenBrandDesignUpdateToggleDisabledThenReturnVisitSiteLegacyCta() = runTest {
-        givenDaxOnboardingActive()
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
-
-        val value = testee.refreshCta(
-            coroutineRule.testDispatcher,
-            isBrowserShowing = false,
-            detectedRefreshPatterns = detectedRefreshPatterns,
-            brokenSitePromptUrl = null,
-        )
-        assertTrue(value is DaxBubbleCta.DaxIntroVisitSiteOptionsCta)
-    }
-
-    @Test
-    fun whenBrandDesignUpdateToggleEnabledAndEndCtaConditionsMetThenReturnEndBrandDesignUpdateCta() = runTest {
+    fun whenEndCtaConditionsMetThenReturnEndBrandDesignUpdateCta() = runTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         givenAtLeastOneDaxDialogCtaShown()
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1479,7 +1449,7 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
         )
-        assertTrue(value is DaxEndBrandDesignUpdateBubbleCta)
+        assertTrue(value is DaxEndBubbleCta)
     }
 
     @Test
@@ -1488,7 +1458,6 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         givenAtLeastOneDaxDialogCtaShown()
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
         whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(DownloadReasonSelection.SEARCH)
 
         val value = testee.refreshCta(
@@ -1498,7 +1467,7 @@ class CtaViewModelTest {
             brokenSitePromptUrl = null,
         )
 
-        assertEquals(DownloadReasonSelection.SEARCH, (value as DaxEndBrandDesignUpdateBubbleCta).segmentedPathWithAiInput)
+        assertEquals(DownloadReasonSelection.SEARCH, (value as DaxEndBubbleCta).segmentedPathWithAiInput)
         verify(mockDuckChat).setInputScreenUserSetting(true)
     }
 
@@ -1508,7 +1477,6 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         givenAtLeastOneDaxDialogCtaShown()
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
         whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(DownloadReasonSelection.AI_CHAT)
 
         val value = testee.refreshCta(
@@ -1518,7 +1486,7 @@ class CtaViewModelTest {
             brokenSitePromptUrl = null,
         )
 
-        value as DaxEndBrandDesignUpdateBubbleCta
+        value as DaxEndBubbleCta
         assertEquals(DownloadReasonSelection.AI_CHAT, value.segmentedPathWithAiInput)
         // The AI path's own copy lives on the Duck.ai End CTA, which it reaches by submitting a chat.
         assertEquals(R.string.onboardingEndDaxDialogDescription, value.description)
@@ -1531,7 +1499,6 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         givenAtLeastOneDaxDialogCtaShown()
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
         whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(null)
 
         val value = testee.refreshCta(
@@ -1541,29 +1508,12 @@ class CtaViewModelTest {
             brokenSitePromptUrl = null,
         )
 
-        assertNull((value as DaxEndBrandDesignUpdateBubbleCta).segmentedPathWithAiInput)
+        assertNull((value as DaxEndBubbleCta).segmentedPathWithAiInput)
         verify(mockDuckChat, never()).setInputScreenUserSetting(any())
     }
 
     @Test
-    fun whenBrandDesignUpdateToggleDisabledAndEndCtaConditionsMetThenReturnLegacyEndCta() = runTest {
-        givenDaxOnboardingActive()
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
-        givenAtLeastOneDaxDialogCtaShown()
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
-
-        val value = testee.refreshCta(
-            coroutineRule.testDispatcher,
-            isBrowserShowing = false,
-            detectedRefreshPatterns = detectedRefreshPatterns,
-            brokenSitePromptUrl = null,
-        )
-        assertTrue(value is DaxBubbleCta.DaxEndCta)
-    }
-
-    @Test
-    fun whenBrandDesignUpdateEnabledAndSubscriptionCtaThenReturnBrandDesignSubscriptionCta() = runTest {
+    fun whenSubscriptionCtaAvailableThenReturnBrandDesignSubscriptionCta() = runTest {
         givenDaxOnboardingActive()
         whenever(mockSubscriptions.isEligible()).thenReturn(true)
         whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
@@ -1573,7 +1523,6 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1581,7 +1530,7 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
         )
-        assertTrue(value is DaxSubscriptionBrandDesignUpdateBubbleCta)
+        assertTrue(value is DaxSubscriptionBubbleCta)
     }
 
     @Test
@@ -1595,7 +1544,6 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
         whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(DownloadReasonSelection.AI_CHAT)
 
         val value = testee.refreshCta(
@@ -1607,30 +1555,8 @@ class CtaViewModelTest {
 
         assertEquals(
             R.string.onboardingPrivacyProCustomAiFlowDaxDialogDescription,
-            (value as DaxSubscriptionBrandDesignUpdateBubbleCta).description,
+            (value as DaxSubscriptionBubbleCta).description,
         )
-    }
-
-    @Test
-    fun whenBrandDesignUpdateDisabledAndSubscriptionCtaThenReturnLegacySubscriptionCta() = runTest {
-        givenDaxOnboardingActive()
-        whenever(mockSubscriptions.isEligible()).thenReturn(true)
-        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
-        whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
-        whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
-
-        val value = testee.refreshCta(
-            coroutineRule.testDispatcher,
-            isBrowserShowing = false,
-            detectedRefreshPatterns = detectedRefreshPatterns,
-            brokenSitePromptUrl = null,
-        )
-        assertTrue(value is DaxBubbleCta.DaxSubscriptionCta)
     }
 
     @Test
@@ -1752,22 +1678,12 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
         )
-        assertFalse(value is DaxBubbleCta.DaxSubscriptionCta)
+        assertFalse(value is DaxSubscriptionBubbleCta)
     }
 
     @Test
-    fun whenPrepareDuckAiEndCtaAndEligibleAndBrandDesignDisabledThenReturnsLegacyVariant() = runTest {
+    fun whenPrepareDuckAiEndCtaAndEligibleThenReturnsBrandDesignVariant() = runTest {
         givenCanShowDuckAiEndCta()
-
-        val result = testee.prepareAndMarkDuckAiEndCtaForInputScreen()
-
-        assertEquals(DuckAiOnboardingEndCtaVariant.LEGACY, result)
-    }
-
-    @Test
-    fun whenPrepareDuckAiEndCtaAndEligibleAndBrandDesignEnabledThenReturnsBrandDesignVariant() = runTest {
-        givenCanShowDuckAiEndCta()
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
 
         val result = testee.prepareAndMarkDuckAiEndCtaForInputScreen()
 
@@ -1856,7 +1772,7 @@ class CtaViewModelTest {
     // region DAX_DUCK_AI_END home bubble (nativeInputField path)
 
     @Test
-    fun whenNativeInputActiveAndCanShowDuckAiEndCtaAndBrandDesignOffThenHomeCtaIsLegacyDuckAiEndBubble() = runTest {
+    fun whenNativeInputActiveAndCanShowDuckAiEndCtaThenHomeCtaIsBrandDesignBubble() = runTest {
         givenDaxOnboardingActive()
         givenCanShowDuckAiEndCta()
         showInputScreenFlow.value = false
@@ -1872,28 +1788,10 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenNativeInputActiveAndCanShowDuckAiEndCtaAndBrandDesignOnThenHomeCtaIsBrandDesignBubble() = runTest {
-        givenDaxOnboardingActive()
-        givenCanShowDuckAiEndCta()
-        showInputScreenFlow.value = false
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
-
-        val cta = testee.refreshCta(
-            coroutineRule.testDispatcher,
-            isBrowserShowing = false,
-            detectedRefreshPatterns = detectedRefreshPatterns,
-            brokenSitePromptUrl = null,
-        )
-
-        assertTrue(cta is DaxDuckAiEndBrandDesignUpdateBubbleCta)
-    }
-
-    @Test
     fun whenCanShowDuckAiEndCtaOnSegmentedAiPathThenHomeCtaCarriesTheAiPath() = runTest {
         givenDaxOnboardingActive()
         givenCanShowDuckAiEndCta()
         showInputScreenFlow.value = false
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
         whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(DownloadReasonSelection.AI_CHAT)
 
         val cta = testee.refreshCta(
@@ -1905,7 +1803,7 @@ class CtaViewModelTest {
 
         assertEquals(
             R.string.aiPathWithToggleEnabledContextualEndDescription,
-            (cta as DaxDuckAiEndBrandDesignUpdateBubbleCta).description,
+            (cta as DaxDuckAiEndBubbleCta).description,
         )
     }
 
@@ -1964,7 +1862,15 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(any())).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DUCK_AI_END)).thenReturn(false)
 
-        val cta = DaxDuckAiEndBubbleCta(mockOnboardingStore, mockAppInstallStore)
+        val cta =
+            DaxDuckAiEndBubbleCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mockDeviceInfo,
+                isCustomAiOnboardingFlow = false,
+                segmentedPath = null,
+            )
         testee.onCtaShown(cta)
 
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_DUCK_AI_END))
@@ -1976,14 +1882,13 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(any())).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DUCK_AI_END)).thenReturn(false)
 
-        val cta = DaxDuckAiEndBrandDesignUpdateBubbleCta(
+        val cta = DaxDuckAiEndBubbleCta(
             onboardingStore = mockOnboardingStore,
             appInstallStore = mockAppInstallStore,
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = false,
             segmentedPath = null,
-            onboardingImprovementsV2Enabled = true,
         )
         testee.onCtaShown(cta)
 
@@ -1992,56 +1897,52 @@ class CtaViewModelTest {
 
     @Test
     fun whenDaxDuckAiEndBrandDesignBubbleCtaCustomAiOnboardingFlowThenDescriptionIsCustomAi() {
-        val cta = DaxDuckAiEndBrandDesignUpdateBubbleCta(
+        val cta = DaxDuckAiEndBubbleCta(
             onboardingStore = mockOnboardingStore,
             appInstallStore = mockAppInstallStore,
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = true,
             segmentedPath = null,
-            onboardingImprovementsV2Enabled = true,
         )
         assertEquals(R.string.onboardingEndCustomAiFlowDaxDialogDescription, cta.description)
     }
 
     @Test
     fun whenDaxDuckAiEndBrandDesignBubbleCtaOnSegmentedAiPathThenDescriptionIsAiPath() {
-        val cta = DaxDuckAiEndBrandDesignUpdateBubbleCta(
+        val cta = DaxDuckAiEndBubbleCta(
             onboardingStore = mockOnboardingStore,
             appInstallStore = mockAppInstallStore,
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = false,
             segmentedPath = DownloadReasonSelection.AI_CHAT,
-            onboardingImprovementsV2Enabled = true,
         )
         assertEquals(R.string.aiPathWithToggleEnabledContextualEndDescription, cta.description)
     }
 
     @Test
     fun whenDaxDuckAiEndBrandDesignBubbleCtaOnSegmentedSearchPathThenDescriptionIsStandard() {
-        val cta = DaxDuckAiEndBrandDesignUpdateBubbleCta(
+        val cta = DaxDuckAiEndBubbleCta(
             onboardingStore = mockOnboardingStore,
             appInstallStore = mockAppInstallStore,
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = false,
             segmentedPath = DownloadReasonSelection.SEARCH,
-            onboardingImprovementsV2Enabled = true,
         )
         assertEquals(R.string.onboardingDuckAiEndCtaDescription, cta.description)
     }
 
     @Test
     fun whenDaxDuckAiEndBrandDesignBubbleCtaStandardFlowThenDescriptionIsStandard() {
-        val cta = DaxDuckAiEndBrandDesignUpdateBubbleCta(
+        val cta = DaxDuckAiEndBubbleCta(
             onboardingStore = mockOnboardingStore,
             appInstallStore = mockAppInstallStore,
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = false,
             segmentedPath = null,
-            onboardingImprovementsV2Enabled = true,
         )
         assertEquals(R.string.onboardingDuckAiEndCtaDescription, cta.description)
     }
@@ -2082,7 +1983,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenBrandDesignContextualCtaShownThenOnboardingShownPixelFired() = runTest {
-        val cta = DaxSerpBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+        val cta = DaxSerpContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
 
         testee.onCtaShown(cta)
 
@@ -2090,15 +1991,15 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenLegacyCtaShownThenNoOnboardingPixelFired() = runTest {
-        testee.onCtaShown(DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore))
+    fun whenTryASearchBubbleCtaShownThenOnboardingShownPixelFired() = runTest {
+        testee.onCtaShown(DaxTryASearchBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo))
 
-        verifyNoInteractions(mockOnboardingPixelSender)
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_SEARCH, OnboardingPixelAction.Shown)
     }
 
     @Test
     fun whenBrandDesignSerpOkClickedThenClickedEngageFired() = runTest {
-        val cta = DaxSerpBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+        val cta = DaxSerpContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
 
         testee.onUserClickCtaOkButton(cta)
 
@@ -2107,7 +2008,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenBrandDesignSerpDismissedNotViaCloseBtnThenNoOnboardingPixelFired() = runTest {
-        val cta = DaxSerpBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+        val cta = DaxSerpContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
 
         testee.onUserDismissedCta(cta)
 
@@ -2116,7 +2017,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenBrandDesignSerpDismissedViaCloseBtnThenClickedDismissFired() = runTest {
-        val cta = DaxSerpBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+        val cta = DaxSerpContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
 
         testee.onUserDismissedCta(cta, viaCloseBtn = true)
 
@@ -2126,7 +2027,7 @@ class CtaViewModelTest {
     @Test
     fun whenContextualFireButtonEngagedThenClickedEngageFired() = runTest {
         val cta =
-            DaxFireButtonBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+            DaxFireButtonContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
 
         testee.onContextualFireButtonEngaged(cta)
 
@@ -2136,7 +2037,7 @@ class CtaViewModelTest {
     @Test
     fun whenContextualSiteLinkTappedForSiteSuggestionsContextualCtaThenSuggestionClickedCustomFired() = runTest {
         val cta =
-            DaxSiteSuggestionsBrandDesignUpdateContextualCta(
+            DaxSiteSuggestionsContextualCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
                 isLightTheme = true,
@@ -2150,7 +2051,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenContextualSiteLinkTappedForUnrelatedCtaThenNoPixelFired() = runTest {
-        val cta = DaxSerpBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+        val cta = DaxSerpContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
 
         testee.onContextualSiteLinkTapped(cta)
 
@@ -2160,7 +2061,7 @@ class CtaViewModelTest {
     @Test
     fun whenContextualTrackersBlockedShieldEngagedForTrackersBlockedCtaThenClickedEngageFired() = runTest {
         val cta =
-            DaxTrackersBlockedBrandDesignUpdateContextualCta(
+            DaxTrackersBlockedContextualCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
                 emptyList(),
@@ -2177,7 +2078,7 @@ class CtaViewModelTest {
     @Test
     fun whenContextualTrackersBlockedShieldEngagedForMainNetworkCtaThenClickedEngageFired() = runTest {
         val cta =
-            DaxMainNetworkBrandDesignUpdateContextualCta(
+            DaxMainNetworkContextualCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
                 "network",
@@ -2194,7 +2095,7 @@ class CtaViewModelTest {
     @Test
     fun whenContextualTrackersBlockedShieldEngagedForNoTrackersCtaThenClickedEngageFired() = runTest {
         val cta =
-            DaxNoTrackersBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+            DaxNoTrackersContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
 
         testee.onContextualTrackersBlockedShieldEngaged(cta)
 
@@ -2203,7 +2104,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenContextualTrackersBlockedShieldEngagedForUnrelatedCtaThenNoPixelFired() = runTest {
-        val cta = DaxSerpBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+        val cta = DaxSerpContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
 
         testee.onContextualTrackersBlockedShieldEngaged(cta)
 
@@ -2213,7 +2114,7 @@ class CtaViewModelTest {
     @Test
     fun whenBrandDesignDuckAiFireButtonCtaShownThenOnboardingShownPixelFired() = runTest {
         val cta =
-            DaxDuckAiFireButtonBrandDesignUpdateContextualCta(
+            DaxDuckAiFireButtonContextualCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
                 isLightTheme = true,
@@ -2228,7 +2129,7 @@ class CtaViewModelTest {
     @Test
     fun whenContextualDuckAiFireButtonEngagedThenClickedEngageFired() = runTest {
         val cta =
-            DaxDuckAiFireButtonBrandDesignUpdateContextualCta(
+            DaxDuckAiFireButtonContextualCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
                 isLightTheme = true,
@@ -2243,7 +2144,7 @@ class CtaViewModelTest {
     @Test
     fun whenContextualDuckAiFireButtonDismissedNotViaCloseBtnThenNoOnboardingPixelFired() = runTest {
         val cta =
-            DaxDuckAiFireButtonBrandDesignUpdateContextualCta(
+            DaxDuckAiFireButtonContextualCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
                 isLightTheme = true,
@@ -2258,7 +2159,7 @@ class CtaViewModelTest {
     @Test
     fun whenContextualSearchSubmittedWithCustomQueryThenSuggestionClickedCustomFired() = runTest {
         whenever(mockOnboardingStore.getSearchOptions()).thenReturn(emptyList())
-        val cta = DaxTryASearchBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, true, mockDeviceInfo)
+        val cta = DaxTryASearchBubbleCta(mockOnboardingStore, mockAppInstallStore, true, mockDeviceInfo)
 
         testee.onContextualSearchSubmitted(cta, "my own search")
 
@@ -2271,7 +2172,7 @@ class CtaViewModelTest {
         whenever(mockOnboardingStore.getSearchOptions()).thenReturn(
             listOf(DaxBubbleCta.DaxDialogIntroOption(optionText = "How to play guitar", iconRes = 0, link = suggestedLink)),
         )
-        val cta = DaxTryASearchBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, true, mockDeviceInfo)
+        val cta = DaxTryASearchBubbleCta(mockOnboardingStore, mockAppInstallStore, true, mockDeviceInfo)
 
         testee.onContextualSearchSubmitted(cta, suggestedLink)
 
@@ -2281,13 +2182,11 @@ class CtaViewModelTest {
     @Test
     fun whenContextualSearchSubmittedForVisitSiteWithCustomQueryThenSuggestionClickedCustomFired() = runTest {
         whenever(mockOnboardingStore.getSitesOptions()).thenReturn(emptyList())
-        val cta = DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(
+        val cta = DaxVisitSiteOptionsBubbleCta(
             mockOnboardingStore,
             mockAppInstallStore,
             true,
             mockDeviceInfo,
-            onboardingImprovementsEnabled = false,
-            onboardingImprovementsV2Enabled = true,
         )
 
         testee.onContextualSearchSubmitted(cta, "custom")
@@ -2297,7 +2196,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenContextualTryASearchBubbleDismissedNotViaCloseBtnThenNoOnboardingPixelFired() = runTest {
-        val cta = DaxTryASearchBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, true, mockDeviceInfo)
+        val cta = DaxTryASearchBubbleCta(mockOnboardingStore, mockAppInstallStore, true, mockDeviceInfo)
 
         testee.onUserDismissedCta(cta)
 
@@ -2306,13 +2205,11 @@ class CtaViewModelTest {
 
     @Test
     fun whenContextualVisitSiteOptionsBubbleDismissedNotViaCloseBtnThenNoOnboardingPixelFired() = runTest {
-        val cta = DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(
+        val cta = DaxVisitSiteOptionsBubbleCta(
             mockOnboardingStore,
             mockAppInstallStore,
             true,
             mockDeviceInfo,
-            onboardingImprovementsEnabled = false,
-            onboardingImprovementsV2Enabled = true,
         )
 
         testee.onUserDismissedCta(cta)
@@ -2323,7 +2220,7 @@ class CtaViewModelTest {
     @Test
     fun whenBrandDesignSiteSuggestionsContextualCtaShownThenOnboardingShownPixelFired() = runTest {
         val cta =
-            DaxSiteSuggestionsBrandDesignUpdateContextualCta(
+            DaxSiteSuggestionsContextualCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
                 isLightTheme = true,
@@ -2339,7 +2236,7 @@ class CtaViewModelTest {
     fun whenContextualSearchSubmittedForSiteSuggestionsContextualCtaWithCustomQueryThenSuggestionClickedCustomFired() = runTest {
         whenever(mockOnboardingStore.getSitesOptions()).thenReturn(emptyList())
         val cta =
-            DaxSiteSuggestionsBrandDesignUpdateContextualCta(
+            DaxSiteSuggestionsContextualCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
                 isLightTheme = true,
@@ -2358,7 +2255,7 @@ class CtaViewModelTest {
             listOf(DaxBubbleCta.DaxDialogIntroOption(optionText = "Example", iconRes = 0, link = suggestedLink)),
         )
         val cta =
-            DaxSiteSuggestionsBrandDesignUpdateContextualCta(
+            DaxSiteSuggestionsContextualCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
                 isLightTheme = true,
@@ -2373,7 +2270,7 @@ class CtaViewModelTest {
     @Test
     fun whenBrandDesignSiteSuggestionsContextualCtaDismissedNotViaCloseBtnThenNoOnboardingPixelFired() = runTest {
         val cta =
-            DaxSiteSuggestionsBrandDesignUpdateContextualCta(
+            DaxSiteSuggestionsContextualCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
                 isLightTheme = true,
@@ -2388,7 +2285,7 @@ class CtaViewModelTest {
     @Test
     fun whenContextualFireButtonDismissedNotViaCloseBtnThenNoOnboardingPixelFired() = runTest {
         val cta =
-            DaxFireButtonBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+            DaxFireButtonContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
 
         testee.onUserDismissedCta(cta)
 
@@ -2398,7 +2295,7 @@ class CtaViewModelTest {
     @Test
     fun whenContextualFireButtonOkClickedThenClickedEngageFiredImmediately() = runTest {
         val cta =
-            DaxFireButtonBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+            DaxFireButtonContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
 
         testee.onUserClickCtaOkButton(cta)
 
@@ -2434,7 +2331,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenSegmentedSearchPathEndBubbleShownThenBothEndAndTryDuckAiShownPixelsFired() = runTest {
-        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = DownloadReasonSelection.SEARCH)
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPathWithAiInput = DownloadReasonSelection.SEARCH)
 
         testee.onCtaShown(cta)
 
@@ -2444,7 +2341,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenSegmentedSearchPathEndBubbleOkClickedThenBothEndAndTryDuckAiClickedEngageFired() = runTest {
-        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = DownloadReasonSelection.SEARCH)
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPathWithAiInput = DownloadReasonSelection.SEARCH)
 
         testee.onUserClickCtaOkButton(cta)
 
@@ -2454,7 +2351,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenSegmentedSearchPathEndBubbleSkippedThenBothEndAndTryDuckAiClickedDismissFired() = runTest {
-        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = DownloadReasonSelection.SEARCH)
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPathWithAiInput = DownloadReasonSelection.SEARCH)
 
         testee.onUserDismissedCta(cta, viaSkipBtn = true)
 
@@ -2464,7 +2361,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenSegmentedAiPathEndBubbleShownThenTryDuckAiPixelNotFired() = runTest {
-        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = DownloadReasonSelection.AI_CHAT)
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPathWithAiInput = DownloadReasonSelection.AI_CHAT)
 
         testee.onCtaShown(cta)
 
@@ -2474,7 +2371,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenEndContextualDialogShownThenTryDuckAiPixelNotFired() = runTest {
-        val cta = daxEndBrandDesignUpdateContextualCta()
+        val cta = daxEndContextualCta()
 
         testee.onCtaShown(cta)
 
@@ -2563,7 +2460,7 @@ class CtaViewModelTest {
         verify(mockPixel, never()).fire(eq(ONBOARDING_DAX_CTA_DISMISS_BUTTON), any(), any(), eq(Count))
     }
 
-    private fun subscriptionPromoBubbleCta() = DaxSubscriptionBrandDesignUpdateBubbleCta(
+    private fun subscriptionPromoBubbleCta() = DaxSubscriptionBubbleCta(
         mockOnboardingStore,
         mockAppInstallStore,
         isLightTheme = true,
@@ -2571,36 +2468,31 @@ class CtaViewModelTest {
         isCustomAiOnboardingFlow = false,
         isFreeTrialCopy = false,
         segmentedPath = null,
-        onboardingImprovementsEnabled = false,
-        onboardingImprovementsV2Enabled = true,
     )
 
-    private fun daxEndBrandDesignUpdateBubbleCta(segmentedPath: DownloadReasonSelection? = null) = DaxEndBrandDesignUpdateBubbleCta(
+    private fun daxEndBrandDesignUpdateBubbleCta(segmentedPathWithAiInput: DownloadReasonSelection? = null) = DaxEndBubbleCta(
         mockOnboardingStore,
         mockAppInstallStore,
         isLightTheme = true,
         deviceInfo = mockDeviceInfo,
-        onboardingImprovementsEnabled = false,
-        onboardingImprovementsV2Enabled = true,
         isOmnibarBottom = false,
-        segmentedPathWithAiInput = segmentedPath,
+        segmentedPathWithAiInput = segmentedPathWithAiInput,
     )
 
-    private fun daxEndBrandDesignUpdateContextualCta() = DaxEndBrandDesignUpdateContextualCta(
+    private fun daxEndContextualCta() = DaxEndContextualCta(
         mockOnboardingStore,
         mockAppInstallStore,
         isLightTheme = true,
         deviceInfo = mockDeviceInfo,
     )
 
-    private fun daxDuckAiEndBrandDesignUpdateBubbleCta() = DaxDuckAiEndBrandDesignUpdateBubbleCta(
+    private fun daxDuckAiEndBrandDesignUpdateBubbleCta() = DaxDuckAiEndBubbleCta(
         mockOnboardingStore,
         mockAppInstallStore,
         isLightTheme = true,
         deviceInfo = mockDeviceInfo,
         isCustomAiOnboardingFlow = false,
         segmentedPath = null,
-        onboardingImprovementsV2Enabled = true,
     )
 
     private fun givenDuckAiOnboardingFlowArmed() {

@@ -18,7 +18,6 @@ package com.duckduckgo.app.onboarding.store
 
 import android.content.Context
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import org.junit.Assert.assertEquals
@@ -37,7 +36,6 @@ class OnboardingStoreImplTest {
 
     private val testee = OnboardingStoreImpl(
         context = mock<Context>(),
-        onboardingBrandDesignUpdateToggles = mock<OnboardingBrandDesignUpdateToggles>(),
         sharedPreferencesProvider = sharedPreferencesProvider,
     )
 

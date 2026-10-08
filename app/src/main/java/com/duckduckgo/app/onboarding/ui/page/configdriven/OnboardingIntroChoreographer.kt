@@ -33,7 +33,7 @@ import androidx.core.view.updateLayoutParams
 import com.airbnb.lottie.FontAssetDelegate
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.model.KeyPath
-import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageUpdateBinding
+import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBinding
 import com.duckduckgo.fonts.R as FontsR
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -44,7 +44,7 @@ import com.duckduckgo.mobile.android.R as CommonR
  * which owns it from then on, so the two never animate it at the same time.
  */
 class OnboardingIntroChoreographer(
-    private val binding: ContentOnboardingWelcomePageUpdateBinding,
+    private val binding: ContentOnboardingWelcomePageBinding,
 ) {
 
     private var introAnimatorSet: AnimatorSet? = null

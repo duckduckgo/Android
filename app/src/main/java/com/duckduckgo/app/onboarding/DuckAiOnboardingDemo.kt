@@ -29,7 +29,7 @@ import javax.inject.Inject
 
 /**
  * The in-browser Duck.ai onboarding demo (the fire-button CTA sequence). Owns turning the demo on so
- * both the legacy onboarding-done path and the linear-onboarding `duck_ai_demo` step arm it identically.
+ * both the onboarding-done path and the linear-onboarding `duck_ai_demo` step arm it identically.
  */
 interface DuckAiOnboardingDemo {
     /**

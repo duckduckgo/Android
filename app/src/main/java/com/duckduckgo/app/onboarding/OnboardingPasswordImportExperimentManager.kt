@@ -18,7 +18,6 @@ package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportToggles.OnboardingPasswordImportCohorts
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -42,7 +41,6 @@ interface OnboardingPasswordImportExperimentManager {
 @SingleInstanceIn(AppScope::class)
 class OnboardingPasswordImportExperimentManagerImpl @Inject constructor(
     private val toggles: OnboardingPasswordImportToggles,
-    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val importPasswordsFromGoogle: ImportPasswordsFromGoogle,
     private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
@@ -69,7 +67,6 @@ class OnboardingPasswordImportExperimentManagerImpl @Inject constructor(
      */
     private suspend fun checkPrerequisites() =
         toggles.self().isEnabled() &&
-            onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled() &&
             !appBuildConfig.isAppReinstall() &&
             importPasswordsFromGoogle.isSupported()
 }

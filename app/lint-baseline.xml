@@ -909,6 +909,17 @@
         errorLine1="import com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
+            file="src/test/java/com/duckduckgo/app/onboarding/orchestrator/NewUserOnboardingPlanBootstrapperTest.kt"
+            line="34"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="NoImplImportsInAppModule"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
             file="src/test/java/com/duckduckgo/app/onboarding/orchestrator/NewUserOnboardingPlanProviderTest.kt"
             line="62"
             column="1"/>
@@ -2990,7 +3001,7 @@
             column="5"
             message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/daxCtaContainer"/>
         <location
-            file="src/main/res/layout/include_onboarding_bubble_dax_dialog_brand_design_update.xml"
+            file="src/main/res/layout/include_onboarding_bubble_dax_dialog.xml"
             line="5"
             column="5"
             message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog_brand_design_update.xml defines @+id/daxCtaContainer"/>
@@ -3193,7 +3204,7 @@
             column="21"
             message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/primaryCta"/>
         <location
-            file="src/main/res/layout/include_onboarding_bubble_dax_dialog_brand_design_update.xml"
+            file="src/main/res/layout/include_onboarding_bubble_dax_dialog.xml"
             line="97"
             column="17"
             message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog_brand_design_update.xml defines @+id/primaryCta"/>
@@ -3223,7 +3234,7 @@
 
     <issue
         id="DuplicateIncludedIds"
-        message="Duplicate id @+id/wavingDax, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog_brand_design_update.xml defines @+id/wavingDax, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog_brand_design_update.xml defines @+id/wavingDax]"
+        message="Duplicate id @+id/wavingDax, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/wavingDax, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/wavingDax]"
         errorLine1="            &lt;include"
         errorLine2="            ^">
         <location
@@ -3232,12 +3243,12 @@
             column="13"
             message="Duplicate id @+id/wavingDax, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog_brand_design_update.xml defines @+id/wavingDax, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog_brand_design_update.xml defines @+id/wavingDax]"/>
         <location
-            file="src/main/res/layout/include_onboarding_in_context_dax_dialog_brand_design_update.xml"
+            file="src/main/res/layout/include_onboarding_in_context_dax_dialog.xml"
             line="172"
             column="9"
             message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog_brand_design_update.xml defines @+id/wavingDax"/>
         <location
-            file="src/main/res/layout/include_onboarding_bubble_dax_dialog_brand_design_update.xml"
+            file="src/main/res/layout/include_onboarding_bubble_dax_dialog.xml"
             line="135"
             column="9"
             message="Defined here, included via layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog_brand_design_update.xml defines @+id/wavingDax"/>
@@ -3259,7 +3270,7 @@
             column="5"
             message="Defined here, included via layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/daxCtaContainer"/>
         <location
-            file="src/main/res/layout/include_onboarding_bubble_dax_dialog_brand_design_update.xml"
+            file="src/main/res/layout/include_onboarding_bubble_dax_dialog.xml"
             line="5"
             column="5"
             message="Defined here, included via layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog_brand_design_update.xml defines @+id/daxCtaContainer"/>
@@ -3281,978 +3292,10 @@
             column="21"
             message="Defined here, included via layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/primaryCta"/>
         <location
-            file="src/main/res/layout/include_onboarding_bubble_dax_dialog_brand_design_update.xml"
+            file="src/main/res/layout/include_onboarding_bubble_dax_dialog.xml"
             line="97"
             column="17"
             message="Defined here, included via layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog_brand_design_update.xml defines @+id/primaryCta"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/check1, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check1, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check1]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/check1, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check1, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check1]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="54"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check1"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="54"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check1"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/check1, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check1, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check1]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/check1, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check1, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check1]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="54"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check1"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="54"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check1"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/check2, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check2, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check2]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/check2, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check2, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check2]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="104"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check2"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="104"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check2"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/check2, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check2, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check2]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/check2, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check2, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check2]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="104"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check2"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="104"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check2"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/check3, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check3, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check3]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/check3, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check3, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check3]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="154"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check3"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="154"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check3"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/check3, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check3, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check3]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/check3, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check3, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check3]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="154"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check3"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="154"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check3"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/check4, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check4, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check4]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/check4, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check4, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check4]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="204"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check4"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="204"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check4"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/check4, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check4, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check4]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/check4, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check4, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check4]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="204"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check4"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="204"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check4"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/check5, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check5, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check5]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/check5, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check5, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check5]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="254"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check5"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="254"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check5"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/check5, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check5, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check5]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/check5, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check5, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check5]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="254"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/check5"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="254"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/check5"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/chromeLogo, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/chromeLogo, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/chromeLogo]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/chromeLogo, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/chromeLogo, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/chromeLogo]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="36"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/chromeLogo"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="36"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/chromeLogo"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/chromeLogo, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/chromeLogo, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/chromeLogo]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/chromeLogo, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/chromeLogo, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/chromeLogo]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="36"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/chromeLogo"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="36"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/chromeLogo"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/cross1, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross1, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross1]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/cross1, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross1, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross1]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="64"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross1"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="64"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross1"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/cross1, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross1, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross1]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/cross1, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross1, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross1]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="64"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross1"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="64"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross1"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/cross2, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross2, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross2]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/cross2, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross2, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross2]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="114"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross2"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="114"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross2"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/cross2, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross2, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross2]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/cross2, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross2, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross2]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="114"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross2"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="114"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross2"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/cross3, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross3, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross3]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/cross3, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross3, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross3]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="164"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross3"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="164"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross3"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/cross3, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross3, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross3]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/cross3, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross3, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross3]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="164"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross3"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="164"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross3"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/cross4, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross4, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross4]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/cross4, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross4, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross4]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="214"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross4"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="214"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross4"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/cross4, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross4, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross4]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/cross4, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross4, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross4]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="214"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross4"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="214"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross4"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/cross5, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross5, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross5]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/cross5, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross5, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross5]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="264"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross5"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="264"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross5"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/cross5, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross5, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross5]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/cross5, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross5, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross5]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="264"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/cross5"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="264"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/cross5"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/ddgLogo, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/ddgLogo, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/ddgLogo]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/ddgLogo, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/ddgLogo, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/ddgLogo]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="27"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/ddgLogo"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="27"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/ddgLogo"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/ddgLogo, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/ddgLogo, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/ddgLogo]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/ddgLogo, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/ddgLogo, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/ddgLogo]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="27"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/ddgLogo"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="27"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/ddgLogo"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/feature1, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature1, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature1]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/feature1, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature1, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature1]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="85"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature1"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="85"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature1"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/feature1, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature1, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature1]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/feature1, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature1, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature1]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="85"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature1"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="85"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature1"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/feature2, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature2, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature2]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/feature2, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature2, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature2]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="135"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature2"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="135"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature2"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/feature2, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature2, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature2]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/feature2, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature2, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature2]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="135"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature2"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="135"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature2"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/feature3, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature3, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature3]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/feature3, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature3, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature3]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="185"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature3"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="185"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature3"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/feature3, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature3, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature3]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/feature3, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature3, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature3]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="185"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature3"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="185"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature3"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/feature4, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature4, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature4]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/feature4, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature4, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature4]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="235"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature4"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="235"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature4"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/feature4, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature4, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature4]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/feature4, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature4, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature4]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="235"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature4"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="235"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature4"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/feature5, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature5, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature5]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/feature5, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature5, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature5]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="285"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature5"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="285"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature5"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/feature5, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature5, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature5]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/feature5, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature5, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature5]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="285"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/feature5"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="285"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/feature5"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/featureIcon1, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon1, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon1]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/featureIcon1, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon1, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon1]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="74"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon1"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="74"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon1"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/featureIcon1, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon1, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon1]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/featureIcon1, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon1, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon1]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="74"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon1"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="74"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon1"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/featureIcon2, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon2, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon2]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/featureIcon2, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon2, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon2]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="124"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon2"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="124"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon2"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/featureIcon2, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon2, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon2]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/featureIcon2, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon2, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon2]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="124"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon2"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="124"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon2"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/featureIcon3, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon3, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon3]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/featureIcon3, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon3, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon3]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="174"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon3"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="174"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon3"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/featureIcon3, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon3, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon3]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/featureIcon3, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon3, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon3]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="174"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon3"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="174"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon3"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/featureIcon4, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon4, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon4]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/featureIcon4, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon4, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon4]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="224"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon4"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="224"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon4"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/featureIcon4, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon4, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon4]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/featureIcon4, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon4, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon4]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="224"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon4"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="224"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon4"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/featureIcon5, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon5, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon5]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/featureIcon5, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon5, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon5]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="274"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon5"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="274"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon5"/>
-    </issue>
-
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/featureIcon5, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon5, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon5]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="146"
-            column="17"
-            message="Duplicate id @+id/featureIcon5, defined or included multiple times in layout/pre_onboarding_dax_dialog_cta.xml: [layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon5, layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon5]"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="274"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart.xml defines @+id/featureIcon5"/>
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="274"
-            column="9"
-            message="Defined here, included via layout/pre_onboarding_dax_dialog_cta.xml => layout/pre_onboarding_comparison_chart_with_duck_ai.xml defines @+id/featureIcon5"/>
     </issue>
 
     <issue
@@ -4455,11 +3498,11 @@
 
     <issue
         id="InconsistentLayout"
-        message="The id &quot;contentScroll&quot; in layout &quot;content_onboarding_default_browser_update&quot; is missing from the following layout configurations: layout-land (present in layout)"
+        message="The id &quot;contentScroll&quot; in layout &quot;content_onboarding_default_browser&quot; is missing from the following layout configurations: layout-land (present in layout)"
         errorLine1="        android:id=&quot;@+id/contentScroll&quot;"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/content_onboarding_default_browser_update.xml"
+            file="src/main/res/layout/content_onboarding_default_browser.xml"
             line="28"
             column="9"
             message="Occurrence in layout"/>
@@ -4467,11 +3510,11 @@
 
     <issue
         id="InconsistentLayout"
-        message="The id &quot;contextualBrandDesignNoCtaContent&quot; in layout &quot;include_onboarding_in_context_dax_dialog_brand_design_update&quot; is missing from the following layout configurations: layout-land (present in layout)"
+        message="The id &quot;contextualBrandDesignNoCtaContent&quot; in layout &quot;include_onboarding_in_context_dax_dialog&quot; is missing from the following layout configurations: layout-land (present in layout)"
         errorLine1="                android:id=&quot;@+id/contextualBrandDesignNoCtaContent&quot;"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/include_onboarding_in_context_dax_dialog_brand_design_update.xml"
+            file="src/main/res/layout/include_onboarding_in_context_dax_dialog.xml"
             line="140"
             column="17"
             message="Occurrence in layout"/>
@@ -9127,39 +8170,6 @@
     </issue>
 
     <issue
-        id="DisableBaselineAlignment"
-        message="Set `android:baselineAligned=&quot;false&quot;` on this element for better performance"
-        errorLine1="                &lt;LinearLayout"
-        errorLine2="                 ~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="165"
-            column="18"/>
-    </issue>
-
-    <issue
-        id="NestedWeights"
-        message="Nested weights are bad for performance"
-        errorLine1="                            android:layout_weight=&quot;1&quot;"
-        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="198"
-            column="29"/>
-    </issue>
-
-    <issue
-        id="NestedWeights"
-        message="Nested weights are bad for performance"
-        errorLine1="                            android:layout_weight=&quot;1&quot;"
-        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="237"
-            column="29"/>
-    </issue>
-
-    <issue
         id="Overdraw"
         message="Possible overdraw: Root element paints background `@color/blue` with a theme that also paints a background (inferred theme is `@style/Theme_DuckDuckGo_Survey`)"
         errorLine1="    android:background=&quot;@color/blue&quot;"
@@ -9242,7 +8252,7 @@
         errorLine1="    android:background=&quot;?attr/onboardingSurfaceBackdrop&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout-land/content_onboarding_default_browser_update.xml"
+            file="src/main/res/layout-land/content_onboarding_default_browser.xml"
             line="23"
             column="5"/>
     </issue>
@@ -9253,7 +8263,7 @@
         errorLine1="    android:background=&quot;?attr/onboardingSurfaceBackdrop&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/content_onboarding_default_browser_update.xml"
+            file="src/main/res/layout/content_onboarding_default_browser.xml"
             line="23"
             column="5"/>
     </issue>
@@ -9264,7 +8274,7 @@
         errorLine1="    android:background=&quot;?attr/onboardingSurfaceBackdrop&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout-land/content_onboarding_welcome_page_update.xml"
+            file="src/main/res/layout-land/content_onboarding_welcome_page.xml"
             line="23"
             column="5"/>
     </issue>
@@ -9275,7 +8285,7 @@
         errorLine1="    android:background=&quot;?attr/onboardingSurfaceBackdrop&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout-sw600dp/content_onboarding_welcome_page_update.xml"
+            file="src/main/res/layout-sw600dp/content_onboarding_welcome_page.xml"
             line="23"
             column="5"/>
     </issue>
@@ -9286,7 +8296,7 @@
         errorLine1="    android:background=&quot;?attr/onboardingSurfaceBackdrop&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/content_onboarding_welcome_page_update.xml"
+            file="src/main/res/layout/content_onboarding_welcome_page.xml"
             line="23"
             column="5"/>
     </issue>
@@ -9352,7 +8362,7 @@
         errorLine1="    android:background=&quot;?attr/onboardingSurfaceBackdrop&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout-land/include_onboarding_in_context_dax_dialog_brand_design_update.xml"
+            file="src/main/res/layout-land/include_onboarding_in_context_dax_dialog.xml"
             line="24"
             column="5"/>
     </issue>
@@ -9363,7 +8373,7 @@
         errorLine1="    android:background=&quot;?attr/onboardingSurfaceBackdrop&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/include_onboarding_in_context_dax_dialog_brand_design_update.xml"
+            file="src/main/res/layout/include_onboarding_in_context_dax_dialog.xml"
             line="24"
             column="5"/>
     </issue>
@@ -9596,28 +8606,6 @@
         <location
             file="src/main/res/drawable/background_navigation_bar_shadow.xml"
             line="16"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.background_preonboarding_option` appears to be unused"
-        errorLine1="&lt;ripple xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/background_preonboarding_option.xml"
-            line="17"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.background_preonboarding_option_selected` appears to be unused"
-        errorLine1="&lt;ripple xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/background_preonboarding_option_selected.xml"
-            line="17"
             column="1"/>
     </issue>
 
@@ -11836,17 +10824,6 @@
     </issue>
 
     <issue
-        id="TextFields"
-        message="This text field does not specify an `inputType`"
-        errorLine1="            &lt;EditText"
-        errorLine2="             ~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_input_mode_demo.xml"
-            line="65"
-            column="14"/>
-    </issue>
-
-    <issue
         id="Autofill"
         message="Missing `autofillHints` attribute"
         errorLine1="    &lt;EditText"
@@ -11863,7 +10840,7 @@
         errorLine1="        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))"
         errorLine2="                                                ~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdateDefaultBrowserPage.kt"
+            file="src/main/java/com/duckduckgo/app/onboarding/ui/page/DefaultBrowserPage.kt"
             line="238"
             column="49"/>
     </issue>
@@ -12138,7 +11115,7 @@
         errorLine1="                Uri.parse(siteHost).baseHost?.removePrefix(&quot;m.&quot;),"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/duckduckgo/app/cta/ui/DaxMainNetworkBrandDesignUpdateContextualCta.kt"
+            file="src/main/java/com/duckduckgo/app/cta/ui/DaxMainNetworkContextualCta.kt"
             line="80"
             column="17"/>
     </issue>
@@ -12149,7 +11126,7 @@
         errorLine1="                Uri.parse(siteHost).baseHost?.removePrefix(&quot;m.&quot;),"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/duckduckgo/app/cta/ui/DaxMainNetworkBrandDesignUpdateContextualCta.kt"
+            file="src/main/java/com/duckduckgo/app/cta/ui/DaxMainNetworkContextualCta.kt"
             line="87"
             column="17"/>
     </issue>
@@ -12424,50 +11401,6 @@
         errorLine1="    &lt;ImageView"
         errorLine2="     ~~~~~~~~~">
         <location
-            file="src/main/res/layout-land/content_onboarding_welcome_page.xml"
-            line="26"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/content_onboarding_welcome_page.xml"
-            line="26"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/content_onboarding_welcome_page.xml"
-            line="33"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/content_onboarding_welcome_page.xml"
-            line="63"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
             file="src/main/res/layout/include_new_browser_tab.xml"
             line="29"
             column="6"/>
@@ -12493,446 +11426,6 @@
             file="src/main/res/layout/include_onboarding_in_context_dax_dialog.xml"
             line="33"
             column="10"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="26"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="35"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="53"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="63"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="73"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="103"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="113"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="123"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="153"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="163"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="173"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="203"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="213"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="223"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="253"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="263"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart.xml"
-            line="273"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="26"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="35"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="53"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="63"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="73"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="103"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="113"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="123"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="153"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="163"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="173"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="203"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="213"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="223"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="253"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="263"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_comparison_chart_with_duck_ai.xml"
-            line="273"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="        &lt;ImageView"
-        errorLine2="         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="55"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                &lt;ImageView"
-        errorLine2="                 ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="127"
-            column="18"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                        &lt;ImageView"
-        errorLine2="                         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="185"
-            column="26"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                        &lt;ImageView"
-        errorLine2="                         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="204"
-            column="26"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                        &lt;ImageView"
-        errorLine2="                         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="224"
-            column="26"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                        &lt;ImageView"
-        errorLine2="                         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/pre_onboarding_dax_dialog_cta.xml"
-            line="243"
-            column="26"/>
     </issue>
 
     <issue

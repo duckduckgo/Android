@@ -94,7 +94,7 @@ class FakeSettingsDataStore :
         }
 
     override var selectedFireAnimation: FireAnimation
-        get() = store["selectedFireAnimation"] as FireAnimation? ?: FireAnimation.HeroFire
+        get() = store["selectedFireAnimation"] as FireAnimation? ?: FireAnimation.Inferno
         set(value) {
             store["selectedFireAnimation"] = value
         }

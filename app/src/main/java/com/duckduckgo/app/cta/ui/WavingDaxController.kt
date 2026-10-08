@@ -19,7 +19,6 @@ package com.duckduckgo.app.cta.ui
 import android.animation.ValueAnimator
 import android.content.res.Configuration
 import android.graphics.Rect
-import android.graphics.RectF
 import android.view.View
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -27,7 +26,7 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.onboarding.ui.page.OnboardingDecorationSizing
-import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
+import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.device.isTablet
 
@@ -35,7 +34,6 @@ internal class WavingDaxController(
     private val showArrow: Boolean,
     private val deviceInfo: DeviceInfo,
     private val wavingDaxSpec: DaxBubbleCta.WavingDaxSpec,
-    private val improvementsV2Enabled: Boolean,
 ) {
 
     private var fitArrowAnimator: ValueAnimator? = null
@@ -46,21 +44,12 @@ internal class WavingDaxController(
     fun applyFit(container: View) {
         this.container = container
         container.removeCallbacks(fitRunnable)
-        if (improvementsV2Enabled) {
-            val height = computeDaxFitHeight(container)
-            if (height == null) {
-                applyFitResult(container, false)
-            } else {
-                applyDaxHeight(container, height)
-                container.postDelayed(fitRunnable, FIT_SETTLE_DELAY_MS)
-            }
+        val height = computeDaxFitHeight(container)
+        if (height == null) {
+            applyFitResult(container, false)
         } else {
-            val fits = computeDaxFits(container) ?: return
-            if (fits) {
-                container.postDelayed(fitRunnable, FIT_SETTLE_DELAY_MS)
-            } else {
-                applyFitResult(container, false)
-            }
+            applyDaxHeight(container, height)
+            container.postDelayed(fitRunnable, FIT_SETTLE_DELAY_MS)
         }
     }
 
@@ -78,7 +67,7 @@ internal class WavingDaxController(
     }
 
     /**
-     * Height for a bottom-anchored waving Dax (V2 on). Pure so it can be unit-tested without a device.
+     * Height for a bottom-anchored waving Dax based on available room. Pure so it can be unit-tested without a device.
      */
     internal fun daxFitHeight(
         usableBottom: Int,
@@ -92,34 +81,14 @@ internal class WavingDaxController(
         maxHeightPx = maxHeightPx,
     )
 
-    // TODO: remove when onboardingImprovementsV2 flag is removed
-    internal fun daxFits(
-        daxTop: Int,
-        daxLeft: Int,
-        daxRight: Int,
-        cardBodyBottom: Int,
-        finBottom: Int,
-        finLeft: Int,
-        finRight: Int,
-    ): Boolean {
-        if (daxTop < cardBodyBottom) return false
-        val overlapsFinHorizontally = daxRight > finLeft && daxLeft < finRight
-        if (daxTop < finBottom && overlapsFinHorizontally) return false
-        return true
-    }
-
     private fun decideFit(container: View) {
-        if (improvementsV2Enabled) {
-            val height = computeDaxFitHeight(container)
-            if (height == null) {
-                applyFitResult(container, false)
-                return
-            }
-            applyDaxHeight(container, height)
-            applyFitResult(container, true)
-        } else {
-            if (computeDaxFits(container) == true) applyFitResult(container, true)
+        val height = computeDaxFitHeight(container)
+        if (height == null) {
+            applyFitResult(container, false)
+            return
         }
+        applyDaxHeight(container, height)
+        applyFitResult(container, true)
     }
 
     private fun applyDaxHeight(container: View, height: Int) {
@@ -142,7 +111,7 @@ internal class WavingDaxController(
     private fun computeDaxFitHeight(container: View): Int? {
         if (!container.isShown || container.isPhoneLandscape()) return null
 
-        val cardView = container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView) ?: return null
+        val cardView = container.findViewById<DaxOnboardingBubbleCardView>(R.id.brandDesignCardView) ?: return null
 
         val density = container.resources.displayMetrics.density
         val marginPx = (DAX_FIT_MARGIN_DP * density).toInt()
@@ -166,37 +135,12 @@ internal class WavingDaxController(
         )
     }
 
-    // TODO: remove when onboardingImprovementsV2 flag is removed
-    private fun computeDaxFits(container: View): Boolean? {
-        if (!container.isShown || container.isPhoneLandscape()) return null
-
-        val dax = container.findViewById<LottieAnimationView>(R.id.wavingDax) ?: return null
-        val cardView = container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView) ?: return null
-        val finBounds = cardView.arrowBounds() ?: return null
-
-        val daxRect = RectF()
-        viewBoundsOnScreen(dax, daxRect)
-
-        val cardLoc = IntArray(2)
-        cardView.getLocationOnScreen(cardLoc)
-
-        return daxFits(
-            daxTop = daxRect.top.toInt(),
-            daxLeft = daxRect.left.toInt(),
-            daxRight = daxRect.right.toInt(),
-            cardBodyBottom = cardLoc[1] + finBounds.top.toInt(),
-            finBottom = cardLoc[1] + finBounds.bottom.toInt(),
-            finLeft = cardLoc[0] + finBounds.left.toInt(),
-            finRight = cardLoc[0] + finBounds.right.toInt(),
-        )
-    }
-
     private fun applyFitResult(container: View, fits: Boolean) {
         if (fits == lastDaxFits) return
         lastDaxFits = fits
 
         val dax = container.findViewById<LottieAnimationView>(R.id.wavingDax) ?: return
-        val cardView = container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView) ?: return
+        val cardView = container.findViewById<DaxOnboardingBubbleCardView>(R.id.brandDesignCardView) ?: return
 
         if (fits) {
             if (!dax.isVisible) {
@@ -221,7 +165,7 @@ internal class WavingDaxController(
     }
 
     private fun buildArrowDepthAnimator(
-        cardView: DaxOnboardingBubbleBrandDesignUpdateCardView,
+        cardView: DaxOnboardingBubbleCardView,
         from: Float,
         to: Float,
     ): ValueAnimator =
@@ -230,15 +174,6 @@ internal class WavingDaxController(
             interpolator = FastOutSlowInInterpolator()
             addUpdateListener { cardView.setArrowDepthFraction(it.animatedValue as Float) }
         }
-
-    // TODO: remove when onboardingImprovementsV2 flag is removed
-    private fun viewBoundsOnScreen(view: View, out: RectF) {
-        out.set(0f, 0f, view.width.toFloat(), view.height.toFloat())
-        view.matrix.mapRect(out)
-        val loc = IntArray(2)
-        (view.parent as? View)?.getLocationOnScreen(loc)
-        out.offset((loc[0] + view.left).toFloat(), (loc[1] + view.top).toFloat())
-    }
 
     private fun View.isPhoneLandscape(): Boolean =
         !deviceInfo.isTablet() &&

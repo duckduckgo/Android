@@ -16,7 +16,7 @@
             "appVersion",
             {
                 "key": "fa",
-                "description": "Identifier of the selected fire animation. 'fai' is the legacy Inferno (now displayed as 'Inferno Classic' under the fireAnimationUpdate kill switch). 'inferno' is the new default Inferno.",
+                "description": "Identifier of the selected fire animation. 'fai' is Inferno Classic (the original Inferno animation). 'inferno' is the current default Inferno.",
                 "type": "string",
                 "enum": ["fai", "fawp", "faas", "fann", "inferno"]
             }
@@ -31,7 +31,7 @@
             "appVersion",
             {
                 "key": "fa",
-                "description": "Identifier of the played fire animation. 'fai' is the legacy Inferno (now displayed as 'Inferno Classic' under the fireAnimationUpdate kill switch). 'inferno' is the new default Inferno.",
+                "description": "Identifier of the played fire animation. 'fai' is Inferno Classic (the original Inferno animation). 'inferno' is the current default Inferno.",
                 "type": "string",
                 "enum": ["fai", "fawp", "faas", "fann", "inferno"]
             }

@@ -233,11 +233,10 @@ class NativeInputLayoutCoordinator(
             rootView.findViewById(R.id.indonesiaNewTabSectionView),
             rootView.findViewById(R.id.messageCta),
         )
-        // Onboarding CTA bubbles live inside newTabContent and must clear the widget, so a visible
-        // one overrides the logo-only suppression below.
+        // CTA bubbles live inside newTabContent and must clear the widget, so a visible one
+        // overrides the logo-only suppression below.
         val onboardingCtaViews = listOfNotNull(
             rootView.findViewById(R.id.brandDesignDialogScrollView),
-            rootView.findViewById(R.id.includeOnboardingDaxDialogBubble),
         )
 
         // Animate content reflow when the widget toggles Search ↔ DuckAI. Staged here but only assigned

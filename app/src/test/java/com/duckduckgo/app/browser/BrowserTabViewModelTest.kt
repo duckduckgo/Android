@@ -185,22 +185,18 @@ import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.cta.ui.DaxBubbleCta
-import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxIntroSearchOptionsCta
-import com.duckduckgo.app.cta.ui.DaxDuckAiEndBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiEndBubbleCta
-import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
-import com.duckduckgo.app.cta.ui.DaxEndBrandDesignUpdateBubbleCta
-import com.duckduckgo.app.cta.ui.DaxFireButtonBrandDesignUpdateContextualCta
-import com.duckduckgo.app.cta.ui.DaxSerpBrandDesignUpdateContextualCta
-import com.duckduckgo.app.cta.ui.DaxSiteSuggestionsBrandDesignUpdateContextualCta
-import com.duckduckgo.app.cta.ui.DaxTrackersBlockedBrandDesignUpdateContextualCta
-import com.duckduckgo.app.cta.ui.DaxTryASearchBrandDesignUpdateBubbleCta
+import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonContextualCta
+import com.duckduckgo.app.cta.ui.DaxEndBubbleCta
+import com.duckduckgo.app.cta.ui.DaxFireButtonContextualCta
+import com.duckduckgo.app.cta.ui.DaxMainNetworkContextualCta
+import com.duckduckgo.app.cta.ui.DaxSerpContextualCta
+import com.duckduckgo.app.cta.ui.DaxSiteSuggestionsContextualCta
+import com.duckduckgo.app.cta.ui.DaxSubscriptionBubbleCta
+import com.duckduckgo.app.cta.ui.DaxTrackersBlockedContextualCta
+import com.duckduckgo.app.cta.ui.DaxTryASearchBubbleCta
+import com.duckduckgo.app.cta.ui.DaxVisitSiteOptionsBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxDuckAiFireButtonCta
-import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxMainNetworkCta
-import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxSerpCta
-import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxTrackersBlockedCta
 import com.duckduckgo.app.cta.ui.SubscriptionPromoFlow
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalDecider
@@ -229,7 +225,6 @@ import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE
@@ -306,6 +301,7 @@ import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -380,6 +376,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -393,6 +390,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -423,6 +421,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
@@ -656,7 +655,6 @@ class BrowserTabViewModelTest {
     private val mockSSLCertificatesFeature: SSLCertificatesFeature = mock()
     private val mockBypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository = mock()
     private val mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
-    private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
     private val protectionTogglePlugin = FakePrivacyProtectionTogglePlugin()
     private val protectionTogglePluginPoint = FakePluginPoint(protectionTogglePlugin)
@@ -874,8 +872,6 @@ class BrowserTabViewModelTest {
             whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
             whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers()).thenReturn(mockDisabledToggle)
             whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
-            whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockDisabledToggle)
-            whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
             whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
             whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(mockDuckAiFeatureStateInputScreenFlow)
             whenever(mockDuckAiFeatureState.showContextualMode).thenReturn(mockDuckAiContextualModeFlow)
@@ -909,7 +905,6 @@ class BrowserTabViewModelTest {
                         on { getPlugins() } doReturn emptyList()
                     },
                     duckChat = mockDuckChat,
-                    onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
                     appTheme = mockAppTheme,
                     deviceInfo = mockDeviceInfo,
                     coroutineScope = coroutineRule.testScope,
@@ -964,7 +959,7 @@ class BrowserTabViewModelTest {
             whenever(mockStack.getItemAtIndex(any())).thenReturn(mockWebHistoryItem)
         }
 
-    private fun initialiseViewModel() {
+    private fun initialiseViewModel(viewModelDispatchers: DispatcherProvider = coroutineRule.testDispatcherProvider) {
         // Detach the previous instance's command observer before creating a new VM, so tests that
         // call initialiseViewModel() more than once (e.g. to swap browserMode mid-test) don't leave
         // a stale VM attached to mockCommandObserver and emitting unexpected commands.
@@ -1012,7 +1007,7 @@ class BrowserTabViewModelTest {
                 ctaViewModel = ctaViewModel,
                 searchCountDao = mockSearchCountDao,
                 pixel = mockPixel,
-                dispatchers = coroutineRule.testDispatcherProvider,
+                dispatchers = viewModelDispatchers,
                 fireproofWebsiteRepository = fireproofWebsiteRepositoryImpl,
                 savedSitesRepository = mockSavedSitesRepository,
                 navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
@@ -1105,7 +1100,6 @@ class BrowserTabViewModelTest {
                 cachedFileDownloader = mockCachedFileDownloader,
                 newDownloadState = mockNewDownloadState,
                 downloadsRepository = mockDownloadsRepository,
-                onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
                 onboardingStore = mockOnboardingStore,
                 autocompleteHistoryDeleteFeature = fakeAutocompleteHistoryDeleteFeature,
                 customAiOnboardingStore = mockCustomAiOnboardingStore,
@@ -4208,7 +4202,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedCtaButtonThenFirePixel() {
-        val cta = DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = DaxTryASearchBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
         verify(mockPixel).fire(cta.okPixel!!, cta.pixelOkParameters())
@@ -4216,7 +4210,14 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedDaxMainNetworkCtaOKButtonAndMaliciousSiteBlockedThenCtaIsNull() {
-        val cta = DaxMainNetworkCta(mockOnboardingStore, mockAppInstallStore, "", "")
+        val cta = DaxMainNetworkContextualCta(
+            mockOnboardingStore,
+            mockAppInstallStore,
+            "",
+            "",
+            isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
+        )
         setCta(cta)
 
         testee.onUserClickCtaOkButton(cta)
@@ -4226,7 +4227,14 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedDaxDuckAiEndBubbleCtaOkButtonThenCtaIsRefreshedAway() = runTest {
-        val cta = DaxDuckAiEndBubbleCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = DaxDuckAiEndBubbleCta(
+            mockOnboardingStore,
+            mockAppInstallStore,
+            isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
+            isCustomAiOnboardingFlow = false,
+            segmentedPath = null,
+        )
         setCta(cta)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DUCK_AI_END)).thenReturn(true)
 
@@ -4238,14 +4246,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedDaxDuckAiEndBrandDesignBubbleCtaOkButtonThenCtaIsRefreshedAway() = runTest {
-        val cta = DaxDuckAiEndBrandDesignUpdateBubbleCta(
+        val cta = DaxDuckAiEndBubbleCta(
             onboardingStore = mockOnboardingStore,
             appInstallStore = mockAppInstallStore,
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = false,
             segmentedPath = null,
-            onboardingImprovementsV2Enabled = true,
         )
         setCta(cta)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DUCK_AI_END)).thenReturn(true)
@@ -4294,13 +4301,11 @@ class BrowserTabViewModelTest {
         verify(mockOnboardingInputScreenLaunchTarget, never()).setOpenOnDuckAi()
     }
 
-    private fun daxEndBrandDesignUpdateBubbleCta(segmentedPath: DownloadReasonSelection?) = DaxEndBrandDesignUpdateBubbleCta(
+    private fun daxEndBrandDesignUpdateBubbleCta(segmentedPath: DownloadReasonSelection?) = DaxEndBubbleCta(
         onboardingStore = mockOnboardingStore,
         appInstallStore = mockAppInstallStore,
         isLightTheme = true,
         deviceInfo = mockDeviceInfo,
-        onboardingImprovementsEnabled = true,
-        onboardingImprovementsV2Enabled = true,
         isOmnibarBottom = false,
         segmentedPathWithAiInput = segmentedPath,
     )
@@ -4324,10 +4329,14 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserClickedLearnMoreExperimentBubbleCtaButtonThenLaunchSubscription() {
         val cta =
-            DaxBubbleCta.DaxSubscriptionCta(
+            DaxSubscriptionBubbleCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mockDeviceInfo,
+                isCustomAiOnboardingFlow = false,
                 isFreeTrialCopy = false,
+                segmentedPath = null,
             )
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
@@ -4336,10 +4345,14 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedDaxSubscriptionCtaCtaThenLaunchSubscriptionWithOnboardingOrigin() {
-        val cta = DaxBubbleCta.DaxSubscriptionCta(
+        val cta = DaxSubscriptionBubbleCta(
             mockOnboardingStore,
             mockAppInstallStore,
+            isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
+            isCustomAiOnboardingFlow = false,
             isFreeTrialCopy = false,
+            segmentedPath = null,
         )
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
@@ -4352,10 +4365,14 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserClickedDaxSubscriptionCtaInCustomAiOnboardingFlowThenLaunchSubscriptionWithFeaturePageDuckAi() = runTest {
         whenever(mockCustomAiOnboardingStore.isEnabled()).thenReturn(true)
-        val cta = DaxBubbleCta.DaxSubscriptionCta(
+        val cta = DaxSubscriptionBubbleCta(
             mockOnboardingStore,
             mockAppInstallStore,
+            isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
+            isCustomAiOnboardingFlow = true,
             isFreeTrialCopy = false,
+            segmentedPath = null,
         )
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
@@ -4368,10 +4385,14 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserClickedDaxSubscriptionCtaOnSegmentedAiPathThenLaunchSubscriptionWithFeaturePageDuckAi() = runTest {
         whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(DownloadReasonSelection.AI_CHAT)
-        val cta = DaxBubbleCta.DaxSubscriptionCta(
+        val cta = DaxSubscriptionBubbleCta(
             mockOnboardingStore,
             mockAppInstallStore,
+            isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
+            isCustomAiOnboardingFlow = false,
             isFreeTrialCopy = false,
+            segmentedPath = DownloadReasonSelection.AI_CHAT,
         )
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
@@ -4489,10 +4510,14 @@ class BrowserTabViewModelTest {
         runTest {
             testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
             setBrowserShowing(false)
-            val onboardingCta = DaxBubbleCta.DaxSubscriptionCta(
+            val onboardingCta = DaxSubscriptionBubbleCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mockDeviceInfo,
+                isCustomAiOnboardingFlow = false,
                 isFreeTrialCopy = false,
+                segmentedPath = null,
             )
             setCta(onboardingCta)
 
@@ -4533,10 +4558,14 @@ class BrowserTabViewModelTest {
             loadUrl(exampleUrl, isBrowserShowing = true)
             testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = false)
             setCta(
-                DaxBubbleCta.DaxSubscriptionCta(
+                DaxSubscriptionBubbleCta(
                     mockOnboardingStore,
                     mockAppInstallStore,
+                    isLightTheme = true,
+                    deviceInfo = mockDeviceInfo,
+                    isCustomAiOnboardingFlow = false,
                     isFreeTrialCopy = false,
+                    segmentedPath = null,
                 ),
             )
 
@@ -6575,30 +6604,27 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnConfigurationChangedAndOrientationChangedAndBrandDesignToggleEnabledThenReinflateCommandIsEmitted() = runTest {
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+    fun whenOnConfigurationChangedAndOrientationChangedThenReinflateCommandIsEmitted() = runTest {
+        val mainDispatcher = StandardTestDispatcher()
+        val dispatchers =
+            object : DispatcherProvider by coroutineRule.testDispatcherProvider {
+                override fun main(): CoroutineDispatcher = mainDispatcher
+            }
+        resetChannels()
+        initialiseViewModel(viewModelDispatchers = dispatchers)
+        clearInvocations(mockCommandObserver)
 
         testee.onConfigurationChanged(orientationChanged = true)
-        advanceUntilIdle()
 
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.allValues.any { it is Command.ReinflateBrandDesignContextualDialog })
+        verify(mockCommandObserver, never()).onChanged(Command.ReinflateBrandDesignContextualDialog)
+
+        mainDispatcher.scheduler.runCurrent()
+
+        verify(mockCommandObserver, times(1)).onChanged(Command.ReinflateBrandDesignContextualDialog)
     }
 
     @Test
-    fun whenOnConfigurationChangedAndOrientationChangedAndBrandDesignToggleDisabledThenNoReinflateCommandIsEmitted() = runTest {
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
-
-        testee.onConfigurationChanged(orientationChanged = true)
-        advanceUntilIdle()
-
-        verify(mockCommandObserver, never()).onChanged(any<Command.ReinflateBrandDesignContextualDialog>())
-    }
-
-    @Test
-    fun whenOnConfigurationChangedAndOrientationUnchangedAndBrandDesignToggleEnabledThenNoReinflateCommandIsEmitted() = runTest {
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
-
+    fun whenOnConfigurationChangedAndOrientationUnchangedThenNoReinflateCommandIsEmitted() = runTest {
         testee.onConfigurationChanged(orientationChanged = false)
         advanceUntilIdle()
 
@@ -6606,8 +6632,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnConfigurationChangedThenForceRenderingTickerUpdatedRegardlessOfToggleOrOrientation() = runTest {
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
+    fun whenOnConfigurationChangedThenForceRenderingTickerUpdatedRegardlessOfOrientation() = runTest {
         val tickerBefore = testee.browserViewState.value?.forceRenderingTicker
 
         testee.onConfigurationChanged(orientationChanged = false)
@@ -8355,11 +8380,13 @@ class BrowserTabViewModelTest {
     fun whenTrackersBlockedCtaShownWithBrowserShowingThenPrivacyShieldIsHighlighted() =
         runTest {
             val cta =
-                DaxTrackersBlockedCta(
+                DaxTrackersBlockedContextualCta(
                     onboardingStore = mockOnboardingStore,
                     appInstallStore = mockAppInstallStore,
                     trackers = emptyList(),
                     settingsDataStore = mockSettingsDataStore,
+                    isLightTheme = true,
+                    deviceInfo = mockDeviceInfo,
                 )
             testee.ctaViewState.value = ctaViewState().copy(cta = cta)
             testee.browserViewState.value = browserViewState().copy(browserShowing = true, maliciousSiteBlocked = false)
@@ -8373,11 +8400,13 @@ class BrowserTabViewModelTest {
     fun whenTrackersBlockedCtaShownWithMaliciousSiteBlockedThenPrivacyShieldIsNotHighlighted() =
         runTest {
             val cta =
-                DaxTrackersBlockedCta(
+                DaxTrackersBlockedContextualCta(
                     onboardingStore = mockOnboardingStore,
                     appInstallStore = mockAppInstallStore,
                     trackers = emptyList(),
                     settingsDataStore = mockSettingsDataStore,
+                    isLightTheme = true,
+                    deviceInfo = mockDeviceInfo,
                 )
             testee.ctaViewState.value = ctaViewState().copy(cta = cta)
             testee.browserViewState.value = browserViewState().copy(browserShowing = false, maliciousSiteBlocked = true)
@@ -8391,11 +8420,13 @@ class BrowserTabViewModelTest {
     fun givenTrackersBlockedCtaShownWhenLaunchingTabSwitcherThenCtaIsDismissed() =
         runTest {
             val cta =
-                DaxTrackersBlockedCta(
+                DaxTrackersBlockedContextualCta(
                     onboardingStore = mockOnboardingStore,
                     appInstallStore = mockAppInstallStore,
                     trackers = emptyList(),
                     settingsDataStore = mockSettingsDataStore,
+                    isLightTheme = true,
+                    deviceInfo = mockDeviceInfo,
                 )
             testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
@@ -8408,11 +8439,13 @@ class BrowserTabViewModelTest {
     fun givenTrackersBlockedCtaShownWhenUserRequestOpeningNewTabThenCtaIsDismissed() =
         runTest {
             val cta =
-                DaxTrackersBlockedCta(
+                DaxTrackersBlockedContextualCta(
                     onboardingStore = mockOnboardingStore,
                     appInstallStore = mockAppInstallStore,
                     trackers = emptyList(),
                     settingsDataStore = mockSettingsDataStore,
+                    isLightTheme = true,
+                    deviceInfo = mockDeviceInfo,
                 )
             testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
@@ -8424,11 +8457,13 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserDismissDaxTrackersBlockedDialogThenFinishPrivacyShieldPulse() {
         val cta =
-            DaxTrackersBlockedCta(
+            DaxTrackersBlockedContextualCta(
                 onboardingStore = mockOnboardingStore,
                 appInstallStore = mockAppInstallStore,
                 trackers = emptyList(),
                 settingsDataStore = mockSettingsDataStore,
+                isLightTheme = true,
+                deviceInfo = mockDeviceInfo,
             )
         setCta(cta)
 
@@ -8439,7 +8474,7 @@ class BrowserTabViewModelTest {
     @Test
     fun givenOnboardingCtaShownWhenUserSubmittedQueryThenDismissCta() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = DaxSerpContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
         testee.ctaViewState.value = CtaViewState(cta = cta)
 
         testee.onUserSubmittedQuery("foo")
@@ -8584,7 +8619,7 @@ class BrowserTabViewModelTest {
     @Test
     fun givenSuggestedSearchesDialogShownWhenUserSubmittedQueryThenCustomSearchPixelIsSent() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        val cta = DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = DaxTryASearchBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
         testee.ctaViewState.value = CtaViewState(cta = cta)
 
         testee.onUserSubmittedQuery("foo")
@@ -8595,7 +8630,7 @@ class BrowserTabViewModelTest {
     @Test
     fun givenBrandDesignUpdateSearchDialogShownWhenUserSubmittedQueryThenCustomSearchPixelIsSent() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        val cta = DaxTryASearchBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+        val cta = DaxTryASearchBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
         testee.ctaViewState.value = CtaViewState(cta = cta)
 
         testee.onUserSubmittedQuery("foo")
@@ -8606,7 +8641,7 @@ class BrowserTabViewModelTest {
     @Test
     fun givenSuggestedSitesDialogShownWhenUserSubmittedQueryThenCustomSitePixelIsSent() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        val cta = DaxBubbleCta.DaxIntroVisitSiteOptionsCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = DaxVisitSiteOptionsBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
         testee.ctaViewState.value = CtaViewState(cta = cta)
 
         testee.onUserSubmittedQuery("foo")
@@ -10682,9 +10717,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserClicksDaxIntroSearchOptionsCtaDismissButtonThenHideOnboardingDaxBubbleCtaCommandIssuedAndPixelFired() =
+    fun whenUserClicksDaxTryASearchBubbleCtaDismissButtonThenHideOnboardingDaxBubbleCtaCommandIssuedAndPixelFired() =
         runTest {
-            val cta = DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
+            val cta = DaxTryASearchBubbleCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mockDeviceInfo,
+            )
 
             testee.onUserClickCtaDismissButton(cta)
 
@@ -10697,7 +10737,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserClicksDaxSerpCtaDismissButtonThenHideOnboardingDaxDialogCommandIssuedAndPixelFired() =
         runTest {
-            val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
+            val cta = DaxSerpContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
 
             testee.onUserClickCtaDismissButton(cta)
 
@@ -10854,24 +10894,6 @@ class BrowserTabViewModelTest {
         testee.setBrowserBackground(lightModeEnabled = false)
 
         assertCommandIssued<Command.SetBrowserBackground> {
-            assertEquals(CommonR.drawable.onboarding_background_bitmap_dark, this.backgroundRes)
-        }
-    }
-
-    @Test
-    fun whenSetOnboardingDialogBackgroundAndLightModeEnabledThenSetBrowserBackgroundCommandIssuedWithCorrectColor() {
-        testee.setOnboardingDialogBackground(lightModeEnabled = true)
-
-        assertCommandIssued<Command.SetOnboardingDialogBackground> {
-            assertEquals(CommonR.drawable.onboarding_background_bitmap_light, this.backgroundRes)
-        }
-    }
-
-    @Test
-    fun whenSetOnboardingDialogBackgroundAndDarkModeEnabledThenSetBrowserBackgroundCommandIssuedWithCorrectColor() {
-        testee.setOnboardingDialogBackground(lightModeEnabled = false)
-
-        assertCommandIssued<Command.SetOnboardingDialogBackground> {
             assertEquals(CommonR.drawable.onboarding_background_bitmap_dark, this.backgroundRes)
         }
     }
@@ -11040,7 +11062,7 @@ class BrowserTabViewModelTest {
     fun whenCustomQuerySubmittedWithBrandDesignSearchBubbleThenSuggestionCustomFired() = runTest {
         whenever(mockOnboardingStore.getSearchOptions()).thenReturn(emptyList())
         whenever(mockOmnibarConverter.convertQueryToUrl("my own search", null)).thenReturn("https://duckduckgo.com/?q=my+own+search")
-        val cta = DaxTryASearchBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, true, mockDeviceInfo)
+        val cta = DaxTryASearchBubbleCta(mockOnboardingStore, mockAppInstallStore, true, mockDeviceInfo)
         setCta(cta)
 
         testee.onUserSubmittedQuery("my own search")
@@ -11051,7 +11073,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenFireMenuSelectedWithBrandDesignFireCtaThenFireButtonEngageFired() = runTest {
         val cta =
-            DaxFireButtonBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+            DaxFireButtonContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
         setCta(cta)
 
         testee.onFireMenuSelected(Omnibar.ViewMode.Browser(exampleUrl))
@@ -11061,7 +11083,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBrandDesignSerpOkClickedThenEngageFiredButNotDismiss() = runTest {
-        val cta = DaxSerpBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+        val cta = DaxSerpContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
         setCta(cta)
 
         testee.onUserClickCtaOkButton(cta)
@@ -11073,7 +11095,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenShouldOverrideWithSiteSuggestionsContextualCtaThenSuggestionClickedCustomFired() = runTest {
         val cta =
-            DaxSiteSuggestionsBrandDesignUpdateContextualCta(
+            DaxSiteSuggestionsContextualCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
                 isLightTheme = true,
@@ -11088,7 +11110,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenPrivacyShieldSelectedWithBrandDesignTrackersBlockedCtaThenClickedEngageFired() = runTest {
-        val cta = DaxTrackersBlockedBrandDesignUpdateContextualCta(
+        val cta = DaxTrackersBlockedContextualCta(
             mockOnboardingStore,
             mockAppInstallStore,
             emptyList(),
@@ -11105,7 +11127,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenPrivacyShieldSelectedWithUnrelatedCtaThenNoPixelFired() = runTest {
-        val cta = DaxSerpBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+        val cta = DaxSerpContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
         setCta(cta)
 
         testee.onPrivacyShieldSelected()
@@ -11717,21 +11739,14 @@ class BrowserTabViewModelTest {
 
     private fun browserViewState() = testee.browserViewState.value!!
 
-    private fun brandDesignDuckAiFireButtonCta() = DaxDuckAiFireButtonBrandDesignUpdateContextualCta(
+    private fun brandDesignDuckAiFireButtonCta() = DaxDuckAiFireButtonContextualCta(
         onboardingStore = mockOnboardingStore,
         appInstallStore = mockAppInstallStore,
         isLightTheme = true,
         deviceInfo = mockDeviceInfo,
     )
 
-    private fun trackersBlockedCta() = DaxTrackersBlockedCta(
-        onboardingStore = mockOnboardingStore,
-        appInstallStore = mockAppInstallStore,
-        trackers = emptyList(),
-        settingsDataStore = mockSettingsDataStore,
-    )
-
-    private fun brandDesignTrackersBlockedCta() = DaxTrackersBlockedBrandDesignUpdateContextualCta(
+    private fun brandDesignTrackersBlockedCta() = DaxTrackersBlockedContextualCta(
         onboardingStore = mockOnboardingStore,
         appInstallStore = mockAppInstallStore,
         trackers = emptyList(),
@@ -13517,7 +13532,7 @@ class BrowserTabViewModelTest {
         dismissedCtaDaoChannel.send(emptyList())
 
         testee.ctaViewState.value = ctaViewState().copy(
-            cta = DaxDuckAiFireButtonCta(mockOnboardingStore, mockAppInstallStore),
+            cta = DaxDuckAiFireButtonContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo),
         )
 
         advanceUntilIdle()
@@ -13545,7 +13560,7 @@ class BrowserTabViewModelTest {
         dismissedCtaDaoChannel.send(emptyList())
 
         testee.ctaViewState.value = ctaViewState().copy(
-            cta = DaxDuckAiFireButtonCta(mockOnboardingStore, mockAppInstallStore),
+            cta = DaxDuckAiFireButtonContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo),
         )
         advanceUntilIdle()
 
@@ -13576,21 +13591,9 @@ class BrowserTabViewModelTest {
         testee.browserViewState.observeForever(observer)
         dismissedCtaDaoChannel.send(emptyList())
 
-        val serpCta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
+        val serpCta = DaxSerpContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
         testee.ctaViewState.value = ctaViewState().copy(cta = serpCta)
 
-        advanceUntilIdle()
-
-        assertFalse((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
-    }
-
-    @Test
-    fun whenTrackersBlockedCtaShownAndPulseActiveThenFireButtonNotHighlighted() = runTest {
-        val observer = ValueCaptorObserver<BrowserViewState>(false)
-        testee.browserViewState.observeForever(observer)
-        givenFireButtonPulsing(DAX_DIALOG_NETWORK)
-
-        testee.ctaViewState.value = ctaViewState().copy(cta = trackersBlockedCta())
         advanceUntilIdle()
 
         assertFalse((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
@@ -13614,7 +13617,7 @@ class BrowserTabViewModelTest {
         testee.browserViewState.observeForever(observer)
         givenFireButtonPulsing(DAX_DIALOG_NETWORK)
 
-        testee.ctaViewState.value = ctaViewState().copy(cta = trackersBlockedCta())
+        testee.ctaViewState.value = ctaViewState().copy(cta = brandDesignTrackersBlockedCta())
         advanceUntilIdle()
         assertFalse((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
 
@@ -13649,7 +13652,7 @@ class BrowserTabViewModelTest {
 
         // Set the CTA so showPulseAnimation keeps emitting true and sustains the highlight
         testee.ctaViewState.value = ctaViewState().copy(
-            cta = DaxDuckAiFireButtonCta(mockOnboardingStore, mockAppInstallStore),
+            cta = DaxDuckAiFireButtonContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo),
         )
         testee.browserViewState.value = browserViewState().copy(
             isOmnibarLockedForOnboarding = true,
@@ -13693,7 +13696,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenDismissDuckAiFireOnboardingCtaCalledWithDuckAiFireCtaThenCtaDismissed() = runTest {
         dismissedCtaDaoChannel.send(emptyList())
-        val cta = DaxDuckAiFireButtonCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = DaxDuckAiFireButtonContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
         testee.dismissDuckAiFireOnboardingCta()
@@ -13716,7 +13719,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenDismissDuckAiFireOnboardingCtaCalledWithDifferentCtaThenNoop() = runTest {
         dismissedCtaDaoChannel.send(emptyList())
-        val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = DaxSerpContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
         testee.dismissDuckAiFireOnboardingCta()
@@ -13730,7 +13733,7 @@ class BrowserTabViewModelTest {
         // Custom AI onboarding defers dismissal to the end of the orchestrator run, so the CTA must survive here.
         whenever(mockCustomAiOnboardingStore.isEnabled()).thenReturn(true)
         dismissedCtaDaoChannel.send(emptyList())
-        val cta = DaxDuckAiFireButtonCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = DaxDuckAiFireButtonContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
         testee.dismissDuckAiFireOnboardingCta()

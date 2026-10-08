@@ -25,7 +25,6 @@ import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
 import androidx.annotation.AttrRes
-import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
@@ -40,8 +39,8 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
+import com.duckduckgo.app.cta.ui.ContextualDaxDialogCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
-import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -439,7 +438,7 @@ sealed class Command {
     ) : Command()
 
     data class HideOnboardingDaxDialog(
-        val onboardingCta: OnboardingDaxDialogCta,
+        val onboardingCta: ContextualDaxDialogCta,
     ) : Command()
 
     data class HideBrokenSitePromptCta(
@@ -470,18 +469,10 @@ sealed class Command {
         val fillMaxHeightFraction: Float = 1f,
     ) : Command()
 
-    class SetOnboardingDialogBackground(
-        @DrawableRes val backgroundRes: Int,
-    ) : Command()
-
-    class SetOnboardingDialogBackgroundColor(
-        @ColorRes val colorRes: Int,
-    ) : Command()
-
     data object ReinflateBrandDesignContextualDialog : Command()
 
     data class LaunchFireDialogFromOnboardingDialog(
-        val onboardingCta: OnboardingDaxDialogCta,
+        val onboardingCta: ContextualDaxDialogCta,
     ) : Command()
 
     data object LaunchDuckAiOnboardingFireDialog : Command()
