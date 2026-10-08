@@ -28,10 +28,10 @@ import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aCardsListMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aMediumMessage
-import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aNextStepsItemsMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aSmallMessage
+import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.actionableItemsContent
+import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.anActionableItemsMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.cardsListContent
-import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.nextStepsItemsContent
 import com.duckduckgo.remote.messaging.impl.models.*
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
 import com.duckduckgo.remote.messaging.store.RemoteMessagingCohort
@@ -961,11 +961,11 @@ class RemoteMessagingConfigMatcherTest {
     }
 
     @Test
-    fun whenNextStepsItemsMessageWithSomeItemsPassingRulesThenReturnsFilteredMessage() = runBlocking {
+    fun whenActionableItemsMessageWithSomeItemsPassingRulesThenReturnsFilteredMessage() = runBlocking {
         givenDeviceMatches(Api(max = 19))
         val passingItem = CardItem.ListItem(
             id = "setup_default_browser",
-            type = CardItemType.NEXT_STEP_ITEM,
+            type = CardItemType.ONE_ACTION_ITEM,
             titleText = "Set as default browser",
             descriptionText = "Description",
             placeholder = Content.Placeholder.ANNOUNCE,
@@ -975,7 +975,7 @@ class RemoteMessagingConfigMatcherTest {
         )
         val failingItem = CardItem.ListItem(
             id = "setup_add_widget",
-            type = CardItemType.NEXT_STEP_ITEM,
+            type = CardItemType.ONE_ACTION_ITEM,
             titleText = "Add widget",
             descriptionText = "Description",
             placeholder = Content.Placeholder.RADAR,
@@ -983,8 +983,8 @@ class RemoteMessagingConfigMatcherTest {
             matchingRules = rules(2),
             exclusionRules = emptyList(),
         )
-        val content = nextStepsItemsContent(listItems = listOf(passingItem, failingItem))
-        val message = aNextStepsItemsMessage(content = content)
+        val content = actionableItemsContent(listItems = listOf(passingItem, failingItem))
+        val message = anActionableItemsMessage(content = content)
 
         val result = testee.evaluate(
             RemoteConfig(
@@ -1000,11 +1000,11 @@ class RemoteMessagingConfigMatcherTest {
     }
 
     @Test
-    fun whenNextStepsItemsMessageWithAllItemsFailingRulesThenReturnsNull() = runBlocking {
+    fun whenActionableItemsMessageWithAllItemsFailingRulesThenReturnsNull() = runBlocking {
         givenDeviceMatches(Api(max = 19))
         val failingItem = CardItem.ListItem(
             id = "setup_default_browser",
-            type = CardItemType.NEXT_STEP_ITEM,
+            type = CardItemType.ONE_ACTION_ITEM,
             titleText = "Set as default browser",
             descriptionText = "Description",
             placeholder = Content.Placeholder.ANNOUNCE,
@@ -1012,7 +1012,7 @@ class RemoteMessagingConfigMatcherTest {
             matchingRules = rules(2),
             exclusionRules = emptyList(),
         )
-        val message = aNextStepsItemsMessage(content = nextStepsItemsContent(listItems = listOf(failingItem)))
+        val message = anActionableItemsMessage(content = actionableItemsContent(listItems = listOf(failingItem)))
 
         val result = testee.evaluate(
             RemoteConfig(

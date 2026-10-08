@@ -20,11 +20,11 @@ import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.CardItemType
 import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.Content.ActionableItems
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
 import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
 import com.duckduckgo.remote.messaging.api.Content.CardsList
 import com.duckduckgo.remote.messaging.api.Content.Medium
-import com.duckduckgo.remote.messaging.api.Content.NextStepsItems
 import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.Content.PromoSingleAction
 import com.duckduckgo.remote.messaging.api.Content.Small
@@ -35,11 +35,11 @@ import com.duckduckgo.remote.messaging.api.MessageTrigger
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.models.*
+import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.ACTIONABLE_ITEMS
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.BIG_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.BIG_TWO_ACTION
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.CARDS_LIST
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.MEDIUM
-import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.NEXT_STEPS_ITEMS
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.PROMO_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.SMALL
 import com.duckduckgo.remote.messaging.impl.models.asJsonFormat
@@ -111,10 +111,10 @@ private val cardsListMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Co
     )
 }
 
-private val nextStepsItemsMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Content = { jsonContent, actionMappers ->
-    NextStepsItems(
+private val actionableItemsMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Content = { jsonContent, actionMappers ->
+    ActionableItems(
         titleText = jsonContent.titleText.failIfEmpty(),
-        listItems = jsonContent.listItems.toListItems(actionMappers, NEXT_STEPS_ITEM_TYPES),
+        listItems = jsonContent.listItems.toListItems(actionMappers, ACTIONABLE_ITEM_TYPES),
     )
 }
 
@@ -124,7 +124,7 @@ private val CARDS_LIST_ITEM_TYPES = setOf(
     CardItemType.LIST_SECTION_TITLE,
 )
 
-private val NEXT_STEPS_ITEM_TYPES = setOf(CardItemType.NEXT_STEP_ITEM)
+private val ACTIONABLE_ITEM_TYPES = setOf(CardItemType.ONE_ACTION_ITEM)
 
 private fun List<JsonListItem>?.toListItems(
     actionMappers: Set<MessageActionMapperPlugin>,
@@ -144,7 +144,7 @@ private val twoLineListItemMapper: (JsonListItem, Set<MessageActionMapperPlugin>
     jsonItem.toListItem(actionMappers)
 }
 
-private val nextStepItemMapper: (JsonListItem, Set<MessageActionMapperPlugin>) -> CardItem = { jsonItem, actionMappers ->
+private val oneActionItemMapper: (JsonListItem, Set<MessageActionMapperPlugin>) -> CardItem = { jsonItem, actionMappers ->
     jsonItem.toListItem(actionMappers)
 }
 
@@ -176,7 +176,7 @@ private val itemMappers = mapOf(
     CardItemType.TWO_LINE_LIST_ITEM.jsonValue to twoLineListItemMapper,
     CardItemType.FEATURED_TWO_LINE_SINGLE_ACTION_LIST_ITEM.jsonValue to twoLineListItemMapper,
     CardItemType.LIST_SECTION_TITLE.jsonValue to sectionTitleMapper,
-    CardItemType.NEXT_STEP_ITEM.jsonValue to nextStepItemMapper,
+    CardItemType.ONE_ACTION_ITEM.jsonValue to oneActionItemMapper,
 )
 
 // plugin point?
@@ -187,7 +187,7 @@ private val messageMappers = mapOf(
     Pair(BIG_TWO_ACTION.jsonValue, bigMessageTwoActionMapper),
     Pair(PROMO_SINGLE_ACTION.jsonValue, promoSingleActionMapper),
     Pair(CARDS_LIST.jsonValue, cardsListMapper),
-    Pair(NEXT_STEPS_ITEMS.jsonValue, nextStepsItemsMapper),
+    Pair(ACTIONABLE_ITEMS.jsonValue, actionableItemsMapper),
 )
 
 fun List<JsonRemoteMessage>.mapToRemoteMessage(
@@ -322,7 +322,7 @@ private fun Content.localize(translations: JsonContentTranslations): Content {
             listItems = listItems.localize(translations),
         )
 
-        is NextStepsItems -> this.copy(
+        is ActionableItems -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             listItems = listItems.localize(translations),
         )

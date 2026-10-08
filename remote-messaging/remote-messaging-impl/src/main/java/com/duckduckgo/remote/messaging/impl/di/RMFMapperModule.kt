@@ -19,12 +19,12 @@ package com.duckduckgo.remote.messaging.impl.di
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.Content.ActionableItems
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
 import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
 import com.duckduckgo.remote.messaging.api.Content.CardsList
 import com.duckduckgo.remote.messaging.api.Content.Medium
 import com.duckduckgo.remote.messaging.api.Content.MessageType
-import com.duckduckgo.remote.messaging.api.Content.NextStepsItems
 import com.duckduckgo.remote.messaging.api.Content.PromoSingleAction
 import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
@@ -68,7 +68,7 @@ object RMFMapperModule {
                     .withSubtype(BigTwoActions::class.java, MessageType.BIG_TWO_ACTION.name)
                     .withSubtype(PromoSingleAction::class.java, MessageType.PROMO_SINGLE_ACTION.name)
                     .withSubtype(CardsList::class.java, MessageType.CARDS_LIST.name)
-                    .withSubtype(NextStepsItems::class.java, MessageType.NEXT_STEPS_ITEMS.name),
+                    .withSubtype(ActionableItems::class.java, MessageType.ACTIONABLE_ITEMS.name),
             )
             .add(ActionAdapter(actionMappers))
             .add(CardItemAdapter())

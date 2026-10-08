@@ -104,5 +104,5 @@ sealed class JsonMessageType(val jsonValue: String) {
     data object BIG_TWO_ACTION : JsonMessageType("big_two_action")
     data object PROMO_SINGLE_ACTION : JsonMessageType("promo_single_action")
     data object CARDS_LIST : JsonMessageType("cards_list")
-    data object NEXT_STEPS_ITEMS : JsonMessageType("next_steps_items")
+    data object ACTIONABLE_ITEMS : JsonMessageType("actionable_items")
 }

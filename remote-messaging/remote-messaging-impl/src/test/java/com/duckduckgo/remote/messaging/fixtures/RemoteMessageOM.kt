@@ -124,10 +124,10 @@ object RemoteMessageOM {
         imageUrl = imageUrl,
     )
 
-    fun nextStepsItemsContent(
+    fun actionableItemsContent(
         titleText: String = "Complete your setup",
-        listItems: List<CardItem> = nextStepListItems(),
-    ) = Content.NextStepsItems(
+        listItems: List<CardItem> = actionableListItems(),
+    ) = Content.ActionableItems(
         titleText = titleText,
         listItems = listItems,
     )
@@ -228,9 +228,9 @@ object RemoteMessageOM {
         )
     }
 
-    fun aNextStepsItemsMessage(
+    fun anActionableItemsMessage(
         id: String = "id",
-        content: Content = nextStepsItemsContent(),
+        content: Content = actionableItemsContent(),
         exclusionRules: List<Int> = emptyList(),
         matchingRules: List<Int> = emptyList(),
         surfaces: List<Surface> = emptyList(),
@@ -244,7 +244,7 @@ object RemoteMessageOM {
         )
     }
 
-    fun nextStepListItems(
+    fun actionableListItems(
         defaultBrowserTitleText: String = "Set as default browser",
         defaultBrowserDescriptionText: String = "Open links in DuckDuckGo",
         defaultBrowserPrimaryActionText: String = "Set as default",
@@ -254,7 +254,7 @@ object RemoteMessageOM {
     ) = listOf(
         CardItem.ListItem(
             id = "setup_default_browser",
-            type = CardItemType.NEXT_STEP_ITEM,
+            type = CardItemType.ONE_ACTION_ITEM,
             titleText = defaultBrowserTitleText,
             descriptionText = defaultBrowserDescriptionText,
             placeholder = ANNOUNCE,
@@ -265,7 +265,7 @@ object RemoteMessageOM {
         ),
         CardItem.ListItem(
             id = "setup_add_widget",
-            type = CardItemType.NEXT_STEP_ITEM,
+            type = CardItemType.ONE_ACTION_ITEM,
             titleText = addWidgetTitleText,
             descriptionText = addWidgetDescriptionText,
             placeholder = RADAR,

@@ -355,8 +355,8 @@ class RemoteMessagingConfigJsonMapperTest {
     }
 
     @Test
-    fun whenNextStepsItemsMessageThenMappedIntoRemoteConfig() = runTest {
-        val result = getConfigFromJson("json/remote_messaging_config_next_steps_items.json")
+    fun whenActionableItemsMessageThenMappedIntoRemoteConfig() = runTest {
+        val result = getConfigFromJson("json/remote_messaging_config_actionable_items.json")
 
         val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins, fakeFeatureToggles)
 
@@ -365,12 +365,12 @@ class RemoteMessagingConfigJsonMapperTest {
         assertEquals(1, config.messages.size)
         val expected = RemoteMessage(
             id = "android_complete_your_setup",
-            content = Content.NextStepsItems(
+            content = Content.ActionableItems(
                 titleText = "Complete your setup",
                 listItems = listOf(
                     CardItem.ListItem(
                         id = "setup_default_browser",
-                        type = CardItemType.NEXT_STEP_ITEM,
+                        type = CardItemType.ONE_ACTION_ITEM,
                         titleText = "Set as default browser",
                         descriptionText = "Open links in DuckDuckGo.",
                         placeholder = ANNOUNCE,
@@ -382,7 +382,7 @@ class RemoteMessagingConfigJsonMapperTest {
                     ),
                     CardItem.ListItem(
                         id = "setup_add_widget",
-                        type = CardItemType.NEXT_STEP_ITEM,
+                        type = CardItemType.ONE_ACTION_ITEM,
                         titleText = "Add widget",
                         descriptionText = "Search from your home screen.",
                         placeholder = Content.Placeholder.RADAR,

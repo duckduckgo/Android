@@ -11,12 +11,12 @@
       ],
       "exclusionRules": [],
       "content": {
-        "messageType": "next_steps_items",
+        "messageType": "actionable_items",
         "titleText": "Complete your setup",
         "listItems": [
           {
             "id": "setup_default_browser",
-            "type": "setup_item",
+            "type": "one_action_item",
             "titleText": "Set as default browser",
             "descriptionText": "Open links in DuckDuckGo.",
             "placeholder": "Announce",
@@ -29,7 +29,7 @@
           },
           {
             "id": "setup_add_widget",
-            "type": "setup_item",
+            "type": "one_action_item",
             "titleText": "Add widget",
             "descriptionText": "Search from your home screen.",
             "placeholder": "Radar",

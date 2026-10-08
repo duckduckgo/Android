@@ -68,7 +68,7 @@ class RemoteMessagingConfigMatcher(
     ): RemoteMessage? {
         val listItems = when (val content = message.content) {
             is Content.CardsList -> content.listItems
-            is Content.NextStepsItems -> content.listItems
+            is Content.ActionableItems -> content.listItems
             else -> return message
         }
 
@@ -114,7 +114,7 @@ class RemoteMessagingConfigMatcher(
         logcat(INFO) { "RMF: Filtered ${listItems.size - filteredItems.size} CardItems for message ${message.id}." }
         val filteredContent = when (val content = message.content) {
             is Content.CardsList -> content.copy(listItems = filteredItems)
-            is Content.NextStepsItems -> content.copy(listItems = filteredItems)
+            is Content.ActionableItems -> content.copy(listItems = filteredItems)
             else -> content
         }
         return message.copy(content = filteredContent)

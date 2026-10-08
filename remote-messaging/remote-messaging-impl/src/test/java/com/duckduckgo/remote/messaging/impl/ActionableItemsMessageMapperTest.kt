@@ -22,10 +22,10 @@ import com.duckduckgo.remote.messaging.api.CardItemType
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aJsonMessage
-import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.nextStepsItemsJsonContent
-import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aNextStepsItemsMessage
-import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.nextStepListItems
-import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.nextStepsItemsContent
+import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.actionableItemsJsonContent
+import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.actionableItemsContent
+import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.actionableListItems
+import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.anActionableItemsMessage
 import com.duckduckgo.remote.messaging.fixtures.getMessageMapper
 import com.duckduckgo.remote.messaging.fixtures.messageActionPlugins
 import com.duckduckgo.remote.messaging.impl.mappers.mapToRemoteMessage
@@ -37,29 +37,29 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.util.Locale
 
-class NextStepsItemsMessageMapperTest {
+class ActionableItemsMessageMapperTest {
 
     @Test
-    fun whenNextStepsItemsMessageWithValidDataThenReturnMessage() {
-        val jsonMessages = listOf(aJsonMessage(id = "next_steps", content = nextStepsItemsJsonContent()))
+    fun whenActionableItemsMessageWithValidDataThenReturnMessage() {
+        val jsonMessages = listOf(aJsonMessage(id = "actionable_items", content = actionableItemsJsonContent()))
 
         val remoteMessages = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins)
 
         assertEquals(1, remoteMessages.size)
         val content = remoteMessages.first().content
-        assertTrue(content is Content.NextStepsItems)
-        assertEquals(nextStepsItemsContent(), content)
+        assertTrue(content is Content.ActionableItems)
+        assertEquals(actionableItemsContent(), content)
     }
 
     @Test
-    fun whenSetupItemThenMappedAsNextStepItemListItem() {
-        val jsonMessages = listOf(aJsonMessage(id = "next_steps", content = nextStepsItemsJsonContent()))
+    fun whenOneActionItemThenMappedAsOneActionItemListItem() {
+        val jsonMessages = listOf(aJsonMessage(id = "actionable_items", content = actionableItemsJsonContent()))
 
-        val content = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins).first().content as Content.NextStepsItems
+        val content = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins).first().content as Content.ActionableItems
 
         val item = content.listItems.first() as CardItem.ListItem
         assertEquals("setup_default_browser", item.id)
-        assertEquals(CardItemType.NEXT_STEP_ITEM, item.type)
+        assertEquals(CardItemType.ONE_ACTION_ITEM, item.type)
         assertEquals("Set as default", item.primaryActionText)
         assertEquals(Action.DefaultBrowser, item.primaryAction)
     }
@@ -75,16 +75,16 @@ class NextStepsItemsMessageMapperTest {
                 placeholder = "Announce",
                 primaryAction = JsonMessageAction(type = "url", value = "https://example.com", additionalParameters = null),
             ),
-        ) + nextStepsItemsJsonContent().listItems.orEmpty()
-        val jsonMessages = listOf(aJsonMessage(id = "next_steps", content = nextStepsItemsJsonContent(listItems = listItems)))
+        ) + actionableItemsJsonContent().listItems.orEmpty()
+        val jsonMessages = listOf(aJsonMessage(id = "actionable_items", content = actionableItemsJsonContent(listItems = listItems)))
 
-        val content = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins).first().content as Content.NextStepsItems
+        val content = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins).first().content as Content.ActionableItems
 
-        assertEquals(nextStepListItems(), content.listItems)
+        assertEquals(actionableListItems(), content.listItems)
     }
 
     @Test
-    fun whenListItemTypeIsNotNextStepItemThenItemIsDropped() {
+    fun whenListItemTypeIsNotOneActionItemThenItemIsDropped() {
         val unsupportedItems = listOf("two_line_list_item", "featured_two_line_single_action_list_item", "section_title").map { type ->
             JsonListItem(
                 id = type,
@@ -95,26 +95,26 @@ class NextStepsItemsMessageMapperTest {
                 primaryAction = JsonMessageAction(type = "url", value = "https://example.com", additionalParameters = null),
             )
         }
-        val listItems = unsupportedItems + nextStepsItemsJsonContent().listItems.orEmpty()
-        val jsonMessages = listOf(aJsonMessage(id = "next_steps", content = nextStepsItemsJsonContent(listItems = listItems)))
+        val listItems = unsupportedItems + actionableItemsJsonContent().listItems.orEmpty()
+        val jsonMessages = listOf(aJsonMessage(id = "actionable_items", content = actionableItemsJsonContent(listItems = listItems)))
 
-        val content = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins).first().content as Content.NextStepsItems
+        val content = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins).first().content as Content.ActionableItems
 
-        assertEquals(nextStepListItems(), content.listItems)
+        assertEquals(actionableListItems(), content.listItems)
     }
 
     @Test
-    fun whenNextStepsItemsMessageWithEmptyListItemsThenReturnEmptyList() {
-        val jsonMessages = listOf(aJsonMessage(id = "next_steps", content = nextStepsItemsJsonContent(listItems = emptyList())))
+    fun whenActionableItemsMessageWithEmptyListItemsThenReturnEmptyList() {
+        val jsonMessages = listOf(aJsonMessage(id = "actionable_items", content = actionableItemsJsonContent(listItems = emptyList())))
 
-        val content = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins).first().content as Content.NextStepsItems
+        val content = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins).first().content as Content.ActionableItems
 
         assertEquals(emptyList<CardItem>(), content.listItems)
     }
 
     @Test
-    fun whenNextStepsItemsMessageWithEmptyTitleThenMessageIsFiltered() {
-        val jsonMessages = listOf(aJsonMessage(id = "next_steps", content = nextStepsItemsJsonContent(titleText = "")))
+    fun whenActionableItemsMessageWithEmptyTitleThenMessageIsFiltered() {
+        val jsonMessages = listOf(aJsonMessage(id = "actionable_items", content = actionableItemsJsonContent(titleText = "")))
 
         val remoteMessages = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins)
 
@@ -126,14 +126,14 @@ class NextStepsItemsMessageMapperTest {
         val listItems = listOf(
             JsonListItem(
                 id = "",
-                type = "setup_item",
+                type = "one_action_item",
                 titleText = "Set as default browser",
                 descriptionText = "Description",
                 placeholder = "Announce",
                 primaryAction = JsonMessageAction(type = "defaultBrowser", value = "", additionalParameters = null),
             ),
         )
-        val jsonMessages = listOf(aJsonMessage(id = "next_steps", content = nextStepsItemsJsonContent(listItems = listItems)))
+        val jsonMessages = listOf(aJsonMessage(id = "actionable_items", content = actionableItemsJsonContent(listItems = listItems)))
 
         val remoteMessages = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins)
 
@@ -154,13 +154,13 @@ class NextStepsItemsMessageMapperTest {
                 ),
             ),
         )
-        val jsonMessages = listOf(aJsonMessage(id = "next_steps", content = nextStepsItemsJsonContent(), translations = translations))
+        val jsonMessages = listOf(aJsonMessage(id = "actionable_items", content = actionableItemsJsonContent(), translations = translations))
 
-        val content = jsonMessages.mapToRemoteMessage(Locale.GERMANY, messageActionPlugins).first().content as Content.NextStepsItems
+        val content = jsonMessages.mapToRemoteMessage(Locale.GERMANY, messageActionPlugins).first().content as Content.ActionableItems
 
-        val expected = nextStepsItemsContent(
+        val expected = actionableItemsContent(
             titleText = "Einrichtung abschließen",
-            listItems = nextStepListItems(
+            listItems = actionableListItems(
                 defaultBrowserTitleText = "Als Standardbrowser festlegen",
                 defaultBrowserDescriptionText = "Links in DuckDuckGo öffnen",
                 defaultBrowserPrimaryActionText = "Als Standard festlegen",
@@ -170,9 +170,9 @@ class NextStepsItemsMessageMapperTest {
     }
 
     @Test
-    fun whenNextStepsItemsMessageSerializedThenDeserializedMessageIsEqual() {
+    fun whenActionableItemsMessageSerializedThenDeserializedMessageIsEqual() {
         val mapper = getMessageMapper()
-        val message = aNextStepsItemsMessage(id = "next_steps")
+        val message = anActionableItemsMessage(id = "actionable_items")
 
         val restored = mapper.fromMessage(mapper.toString(message))
 

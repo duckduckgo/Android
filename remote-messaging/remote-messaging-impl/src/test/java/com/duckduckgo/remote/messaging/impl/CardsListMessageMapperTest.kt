@@ -454,16 +454,16 @@ class CardsListMessageMapperTest {
     }
 
     @Test
-    fun whenCardsListContainsNextStepItemThenItemIsDropped() {
-        val nextStepItem = JsonListItem(
-            id = "setup_item",
-            type = "setup_item",
+    fun whenCardsListContainsOneActionItemThenItemIsDropped() {
+        val oneActionItem = JsonListItem(
+            id = "one_action_item",
+            type = "one_action_item",
             titleText = "Set as default",
             descriptionText = "Description",
             placeholder = "Announce",
             primaryAction = JsonMessageAction(type = "defaultBrowser", value = "", additionalParameters = null),
         )
-        val listItems = cardsListJsonContent().listItems.orEmpty() + nextStepItem
+        val listItems = cardsListJsonContent().listItems.orEmpty() + oneActionItem
         val jsonMessages = listOf(aJsonMessage(id = "cards1", content = cardsListJsonContent(listItems = listItems)))
 
         val content = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins).first().content as Content.CardsList

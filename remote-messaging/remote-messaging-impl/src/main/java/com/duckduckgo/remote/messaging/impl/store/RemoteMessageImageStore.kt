@@ -119,7 +119,7 @@ class GlideRemoteMessageImageStore(
     private suspend fun fetchAndStoreCardItemImages(message: RemoteMessage?) {
         val (listItems, imagesDir) = when (val content = message?.content) {
             is Content.CardsList -> content.listItems to CARD_ITEM_IMAGES_DIR
-            is Content.NextStepsItems -> content.listItems to NEXT_STEP_ITEM_IMAGES_DIR
+            is Content.ActionableItems -> content.listItems to ACTIONABLE_ITEM_IMAGES_DIR
             else -> return
         }
 
@@ -182,13 +182,13 @@ class GlideRemoteMessageImageStore(
             is Content.BigTwoActions -> this.imageUrl
             is Content.PromoSingleAction -> this.imageUrl
             is Content.CardsList -> this.imageUrl
-            is Content.NextStepsItems -> null
+            is Content.ActionableItems -> null
         }
     }
 
     companion object {
         private const val REMOTE_IMAGE_FILE_PREFIX = "active_message_remote_image"
         private const val CARD_ITEM_IMAGES_DIR = "rmf_card_item_images"
-        private const val NEXT_STEP_ITEM_IMAGES_DIR = "rmf_next_step_item_images"
+        private const val ACTIONABLE_ITEM_IMAGES_DIR = "rmf_actionable_item_images"
     }
 }
