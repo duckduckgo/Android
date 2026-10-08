@@ -37,12 +37,8 @@ import com.duckduckgo.feature.toggles.codegen.ContributesRemoteFeatureCodeGenera
 import com.duckduckgo.feature.toggles.codegen.ContributesRemoteFeatureCodeGeneratorTest.Cohorts.CONTROL
 import com.duckduckgo.feature.toggles.fakes.FakeFeatureTogglesCallback
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import dagger.Lazy
-import dagger.SingleInstanceIn
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -51,7 +47,6 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
@@ -121,7 +116,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
             .kotlin
 
-        val annotation = generatedClass.java.getAnnotation(SingleInstanceIn::class.java)!!
+        val annotation = generatedClass.java.getAnnotation(dev.zacsweers.metro.SingleIn::class.java)!!
         assertEquals(TriggerTestScope::class, annotation.scope)
     }
 
@@ -136,28 +131,17 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    @Ignore("ContributesBinding is only present in kotlin metadata now, we need to fix")
-    fun `the generated class contributes the toggle store binding`() = runTest {
-        val generatedClass = Class
-            .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
-            .kotlin
+    fun `the remote feature joins the unqualified privacy feature plugin set`() = runTest {
+        val proxyModule = Class.forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_ProxyModule")
+        val method = proxyModule.methods.single { it.name == "providesTestTriggerFeaturePrivacyFeaturePlugin" }
 
-        val annotation = generatedClass.java.getAnnotation(ContributesBinding::class.java)!!
-        assertEquals(TriggerTestScope::class, annotation.scope)
-        assertEquals(Toggle.Store::class, annotation.boundType)
-    }
-
-    @Test
-    @Ignore("ContributesMultibinding is only present in kotlin metadata now, we need to fix")
-    fun `the generated class contributes the privacy plugin multibinding`() = runTest {
-        val generatedClass = Class
-            .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
-            .kotlin
-
-        val annotation = generatedClass.java.getAnnotation(ContributesMultibinding::class.java)!!
-        assertEquals(TriggerTestScope::class, annotation.scope)
-        assertEquals(PrivacyFeaturePlugin::class, annotation.boundType)
-        assertTrue(annotation.ignoreQualifier)
+        assertEquals(PrivacyFeaturePlugin::class.java, method.returnType)
+        assertNotNull(method.getAnnotation(dev.zacsweers.metro.IntoSet::class.java))
+        assertTrue(
+            method.annotations.none { annotation ->
+                annotation.annotationClass.java.isAnnotationPresent(javax.inject.Qualifier::class.java)
+            },
+        )
     }
 
     @Test
@@ -363,13 +347,13 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                 .forName("com.duckduckgo.feature.toggles.codegen.AnotherTestTriggerFeature_RemoteFeature")
                 .getConstructor(
                     FeatureSettings.Store::class.java,
-                    dagger.Lazy::class.java as Class<*>,
+                    kotlin.Lazy::class.java as Class<*>,
                     AppBuildConfig::class.java,
                     VariantManager::class.java,
                     Context::class.java,
                 ).newInstance(
                     FeatureSettings.EMPTY_STORE,
-                    Lazy { anotherTestFeature },
+                    lazyOf(anotherTestFeature),
                     appBuildConfig,
                     variantManager,
                     context,
@@ -5323,13 +5307,13 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
             .getConstructor(
                 FeatureSettings.Store::class.java,
-                dagger.Lazy::class.java as Class<*>,
+                kotlin.Lazy::class.java as Class<*>,
                 AppBuildConfig::class.java,
                 VariantManager::class.java,
                 Context::class.java,
             ).newInstance(
                 FeatureSettings.EMPTY_STORE,
-                Lazy { testFeature },
+                lazyOf(testFeature),
                 appBuildConfig,
                 variantManager,
                 context,

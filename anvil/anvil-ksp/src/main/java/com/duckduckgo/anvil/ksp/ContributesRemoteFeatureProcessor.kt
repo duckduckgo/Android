@@ -55,10 +55,10 @@ class ContributesRemoteFeatureProcessor(
         private const val REMOTE_FEATURE_STORE_NAMED = "com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed"
         private const val SUPPRESS_FQ = "kotlin.Suppress"
 
-        // Anvil annotations
-        private val CONTRIBUTES_MULTIBINDING = ClassName("com.squareup.anvil.annotations", "ContributesMultibinding")
-        private val CONTRIBUTES_BINDING = ClassName("com.squareup.anvil.annotations", "ContributesBinding")
-        private val CONTRIBUTES_TO = ClassName("com.squareup.anvil.annotations", "ContributesTo")
+        // Metro annotations
+        private val CONTRIBUTES_BINDING = ClassName("dev.zacsweers.metro", "ContributesBinding")
+        private val CONTRIBUTES_TO = ClassName("dev.zacsweers.metro", "ContributesTo")
+        private val BINDING = ClassName("dev.zacsweers.metro", "binding")
 
         // Feature toggles API
         private val PRIVACY_FEATURE_PLUGIN = ClassName("com.duckduckgo.privacy.config.api", "PrivacyFeaturePlugin")
@@ -86,12 +86,12 @@ class ContributesRemoteFeatureProcessor(
         // Variant manager
         private val VARIANT_MANAGER = ClassName("com.duckduckgo.experiments.api", "VariantManager")
 
-        // Dagger
-        private val SINGLE_INSTANCE_IN = ClassName("dagger", "SingleInstanceIn")
-        private val DAGGER_MODULE = ClassName("dagger", "Module")
-        private val DAGGER_PROVIDES = ClassName("dagger", "Provides")
-        private val DAGGER_LAZY = ClassName("dagger", "Lazy")
-        private val INTO_SET = ClassName("dagger.multibindings", "IntoSet")
+        // Metro
+        private val SINGLE_IN = ClassName("dev.zacsweers.metro", "SingleIn")
+        private val BINDING_CONTAINER = ClassName("dev.zacsweers.metro", "BindingContainer")
+        private val PROVIDES = ClassName("dev.zacsweers.metro", "Provides")
+        private val LAZY = ClassName("kotlin", "Lazy")
+        private val INTO_SET = ClassName("dev.zacsweers.metro", "IntoSet")
         private val INJECT = ClassName("javax.inject", "Inject")
 
         // Android
@@ -349,7 +349,7 @@ class ContributesRemoteFeatureProcessor(
                     .build(),
             )
             .addProperty(
-                PropertySpec.builder("feature", DAGGER_LAZY.parameterizedBy(boundTypeClassName), KModifier.PRIVATE)
+                PropertySpec.builder("feature", LAZY.parameterizedBy(boundTypeClassName), KModifier.PRIVATE)
                     .initializer("feature")
                     .build(),
             )
@@ -405,18 +405,11 @@ class ContributesRemoteFeatureProcessor(
         customStorePresence: CustomStorePresence,
     ): List<AnnotationSpec> {
         return buildList {
-            add(
-                AnnotationSpec.builder(CONTRIBUTES_MULTIBINDING)
-                    .addMember("scope = %T::class", scope)
-                    .addMember("boundType = %T::class", PRIVACY_FEATURE_PLUGIN)
-                    .addMember("ignoreQualifier = true")
-                    .build(),
-            )
             if (!customStorePresence.toggleStorePresent) {
                 add(
                     AnnotationSpec.builder(CONTRIBUTES_BINDING)
                         .addMember("scope = %T::class", scope)
-                        .addMember("boundType = %T::class", TOGGLE_STORE)
+                        .addMember("binding = %T<%T>()", BINDING, TOGGLE_STORE)
                         .build(),
                 )
                 add(
@@ -426,7 +419,7 @@ class ContributesRemoteFeatureProcessor(
                 )
             }
             add(
-                AnnotationSpec.builder(SINGLE_INSTANCE_IN)
+                AnnotationSpec.builder(SINGLE_IN)
                     .addMember("scope = %T::class", scope)
                     .build(),
             )
@@ -445,7 +438,7 @@ class ContributesRemoteFeatureProcessor(
                     )
                     .build(),
             )
-            .addParameter("feature", DAGGER_LAZY.parameterizedBy(boundTypeClassName))
+            .addParameter("feature", LAZY.parameterizedBy(boundTypeClassName))
             .addParameter("appBuildConfig", APP_BUILD_CONFIG)
             .addParameter("variantManager", VARIANT_MANAGER)
             .addParameter("context", CONTEXT)
@@ -479,7 +472,7 @@ class ContributesRemoteFeatureProcessor(
                     """
                         try {
                             // try to hash with all sub-features
-                            val concatMethodNames = this.feature.get().javaClass
+                            val concatMethodNames = this.feature.value.javaClass
                                 .declaredMethods
                                 .map { it.name }
                                 .sorted()
@@ -519,7 +512,7 @@ class ContributesRemoteFeatureProcessor(
                     val exceptions = parseExceptions(feature.exceptions)
 
                     val isEnabled = (feature.state == "enabled") || (appBuildConfig.flavor == %T && feature.state == "internal")
-                    this.feature.get().invokeMethod("self").setRawStoredState(
+                    this.feature.value.invokeMethod("self").setRawStoredState(
                         Toggle.State(
                             remoteEnableState = isEnabled,
                             enable = isEnabled,
@@ -538,10 +531,10 @@ class ContributesRemoteFeatureProcessor(
                             // try-catch to just skip any issues with a particular
                             // sub-feature and continue with the rest of them
                             try {
-                                val previousState = this.feature.get().invokeMethod(subfeature.key).getRawStoredState()
+                                val previousState = this.feature.value.invokeMethod(subfeature.key).getRawStoredState()
                                 // we try to honour the previous state
                                 // else we resort to compute it using isEnabled()
-                                val previousStateValue = previousState?.enable ?: this.feature.get().invokeMethod(subfeature.key).isEnabled()
+                                val previousStateValue = previousState?.enable ?: this.feature.value.invokeMethod(subfeature.key).isEnabled()
 
                                 val previousRolloutThreshold = previousState?.rolloutThreshold
                                 val previousAssignedCohort = previousState?.assignedCohort
@@ -565,7 +558,7 @@ class ContributesRemoteFeatureProcessor(
                                 } ?: emptyList()
                                 val settings = jsonToggle?.settings?.toString()
                                 val subFeatureExceptions = parseExceptions(jsonToggle.exceptions)
-                                this.feature.get().invokeMethod(subfeature.key).setRawStoredState(
+                                this.feature.value.invokeMethod(subfeature.key).setRawStoredState(
                                     Toggle.State(
                                         remoteEnableState = newStateValue,
                                         enable = previousStateValue,
@@ -729,7 +722,7 @@ class ContributesRemoteFeatureProcessor(
             .toList()
 
         val typeSpecBuilder = TypeSpec.objectBuilder(generatedClassName)
-            .addAnnotation(AnnotationSpec.builder(DAGGER_MODULE).build())
+            .addAnnotation(AnnotationSpec.builder(BINDING_CONTAINER).build())
             .addAnnotation(
                 AnnotationSpec.builder(CONTRIBUTES_TO)
                     .addMember("scope = %T::class", scope)
@@ -737,9 +730,9 @@ class ContributesRemoteFeatureProcessor(
             )
             .addFunction(
                 FunSpec.builder("provides${boundType.simpleName.asString()}")
-                    .addAnnotation(DAGGER_PROVIDES)
+                    .addAnnotation(PROVIDES)
                     .addAnnotation(
-                        AnnotationSpec.builder(SINGLE_INSTANCE_IN)
+                        AnnotationSpec.builder(SINGLE_IN)
                             .addMember("scope = %T::class", scope)
                             .build(),
                     )
@@ -780,7 +773,7 @@ class ContributesRemoteFeatureProcessor(
         if (!customStorePresence.settingsStorePresent) {
             typeSpecBuilder.addFunction(
                 FunSpec.builder("providesNoopSettingsStore")
-                    .addAnnotation(DAGGER_PROVIDES)
+                    .addAnnotation(PROVIDES)
                     .addAnnotation(
                         AnnotationSpec.builder(REMOTE_FEATURE_STORE_NAMED_CLASS)
                             .addMember("value = %T::class", boundTypeClassName)
@@ -801,9 +794,9 @@ class ContributesRemoteFeatureProcessor(
 
         typeSpecBuilder.addFunction(
             FunSpec.builder("provides${boundType.simpleName.asString()}Inventory")
-                .addAnnotation(DAGGER_PROVIDES)
+                .addAnnotation(PROVIDES)
                 .addAnnotation(
-                    AnnotationSpec.builder(SINGLE_INSTANCE_IN)
+                    AnnotationSpec.builder(SINGLE_IN)
                         .addMember("scope = %T::class", scope)
                         .build(),
                 )
@@ -828,6 +821,16 @@ class ContributesRemoteFeatureProcessor(
                     ),
                 )
                 .returns(FEATURE_TOGGLES_INVENTORY)
+                .build(),
+        )
+
+        typeSpecBuilder.addFunction(
+            FunSpec.builder("provides${boundType.simpleName.asString()}PrivacyFeaturePlugin")
+                .addAnnotation(PROVIDES)
+                .addAnnotation(INTO_SET)
+                .addParameter("remoteFeature", ClassName(packageName, "${classDecl.simpleName.asString()}_RemoteFeature"))
+                .returns(PRIVACY_FEATURE_PLUGIN)
+                .addStatement("return remoteFeature")
                 .build(),
         )
 
