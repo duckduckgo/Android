@@ -22,11 +22,14 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.CurrentTimeProvider
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.pixels.WireguardHandshakeMonitor
+import com.duckduckgo.networkprotection.impl.portprobing.PortProbingCoordinator
+import com.duckduckgo.networkprotection.impl.portprobing.replacingEndpointPort
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -46,6 +49,8 @@ class FailureRecoveryHandler @Inject constructor(
     private val currentTimeProvider: CurrentTimeProvider,
     private val networkProtectionPixels: NetworkProtectionPixels,
     private val dispatcherProvider: DispatcherProvider,
+    private val vpnRemoteFeatures: VpnRemoteFeatures,
+    private val portProbingCoordinator: PortProbingCoordinator,
 ) : WireguardHandshakeMonitor.Listener {
 
     private var failureRecoveryInProgress = AtomicBoolean(false)
@@ -138,14 +143,41 @@ class FailureRecoveryHandler @Inject constructor(
                 vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
             } else {
                 networkProtectionPixels.reportFailureRecoveryCompletedWithServerHealthy()
-                // Ignore created config, new keypair should eventually be ignored by the controller
-                logcat { "Failure recovery: server is healthy, nothing to do." }
+                // Same server - probe ports if feature is enabled
+                if (vpnRemoteFeatures.endpointPortFallback().isEnabled()) {
+                    val differentPortResponded = probeForDifferentPort(config)
+                    if (differentPortResponded) {
+                        logcat { "Failure recovery: different port responded, restarting VPN" }
+                        wgTunnel.markTunnelHealthy()
+                        vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
+                    } else {
+                        logcat { "Failure recovery: no different port responded, server is healthy" }
+                    }
+                } else {
+                    // Ignore created config, new keypair should eventually be ignored by the controller
+                    logcat { "Failure recovery: server is healthy, nothing to do." }
+                }
             }
         } else {
             logcat { "Failure recovery: Ignore attempted recovery due to VPN being off" }
         }
 
         return Result.success(Unit)
+    }
+
+    private suspend fun probeForDifferentPort(config: com.wireguard.config.Config): Boolean {
+        val result = portProbingCoordinator.probeAndSelect(config, wgTunnelConfig)
+            ?: return false.also { logcat { "Failure recovery port probe: skipping (not enough ports)" } }
+
+        // Only restart if DIFFERENT port responded
+        return if (result.probedPort != null && result.portChanged) {
+            logcat { "Failure recovery port probe: port ${result.selectedPort} responded, switching" }
+            wgTunnelConfig.setWgConfig(config.replacingEndpointPort(result.selectedPort))
+            true
+        } else {
+            logcat { "Failure recovery port probe: current port still works or nothing responded" }
+            false
+        }
     }
 
     companion object {

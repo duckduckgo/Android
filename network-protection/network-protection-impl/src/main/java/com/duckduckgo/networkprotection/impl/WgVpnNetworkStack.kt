@@ -31,11 +31,8 @@ import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.computeBlockMalwareDnsOrSame
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
-import com.duckduckgo.networkprotection.impl.portprobing.PortProber
-import com.duckduckgo.networkprotection.impl.portprobing.PortSelector
-import com.duckduckgo.networkprotection.impl.portprobing.currentEndpointPort
+import com.duckduckgo.networkprotection.impl.portprobing.PortProbingCoordinator
 import com.duckduckgo.networkprotection.impl.portprobing.replacingEndpointPort
-import com.duckduckgo.networkprotection.impl.portprobing.serverIp
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -64,8 +61,7 @@ class WgVpnNetworkStack @Inject constructor(
     private val crashLogger: CrashLogger,
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
     private val vpnRemoteFeatures: VpnRemoteFeatures,
-    private val portProber: Lazy<PortProber>,
-    private val portSelector: Lazy<PortSelector>,
+    private val portProbingCoordinator: Lazy<PortProbingCoordinator>,
 ) : VpnNetworkStack {
     private var wgConfig: Config? = null
 
@@ -117,46 +113,14 @@ class WgVpnNetworkStack @Inject constructor(
     }
 
     private suspend fun probeAndSelectPort(config: Config): Config {
-        val serverIp = config.serverIp()
-        val advertisedPorts = wgTunnelConfigLazy.get().getAdvertisedPorts()
-        val serverDefaultPort = wgTunnelConfigLazy.get().getServerDefaultPort()
-        val rememberedPort = wgTunnelConfigLazy.get().getRememberedPort()
-        val currentPort = config.currentEndpointPort()
+        val result = portProbingCoordinator.get().probeAndSelect(config, wgTunnelConfigLazy.get())
+            ?: return config.also { logcat { "Port probing: skipping (not enough ports)" } }
 
-        if (serverIp == null || advertisedPorts.isEmpty()) {
-            logcat { "Port probing: skipping (no server IP or no advertised ports)" }
-            return config
-        }
-
-        if (advertisedPorts.size == 1) {
-            logcat { "Port probing: skipping (only one advertised port)" }
-            return config
-        }
-
-        val candidatePorts = portSelector.get().orderCandidatePorts(
-            rememberedPort = rememberedPort,
-            serverDefaultPort = serverDefaultPort,
-            advertisedPorts = advertisedPorts,
-        )
-
-        val probedPort = portProber.get().probePortsInParallel(serverIp, candidatePorts)
-
-        val selectionResult = portSelector.get().selectPort(
-            probedPort = probedPort,
-            currentPort = currentPort,
-            serverDefaultPort = serverDefaultPort,
-            advertisedPorts = advertisedPorts,
-        )
-
-        if (selectionResult.shouldRemember) {
-            wgTunnelConfigLazy.get().setRememberedPort(selectionResult.selectedPort)
-        }
-
-        return if (selectionResult.selectedPort != currentPort) {
-            logcat { "Port probing: switching from $currentPort to ${selectionResult.selectedPort}" }
-            config.replacingEndpointPort(selectionResult.selectedPort)
+        return if (result.portChanged) {
+            logcat { "Port probing: switching to ${result.selectedPort}" }
+            config.replacingEndpointPort(result.selectedPort)
         } else {
-            logcat { "Port probing: keeping current port $currentPort" }
+            logcat { "Port probing: keeping current port ${result.selectedPort}" }
             config
         }
     }
