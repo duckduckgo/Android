@@ -311,7 +311,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         }
     }
 
-    suspend fun launchDeviceAuth() {
+    suspend fun launchDeviceAuth(suppressAuthPrompt: Boolean = false) {
         if (!autofillStore.autofillAvailable()) {
             logcat(VERBOSE) { "Can't access secure storage so can't offer autofill functionality" }
             deviceUnsupported()
@@ -328,6 +328,9 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         val shouldAskAuth = credentialCount == null || credentialCount == 0
         if (shouldAskAuth) {
             logcat(VERBOSE) { "No credentials; can skip showing device auth" }
+            unlock()
+        } else if (suppressAuthPrompt) {
+            logcat(VERBOSE) { "Auth prompt suppressed by caller; unlocking without device auth" }
             unlock()
         } else {
             addCommand(LaunchDeviceAuth)
