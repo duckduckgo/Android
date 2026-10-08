@@ -21,9 +21,12 @@
     <string name="newTabReturnHatchFireTabTitle">Naposledy použitá karta Fire</string>
     <string name="newTabReturnHatchTabClosed">Karta bola zatvorená</string>
     <string name="newTabReturnHatchUndo">Zrušiť zmenu</string>
-    <string name="hatchMenuReturnTab">Späť na kartu</string>
+    <string name="hatchMenuReturnToLastUsedTab">Návrat na naposledy použitú kartu</string>
     <string name="hatchMenuAfterInactivitySettings">Po nečinnosti</string>
-    <string name="hatchMenuCloseTab">Zatvoriť kartu</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Otvoriť novú kartu</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Naposledy použitá karta</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="&apos;%1$s&apos; is the menu row label (&apos;After Inactivity&apos;) and &apos;%2$s&apos; is the current destination, e.g. &apos;After Inactivity, Open New Tab&apos;">%1$s, %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Zatvoriť naposledy použitú kartu</string>
     <string name="hatchMenuBurnTab">Odstrániť kartu</string>
-    <string name="hatchMenuHideShortcut">Skryť skratku</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="&apos;Return to&apos; refers to this menu&apos;s own &apos;Return to…&apos; label shown above this item">Skryť skratku „Vrátiť sa na“</string>
 </resources>
