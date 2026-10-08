@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Die Website „%1$s“ möchte auf deine Kamera zugreifen</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Die Website „%1$s“ möchte auf dein Mikrofon zugreifen</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Die Website „%1$s“ möchte auf deine Kamera und dein Mikrofon zugreifen</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ möchte auf dieser Website auf deinen Standort zugreifen</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" möchte auf dieser Website auf deine Kamera zugreifen</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ möchte auf dieser Website auf dein Mikrofon zugreifen</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ möchte auf dieser Website auf deine Kamera und dein Mikrofon zugreifen</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ möchte auf dieser Website auf deine DRM-Software (Digital Rights Management) zugreifen</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Wenn du dies nicht erlaubst, können Videos auf der Website möglicherweise nicht mehr abgespielt werden, aber diese Website hat keinen Zugriff auf die von der DRM-Software bereitgestellten Gerätekennungen.</string>
 
     <!-- Reminder dialog -->
