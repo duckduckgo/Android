@@ -82,7 +82,7 @@ The live source of truth is a `# Cannot update â€¦ because it requires Kotlin â€
 - Kotlin itself
 - AGP (Android Gradle Plugin)
 - Room
-- Dagger / Anvil
+- Metro
 - Coil
 - Compose compiler
 - `kotlinx.collections.immutable`

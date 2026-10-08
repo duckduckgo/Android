@@ -4,7 +4,7 @@ import kotlin.reflect.KClass
 
 /**
  * Type alias for the injector factory map.
- * Uses KClass<*> keys, which is what Metro's @ClassKey interop produces.
+ * Uses KClass<*> keys, which is what Metro's @ClassKey produces.
  */
 typealias InjectorFactoryMap = Map<@JvmSuppressWildcards KClass<*>, @JvmSuppressWildcards AndroidInjector.Factory<*, *>>
 

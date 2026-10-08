@@ -21,7 +21,6 @@ dependencies {
     implementation "com.google.devtools.ksp:symbol-processing-api:_"
     implementation "com.squareup:kotlinpoet:1.11.0"
     implementation "com.squareup:kotlinpoet-ksp:1.11.0"
-    implementation Google.dagger
 
     implementation "com.google.auto.service:auto-service-annotations:1.1.0"
     ksp "dev.zacsweers.autoservice:auto-service-ksp:1.1.0"
@@ -32,6 +31,6 @@ dependencies {
     testImplementation "dev.zacsweers.kctfork:core:0.11.1"
     testImplementation "dev.zacsweers.kctfork:ksp:0.11.1"
     testImplementation "com.google.devtools.ksp:symbol-processing-api:_"
-    testImplementation "com.squareup.anvil:annotations:2.7.0"
     testImplementation "dev.zacsweers.metro:runtime:_"
+    testImplementation "javax.inject:javax.inject:_"
 }

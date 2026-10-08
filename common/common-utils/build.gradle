@@ -55,8 +55,6 @@ dependencies {
     // Android KTX
     implementation AndroidX.core.ktx
 
-    implementation Google.dagger
-
     implementation "com.squareup.logcat:logcat:_"
 
     implementation Square.okHttp3.okHttp

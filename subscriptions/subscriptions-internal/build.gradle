@@ -52,9 +52,6 @@ dependencies {
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.commonJava8
 
-    // Dagger
-    implementation Google.dagger
-
     implementation KotlinX.coroutines.core
 
     implementation "com.squareup.logcat:logcat:_"

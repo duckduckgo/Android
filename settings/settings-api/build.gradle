@@ -25,7 +25,6 @@ dependencies {
     implementation project(':feature-toggles-api')
 
     implementation project(':navigation-api')
-    implementation Google.dagger
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
 

@@ -56,9 +56,6 @@ dependencies {
     ksp AndroidX.room.compiler
     testImplementation AndroidX.room.testing
 
-    // Dagger
-    implementation Google.dagger
-
     implementation KotlinX.coroutines.core
     implementation "com.squareup.logcat:logcat:_"
 

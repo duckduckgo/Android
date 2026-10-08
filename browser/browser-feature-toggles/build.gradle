@@ -36,7 +36,4 @@ dependencies {
 
     // FeatureToggles.Builder leaks CoroutineDispatcher in its constructor signature
     implementation KotlinX.coroutines.core
-
-    // just to get the dagger annotations
-    implementation Google.dagger
 }

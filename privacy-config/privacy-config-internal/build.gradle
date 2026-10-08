@@ -99,9 +99,6 @@ dependencies {
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation Square.okHttp3.okHttp
-    
-    // Dagger
-    implementation Google.dagger
 
     implementation "com.squareup.logcat:logcat:_"
     implementation "io.github.vishwakarma:zjsonpatch:_"

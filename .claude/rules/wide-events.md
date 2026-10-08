@@ -127,7 +127,7 @@ interface MyFeatureWideEvent {
 }
 
 // 2. Implement it, injecting WideEventClient
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class MyFeatureWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,

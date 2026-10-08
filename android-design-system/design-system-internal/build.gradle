@@ -58,7 +58,4 @@ dependencies {
     implementation AndroidX.fragment.ktx
     implementation AndroidX.recyclerView
     implementation AndroidX.lifecycle.viewModelKtx
-    // just to get the dagger annotations
-    implementation Google.dagger
-
 }

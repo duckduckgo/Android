@@ -50,7 +50,6 @@ dependencies {
     implementation AndroidX.fragment.ktx
     implementation Google.android.material
     implementation "com.squareup.logcat:logcat:_"
-    implementation Google.dagger
     implementation KotlinX.coroutines.core
     implementation AndroidX.core.ktx
     implementation AndroidX.lifecycle.viewModelKtx

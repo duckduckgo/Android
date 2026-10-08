@@ -41,9 +41,6 @@ dependencies {
     ksp project(':anvil-ksp')
     implementation project(':anvil-annotations')
 
-    // Dagger
-    implementation Google.dagger
-
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.appCompat

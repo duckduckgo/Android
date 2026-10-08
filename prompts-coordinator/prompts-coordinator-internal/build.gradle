@@ -34,6 +34,5 @@ dependencies {
     implementation project(':anvil-annotations')
     implementation project(':di')
 
-    implementation Google.dagger
     implementation KotlinX.coroutines.core
 }

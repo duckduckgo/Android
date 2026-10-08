@@ -35,7 +35,6 @@ dependencies {
     implementation project(':data-store-api')
 
     implementation AndroidX.room.runtime
-    implementation Google.dagger
     implementation Square.moshi
 
     testImplementation Testing.junit4
