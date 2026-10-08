@@ -35,6 +35,8 @@ import com.duckduckgo.pir.impl.checker.isEnabled
 import com.duckduckgo.pir.impl.dashboard.PirDashboardUrlProvider
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
+import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
+import com.duckduckgo.pir.impl.store.PirFreemiumFirstScanResult
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.internal.R
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalSettingsBinding
@@ -73,6 +75,9 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var pirFeatureDataCleaner: PirFeatureDataCleaner
+
+    @Inject
+    lateinit var pirFreemiumDataStore: PirFreemiumDataStore
 
     private val binding: ActivityPirInternalSettingsBinding by viewBinding()
 
@@ -147,9 +152,22 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
+        binding.pirSimulateFreeScanMatches.setOnClickListener { simulateFreeScanResult(PirFreemiumFirstScanResult.MATCHES_FOUND) }
+        binding.pirSimulateFreeScanNoMatches.setOnClickListener { simulateFreeScanResult(PirFreemiumFirstScanResult.NO_MATCHES) }
+
         binding.pirForceFreemiumEligibility.setIsChecked(pirInternalSettingsDataStore.isFreemiumEligibilityForced)
         binding.pirForceFreemiumEligibility.setOnCheckedChangeListener { _, isChecked ->
             pirInternalSettingsDataStore.isFreemiumEligibilityForced = isChecked
+        }
+    }
+
+    private fun simulateFreeScanResult(result: PirFreemiumFirstScanResult) {
+        lifecycleScope.launch(dispatcherProvider.io()) {
+            pirFreemiumDataStore.clearFirstScanResult()
+            pirFreemiumDataStore.recordFirstScanResult(result)
+            withContext(dispatcherProvider.main()) {
+                Toast.makeText(this@PirDevSettingsActivity, getString(R.string.pirDevSimulateFreeScanDone), Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

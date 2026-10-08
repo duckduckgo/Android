@@ -1086,6 +1086,7 @@ class PirEndToEndTest {
         override val firstScanResult: PirFreemiumFirstScanResult? = null
         override fun activate(timestampMillis: Long) = Unit
         override fun recordFirstScanResult(result: PirFreemiumFirstScanResult) = Unit
+        override fun clearFirstScanResult() = Unit
         override fun reset() = Unit
     }
 

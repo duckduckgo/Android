@@ -94,6 +94,18 @@
                 android:layout_height="wrap_content"
                 android:text="@string/pirDevResetFreemiumState" />
 
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/pirSimulateFreeScanMatches"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pirDevSimulateFreeScanMatches" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/pirSimulateFreeScanNoMatches"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pirDevSimulateFreeScanNoMatches" />
+
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/pirForceFreemiumEligibility"
                 android:layout_width="match_parent"

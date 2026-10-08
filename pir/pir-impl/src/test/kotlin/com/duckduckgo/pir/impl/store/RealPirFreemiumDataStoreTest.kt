@@ -23,6 +23,7 @@ import com.duckduckgo.pir.impl.store.PirFreemiumFirstScanResult.NO_MATCHES
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -124,6 +125,19 @@ class RealPirFreemiumDataStoreTest {
         testee.recordFirstScanResult(NO_MATCHES)
 
         assertEquals(NO_MATCHES, testee.firstScanResult)
+    }
+
+    @Test
+    fun whenFirstScanResultIsClearedThenNoMatchesCanReplaceMatchesFoundAndActivationIsKept() {
+        testee.activate(timestampMillis = 1_000L)
+        testee.recordFirstScanResult(MATCHES_FOUND)
+
+        testee.clearFirstScanResult()
+        testee.recordFirstScanResult(NO_MATCHES)
+
+        assertEquals(NO_MATCHES, testee.firstScanResult)
+        assertTrue(testee.didActivate)
+        assertEquals(1_000L, testee.firstProfileSavedTimestamp)
     }
 
     private companion object {
