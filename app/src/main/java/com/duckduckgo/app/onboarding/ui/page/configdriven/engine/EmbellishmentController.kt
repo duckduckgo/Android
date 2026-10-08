@@ -98,8 +98,6 @@ class EmbellishmentControllerImpl(
     )
 
     init {
-        fitCorrector.enabled = true
-        fitCorrector.reservesInsetAboveDecoration = true
         fitCorrector.attach()
     }
 
@@ -297,8 +295,8 @@ class EmbellishmentControllerImpl(
     /**
      * A screen with no decoration still reserves the room one would have taken, so its card sits at a
      * comparable height rather than dropping to the parent bottom. The floor is the card's bottom inset, so that a
-     * band shrunk by a tall card still covers the bottom bar; the card reserves whatever the band cannot cover,
-     * via [OnboardingDecorationFitCorrector.reservesInsetAboveDecoration].
+     * band shrunk by a tall card still covers the bottom bar; the card reserves whatever the band cannot cover
+     * (see [OnboardingDecorationFitCorrector]).
      */
     private fun buildUndecoratedBand(): Decoration {
         val view = binding.undecoratedBand

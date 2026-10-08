@@ -63,7 +63,6 @@ class SegmentedOnboardingExperimentManagerImpl @Inject constructor(
 
     private suspend fun checkPrerequisites() =
         onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled() &&
-            onboardingBrandDesignUpdateToggles.configDrivenDialogs().isEnabled() &&
             !onboardingPasswordImportToggles.passwordImportExperimentAug25().isEnabled() &&
             !appBuildConfig.isAppReinstall()
 }

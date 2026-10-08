@@ -29,16 +29,13 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
-import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.AI_COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN_PREVIEW
-import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.QUICK_SETUP
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
-import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.WIDGET_PROMPT
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetAddressBarPositionOptions
@@ -215,10 +212,6 @@ class WelcomePageViewModel @Inject constructor(
                 }
             }
 
-            AI_COMPARISON_CHART -> {
-                // no-op, only used in BrandDesignUpdate path
-            }
-
             SKIP_ONBOARDING_OPTION -> {
                 viewModelScope.launch {
                     _commands.send(OnboardingSkipped)
@@ -280,12 +273,6 @@ class WelcomePageViewModel @Inject constructor(
                     _commands.send(Finish)
                 }
             }
-
-            QUICK_SETUP -> {
-            }
-
-            WIDGET_PROMPT -> {
-            }
         }
     }
 
@@ -311,7 +298,7 @@ class WelcomePageViewModel @Inject constructor(
                 // no-op
             }
 
-            COMPARISON_CHART, AI_COMPARISON_CHART -> {
+            COMPARISON_CHART -> {
                 // no-op
             }
 
@@ -332,13 +319,6 @@ class WelcomePageViewModel @Inject constructor(
 
             INPUT_SCREEN_PREVIEW -> {
                 // no-op
-            }
-
-            QUICK_SETUP -> {
-                // no-op
-            }
-
-            WIDGET_PROMPT -> {
             }
         }
     }
@@ -388,9 +368,6 @@ class WelcomePageViewModel @Inject constructor(
             COMPARISON_CHART -> {
                 pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
             }
-            AI_COMPARISON_CHART -> {
-                // no pixel yet
-            }
             SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
             ADDRESS_BAR_POSITION -> {
                 pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
@@ -400,12 +377,6 @@ class WelcomePageViewModel @Inject constructor(
             }
             INPUT_SCREEN_PREVIEW -> {
                 // no pixel yet
-            }
-
-            QUICK_SETUP -> {
-            }
-
-            WIDGET_PROMPT -> {
             }
         }
     }
