@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Сайт «%1$s» запрашивает доступ к вашей камере</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Сайт «%1$s» запрашивает доступ к вашему микрофону</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Сайт «%1$s» запрашивает доступ к вашей камере и микрофону</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">«%1$s» запрашивает доступ к вашей геопозиции на этом сайте</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">«%1$s» запрашивает доступ к вашей камере на этом сайте</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" запрашивает доступ к микрофону на этом сайте</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">«%1$s» запрашивает доступ к вашей камере и микрофону на этом сайте</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">«%1$s» запрашивает доступ к вашим программам защиты авторских прав (DRM) на этом сайте</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Если ты не разрешишь, видео на сайте могут перестать воспроизводиться, но этот сайт не получит доступа к идентификаторам устройств, которые предоставляет DRM.</string>
 
     <!-- Reminder dialog -->
