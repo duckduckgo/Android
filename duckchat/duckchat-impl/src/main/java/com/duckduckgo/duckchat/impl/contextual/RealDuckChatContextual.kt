@@ -62,7 +62,10 @@ class RealDuckChatContextual @Inject constructor(
         textSelection: String?,
         showChatSurface: () -> Unit,
     ) {
-        if (anchor == null || !duckChatInternal.isContextualSheetRedesignEnabled()) {
+        // Every caller already gates on contextual mode, so this is a backstop. Falling back to
+        // showChatSurface() would open the contextual sheet — the very thing the mode disables.
+        if (!duckChatInternal.isDuckChatContextualModeEnabled()) return
+        if (anchor == null) {
             showChatSurface()
             return
         }
@@ -102,17 +105,9 @@ class RealDuckChatContextual @Inject constructor(
     }
 
     override fun createChatSurface(tabId: String): Fragment {
-        return if (duckChatInternal.isContextualSheetRedesignEnabled()) {
-            DuckChatContextualWebViewFragment().apply {
-                arguments = Bundle().apply {
-                    putString(DuckChatContextualWebViewFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
-                }
-            }
-        } else {
-            DuckChatContextualFragment().apply {
-                arguments = Bundle().apply {
-                    putString(DuckChatContextualFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
-                }
+        return DuckChatContextualWebViewFragment().apply {
+            arguments = Bundle().apply {
+                putString(DuckChatContextualWebViewFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
             }
         }
     }

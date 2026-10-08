@@ -26,6 +26,7 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelecti
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyNoInteractions
@@ -58,20 +59,24 @@ class RealDuckChatContextualTest {
         textSelectionRepository,
     )
 
+    @Before
+    fun setup() {
+        whenever(duckChatInternal.isDuckChatContextualModeEnabled()).thenReturn(true)
+    }
+
     @Test
-    fun whenRedesignDisabledThenLaunchedAndDoesNotOpenNewTab() = runTest {
-        whenever(duckChatInternal.isContextualSheetRedesignEnabled()).thenReturn(false)
+    fun whenContextualModeDisabledThenNothingIsShown() = runTest {
+        whenever(duckChatInternal.isDuckChatContextualModeEnabled()).thenReturn(false)
         var askAboutPageCount = 0
 
         testee.launch("tabId", sourceUrl = null, anchor = anchor) { askAboutPageCount++ }
 
-        assertEquals(1, askAboutPageCount)
+        assertEquals(0, askAboutPageCount)
         verifyNoInteractions(browserNav)
     }
 
     @Test
     fun whenAnchorNullThenAskAboutPageInvokedDirectly() = runTest {
-        whenever(duckChatInternal.isContextualSheetRedesignEnabled()).thenReturn(true)
         var askAboutPageCount = 0
 
         testee.launch("tabId", sourceUrl = null, anchor = null) { askAboutPageCount++ }
@@ -82,7 +87,6 @@ class RealDuckChatContextualTest {
 
     @Test
     fun whenNoPageAndChatsEntryDisabledThenChatSurfaceShownInsteadOfMenu() = runTest {
-        whenever(duckChatInternal.isContextualSheetRedesignEnabled()).thenReturn(true)
         whenever(duckChatInternal.isContextualMenuAllChatsEnabled()).thenReturn(false)
         var askAboutPageCount = 0
 
@@ -94,7 +98,6 @@ class RealDuckChatContextualTest {
 
     @Test
     fun whenChatInProgressThenAskAboutPageInvokedWithoutShowingMenu() = runTest {
-        whenever(duckChatInternal.isContextualSheetRedesignEnabled()).thenReturn(true)
         whenever(contextualDataStore.getTabChatUrl("tabId")).thenReturn("https://duckduckgo.com/?chatId=123")
         whenever(contextualDataStore.getTabClosedTimestamp("tabId")).thenReturn(null)
         var askAboutPageCount = 0
@@ -106,7 +109,6 @@ class RealDuckChatContextualTest {
 
     @Test
     fun whenStoredChatSessionExpiredThenTreatedAsNoChatInProgress() = runTest {
-        whenever(duckChatInternal.isContextualSheetRedesignEnabled()).thenReturn(true)
         whenever(duckChatInternal.isContextualMenuAllChatsEnabled()).thenReturn(true)
         whenever(contextualDataStore.getTabChatUrl("tabId")).thenReturn("https://duckduckgo.com/?chatId=123")
         whenever(contextualDataStore.getTabClosedTimestamp("tabId")).thenReturn(0L)
