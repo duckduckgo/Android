@@ -1,7 +1,7 @@
 package com.test
 
 import com.duckduckgo.di.scopes.ActivityScope
-import com.squareup.anvil.annotations.ContributesTo
+import dev.zacsweers.metro.ContributesTo
 import kotlin.Unit
 
 @ContributesTo(scope = ActivityScope::class)

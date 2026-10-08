@@ -1,14 +1,14 @@
 package com.test
 
 import com.duckduckgo.di.scopes.ActivityScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Binds
-import dagger.Module
 import dagger.android.AndroidInjector
-import dagger.multibindings.ClassKey
-import dagger.multibindings.IntoMap
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.Binds
+import dev.zacsweers.metro.ClassKey
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.IntoMap
 
-@Module
+@BindingContainer
 @ContributesTo(scope = ActivityScope::class)
 public abstract class MyFragment_SubComponent_Module {
   @Binds
