@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Site-ul „%1$s” dorește să-ți acceseze camera</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Site-ul „%1$s” dorește să-ți acceseze microfonul</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Site-ul „%1$s” dorește să-ți acceseze camera și microfonul</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s” dorește să-ți acceseze locația pe acest site</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s” dorește să-ți acceseze camera pe acest site</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" dorește să-ți acceseze microfonul pe acest site</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s” dorește să-ți acceseze camera și microfonul pe acest site</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s” dorește să-ți acceseze software-ul de management al drepturilor digitale (DRM) pe acest site</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Dacă nu permiți, videoclipurile de pe site ar putea deveni de neredat, dar acest site nu va avea acces la identificatorii de dispozitiv oferiți de software-ul DRM.</string>
 
     <!-- Reminder dialog -->
