@@ -7,7 +7,7 @@ plugins {
     id 'com.android.application'
 
     id 'com.google.devtools.ksp'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'androidx.room'
     id 'org.jetbrains.kotlin.plugin.compose'
 }

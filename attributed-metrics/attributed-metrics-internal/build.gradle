@@ -1,15 +1,12 @@
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     namespace 'com.duckduckgo.attributed.metrics.internal'
     testOptions {
         unitTests {

@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -65,10 +65,6 @@ dependencies {
     androidTestImplementation AndroidX.archCore.testing
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
-}
-
-anvil {
-    generateDaggerFactories = true // default is false
 }
 
 
