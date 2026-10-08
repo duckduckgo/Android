@@ -476,10 +476,13 @@ class RealNativeInputManager @Inject constructor(
                 isBottom = isBottom,
                 onUpdate = { layoutCoordinator.onWidgetAnimationFrame(card) },
                 onCancel = {
-                    widgetView.background = rootBackground
-                    widgetFrom(widgetView)?.setFooterSuppressed(false)
-                    layoutCoordinator.setWidgetAnimating(false)
-                    layoutCoordinator.resumeContentReflow()
+                    if (rootView.findViewById<View?>(R.id.inputModeRoot) === widgetView) {
+                        isExiting = false
+                        widgetView.background = rootBackground
+                        widgetFrom(widgetView)?.setFooterSuppressed(false)
+                        layoutCoordinator.setWidgetAnimating(false)
+                        layoutCoordinator.resumeContentReflow()
+                    }
                 },
                 onComplete = {
                     // Reset content under the still-suspended reflow and keep isWidgetAnimating true
