@@ -2183,6 +2183,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
         givenSubscriptionExists(status = INACTIVE)
         assertTrue(manager.entitlementSet.first().isEmpty())
