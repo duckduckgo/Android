@@ -32,6 +32,9 @@ interface SitePermissionsAllowedDao {
     @Query("select * from site_permission_allowed")
     fun getAllSitesPermissionsAllowedAsFlow(): Flow<List<SitePermissionAllowedEntity>>
 
+    @Query("select distinct domain from site_permission_allowed")
+    fun getAllowedDomains(): List<String>
+
     @Query("select * from site_permission_allowed where domain = :domain and tabId = :tabId and permissionAllowed = :permissionAllowed")
     suspend fun getSitePermissionAllowed(domain: String, tabId: String, permissionAllowed: String): SitePermissionAllowedEntity?
 

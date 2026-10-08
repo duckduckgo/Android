@@ -57,7 +57,7 @@ interface SitePermissionsRepository {
     fun sitePermissionGranted(url: String, tabId: String, permission: String)
     fun sitePermissionPermanentlySaved(url: String, permission: String, settingType: SitePermissionAskSettingType)
     fun sitePermissionsWebsitesFlow(): Flow<List<SitePermissionsEntity>>
-    fun sitePermissionsForAllWebsites(): List<SitePermissionsEntity>
+    fun domainsWithPermissions(): Set<String>
     fun sitePermissionsAllowedFlow(): Flow<List<SitePermissionAllowedEntity>>
     fun getDrmForSession(tabId: String, domain: String): Boolean?
     fun saveDrmForSession(tabId: String, domain: String, allowed: Boolean)
@@ -217,8 +217,8 @@ class SitePermissionsRepositoryImpl @Inject constructor(
         }.flowOn(dispatcherProvider.io())
     }
 
-    override fun sitePermissionsForAllWebsites(): List<SitePermissionsEntity> {
-        return sitePermissionsDao.getAllSitesPermissions()
+    override fun domainsWithPermissions(): Set<String> {
+        return sitePermissionsDao.getAllSitesPermissions().map { it.domain }.toSet() + sitePermissionsAllowedDao.getAllowedDomains()
     }
 
     override fun sitePermissionsAllowedFlow(): Flow<List<SitePermissionAllowedEntity>> {

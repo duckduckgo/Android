@@ -321,10 +321,11 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
-    fun whenSitePermissionsForAllWebsitesIsCalledThenGetSitePermissionsForAllWebsites() = runTest {
-        repository.sitePermissionsForAllWebsites()
+    fun whenDomainsWithPermissionsThenIncludeDomainsWithOnlyOneTimeGrants() = runTest {
+        whenever(mockSitePermissionsDao.getAllSitesPermissions()).thenReturn(listOf(SitePermissionsEntity("a.com"), SitePermissionsEntity("b.com")))
+        whenever(mockSitePermissionsAllowedDao.getAllowedDomains()).thenReturn(listOf("b.com", "c.com"))
 
-        verify(mockSitePermissionsDao).getAllSitesPermissions()
+        assertEquals(setOf("a.com", "b.com", "c.com"), repository.domainsWithPermissions())
     }
 
     @Test
