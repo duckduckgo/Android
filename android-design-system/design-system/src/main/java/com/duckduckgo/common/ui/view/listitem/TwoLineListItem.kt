@@ -158,4 +158,32 @@ class TwoLineListItem @JvmOverloads constructor(
             recycle()
         }
     }
+
+    /** Sets how the leading icon is aligned vertically against the rest of the item */
+    fun setLeadingIconVerticalAlignment(alignment: VerticalAlignment) {
+        val anchor = when (alignment) {
+            VerticalAlignment.Center -> LayoutParams.PARENT_ID
+            VerticalAlignment.PrimaryText -> binding.primaryText.id
+        }
+        val params = binding.leadingIconBackground.layoutParams as LayoutParams
+        params.topToTop = anchor
+        params.bottomToBottom = anchor
+        binding.leadingIconBackground.layoutParams = params
+    }
+
+    enum class VerticalAlignment {
+        Center,
+        PrimaryText,
+        ;
+
+        companion object {
+            fun from(value: Int): VerticalAlignment {
+                // same order as attrs-lists.xml
+                return when (value) {
+                    1 -> PrimaryText
+                    else -> Center
+                }
+            }
+        }
+    }
 }
