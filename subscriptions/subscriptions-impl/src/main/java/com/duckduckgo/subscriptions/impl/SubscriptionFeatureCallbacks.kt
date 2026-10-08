@@ -23,6 +23,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
+import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboardingExperimentMetrics
 import com.duckduckgo.subscriptions.impl.wideevents.FreeTrialConversionWideEvent
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
@@ -38,6 +39,7 @@ class SubscriptionFeatureCallbacks @Inject constructor(
     private val freeTrialConversionWideEvent: FreeTrialConversionWideEvent,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val subscriptionOnboardingExperimentMetrics: SubscriptionOnboardingExperimentMetrics,
 ) : VpnServiceCallbacks, AtbLifecyclePlugin {
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
@@ -66,6 +68,7 @@ class SubscriptionFeatureCallbacks @Inject constructor(
         if (metadata[KEY_MODEL_TIER] in MODEL_TIERS_PAID) {
             coroutineScope.launch(dispatcherProvider.io()) {
                 freeTrialConversionWideEvent.onDuckAiPaidPromptSubmitted()
+                subscriptionOnboardingExperimentMetrics.fireDuckAiPaidUsed()
             }
         }
     }

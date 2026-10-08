@@ -70,6 +70,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
 import com.duckduckgo.subscriptions.impl.internal.PaywallUrlResolver
 import com.duckduckgo.subscriptions.impl.notification.SubscriptionExpirationReminderScheduler
+import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboardingExperiments
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActive
@@ -105,6 +106,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val networkProtectionAccessState: NetworkProtectionAccessState,
     private val pixelSender: SubscriptionPixelSender,
     private val subscriptionsFeature: SubscriptionsFeature,
+    private val subscriptionOnboardingExperiments: SubscriptionOnboardingExperiments,
     private val pirFeature: PirFeature,
     private val subscriptionExpirationReminderScheduler: SubscriptionExpirationReminderScheduler,
     private val paywallUrlResolver: PaywallUrlResolver,
@@ -163,11 +165,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                             JSONObject(PURCHASE_COMPLETED_JSON),
                         ),
                         isFreeTrial = it.isFreeTrial,
-                        launchOnboarding = if (it.isFreeTrial) {
-                            subscriptionsFeature.onboardingSubscriptionExperiment().isEnabled()
-                        } else {
-                            subscriptionsFeature.onboardingSubscriptionExperimentMonthly().isEnabled()
-                        },
+                        launchOnboarding = subscriptionOnboardingExperiments.isTreatment(),
                     )
                 }
                 is CurrentPurchase.InProgress, CurrentPurchase.PreFlowInProgress -> InProgress

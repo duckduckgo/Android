@@ -25,6 +25,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.api.model.Entitlement
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ADVANCED_SUBSCRIPTION
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PRO_PLAN_US
@@ -49,6 +50,7 @@ import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Failure
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Purchased
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
 import com.duckduckgo.subscriptions.impl.notification.VpnReminderNotificationScheduler
+import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboardingExperiments
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
@@ -101,6 +103,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -154,6 +157,7 @@ class RealSubscriptionsManagerTest {
     private val timeProvider = FakeTimeProvider()
     private val backgroundTokenRefresh: BackgroundTokenRefresh = mock()
     private val crossProcessLock: CrossProcessLock = mock()
+    private val subscriptionOnboardingExperiments: SubscriptionOnboardingExperiments = mock()
     private lateinit var subscriptionsManager: RealSubscriptionsManager
 
     @Before
@@ -183,6 +187,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
     }
 
@@ -537,6 +542,64 @@ class RealSubscriptionsManagerTest {
                     ),
                 ),
             )
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenFreeTrialPurchaseConfirmedThenEnrollsOnboardingExperimentAsFreeTrialBeforeConfirm() = runTest {
+        givenSubscriptionConcurrentExperimentsEnabled(true)
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        givenConfirmPurchaseSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase(offerId = MONTHLY_FREE_TRIAL_OFFER_US)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Success)
+
+            inOrder(subscriptionOnboardingExperiments, subscriptionsService) {
+                verify(subscriptionOnboardingExperiments).enroll(true)
+                verify(subscriptionsService).confirm(any())
+            }
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPaidPurchaseConfirmedThenEnrollsOnboardingExperimentAsPaidBeforeConfirm() = runTest {
+        givenSubscriptionConcurrentExperimentsEnabled(true)
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        givenConfirmPurchaseSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase(offerId = null)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Success)
+
+            inOrder(subscriptionOnboardingExperiments, subscriptionsService) {
+                verify(subscriptionOnboardingExperiments).enroll(false)
+                verify(subscriptionsService).confirm(any())
+            }
 
             cancelAndConsumeRemainingEvents()
         }
@@ -922,6 +985,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.subscriptionStatus.test {
@@ -957,6 +1021,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.subscriptionStatus.test {
@@ -996,6 +1061,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.currentPurchaseState.test {
@@ -1049,6 +1115,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.currentPurchaseState.test {
@@ -1097,6 +1164,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.currentPurchaseState.test {
@@ -1140,6 +1208,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.currentPurchaseState.test {
@@ -1176,6 +1245,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.currentPurchaseState.test {
@@ -1513,6 +1583,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
         manager.signOut()
         verify(mockRepo).setSubscription(null)
@@ -1565,6 +1636,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.subscriptionStatus.test {
@@ -1916,6 +1988,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         assertFalse(subscriptionsManager.canSupportEncryption())

@@ -40,6 +40,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.internal.PaywallUrlResolver
 import com.duckduckgo.subscriptions.impl.notification.SubscriptionExpirationReminderScheduler
+import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboardingExperiments
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
@@ -88,6 +89,7 @@ class SubscriptionWebViewViewModelTest {
     private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
     private val subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java, FakeToggleStore())
+    private val subscriptionOnboardingExperiments: SubscriptionOnboardingExperiments = mock()
     private val pirFeature: PirFeature = mock()
     private val subscriptionExpirationReminderScheduler: SubscriptionExpirationReminderScheduler = mock()
     private val paywallUrlResolver: PaywallUrlResolver = mock()
@@ -98,6 +100,7 @@ class SubscriptionWebViewViewModelTest {
     fun setup() = runTest {
         whenever(networkProtectionAccessState.getScreenForCurrentState()).thenReturn(NetworkProtectionManagementScreenNoParams)
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
+        runBlocking { whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(false) }
         viewModel = SubscriptionWebViewViewModel(
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             subscriptionsManager = subscriptionsManager,
@@ -105,6 +108,7 @@ class SubscriptionWebViewViewModelTest {
             networkProtectionAccessState = networkProtectionAccessState,
             pixelSender = pixelSender,
             subscriptionsFeature = subscriptionsFeature,
+            subscriptionOnboardingExperiments = subscriptionOnboardingExperiments,
             pirFeature = pirFeature,
             subscriptionExpirationReminderScheduler = subscriptionExpirationReminderScheduler,
             paywallUrlResolver = paywallUrlResolver,
@@ -184,30 +188,26 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
-    fun whenFreeTrialPurchaseAndFreeTrialOnboardingEnabledThenLaunchOnboarding() = runTest {
-        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
-        subscriptionsFeature.onboardingSubscriptionExperimentMonthly().setRawStoredState(Toggle.State(enable = false))
+    fun whenPurchaseInTreatmentThenLaunchOnboarding() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
         assertLaunchOnboarding(isFreeTrial = true, expected = true)
     }
 
     @Test
-    fun whenFreeTrialPurchaseAndFreeTrialOnboardingDisabledThenDoNotLaunchOnboarding() = runTest {
-        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = false))
-        subscriptionsFeature.onboardingSubscriptionExperimentMonthly().setRawStoredState(Toggle.State(enable = true))
+    fun whenPurchaseInControlThenDoNotLaunchOnboarding() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(false)
         assertLaunchOnboarding(isFreeTrial = true, expected = false)
     }
 
     @Test
-    fun whenNonFreeTrialPurchaseAndMonthlyOnboardingEnabledThenLaunchOnboarding() = runTest {
-        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = false))
-        subscriptionsFeature.onboardingSubscriptionExperimentMonthly().setRawStoredState(Toggle.State(enable = true))
+    fun whenPaidPurchaseInTreatmentThenLaunchOnboarding() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
         assertLaunchOnboarding(isFreeTrial = false, expected = true)
     }
 
     @Test
-    fun whenNonFreeTrialPurchaseAndMonthlyOnboardingDisabledThenDoNotLaunchOnboarding() = runTest {
-        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
-        subscriptionsFeature.onboardingSubscriptionExperimentMonthly().setRawStoredState(Toggle.State(enable = false))
+    fun whenPaidPurchaseInControlThenDoNotLaunchOnboarding() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(false)
         assertLaunchOnboarding(isFreeTrial = false, expected = false)
     }
 

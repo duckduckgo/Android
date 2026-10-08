@@ -36,6 +36,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_MONTHLY_PRO
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingProgress
+import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboardingExperiments
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.PendingPlan
 import com.duckduckgo.subscriptions.impl.repository.Subscription
@@ -72,6 +73,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
     private val subscriptionsFeature: SubscriptionsFeature,
     private val onboardingProgress: SubscriptionOnboardingProgress,
     private val onboardingStore: SubscriptionOnboardingStore,
+    private val subscriptionOnboardingExperiments: SubscriptionOnboardingExperiments,
     private val currentTimeProvider: CurrentTimeProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -174,7 +176,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
     }
 
     private suspend fun onboardingEntryPoint(subscription: Subscription): OnboardingEntryPoint? {
-        if (!subscriptionsFeature.onboardingSubscriptionExperiment().isEnabled()) return null
+        if (!subscriptionOnboardingExperiments.isTreatment()) return null
         if (!subscription.isActive()) return null
 
         val percentage = onboardingProgress.completionPercentage()

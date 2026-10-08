@@ -29,6 +29,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.impl.subscriptiononboarding.experiment.SubscriptionOnboardingExperimentMetrics
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenDuckAiWebSettings
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
@@ -71,6 +72,7 @@ class DuckChatSettingsViewModelTest {
     private val settingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val serpSettingsDataProvider: SerpSettingsDataProvider = mock()
+    private val subscriptionOnboardingExperimentMetrics: SubscriptionOnboardingExperimentMetrics = mock()
 
     @Before
     fun setUp() =
@@ -96,6 +98,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
         }
 
@@ -111,6 +114,13 @@ class DuckChatSettingsViewModelTest {
         runTest {
             testee.onDuckChatUserEnabledToggled(true)
             verify(duckChat).setEnableDuckChatUserSetting(true)
+        }
+
+    @Test
+    fun whenUseWithoutAiClickedThenFiresAiFeaturesDisabledExperimentMetric() =
+        runTest {
+            testee.onUseWithoutAiClicked()
+            verify(subscriptionOnboardingExperimentMetrics).fireAiFeaturesDisabled()
         }
 
     @Test
@@ -170,6 +180,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -192,6 +203,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -214,6 +226,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -236,6 +249,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -258,6 +272,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -280,6 +295,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -303,6 +319,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -327,6 +344,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -417,6 +435,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.duckChatSearchAISettingsClicked()
@@ -515,6 +534,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -538,6 +558,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -561,6 +582,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -583,6 +605,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -603,6 +626,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -626,6 +650,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -649,6 +674,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -717,6 +743,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -781,6 +808,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -838,6 +866,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -910,6 +939,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -958,6 +988,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -984,6 +1015,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -1010,6 +1042,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -1036,6 +1069,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -1058,6 +1092,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -1079,6 +1114,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -1138,6 +1174,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -1159,6 +1196,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -1183,6 +1221,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -1207,6 +1246,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -1230,6 +1270,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -1253,6 +1294,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -1276,6 +1318,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -1299,6 +1342,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -1322,6 +1366,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -1343,6 +1388,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -1431,6 +1477,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {
@@ -1456,6 +1503,7 @@ class DuckChatSettingsViewModelTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
+                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
             )
 
             testee.viewState.test {

@@ -24,12 +24,16 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.forPlan
+import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
+import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.BackPressed
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.StepFinished
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingPlanProvider.Companion.SUBSCRIPTION_ONBOARDING_PLAN_ID
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionOnboardingStepPixels.Step
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -58,6 +62,8 @@ class SubscriptionOnboardingViewModel @Inject constructor(
     private val onboardingStore: SubscriptionOnboardingStore,
     private val controller: SubscriptionOnboardingController,
     private val handoffState: SubscriptionOnboardingHandoffState,
+    private val pixelSender: SubscriptionPixelSender,
+    private val subscriptionsManager: SubscriptionsManager,
 ) : ViewModel() {
 
     sealed interface Command {
@@ -83,6 +89,8 @@ class SubscriptionOnboardingViewModel @Inject constructor(
     private var canGoBack = false
     private var pendingHandoff: (() -> Unit)? = null
     private val handoffJob = ConflatedJob()
+    private var lastShownStepId: String? = null
+    private var freeTrial: Boolean? = null
 
     fun start() {
         if (started) return
@@ -112,6 +120,7 @@ class SubscriptionOnboardingViewModel @Inject constructor(
                         showNavigationIcon = !handoffState.isHandoff,
                     )
                     _commands.send(Command.ShowStep(step.stepPlugin))
+                    fireStepShown(step.stepPlugin.stepId)
                     scheduleHandoffIfPending()
                 }
             }
@@ -123,6 +132,7 @@ class SubscriptionOnboardingViewModel @Inject constructor(
     private suspend fun handleControllerEvent(event: SubscriptionOnboardingController.Event) {
         when (event) {
             is SubscriptionOnboardingController.Event.StepFinished -> {
+                fireStepOutcome(event.stepId, event.outcome)
                 if (event.outcome == SubscriptionOnboardingStepOutcome.COMPLETED) {
                     onboardingStore.setStepCompleted(event.stepId)
                 }
@@ -146,6 +156,27 @@ class SubscriptionOnboardingViewModel @Inject constructor(
             }
         }
     }
+
+    private suspend fun fireStepShown(stepId: String) {
+        if (stepId == lastShownStepId) return
+        lastShownStepId = stepId
+        Step.fromStepId(stepId)?.let { pixelSender.reportOnboardingStepShown(it, isFreeTrial()) }
+    }
+
+    private suspend fun fireStepOutcome(
+        stepId: String,
+        outcome: SubscriptionOnboardingStepOutcome,
+    ) {
+        val step = Step.fromStepId(stepId)?.takeIf { it.supportsOutcome } ?: return
+        when (outcome) {
+            SubscriptionOnboardingStepOutcome.COMPLETED -> pixelSender.reportOnboardingStepCompleted(step, isFreeTrial())
+            SubscriptionOnboardingStepOutcome.SKIPPED -> pixelSender.reportOnboardingStepSkipped(step, isFreeTrial())
+        }
+    }
+
+    private suspend fun isFreeTrial(): Boolean =
+        freeTrial ?: (subscriptionsManager.getSubscription()?.activeOffers?.contains(ActiveOfferType.TRIAL) == true)
+            .also { freeTrial = it }
 
     private fun scheduleHandoffIfPending() {
         val handoff = pendingHandoff ?: return
