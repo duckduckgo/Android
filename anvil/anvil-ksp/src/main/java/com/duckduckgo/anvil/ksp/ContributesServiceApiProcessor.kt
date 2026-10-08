@@ -48,9 +48,9 @@ class ContributesServiceApiProcessor(
         private const val CONTRIBUTES_NON_CACHING_SERVICE_API = "com.duckduckgo.anvil.annotations.ContributesNonCachingServiceApi"
         private const val JAVAX_QUALIFIER = "javax.inject.Qualifier"
 
-        private val MODULE_CLASS = ClassName("dagger", "Module")
-        private val PROVIDES_CLASS = ClassName("dagger", "Provides")
-        private val CONTRIBUTES_TO_CLASS = ClassName("com.squareup.anvil.annotations", "ContributesTo")
+        private val BINDING_CONTAINER_CLASS = ClassName("dev.zacsweers.metro", "BindingContainer")
+        private val PROVIDES_CLASS = ClassName("dev.zacsweers.metro", "Provides")
+        private val CONTRIBUTES_TO_CLASS = ClassName("dev.zacsweers.metro", "ContributesTo")
         private val NAMED_CLASS = ClassName("javax.inject", "Named")
         private val RETROFIT_CLASS = ClassName("retrofit2", "Retrofit")
     }
@@ -151,7 +151,7 @@ class ContributesServiceApiProcessor(
             .build()
 
         val moduleType = TypeSpec.objectBuilder(moduleClassName)
-            .addAnnotation(MODULE_CLASS)
+            .addAnnotation(BINDING_CONTAINER_CLASS)
             .addAnnotation(
                 AnnotationSpec.builder(CONTRIBUTES_TO_CLASS)
                     .addMember("scope = %T::class", scopeClassName)

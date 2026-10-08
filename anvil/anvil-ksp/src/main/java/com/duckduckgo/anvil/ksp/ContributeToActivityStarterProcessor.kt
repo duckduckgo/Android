@@ -53,8 +53,8 @@ class ContributeToActivityStarterProcessor(
         private const val DUCKDUCKGO_ACTIVITY =
             "com.duckduckgo.common.ui.DuckDuckGoActivity"
 
-        private val CONTRIBUTES_MULTIBINDING_CLASS =
-            ClassName("com.squareup.anvil.annotations", "ContributesMultibinding")
+        private val CONTRIBUTES_INTO_SET_CLASS =
+            ClassName("dev.zacsweers.metro", "ContributesIntoSet")
         private val APP_SCOPE_CLASS =
             ClassName("com.duckduckgo.di.scopes", "AppScope")
         private val PARAM_TO_ACTIVITY_MAPPER_CLASS =
@@ -185,7 +185,7 @@ class ContributeToActivityStarterProcessor(
 
         return TypeSpec.classBuilder(mapperClassName)
             .addAnnotation(
-                AnnotationSpec.builder(CONTRIBUTES_MULTIBINDING_CLASS)
+                AnnotationSpec.builder(CONTRIBUTES_INTO_SET_CLASS)
                     .addMember("scope = %T::class", APP_SCOPE_CLASS)
                     .build(),
             )

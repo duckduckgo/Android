@@ -52,7 +52,7 @@ class ContributesViewModelProcessor(
         private const val JAVAX_INJECT = "javax.inject.Inject"
         private val SCOPE_ANNOTATIONS = setOf("dagger.SingleInstanceIn", "dev.zacsweers.metro.SingleIn")
 
-        private val CONTRIBUTES_MULTIBINDING_CLASS = ClassName("com.squareup.anvil.annotations", "ContributesMultibinding")
+        private val CONTRIBUTES_INTO_SET_CLASS = ClassName("dev.zacsweers.metro", "ContributesIntoSet")
         private val VIEW_MODEL_FACTORY_PLUGIN_CLASS = ClassName("com.duckduckgo.common.utils.plugins.view_model", "ViewModelFactoryPlugin")
         private val VIEW_MODEL_CLASS = ClassName("androidx.lifecycle", "ViewModel")
         private val PROVIDER_CLASS = ClassName("javax.inject", "Provider")
@@ -167,7 +167,7 @@ class ContributesViewModelProcessor(
         // Build class
         val typeSpec = TypeSpec.classBuilder(factoryName)
             .addAnnotation(
-                AnnotationSpec.builder(CONTRIBUTES_MULTIBINDING_CLASS)
+                AnnotationSpec.builder(CONTRIBUTES_INTO_SET_CLASS)
                     .addMember("%T::class", scopeClassName)
                     .build(),
             )

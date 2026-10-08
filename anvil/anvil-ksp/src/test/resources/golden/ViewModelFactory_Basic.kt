@@ -3,12 +3,12 @@ package com.test
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.common.utils.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.ActivityScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import java.lang.Class
 import javax.inject.Inject
 import javax.inject.Provider
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoSet(ActivityScope::class)
 public class MyViewModel_ViewModelFactory @Inject constructor(
   private val viewModelProvider: Provider<MyViewModel>,
 ) : ViewModelFactoryPlugin {
