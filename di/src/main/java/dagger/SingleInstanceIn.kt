@@ -16,12 +16,12 @@
 
 package dagger
 
-import javax.inject.Scope
-import kotlin.reflect.KClass
-
-@Scope
-@MustBeDocumented
-@Retention(AnnotationRetention.RUNTIME)
-annotation class SingleInstanceIn(
-    val scope: KClass<*>,
-)
+/**
+ * [SingleInstanceIn] is a typealias for Metro's [dev.zacsweers.metro.SingleIn].
+ *
+ * This ensures that `@SingleInstanceIn(AppScope::class)` on bindings is the same annotation
+ * as the synthetic `@SingleIn(AppScope::class)` that Metro creates from `@DependencyGraph(scope)`.
+ * Without this, Metro treats them as different scopes and fails to delegate scoped bindings
+ * to parent graphs.
+ */
+typealias SingleInstanceIn = dev.zacsweers.metro.SingleIn
