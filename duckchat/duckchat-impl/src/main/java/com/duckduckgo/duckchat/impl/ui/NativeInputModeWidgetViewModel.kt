@@ -374,6 +374,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     fun setFooterInputFocused(focused: Boolean) {
         footerInputFocused.value = focused
+
+        activeTabId.value?.let { tabId ->
+            nativeInputStatePublisher.update(tabId) { it.copy(isInputFocused = focused) }
+        }
     }
 
     fun selectModelById(modelId: String) {

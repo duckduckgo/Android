@@ -19,9 +19,9 @@ package com.duckduckgo.app.browser.newtab
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -36,9 +36,8 @@ class NextStepsInputFocusVisibilityHandler @Inject constructor(
     savedSitesRepository: SavedSitesRepository,
     duckChat: DuckChat,
     duckChatInputModeState: DuckChatInputModeState,
+    nativeInputStateProvider: NativeInputStateProvider,
 ) {
-
-    private val isInputFocused = MutableStateFlow(false)
 
     // No value is replayed until the Chat tab first fetches, so an unknown state counts as no chats.
     private val hasDuckAiChats = combine(
@@ -47,15 +46,11 @@ class NextStepsInputFocusVisibilityHandler @Inject constructor(
     ) { hasChats, chatSuggestionsEnabled -> hasChats && chatSuggestionsEnabled }
 
     val shouldHideNextSteps: Flow<Boolean> = combine(
-        isInputFocused,
+        nativeInputStateProvider.state.map { it.isInputFocused },
         savedSitesRepository.getFavorites().map { it.isNotEmpty() },
         duckChatInputModeState.displayedMode.map { it == InputMode.DUCK_AI },
         hasDuckAiChats,
     ) { focused, hasFavourites, isDuckAiTabSelected, hasChats ->
         focused && (hasFavourites || (isDuckAiTabSelected && hasChats))
     }.distinctUntilChanged()
-
-    fun onInputFocusChanged(isFocused: Boolean) {
-        isInputFocused.value = isFocused
-    }
 }

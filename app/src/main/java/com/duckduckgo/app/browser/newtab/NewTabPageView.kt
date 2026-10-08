@@ -60,7 +60,6 @@ import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.browser.api.OmnibarFocusState
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
@@ -145,9 +144,6 @@ class NewTabPageView @JvmOverloads constructor(
     @Inject
     lateinit var nextSteps: NextSteps
 
-    @Inject
-    lateinit var omnibarFocusState: OmnibarFocusState
-
     private val binding: ViewNewTabBinding by viewBinding()
 
     private val homeBackgroundLogo by lazy { HomeBackgroundLogo(binding.ddgLogo) }
@@ -164,7 +160,6 @@ class NewTabPageView @JvmOverloads constructor(
     private val conflatedCommandJob = ConflatedJob()
     private val conflatedNativeInputJob = ConflatedJob()
     private val conflatedChatModeJob = ConflatedJob()
-    private val conflatedOmnibarFocusJob = ConflatedJob()
 
     private var lastSelectedMode: InputMode? = null
     private var logoAnimator: ValueAnimator? = null
@@ -209,10 +204,6 @@ class NewTabPageView @JvmOverloads constructor(
             .onEach { mode -> updateLogoForMode(mode) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
-        conflatedOmnibarFocusJob += omnibarFocusState.isFocused
-            .onEach { viewModel.onOmnibarFocusChanged(it) }
-            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
-
         disableViewStateSaving()
     }
 
@@ -224,7 +215,6 @@ class NewTabPageView @JvmOverloads constructor(
         conflatedCommandJob.cancel()
         conflatedNativeInputJob.cancel()
         conflatedChatModeJob.cancel()
-        conflatedOmnibarFocusJob.cancel()
         TransitionManager.endTransitions(binding.root)
         nextStepsSectionJob?.cancel()
         nextStepsSectionJob = null

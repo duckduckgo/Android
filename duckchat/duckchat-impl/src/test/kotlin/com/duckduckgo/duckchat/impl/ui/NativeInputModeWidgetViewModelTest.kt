@@ -1061,6 +1061,21 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenSetFooterInputFocusedThenPublishedToActiveTabState() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.setFooterInputFocused(true)
+        advanceUntilIdle()
+        assertTrue(nativeInputStateProvider.stateForTab("tab-A").value.isInputFocused)
+
+        viewModel.setFooterInputFocused(false)
+        advanceUntilIdle()
+        assertFalse(nativeInputStateProvider.stateForTab("tab-A").value.isInputFocused)
+    }
+
+    @Test
     fun whenSetAttachmentStateThenPublishedToActiveTabState() = runTest {
         val viewModel = createViewModel()
         viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)

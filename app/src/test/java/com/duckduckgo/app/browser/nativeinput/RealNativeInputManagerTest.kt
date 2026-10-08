@@ -34,7 +34,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
-import com.duckduckgo.app.browser.omnibar.RealOmnibarFocusState
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -131,7 +130,6 @@ class RealNativeInputManagerTest {
             nativeInputEventListener,
             edgeToEdgeHandler,
             duckAiChatStore,
-            RealOmnibarFocusState(),
         )
     }
 

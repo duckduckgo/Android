@@ -159,10 +159,6 @@ class NewTabPageViewModel @AssistedInject constructor(
             .launchIn(viewModelScope)
     }
 
-    fun onOmnibarFocusChanged(isFocused: Boolean) {
-        nextStepsInputFocusVisibilityHandler.onInputFocusChanged(isFocused)
-    }
-
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
 

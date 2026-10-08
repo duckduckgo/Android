@@ -34,6 +34,8 @@ import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
@@ -97,6 +99,9 @@ class NewTabPageViewModelTest {
     private val mockDuckChatInputModeState: DuckChatInputModeState = mock {
         on { displayedMode } doReturn MutableStateFlow(InputMode.SEARCH)
     }
+    private val mockNativeInputStateProvider: NativeInputStateProvider = mock {
+        on { state } doReturn flowOf(NativeInputState.zero())
+    }
 
     private lateinit var testee: NewTabPageViewModel
 
@@ -140,6 +145,7 @@ class NewTabPageViewModelTest {
                 savedSitesRepository = mockSavedSitesRepository,
                 duckChat = mockDuckChat,
                 duckChatInputModeState = mockDuckChatInputModeState,
+                nativeInputStateProvider = mockNativeInputStateProvider,
             ),
             browserMode = browserMode,
         )
