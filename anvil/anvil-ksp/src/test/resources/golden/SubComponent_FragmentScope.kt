@@ -5,10 +5,8 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesSubcomponent
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.BindsInstance
-import dagger.SingleInstanceIn
 import dagger.android.AndroidInjector
 
-@SingleInstanceIn(scope = FragmentScope::class)
 @ContributesSubcomponent(
   scope = FragmentScope::class,
   parentScope = ActivityScope::class,

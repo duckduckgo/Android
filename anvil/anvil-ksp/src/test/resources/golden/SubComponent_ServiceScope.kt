@@ -5,10 +5,8 @@ import com.duckduckgo.di.scopes.ServiceScope
 import com.squareup.anvil.annotations.ContributesSubcomponent
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.BindsInstance
-import dagger.SingleInstanceIn
 import dagger.android.AndroidInjector
 
-@SingleInstanceIn(scope = ServiceScope::class)
 @ContributesSubcomponent(
   scope = ServiceScope::class,
   parentScope = AppScope::class,
