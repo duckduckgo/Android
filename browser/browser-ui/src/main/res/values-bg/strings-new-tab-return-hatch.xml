@@ -21,9 +21,12 @@
     <string name="newTabReturnHatchFireTabTitle">Последно използван раздел Fire</string>
     <string name="newTabReturnHatchTabClosed">Разделът е затворен</string>
     <string name="newTabReturnHatchUndo">Отмяна</string>
-    <string name="hatchMenuReturnTab">Връщане към раздела</string>
+    <string name="hatchMenuReturnToLastUsedTab">Връщане към последно използвания раздел</string>
     <string name="hatchMenuAfterInactivitySettings">След неактивност</string>
-    <string name="hatchMenuCloseTab">Затваряне на раздела</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Отвори нов раздел</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Последно използван раздел</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="&apos;%1$s&apos; is the menu row label (&apos;After Inactivity&apos;) and &apos;%2$s&apos; is the current destination, e.g. &apos;After Inactivity, Open New Tab&apos;">%1$s, %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Затваряне на последно използвания раздел</string>
     <string name="hatchMenuBurnTab">Изтриване на раздела</string>
-    <string name="hatchMenuHideShortcut">Скриване на прекия път</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="&apos;Return to&apos; refers to this menu&apos;s own &apos;Return to…&apos; label shown above this item">Скриване на бърза връзка „Върни се към“</string>
 </resources>
