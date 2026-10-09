@@ -824,8 +824,8 @@
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Εμφάνιση στην Εκκίνηση εφαρμογής</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab">Τελευταία καρτέλα που άνοιξε</string>
-    <string name="showOnAppLaunchOptionNewTabPage">Σελίδα νέας καρτέλας</string>
+    <string name="showOnAppLaunchOptionLastUsedTab">Τελευταία καρτέλα που χρησιμοποιήθηκε</string>
+    <string name="showOnAppLaunchOptionOpenNewTab">Σελίδα νέας καρτέλας</string>
     <string name="showOnAppLaunchOptionSpecificPage">Συγκεκριμένη σελίδα</string>
 
     <!-- Privacy Dashboard -->
