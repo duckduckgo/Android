@@ -1,7 +1,7 @@
 package com.test
 
+import com.duckduckgo.di.android.AndroidInjector
 import com.duckduckgo.di.scopes.AppScope
-import dagger.android.AndroidInjector
 import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.Binds
 import dev.zacsweers.metro.ClassKey

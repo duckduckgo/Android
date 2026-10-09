@@ -31,6 +31,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
@@ -42,7 +43,6 @@ import com.duckduckgo.mobile.android.vpn.ui.newtab.AppTrackingProtectionNewTabSe
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
-import dagger.android.support.AndroidSupportInjection
 import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn

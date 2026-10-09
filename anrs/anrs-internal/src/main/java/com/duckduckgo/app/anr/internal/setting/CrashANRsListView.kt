@@ -31,10 +31,10 @@ import com.duckduckgo.app.anr.internal.setting.VitalsAdapterList.VitalsItems.Cra
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import dagger.android.support.AndroidSupportInjection
 import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine

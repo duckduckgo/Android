@@ -1,8 +1,8 @@
 package com.test
 
+import com.duckduckgo.di.android.AndroidInjector
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ServiceScope
-import dagger.android.AndroidInjector
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.GraphExtension
 import dev.zacsweers.metro.Provides

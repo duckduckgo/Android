@@ -55,12 +55,12 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.R.styleable
 import com.duckduckgo.mobile.android.databinding.ViewNotifyMeViewBinding
 import com.google.android.material.button.MaterialButton.ICON_GRAVITY_TEXT_START
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

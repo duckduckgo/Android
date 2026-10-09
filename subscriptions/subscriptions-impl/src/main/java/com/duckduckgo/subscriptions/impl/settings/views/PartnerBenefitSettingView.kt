@@ -29,12 +29,12 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.subscriptions.impl.databinding.ViewPartnerBenefitSettingsBinding
 import com.duckduckgo.subscriptions.impl.settings.views.PartnerBenefitSettingViewModel.Command
 import com.duckduckgo.subscriptions.impl.settings.views.PartnerBenefitSettingViewModel.Command.OpenPartnershipsHub
 import com.duckduckgo.subscriptions.impl.settings.views.PartnerBenefitSettingViewModel.ViewState
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject

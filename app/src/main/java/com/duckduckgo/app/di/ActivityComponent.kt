@@ -19,10 +19,10 @@ package com.duckduckgo.app.di
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.app.di.ActivityComponent.Factory
+import com.duckduckgo.di.android.AndroidInjector
+import com.duckduckgo.di.android.DaggerActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
-import dagger.android.AndroidInjector
-import dagger.android.DaggerActivity
 import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.Binds
 import dev.zacsweers.metro.ClassKey

@@ -26,13 +26,13 @@ import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.ui.R
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.tabs.TabLayout
-import dagger.android.support.AndroidSupportInjection
 import dev.zacsweers.metro.HasMemberInjections
 import javax.inject.Inject
 

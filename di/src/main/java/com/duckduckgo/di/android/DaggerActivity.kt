@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package dagger.android
+package com.duckduckgo.di.android
 
-import android.annotation.SuppressLint
-import androidx.annotation.LayoutRes
-import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
 import dev.zacsweers.metro.HasMemberInjections
 import javax.inject.Inject
 
 @HasMemberInjections
-@SuppressLint("NoFragment") // this is base fragment class to be used instead of Fragment
-abstract class DaggerFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(contentLayoutId), HasDaggerInjector {
+abstract class DaggerActivity : AppCompatActivity(), HasDaggerInjector {
     @Inject
     lateinit var injectorFactoryMap: InjectorFactoryMap
 

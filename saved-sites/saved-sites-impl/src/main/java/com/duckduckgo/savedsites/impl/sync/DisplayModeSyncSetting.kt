@@ -24,10 +24,10 @@ import com.duckduckgo.anvil.annotations.*
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.android.support.*
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.saved.sites.impl.databinding.*
 import com.duckduckgo.savedsites.impl.sync.DisplayModeViewModel.ViewState
-import dagger.android.support.*
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

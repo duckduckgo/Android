@@ -56,8 +56,8 @@ class ContributesSubComponentProcessor(
         private val BINDING_CONTAINER_CLASS = ClassName("dev.zacsweers.metro", "BindingContainer")
         private val INTO_MAP_CLASS = ClassName("dev.zacsweers.metro", "IntoMap")
         private val CLASS_KEY_CLASS = ClassName("dev.zacsweers.metro", "ClassKey")
-        private val ANDROID_INJECTOR_CLASS = ClassName("dagger.android", "AndroidInjector")
-        private val ANDROID_INJECTOR_FACTORY_CLASS = ClassName("dagger.android", "AndroidInjector", "Factory")
+        private val ANDROID_INJECTOR_CLASS = ClassName("com.duckduckgo.di.android", "AndroidInjector")
+        private val ANDROID_INJECTOR_FACTORY_CLASS = ClassName("com.duckduckgo.di.android", "AndroidInjector", "Factory")
 
         private val APP_SCOPE = ClassName("com.duckduckgo.di.scopes", "AppScope")
         private val ACTIVITY_SCOPE = ClassName("com.duckduckgo.di.scopes", "ActivityScope")

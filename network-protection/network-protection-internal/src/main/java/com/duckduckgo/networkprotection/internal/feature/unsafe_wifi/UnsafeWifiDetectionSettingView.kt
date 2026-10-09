@@ -32,6 +32,7 @@ import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.networkprotection.impl.settings.VpnSettingPlugin
@@ -44,7 +45,6 @@ import com.duckduckgo.networkprotection.internal.feature.unsafe_wifi.UnsafeWifiD
 import com.duckduckgo.networkprotection.internal.feature.unsafe_wifi.UnsafeWifiDetectionSettingView.State.Enable
 import com.duckduckgo.networkprotection.internal.feature.unsafe_wifi.UnsafeWifiDetectionSettingView.State.Idle
 import com.duckduckgo.networkprotection.internal.feature.unsafe_wifi.UnsafeWifiDetectionViewModel.Factory
-import dagger.android.support.AndroidSupportInjection
 import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi

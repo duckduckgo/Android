@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package dagger.android.support
+package com.duckduckgo.di.android.support
 
 import android.view.View
 import androidx.fragment.app.Fragment
-import dagger.android.AndroidInjection
-import dagger.android.AndroidInjector
+import com.duckduckgo.di.android.AndroidInjection
+import com.duckduckgo.di.android.AndroidInjector
 
 class AndroidSupportInjection {
     companion object {

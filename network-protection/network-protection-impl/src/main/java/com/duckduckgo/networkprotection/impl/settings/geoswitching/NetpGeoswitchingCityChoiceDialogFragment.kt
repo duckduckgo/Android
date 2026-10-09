@@ -32,13 +32,13 @@ import com.duckduckgo.common.ui.view.text.DaxTextView.TextType
 import com.duckduckgo.common.ui.view.text.DaxTextView.Typography
 import com.duckduckgo.common.ui.view.text.DaxTextView.Typography.H4
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.configuration.WgServerDebugProvider
 import com.duckduckgo.networkprotection.impl.databinding.DialogGeoswitchingCityBinding
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject

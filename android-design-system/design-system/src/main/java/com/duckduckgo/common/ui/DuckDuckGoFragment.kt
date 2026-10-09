@@ -18,8 +18,8 @@ package com.duckduckgo.common.ui
 
 import android.content.Context
 import androidx.annotation.LayoutRes
-import dagger.android.DaggerFragment
-import dagger.android.support.AndroidSupportInjection
+import com.duckduckgo.di.android.DaggerFragment
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import dev.zacsweers.metro.HasMemberInjections
 
 @HasMemberInjections

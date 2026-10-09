@@ -17,12 +17,12 @@
 package com.duckduckgo.common.ui
 
 import android.content.Context
+import com.duckduckgo.di.android.AndroidInjector
+import com.duckduckgo.di.android.HasDaggerInjector
+import com.duckduckgo.di.android.InjectorFactoryMap
+import com.duckduckgo.di.android.getFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import dagger.android.AndroidInjector
-import dagger.android.HasDaggerInjector
-import dagger.android.InjectorFactoryMap
-import dagger.android.getFactory
-import dagger.android.support.AndroidSupportInjection
 import dev.zacsweers.metro.HasMemberInjections
 import javax.inject.Inject
 

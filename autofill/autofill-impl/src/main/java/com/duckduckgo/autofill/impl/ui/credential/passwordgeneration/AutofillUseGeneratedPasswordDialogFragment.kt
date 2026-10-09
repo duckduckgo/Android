@@ -45,11 +45,11 @@ import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.AutofillUse
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.ui.view.toPx
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import dagger.android.support.AndroidSupportInjection
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject

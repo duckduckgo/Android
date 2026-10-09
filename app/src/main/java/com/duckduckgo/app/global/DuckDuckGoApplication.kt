@@ -29,10 +29,10 @@ import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.di.android.AndroidInjector
+import com.duckduckgo.di.android.HasDaggerInjector
+import com.duckduckgo.di.android.getFactory
 import com.duckduckgo.referral.api.AppInstallationReferrerStateListener
-import dagger.android.AndroidInjector
-import dagger.android.HasDaggerInjector
-import dagger.android.getFactory
 import dev.zacsweers.metro.HasMemberInjections
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
@@ -74,7 +74,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     lateinit var appCoroutineScope: CoroutineScope
 
     @Inject
-    lateinit var injectorFactoryMap: dagger.android.InjectorFactoryMap
+    lateinit var injectorFactoryMap: com.duckduckgo.di.android.InjectorFactoryMap
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
