@@ -17,4 +17,9 @@
 <resources>
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_example_code">eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNjgwRDQ1QjUtNUU2RS00MzQ3LTlDNDQtQjZGQkU4MEZDNEE3IiwicHJpbWFyelkasd92V9rZXkiOiJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFPSJ9fQ==</string>
+
+    <!-- Pairing screen -->
+    <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo needs to access your&#160;camera.</string>
+    <string name="sync_simplified_scanner_no_permission_body_v2">Camera permissions are required to scan the QR&#160;code.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button_v2">Change Permissions</string>
 </resources>
