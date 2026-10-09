@@ -70,7 +70,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="Supported Version"
-                    app:secondaryText="v5"
+                    app:secondaryText="v6"
             />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
