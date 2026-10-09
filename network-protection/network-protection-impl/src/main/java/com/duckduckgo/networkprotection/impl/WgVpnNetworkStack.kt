@@ -84,6 +84,7 @@ class WgVpnNetworkStack @Inject constructor(
             } else {
                 withServerDefaultPort(wgConfig!!)
             }
+            wgTunnelConfigLazy.get().setActivePort(wgConfig!!.currentEndpointPort())
 
             val privateDns = dnsProvider.getPrivateDns()
             val dns = if (netPSettingsLocalConfig.blockMalware().isEnabled() && vpnRemoteFeatures.allowDnsBlockMalware().isEnabled()) {
@@ -118,13 +119,6 @@ class WgVpnNetworkStack @Inject constructor(
         val result = portProbingCoordinator.get().probeAndSelect()
             ?: return config.also { logcat { "Port probing: skipping (not enough ports)" } }
 
-        if (result.shouldRemember) {
-            wgTunnelConfigLazy.get().setRememberedPort(result.selectedPort)
-            logcat { "Port probing: remembered port ${result.selectedPort}" }
-        }
-
-        // Always apply selected port to config if different from config's port
-        // (portChanged compares with rememberedPort, but we need to check config's port here)
         return if (result.selectedPort != config.currentEndpointPort()) {
             logcat { "Port probing: switching to ${result.selectedPort}" }
             config.replacingEndpointPort(result.selectedPort)

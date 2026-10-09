@@ -119,6 +119,16 @@ class WgTunnelTest {
     }
 
     @Throws(Exception::class)
+    @Test
+    fun whenClearWgConfigThenResetActivePort() {
+        val wgTunnelConfig = RealWgTunnelConfig(wgTunnelStore)
+        wgTunnelConfig.setActivePort(51820L)
+
+        wgTunnelConfig.clearWgConfig()
+
+        assertEquals(0L, wgTunnelConfig.getActivePort())
+    }
+
     fun setFinalStatic(field: Field, newValue: Any?) {
         field.setAccessible(true)
         field.set(null, newValue)

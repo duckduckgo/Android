@@ -23,17 +23,16 @@ import javax.inject.Inject
 
 /**
  * Result of port probing and selection
+ * @property selectedPort the port the tunnel should use
+ * @property shouldSwitchPort true when another port responded but the port the tunnel is using did not
  */
 data class PortProbeResult(
-    val probedPort: Long?,
     val selectedPort: Long,
-    val shouldRemember: Boolean,
-    val portChanged: Boolean,
+    val shouldSwitchPort: Boolean,
 )
 
 /**
- * Coordinates port probing workflow: reads port state, probes ports, selects best port,
- * and remembers successful ports.
+ * Coordinates port probing workflow: reads port state, probes ports and selects the best port.
  */
 interface PortProbingCoordinator {
     /**
@@ -55,38 +54,30 @@ class RealPortProbingCoordinator @Inject constructor(
         val serverIp = config?.serverIp() ?: return null
         val advertisedPorts = wgTunnelConfig.getAdvertisedPorts()
 
-        if (advertisedPorts.isEmpty() || advertisedPorts.size == 1) return null
+        if (advertisedPorts.size < 2) return null
 
         val serverDefaultPort = wgTunnelConfig.getServerDefaultPort()
-        val rememberedPort = wgTunnelConfig.getRememberedPort()
-        val currentPort = config.currentEndpointPort()
+        val currentPort = wgTunnelConfig.getActivePort().takeIf { it > 0 } ?: config.currentEndpointPort()
 
         val candidatePorts = portSelector.orderCandidatePorts(
-            rememberedPort = rememberedPort,
             serverDefaultPort = serverDefaultPort,
             advertisedPorts = advertisedPorts,
         )
 
-        val probedPort = portProber.probePortsInParallel(serverIp, candidatePorts)
+        // Both answering fully determines the outcome: the default is selected and the current port is known to work
+        val earlyExitPorts = setOf(serverDefaultPort, currentPort).filter { it in candidatePorts }.toSet()
+        val respondedPorts = portProber.probePortsInParallel(serverIp, candidatePorts, earlyExitPorts)
 
-        val selectionResult = portSelector.selectPort(
-            probedPort = probedPort,
+        val selectedPort = portSelector.selectPort(
+            respondedPorts = respondedPorts,
             currentPort = currentPort,
             serverDefaultPort = serverDefaultPort,
             advertisedPorts = advertisedPorts,
         )
 
-        val referencePort = if (rememberedPort != 0L && rememberedPort != -1L) {
-            rememberedPort
-        } else {
-            currentPort
-        }
-
         return PortProbeResult(
-            probedPort = probedPort,
-            selectedPort = selectionResult.selectedPort,
-            shouldRemember = selectionResult.shouldRemember,
-            portChanged = selectionResult.selectedPort != referencePort,
+            selectedPort = selectedPort,
+            shouldSwitchPort = respondedPorts.isNotEmpty() && !respondedPorts.contains(currentPort),
         )
     }
 }

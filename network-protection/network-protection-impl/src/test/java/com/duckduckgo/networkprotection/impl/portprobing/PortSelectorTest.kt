@@ -17,8 +17,6 @@
 package com.duckduckgo.networkprotection.impl.portprobing
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -33,86 +31,67 @@ class PortSelectorTest {
 
     @Test
     fun `selectPort uses default port when it responds`() {
-        val result = portSelector.selectPort(
-            probedPort = 443L,
-            currentPort = 443L,
+        val selectedPort = portSelector.selectPort(
+            respondedPorts = listOf(51820L, 443L),
+            currentPort = 51820L,
             serverDefaultPort = 443L,
             advertisedPorts = listOf(443L, 51820L),
         )
 
-        assertEquals(443L, result.selectedPort)
-        assertTrue(result.shouldRemember)
+        assertEquals(443L, selectedPort)
     }
 
     @Test
     fun `selectPort uses fallback port when default does not respond`() {
-        val result = portSelector.selectPort(
-            probedPort = 51820L,
+        val selectedPort = portSelector.selectPort(
+            respondedPorts = listOf(51820L),
             currentPort = 443L,
             serverDefaultPort = 443L,
             advertisedPorts = listOf(443L, 51820L),
         )
 
-        assertEquals(51820L, result.selectedPort)
-        assertTrue(result.shouldRemember)
+        assertEquals(51820L, selectedPort)
     }
 
     @Test
     fun `selectPort keeps current port when nothing responds and current is advertised`() {
-        val result = portSelector.selectPort(
-            probedPort = null,
-            currentPort = 443L,
+        val selectedPort = portSelector.selectPort(
+            respondedPorts = emptyList(),
+            currentPort = 51820L,
             serverDefaultPort = 443L,
             advertisedPorts = listOf(443L, 51820L),
         )
 
-        assertEquals(443L, result.selectedPort)
-        assertFalse(result.shouldRemember)
+        assertEquals(51820L, selectedPort)
     }
 
     @Test
     fun `selectPort uses server default when nothing responds and current not advertised`() {
-        val result = portSelector.selectPort(
-            probedPort = null,
+        val selectedPort = portSelector.selectPort(
+            respondedPorts = emptyList(),
             currentPort = 9999L,
             serverDefaultPort = 443L,
             advertisedPorts = listOf(443L, 51820L),
         )
 
-        assertEquals(443L, result.selectedPort)
-        assertFalse(result.shouldRemember)
+        assertEquals(443L, selectedPort)
     }
 
     @Test
-    fun `orderCandidatePorts always puts server default first`() {
+    fun `orderCandidatePorts puts server default first`() {
         val orderedPorts = portSelector.orderCandidatePorts(
-            rememberedPort = 51820L,
             serverDefaultPort = 443L,
-            advertisedPorts = listOf(443L, 51820L),
+            advertisedPorts = listOf(51820L, 443L, 8080L),
         )
 
-        // Server default (443) is always first, even when 51820 was remembered
-        assertEquals(listOf(443L, 51820L), orderedPorts)
-    }
-
-    @Test
-    fun `orderCandidatePorts puts remembered port second when different from default`() {
-        val orderedPorts = portSelector.orderCandidatePorts(
-            rememberedPort = 51820L,
-            serverDefaultPort = 443L,
-            advertisedPorts = listOf(443L, 51820L, 8080L),
-        )
-
-        // Order: default (443), remembered (51820), remaining (8080)
         assertEquals(listOf(443L, 51820L, 8080L), orderedPorts)
     }
 
     @Test
     fun `orderCandidatePorts deduplicates ports`() {
         val orderedPorts = portSelector.orderCandidatePorts(
-            rememberedPort = 443L,
             serverDefaultPort = 443L,
-            advertisedPorts = listOf(443L, 51820L),
+            advertisedPorts = listOf(443L, 51820L, 443L),
         )
 
         assertEquals(listOf(443L, 51820L), orderedPorts)
@@ -121,7 +100,6 @@ class PortSelectorTest {
     @Test
     fun `orderCandidatePorts filters out zero ports`() {
         val orderedPorts = portSelector.orderCandidatePorts(
-            rememberedPort = 0L,
             serverDefaultPort = 443L,
             advertisedPorts = listOf(443L, 0L, 51820L),
         )
