@@ -55,22 +55,6 @@ class ContributesPluginPointProcessorTest {
         """.trimIndent(),
     )
 
-    private val daggerSetStub = SourceFile.kotlin(
-        "DaggerSet.kt",
-        """
-        package com.duckduckgo.di
-        typealias DaggerSet<T> = Set<@JvmSuppressWildcards T>
-        """.trimIndent(),
-    )
-
-    private val daggerMapStub = SourceFile.kotlin(
-        "DaggerMap.kt",
-        """
-        package com.duckduckgo.di
-        typealias DaggerMap<K, V> = Map<@JvmSuppressWildcards K, @JvmSuppressWildcards V>
-        """.trimIndent(),
-    )
-
     @Test
     fun `basic plugin point generates PluginPoint and Module`() {
         val source = SourceFile.kotlin(
@@ -87,7 +71,7 @@ class ContributesPluginPointProcessorTest {
             """.trimIndent(),
         )
 
-        val result = compile(source, appScopeStub, pluginPointStub, daggerSetStub, daggerMapStub)
+        val result = compile(source, appScopeStub, pluginPointStub)
         val generatedPluginPoint = result.findGeneratedSource("TestPlugin_PluginPoint.kt")
         val goldenPluginPoint = loadGolden("PluginPoint_Basic.kt")
         assertEquals(goldenPluginPoint, generatedPluginPoint)
@@ -115,7 +99,7 @@ class ContributesPluginPointProcessorTest {
             """.trimIndent(),
         )
 
-        val result = compile(source, appScopeStub, pluginPointStub, daggerSetStub, daggerMapStub)
+        val result = compile(source, appScopeStub, pluginPointStub)
         val generatedPluginPoint = result.findGeneratedSource("TriggerInterface_PluginPoint.kt")
         val goldenPluginPoint = loadGolden("PluginPoint_BoundType.kt")
         assertEquals(goldenPluginPoint, generatedPluginPoint)
@@ -139,7 +123,7 @@ class ContributesPluginPointProcessorTest {
             """.trimIndent(),
         )
 
-        val result = compile(source, appScopeStub, pluginPointStub, daggerSetStub, daggerMapStub)
+        val result = compile(source, appScopeStub, pluginPointStub)
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("must be an interface"))
     }

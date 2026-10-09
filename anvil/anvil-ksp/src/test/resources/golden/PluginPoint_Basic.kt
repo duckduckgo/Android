@@ -1,15 +1,15 @@
 package com.test
 
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.di.DaggerMap
-import com.duckduckgo.di.DaggerSet
 import javax.inject.Inject
 import kotlin.Int
 import kotlin.collections.Collection
+import kotlin.collections.Map
+import kotlin.collections.Set
 
 public class TestPlugin_PluginPoint @Inject constructor(
-  private val setPlugins: DaggerSet<TestPlugin>,
-  private val mapPlugins: DaggerMap<Int, TestPlugin>,
+  private val setPlugins: Set<TestPlugin>,
+  private val mapPlugins: Map<Int, TestPlugin>,
 ) : PluginPoint<TestPlugin> {
   private val sortedPlugins: Collection<TestPlugin> by lazy {
         mapPlugins.entries

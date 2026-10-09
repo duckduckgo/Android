@@ -1,15 +1,15 @@
 package com.test
 
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.di.DaggerMap
-import com.duckduckgo.di.DaggerSet
 import javax.inject.Inject
 import kotlin.Int
 import kotlin.collections.Collection
+import kotlin.collections.Map
+import kotlin.collections.Set
 
 public class TriggerInterface_PluginPoint @Inject constructor(
-  private val setPlugins: DaggerSet<MyBoundPlugin>,
-  private val mapPlugins: DaggerMap<Int, MyBoundPlugin>,
+  private val setPlugins: Set<MyBoundPlugin>,
+  private val mapPlugins: Map<Int, MyBoundPlugin>,
 ) : PluginPoint<MyBoundPlugin> {
   private val sortedPlugins: Collection<MyBoundPlugin> by lazy {
         mapPlugins.entries

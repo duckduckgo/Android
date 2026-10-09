@@ -136,15 +136,6 @@ class ContributesActivePluginPointProcessorTest {
         """.trimIndent(),
     )
 
-    private val daggerSetStub = SourceFile.kotlin(
-        "DaggerSet.kt",
-        """
-        package com.duckduckgo.di
-        typealias DaggerSet<T> = Set<@JvmSuppressWildcards T>
-        typealias DaggerMap<K, V> = Map<@JvmSuppressWildcards K, @JvmSuppressWildcards V>
-        """.trimIndent(),
-    )
-
     private val allStubs get() = arrayOf(
         appScopeStub,
         activityScopeStub,
@@ -154,7 +145,6 @@ class ContributesActivePluginPointProcessorTest {
         dispatcherProviderStub,
         sharedPreferencesProviderStub,
         appCoroutineScopeStub,
-        daggerSetStub,
     )
 
     // ========================================================================
