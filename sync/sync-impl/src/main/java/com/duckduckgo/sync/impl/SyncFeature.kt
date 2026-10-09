@@ -148,7 +148,7 @@ interface SyncFeature {
      *   - Camera permission is request upfront when opening barcode scanner.
      *   - Account deletion flow is explicit about deletion results.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun canUseImprovedSyncFlow(): Toggle
 }
 

@@ -423,6 +423,7 @@ class SyncActivity : DuckDuckGoActivity() {
                 backUpNewAccountLauncher.launch(
                     SyncThisDeviceContract.Input(
                         launchSource = launchSource,
+                        isAuthRequired = command.isAuthRequired,
                     ),
                 )
             }
@@ -431,6 +432,7 @@ class SyncActivity : DuckDuckGoActivity() {
                 recoverSyncedDataLauncher.launch(
                     RecoverSyncedDataContract.Input(
                         launchSource = launchSource,
+                        isAuthRequired = command.isAuthRequired,
                     ),
                 )
             }
@@ -451,6 +453,7 @@ class SyncActivity : DuckDuckGoActivity() {
                         backUpNewAccountLauncher.launch(
                             SyncThisDeviceContract.Input(
                                 launchSource = launchSource,
+                                isAuthRequired = false,
                             ),
                         )
                     }
@@ -471,6 +474,7 @@ class SyncActivity : DuckDuckGoActivity() {
                         recoverSyncedDataLauncher.launch(
                             RecoverSyncedDataContract.Input(
                                 launchSource = launchSource,
+                                isAuthRequired = false,
                             ),
                         )
                     }
