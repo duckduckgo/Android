@@ -102699,7 +102699,7 @@ function findPRTask(customFields) {
         const prTasks = yield client.tasks.searchInWorkspace(ASANA_WORKSPACE_ID, {
             [`custom_fields.${customFields.url.gid}.value`]: prURL,
             // eslint-disable-next-line camelcase
-            opt_fields: 'name,parent,completed'
+            opt_fields: 'name,parent,completed,permalink_url'
         });
         if (prTasks.data.length > 0) {
             (0, core_1.info)(`Found PR task using searchInWorkspace: ${prTasks.data[0].gid}`);
@@ -102711,7 +102711,7 @@ function findPRTask(customFields) {
             // https://developers.asana.com/reference/searchtasksforworkspace#eventual-consistency
             const projectTasks = yield client.tasks.findByProject(PROJECT_ID, {
                 // eslint-disable-next-line camelcase
-                opt_fields: 'custom_fields',
+                opt_fields: 'custom_fields,permalink_url',
                 limit: 100
             });
             for (const task of projectTasks.data) {
@@ -102835,7 +102835,7 @@ function createOrFindPRTask(payload, title, prStatus, customFields) {
                 if (openShipReviewTask) {
                     subTasks = yield client.tasks.subtasks(openShipReviewTask.gid, {
                         // eslint-disable-next-line camelcase
-                        opt_fields: 'name,completed,assignee,custom_fields',
+                        opt_fields: 'name,completed,assignee,custom_fields,permalink_url',
                         limit: 100
                     });
                     shipReviewPRTask = subTasks.data.find(t => t.name.includes('Pull Request') &&
