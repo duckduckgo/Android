@@ -27,7 +27,7 @@
   "dependencies": {
     "@actions/core": "^1.10.0",
     "@actions/github": "^6.0.0",
-    "asana": "github:Asana/node-asana",
+    "asana": "1.0.1",
     "markdown-it": "^14.0.0"
   },
   "devDependencies": {

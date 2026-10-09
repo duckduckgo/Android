@@ -185,18 +185,26 @@ function getFollowers(
   return undefined
 }
 
+function isBotReview(): boolean {
+  return (
+    context.eventName === 'pull_request_review' &&
+    (context.payload as PullRequestReviewEvent).review.user.type === 'Bot'
+  )
+}
+
 async function getAssignee(
   payload: PullRequestEvent,
   allowRandomReviewer: boolean
 ): Promise<string | undefined> {
   const githubAuthor = payload.pull_request.user.login
+  const isCandidate = (user: User): boolean =>
+    user.login !== githubAuthor && user.type !== 'Bot'
   let githubAssignee: string | undefined =
-    payload.pull_request.assignees.find(user => user.login !== githubAuthor)
-      ?.login ??
+    payload.pull_request.assignees.find(isCandidate)?.login ??
     payload.pull_request.requested_reviewers
       .map(user => user as User)
       .filter(user => user !== undefined)
-      .find(user => user.login !== githubAuthor)?.login
+      .find(isCandidate)?.login
 
   if (allowRandomReviewer && !githubAssignee) {
     info('Setting up random reviewer as noone is assigned to this PR')
@@ -417,6 +425,10 @@ async function run(): Promise<void> {
       )
     ) {
       info('Only runs for PR changes and reviews')
+      return
+    }
+    if (isBotReview()) {
+      info('Ignoring review posted by a bot')
       return
     }
 
