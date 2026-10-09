@@ -31,7 +31,9 @@ class RealCredentialExchange @Inject constructor(
 ) : CredentialExchange {
 
     override suspend fun isImportSupported(): Boolean {
-        val enabled = withContext(dispatchers.io()) { credentialExchangeFeature.self().isEnabled() }
+        val enabled = withContext(dispatchers.io()) {
+            credentialExchangeFeature.self().isEnabled() && credentialExchangeFeature.canImportPasswords().isEnabled()
+        }
         return enabled && exporterAppDetector.exporterApps().isNotEmpty()
     }
 }
