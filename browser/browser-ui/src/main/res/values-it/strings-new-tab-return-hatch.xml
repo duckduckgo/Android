@@ -21,9 +21,12 @@
     <string name="newTabReturnHatchFireTabTitle">Ultima scheda Fire usata</string>
     <string name="newTabReturnHatchTabClosed">Scheda chiusa</string>
     <string name="newTabReturnHatchUndo">Annulla</string>
-    <string name="hatchMenuReturnTab">Torna alla scheda</string>
+    <string name="hatchMenuReturnToLastUsedTab">Torna all\'ultima scheda usata</string>
     <string name="hatchMenuAfterInactivitySettings">Dopo l\'inattività</string>
-    <string name="hatchMenuCloseTab">Chiudi scheda</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Apri una nuova scheda</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Ultima scheda usata</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="&apos;%1$s&apos; is the menu row label (&apos;After Inactivity&apos;) and &apos;%2$s&apos; is the current destination, e.g. &apos;After Inactivity, Open New Tab&apos;">%1$s, %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Chiudi l\'ultima scheda usata</string>
     <string name="hatchMenuBurnTab">Elimina scheda</string>
-    <string name="hatchMenuHideShortcut">Nascondi scorciatoia</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="&apos;Return to&apos; refers to this menu&apos;s own &apos;Return to…&apos; label shown above this item">Nascondi scorciatoia \"Torna a\"</string>
 </resources>
