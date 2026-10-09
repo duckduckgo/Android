@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.duckduckgo.nextsteps.impl
 
+import android.content.Context
+import android.view.View
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.nextsteps.api.NextSteps
+import com.duckduckgo.nextsteps.impl.NextStepsItemsExperimentToggles.Cohorts
+import com.duckduckgo.nextsteps.impl.ui.NextStepsStackedCardsView
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
@@ -38,5 +41,13 @@ class RealNextSteps @Inject constructor(
             return@withContext
         }
         nextStepsItemsFeatureToggles.nextStepsItemsExperiment().enroll()
+    }
+
+    override suspend fun provideSectionView(context: Context): View? {
+        val showStackedCards = withContext(dispatcherProvider.io()) {
+            nextStepsItemsFeatureToggles.self().isEnabled() &&
+                nextStepsItemsFeatureToggles.nextStepsItemsExperiment().isEnrolledAndEnabled(Cohorts.STACKED_CARDS)
+        }
+        return if (showStackedCards) NextStepsStackedCardsView(context) else null
     }
 }

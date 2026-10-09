@@ -30,12 +30,22 @@ dependencies {
     implementation project(':common-utils')
     implementation project(':app-build-config-api')
     implementation project(':feature-toggles-api')
+    implementation project(':remote-messaging-api')
+    implementation project(':design-system')
 
     // Dagger
     compileOnly "org.glassfish:javax.annotation:10.0-b28"
     implementation Google.dagger
 
     implementation KotlinX.coroutines.core
+
+    implementation AndroidX.core.ktx
+    implementation AndroidX.appCompat
+    implementation Google.android.material
+    implementation AndroidX.constraintLayout
+    implementation AndroidX.lifecycle.runtime.ktx
+    implementation AndroidX.lifecycle.viewModelKtx
+    implementation "com.github.bumptech.glide:glide:_"
 
     // Testing dependencies
     testImplementation project(path: ':common-test')
