@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Spletno mesto »%1$s« želi dostopati do vašega fotoaparata</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Spletno mesto »%1$s« želi dostopati do vašega mikrofona</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Spletno mesto »%1$s« želi dostopati do vašega fotoaparata in mikrofona</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">»%1$s« želi na tem spletnem mestu dostopati do vaše lokacije</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">»%1$s« želi na tem spletnem mestu dostopati do vašega fotoaparata</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">»%1$s« želi na tem spletnem mestu dostopati do vašega mikrofona</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">»%1$s« želi na tem spletnem mestu dostopati do vaše kamere in mikrofona</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">»%1$s« želi na tem spletnem mestu dostopati do vaše programske opreme za upravljanje digitalnih pravic (DRM)</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Če ne dovolite, videoposnetkov na spletnem mestu morda ne bo mogoče predvajati, vendar to spletno mesto ne bo imelo dostopa do identifikatorjev naprav, ki jih zagotavlja programska oprema DRM.</string>
 
     <!-- Reminder dialog -->
