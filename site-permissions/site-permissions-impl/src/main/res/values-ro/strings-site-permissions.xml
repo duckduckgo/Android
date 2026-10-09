@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Site-ul „%1$s” dorește să-ți acceseze camera</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Site-ul „%1$s” dorește să-ți acceseze microfonul</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Site-ul „%1$s” dorește să-ți acceseze camera și microfonul</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s” dorește să-ți acceseze locația pe acest site</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s” dorește să-ți acceseze camera pe acest site</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" dorește să-ți acceseze microfonul pe acest site</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s” dorește să-ți acceseze camera și microfonul pe acest site</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s” dorește să-ți acceseze software-ul de management al drepturilor digitale (DRM) pe acest site</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Dacă nu permiți, videoclipurile de pe site ar putea deveni de neredat, dar acest site nu va avea acces la identificatorii de dispozitiv oferiți de software-ul DRM.</string>
 
     <!-- Reminder dialog -->
@@ -104,5 +109,22 @@
     <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">DuckDuckGo nu a putut oferi accesul la cameră acestui site</string>
     <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo nu a putut acorda accesul la microfon acestui site</string>
     <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo nu a putut acorda accesul la cameră și microfon acestui site</string>
+
+    <!-- Permission settings redesign -->
+    <string name="permissionSettingsAlwaysAllow" instruction="Permission setting option: the site gets the permission without asking">Permite întotdeauna</string>
+    <string name="permissionSettingsAskEachTime" instruction="Permission setting option: the site has to ask for the permission every time">Întreabă de fiecare dată</string>
+    <string name="permissionSettingsLocationDialogTitle">Permite site-urilor să solicite permisiunea pentru locație</string>
+    <string name="permissionSettingsLocationDialogMessage">Dacă alegi „Nu permite niciodată”, nu vei putea utiliza anumite funcționalități de pe site-uri, cum ar fi indicațiile de orientare pe hărți sau magazinele din apropiere.</string>
+    <string name="permissionSettingsCameraDialogTitle">Permite site-urilor să solicite permisiunea pentru cameră</string>
+    <string name="permissionSettingsCameraDialogMessage">Dacă alegi „Nu permite niciodată”, nu vei putea folosi funcții precum chatul video pe site-uri.</string>
+    <string name="permissionSettingsMicrophoneDialogTitle">Permite ca site-urile să solicite permisiunea pentru microfon</string>
+    <string name="permissionSettingsMicrophoneDialogMessage">Dacă alegi „Nu permite niciodată”, nu vei putea utiliza funcționalități precum chatul vocal pe site-uri.</string>
+    <string name="permissionSettingsDrmDialogTitle">Permite site-urilor să solicite permisiunea pentru administrarea drepturilor digitale (DRM)</string>
+    <string name="permissionSettingsDrmTitle" instruction="Name of a permission setting for playing protected video content">Administrarea drepturilor digitale (DRM)</string>
+    <string name="permissionsPerWebsiteRedesignHeader" instruction="Placeholder is the name of a website">Permisiuni pentru %1$s</string>
+    <string name="permissionsPerWebsiteRemovePermissions" instruction="Button that removes all saved permissions for the website shown on the screen">Elimină permisiunile</string>
+    <string name="permissionsRemovedForSiteSnackbar" instruction="Placeholder is the name of a website">Permisiuni eliminate pentru &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="permissionsRemovedForAllSitesSnackbar">Permisiuni eliminate pentru toate site-urile</string>
+    <string name="permissionSettingsDrmDialogMessage">Dacă alegi „Nu permite niciodată”, videoclipurile de pe site ar putea deveni imposibil de redat.</string>
 
 </resources>

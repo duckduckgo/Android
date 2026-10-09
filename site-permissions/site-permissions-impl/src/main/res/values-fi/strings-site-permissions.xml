@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\"-verkkosivusto haluaa käyttää kameraasi</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Sivusto \"%1$s\" haluaa käyttää mikrofonia</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\"-verkkosivusto haluaa käyttää kameraasi ja mikrofoniasi</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" haluaa käyttää sijaintiasi tällä verkkosivustolla</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" haluaa käyttää kameraasi tällä verkkosivustolla</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" haluaa käyttää mikrofoniasi tällä verkkosivustolla</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" haluaa käyttää kameraasi ja mikrofoniasi tällä verkkosivustolla</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" haluaa käyttää DRM-ohjelmistoasi (Digital Rights Management) tällä verkkosivustolla</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Jos et salli, sivustolla olevia videoita ei ehkä voida toistaa, mutta tämä sivusto ei voi käyttää DRM-ohjelmiston tarjoamia laitetunnisteita.</string>
 
     <!-- Reminder dialog -->
@@ -104,5 +109,22 @@
     <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">DuckDuckGo ei voinut antaa kameran käyttöoikeutta tälle sivustolle</string>
     <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo ei voinut antaa mikrofonin käyttöoikeutta tälle sivustolle</string>
     <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo ei voinut antaa kameran ja mikrofonin käyttöoikeutta tälle sivustolle</string>
+
+    <!-- Permission settings redesign -->
+    <string name="permissionSettingsAlwaysAllow" instruction="Permission setting option: the site gets the permission without asking">Salli aina</string>
+    <string name="permissionSettingsAskEachTime" instruction="Permission setting option: the site has to ask for the permission every time">Kysy joka kerta</string>
+    <string name="permissionSettingsLocationDialogTitle">Salli sivustojen pyytää sijaintilupaa</string>
+    <string name="permissionSettingsLocationDialogMessage">Jos valitset “Älä koskaan salli”, et voi käyttää sivustoilla tiettyjä ominaisuuksia, kuten karttojen reittiohjeet tai lähellä olevat kaupat.</string>
+    <string name="permissionSettingsCameraDialogTitle">Salli sivustojen pyytää kameran käyttöoikeutta</string>
+    <string name="permissionSettingsCameraDialogMessage">Jos valitset “Älä koskaan salli”, et voi käyttää sivustoilla tiettyjä ominaisuuksia, kuten videokeskustelut.</string>
+    <string name="permissionSettingsMicrophoneDialogTitle">Salli sivustojen pyytää mikrofonin käyttöoikeutta</string>
+    <string name="permissionSettingsMicrophoneDialogMessage">Jos valitset “Älä koskaan salli”, et voi käyttää ominaisuuksia, kuten puhekeskustelut sivustoilla.</string>
+    <string name="permissionSettingsDrmDialogTitle">Salli sivustojen pyytää digitaalisten oikeuksien hallintaa (DRM)</string>
+    <string name="permissionSettingsDrmTitle" instruction="Name of a permission setting for playing protected video content">Digitaalisten oikeuksien hallinta (DRM)</string>
+    <string name="permissionsPerWebsiteRedesignHeader" instruction="Placeholder is the name of a website">Käyttöoikeudet sivustolle %1$s</string>
+    <string name="permissionsPerWebsiteRemovePermissions" instruction="Button that removes all saved permissions for the website shown on the screen">Poista käyttöoikeudet</string>
+    <string name="permissionsRemovedForSiteSnackbar" instruction="Placeholder is the name of a website">Käyttöoikeudet poistettu sivustolta &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="permissionsRemovedForAllSitesSnackbar">Käyttöoikeudet poistettu kaikilta sivustoilta</string>
+    <string name="permissionSettingsDrmDialogMessage">Jos valitset “Älä koskaan salli”, sivustolla olevia videoita ei ehkä voida toistaa.</string>
 
 </resources>

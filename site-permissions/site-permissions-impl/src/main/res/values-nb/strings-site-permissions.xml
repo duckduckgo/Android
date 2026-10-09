@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Nettstedet «%1$s» ønsker tilgang til kameraet ditt</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Nettstedet «%1$s» ønsker tilgang til mikrofonen din</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Nettstedet «%1$s» ønsker tilgang til kameraet og mikrofonen din</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">«%1$s» ønsker tilgang til posisjonen din på dette nettstedet</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" ønsker tilgang til kameraet ditt på dette nettstedet</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" ønsker tilgang til mikrofonen din på dette nettstedet</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" ønsker tilgang til kameraet og mikrofonen din på dette nettstedet</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" ønsker tilgang til programvaren din for digital rettighetsadministrasjon (DRA) på dette nettstedet</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Hvis du ikke tillater det, kan det hende at videoer på nettstedet ikke kan spilles av, men dette nettstedet får ikke tilgang til enhetsidentifikatorer oppgitt av DRM-programvare.</string>
 
     <!-- Reminder dialog -->
@@ -104,5 +109,22 @@
     <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">DuckDuckGo kunne ikke gi kameratilgang til dette nettstedet</string>
     <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo kunne ikke gi mikrofontilgang til dette nettstedet</string>
     <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo kunne ikke gi kamera- og mikrofontilgang til dette nettstedet</string>
+
+    <!-- Permission settings redesign -->
+    <string name="permissionSettingsAlwaysAllow" instruction="Permission setting option: the site gets the permission without asking">Tillat alltid</string>
+    <string name="permissionSettingsAskEachTime" instruction="Permission setting option: the site has to ask for the permission every time">Spør hver gang</string>
+    <string name="permissionSettingsLocationDialogTitle">Tillat nettsteder å be om posisjonstillatelse</string>
+    <string name="permissionSettingsLocationDialogMessage">Hvis du velger «Tillat aldri», er det enkelte funksjoner på nettsteder du ikke kan bruke, som veibeskrivelser på kart eller butikker i nærheten.</string>
+    <string name="permissionSettingsCameraDialogTitle">Tillat nettsteder å be om kameratillatelse</string>
+    <string name="permissionSettingsCameraDialogMessage">Hvis du velger «Aldri tillat», kan du ikke bruke funksjoner som videochat på nettsteder.</string>
+    <string name="permissionSettingsMicrophoneDialogTitle">Tillat nettsteder å be om mikrofontillatelse</string>
+    <string name="permissionSettingsMicrophoneDialogMessage">Hvis du velger «Aldri tillat», kan du ikke bruke funksjoner som talechat på nettsteder.</string>
+    <string name="permissionSettingsDrmDialogTitle">Tillat nettsteder å be om tillatelse til digital rettighetsadministrasjon (DRA)</string>
+    <string name="permissionSettingsDrmTitle" instruction="Name of a permission setting for playing protected video content">Digital rettighetsadministrasjon (DRA)</string>
+    <string name="permissionsPerWebsiteRedesignHeader" instruction="Placeholder is the name of a website">Tillatelser for %1$s</string>
+    <string name="permissionsPerWebsiteRemovePermissions" instruction="Button that removes all saved permissions for the website shown on the screen">Fjern tillatelser</string>
+    <string name="permissionsRemovedForSiteSnackbar" instruction="Placeholder is the name of a website">Tillatelser fjernet for &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="permissionsRemovedForAllSitesSnackbar">Tillatelser fjernet for alle nettsteder</string>
+    <string name="permissionSettingsDrmDialogMessage">Hvis du velger «Aldri tillat», kan det hende at videoer på nettstedet ikke kan spilles av.</string>
 
 </resources>

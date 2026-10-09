@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Сайт «%1$s» запрашивает доступ к вашей камере</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Сайт «%1$s» запрашивает доступ к вашему микрофону</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Сайт «%1$s» запрашивает доступ к вашей камере и микрофону</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">«%1$s» запрашивает доступ к вашей геопозиции на этом сайте</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">«%1$s» запрашивает доступ к вашей камере на этом сайте</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" запрашивает доступ к микрофону на этом сайте</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">«%1$s» запрашивает доступ к вашей камере и микрофону на этом сайте</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">«%1$s» запрашивает доступ к вашим программам защиты авторских прав (DRM) на этом сайте</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Если ты не разрешишь, видео на сайте могут перестать воспроизводиться, но этот сайт не получит доступа к идентификаторам устройств, которые предоставляет DRM.</string>
 
     <!-- Reminder dialog -->
@@ -104,5 +109,22 @@
     <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">DuckDuckGo не удалось предоставить этому сайту доступ к камере</string>
     <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo не удалось предоставить этому сайту доступ к микрофону</string>
     <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo не удалось предоставить этому сайту доступ к камере и микрофону</string>
+
+    <!-- Permission settings redesign -->
+    <string name="permissionSettingsAlwaysAllow" instruction="Permission setting option: the site gets the permission without asking">Разрешать всегда</string>
+    <string name="permissionSettingsAskEachTime" instruction="Permission setting option: the site has to ask for the permission every time">Спрашивать каждый раз</string>
+    <string name="permissionSettingsLocationDialogTitle">Разрешить сайтам запрашивать доступ к местоположению</string>
+    <string name="permissionSettingsLocationDialogMessage">Если ты выберешь «Никогда не разрешать», ты не сможешь пользоваться некоторыми функциями на сайтах, например прокладывать маршруты на картах или находить магазины поблизости.</string>
+    <string name="permissionSettingsCameraDialogTitle">Разрешить сайтам запрашивать доступ к камере</string>
+    <string name="permissionSettingsCameraDialogMessage">Если ты выберешь «Никогда не разрешать», ты не сможешь использовать такие функции, как видеочат на сайтах.</string>
+    <string name="permissionSettingsMicrophoneDialogTitle">Разрешить сайтам запрашивать доступ к микрофону</string>
+    <string name="permissionSettingsMicrophoneDialogMessage">Если вы выберете вариант «Никогда не разрешать», вы не сможете использовать такие функции, как голосовой чат на сайтах.</string>
+    <string name="permissionSettingsDrmDialogTitle">Разрешить сайтам запрашивать доступ к защите авторских прав (DRM)</string>
+    <string name="permissionSettingsDrmTitle" instruction="Name of a permission setting for playing protected video content">Защита авторских прав (DRM)</string>
+    <string name="permissionsPerWebsiteRedesignHeader" instruction="Placeholder is the name of a website">Разрешения для %1$s</string>
+    <string name="permissionsPerWebsiteRemovePermissions" instruction="Button that removes all saved permissions for the website shown on the screen">Удалить разрешения</string>
+    <string name="permissionsRemovedForSiteSnackbar" instruction="Placeholder is the name of a website">Разрешения удалены для сайта &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="permissionsRemovedForAllSitesSnackbar">Разрешения удалены для всех сайтов</string>
+    <string name="permissionSettingsDrmDialogMessage">Если вы выберете вариант «Никогда не разрешать», видео на сайте могут стать недоступными для воспроизведения.</string>
 
 </resources>

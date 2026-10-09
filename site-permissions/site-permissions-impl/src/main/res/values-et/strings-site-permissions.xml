@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Veebisait „%1$s“ soovib juurdepääsu sinu kaamerale</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Veebisait „%1$s“ soovib juurdepääsu sinu mikrofonile</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Veebisait „%1$s“ soovib juurdepääsu kaamerale ja mikrofonile</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ soovib sellel veebisaidil juurdepääsu sinu asukohale</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ soovib sellel veebisaidil juurdepääsu sinu kaamerale</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ soovib sellel veebisaidil juurdepääsu sinu mikrofonile</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ soovib sellel veebisaidil juurdepääsu sinu kaamerale ja mikrofonile</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ soovib sellel veebisaidil juurdepääsu sinu digitaalõiguste halduse (DRM) tarkvarale</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Kui keeldud, võivad saidil videod muutuda mängitamatuks, kuid sellel saidil puudub juurdepääs DRM-tarkvara pakutavatele seadme identifikaatoritele.</string>
 
     <!-- Reminder dialog -->
@@ -104,5 +109,22 @@
     <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">DuckDuckGo ei saanud sellele saidile kaamerale juurdepääsu anda</string>
     <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo ei saanud sellele saidile mikrofoni ligipääsu anda</string>
     <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo ei saanud sellele saidile kaamerale ja mikrofonile juurdepääsu anda</string>
+
+    <!-- Permission settings redesign -->
+    <string name="permissionSettingsAlwaysAllow" instruction="Permission setting option: the site gets the permission without asking">Luba alati</string>
+    <string name="permissionSettingsAskEachTime" instruction="Permission setting option: the site has to ask for the permission every time">Küsi iga kord</string>
+    <string name="permissionSettingsLocationDialogTitle">Luba saitidel küsida asukohaluba</string>
+    <string name="permissionSettingsLocationDialogMessage">Kui valid „Ära kunagi luba”, ei saa sa saitidel teatud funktsioone kasutada, näiteks juhiseid kaartidel või lähedalasuvaid poode.</string>
+    <string name="permissionSettingsCameraDialogTitle">Luba saitidel küsida kaamera luba</string>
+    <string name="permissionSettingsCameraDialogMessage">Kui valid „Ära kunagi luba”, ei saa sa saitidel kasutada selliseid funktsioone nagu videovestlus.</string>
+    <string name="permissionSettingsMicrophoneDialogTitle">Luba saitidel küsida mikrofoni luba</string>
+    <string name="permissionSettingsMicrophoneDialogMessage">Kui valid „Ära kunagi luba”, ei saa sa saitidel kasutada selliseid funktsioone nagu häälvestlus.</string>
+    <string name="permissionSettingsDrmDialogTitle">Luba saitidel küsida digitaalõiguste halduse (DRM) luba</string>
+    <string name="permissionSettingsDrmTitle" instruction="Name of a permission setting for playing protected video content">Digitaalõiguste haldus (DRM)</string>
+    <string name="permissionsPerWebsiteRedesignHeader" instruction="Placeholder is the name of a website">Load %1$s jaoks</string>
+    <string name="permissionsPerWebsiteRemovePermissions" instruction="Button that removes all saved permissions for the website shown on the screen">Eemalda õigused</string>
+    <string name="permissionsRemovedForSiteSnackbar" instruction="Placeholder is the name of a website">Saidi &lt;b&gt;%1$s&lt;/b&gt; load on eemaldatud</string>
+    <string name="permissionsRemovedForAllSitesSnackbar">Kõikide saitide load on eemaldatud</string>
+    <string name="permissionSettingsDrmDialogMessage">Kui valid „Ära kunagi luba”, võivad saidil olevad videod muutuda mängitamatuks.</string>
 
 </resources>

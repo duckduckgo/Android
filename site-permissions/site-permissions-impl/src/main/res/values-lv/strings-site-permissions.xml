@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Vietne \"%1$s\" vēlas piekļūt tavai kamerai</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Vietne \"%1$s\" vēlas piekļūt tavam mikrofonam</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Vietne \"%1$s\" vēlas piekļūt tavai kamerai un mikrofonam</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">“%1$s” vēlas piekļūt tavai atrašanās vietai šajā vietnē</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">“%1$s” vēlas piekļūt tavai kamerai šajā vietnē</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">“%1$s” vēlas piekļūt tavam mikrofonam šajā vietnē</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">“%1$s” vēlas piekļūt tavai kamerai un mikrofonam šajā vietnē</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">“%1$s” vēlas piekļūt tavai digitālā satura tiesību pārvaldības (DRM) programmatūrai šajā vietnē</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Ja neatļausi, vietnē esošos videoklipus, iespējams, nevarēs atskaņot, taču šai vietnei nebūs piekļuves DRM programmatūras nodrošinātajiem ierīču identifikatoriem.</string>
 
     <!-- Reminder dialog -->
@@ -104,5 +109,22 @@
     <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">DuckDuckGo nevarēja piešķirt šai vietnei piekļuvi kamerai</string>
     <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo nevarēja piešķirt šai vietnei piekļuvi mikrofonam</string>
     <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo nevarēja piešķirt šai vietnei piekļuvi kamerai un mikrofonam</string>
+
+    <!-- Permission settings redesign -->
+    <string name="permissionSettingsAlwaysAllow" instruction="Permission setting option: the site gets the permission without asking">Vienmēr atļaut</string>
+    <string name="permissionSettingsAskEachTime" instruction="Permission setting option: the site has to ask for the permission every time">Jautāt katru reizi</string>
+    <string name="permissionSettingsLocationDialogTitle">Ļaut vietnēm pieprasīt atrašanās vietas atļauju</string>
+    <string name="permissionSettingsLocationDialogMessage">Ja izvēlēsies “Nekad neatļaut”, vietnēs nevarēsi izmantot noteiktas funkcijas, piemēram, norādes kartēs vai tuvumā esošos veikalus.</string>
+    <string name="permissionSettingsCameraDialogTitle">Atļaut vietnēm prasīt kameras atļauju</string>
+    <string name="permissionSettingsCameraDialogMessage">Ja izvēlēsies “Nekad neatļaut”, vietnēs nevarēsi izmantot tādas funkcijas kā video tērzēšana.</string>
+    <string name="permissionSettingsMicrophoneDialogTitle">Atļaut vietnēm prasīt mikrofona atļauju</string>
+    <string name="permissionSettingsMicrophoneDialogMessage">Ja izvēlēsies “Nekad neatļaut”, nevarēsi izmantot tādas funkcijas kā balss tērzēšana vietnēs.</string>
+    <string name="permissionSettingsDrmDialogTitle">Atļaut vietnēm prasīt digitālā satura tiesību pārvaldības (DRM) atļauju</string>
+    <string name="permissionSettingsDrmTitle" instruction="Name of a permission setting for playing protected video content">Digitālā satura tiesību pārvaldība (DRM)</string>
+    <string name="permissionsPerWebsiteRedesignHeader" instruction="Placeholder is the name of a website">Atļaujas vietnei %1$s</string>
+    <string name="permissionsPerWebsiteRemovePermissions" instruction="Button that removes all saved permissions for the website shown on the screen">Noņemt atļaujas</string>
+    <string name="permissionsRemovedForSiteSnackbar" instruction="Placeholder is the name of a website">Atļaujas noņemtas vietnei &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="permissionsRemovedForAllSitesSnackbar">Atļaujas noņemtas visām vietnēm</string>
+    <string name="permissionSettingsDrmDialogMessage">Ja izvēlies “Nekad neatļaut”, vietnē esošos videoklipus, iespējams, nevarēs atskaņot.</string>
 
 </resources>

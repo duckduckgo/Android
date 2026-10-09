@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Ο ιστότοπος «%1$s» θέλει να αποκτήσει πρόσβαση στην κάμερά σου</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Ο ιστότοπος «%1$s» επιθυμεί να αποκτήσει πρόσβαση στο μικρόφωνό σου</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Ο ιστότοπος «%1$s» θέλει να αποκτήσει πρόσβαση στην κάμερα και στο μικρόφωνό σου</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">Ο ιστότοπος «%1$s» θέλει να αποκτήσει πρόσβαση στην τοποθεσία σου σε αυτόν τον ιστότοπο</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">Ο ιστότοπος \"%1$s\" θέλει να αποκτήσει πρόσβαση στην κάμερά σου σε αυτόν τον ιστότοπο</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">Ο ιστότοπος «%1$s» θέλει να αποκτήσει πρόσβαση στο μικρόφωνό σου σε αυτόν τον ιστότοπο</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">Ο ιστότοπος «%1$s» θέλει να αποκτήσει πρόσβαση στην κάμερα και στο μικρόφωνό σου σε αυτόν τον ιστότοπο</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">Ο ιστότοπος «%1$s» θέλει να αποκτήσει πρόσβαση στο λογισμικό διαχείρισης ψηφιακών δικαιωμάτων (DRM) σου σε αυτόν τον ιστότοπο</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Αν δεν το επιτρέψεις, η αναπαραγωγή των βίντεο στον ιστότοπο ενδέχεται να μην είναι δυνατή, αλλά αυτός ο ιστότοπος δεν θα έχει πρόσβαση στα αναγνωριστικά συσκευών που παρέχονται από το λογισμικό DRM.</string>
 
     <!-- Reminder dialog -->
@@ -104,5 +109,22 @@
     <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">Το DuckDuckGo δεν μπόρεσε να δώσει πρόσβαση στην κάμερα σε αυτόν τον ιστότοπο</string>
     <string name="sitePermissionsTieredMicDeniedSnackBarMessage">Το DuckDuckGo δεν μπόρεσε να δώσει πρόσβαση στο μικρόφωνο σε αυτόν τον ιστότοπο</string>
     <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">Το DuckDuckGo δεν μπόρεσε να δώσει πρόσβαση στην κάμερα και στο μικρόφωνο σε αυτόν τον ιστότοπο</string>
+
+    <!-- Permission settings redesign -->
+    <string name="permissionSettingsAlwaysAllow" instruction="Permission setting option: the site gets the permission without asking">Να επιτρέπεται πάντα</string>
+    <string name="permissionSettingsAskEachTime" instruction="Permission setting option: the site has to ask for the permission every time">Να γίνεται ερώτηση κάθε φορά</string>
+    <string name="permissionSettingsLocationDialogTitle">Να επιτρέπεται στους ιστότοπους να ζητούν άδεια τοποθεσίας</string>
+    <string name="permissionSettingsLocationDialogMessage">Αν επιλέξεις «Να μην επιτρέπεται ποτέ», δεν θα μπορείς να χρησιμοποιείς ορισμένες λειτουργίες σε ιστότοπους, όπως οδηγίες σε χάρτες ή κοντινά καταστήματα.</string>
+    <string name="permissionSettingsCameraDialogTitle">Να επιτρέπεται στους ιστότοπους να ζητούν άδεια πρόσβασης στην κάμερα</string>
+    <string name="permissionSettingsCameraDialogMessage">Αν επιλέξεις «Να μην επιτρέπεται ποτέ», δεν θα μπορείς να χρησιμοποιείς λειτουργίες όπως η βιντεοσυνομιλία σε ιστότοπους.</string>
+    <string name="permissionSettingsMicrophoneDialogTitle">Να επιτρέπεται στους ιστοτόπους να ζητούν άδεια πρόσβασης στο μικρόφωνο</string>
+    <string name="permissionSettingsMicrophoneDialogMessage">Αν επιλέξεις «Να μην επιτρέπεται ποτέ», δεν θα μπορείς να χρησιμοποιείς λειτουργίες όπως η φωνητική συνομιλία σε ιστότοπους.</string>
+    <string name="permissionSettingsDrmDialogTitle">Να επιτρέπεται στους ιστότοπους να ζητούν άδεια διαχείρισης ψηφιακών δικαιωμάτων (DRM)</string>
+    <string name="permissionSettingsDrmTitle" instruction="Name of a permission setting for playing protected video content">Διαχείριση ψηφιακών δικαιωμάτων (DRM)</string>
+    <string name="permissionsPerWebsiteRedesignHeader" instruction="Placeholder is the name of a website">Δικαιώματα για %1$s</string>
+    <string name="permissionsPerWebsiteRemovePermissions" instruction="Button that removes all saved permissions for the website shown on the screen">Κατάργηση δικαιωμάτων</string>
+    <string name="permissionsRemovedForSiteSnackbar" instruction="Placeholder is the name of a website">Τα δικαιώματα καταργήθηκαν για το &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="permissionsRemovedForAllSitesSnackbar">Τα δικαιώματα καταργήθηκαν για όλους τους ιστότοπους</string>
+    <string name="permissionSettingsDrmDialogMessage">Αν επιλέξεις «Να μην επιτρέπεται ποτέ», η αναπαραγωγή των βίντεο στον ιστότοπο ενδέχεται να μην είναι δυνατή.</string>
 
 </resources>
