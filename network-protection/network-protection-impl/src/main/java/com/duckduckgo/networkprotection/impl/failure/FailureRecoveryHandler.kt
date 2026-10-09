@@ -142,7 +142,6 @@ class FailureRecoveryHandler @Inject constructor(
                 vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
             } else {
                 networkProtectionPixels.reportFailureRecoveryCompletedWithServerHealthy()
-                // Same server - probe ports if feature is enabled
                 if (vpnRemoteFeatures.endpointPortFallback().isEnabled()) {
                     if (shouldTryDifferentPort()) {
                         logcat { "Failure recovery: different port responded, restarting VPN" }
@@ -167,13 +166,12 @@ class FailureRecoveryHandler @Inject constructor(
         val result = portProbingCoordinator.probeAndSelect()
             ?: return false.also { logcat { "Failure recovery: not enough ports to probe" } }
 
-        // Return true if a different port would be selected
-        // VPN restart (via WgVpnNetworkStack.onPrepareVpn) will handle actual port selection and config update
-        return if (result.portChanged) {
-            logcat { "Failure recovery: port ${result.selectedPort} would be better than current" }
+        // The restart re-runs probing in WgVpnNetworkStack.onPrepareVpn, which applies the new port
+        return if (result.shouldSwitchPort) {
+            logcat { "Failure recovery: current port is unreachable, port ${result.selectedPort} responded" }
             true
         } else {
-            logcat { "Failure recovery: current port ${result.selectedPort} is already optimal" }
+            logcat { "Failure recovery: current port is reachable or no port responded" }
             false
         }
     }
