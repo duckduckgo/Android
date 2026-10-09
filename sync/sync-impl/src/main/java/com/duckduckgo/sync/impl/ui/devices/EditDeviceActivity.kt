@@ -31,7 +31,9 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE_SECONDARY
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
+import com.duckduckgo.common.ui.view.button.ButtonType.SECONDARY
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
@@ -206,43 +208,60 @@ class EditDeviceActivity : DuckDuckGoActivity() {
     }
 
     private fun askRemoveDevice() {
-        TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_simplified_edit_device_remove_dialog_title)
-            .setMessage(getString(R.string.sync_simplified_edit_device_remove_dialog_body, currentDevice.deviceName))
-            .setPositiveButton(R.string.sync_simplified_edit_device_remove_dialog_primary_button, DESTRUCTIVE)
-            .setNegativeButton(R.string.sync_simplified_edit_device_remove_dialog_secondary_button, GHOST_ALT)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        viewModel.onRemoveDeviceConfirmed()
-                    }
-                },
-            )
-            .setCancellable(true)
-            .show()
+        val listener = object : TextAlertDialogBuilder.EventListener() {
+            override fun onPositiveButtonClicked() {
+                viewModel.onRemoveDeviceConfirmed()
+            }
+        }
+        if (viewModel.viewState.value.isImprovedSyncEnabled) {
+            askRemoveDeviceForImprovedUi(listener)
+        } else {
+            TextAlertDialogBuilder(this)
+                .setTitle(R.string.sync_simplified_edit_device_remove_dialog_title)
+                .setMessage(getString(R.string.sync_simplified_edit_device_remove_dialog_body, currentDevice.deviceName))
+                .setPositiveButton(R.string.sync_simplified_edit_device_remove_dialog_primary_button, DESTRUCTIVE)
+                .setNegativeButton(R.string.sync_simplified_edit_device_remove_dialog_secondary_button, GHOST_ALT)
+                .addEventListener(listener)
+                .setCancellable(true)
+                .show()
+        }
     }
 
     private fun askTurnOffSync() {
+        val listener = object : TextAlertDialogBuilder.EventListener() {
+            override fun onPositiveButtonClicked() {
+                viewModel.onTurnOffSyncConfirmed()
+            }
+
+            override fun onNegativeButtonClicked() {
+                viewModel.onTurnOffSyncCanceled()
+            }
+
+            override fun onDialogCancelled() {
+                viewModel.onTurnOffSyncCanceled()
+            }
+        }
+        if (viewModel.viewState.value.isImprovedSyncEnabled) {
+            askRemoveDeviceForImprovedUi(listener)
+        } else {
+            TextAlertDialogBuilder(this)
+                .setTitle(R.string.sync_simplified_edit_device_turn_off_dialog_title)
+                .setMessage(getString(R.string.sync_simplified_edit_device_turn_off_dialog_body))
+                .setPositiveButton(R.string.sync_simplified_edit_device_turn_off_dialog_primary_button)
+                .setNegativeButton(R.string.sync_simplified_edit_device_turn_off_dialog_secondary_button)
+                .addEventListener(listener)
+                .setCancellable(true)
+                .show()
+        }
+    }
+
+    private fun askRemoveDeviceForImprovedUi(listener: TextAlertDialogBuilder.EventListener) {
         TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_simplified_edit_device_turn_off_dialog_title)
-            .setMessage(getString(R.string.sync_simplified_edit_device_turn_off_dialog_body))
-            .setPositiveButton(R.string.sync_simplified_edit_device_turn_off_dialog_primary_button)
-            .setNegativeButton(R.string.sync_simplified_edit_device_turn_off_dialog_secondary_button)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        viewModel.onTurnOffSyncConfirmed()
-                    }
-
-                    override fun onNegativeButtonClicked() {
-                        viewModel.onTurnOffSyncCanceled()
-                    }
-
-                    override fun onDialogCancelled() {
-                        viewModel.onTurnOffSyncCanceled()
-                    }
-                },
-            )
+            .setTitle(getString(R.string.sync_simplified_edit_device_remove_dialog_title_v2, currentDevice.deviceName))
+            .setMessage(getString(R.string.sync_simplified_edit_device_remove_dialog_body_v2, currentDevice.deviceName))
+            .setPositiveButton(R.string.sync_simplified_edit_device_remove_dialog_primary_button, DESTRUCTIVE_SECONDARY)
+            .setNegativeButton(R.string.sync_simplified_edit_device_remove_dialog_secondary_button, SECONDARY)
+            .addEventListener(listener)
             .setCancellable(true)
             .show()
     }
