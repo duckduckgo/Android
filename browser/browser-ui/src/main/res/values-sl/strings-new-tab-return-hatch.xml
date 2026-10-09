@@ -21,9 +21,12 @@
     <string name="newTabReturnHatchFireTabTitle">Zadnja uporaba zavihka Fire</string>
     <string name="newTabReturnHatchTabClosed">Zavihek zaprt</string>
     <string name="newTabReturnHatchUndo">Razveljavi</string>
-    <string name="hatchMenuReturnTab">Nazaj na zavihek</string>
+    <string name="hatchMenuReturnToLastUsedTab">Nazaj na nazadnje uporabljeni zavihek</string>
     <string name="hatchMenuAfterInactivitySettings">Po neaktivnosti</string>
-    <string name="hatchMenuCloseTab">Zapri zavihek</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Odpri nov zavihek</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Nazadnje uporabljeni zavihek</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="&apos;%1$s&apos; is the menu row label (&apos;After Inactivity&apos;) and &apos;%2$s&apos; is the current destination, e.g. &apos;After Inactivity, Open New Tab&apos;">%1$s, %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Zapri nazadnje uporabljeni zavihek</string>
     <string name="hatchMenuBurnTab">Izbriši zavihek</string>
-    <string name="hatchMenuHideShortcut">Skrij bližnjico</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="&apos;Return to&apos; refers to this menu&apos;s own &apos;Return to…&apos; label shown above this item">Skrij bližnjico »Nazaj na«</string>
 </resources>
