@@ -60,6 +60,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsMa
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialMode.ListMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialMode.Locked
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialMode.Viewing
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ExternalImportAuthSuppressor
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementCredentialsMode
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementDeviceUnsupportedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementDisabledMode
@@ -92,6 +93,9 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
 
     @Inject
     lateinit var deviceAuthenticator: DeviceAuthenticator
+
+    @Inject
+    lateinit var externalImportAuthSuppressor: ExternalImportAuthSuppressor
 
     @Inject
     lateinit var pixel: Pixel
@@ -147,9 +151,10 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
 
     override fun onStart() {
         super.onStart()
+        val suppressAuthPrompt = externalImportAuthSuppressor.consumeSuppression()
         lifecycleScope.launch {
             viewModel.onViewStarted()
-            viewModel.launchDeviceAuth()
+            viewModel.launchDeviceAuth(suppressAuthPrompt)
         }
     }
 
