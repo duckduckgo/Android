@@ -24,11 +24,11 @@ import com.duckduckgo.di.android.AndroidInjector
 class AndroidSupportInjection {
     companion object {
         inline fun <reified T : Fragment> inject(instance: T) {
-            AndroidInjector.inject(AndroidInjection.findHasDaggerInjectorForFragment(instance), instance)
+            AndroidInjector.inject(AndroidInjection.findInjectorForFragment(instance), instance)
         }
 
         inline fun <reified T : View> inject(instance: T) {
-            AndroidInjector.inject(AndroidInjection.findHasDaggerInjectorForView(instance), instance)
+            AndroidInjector.inject(AndroidInjection.findInjectorForView(instance), instance)
         }
     }
 }

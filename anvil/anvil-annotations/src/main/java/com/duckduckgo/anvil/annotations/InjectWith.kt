@@ -19,11 +19,11 @@ package com.duckduckgo.anvil.annotations
 import kotlin.reflect.KClass
 
 /**
- * Anvil annotation to generate the Dagger subcomponents for all Android types like Activities, Fragments, Services, etc.
+ * Anvil annotation to generate the injector subcomponents for all Android types like Activities, Fragments, Services, etc.
  *
  * Usage:
  * ```kotlin
- * @ContributesSubComponent(SomeDaggerScope::class)
+ * @ContributesSubComponent(SomeScope::class)
  * class MyActivity {
  *
  * }
@@ -35,6 +35,6 @@ annotation class InjectWith(
     /** The parent component scope to the contributed subcomponent */
     val scope: KClass<*>,
 
-    /** (optional) The binding class key to bind the dagger component */
+    /** (optional) The binding class key to bind the injector */
     val bindingKey: KClass<*> = Unit::class,
 )

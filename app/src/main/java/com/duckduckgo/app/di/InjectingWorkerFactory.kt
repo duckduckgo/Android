@@ -27,7 +27,7 @@ import logcat.LogPriority.INFO
 import logcat.asLog
 import logcat.logcat
 
-class DaggerWorkerFactory(
+class InjectingWorkerFactory(
     private val workerInjectorPluginPoint: PluginPoint<WorkerInjectorPlugin>,
 ) : WorkerFactory() {
 

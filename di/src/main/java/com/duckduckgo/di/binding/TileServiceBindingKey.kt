@@ -16,5 +16,5 @@
 
 package com.duckduckgo.di.binding
 
-interface TileServiceBingingKey
+interface TileServiceBindingKey
 interface VpnTileServiceBindingKey

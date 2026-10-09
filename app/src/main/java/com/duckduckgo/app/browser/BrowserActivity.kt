@@ -386,7 +386,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.daggerInject()
+        super.injectDependencies()
 
         val savedMode = savedInstanceState?.getString(KEY_SAVED_BROWSER_MODE)
         val modeChangedSinceSave = savedMode != null && savedMode != currentBrowserMode.name
@@ -405,7 +405,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         instanceStateBundles = CombinedInstanceState(originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
         pendingModeSwitch = newInstanceState?.getBundle(KEY_PENDING_MODE_SWITCH)?.toPendingModeSwitch()
 
-        super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
+        super.onCreate(savedInstanceState = newInstanceState, injectDependencies = false)
 
         if (modeChangedSinceSave) {
             // remove restored VM and fragments

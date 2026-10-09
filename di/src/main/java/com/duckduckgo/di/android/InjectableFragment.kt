@@ -24,15 +24,15 @@ import javax.inject.Inject
 
 @HasMemberInjections
 @SuppressLint("NoFragment") // this is base fragment class to be used instead of Fragment
-abstract class DaggerFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(contentLayoutId), HasDaggerInjector {
+abstract class InjectableFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(contentLayoutId), HasInjector {
     @Inject
     lateinit var injectorFactoryMap: InjectorFactoryMap
 
-    override fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*, *> {
+    override fun injectorFactoryFor(key: Class<*>): AndroidInjector.Factory<*, *> {
         return injectorFactoryMap.getFactory(key)
             ?: throw RuntimeException(
                 """
-                Could not find the dagger component for ${key.simpleName}.
+                Could not find the injector for ${key.simpleName}.
                 You probably forgot to annotate your class with @InjectWith(Scope::class).
                 """.trimIndent(),
             )

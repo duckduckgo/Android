@@ -18,12 +18,12 @@ package com.duckduckgo.common.ui
 
 import android.content.Context
 import androidx.annotation.LayoutRes
-import com.duckduckgo.di.android.DaggerFragment
+import com.duckduckgo.di.android.InjectableFragment
 import com.duckduckgo.di.android.support.AndroidSupportInjection
 import dev.zacsweers.metro.HasMemberInjections
 
 @HasMemberInjections
-abstract class DuckDuckGoFragment(@LayoutRes contentLayoutId: Int = 0) : DaggerFragment(contentLayoutId) {
+abstract class DuckDuckGoFragment(@LayoutRes contentLayoutId: Int = 0) : InjectableFragment(contentLayoutId) {
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)

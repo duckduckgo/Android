@@ -36,13 +36,13 @@ import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.ui.view.isFullScreen
 import com.duckduckgo.di.android.AndroidInjection
-import com.duckduckgo.di.android.DaggerActivity
+import com.duckduckgo.di.android.InjectableActivity
 import com.duckduckgo.mobile.android.R
 import dev.zacsweers.metro.HasMemberInjections
 import javax.inject.Inject
 
 @HasMemberInjections
-abstract class DuckDuckGoActivity : DaggerActivity() {
+abstract class DuckDuckGoActivity : InjectableActivity() {
 
     @Inject lateinit var viewModelFactory: ViewModelProvider.NewInstanceFactory
 
@@ -69,15 +69,15 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
     }
 
     /**
-     * We need to conditionally defer the Dagger initialization in certain places. So if this method
-     * is called from an Activity with daggerInject=false, you'll probably need to call
-     * daggerInject() directly.
+     * We need to conditionally defer the injection in certain places. So if this method
+     * is called from an Activity with injectDependencies=false, you'll probably need to call
+     * injectDependencies() directly.
      */
     fun onCreate(
         savedInstanceState: Bundle?,
-        daggerInject: Boolean = true,
+        injectDependencies: Boolean = true,
     ) {
-        if (daggerInject) daggerInject()
+        if (injectDependencies) injectDependencies()
         themeChangeReceiver = applyTheme(
             themingDataStore.theme,
             applyFireTheme,
@@ -89,8 +89,8 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
         super.onCreate(savedInstanceState)
     }
 
-    protected fun daggerInject() {
-        AndroidInjection.inject(this, bindingKey = DaggerActivity::class.java)
+    protected fun injectDependencies() {
+        AndroidInjection.inject(this, bindingKey = InjectableActivity::class.java)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -23,7 +23,7 @@ import kotlin.reflect.KClass
  *
  * Usage:
  * ```kotlin
- * @ContributesViewModel(SomeDaggerScope::class)
+ * @ContributesViewModel(SomeScope::class)
  * class MyViewModel @Inject constructor(...) {
  *
  * }

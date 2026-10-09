@@ -261,7 +261,7 @@ class FavoritesWidgetItemFactory(
 
     private fun inject(context: Context) {
         val application = context.applicationContext as DuckDuckGoApplication
-        application.daggerAppComponent.inject(this)
+        application.appComponent.inject(this)
     }
 
     companion object {

@@ -28,15 +28,15 @@ import androidx.fragment.app.findFragment
 import dev.zacsweers.metro.Provides
 import java.lang.RuntimeException
 
-interface HasDaggerInjector {
+interface HasInjector {
     /**
-     * This method returns the Dagger component factory given the key that identifies it.
-     * This dagger component factory relates to Android types like Activities, Fragments, Services etc.
-     * The component factory will be used by the [AndroidInjector] to do two things
-     *  1. creating the dagger component
+     * This method returns the injector factory given the key that identifies it.
+     * This injector factory relates to Android types like Activities, Fragments, Services etc.
+     * The injector factory will be used by the [AndroidInjector] to do two things
+     *  1. creating the injector
      *  2. inject the dependencies in the Android type (eg. Activity)
      */
-    fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*, *>
+    fun injectorFactoryFor(key: Class<*>): AndroidInjector.Factory<*, *>
 }
 
 interface AndroidInjector<T> {
@@ -59,9 +59,9 @@ interface AndroidInjector<T> {
     companion object {
         /**
          * This method will:
-         *  1. Uses the [Application] that should implement [HasDaggerInjector] to get the dagger component factory
+         *  1. Uses the [Application] that should implement [HasInjector] to get the injector factory
          *   the (Android type) instance passed as parameter
-         *  2. Use the factory to create the dagger component that relates to an Android type, eg. Activity
+         *  2. Use the factory to create the injector that relates to an Android type, eg. Activity
          *  3. Inject any dependency requested by the Android type
          */
         inline fun <reified T, R : AndroidInjector<T>> inject(
@@ -69,14 +69,14 @@ interface AndroidInjector<T> {
             instance: T,
             mapKey: Class<*>? = null,
         ) {
-            if ((injector is HasDaggerInjector)) {
-                (injector.daggerFactoryFor(mapKey ?: instance!!::class.java) as Factory<T, R>)
+            if ((injector is HasInjector)) {
+                (injector.injectorFactoryFor(mapKey ?: instance!!::class.java) as Factory<T, R>)
                     .create(instance)
                     .run {
                         javaClass.getMethod("inject", instance!!::class.java).invoke(this, instance)
                     }
             } else {
-                throw RuntimeException("${injector.javaClass.canonicalName} class does not extend ${HasDaggerInjector::class.simpleName}")
+                throw RuntimeException("${injector.javaClass.canonicalName} class does not extend ${HasInjector::class.simpleName}")
             }
         }
     }
@@ -102,7 +102,7 @@ class AndroidInjection {
             instance: T,
             bindingKey: Class<*>? = null,
         ) {
-            AndroidInjector.inject(findHasDaggerInjectorForFragment(instance), instance, bindingKey)
+            AndroidInjector.inject(findInjectorForFragment(instance), instance, bindingKey)
         }
 
         inline fun <reified T : Service> inject(
@@ -124,7 +124,7 @@ class AndroidInjection {
             instance: T,
             bindingKey: Class<*>? = null,
         ) {
-            AndroidInjector.inject(findHasDaggerInjectorForView(instance), instance, bindingKey)
+            AndroidInjector.inject(findInjectorForView(instance), instance, bindingKey)
         }
 
         /**
@@ -132,26 +132,26 @@ class AndroidInjection {
          * is thrown.
          *
          * The algorithm is the following:
-         * * walks the parent fragment hierarchy until if finds one that implements [HasDaggerInjector], else
-         * * uses the [fragment]'s and returns it if it implements [HasDaggerInjector], else
-         * * uses the [Application] and returns it if it implements [HasDaggerInjector], else
+         * * walks the parent fragment hierarchy until if finds one that implements [HasInjector], else
+         * * uses the [fragment]'s and returns it if it implements [HasInjector], else
+         * * uses the [Application] and returns it if it implements [HasInjector], else
          * * throws [IllegalArgumentException]
          */
-        fun findHasDaggerInjectorForFragment(fragment: Fragment): HasDaggerInjector {
+        fun findInjectorForFragment(fragment: Fragment): HasInjector {
             var parentFragment: Fragment? = fragment
             while (parentFragment?.parentFragment != null) {
                 parentFragment = parentFragment.parentFragment
 
-                if (parentFragment is HasDaggerInjector) {
+                if (parentFragment is HasInjector) {
                     return parentFragment
                 }
             }
             val activity = fragment.activity
-            if (activity is HasDaggerInjector) {
+            if (activity is HasInjector) {
                 return activity
             }
 
-            activity?.application?.let { return it as HasDaggerInjector }
+            activity?.application?.let { return it as HasInjector }
 
             throw IllegalArgumentException("No injector found for ${fragment.javaClass.canonicalName}")
         }
@@ -161,21 +161,21 @@ class AndroidInjection {
          * is thrown.
          *
          * The algorithm is the following:
-         * 1. Locate the [DaggerFragment] fragment where this view is attached. If found, return it.
-         * 2. If the view is not attached to a [DaggerFragment] fragment, find the activity where this view is attached. If the activity
-         * implements [HasDaggerInjector] the return it.
+         * 1. Locate the [InjectableFragment] fragment where this view is attached. If found, return it.
+         * 2. If the view is not attached to a [InjectableFragment] fragment, find the activity where this view is attached. If the activity
+         * implements [HasInjector] the return it.
          * 3. If above steps are unsuccessful throw [IllegalArgumentException].
          */
-        fun findHasDaggerInjectorForView(view: View): HasDaggerInjector {
+        fun findInjectorForView(view: View): HasInjector {
             try {
-                return view.findFragment<DaggerFragment>()
+                return view.findFragment<InjectableFragment>()
             } catch (e: IllegalStateException) {
-                // This view is not attached to a [DaggerFragment] fragment.
+                // This view is not attached to a [InjectableFragment] fragment.
             }
 
             var context = view.context
             while (context is ContextWrapper) {
-                if (context is Activity && context is HasDaggerInjector) {
+                if (context is Activity && context is HasInjector) {
                     return context
                 }
                 context = context.baseContext
