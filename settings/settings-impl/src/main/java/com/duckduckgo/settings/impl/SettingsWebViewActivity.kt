@@ -34,7 +34,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.getActivityParams
-import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import com.duckduckgo.settings.impl.databinding.ActivitySettingsWebviewBinding
 import kotlinx.coroutines.flow.launchIn
@@ -58,9 +57,6 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var settingsWebViewClient: SettingsWebViewClient
-
-    @Inject
-    lateinit var serpSettingsFeature: SerpSettingsFeature
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -166,23 +162,21 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
                 setSupportZoom(true)
             }
 
-            if (serpSettingsFeature.storeSerpSettings().isEnabled()) {
-                webView.webViewClient = settingsWebViewClient
+            webView.webViewClient = settingsWebViewClient
 
-                contentScopeScripts.register(
-                    webView,
-                    object : JsMessageCallback() {
-                        override fun process(
-                            featureName: String,
-                            method: String,
-                            id: String?,
-                            data: JSONObject?,
-                        ) {
-                            // No-op
-                        }
-                    },
-                )
-            }
+            contentScopeScripts.register(
+                webView,
+                object : JsMessageCallback() {
+                    override fun process(
+                        featureName: String,
+                        method: String,
+                        id: String?,
+                        data: JSONObject?,
+                    ) {
+                        // No-op
+                    }
+                },
+            )
         }
     }
 

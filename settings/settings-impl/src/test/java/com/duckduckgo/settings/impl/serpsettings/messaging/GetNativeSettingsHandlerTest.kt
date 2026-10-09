@@ -16,13 +16,9 @@
 
 package com.duckduckgo.settings.impl.serpsettings.messaging
 
-import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.JsMessage
-import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.settings.impl.serpsettings.fakes.FakeJsMessaging
 import com.duckduckgo.settings.impl.serpsettings.fakes.FakeSerpSettingsDataStore
 import kotlinx.coroutines.test.runTest
@@ -33,15 +29,12 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class GetNativeSettingsHandlerTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val fakeSerpSettingsFeature: SerpSettingsFeature =
-        FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
     private lateinit var fakeDataStore: FakeSerpSettingsDataStore
     private lateinit var fakeJsMessaging: FakeJsMessaging
     private lateinit var handler: GetNativeSettingsHandler
@@ -54,7 +47,6 @@ class GetNativeSettingsHandlerTest {
         handler = GetNativeSettingsHandler(
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             appScope = coroutineTestRule.testScope,
-            serpSettingsFeature = fakeSerpSettingsFeature,
             serpSettingsDataStore = fakeDataStore,
         )
     }
@@ -79,23 +71,7 @@ class GetNativeSettingsHandlerTest {
     }
 
     @Test
-    fun `when feature flag is disabled then no response is sent`() = runTest {
-        fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = false))
-        val jsMessage = createJsMessage()
-
-        handler.getJsMessageHandler().process(
-            jsMessage = jsMessage,
-            jsMessaging = fakeJsMessaging,
-            jsMessageCallback = null,
-        )
-        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-
-        assertEquals(0, fakeJsMessaging.getResponseCount())
-    }
-
-    @Test
     fun `when settings are null then returns noNativeSettings true`() = runTest {
-        fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
         fakeDataStore.reset()
         val jsMessage = createJsMessage()
 
@@ -116,7 +92,6 @@ class GetNativeSettingsHandlerTest {
 
     @Test
     fun `when settings are empty JSON object then returns empty JSONObject`() = runTest {
-        fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
         fakeDataStore.setSerpSettings("{}")
         val jsMessage = createJsMessage()
 
@@ -136,7 +111,6 @@ class GetNativeSettingsHandlerTest {
 
     @Test
     fun `when settings contain valid JSON then parses and returns JSONObject`() = runTest {
-        fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
         val settingsJson = """{"isDuckAiEnabled":"true","duckAiTitle":"Duck.AI"}"""
         fakeDataStore.setSerpSettings(settingsJson)
         val jsMessage = createJsMessage()
@@ -156,7 +130,6 @@ class GetNativeSettingsHandlerTest {
 
     @Test
     fun `when id is null then no response is sent`() = runTest {
-        fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
         fakeDataStore.setSerpSettings("""{"isDuckAiEnabled":"true"}""")
 
         val jsMessage = JsMessage(
@@ -175,7 +148,6 @@ class GetNativeSettingsHandlerTest {
 
     @Test
     fun `when id is not null then response is sent`() = runTest {
-        fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
         fakeDataStore.setSerpSettings("""{"isDuckAiEnabled":"true"}""")
 
         val jsMessage = JsMessage(
@@ -196,7 +168,6 @@ class GetNativeSettingsHandlerTest {
 
     @Test
     fun `returns noNativeSettings true until settings are stored`() = runTest {
-        fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
         fakeDataStore.reset()
         val jsMessage = createJsMessage()
 

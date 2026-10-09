@@ -21,13 +21,10 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig.Preferen
 import com.duckduckgo.app.onboarding.ui.page.configdriven.TextConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin.Preference
 import com.duckduckgo.settings.api.SerpSettingsDataProvider
-import com.duckduckgo.settings.api.SerpSettingsFeature
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
@@ -37,7 +34,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -53,7 +49,6 @@ class OnboardingPreferenceCatalogImplTest {
 
     private val navigationHistory: NavigationHistory = mock()
     private val serpSettingsDataProvider: SerpSettingsDataProvider = mock()
-    private val serpSettingsFeature: SerpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
     private val adBlockingPlugin = FakeOnboardingBooleanPreferencePlugin()
     private val rejectOptionalCookiesPlugin = FakeOnboardingBooleanPreferencePlugin(
         id = OnboardingBooleanPreferencePlugin.Id.RejectOptionalCookies,
@@ -84,15 +79,9 @@ class OnboardingPreferenceCatalogImplTest {
     private val testee = OnboardingPreferenceCatalogImpl(
         navigationHistory = navigationHistory,
         serpSettingsDataProvider = serpSettingsDataProvider,
-        serpSettingsFeature = serpSettingsFeature,
         booleanPreferencePlugins = booleanPreferencePlugins,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
-
-    @Before
-    fun setup() {
-        serpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
-    }
 
     private suspend fun rowFor(preference: OnboardingPreference): Row? = testee.offer(listOf(preference)).singleOrNull()
 
@@ -128,8 +117,7 @@ class OnboardingPreferenceCatalogImplTest {
     }
 
     @Test
-    fun `when serp settings storage enabled then serp backed preferences are offered`() = runTest {
-        serpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
+    fun `when serp backed preferences are requested then they are offered`() = runTest {
         whenever(serpSettingsDataProvider.observeSetting("kp")).thenReturn(flowOf(null))
 
         val offered = testee.offer(
@@ -147,22 +135,6 @@ class OnboardingPreferenceCatalogImplTest {
                 OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
             ),
             offered.map { it.preference },
-        )
-    }
-
-    @Test
-    fun `when serp settings storage disabled then serp backed preferences are not offered`() = runTest {
-        serpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = false))
-
-        assertEquals(
-            emptyList<Row>(),
-            testee.offer(
-                listOf(
-                    OnboardingPreference.SAFE_SEARCH,
-                    OnboardingPreference.SEARCH_ASSIST,
-                    OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
-                ),
-            ),
         )
     }
 

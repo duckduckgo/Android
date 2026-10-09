@@ -16,16 +16,12 @@
 
 package com.duckduckgo.settings.impl
 
-import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeScriptsSubscriptionEventPlugin
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.settings.impl.SettingsWebViewViewModel.Command
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -37,7 +33,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@SuppressLint("DenyListedApi")
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class SettingsWebViewViewModelTest {
@@ -47,7 +42,6 @@ class SettingsWebViewViewModelTest {
 
     private lateinit var viewModel: SettingsWebViewViewModel
     private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
-    private var fakeSerpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
 
     @Before
     fun setup() {
@@ -55,7 +49,6 @@ class SettingsWebViewViewModelTest {
 
         viewModel = SettingsWebViewViewModel(
             contentScopeScriptsSubscriptionEventPluginPoint = fakeContentScopeScriptsSubscriptionEventPluginPoint,
-            serpSettingsFeature = fakeSerpSettingsFeature,
         )
     }
 
@@ -83,8 +76,6 @@ class SettingsWebViewViewModelTest {
 
     @Test
     fun whenOnViewResumedWithNoPluginsThenNoSubscriptionEventsSent() = runTest {
-        fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(State(enable = true))
-
         viewModel.onResume()
 
         viewModel.subscriptionEventDataFlow.test {
@@ -95,7 +86,6 @@ class SettingsWebViewViewModelTest {
 
     @Test
     fun whenOnViewResumedWithPluginsThenSubscriptionEventsSent() = runTest {
-        fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(State(enable = true))
         val events = mutableListOf<SubscriptionEventData>().apply {
             add(
                 SubscriptionEventData(
@@ -126,38 +116,6 @@ class SettingsWebViewViewModelTest {
                 assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
                 assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
             }
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnViewResumedWithPluginsAndSerpSettingsFeatureFlagOffThenNoEventsSent() = runTest {
-        fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(State(enable = false))
-        val events = mutableListOf<SubscriptionEventData>().apply {
-            add(
-                SubscriptionEventData(
-                    featureName = "event1",
-                    subscriptionName = "subscription1",
-                    params = JSONObject().put("param1", "value1"),
-                ),
-            )
-            add(
-                SubscriptionEventData(
-                    featureName = "event2",
-                    subscriptionName = "subscription2",
-                    params = JSONObject().put("param2", "value2"),
-                ),
-            )
-        }
-
-        fakeContentScopeScriptsSubscriptionEventPluginPoint.addPlugins(
-            events.map { FakeContentScopeScriptsSubscriptionEventPlugin(it) },
-        )
-
-        viewModel.onResume()
-
-        viewModel.subscriptionEventDataFlow.test {
-            expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
     }

@@ -99,7 +99,6 @@ import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.referral.api.AppReferrer
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.request.interception.api.RequestBlocklist
-import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.tracker.detection.api.TrackerDetector
 import com.duckduckgo.user.agent.api.UserAgentProvider
@@ -123,9 +122,6 @@ class BrowserModule {
         statisticsStore: StatisticsDataStore,
         variantManager: VariantManager,
         appReferrer: AppReferrer,
-        duckChat: DuckChat,
-        androidBrowserConfigFeature: AndroidBrowserConfigFeature,
-        serpSettingsFeature: SerpSettingsFeature,
         deviceInfo: DeviceInfo,
     ): RequestRewriter {
         return DuckDuckGoRequestRewriter(
@@ -133,9 +129,6 @@ class BrowserModule {
             statisticsStore,
             variantManager,
             appReferrer,
-            duckChat,
-            androidBrowserConfigFeature,
-            serpSettingsFeature,
             deviceInfo,
         )
     }
