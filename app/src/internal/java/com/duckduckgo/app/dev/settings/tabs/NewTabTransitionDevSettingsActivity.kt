@@ -23,6 +23,8 @@ import androidx.core.view.isVisible
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityNewTabTransitionDevSettingsBinding
+import com.duckduckgo.app.browser.tabs.ContainerTransformSource
+import com.duckduckgo.app.browser.tabs.ContainerTransformStartSize
 import com.duckduckgo.app.browser.tabs.NewTabTransition
 import com.duckduckgo.app.browser.tabs.NewTabTransitionSettings
 import com.duckduckgo.app.browser.tabs.TabManagerCloseBehaviour
@@ -58,7 +60,12 @@ class NewTabTransitionDevSettingsActivity : DuckDuckGoActivity() {
         binding.animateClosingTabsToggle.quietlySetIsChecked(newTabTransitionSettings.animateClosingTabs) { _, isChecked ->
             newTabTransitionSettings.animateClosingTabs = isChecked
         }
+        binding.containerRoundedCornersToggle.quietlySetIsChecked(newTabTransitionSettings.containerTransformRoundedCorners) { _, isChecked ->
+            newTabTransitionSettings.containerTransformRoundedCorners = isChecked
+        }
         binding.transitionSelector.setOnClickListener { showTransitionPicker() }
+        binding.containerSourceSelector.setOnClickListener { showContainerSourcePicker() }
+        binding.containerStartSizeSelector.setOnClickListener { showContainerStartSizePicker() }
         binding.tabManagerCloseSelector.setOnClickListener { showTabManagerClosePicker() }
         render()
     }
@@ -73,6 +80,16 @@ class NewTabTransitionDevSettingsActivity : DuckDuckGoActivity() {
         binding.swipingTabsNote.isVisible = newTabTransitionSettings.isOverrideEnabled
         binding.transitionSelector.isEnabled = newTabTransitionSettings.isOverrideEnabled
         binding.transitionSelector.setSecondaryText(getString(newTabTransitionSettings.transition.label()))
+        val isContainerTransform = newTabTransitionSettings.transition == NewTabTransition.CONTAINER_TRANSFORM
+        val isBottomCentered = newTabTransitionSettings.containerTransformSource == ContainerTransformSource.BOTTOM_CENTERED
+        binding.containerSourceSelector.isVisible = isContainerTransform
+        binding.containerSourceSelector.isEnabled = newTabTransitionSettings.isOverrideEnabled
+        binding.containerSourceSelector.setSecondaryText(getString(newTabTransitionSettings.containerTransformSource.label()))
+        binding.containerStartSizeSelector.isVisible = isContainerTransform
+        binding.containerStartSizeSelector.isEnabled = newTabTransitionSettings.isOverrideEnabled && isBottomCentered
+        binding.containerStartSizeSelector.setSecondaryText(getString(newTabTransitionSettings.containerTransformStartSize.label()))
+        binding.containerRoundedCornersToggle.isVisible = isContainerTransform
+        binding.containerRoundedCornersToggle.isEnabled = newTabTransitionSettings.isOverrideEnabled
         binding.animateClosingTabsToggle.isEnabled = newTabTransitionSettings.isOverrideEnabled
         binding.tabManagerCloseSelector.isEnabled = newTabTransitionSettings.isOverrideEnabled
         binding.tabManagerCloseSelector.setSecondaryText(getString(newTabTransitionSettings.tabManagerCloseBehaviour.label()))
@@ -90,6 +107,39 @@ class NewTabTransitionDevSettingsActivity : DuckDuckGoActivity() {
 
     private fun onTransitionSelected(transition: NewTabTransition) {
         newTabTransitionSettings.transition = transition
+        render()
+    }
+
+    private fun showContainerSourcePicker() {
+        val popup = PopupMenu(layoutInflater, R.layout.popup_window_container_transform_source)
+        val view = popup.contentView
+        popup.apply {
+            onMenuItemClicked(view.findViewById(R.id.toolbarIcons)) { onContainerSourceSelected(ContainerTransformSource.TOOLBAR_ICONS) }
+            onMenuItemClicked(view.findViewById(R.id.bottomCentered)) { onContainerSourceSelected(ContainerTransformSource.BOTTOM_CENTERED) }
+        }
+        popup.show(binding.root, binding.containerSourceSelector)
+    }
+
+    private fun onContainerSourceSelected(source: ContainerTransformSource) {
+        newTabTransitionSettings.containerTransformSource = source
+        render()
+    }
+
+    private fun showContainerStartSizePicker() {
+        val popup = PopupMenu(layoutInflater, R.layout.popup_window_container_transform_start_size)
+        val view = popup.contentView
+        popup.apply {
+            onMenuItemClicked(view.findViewById(R.id.startSizeQuarter)) { onContainerStartSizeSelected(ContainerTransformStartSize.QUARTER) }
+            onMenuItemClicked(view.findViewById(R.id.startSizeHalf)) { onContainerStartSizeSelected(ContainerTransformStartSize.HALF) }
+            onMenuItemClicked(view.findViewById(R.id.startSizeThreeQuarters)) {
+                onContainerStartSizeSelected(ContainerTransformStartSize.THREE_QUARTERS)
+            }
+        }
+        popup.show(binding.root, binding.containerStartSizeSelector)
+    }
+
+    private fun onContainerStartSizeSelected(startSize: ContainerTransformStartSize) {
+        newTabTransitionSettings.containerTransformStartSize = startSize
         render()
     }
 
@@ -111,6 +161,17 @@ class NewTabTransitionDevSettingsActivity : DuckDuckGoActivity() {
     private fun NewTabTransition.label(): Int = when (this) {
         NewTabTransition.SHARED_AXIS -> R.string.newTabTransitionDevSettingsSharedAxis
         NewTabTransition.CONTAINER_TRANSFORM -> R.string.newTabTransitionDevSettingsContainerTransform
+    }
+
+    private fun ContainerTransformSource.label(): Int = when (this) {
+        ContainerTransformSource.TOOLBAR_ICONS -> R.string.newTabTransitionDevSettingsContainerSourceToolbarIcons
+        ContainerTransformSource.BOTTOM_CENTERED -> R.string.newTabTransitionDevSettingsContainerSourceBottomCentered
+    }
+
+    private fun ContainerTransformStartSize.label(): Int = when (this) {
+        ContainerTransformStartSize.QUARTER -> R.string.newTabTransitionDevSettingsContainerStartSizeQuarter
+        ContainerTransformStartSize.HALF -> R.string.newTabTransitionDevSettingsContainerStartSizeHalf
+        ContainerTransformStartSize.THREE_QUARTERS -> R.string.newTabTransitionDevSettingsContainerStartSizeThreeQuarters
     }
 
     private fun TabManagerCloseBehaviour.label(): Int = when (this) {

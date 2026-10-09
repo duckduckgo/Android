@@ -24,46 +24,73 @@
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar" />
 
-    <LinearLayout
-        android:id="@+id/contentLayout"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-            android:id="@+id/transitionOverrideToggle"
+        <LinearLayout
+            android:id="@+id/contentLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:primaryText="@string/newTabTransitionDevSettingsOverride"
-            app:showSwitch="true" />
+            android:orientation="vertical">
 
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/swipingTabsNote"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingHorizontal="@dimen/keyline_4"
-            android:paddingBottom="@dimen/keyline_2"
-            android:text="@string/newTabTransitionDevSettingsSwipingTabsNote"
-            android:visibility="gone"
-            app:typography="body2" />
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/transitionOverrideToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/newTabTransitionDevSettingsOverride"
+                app:showSwitch="true" />
 
-        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-            android:id="@+id/transitionSelector"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryText="@string/newTabTransitionDevSettingsTransition" />
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/swipingTabsNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/keyline_4"
+                android:paddingBottom="@dimen/keyline_2"
+                android:text="@string/newTabTransitionDevSettingsSwipingTabsNote"
+                android:visibility="gone"
+                app:typography="body2" />
 
-        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-            android:id="@+id/animateClosingTabsToggle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryText="@string/newTabTransitionDevSettingsAnimateClosingTabs"
-            app:showSwitch="true" />
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/transitionSelector"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/newTabTransitionDevSettingsTransition" />
 
-        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-            android:id="@+id/tabManagerCloseSelector"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryText="@string/newTabTransitionDevSettingsTabManagerClose" />
-    </LinearLayout>
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/containerSourceSelector"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/newTabTransitionDevSettingsContainerSource" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/containerStartSizeSelector"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/newTabTransitionDevSettingsContainerStartSize" />
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/containerRoundedCornersToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/newTabTransitionDevSettingsContainerRoundedCorners"
+                app:showSwitch="true" />
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/animateClosingTabsToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/newTabTransitionDevSettingsAnimateClosingTabs"
+                app:showSwitch="true" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/tabManagerCloseSelector"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/newTabTransitionDevSettingsTabManagerClose" />
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

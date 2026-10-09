@@ -72,6 +72,9 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.applyAddressBarRebrandRadius
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.state.ModeSwitchRecreateSignal
+import com.duckduckgo.app.browser.tabs.ContainerTransformOptions
+import com.duckduckgo.app.browser.tabs.ContainerTransformSource
+import com.duckduckgo.app.browser.tabs.ContainerTransformStartSize
 import com.duckduckgo.app.browser.tabs.NewTabTransition
 import com.duckduckgo.app.browser.tabs.NewTabTransitionSettings
 import com.duckduckgo.app.browser.tabs.TabManager
@@ -264,6 +267,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private var newTabTransition: NewTabTransition? = null
     private var closeTabTransition: NewTabTransition? = null
+    private var containerTransformOptions = ContainerTransformOptions(
+        source = ContainerTransformSource.TOOLBAR_ICONS,
+        startSize = ContainerTransformStartSize.THREE_QUARTERS,
+        roundedCorners = true,
+    )
     private val tabIdsPendingRemoval = mutableSetOf<String>()
     private var closingTabId: String? = null
     private var closingTabRequestedAt = 0L
@@ -643,10 +651,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
         super.onResume()
         lifecycleScope.launch {
             withContext(dispatcherProvider.io()) {
-                newTabTransitionSettings.enabledTransition() to newTabTransitionSettings.enabledCloseTransition()
-            }.let { (openTransition, closeTransition) ->
+                Triple(
+                    newTabTransitionSettings.enabledTransition(),
+                    newTabTransitionSettings.enabledCloseTransition(),
+                    newTabTransitionSettings.containerTransformOptions(),
+                )
+            }.let { (openTransition, closeTransition, containerOptions) ->
                 newTabTransition = openTransition
                 closeTabTransition = closeTransition
+                containerTransformOptions = containerOptions
             }
         }
         appReturnPixelSender.fireIfNeeded(pendingLaunchSource ?: LaunchSourceValues.STANDARD)
@@ -751,7 +764,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             // its view would be re-attached to the window after the fragment is gone.
             val canAnimateOut = tab.isAdded && !tab.isRemoving && tab.tabId !in tabIdsPendingRemoval
             if (isNewTab && transition != null && canAnimateOut) {
-                transaction.applyNewTabTransition(transition, supportFragmentManager, from = tab, to = fragment)
+                transaction.applyNewTabTransition(transition, supportFragmentManager, from = tab, to = fragment, containerTransformOptions)
             }
             transaction.hide(tab)
             transaction.add(R.id.fragmentContainer, fragment, tabId)
@@ -823,7 +836,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
         revealed: BrowserTabFragment,
     ) {
         closingTabId = null
-        closeTabTransition?.let { applyCloseTabTransition(it, supportFragmentManager, closing = closingTab, revealed = revealed) }
+        closeTabTransition?.let {
+            applyCloseTabTransition(
+                transition = it,
+                fragmentManager = supportFragmentManager,
+                closing = closingTab,
+                revealed = revealed,
+                containerOptions = containerTransformOptions,
+            )
+        }
         tabIdsPendingRemoval.add(closingTab.tabId)
         hide(closingTab)
         lastActiveTabs.remove(closingTab.tabId)

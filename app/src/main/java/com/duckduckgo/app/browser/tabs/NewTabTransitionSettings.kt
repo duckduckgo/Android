@@ -29,6 +29,9 @@ interface NewTabTransitionSettings {
     var transition: NewTabTransition
     var tabManagerCloseBehaviour: TabManagerCloseBehaviour
     var animateClosingTabs: Boolean
+    var containerTransformSource: ContainerTransformSource
+    var containerTransformStartSize: ContainerTransformStartSize
+    var containerTransformRoundedCorners: Boolean
 
     /** Reads SharedPreferences, so call it off the main thread. Null when the override is off. */
     fun enabledTransition(): NewTabTransition?
@@ -38,7 +41,27 @@ interface NewTabTransitionSettings {
 
     /** Whether the tab manager skips its close animation when it opens a new tab. Reads SharedPreferences. */
     fun hidesTabManagerImmediately(): Boolean
+
+    /** Reads SharedPreferences, so call it off the main thread. */
+    fun containerTransformOptions(): ContainerTransformOptions
 }
+
+enum class ContainerTransformSource {
+    TOOLBAR_ICONS,
+    BOTTOM_CENTERED,
+}
+
+enum class ContainerTransformStartSize(val fraction: Float) {
+    QUARTER(0.25f),
+    HALF(0.5f),
+    THREE_QUARTERS(0.75f),
+}
+
+data class ContainerTransformOptions(
+    val source: ContainerTransformSource,
+    val startSize: ContainerTransformStartSize,
+    val roundedCorners: Boolean,
+)
 
 enum class TabManagerCloseBehaviour {
     SLIDE,
@@ -70,6 +93,22 @@ class NewTabTransitionSharedPreferences @Inject constructor(private val context:
         get() = preferences.getBoolean(KEY_ANIMATE_CLOSING_TABS, true)
         set(enabled) = preferences.edit { putBoolean(KEY_ANIMATE_CLOSING_TABS, enabled) }
 
+    override var containerTransformSource: ContainerTransformSource
+        get() = preferences.getString(KEY_CONTAINER_TRANSFORM_SOURCE, null)
+            ?.let { saved -> ContainerTransformSource.entries.firstOrNull { it.name == saved } }
+            ?: ContainerTransformSource.TOOLBAR_ICONS
+        set(value) = preferences.edit { putString(KEY_CONTAINER_TRANSFORM_SOURCE, value.name) }
+
+    override var containerTransformStartSize: ContainerTransformStartSize
+        get() = preferences.getString(KEY_CONTAINER_TRANSFORM_START_SIZE, null)
+            ?.let { saved -> ContainerTransformStartSize.entries.firstOrNull { it.name == saved } }
+            ?: ContainerTransformStartSize.THREE_QUARTERS
+        set(value) = preferences.edit { putString(KEY_CONTAINER_TRANSFORM_START_SIZE, value.name) }
+
+    override var containerTransformRoundedCorners: Boolean
+        get() = preferences.getBoolean(KEY_CONTAINER_TRANSFORM_ROUNDED_CORNERS, true)
+        set(enabled) = preferences.edit { putBoolean(KEY_CONTAINER_TRANSFORM_ROUNDED_CORNERS, enabled) }
+
     override fun enabledTransition(): NewTabTransition? = if (isOverrideEnabled) transition else null
 
     override fun enabledCloseTransition(): NewTabTransition? = if (isOverrideEnabled && animateClosingTabs) transition else null
@@ -77,11 +116,20 @@ class NewTabTransitionSharedPreferences @Inject constructor(private val context:
     override fun hidesTabManagerImmediately(): Boolean =
         isOverrideEnabled && tabManagerCloseBehaviour == TabManagerCloseBehaviour.HIDE_IMMEDIATELY
 
+    override fun containerTransformOptions(): ContainerTransformOptions = ContainerTransformOptions(
+        source = containerTransformSource,
+        startSize = containerTransformStartSize,
+        roundedCorners = containerTransformRoundedCorners,
+    )
+
     private companion object {
         const val FILENAME = "com.duckduckgo.app.browser.tabs.new_tab_transition"
         const val KEY_OVERRIDE_ENABLED = "KEY_OVERRIDE_ENABLED"
         const val KEY_TRANSITION = "KEY_TRANSITION"
         const val KEY_TAB_MANAGER_CLOSE_BEHAVIOUR = "KEY_TAB_MANAGER_CLOSE_BEHAVIOUR"
         const val KEY_ANIMATE_CLOSING_TABS = "KEY_ANIMATE_CLOSING_TABS"
+        const val KEY_CONTAINER_TRANSFORM_SOURCE = "KEY_CONTAINER_TRANSFORM_SOURCE"
+        const val KEY_CONTAINER_TRANSFORM_START_SIZE = "KEY_CONTAINER_TRANSFORM_START_SIZE"
+        const val KEY_CONTAINER_TRANSFORM_ROUNDED_CORNERS = "KEY_CONTAINER_TRANSFORM_ROUNDED_CORNERS"
     }
 }

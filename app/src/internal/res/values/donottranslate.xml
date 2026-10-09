@@ -147,6 +147,14 @@
     <string name="newTabTransitionDevSettingsTransition">Transition</string>
     <string name="newTabTransitionDevSettingsSharedAxis">Forward and backward</string>
     <string name="newTabTransitionDevSettingsContainerTransform">Container transform</string>
+    <string name="newTabTransitionDevSettingsContainerSource">Transition source</string>
+    <string name="newTabTransitionDevSettingsContainerSourceToolbarIcons">Toolbar icons</string>
+    <string name="newTabTransitionDevSettingsContainerSourceBottomCentered">Bottom centered</string>
+    <string name="newTabTransitionDevSettingsContainerStartSize">Starting size</string>
+    <string name="newTabTransitionDevSettingsContainerStartSizeQuarter" formatted="false">25%</string>
+    <string name="newTabTransitionDevSettingsContainerStartSizeHalf" formatted="false">50%</string>
+    <string name="newTabTransitionDevSettingsContainerStartSizeThreeQuarters" formatted="false">75%</string>
+    <string name="newTabTransitionDevSettingsContainerRoundedCorners">Rounded corners during transition</string>
     <string name="newTabTransitionDevSettingsAnimateClosingTabs">Animate closing tabs</string>
     <string name="newTabTransitionDevSettingsTabManagerClose">Tab manager close behaviour</string>
     <string name="newTabTransitionDevSettingsTabManagerSlide">Sliding (default)</string>
