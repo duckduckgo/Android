@@ -302,7 +302,7 @@ class FailureRecoveryHandlerTest {
     fun whenFailureRecoveryAndServerDidNotChangeAndDifferentPortSelectedThenRefreshNetp() = runTest {
         vpnRemoteFeatures.endpointPortFallback().setRawStoredState(Toggle.State(enable = true))
         givenFailureRecoveryReturnsSameServer()
-        whenever(portProbingCoordinator.probeAndSelect()).thenReturn(portProbeResult(portChanged = true))
+        whenever(portProbingCoordinator.probeAndSelect()).thenReturn(portProbeResult(shouldSwitchPort = true))
 
         failureRecoveryHandler.onTunnelFailure(coroutineTestRule.testScope, TimeUnit.MINUTES.toSeconds(3))
 
@@ -318,7 +318,7 @@ class FailureRecoveryHandlerTest {
     fun whenFailureRecoveryAndServerDidNotChangeAndSamePortSelectedThenDoNothing() = runTest {
         vpnRemoteFeatures.endpointPortFallback().setRawStoredState(Toggle.State(enable = true))
         givenFailureRecoveryReturnsSameServer()
-        whenever(portProbingCoordinator.probeAndSelect()).thenReturn(portProbeResult(portChanged = false))
+        whenever(portProbingCoordinator.probeAndSelect()).thenReturn(portProbeResult(shouldSwitchPort = false))
 
         failureRecoveryHandler.onTunnelFailure(coroutineTestRule.testScope, TimeUnit.MINUTES.toSeconds(3))
 
@@ -364,11 +364,9 @@ class FailureRecoveryHandlerTest {
         whenever(wgTunnel.createWgConfig(anyOrNull())).thenReturn(Result.success(getWgConfig(defaultServerData)))
     }
 
-    private fun portProbeResult(portChanged: Boolean) = PortProbeResult(
-        probedPort = 51820L,
+    private fun portProbeResult(shouldSwitchPort: Boolean) = PortProbeResult(
         selectedPort = 51820L,
-        shouldRemember = true,
-        portChanged = portChanged,
+        shouldSwitchPort = shouldSwitchPort,
     )
 
     private fun getWgConfig(serverData: WgServerData): Config {
