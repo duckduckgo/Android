@@ -30,9 +30,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -55,8 +53,11 @@ class OnboardingDevSettingsViewModelTest {
         CtaId.DAX_INTRO_PRIVACY_PRO,
     )
 
-    /** requiredCtas + ADD_WIDGET + DAX_INTRO_VISIT_SITE (matches ViewModel's visibleCtaIds()). */
-    private val allCtaIds = requiredCtas + listOf(CtaId.ADD_WIDGET, CtaId.DAX_INTRO_VISIT_SITE)
+    private val allCtaIds = requiredCtas + listOf(
+        CtaId.DAX_INTRO_VISIT_SITE,
+        CtaId.DAX_DIALOG_NETWORK,
+        CtaId.DAX_DIALOG_OTHER,
+    )
 
     private val testee = OnboardingDevSettingsViewModel(
         userStageStore = userStageStore,
@@ -143,6 +144,7 @@ class OnboardingDevSettingsViewModelTest {
         whenever(ctaViewModel.requiredDaxOnboardingCtas()).thenReturn(requiredCtas)
         allCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(false) }
 
+        testee.start()
         testee.onOnboardingCompletedToggled(true)
 
         verify(userStageStore).moveToStage(AppStage.ESTABLISHED)
@@ -156,6 +158,7 @@ class OnboardingDevSettingsViewModelTest {
         whenever(ctaViewModel.requiredDaxOnboardingCtas()).thenReturn(requiredCtas)
         allCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(true) }
 
+        testee.start()
         testee.onOnboardingCompletedToggled(false)
 
         verify(userStageStore).moveToStage(AppStage.DAX_ONBOARDING)
@@ -205,25 +208,5 @@ class OnboardingDevSettingsViewModelTest {
         testee.onCtaDismissedToggled(CtaId.DAX_INTRO, isDismissed = false)
 
         verify(dismissedCtaDao).delete(CtaId.DAX_INTRO)
-    }
-
-    @Test
-    fun whenAddWidgetToggledThenOnlyDaoUpdatedNoStageChange() = runTest {
-        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
-        whenever(settingsDataStore.hideTips).thenReturn(false)
-        whenever(ctaViewModel.requiredDaxOnboardingCtas()).thenReturn(requiredCtas)
-        allCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(false) }
-
-        testee.onCtaDismissedToggled(CtaId.ADD_WIDGET, isDismissed = true)
-
-        verify(dismissedCtaDao).insert(DismissedCta(CtaId.ADD_WIDGET))
-        verify(userStageStore, never()).moveToStage(any())
-    }
-
-    @Test
-    fun isIndependentCtaReturnsTrueOnlyForAddWidget() {
-        assertTrue(testee.isIndependentCta(CtaId.ADD_WIDGET))
-        assertFalse(testee.isIndependentCta(CtaId.DAX_INTRO))
-        assertFalse(testee.isIndependentCta(CtaId.DAX_END))
     }
 }
