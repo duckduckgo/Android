@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Witryna „%1$s” chce uzyskać dostęp do Twojego aparatu</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Witryna „%1$s” chce uzyskać dostęp do Twojego mikrofonu</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Witryna „%1$s” chce uzyskać dostęp do Twojego aparatu i mikrofonu</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s” chce uzyskać dostęp do Twojej lokalizacji w tej witrynie</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s” chce uzyskać dostęp do Twojego aparatu w tej witrynie</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s” chce uzyskać dostęp do Twojego mikrofonu w tej witrynie</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s” chce uzyskać dostęp do Twojego aparatu i mikrofonu w tej witrynie</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s” chce uzyskać dostęp do twojego oprogramowania do zarządzania prawami cyfrowymi (DRM) w tej witrynie</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Jeśli nie zezwolisz, filmy na stronie mogą stać się niedostępne, ale ta strona nie będzie miała dostępu do identyfikatorów urządzeń dostarczanych przez oprogramowanie DRM.</string>
 
     <!-- Reminder dialog -->
