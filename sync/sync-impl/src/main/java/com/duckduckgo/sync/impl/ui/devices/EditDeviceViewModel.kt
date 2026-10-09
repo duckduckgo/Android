@@ -26,6 +26,7 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncFeature
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -42,17 +43,27 @@ class EditDeviceViewModel @AssistedInject constructor(
     @Assisted device: ConnectedDevice,
     private val syncAccountRepository: SyncAccountRepository,
     private val dispatchers: DispatcherProvider,
+    private val syncFeature: SyncFeature,
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(
         ViewState(
             device = device,
             isEditingName = false,
+            isImprovedSyncEnabled = false,
         ),
     )
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
 
     private val _commands = Channel<Command>(Channel.BUFFERED)
     val commands: Flow<Command> = _commands.receiveAsFlow()
+
+    init {
+        viewModelScope.launch {
+            syncFeature.canUseImprovedSyncFlow().enabled().collect { isEnabled ->
+                _viewState.update { current -> current.copy(isImprovedSyncEnabled = isEnabled) }
+            }
+        }
+    }
 
     fun onEditDeviceName() {
         viewModelScope.launch {
@@ -119,6 +130,7 @@ class EditDeviceViewModel @AssistedInject constructor(
     data class ViewState(
         val device: ConnectedDevice,
         val isEditingName: Boolean,
+        val isImprovedSyncEnabled: Boolean,
     )
 
     sealed interface Command {
