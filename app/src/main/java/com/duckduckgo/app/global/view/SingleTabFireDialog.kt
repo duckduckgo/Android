@@ -386,6 +386,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
                 isAppearanceLightStatusBars = false
                 isAppearanceLightNavigationBars = false
             }
+            setDimAmount(0f)
         }
         isCancelable = false
         binding.fireAnimationView.show()
