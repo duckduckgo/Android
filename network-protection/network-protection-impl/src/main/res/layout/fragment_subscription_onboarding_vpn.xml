@@ -40,8 +40,8 @@
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/subscriptionOnboardingVpnHeaderAnimation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="128dp"
+                android:layout_height="96dp"
                 android:layout_gravity="center_horizontal"
                 android:importantForAccessibility="no" />
 
