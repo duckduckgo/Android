@@ -170,7 +170,7 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
                 }
                 if (celebrate) {
                     doOnEnd {
-                        binding.subscriptionOnboardingCompletionConfetti.fire(anchor = binding.subscriptionOnboardingCompletionIcon)
+                        binding.subscriptionOnboardingCompletionConfetti.fire()
                     }
                 }
                 start()

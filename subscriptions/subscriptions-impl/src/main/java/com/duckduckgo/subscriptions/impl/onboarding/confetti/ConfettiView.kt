@@ -16,7 +16,6 @@
 
 package com.duckduckgo.subscriptions.impl.onboarding.confetti
 
-import android.animation.TimeInterpolator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Bitmap
@@ -25,10 +24,8 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.Paint
-import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
-import android.view.animation.PathInterpolator
 import androidx.core.graphics.PathParser
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.withClip
@@ -69,9 +66,6 @@ internal data class ConfettiConfiguration(
     val zSpin: Double = 0.2,
     val size: Double = 3.0,
     val sizeVariation: Double = 1.6,
-    val pictogramScaleSize: Double = 1.1,
-    val pictogramScaleDuration: Double = 0.6,
-    val frontTransitionDelayMs: Long = 200L,
     val enabledShapes: Set<ConfettiShape> = setOf(ConfettiShape.STAR, ConfettiShape.BLOB, ConfettiShape.RECT),
     val enabledColorFamilies: Set<ConfettiColorFamily> = setOf(
         ConfettiColorFamily.MANDARIN,
@@ -99,25 +93,16 @@ internal class ConfettiView @JvmOverloads constructor(
     private val strokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
     private val camera = Camera()
     private val cameraMatrix = Matrix()
-    private val easeOutInterpolator: TimeInterpolator = PathInterpolator(0.22f, 1f, 0.36f, 1f)
     private val random = kotlin.random.Random.Default
 
-    private val density = resources.displayMetrics.density
+    private val pxPerDp = resources.displayMetrics.density
 
     private val activeParticles = mutableListOf<ActiveParticle>()
     private val particleBitmapCache = mutableMapOf<String, Bitmap>()
 
-    private val ownLocation = IntArray(2)
-    private val anchorLocation = IntArray(2)
-    private val anchorBounds = RectF()
-
-    private var anchor: View? = null
-    private var coverVisible = false
     private var burstProgress = 0f
 
     private var burstAnimator: ValueAnimator? = null
-    private var anchorPulseAnimator: ValueAnimator? = null
-    private var coverHideRunnable: Runnable? = null
     private var cleanupRunnable: Runnable? = null
 
     override fun onDetachedFromWindow() {
@@ -125,7 +110,7 @@ internal class ConfettiView @JvmOverloads constructor(
         super.onDetachedFromWindow()
     }
 
-    fun fire(anchor: View) {
+    fun fire() {
         val activeShapes = weightedShapes.filter { configuration.enabledShapes.contains(it) }
         if (activeShapes.isEmpty()) return
 
@@ -176,31 +161,13 @@ internal class ConfettiView @JvmOverloads constructor(
             activeParticles += ActiveParticle(
                 bitmap = bitmap,
                 keyframes = keyframes,
-                sizePx = pieceSize.toFloat() * density,
+                sizePx = pieceSize.toFloat() * pxPerDp,
             )
         }
 
         if (activeParticles.isEmpty()) return
 
-        this.anchor = anchor
-        coverVisible = true
         burstProgress = 0f
-
-        coverHideRunnable = Runnable {
-            coverVisible = false
-            invalidate()
-        }.also { postDelayed(it, configuration.frontTransitionDelayMs) }
-
-        anchorPulseAnimator = ValueAnimator.ofFloat(configuration.pictogramScaleSize.toFloat(), 1f).apply {
-            duration = (configuration.pictogramScaleDuration * 1000).roundToInt().toLong().coerceAtLeast(1L)
-            interpolator = easeOutInterpolator
-            addUpdateListener {
-                val scale = it.animatedValue as Float
-                anchor.scaleX = scale
-                anchor.scaleY = scale
-            }
-            start()
-        }
 
         burstAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
             duration = (configuration.duration * 1000).roundToInt().toLong().coerceAtLeast(1L)
@@ -216,7 +183,6 @@ internal class ConfettiView @JvmOverloads constructor(
             activeParticles.clear()
             burstAnimator = null
             cleanupRunnable = null
-            this.anchor = null
             invalidate()
         }.also {
             val cleanupDelay = ((configuration.duration + 0.5) * 1000).roundToInt().toLong()
@@ -226,43 +192,18 @@ internal class ConfettiView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        val anchor = anchor ?: return
         if (activeParticles.isEmpty()) return
-
-        updateAnchorBounds(anchor)
-        canvas.withSave {
-            if (coverVisible) clipOutRect(anchorBounds)
-            drawParticles(this, burstProgress, anchorBounds.centerX(), anchorBounds.centerY())
-        }
+        drawParticles(canvas, burstProgress, width / 2f, height / 2f)
     }
 
     private fun clearActiveBurst() {
         burstAnimator?.cancel()
         burstAnimator = null
-        anchorPulseAnimator?.cancel()
-        anchorPulseAnimator = null
-        coverHideRunnable?.let(::removeCallbacks)
-        coverHideRunnable = null
         cleanupRunnable?.let(::removeCallbacks)
         cleanupRunnable = null
 
-        anchor?.let {
-            it.scaleX = 1f
-            it.scaleY = 1f
-        }
-        anchor = null
-        coverVisible = false
         burstProgress = 0f
         activeParticles.clear()
-    }
-
-    // Recomputed every frame so the burst stays attached to the anchor if its container scrolls mid-animation.
-    private fun updateAnchorBounds(anchor: View) {
-        getLocationInWindow(ownLocation)
-        anchor.getLocationInWindow(anchorLocation)
-        val left = (anchorLocation[0] - ownLocation[0]).toFloat()
-        val top = (anchorLocation[1] - ownLocation[1]).toFloat()
-        anchorBounds.set(left, top, left + anchor.width * anchor.scaleX, top + anchor.height * anchor.scaleY)
     }
 
     private fun drawParticles(
@@ -286,7 +227,7 @@ internal class ConfettiView @JvmOverloads constructor(
 
             particlePaint.alpha = alpha
             canvas.withSave {
-                translate(originX + state.tx * density, originY + state.ty * density)
+                translate(originX + state.tx * pxPerDp, originY + state.ty * pxPerDp)
 
                 if (state.rotX != 0f || state.rotY != 0f) {
                     camera.save()
