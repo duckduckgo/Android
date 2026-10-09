@@ -206,6 +206,7 @@ class NativeInputLayoutCoordinator(
             rootView.findViewById(R.id.appTrackingProtectionStateView),
             rootView.findViewById(R.id.indonesiaNewTabSectionView),
             rootView.findViewById(R.id.messageCta),
+            rootView.findViewById(R.id.nextStepsContainer),
         )
         // Onboarding CTA bubbles live inside newTabContent and must clear the widget, so a visible
         // one overrides the logo-only suppression below.

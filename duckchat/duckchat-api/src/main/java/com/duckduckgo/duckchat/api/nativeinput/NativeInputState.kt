@@ -60,6 +60,9 @@ data class NativeInputState(
 
     /** Show pulse animation around the Duck.ai fire button. */
     val duckAiFireButtonHighlighted: Boolean = false,
+
+    /** True while the input field has focus. Resets to false when the widget detaches. */
+    val isInputFocused: Boolean = false,
 ) {
     enum class InputMode {
         SEARCH_AND_DUCK_AI,
