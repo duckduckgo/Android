@@ -228,6 +228,7 @@ import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.internalfeedback.InternalFeedbackScreenshotCapturer
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -498,6 +499,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var pdfPreviewGenerator: PdfPreviewGenerator
+
+    @Inject
+    lateinit var internalFeedbackScreenshotCapturer: InternalFeedbackScreenshotCapturer
 
     @Inject
     lateinit var previewPersister: WebViewPreviewPersister
@@ -1873,7 +1877,10 @@ class BrowserTabFragment :
                 onFireButtonPressed()
             }
             onMenuItemClicked(internalFeedbackMenuItem) {
-                viewModel.onInternalFeedbackSelected()
+                launch {
+                    internalFeedbackScreenshotCapturer.capture(requireActivity().window)
+                    viewModel.onInternalFeedbackSelected()
+                }
             }
         }
         if (!tabDisplayedInCustomTabScreen) {
