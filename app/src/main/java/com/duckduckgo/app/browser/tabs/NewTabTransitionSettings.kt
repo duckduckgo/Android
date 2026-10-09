@@ -32,6 +32,7 @@ interface NewTabTransitionSettings {
     var containerTransformSource: ContainerTransformSource
     var containerTransformStartSize: ContainerTransformStartSize
     var containerTransformRoundedCorners: Boolean
+    var containerTransformPageReveal: ContainerTransformPageReveal
 
     /** Reads SharedPreferences, so call it off the main thread. Null when the override is off. */
     fun enabledTransition(): NewTabTransition?
@@ -57,10 +58,16 @@ enum class ContainerTransformStartSize(val fraction: Float) {
     THREE_QUARTERS(0.75f),
 }
 
+enum class ContainerTransformPageReveal {
+    DURING_ANIMATION,
+    AFTER_FULL_SCREEN,
+}
+
 data class ContainerTransformOptions(
     val source: ContainerTransformSource,
     val startSize: ContainerTransformStartSize,
     val roundedCorners: Boolean,
+    val pageReveal: ContainerTransformPageReveal,
 )
 
 enum class TabManagerCloseBehaviour {
@@ -109,6 +116,12 @@ class NewTabTransitionSharedPreferences @Inject constructor(private val context:
         get() = preferences.getBoolean(KEY_CONTAINER_TRANSFORM_ROUNDED_CORNERS, true)
         set(enabled) = preferences.edit { putBoolean(KEY_CONTAINER_TRANSFORM_ROUNDED_CORNERS, enabled) }
 
+    override var containerTransformPageReveal: ContainerTransformPageReveal
+        get() = preferences.getString(KEY_CONTAINER_TRANSFORM_PAGE_REVEAL, null)
+            ?.let { saved -> ContainerTransformPageReveal.entries.firstOrNull { it.name == saved } }
+            ?: ContainerTransformPageReveal.DURING_ANIMATION
+        set(value) = preferences.edit { putString(KEY_CONTAINER_TRANSFORM_PAGE_REVEAL, value.name) }
+
     override fun enabledTransition(): NewTabTransition? = if (isOverrideEnabled) transition else null
 
     override fun enabledCloseTransition(): NewTabTransition? = if (isOverrideEnabled && animateClosingTabs) transition else null
@@ -120,6 +133,7 @@ class NewTabTransitionSharedPreferences @Inject constructor(private val context:
         source = containerTransformSource,
         startSize = containerTransformStartSize,
         roundedCorners = containerTransformRoundedCorners,
+        pageReveal = containerTransformPageReveal,
     )
 
     private companion object {
@@ -131,5 +145,6 @@ class NewTabTransitionSharedPreferences @Inject constructor(private val context:
         const val KEY_CONTAINER_TRANSFORM_SOURCE = "KEY_CONTAINER_TRANSFORM_SOURCE"
         const val KEY_CONTAINER_TRANSFORM_START_SIZE = "KEY_CONTAINER_TRANSFORM_START_SIZE"
         const val KEY_CONTAINER_TRANSFORM_ROUNDED_CORNERS = "KEY_CONTAINER_TRANSFORM_ROUNDED_CORNERS"
+        const val KEY_CONTAINER_TRANSFORM_PAGE_REVEAL = "KEY_CONTAINER_TRANSFORM_PAGE_REVEAL"
     }
 }

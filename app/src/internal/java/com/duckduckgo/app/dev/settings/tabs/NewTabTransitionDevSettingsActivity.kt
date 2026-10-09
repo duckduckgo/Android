@@ -23,6 +23,7 @@ import androidx.core.view.isVisible
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityNewTabTransitionDevSettingsBinding
+import com.duckduckgo.app.browser.tabs.ContainerTransformPageReveal
 import com.duckduckgo.app.browser.tabs.ContainerTransformSource
 import com.duckduckgo.app.browser.tabs.ContainerTransformStartSize
 import com.duckduckgo.app.browser.tabs.NewTabTransition
@@ -66,6 +67,7 @@ class NewTabTransitionDevSettingsActivity : DuckDuckGoActivity() {
         binding.transitionSelector.setOnClickListener { showTransitionPicker() }
         binding.containerSourceSelector.setOnClickListener { showContainerSourcePicker() }
         binding.containerStartSizeSelector.setOnClickListener { showContainerStartSizePicker() }
+        binding.containerPageRevealSelector.setOnClickListener { showContainerPageRevealPicker() }
         binding.tabManagerCloseSelector.setOnClickListener { showTabManagerClosePicker() }
         render()
     }
@@ -90,6 +92,9 @@ class NewTabTransitionDevSettingsActivity : DuckDuckGoActivity() {
         binding.containerStartSizeSelector.setSecondaryText(getString(newTabTransitionSettings.containerTransformStartSize.label()))
         binding.containerRoundedCornersToggle.isVisible = isContainerTransform
         binding.containerRoundedCornersToggle.isEnabled = newTabTransitionSettings.isOverrideEnabled
+        binding.containerPageRevealSelector.isVisible = isContainerTransform
+        binding.containerPageRevealSelector.isEnabled = newTabTransitionSettings.isOverrideEnabled
+        binding.containerPageRevealSelector.setSecondaryText(getString(newTabTransitionSettings.containerTransformPageReveal.label()))
         binding.animateClosingTabsToggle.isEnabled = newTabTransitionSettings.isOverrideEnabled
         binding.tabManagerCloseSelector.isEnabled = newTabTransitionSettings.isOverrideEnabled
         binding.tabManagerCloseSelector.setSecondaryText(getString(newTabTransitionSettings.tabManagerCloseBehaviour.label()))
@@ -143,6 +148,25 @@ class NewTabTransitionDevSettingsActivity : DuckDuckGoActivity() {
         render()
     }
 
+    private fun showContainerPageRevealPicker() {
+        val popup = PopupMenu(layoutInflater, R.layout.popup_window_container_transform_page_reveal)
+        val view = popup.contentView
+        popup.apply {
+            onMenuItemClicked(view.findViewById(R.id.pageRevealDuringAnimation)) {
+                onContainerPageRevealSelected(ContainerTransformPageReveal.DURING_ANIMATION)
+            }
+            onMenuItemClicked(view.findViewById(R.id.pageRevealAfterFullScreen)) {
+                onContainerPageRevealSelected(ContainerTransformPageReveal.AFTER_FULL_SCREEN)
+            }
+        }
+        popup.show(binding.root, binding.containerPageRevealSelector)
+    }
+
+    private fun onContainerPageRevealSelected(pageReveal: ContainerTransformPageReveal) {
+        newTabTransitionSettings.containerTransformPageReveal = pageReveal
+        render()
+    }
+
     private fun showTabManagerClosePicker() {
         val popup = PopupMenu(layoutInflater, R.layout.popup_window_tab_manager_close_behaviour)
         val view = popup.contentView
@@ -172,6 +196,11 @@ class NewTabTransitionDevSettingsActivity : DuckDuckGoActivity() {
         ContainerTransformStartSize.QUARTER -> R.string.newTabTransitionDevSettingsContainerStartSizeQuarter
         ContainerTransformStartSize.HALF -> R.string.newTabTransitionDevSettingsContainerStartSizeHalf
         ContainerTransformStartSize.THREE_QUARTERS -> R.string.newTabTransitionDevSettingsContainerStartSizeThreeQuarters
+    }
+
+    private fun ContainerTransformPageReveal.label(): Int = when (this) {
+        ContainerTransformPageReveal.DURING_ANIMATION -> R.string.newTabTransitionDevSettingsContainerPageRevealDuringAnimation
+        ContainerTransformPageReveal.AFTER_FULL_SCREEN -> R.string.newTabTransitionDevSettingsContainerPageRevealAfterFullScreen
     }
 
     private fun TabManagerCloseBehaviour.label(): Int = when (this) {

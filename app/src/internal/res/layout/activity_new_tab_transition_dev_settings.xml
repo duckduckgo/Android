@@ -79,6 +79,13 @@
                 app:primaryText="@string/newTabTransitionDevSettingsContainerRoundedCorners"
                 app:showSwitch="true" />
 
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/containerPageRevealSelector"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/newTabTransitionDevSettingsContainerPageReveal" />
+
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/animateClosingTabsToggle"
                 android:layout_width="match_parent"

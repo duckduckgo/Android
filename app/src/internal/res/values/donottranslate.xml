@@ -155,6 +155,9 @@
     <string name="newTabTransitionDevSettingsContainerStartSizeHalf" formatted="false">50%</string>
     <string name="newTabTransitionDevSettingsContainerStartSizeThreeQuarters" formatted="false">75%</string>
     <string name="newTabTransitionDevSettingsContainerRoundedCorners">Rounded corners during transition</string>
+    <string name="newTabTransitionDevSettingsContainerPageReveal">Page reveal</string>
+    <string name="newTabTransitionDevSettingsContainerPageRevealDuringAnimation">During animation (Material default)</string>
+    <string name="newTabTransitionDevSettingsContainerPageRevealAfterFullScreen">After full screen</string>
     <string name="newTabTransitionDevSettingsAnimateClosingTabs">Animate closing tabs</string>
     <string name="newTabTransitionDevSettingsTabManagerClose">Tab manager close behaviour</string>
     <string name="newTabTransitionDevSettingsTabManagerSlide">Sliding (default)</string>

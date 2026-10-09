@@ -73,6 +73,7 @@ import com.duckduckgo.app.browser.omnibar.applyAddressBarRebrandRadius
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.state.ModeSwitchRecreateSignal
 import com.duckduckgo.app.browser.tabs.ContainerTransformOptions
+import com.duckduckgo.app.browser.tabs.ContainerTransformPageReveal
 import com.duckduckgo.app.browser.tabs.ContainerTransformSource
 import com.duckduckgo.app.browser.tabs.ContainerTransformStartSize
 import com.duckduckgo.app.browser.tabs.NewTabTransition
@@ -271,6 +272,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         source = ContainerTransformSource.TOOLBAR_ICONS,
         startSize = ContainerTransformStartSize.THREE_QUARTERS,
         roundedCorners = true,
+        pageReveal = ContainerTransformPageReveal.DURING_ANIMATION,
     )
     private val tabIdsPendingRemoval = mutableSetOf<String>()
     private var closingTabId: String? = null

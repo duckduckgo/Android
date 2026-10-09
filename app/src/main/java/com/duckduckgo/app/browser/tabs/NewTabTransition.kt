@@ -26,6 +26,8 @@ import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import androidx.transition.Transition
+import androidx.transition.TransitionListenerAdapter
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.common.ui.view.getColorFromAttr
@@ -76,6 +78,9 @@ fun FragmentTransaction.applyNewTabTransition(
                 setAllContainerColors(from.requireContext().getColorFromAttr(CommonR.attr.daxColorBackground))
                 if (containerOptions.roundedCorners) {
                     setRoundedCorners(smallView = source, smallViewIsStart = true)
+                }
+                if (containerOptions.pageReveal == ContainerTransformPageReveal.AFTER_FULL_SCREEN) {
+                    hidePageUntilEnd(to, fragmentManager)
                 }
             }
             // Keeps the old tab on screen underneath the growing container instead of hiding it straight away.
@@ -162,6 +167,30 @@ private fun ViewGroup.removeTransitionAnchors() {
     children.filter { it.tag == TRANSITION_ANCHOR_TAG }.toList().forEach { removeView(it) }
 }
 
+// A page that's still painting would show half-drawn inside the growing container, so it stays hidden until the
+// tab is full screen. The timeout restores it if the transition never runs.
+private fun MaterialContainerTransform.hidePageUntilEnd(
+    tab: Fragment,
+    fragmentManager: FragmentManager,
+) {
+    tab.doOnViewCreated(fragmentManager) { view ->
+        val page = view.findViewById<View>(R.id.webViewContainer) ?: return@doOnViewCreated
+        page.alpha = 0f
+        val reveal = Runnable { if (page.alpha == 0f) page.animate().alpha(1f).setDuration(PAGE_REVEAL_DURATION_MS) }
+        page.postDelayed(reveal, duration + PAGE_REVEAL_TIMEOUT_MARGIN_MS)
+        addListener(
+            object : TransitionListenerAdapter() {
+                override fun onTransitionEnd(transition: Transition) {
+                    page.removeCallbacks(reveal)
+                    reveal.run()
+                }
+
+                override fun onTransitionCancel(transition: Transition) = onTransitionEnd(transition)
+            },
+        )
+    }
+}
+
 // The tab keeps the screen's rounded corners while it moves; a toolbar icon starts or ends as a pill.
 private fun MaterialContainerTransform.setRoundedCorners(
     smallView: View,
@@ -238,4 +267,6 @@ private const val CLOSE_TRANSFORM_SOURCE_NAME = "closeTabTransitionSource"
 private const val CLOSE_TRANSFORM_TARGET_NAME = "closeTabTransitionTarget"
 private const val CONTAINER_TRANSFORM_DURATION_MS = 450L
 private const val TRANSITION_ANCHOR_TAG = "newTabTransitionAnchor"
+private const val PAGE_REVEAL_DURATION_MS = 150L
+private const val PAGE_REVEAL_TIMEOUT_MARGIN_MS = 300L
 private const val DEFAULT_SCREEN_CORNER_RADIUS_DP = 16
