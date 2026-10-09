@@ -121,7 +121,7 @@ class RealWgServerApi @Inject constructor(
         address = allowedIPs.first(),
         gateway = server.internalIp,
         location = server.attributes.extractLocation(),
-        ports = server.ports.ifEmpty { listOf(server.port) },
+        ports = server.ports.orEmpty().ifEmpty { listOf(server.port) },
     )
 
     private fun Server.extractPublicEndpoint(): String {
