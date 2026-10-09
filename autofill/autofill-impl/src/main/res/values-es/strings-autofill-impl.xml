@@ -249,6 +249,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importar contraseñas de Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google puede pedirte que inicies sesión o introduzcas tu contraseña para confirmar.</string>
+    <string name="importPasswordsChooseMethodDialogSubtitleDeviceAuth">Es posible que tu dispositivo te pida que introduzcas tu PIN, contraseña o patrón para confirmar.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Importar desde Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Elige un archivo CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importar desde el navegador del escritorio</string>
@@ -280,8 +281,10 @@
 
     <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Trae tus contraseñas de&lt;br /&gt;Google a DuckDuckGo</string>
     <string name="passwords_import_promo_subtitle">Importa tus contraseñas a DuckDuckGo de forma rápida y segura. Google puede pedirte que introduzcas tu contraseña.</string>
+    <string name="passwords_import_promo_subtitle_device_auth">Importa tus contraseñas a DuckDuckGo de forma rápida y segura. Es posible que el dispositivo te pida que introduzcas tu PIN, contraseña o patrón para confirmar.</string>
     <string name="passwords_import_promo_action">Importar desde Google</string>
     <string name="passwords_import_promo_in_browser_title">Trae tus contraseñas de Google a DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_title_device_auth">Importa tus contraseñas de Google a DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">No volver a preguntar</string>
     <string name="passwords_import_promo_in_settings_title">Importar contraseñas de Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Ocultar</string>

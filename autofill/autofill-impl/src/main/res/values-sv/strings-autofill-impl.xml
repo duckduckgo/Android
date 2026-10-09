@@ -249,6 +249,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importera lösenord från Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google kan be dig att logga in eller ange ditt lösenord för att bekräfta åtgärden.</string>
+    <string name="importPasswordsChooseMethodDialogSubtitleDeviceAuth">Din enhet kan be dig att ange din PIN-kod, ditt lösenord eller ditt mönster för att bekräfta.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Importera från Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Välj en CSV-fil</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importera från webbläsare för dator</string>
@@ -280,8 +281,10 @@
 
     <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Ta med dina lösenord från&lt;br /&gt;Google till DuckDuckGo</string>
     <string name="passwords_import_promo_subtitle">Importera snabbt och säkert dina lösenord till DuckDuckGo. Google kan be dig att ange ditt lösenord.</string>
+    <string name="passwords_import_promo_subtitle_device_auth">Importera snabbt och säkert dina lösenord till DuckDuckGo. Din enhet kan be dig att ange din PIN-kod, ditt lösenord eller ditt mönster för att bekräfta.</string>
     <string name="passwords_import_promo_action">Importera från Google</string>
     <string name="passwords_import_promo_in_browser_title">Ta med dina lösenord från Google till DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_title_device_auth">Importera dina lösenord från Google till DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Fråga inte igen</string>
     <string name="passwords_import_promo_in_settings_title">Importera lösenord från Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Dölj</string>
