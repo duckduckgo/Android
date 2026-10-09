@@ -29,6 +29,8 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.android.AndroidInjection
+import com.duckduckgo.di.binding.VpnTileServiceBindingKey
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenAndEnable
@@ -37,8 +39,6 @@ import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.pixels.VpnEnableWideEvent
 import com.duckduckgo.networkprotection.impl.pixels.VpnEnableWideEvent.EntryPoint.SYSTEM_TILE
 import com.duckduckgo.networkprotection.impl.quickaccess.VpnTileStateProvider.VpnTileState
-import dagger.android.AndroidInjection
-import dagger.binding.VpnTileServiceBindingKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

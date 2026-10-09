@@ -23,8 +23,8 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.desktopapppromotion.api.DesktopAppPromotionInteractionHandler.Interaction
+import com.duckduckgo.di.android.AndroidInjection
 import com.duckduckgo.di.scopes.ReceiverScope
-import dagger.android.AndroidInjection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject

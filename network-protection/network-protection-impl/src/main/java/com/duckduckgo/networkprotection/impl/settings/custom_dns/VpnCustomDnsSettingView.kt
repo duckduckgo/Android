@@ -29,6 +29,7 @@ import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.isPrivateDnsStrict
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -42,7 +43,6 @@ import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSet
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSettingView.State.DefaultBlockMalware
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSettingView.State.Idle
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsViewSettingViewModel.Factory
-import dagger.android.support.AndroidSupportInjection
 import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow

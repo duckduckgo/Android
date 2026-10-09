@@ -31,11 +31,11 @@ import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.di.android.AndroidInjection
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
-import dagger.android.AndroidInjection
 import javax.inject.Inject
 
 /**

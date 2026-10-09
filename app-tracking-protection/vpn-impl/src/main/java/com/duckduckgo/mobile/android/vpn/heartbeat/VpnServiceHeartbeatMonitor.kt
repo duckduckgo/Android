@@ -25,6 +25,7 @@ import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.android.AndroidInjection
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
@@ -34,7 +35,6 @@ import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import dagger.android.AndroidInjection
 import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.IntoSet

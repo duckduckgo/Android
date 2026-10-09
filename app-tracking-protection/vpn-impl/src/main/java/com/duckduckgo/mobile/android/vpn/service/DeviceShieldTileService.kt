@@ -30,13 +30,13 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.android.AndroidInjection
+import com.duckduckgo.di.binding.TileServiceBingingKey
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import dagger.android.AndroidInjection
-import dagger.binding.TileServiceBingingKey
 import kotlinx.coroutines.*
 import logcat.logcat
 import javax.inject.Inject

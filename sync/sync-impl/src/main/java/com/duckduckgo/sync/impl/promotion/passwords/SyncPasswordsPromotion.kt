@@ -35,6 +35,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -45,7 +46,6 @@ import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewMo
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command.ReevalutePromo
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityWithSourceParams
-import dagger.android.support.AndroidSupportInjection
 import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn

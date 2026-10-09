@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dagger.android
+package com.duckduckgo.di.android
 
 import android.app.Activity
 import android.app.Application

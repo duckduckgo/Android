@@ -39,8 +39,8 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.applyBoldSpanTo
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extractDomain
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
-import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)

@@ -42,6 +42,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.di.android.AndroidInjection
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
@@ -63,7 +64,6 @@ import com.duckduckgo.mobile.android.vpn.pixels.VpnEnableWideEvent
 import com.duckduckgo.mobile.android.vpn.service.state.VpnStateMonitorService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnEnabledNotificationBuilder
-import dagger.android.AndroidInjection
 import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.Binds
 import dev.zacsweers.metro.ContributesTo

@@ -35,9 +35,9 @@ import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
 import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.ui.view.isFullScreen
+import com.duckduckgo.di.android.AndroidInjection
+import com.duckduckgo.di.android.DaggerActivity
 import com.duckduckgo.mobile.android.R
-import dagger.android.AndroidInjection
-import dagger.android.DaggerActivity
 import dev.zacsweers.metro.HasMemberInjections
 import javax.inject.Inject
 

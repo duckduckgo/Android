@@ -31,11 +31,11 @@ import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import com.duckduckgo.app.browser.R as BrowserR
 import com.duckduckgo.mobile.android.R as CommonR

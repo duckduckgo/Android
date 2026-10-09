@@ -31,13 +31,13 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.nextsteps.impl.R
 import com.duckduckgo.nextsteps.impl.databinding.ViewNextStepsCardBinding
 import com.duckduckgo.nextsteps.impl.databinding.ViewNextStepsStackedCardsBinding
 import com.duckduckgo.nextsteps.impl.ui.NextStepsItemsViewModel.ViewState
 import com.duckduckgo.remote.messaging.api.CardItem
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject

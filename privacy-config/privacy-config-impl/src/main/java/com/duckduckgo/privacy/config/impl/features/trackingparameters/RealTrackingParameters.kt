@@ -22,6 +22,7 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.common.utils.replaceQueryParameters
+import com.duckduckgo.di.WrongScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
@@ -29,7 +30,6 @@ import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersRepository
-import dagger.WrongScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.ERROR

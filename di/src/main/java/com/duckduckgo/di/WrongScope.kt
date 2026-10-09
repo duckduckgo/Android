@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-package dagger.binding
+package com.duckduckgo.di
 
-interface TileServiceBingingKey
-interface VpnTileServiceBindingKey
+import kotlin.reflect.KClass
+
+@MustBeDocumented
+@Retention(AnnotationRetention.SOURCE)
+annotation class WrongScope(
+    val comment: String,
+    val correctScope: KClass<*>,
+)

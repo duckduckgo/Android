@@ -30,13 +30,13 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.saved.sites.impl.databinding.ViewSaveSiteSyncPausedWarningBinding
 import com.duckduckgo.savedsites.impl.sync.SavedSiteSyncPausedViewModel.Command
 import com.duckduckgo.savedsites.impl.sync.SavedSiteSyncPausedViewModel.Command.NavigateToBookmarks
 import com.duckduckgo.savedsites.impl.sync.SavedSiteSyncPausedViewModel.ViewState
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

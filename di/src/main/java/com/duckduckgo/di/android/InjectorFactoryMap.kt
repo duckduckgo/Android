@@ -1,4 +1,4 @@
-package dagger.android
+package com.duckduckgo.di.android
 
 import kotlin.reflect.KClass
 
