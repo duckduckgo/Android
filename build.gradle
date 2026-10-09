@@ -406,3 +406,7 @@ tasks.register('aiConfigCheck') {
     }
 }
 
+
+// :app adds the privacy Flank configs to this project's fladle extension, and fladle only registers
+// tasks for the configs present when this project finishes evaluating, so :app must be evaluated first.
+evaluationDependsOn(':app')
