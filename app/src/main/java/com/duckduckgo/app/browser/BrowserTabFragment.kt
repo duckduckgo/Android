@@ -35,6 +35,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.os.Message
+import android.os.SystemClock
 import android.print.PrintAttributes
 import android.print.PrintDocumentAdapter
 import android.print.PrintManager
@@ -184,6 +185,7 @@ import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.suggestredirect.RedirectSuggestion
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.browser.tabs.findVisibleViewWithId
 import com.duckduckgo.app.browser.ui.dialogs.AutomaticFireproofDialogOptions
 import com.duckduckgo.app.browser.ui.dialogs.LaunchInExternalAppOptions
 import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.HomeScreenWidgetBottomSheetDialog
@@ -434,6 +436,10 @@ class BrowserTabFragment :
 
     private var duckAiContextualFragment: Fragment? = null
     private var duckChatButtonAnchor: View? = null
+
+    private var chatMenuAnchor: View? = null
+    private var newTabTransitionSource: View? = null
+    private var newTabTransitionSourceSetAt = 0L
     private var contextualSheetLayoutChangeListener: View.OnLayoutChangeListener? = null
     private var contextualSheetBottomSheetCallback: BottomSheetBehavior.BottomSheetCallback? = null
 
@@ -836,15 +842,19 @@ class BrowserTabFragment :
     private val chatMenuPopup by lazy {
         PopupMenu(layoutInflater, com.duckduckgo.duckchat.impl.R.layout.popup_chat_menu).apply {
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewChat)) {
+                setNewTabTransitionSource(chatMenuAnchor)
                 viewModel.openNewDuckChatFromChatMenu()
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewVoiceChat)) {
+                setNewTabTransitionSource(chatMenuAnchor)
                 viewModel.openNewVoiceChatFromChatMenu()
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewImage)) {
+                setNewTabTransitionSource(chatMenuAnchor)
                 viewModel.openNewImageDuckChatFromChatMenu()
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)) {
+                setNewTabTransitionSource(chatMenuAnchor)
                 // With the native sidebar this entry opens the new tab with its input screen surfaced on
                 // the Search tab. The target is threaded to the new tab itself rather than armed globally,
                 // so it can't be consumed by another tab.
@@ -1554,6 +1564,7 @@ class BrowserTabFragment :
                 }
 
                 override fun onNewTabButtonClicked() {
+                    setNewTabTransitionSource(binding.navigationBar.findViewById(R.id.newTabButton))
                     viewModel.onNavigationBarNewTabButtonClicked()
                 }
 
@@ -1820,6 +1831,7 @@ class BrowserTabFragment :
                 onRefreshClicked()
             }
             onMenuItemClicked(newTabMenuItem) {
+                setNewTabTransitionSource(browserMenuButton())
                 viewModel.onNewTabMenuItemClicked()
             }
             onMenuItemClicked(bookmarksMenuItem) {
@@ -1901,10 +1913,12 @@ class BrowserTabFragment :
                     it.hideKeyboard()
                     it.clearFocus()
                 }
+                setNewTabTransitionSource(browserMenuButton())
                 viewModel.openNewDuckChat(omnibar.viewMode)
             }
             onMenuItemClicked(duckAiNewChatMenuItem) {
                 pixel.fire(AppPixelName.SHEET_MENU_AICHAT)
+                setNewTabTransitionSource(browserMenuButton())
                 viewModel.openNewDuckChat(omnibar.viewMode)
             }
             onMenuItemClicked(duckAiNewVoiceChatMenuItem) {
@@ -2978,6 +2992,7 @@ class BrowserTabFragment :
             is Command.RequiresAuthentication -> showAuthenticationDialog(it.request)
             is Command.SaveCredentials -> saveBasicAuthCredentials(it.request, it.credentials)
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
+            is Command.CurrentTabClosing -> browserActivity?.onCurrentTabClosing(it.tabId)
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
             is Command.HideWebContent -> webView?.hide()
@@ -4000,6 +4015,7 @@ class BrowserTabFragment :
 
                 override fun onPlusButtonPressed(anchor: View) {
                     val activity = activity ?: return
+                    chatMenuAnchor = anchor
                     chatMenuPopup.contentView
                         .findViewById<View>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)
                         .isVisible = fireModeAvailability.isAvailable()
@@ -4037,6 +4053,7 @@ class BrowserTabFragment :
 
                 override fun onDuckChatButtonPressed(anchor: View) {
                     duckChatButtonAnchor = anchor
+                    setNewTabTransitionSource(anchor)
                     val hasFocus = omnibar.omnibarTextInput.hasFocus()
                     val isNtp = omnibar.viewMode == ViewMode.NewTab
                     onOmnibarDuckChatPressed(query = omnibar.getText(), hasFocus = hasFocus, isNtp = isNtp)
@@ -4052,6 +4069,23 @@ class BrowserTabFragment :
                 }
             },
         )
+    }
+
+    private fun setNewTabTransitionSource(source: View?) {
+        newTabTransitionSource = source
+        newTabTransitionSourceSetAt = SystemClock.uptimeMillis()
+    }
+
+    private fun browserMenuButton(): View? = view?.findVisibleViewWithId(setOf(R.id.browserMenu, R.id.menuButton))
+
+    /**
+     * The control that just asked for a new tab, so the new-tab transition can grow from it. Expires quickly so a
+     * control that didn't end up opening a tab isn't used for a later, unrelated one.
+     */
+    fun consumeNewTabTransitionSource(): View? {
+        val source = newTabTransitionSource?.takeIf { SystemClock.uptimeMillis() - newTabTransitionSourceSetAt < NEW_TAB_TRANSITION_SOURCE_TTL_MS }
+        newTabTransitionSource = null
+        return source
     }
 
     fun launchContextualDuckAi(textSelection: String? = null) {
@@ -5607,6 +5641,7 @@ class BrowserTabFragment :
     }
 
     companion object {
+        private const val NEW_TAB_TRANSITION_SOURCE_TTL_MS = 2_000L
         private const val CUSTOM_TAB_TOOLBAR_COLOR_ARG = "CUSTOM_TAB_TOOLBAR_COLOR_ARG"
         private const val TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG = "TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG"
         private const val TAB_ID_ARG = "TAB_ID_ARG"

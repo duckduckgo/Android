@@ -89,6 +89,7 @@ import com.duckduckgo.app.browser.commands.Command.CloseCustomTab
 import com.duckduckgo.app.browser.commands.Command.ConvertBlobToDataUri
 import com.duckduckgo.app.browser.commands.Command.CopyAliasToClipboard
 import com.duckduckgo.app.browser.commands.Command.CopyLink
+import com.duckduckgo.app.browser.commands.Command.CurrentTabClosing
 import com.duckduckgo.app.browser.commands.Command.DeleteFavoriteConfirmation
 import com.duckduckgo.app.browser.commands.Command.DeleteFireproofConfirmation
 import com.duckduckgo.app.browser.commands.Command.DeleteSavedSiteConfirmation
@@ -1770,6 +1771,7 @@ class BrowserTabViewModel @Inject constructor(
         val currentTab = tabRepository.liveSelectedTab.value
         currentTab?.let {
             adClickManager.clearTabId(it.tabId)
+            command.value = CurrentTabClosing(it.tabId)
             tabRepository.deleteTabAndSelectSource(it.tabId)
         }
     }

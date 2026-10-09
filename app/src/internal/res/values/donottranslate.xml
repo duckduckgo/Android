@@ -139,4 +139,17 @@
     <string name="modalCoordinatorDevSettingsResetCooldownDescription">Once a prompt is shown, further modals are blocked: by the prompts coordinator quiet gap, or by the internal 24-hour window when the coordinator is off. This clears both, so modals are evaluated again on the next app resume.</string>
     <string name="modalCoordinatorDevSettingsResetCooldown">Reset modal cooldown</string>
     <string name="modalCoordinatorDevSettingsResetCooldownDone">Modal cooldown reset</string>
+
+    <!-- New Tab Transition Dev Settings -->
+    <string name="devSettingsScreenNewTabTransitions">New Tab Transitions</string>
+    <string name="devSettingsScreenNewTabTransitionsSubtitle">Animate opening a new tab</string>
+    <string name="newTabTransitionDevSettingsOverride">Transition Override</string>
+    <string name="newTabTransitionDevSettingsTransition">Transition</string>
+    <string name="newTabTransitionDevSettingsSharedAxis">Forward and backward</string>
+    <string name="newTabTransitionDevSettingsContainerTransform">Container transform</string>
+    <string name="newTabTransitionDevSettingsAnimateClosingTabs">Animate closing tabs</string>
+    <string name="newTabTransitionDevSettingsTabManagerClose">Tab manager close behaviour</string>
+    <string name="newTabTransitionDevSettingsTabManagerSlide">Sliding (default)</string>
+    <string name="newTabTransitionDevSettingsTabManagerHideImmediately">Hide immediately</string>
+    <string name="newTabTransitionDevSettingsSwipingTabsNote">Requires the swipingTabs feature flag to be off. Kill and restart the app after changing that flag.</string>
 </resources>

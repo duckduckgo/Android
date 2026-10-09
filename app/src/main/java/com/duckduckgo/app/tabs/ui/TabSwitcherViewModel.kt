@@ -25,6 +25,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.browser.tabs.NewTabTransitionSettings
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.promo.FireTabsPromos
 import com.duckduckgo.app.pixels.AppPixelName
@@ -119,6 +120,7 @@ class TabSwitcherViewModel @Inject constructor(
     @param:AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val fireTabsPromos: FireTabsPromos,
     private val remoteMessageModel: RemoteMessageModel,
+    private val newTabTransitionSettings: NewTabTransitionSettings,
 ) : ViewModel() {
 
     private val fireModeAvailable = fireModeAvailability.isAvailable()
@@ -227,6 +229,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     sealed class Command {
         data object Close : Command()
+        data object CloseToNewTab : Command()
         data class CloseAndShowUndoMessage(val deletedTabIds: List<String>) : Command()
         data class CloseTabsRequest(
             val tabIds: List<String>,
@@ -267,7 +270,7 @@ class TabSwitcherViewModel @Inject constructor(
             tabRepository.add()
         }
 
-        command.value = Command.Close
+        closeToNewTab()
         val browserModeParam = mapOf(Pixel.PixelParameter.BROWSER_MODE to currentMode.value.name.lowercase())
         if (fromOverflowMenu) {
             pixel.fire(AppPixelName.TAB_MANAGER_MENU_NEW_TAB_PRESSED, browserModeParam)
@@ -671,7 +674,7 @@ class TabSwitcherViewModel @Inject constructor(
             val url = duckChat.getDuckChatUrl("", false)
             duckChat.reportDuckChatEntry(DuckChatEntryPoint.TAB_SWITCHER, opensNewTab = true, hasPrompt = false)
             tabRepository.add(url, true)
-            command.value = Command.Close
+            closeToNewTab()
         }
     }
 
@@ -679,8 +682,13 @@ class TabSwitcherViewModel @Inject constructor(
         viewModelScope.launch {
             duckChat.reportDuckChatEntry(DuckChatEntryPoint.RECENT_CHAT_TAB_SWITCHER, opensNewTab = true, hasPrompt = false)
             tabRepository.add(chatUrl, true)
-            command.value = Command.Close
+            closeToNewTab()
         }
+    }
+
+    private suspend fun closeToNewTab() {
+        val hideImmediately = withContext(dispatcherProvider.io()) { newTabTransitionSettings.hidesTabManagerImmediately() }
+        command.value = if (hideImmediately) Command.CloseToNewTab else Command.Close
     }
 
     fun onFireTabsPromoDismissed() {

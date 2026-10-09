@@ -44,6 +44,7 @@ import com.duckduckgo.app.dev.settings.customtabs.CustomTabsInternalSettingsActi
 import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.dev.settings.notifications.NotificationsActivity
 import com.duckduckgo.app.dev.settings.tabs.DevTabsActivity
+import com.duckduckgo.app.dev.settings.tabs.NewTabTransitionDevSettingsActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -117,6 +118,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         binding.customTabs.setOnClickListener { viewModel.customTabsClicked() }
         binding.notifications.setOnClickListener { viewModel.notificationsClicked() }
         binding.tabs.setOnClickListener { viewModel.tabsClicked() }
+        binding.newTabTransitions.setOnClickListener { startActivity(NewTabTransitionDevSettingsActivity.intent(this)) }
     }
 
     private fun observeViewModel() {

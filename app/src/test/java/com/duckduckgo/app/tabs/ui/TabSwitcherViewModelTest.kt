@@ -26,6 +26,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.browser.tabs.NewTabTransitionSettings
 import com.duckduckgo.app.fire.promo.FireTabsPromos
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
@@ -179,6 +180,7 @@ class TabSwitcherViewModelTest {
     private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
+    private val newTabTransitionSettings: NewTabTransitionSettings = mock()
 
     private lateinit var testee: TabSwitcherViewModel
 
@@ -255,6 +257,7 @@ class TabSwitcherViewModelTest {
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
+            newTabTransitionSettings,
         )
     }
 
@@ -295,6 +298,26 @@ class TabSwitcherViewModelTest {
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_CLICKED, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
         assertEquals(Command.Close, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenNewTabRequestedAndTabManagerSlidesThenClose() = runTest {
+        whenever(newTabTransitionSettings.hidesTabManagerImmediately()).thenReturn(false)
+
+        testee.onNewTabRequested(fromOverflowMenu = false)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.Close, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenNewTabRequestedAndTabManagerHidesImmediatelyThenCloseToNewTab() = runTest {
+        whenever(newTabTransitionSettings.hidesTabManagerImmediately()).thenReturn(true)
+
+        testee.onNewTabRequested(fromOverflowMenu = false)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.CloseToNewTab, commandCaptor.lastValue)
     }
 
     @Test
@@ -930,6 +953,28 @@ class TabSwitcherViewModelTest {
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.Close, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun `when Duck Chat menu new chat selected and tab manager hides immediately then close to new tab`() = runTest {
+        whenever(newTabTransitionSettings.hidesTabManagerImmediately()).thenReturn(true)
+        whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
+        whenever(duckChatMock.getDuckChatUrl(any(), any(), any())).thenReturn("https://duck.ai")
+
+        testee.onDuckAiNewChatSelected()
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.CloseToNewTab, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun `when Duck Chat menu chat selected and tab manager hides immediately then close to new tab`() = runTest {
+        whenever(newTabTransitionSettings.hidesTabManagerImmediately()).thenReturn(true)
+
+        testee.onDuckAiChatSelected("https://duck.ai/?chatID=chat-1")
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.CloseToNewTab, commandCaptor.lastValue)
     }
 
     @Test
@@ -2260,6 +2305,7 @@ class TabSwitcherViewModelTest {
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
+            newTabTransitionSettings,
         )
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             isolatedViewModel.viewState.collect()
@@ -2306,6 +2352,7 @@ class TabSwitcherViewModelTest {
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
+            newTabTransitionSettings,
         )
 
         assertFalse(isolatedViewModel.viewState.value.isBrowserModeToggleVisible)
@@ -2381,6 +2428,7 @@ class TabSwitcherViewModelTest {
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
+            newTabTransitionSettings,
         )
 
         isolatedViewModel.onBrowserModeToggled(BrowserMode.FIRE, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)

@@ -51,6 +51,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -425,8 +426,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     // The attachment plugin's ViewModel, shared through this widget's ViewModelStoreOwner. Submission
     // needs the staged attachments, and reading them from the ViewModel keeps the widget out of the
     // plugin's view.
+    // A closing tab's view can be re-attached to the window for its exit animation after the fragment is gone;
+    // its view lifecycle is DESTROYED by then and resolving the ViewModel through it would crash.
     private val attachmentViewModel: AttachmentViewModel?
-        get() = if (::viewModelFactory.isInitialized) {
+        get() = if (::viewModelFactory.isInitialized && findViewTreeLifecycleOwner()?.lifecycle?.currentState != Lifecycle.State.DESTROYED) {
             findViewTreeViewModelStoreOwner()?.let { owner ->
                 ViewModelProvider(owner, viewModelFactory)[AttachmentViewModel::class.java]
             }

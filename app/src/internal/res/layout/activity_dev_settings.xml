@@ -96,6 +96,13 @@
                 app:primaryText="@string/devSettingsScreenTabs"
                 app:secondaryText="@string/devSettingsScreenTabsSubtitle" />
 
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/newTabTransitions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/devSettingsScreenNewTabTransitions"
+                app:secondaryText="@string/devSettingsScreenNewTabTransitionsSubtitle" />
+
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/privacyTitle"
                 android:layout_width="wrap_content"

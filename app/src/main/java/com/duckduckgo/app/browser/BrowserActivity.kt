@@ -45,6 +45,7 @@ import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
@@ -71,10 +72,15 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.applyAddressBarRebrandRadius
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.state.ModeSwitchRecreateSignal
+import com.duckduckgo.app.browser.tabs.NewTabTransition
+import com.duckduckgo.app.browser.tabs.NewTabTransitionSettings
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.browser.tabs.TabReuseDistanceReporter
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
+import com.duckduckgo.app.browser.tabs.applyCloseTabTransition
+import com.duckduckgo.app.browser.tabs.applyNewTabTransition
+import com.duckduckgo.app.browser.tabs.clearNewTabTransitions
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.AppShortcutDataClearer
 import com.duckduckgo.app.fire.DataClearer
@@ -214,6 +220,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
+    @Inject lateinit var newTabTransitionSettings: NewTabTransitionSettings
+
     @Inject lateinit var modeSwitchRecreateSignal: ModeSwitchRecreateSignal
 
     @Inject
@@ -253,6 +261,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
         get() = currentBrowserMode == BrowserMode.FIRE
 
     private val lastActiveTabs = TabList()
+
+    private var newTabTransition: NewTabTransition? = null
+    private var closeTabTransition: NewTabTransition? = null
+    private val tabIdsPendingRemoval = mutableSetOf<String>()
+    private var closingTabId: String? = null
+    private var closingTabRequestedAt = 0L
 
     private var currentTabRef: BrowserTabFragment? = null
     private var currentTab: BrowserTabFragment?
@@ -627,6 +641,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onResume() {
         super.onResume()
+        lifecycleScope.launch {
+            withContext(dispatcherProvider.io()) {
+                newTabTransitionSettings.enabledTransition() to newTabTransitionSettings.enabledCloseTransition()
+            }.let { (openTransition, closeTransition) ->
+                newTabTransition = openTransition
+                closeTabTransition = closeTransition
+            }
+        }
         appReturnPixelSender.fireIfNeeded(pendingLaunchSource ?: LaunchSourceValues.STANDARD)
         pendingLaunchSource = null
     }
@@ -697,11 +719,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
         url: String? = null,
         skipHome: Boolean,
         isExternal: Boolean,
+        isNewTab: Boolean,
     ): BrowserTabFragment {
         logcat(INFO) { "Opening new tab, url: $url, tabId: $tabId" }
         val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome, isExternal)
         fragment.inputModeTarget = consumeInputModeTargetForTab(tabId)
-        addOrReplaceNewTab(fragment, tabId)
+        addOrReplaceNewTab(fragment, tabId, isNewTab)
         currentTab = fragment
         return fragment
     }
@@ -709,15 +732,27 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private fun addOrReplaceNewTab(
         fragment: BrowserTabFragment,
         tabId: String,
+        isNewTab: Boolean,
     ) {
         if (supportFragmentManager.isStateSaved) {
             return
         }
+        supportFragmentManager.clearNewTabTransitions()
         val transaction = supportFragmentManager.beginTransaction()
         val tab = currentTab
         if (tab == null) {
             transaction.replace(R.id.fragmentContainer, fragment, tabId)
+        } else if (isClosingTab(tab)) {
+            transaction.hideClosingTab(tab, revealed = fragment)
+            transaction.add(R.id.fragmentContainer, fragment, tabId)
         } else {
+            val transition = newTabTransition
+            // A tab queued for removal (e.g. the blank tab a new Duck.ai chat replaces) can't animate out:
+            // its view would be re-attached to the window after the fragment is gone.
+            val canAnimateOut = tab.isAdded && !tab.isRemoving && tab.tabId !in tabIdsPendingRemoval
+            if (isNewTab && transition != null && canAnimateOut) {
+                transaction.applyNewTabTransition(transition, supportFragmentManager, from = tab, to = fragment)
+            }
             transaction.hide(tab)
             transaction.add(R.id.fragmentContainer, fragment, tabId)
         }
@@ -745,20 +780,68 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
         if (fragment == null) {
-            openNewTab(tab.tabId, tab.url, tab.skipHome, isExternal = consumeExternalLaunchForTab(tab.tabId))
+            openNewTab(
+                tab.tabId,
+                tab.url,
+                tab.skipHome,
+                isExternal = consumeExternalLaunchForTab(tab.tabId),
+                // A tab that has never been shown; background tabs are created unviewed.
+                isNewTab = tab.lastAccessTime == null && tab.viewed,
+            )
             return
         }
+        supportFragmentManager.clearNewTabTransitions()
         val transaction = supportFragmentManager.beginTransaction()
         currentTab?.let {
-            transaction.hide(it)
+            if (isClosingTab(it)) {
+                transaction.hideClosingTab(it, revealed = fragment)
+            } else {
+                transaction.hide(it)
+            }
         }
         transaction.show(fragment)
         transaction.commit()
         currentTab = fragment
     }
 
+    /** Called just before the current tab is deleted, so it can be removed in the transaction that shows the next tab. */
+    fun onCurrentTabClosing(tabId: String) {
+        // The tab manager closes tabs on its own, so its closes never reach here and aren't animated.
+        if (swipingTabsFeature.isEnabled || closeTabTransition == null || !lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return
+        closingTabId = tabId
+        closingTabRequestedAt = SystemClock.uptimeMillis()
+    }
+
+    private fun isClosingTab(tab: BrowserTabFragment): Boolean =
+        tab.tabId == closingTabId && SystemClock.uptimeMillis() - closingTabRequestedAt < CLOSING_TAB_TIMEOUT_MS
+
+    // A removed fragment's view leaves the container straight away and its exit animation then runs from an
+    // overlay a frame later, which shows as a flicker. Hiding keeps the view in place while it animates out;
+    // the fragment is removed once the animation is over.
+    private fun FragmentTransaction.hideClosingTab(
+        closingTab: BrowserTabFragment,
+        revealed: BrowserTabFragment,
+    ) {
+        closingTabId = null
+        closeTabTransition?.let { applyCloseTabTransition(it, supportFragmentManager, closing = closingTab, revealed = revealed) }
+        tabIdsPendingRemoval.add(closingTab.tabId)
+        hide(closingTab)
+        lastActiveTabs.remove(closingTab.tabId)
+        lifecycleScope.launch {
+            delay(CLOSING_TAB_REMOVAL_DELAY_MS)
+            tabIdsPendingRemoval.remove(closingTab.tabId)
+            if (!supportFragmentManager.isStateSaved && closingTab.isAdded) {
+                removeTabs(listOf(closingTab))
+            }
+        }
+    }
+
     private fun removeTabs(fragments: List<BrowserTabFragment>) {
+        supportFragmentManager.clearNewTabTransitions()
+        val removedTabIds = fragments.map { it.tabId }
+        tabIdsPendingRemoval.addAll(removedTabIds)
         val transaction = supportFragmentManager.beginTransaction()
+        transaction.runOnCommit { tabIdsPendingRemoval.removeAll(removedTabIds.toSet()) }
         fragments.forEach {
             transaction.remove(it)
             lastActiveTabs.remove(it.tabId)
@@ -1006,6 +1089,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 .fragments
                 .mapNotNull { it as? BrowserTabFragment }
                 .filter { fragment -> updatedTabs.none { it.tabId == fragment.tabId } }
+                // The closing tab is removed by the transaction that shows the next tab.
+                .filterNot { isClosingTab(it) || it.tabId in tabIdsPendingRemoval }
 
         if (stale.isNotEmpty()) {
             removeTabs(stale)
@@ -1402,6 +1487,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         private const val MAX_ACTIVE_TABS = 40
         private const val KEY_TAB_PAGER_STATE = "tabPagerState"
+        private const val CLOSING_TAB_TIMEOUT_MS = 1_000L
+        private const val CLOSING_TAB_REMOVAL_DELAY_MS = 600L
         private const val KEY_SAVED_BROWSER_MODE = "savedBrowserMode"
 
         private const val KEY_PENDING_MODE_SWITCH = "pendingModeSwitch"
@@ -1781,7 +1868,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     tabManager.openNewTab(sourceTabId = sourceTabId)
                 } else {
                     val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
-                    val fragment = openNewTab(tabId, null, false, intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ?: false)
+                    val fragment = openNewTab(
+                        tabId,
+                        null,
+                        false,
+                        intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ?: false,
+                        isNewTab = true,
+                    )
                     fragment.messageFromPreviousTab = message
                 }
             }
