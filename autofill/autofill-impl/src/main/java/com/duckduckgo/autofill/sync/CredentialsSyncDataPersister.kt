@@ -23,7 +23,6 @@ import com.duckduckgo.autofill.sync.CredentialsSyncDataPersister.Adapters.Compan
 import com.duckduckgo.autofill.sync.persister.CredentialsMergeStrategy
 import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.common.utils.formatters.time.SyncDateProvider
-import com.duckduckgo.di.DaggerMap
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncErrorResponse
@@ -45,7 +44,7 @@ import javax.inject.*
 class CredentialsSyncDataPersister @Inject constructor(
     private val credentialsSyncMetadata: CredentialsSyncMetadata,
     private val credentialsSyncStore: CredentialsSyncStore,
-    private val strategies: DaggerMap<SyncConflictResolution, CredentialsMergeStrategy>,
+    private val strategies: Map<SyncConflictResolution, CredentialsMergeStrategy>,
     private val appBuildConfig: AppBuildConfig,
     private val credentialsSyncFeatureListener: CredentialsSyncFeatureListener,
 ) : SyncableDataPersister {

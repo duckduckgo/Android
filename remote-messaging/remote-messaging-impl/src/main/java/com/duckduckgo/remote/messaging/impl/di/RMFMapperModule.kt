@@ -16,7 +16,6 @@
 
 package com.duckduckgo.remote.messaging.impl.di
 
-import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.Content.ActionableItems
@@ -56,7 +55,7 @@ object RMFMapperModule {
     @Provides
     @SingleIn(AppScope::class)
     fun provideMoshiAdapter(
-        actionMappers: DaggerSet<MessageActionMapperPlugin>,
+        actionMappers: Set<MessageActionMapperPlugin>,
     ): JsonAdapter<RemoteMessage> {
         val moshi = Moshi.Builder()
             .add(

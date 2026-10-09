@@ -34,9 +34,11 @@ import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.INT
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.MAP
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.SET
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.ksp.KotlinPoetKspPreview
 import com.squareup.kotlinpoet.ksp.toClassName
@@ -57,8 +59,6 @@ class ContributesPluginPointProcessor(
         private val MULTIBINDS_CLASS = ClassName("dev.zacsweers.metro", "Multibinds")
         private val CONTRIBUTES_TO_CLASS = ClassName("dev.zacsweers.metro", "ContributesTo")
         private val PLUGIN_POINT_CLASS = ClassName("com.duckduckgo.common.utils.plugins", "PluginPoint")
-        private val DAGGER_SET_CLASS = ClassName("com.duckduckgo.di", "DaggerSet")
-        private val DAGGER_MAP_CLASS = ClassName("com.duckduckgo.di", "DaggerMap")
         private val COLLECTION_CLASS = ClassName("kotlin.collections", "Collection")
     }
 
@@ -129,8 +129,8 @@ class ContributesPluginPointProcessor(
     ) {
         val pluginPointClassName = "${simpleName}_PluginPoint"
 
-        val setPluginsType = DAGGER_SET_CLASS.parameterizedBy(pluginClassName)
-        val mapPluginsType = DAGGER_MAP_CLASS.parameterizedBy(INT, pluginClassName)
+        val setPluginsType = SET.parameterizedBy(pluginClassName)
+        val mapPluginsType = MAP.parameterizedBy(INT, pluginClassName)
         val collectionType = COLLECTION_CLASS.parameterizedBy(pluginClassName)
 
         val setPluginsProperty = PropertySpec.builder("setPlugins", setPluginsType)
@@ -201,8 +201,8 @@ class ContributesPluginPointProcessor(
         val moduleClassName = "${simpleName}_PluginPoint_Module"
         val pluginPointImplClassName = ClassName(packageName, "${simpleName}_PluginPoint")
 
-        val setType = DAGGER_SET_CLASS.parameterizedBy(pluginClassName)
-        val mapType = DAGGER_MAP_CLASS.parameterizedBy(INT, pluginClassName)
+        val setType = SET.parameterizedBy(pluginClassName)
+        val mapType = MAP.parameterizedBy(INT, pluginClassName)
         val pluginPointType = PLUGIN_POINT_CLASS.parameterizedBy(pluginClassName)
 
         val bindSetEmptyFun = FunSpec.builder("bindSetEmpty${simpleName}_PluginPoint")
