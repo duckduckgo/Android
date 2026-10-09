@@ -860,8 +860,8 @@
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Pokaż przy uruchomieniu aplikacji</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab">Ostatnio otwarta karta</string>
-    <string name="showOnAppLaunchOptionNewTabPage">Strona nowej karty</string>
+    <string name="showOnAppLaunchOptionLastUsedTab">Ostatnio używana karta</string>
+    <string name="showOnAppLaunchOptionOpenNewTab">Strona nowej karty</string>
     <string name="showOnAppLaunchOptionSpecificPage">Określona strona</string>
 
     <!-- Privacy Dashboard -->
