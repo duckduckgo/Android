@@ -21,9 +21,12 @@
     <string name="newTabReturnHatchFireTabTitle">Viimati kasutatud Fire vahekaart</string>
     <string name="newTabReturnHatchTabClosed">Vaheleht on suletud</string>
     <string name="newTabReturnHatchUndo">Võta tagasi</string>
-    <string name="hatchMenuReturnTab">Tagasi vahelehele</string>
+    <string name="hatchMenuReturnToLastUsedTab">Tagasi viimati kasutatud vahelehele</string>
     <string name="hatchMenuAfterInactivitySettings">Pärast tegevusetust</string>
-    <string name="hatchMenuCloseTab">Sulge vaheleht</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Ava uus vaheleht</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Viimati kasutatud vahekaart</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="&apos;%1$s&apos; is the menu row label (&apos;After Inactivity&apos;) and &apos;%2$s&apos; is the current destination, e.g. &apos;After Inactivity, Open New Tab&apos;">%1$s, %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Sulge viimati kasutatud vahekaart</string>
     <string name="hatchMenuBurnTab">Kustuta vahekaart</string>
-    <string name="hatchMenuHideShortcut">Peida otsetee</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="&apos;Return to&apos; refers to this menu&apos;s own &apos;Return to…&apos; label shown above this item">Peida otsetee „Tagasi”</string>
 </resources>
