@@ -29,9 +29,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.SyncBuildConfig
+import com.duckduckgo.sync.impl.auth.AuthLauncher.AuthResult
 import com.duckduckgo.sync.impl.auth.AuthPrompt.Enroll
 import com.duckduckgo.sync.impl.auth.AuthPrompt.Verify
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -41,7 +41,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 /**
- * Renders prompts published by [DeviceAuthenticator2.currentPrompt] in the current activity.
+ * Renders prompts published by [DeviceAuthenticator.currentPrompt] in the current activity.
  */
 interface AuthPromptRenderer {
     /**
