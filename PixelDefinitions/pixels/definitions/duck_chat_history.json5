@@ -228,7 +228,7 @@
     "m_aichat_history_screen_shown": {
         "description": "The native Duck.ai chat history screen was shown. The `source` parameter identifies the entry point",
         "owners": ["karlenDimla"],
-        "triggers": ["impression"],
+        "triggers": ["user_interaction"],
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": [
             "appVersion",
@@ -236,7 +236,7 @@
                 "key": "source",
                 "description": "The entry point from which the chat history screen was opened",
                 "type": "string",
-                "enum": ["browser_menu", "address_bar", "contextual_chat", "side_bar"]
+                "enum": ["browser_menu", "address_bar", "contextual_chat", "side_bar", "deeplink"]
             }
         ]
     }

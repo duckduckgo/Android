@@ -25,6 +25,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatHistoryParams
 import com.duckduckgo.duckchat.impl.databinding.ActivityChatHistoryBinding
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import javax.inject.Inject
 
@@ -32,7 +33,8 @@ import javax.inject.Inject
  * Thin host for chat-history-related fragments.
  */
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(DuckChatHistoryParams::class, screenName = "duckai.history")
+@ContributeToActivityStarter(DuckChatHistoryDeeplinkParams::class, screenName = "duckai.history")
+@ContributeToActivityStarter(DuckChatHistoryParams::class)
 class ChatHistoryActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -46,10 +48,20 @@ class ChatHistoryActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
 
         if (savedInstanceState == null) {
-            intent.getActivityParams(DuckChatHistoryParams::class.java)?.let { duckChatPixels.reportChatHistoryScreenShown(it.source) }
+            reportScreenShown()
             supportFragmentManager.beginTransaction()
                 .replace(binding.chatHistoryFragmentContainer.id, ChatHistoryFragment.newInstance())
                 .commit()
         }
     }
+
+    private fun reportScreenShown() {
+        when (val params = intent.getActivityParams(GlobalActivityStarter.ActivityParams::class.java)) {
+            is DuckChatHistoryParams -> duckChatPixels.reportChatHistoryScreenShown(params.source)
+            is DuckChatHistoryDeeplinkParams -> duckChatPixels.reportChatHistoryScreenShownFromDeeplink()
+            else -> Unit
+        }
+    }
 }
+
+internal data object DuckChatHistoryDeeplinkParams : GlobalActivityStarter.ActivityParams

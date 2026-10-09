@@ -190,6 +190,7 @@ interface DuckChatPixels {
     fun reportContextualRecentChatSelected()
     fun reportContextualViewAllChatsTapped()
     fun reportChatHistoryScreenShown(source: DuckChatHistorySource)
+    fun reportChatHistoryScreenShownFromDeeplink()
     fun reportContextualOpenDuckAiMenuTapped()
     fun reportContextualPageContextInvalidEmpty()
     fun reportContextualPageContextInvalidNoTitle()
@@ -735,7 +736,15 @@ class RealDuckChatPixels @Inject constructor(
     }
 
     override fun reportChatHistoryScreenShown(source: DuckChatHistorySource) {
-        val params = mapOf(DuckChatPixelParameters.ENTRY_SOURCE to source.pixelValue())
+        fireChatHistoryScreenShown(source.pixelValue())
+    }
+
+    override fun reportChatHistoryScreenShownFromDeeplink() {
+        fireChatHistoryScreenShown("deeplink")
+    }
+
+    private fun fireChatHistoryScreenShown(source: String) {
+        val params = mapOf(DuckChatPixelParameters.ENTRY_SOURCE to source)
         appCoroutineScope.launch(dispatcherProvider.io()) {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_COUNT, params)
             pixel.fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_DAILY, params, type = Pixel.PixelType.Daily())
