@@ -249,6 +249,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Passwörter von Google importieren</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google fordert dich eventuell auf, dich anzumelden oder dein Passwort zur Bestätigung einzugeben.</string>
+    <string name="importPasswordsChooseMethodDialogSubtitleDeviceAuth">Dein Gerät fordert dich möglicherweise auf, zur Bestätigung deine PIN, dein Passwort oder dein Muster einzugeben.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Von Google importieren</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">CSV-Datei wählen</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Aus Desktop-Browser importieren</string>
@@ -280,8 +281,10 @@
 
     <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Übertrage deine Passwörter von&lt;br /&gt;Google zu DuckDuckGo</string>
     <string name="passwords_import_promo_subtitle">Importiere deine Passwörter schnell und sicher zu DuckDuckGo. Google fordert dich möglicherweise auf, dein Passwort einzugeben.</string>
+    <string name="passwords_import_promo_subtitle_device_auth">Importiere deine Passwörter schnell und sicher zu DuckDuckGo. Dein Gerät fordert dich möglicherweise auf, zur Bestätigung deine PIN, dein Passwort oder dein Muster einzugeben.</string>
     <string name="passwords_import_promo_action">Von Google importieren</string>
     <string name="passwords_import_promo_in_browser_title">Übertrage deine Passwörter von Google zu DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_title_device_auth">Importiere deine Passwörter von Google zu DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Nicht erneut fragen</string>
     <string name="passwords_import_promo_in_settings_title">Passwörter von Google importieren</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Ausblenden</string>
