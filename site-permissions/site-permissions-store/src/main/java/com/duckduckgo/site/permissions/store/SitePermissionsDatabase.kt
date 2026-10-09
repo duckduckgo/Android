@@ -27,7 +27,7 @@ import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissi
 
 @Database(
     exportSchema = true,
-    version = 5,
+    version = 6,
     entities = [
         SitePermissionsEntity::class,
         SitePermissionAllowedEntity::class,
@@ -56,4 +56,26 @@ val MIGRATION_4_5 = object : Migration(4, 5) {
     }
 }
 
-val ALL_MIGRATIONS = listOf(MIGRATION_1_2, MIGRATION_3_4, MIGRATION_4_5)
+val MIGRATION_5_6 = object : Migration(5, 6) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        // Rows used to be created for one-time grants with every setting defaulted to ASK_EVERY_TIME, which can't be told
+        // apart from an explicit choice, so all of them become "not set" and sites left with nothing are dropped.
+        database.execSQL(
+            "CREATE TABLE `site_permissions_new` (`domain` TEXT NOT NULL, `askCameraSetting` TEXT, `askMicSetting` TEXT, " +
+                "`askDrmSetting` TEXT, `askLocationSetting` TEXT, PRIMARY KEY(`domain`))",
+        )
+        database.execSQL(
+            "INSERT INTO `site_permissions_new` SELECT `domain`, NULLIF(`askCameraSetting`, 'ASK_EVERY_TIME'), " +
+                "NULLIF(`askMicSetting`, 'ASK_EVERY_TIME'), NULLIF(`askDrmSetting`, 'ASK_EVERY_TIME'), " +
+                "NULLIF(`askLocationSetting`, 'ASK_EVERY_TIME') FROM `site_permissions`",
+        )
+        database.execSQL("DROP TABLE `site_permissions`")
+        database.execSQL("ALTER TABLE `site_permissions_new` RENAME TO `site_permissions`")
+        database.execSQL(
+            "DELETE FROM `site_permissions` WHERE `askCameraSetting` IS NULL AND `askMicSetting` IS NULL " +
+                "AND `askDrmSetting` IS NULL AND `askLocationSetting` IS NULL",
+        )
+    }
+}
+
+val ALL_MIGRATIONS = listOf(MIGRATION_1_2, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)

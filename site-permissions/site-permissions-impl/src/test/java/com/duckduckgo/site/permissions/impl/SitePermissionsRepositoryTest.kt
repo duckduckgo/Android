@@ -29,6 +29,7 @@ import com.duckduckgo.site.permissions.impl.drm.DrmPolicyReason
 import com.duckduckgo.site.permissions.impl.drm.DrmSessionStore
 import com.duckduckgo.site.permissions.impl.drmblock.DrmBlock
 import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
+import com.duckduckgo.site.permissions.impl.feature.SitePermissionsDialogRedesignFeature
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType.ALLOW_ALWAYS
@@ -37,11 +38,15 @@ import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEnti
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionsAllowedDao
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -63,6 +68,7 @@ class SitePermissionsRepositoryTest {
     private val mockDrmBlock: DrmBlock = mock()
     private val mockDrmPolicyManager: DrmPolicyManager = mock()
     private val drmPolicyFeature = FakeFeatureToggleFactory.create(DrmPolicyFeature::class.java)
+    private val sitePermissionsDialogRedesignFeature = FakeFeatureToggleFactory.create(SitePermissionsDialogRedesignFeature::class.java)
 
     private val repository = SitePermissionsRepositoryImpl(
         mockSitePermissionsDao,
@@ -74,6 +80,7 @@ class SitePermissionsRepositoryTest {
         DrmSessionStore(),
         drmPolicyFeature,
         { mockDrmPolicyManager },
+        sitePermissionsDialogRedesignFeature,
     )
 
     private val url = "https://domain.com/whatever"
@@ -84,6 +91,7 @@ class SitePermissionsRepositoryTest {
     fun before() {
         drmPolicyFeature.self().setRawStoredState(Toggle.State(true))
         drmPolicyFeature.centralPolicy().setRawStoredState(Toggle.State(false))
+        sitePermissionsDialogRedesignFeature.explicitPermissionsOnly().setRawStoredState(Toggle.State(false))
     }
 
     @Test
@@ -261,6 +269,16 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
+    fun whenExplicitPermissionsOnlyAndUserGrantsSitePermissionThenSkipSaveEntity() = runTest {
+        sitePermissionsDialogRedesignFeature.explicitPermissionsOnly().setRawStoredState(Toggle.State(true))
+        setInitialSettings()
+        repository.sitePermissionGranted(url, "tabId", PermissionRequest.RESOURCE_VIDEO_CAPTURE)
+
+        verify(mockSitePermissionsDao, never()).insert(any())
+        verify(mockSitePermissionsAllowedDao).insert(any())
+    }
+
+    @Test
     fun whenUserGrantsSitePermissionAlreadyInDbThenSkipSaveEntity() = runTest {
         val testEntity = SitePermissionsEntity(domain)
         setInitialSettings(sitePermissionEntity = testEntity)
@@ -278,17 +296,58 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
+    fun whenExplicitPermissionsOnlyAndUserGrantsSitePermissionThenDeleteExpiredAllowedEntities() = runTest {
+        sitePermissionsDialogRedesignFeature.explicitPermissionsOnly().setRawStoredState(Toggle.State(true))
+        setInitialSettings()
+        val before = System.currentTimeMillis()
+        repository.sitePermissionGranted(url, "tabId", PermissionRequest.RESOURCE_VIDEO_CAPTURE)
+
+        val cutoff = argumentCaptor<Long>()
+        verify(mockSitePermissionsAllowedDao).deleteAllowedBefore(cutoff.capture())
+        assertTrue(cutoff.firstValue >= before - SitePermissionAllowedEntity.EXPIRY_MILLIS)
+        assertTrue(cutoff.firstValue <= System.currentTimeMillis() - SitePermissionAllowedEntity.EXPIRY_MILLIS)
+    }
+
+    @Test
+    fun whenNotExplicitPermissionsOnlyAndUserGrantsSitePermissionThenKeepExpiredAllowedEntities() = runTest {
+        setInitialSettings()
+        repository.sitePermissionGranted(url, "tabId", PermissionRequest.RESOURCE_VIDEO_CAPTURE)
+
+        verify(mockSitePermissionsAllowedDao, never()).deleteAllowedBefore(any())
+    }
+
+    @Test
     fun whenSitePermissionsWebsitesFlowIsCalledThenGetSitePermissionsWebsitesFlow() = runTest {
+        whenever(mockSitePermissionsDao.getAllSitesPermissionsAsFlow()).thenReturn(flowOf(emptyList()))
         repository.sitePermissionsWebsitesFlow()
 
         verify(mockSitePermissionsDao).getAllSitesPermissionsAsFlow()
     }
 
     @Test
-    fun whenSitePermissionsForAllWebsitesIsCalledThenGetSitePermissionsForAllWebsites() = runTest {
-        repository.sitePermissionsForAllWebsites()
+    fun whenExplicitPermissionsOnlyThenSitePermissionsWebsitesFlowSkipsSitesWithNothingSet() = runTest {
+        sitePermissionsDialogRedesignFeature.explicitPermissionsOnly().setRawStoredState(Toggle.State(true))
+        val explicitSite = SitePermissionsEntity(domain, askCameraSetting = ALLOW_ALWAYS.name)
+        val siteWithNothingSet = SitePermissionsEntity("other.com")
+        whenever(mockSitePermissionsDao.getAllSitesPermissionsAsFlow()).thenReturn(flowOf(listOf(explicitSite, siteWithNothingSet)))
 
-        verify(mockSitePermissionsDao).getAllSitesPermissions()
+        assertEquals(listOf(explicitSite), repository.sitePermissionsWebsitesFlow().first())
+    }
+
+    @Test
+    fun whenNotExplicitPermissionsOnlyThenSitePermissionsWebsitesFlowKeepsSitesWithNothingSet() = runTest {
+        val sites = listOf(SitePermissionsEntity(domain))
+        whenever(mockSitePermissionsDao.getAllSitesPermissionsAsFlow()).thenReturn(flowOf(sites))
+
+        assertEquals(sites, repository.sitePermissionsWebsitesFlow().first())
+    }
+
+    @Test
+    fun whenDomainsWithPermissionsThenIncludeDomainsWithOnlyOneTimeGrants() = runTest {
+        whenever(mockSitePermissionsDao.getAllSitesPermissions()).thenReturn(listOf(SitePermissionsEntity("a.com"), SitePermissionsEntity("b.com")))
+        whenever(mockSitePermissionsAllowedDao.getAllowedDomains()).thenReturn(listOf("b.com", "c.com"))
+
+        assertEquals(setOf("a.com", "b.com", "c.com"), repository.domainsWithPermissions())
     }
 
     @Test
