@@ -30,6 +30,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 
 class RemoteMessageAutoDismissEvaluatorTest {
@@ -124,25 +125,91 @@ class RemoteMessageAutoDismissEvaluatorTest {
         verify(remoteMessagingPixels).fireRemoteMessageAutoDismissedPixel(message)
     }
 
+    @Test
+    fun whenActiveDaysReachedOnTheLastActiveDayThenMessageIsKept() {
+        onDay(100)
+
+        val dismissed = testee.shouldAutoDismiss(
+            aMessageWith(dismissAfterUniqueDailyImpressions = 3),
+            anEntity(uniqueImpressionDays = 3, lastImpressionDay = 100),
+        )
+
+        assertFalse(dismissed)
+        verifyNoInteractions(remoteMessagingPixels)
+    }
+
+    @Test
+    fun whenActiveDaysReachedAndTheLastActiveDayIsOverThenMessageIsReported() {
+        onDay(100)
+        val message = aMessageWith(dismissAfterUniqueDailyImpressions = 3)
+
+        assertTrue(testee.shouldAutoDismiss(message, anEntity(uniqueImpressionDays = 3, lastImpressionDay = 99)))
+
+        verify(remoteMessagingPixels).fireRemoteMessageAutoDismissedPixel(message)
+    }
+
+    @Test
+    fun whenActiveDaysBelowThresholdThenMessageIsKept() {
+        onDay(100)
+
+        val dismissed = testee.shouldAutoDismiss(
+            aMessageWith(dismissAfterUniqueDailyImpressions = 3),
+            anEntity(uniqueImpressionDays = 2, lastImpressionDay = 99),
+        )
+
+        assertFalse(dismissed)
+        verifyNoInteractions(remoteMessagingPixels)
+    }
+
+    @Test
+    fun whenActiveDaysThresholdIsZeroOrNegativeThenMessageIsNeverDismissed() {
+        onDay(100)
+        val entity = anEntity(uniqueImpressionDays = 10, lastImpressionDay = 99)
+
+        assertFalse(testee.shouldAutoDismiss(aMessageWith(dismissAfterUniqueDailyImpressions = 0), entity))
+        assertFalse(testee.shouldAutoDismiss(aMessageWith(dismissAfterUniqueDailyImpressions = -1), entity))
+
+        verifyNoInteractions(remoteMessagingPixels)
+    }
+
+    @Test
+    fun whenNeverShownThenActiveDaysCannotRetireTheMessage() {
+        onDay(100)
+
+        assertFalse(testee.shouldAutoDismiss(aMessageWith(dismissAfterUniqueDailyImpressions = 3), anEntity()))
+
+        verifyNoInteractions(remoteMessagingPixels)
+    }
+
+    private fun onDay(epochDay: Long) {
+        whenever(currentTimeProvider.localDateTimeNow()).thenReturn(LocalDate.ofEpochDay(epochDay).atTime(12, 0))
+    }
+
     private fun aMessageWith(
         dismissAfterDaysShown: Int? = null,
         maxImpressions: Int? = null,
+        dismissAfterUniqueDailyImpressions: Int? = null,
     ): RemoteMessage = aSmallMessage().copy(
         displayConditions = DisplayConditions(
             trigger = null,
             dismissAfterDaysShown = dismissAfterDaysShown,
             maxImpressions = maxImpressions,
+            dismissAfterUniqueDailyImpressions = dismissAfterUniqueDailyImpressions,
         ),
     )
 
     private fun anEntity(
         firstShownDate: Long? = null,
         impressions: Int = 0,
+        uniqueImpressionDays: Int = 0,
+        lastImpressionDay: Long? = null,
     ) = RemoteMessageEntity(
         id = "id",
         message = "message",
         status = Status.SCHEDULED,
         firstShownDate = firstShownDate,
         impressions = impressions,
+        uniqueImpressionDays = uniqueImpressionDays,
+        lastImpressionDay = lastImpressionDay,
     )
 }

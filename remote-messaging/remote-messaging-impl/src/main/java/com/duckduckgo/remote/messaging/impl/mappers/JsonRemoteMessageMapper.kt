@@ -242,6 +242,7 @@ private fun JsonDisplayConditions.toDisplayConditionsOrNull(): DisplayConditions
         trigger = resolvedTrigger,
         dismissAfterDaysShown = dismissAfterDaysShown,
         maxImpressions = maxImpressions?.takeIf { it > 0 },
+        dismissAfterUniqueDailyImpressions = dismissAfterUniqueDailyImpressions?.takeIf { it > 0 },
     )
 }
 

@@ -28,6 +28,7 @@ dependencies {
     implementation project(':anvil-annotations')
     implementation project(':di')
     implementation project(':common-utils')
+    implementation project(':data-store-api')
     implementation project(':app-build-config-api')
     implementation project(':feature-toggles-api')
     implementation project(':remote-messaging-api')
@@ -50,6 +51,7 @@ dependencies {
     // Testing dependencies
     testImplementation project(path: ':common-test')
     testImplementation project(path: ':feature-toggles-test')
+    testImplementation project(path: ':data-store-test')
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation (KotlinX.coroutines.test) {

@@ -23,7 +23,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     exportSchema = true,
-    version = 4,
+    version = 5,
     entities = [
         RemoteMessagingConfig::class,
         RemoteMessageEntity::class,
@@ -58,7 +58,13 @@ abstract class RemoteMessagingDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE `remote_message` ADD COLUMN `impressions` INTEGER NOT NULL DEFAULT 0")
             }
         }
+        private val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `remote_message` ADD COLUMN `uniqueImpressionDays` INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `remote_message` ADD COLUMN `lastImpressionDay` INTEGER")
+            }
+        }
         val ALL_MIGRATIONS: Array<Migration>
-            get() = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+            get() = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
     }
 }

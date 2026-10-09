@@ -39,6 +39,7 @@ data class JsonDisplayConditions(
     val trigger: String? = null,
     val dismissAfterDaysShown: Int? = null,
     val maxImpressions: Int? = null,
+    val dismissAfterUniqueDailyImpressions: Int? = null,
 )
 
 data class JsonContent(

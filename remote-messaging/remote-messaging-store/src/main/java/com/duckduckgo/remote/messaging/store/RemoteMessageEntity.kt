@@ -27,6 +27,8 @@ data class RemoteMessageEntity(
     val shown: Boolean = false,
     val firstShownDate: Long? = null,
     val impressions: Int = 0,
+    val uniqueImpressionDays: Int = 0,
+    val lastImpressionDay: Long? = null,
 ) {
     enum class Status {
         SCHEDULED,

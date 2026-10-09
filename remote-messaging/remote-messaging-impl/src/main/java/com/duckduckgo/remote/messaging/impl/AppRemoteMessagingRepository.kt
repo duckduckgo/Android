@@ -75,12 +75,17 @@ class AppRemoteMessagingRepository(
 
     override fun markAsShown(remoteMessage: RemoteMessage) {
         val messageEntity = remoteMessagesDao.messagesById(remoteMessage.id) ?: return
+        val now = currentTimeProvider.currentTimeMillis()
+        val today = currentTimeProvider.localDateTimeNow().toLocalDate().toEpochDay()
+        val isNewActiveDay = messageEntity.lastImpressionDay != today
         // Stamp the first-shown timestamp on the first impression only.
         remoteMessagesDao.insert(
             messageEntity.copy(
                 shown = true,
-                firstShownDate = messageEntity.firstShownDate ?: currentTimeProvider.currentTimeMillis(),
+                firstShownDate = messageEntity.firstShownDate ?: now,
                 impressions = messageEntity.impressions + 1,
+                uniqueImpressionDays = messageEntity.uniqueImpressionDays + if (isNewActiveDay) 1 else 0,
+                lastImpressionDay = today,
             ),
         )
     }

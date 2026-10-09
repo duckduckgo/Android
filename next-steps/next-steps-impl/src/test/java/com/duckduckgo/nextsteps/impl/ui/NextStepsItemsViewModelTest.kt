@@ -16,6 +16,9 @@
 package com.duckduckgo.nextsteps.impl.ui
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
+import com.duckduckgo.nextsteps.impl.NextStepsItemsStore
+import com.duckduckgo.nextsteps.impl.RealNextStepsItemsStore
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.CardItemType
@@ -24,6 +27,7 @@ import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.Surface
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -47,15 +51,20 @@ class NextStepsItemsViewModelTest {
         whenever(it.observeActiveMessages()).thenReturn(activeMessage)
     }
 
+    private val itemsStore: NextStepsItemsStore = RealNextStepsItemsStore(FakeSharedPreferencesProvider())
+
     private lateinit var testee: NextStepsItemsViewModel
 
     @Before
     fun setUp() {
-        testee = NextStepsItemsViewModel(
-            dispatchers = coroutineRule.testDispatcherProvider,
-            remoteMessageModel = remoteMessageModel,
-        )
+        testee = aViewModel()
     }
+
+    private fun aViewModel() = NextStepsItemsViewModel(
+        dispatchers = coroutineRule.testDispatcherProvider,
+        remoteMessageModel = remoteMessageModel,
+        itemsStore = itemsStore,
+    )
 
     @Test
     fun `when no active message then state is empty`() = runTest {
@@ -143,6 +152,148 @@ class NextStepsItemsViewModelTest {
         verify(remoteMessageModel).onMessageDismissed(message)
     }
 
+    @Test
+    fun `when a card was dismissed before then it is not shown again by a new view model`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        testee.onFrontCardDismissed()
+        advanceUntilIdle()
+
+        val newViewModel = aViewModel()
+        advanceUntilIdle()
+
+        assertEquals(listOf(addWidgetItem), newViewModel.viewState.value.items)
+    }
+
+    @Test
+    fun `when every card was dismissed before then the section is empty and the message is dismissed`() = runTest {
+        itemsStore.addDismissedItemId(defaultBrowserItem.id)
+        itemsStore.addDismissedItemId(addWidgetItem.id)
+        val message = aMessage(content = nextStepsContent())
+        activeMessage.value = message
+
+        advanceUntilIdle()
+
+        assertEquals(emptyList<CardItem.ListItem>(), testee.viewState.value.items)
+        verify(remoteMessageModel).onMessageDismissed(message)
+    }
+
+    @Test
+    fun `when a new tab page loads the cards then the front card counts one impression`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+
+        assertEquals(1, itemsStore.frontImpressions(defaultBrowserItem.id))
+        assertEquals(0, itemsStore.frontImpressions(addWidgetItem.id))
+    }
+
+    @Test
+    fun `when the message is re-emitted while cards are on screen then no extra impression is counted`() = runTest {
+        val message = aMessage(content = nextStepsContent())
+        activeMessage.value = message
+        advanceUntilIdle()
+
+        activeMessage.value = message.copy(matchingRules = listOf(1))
+        advanceUntilIdle()
+
+        assertEquals(1, itemsStore.frontImpressions(defaultBrowserItem.id))
+    }
+
+    @Test
+    fun `when the front card was loaded fewer than five times then the order is kept`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        loadNewTabPagesUntil(impressions = 4)
+
+        val newViewModel = aViewModel()
+        advanceUntilIdle()
+
+        assertEquals(listOf(defaultBrowserItem, addWidgetItem), newViewModel.viewState.value.items)
+    }
+
+    @Test
+    fun `when the front card was loaded five times then it moves to the back on the next load`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        loadNewTabPagesUntil(impressions = 5)
+
+        val newViewModel = aViewModel()
+        advanceUntilIdle()
+
+        assertEquals(listOf(addWidgetItem, defaultBrowserItem), newViewModel.viewState.value.items)
+    }
+
+    @Test
+    fun `when the message is re-emitted while cards are on screen then the order on screen does not change`() = runTest {
+        val message = aMessage(content = nextStepsContent())
+        activeMessage.value = message
+        loadNewTabPagesUntil(impressions = 5)
+        val viewModel = aViewModel()
+        advanceUntilIdle()
+        assertEquals(listOf(addWidgetItem, defaultBrowserItem), viewModel.viewState.value.items)
+        repeat(5) { itemsStore.incrementFrontImpressions(addWidgetItem.id) }
+
+        activeMessage.value = message.copy(matchingRules = listOf(1))
+        advanceUntilIdle()
+
+        assertEquals(listOf(addWidgetItem, defaultBrowserItem), viewModel.viewState.value.items)
+    }
+
+    @Test
+    fun `when a card was just rotated to the front then its impressions start from one`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        loadNewTabPagesUntil(impressions = 5)
+
+        val rotatedViewModel = aViewModel()
+        advanceUntilIdle()
+
+        assertEquals(listOf(addWidgetItem, defaultBrowserItem), rotatedViewModel.viewState.value.items)
+        assertEquals(1, itemsStore.frontImpressions(addWidgetItem.id))
+        assertEquals(0, itemsStore.frontImpressions(defaultBrowserItem.id))
+    }
+
+    @Test
+    fun `when only one card is left then it never rotates`() = runTest {
+        itemsStore.addDismissedItemId(addWidgetItem.id)
+        activeMessage.value = aMessage(content = nextStepsContent())
+        loadNewTabPagesUntil(impressions = 6)
+
+        val newViewModel = aViewModel()
+        advanceUntilIdle()
+
+        assertEquals(listOf(defaultBrowserItem), newViewModel.viewState.value.items)
+    }
+
+    @Test
+    fun `when the stored order has ids that are gone and the config has new ids then new ids are appended`() = runTest {
+        itemsStore.saveItemOrder(listOf("setup_removed", addWidgetItem.id, defaultBrowserItem.id))
+        activeMessage.value = aMessage(
+            content = Content.ActionableItems(
+                titleText = "Complete your setup",
+                listItems = listOf(syncItem, defaultBrowserItem, addWidgetItem),
+            ),
+        )
+
+        advanceUntilIdle()
+
+        assertEquals(listOf(addWidgetItem, defaultBrowserItem, syncItem), testee.viewState.value.items)
+    }
+
+    @Test
+    fun `when there are no items then no impression is counted`() = runTest {
+        advanceUntilIdle()
+
+        assertEquals(0, itemsStore.frontImpressions(defaultBrowserItem.id))
+    }
+
+    private fun TestScope.loadNewTabPagesUntil(impressions: Int) {
+        advanceUntilIdle()
+        val frontId = testee.viewState.value.items.first().id
+        while (itemsStore.frontImpressions(frontId) < impressions) {
+            aViewModel()
+            advanceUntilIdle()
+        }
+        assertEquals(impressions, itemsStore.frontImpressions(frontId))
+    }
+
     private val defaultBrowserItem = CardItem.ListItem(
         id = "setup_default_browser",
         type = CardItemType.ONE_ACTION_ITEM,
@@ -156,6 +307,8 @@ class NextStepsItemsViewModelTest {
     )
 
     private val addWidgetItem = defaultBrowserItem.copy(id = "setup_add_widget", titleText = "Try our Home screen widget")
+
+    private val syncItem = defaultBrowserItem.copy(id = "setup_sync", titleText = "Sync your data")
 
     private fun nextStepsContent() = Content.ActionableItems(
         titleText = "Complete your setup",
