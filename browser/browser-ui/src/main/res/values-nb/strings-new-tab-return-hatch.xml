@@ -21,9 +21,12 @@
     <string name="newTabReturnHatchFireTabTitle">Sist brukte Fire-fane</string>
     <string name="newTabReturnHatchTabClosed">Fanen er lukket</string>
     <string name="newTabReturnHatchUndo">Angre</string>
-    <string name="hatchMenuReturnTab">Tilbake til fanen</string>
+    <string name="hatchMenuReturnToLastUsedTab">Gå tilbake til fanen du brukte sist</string>
     <string name="hatchMenuAfterInactivitySettings">Etter inaktivitet</string>
-    <string name="hatchMenuCloseTab">Lukk fanen</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Åpne ny fane</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Sist brukte fane</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="&apos;%1$s&apos; is the menu row label (&apos;After Inactivity&apos;) and &apos;%2$s&apos; is the current destination, e.g. &apos;After Inactivity, Open New Tab&apos;">%1$s, %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Lukk sist brukte fane</string>
     <string name="hatchMenuBurnTab">Slett fanen</string>
-    <string name="hatchMenuHideShortcut">Skjul snarvei</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="&apos;Return to&apos; refers to this menu&apos;s own &apos;Return to…&apos; label shown above this item">Skjul snarveien «Gå tilbake til»</string>
 </resources>
