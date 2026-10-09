@@ -37,6 +37,7 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
+import com.duckduckgo.app.tabs.model.PageTitleFetcher
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
@@ -121,6 +122,66 @@ class TabDataRepositoryTest {
     @After
     fun after() {
         daoDeletableTabs.close()
+    }
+
+    @Test
+    fun whenAddNewTabAfterExistingTabThenTitleIsUrlWithoutSchemeAndWww() = runTest {
+        val testee = tabDataRepository()
+        testee.addNewTabAfterExistingTab("https://www.bbc.co.uk/news/articles/abc", "tabid")
+        val captor = argumentCaptor<TabEntity>()
+        verify(mockDao).insertTabAtPosition(captor.capture())
+        assertEquals("bbc.co.uk/news/articles/abc", captor.firstValue.title)
+    }
+
+    @Test
+    fun whenAddNewTabAfterExistingTabAndPageTitleFetchedThenUnviewedTabTitleUpdated() = runTest {
+        val fetcher: PageTitleFetcher = mock()
+        whenever(fetcher.fetchTitle(any())).thenReturn("Headline")
+        whenever(mockDao.tab(any())).thenReturn(TabEntity(tabId = "new", viewed = false))
+        val testee = tabDataRepository(pageTitleFetcher = fetcher)
+
+        testee.addNewTabAfterExistingTab("https://example.com/article", "tabid")
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDao).updateUrlAndTitle(any(), eq("https://example.com/article"), eq("Headline"), eq(false))
+    }
+
+    @Test
+    fun whenAddNewTabAfterExistingTabAndPrefetchDisabledThenTitleAndFaviconNotFetched() = runTest {
+        tabManagerFeatureFlags.backgroundTabPrefetch().setRawStoredState(State(enable = false))
+        val fetcher: PageTitleFetcher = mock()
+        val faviconManager: FaviconManager = mock()
+        val testee = tabDataRepository(pageTitleFetcher = fetcher, faviconManager = faviconManager)
+
+        testee.addNewTabAfterExistingTab("https://example.com/article", "tabid")
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(fetcher, never()).fetchTitle(any())
+        verify(faviconManager, never()).tryFetchFaviconForUrl(any(), any())
+    }
+
+    @Test
+    fun whenAddNewTabAfterExistingTabThenFaviconFetched() = runTest {
+        val faviconManager: FaviconManager = mock()
+        val testee = tabDataRepository(faviconManager = faviconManager)
+
+        testee.addNewTabAfterExistingTab("https://example.com/article", "tabid")
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(faviconManager).tryFetchFaviconForUrl(any(), eq("https://example.com/article"))
+    }
+
+    @Test
+    fun whenAddNewTabAfterExistingTabAndTabViewedBeforeTitleFetchedThenTitleNotUpdated() = runTest {
+        val fetcher: PageTitleFetcher = mock()
+        whenever(fetcher.fetchTitle(any())).thenReturn("Headline")
+        whenever(mockDao.tab(any())).thenReturn(TabEntity(tabId = "new", viewed = true))
+        val testee = tabDataRepository(pageTitleFetcher = fetcher)
+
+        testee.addNewTabAfterExistingTab("https://example.com/article", "tabid")
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDao, never()).updateUrlAndTitle(any(), anyOrNull(), anyOrNull(), any())
     }
 
     @Test
@@ -1042,6 +1103,7 @@ class TabDataRepositoryTest {
         tabVisitedSitesRepository: TabVisitedSitesRepository = mockTabVisitedSitesRepository,
         nativeInputStatePublisher: NativeInputStatePublisher = mockNativeInputStatePublisher,
         duckAiTabSessionRepository: DuckAiTabSessionRepository = mock(),
+        pageTitleFetcher: PageTitleFetcher = mock(),
     ): TabDataRepository {
         return TabDataRepository(
             dao,
@@ -1069,6 +1131,7 @@ class TabDataRepositoryTest {
             tabVisitedSitesRepository,
             nativeInputStatePublisher,
             duckAiTabSessionRepository,
+            pageTitleFetcher,
         )
     }
 

@@ -37,6 +37,7 @@ import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.toStringDropScheme
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import io.reactivex.Scheduler
@@ -76,6 +77,7 @@ class TabDataRepository(
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
     private val nativeInputStatePublisher: NativeInputStatePublisher,
     private val duckAiTabSessionRepository: DuckAiTabSessionRepository,
+    private val pageTitleFetcher: PageTitleFetcher,
 ) : TabRepository, TabAtomicOperations {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()
@@ -287,20 +289,39 @@ class TabDataRepository(
         url: String?,
         tabId: String,
     ) {
+        val newTabId = generateTabId()
         databaseExecutor().scheduleDirect {
             val position = tabsDao.tab(tabId)?.position ?: -1
-            val uri = Uri.parse(url)
-            val title = uri.host?.removePrefix("www.") ?: url
             val tab = TabEntity(
-                tabId = generateTabId(),
+                tabId = newTabId,
                 url = url,
-                title = title,
+                title = Uri.parse(url).toStringDropScheme().removePrefix("www."),
                 skipHome = false,
                 viewed = false,
                 position = position + 1,
                 sourceTabId = tabId,
             )
             tabsDao.insertTabAtPosition(tab)
+        }
+
+        if (url != null) {
+            prefetchTitleAndIcon(newTabId, url)
+        }
+    }
+
+    private fun prefetchTitleAndIcon(newTabId: String, url: String) {
+        appCoroutineScope.launch {
+            if (tabManagerFeatureFlags.backgroundTabPrefetch().isEnabled()) {
+                launch { faviconManager.tryFetchFaviconForUrl(newTabId, url) }
+
+                pageTitleFetcher.fetchTitle(url)?.let { title ->
+                    databaseExecutor().scheduleDirect {
+                        if (tabsDao.tab(newTabId)?.viewed == false) {
+                            tabsDao.updateUrlAndTitle(newTabId, url, title, viewed = false)
+                        }
+                    }
+                }
+            }
         }
     }
 

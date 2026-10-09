@@ -28,6 +28,7 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
+import com.duckduckgo.app.tabs.model.PageTitleFetcher
 import com.duckduckgo.app.tabs.model.TabAtomicOperations
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -82,6 +83,7 @@ abstract class TabRepositoryModule {
             tabVisitedSitesRepository: TabVisitedSitesRepository,
             nativeInputStatePublisher: NativeInputStatePublisher,
             duckAiTabSessionRepository: DuckAiTabSessionRepository,
+            pageTitleFetcher: PageTitleFetcher,
         ): TabDataRepository = TabDataRepository(
             tabsDao = tabsDao,
             siteFactory = siteFactory,
@@ -98,6 +100,7 @@ abstract class TabRepositoryModule {
             tabVisitedSitesRepository = tabVisitedSitesRepository,
             nativeInputStatePublisher = nativeInputStatePublisher,
             duckAiTabSessionRepository = duckAiTabSessionRepository,
+            pageTitleFetcher = pageTitleFetcher,
         )
 
         @Provides
@@ -119,6 +122,7 @@ abstract class TabRepositoryModule {
             tabVisitedSitesRepository: TabVisitedSitesRepository,
             nativeInputStatePublisher: NativeInputStatePublisher,
             duckAiTabSessionRepository: DuckAiTabSessionRepository,
+            pageTitleFetcher: PageTitleFetcher,
         ): TabDataRepository = TabDataRepository(
             tabsDao = tabsDao,
             siteFactory = siteFactory,
@@ -135,6 +139,7 @@ abstract class TabRepositoryModule {
             tabVisitedSitesRepository = tabVisitedSitesRepository,
             nativeInputStatePublisher = nativeInputStatePublisher,
             duckAiTabSessionRepository = duckAiTabSessionRepository,
+            pageTitleFetcher = pageTitleFetcher,
         )
     }
 }
