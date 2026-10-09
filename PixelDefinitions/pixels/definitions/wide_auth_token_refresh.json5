@@ -76,6 +76,11 @@
                 "examples": ["unknown_account", "invalid_token_request"]
             },
             {
+                "key": "feature.data.ext.backend_error_code",
+                "description": "Backend-supplied numeric code from the `error_code` field of the token endpoint's error body, sent alongside `error`.",
+                "enum": ["0", "1", "2", "3", "4"]
+            },
+            {
                 "key": "feature.data.ext.play_login_error",
                 "description": "Why the Play store login fallback failed. PurchaseInfoNotAvailable carries the reason Play could not be queried.",
                 "type": "string",

@@ -44,7 +44,11 @@ interface AuthTokenRefreshWideEvent {
     suspend fun onTokenRead()
     suspend fun onJwksFetched()
     suspend fun onTokensFetched()
-    suspend fun onBackendErrorResponse(backendErrorResponse: String)
+    suspend fun onBackendErrorResponse(
+        backendErrorResponse: String?,
+        backendErrorCode: Int?,
+    )
+
     suspend fun onTokensValidated()
     suspend fun onUnknownAccountError()
     suspend fun onPlayLoginSuccess()
@@ -87,7 +91,7 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
                     KEY_NETP_IS_RUNNING to runCatching { networkProtectionState.get().isRunning().toString() }.getOrDefault(""),
                     KEY_PROCESS_NAME to processName,
                 ),
-                definition = WideEventDefinition(version = Version(minor = 1, patch = 0)),
+                definition = WideEventDefinition(version = Version(minor = 1, patch = 1)),
             )
             .getOrNull()
             ?.also { wideEventId ->
@@ -204,14 +208,20 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
         }
     }
 
-    override suspend fun onBackendErrorResponse(backendErrorResponse: String) {
+    override suspend fun onBackendErrorResponse(
+        backendErrorResponse: String?,
+        backendErrorCode: Int?,
+    ) {
         if (!isFeatureEnabled()) return
         ongoingTokenRefreshWideEventId?.let { wideEventId ->
             wideEventClient.flowStep(
                 wideEventId = wideEventId,
                 stepName = STEP_TOKEN_REQUEST,
                 success = false,
-                metadata = mapOf(KEY_BACKEND_ERROR_RESPONSE to backendErrorResponse),
+                metadata = buildMap {
+                    backendErrorResponse?.let { put(KEY_BACKEND_ERROR_RESPONSE, it) }
+                    backendErrorCode?.let { put(KEY_BACKEND_ERROR_CODE, it.toString()) }
+                },
             )
         }
     }
@@ -240,6 +250,7 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
         const val KEY_LOCK_OUTCOME = "lock_outcome"
         const val KEY_SUBSCRIPTION_STATUS = "subscription_status"
         const val KEY_BACKEND_ERROR_RESPONSE = "backend_error_response"
+        const val KEY_BACKEND_ERROR_CODE = "backend_error_code"
         const val KEY_PLAY_LOGIN_ERROR = "play_login_error"
         const val KEY_SIGNED_OUT = "signed_out"
         const val KEY_NETP_IS_ENABLED = "netp_is_enabled"
