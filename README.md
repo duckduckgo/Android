@@ -29,4 +29,4 @@ Contact us at https://duckduckgo.com/feedback if you have feedback, questions or
 ## License
 DuckDuckGo android is distributed under the Apache 2.0 [license](LICENSE).
 
-## Test 1
+## Test 2
