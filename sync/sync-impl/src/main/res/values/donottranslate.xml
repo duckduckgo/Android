@@ -22,4 +22,7 @@
     <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo needs to access your&#160;camera.</string>
     <string name="sync_simplified_scanner_no_permission_body_v2">Camera permissions are required to scan the QR&#160;code.</string>
     <string name="sync_simplified_scanner_no_permission_primary_button_v2">Change Permissions</string>
+
+    <!-- Scanner screen: camera intro -->
+    <string name="sync_simplified_scanner_camera_primary_button_v2">Got It</string>
 </resources>
