@@ -79,9 +79,10 @@ class WgVpnNetworkStack @Inject constructor(
                 .getOrThrow()
             logcat { "Wireguard configuration:\n$wgConfig" }
 
-            // Probe ports if feature is enabled
-            if (vpnRemoteFeatures.endpointPortFallback().isEnabled()) {
-                wgConfig = probeAndSelectPort(wgConfig!!)
+            wgConfig = if (vpnRemoteFeatures.endpointPortFallback().isEnabled()) {
+                probeAndSelectPort(wgConfig!!)
+            } else {
+                withServerDefaultPort(wgConfig!!)
             }
 
             val privateDns = dnsProvider.getPrivateDns()
@@ -129,6 +130,16 @@ class WgVpnNetworkStack @Inject constructor(
             config.replacingEndpointPort(result.selectedPort)
         } else {
             logcat { "Port probing: keeping port ${result.selectedPort}" }
+            config
+        }
+    }
+
+    private fun withServerDefaultPort(config: Config): Config {
+        val defaultPort = wgTunnelConfigLazy.get().getServerDefaultPort()
+        return if (defaultPort > 0 && defaultPort != config.currentEndpointPort()) {
+            logcat { "Port probing disabled: switching to server default port $defaultPort" }
+            config.replacingEndpointPort(defaultPort)
+        } else {
             config
         }
     }
