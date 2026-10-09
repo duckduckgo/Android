@@ -32,6 +32,7 @@ import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.computeBlockMalwareDnsOrSame
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.portprobing.PortProbingCoordinator
+import com.duckduckgo.networkprotection.impl.portprobing.currentEndpointPort
 import com.duckduckgo.networkprotection.impl.portprobing.replacingEndpointPort
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
@@ -113,14 +114,21 @@ class WgVpnNetworkStack @Inject constructor(
     }
 
     private suspend fun probeAndSelectPort(config: Config): Config {
-        val result = portProbingCoordinator.get().probeAndSelect(config, wgTunnelConfigLazy.get())
+        val result = portProbingCoordinator.get().probeAndSelect()
             ?: return config.also { logcat { "Port probing: skipping (not enough ports)" } }
 
-        return if (result.portChanged) {
+        if (result.shouldRemember) {
+            wgTunnelConfigLazy.get().setRememberedPort(result.selectedPort)
+            logcat { "Port probing: remembered port ${result.selectedPort}" }
+        }
+
+        // Always apply selected port to config if different from config's port
+        // (portChanged compares with rememberedPort, but we need to check config's port here)
+        return if (result.selectedPort != config.currentEndpointPort()) {
             logcat { "Port probing: switching to ${result.selectedPort}" }
             config.replacingEndpointPort(result.selectedPort)
         } else {
-            logcat { "Port probing: keeping current port ${result.selectedPort}" }
+            logcat { "Port probing: keeping port ${result.selectedPort}" }
             config
         }
     }

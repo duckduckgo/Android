@@ -19,7 +19,6 @@ package com.duckduckgo.networkprotection.impl.portprobing
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.squareup.anvil.annotations.ContributesBinding
-import com.wireguard.config.Config
 import javax.inject.Inject
 
 /**
@@ -39,27 +38,21 @@ data class PortProbeResult(
 interface PortProbingCoordinator {
     /**
      * Probes available ports and selects the best one
-     * @param config the current WireGuard config
-     * @param wgTunnelConfig tunnel config for reading/writing port state
      * @return probe result, or null if probing should be skipped
      */
-    suspend fun probeAndSelect(
-        config: Config,
-        wgTunnelConfig: WgTunnelConfig,
-    ): PortProbeResult?
+    suspend fun probeAndSelect(): PortProbeResult?
 }
 
 @ContributesBinding(VpnScope::class)
 class RealPortProbingCoordinator @Inject constructor(
     private val portProber: PortProber,
     private val portSelector: PortSelector,
+    private val wgTunnelConfig: WgTunnelConfig,
 ) : PortProbingCoordinator {
 
-    override suspend fun probeAndSelect(
-        config: Config,
-        wgTunnelConfig: WgTunnelConfig,
-    ): PortProbeResult? {
-        val serverIp = config.serverIp() ?: return null
+    override suspend fun probeAndSelect(): PortProbeResult? {
+        val config = wgTunnelConfig.getWgConfig()
+        val serverIp = config?.serverIp() ?: return null
         val advertisedPorts = wgTunnelConfig.getAdvertisedPorts()
 
         if (advertisedPorts.isEmpty() || advertisedPorts.size == 1) return null
@@ -83,15 +76,17 @@ class RealPortProbingCoordinator @Inject constructor(
             advertisedPorts = advertisedPorts,
         )
 
-        if (selectionResult.shouldRemember) {
-            wgTunnelConfig.setRememberedPort(selectionResult.selectedPort)
+        val referencePort = if (rememberedPort != 0L && rememberedPort != -1L) {
+            rememberedPort
+        } else {
+            currentPort
         }
 
         return PortProbeResult(
             probedPort = probedPort,
             selectedPort = selectionResult.selectedPort,
             shouldRemember = selectionResult.shouldRemember,
-            portChanged = selectionResult.selectedPort != currentPort,
+            portChanged = selectionResult.selectedPort != referencePort,
         )
     }
 }

@@ -29,7 +29,6 @@ import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.pixels.WireguardHandshakeMonitor
 import com.duckduckgo.networkprotection.impl.portprobing.PortProbingCoordinator
-import com.duckduckgo.networkprotection.impl.portprobing.replacingEndpointPort
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -145,8 +144,7 @@ class FailureRecoveryHandler @Inject constructor(
                 networkProtectionPixels.reportFailureRecoveryCompletedWithServerHealthy()
                 // Same server - probe ports if feature is enabled
                 if (vpnRemoteFeatures.endpointPortFallback().isEnabled()) {
-                    val differentPortResponded = probeForDifferentPort(config)
-                    if (differentPortResponded) {
+                    if (shouldTryDifferentPort()) {
                         logcat { "Failure recovery: different port responded, restarting VPN" }
                         wgTunnel.markTunnelHealthy()
                         vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
@@ -165,17 +163,17 @@ class FailureRecoveryHandler @Inject constructor(
         return Result.success(Unit)
     }
 
-    private suspend fun probeForDifferentPort(config: com.wireguard.config.Config): Boolean {
-        val result = portProbingCoordinator.probeAndSelect(config, wgTunnelConfig)
-            ?: return false.also { logcat { "Failure recovery port probe: skipping (not enough ports)" } }
+    private suspend fun shouldTryDifferentPort(): Boolean {
+        val result = portProbingCoordinator.probeAndSelect()
+            ?: return false.also { logcat { "Failure recovery: not enough ports to probe" } }
 
-        // Switch if selected port is different (even if no probe succeeded - selector falls back to default)
+        // Return true if a different port would be selected
+        // VPN restart (via WgVpnNetworkStack.onPrepareVpn) will handle actual port selection and config update
         return if (result.portChanged) {
-            logcat { "Failure recovery port probe: switching to port ${result.selectedPort}" }
-            wgTunnelConfig.setWgConfig(config.replacingEndpointPort(result.selectedPort))
+            logcat { "Failure recovery: port ${result.selectedPort} would be better than current" }
             true
         } else {
-            logcat { "Failure recovery port probe: keeping current port ${result.selectedPort}" }
+            logcat { "Failure recovery: current port ${result.selectedPort} is already optimal" }
             false
         }
     }
