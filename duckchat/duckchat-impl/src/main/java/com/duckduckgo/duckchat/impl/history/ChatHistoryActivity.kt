@@ -22,15 +22,21 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
+import com.duckduckgo.duckchat.api.DuckChatHistoryParams
 import com.duckduckgo.duckchat.impl.databinding.ActivityChatHistoryBinding
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.navigation.api.getActivityParams
+import javax.inject.Inject
 
 /**
  * Thin host for chat-history-related fragments.
  */
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(DuckChatHistoryNoParams::class, screenName = "duckai.history")
+@ContributeToActivityStarter(DuckChatHistoryParams::class, screenName = "duckai.history")
 class ChatHistoryActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var duckChatPixels: DuckChatPixels
 
     private val binding: ActivityChatHistoryBinding by viewBinding()
 
@@ -40,6 +46,7 @@ class ChatHistoryActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
 
         if (savedInstanceState == null) {
+            intent.getActivityParams(DuckChatHistoryParams::class.java)?.let { duckChatPixels.reportChatHistoryScreenShown(it.source) }
             supportFragmentManager.beginTransaction()
                 .replace(binding.chatHistoryFragmentContainer.id, ChatHistoryFragment.newInstance())
                 .commit()

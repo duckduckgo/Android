@@ -24,6 +24,7 @@ import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_ACCEPT_TERMS_AND_CONDITIONS
@@ -473,6 +474,17 @@ class RealDuckChatPixelsTest {
 
         verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_COUNT)
         verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportChatHistoryScreenShown then fires count and daily with source`() = runTest {
+        testee.reportChatHistoryScreenShown(DuckChatHistorySource.CONTEXTUAL_CHAT)
+
+        advanceUntilIdle()
+
+        val params = mapOf(DuckChatPixelParameters.ENTRY_SOURCE to "contextual_chat")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_COUNT, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_DAILY, params, type = Pixel.PixelType.Daily())
     }
 
     @Test
