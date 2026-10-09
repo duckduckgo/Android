@@ -25,4 +25,8 @@
 
     <!-- Scanner screen: camera intro -->
     <string name="sync_simplified_scanner_camera_primary_button_v2">Got It</string>
+
+    <!-- Edit Device screen: remove device dialog -->
+    <string name="sync_simplified_edit_device_remove_dialog_title_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Remove %1$s from Sync&#160;&amp;&#160;Backup?</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body_v2" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” will no longer be able to access your synced data. Bookmarks, Autofill data and Duck.ai chats will remain on your devices.</string>
 </resources>

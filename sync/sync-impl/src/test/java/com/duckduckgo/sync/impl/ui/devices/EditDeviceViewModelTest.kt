@@ -18,11 +18,14 @@ package com.duckduckgo.sync.impl.ui.devices
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.DeviceType
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.ui.devices.EditDeviceViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.devices.EditDeviceViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.devices.EditDeviceViewModel.Command.AskTurnOffSync
@@ -34,6 +37,7 @@ import com.duckduckgo.sync.impl.ui.devices.EditDeviceViewModel.Command.SetSyncTu
 import com.duckduckgo.sync.impl.ui.devices.EditDeviceViewModel.Command.ShowError
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -57,14 +61,19 @@ class EditDeviceViewModelTest {
 
     private val syncAccountRepository = mock<SyncAccountRepository>()
 
-    private val testee = EditDeviceViewModel(
+    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java, ioDispatcher = coroutineTestRule.testDispatcher)
+
+    private fun createTestee() = EditDeviceViewModel(
         device = device,
         syncAccountRepository = syncAccountRepository,
         dispatchers = coroutineTestRule.testDispatcherProvider,
+        syncFeature = syncFeature,
     )
 
     @Test
     fun `when the view state is observed then it emits the device it was created with`() = runTest {
+        val testee = createTestee()
+
         testee.viewState.test {
             assertEquals(device, awaitItem().device)
 
@@ -73,7 +82,39 @@ class EditDeviceViewModelTest {
     }
 
     @Test
+    fun `when the improved sync flow is enabled then the view state reflects it`() = runTest {
+        syncFeature.canUseImprovedSyncFlow().setRawStoredState(State(enable = true))
+
+        val testee = createTestee()
+
+        assertTrue(testee.viewState.value.isImprovedSyncEnabled)
+    }
+
+    @Test
+    fun `when the improved sync flow is disabled then the view state reflects it`() = runTest {
+        syncFeature.canUseImprovedSyncFlow().setRawStoredState(State(enable = false))
+
+        val testee = createTestee()
+
+        assertFalse(testee.viewState.value.isImprovedSyncEnabled)
+    }
+
+    @Test
+    fun `when the device is renamed then the improved sync flag is preserved`() = runTest {
+        syncFeature.canUseImprovedSyncFlow().setRawStoredState(State(enable = true))
+        whenever(syncAccountRepository.renameDevice(any())).thenReturn(Result.Success(true))
+
+        val testee = createTestee()
+
+        testee.confirmNewDeviceName("New Device Name")
+
+        assertTrue(testee.viewState.value.isImprovedSyncEnabled)
+    }
+
+    @Test
     fun `when the user edits the device name then the edit dialog is requested`() = runTest {
+        val testee = createTestee()
+
         testee.commands.test {
             testee.onEditDeviceName()
             assertIs<AskEditDevice>(awaitItem())
@@ -86,6 +127,8 @@ class EditDeviceViewModelTest {
     fun `when a new device name is confirmed then the device is renamed in the repository`() = runTest {
         whenever(syncAccountRepository.renameDevice(any())).thenReturn(Result.Success(true))
 
+        val testee = createTestee()
+
         testee.confirmNewDeviceName("New Device Name")
 
         verify(syncAccountRepository).renameDevice(device.copy(deviceName = "New Device Name"))
@@ -95,6 +138,8 @@ class EditDeviceViewModelTest {
     fun `when renaming the device succeeds then the view state reflects the new name`() = runTest {
         whenever(syncAccountRepository.renameDevice(any())).thenReturn(Result.Success(true))
 
+        val testee = createTestee()
+
         testee.confirmNewDeviceName("New Device Name")
 
         assertEquals("New Device Name", testee.viewState.value.device.deviceName)
@@ -103,6 +148,8 @@ class EditDeviceViewModelTest {
     @Test
     fun `when renaming the device succeeds then the edited result is set`() = runTest {
         whenever(syncAccountRepository.renameDevice(any())).thenReturn(Result.Success(true))
+
+        val testee = createTestee()
 
         testee.commands.test {
             testee.confirmNewDeviceName("New Device Name")
@@ -115,6 +162,8 @@ class EditDeviceViewModelTest {
     @Test
     fun `when renaming the device fails then the toggle is reset and an error is shown`() = runTest {
         whenever(syncAccountRepository.renameDevice(any())).thenReturn(Result.Error(reason = "boom"))
+
+        val testee = createTestee()
 
         testee.commands.test {
             testee.confirmNewDeviceName("New Device Name")
@@ -132,6 +181,8 @@ class EditDeviceViewModelTest {
     fun `when renaming the device fails then the device name is not updated`() = runTest {
         whenever(syncAccountRepository.renameDevice(any())).thenReturn(Result.Error(reason = "boom"))
 
+        val testee = createTestee()
+
         testee.confirmNewDeviceName("New Device Name")
 
         assertEquals(device, testee.viewState.value.device)
@@ -139,6 +190,8 @@ class EditDeviceViewModelTest {
 
     @Test
     fun `when the user turns off sync then confirmation is requested`() = runTest {
+        val testee = createTestee()
+
         testee.commands.test {
             testee.onTurnOffSync()
             assertIs<AskTurnOffSync>(awaitItem())
@@ -149,6 +202,8 @@ class EditDeviceViewModelTest {
 
     @Test
     fun `when turning off sync is confirmed then the result is set and the screen closes`() = runTest {
+        val testee = createTestee()
+
         testee.commands.test {
             testee.onTurnOffSyncConfirmed()
             assertIs<SetSyncTurnedOffResult>(awaitItem())
@@ -160,6 +215,8 @@ class EditDeviceViewModelTest {
 
     @Test
     fun `when turning off sync is canceled then the toggle is reset`() = runTest {
+        val testee = createTestee()
+
         testee.commands.test {
             testee.onTurnOffSyncCanceled()
             assertIs<ResetTurnOffSyncToggle>(awaitItem())
@@ -170,6 +227,8 @@ class EditDeviceViewModelTest {
 
     @Test
     fun `when the user removes the device then confirmation is requested`() = runTest {
+        val testee = createTestee()
+
         testee.commands.test {
             testee.onRemoveDevice()
             assertIs<AskRemoveDevice>(awaitItem())
@@ -180,6 +239,8 @@ class EditDeviceViewModelTest {
 
     @Test
     fun `when removing the device is confirmed then the result is set and the screen closes`() = runTest {
+        val testee = createTestee()
+
         testee.commands.test {
             testee.onRemoveDeviceConfirmed()
             assertIs<SetDeviceRemovedResult>(awaitItem())
@@ -191,6 +252,8 @@ class EditDeviceViewModelTest {
 
     @Test
     fun `when the user closes the screen then the close command is sent`() = runTest {
+        val testee = createTestee()
+
         testee.commands.test {
             testee.onCloseClicked()
             assertIs<Close>(awaitItem())
