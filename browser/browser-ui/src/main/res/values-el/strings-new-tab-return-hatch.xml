@@ -21,9 +21,12 @@
     <string name="newTabReturnHatchFireTabTitle">Τελευταία χρήση καρτέλας Fire</string>
     <string name="newTabReturnHatchTabClosed">Η καρτέλα έκλεισε</string>
     <string name="newTabReturnHatchUndo">Αναίρεση</string>
-    <string name="hatchMenuReturnTab">Επιστροφή στην καρτέλα</string>
+    <string name="hatchMenuReturnToLastUsedTab">Επιστροφή στην τελευταία καρτέλα που χρησιμοποιήθηκε</string>
     <string name="hatchMenuAfterInactivitySettings">Μετά από αδράνεια</string>
-    <string name="hatchMenuCloseTab">Κλείσιμο καρτέλας</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Άνοιγμα νέας καρτέλας</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Τελευταία καρτέλα που χρησιμοποιήθηκε</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="&apos;%1$s&apos; is the menu row label (&apos;After Inactivity&apos;) and &apos;%2$s&apos; is the current destination, e.g. &apos;After Inactivity, Open New Tab&apos;">%1$s, %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Κλείσιμο τελευταίας καρτέλας που χρησιμοποιήθηκε</string>
     <string name="hatchMenuBurnTab">Διαγραφή καρτέλας</string>
-    <string name="hatchMenuHideShortcut">Απόκρυψη συντόμευσης</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="&apos;Return to&apos; refers to this menu&apos;s own &apos;Return to…&apos; label shown above this item">Απόκρυψη συντόμευσης «Επιστροφή σε»</string>
 </resources>
