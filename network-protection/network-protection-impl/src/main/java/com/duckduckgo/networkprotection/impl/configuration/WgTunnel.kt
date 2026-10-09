@@ -95,14 +95,14 @@ interface WgTunnelConfig {
     fun setWgConfig(config: Config)
 
     /**
-     * @return the last successful port that was used
+     * @return the endpoint port the tunnel was last configured with, or 0 if none
      */
-    fun getRememberedPort(): Long
+    fun getActivePort(): Long
 
     /**
-     * @param port the port to remember as successful
+     * @param port the endpoint port the tunnel is being configured with
      */
-    fun setRememberedPort(port: Long)
+    fun setActivePort(port: Long)
 
     /**
      * @return all ports advertised by the current server
@@ -132,18 +132,20 @@ class RealWgTunnelConfig @Inject constructor(
 
     override fun clearWgConfig() {
         wgTunnelStore.wireguardConfig = null
+
+        wgTunnelStore.activePort = 0L
     }
 
     override fun setWgConfig(config: Config) {
         wgTunnelStore.wireguardConfig = config
     }
 
-    override fun getRememberedPort(): Long {
-        return wgTunnelStore.rememberedPort
+    override fun getActivePort(): Long {
+        return wgTunnelStore.activePort
     }
 
-    override fun setRememberedPort(port: Long) {
-        wgTunnelStore.rememberedPort = port
+    override fun setActivePort(port: Long) {
+        wgTunnelStore.activePort = port
     }
 
     override fun getAdvertisedPorts(): List<Long> {
@@ -325,10 +327,10 @@ class WgTunnelStore constructor(
             prefs.edit(commit = true) { putLong(KEY_WG_PRIVATE_KEY_LAST_UPDATE, value) }
         }
 
-    var rememberedPort: Long
-        get() = prefs.getLong(KEY_REMEMBERED_PORT, 0L)
+    var activePort: Long
+        get() = prefs.getLong(KEY_ACTIVE_PORT, 0L)
         set(value) {
-            prefs.edit(commit = true) { putLong(KEY_REMEMBERED_PORT, value) }
+            prefs.edit(commit = true) { putLong(KEY_ACTIVE_PORT, value) }
         }
 
     var advertisedPorts: List<Long>
@@ -350,7 +352,7 @@ class WgTunnelStore constructor(
         private const val FILENAME = "com.duckduckgo.vpn.tunnel.config.v1"
         private const val KEY_WG_CONFIG = "wg_config_key"
         private const val KEY_WG_PRIVATE_KEY_LAST_UPDATE = "wg_private_key_last_update"
-        private const val KEY_REMEMBERED_PORT = "wg_remembered_port"
+        private const val KEY_ACTIVE_PORT = "wg_active_port"
         private const val KEY_ADVERTISED_PORTS = "wg_advertised_ports"
         private const val KEY_SERVER_DEFAULT_PORT = "wg_server_default_port"
     }
