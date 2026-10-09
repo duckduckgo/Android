@@ -27,7 +27,7 @@ import kotlin.reflect.KClass
  *
  * Usage:
  * ```kotlin
- * @ContributesActivePlugin(SomeDaggerScope::class)
+ * @ContributesActivePlugin(SomeScope::class)
  * class MyPluginImpl : MyPlugin {
  *
  * }

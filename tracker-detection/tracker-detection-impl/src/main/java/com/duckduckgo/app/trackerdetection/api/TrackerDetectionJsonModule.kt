@@ -33,7 +33,7 @@ object TrackerDetectionJsonModule {
 
     /**
      * Room instantiates type converters itself, so the tracker-detection adapters have to be
-     * reachable without going through the Dagger graph as well as through it.
+     * reachable without going through the DI graph as well as through it.
      */
     val moshi: Moshi = Moshi.Builder()
         .add(ActionJsonAdapter())

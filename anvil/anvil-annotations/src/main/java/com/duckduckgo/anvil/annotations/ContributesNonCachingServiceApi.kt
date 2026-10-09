@@ -23,7 +23,7 @@ import kotlin.reflect.KClass
  *
  * Usage:
  * ```kotlin
- * @ContributesNonCachingServiceApi(SomeDaggerScope::class)
+ * @ContributesNonCachingServiceApi(SomeScope::class)
  * interface MyServiceApi {
  *
  * }

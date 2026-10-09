@@ -31,7 +31,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.android.AndroidInjection
-import com.duckduckgo.di.binding.TileServiceBingingKey
+import com.duckduckgo.di.binding.TileServiceBindingKey
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
@@ -44,10 +44,10 @@ import javax.inject.Inject
 @Suppress("NoHardcodedCoroutineDispatcher")
 // We don't use the DeviceShieldTileService::class as binding key because TileService (Android) class does not
 // exist in all APIs, and so using it DeviceShieldTileService::class as key would compile but immediately crash
-// at startup when Java class loader tries to resolve the TileService::class upon Dagger setup
+// at startup when Java class loader tries to resolve the TileService::class upon DI graph setup
 @InjectWith(
     scope = ServiceScope::class,
-    bindingKey = TileServiceBingingKey::class,
+    bindingKey = TileServiceBindingKey::class,
 )
 class DeviceShieldTileService : TileService() {
 
@@ -64,7 +64,7 @@ class DeviceShieldTileService : TileService() {
 
     override fun onCreate() {
         super.onCreate()
-        AndroidInjection.inject(this, TileServiceBingingKey::class.java)
+        AndroidInjection.inject(this, TileServiceBindingKey::class.java)
     }
 
     override fun onClick() {

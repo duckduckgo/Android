@@ -18,7 +18,7 @@ package com.duckduckgo.common.ui
 
 import android.content.Context
 import com.duckduckgo.di.android.AndroidInjector
-import com.duckduckgo.di.android.HasDaggerInjector
+import com.duckduckgo.di.android.HasInjector
 import com.duckduckgo.di.android.InjectorFactoryMap
 import com.duckduckgo.di.android.getFactory
 import com.duckduckgo.di.android.support.AndroidSupportInjection
@@ -27,14 +27,14 @@ import dev.zacsweers.metro.HasMemberInjections
 import javax.inject.Inject
 
 /**
- * Base bottom-sheet dialog that wires DuckDuckGo's Dagger injection, mirroring [DuckDuckGoFragment].
+ * Base bottom-sheet dialog that wires DuckDuckGo's dependency injection, mirroring [DuckDuckGoFragment].
  *
- * It implements [HasDaggerInjector] so that child views which self-inject (e.g.
+ * It implements [HasInjector] so that child views which self-inject (e.g.
  * `@InjectWith(ViewScope::class)` views resolving their injector by walking up to the hosting
  * fragment) work inside a dialog, just as they do inside a [DuckDuckGoFragment].
  */
 @HasMemberInjections
-abstract class DuckDuckGoBottomSheetDialogFragment : BottomSheetDialogFragment(), HasDaggerInjector {
+abstract class DuckDuckGoBottomSheetDialogFragment : BottomSheetDialogFragment(), HasInjector {
 
     @Inject
     lateinit var injectorFactoryMap: InjectorFactoryMap
@@ -44,11 +44,11 @@ abstract class DuckDuckGoBottomSheetDialogFragment : BottomSheetDialogFragment()
         super.onAttach(context)
     }
 
-    override fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*, *> {
+    override fun injectorFactoryFor(key: Class<*>): AndroidInjector.Factory<*, *> {
         return injectorFactoryMap.getFactory(key)
             ?: throw RuntimeException(
                 """
-                Could not find the dagger component for ${key.simpleName}.
+                Could not find the injector for ${key.simpleName}.
                 You probably forgot to annotate your class with @InjectWith(Scope::class).
                 """.trimIndent(),
             )

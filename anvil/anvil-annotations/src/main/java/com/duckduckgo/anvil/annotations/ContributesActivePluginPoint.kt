@@ -25,7 +25,7 @@ import kotlin.reflect.KClass
  *
  * Usage:
  * ```kotlin
- * @ContributesActivePluginPoint(SomeDaggerScope::class)
+ * @ContributesActivePluginPoint(SomeScope::class)
  * interface MyPlugin : ActivePlugin {
  *
  * }
