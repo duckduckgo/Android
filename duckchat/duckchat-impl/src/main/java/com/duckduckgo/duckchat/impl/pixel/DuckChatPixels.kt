@@ -1648,6 +1648,11 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_OMNIBAR_MENU_NEW_TAB_TAPPED_DAILY("m_aichat_omnibar_menu_new_tab_tapped_daily"),
     DUCK_CHAT_OMNIBAR_MENU_NEW_FIRE_TAB_TAPPED_COUNT("m_aichat_omnibar_menu_new_fire_tab_tapped_count"),
     DUCK_CHAT_OMNIBAR_MENU_NEW_FIRE_TAB_TAPPED_DAILY("m_aichat_omnibar_menu_new_fire_tab_tapped_daily"),
+
+    DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_COUNT("m_tab_manager_switch_to_ai_tab_count"),
+    DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_DAILY("m_tab_manager_switch_to_ai_tab_daily"),
+    DUCK_CHAT_TAB_SWITCHER_CLOSE_AI_TAB_COUNT("m_tab_manager_close_ai_tab_count"),
+    DUCK_CHAT_TAB_SWITCHER_CLOSE_AI_TAB_DAILY("m_tab_manager_close_ai_tab_daily"),
 }
 
 object DuckChatPixelParameters {
@@ -1947,6 +1952,10 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_TAB_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_FIRE_TAB_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_FIRE_TAB_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_CLOSE_AI_TAB_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_CLOSE_AI_TAB_DAILY.pixelName to PixelParameter.removeAtb(),
             "m_duck-ai_native-storage_" to PixelParameter.removeAtb(),
             // Prefix: covers every m_aichat_unified_input_* pixel (tools, submit, model/reasoning,
             // upsell, attachments, voice, stop) AND the app-side chat_header_upgrade_tapped, which

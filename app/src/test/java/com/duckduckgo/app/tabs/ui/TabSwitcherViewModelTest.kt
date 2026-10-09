@@ -19,6 +19,7 @@
 package com.duckduckgo.app.tabs.ui
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
@@ -435,6 +436,48 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
+    fun whenInactiveDuckAiTabSelectedThenSwitchToAiTabPixelsSent() = runTest {
+        val duckAiUrl = "https://duck.ai/chat"
+        tabList = listOf(TabEntity("abc", url = "https://example.com", position = 0), TabEntity("duckai1", url = duckAiUrl, position = 1))
+        whenever(duckChatMock.isDuckChatUrl(any())).thenAnswer { it.getArgument<Uri>(0).toString() == duckAiUrl }
+        initializeMockTabEntitesData()
+        initializeViewModel()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        advanceUntilIdle()
+
+        testee.onTabSelected("duckai1")
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenActiveDuckAiTabSelectedThenSwitchToAiTabPixelsSent() = runTest {
+        tabList = listOf(TabEntity("duckai1", url = "https://duck.ai/chat", position = 1))
+        whenever(duckChatMock.isDuckChatUrl(any())).thenReturn(true)
+        initializeMockTabEntitesData()
+        initializeViewModel()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        advanceUntilIdle()
+
+        testee.onTabSelected("duckai1")
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenRegularTabSelectedThenSwitchToAiTabPixelsNotSent() = runTest {
+        testee.onTabSelected("abc")
+
+        verify(mockPixel, never()).fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_COUNT)
+    }
+
+    @Test
     fun whenTabSelectedAndDeselectedThenViewStateUpdatedAndPixelsSent() = runTest {
         prepareSelectionMode()
 
@@ -689,6 +732,23 @@ class TabSwitcherViewModelTest {
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.ShowUndoDeleteTabsMessage(listOf(tab.id)), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenDuckAiTabClosedInNormalModeThenCloseAiTabPixelsSent() = runTest {
+        val tab = DuckAiTab(TabEntity("duckai1", url = "https://duck.ai/chat", position = 1), isActive = false)
+
+        testee.onTabCloseInNormalModeRequested(tab)
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_CLOSE_AI_TAB_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_CLOSE_AI_TAB_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenRegularTabClosedInNormalModeThenCloseAiTabPixelsNotSent() = runTest {
+        testee.onTabCloseInNormalModeRequested(tabSwitcherItems.first())
+
+        verify(mockPixel, never()).fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_CLOSE_AI_TAB_COUNT)
     }
 
     @Test
