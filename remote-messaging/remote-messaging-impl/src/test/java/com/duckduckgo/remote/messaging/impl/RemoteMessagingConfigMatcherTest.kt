@@ -29,6 +29,8 @@ import com.duckduckgo.remote.messaging.api.MatchingAttribute
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aCardsListMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aMediumMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aSmallMessage
+import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.actionableItemsContent
+import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.anActionableItemsMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.cardsListContent
 import com.duckduckgo.remote.messaging.impl.models.*
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
@@ -956,6 +958,70 @@ class RemoteMessagingConfigMatcherTest {
 
     private fun givenUserDismissed(vararg ids: String) {
         whenever(remoteMessagingRepository.dismissedMessages()).thenReturn(ids.asList())
+    }
+
+    @Test
+    fun whenActionableItemsMessageWithSomeItemsPassingRulesThenReturnsFilteredMessage() = runBlocking {
+        givenDeviceMatches(Api(max = 19))
+        val passingItem = CardItem.ListItem(
+            id = "setup_default_browser",
+            type = CardItemType.ONE_ACTION_ITEM,
+            titleText = "Set as default browser",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.ANNOUNCE,
+            primaryAction = Action.DefaultBrowser,
+            matchingRules = rules(1),
+            exclusionRules = emptyList(),
+        )
+        val failingItem = CardItem.ListItem(
+            id = "setup_add_widget",
+            type = CardItemType.ONE_ACTION_ITEM,
+            titleText = "Add widget",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.RADAR,
+            primaryAction = Action.Dismiss,
+            matchingRules = rules(2),
+            exclusionRules = emptyList(),
+        )
+        val content = actionableItemsContent(listItems = listOf(passingItem, failingItem))
+        val message = anActionableItemsMessage(content = content)
+
+        val result = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(message),
+                rules = listOf(
+                    rule(id = 1, matchingAttributes = arrayOf(Api(max = 19))),
+                    rule(id = 2, matchingAttributes = arrayOf(Api(max = 15))),
+                ),
+            ),
+        )
+
+        assertEquals(message.copy(content = content.copy(listItems = listOf(passingItem))), result)
+    }
+
+    @Test
+    fun whenActionableItemsMessageWithAllItemsFailingRulesThenReturnsNull() = runBlocking {
+        givenDeviceMatches(Api(max = 19))
+        val failingItem = CardItem.ListItem(
+            id = "setup_default_browser",
+            type = CardItemType.ONE_ACTION_ITEM,
+            titleText = "Set as default browser",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.ANNOUNCE,
+            primaryAction = Action.DefaultBrowser,
+            matchingRules = rules(2),
+            exclusionRules = emptyList(),
+        )
+        val message = anActionableItemsMessage(content = actionableItemsContent(listItems = listOf(failingItem)))
+
+        val result = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(message),
+                rules = listOf(rule(id = 2, matchingAttributes = arrayOf(Api(max = 15)))),
+            ),
+        )
+
+        assertNull(result)
     }
 
     private fun rule(

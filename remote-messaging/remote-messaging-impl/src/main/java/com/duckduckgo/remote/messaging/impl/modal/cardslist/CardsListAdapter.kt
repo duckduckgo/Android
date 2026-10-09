@@ -119,7 +119,9 @@ class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsL
     override fun getItemViewType(position: Int): Int = when (val item = getItem(position)) {
         is ModalListItem.Header -> ITEM_TYPE_HEADER
         is ModalListItem.CardListItem -> when (item.cardItem.type) {
-            CardItemType.TWO_LINE_LIST_ITEM -> ITEM_TYPE_TWO_LINE_LIST_ITEM
+            CardItemType.TWO_LINE_LIST_ITEM,
+            CardItemType.ONE_ACTION_ITEM,
+            -> ITEM_TYPE_TWO_LINE_LIST_ITEM
             CardItemType.LIST_SECTION_TITLE -> ITEM_TYPE_LIST_SECTION_TITLE
             CardItemType.FEATURED_TWO_LINE_SINGLE_ACTION_LIST_ITEM -> ITEM_TYPE_FEATURED_TWO_LINE_LIST_ITEM
         }
