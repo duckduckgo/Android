@@ -29,4 +29,7 @@ interface ShowOnAppLaunchFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun afterInactivitySettingsLayout(): Toggle
 }

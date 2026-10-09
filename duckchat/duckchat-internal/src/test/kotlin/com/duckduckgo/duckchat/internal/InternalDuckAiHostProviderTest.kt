@@ -19,7 +19,9 @@ package com.duckduckgo.duckchat.internal
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.duckchat.internal.store.DuckAiInternalSettingsDataStore
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
@@ -82,6 +84,30 @@ class InternalDuckAiHostProviderTest {
         provider.setCustomUrl(null)
 
         assertEquals("duck.ai", provider.getHost())
+    }
+
+    @Test
+    fun whenNoCustomUrlThenIsCustomHostIsFalse() {
+        val provider = createProvider(customUrl = null)
+
+        assertFalse(provider.isCustomHost())
+    }
+
+    @Test
+    fun whenCustomUrlSetThenIsCustomHostIsTrue() {
+        val provider = createProvider(customUrl = "https://staging.duck.ai")
+
+        assertTrue(provider.isCustomHost())
+    }
+
+    @Test
+    fun whenCustomUrlClearedThenIsCustomHostRevertsToFalse() {
+        val provider = createProvider(customUrl = "https://staging.duck.ai")
+        assertTrue(provider.isCustomHost())
+
+        provider.setCustomUrl(null)
+
+        assertFalse(provider.isCustomHost())
     }
 
     @Test

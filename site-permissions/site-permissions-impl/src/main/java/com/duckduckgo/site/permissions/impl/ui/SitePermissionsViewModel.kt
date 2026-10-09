@@ -25,12 +25,15 @@ import com.duckduckgo.site.permissions.impl.R
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command.LaunchWebsiteAllowed
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command.ShowRemovedSiteConfirmationSnackbar
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -48,6 +51,7 @@ class SitePermissionsViewModel @Inject constructor(
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
     private var cachedAllowedSites: List<SitePermissionAllowedEntity> = listOf()
+    private var allowedSitesJob: Job? = null
 
     data class ViewState(
         val askLocationEnabled: Boolean = true,
@@ -55,11 +59,17 @@ class SitePermissionsViewModel @Inject constructor(
         val askMicEnabled: Boolean = true,
         val askDrmEnabled: Boolean = true,
         val sitesPermissionsAllowed: List<SitePermissionsEntity> = listOf(),
+        val sitesLoaded: Boolean = false,
     )
 
     sealed class Command {
         class ShowRemovedAllConfirmationSnackbar(val removedSitePermissions: List<SitePermissionsEntity>) : Command()
         class LaunchWebsiteAllowed(val domain: String) : Command()
+        class ShowRemovedSiteConfirmationSnackbar(
+            val domain: String,
+            val removedSitePermissions: List<SitePermissionsEntity>,
+            val removedAllowedSites: List<SitePermissionAllowedEntity>,
+        ) : Command()
     }
 
     init {
@@ -73,11 +83,13 @@ class SitePermissionsViewModel @Inject constructor(
     }
 
     fun allowedSites() {
-        viewModelScope.launch {
+        if (allowedSitesJob?.isActive == true) return
+        allowedSitesJob = viewModelScope.launch {
             sitePermissionsRepository.sitePermissionsWebsitesFlow().collect {
                 _viewState.emit(
                     _viewState.value.copy(
                         sitesPermissionsAllowed = it,
+                        sitesLoaded = true,
                     ),
                 )
             }
@@ -120,11 +132,24 @@ class SitePermissionsViewModel @Inject constructor(
     fun removeAllSitesSelected() {
         val sitePermissions = _viewState.value.sitesPermissionsAllowed.toMutableList()
         viewModelScope.launch(dispatcherProvider.io()) {
-            sitePermissionsRepository.sitePermissionsAllowedFlow().collect { sitePermissionsAllowed ->
-                sitePermissionsRepository.deleteAll()
-                _commands.send(ShowRemovedAllConfirmationSnackbar(sitePermissions))
-                cachedAllowedSites = sitePermissionsAllowed
-            }
+            cachedAllowedSites = sitePermissionsRepository.sitePermissionsAllowedFlow().firstOrNull().orEmpty()
+            sitePermissionsRepository.deleteAll()
+            _commands.send(ShowRemovedAllConfirmationSnackbar(sitePermissions))
+        }
+    }
+
+    fun removeSiteSelected(domain: String) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val sitePermissions = sitePermissionsRepository.getSitePermissionsForWebsite(domain)
+            val allowedSites = sitePermissionsRepository.sitePermissionsAllowedFlow().firstOrNull().orEmpty().filter { it.domain == domain }
+            sitePermissionsRepository.deletePermissionsForSite(domain)
+            _commands.send(ShowRemovedSiteConfirmationSnackbar(domain, listOfNotNull(sitePermissions), allowedSites))
+        }
+    }
+
+    fun onSnackBarUndoRemoveSite(command: ShowRemovedSiteConfirmationSnackbar) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            sitePermissionsRepository.undoDeleteAll(command.removedSitePermissions, command.removedAllowedSites)
         }
     }
 

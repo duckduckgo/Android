@@ -18,7 +18,7 @@
         <item name="bottomSheetStyle">@style/Widget.DuckDuckGo.ModalBottomSheetStyle.NewAddressBarPicker</item>
     </style>
 
-    <!-- Opt-in variant used when EdgeToEdgeBucket.BOTTOM_SHEETS is enabled: keeps the onboarding-backdrop
+    <!-- Edge-to-edge variant used by bottom sheets: keeps the onboarding-backdrop
          bottomSheetStyle but draws the sheet behind the transparent system bars. Content clears the nav bar
          via View.applyBottomSystemBarInsetPadding(). -->
     <style name="Widget.DuckDuckGo.BottomSheetDialog.NewAddressBarPicker.EdgeToEdge" parent="Widget.DuckDuckGo.BottomSheetDialog.NewAddressBarPicker">

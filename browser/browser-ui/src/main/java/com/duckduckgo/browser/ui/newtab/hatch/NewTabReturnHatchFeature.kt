@@ -32,4 +32,7 @@ interface NewTabReturnHatchFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun closeNewTabOnReturn(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun afterInactivityEntry(): Toggle
 }

@@ -19,6 +19,11 @@
     <string name="newTabReturnHatchSerpPlaceholderTitle">DuckDuckGo - Protection. Privacy. Peace of mind.</string>
     <string name="newTabReturnHatchDuckChatPlaceholderTitle">Duck.ai by DuckDuckGo. Private AI chat. Free.</string>
 
+    <!-- Not yet requested for translation: move to strings-new-tab-return-hatch.xml when copy is final. -->
+    <string name="hatchMenuAfterInactivityDestinationLastOpenedTab">Last Opened Tab</string>
+    <string name="hatchMenuAfterInactivityDestinationNewTabPage">New Tab Page</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="'%1$s' is the menu row label ('After Inactivity') and '%2$s' is the current destination, e.g. 'After Inactivity, New Tab Page'">%1$s, %2$s</string>
+
     <string name="tabSwitcherContentDescription">Tabs</string>
     <string name="duck_ai_tab_label">Duck.ai</string>
     <string name="duck_ai_tab_icon_content_description">Duck.ai icon</string>

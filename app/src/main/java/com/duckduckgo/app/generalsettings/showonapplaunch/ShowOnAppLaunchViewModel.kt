@@ -45,6 +45,7 @@ class ShowOnAppLaunchViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val afterInactivitySettingsDataProvider: AfterInactivitySettingsDataProvider,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
     private val pixel: Pixel,
 ) : ViewModel() {
 
@@ -56,6 +57,7 @@ class ShowOnAppLaunchViewModel @Inject constructor(
         val idleThresholdOptions: List<Long> = FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_OPTIONS,
         val returnToLastTabEnabled: Boolean = true,
         val showAfterInactivityTimeout: Boolean = false,
+        val useRedesignedAfterInactivityLayout: Boolean = false,
     )
 
     sealed class Command {
@@ -76,13 +78,17 @@ class ShowOnAppLaunchViewModel @Inject constructor(
         combine(
             afterInactivitySettingsDataProvider.settings,
             androidBrowserConfigFeature.showNTPAfterIdleReturn().enabled(),
-        ) { settings, showNTPAfterIdleReturn ->
-            _viewState.value = settings.toViewState(showNTPAfterIdleReturn)
+            showOnAppLaunchFeature.afterInactivitySettingsLayout().enabled(),
+        ) { settings, showNTPAfterIdleReturn, useRedesignedAfterInactivityLayout ->
+            _viewState.value = settings.toViewState(showNTPAfterIdleReturn, useRedesignedAfterInactivityLayout)
         }.flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
     }
 
-    private fun AfterInactivitySettings.toViewState(showNTPAfterIdleReturn: Boolean): ViewState {
+    private fun AfterInactivitySettings.toViewState(
+        showNTPAfterIdleReturn: Boolean,
+        useRedesignedAfterInactivityLayout: Boolean,
+    ): ViewState {
         val effectiveTimeoutSeconds = when (this) {
             AfterInactivitySettings.LastUsedTab -> FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_SECONDS
             is AfterInactivitySettings.NewTabPage -> effectiveTimeoutSeconds
@@ -97,6 +103,7 @@ class ShowOnAppLaunchViewModel @Inject constructor(
             selectedIdleThresholdSeconds = effectiveTimeoutSeconds,
             returnToLastTabEnabled = (this as? AfterInactivitySettings.NewTabPage)?.returnToLastTabShortcutEnabled ?: true,
             showAfterInactivityTimeout = showNTPAfterIdleReturn && this !is AfterInactivitySettings.LastUsedTab,
+            useRedesignedAfterInactivityLayout = useRedesignedAfterInactivityLayout,
         )
     }
 

@@ -19,9 +19,9 @@ package com.duckduckgo.app.browser.favicon
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.file.FileDeleter
 import com.duckduckgo.common.utils.sha256
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.sync.Mutex

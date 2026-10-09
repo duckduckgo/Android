@@ -5207,7 +5207,7 @@ class BrowserTabViewModel @Inject constructor(
                             unblockDuckAiOnboardingCta()
                         }
                     }
-                    duckChatJSHelper.consumeTabContextPromptOnHandoff(method)?.let { event ->
+                    duckChatJSHelper.consumeTabContextPromptOnHandoff(method, browserMode)?.let { event ->
                         // There is a pending tab context prompt waiting to be sent
                         withContext(dispatchers.main()) {
                             _subscriptionEventDataChannel.send(event)
@@ -5838,13 +5838,28 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun openNewImageDuckChat(viewMode: ViewMode) {
-        val entryPoint = if (viewMode == ViewMode.NewTab) {
-            DuckChatEntryPoint.BROWSING_MENU_NTP
-        } else {
-            DuckChatEntryPoint.BROWSING_MENU_WEBPAGE
-        }
-        duckChat.openDuckChatImageGeneration(entryPoint)
+    fun openNewVoiceChatFromChatMenu() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_COUNT)
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_DAILY, type = Daily())
+        duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+    }
+
+    fun openNewImageDuckChatFromChatMenu() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_COUNT)
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_DAILY, type = Daily())
+        duckChat.openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
+    }
+
+    fun onNewTabFromChatMenuSelected() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_TAB_TAPPED_COUNT)
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_TAB_TAPPED_DAILY, type = Daily())
+        recordPendingNewTabOpenedExit()
+    }
+
+    fun onNewFireTabFromChatMenuSelected() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_FIRE_TAB_TAPPED_COUNT)
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_FIRE_TAB_TAPPED_DAILY, type = Daily())
+        recordPendingFireTabOpenedExit()
     }
 
     /** New Chat from the Duck.ai omnibar "+" menu, which is only ever shown in a Duck.ai chat. */

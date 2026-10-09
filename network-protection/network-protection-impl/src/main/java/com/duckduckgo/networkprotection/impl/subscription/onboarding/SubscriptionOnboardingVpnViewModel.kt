@@ -31,6 +31,7 @@ import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayableCountry
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getEmojiForCountryCode
 import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnStepPlugin.Companion.VPN_STEP_ID
+import com.duckduckgo.networkprotection.impl.subscription.onboarding.experiment.SubscriptionOnboardingExperimentMetrics
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.SKIPPED
@@ -60,6 +61,7 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
     private val networkProtectionState: NetworkProtectionState,
     private val wgTunnelConfig: WgTunnelConfig,
     private val dispatcherProvider: DispatcherProvider,
+    private val subscriptionOnboardingExperimentMetrics: SubscriptionOnboardingExperimentMetrics,
 ) : ViewModel() {
 
     private val viewState = MutableStateFlow(ViewState())
@@ -142,6 +144,8 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
                 viewState.update {
                     if (it.activating) it.copy(activating = false, vpnActivationError = VPNActivationError.CONNECTION_FAILED) else it
                 }
+            } else {
+                subscriptionOnboardingExperimentMetrics.fireVpnActivated()
             }
         }
     }

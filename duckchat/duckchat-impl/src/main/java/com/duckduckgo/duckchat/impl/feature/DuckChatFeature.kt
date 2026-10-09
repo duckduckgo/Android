@@ -245,13 +245,6 @@ interface DuckChatFeature {
     fun aiFeaturesNativeControls(): Toggle
 
     /**
-     * @return Toggle iseÉnabled `true` when the remove chat history feature is enabled.
-     * If the remote feature is not present defaults to `true`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun removeChatHistory(): Toggle
-
-    /**
      * @return `true` when the Duck.ai contextual sheet's initial INPUT state should use the native
      * unified input widget as its composer. Gated together with [nativeChatInput] (and
      * [nativeInputField]): when this is off but native chat input is on, the contextual sheet uses
@@ -260,21 +253,6 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun contextualNativeInput(): Toggle
-
-    /**
-     * @return `true` when the native input attachment layout changes are enabled: the attachment row is
-     * placed above the text input, and the contextual sheet keeps its expanded padding regardless of focus.
-     * If the remote feature is not present defaults to `internal`.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun nativeInputAttachmentChanges(): Toggle
-
-    /**
-     * @return `true` when the redesigned Duck.ai contextual sheet UI and flow are enabled.
-     * If the remote feature is not present defaults to `INTERNAL`.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun contextualSheetRedesign(): Toggle
 
     /**
      * @return `true` when the All Chats entry (and its divider) is shown in the Duck.ai address bar menu.
@@ -329,4 +307,12 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun duckAiUsageWarnings(): Toggle
+
+    /**
+     * @return `true` when the Duck.ai Terms of Service consent is handled by the native input
+     * (disclaimer under the input, consent carried by the first prompt submit).
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun nativeToSConsent(): Toggle
 }

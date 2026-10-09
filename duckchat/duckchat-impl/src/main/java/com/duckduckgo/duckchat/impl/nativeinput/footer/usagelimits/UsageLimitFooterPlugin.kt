@@ -26,6 +26,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.nativeinput.footer.FooterCategory
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooter
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterHost
@@ -73,6 +74,7 @@ class UsageLimitFooterPlugin @Inject constructor(
 ) : NativeInputFooterPlugin {
 
     override val priority: Int = 50
+    override val category: FooterCategory = FooterCategory.USAGE_NOTICE
 
     private data class Inputs(
         val snapshot: UsageLimitsSnapshot?,

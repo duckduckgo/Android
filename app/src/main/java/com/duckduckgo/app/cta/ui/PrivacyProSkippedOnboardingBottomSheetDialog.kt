@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat.getString
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.BottomSheetPrivacyProSkippedOnboardingBinding
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.ui.view.getDimensionFromAttr
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.preventWidows
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -38,10 +39,9 @@ import com.google.android.material.R as MaterialR
 class PrivacyProSkippedOnboardingBottomSheetDialog(
     private val context: Context,
     private val isFreeTrialCopy: Boolean,
-    private val edgeToEdgeEnabled: Boolean,
 ) : BottomSheetDialog(
     context,
-    if (edgeToEdgeEnabled) CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge else 0,
+    CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge,
 ) {
 
     private val binding: BottomSheetPrivacyProSkippedOnboardingBinding =
@@ -51,9 +51,7 @@ class PrivacyProSkippedOnboardingBottomSheetDialog(
 
     init {
         setContentView(binding.root)
-        if (edgeToEdgeEnabled) {
-            binding.root.applyBottomSystemBarInsetPadding()
-        }
+        binding.root.applyBottomSystemBarInsetPadding()
         this.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         this.behavior.isDraggable = false
 
@@ -91,10 +89,11 @@ class PrivacyProSkippedOnboardingBottomSheetDialog(
         val bottomSheet = bottomSheetDialog.findViewById<FrameLayout>(MaterialR.id.design_bottom_sheet)
 
         val shapeDrawable = MaterialShapeDrawable.createWithElevationOverlay(context)
+        val radius = bottomSheetDialog.context.getDimensionFromAttr(CommonR.attr.daxSheetRadius, CommonR.dimen.dialogBorderRadius)
         shapeDrawable.shapeAppearanceModel = shapeDrawable.shapeAppearanceModel
             .toBuilder()
-            .setTopLeftCorner(CornerFamily.ROUNDED, context.resources.getDimension(CommonR.dimen.dialogBorderRadius))
-            .setTopRightCorner(CornerFamily.ROUNDED, context.resources.getDimension(CommonR.dimen.dialogBorderRadius))
+            .setTopLeftCorner(CornerFamily.ROUNDED, radius)
+            .setTopRightCorner(CornerFamily.ROUNDED, radius)
             .build()
         bottomSheet?.background = shapeDrawable
     }

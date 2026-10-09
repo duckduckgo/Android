@@ -40,9 +40,7 @@ import com.duckduckgo.common.ui.view.setEnabledOpacity
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.safeGetApplicationIcon
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
@@ -97,9 +95,6 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     lateinit var breakageCategories: List<AppBreakageCategory>
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val binding: ActivityApptpCompanyTrackersActivityBinding by viewBinding()
@@ -119,10 +114,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.VPN)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         reportBreakage = registerForActivityResult(reportBreakageContract.get()) {
             if (!it.isEmpty()) {
@@ -139,9 +131,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
                 .error(TextDrawable.asIconDrawable(getAppName()))
                 .into(appIcon)
         }
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         binding.trackingLearnMore.addClickableLink("learn_more_link", getText(R.string.atp_CompanyDetailsTrackingLearnMore)) {
             globalActivityStarter.start(

@@ -17,31 +17,27 @@
 package com.duckduckgo.app.onboardingquicksetup.ui
 
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.BottomSheetQuickSetupSearchOptionsBinding
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.ui.setRoundCorners
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.AppTheme
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.FragmentScope
-import com.google.android.material.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.shape.CornerFamily
-import com.google.android.material.shape.MaterialShapeDrawable
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import com.duckduckgo.app.browser.R as BrowserR
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class QuickSetupSearchOptionsBottomSheet : BottomSheetDialogFragment() {
@@ -50,7 +46,7 @@ class QuickSetupSearchOptionsBottomSheet : BottomSheetDialogFragment() {
     lateinit var appTheme: AppTheme
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     private var initialWithAi: Boolean = true
     private var withAi: Boolean = true
@@ -74,6 +70,9 @@ class QuickSetupSearchOptionsBottomSheet : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?,
     ): View {
         val binding = BottomSheetQuickSetupSearchOptionsBinding.inflate(inflater, container, false)
+        if (appBrandDesignUpdateToggles.radius().isEnabled()) {
+            binding.root.applyRadiusOverlayToSheetBackground()
+        }
         this.binding = binding
 
         with(binding.inputScreenPicker) {
@@ -93,23 +92,22 @@ class QuickSetupSearchOptionsBottomSheet : BottomSheetDialogFragment() {
         binding.quickSetupSearchOptionsCloseButton.setOnClickListener {
             dismiss()
         }
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-            binding.root.applyBottomSystemBarInsetPadding()
-        }
+        binding.root.applyBottomSystemBarInsetPadding()
         return binding.root
     }
 
-    override fun getTheme(): Int = if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-        com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge
-    } else {
-        com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog
-    }
+    override fun getTheme(): Int = com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge
 
     override fun onCreateDialog(savedInstanceState: Bundle?): android.app.Dialog {
         val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
         dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         dialog.behavior.isDraggable = false
-        dialog.setOnShowListener(::setRoundCorners)
+        dialog.setOnShowListener {
+            dialog.setRoundCorners(
+                CommonR.attr.daxOnboardingSheetRadius,
+                CommonR.dimen.onboardingBottomSheetCornerRadius,
+            )
+        }
         return dialog
     }
 
@@ -122,18 +120,6 @@ class QuickSetupSearchOptionsBottomSheet : BottomSheetDialogFragment() {
         binding?.inputScreenPicker?.cancelLottieAnimations()
         binding = null
         super.onDestroyView()
-    }
-
-    private fun setRoundCorners(dialogInterface: DialogInterface) {
-        val bottomSheet = (dialogInterface as BottomSheetDialog).findViewById<FrameLayout>(R.id.design_bottom_sheet)
-        val ctx = requireContext()
-        val shapeDrawable = MaterialShapeDrawable.createWithElevationOverlay(ctx)
-        shapeDrawable.shapeAppearanceModel = shapeDrawable.shapeAppearanceModel
-            .toBuilder()
-            .setTopLeftCorner(CornerFamily.ROUNDED, ctx.resources.getDimension(BrowserR.dimen.onboardingBottomSheetCornerRadius))
-            .setTopRightCorner(CornerFamily.ROUNDED, ctx.resources.getDimension(BrowserR.dimen.onboardingBottomSheetCornerRadius))
-            .build()
-        bottomSheet?.background = shapeDrawable
     }
 
     companion object {

@@ -1,4 +1,4 @@
-name: Pixel Schema Validation
+name: Pixel Schema Linting
 
 on:
     push:

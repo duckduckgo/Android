@@ -39,9 +39,7 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonParams
 import com.duckduckgo.daxprompts.api.LaunchSource
 import com.duckduckgo.daxprompts.impl.R
@@ -94,26 +92,18 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.ONBOARDING)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         setContentView(binding.root)
-        if (edgeToEdgeEnabled) {
-            // Full-bleed background on the root, no separate toolbar, everything else constrained to
-            // "parent" - a single root padding call clears the close button (top), the comparison card's
-            // buttons (bottom) and the guideline-percentage content (sides, landscape) all at once.
-            edgeToEdgeHandler.applySystemBarInsets(binding.daxPromptBrowserComparisonContainer)
-        }
+        // Full-bleed background on the root, no separate toolbar, everything else constrained to
+        // "parent" - a single root padding call clears the close button (top), the comparison card's
+        // buttons (bottom) and the guideline-percentage content (sides, landscape) all at once.
+        edgeToEdgeHandler.applySystemBarInsets(binding.daxPromptBrowserComparisonContainer)
 
         if (SDK_INT >= 34) {
             overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, R.anim.slide_to_bottom)

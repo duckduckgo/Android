@@ -309,8 +309,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     @Inject
     lateinit var faviconManager: FaviconManager
 
-    private var attachmentChangesEnabled: Boolean = false
-
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
@@ -322,7 +320,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var floatingSubmitContainer: ViewGroup? = null
     private var chatStateJob: Job? = null
     private var chatSuggestionsSettingJob: Job? = null
-    private var attachmentChangesJob: Job? = null
     private var chatSuggestionsJob: Job? = null
     private var tierJob: Job? = null
     private var nativeInputStateJob: Job? = null
@@ -689,7 +686,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
-        observeAttachmentChangesEnabled()
         inputModeSwitch.addOnTabSelectedListener(duckChatTabSelectedListener)
         if (!isEditWidget) {
             // The edit widget's mode/query are the message being edited, not the shared browser-wide
@@ -718,8 +714,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     /**
-     * The leading fire menu in the bottom-bar layout lives as a sibling of this widget
-     * (see input_mode_widget_card_view_bottom.xml). Wire its click here so it shares the
+     * The leading fire menu lives as a sibling of this widget in the bottom omnibar
+     * (see input_mode_widget_card_view.xml). Wire its click here so it shares the
      * same [onFireButtonTapped] callback as the trailing fire that lives inside the widget.
      */
     private fun bindLeadingFireButtonClick() {
@@ -796,8 +792,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatStateJob = null
         chatSuggestionsSettingJob?.cancel()
         chatSuggestionsSettingJob = null
-        attachmentChangesJob?.cancel()
-        attachmentChangesJob = null
         tierJob?.cancel()
         tierJob = null
         nativeInputStateJob?.cancel()
@@ -940,14 +934,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val bottomRow = findViewById<View?>(R.id.inputModeWidgetBottomRow) ?: return
         val suppress = nativeInputState?.shouldSuppressBottomRow() == true
         val visible = isChatTabSelected() &&
-            (inputField.hasFocus() || previewEnterFocus || showForUnfocusedContextual() || isEditWidget) &&
+            (inputField.hasFocus() || previewEnterFocus || isEditWidget) &&
             !isStreaming &&
             !suppress
         bottomRow.visibility = if (visible) VISIBLE else GONE
-    }
-
-    private fun showForUnfocusedContextual(): Boolean {
-        return isContextualWidget && !duckChatInternal.isContextualSheetRedesignEnabled()
     }
 
     /**
@@ -978,26 +968,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
         findViewById<View?>(R.id.inputModeSwitchRow)?.visibility = if (effective) VISIBLE else GONE
     }
 
-    private fun applyAttachmentPlacement() {
-        // When enabled, the attachment row sits above the text input instead of below it.
-        if (!attachmentChangesEnabled) return
-        val container = findViewById<ViewGroup>(R.id.inputModeWidgetContentContainer) ?: return
-        val attachments = findViewById<View>(R.id.attachmentsContainer) ?: return
-        val inputRow = findViewById<View>(R.id.inputModeWidgetCardContent) ?: return
-        if (container.indexOfChild(attachments) == container.indexOfChild(inputRow) - 1) return
-        container.removeView(attachments)
-        container.addView(attachments, container.indexOfChild(inputRow))
-    }
-
     private fun applyVerticalPaddingForFocus() {
         // 4dp when minimized, 8dp when expanded. The browser omnibar with the toggle disabled stays
         // minimized regardless of focus; the duck.ai omnibar and browser omnibar with toggle enabled
-        // expand on focus; the duck.ai contextual sheet is always expanded when the attachment changes
-        // are enabled.
+        // expand on focus; the duck.ai contextual sheet is always expanded.
         val isBrowserOmnibarMinimized = nativeInputState?.let {
             it.inputContext == NativeInputState.InputContext.BROWSER && !it.toggleVisible
         } ?: true
-        val expanded = (attachmentChangesEnabled && isContextualWidget) ||
+        val expanded = isContextualWidget ||
             (!isBrowserOmnibarMinimized && (inputField.hasFocus() || previewEnterFocus))
         val verticalPadAttr = if (expanded) {
             com.duckduckgo.mobile.android.R.dimen.keyline_2
@@ -1110,8 +1088,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     /**
-     * In a fullscreen Duck.ai chat the fire button moves into the bottom-bar layout
-     * (sibling to this widget, see input_mode_widget_card_view_bottom.xml). The trailing
+     * In a fullscreen Duck.ai chat the fire button moves into the bottom omnibar layout
+     * (sibling to this widget, see input_mode_widget_card_view.xml). The trailing
      * fire that lives inside the widget hides in DUCK_AI so the user only ever sees one
      * fire affordance; other contexts keep today's trailing placement.
      *
@@ -1119,7 +1097,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
      * typing and the chrome around the input should yield space to the keyboard / input area.
      */
     private fun updateFireButtonVisibility(state: NativeInputState) {
-        val showLeading = state.shouldShowLeadingFireButton(isEditing = isEditWidget) && !inputField.hasFocus()
+        // The leading fire lives only in the bottom omnibar's layout row; the unified wrapper now carries
+        // the view in both positions, so gate on position to keep it bottom-only as before.
+        val showLeading = isWidgetBottom() && state.shouldShowLeadingFireButton(isEditing = isEditWidget) && !inputField.hasFocus()
         leadingFireButtonView()?.visibility = if (showLeading) VISIBLE else GONE
         fireButton.visibility =
             if (state.shouldShowTrailingFireButton(isEditing = isEditWidget)) VISIBLE else GONE
@@ -1692,11 +1672,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
         // condition (not an early return) so a bottom Duck.ai frame still reaches the reset below.
         val isBrowserSearchOnly = state.inputContext == NativeInputState.InputContext.BROWSER && !state.toggleVisible
         if (state.isBottom) {
-            if (isBrowserSearchOnly && appBrandDesignUpdateToggles.addressBar().isEnabled()) {
-                card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.rebrandInputRadius)
-            } else {
-                card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
+            val radius = when {
+                !isBrowserSearchOnly -> com.duckduckgo.mobile.android.R.dimen.extraLargeShapeCornerRadius
+                appBrandDesignUpdateToggles.addressBar().isEnabled() -> com.duckduckgo.mobile.android.R.dimen.rebrandInputRadius
+                else -> com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius
             }
+            card.radius = card.resources.getDimension(radius)
         }
         if (isBrowserSearchOnly && !state.isBottom) {
             val targetTopMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginTop)
@@ -1878,17 +1859,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatSuggestionsSettingJob?.cancel()
         chatSuggestionsSettingJob = viewModel.chatSuggestionsUserEnabled
             .onEach { enabled -> chatSuggestionsUserEnabled = enabled }
-            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
-    }
-
-    private fun observeAttachmentChangesEnabled() {
-        attachmentChangesJob?.cancel()
-        attachmentChangesJob = viewModel.attachmentChangesEnabled
-            .onEach { enabled ->
-                attachmentChangesEnabled = enabled
-                applyAttachmentPlacement()
-                applyVerticalPaddingForFocus()
-            }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
     }
 

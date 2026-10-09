@@ -11900,17 +11900,39 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOpenNewImageDuckChatFromDuckAiThenOpensImageGenerationWithWebpageEntryPoint() = runTest {
-        testee.openNewImageDuckChat(ViewMode.DuckAI)
+    fun whenNewVoiceChatRequestedFromChatMenuThenOpensVoiceChatAndFiresPixels() = runTest {
+        testee.openNewVoiceChatFromChatMenu()
 
-        verify(mockDuckChat).openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
+        verify(mockDuckChat).openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_DAILY, type = Daily())
     }
 
     @Test
-    fun whenOpenNewImageDuckChatFromNewTabThenOpensImageGenerationWithNtpEntryPoint() = runTest {
-        testee.openNewImageDuckChat(ViewMode.NewTab)
+    fun whenNewImageRequestedFromChatMenuThenOpensImageGenerationAndFiresPixels() = runTest {
+        testee.openNewImageDuckChatFromChatMenu()
 
-        verify(mockDuckChat).openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_NTP)
+        verify(mockDuckChat).openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenNewTabSelectedFromChatMenuThenRecordsSessionExitAndFiresPixels() = runTest {
+        testee.onNewTabFromChatMenuSelected()
+
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_TAB_TAPPED_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_TAB_TAPPED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenNewFireTabSelectedFromChatMenuThenRecordsSessionExitAndFiresPixels() = runTest {
+        testee.onNewFireTabFromChatMenuSelected()
+
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.FIRE_TAB_OPENED)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_FIRE_TAB_TAPPED_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_FIRE_TAB_TAPPED_DAILY, type = Daily())
     }
 
     @Test

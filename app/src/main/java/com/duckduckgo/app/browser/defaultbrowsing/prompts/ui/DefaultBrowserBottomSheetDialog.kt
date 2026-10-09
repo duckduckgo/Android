@@ -24,8 +24,7 @@ import android.widget.FrameLayout
 import androidx.core.content.ContextCompat.getString
 import com.duckduckgo.app.browser.databinding.BottomSheetDefaultBrowserBinding
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
+import com.duckduckgo.common.ui.view.getDimensionFromAttr
 import com.duckduckgo.common.utils.extensions.preventWidows
 import com.google.android.material.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -38,14 +37,9 @@ import com.duckduckgo.mobile.android.R as CommonR
 @SuppressLint("NoBottomSheetDialog")
 class DefaultBrowserBottomSheetDialog(
     private val context: Context,
-    edgeToEdgeProvider: EdgeToEdgeProvider,
 ) : BottomSheetDialog(
     context,
-    if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-        CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge
-    } else {
-        0
-    },
+    CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge,
 ) {
 
     private val binding: BottomSheetDefaultBrowserBinding = BottomSheetDefaultBrowserBinding.inflate(LayoutInflater.from(context))
@@ -59,9 +53,7 @@ class DefaultBrowserBottomSheetDialog(
         this.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         this.behavior.isDraggable = false
 
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-            binding.dialogRootView.applyBottomSystemBarInsetPadding()
-        }
+        binding.dialogRootView.applyBottomSystemBarInsetPadding()
 
         binding.defaultBrowserBottomSheetDialogTitle.text =
             getString(context, BrowserR.string.defaultBrowserBottomSheetDialogTitle).preventWidows()
@@ -95,10 +87,11 @@ class DefaultBrowserBottomSheetDialog(
         val bottomSheet = bottomSheetDialog.findViewById<FrameLayout>(R.id.design_bottom_sheet)
 
         val shapeDrawable = MaterialShapeDrawable.createWithElevationOverlay(context)
+        val radius = bottomSheetDialog.context.getDimensionFromAttr(CommonR.attr.daxSheetRadius, CommonR.dimen.dialogBorderRadius)
         shapeDrawable.shapeAppearanceModel = shapeDrawable.shapeAppearanceModel
             .toBuilder()
-            .setTopLeftCorner(CornerFamily.ROUNDED, context.resources.getDimension(CommonR.dimen.dialogBorderRadius))
-            .setTopRightCorner(CornerFamily.ROUNDED, context.resources.getDimension(CommonR.dimen.dialogBorderRadius))
+            .setTopLeftCorner(CornerFamily.ROUNDED, radius)
+            .setTopRightCorner(CornerFamily.ROUNDED, radius)
             .build()
         bottomSheet?.background = shapeDrawable
     }

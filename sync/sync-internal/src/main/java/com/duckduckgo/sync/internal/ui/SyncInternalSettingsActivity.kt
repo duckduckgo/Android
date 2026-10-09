@@ -39,6 +39,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.auth.AuthPromptRenderer
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivity
 import com.duckduckgo.sync.impl.ui.recoverycode.RecoveryCodeActivity
 import com.duckduckgo.sync.internal.databinding.ActivityInternalSyncSettingsBinding
@@ -79,6 +80,9 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
+    @Inject
+    lateinit var authPromptRenderer: AuthPromptRenderer
+
     private val barcodeLauncher = registerForActivityResult(
         ScanContract(),
     ) { result: ScanIntentResult ->
@@ -112,6 +116,7 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         setupToolbar(binding.includeToolbar.toolbar)
         observeUiEvents()
         configureListeners()
+        authPromptRenderer.bind(viewModel.authPrompts)
     }
 
     override fun onResume() {
@@ -123,6 +128,8 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.launchSyncSettingsButton.setOnClickListener {
             startActivity(Intent(this, SyncActivity::class.java))
         }
+        binding.authenticateButton.setOnClickListener { viewModel.onAuthenticateClicked() }
+        binding.invalidateGracePeriodButton.setOnClickListener { viewModel.onInvalidateGracePeriodClicked() }
         binding.openV2PairingDebugButton.setOnClickListener {
             startActivity(Intent(this, SyncV2PairingDebugActivity::class.java))
         }
@@ -386,6 +393,7 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         }
         binding.migrationStatusTextView.text = viewState.migrationStatusText
         binding.migrationResultTextView.text = viewState.migrationResult
+        binding.authenticateResultTextView.text = viewState.authenticateResult
         if (viewState.isSignedIn) {
             viewState.connectedDevices.forEach { device ->
                 val connectedBinding = ItemConnectedDeviceBinding.inflate(layoutInflater, binding.connectedDevicesList, true)

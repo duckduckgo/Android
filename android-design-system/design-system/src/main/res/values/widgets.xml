@@ -66,6 +66,10 @@
         <item name="backgroundTint">?attr/daxColorSurface</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.Snackbar.Rebrand" parent="Widget.DuckDuckGo.Snackbar">
+        <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.LargeComponent</item>
+    </style>
+
     <style name="Widget.DuckDuckGo.SnackbarButton" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
         <item name="android:textColor">?attr/daxColorSnackbarAction</item>
         <item name="android:textAppearance">?attr/textAppearanceButton</item>
@@ -294,7 +298,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="cardElevation">4dp</item>
-        <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="cardCornerRadius">?attr/daxContainerRadius</item>
         <item name="android:layout_margin">@dimen/keyline_4</item>
     </style>
 
@@ -302,7 +306,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="cardElevation">4dp</item>
-        <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="cardCornerRadius">?attr/daxContainerRadius</item>
         <item name="android:layout_marginTop">@dimen/keyline_4</item>
         <item name="android:layout_marginHorizontal">@dimen/keyline_4</item>
     </style>
@@ -361,7 +365,7 @@
 
     <style name="Widget.DuckDuckGo.DialogCorners">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">@dimen/dialogBorderRadius</item>
+        <item name="cornerSize">?attr/daxDialogRadius</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DialogCorners.Rebrand">
@@ -391,7 +395,7 @@
     <style name="Widget.DuckDuckGo.DaxDialog"/>
 
     <style name="Widget.DuckDuckGo.DaxDialog.Outline">
-        <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="cardCornerRadius">?attr/daxContainerRadius</item>
         <item name="android:backgroundTint">?attr/daxColorSurface</item>
         <item name="android:layout_marginStart">@dimen/keyline_4</item>
         <item name="android:layout_marginEnd">@dimen/keyline_4</item>
@@ -469,18 +473,18 @@
         <item name="bottomSheetStyle">@style/Widget.DuckDuckGo.ModalBottomSheetStyle</item>
     </style>
 
-    <!-- Opt-in variant used when EdgeToEdgeBucket.BOTTOM_SHEETS is enabled: draws the sheet behind the
+    <!-- Edge-to-edge variant used by bottom sheets: draws the sheet behind the
          transparent system bars (edge-to-edge, Android 15+). Content clears the nav bar via
          View.applyBottomSystemBarInsetPadding(); Material adds the top status-bar inset.
          `enableEdgeToEdge` can only be read from the theme at dialog construction (no runtime setter),
-         so callers pick this style vs. the plain one above based on the toggle. -->
+         so bottom sheets set this style rather than the plain one above. -->
     <style name="Widget.DuckDuckGo.BottomSheetDialog.EdgeToEdge" parent="Widget.DuckDuckGo.BottomSheetDialog">
         <item name="enableEdgeToEdge">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
-        <!-- Material's own bottom auto-padding (default true) would double up with our manual,
-             toggle-gated View.applyBottomSystemBarInsetPadding() now that the window is genuinely
+        <!-- Material's own bottom auto-padding (default true) would double up with our manual
+             View.applyBottomSystemBarInsetPadding() now that the window is genuinely
              edge-to-edge. Disable it; top/left/right auto-padding stay on (nothing manual replaces them). -->
         <item name="paddingBottomSystemWindowInsets">false</item>
     </style>
@@ -503,7 +507,7 @@
         <item name="bottomSheetStyle">@style/Widget.DuckDuckGo.ModalBottomSheetCollapsedStyle</item>
     </style>
 
-    <!-- Opt-in variant used when EdgeToEdgeBucket.BOTTOM_SHEETS is enabled: draw behind the transparent
+    <!-- Edge-to-edge variant used by bottom sheets: draw behind the transparent
          system bars; content clears the nav bar via View.applyBottomSystemBarInsetPadding(). -->
     <style name="Widget.DuckDuckGo.BottomSheetDialogCollapsed.EdgeToEdge" parent="Widget.DuckDuckGo.BottomSheetDialogCollapsed">
         <item name="enableEdgeToEdge">true</item>
@@ -520,8 +524,8 @@
 
     <style name="Widget.DuckDuckGo.BottomSheetDialogCorners">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSizeTopRight">@dimen/dialogBorderRadius</item>
-        <item name="cornerSizeTopLeft">@dimen/dialogBorderRadius</item>
+        <item name="cornerSizeTopRight">?attr/daxSheetRadius</item>
+        <item name="cornerSizeTopLeft">?attr/daxSheetRadius</item>
         <item name="cornerSizeBottomRight">0dp</item>
         <item name="cornerSizeBottomLeft">0dp</item>
     </style>

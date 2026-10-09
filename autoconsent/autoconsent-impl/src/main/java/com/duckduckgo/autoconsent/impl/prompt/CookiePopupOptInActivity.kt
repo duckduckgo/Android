@@ -39,9 +39,7 @@ import com.duckduckgo.autoconsent.impl.prompt.CookiePopupOptInViewModel.Variant
 import com.duckduckgo.autoconsent.impl.prompt.CookiePopupOptInViewModel.ViewState
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -49,9 +47,6 @@ import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class CookiePopupOptInActivity : DuckDuckGoActivity() {
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -66,17 +61,12 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.ONBOARDING)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         window.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
 
         setContentView(binding.root)
-        if (edgeToEdgeEnabled) {
-            edgeToEdgeHandler.applySystemBarInsets(binding.cookiePopupOptInContainer)
-        }
+        edgeToEdgeHandler.applySystemBarInsets(binding.cookiePopupOptInContainer)
 
         if (SDK_INT >= 34) {
             overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, R.anim.slide_to_bottom)

@@ -47,6 +47,7 @@ import com.duckduckgo.duckchat.impl.models.AIChatAttachmentUsage
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
+import com.duckduckgo.duckchat.impl.terms.DuckAiTermsConsent
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
@@ -94,7 +95,10 @@ interface DuckChatJSHelper {
 
     fun clearTabContextPromptEvent()
 
-    fun consumeTabContextPromptOnHandoff(method: String): SubscriptionEventData?
+    fun consumeTabContextPromptOnHandoff(
+        method: String,
+        browserMode: BrowserMode,
+    ): SubscriptionEventData?
 }
 
 enum class Mode {
@@ -131,6 +135,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val editPromptSessionStore: EditPromptSessionStore,
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
     private val duckAiSessionCallback: DuckAiSessionCallback,
+    private val termsConsent: DuckAiTermsConsent,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -174,7 +179,7 @@ class RealDuckChatJSHelper @Inject constructor(
 
             METHOD_GET_AI_CHAT_NATIVE_PROMPT ->
                 id?.let {
-                    getAIChatNativePrompt(featureName, method, it)
+                    getAIChatNativePrompt(featureName, method, it, browserMode)
                 }
 
             METHOD_OPEN_AI_CHAT -> {
@@ -392,13 +397,17 @@ class RealDuckChatJSHelper @Inject constructor(
         pendingTabContextStore.clear()
     }
 
-    override fun consumeTabContextPromptOnHandoff(method: String): SubscriptionEventData? {
+    override fun consumeTabContextPromptOnHandoff(
+        method: String,
+        browserMode: BrowserMode,
+    ): SubscriptionEventData? {
         if (!duckChatFeature.chatTabAttachments().isEnabled()) return null
         if (method != METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA) return null
         val pending = pendingTabContextStore.consume() ?: return null
 
         val params = JSONObject().apply {
             put(PLATFORM, ANDROID)
+            termsConsent.carry(this, browserMode)
             put("tool", "query")
             put(
                 "query",
@@ -513,11 +522,13 @@ class RealDuckChatJSHelper @Inject constructor(
         featureName: String,
         method: String,
         id: String,
+        browserMode: BrowserMode,
     ): JsCallbackData {
         val pending = pendingNativePromptStore.consume()
         val jsonPayload = JSONObject().apply {
             put(PLATFORM, ANDROID)
             if (pending != null) {
+                termsConsent.carry(this, browserMode)
                 put("tool", "query")
                 put(
                     "query",

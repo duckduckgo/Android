@@ -22,6 +22,7 @@ import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -37,6 +38,7 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.menu.applyMenuRadiusClipping
 import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.divider.HorizontalDivider
 import com.duckduckgo.common.ui.view.text.DaxTextView
@@ -73,7 +75,7 @@ class ModelPickerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : FrameLayout(context, attrs, defStyle), ModelPicker {
+) : FrameLayout(context, attrs, defStyle), ModelPicker, CompactableControl {
 
     @Inject lateinit var viewModelFactory: ViewViewModelFactory
 
@@ -93,6 +95,23 @@ class ModelPickerView @JvmOverloads constructor(
     private var showPickerJob: Job? = null
     private var popupWindow: PopupWindow? = null
     private var lastNativeInputState: NativeInputState? = null
+    private var compactLevel = AdaptiveBottomRowLayout.LEVEL_FULL
+    private var chipLabelText: String? = null
+    private var chipChrome: Float? = null
+    private var chipIconJob: Job? = null
+    private val chipSize = resources.getDimension(R.dimen.nativeInputButtonSize)
+    private val defaultPaddings by lazy {
+        ChipPaddings(
+            textStart = chip.textStartPadding,
+            textEnd = chip.textEndPadding,
+            chipStart = chip.chipStartPadding,
+            chipEnd = chip.chipEndPadding,
+            iconEnd = chip.iconEndPadding,
+            closeIconStart = chip.closeIconStartPadding,
+            closeIconEnd = chip.closeIconEndPadding,
+            closeIconSize = chip.closeIconSize,
+        )
+    }
 
     // Mirrors the input context from the per-tab native input state so currentSurface() can be
     // read synchronously from popup callbacks. Updated by observeInputContext().
@@ -154,7 +173,15 @@ class ModelPickerView @JvmOverloads constructor(
 
         chipLabelJob?.cancel()
         chipLabelJob = viewModel.chipLabel
-            .onEach { label -> label?.let { chip.text = it } }
+            .onEach { label ->
+                chipLabelText = label ?: chipLabelText
+                applyCompactLevel()
+            }
+            .launchIn(scope)
+
+        chipIconJob?.cancel()
+        chipIconJob = viewModel.chipIconRes
+            .onEach { iconRes -> chip.setChipIconResource(iconRes) }
             .launchIn(scope)
 
         commandJob?.cancel()
@@ -185,6 +212,71 @@ class ModelPickerView @JvmOverloads constructor(
                 }
             }
             .launchIn(scope)
+    }
+
+    override fun setCompactLevel(level: Int) {
+        if (compactLevel == level) return
+        compactLevel = level
+        applyCompactLevel()
+    }
+
+    // Collapsed, the pill is the provider icon and still opens the same menu. The chip keeps reserving room for its
+    // text and close icon unless their paddings are zeroed, which leaves blank space beside the icon.
+    private fun applyCompactLevel() {
+        val defaults = defaultPaddings
+        val iconOnly = compactLevel >= AdaptiveBottomRowLayout.LEVEL_MODEL_ICON
+        chip.text = if (iconOnly) "" else chipLabelText.orEmpty()
+        chip.isChipIconVisible = iconOnly
+        chip.isCloseIconVisible = !iconOnly
+        chip.textStartPadding = if (iconOnly) 0f else defaults.textStart
+        chip.textEndPadding = if (iconOnly) 0f else defaults.textEnd
+        // A square the size of the other bottom-row buttons, with the icon centred in it.
+        val sidePadding = ((chipSize - chip.chipIconSize) / 2f).coerceAtLeast(0f)
+        chip.chipStartPadding = if (iconOnly) sidePadding else defaults.chipStart
+        chip.chipEndPadding = if (iconOnly) sidePadding else defaults.chipEnd
+        chip.updateLayoutParams { width = if (iconOnly) chipSize.toInt() else ViewGroup.LayoutParams.WRAP_CONTENT }
+        chip.iconEndPadding = if (iconOnly) 0f else defaults.iconEnd
+        chip.closeIconStartPadding = if (iconOnly) 0f else defaults.closeIconStart
+        chip.closeIconEndPadding = if (iconOnly) 0f else defaults.closeIconEnd
+        chip.contentDescription = chipLabelText
+    }
+
+    private data class ChipPaddings(
+        val textStart: Float,
+        val textEnd: Float,
+        val chipStart: Float,
+        val chipEnd: Float,
+        val iconEnd: Float,
+        val closeIconStart: Float,
+        val closeIconEnd: Float,
+        val closeIconSize: Float,
+    )
+
+    // Sized for the longest model name, so picking a different model never changes how the row is laid out.
+    override fun worstCaseWidth(level: Int): Int {
+        val margin = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
+        if (level >= AdaptiveBottomRowLayout.LEVEL_MODEL_ICON) return chipSize.toInt() + margin
+        val defaults = defaultPaddings
+        val longestName = if (isAttachedToWindow) viewModel.state.value.models.maxOfOrNull { it.shortName }.orEmpty() else ""
+        val textWidth = chip.paint.measureText(longestName.ifEmpty { chipLabelText.orEmpty() })
+        val closeIconWidth = defaults.closeIconStart + defaults.closeIconSize + defaults.closeIconEnd
+        val estimatedChrome = defaults.chipStart + defaults.textStart + defaults.textEnd + closeIconWidth + defaults.chipEnd
+        return ((chipChrome ?: estimatedChrome) + textWidth).toInt() + margin
+    }
+
+    // Once the chip has shown its text, the real width around the label is known, which is more exact than the paddings.
+    override fun onLayout(
+        changed: Boolean,
+        left: Int,
+        top: Int,
+        right: Int,
+        bottom: Int,
+    ) {
+        super.onLayout(changed, left, top, right, bottom)
+        val label = chip.text?.toString().orEmpty()
+        if (compactLevel == AdaptiveBottomRowLayout.LEVEL_FULL && label.isNotEmpty() && chip.width > 0) {
+            chipChrome = chip.width - chip.paint.measureText(label)
+        }
     }
 
     override fun hasPendingRecoverySelection(): Boolean = viewModel.hasPendingRecoverySelection()
@@ -245,6 +337,7 @@ class ModelPickerView @JvmOverloads constructor(
             ScrollView(context).apply {
                 addView(container)
                 setBackgroundResource(com.duckduckgo.mobile.android.R.drawable.popup_menu_bg)
+                applyMenuRadiusClipping()
                 isVerticalScrollBarEnabled = false
             },
             resources.getDimensionPixelSize(R.dimen.nativeInputMenuWidth),

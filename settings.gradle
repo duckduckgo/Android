@@ -107,7 +107,6 @@ buildCache {
         // (NOTE: 'build-cache' is kept in the module auto-discovery ignore list above so its
         // ever-changing contents are not fingerprinted as a configuration-cache input).
         directory = new File(rootDir, 'build-cache')
-        removeUnusedEntriesAfterDays = 7
     }
 
     remote(develocity.buildCache) {

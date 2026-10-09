@@ -29,6 +29,9 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.content.res.Configuration
+import android.graphics.Rect
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.LayerDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -80,6 +83,7 @@ import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -212,6 +216,7 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.KeyboardFollowingCallback
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.cta.ui.PrivacyProSkippedOnboardingBottomSheetDialog
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
@@ -313,9 +318,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.KeyboardVisibilityUtil
 import com.duckduckgo.common.utils.device.isTablet
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.showKeyboard
@@ -693,9 +696,6 @@ class BrowserTabFragment :
     lateinit var clipboardInteractor: ClipboardInteractor
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     /**
@@ -823,23 +823,23 @@ class BrowserTabFragment :
                 viewModel.openNewDuckChatFromChatMenu()
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewVoiceChat)) {
-                duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+                viewModel.openNewVoiceChatFromChatMenu()
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewImage)) {
-                viewModel.openNewImageDuckChat(omnibar.viewMode)
+                viewModel.openNewImageDuckChatFromChatMenu()
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)) {
                 // With the native sidebar this entry opens the new tab with its input screen surfaced on
                 // the Search tab. The target is threaded to the new tab itself rather than armed globally,
                 // so it can't be consumed by another tab.
-                viewModel.recordPendingNewTabOpenedExit()
+                viewModel.onNewTabFromChatMenuSelected()
                 browserActivity?.launchNewTab(
                     browserMode = BrowserMode.REGULAR,
                     inputModeTarget = if (duckAiFeatureState.nativeDuckAiSidebar.value) InputMode.SEARCH else null,
                 )
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)) {
-                viewModel.recordPendingFireTabOpenedExit()
+                viewModel.onNewFireTabFromChatMenuSelected()
                 browserActivity?.launchNewTab(browserMode = BrowserMode.FIRE)
             }
         }
@@ -1216,17 +1216,15 @@ class BrowserTabFragment :
 
         disableViewStateSaving()
 
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
-            edgeToEdgeHandler.applyNavigationBarInsetsAsMargin(binding.rootView)
-            val hasBottomBar = !tabDisplayedInCustomTabScreen &&
-                (omnibar.omnibarType == OmnibarType.SPLIT || omnibar.omnibarType == OmnibarType.SINGLE_BOTTOM)
-            if (hasBottomBar) {
-                edgeToEdgeHandler.applyNavigationBarScrim(
-                    binding.rootView,
-                    requireContext().getColorFromAttr(com.duckduckgo.mobile.android.R.attr.preferredNavigationBarColor),
-                    coverGestureNav = true,
-                )
-            }
+        edgeToEdgeHandler.applyNavigationBarInsetsAsMargin(binding.rootView)
+        val hasBottomBar = !tabDisplayedInCustomTabScreen &&
+            (omnibar.omnibarType == OmnibarType.SPLIT || omnibar.omnibarType == OmnibarType.SINGLE_BOTTOM)
+        if (hasBottomBar) {
+            edgeToEdgeHandler.applyNavigationBarScrim(
+                binding.rootView,
+                requireContext().getColorFromAttr(com.duckduckgo.mobile.android.R.attr.preferredNavigationBarColor),
+                coverGestureNav = true,
+            )
         }
 
         if (savedInstanceState == null) {
@@ -1669,10 +1667,6 @@ class BrowserTabFragment :
                 customTabToolbarColor,
             )
 
-            if (!edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
-                requireActivity().window.navigationBarColor = customTabToolbarColor
-                requireActivity().window.statusBarColor = customTabToolbarColor
-            }
             // Update status bar icon colors based on toolbar color luminance
             updateStatusBarIconColors(customTabToolbarColor)
 
@@ -1772,7 +1766,6 @@ class BrowserTabFragment :
                 pixel.fire(AppPixelName.BROWSING_MENU_USED_UNIQUE, type = Unique())
                 pixel.fire(AppPixelName.BROWSING_MENU_USED, type = Count)
             },
-            edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
             topInContextSections = topInContextSections.getPlugins(),
             currentUrl = viewModel.url?.toUri(),
         )
@@ -2856,8 +2849,8 @@ class BrowserTabFragment :
                     // Skip if the widget is already attached — Command.ShowKeyboard can fire
                     // multiple times per session (e.g. CTA refresh / tab swipe back to NTP) and
                     // showNativeInput() tears down and re-animates the widget on each call.
-                    // Must cover bottom omnibar too (inputModeBottomRoot); checking only the top
-                    // root re-opened UTI on every swipe and stacked NTP content insets.
+                    // isNativeInputShown checks the single inputModeRoot across both positions; a
+                    // top-only check re-opened UTI on every swipe and stacked NTP content insets.
                     if (!nativeInputManager.isNativeInputShown()) {
                         showNativeInput()
                     }
@@ -5522,7 +5515,6 @@ class BrowserTabFragment :
                         viewModel.historicalPageSelected(stackIndex)
                     }
                 },
-                edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
             ).show()
         }
     }
@@ -6044,6 +6036,7 @@ class BrowserTabFragment :
         private var lastSeenCtaViewState: CtaViewState? = null
         private var lastSeenPrivacyShieldViewState: PrivacyShieldViewState? = null
         private var brandDesignFitLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
+        private var brandDesignKeyboardCallback: KeyboardFollowingCallback? = null
 
         fun renderPrivacyShield(viewState: PrivacyShieldViewState) {
             renderIfChanged(viewState, lastSeenPrivacyShieldViewState) {
@@ -6436,9 +6429,50 @@ class BrowserTabFragment :
             removeBrandDesignFitListener()
             val listener = ViewTreeObserver.OnGlobalLayoutListener {
                 (lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.applyFit()
+                if (brandDesignKeyboardCallback?.isAnimating != true) clipWavingDaxAtCover()
             }
             brandDesignFitLayoutListener = listener
             brandDesignDialogScrollView.viewTreeObserver.addOnGlobalLayoutListener(listener)
+            var imeCta: DaxBubbleCta.BrandDesignUpdateBubbleCta? = null
+            // The tab shrinks before the keyboard arrives, briefly uncovering what's behind it.
+            var restoreBehindTab: (() -> Unit)? = null
+            val callback = KeyboardFollowingCallback(
+                views = {
+                    listOfNotNull<View>(
+                        brandDesignDialogScrollView.findViewById(R.id.wavingDax),
+                        newBrowserTab.rebrandBrowserBackground,
+                    )
+                },
+                layoutBottomInset = { (binding.rootView.layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin ?: 0 },
+                onStarted = {
+                    nativeInputManager.onKeyboardAnimationChanged(true)
+                    imeCta = (lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.also { it.onImeAnimationStarted() }
+                    val behindTab = binding.rootView.parent as? View
+                    val fill = newBrowserTab.newTabLayout.background as? ColorDrawable
+                    val insets = ViewCompat.getRootWindowInsets(binding.rootView)
+                    if (insets?.isVisible(WindowInsetsCompat.Type.ime()) == false && behindTab != null && fill != null) {
+                        val previous = behindTab.background
+                        val gestureBar = insets.getInsets(
+                            WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout(),
+                        ).bottom
+                        val layers = listOfNotNull(previous, ColorDrawable(fill.color))
+                        behindTab.background = LayerDrawable(layers.toTypedArray()).apply {
+                            setLayerInset(layers.lastIndex, 0, 0, 0, gestureBar)
+                        }
+                        restoreBehindTab = { behindTab.background = previous }
+                    }
+                },
+                onEnded = {
+                    nativeInputManager.onKeyboardAnimationChanged(false)
+                    imeCta?.onImeAnimationEnded()
+                    imeCta = null
+                    restoreBehindTab?.invoke()
+                    restoreBehindTab = null
+                    clipWavingDaxAtCover()
+                },
+            )
+            brandDesignKeyboardCallback = callback
+            ViewCompat.setWindowInsetsAnimationCallback(brandDesignDialogScrollView, callback)
         }
 
         fun removeBrandDesignFitListener() {
@@ -6446,7 +6480,29 @@ class BrowserTabFragment :
                 brandDesignDialogScrollView.viewTreeObserver.removeOnGlobalLayoutListener(it)
             }
             brandDesignFitLayoutListener = null
+            brandDesignKeyboardCallback?.restore()
+            brandDesignKeyboardCallback = null
+            ViewCompat.setWindowInsetsAnimationCallback(brandDesignDialogScrollView, null)
+            brandDesignDialogScrollView.findViewById<View>(R.id.wavingDax)?.clipBounds = null
         }
+
+        // Dax is pushed below the content so his legs sit under the bottom bar, or under the gesture bar scrim with the
+        // address bar at the top. Neither covers him, so cut him off where they start. The clip moves with Dax, so it
+        // also holds while he rides the keyboard and the bar jumps ahead of him.
+        private fun clipWavingDaxAtCover() {
+            val dax = brandDesignDialogScrollView.findViewById<View>(R.id.wavingDax) ?: return
+            val coverTop = if (omnibar.omnibarType == OmnibarType.SINGLE_BOTTOM) {
+                val bar = binding.rootView.rootView.findViewById<View>(R.id.inputModeWidgetCard)?.takeIf { it.isShown }
+                    ?: omnibar.omnibarView as? View ?: return
+                bar.windowY()
+            } else {
+                binding.rootView.windowY() + binding.rootView.height
+            }
+            val visibleHeight = coverTop - dax.windowY()
+            dax.clipBounds = if (visibleHeight in 0 until dax.height) Rect(0, 0, dax.width, visibleHeight) else null
+        }
+
+        private fun View.windowY(): Int = IntArray(2).also(::getLocationInWindow)[1]
 
         fun reapplyBubbleForOrientation() {
             (lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.onOrientationChanged()
@@ -6458,7 +6514,6 @@ class BrowserTabFragment :
             privacyProSkippedOnboardingBottomSheet = PrivacyProSkippedOnboardingBottomSheetDialog(
                 context = requireContext(),
                 isFreeTrialCopy = configuration.isFreeTrialCopy,
-                edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
             ).also { dialog ->
                 dialog.eventListener = object : PrivacyProSkippedOnboardingBottomSheetDialog.EventListener {
                     override fun onShown() {

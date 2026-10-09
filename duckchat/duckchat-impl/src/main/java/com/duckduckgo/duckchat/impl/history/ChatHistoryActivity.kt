@@ -21,12 +21,9 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
 import com.duckduckgo.duckchat.impl.databinding.ActivityChatHistoryBinding
-import javax.inject.Inject
 
 /**
  * Thin host for chat-history-related fragments.
@@ -35,16 +32,11 @@ import javax.inject.Inject
 @ContributeToActivityStarter(DuckChatHistoryNoParams::class, screenName = "duckai.history")
 class ChatHistoryActivity : DuckDuckGoActivity() {
 
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
     private val binding: ActivityChatHistoryBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
 
         if (savedInstanceState == null) {

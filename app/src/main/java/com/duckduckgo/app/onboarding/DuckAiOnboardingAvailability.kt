@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.onboarding
 
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -32,13 +31,11 @@ interface DuckAiOnboardingAvailability {
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDuckAiOnboardingAvailability @Inject constructor(
-    private val toggles: ExtendedOnboardingFeatureToggles,
     private val duckChat: DuckChat,
     private val dispatcherProvider: DispatcherProvider,
 ) : DuckAiOnboardingAvailability {
     override suspend fun isDuckAiOnboardingEnabled(): Boolean =
         withContext(dispatcherProvider.io()) {
-            duckChat.isEnabled() &&
-                toggles.duckAiOnboarding().isEnabled()
+            duckChat.isEnabled()
         }
 }
