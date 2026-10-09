@@ -105,7 +105,6 @@ class NoNewBrowserFeatureToggleDetector : Detector(), SourceCodeScanner {
             "AndroidBrowserConfigFeature#checkMaliciousAfterHttpsUpgrade",
             "AndroidBrowserConfigFeature#newThreatProtectionSettings",
             "AndroidBrowserConfigFeature#handleIntentScheme",
-            "AndroidBrowserConfigFeature#hideDuckAiInSerpKillSwitch",
             "AndroidBrowserConfigFeature#validateIntentResolution",
             "AndroidBrowserConfigFeature#establishedAppStageGuard",
             "AndroidBrowserConfigFeature#vpnMenuItem",

@@ -433,7 +433,6 @@ import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSa
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.serp.logos.api.SerpLogos
-import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
@@ -585,7 +584,6 @@ class BrowserTabViewModel @Inject constructor(
     private val autoconsentPixelManager: AutoconsentPixelManager,
     private val omnibarRepository: OmnibarRepository,
     private val contentScopeScriptsSubscriptionEventPluginPoint: PluginPoint<ContentScopeScriptsSubscriptionEventPlugin>,
-    private val serpSettingsFeature: SerpSettingsFeature,
     private val pageContextJSHelper: PageContextJSHelper,
     private val tabPageContextRepository: TabPageContextRepository,
     private val syncStatusChangedObserver: SyncStatusChangedObserver,
@@ -1334,11 +1332,9 @@ class BrowserTabViewModel @Inject constructor(
             showErrorWithAction()
         }
 
-        if (serpSettingsFeature.storeSerpSettings().isEnabled()) {
-            viewModelScope.launch {
-                contentScopeScriptsSubscriptionEventPluginPoint.getPlugins().forEach { plugin ->
-                    _subscriptionEventDataChannel.send(plugin.getSubscriptionEventData())
-                }
+        viewModelScope.launch {
+            contentScopeScriptsSubscriptionEventPluginPoint.getPlugins().forEach { plugin ->
+                _subscriptionEventDataChannel.send(plugin.getSubscriptionEventData())
             }
         }
     }

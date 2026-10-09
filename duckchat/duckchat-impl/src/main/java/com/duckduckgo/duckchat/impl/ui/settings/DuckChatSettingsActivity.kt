@@ -327,23 +327,18 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                     }
                 }
 
-                if (viewState.isHideGeneratedImagesOptionVisible) {
-                    searchSettingsSectionHeader.isVisible = true
+                searchSettingsSectionHeader.isVisible = true
 
-                    with(duckAiHideAiGeneratedImagesLink) {
-                        isVisible = true
-                        // When native controls are on the row reflects the current On/Off state and opens the
-                        // native dialog; otherwise it keeps its static description and opens the SERP webview.
-                        if (viewState.isNativeControlsEnabled) {
-                            setSecondaryText(getString(viewState.hideAiGeneratedImages.toDisplayNameRes()))
-                        }
-                        setOnClickListener {
-                            viewModel.onDuckAiHideAiGeneratedImagesClicked()
-                        }
+                with(duckAiHideAiGeneratedImagesLink) {
+                    isVisible = true
+                    // When native controls are on the row reflects the current On/Off state and opens the
+                    // native dialog; otherwise it keeps its static description and opens the SERP webview.
+                    if (viewState.isNativeControlsEnabled) {
+                        setSecondaryText(getString(viewState.hideAiGeneratedImages.toDisplayNameRes()))
                     }
-                } else {
-                    searchSettingsSectionHeader.isGone = true
-                    duckAiHideAiGeneratedImagesLink.isGone = true
+                    setOnClickListener {
+                        viewModel.onDuckAiHideAiGeneratedImagesClicked()
+                    }
                 }
             } else {
                 inputScreenSettingsBinding.divider2.isGone = true

@@ -365,7 +365,6 @@ import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.serp.logos.api.SerpLogos
-import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
@@ -747,7 +746,6 @@ class BrowserTabViewModelTest {
     private val mockDeviceAppLookup: DeviceAppLookup = mock()
 
     private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
-    private var serpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
     private var fakeBrowserUiLockFeature = FakeFeatureToggleFactory.create(BrowserUiLockFeature::class.java)
     private var fakeFaviconFetchingFixFeature = FakeFeatureToggleFactory.create(FaviconFetchingFixFeature::class.java)
     private var fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
@@ -1082,7 +1080,6 @@ class BrowserTabViewModelTest {
                 autoconsentPixelManager = mockAutoconsentPixelManager,
                 omnibarRepository = mockOmnibarFeatureRepository,
                 contentScopeScriptsSubscriptionEventPluginPoint = fakeContentScopeScriptsSubscriptionEventPluginPoint,
-                serpSettingsFeature = serpSettingsFeature,
                 syncStatusChangedObserver = mockSyncStatusChangedObserver,
                 pageContextJSHelper = mockPageContextJSHelper,
                 tabPageContextRepository = mockTabPageContextRepository,
@@ -11820,8 +11817,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOnViewResumedWithNoPluginsThenNoSubscriptionEventsSent() = runTest {
-        serpSettingsFeature.storeSerpSettings().setRawStoredState(State(enable = true))
-
         testee.onViewResumed()
 
         testee.subscriptionEventDataFlow.test {
@@ -11832,7 +11827,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOnViewResumedWithPluginsThenSubscriptionEventsSent() = runTest {
-        serpSettingsFeature.storeSerpSettings().setRawStoredState(State(enable = true))
         val events = mutableListOf<SubscriptionEventData>().apply {
             add(
                 SubscriptionEventData(
@@ -11863,38 +11857,6 @@ class BrowserTabViewModelTest {
                 assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
                 assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
             }
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnViewResumedWithPluginsAndSerpSettingsFeatureFlagOffThenNoEventsSent() = runTest {
-        serpSettingsFeature.storeSerpSettings().setRawStoredState(State(enable = false))
-        val events = mutableListOf<SubscriptionEventData>().apply {
-            add(
-                SubscriptionEventData(
-                    featureName = "event1",
-                    subscriptionName = "subscription1",
-                    params = JSONObject().put("param1", "value1"),
-                ),
-            )
-            add(
-                SubscriptionEventData(
-                    featureName = "event2",
-                    subscriptionName = "subscription2",
-                    params = JSONObject().put("param2", "value2"),
-                ),
-            )
-        }
-
-        fakeContentScopeScriptsSubscriptionEventPluginPoint.addPlugins(
-            events.map { FakeContentScopeScriptsSubscriptionEventPlugin(it) },
-        )
-
-        testee.onViewResumed()
-
-        testee.subscriptionEventDataFlow.test {
-            expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
     }

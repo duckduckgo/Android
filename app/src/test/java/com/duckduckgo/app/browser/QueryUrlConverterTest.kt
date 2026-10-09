@@ -27,12 +27,10 @@ import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.device.DeviceInfo.FormFactor.PHONE
-import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.referral.api.AppReferrer
-import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.urlpredictor.Decision
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
@@ -59,9 +57,7 @@ class QueryUrlConverterTest {
     private var mockStatisticsStore: StatisticsDataStore = mock()
     private val variantManager: VariantManager = mock()
     private val mockAppReferrer: AppReferrer = mock()
-    private val duckChat: DuckChat = mock()
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
-    private val serpSettingsFeature: SerpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
     private val queryUrlPredictor: QueryUrlPredictor = mock()
     private val mockDeviceInfo: DeviceInfo = mock()
     private val requestRewriter =
@@ -70,9 +66,6 @@ class QueryUrlConverterTest {
             mockStatisticsStore,
             variantManager,
             mockAppReferrer,
-            duckChat,
-            androidBrowserConfigFeature,
-            serpSettingsFeature,
             mockDeviceInfo,
         )
     private val testee: QueryUrlConverter = createTestee(useUrlPredictorEnabled = false)
@@ -80,10 +73,8 @@ class QueryUrlConverterTest {
     @Before
     fun setup() {
         whenever(variantManager.getVariantKey()).thenReturn("")
-        whenever(duckChat.isEnabled()).thenReturn(true)
         whenever(queryUrlPredictor.isReady()).thenReturn(true)
         whenever(mockDeviceInfo.formFactor()).thenReturn(PHONE)
-        androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(true))
     }
 
     @Test
