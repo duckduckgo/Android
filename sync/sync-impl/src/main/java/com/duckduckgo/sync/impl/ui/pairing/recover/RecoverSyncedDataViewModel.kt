@@ -27,6 +27,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -40,13 +41,16 @@ class RecoverSyncedDataViewModel @AssistedInject constructor(
     private val syncPixels: SyncPixels,
 ) : ViewModel() {
     private val _commands = Channel<Command>()
-    internal val commands = _commands.receiveAsFlow()
+    val commands = _commands.receiveAsFlow()
 
     val authPrompts: StateFlow<AuthPrompt?> = deviceAuthenticator.currentPrompt
 
+    private var authJob: Job? = null
+
     fun onRecoverDataClicked() {
+        if (authJob?.isActive == true) return
         syncPixels.fireRecoverSyncDataConfirmed()
-        viewModelScope.launch {
+        authJob = viewModelScope.launch {
             if (!isAuthRequired) {
                 _commands.send(Command.ReadSyncCode)
                 return@launch
