@@ -238,8 +238,8 @@
         app:daxButtonSize="large"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-    <nl.dionsegijn.konfetti.KonfettiView
-        android:id="@+id/subscriptionOnboardingWelcomeKonfetti"
+    <com.duckduckgo.subscriptions.impl.onboarding.confetti.ConfettiView
+        android:id="@+id/subscriptionOnboardingWelcomeConfetti"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clickable="false"
