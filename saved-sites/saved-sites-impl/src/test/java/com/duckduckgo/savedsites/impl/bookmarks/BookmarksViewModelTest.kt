@@ -653,4 +653,35 @@ class BookmarksViewModelTest {
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertEquals(BookmarksViewModel.Command.LaunchAddFolder, commandCaptor.lastValue)
     }
+
+    @Test
+    fun whenFolderDeletedWhileSearchingThenRemainingItemsStayInTheSearchableList() = runTest {
+        savedSitesFlow.value = SavedSites(favorites = emptyList(), bookmarks = listOf(bookmarkFolder))
+        whenever(savedSitesRepository.getFavoritesSync()).thenReturn(listOf(favorite))
+        whenever(savedSitesRepository.getBookmarksTree()).thenReturn(listOf(bookmark))
+        whenever(savedSitesRepository.getFolderTree(BOOKMARKS_ROOT, null)).thenReturn(listOf(bookmarkFolderItem))
+
+        testee.fetchAllBookmarksAndFolders()
+        assertTrue(testee.itemsToDisplay.value.isNotEmpty())
+
+        testee.onDeleteBookmarkFolderRequested(bookmarkFolder)
+
+        val remainingItems = testee.itemsToDisplay.value
+        assertTrue(remainingItems.any { it is BookmarkItem && it.bookmark.id == bookmark.id })
+        assertFalse(remainingItems.any { it is BookmarksAdapter.BookmarkFolderItem })
+    }
+
+    @Test
+    fun whenSearchingThenFoldersPendingDeletionAreNotDisplayed() = runTest {
+        whenever(savedSitesRepository.getFavoritesSync()).thenReturn(listOf(favorite))
+        whenever(savedSitesRepository.getBookmarksTree()).thenReturn(listOf(bookmark))
+        whenever(savedSitesRepository.getFolderTree(BOOKMARKS_ROOT, null)).thenReturn(listOf(bookmarkFolderItem))
+
+        testee.onDeleteBookmarkFolderRequested(bookmarkFolder)
+        testee.fetchAllBookmarksAndFolders()
+
+        val searchableItems = testee.itemsToDisplay.value
+        assertTrue(searchableItems.any { it is BookmarkItem && it.bookmark.id == bookmark.id })
+        assertFalse(searchableItems.any { it is BookmarksAdapter.BookmarkFolderItem })
+    }
 }
