@@ -29,6 +29,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
+import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.checker.isEnabled
 import com.duckduckgo.pir.impl.dashboard.PirDashboardUrlProvider
@@ -40,6 +41,7 @@ import com.duckduckgo.pir.internal.databinding.ActivityPirInternalSettingsBindin
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEventsResultsScreen
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -68,6 +70,9 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
+    @Inject
+    lateinit var pirFeatureDataCleaner: PirFeatureDataCleaner
 
     private val binding: ActivityPirInternalSettingsBinding by viewBinding()
 
@@ -131,6 +136,15 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
             pirInternalSettingsDataStore.customDashboardUrl = null
             binding.pirCustomUrlInput.text = PirDashboardWebConstants.DEFAULT_WEB_UI_URL
             Toast.makeText(this, getString(R.string.pirDevCustomUrlReset), Toast.LENGTH_SHORT).show()
+        }
+
+        binding.pirResetFreemiumState.setOnClickListener {
+            lifecycleScope.launch(dispatcherProvider.io()) {
+                pirFeatureDataCleaner.removeUserData()
+                withContext(dispatcherProvider.main()) {
+                    Toast.makeText(this@PirDevSettingsActivity, getString(R.string.pirDevResetFreemiumStateDone), Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 

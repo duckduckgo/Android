@@ -24,6 +24,11 @@
     <string name="pirOptOutNotificationMessageComplete">Opt out is complete! View your results.</string>
     <string name="pirDashboardManualConfigWarning">Warning: Broker config has been manually modified. Results may differ from production.</string>
 
+    <!-- Freemium PIR settings entry point -->
+    <string name="pirFreemiumSettingSubtitle">Find your personal info on sites that sell it.</string>
+    <string name="pirFreemiumSettingStartScan">Start Free Scan</string>
+    <string name="pirFreemiumSettingViewResults">View Scan Results</string>
+
     <!-- PIR subscription onboarding step -->
     <string name="pirOnboardingStepTitle">Personal Information Removal</string>
     <string name="pirOnboardingStepDescription">DuckDuckGo helps find and remove your personal info from data broker sites, fighting identity theft and spam.</string>
