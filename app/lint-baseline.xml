@@ -212,17 +212,6 @@
 
     <issue
         id="NoImplImportsInAppModule"
-        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
-        errorLine1="import com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdatePageViewModelTest.kt"
-            line="59"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="NoImplImportsInAppModule"
         message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.contextual.DuckChatContextualSharedViewModel&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
         errorLine1="import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualSharedViewModel"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -8651,17 +8640,6 @@
             file="src/main/java/com/duckduckgo/app/privacy/ui/WebsitesAdapter.kt"
             line="65"
             column="13"/>
-    </issue>
-
-    <issue
-        id="Recycle"
-        message="This animation should be started with `#start()`"
-        errorLine1="        val stepIndicatorFadeIn = ObjectAnimator.ofFloat(binding.daxDialogCta.stepIndicator, View.ALPHA, 0f, 1f).apply {"
-        errorLine2="                                                 ~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdateWelcomePage.kt"
-            line="2761"
-            column="50"/>
     </issue>
 
     <issue
