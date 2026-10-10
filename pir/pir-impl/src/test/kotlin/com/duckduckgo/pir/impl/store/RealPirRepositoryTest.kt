@@ -1043,4 +1043,17 @@ class RealPirRepositoryTest {
         verify(mockUserProfileDao, never()).deleteAllProfiles()
         verify(mockPirDataStore, never()).reset()
     }
+
+    @Test
+    fun whenUpdateProfileQueriesAndDatabaseUnavailableThenReturnFalse() = runTest {
+        whenever(mockDatabaseFactory.getDatabase()).thenReturn(null)
+
+        val result = testee.updateProfileQueries(
+            profileQueriesToAdd = emptyList(),
+            profileQueriesToUpdate = emptyList(),
+            profileQueryIdsToDelete = listOf(1L),
+        )
+
+        assertEquals(false, result)
+    }
 }
