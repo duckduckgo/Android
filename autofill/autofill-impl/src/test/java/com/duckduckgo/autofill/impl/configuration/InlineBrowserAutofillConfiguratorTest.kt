@@ -26,6 +26,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -45,7 +46,7 @@ class InlineBrowserAutofillConfiguratorTest {
     @Before
     fun before() = runTest {
         whenever(autofillJavascriptLoader.getAutofillJavascript()).thenReturn("")
-        whenever(autofillRuntimeConfigProvider.getRuntimeConfiguration(any(), any(), any(), any())).thenReturn("")
+        whenever(autofillRuntimeConfigProvider.getRuntimeConfiguration(any(), any(), any(), any())).thenReturn(FORMATTED_JS)
 
         val internalConfigurator = RealInlineBrowserAutofillConfigurator(
             autofillRuntimeConfigProvider,
@@ -62,7 +63,7 @@ class InlineBrowserAutofillConfiguratorTest {
         givenFeatureIsDisabled()
         inlineBrowserAutofillConfigurator.configureAutofillForCurrentPage(webView, "https://example.com", BrowserMode.REGULAR)
 
-        verify(webView, never()).evaluateJavascript("javascript:", null)
+        verify(webView, never()).evaluateJavascript(any(), anyOrNull())
     }
 
     @Test
@@ -70,7 +71,7 @@ class InlineBrowserAutofillConfiguratorTest {
         givenFeatureIsEnabled()
         inlineBrowserAutofillConfigurator.configureAutofillForCurrentPage(webView, "https://example.com", BrowserMode.REGULAR)
 
-        verify(webView).evaluateJavascript("javascript:", null)
+        verify(webView).evaluateJavascript(FORMATTED_JS, null)
     }
 
     private suspend fun givenFeatureIsEnabled() {
@@ -79,5 +80,9 @@ class InlineBrowserAutofillConfiguratorTest {
 
     private suspend fun givenFeatureIsDisabled() {
         whenever(autofillCapabilityChecker.isAutofillEnabledByConfiguration(any())).thenReturn(false)
+    }
+
+    companion object {
+        private const val FORMATTED_JS = "javascript:formatted-js"
     }
 }

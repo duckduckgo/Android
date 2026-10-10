@@ -59,7 +59,7 @@ class RealInlineBrowserAutofillConfigurator @Inject constructor(
                 val formatted = autofillRuntimeConfigProvider.getRuntimeConfiguration(rawJs, url, reauthenticationDetails, browserMode)
 
                 withContext(dispatchers.main()) {
-                    webView.evaluateJavascript("javascript:$formatted", null)
+                    webView.evaluateJavascript(formatted, null)
                 }
             } else {
                 logcat(VERBOSE) { "Won't inject autofill JS into WebView for: $url" }
