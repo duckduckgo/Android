@@ -26,11 +26,13 @@ import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
+import com.duckduckgo.anrs.api.CrashAnnotationContributor
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.checkMainThread
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.library.loader.LibraryLoader
@@ -65,6 +67,7 @@ class NativeCrashInit @Inject constructor(
     @param:ProcessName private val processName: String,
     private val crashpadInitializer: CrashpadInitializer,
     private val pixel: Pixel,
+    private val crashAnnotationContributors: PluginPoint<CrashAnnotationContributor>,
 ) : MainProcessLifecycleObserver, VpnProcessLifecycleObserver, LibraryLoaderListener, PirProcessLifecycleObserver {
 
     private val isCustomTab: Boolean by lazy { customTabDetector.isCustomTab() }
@@ -144,6 +147,11 @@ class NativeCrashInit @Inject constructor(
     }
 
     private fun initCrashpad() {
+        val dynamicKeys = crashAnnotationContributors.getPlugins().flatMapTo(mutableSetOf()) { it.keys }
+        check(!appBuildConfig.isInternalBuild() || dynamicKeys.size <= 60) {
+            "Crashpad annotation budget exceeded: ${dynamicKeys.size} keys registered (limit ~60). " +
+                "Reduce the number of keys contributed via CrashAnnotationContributor."
+        }
         val initialized = runCatching {
             crashpadInitializer.initialize(
                 extraAnnotations = mapOf(
@@ -151,6 +159,7 @@ class NativeCrashInit @Inject constructor(
                     "webViewPackage" to webViewPackage,
                     "webViewVersion" to webViewVersion,
                 ),
+                dynamicAnnotationKeys = dynamicKeys,
                 onCrash = {
                     pixel.enqueueFire(
                         APPLICATION_CRASH_NATIVE,
@@ -158,8 +167,6 @@ class NativeCrashInit @Inject constructor(
                             "v" to "${appBuildConfig.versionName}-${appBuildConfig.flavor}",
                             "pn" to processName,
                             "customTab" to "$isCustomTab",
-                            "webViewPackage" to webViewPackage,
-                            "webViewVersion" to webViewVersion,
                         ),
                     )
                 },
