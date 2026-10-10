@@ -18,20 +18,37 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.terms.DuckAiTermsRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
 @ContributesViewModel(ViewScope::class)
 class VoiceChatViewModel @Inject constructor(
     private val nativeInputStateProvider: NativeInputStateProvider,
+    private val termsRepository: DuckAiTermsRepository,
+    private val duckChatFeature: DuckChatFeature,
+    private val browserMode: BrowserMode,
 ) : ViewModel() {
 
-    fun available(editTabId: String?): Flow<Boolean> =
-        (if (editTabId != null) nativeInputStateProvider.stateForTab(editTabId) else nativeInputStateProvider.state)
-            .map { it.voiceChatAvailable && !it.hasText && !it.hasAttachments && !it.isChatStreaming }
-            .distinctUntilChanged()
+    // The first prompt is the one that accepts the terms, so the labelled Ask button takes this button's place
+    // until they are accepted. The edit surface never shows the Ask button, so it keeps voice.
+    private val termsRequired: Flow<Boolean> = combine(
+        duckChatFeature.nativeToSConsent().enabled(),
+        termsRepository.observeTermsAccepted(browserMode),
+    ) { enabled, accepted -> enabled && !accepted }
+
+    fun available(editTabId: String?): Flow<Boolean> {
+        val state = if (editTabId != null) nativeInputStateProvider.stateForTab(editTabId) else nativeInputStateProvider.state
+        val terms = if (editTabId != null) flowOf(false) else termsRequired
+        return combine(state, terms) { inputState, termsRequired ->
+            inputState.voiceChatAvailable && !inputState.hasText && !inputState.hasAttachments && !inputState.isChatStreaming && !termsRequired
+        }.distinctUntilChanged()
+    }
 }

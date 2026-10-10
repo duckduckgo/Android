@@ -749,6 +749,36 @@ class DuckChatContextualWebViewViewModelTest {
         verify(termsConsent).carry(any(), eq(BrowserMode.REGULAR))
     }
 
+    @Test
+    fun `when a canned entry prompt is sent then the terms consent is not carried`() = runTest {
+        val prompt = NativeInputPrompt("Translate this page", null, null, null, null, null)
+        whenever(contextualEntryPromptStore.consume("tab-1"))
+            .thenReturn(ContextualEntryPrompt("tab-1", prompt, serializedPageContext = null, carriesTermsConsent = false))
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onWebAppReady()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(termsConsent, never()).carry(any(), any())
+    }
+
+    @Test
+    fun `when a typed entry prompt is sent then the terms consent is carried`() = runTest {
+        val prompt = NativeInputPrompt("hello", null, null, null, null, null)
+        whenever(contextualEntryPromptStore.consume("tab-1"))
+            .thenReturn(ContextualEntryPrompt("tab-1", prompt, serializedPageContext = null))
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onWebAppReady()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(termsConsent).carry(any(), eq(BrowserMode.REGULAR))
+    }
+
     private fun buildViewModel() = DuckChatContextualWebViewViewModel(
         dispatchers = coroutineRule.testDispatcherProvider,
         duckChat = duckChat,
