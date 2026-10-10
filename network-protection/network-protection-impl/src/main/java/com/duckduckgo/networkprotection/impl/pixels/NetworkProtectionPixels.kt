@@ -265,6 +265,11 @@ interface NetworkProtectionPixels {
     fun reportFailureRecoveryCompletedWithServerUnhealthy()
     fun reportFailureRecoveryCompletedWithDifferentTunnelAddress()
 
+    /**
+     * Reports that port probing switched the tunnel to an endpoint port other than the server's default
+     */
+    fun reportSwitchedToFallbackPort()
+
     fun reportAccessRevokedDialogShown()
     fun reportAccessRevokedDialogSubscribeClicked()
     fun reportAccessRevokedDialogDismissClicked()
@@ -541,6 +546,11 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportFailureRecoveryCompletedWithDifferentTunnelAddress() {
         firePixel(NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY_NEW_TUN_ADDRESS)
         tryToFireDailyPixel(NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY_NEW_TUN_ADDRESS_DAILY)
+    }
+
+    override fun reportSwitchedToFallbackPort() {
+        firePixel(NETP_SWITCHED_TO_FALLBACK_PORT)
+        tryToFireDailyPixel(NETP_SWITCHED_TO_FALLBACK_PORT_DAILY)
     }
 
     override fun reportAccessRevokedDialogShown() {
