@@ -38,7 +38,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -87,17 +86,19 @@ class RealPirWorkHandler @Inject constructor(
             if (pirRemoteFeatures.pirBeta().isEnabled()) {
                 // User could have a valid subscription but is not entitled to PIR,
                 // so we have to check both
+                // The flows only signal a change: their first value is whatever this process cached earlier,
+                // which outside the main process can predate a purchase or expiry, so both are read from storage.
                 combine(
                     subscriptions.getSubscriptionStatusFlow()
                         .distinctUntilChanged(),
-                    subscriptions.getEntitlementStatus()
-                        .map { entitledProducts ->
-                            entitledProducts.contains(PIR)
-                        }
+                    subscriptions.getEntitlements()
                         .distinctUntilChanged(),
-                ) { subscriptionStatus, hasValidEntitlement ->
-                    resolveEligibility(subscriptionStatus, hasValidEntitlement)
-                }
+                ) { _, _ ->
+                    resolveEligibility(
+                        subscriptionStatus = subscriptions.getSubscriptionStatus(),
+                        hasValidEntitlement = subscriptions.getCurrentEntitlements().any { it.product == PIR.value },
+                    )
+                }.distinctUntilChanged()
             } else {
                 flowOf(PirEligibility.Disabled(DisabledReason.FEATURE_DISABLED))
             }
