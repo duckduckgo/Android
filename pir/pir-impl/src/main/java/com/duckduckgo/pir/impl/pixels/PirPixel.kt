@@ -206,6 +206,11 @@ enum class PirPixel(
         type = Unique(),
     ),
 
+    PIR_FREEMIUM_UPSELL(
+        baseName = "m_dbp_freemium_upsell",
+        type = Unique(),
+    ),
+
     PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS(
         baseName = "m_dbp_weekly_child-broker_orphaned-optouts",
         type = Count,

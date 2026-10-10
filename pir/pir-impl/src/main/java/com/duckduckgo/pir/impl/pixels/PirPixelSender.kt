@@ -59,6 +59,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_START_FAILED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FREEMIUM_SETTINGS_ENTRY_POINT_CLICKED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FREEMIUM_SETTINGS_ENTRY_POINT_IMPRESSION
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FREEMIUM_UPSELL
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_DURATION
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_INCOMPLETE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERACTION_DAU
@@ -670,6 +671,8 @@ interface PirPixelSender {
         errorMessage: String,
         stepType: String,
     )
+
+    fun reportFreemiumUpsell()
 
     fun reportDashboardOpened()
 
@@ -1585,6 +1588,10 @@ class RealPirPixelSender @Inject constructor(
         )
 
         fire(PIR_BROKER_ACTION_FAILED, params)
+    }
+
+    override fun reportFreemiumUpsell() {
+        fire(PIR_FREEMIUM_UPSELL)
     }
 
     override fun reportDashboardOpened() {
