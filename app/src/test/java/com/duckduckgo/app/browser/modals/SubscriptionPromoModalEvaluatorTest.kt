@@ -103,7 +103,5 @@ class SubscriptionPromoModalEvaluatorTest {
             shownFreeTrialCopy = isFreeTrialCopy
             return subscriptionResult
         }
-
-        override suspend fun showAddWidgetPromo(supportsAutomaticAdd: Boolean): Boolean = false
     }
 }

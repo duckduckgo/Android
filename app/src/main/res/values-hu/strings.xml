@@ -328,11 +328,6 @@
     <string name="surveyLoadingErrorText">A kérdőívünk jelenleg nem töltődik be.\nKérjük, próbáld meg később.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Próbáld ki a Keresés minialkalmazást!</string>
-    <string name="addWidgetCtaDescription">A gyors és könnyű hozzáférés érdekében add hozzá kereső minialkalmazásunkat a kezdőképernyődhöz.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Minialkalmazás hozzáadása</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Mutasd</string>
-    <string name="addWidgetCtaDismissButton">Elutasítás</string>
     <string name="addWidgetInstructionsActivityTitle">Minialkalmazás hozzáadása</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Nyomd meg hosszan a kezdőképernyőt, majd nyisd meg a minialkalmazás menüt.</string>
@@ -868,9 +863,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Próbáld ki kezdőképernyő-minialkalmazásunkat!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">A gyors és könnyű hozzáférés érdekében add hozzá kereső minialkalmazásunkat a kezdőképernyődhöz.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Minialkalmazás hozzáadása</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Most nem</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Keresés a DuckDuckGo alkalmazásban</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Kezdőképernyő-minialkalmazás</string>

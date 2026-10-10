@@ -331,11 +331,6 @@
     <string name="surveyLoadingErrorText">Mūsu aptauju pašlaik nevar ielādēt.\nLūdzu, vēlāk pamēģini vēlreiz.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Izmēģiniet mūsu meklēšanas logrīku!</string>
-    <string name="addWidgetCtaDescription">Pievieno mūsu meklēšanas logrīku savam sākuma ekrānam ātrai un vienkāršai piekļuvei.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Pievienot logrīku</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Parādīt man</string>
-    <string name="addWidgetCtaDismissButton">Nerādīt</string>
     <string name="addWidgetInstructionsActivityTitle">Pievienot logrīku</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Ilgi nospied sākuma ekrānā, pēc tam atver logrīku izvēlni.</string>
@@ -886,9 +881,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Pamēģini mūsu sākuma ekrāna logrīku!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Pievieno mūsu meklēšanas logrīku savam sākuma ekrānam ātrai un vienkāršai piekļuvei.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Pievienot logrīku</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ne tagad</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Meklēt DuckDuckGo</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Sākuma ekrāna logrīks</string>

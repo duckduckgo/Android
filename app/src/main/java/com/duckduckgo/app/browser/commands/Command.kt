@@ -258,8 +258,6 @@ sealed class Command {
 
     data object LaunchAppTPOnboarding : Command()
 
-    data object LaunchAddWidgetOnboarding : Command()
-
     class RequiresAuthentication(
         val request: BasicAuthenticationRequest,
     ) : Command()

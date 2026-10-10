@@ -334,11 +334,6 @@
     <string name="surveyLoadingErrorText">Náš průzkum se momentálně nenačítá.\nZkuste to prosím později.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Vyzkoušejte náš vyhledávací widget!</string>
-    <string name="addWidgetCtaDescription">Přidejte náš vyhledávací widget na domovskou obrazovku a získejte rychlý a snadný přístup.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Přidat widget</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Zobrazit</string>
-    <string name="addWidgetCtaDismissButton">Odmítnout</string>
     <string name="addWidgetInstructionsActivityTitle">Přidat widget</string>
     <string name="addWidgetInstruction1Label">1.</string>
     <string name="addWidgetInstruction1">Dlouze stiskněte domovskou obrazovku a poté otevřete nabídku widgetů.</string>
@@ -904,9 +899,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Vyzkoušej náš widget na domovskou obrazovku!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Přidejte náš vyhledávací widget na domovskou obrazovku a získejte rychlý a snadný přístup.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Přidat widget</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Teď ne</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Hledat DuckDuckGo</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Widget na plochu</string>

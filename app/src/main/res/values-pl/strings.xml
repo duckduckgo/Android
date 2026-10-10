@@ -334,11 +334,6 @@
     <string name="surveyLoadingErrorText">Nasza ankieta nie wczytuje się.\nSpróbuj ponownie później.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Wypróbuj widżet naszej wyszukiwarki!</string>
-    <string name="addWidgetCtaDescription">Dodaj widżet naszej wyszukiwarki do ekranu głównego, aby mieć do niej szybki i łatwy dostęp.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Dodaj widżet</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Pokaż mi</string>
-    <string name="addWidgetCtaDismissButton">Odrzuć</string>
     <string name="addWidgetInstructionsActivityTitle">Dodaj widżet</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Przyciśnij i przytrzymaj ekran główny, a następnie otwórz menu z widżetami.</string>
@@ -904,9 +899,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Wypróbuj nasz widżet ekranu głównego!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Dodaj widżet naszej wyszukiwarki do ekranu głównego, aby mieć do niej szybki i łatwy dostęp.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Dodaj widżet</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Nie teraz</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Szukaj w DuckDuckGo</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Widżet ekranu głównego</string>

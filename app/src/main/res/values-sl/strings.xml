@@ -334,11 +334,6 @@
     <string name="surveyLoadingErrorText">Naša anketa se trenutno ne nalaga.\nPoskusite ponovno pozneje.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Preizkusite naš gradnik za iskanje!</string>
-    <string name="addWidgetCtaDescription">Dodajte naš gradnik za iskanje na domači zaslon za hiter in preprost dostop.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Dodaj gradnik</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Pokaži mi</string>
-    <string name="addWidgetCtaDismissButton">Opusti</string>
     <string name="addWidgetInstructionsActivityTitle">Dodaj gradnik</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Dolgo pritisnite domači zaslon, nato odprite meni gradnikov.</string>
@@ -904,9 +899,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Preizkusite naš pripomoček za domači zaslon!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Dodajte naš gradnik za iskanje na domači zaslon za hiter in preprost dostop.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Dodaj gradnik</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ne zdaj</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Poišči DuckDuckGo</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Pripomoček na domačem zaslonu</string>

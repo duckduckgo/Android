@@ -328,11 +328,6 @@
     <string name="surveyLoadingErrorText">Η έρευνά μας δεν φορτώνει αυτήν τη στιγμή.\nΠροσπαθήστε ξανά αργότερα.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Δοκιμάστε το γραφικό στοιχείο μας αναζήτησης!</string>
-    <string name="addWidgetCtaDescription">Προσθέστε το γραφικό στοιχείο μας αναζήτησης στην αρχική οθόνη σας για γρήγορη και εύκολη πρόσβαση.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Προσθήκη γραφικού στοιχείου</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Εμφάνιση</string>
-    <string name="addWidgetCtaDismissButton">Απόρριψη</string>
     <string name="addWidgetInstructionsActivityTitle">Προσθήκη γραφικού στοιχείου</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Πατήστε παρατεταμένα στην αρχική οθόνη και ανοίξτε το μενού γραφικών στοιχείων.</string>
@@ -868,9 +863,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Δοκιμάστε τη μικροεφαρμογή μας για την Αρχική οθόνη!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Προσθέστε το γραφικό στοιχείο μας αναζήτησης στην αρχική οθόνη σας για γρήγορη και εύκολη πρόσβαση.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Προσθήκη γραφικού στοιχείου</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Όχι τώρα</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Αναζήτηση DuckDuckGo</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Μικροεφαρμογή αρχικής οθόνης</string>

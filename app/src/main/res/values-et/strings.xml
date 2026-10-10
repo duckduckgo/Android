@@ -328,11 +328,6 @@
     <string name="surveyLoadingErrorText">Meie küsitlust praegu laadida ei õnnestunud.\nPalun proovige hiljem uuesti.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Proovi meie otsinguvidinat!</string>
-    <string name="addWidgetCtaDescription">Kiire ja hõlpsa juurdepääsu tagamiseks lisage meie meie otsinguvidin avakuvale.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Lisage vidin</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Näita mulle</string>
-    <string name="addWidgetCtaDismissButton">Loobu</string>
     <string name="addWidgetInstructionsActivityTitle">Lisage vidin</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Vajuta pikalt avakuval ja ava vidinate menüü.</string>
@@ -868,9 +863,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Proovige meie avakuva vidinat!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Kiire ja hõlpsa juurdepääsu tagamiseks lisage meie meie otsinguvidin avakuvale.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Lisage vidin</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Mitte praegu</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">DuckDuckGo otsing</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Avakuva vidin</string>

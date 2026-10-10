@@ -328,11 +328,6 @@
     <string name="surveyLoadingErrorText">В момента анкетата ни не се зарежда.\n Моля, опитайте отново по-късно.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Изпробвайте нашето приспособление за търсене!</string>
-    <string name="addWidgetCtaDescription">Добавете нашето приспособление за търсене към началния си екран за бърз и лесен достъп.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Добави приспособлението</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Показване</string>
-    <string name="addWidgetCtaDismissButton">Отказване</string>
     <string name="addWidgetInstructionsActivityTitle">Добави приспособлението</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Натиснете продължително началния екран и след това отворете менюто с приспособления.</string>
@@ -868,9 +863,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Опитайте нашия уиджет на началния екран!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Добавете нашето приспособление за търсене към началния си екран за бърз и лесен достъп.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Добави приспособлението</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Не сега</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Търсене с DuckDuckGo</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Уиджет на началния екран</string>

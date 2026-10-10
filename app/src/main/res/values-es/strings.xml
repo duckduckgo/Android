@@ -328,11 +328,6 @@
     <string name="surveyLoadingErrorText">Nuestra encuesta no se ha podido cargar en este momento.\nVuelve a intentarlo más tarde.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">¡Prueba nuestro widget de búsqueda!</string>
-    <string name="addWidgetCtaDescription">Añade nuestro widget de búsqueda a tu pantalla de inicio para facilitar y agilizar el acceso.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Añadir widget</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Mostrar</string>
-    <string name="addWidgetCtaDismissButton">Descartar</string>
     <string name="addWidgetInstructionsActivityTitle">Añadir widget</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Pulsa tu pantalla de inicio durante unos segundos y, a continuación, abre el menú de widgets.</string>
@@ -868,9 +863,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">¡Prueba nuestro widget de pantalla de inicio!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Añade nuestro widget de búsqueda a tu pantalla de inicio para facilitar y agilizar el acceso.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Añadir widget</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ahora no</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Buscar en DuckDuckGo</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Widget de pantalla de inicio</string>

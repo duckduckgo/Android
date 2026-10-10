@@ -328,11 +328,6 @@
     <string name="surveyLoadingErrorText">O nosso inquérito não pode ser carregado neste momento.\nVolte a tentar mais tarde.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Experimente o nosso widget de pesquisa!</string>
-    <string name="addWidgetCtaDescription">Adicione o nosso widget de pesquisa ao seu ecrã inicial para obter acesso rápido e fácil.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Adicionar widget</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Mostrar-me</string>
-    <string name="addWidgetCtaDismissButton">Ignorar</string>
     <string name="addWidgetInstructionsActivityTitle">Adicionar widget</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Prima prolongadamente o ecrã inicial e, em seguida, abra o menu de widgets.</string>
@@ -868,9 +863,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Experimenta o nosso widget do ecrã inicial!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Adicione o nosso widget de pesquisa ao seu ecrã inicial para obter acesso rápido e fácil.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Adicionar widget</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Agora não</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Pesquisar no DuckDuckGo</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Widget da página principal</string>

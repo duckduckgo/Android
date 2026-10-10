@@ -21,7 +21,6 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelectio
 
 interface OnboardingStore {
     var onboardingDialogJourney: String?
-    var linearPlanWidgetPromptShown: Boolean
 
     fun getSearchOptions(): List<DaxDialogIntroOption>
     fun getChatSuggestions(): List<DaxDialogIntroOption>

@@ -328,11 +328,6 @@
     <string name="surveyLoadingErrorText">Al momento non è possibile caricare il sondaggio.\nRiprova più tardi.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Prova il nostro widget di ricerca!</string>
-    <string name="addWidgetCtaDescription">Aggiungi il nostro widget di ricerca alla schermata principale per accedere all\'app in modo facile e veloce.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Aggiungi widget</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Mostra</string>
-    <string name="addWidgetCtaDismissButton">Ignora</string>
     <string name="addWidgetInstructionsActivityTitle">Aggiungi widget</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Tieni premuto sulla schermata principale e apri il menu dei widget.</string>
@@ -868,9 +863,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Prova il nostro widget per la schermata Home!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Aggiungi il nostro widget di ricerca alla schermata principale per accedere all\'app in modo facile e veloce.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Aggiungi widget</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Non adesso</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Cerca con DuckDuckGo</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Widget della schermata iniziale</string>

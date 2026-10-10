@@ -2138,61 +2138,6 @@ sealed class DaxBubbleCta(
     }
 }
 
-sealed class HomePanelCta(
-    override val ctaId: CtaId,
-    @DrawableRes open val image: Int,
-    @StringRes open val title: Int,
-    @StringRes open val description: Int,
-    @StringRes open val okButton: Int,
-    @StringRes open val dismissButton: Int,
-    override val shownPixel: Pixel.PixelName?,
-    override val okPixel: Pixel.PixelName?,
-    override val cancelPixel: Pixel.PixelName?,
-    override val closePixel: Pixel.PixelName? = null,
-) : Cta,
-    ViewCta {
-    override fun showCta(
-        view: View,
-        onTypingAnimationFinished: () -> Unit,
-    ) {
-        // no-op. We are now using a Bottom Sheet to display this
-        // but we want to keep the same classes for pixels, etc
-    }
-
-    override fun pixelCancelParameters(): Map<String, String> = emptyMap()
-
-    override fun pixelOkParameters(): Map<String, String> = emptyMap()
-
-    override fun pixelShownParameters(): Map<String, String> = emptyMap()
-
-    override fun shouldDropAddressBarFocusWhenShown(): Boolean = true
-
-    data object AddWidgetAutoOnboarding :
-        HomePanelCta(
-            CtaId.ADD_WIDGET,
-            R.drawable.add_widget_cta_icon,
-            R.string.addWidgetCtaTitle,
-            R.string.addWidgetCtaDescription,
-            R.string.addWidgetCtaAutoLaunchButton,
-            R.string.addWidgetCtaDismissButton,
-            AppPixelName.WIDGET_CTA_SHOWN,
-            AppPixelName.WIDGET_CTA_LAUNCHED,
-            AppPixelName.WIDGET_CTA_DISMISSED,
-        )
-
-    data object AddWidgetInstructions : HomePanelCta(
-        CtaId.ADD_WIDGET,
-        R.drawable.add_widget_cta_icon,
-        R.string.addWidgetCtaTitle,
-        R.string.addWidgetCtaDescription,
-        R.string.addWidgetCtaInstructionsLaunchButton,
-        R.string.addWidgetCtaDismissButton,
-        AppPixelName.WIDGET_LEGACY_CTA_SHOWN,
-        AppPixelName.WIDGET_LEGACY_CTA_LAUNCHED,
-        AppPixelName.WIDGET_LEGACY_CTA_DISMISSED,
-    )
-}
-
 class BrokenSitePromptDialogCta : Cta {
     override val ctaId: CtaId = CtaId.BROKEN_SITE_PROMPT
     override val shownPixel: Pixel.PixelName = SITE_NOT_WORKING_SHOWN

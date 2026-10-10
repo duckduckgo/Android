@@ -331,11 +331,6 @@
     <string name="surveyLoadingErrorText">Sondajul nostru nu se încarcă.\nTe rugăm să încercerci din nou, mai târziu.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Încearcă widget-ul nostru de căutare!</string>
-    <string name="addWidgetCtaDescription">Adăugă widget-ul de căutare la ecranul de pornire, pentru acces rapid și ușor.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Adaugă widget</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Afișează</string>
-    <string name="addWidgetCtaDismissButton">Renunță</string>
     <string name="addWidgetInstructionsActivityTitle">Adăugare widget</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Apasă lung pe ecranul de pornire, apoi deschide meniul widget-urilor.</string>
@@ -886,9 +881,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Încearcă widgetul nostru pentru ecranul de întâmpinare!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Adăugă widget-ul de căutare la ecranul de pornire, pentru acces rapid și ușor.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Adaugă widget</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Nu acum</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Căutare DuckDuckGo</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Widget pe ecranul de pornire</string>

@@ -113,7 +113,6 @@ import com.duckduckgo.app.browser.commands.Command.HideSSLError
 import com.duckduckgo.app.browser.commands.Command.HideWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.HideWebContent
 import com.duckduckgo.app.browser.commands.Command.InjectEmailAddress
-import com.duckduckgo.app.browser.commands.Command.LaunchAddWidgetOnboarding
 import com.duckduckgo.app.browser.commands.Command.LaunchAutofillSettings
 import com.duckduckgo.app.browser.commands.Command.LaunchBookmarksActivity
 import com.duckduckgo.app.browser.commands.Command.LaunchDuckAiOnboardingFireDialog
@@ -275,7 +274,6 @@ import com.duckduckgo.app.cta.ui.DaxSubscriptionBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxTrackersBlockedBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxTryASearchBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxVisitSiteOptionsBrandDesignUpdateBubbleCta
-import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.cta.ui.SubscriptionPromoFlow
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
@@ -3921,19 +3919,6 @@ class BrowserTabViewModel @Inject constructor(
         true
     }
 
-    override suspend fun showAddWidgetPromo(supportsAutomaticAdd: Boolean): Boolean = withContext(dispatchers.main()) {
-        if (!canShowPromo()) return@withContext false
-        if (currentBrowserViewState().browserShowing) return@withContext false
-        if (currentCtaViewState().cta != null) return@withContext false
-        val cta = if (supportsAutomaticAdd) HomePanelCta.AddWidgetAutoOnboarding else HomePanelCta.AddWidgetInstructions
-        ctaViewState.value = currentCtaViewState().copy(
-            cta = cta,
-            isBrowserShowing = false,
-            isErrorShowing = false,
-        )
-        true
-    }
-
     private fun canShowPromo(): Boolean =
         currentGlobalLayoutState() is Browser && !currentBrowserViewState().maliciousSiteBlocked
 
@@ -3967,13 +3952,11 @@ class BrowserTabViewModel @Inject constructor(
             ?: if (onboardingInputScreenLaunchTarget.consumeOpenOnDuckAi()) InputMode.DUCK_AI else null
 
     fun onUserClickCtaOkButton(cta: Cta) {
-        releaseAddWidgetModalSlot(cta)
         viewModelScope.launch {
             ctaViewModel.onUserClickCtaOkButton(cta)
         }
         val onboardingCommand =
             when (cta) {
-                is HomePanelCta.AddWidgetInstructions, is HomePanelCta.AddWidgetAutoOnboarding -> LaunchAddWidgetOnboarding
                 is OnboardingDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
                 is DaxBubbleCta -> {
                     onDaxBubbleCtaOkButtonClicked(cta)
@@ -3994,7 +3977,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onUserClickCtaSecondaryButton(cta: Cta) {
-        releaseAddWidgetModalSlot(cta)
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta, viaSkipBtn = true)
             if (cta is BrokenSitePromptDialogCta) {
@@ -4012,13 +3994,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun releaseAddWidgetModalSlot(cta: Cta) {
-        if (cta !is HomePanelCta) return
-        ctaViewState.value = currentCtaViewState().copy(cta = null)
-    }
-
     fun onUserClickCtaDismissButton(cta: Cta) {
-        releaseAddWidgetModalSlot(cta)
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta, viaCloseBtn = true)
             if (cta is DaxBubbleCta) {
