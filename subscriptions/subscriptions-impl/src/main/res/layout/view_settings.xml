@@ -36,6 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:leadingIcon="@drawable/subscription_color_24"
+            app:leadingIconVerticalAlignment="primary_text"
             app:primaryText="@string/subscriptionSettingSubscribe"
             app:primaryTextTruncated="false" />
 
@@ -46,7 +47,7 @@
             android:layout_marginStart="56dp"
             android:layout_marginTop="@dimen/keyline_3"
             android:layout_marginBottom="@dimen/keyline_3"
-            app:textType="primary"
+            android:textColor="?attr/daxColorAccentBlue"
             app:typography="body1"
             tools:text="@string/subscriptionSettingGet" />
 
@@ -96,6 +97,7 @@
             android:layout_height="wrap_content"
             android:paddingStart="40dp"
             app:primaryText="@string/subscriptionSettingRestore"
+            app:primaryTextColorOverlay="?attr/daxColorAccentBlue"
             tools:ignore="RtlSymmetry" />
 
     </com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout>
