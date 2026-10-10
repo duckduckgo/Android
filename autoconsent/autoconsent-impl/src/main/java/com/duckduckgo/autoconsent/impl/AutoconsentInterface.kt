@@ -30,16 +30,27 @@ class AutoconsentInterface(
 ) {
     @JavascriptInterface
     fun process(message: String) {
-        try {
-            val parsedMessage = JSONObject(message)
-            val type: String = parsedMessage.getString("type")
-            messageHandlerPlugins.getPlugins().firstOrNull { it.supportedTypes.contains(type) }?.process(type, message, webView, autoconsentCallback)
-        } catch (e: Exception) {
-            logcat { e.localizedMessage }
-        }
+        dispatch(messageHandlerPlugins, message, webView, autoconsentCallback, AutoconsentFrame.legacy(webView))
     }
 
     companion object {
         const val AUTOCONSENT_INTERFACE = "AutoconsentAndroid"
+
+        fun dispatch(
+            messageHandlerPlugins: PluginPoint<MessageHandlerPlugin>,
+            message: String,
+            webView: WebView,
+            autoconsentCallback: AutoconsentCallback,
+            frame: AutoconsentFrame,
+        ) {
+            try {
+                val parsedMessage = JSONObject(message)
+                val type: String = parsedMessage.getString("type")
+                messageHandlerPlugins.getPlugins().firstOrNull { it.supportedTypes.contains(type) }
+                    ?.process(type, message, webView, autoconsentCallback, frame)
+            } catch (e: Exception) {
+                logcat { e.localizedMessage }
+            }
+        }
     }
 }

@@ -17,23 +17,19 @@
 package com.duckduckgo.autoconsent.impl
 
 import android.webkit.WebView
-import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
-import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.AutoconsentInterface.Companion.AUTOCONSENT_INTERFACE
 import com.duckduckgo.autoconsent.impl.cache.AutoconsentSettingsCache
 import com.duckduckgo.autoconsent.impl.handlers.ReplyHandler
-import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentExceptionsRepository
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
-import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
@@ -51,10 +47,9 @@ import javax.inject.Inject
 class RealAutoconsent @Inject constructor(
     private val messageHandlerPlugins: PluginPoint<MessageHandlerPlugin>,
     private val settingsRepository: AutoconsentSettingsRepository,
-    private val autoconsentExceptionsRepository: AutoconsentExceptionsRepository,
     private val autoconsent: AutoconsentFeature,
-    private val userAllowlistRepository: UserAllowListRepository,
-    private val unprotectedTemporary: UnprotectedTemporary,
+    private val siteChecker: AutoconsentSiteChecker,
+    private val documentStartInjector: AutoconsentDocumentStartInjector,
     private val settingsCache: AutoconsentSettingsCache,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
@@ -70,12 +65,25 @@ class RealAutoconsent @Inject constructor(
     }
 
     override fun injectAutoconsent(webView: WebView, url: String) {
-        if (isAutoconsentEnabled() && !urlInUserAllowList(url) && !isAnException(url)) {
+        if (documentStartInjector.isRegistered(webView)) return
+        if (isSettingEnabled() && siteChecker.isEnabledForSite(url)) {
             webView.evaluateJavascript("javascript:${getFunctionsJS()}", null)
         }
     }
 
     override fun addJsInterface(webView: WebView, autoconsentCallback: AutoconsentCallback) {
+        if (!autoconsent.documentStartInjection().isEnabled()) {
+            addLegacyJsInterface(webView, autoconsentCallback)
+            return
+        }
+        appCoroutineScope.launch(dispatcherProvider.main()) {
+            if (!documentStartInjector.register(webView, autoconsentCallback)) {
+                addLegacyJsInterface(webView, autoconsentCallback)
+            }
+        }
+    }
+
+    private fun addLegacyJsInterface(webView: WebView, autoconsentCallback: AutoconsentCallback) {
         webView.addJavascriptInterface(
             AutoconsentInterface(messageHandlerPlugins, webView, autoconsentCallback),
             AUTOCONSENT_INTERFACE,
@@ -115,24 +123,8 @@ class RealAutoconsent @Inject constructor(
         settingsRepository.firstPopupHandled = true
     }
 
-    private fun urlInUserAllowList(url: String): Boolean {
-        return try {
-            userAllowlistRepository.isUrlInUserAllowList(url)
-        } catch (e: Exception) {
-            false
-        }
-    }
-
     private fun isEnabled(): Boolean {
         return autoconsent.self().isEnabled()
-    }
-
-    private fun isAnException(url: String): Boolean {
-        return matches(url) || unprotectedTemporary.isAnException(url)
-    }
-
-    private fun matches(url: String): Boolean {
-        return autoconsentExceptionsRepository.exceptions.any { UriString.sameOrSubdomain(url, it.domain) }
     }
 
     private fun getFunctionsJS(): String {

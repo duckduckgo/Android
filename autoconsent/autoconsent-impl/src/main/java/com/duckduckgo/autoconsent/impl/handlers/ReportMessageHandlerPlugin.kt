@@ -19,6 +19,7 @@ package com.duckduckgo.autoconsent.impl.handlers
 import android.webkit.WebView
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.impl.AutoconsentFrame
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
@@ -45,7 +46,13 @@ class ReportMessageHandlerPlugin @Inject constructor(
 
     private val moshi by lazy { Moshi.Builder().add(JSONObjectAdapter()).build() }
 
-    override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
+    override fun process(
+        messageType: String,
+        jsonString: String,
+        webView: WebView,
+        autoconsentCallback: AutoconsentCallback,
+        frame: AutoconsentFrame,
+    ) {
         if (supportedTypes.contains(messageType)) {
             appCoroutineScope.launch(dispatcherProvider.main()) {
                 try {

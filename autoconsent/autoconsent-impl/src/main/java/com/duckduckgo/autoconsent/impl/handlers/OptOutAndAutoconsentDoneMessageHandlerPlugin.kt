@@ -21,6 +21,7 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.api.AutoconsentResult
+import com.duckduckgo.autoconsent.impl.AutoconsentFrame
 import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
@@ -34,6 +35,8 @@ import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
+import java.util.Collections
+import java.util.WeakHashMap
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
@@ -45,13 +48,21 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
-    private var selfTest = false
 
-    override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
+    // Keyed by frame URL and CMP, because several frames of one WebView can run autoconsent at the same time.
+    private val pendingSelfTests: MutableMap<WebView, MutableSet<String>> = Collections.synchronizedMap(WeakHashMap())
+
+    override fun process(
+        messageType: String,
+        jsonString: String,
+        webView: WebView,
+        autoconsentCallback: AutoconsentCallback,
+        frame: AutoconsentFrame,
+    ) {
         if (supportedTypes.contains(messageType)) {
             when (messageType) {
                 OPT_OUT -> processOptOutResult(jsonString, webView, autoconsentCallback)
-                RESULT_MESSAGE -> processAutoconsentDone(jsonString, webView, autoconsentCallback)
+                RESULT_MESSAGE -> processAutoconsentDone(jsonString, webView, autoconsentCallback, frame)
                 else -> return
             }
         }
@@ -76,14 +87,20 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
                     ),
                 )
             } else if (message.scheduleSelfTest) {
-                selfTest = true
+                pendingSelfTests.getOrPut(webView) { Collections.synchronizedSet(mutableSetOf()) }
+                    .add(selfTestKey(message.url, message.cmp))
             }
         } catch (e: Exception) {
             logcat { e.localizedMessage }
         }
     }
 
-    private fun processAutoconsentDone(jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
+    private fun processAutoconsentDone(
+        jsonString: String,
+        webView: WebView,
+        autoconsentCallback: AutoconsentCallback,
+        frame: AutoconsentFrame,
+    ) {
         try {
             val message: AutoconsentDoneMessage = parseAutoconsentDoneMessage(jsonString) ?: return
 
@@ -109,16 +126,17 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
                 ),
             )
 
-            if (selfTest) {
+            if (pendingSelfTests[webView]?.remove(selfTestKey(message.url, message.cmp)) == true) {
                 appCoroutineScope.launch(dispatcherProvider.main()) {
-                    webView.evaluateJavascript("javascript:${ReplyHandler.constructReply("""{ "type": "selfTest" }""")}", null)
+                    frame.reply("""{ "type": "selfTest" }""")
                 }
             }
-            selfTest = false
         } catch (e: Exception) {
             logcat { e.localizedMessage }
         }
     }
+
+    private fun selfTestKey(url: String, cmp: String): String = "$cmp|${url.substringBefore('#')}"
 
     private fun parseOptOutMessage(jsonString: String): OptOutResultMessage? {
         val jsonAdapter: JsonAdapter<OptOutResultMessage> = moshi.adapter(OptOutResultMessage::class.java)

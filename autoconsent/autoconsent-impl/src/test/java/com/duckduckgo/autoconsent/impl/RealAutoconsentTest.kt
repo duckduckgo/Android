@@ -19,6 +19,8 @@ package com.duckduckgo.autoconsent.impl
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.impl.AutoconsentInterface.Companion.AUTOCONSENT_INTERFACE
 import com.duckduckgo.autoconsent.impl.cache.RealAutoconsentSettingsCache
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentExceptionsRepository
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
@@ -50,6 +52,9 @@ class RealAutoconsentTest {
     private val mockAutoconsentExceptionsRepository: AutoconsentExceptionsRepository = mock()
     private val mockAutoconsentFeature: AutoconsentFeature = mock()
     private val mockToggle: Toggle = mock()
+    private val mockDocumentStartToggle: Toggle = mock()
+    private val documentStartInjector = FakeDocumentStartInjector()
+    private val mockCallback: AutoconsentCallback = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
 
     lateinit var autoconsent: RealAutoconsent
@@ -58,15 +63,15 @@ class RealAutoconsentTest {
     fun setup() {
         whenever(mockAutoconsentFeature.self()).thenReturn(mockToggle)
         whenever(mockToggle.isEnabled()).thenReturn(true)
+        whenever(mockAutoconsentFeature.documentStartInjection()).thenReturn(mockDocumentStartToggle)
         whenever(mockAutoconsentExceptionsRepository.exceptions)
             .thenReturn(CopyOnWriteArrayList<FeatureException>().apply { add(FeatureException("exception.com", "reason")) })
         autoconsent = RealAutoconsent(
             pluginPoint,
             settingsRepository,
-            mockAutoconsentExceptionsRepository,
             mockAutoconsentFeature,
-            userAllowlist,
-            unprotected,
+            RealAutoconsentSiteChecker(mockAutoconsentFeature, mockAutoconsentExceptionsRepository, userAllowlist, unprotected),
+            documentStartInjector,
             settingsCache,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -237,6 +242,62 @@ class RealAutoconsentTest {
         autoconsent.injectAutoconsent(webView, URL)
 
         assertNull(shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    @Test
+    fun whenDocumentStartScriptRegisteredThenInjectAutoconsentDoesNotCallEvaluate() {
+        givenSettingsRepositoryAllowsInjection()
+        documentStartInjector.registered = true
+
+        autoconsent.injectAutoconsent(webView, URL)
+
+        assertNull(shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    @Test
+    fun whenDocumentStartInjectionDisabledThenAddJsInterfaceAddsLegacyInterface() {
+        whenever(mockDocumentStartToggle.isEnabled()).thenReturn(false)
+
+        autoconsent.addJsInterface(webView, mockCallback)
+
+        assertEquals(0, documentStartInjector.registerCalls)
+        assertNotNull(shadowOf(webView).getJavascriptInterface(AUTOCONSENT_INTERFACE))
+    }
+
+    @Test
+    fun whenDocumentStartInjectionEnabledAndRegisteredThenNoLegacyInterface() {
+        whenever(mockDocumentStartToggle.isEnabled()).thenReturn(true)
+        documentStartInjector.registerResult = true
+
+        autoconsent.addJsInterface(webView, mockCallback)
+
+        assertEquals(1, documentStartInjector.registerCalls)
+        assertNull(shadowOf(webView).getJavascriptInterface(AUTOCONSENT_INTERFACE))
+    }
+
+    @Test
+    fun whenDocumentStartInjectionEnabledButRegisterFailsThenAddLegacyInterface() {
+        whenever(mockDocumentStartToggle.isEnabled()).thenReturn(true)
+        documentStartInjector.registerResult = false
+
+        autoconsent.addJsInterface(webView, mockCallback)
+
+        assertEquals(1, documentStartInjector.registerCalls)
+        assertNotNull(shadowOf(webView).getJavascriptInterface(AUTOCONSENT_INTERFACE))
+    }
+
+    private class FakeDocumentStartInjector : AutoconsentDocumentStartInjector {
+        var registered = false
+        var registerResult = false
+        var registerCalls = 0
+
+        override suspend fun register(webView: WebView, autoconsentCallback: AutoconsentCallback): Boolean {
+            registerCalls++
+            registered = registerResult
+            return registerResult
+        }
+
+        override fun isRegistered(webView: WebView): Boolean = registered
     }
 
     private fun givenSettingsRepositoryAllowsInjection() {

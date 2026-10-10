@@ -61,6 +61,13 @@ interface AutoconsentFeature {
     fun heuristicAction(): Toggle
 
     /**
+     * Injects autoconsent into every frame with addDocumentStartJavaScript and talks to it with a WebMessageListener,
+     * instead of evaluateJavascript (top frame only) and addJavascriptInterface.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun documentStartInjection(): Toggle
+
+    /**
      * Gate for the new Cookie Pop-up Preference settings UI and behavior.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)

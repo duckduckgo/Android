@@ -21,8 +21,10 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.api.AutoconsentResult
+import com.duckduckgo.autoconsent.impl.AutoconsentFrame
 import com.duckduckgo.autoconsent.impl.AutoconsentHeuristicModeProvider
 import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
+import com.duckduckgo.autoconsent.impl.AutoconsentSiteChecker
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.cache.AutoconsentSettingsCache
@@ -54,6 +56,7 @@ class InitMessageHandlerPlugin @Inject constructor(
     private val autoconsentPixelManager: AutoconsentPixelManager,
     private val reloadLoopDetector: AutoconsentReloadLoopDetector,
     private val heuristicModeProvider: AutoconsentHeuristicModeProvider,
+    private val siteChecker: AutoconsentSiteChecker,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -63,6 +66,7 @@ class InitMessageHandlerPlugin @Inject constructor(
         jsonString: String,
         webView: WebView,
         autoconsentCallback: AutoconsentCallback,
+        frame: AutoconsentFrame,
     ) {
         if (supportedTypes.contains(messageType)) {
             appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -75,7 +79,14 @@ class InitMessageHandlerPlugin @Inject constructor(
                         return@launch
                     }
 
-                    reloadLoopDetector.updateUrl(webView, url)
+                    val siteUrl = if (frame.isMainFrame) url else frame.topUrl ?: url
+                    if (!siteChecker.isEnabledForSite(siteUrl)) {
+                        return@launch
+                    }
+
+                    if (frame.isMainFrame) {
+                        reloadLoopDetector.updateUrl(webView, url)
+                    }
 
                     if (!settingsRepository.userSetting) {
                         autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DISABLED_FOR_SITE_DAILY)
@@ -84,17 +95,19 @@ class InitMessageHandlerPlugin @Inject constructor(
 
                     autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_INIT_DAILY)
 
-                    // Reset site
-                    autoconsentCallback.onResultReceived(
-                        AutoconsentResult(
-                            consentManaged = false,
-                            optOutFailed = false,
-                            selfTestFailed = false,
-                            isCosmetic = false,
-                            consentRule = reloadLoopDetector.getLastHandledCMP(webView),
-                            consentReloadLoop = reloadLoopDetector.isReloadLoopDetected(webView),
-                        ),
-                    )
+                    if (frame.isMainFrame) {
+                        // Reset site
+                        autoconsentCallback.onResultReceived(
+                            AutoconsentResult(
+                                consentManaged = false,
+                                optOutFailed = false,
+                                selfTestFailed = false,
+                                isCosmetic = false,
+                                consentRule = reloadLoopDetector.getLastHandledCMP(webView),
+                                consentReloadLoop = reloadLoopDetector.isReloadLoopDetected(webView),
+                            ),
+                        )
+                    }
 
                     val settings = settingsCache.getSettings() ?: return@launch
                     val config = buildConfig(settings.disabledCMPs, webView)
@@ -104,10 +117,10 @@ class InitMessageHandlerPlugin @Inject constructor(
                         InitResp(config = config, rules = AutoconsentRuleset(settings.compactRuleList))
                     }
 
-                    val response = ReplyHandler.constructReply(getMessage(initResp))
+                    val response = getMessage(initResp)
 
                     withContext(dispatcherProvider.main()) {
-                        webView.evaluateJavascript("javascript:$response", null)
+                        frame.reply(response)
                     }
                 } catch (e: Exception) {
                     logcat { e.localizedMessage }

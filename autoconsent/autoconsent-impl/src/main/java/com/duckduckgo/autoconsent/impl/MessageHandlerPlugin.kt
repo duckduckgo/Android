@@ -27,6 +27,13 @@ import com.duckduckgo.di.scopes.AppScope
 )
 @Suppress("unused")
 interface MessageHandlerPlugin {
-    fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback)
+    fun process(
+        messageType: String,
+        jsonString: String,
+        webView: WebView,
+        autoconsentCallback: AutoconsentCallback,
+        frame: AutoconsentFrame = AutoconsentFrame.legacy(webView),
+    )
+
     val supportedTypes: List<String>
 }

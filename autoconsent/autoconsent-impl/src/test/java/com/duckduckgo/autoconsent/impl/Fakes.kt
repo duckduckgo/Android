@@ -38,14 +38,17 @@ class FakePluginPoint : PluginPoint<MessageHandlerPlugin> {
 
 class FakeMessageHandlerPlugin : MessageHandlerPlugin {
     var count = 0
+    var lastFrame: AutoconsentFrame? = null
 
     override fun process(
         messageType: String,
         jsonString: String,
         webView: WebView,
         autoconsentCallback: AutoconsentCallback,
+        frame: AutoconsentFrame,
     ) {
         count++
+        lastFrame = frame
     }
 
     override val supportedTypes: List<String> = listOf("fake")
@@ -94,4 +97,10 @@ class FakeUserAllowlist(private val userAllowList: List<String>) : UserAllowList
     override suspend fun addDomainToUserAllowList(domain: String) = Unit
 
     override suspend fun removeDomainFromUserAllowList(domain: String) = Unit
+}
+
+class FakeSiteChecker(private val disabledSites: List<String> = emptyList()) : AutoconsentSiteChecker {
+    override fun isEnabledForSite(url: String): Boolean {
+        return disabledSites.none { url.toUri().domain() == it }
+    }
 }

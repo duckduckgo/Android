@@ -18,6 +18,7 @@ package com.duckduckgo.autoconsent.impl.handlers
 
 import android.webkit.WebView
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.impl.AutoconsentFrame
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
 import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
@@ -31,7 +32,13 @@ class AutoconsentErrorMessageHandlerPlugin @Inject constructor(
     private val autoconsentPixelManager: AutoconsentPixelManager,
 ) : MessageHandlerPlugin {
 
-    override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
+    override fun process(
+        messageType: String,
+        jsonString: String,
+        webView: WebView,
+        autoconsentCallback: AutoconsentCallback,
+        frame: AutoconsentFrame,
+    ) {
         try {
             if (supportedTypes.contains(messageType)) {
                 autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ERROR_MULTIPLE_POPUPS_DAILY)

@@ -21,6 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.api.AutoconsentResult
+import com.duckduckgo.autoconsent.impl.AutoconsentFrame
 import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
 import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
@@ -142,6 +143,33 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
     }
 
     @Test
+    fun whenSelfTestScheduledInOneFrameThenSelfTestIsSentOnlyToThatFrame() {
+        val adFrameReplies = mutableListOf<String>()
+        val cmpFrameReplies = mutableListOf<String>()
+        val adFrame = AutoconsentFrame(isMainFrame = false, topUrl = "http://www.example.com") { adFrameReplies.add(it) }
+        val cmpFrame = AutoconsentFrame(isMainFrame = false, topUrl = "http://www.example.com") { cmpFrameReplies.add(it) }
+
+        handler.process(getOptOut(), optOutMessage(result = true, selfTest = true, url = CMP_FRAME_URL), webView, mockCallback, cmpFrame)
+        handler.process(getAutoconsentType(), autoconsentDoneMessage(url = AD_FRAME_URL), webView, mockCallback, adFrame)
+        handler.process(getAutoconsentType(), autoconsentDoneMessage(url = CMP_FRAME_URL), webView, mockCallback, cmpFrame)
+
+        assertTrue(adFrameReplies.isEmpty())
+        assertEquals(listOf("""{ "type": "selfTest" }"""), cmpFrameReplies)
+    }
+
+    @Test
+    fun whenSelfTestAlreadySentThenDoNotSendItAgain() {
+        val replies = mutableListOf<String>()
+        val frame = AutoconsentFrame(isMainFrame = true, topUrl = null) { replies.add(it) }
+
+        handler.process(getOptOut(), optOutMessage(result = true, selfTest = true), webView, mockCallback, frame)
+        handler.process(getAutoconsentType(), autoconsentDoneMessage(), webView, mockCallback, frame)
+        handler.process(getAutoconsentType(), autoconsentDoneMessage(), webView, mockCallback, frame)
+
+        assertEquals(1, replies.size)
+    }
+
+    @Test
     fun whenProcessOptOutAndResultIsFalseThenFireErrorOptOutPixel() {
         handler.process(getOptOut(), optOutMessage(result = false, selfTest = false), webView, mockCallback)
 
@@ -198,9 +226,9 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
 
     private fun getAutoconsentType(): String = handler.supportedTypes.last()
 
-    private fun optOutMessage(result: Boolean, selfTest: Boolean): String {
+    private fun optOutMessage(result: Boolean, selfTest: Boolean, url: String = "http://www.example.com"): String {
         return """
-            {"type":"${getOptOut()}", "result": $result, "scheduleSelfTest": $selfTest, "cmp": "test", "url": "http://www.example.com"}
+            {"type":"${getOptOut()}", "result": $result, "scheduleSelfTest": $selfTest, "cmp": "test", "url": "$url"}
         """.trimIndent()
     }
 
@@ -208,5 +236,10 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
         return """
             {"type":"${getAutoconsentType()}", "cmp": "test", "url": "$url", "isCosmetic": $cosmetic}
         """.trimIndent()
+    }
+
+    companion object {
+        private const val CMP_FRAME_URL = "https://cmp.example.net/consent"
+        private const val AD_FRAME_URL = "https://ads.example.org/frame"
     }
 }

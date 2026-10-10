@@ -67,6 +67,7 @@ dependencies {
     implementation Square.retrofit2.converter.moshi
     implementation Google.dagger
     implementation AndroidX.core.ktx
+    implementation AndroidX.webkit
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.room.runtime

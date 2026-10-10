@@ -19,6 +19,7 @@ package com.duckduckgo.autoconsent.impl.handlers
 import android.webkit.WebView
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.api.AutoconsentResult
+import com.duckduckgo.autoconsent.impl.AutoconsentFrame
 import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
@@ -39,7 +40,13 @@ class SelfTestResultMessageHandlerPlugin @Inject constructor(
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
-    override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
+    override fun process(
+        messageType: String,
+        jsonString: String,
+        webView: WebView,
+        autoconsentCallback: AutoconsentCallback,
+        frame: AutoconsentFrame,
+    ) {
         if (supportedTypes.contains(messageType)) {
             try {
                 val message: SelfTestResultMessage = parseMessage(jsonString) ?: return

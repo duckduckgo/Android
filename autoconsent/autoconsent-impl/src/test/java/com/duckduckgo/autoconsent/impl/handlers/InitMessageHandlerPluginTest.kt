@@ -22,9 +22,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.api.AutoconsentResult
+import com.duckduckgo.autoconsent.impl.AutoconsentFrame
 import com.duckduckgo.autoconsent.impl.AutoconsentHeuristicModeProvider
 import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
+import com.duckduckgo.autoconsent.impl.FakeSiteChecker
 import com.duckduckgo.autoconsent.impl.RealAutoconsentHeuristicModeProvider
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.cache.RealAutoconsentSettingsCache
@@ -44,7 +46,9 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.Shadows.shadowOf
@@ -82,6 +86,7 @@ class InitMessageHandlerPluginTest {
         mockPixelManager,
         mockReloadLoopDetector,
         heuristicModeProvider,
+        FakeSiteChecker(disabledSites = listOf(DISABLED_SITE)),
     )
 
     @Test
@@ -381,6 +386,83 @@ class InitMessageHandlerPluginTest {
     }
 
     @Test
+    fun whenProcessFromSubframeThenDoNotResetResultOrUpdateUrl() {
+        settingsRepository.userSetting = true
+        settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}")
+        val replies = mutableListOf<String>()
+
+        initHandlerPlugin.process(
+            initHandlerPlugin.supportedTypes.first(),
+            message(),
+            webView,
+            mockCallback,
+            subframe(topUrl = "https://top.com/", replies = replies),
+        )
+
+        verify(mockCallback, never()).onResultReceived(any())
+        verify(mockReloadLoopDetector, never()).updateUrl(any(), any())
+        assertEquals(1, replies.size)
+        assertNull(shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    @Test
+    fun whenProcessFromSubframeThenReplyGoesToThatFrame() {
+        settingsRepository.userSetting = true
+        settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}")
+        val replies = mutableListOf<String>()
+
+        initHandlerPlugin.process(
+            initHandlerPlugin.supportedTypes.first(),
+            message(),
+            webView,
+            mockCallback,
+            subframe(topUrl = "https://top.com/", replies = replies),
+        )
+
+        val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
+        val initResp = moshi.adapter(InitResp::class.java).fromJson(replies.single())
+        assertEquals("initResp", initResp!!.type)
+    }
+
+    @Test
+    fun whenSubframeTopSiteIsDisabledThenDoNotReply() {
+        settingsRepository.userSetting = true
+        settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}")
+        val replies = mutableListOf<String>()
+
+        initHandlerPlugin.process(
+            initHandlerPlugin.supportedTypes.first(),
+            message(),
+            webView,
+            mockCallback,
+            subframe(topUrl = "https://$DISABLED_SITE/page", replies = replies),
+        )
+
+        assertTrue(replies.isEmpty())
+        verify(mockPixelManager, never()).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_INIT_DAILY)
+    }
+
+    @Test
+    fun whenMainFrameSiteIsDisabledThenDoNotReply() {
+        settingsRepository.userSetting = true
+        settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}")
+
+        initHandlerPlugin.process(
+            initHandlerPlugin.supportedTypes.first(),
+            """{"type":"init", "url": "https://$DISABLED_SITE/"}""",
+            webView,
+            mockCallback,
+        )
+
+        assertNull(shadowOf(webView).lastEvaluatedJavascript)
+        verify(mockCallback, never()).onResultReceived(any())
+    }
+
+    private fun subframe(topUrl: String, replies: MutableList<String>): AutoconsentFrame {
+        return AutoconsentFrame(isMainFrame = false, topUrl = topUrl) { replies.add(it) }
+    }
+
+    @Test
     fun filterCompactRulesWhenUnsupportedVersionRturnsEmptyRuleset() {
         settingsCache.updateSettings("{\"compactRuleList\": {\"v\": 2, \"r\": [], \"s\": [] }}")
         val rules = settingsCache.getSettings()!!.compactRuleList
@@ -488,5 +570,9 @@ class InitMessageHandlerPluginTest {
         val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
         val jsonAdapter: JsonAdapter<InitResp> = moshi.adapter(InitResp::class.java)
         return jsonAdapter.fromJson(trimmedJson)
+    }
+
+    companion object {
+        private const val DISABLED_SITE = "disabled.com"
     }
 }
