@@ -91,7 +91,7 @@ async function findPRTask(
   const prTasks = await client.tasks.searchInWorkspace(ASANA_WORKSPACE_ID, {
     [`custom_fields.${customFields.url.gid}.value`]: prURL,
     // eslint-disable-next-line camelcase
-    opt_fields: 'name,parent,completed'
+    opt_fields: 'name,parent,completed,permalink_url'
   })
   if (prTasks.data.length > 0) {
     info(`Found PR task using searchInWorkspace: ${prTasks.data[0].gid}`)
@@ -102,7 +102,7 @@ async function findPRTask(
     // https://developers.asana.com/reference/searchtasksforworkspace#eventual-consistency
     const projectTasks = await client.tasks.findByProject(PROJECT_ID, {
       // eslint-disable-next-line camelcase
-      opt_fields: 'custom_fields',
+      opt_fields: 'custom_fields,permalink_url',
       limit: 100
     })
 
@@ -268,7 +268,7 @@ async function createOrFindPRTask(
       if (openShipReviewTask) {
         subTasks = await client.tasks.subtasks(openShipReviewTask.gid, {
           // eslint-disable-next-line camelcase
-          opt_fields: 'name,completed,assignee,custom_fields',
+          opt_fields: 'name,completed,assignee,custom_fields,permalink_url',
           limit: 100
         })
         shipReviewPRTask = subTasks.data.find(
@@ -302,109 +302,63 @@ async function createOrFindPRTask(
     return
   }
 
-  let task
-  // PR is opened
-  if (['opened'].includes(payload.action)) {
-    // the parent task has a Ship Review ...
-    if (openShipReviewTask) {
-      // ... and an approriate PR review task
-      if (shipReviewPRTask) {
-        await client.tasks.addProject(shipReviewPRTask.gid, {
-          project: PROJECT_ID
-        })
-        client.tasks.updateTask(shipReviewPRTask.gid, {
-          // eslint-disable-next-line camelcase
-          custom_fields: {
-            [customFields.url.gid]: payload.pull_request.html_url,
-            [customFields.status.gid]: prStatus
-          }
-        })
-        task = shipReviewPRTask
-        setOutput('result', 'updated')
-        // ... otherwise create a new code review task under the ship review task
-      } else {
-        task = await createPRTask(
-          openShipReviewTask.gid,
-          followers,
-          title,
-          prStatus,
-          customFields,
-          automatedPR
-        )
-        setOutput('result', 'created')
-      }
-      // if parent doesn't have a Ship Review just create a new Code Review task
-    } else {
-      task = await createPRTask(
-        parentTaskId,
-        followers,
-        title,
-        prStatus,
-        customFields,
-        automatedPR
-      )
-      setOutput('result', 'created')
-    }
-  } else {
-    const maxRetries = 5
-    let retries = 0
-
-    while (retries < maxRetries) {
-      // Wait for PR to appear
-      task = await findPRTask(customFields)
-      if (task) {
-        setOutput('result', 'updated')
-        break
-      }
-      info(`PR task not found yet. Sleeping...`)
-      await new Promise(resolve => setTimeout(resolve, 20000))
-      retries++
-    }
-
-    // if PR task cannot be found although this is an ongoing PR
-    if (!task) {
-      // the parent task has a Ship Review ...
-      if (openShipReviewTask) {
-        // ... and an PR review task that's not completed without any PR link
-        if (shipReviewPRTask) {
-          // add the Ship Review PR task to the code review project and assign the PR link to it
-          await client.tasks.addProject(shipReviewPRTask.gid, {
-            project: PROJECT_ID
-          })
-          client.tasks.updateTask(shipReviewPRTask.gid, {
-            // eslint-disable-next-line camelcase
-            custom_fields: {
-              [customFields.url.gid]: payload.pull_request.html_url,
-              [customFields.status.gid]: prStatus
-            }
-          })
-          task = shipReviewPRTask
-          setOutput('result', 'updated')
-          // ... otherwise abort sync as this action cannot open a new Ship Review PR task
-        } else {
-          info(
-            `Skipping code review task creation for PR because the linked Asana task already has a pending '${openShipReviewTask.name}' task but no open PR review subtask`
-          )
-          return
-        }
-        // if parent doesn't have a Ship Review just create a new Code Review task
-      } else {
-        info(
-          `Waited a long time and no task appeared. Assuming old PR and creating a new task.`
-        )
-        task = await createPRTask(
-          parentTaskId,
-          followers,
-          title,
-          prStatus,
-          customFields,
-          automatedPR
-        )
-        setOutput('result', 'created')
-      }
-    }
+  // The workflow's concurrency group serializes runs per PR, so whichever
+  // event reaches here first creates the task and every later one finds it.
+  const existingTask = await findPRTask(customFields)
+  if (existingTask) {
+    setOutput('result', 'updated')
+    return existingTask
   }
 
+  // the parent task has a Ship Review ...
+  if (openShipReviewTask) {
+    // ... and a PR review subtask we can adopt: add it to the code review
+    // project and point it at this PR
+    if (shipReviewPRTask) {
+      await client.tasks.addProject(shipReviewPRTask.gid, {
+        project: PROJECT_ID
+      })
+      client.tasks.updateTask(shipReviewPRTask.gid, {
+        // eslint-disable-next-line camelcase
+        custom_fields: {
+          [customFields.url.gid]: payload.pull_request.html_url,
+          [customFields.status.gid]: prStatus
+        }
+      })
+      setOutput('result', 'updated')
+      return shipReviewPRTask
+    }
+
+    // ... otherwise only the `opened` run may add a new code review task under
+    // the ship review task; any later event aborts the sync instead
+    if (payload.action !== 'opened') {
+      info(
+        `Skipping code review task creation for PR because the linked Asana task already has a pending '${openShipReviewTask.name}' task but no open PR review subtask`
+      )
+      return
+    }
+    const task = await createPRTask(
+      openShipReviewTask.gid,
+      followers,
+      title,
+      prStatus,
+      customFields,
+      automatedPR
+    )
+    setOutput('result', 'created')
+    return task
+  }
+
+  // if parent doesn't have a Ship Review just create a new Code Review task
+  const task = await createPRTask(
+    parentTaskId,
+    followers,
+    title,
+    prStatus,
+    customFields,
+    automatedPR
+  )
+  setOutput('result', 'created')
   return task
 }
 
