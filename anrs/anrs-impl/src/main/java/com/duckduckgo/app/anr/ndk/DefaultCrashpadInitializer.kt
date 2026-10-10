@@ -33,12 +33,14 @@ class DefaultCrashpadInitializer @Inject constructor(
     override fun initialize(
         extraAnnotations: Map<String, String>,
         onCrash: (() -> Unit)?,
-    ): Boolean = Crashpad.init(
-        context,
-        platform = "Android",
-        version = "${appBuildConfig.versionName}-${appBuildConfig.flavor}",
-        osVersion = "Android SDK ${appBuildConfig.sdkInt}",
-        extraAnnotations = extraAnnotations,
-        config = CrashpadConfig(onCrash = onCrash),
-    )
+    ): Boolean {
+        return Crashpad.init(
+            context,
+            platform = "Android",
+            version = "${appBuildConfig.versionName}-${appBuildConfig.flavor}",
+            osVersion = "Android SDK ${appBuildConfig.sdkInt}",
+            extraAnnotations = extraAnnotations,
+            config = CrashpadConfig(onCrash = onCrash),
+        )
+    }
 }
