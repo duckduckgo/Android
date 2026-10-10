@@ -116,7 +116,9 @@ class QueryUrlConverter @Inject constructor(
         }
 
         requestRewriter.addCustomQueryParams(uriBuilder)
-        return uriBuilder.build().toString()
+
+        // Encode single quotes after URL is built since Uri.Builder doesn't encode them
+        return uriBuilder.build().toString().replace("'", "%27")
     }
 
     private fun convertUri(input: String): String {
