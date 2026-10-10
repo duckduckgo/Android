@@ -29,6 +29,7 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelPa
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
 import com.duckduckgo.duckchat.impl.ModelTier
@@ -188,6 +189,8 @@ interface DuckChatPixels {
     fun reportContextualRecentChatsPopupDisplayed()
     fun reportContextualRecentChatSelected()
     fun reportContextualViewAllChatsTapped()
+    fun reportChatHistoryScreenShown(source: DuckChatHistorySource)
+    fun reportChatHistoryScreenShownFromDeeplink()
     fun reportContextualOpenDuckAiMenuTapped()
     fun reportContextualPageContextInvalidEmpty()
     fun reportContextualPageContextInvalidNoTitle()
@@ -730,6 +733,29 @@ class RealDuckChatPixels @Inject constructor(
             pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_VIEW_ALL_CHATS_TAPPED_COUNT)
             pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_VIEW_ALL_CHATS_TAPPED_DAILY, type = Pixel.PixelType.Daily())
         }
+    }
+
+    override fun reportChatHistoryScreenShown(source: DuckChatHistorySource) {
+        fireChatHistoryScreenShown(source.pixelValue())
+    }
+
+    override fun reportChatHistoryScreenShownFromDeeplink() {
+        fireChatHistoryScreenShown("deeplink")
+    }
+
+    private fun fireChatHistoryScreenShown(source: String) {
+        fireCountAndDaily(
+            count = DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_COUNT,
+            daily = DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_DAILY,
+            parameters = mapOf(DuckChatPixelParameters.ENTRY_SOURCE to source),
+        )
+    }
+
+    private fun DuckChatHistorySource.pixelValue(): String = when (this) {
+        DuckChatHistorySource.BROWSER_MENU -> "browser_menu"
+        DuckChatHistorySource.ADDRESS_BAR -> "address_bar"
+        DuckChatHistorySource.CONTEXTUAL_CHAT -> "contextual_chat"
+        DuckChatHistorySource.SIDEBAR -> "sidebar"
     }
 
     override fun reportContextualOpenDuckAiMenuTapped() {
@@ -1575,6 +1601,8 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_HISTORY_NEW_CHAT_TAPPED_DAILY("m_aichat_history_new_chat_tapped_daily"),
     DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_COUNT("m_aichat_history_download_selected_count"),
     DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_DAILY("m_aichat_history_download_selected_daily"),
+    DUCK_CHAT_HISTORY_SCREEN_SHOWN_COUNT("m_aichat_history_screen_shown_count"),
+    DUCK_CHAT_HISTORY_SCREEN_SHOWN_DAILY("m_aichat_history_screen_shown_daily"),
     DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SELECTED_COUNT("m_aichat_unified_input_image_generation_selected_count"),
     DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SELECTED_DAILY("m_aichat_unified_input_image_generation_selected_daily"),
     DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_DESELECTED_COUNT("m_aichat_unified_input_image_generation_deselected_count"),
@@ -1939,6 +1967,8 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_HISTORY_NEW_CHAT_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),

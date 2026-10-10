@@ -73,7 +73,8 @@ import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.duckchat.api.DuckChatContextual
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
-import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
+import com.duckduckgo.duckchat.api.DuckChatHistoryParams
+import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
@@ -592,7 +593,7 @@ class DuckChatContextualWebViewFragment :
 
                     is DuckChatContextualWebViewViewModel.Command.LaunchChatHistory -> {
                         viewModel.onContextualClose()
-                        globalActivityStarter.start(requireContext(), DuckChatHistoryNoParams)
+                        globalActivityStarter.start(requireContext(), DuckChatHistoryParams(DuckChatHistorySource.CONTEXTUAL_CHAT))
                     }
 
                     is DuckChatContextualWebViewViewModel.Command.OpenSearchInNewTab -> {

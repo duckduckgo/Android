@@ -20,5 +20,19 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 
 /**
  * Use this model to launch the Duck.ai chat history screen.
+ *
+ * @param source the entry point the screen is opened from
  */
-data object DuckChatHistoryNoParams : GlobalActivityStarter.ActivityParams
+data class DuckChatHistoryParams(
+    val source: DuckChatHistorySource,
+) : GlobalActivityStarter.ActivityParams
+
+/**
+ * Entry points from which the Duck.ai chat history screen can be opened.
+ */
+enum class DuckChatHistorySource {
+    BROWSER_MENU,
+    ADDRESS_BAR,
+    CONTEXTUAL_CHAT,
+    SIDEBAR,
+}
