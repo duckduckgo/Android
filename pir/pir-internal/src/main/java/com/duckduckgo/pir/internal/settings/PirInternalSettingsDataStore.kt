@@ -25,6 +25,7 @@ import javax.inject.Inject
 
 interface PirInternalSettingsDataStore {
     var customDashboardUrl: String?
+    var isFreemiumEligibilityForced: Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -44,8 +45,13 @@ class RealPirInternalSettingsDataStore @Inject constructor(
         get() = preferences.getString(KEY_CUSTOM_DASHBOARD_URL, null)?.takeIf { it.isNotBlank() }
         set(value) = preferences.edit { putString(KEY_CUSTOM_DASHBOARD_URL, value) }
 
+    override var isFreemiumEligibilityForced: Boolean
+        get() = preferences.getBoolean(KEY_FREEMIUM_ELIGIBILITY_FORCED, false)
+        set(value) = preferences.edit { putBoolean(KEY_FREEMIUM_ELIGIBILITY_FORCED, value) }
+
     companion object {
         private const val FILENAME = "com.duckduckgo.pir.internal.settings"
         private const val KEY_CUSTOM_DASHBOARD_URL = "KEY_CUSTOM_DASHBOARD_URL"
+        private const val KEY_FREEMIUM_ELIGIBILITY_FORCED = "KEY_FREEMIUM_ELIGIBILITY_FORCED"
     }
 }
