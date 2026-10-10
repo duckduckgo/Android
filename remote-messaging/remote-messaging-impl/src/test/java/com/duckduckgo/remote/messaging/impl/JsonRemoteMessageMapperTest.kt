@@ -391,6 +391,18 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                     ),
                 ),
             ),
+            TestCase(
+                listOf(
+                    aJsonMessage(id = "id1", content = bigSingleActionJsonContent(placeholder = "PIR")),
+                ),
+                listOf(
+                    aBigSingleActionMessage(
+                        id = "id1",
+                        content = bigSingleActionContent(placeholder = Content.Placeholder.PIR),
+                        surfaces = listOf(NEW_TAB_PAGE),
+                    ),
+                ),
+            ),
         )
 
         private fun frenchTranslations() = JsonContentTranslations(
