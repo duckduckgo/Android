@@ -64,9 +64,12 @@ import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.browser.pageload.PageLoadTimeoutPixels
+import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Event
 import com.duckduckgo.app.browser.pageload.PageLoadTraceMarker
 import com.duckduckgo.app.browser.pageload.PageLoadTracer
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
+import com.duckduckgo.app.browser.pageload.RealPageLoadTimeoutWatchdog
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -81,6 +84,7 @@ import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.AppUrl.Url.HOST
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -146,6 +150,8 @@ class BrowserWebViewClient @Inject constructor(
     private val forceWebViewRecompositeFeature: ForceWebViewRecompositeFeature,
     private val pageLoadTracer: PageLoadTracer,
     private val browserMode: BrowserMode,
+    pageLoadTimeoutWatchdogFactory: RealPageLoadTimeoutWatchdog.Factory,
+    private val pageLoadTimeoutPixels: PageLoadTimeoutPixels,
 ) : WebViewClient() {
     var webViewClientListener: WebViewClientListener? = null
     var clientProvider: ClientBrandHintProvider? = null
@@ -169,6 +175,9 @@ class BrowserWebViewClient @Inject constructor(
 
     private val pageLoadTraceMarker = PageLoadTraceMarker(pageLoadTracer)
 
+    private val pageLoadTimeoutWatchdog = pageLoadTimeoutWatchdogFactory.create(appCoroutineScope)
+    private val pageLoadTimeoutsJob = ConflatedJob()
+
     private val isAppSchemeInterceptionEnabled = AtomicBoolean(true)
     private val isForceRecompositeEnabled = AtomicBoolean(true)
 
@@ -186,6 +195,20 @@ class BrowserWebViewClient @Inject constructor(
                 .collect { enabled ->
                     isForceRecompositeEnabled.set(enabled)
                 }
+        }
+    }
+
+    init {
+        pageLoadTimeoutsJob += appCoroutineScope.launch(dispatcherProvider.main()) {
+            pageLoadTimeoutWatchdog.events.collect { event ->
+                when (event) {
+                    is Event.TimedOut -> {
+                        pageLoadTimeoutPixels.fireTimeoutShown(event.phase)
+                        webViewClientListener?.onPageLoadTimeout()
+                    }
+                    is Event.Recovered -> pageLoadTimeoutPixels.fireTimeoutRecovered(event.elapsedSinceTimeoutMs)
+                }
+            }
         }
     }
 
@@ -243,7 +266,21 @@ class BrowserWebViewClient @Inject constructor(
         request: WebResourceRequest,
     ): Boolean {
         val url = request.url
-        return shouldOverride(view, url, request.isForMainFrame, request.isRedirect, request.hasGesture())
+        val isMainFrameRedirect = request.isForMainFrame && request.isRedirect
+        // Reported before the override logic so a reload issued from inside it is not undone by the cancellation below.
+        if (isMainFrameRedirect) {
+            pageLoadTimeoutWatchdog.onRedirect(url.toString())
+        }
+        val overridden = shouldOverride(view, url, request.isForMainFrame, request.isRedirect, request.hasGesture())
+        if (isMainFrameRedirect && overridden) {
+            pageLoadTimeoutWatchdog.onNavigationCancelled(url.toString())
+        }
+        return overridden
+    }
+
+    fun destroy() {
+        pageLoadTimeoutWatchdog.onNavigatedAway()
+        pageLoadTimeoutsJob.cancel()
     }
 
     /**
@@ -538,6 +575,7 @@ class BrowserWebViewClient @Inject constructor(
         url: String,
     ) {
         logcat(VERBOSE) { "onPageCommitVisible webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
+        pageLoadTimeoutWatchdog.onFirstContentVisible(url)
         pageCommitVisibleFired = true
         // Show only when the commit matches the tab state
         if (webView.url == url) {
@@ -591,6 +629,7 @@ class BrowserWebViewClient @Inject constructor(
         }
 
         lastInterceptedAppSchemeUrl = null
+        url?.let { pageLoadTimeoutWatchdog.onCommitted(it) }
 
         var wideEventNavigation: Pair<String, Long>? = null
         url?.let {
@@ -748,6 +787,7 @@ class BrowserWebViewClient @Inject constructor(
         url: String?,
     ) {
         logcat(VERBOSE) { "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
+        url?.let { pageLoadTimeoutWatchdog.onFinished(it) }
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
@@ -858,6 +898,10 @@ class BrowserWebViewClient @Inject constructor(
                 if (request.method == "POST") {
                     loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
                 }
+                // The request waits here, so this always runs before the load can commit.
+                if (request.isForMainFrame) {
+                    pageLoadTimeoutWatchdog.onMainFrameRequest(request.url.toString())
+                }
                 webView.url
             }
             logcat(VERBOSE) { "Intercepting resource ${request.url} type:${request.method} on page $documentUrl" }
@@ -893,6 +937,7 @@ class BrowserWebViewClient @Inject constructor(
             this.start = null
         }
 
+        pageLoadTimeoutWatchdog.onEngineError()
         webViewClientListener?.recoverFromRenderProcessGone()
         return true
     }
@@ -946,6 +991,7 @@ class BrowserWebViewClient @Inject constructor(
         if (trusted is CertificateValidationState.TrustedChain) {
             handler.proceed()
         } else {
+            pageLoadTimeoutWatchdog.onEngineError()
             webViewClientListener?.onReceivedSslError(handler, parseSSlErrorResponse(error))
         }
     }
@@ -1019,6 +1065,7 @@ class BrowserWebViewClient @Inject constructor(
                         this.start = null
                     }
                 }
+                pageLoadTimeoutWatchdog.onEngineError()
                 webViewClientListener?.onReceivedError(parsedError, request.url.toString(), webResourceError.errorCode.asStringErrorCode())
                 logcat { "recordErrorCode for ${request.url}" }
                 webViewClientListener?.recordErrorCode(
@@ -1055,6 +1102,7 @@ class BrowserWebViewClient @Inject constructor(
         }
         if (request?.isForMainFrame == true) {
             errorResponse?.let {
+                pageLoadTimeoutWatchdog.onEngineError()
                 logcat { "recordHttpErrorCode for ${request.url}" }
                 webViewClientListener?.recordHttpErrorCode(it.statusCode, request.url.toString())
             }
@@ -1117,6 +1165,8 @@ enum class WebViewPixelName(override val pixelName: String) : Pixel.PixelName {
     WEB_PAGE_LOADED("m_web_view_page_loaded"),
     WEB_PAGE_PAINTED("m_web_view_page_painted"),
     WEB_VIEW_FORCED_RECOMPOSITE("m_web_view_forced_recomposite"),
+    WEB_PAGE_LOAD_TIMEOUT_SHOWN("m_page_load_timeout_shown"),
+    WEB_PAGE_LOAD_TIMEOUT_RECOVERED("m_page_load_timeout_recovered"),
 }
 
 enum class WebViewErrorResponse(
@@ -1127,6 +1177,7 @@ enum class WebViewErrorResponse(
     OMITTED(R.string.webViewErrorNoConnection),
     LOADING(R.string.webViewErrorNoConnection),
     SSL_PROTOCOL_ERROR(R.string.webViewErrorSslProtocol),
+    TIMEOUT(R.string.webViewErrorTimeout),
 }
 
 data class SslErrorResponse(

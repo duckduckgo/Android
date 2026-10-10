@@ -1,0 +1,28 @@
+{
+    "m_page_load_timeout_shown": {
+        "description": "The page load watchdog reported a main-frame load that is stuck without visible content and the timeout UI was requested. Fired every time, not daily.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["page_load"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "phase",
+                "description": "How far the navigation got when it timed out",
+                "enum": ["not_committed", "committed_no_content"]
+            }
+        ]
+    },
+    "m_page_load_timeout_recovered": {
+        "description": "A navigation that had timed out later showed content or finished on its own, without the user retrying. Fired at most once per timeout.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["page_load"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "recovered_after",
+                "description": "Time from the timeout to the recovery (the page showing content or finishing), bucketed",
+                "enum": ["0-5s", "5-15s", "15-30s", "30-60s", "60s+"]
+            }
+        ]
+    }
+}

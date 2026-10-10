@@ -68,6 +68,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.WebViewErrorResponse.SSL_PROTOCOL_ERROR
+import com.duckduckgo.app.browser.WebViewErrorResponse.TIMEOUT
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
@@ -2648,6 +2649,24 @@ class BrowserTabViewModel @Inject constructor(
         errorPagePendingDismissal = currentBrowserViewState().browserError != OMITTED
     }
 
+    override fun onPageLoadTimeout() {
+        val state = currentBrowserViewState()
+        val canShowError = state.browserShowing &&
+            state.sslError == NONE &&
+            !state.maliciousSiteBlocked &&
+            (state.browserError == OMITTED || state.browserError == LOADING)
+        if (!canShowError) return
+
+        errorPagePendingDismissal = false
+        browserViewState.value = state.copy(
+            browserError = TIMEOUT,
+            redirectSuggestion = null,
+            showPrivacyShield = HighlightableButton.Visible(enabled = false),
+        )
+        command.value = WebViewError(TIMEOUT, url.orEmpty())
+        suggestRedirectJob.cancel()
+    }
+
     override fun pageRefreshed(refreshedUrl: String) {
         logcat { "pageRefreshed URL: $url refreshedUrl $refreshedUrl" }
         if (url == null || refreshedUrl == url) {
@@ -2716,7 +2735,7 @@ class BrowserTabViewModel @Inject constructor(
         }
         when (currentBrowserViewState().browserError) {
             OMITTED, LOADING -> badUrlErrorPageWideEvent.onPageLoadFinished(tabId)
-            BAD_URL, CONNECTION, SSL_PROTOCOL_ERROR -> Unit
+            BAD_URL, CONNECTION, SSL_PROTOCOL_ERROR, TIMEOUT -> Unit
         }
         if (!currentBrowserViewState().maliciousSiteBlocked && site != null) {
             navigationStateChanged(webViewNavigationState)
@@ -4772,7 +4791,7 @@ class BrowserTabViewModel @Inject constructor(
             CONNECTION -> badUrlErrorPageWideEvent.onConnectionErrorPageDisplayed(tabId)
             SSL_PROTOCOL_ERROR -> badUrlErrorPageWideEvent.onOtherErrorPageDisplayed(tabId)
             OMITTED -> badUrlErrorPageWideEvent.onOmittedErrorReceived(tabId)
-            LOADING -> Unit
+            LOADING, TIMEOUT -> Unit
         }
         if (errorType == BAD_URL &&
             suggestRedirectOnUnresolvedErrorFeature.self().isEnabled() &&
