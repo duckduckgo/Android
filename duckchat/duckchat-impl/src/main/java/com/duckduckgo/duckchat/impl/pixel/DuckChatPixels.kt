@@ -744,18 +744,18 @@ class RealDuckChatPixels @Inject constructor(
     }
 
     private fun fireChatHistoryScreenShown(source: String) {
-        val params = mapOf(DuckChatPixelParameters.ENTRY_SOURCE to source)
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_COUNT, params)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_DAILY, params, type = Pixel.PixelType.Daily())
-        }
+        fireCountAndDaily(
+            count = DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_COUNT,
+            daily = DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_DAILY,
+            parameters = mapOf(DuckChatPixelParameters.ENTRY_SOURCE to source),
+        )
     }
 
     private fun DuckChatHistorySource.pixelValue(): String = when (this) {
         DuckChatHistorySource.BROWSER_MENU -> "browser_menu"
         DuckChatHistorySource.ADDRESS_BAR -> "address_bar"
         DuckChatHistorySource.CONTEXTUAL_CHAT -> "contextual_chat"
-        DuckChatHistorySource.SIDE_BAR -> "side_bar"
+        DuckChatHistorySource.SIDEBAR -> "sidebar"
     }
 
     override fun reportContextualOpenDuckAiMenuTapped() {

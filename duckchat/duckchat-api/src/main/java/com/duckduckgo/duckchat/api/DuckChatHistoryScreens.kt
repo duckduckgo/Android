@@ -34,5 +34,5 @@ enum class DuckChatHistorySource {
     BROWSER_MENU,
     ADDRESS_BAR,
     CONTEXTUAL_CHAT,
-    SIDE_BAR,
+    SIDEBAR,
 }

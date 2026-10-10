@@ -5925,7 +5925,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onDuckChatSidebarButtonPressed() {
         if (duckAiFeatureState.nativeDuckAiSidebar.value) {
-            openDuckChatHistory(DuckChatHistorySource.SIDE_BAR)
+            openDuckChatHistory(DuckChatHistorySource.SIDEBAR)
         } else {
             openDuckChatSidebar()
         }

@@ -12105,7 +12105,7 @@ class BrowserTabViewModelTest {
 
         testee.onDuckChatSidebarButtonPressed()
 
-        assertCommandIssued<Command.LaunchDuckChatHistory> { assertEquals(DuckChatHistorySource.SIDE_BAR, source) }
+        assertCommandIssued<Command.LaunchDuckChatHistory> { assertEquals(DuckChatHistorySource.SIDEBAR, source) }
         verify(mockDuckChatJSHelper, never()).onNativeAction(NativeAction.SIDEBAR)
     }
 

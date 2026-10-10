@@ -236,7 +236,7 @@
                 "key": "source",
                 "description": "The entry point from which the chat history screen was opened",
                 "type": "string",
-                "enum": ["browser_menu", "address_bar", "contextual_chat", "side_bar", "deeplink"]
+                "enum": ["browser_menu", "address_bar", "contextual_chat", "sidebar", "deeplink"]
             }
         ]
     }
