@@ -34,6 +34,12 @@ interface TabManagerFeatureFlags {
     fun tabInsertionFixes(): Toggle
 
     /**
+     * Kill switch for fetching the page title and favicon of tabs opened in the background, before they are loaded.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun backgroundTabPrefetch(): Toggle
+
+    /**
      * Reports the furthest a user went back in the tab activation order, so that the effect of
      * lowering the retained fragment limit can be sized before it is changed.
      */
