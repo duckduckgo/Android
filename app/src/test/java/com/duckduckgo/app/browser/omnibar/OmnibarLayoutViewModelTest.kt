@@ -61,7 +61,6 @@ import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -168,10 +167,6 @@ class OmnibarLayoutViewModelTest {
         whenever(serpEasterEggLogosToggles.setFavourite()).thenReturn(mock())
         whenever(serpEasterEggLogosToggles.setFavourite().isEnabled()).thenReturn(false)
         whenever(serpEasterEggLogosToggles.setFavourite().enabled()).thenReturn(setFavouriteFeatureEnabledFlow)
-        runBlocking {
-            whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        }
-
         fakeStandardizedLeadingIconToggle = FeatureToggles.Builder(
             FakeToggleStore(),
             featureName = "standardizedLeadingIcon",

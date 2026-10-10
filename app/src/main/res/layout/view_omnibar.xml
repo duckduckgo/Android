@@ -131,21 +131,6 @@
                                 app:layout_constraintStart_toStartOf="parent" />
 
                             <com.airbnb.lottie.LottieAnimationView
-                                android:id="@+id/trackersAnimation"
-                                android:layout_width="wrap_content"
-                                android:layout_height="0dp"
-                                android:layout_marginStart="4dp"
-                                android:layout_marginEnd="@dimen/keyline_1"
-                                android:importantForAccessibility="no"
-                                android:paddingStart="@dimen/keyline_4"
-                                android:saveEnabled="false"
-                                android:scaleType="centerCrop"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="@id/omniBarContentContainer"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:lottie_autoPlay="false" />
-
-                            <com.airbnb.lottie.LottieAnimationView
                                 android:id="@+id/shieldIcon"
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
@@ -445,6 +430,7 @@
                 android:id="@+id/shieldIconPulseAnimationContainer"
                 android:layout_width="74dp"
                 android:layout_height="match_parent"
+                android:layout_marginStart="1dp"
                 android:paddingTop="@dimen/omnibarCardMarginTop"
                 android:paddingBottom="@dimen/omnibarCardMarginBottom"
                 app:layout_constraintBottom_toBottomOf="parent"

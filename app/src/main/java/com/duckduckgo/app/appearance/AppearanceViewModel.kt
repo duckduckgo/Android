@@ -20,7 +20,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
@@ -60,7 +59,6 @@ class AppearanceViewModel @Inject constructor(
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
     private val tabSwitcherDataStore: TabSwitcherDataStore,
-    private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
     omnibarRepository: OmnibarRepository,
 ) : ViewModel() {
@@ -74,7 +72,6 @@ class AppearanceViewModel @Inject constructor(
         val isFullUrlEnabled: Boolean = true,
         val isTrackersCountInTabSwitcherEnabled: Boolean = true,
         val isAddressBarTrackersAnimationEnabled: Boolean = true,
-        val shouldShowAddressBarTrackersAnimationItem: Boolean = false,
         val shouldShowSplitOmnibarSettings: Boolean = false,
         val showAppIconSettingFirst: Boolean = false,
     )
@@ -111,11 +108,9 @@ class AppearanceViewModel @Inject constructor(
         urlDisplayRepository.isFullUrlEnabled,
         tabSwitcherDataStore.isTrackersAnimationInfoTileHidden(),
     ) { currentViewState, isFullUrlEnabled, isTrackersAnimationTileHidden ->
-        val isAddressBarTrackersAnimationFeatureEnabled = addressBarTrackersAnimationManager.isFeatureEnabled()
         currentViewState.copy(
             isTrackersCountInTabSwitcherEnabled = !isTrackersAnimationTileHidden,
             isFullUrlEnabled = isFullUrlEnabled,
-            shouldShowAddressBarTrackersAnimationItem = isAddressBarTrackersAnimationFeatureEnabled,
         )
     }.stateIn(viewModelScope, SharingStarted.Lazily, viewState.value)
 

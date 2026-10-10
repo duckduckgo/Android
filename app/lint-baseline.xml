@@ -4442,27 +4442,6 @@
             message="Defined here, included via layout/view_omnibar.xml => layout/include_new_custom_tab_toolbar.xml defines @+id/daxIcon"/>
     </issue>
 
-    <issue
-        id="DuplicateIncludedIds"
-        message="Duplicate id @+id/trackersAnimation, defined or included multiple times in layout/view_omnibar.xml: [layout/view_omnibar.xml defines @+id/trackersAnimation, layout/view_omnibar.xml => layout/include_new_custom_tab_toolbar.xml defines @+id/trackersAnimation]"
-        errorLine1="                &lt;include"
-        errorLine2="                ^">
-        <location
-            file="src/main/res/layout/view_omnibar.xml"
-            line="488"
-            column="17"
-            message="Duplicate id @+id/trackersAnimation, defined or included multiple times in layout/view_omnibar.xml: [layout/view_omnibar.xml defines @+id/trackersAnimation, layout/view_omnibar.xml => layout/include_new_custom_tab_toolbar.xml defines @+id/trackersAnimation]"/>
-        <location
-            file="src/main/res/layout/view_omnibar.xml"
-            line="134"
-            column="33"
-            message="Defined here"/>
-        <location
-            file="src/main/res/layout/include_new_custom_tab_toolbar.xml"
-            line="60"
-            column="9"
-            message="Defined here, included via layout/view_omnibar.xml => layout/include_new_custom_tab_toolbar.xml defines @+id/trackersAnimation"/>
-    </issue>
 
     <issue
         id="InconsistentLayout"
