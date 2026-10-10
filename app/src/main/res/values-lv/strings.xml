@@ -843,8 +843,8 @@
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Rādīt lietotnes palaišanas laikā</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab">Pēdējā atvērtā cilne</string>
-    <string name="showOnAppLaunchOptionNewTabPage">Jaunas cilnes lapa</string>
+    <string name="showOnAppLaunchOptionLastUsedTab">Pēdējā lietotā cilne</string>
+    <string name="showOnAppLaunchOptionOpenNewTab">Jaunas cilnes lapa</string>
     <string name="showOnAppLaunchOptionSpecificPage">Konkrēta lapa</string>
 
     <!-- Privacy Dashboard -->

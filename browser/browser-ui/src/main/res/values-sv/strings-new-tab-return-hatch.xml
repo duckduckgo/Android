@@ -21,9 +21,12 @@
     <string name="newTabReturnHatchFireTabTitle">Senast använda Fire Tab</string>
     <string name="newTabReturnHatchTabClosed">Fliken är stängd</string>
     <string name="newTabReturnHatchUndo">Ångra</string>
-    <string name="hatchMenuReturnTab">Återgå till flik</string>
+    <string name="hatchMenuReturnToLastUsedTab">Återgå till den senaste använda fliken</string>
     <string name="hatchMenuAfterInactivitySettings">Efter inaktivitet</string>
-    <string name="hatchMenuCloseTab">Stäng flik</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Öppna ny flik</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Senast använda flik</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="&apos;%1$s&apos; is the menu row label (&apos;After Inactivity&apos;) and &apos;%2$s&apos; is the current destination, e.g. &apos;After Inactivity, Open New Tab&apos;">%1$s, %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Stäng senast använda flik</string>
     <string name="hatchMenuBurnTab">Radera flik</string>
-    <string name="hatchMenuHideShortcut">Dölj genväg</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="&apos;Return to&apos; refers to this menu&apos;s own &apos;Return to…&apos; label shown above this item">Dölj genvägen för ”Återgå till”</string>
 </resources>

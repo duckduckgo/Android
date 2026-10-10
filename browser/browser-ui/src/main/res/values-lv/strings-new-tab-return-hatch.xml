@@ -21,9 +21,12 @@
     <string name="newTabReturnHatchFireTabTitle">Pēdējā izmantotā Fire cilne</string>
     <string name="newTabReturnHatchTabClosed">Cilne aizvērta</string>
     <string name="newTabReturnHatchUndo">Atsaukt</string>
-    <string name="hatchMenuReturnTab">Atgriezties pie cilnes</string>
+    <string name="hatchMenuReturnToLastUsedTab">Atgriezties pēdējā izmantotajā cilnē</string>
     <string name="hatchMenuAfterInactivitySettings">Pēc neaktivitātes perioda</string>
-    <string name="hatchMenuCloseTab">Aizvērt cilni</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Atvērt jaunu cilni</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Pēdējā lietotā cilne</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="&apos;%1$s&apos; is the menu row label (&apos;After Inactivity&apos;) and &apos;%2$s&apos; is the current destination, e.g. &apos;After Inactivity, Open New Tab&apos;">%1$s, %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Aizvērt pēdējo lietoto cilni</string>
     <string name="hatchMenuBurnTab">Dzēst cilni</string>
-    <string name="hatchMenuHideShortcut">Paslēpt saīsni</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="&apos;Return to&apos; refers to this menu&apos;s own &apos;Return to…&apos; label shown above this item">Paslēpt „Atgriezties” saīsni</string>
 </resources>

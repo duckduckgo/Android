@@ -21,9 +21,12 @@
     <string name="newTabReturnHatchFireTabTitle">Ostatnio używana karta Fire</string>
     <string name="newTabReturnHatchTabClosed">Karta zamknięta</string>
     <string name="newTabReturnHatchUndo">Cofnij</string>
-    <string name="hatchMenuReturnTab">Powrót do karty</string>
+    <string name="hatchMenuReturnToLastUsedTab">Wróć do ostatnio używanej karty</string>
     <string name="hatchMenuAfterInactivitySettings">Po braku aktywności</string>
-    <string name="hatchMenuCloseTab">Zamknij kartę</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Otwórz nową kartę</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Ostatnio używana karta</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="&apos;%1$s&apos; is the menu row label (&apos;After Inactivity&apos;) and &apos;%2$s&apos; is the current destination, e.g. &apos;After Inactivity, Open New Tab&apos;">%1$s, %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Zamknij ostatnio używaną kartę</string>
     <string name="hatchMenuBurnTab">Usuń kartę</string>
-    <string name="hatchMenuHideShortcut">Ukryj skrót</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="&apos;Return to&apos; refers to this menu&apos;s own &apos;Return to…&apos; label shown above this item">Ukryj skrót „Wróć do”</string>
 </resources>

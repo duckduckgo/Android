@@ -95,7 +95,11 @@ class NewTabReturnHatchView @JvmOverloads constructor(
     }
 
     private val popupMenu by lazy {
-        PopupMenu(LayoutInflater.from(context), R.layout.popup_hatch_menu)
+        PopupMenu(
+            layoutInflater = LayoutInflater.from(context),
+            resourceId = R.layout.popup_hatch_menu,
+            width = resources.getDimensionPixelSize(R.dimen.hatchMenuWidth),
+        )
     }
 
     override fun onAttachedToWindow() {
@@ -209,7 +213,6 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         val visibility = if (this.showAfterInactivityEntry) VISIBLE else GONE
         popupMenu.contentView.findViewById<View>(R.id.hatchMenuAfterInactivity).visibility = visibility
         popupMenu.contentView.findViewById<View>(R.id.hatchMenuAfterInactivityTopDivider).visibility = visibility
-        popupMenu.contentView.findViewById<View>(R.id.hatchMenuAfterInactivityBottomDivider).visibility = visibility
         if (!this.showAfterInactivityEntry) return
 
         val summaryText = when (this.afterInactivityDestinationSummary) {

@@ -21,9 +21,12 @@
     <string name="newTabReturnHatchFireTabTitle">Dernier Onglet Fire utilisé</string>
     <string name="newTabReturnHatchTabClosed">Onglet fermé</string>
     <string name="newTabReturnHatchUndo">Annuler</string>
-    <string name="hatchMenuReturnTab">Retourner à l\'onglet</string>
+    <string name="hatchMenuReturnToLastUsedTab">Retourner au dernier onglet utilisé</string>
     <string name="hatchMenuAfterInactivitySettings">Après l\'inactivité</string>
-    <string name="hatchMenuCloseTab">Fermer l\'onglet</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Ouvrir un nouvel onglet</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Dernier onglet utilisé</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="&apos;%1$s&apos; is the menu row label (&apos;After Inactivity&apos;) and &apos;%2$s&apos; is the current destination, e.g. &apos;After Inactivity, Open New Tab&apos;">%1$s, %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Fermer le dernier onglet utilisé</string>
     <string name="hatchMenuBurnTab">Supprimer l\'onglet</string>
-    <string name="hatchMenuHideShortcut">Masquer le raccourci</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="&apos;Return to&apos; refers to this menu&apos;s own &apos;Return to…&apos; label shown above this item">Masquer le raccourci « Retour à »</string>
 </resources>

@@ -21,9 +21,12 @@
     <string name="newTabReturnHatchFireTabTitle">Laatst gebruikte Fire Tab</string>
     <string name="newTabReturnHatchTabClosed">Tabblad gesloten</string>
     <string name="newTabReturnHatchUndo">Ongedaan maken</string>
-    <string name="hatchMenuReturnTab">Terug naar tabblad</string>
+    <string name="hatchMenuReturnToLastUsedTab">Terug naar laatst gebruikte tabblad</string>
     <string name="hatchMenuAfterInactivitySettings">Na inactiviteit</string>
-    <string name="hatchMenuCloseTab">Tabblad sluiten</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Nieuw tabblad openen</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Laatst gebruikte tabblad</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="&apos;%1$s&apos; is the menu row label (&apos;After Inactivity&apos;) and &apos;%2$s&apos; is the current destination, e.g. &apos;After Inactivity, Open New Tab&apos;">%1$s, %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Laatst gebruikte tabblad sluiten</string>
     <string name="hatchMenuBurnTab">Tabblad verwijderen</string>
-    <string name="hatchMenuHideShortcut">Snelkoppeling verbergen</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="&apos;Return to&apos; refers to this menu&apos;s own &apos;Return to…&apos; label shown above this item">Snelkoppeling voor \"Terug naar\" verbergen</string>
 </resources>

@@ -21,9 +21,12 @@
     <string name="newTabReturnHatchFireTabTitle">Paskutinį kartą naudotas „Fire“ skirtukas</string>
     <string name="newTabReturnHatchTabClosed">Skirtukas uždarytas</string>
     <string name="newTabReturnHatchUndo">Anuliuoti</string>
-    <string name="hatchMenuReturnTab">Grįžti į skirtuką</string>
+    <string name="hatchMenuReturnToLastUsedTab">Grįžti į paskutinį naudotą skirtuką</string>
     <string name="hatchMenuAfterInactivitySettings">Po neaktyvumo</string>
-    <string name="hatchMenuCloseTab">Uždaryti skirtuką</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Atidaryti naują skirtuką</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Paskutinis naudotas skirtukas</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="&apos;%1$s&apos; is the menu row label (&apos;After Inactivity&apos;) and &apos;%2$s&apos; is the current destination, e.g. &apos;After Inactivity, Open New Tab&apos;">%1$s %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Uždaryti paskutinį naudotą skirtuką</string>
     <string name="hatchMenuBurnTab">Trinti skirtuką</string>
-    <string name="hatchMenuHideShortcut">Slėpti nuorodą</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="&apos;Return to&apos; refers to this menu&apos;s own &apos;Return to…&apos; label shown above this item">Slėpti nuorodą „Grįžti į“</string>
 </resources>

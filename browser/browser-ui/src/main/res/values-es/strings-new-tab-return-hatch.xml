@@ -21,9 +21,12 @@
     <string name="newTabReturnHatchFireTabTitle">Última Fire Tab utilizada</string>
     <string name="newTabReturnHatchTabClosed">Pestaña cerrada</string>
     <string name="newTabReturnHatchUndo">Deshacer</string>
-    <string name="hatchMenuReturnTab">Volver a la pestaña</string>
+    <string name="hatchMenuReturnToLastUsedTab">Volver a la última pestaña utilizada</string>
     <string name="hatchMenuAfterInactivitySettings">Después de inactividad</string>
-    <string name="hatchMenuCloseTab">Cerrar pestaña</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Abrir una nueva pestaña</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Última pestaña utilizada</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="&apos;%1$s&apos; is the menu row label (&apos;After Inactivity&apos;) and &apos;%2$s&apos; is the current destination, e.g. &apos;After Inactivity, Open New Tab&apos;">%1$s, %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Cerrar la última pestaña utilizada</string>
     <string name="hatchMenuBurnTab">Eliminar pestaña</string>
-    <string name="hatchMenuHideShortcut">Ocultar acceso directo</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="&apos;Return to&apos; refers to this menu&apos;s own &apos;Return to…&apos; label shown above this item">Ocultar acceso directo a «Volver a»</string>
 </resources>

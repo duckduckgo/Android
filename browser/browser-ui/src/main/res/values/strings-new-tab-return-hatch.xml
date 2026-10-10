@@ -20,9 +20,12 @@
     <string name="newTabReturnHatchFireTabTitle">Last used Fire Tab</string>
     <string name="newTabReturnHatchTabClosed">Tab closed</string>
     <string name="newTabReturnHatchUndo">Undo</string>
-    <string name="hatchMenuReturnTab">Return to Tab</string>
+    <string name="hatchMenuReturnToLastUsedTab">Return to Last Used Tab</string>
     <string name="hatchMenuAfterInactivitySettings">After Inactivity</string>
-    <string name="hatchMenuCloseTab">Close Tab</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Open New Tab</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Last Used Tab</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="'%1$s' is the menu row label ('After Inactivity') and '%2$s' is the current destination, e.g. 'After Inactivity, Open New Tab'">%1$s, %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Close Last Used Tab</string>
     <string name="hatchMenuBurnTab">Delete Tab</string>
-    <string name="hatchMenuHideShortcut">Hide shortcut</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="'Return to' refers to this menu's own 'Return to…' label shown above this item">Hide \'Return to\' Shortcut</string>
 </resources>

@@ -21,9 +21,12 @@
     <string name="newTabReturnHatchFireTabTitle">Fila Fire utilizată ultima dată</string>
     <string name="newTabReturnHatchTabClosed">Filă închisă</string>
     <string name="newTabReturnHatchUndo">Anulează</string>
-    <string name="hatchMenuReturnTab">Înapoi la filă</string>
+    <string name="hatchMenuReturnToLastUsedTab">Revino la ultima filă utilizată</string>
     <string name="hatchMenuAfterInactivitySettings">După inactivitate</string>
-    <string name="hatchMenuCloseTab">Închide fila</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Deschide o filă nouă</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Ultima filă utilizată</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="&apos;%1$s&apos; is the menu row label (&apos;After Inactivity&apos;) and &apos;%2$s&apos; is the current destination, e.g. &apos;After Inactivity, Open New Tab&apos;">%1$s, %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Închide ultima filă utilizată</string>
     <string name="hatchMenuBurnTab">Șterge fila</string>
-    <string name="hatchMenuHideShortcut">Ascunde scurtătura</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="&apos;Return to&apos; refers to this menu&apos;s own &apos;Return to…&apos; label shown above this item">Ascunde scurtătura pentru „Revino la”</string>
 </resources>

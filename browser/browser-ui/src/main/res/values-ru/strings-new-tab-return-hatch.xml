@@ -21,9 +21,12 @@
     <string name="newTabReturnHatchFireTabTitle">Последняя использованная Fire-вкладка</string>
     <string name="newTabReturnHatchTabClosed">Вкладка закрыта</string>
     <string name="newTabReturnHatchUndo">Отменить</string>
-    <string name="hatchMenuReturnTab">Вернуться к вкладке</string>
+    <string name="hatchMenuReturnToLastUsedTab">Вернуться к последней использованной вкладке</string>
     <string name="hatchMenuAfterInactivitySettings">После бездействия</string>
-    <string name="hatchMenuCloseTab">Закрыть вкладку</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Открыть новую вкладку</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Последняя использованная вкладка</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="&apos;%1$s&apos; is the menu row label (&apos;After Inactivity&apos;) and &apos;%2$s&apos; is the current destination, e.g. &apos;After Inactivity, Open New Tab&apos;">%1$s, %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Закрыть последнюю использованную вкладку</string>
     <string name="hatchMenuBurnTab">Удалить вкладку</string>
-    <string name="hatchMenuHideShortcut">Скрыть ярлык</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="&apos;Return to&apos; refers to this menu&apos;s own &apos;Return to…&apos; label shown above this item">Скрыть ярлык «Вернуться к»</string>
 </resources>

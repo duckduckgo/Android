@@ -21,9 +21,12 @@
     <string name="newTabReturnHatchFireTabTitle">En son kullanılan Fire Sekmesi</string>
     <string name="newTabReturnHatchTabClosed">Sekme kapatıldı</string>
     <string name="newTabReturnHatchUndo">Geri al</string>
-    <string name="hatchMenuReturnTab">Sekmeye geri dön</string>
+    <string name="hatchMenuReturnToLastUsedTab">Son Kullanılan Sekmeye Dön</string>
     <string name="hatchMenuAfterInactivitySettings">Hareketsizlik Sonrası</string>
-    <string name="hatchMenuCloseTab">Sekmeyi kapat</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Yeni Sekme Aç</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Son Kullanılan Sekme</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="&apos;%1$s&apos; is the menu row label (&apos;After Inactivity&apos;) and &apos;%2$s&apos; is the current destination, e.g. &apos;After Inactivity, Open New Tab&apos;">%1$s, %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Son Kullanılan Sekmeyi Kapat</string>
     <string name="hatchMenuBurnTab">Sekmeyi Sil</string>
-    <string name="hatchMenuHideShortcut">Kısayolu gizle</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="&apos;Return to&apos; refers to this menu&apos;s own &apos;Return to…&apos; label shown above this item">‘Geri Dön’ Kısayolunu Gizle</string>
 </resources>

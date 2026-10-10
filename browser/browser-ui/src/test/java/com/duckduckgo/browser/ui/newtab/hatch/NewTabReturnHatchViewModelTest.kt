@@ -206,13 +206,13 @@ class NewTabReturnHatchViewModelTest {
     fun whenProviderDestinationChangesThenViewStateUpdatesAfterInactivitySummary() = runTest {
         testee.viewState.test {
             assertEquals(
-                NewTabReturnHatchViewModel.AfterInactivityDestinationSummary.TextRes(R.string.hatchMenuAfterInactivityDestinationNewTabPage),
+                NewTabReturnHatchViewModel.AfterInactivityDestinationSummary.TextRes(R.string.hatchMenuAfterInactivityOpenNewTab),
                 awaitItem().afterInactivityDestinationSummary,
             )
 
             providerSettings.value = AfterInactivitySettings.LastUsedTab
             assertEquals(
-                NewTabReturnHatchViewModel.AfterInactivityDestinationSummary.TextRes(R.string.hatchMenuAfterInactivityDestinationLastOpenedTab),
+                NewTabReturnHatchViewModel.AfterInactivityDestinationSummary.TextRes(R.string.hatchMenuAfterInactivityLastUsedTab),
                 awaitItem().afterInactivityDestinationSummary,
             )
 

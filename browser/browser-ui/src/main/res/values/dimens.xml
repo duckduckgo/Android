@@ -16,11 +16,6 @@
 
 <resources>
 
-    <string name="newTabReturnHatchSerpPlaceholderTitle">DuckDuckGo - Protection. Privacy. Peace of mind.</string>
-    <string name="newTabReturnHatchDuckChatPlaceholderTitle">Duck.ai by DuckDuckGo. Private AI chat. Free.</string>
+    <dimen name="hatchMenuWidth">240dp</dimen>
 
-    <string name="tabSwitcherContentDescription">Tabs</string>
-    <string name="duck_ai_tab_label">Duck.ai</string>
-    <string name="duck_ai_tab_icon_content_description">Duck.ai icon</string>
-    <string name="browserMenuChats">Chats</string>
 </resources>

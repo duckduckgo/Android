@@ -21,9 +21,12 @@
     <string name="newTabReturnHatchFireTabTitle">Utoljára használt Fire lap</string>
     <string name="newTabReturnHatchTabClosed">Lap bezárva</string>
     <string name="newTabReturnHatchUndo">Visszavonás</string>
-    <string name="hatchMenuReturnTab">Vissza a lapra</string>
+    <string name="hatchMenuReturnToLastUsedTab">Vissza az utoljára használt lapra</string>
     <string name="hatchMenuAfterInactivitySettings">Inaktivitás után</string>
-    <string name="hatchMenuCloseTab">Lap bezárása</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Új lap megnyitása</string>
+    <string name="hatchMenuAfterInactivityLastUsedTab">Utoljára használt lap</string>
+    <string name="hatchMenuAfterInactivityContentDescription" instruction="&apos;%1$s&apos; is the menu row label (&apos;After Inactivity&apos;) and &apos;%2$s&apos; is the current destination, e.g. &apos;After Inactivity, Open New Tab&apos;">%1$s, %2$s</string>
+    <string name="hatchMenuCloseLastUsedTab">Utoljára használt lap bezárása</string>
     <string name="hatchMenuBurnTab">Lap törlése</string>
-    <string name="hatchMenuHideShortcut">Gyorsparancs elrejtése</string>
+    <string name="hatchMenuHideReturnToShortcut" instruction="&apos;Return to&apos; refers to this menu&apos;s own &apos;Return to…&apos; label shown above this item">„Vissza” gyorsparancs elrejtése</string>
 </resources>
