@@ -45,6 +45,9 @@ import com.duckduckgo.pir.impl.scheduling.PirExecutionType.MANUAL_EDIT_PROFILE
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType.MANUAL_INITIAL
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType.MANUAL_INITIAL_RESUME
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType.SCHEDULED
+import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
+import com.duckduckgo.pir.impl.store.PirFreemiumFirstScanResult.MATCHES_FOUND
+import com.duckduckgo.pir.impl.store.PirFreemiumFirstScanResult.NO_MATCHES
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEvent
@@ -99,6 +102,7 @@ class RealPirJobsRunnerTest {
     private val mockPirFreeScanBrokerFilter: PirFreeScanBrokerFilter = mock()
     private val mockPirFreeScanWorkWindow: PirFreeScanWorkWindow = mock()
     private val mockPirScanScheduler: PirScanScheduler = mock()
+    private val mockPirFreemiumDataStore: PirFreemiumDataStore = mock()
 
     @Before
     fun setUp() = kotlinx.coroutines.runBlocking {
@@ -113,6 +117,7 @@ class RealPirJobsRunnerTest {
         whenever(mockNetworkProtectionState.isRunning()).thenReturn(false)
         whenever(mockPirWebViewCountProvider.getMaxWebViewCount()).thenReturn(20)
         whenever(mockPirFreeScanWorkWindow.isOpen()).thenReturn(true)
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(emptyList())
 
         testee = RealPirJobsRunner(
             dispatcherProvider = coroutineRule.testDispatcherProvider,
@@ -133,6 +138,7 @@ class RealPirJobsRunnerTest {
             pirFreeScanBrokerFilter = mockPirFreeScanBrokerFilter,
             pirFreeScanWorkWindow = mockPirFreeScanWorkWindow,
             pirScanScheduler = mockPirScanScheduler,
+            pirFreemiumDataStore = mockPirFreemiumDataStore,
         )
     }
 
@@ -2037,6 +2043,234 @@ class RealPirJobsRunnerTest {
             isTrackerBlockingEnabled = any(),
         )
         verify(mockPirScanWideEvent).onOptOutSkipped(MANUAL_INITIAL)
+    }
+
+    @Test
+    fun whenScanOnlyRunCompletesWithoutMatchesThenFirstScanResultIsNoMatches() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPirFreemiumDataStore).recordFirstScanResult(NO_MATCHES)
+    }
+
+    @Test
+    fun whenScanOnlyRunCompletesWithMatchesThenFirstScanResultIsMatchesFound() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        whenever(mockPirRepository.getAllExtractedProfiles())
+            .thenReturn(listOf(testExtractedProfile.copy(brokerName = "Ungated")))
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPirFreemiumDataStore).recordFirstScanResult(MATCHES_FOUND)
+    }
+
+    @Test
+    fun whenScheduledScanOnlyRunCompletesThenFirstScanResultIsRecorded() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+
+        testee.runEligibleJobs(mockContext, SCHEDULED, PirRunMode.SCAN_ONLY)
+
+        verify(mockPirFreemiumDataStore).recordFirstScanResult(NO_MATCHES)
+    }
+
+    @Test
+    fun whenEveryActiveBrokerIsGatedThenFirstScanResultIsNoMatches() = runTest {
+        val gated = brokerObject("Gated")
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf("Gated"))
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(gated))
+        whenever(mockPirFreeScanBrokerFilter.excludingGatedBrokers(listOf(gated))).thenReturn(emptyList())
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPirFreemiumDataStore).recordFirstScanResult(NO_MATCHES)
+    }
+
+    @Test
+    fun whenScanOnlyRunHasNothingLeftToScanAndMatchesExistThenFirstScanResultIsMatchesFound() = runTest {
+        givenAScanRunWithUngatedBrokers("Scanned")
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(
+                ScanJobRecord(
+                    brokerName = "Scanned",
+                    userProfileId = testProfileQuery.id,
+                    status = ScanJobStatus.MATCHES_FOUND,
+                    lastScanDateInMillis = 500L,
+                ),
+            ),
+        )
+        whenever(mockPirRepository.getAllExtractedProfiles())
+            .thenReturn(listOf(testExtractedProfile.copy(brokerName = "Scanned")))
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPirScan, never()).executeScanForJobs(any(), any(), any(), any(), any())
+        verify(mockPirFreemiumDataStore).recordFirstScanResult(MATCHES_FOUND)
+    }
+
+    @Test
+    fun whenScanAndOptOutRunCompletesThenFirstScanResultIsNotRecorded() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
+
+        verify(mockPirFreemiumDataStore, never()).recordFirstScanResult(any())
+    }
+
+    @Test
+    fun whenMatchesFoundIsAlreadyRecordedThenExtractedProfilesAreNotRead() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        whenever(mockPirFreemiumDataStore.firstScanResult).thenReturn(MATCHES_FOUND)
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPirRepository, never()).getAllExtractedProfiles()
+        verify(mockPirFreemiumDataStore, never()).recordFirstScanResult(any())
+    }
+
+    @Test
+    fun whenNoMatchesIsRecordedAndALaterScanFindsMatchesThenFirstScanResultIsMatchesFound() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        whenever(mockPirFreemiumDataStore.firstScanResult).thenReturn(NO_MATCHES)
+        whenever(mockPirRepository.getAllExtractedProfiles())
+            .thenReturn(listOf(testExtractedProfile.copy(brokerName = "Ungated")))
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPirFreemiumDataStore).recordFirstScanResult(MATCHES_FOUND)
+    }
+
+    @Test
+    fun whenNoMatchesIsRecordedAndThereAreStillNoMatchesThenNothingIsRecordedAgain() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        whenever(mockPirFreemiumDataStore.firstScanResult).thenReturn(NO_MATCHES)
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPirFreemiumDataStore, never()).recordFirstScanResult(any())
+    }
+
+    @Test
+    fun whenSubscribedRunFindsMatchesAfterNoMatchesWasRecordedThenFreemiumStateIsUntouched() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        whenever(mockPirFreemiumDataStore.firstScanResult).thenReturn(NO_MATCHES)
+        whenever(mockPirRepository.getAllExtractedProfiles())
+            .thenReturn(listOf(testExtractedProfile.copy(brokerName = "Ungated")))
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
+
+        verifyNoInteractions(mockPirFreemiumDataStore)
+    }
+
+    @Test
+    fun whenScanOnlyRunHasNoProfileQueriesThenFirstScanResultIsNotRecorded() = runTest {
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(testActiveBrokers)
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(emptyList())
+
+        val result = testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        assertTrue(result.isSuccess)
+        verify(mockPirFreemiumDataStore, never()).recordFirstScanResult(any())
+    }
+
+    @Test
+    fun whenScanOnlyRunHasNoActiveBrokersThenFirstScanResultIsNotRecorded() = runTest {
+        whenever(mockEnsureBrokerDataToggle.isEnabled()).thenReturn(false)
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(emptyList())
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(emptyList())
+        whenever(mockPirFreeScanBrokerFilter.excludingGatedBrokers(emptyList())).thenReturn(emptyList())
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPirFreemiumDataStore, never()).recordFirstScanResult(any())
+    }
+
+    @Test
+    fun whenScanOnlyRunThrowsThenFirstScanResultIsNotRecorded() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        whenever(mockPirScan.executeScanForJobs(any(), any(), any(), anyOrNull(), anyOrNull()))
+            .thenAnswer { throw IllegalStateException("boom") }
+
+        try {
+            testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+            fail("Expected IllegalStateException to propagate")
+        } catch (_: IllegalStateException) {
+            // expected
+        }
+
+        verify(mockPirFreemiumDataStore, never()).recordFirstScanResult(any())
+    }
+
+    @Test
+    fun whenScanOnlyRunIsCancelledThenFirstScanResultIsNotRecorded() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        whenever(mockPirScan.executeScanForJobs(any(), any(), any(), anyOrNull(), anyOrNull()))
+            .thenAnswer { throw CancellationException("cancelled") }
+
+        try {
+            testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+            fail("Expected CancellationException to propagate")
+        } catch (_: CancellationException) {
+            // expected
+        }
+
+        verify(mockPirFreemiumDataStore, never()).recordFirstScanResult(any())
+    }
+
+    @Test
+    fun whenScanOnlyRunLosesItsRendererThenFirstScanResultIsNotRecorded() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        whenever(mockPirScan.executeScanForJobs(any(), any(), any(), anyOrNull(), anyOrNull()))
+            .thenAnswer { throw PirRendererGoneException(didCrash = true) }
+
+        val result = testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        assertTrue(result.isFailure)
+        verify(mockPirFreemiumDataStore, never()).recordFirstScanResult(any())
+    }
+
+    @Test
+    fun whenRecordingFirstScanResultFailsThenScanOnlyRunStillCompletes() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenAnswer { throw IllegalStateException("db") }
+
+        val result = testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        assertTrue(result.isSuccess)
+        verify(mockPirScanWideEvent, never()).onRunFailed(any(), any(), anyOrNull())
+        verify(mockPirScanWideEvent).onOptOutSkipped(MANUAL_INITIAL)
+    }
+
+    @Test
+    fun whenRecordingFirstScanResultFailsForAnAllGatedRunThenRunStillCompletes() = runTest {
+        val gated = brokerObject("Gated")
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf("Gated"))
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(gated))
+        whenever(mockPirFreeScanBrokerFilter.excludingGatedBrokers(listOf(gated))).thenReturn(emptyList())
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenAnswer { throw IllegalStateException("db") }
+
+        val result = testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        assertTrue(result.isSuccess)
+        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
+    }
+
+    @Test
+    fun whenRecordingFirstScanResultIsCancelledThenCancellationPropagates() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenAnswer { throw CancellationException("cancelled") }
+
+        try {
+            testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+            fail("Expected CancellationException to propagate")
+        } catch (_: CancellationException) {
+            // expected
+        }
+
+        verify(mockPirScanWideEvent).onRunCancelled(any(), any())
     }
 
     private suspend fun givenAScanRunWithUngatedBrokers(vararg brokerNames: String) {
