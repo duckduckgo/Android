@@ -112,7 +112,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val settings = settingsCache.getSettings() ?: return@launch
                     val config = buildConfig(settings.disabledCMPs, webView)
                     val initResp = if (autoconsentFeature.ruleFiltering().isEnabled()) {
-                        InitResp(config = config, rules = filterCompactRules(settings.compactRuleList, url))
+                        InitResp(config = config, rules = filterCompactRules(settings.compactRuleList, url, frame.isMainFrame))
                     } else {
                         InitResp(config = config, rules = AutoconsentRuleset(settings.compactRuleList))
                     }
@@ -170,6 +170,7 @@ class InitMessageHandlerPlugin @Inject constructor(
     private fun filterCompactRules(
         rules: CompactRules,
         url: String,
+        isMainFrame: Boolean,
     ): AutoconsentRuleset {
         // If rule format is unsupported, send an empty ruleset.
         if (rules.v > MAX_SUPPORTED_RULES_VERSION || rules.r == null || rules.s == null || rules.r.isEmpty()) {
@@ -181,8 +182,8 @@ class InitMessageHandlerPlugin @Inject constructor(
             val genericRules = rules.r.slice(IntRange(rules.index.genericRuleRange[0], rules.index.genericRuleRange[1] - 1))
             val specificRules = rules.r.slice(IntRange(rules.index.specificRuleRange[0], rules.index.specificRuleRange[1] - 1)).filter {
                 (it[0] as Double).toInt() <= MAX_SUPPORTED_STEP_VERSION &&
-                    (it[4] as Double).toInt() != 1 &&
-                    (it[3] == "" || url.matches((it[3] as String).toRegex()))
+                    (!isMainFrame || (it[4] as Double).toInt() != FRAME_ONLY_RUN_CONTEXT) &&
+                    (it[3] == "" || (it[3] as String).toRegex().containsMatchIn(url))
             }
             if (specificRules.isEmpty()) {
                 // no specific rules, return generic rules + strings up to genericStringEnd
@@ -203,8 +204,8 @@ class InitMessageHandlerPlugin @Inject constructor(
         // No index: run rule and string filtering over the entire ruleset.
         val filteredRules = rules.r.filter {
             (it[0] as Double).toInt() <= MAX_SUPPORTED_STEP_VERSION &&
-                (it[4] as Double).toInt() != 1 &&
-                (it[3] == "" || url.matches((it[3] as String).toRegex()))
+                (!isMainFrame || (it[4] as Double).toInt() != FRAME_ONLY_RUN_CONTEXT) &&
+                (it[3] == "" || (it[3] as String).toRegex().containsMatchIn(url))
         }
         val filteredStrings = filterUnusedStrings(filteredRules, rules.s, 0)
         return AutoconsentRuleset(compact = CompactRules(v = rules.v, s = filteredStrings, r = filteredRules, index = null))
@@ -273,5 +274,8 @@ class InitMessageHandlerPlugin @Inject constructor(
     companion object {
         const val MAX_SUPPORTED_RULES_VERSION = 1
         const val MAX_SUPPORTED_STEP_VERSION = 1
+
+        // Compact encoding of runContext { main: false, frame: true }
+        private const val FRAME_ONLY_RUN_CONTEXT = 1
     }
 }

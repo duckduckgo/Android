@@ -528,6 +528,29 @@ class InitMessageHandlerPluginTest {
     }
 
     @Test
+    fun filterCompactRulesMatchesUrlPatternAgainstPartOfTheUrl() {
+        settingsCache.updateSettings(mockRulesetJson)
+        val rules = settingsCache.getSettings()!!.compactRuleList
+
+        val result = invokeFilterCompactRules(rules, "https://www.24h-lemans.com/en/tickets?ref=home")
+        val compact = result.compact as CompactRules
+
+        assertTrue(compact.r.any { it[1] == "auto_AU_24h-lemans.com_2ab" })
+    }
+
+    @Test
+    fun filterCompactRulesKeepsFrameOnlyRuleForSubframe() {
+        settingsCache.updateSettings(mockRulesetJson)
+        val rules = settingsCache.getSettings()!!.compactRuleList
+
+        val mainFrame = invokeFilterCompactRules(rules, "https://www.dropbox.com/", isMainFrame = true).compact as CompactRules
+        val subframe = invokeFilterCompactRules(rules, "https://www.dropbox.com/", isMainFrame = false).compact as CompactRules
+
+        assertFalse(mainFrame.r.any { it[1] == "auto_AU_help.dropbox.com_4ad" })
+        assertTrue(subframe.r.any { it[1] == "auto_AU_help.dropbox.com_4ad" })
+    }
+
+    @Test
     fun whenRuleFilteringDisabledThenUseOriginalRuleset() {
         settingsRepository.userSetting = true
         settingsCache.updateSettings(mockRulesetJson)
@@ -548,14 +571,16 @@ class InitMessageHandlerPluginTest {
     private fun invokeFilterCompactRules(
         rules: CompactRules,
         url: String,
+        isMainFrame: Boolean = true,
     ): InitMessageHandlerPlugin.AutoconsentRuleset {
         val method = InitMessageHandlerPlugin::class.java.getDeclaredMethod(
             "filterCompactRules",
             CompactRules::class.java,
             String::class.java,
+            Boolean::class.javaPrimitiveType,
         )
         method.isAccessible = true
-        return method.invoke(initHandlerPlugin, rules, url) as InitMessageHandlerPlugin.AutoconsentRuleset
+        return method.invoke(initHandlerPlugin, rules, url, isMainFrame) as InitMessageHandlerPlugin.AutoconsentRuleset
     }
 
     private fun message(): String {
