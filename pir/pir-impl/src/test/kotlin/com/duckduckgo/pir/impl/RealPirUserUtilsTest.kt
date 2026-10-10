@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl
 
 import com.duckduckgo.pir.impl.checker.DisabledReason
 import com.duckduckgo.pir.impl.checker.PirEligibility
+import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.store.PirRepository
@@ -61,7 +62,7 @@ class RealPirUserUtilsTest {
 
     @Test
     fun whenCanRunPirAndHasProfileQueriesThenIsActiveUserReturnsTrue() = runTest {
-        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled))
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)))
         whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(listOf(testProfileQuery))
 
         val result = testee.isActiveUser()
@@ -81,7 +82,7 @@ class RealPirUserUtilsTest {
 
     @Test
     fun whenCanRunPirButNoProfileQueriesThenIsActiveUserReturnsFalse() = runTest {
-        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled))
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)))
         whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(emptyList())
 
         val result = testee.isActiveUser()
@@ -123,7 +124,7 @@ class RealPirUserUtilsTest {
             age = 38,
             deprecated = false,
         )
-        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled))
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)))
         whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(listOf(testProfileQuery, profileQuery2))
 
         val result = testee.isActiveUser()

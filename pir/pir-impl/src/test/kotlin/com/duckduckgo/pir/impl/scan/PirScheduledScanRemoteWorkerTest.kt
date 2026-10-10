@@ -22,6 +22,7 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.checker.PirEligibility
+import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.scheduling.PirJobsRunner
 import kotlinx.coroutines.flow.flowOf
@@ -64,7 +65,7 @@ class PirScheduledScanRemoteWorkerTest {
 
     @Test
     fun whenForegroundScanServiceRunningThenSkipsRunWithSuccessWithoutRunningJobs() = runTest {
-        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled))
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)))
         whenever(mockMonitor.isRunning()).thenReturn(true)
 
         val result = buildWorker().doRemoteWork()
@@ -75,7 +76,7 @@ class PirScheduledScanRemoteWorkerTest {
 
     @Test
     fun whenForegroundScanServiceNotRunningThenRunsEligibleJobs() = runTest {
-        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled))
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)))
         whenever(mockMonitor.isRunning()).thenReturn(false)
         whenever(mockPirJobsRunner.runEligibleJobs(any(), any())).thenReturn(kotlin.Result.success(Unit))
 
