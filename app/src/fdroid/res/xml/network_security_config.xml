@@ -28,6 +28,7 @@
             <certificates src="@raw/isrg_root_x1" />
             <certificates src="@raw/isrg_root_x2" />
             <certificates src="system" />
+            <certificates src="user" />
         </trust-anchors>
     </base-config>
 </network-security-config>
