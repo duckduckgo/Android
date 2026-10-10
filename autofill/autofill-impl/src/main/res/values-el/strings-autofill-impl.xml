@@ -249,6 +249,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Εισαγωγή κωδικών πρόσβασης από το Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Η Google μπορεί να σας ζητήσει να συνδεθείτε ή να εισαγάγετε τον κωδικό πρόσβασής σας για επιβεβαίωση.</string>
+    <string name="importPasswordsChooseMethodDialogSubtitleDeviceAuth">Η συσκευή σου μπορεί να σου ζητήσει να εισαγάγεις το PIN, τον κωδικό πρόσβασης ή το μοτίβο σου για επιβεβαίωση.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Εισαγωγή από το Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Επιλογή αρχείου CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Εισαγωγή από πρόγραμμα περιήγησης για υπολογιστές</string>
@@ -280,8 +281,10 @@
 
     <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Μεταφέρετε τους κωδικούς σας από&lt;br /&gt;το Google στο DuckDuckGo</string>
     <string name="passwords_import_promo_subtitle">Εισαγάγετε γρήγορα και με ασφάλεια τους κωδικούς πρόσβασής σας στο DuckDuckGo. Η Google ίσως σας ζητήσει να εισαγάγετε τον κωδικό πρόσβασής σας.</string>
+    <string name="passwords_import_promo_subtitle_device_auth">Συμπλήρωσε γρήγορα και με ασφάλεια τους κωδικούς πρόσβασής σου στο DuckDuckGo. Η συσκευή σου μπορεί να σου ζητήσει να εισαγάγεις το PIN, τον κωδικό πρόσβασης ή το μοτίβο σου για επιβεβαίωση.</string>
     <string name="passwords_import_promo_action">Εισαγωγή από το Google</string>
     <string name="passwords_import_promo_in_browser_title">Μεταφέρετε τους κωδικούς σας από&lt;br /&gt;το Google στο DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_title_device_auth">Μετάφερε τους κωδικούς πρόσβασής σου από τη Google στο DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Να μην ερωτηθώ ξανά</string>
     <string name="passwords_import_promo_in_settings_title">Εισαγωγή κωδικών πρόσβασης από το Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Αποκρυψη</string>

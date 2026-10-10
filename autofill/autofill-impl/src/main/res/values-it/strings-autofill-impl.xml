@@ -249,6 +249,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importa le password da Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google potrebbe chiederti di effettuare l\'accesso o di inserire la tua password per confermare.</string>
+    <string name="importPasswordsChooseMethodDialogSubtitleDeviceAuth">Il tuo dispositivo potrebbe chiederti di inserire il PIN, la password o la sequenza di sblocco per confermare.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Importa da Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Scegli un file CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importa dal browser desktop</string>
@@ -280,8 +281,10 @@
 
     <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Porta le password da&lt;br /&gt;Google a DuckDuckGo</string>
     <string name="passwords_import_promo_subtitle">Importa rapidamente e in modo sicuro le password su DuckDuckGo. Google potrebbe chiederti di inserire la tua password.</string>
+    <string name="passwords_import_promo_subtitle_device_auth">Importa rapidamente e in modo sicuro le password su DuckDuckGo. Il tuo dispositivo potrebbe chiederti di inserire il PIN, la password o la sequenza di sblocco per confermare.</string>
     <string name="passwords_import_promo_action">Importa da Google</string>
     <string name="passwords_import_promo_in_browser_title">Porta le password da Google a DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_title_device_auth">Importa le tue password da Google a DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Non chiedere più</string>
     <string name="passwords_import_promo_in_settings_title">Importa le password da Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Nascondi</string>
