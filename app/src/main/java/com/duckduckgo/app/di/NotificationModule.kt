@@ -37,7 +37,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 
-@Module(includes = [DaoModule::class])
+@Module
 @ContributesTo(AppScope::class)
 object NotificationModule {
 

@@ -4656,28 +4656,6 @@
     <issue
         id="DenyListedApi"
         message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
-        errorLine1="        private val preferences: SharedPreferences by lazy { context.getSharedPreferences(fileName, Context.MODE_PRIVATE) }"
-        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/global/db/AppDatabase.kt"
-            line="854"
-            column="62"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
-        errorLine1="        whenever(context.getSharedPreferences(anyString(), anyInt())).thenReturn(sharedPreferences)"
-        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidTest/java/com/duckduckgo/app/global/db/AppDatabaseTest.kt"
-            line="532"
-            column="18"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
         errorLine1="        context.getSharedPreferences(AppInstallSharedPreferences.FILENAME, Context.MODE_PRIVATE).edit { clear() }"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location

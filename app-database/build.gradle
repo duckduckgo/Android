@@ -1,0 +1,81 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'com.squareup.anvil'
+    id 'com.google.devtools.ksp'
+    id 'androidx.room'
+}
+
+apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+
+android {
+    anvil {
+        generateDaggerFactories = true // default is false
+    }
+    namespace 'com.duckduckgo.app.database'
+    sourceSets {
+        androidTest.assets.srcDirs += files("$projectDir/schemas")
+    }
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
+}
+
+dependencies {
+    implementation project(path: ':di')
+    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':common-utils')
+    implementation project(path: ':browser-api')
+    implementation project(path: ':browser-mode-api')
+    implementation project(path: ':app-store')
+    implementation project(path: ':saved-sites-api')
+    implementation project(path: ':saved-sites-store')
+    implementation project(path: ':tracker-detection-api')
+    implementation project(path: ':app-build-config-api')
+
+    implementation AndroidX.lifecycle.liveDataKtx
+    implementation AndroidX.room.runtime
+    implementation AndroidX.room.rxJava2
+    implementation KotlinX.coroutines.core
+    implementation Square.moshi
+    implementation "com.squareup.logcat:logcat:_"
+    implementation Google.dagger
+    implementation "io.reactivex.rxjava2:rxjava:_"
+
+    ksp AndroidX.room.compiler
+    ksp project(':anvil-ksp')
+
+    testImplementation Testing.junit4
+
+    androidTestImplementation AndroidX.archCore.testing
+    androidTestImplementation AndroidX.room.testing
+    androidTestImplementation AndroidX.test.ext.junit
+    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation "org.mockito:mockito-android:_"
+    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
+}
+
+tasks.register('androidTestsBuild') {
+    dependsOn 'assembleDebugAndroidTest'
+}
