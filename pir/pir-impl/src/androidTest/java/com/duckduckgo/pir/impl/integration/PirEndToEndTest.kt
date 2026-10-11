@@ -57,6 +57,7 @@ import com.duckduckgo.pir.impl.email.PirEmailConfirmationJobsRunner
 import com.duckduckgo.pir.impl.email.RealPirEmailConfirmation
 import com.duckduckgo.pir.impl.email.RealPirEmailConfirmationJobsRunner
 import com.duckduckgo.pir.impl.freemium.PirFreeScanWorkWindow
+import com.duckduckgo.pir.impl.freemium.PirFreemiumScanCompleteNotifier
 import com.duckduckgo.pir.impl.freemium.RealPirFreeScanBrokerFilter
 import com.duckduckgo.pir.impl.integration.fakes.FakeCurrentTimeProvider
 import com.duckduckgo.pir.impl.integration.fakes.FakeDbpService
@@ -402,6 +403,7 @@ class PirEndToEndTest {
             pirFreeScanWorkWindow = NoOpPirFreeScanWorkWindow,
             pirScanScheduler = NoOpPirScanScheduler,
             pirFreemiumDataStore = NoOpPirFreemiumDataStore,
+            pirFreemiumScanCompleteNotifier = NoOpPirFreemiumScanCompleteNotifier,
         )
 
         pirEmailConfirmation = RealPirEmailConfirmation(
@@ -1078,6 +1080,10 @@ class PirEndToEndTest {
      */
     private object NoOpPirFreeScanWorkWindow : PirFreeScanWorkWindow {
         override suspend fun isOpen(): Boolean = true
+    }
+
+    private object NoOpPirFreemiumScanCompleteNotifier : PirFreemiumScanCompleteNotifier {
+        override suspend fun onScanCompleted(runMode: PirRunMode) = Unit
     }
 
     private object NoOpPirFreemiumDataStore : PirFreemiumDataStore {
