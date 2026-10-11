@@ -23,7 +23,7 @@ import com.duckduckgo.sync.api.engine.SyncableDataPersister
 /**
  * This is here to trigger the code generations
  * [SyncablePlugin] lives in the api module but we don't want to add
- * anvil dependencies
+ * codegen dependencies (-api modules apply neither the Metro plugin nor our KSP processors)
  * CodeGen should not be generated in public api modules.
  */
 @ContributesPluginPoint(

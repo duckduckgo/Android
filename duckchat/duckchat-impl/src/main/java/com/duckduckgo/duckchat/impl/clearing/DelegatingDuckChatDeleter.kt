@@ -32,8 +32,8 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class, replaces = [RealDuckChatDeleter::class])
 class DelegatingDuckChatDeleter @Inject constructor(
     private val nativeDeleter: NativeDuckChatDeleter,
-    // Typed as RealDuckChatDeleter (not DuckChatDeleter) to prevent Anvil
-    // from treating this field as a competing binding for the DuckChatDeleter interface.
+    // Typed as the concrete RealDuckChatDeleter because the DuckChatDeleter interface resolves to this
+    // delegating class itself (it replaces RealDuckChatDeleter).
     private val webViewDeleter: RealDuckChatDeleter,
     @param:RegularMode private val store: DuckAiChatStore,
     private val feature: DuckChatFeature,

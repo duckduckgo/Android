@@ -20,7 +20,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import kotlin.reflect.KClass
 
 /**
- * Anvil annotation to contribute plugins into an Active Plugin Point.
+ * KSP annotation to contribute plugins into an Active Plugin Point.
  * Active plugins are also guarded by remote feature flags
  *
  * This annotation is the counterpart of [ContributesActivePluginPoint]

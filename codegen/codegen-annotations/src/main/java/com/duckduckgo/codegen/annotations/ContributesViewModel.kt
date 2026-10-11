@@ -19,7 +19,7 @@ package com.duckduckgo.codegen.annotations
 import kotlin.reflect.KClass
 
 /**
- * Anvil annotation to generate ViewModel factories
+ * KSP annotation to generate ViewModel factories
  *
  * Usage:
  * ```kotlin

@@ -19,7 +19,7 @@ package com.duckduckgo.codegen.annotations
 import kotlin.reflect.KClass
 
 /**
- * Anvil annotation to generate a non-caching Retrofit service interface implementation.
+ * KSP annotation to generate a non-caching Retrofit service interface implementation.
  *
  * Usage:
  * ```kotlin

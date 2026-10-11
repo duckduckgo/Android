@@ -19,11 +19,13 @@ package com.duckduckgo.codegen.annotations
 import kotlin.reflect.KClass
 
 /**
- * Anvil annotation to generate the injector subcomponents for all Android types like Activities, Fragments, Services, etc.
+ * KSP annotation to generate the injector for an Android type like an Activity, Fragment, Service, etc.
+ * For most scopes this is a graph extension contributed to the parent graph; for `ActivityScope` it is an `X_Injector` that adds an
+ * `inject` function to the shared `ActivityComponent`.
  *
  * Usage:
  * ```kotlin
- * @ContributesSubComponent(SomeScope::class)
+ * @InjectWith(SomeScope::class)
  * class MyActivity {
  *
  * }
@@ -32,9 +34,16 @@ import kotlin.reflect.KClass
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class InjectWith(
-    /** The parent component scope to the contributed subcomponent */
+    /**
+     * The scope of the generated graph extension (e.g. `FragmentScope`). Its parent graph follows from it: Fragment and View scopes
+     * contribute to `ActivityScope`, other scopes to `AppScope`. `ActivityScope` adds an `inject` function to the shared
+     * `ActivityComponent` instead.
+     */
     val scope: KClass<*>,
 
-    /** (optional) The binding class key to bind the injector */
+    /**
+     * (optional) The class key the injector factory is registered under in the parent's `injectorFactoryMap`.
+     * Defaults to the annotated class.
+     */
     val bindingKey: KClass<*> = Unit::class,
 )

@@ -33,8 +33,8 @@ import javax.inject.Inject
 @SingleIn(ActivityScope::class)
 class DelegatingChatSuggestionsReader @Inject constructor(
     private val nativeReader: ChatSuggestionsNativeReader,
-    // Typed as RealChatSuggestionsReader (not ChatSuggestionsReader) to prevent Anvil
-    // from treating this field as a competing binding for the ChatSuggestionsReader interface.
+    // Typed as the concrete RealChatSuggestionsReader because the ChatSuggestionsReader interface resolves to
+    // this delegating class itself (it replaces RealChatSuggestionsReader).
     private val webViewReader: RealChatSuggestionsReader,
     private val store: DuckAiChatStore,
     private val feature: DuckChatFeature,

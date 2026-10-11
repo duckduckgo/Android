@@ -19,7 +19,7 @@ package com.duckduckgo.codegen.annotations
 import kotlin.reflect.KClass
 
 /**
- * Anvil annotation to generate plugin points that are guarded by a remote feature flag.
+ * KSP annotation to generate plugin points that are guarded by a remote feature flag.
  *
  * Active plugins need to extend from [ActivePlugin]
  *
