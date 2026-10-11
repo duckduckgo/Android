@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection.api
 
-import com.duckduckgo.anvil.annotations.ContributesServiceApi
+import com.duckduckgo.codegen.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import okhttp3.ResponseBody
 import retrofit2.Call

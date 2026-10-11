@@ -24,7 +24,7 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
+    ksp project(':codegen-ksp')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':di')
@@ -41,7 +41,7 @@ dependencies {
     implementation project(path: ':autofill-api')
     implementation project(path: ':saved-sites-store')
 
-    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':codegen-annotations')
 
     implementation AndroidX.dataStore.preferences
     implementation "io.reactivex.rxjava2:rxjava:_"

@@ -31,12 +31,12 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.autoconsent.impl.R
 import com.duckduckgo.autoconsent.impl.databinding.ActivityCookiePopupOptInBinding
 import com.duckduckgo.autoconsent.impl.prompt.CookiePopupOptInViewModel.Command
 import com.duckduckgo.autoconsent.impl.prompt.CookiePopupOptInViewModel.Variant
 import com.duckduckgo.autoconsent.impl.prompt.CookiePopupOptInViewModel.ViewState
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler

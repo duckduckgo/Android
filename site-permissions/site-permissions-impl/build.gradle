@@ -23,7 +23,7 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
+    ksp project(':codegen-ksp')
 
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':common-utils')
@@ -40,7 +40,7 @@ dependencies {
     implementation project(path: ':duckchat-api')
     api project(path: ':site-permissions-store')
 
-    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':codegen-annotations')
 
     implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.appCompat

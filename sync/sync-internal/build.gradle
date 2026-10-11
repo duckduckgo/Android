@@ -38,8 +38,8 @@ dependencies {
     implementation project(':app-build-config-api')
     implementation project(':browser-api')
 
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(':codegen-annotations')
 
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.runtime.ktx

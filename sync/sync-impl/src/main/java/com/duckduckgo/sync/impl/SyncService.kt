@@ -16,7 +16,7 @@
 
 package com.duckduckgo.sync.impl
 
-import com.duckduckgo.anvil.annotations.ContributesServiceApi
+import com.duckduckgo.codegen.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.moshi.Json
 import okhttp3.RequestBody

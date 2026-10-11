@@ -27,8 +27,8 @@ dependencies {
     implementation project(':feature-toggles-api')
     implementation project(path: ':common-utils')
 
-    ksp project(':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':di')
 
     implementation KotlinX.coroutines.core

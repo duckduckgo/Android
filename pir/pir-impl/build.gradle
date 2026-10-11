@@ -24,10 +24,10 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
+    ksp project(':codegen-ksp')
     implementation project(":pir-api")
 
-    implementation project(':anvil-annotations')
+    implementation project(':codegen-annotations')
     implementation project(':browser-api')
     implementation project(':design-system')
     implementation project(':common-utils')

@@ -16,10 +16,10 @@
 
 package com.duckduckgo.experiments.impl.reinstalls
 
-import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.moshi.Moshi

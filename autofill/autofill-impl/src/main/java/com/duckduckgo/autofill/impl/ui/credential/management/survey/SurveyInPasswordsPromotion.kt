@@ -24,8 +24,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin.Callback
@@ -35,6 +33,8 @@ import com.duckduckgo.autofill.impl.databinding.ViewPasswordSurveyBinding
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.SurveyInPasswordsPromotionViewModel.Command
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.SurveyInPasswordsPromotionViewModel.Command.DismissSurvey
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.SurveyInPasswordsPromotionViewModel.Command.LaunchSurvey
+import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding

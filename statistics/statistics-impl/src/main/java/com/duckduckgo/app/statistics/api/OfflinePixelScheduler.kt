@@ -19,8 +19,8 @@ package com.duckduckgo.app.statistics.api
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
-import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.HasMemberInjections

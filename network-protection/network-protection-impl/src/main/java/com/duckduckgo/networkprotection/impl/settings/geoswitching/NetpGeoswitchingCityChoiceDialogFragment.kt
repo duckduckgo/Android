@@ -25,7 +25,7 @@ import android.widget.FrameLayout
 import android.widget.RadioGroup
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.view.button.RadioButton
 import com.duckduckgo.common.ui.view.text.DaxTextView.TextType

@@ -16,7 +16,7 @@
 
 package com.duckduckgo.autofill.impl
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
 
 @ContributesPluginPoint(AppScope::class)

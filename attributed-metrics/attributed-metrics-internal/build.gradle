@@ -16,8 +16,8 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(':codegen-annotations')
     implementation project(':attributed-metrics-api')
     implementation project(':attributed-metrics-impl')
     implementation project(':di')

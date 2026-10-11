@@ -27,7 +27,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.adblocking.impl.R
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsEntryViewModel.Command
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsEntryViewModel.Command.OpenSettings
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
