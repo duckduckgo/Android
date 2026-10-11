@@ -122,6 +122,11 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
             // re-resolved after activation, which is what turns a non-subscriber into a scan-only user
             val runMode = pirWorkHandler.canRunPir().firstOrNull().runModeOrNull
 
+            // armed before the scan starts, as the run that finishes this scan is the one that consumes it
+            if (runMode == PirRunMode.SCAN_ONLY) {
+                pirFreemiumDataStore.armScanCompleteNotification()
+            }
+
             // start the initial scan at this point as startScanAndOptOut message is not reliable
             startAndScheduleInitialScan(executionType, runMode)
 
