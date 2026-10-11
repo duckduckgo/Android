@@ -32,6 +32,7 @@ import com.duckduckgo.pir.impl.common.PirRendererGoneException
 import com.duckduckgo.pir.impl.common.PirWebViewCountProvider
 import com.duckduckgo.pir.impl.freemium.PirFreeScanBrokerFilter
 import com.duckduckgo.pir.impl.freemium.PirFreeScanWorkWindow
+import com.duckduckgo.pir.impl.freemium.PirFreemiumScanCompleteNotifier
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
@@ -98,6 +99,7 @@ class RealPirJobsRunner @Inject constructor(
     private val pirFreeScanWorkWindow: PirFreeScanWorkWindow,
     private val pirScanScheduler: PirScanScheduler,
     private val pirFreemiumDataStore: PirFreemiumDataStore,
+    private val pirFreemiumScanCompleteNotifier: PirFreemiumScanCompleteNotifier,
 ) : PirJobsRunner {
     override suspend fun runEligibleJobs(
         context: Context,
@@ -221,6 +223,7 @@ class RealPirJobsRunner @Inject constructor(
                 pirScanWideEvent.onScanCompleted(executionType)
                 pirScanWideEvent.onOptOutSkipped(executionType)
                 recordFreemiumFirstScanResultIfNeeded(runMode)
+                pirFreemiumScanCompleteNotifier.onScanCompleted(runMode)
             } else {
                 logcat { "PIR-JOB-RUNNER: No active brokers available. Completing run." }
                 pirScanWideEvent.onRunFailed(executionType = executionType, reason = FailureReason.NO_ACTIVE_BROKERS)
@@ -257,6 +260,7 @@ class RealPirJobsRunner @Inject constructor(
             pirScanWideEvent.onScanCompleted(executionType)
             pirInitialScanCompletionWideEvent.onScanCompleted()
             recordFreemiumFirstScanResultIfNeeded(runMode)
+            pirFreemiumScanCompleteNotifier.onScanCompleted(runMode)
 
             // A scheduled run IS the scheduled scan worker; cancelling its own unique work here would cancel this coroutine.
             if (runMode == PirRunMode.SCAN_ONLY && executionType != PirExecutionType.SCHEDULED) {
