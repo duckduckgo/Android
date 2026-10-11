@@ -106,6 +106,12 @@
                 android:layout_height="wrap_content"
                 android:text="@string/pirDevSimulateFreeScanNoMatches" />
 
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/pirShowFreemiumScanCompleteNotification"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pirDevShowFreemiumScanCompleteNotification" />
+
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/pirForceFreemiumEligibility"
                 android:layout_width="match_parent"
