@@ -92,6 +92,10 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
 
         pirNotificationManager.createNotificationChannel()
         lifecycle.addObserver(viewModel)
+        viewModel.onLaunched(
+            isRestored = savedInstanceState != null,
+            fromFreemiumScanCompleteNotification = intent.getBooleanExtra(EXTRA_FROM_FREEMIUM_SCAN_COMPLETE_NOTIFICATION, false),
+        )
     }
 
     override fun onDestroy() {

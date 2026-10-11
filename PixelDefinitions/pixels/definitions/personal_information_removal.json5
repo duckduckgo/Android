@@ -2258,6 +2258,13 @@
         "suffixes": ["count_short", "form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_dbp_freemium_notification_opened_first_scan_complete": {
+        "description": "Fired when the PIR dashboard is opened by tapping the Freemium PIR scan-complete notification.",
+        "owners": ["landomen"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
     "wide_pir-initial-scan": {
         "description": "Wide event tracking the lifecycle of a manually-triggered PIR run (initial scan or post-profile-edit), covering scan progress in 10% increments, scan completion, and the follow-on opt-out scheduling phase. Used to measure end-to-end success rate, drop-off, and per-phase latency.",
         "owners": ["karlenDimla", "landomen"],
