@@ -105,6 +105,22 @@ class RealPirNotificationManagerTest {
         assertNotEquals(shadowOf(progressNotification.contentIntent).requestCode, contentIntent.requestCode)
     }
 
+    @Test
+    fun whenFreemiumScanCompleteNotificationIsPostedThenItIsAutoCancelled() {
+        shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
+
+        testee.showFreemiumScanCompleteNotification()
+
+        assertTrue(capturePostedNotification().flags and Notification.FLAG_AUTO_CANCEL != 0)
+    }
+
+    @Test
+    fun whenScanStatusNotificationIsCreatedThenItIsNotAutoCancelled() {
+        val notification = testee.createScanStatusNotification(title = "title", message = "message")
+
+        assertFalse(notification.flags and Notification.FLAG_AUTO_CANCEL != 0)
+    }
+
     private fun capturePostedNotification(): Notification {
         val captor = argumentCaptor<Notification>()
         verify(mockNotificationManagerCompat).notify(eq(SCAN_COMPLETE_NOTIFICATION_ID), captor.capture())

@@ -47,8 +47,8 @@ interface PirNotificationManager {
     ): Notification
 
     /**
-     * Tells a free user their scan is complete, replacing any scan status notification.
-     * Returns whether it was posted, which needs the POST_NOTIFICATIONS permission.
+     * Tells a free user their scan is complete, replacing the scan-complete notification (the paid "Scan complete!" one shares its ID).
+     * Returns false when POST_NOTIFICATIONS is not granted; a post that fails after that check is still reported as true.
      */
     fun showFreemiumScanCompleteNotification(): Boolean
 
@@ -142,6 +142,7 @@ class RealPirNotificationManager @Inject constructor(
             title = context.getString(R.string.pirFreemiumNotificationTitleComplete),
             message = context.getString(R.string.pirFreemiumNotificationMessageComplete),
             contentIntent = pendingIntent,
+            autoCancel = true,
         )
     }
 
@@ -149,12 +150,14 @@ class RealPirNotificationManager @Inject constructor(
         title: String,
         message: String,
         contentIntent: PendingIntent,
+        autoCancel: Boolean = false,
     ): Notification {
         return NotificationCompat.Builder(context, PIR_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
             .setContentTitle(title)
             .setContentText(message)
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setContentIntent(contentIntent)
+            .setAutoCancel(autoCancel)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .build()
     }
