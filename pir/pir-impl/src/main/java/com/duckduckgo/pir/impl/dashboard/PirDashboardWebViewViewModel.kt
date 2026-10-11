@@ -99,6 +99,16 @@ class PirDashboardWebViewViewModel @Inject constructor(
         }
     }
 
+    fun onLaunched(
+        isRestored: Boolean,
+        fromFreemiumScanCompleteNotification: Boolean,
+    ) {
+        // a restored dashboard keeps its launch intent, and the tap was already counted when it was first created
+        if (isRestored || !fromFreemiumScanCompleteNotification) return
+
+        pirPixelSender.reportFreemiumScanCompleteNotificationOpened()
+    }
+
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
         purchaseFlowOutstanding = false

@@ -367,6 +367,10 @@ enum class PirPixel(
         baseName = "m_dbp_freemium_notification_sent_first_scan_complete",
         type = Count,
     ),
+    PIR_FREEMIUM_NOTIFICATION_OPENED_FIRST_SCAN_COMPLETE(
+        baseName = "m_dbp_freemium_notification_opened_first_scan_complete",
+        type = Count,
+    ),
     ;
 
     constructor(
