@@ -155,6 +155,12 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
         binding.pirSimulateFreeScanMatches.setOnClickListener { simulateFreeScanResult(PirFreemiumFirstScanResult.MATCHES_FOUND) }
         binding.pirSimulateFreeScanNoMatches.setOnClickListener { simulateFreeScanResult(PirFreemiumFirstScanResult.NO_MATCHES) }
 
+        binding.pirShowFreemiumScanCompleteNotification.setOnClickListener {
+            if (!pirNotificationManager.showFreemiumScanCompleteNotification()) {
+                Toast.makeText(this, getString(R.string.pirDevShowFreemiumScanCompleteNotificationDenied), Toast.LENGTH_SHORT).show()
+            }
+        }
+
         binding.pirForceFreemiumEligibility.setIsChecked(pirInternalSettingsDataStore.isFreemiumEligibilityForced)
         binding.pirForceFreemiumEligibility.setOnCheckedChangeListener { _, isChecked ->
             pirInternalSettingsDataStore.isFreemiumEligibilityForced = isChecked
