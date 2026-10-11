@@ -340,6 +340,8 @@
                                 android:textCursorDrawable="@drawable/text_cursor"
                                 android:textSize="16sp"
                                 android:textStyle="normal"
+                                android:useBoundsForWidth="false"
+                                tools:targetApi="35"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toStartOf="@id/endIconsContainer"
                                 app:layout_constraintStart_toEndOf="@id/omnibarIconContainer"
