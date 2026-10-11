@@ -110,14 +110,17 @@ class RealPirNotificationManager @Inject constructor(
     }
 
     override fun showFreemiumScanCompleteNotification(): Boolean = runCatching {
-        if (ActivityCompat.checkSelfPermission(context, POST_NOTIFICATIONS) == PERMISSION_GRANTED) {
+        val hasPermission = ActivityCompat.checkSelfPermission(context, POST_NOTIFICATIONS) == PERMISSION_GRANTED
+        if (hasPermission) {
             // the scan can finish in a :pir process that never ran the dashboard, which is where the channel is otherwise created
             createNotificationChannel()
-            notificationManagerCompat.notify(PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE, createFreemiumScanCompleteNotification())
-            true
-        } else {
-            false
+            notificationManagerCompat.checkPermissionAndNotify(
+                context,
+                PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE,
+                createFreemiumScanCompleteNotification(),
+            )
         }
+        hasPermission
     }.getOrDefault(false)
 
     override fun cancelNotifications() {
