@@ -18,7 +18,7 @@ package com.duckduckgo.adblocking.impl.ui
 
 import android.content.Context
 import android.view.View
-import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.settings.api.OtherSettingsPlugin
 import dev.zacsweers.metro.ContributesIntoMap

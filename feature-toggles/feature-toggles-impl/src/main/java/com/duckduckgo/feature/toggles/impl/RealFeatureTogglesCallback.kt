@@ -16,9 +16,9 @@
 
 package com.duckduckgo.feature.toggles.impl
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle.State.Target

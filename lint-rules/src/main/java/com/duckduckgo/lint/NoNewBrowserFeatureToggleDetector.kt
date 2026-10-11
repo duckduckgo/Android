@@ -71,7 +71,7 @@ class NoNewBrowserFeatureToggleDetector : Detector(), SourceCodeScanner {
     }
 
     companion object {
-        private const val CONTRIBUTES_REMOTE_FEATURE_FQN = "com.duckduckgo.anvil.annotations.ContributesRemoteFeature"
+        private const val CONTRIBUTES_REMOTE_FEATURE_FQN = "com.duckduckgo.codegen.annotations.ContributesRemoteFeature"
 
         /**
          * The module namespace is aligned 1:1 with the module, so the package prefix identifies the

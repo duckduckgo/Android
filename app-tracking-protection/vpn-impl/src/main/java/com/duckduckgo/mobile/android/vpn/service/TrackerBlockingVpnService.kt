@@ -37,9 +37,9 @@ import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.anrs.api.CrashLogger.Crash
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.android.AndroidInjection

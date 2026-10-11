@@ -18,7 +18,7 @@ package com.duckduckgo.savedsites.impl.sync
 
 import android.content.*
 import android.view.*
-import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.sync.api.*
 import dev.zacsweers.metro.ContributesIntoMap

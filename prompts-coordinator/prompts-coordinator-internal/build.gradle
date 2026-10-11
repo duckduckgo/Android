@@ -30,8 +30,8 @@ dependencies {
     implementation project(':prompts-coordinator-api')
     implementation project(':prompts-coordinator-impl')
 
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(':codegen-annotations')
     implementation project(':di')
 
     implementation KotlinX.coroutines.core

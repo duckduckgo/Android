@@ -23,8 +23,8 @@ import android.util.AttributeSet
 import android.view.ViewOutlineProvider
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.ui.R
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope

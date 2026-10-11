@@ -21,9 +21,9 @@ import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
-import com.duckduckgo.anvil.annotations.ContributesWorker
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.codegen.annotations.ContributesWorker
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.android.AndroidInjection
 import com.duckduckgo.di.scopes.AppScope

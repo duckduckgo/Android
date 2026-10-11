@@ -29,8 +29,8 @@ dependencies {
     implementation project(path: ':sync-settings-api')
     implementation project(path: ':sync-api')
 
-    ksp project(':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(path: ':codegen-annotations')
 
     implementation AndroidX.appCompat
     implementation Google.android.material

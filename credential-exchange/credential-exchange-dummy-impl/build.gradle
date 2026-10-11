@@ -31,7 +31,7 @@ android {
 dependencies {
     implementation project(path: ':credential-exchange-api')
     implementation project(path: ':di')
-    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':codegen-annotations')
 
     implementation Square.logcat
 }

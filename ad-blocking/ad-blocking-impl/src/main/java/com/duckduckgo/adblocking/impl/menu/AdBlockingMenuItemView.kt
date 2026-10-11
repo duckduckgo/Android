@@ -24,7 +24,7 @@ import androidx.core.view.isGone
 import com.duckduckgo.adblocking.impl.R
 import com.duckduckgo.adblocking.impl.domain.AdBlockingMenuState
 import com.duckduckgo.adblocking.impl.domain.AdBlockingMenuStateProvider
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.view.MenuItemView
 import com.duckduckgo.common.ui.view.MenuItemViewSize
 import com.duckduckgo.common.utils.DispatcherProvider

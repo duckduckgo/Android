@@ -17,7 +17,6 @@
 package com.duckduckgo.autofill.impl.di
 
 import android.content.Context
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.InternalTestUserChecker
@@ -39,6 +38,7 @@ import com.duckduckgo.autofill.store.feature.RealAutofillDefaultStateDecider
 import com.duckduckgo.autofill.store.targets.DomainTargetAppDao
 import com.duckduckgo.autofill.store.targets.DomainTargetAppsDatabase
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.data.store.api.DatabaseProvider
 import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.ActivityScope

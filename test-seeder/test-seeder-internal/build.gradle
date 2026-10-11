@@ -29,8 +29,8 @@ android {
 dependencies {
     implementation project(':test-seeder-api')
 
-    ksp project(path: ':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
+    ksp project(path: ':codegen-ksp')
+    implementation project(path: ':codegen-annotations')
     implementation project(':di')
     implementation project(path: ':common-utils')
 

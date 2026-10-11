@@ -23,7 +23,7 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
+    ksp project(':codegen-ksp')
     implementation project(":new-tab-page-api")
     implementation project(':browser-api')
     implementation project(':duckchat-api')
@@ -50,7 +50,7 @@ dependencies {
     // Room
     implementation AndroidX.room.runtime
 
-    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':di')
     ksp AndroidX.room.compiler
     api AndroidX.dataStore.preferences

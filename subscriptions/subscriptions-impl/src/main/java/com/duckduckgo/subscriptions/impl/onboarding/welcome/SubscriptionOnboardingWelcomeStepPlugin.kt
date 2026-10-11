@@ -17,7 +17,7 @@
 package com.duckduckgo.subscriptions.impl.onboarding.welcome
 
 import androidx.fragment.app.Fragment
-import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import dev.zacsweers.metro.ContributesIntoMap

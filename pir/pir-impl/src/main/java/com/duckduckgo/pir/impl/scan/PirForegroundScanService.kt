@@ -26,7 +26,7 @@ import android.os.Build
 import android.os.IBinder
 import android.os.Process
 import androidx.core.app.ServiceCompat
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.di.android.AndroidInjection
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner

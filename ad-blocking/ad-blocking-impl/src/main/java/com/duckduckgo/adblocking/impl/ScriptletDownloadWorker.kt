@@ -32,9 +32,9 @@ import com.duckduckgo.adblocking.impl.domain.ScriptletUpdater
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionConfigProvider
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionSettings
-import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.moshi.JsonAdapter

@@ -19,8 +19,8 @@ package com.duckduckgo.mobile.android.vpn.apps
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.lifecycle.*
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.isIgnoringBatteryOptimizations
 import com.duckduckgo.di.scopes.ActivityScope

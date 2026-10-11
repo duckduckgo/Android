@@ -36,7 +36,7 @@ internal val PLUGIN_POINT_API = TestFiles.kt(
 ).indented()
 internal val PLUGIN_POINT_ANNOTATIONS_API = TestFiles.kt(
     """
-                    package com.duckduckgo.anvil.annotations
+                    package com.duckduckgo.codegen.annotations
 
                     annotation class ContributesActivePlugin
                     annotation class ContributesActivePluginPoint(

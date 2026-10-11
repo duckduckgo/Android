@@ -17,7 +17,7 @@
 package com.duckduckgo.feedback.impl.ui.negative.brokensite
 
 import androidx.lifecycle.ViewModel
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject

@@ -20,9 +20,9 @@ import android.content.*
 import android.util.*
 import android.widget.*
 import androidx.lifecycle.*
-import com.duckduckgo.anvil.annotations.*
 import com.duckduckgo.app.browser.databinding.ViewSyncFaviconsFetchingBinding
 import com.duckduckgo.app.browser.favicon.setting.FaviconFetchingViewModel.ViewState
+import com.duckduckgo.codegen.annotations.*
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider

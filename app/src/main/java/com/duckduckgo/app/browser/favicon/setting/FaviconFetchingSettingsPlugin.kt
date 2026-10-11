@@ -18,7 +18,7 @@ package com.duckduckgo.app.browser.favicon.setting
 
 import android.content.Context
 import android.view.View
-import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.api.SyncSettingsPlugin
 import dev.zacsweers.metro.ContributesIntoMap

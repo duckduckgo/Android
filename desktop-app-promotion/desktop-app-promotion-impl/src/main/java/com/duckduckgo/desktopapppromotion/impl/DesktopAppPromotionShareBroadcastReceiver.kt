@@ -19,8 +19,8 @@ package com.duckduckgo.desktopapppromotion.impl
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.desktopapppromotion.api.DesktopAppPromotionInteractionHandler.Interaction
 import com.duckduckgo.di.android.AndroidInjection

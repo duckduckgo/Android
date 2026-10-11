@@ -18,7 +18,7 @@ package com.duckduckgo.pir.impl.freemium.settings
 
 import android.content.Context
 import android.view.View
-import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import dev.zacsweers.metro.ContributesIntoMap

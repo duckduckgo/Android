@@ -21,7 +21,7 @@ import android.content.Context
 import android.net.Uri
 import android.view.View
 import android.webkit.ValueCallback
-import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
+import com.duckduckgo.codegen.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext

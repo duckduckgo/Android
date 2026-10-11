@@ -17,9 +17,9 @@
 package com.duckduckgo.feature.toggles.impl
 
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.MetricType

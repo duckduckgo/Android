@@ -21,8 +21,8 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import androidx.annotation.WorkerThread
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.android.AndroidInjection
 import com.duckduckgo.di.scopes.VpnScope

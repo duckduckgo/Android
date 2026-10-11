@@ -45,8 +45,8 @@ tasks.named('jvm_tests').configure { setDependsOn(['testPlayDebugUnitTest']) }
 tasks.named('jvm_checks').configure { setDependsOn(['spotlessCheck', 'lint', 'testPlayDebugUnitTest']) }
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(':codegen-annotations')
 
     implementation project(':di')
     implementation project(':common-utils')
