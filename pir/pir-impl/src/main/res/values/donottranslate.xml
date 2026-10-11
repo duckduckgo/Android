@@ -29,6 +29,10 @@
     <string name="pirFreemiumSettingStartScan">Start Free Scan</string>
     <string name="pirFreemiumSettingViewResults">View Scan Results</string>
 
+    <!-- Freemium PIR scan complete notification -->
+    <string name="pirFreemiumNotificationTitleComplete">Free Personal Information Scan</string>
+    <string name="pirFreemiumNotificationMessageComplete">Your free personal info scan is now complete. Check out the results…</string>
+
     <!-- PIR subscription onboarding step -->
     <string name="pirOnboardingStepTitle">Personal Information Removal</string>
     <string name="pirOnboardingStepDescription">DuckDuckGo finds and removes your personal info from data broker sites, helping to combat identity theft and spam.</string>

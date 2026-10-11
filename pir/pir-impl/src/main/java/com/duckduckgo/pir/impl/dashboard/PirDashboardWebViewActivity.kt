@@ -218,5 +218,6 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
 
     companion object {
         const val EXTRA_SHOW_CLOSE_BUTTON = "extra_show_close_button"
+        const val EXTRA_FROM_FREEMIUM_SCAN_COMPLETE_NOTIFICATION = "extra_from_freemium_scan_complete_notification"
     }
 }

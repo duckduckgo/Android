@@ -16,16 +16,20 @@
 
 package com.duckduckgo.pir.impl.notifications
 
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager.PERMISSION_GRANTED
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.R
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewActivity
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -41,6 +45,12 @@ interface PirNotificationManager {
         title: String,
         message: String,
     ): Notification
+
+    /**
+     * Tells a free user their scan is complete, replacing any scan status notification.
+     * Returns whether it was posted, which needs the POST_NOTIFICATIONS permission.
+     */
+    fun showFreemiumScanCompleteNotification(): Boolean
 
     fun cancelNotifications()
 }
@@ -96,17 +106,54 @@ class RealPirNotificationManager @Inject constructor(
             PendingIntent.FLAG_IMMUTABLE,
         )
 
+        return buildNotification(title = title, message = message, contentIntent = pendingIntent)
+    }
+
+    override fun showFreemiumScanCompleteNotification(): Boolean = runCatching {
+        if (ActivityCompat.checkSelfPermission(context, POST_NOTIFICATIONS) != PERMISSION_GRANTED) {
+            false
+        } else {
+            // the scan can finish in a :pir process that never ran the dashboard, which is where the channel is otherwise created
+            createNotificationChannel()
+            notificationManagerCompat.notify(PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE, createFreemiumScanCompleteNotification())
+            true
+        }
+    }.getOrDefault(false)
+
+    override fun cancelNotifications() {
+        notificationManagerCompat.cancel(PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE)
+    }
+
+    private fun createFreemiumScanCompleteNotification(): Notification {
+        val notificationIntent = Intent(context, PirDashboardWebViewActivity::class.java)
+            .putExtra(PirDashboardWebViewActivity.EXTRA_FROM_FREEMIUM_SCAN_COMPLETE_NOTIFICATION, true)
+        // PendingIntent matching ignores extras, so sharing the scan status request code would hand back that intent without the extra
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            FREEMIUM_SCAN_COMPLETE_REQUEST_CODE,
+            notificationIntent,
+            PendingIntent.FLAG_IMMUTABLE,
+        )
+
+        return buildNotification(
+            title = context.getString(R.string.pirFreemiumNotificationTitleComplete),
+            message = context.getString(R.string.pirFreemiumNotificationMessageComplete),
+            contentIntent = pendingIntent,
+        )
+    }
+
+    private fun buildNotification(
+        title: String,
+        message: String,
+        contentIntent: PendingIntent,
+    ): Notification {
         return NotificationCompat.Builder(context, PIR_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
             .setContentTitle(title)
             .setContentText(message)
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
-            .setContentIntent(pendingIntent)
+            .setContentIntent(contentIntent)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .build()
-    }
-
-    override fun cancelNotifications() {
-        notificationManagerCompat.cancel(PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE)
     }
 
     companion object {
@@ -115,5 +162,6 @@ class RealPirNotificationManager @Inject constructor(
 
         private const val PIR_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID = "com.duckduckgo.pir.PirNotificationChannel"
         private const val PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE = 987
+        private const val FREEMIUM_SCAN_COMPLETE_REQUEST_CODE = 1
     }
 }
