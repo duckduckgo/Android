@@ -57,6 +57,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_LOW_MEMORY
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_START_FAILED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FREEMIUM_NOTIFICATION_SENT_FIRST_SCAN_COMPLETE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FREEMIUM_SETTINGS_ENTRY_POINT_CLICKED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FREEMIUM_SETTINGS_ENTRY_POINT_IMPRESSION
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FREEMIUM_UPSELL
@@ -712,6 +713,8 @@ interface PirPixelSender {
     fun reportFreemiumSettingsEntryPointImpression()
 
     fun reportFreemiumSettingsEntryPointClicked(ctaState: PirFreemiumCtaState)
+
+    fun reportFreemiumScanCompleteNotificationSent()
 }
 
 @ContributesBinding(AppScope::class)
@@ -1676,6 +1679,10 @@ class RealPirPixelSender @Inject constructor(
 
     override fun reportFreemiumSettingsEntryPointClicked(ctaState: PirFreemiumCtaState) {
         fire(PIR_FREEMIUM_SETTINGS_ENTRY_POINT_CLICKED, mapOf(PARAM_KEY_CTA_STATE to ctaState.paramValue))
+    }
+
+    override fun reportFreemiumScanCompleteNotificationSent() {
+        fire(PIR_FREEMIUM_NOTIFICATION_SENT_FIRST_SCAN_COMPLETE)
     }
 
     private fun usageParams(): Map<String, String> = mapOf(
