@@ -1087,6 +1087,8 @@ class PirEndToEndTest {
         override fun activate(timestampMillis: Long) = Unit
         override fun recordFirstScanResult(result: PirFreemiumFirstScanResult) = Unit
         override fun clearFirstScanResult() = Unit
+        override fun armScanCompleteNotification() = Unit
+        override fun consumeScanCompleteNotification(): Boolean = false
         override fun reset() = Unit
     }
 

@@ -46,6 +46,12 @@ interface PirFreemiumDataStore {
     /** Forgets the recorded outcome but keeps activation, so a tester can record either result. */
     fun clearFirstScanResult()
 
+    /** Armed by a free user's profile save; the next scan that completes normally consumes it. */
+    fun armScanCompleteNotification()
+
+    /** Returns whether a scan-complete notification was pending, and clears it. */
+    fun consumeScanCompleteNotification(): Boolean
+
     fun reset()
 }
 
@@ -96,11 +102,28 @@ internal class RealPirFreemiumDataStore(
         }
     }
 
+    override fun armScanCompleteNotification() {
+        // committed synchronously as the dashboard (:main) arms it and the scan (:pir) consumes it
+        preferences.edit(commit = true) {
+            putBoolean(KEY_SCAN_COMPLETE_NOTIFICATION_PENDING, true)
+        }
+    }
+
+    override fun consumeScanCompleteNotification(): Boolean {
+        if (!preferences.getBoolean(KEY_SCAN_COMPLETE_NOTIFICATION_PENDING, false)) return false
+
+        preferences.edit(commit = true) {
+            remove(KEY_SCAN_COMPLETE_NOTIFICATION_PENDING)
+        }
+        return true
+    }
+
     override fun reset() {
         preferences.edit(commit = true) {
             putBoolean(KEY_DID_ACTIVATE, false)
             putLong(KEY_FIRST_PROFILE_SAVED_TIMESTAMP, 0L)
             remove(KEY_FIRST_SCAN_RESULT)
+            remove(KEY_SCAN_COMPLETE_NOTIFICATION_PENDING)
         }
     }
 
@@ -109,5 +132,6 @@ internal class RealPirFreemiumDataStore(
         private const val KEY_DID_ACTIVATE = "KEY_DID_ACTIVATE"
         private const val KEY_FIRST_PROFILE_SAVED_TIMESTAMP = "KEY_FIRST_PROFILE_SAVED_TIMESTAMP"
         private const val KEY_FIRST_SCAN_RESULT = "KEY_FIRST_SCAN_RESULT"
+        private const val KEY_SCAN_COMPLETE_NOTIFICATION_PENDING = "KEY_SCAN_COMPLETE_NOTIFICATION_PENDING"
     }
 }
