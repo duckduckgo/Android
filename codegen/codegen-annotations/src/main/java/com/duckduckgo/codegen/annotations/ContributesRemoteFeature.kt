@@ -19,7 +19,7 @@ package com.duckduckgo.codegen.annotations
 import kotlin.reflect.KClass
 
 /**
- * Anvil annotation to generate remote features
+ * KSP annotation to generate remote features
  *
  * Usage:
  * ```kotlin

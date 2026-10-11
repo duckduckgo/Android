@@ -19,7 +19,7 @@ package com.duckduckgo.codegen.annotations
 import kotlin.reflect.KClass
 
 /**
- * Anvil annotation to generate and contribute the Map<ActivityParams, Class<ActivityParams>> to the activity starter.
+ * KSP annotation to generate and contribute the Map<ActivityParams, Class<ActivityParams>> to the activity starter.
  * It is also possible to define a [screenName], that can be used to deeplink to a screen from RMF.
  *
  * The [screenName] should be named as [feature].<screenName>. For instance, for the VPN feature has many sub-screens, eg. main, settings and so

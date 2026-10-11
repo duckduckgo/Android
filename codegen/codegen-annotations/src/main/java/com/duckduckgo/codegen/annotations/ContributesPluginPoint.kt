@@ -19,7 +19,7 @@ package com.duckduckgo.codegen.annotations
 import kotlin.reflect.KClass
 
 /**
- * Anvil annotation to generate plugin points
+ * KSP annotation to generate plugin points
  *
  * Usage:
  * ```kotlin
