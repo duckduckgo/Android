@@ -37,7 +37,7 @@
     },
     "webTelemetry_detectorPerf_day": {
         "description": "Daily bucketed counts of measured pages, Web Detection group runs and failures, and group performance threshold crossings. Fired by the eventHub feature at the end of each 1-day period.",
-        "owners": ["miasma13"],
+        "owners": ["jdorweiler"],
         "triggers": ["scheduled"],
         "parameters": [
             {
@@ -55,7 +55,7 @@
     },
     "webTelemetry_detectorPerf_week": {
         "description": "Weekly bucketed counts of measured pages, Web Detection group runs and failures, and group performance threshold crossings. Fired by the eventHub feature at the end of each 7-day period.",
-        "owners": ["miasma13"],
+        "owners": ["jdorweiler"],
         "triggers": ["scheduled"],
         "parameters": [
             {
