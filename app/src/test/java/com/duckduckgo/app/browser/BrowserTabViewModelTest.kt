@@ -80,6 +80,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.WebViewErrorResponse.SSL_PROTOCOL_ERROR
+import com.duckduckgo.app.browser.WebViewErrorResponse.TIMEOUT
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
@@ -9052,6 +9053,61 @@ class BrowserTabViewModelTest {
             assertEquals(BAD_URL, browserViewState().browserError)
             assertCommandIssued<Command.WebViewError>()
         }
+
+    // region Page load timeout
+    @Test
+    fun whenPageLoadTimesOutThenTimeoutErrorIsShownAndLoadIsNotStopped() = runTest {
+        loadUrl("https://example.com")
+        clearInvocations(mockCommandObserver)
+
+        testee.onPageLoadTimeout()
+
+        assertEquals(TIMEOUT, browserViewState().browserError)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(listOf(Command.WebViewError::class), commandCaptor.allValues.map { it::class })
+        assertEquals(TIMEOUT, (commandCaptor.lastValue as Command.WebViewError).errorType)
+    }
+
+    @Test
+    fun whenPageLoadTimesOutWhileBrowserIsNotShowingThenNoErrorIsShown() = runTest {
+        loadUrl("https://example.com", isBrowserShowing = false)
+
+        testee.onPageLoadTimeout()
+
+        assertEquals(OMITTED, browserViewState().browserError)
+        assertCommandNotIssued<Command.WebViewError>()
+    }
+
+    @Test
+    fun whenPageLoadTimesOutWhileAnotherErrorIsShownThenItIsKept() = runTest {
+        givenErrorPageShowingForSite(BAD_URL, FAILED_SITE)
+
+        testee.onPageLoadTimeout()
+
+        assertEquals(BAD_URL, browserViewState().browserError)
+    }
+
+    @Test
+    fun whenPageLoadTimesOutWhileReloadingAnErrorPageThenTimeoutErrorIsShown() = runTest {
+        givenErrorPageShowingForSite(BAD_URL, FAILED_SITE)
+        testee.onWebViewRefreshed()
+        assertEquals(LOADING, browserViewState().browserError)
+
+        testee.onPageLoadTimeout()
+
+        assertEquals(TIMEOUT, browserViewState().browserError)
+    }
+
+    @Test
+    fun whenPageLoadTimesOutThenTimeoutErrorDoesNotFireErrorPixels() = runTest {
+        fakeAndroidConfigBrowserFeature.errorPagePixel().setRawStoredState(State(enable = true))
+        loadUrl("https://example.com")
+
+        testee.onPageLoadTimeout()
+
+        verify(mockPixel, never()).enqueueFire(eq(AppPixelName.ERROR_PAGE_SHOWN), any(), any(), any())
+    }
+    // endregion
 
     // region Custom error page is kept until the next page starts loading
     @Test
