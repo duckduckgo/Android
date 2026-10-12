@@ -42,4 +42,14 @@ interface OnboardingStore {
      * screen.
      */
     fun getSegmentedPathWithAiInput(): DownloadReasonSelection?
+
+    /**
+     * Should be called when the user submits an AI Chat prompt during the onboarding.
+     */
+    fun setTriedAIChat()
+
+    /**
+     * @return whether the user submitted an AI Chat prompt during the onboarding.
+     */
+    fun getTriedAIChat(): Boolean
 }

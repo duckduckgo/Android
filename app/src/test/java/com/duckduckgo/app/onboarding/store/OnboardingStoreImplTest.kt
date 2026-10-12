@@ -22,7 +22,9 @@ import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdat
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -87,5 +89,17 @@ class OnboardingStoreImplTest {
 
         testee.setDownloadReason(DownloadReasonSelection.BLOCK_ADS)
         assertNull(testee.getSegmentedPathWithAiInput())
+    }
+
+    @Test
+    fun `when tried AI Chat not set then getTriedAIChat returns false`() {
+        assertFalse(testee.getTriedAIChat())
+    }
+
+    @Test
+    fun `when tried AI Chat set then getTriedAIChat returns true`() {
+        testee.setTriedAIChat()
+
+        assertTrue(testee.getTriedAIChat())
     }
 }

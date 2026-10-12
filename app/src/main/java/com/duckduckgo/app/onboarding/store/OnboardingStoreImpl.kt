@@ -245,6 +245,14 @@ class OnboardingStoreImpl @Inject constructor(
         return getDownloadReason()?.takeIf { it == DownloadReasonSelection.SEARCH || it == DownloadReasonSelection.AI_CHAT }
     }
 
+    override fun setTriedAIChat() {
+        preferences.edit { putBoolean(KEY_TRIED_AI_CHAT, true) }
+    }
+
+    override fun getTriedAIChat(): Boolean {
+        return preferences.getBoolean(KEY_TRIED_AI_CHAT, false)
+    }
+
     companion object {
         const val FILENAME = "com.duckduckgo.app.onboarding.settings"
         const val ONBOARDING_JOURNEY = "onboardingJourney"
@@ -253,5 +261,6 @@ class OnboardingStoreImpl @Inject constructor(
         private const val KEY_DUCK_AI_ONBOARDING_FLOW = "duckAiOnboardingFlow"
         private const val KEY_LINEAR_PLAN_WIDGET_PROMPT_SHOWN = "linearPlanWidgetPromptShown"
         private const val KEY_DOWNLOAD_REASON = "downloadReason"
+        private const val KEY_TRIED_AI_CHAT = "triedAiChat"
     }
 }
