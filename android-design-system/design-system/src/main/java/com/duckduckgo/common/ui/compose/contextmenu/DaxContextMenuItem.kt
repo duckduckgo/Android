@@ -171,7 +171,7 @@ internal object DaxContextMenuItemDefaults {
 
     val IconStartPadding: Dp = 12.dp
     val IconEndPadding: Dp = 16.dp
-    val LeadingIconSize: Dp = 24.dp
+    val LeadingIconSize: Dp = 16.dp
 
     val InsetStartPadding: Dp = 48.dp
     val InsetEndPadding: Dp = 16.dp
