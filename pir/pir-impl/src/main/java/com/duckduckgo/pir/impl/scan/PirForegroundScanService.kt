@@ -31,7 +31,6 @@ import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.R
 import com.duckduckgo.pir.impl.checker.PirEligibility
-import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.checker.runModeOrNull
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
@@ -130,14 +129,7 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
                 stopSelf()
                 return@launch
             }
-            val result = pirJobsRunner.runEligibleJobs(this@PirForegroundScanService, executionType, runMode)
-            // freemium handles a notification in a different way
-            if (result.isSuccess && runMode == PirRunMode.SCAN_AND_OPT_OUT) {
-                pirNotificationManager.showScanStatusNotification(
-                    title = getString(R.string.pirNotificationTitleComplete),
-                    message = getString(R.string.pirNotificationMessageComplete),
-                )
-            }
+            pirJobsRunner.runEligibleJobs(this@PirForegroundScanService, executionType, runMode)
             stopSelf()
         }
 

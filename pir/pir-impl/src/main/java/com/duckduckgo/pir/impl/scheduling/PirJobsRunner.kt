@@ -32,10 +32,10 @@ import com.duckduckgo.pir.impl.common.PirRendererGoneException
 import com.duckduckgo.pir.impl.common.PirWebViewCountProvider
 import com.duckduckgo.pir.impl.freemium.PirFreeScanBrokerFilter
 import com.duckduckgo.pir.impl.freemium.PirFreeScanWorkWindow
-import com.duckduckgo.pir.impl.freemium.PirFreemiumScanCompleteNotifier
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
+import com.duckduckgo.pir.impl.notifications.PirScanCompleteNotifier
 import com.duckduckgo.pir.impl.optout.PirOptOut
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scan.PirScan
@@ -99,7 +99,7 @@ class RealPirJobsRunner @Inject constructor(
     private val pirFreeScanWorkWindow: PirFreeScanWorkWindow,
     private val pirScanScheduler: PirScanScheduler,
     private val pirFreemiumDataStore: PirFreemiumDataStore,
-    private val pirFreemiumScanCompleteNotifier: PirFreemiumScanCompleteNotifier,
+    private val pirScanCompleteNotifier: PirScanCompleteNotifier,
 ) : PirJobsRunner {
     override suspend fun runEligibleJobs(
         context: Context,
@@ -223,7 +223,7 @@ class RealPirJobsRunner @Inject constructor(
                 pirScanWideEvent.onScanCompleted(executionType)
                 pirScanWideEvent.onOptOutSkipped(executionType)
                 recordFreemiumFirstScanResultIfNeeded(runMode)
-                pirFreemiumScanCompleteNotifier.onScanCompleted(runMode)
+                pirScanCompleteNotifier.onRunCompleted(runMode)
             } else {
                 logcat { "PIR-JOB-RUNNER: No active brokers available. Completing run." }
                 pirScanWideEvent.onRunFailed(executionType = executionType, reason = FailureReason.NO_ACTIVE_BROKERS)
@@ -260,7 +260,6 @@ class RealPirJobsRunner @Inject constructor(
             pirScanWideEvent.onScanCompleted(executionType)
             pirInitialScanCompletionWideEvent.onScanCompleted()
             recordFreemiumFirstScanResultIfNeeded(runMode)
-            pirFreemiumScanCompleteNotifier.onScanCompleted(runMode)
 
             // A scheduled run IS the scheduled scan worker; cancelling its own unique work here would cancel this coroutine.
             if (runMode == PirRunMode.SCAN_ONLY && executionType != PirExecutionType.SCHEDULED) {
@@ -294,6 +293,7 @@ class RealPirJobsRunner @Inject constructor(
                     profileQueryCount = profileQueries.size,
                     brokerCount = activeBrokers.size,
                 )
+                pirScanCompleteNotifier.onRunCompleted(runMode)
                 return@withContext Result.success(Unit)
             }
 
@@ -312,6 +312,7 @@ class RealPirJobsRunner @Inject constructor(
                     profileQueryCount = profileQueries.size,
                     brokerCount = activeBrokers.size,
                 )
+                pirScanCompleteNotifier.onRunCompleted(runMode)
                 return@withContext Result.success(Unit)
             }
 
@@ -332,6 +333,7 @@ class RealPirJobsRunner @Inject constructor(
                 profileQueryCount = profileQueries.size,
                 brokerCount = activeBrokers.size,
             )
+            pirScanCompleteNotifier.onRunCompleted(runMode)
             return@withContext Result.success(Unit)
         } catch (e: TimeoutCancellationException) {
             pirScanWideEvent.onRunFailed(executionType = executionType, reason = FailureReason.TIMEOUT_CANCELLATION_EXCEPTION)
