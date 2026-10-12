@@ -69,6 +69,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERACTION_MAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERACTION_WAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_MANUAL_RESET
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_NOTIFICATION_SENT_FIRST_SCAN_COMPLETE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_INVALID_EVENT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_PARSE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_SEND
@@ -718,6 +719,8 @@ interface PirPixelSender {
     fun reportFreemiumScanCompleteNotificationSent()
 
     fun reportFreemiumScanCompleteNotificationOpened()
+
+    fun reportScanCompleteNotificationSent()
 }
 
 @ContributesBinding(AppScope::class)
@@ -1690,6 +1693,10 @@ class RealPirPixelSender @Inject constructor(
 
     override fun reportFreemiumScanCompleteNotificationOpened() {
         fire(PIR_FREEMIUM_NOTIFICATION_OPENED_FIRST_SCAN_COMPLETE)
+    }
+
+    override fun reportScanCompleteNotificationSent() {
+        fire(PIR_NOTIFICATION_SENT_FIRST_SCAN_COMPLETE)
     }
 
     private fun usageParams(): Map<String, String> = mapOf(
