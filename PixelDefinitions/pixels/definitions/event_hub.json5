@@ -34,5 +34,41 @@
                 "description": "Unix timestamp (UTC) denoting the start of the measurement period"
             }
         ]
+    },
+    "webTelemetry_detectorPerf_day": {
+        "description": "Daily bucketed counts of measured pages, Web Detection group runs and failures, and group performance threshold crossings. Fired by the eventHub feature at the end of each 1-day period.",
+        "owners": ["miasma13"],
+        "triggers": ["scheduled"],
+        "parameters": [
+            {
+                "keyPattern": "^(pagesMeasured|(adwalls|captcha|commentsDisabled|other)(Ran|Failed|Over(8|16|50|150)|TotalOver(50|100|250|500))|combinedOver(100|250|500))$",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_detectorPerf_week": {
+        "description": "Weekly bucketed counts of measured pages, Web Detection group runs and failures, and group performance threshold crossings. Fired by the eventHub feature at the end of each 7-day period.",
+        "owners": ["miasma13"],
+        "triggers": ["scheduled"],
+        "parameters": [
+            {
+                "keyPattern": "^(pagesMeasured|(adwalls|captcha|commentsDisabled|other)(Ran|Failed|Over(8|16|50|150)|TotalOver(50|100|250|500))|combinedOver(100|250|500))$",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
     }
 }
