@@ -24,6 +24,8 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.pir.impl.checker.PirRunMode.SCAN_AND_OPT_OUT
+import com.duckduckgo.pir.impl.checker.PirRunMode.SCAN_ONLY
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewActivity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -61,7 +63,7 @@ class RealPirNotificationManagerTest {
     fun whenPermissionGrantedThenFreemiumScanCompleteNotificationIsPostedWithFreemiumCopy() {
         shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
 
-        val posted = testee.showFreemiumScanCompleteNotification()
+        val posted = testee.showScanCompleteNotification(SCAN_ONLY)
 
         assertTrue(posted)
         val notification = capturePostedNotification()
@@ -73,10 +75,35 @@ class RealPirNotificationManagerTest {
     }
 
     @Test
+    fun whenPermissionGrantedThenPaidScanCompleteNotificationIsPostedWithPaidCopy() {
+        shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
+
+        val posted = testee.showScanCompleteNotification(SCAN_AND_OPT_OUT)
+
+        assertTrue(posted)
+        val notification = capturePostedNotification()
+        assertEquals("Scan complete!", notification.extras.getCharSequence(Notification.EXTRA_TITLE).toString())
+        assertEquals(
+            "DuckDuckGo has started the process to remove records matching your personal info online. See what we found…",
+            notification.extras.getCharSequence(Notification.EXTRA_TEXT).toString(),
+        )
+    }
+
+    @Test
     fun whenPermissionDeniedThenFreemiumScanCompleteNotificationIsNotPosted() {
         shadowOf(application).denyPermissions(POST_NOTIFICATIONS)
 
-        val posted = testee.showFreemiumScanCompleteNotification()
+        val posted = testee.showScanCompleteNotification(SCAN_ONLY)
+
+        assertFalse(posted)
+        verify(mockNotificationManagerCompat, never()).notify(any<Int>(), any<Notification>())
+    }
+
+    @Test
+    fun whenPermissionDeniedThenPaidScanCompleteNotificationIsNotPosted() {
+        shadowOf(application).denyPermissions(POST_NOTIFICATIONS)
+
+        val posted = testee.showScanCompleteNotification(SCAN_AND_OPT_OUT)
 
         assertFalse(posted)
         verify(mockNotificationManagerCompat, never()).notify(any<Int>(), any<Notification>())
@@ -86,7 +113,17 @@ class RealPirNotificationManagerTest {
     fun whenFreemiumScanCompleteNotificationIsPostedThenItCreatesThePirChannel() {
         shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
 
-        testee.showFreemiumScanCompleteNotification()
+        testee.showScanCompleteNotification(SCAN_ONLY)
+
+        val systemNotificationManager = context.getSystemService(NotificationManager::class.java)
+        assertNotNull(systemNotificationManager.getNotificationChannel(PIR_CHANNEL_ID))
+    }
+
+    @Test
+    fun whenPaidScanCompleteNotificationIsPostedThenItCreatesThePirChannel() {
+        shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
+
+        testee.showScanCompleteNotification(SCAN_AND_OPT_OUT)
 
         val systemNotificationManager = context.getSystemService(NotificationManager::class.java)
         assertNotNull(systemNotificationManager.getNotificationChannel(PIR_CHANNEL_ID))
@@ -97,7 +134,7 @@ class RealPirNotificationManagerTest {
         shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
         val progressNotification = testee.createScanStatusNotification(title = "title", message = "message")
 
-        testee.showFreemiumScanCompleteNotification()
+        testee.showScanCompleteNotification(SCAN_ONLY)
 
         val contentIntent = shadowOf(capturePostedNotification().contentIntent)
         assertEquals(PirDashboardWebViewActivity::class.java.name, contentIntent.savedIntent.component?.className)
@@ -106,10 +143,32 @@ class RealPirNotificationManagerTest {
     }
 
     @Test
+    fun whenPaidScanCompleteNotificationIsPostedThenTapOpensDashboardWithoutFreemiumAttribution() {
+        shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
+        val progressNotification = testee.createScanStatusNotification(title = "title", message = "message")
+
+        testee.showScanCompleteNotification(SCAN_AND_OPT_OUT)
+
+        val contentIntent = shadowOf(capturePostedNotification().contentIntent)
+        assertEquals(PirDashboardWebViewActivity::class.java.name, contentIntent.savedIntent.component?.className)
+        assertFalse(contentIntent.savedIntent.getBooleanExtra(PirDashboardWebViewActivity.EXTRA_FROM_FREEMIUM_SCAN_COMPLETE_NOTIFICATION, false))
+        assertEquals(shadowOf(progressNotification.contentIntent).requestCode, contentIntent.requestCode)
+    }
+
+    @Test
     fun whenFreemiumScanCompleteNotificationIsPostedThenItIsAutoCancelled() {
         shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
 
-        testee.showFreemiumScanCompleteNotification()
+        testee.showScanCompleteNotification(SCAN_ONLY)
+
+        assertTrue(capturePostedNotification().flags and Notification.FLAG_AUTO_CANCEL != 0)
+    }
+
+    @Test
+    fun whenPaidScanCompleteNotificationIsPostedThenItIsAutoCancelled() {
+        shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
+
+        testee.showScanCompleteNotification(SCAN_AND_OPT_OUT)
 
         assertTrue(capturePostedNotification().flags and Notification.FLAG_AUTO_CANCEL != 0)
     }
