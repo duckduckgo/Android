@@ -129,7 +129,10 @@
             "tab_switcher_existing_chat",
             "subscription_onboarding",
             "browsing_menu_duckai",
-            "duck_ai_new_chat"
+            "duck_ai_new_chat",
+            "recent_chat_tab_switcher",
+            "recent_chat_contextual",
+            "recent_chat_input"
         ]
     },
     "osVersion": {

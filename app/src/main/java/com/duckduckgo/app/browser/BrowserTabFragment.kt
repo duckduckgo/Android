@@ -3998,10 +3998,6 @@ class BrowserTabFragment :
                     pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_SIDEBAR_TAPPED)
                     viewModel.onDuckChatSidebarButtonPressed()
                 }
-
-                override fun onDuckAIBackButtonPressed() {
-                    onBackArrowClicked()
-                }
             },
         )
     }

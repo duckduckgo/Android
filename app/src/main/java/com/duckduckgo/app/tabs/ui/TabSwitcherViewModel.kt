@@ -669,7 +669,7 @@ class TabSwitcherViewModel @Inject constructor(
         return@withContext null
     }
 
-    fun onDuckAIButtonClicked() {
+    fun onDuckAiNewChatSelected() {
         viewModelScope.launch {
             val params = duckChat.createWasUsedBeforePixelParams()
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, parameters = params)
@@ -677,6 +677,14 @@ class TabSwitcherViewModel @Inject constructor(
             val url = duckChat.getDuckChatUrl("", false)
             duckChat.reportDuckChatEntry(DuckChatEntryPoint.TAB_SWITCHER, opensNewTab = true, hasPrompt = false)
             tabRepository.add(url, true)
+            command.value = Command.Close
+        }
+    }
+
+    fun onDuckAiChatSelected(chatUrl: String) {
+        viewModelScope.launch {
+            duckChat.reportDuckChatEntry(DuckChatEntryPoint.RECENT_CHAT_TAB_SWITCHER, opensNewTab = true, hasPrompt = false)
+            tabRepository.add(chatUrl, true)
             command.value = Command.Close
         }
     }
