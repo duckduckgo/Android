@@ -60,8 +60,8 @@ class RealPirScanCompleteNotifierTest {
     }
 
     @Test
-    fun whenProfileIsSavedThenScanCompleteNotificationIsMarkedPending() {
-        testee.onProfileSaved()
+    fun whenInitialScanStartsThenScanCompleteNotificationIsMarkedPending() {
+        testee.onInitialScanStarted()
 
         assertTrue(fakeDataStore.isNotificationPending)
     }
@@ -76,7 +76,7 @@ class RealPirScanCompleteNotifierTest {
 
     @Test
     fun whenPendingAndScanOnlyThenFreemiumNotificationIsPostedAndOnlyFreemiumSentPixelFires() = runTest {
-        testee.onProfileSaved()
+        testee.onInitialScanStarted()
 
         testee.onRunCompleted(SCAN_ONLY)
 
@@ -87,7 +87,7 @@ class RealPirScanCompleteNotifierTest {
 
     @Test
     fun whenPendingAndScanAndOptOutThenPaidNotificationIsPostedAndOnlyPaidSentPixelFires() = runTest {
-        testee.onProfileSaved()
+        testee.onInitialScanStarted()
 
         testee.onRunCompleted(SCAN_AND_OPT_OUT)
 
@@ -98,7 +98,7 @@ class RealPirScanCompleteNotifierTest {
 
     @Test
     fun whenPendingThenALaterCompletionPostsNothing() = runTest {
-        testee.onProfileSaved()
+        testee.onInitialScanStarted()
 
         testee.onRunCompleted(SCAN_AND_OPT_OUT)
         testee.onRunCompleted(SCAN_AND_OPT_OUT)
@@ -108,7 +108,7 @@ class RealPirScanCompleteNotifierTest {
 
     @Test
     fun whenScanOnlyNotificationIsNotPostedThenFlagIsStillTakenAndNoPixelFires() = runTest {
-        testee.onProfileSaved()
+        testee.onInitialScanStarted()
         whenever(mockNotificationManager.showScanCompleteNotification(any())).thenReturn(false)
 
         testee.onRunCompleted(SCAN_ONLY)
@@ -119,7 +119,7 @@ class RealPirScanCompleteNotifierTest {
 
     @Test
     fun whenScanAndOptOutNotificationIsNotPostedThenFlagIsStillTakenAndNoPixelFires() = runTest {
-        testee.onProfileSaved()
+        testee.onInitialScanStarted()
         whenever(mockNotificationManager.showScanCompleteNotification(any())).thenReturn(false)
 
         testee.onRunCompleted(SCAN_AND_OPT_OUT)
@@ -130,7 +130,7 @@ class RealPirScanCompleteNotifierTest {
 
     @Test
     fun whenDataStoreFailsThenNothingIsPostedAndNoExceptionEscapes() = runTest {
-        testee.onProfileSaved()
+        testee.onInitialScanStarted()
         fakeDataStore.takeError = IllegalStateException("prefs")
 
         testee.onRunCompleted(SCAN_ONLY)
@@ -140,7 +140,7 @@ class RealPirScanCompleteNotifierTest {
 
     @Test
     fun whenPostingFailsThenNoPixelFiresAndNoExceptionEscapes() = runTest {
-        testee.onProfileSaved()
+        testee.onInitialScanStarted()
         whenever(mockNotificationManager.showScanCompleteNotification(any())).thenAnswer { throw IllegalStateException("post") }
 
         testee.onRunCompleted(SCAN_AND_OPT_OUT)
@@ -150,7 +150,7 @@ class RealPirScanCompleteNotifierTest {
 
     @Test
     fun whenCancelledWhileTakingThenCancellationPropagates() = runTest {
-        testee.onProfileSaved()
+        testee.onInitialScanStarted()
         fakeDataStore.takeError = CancellationException("cancelled")
 
         try {

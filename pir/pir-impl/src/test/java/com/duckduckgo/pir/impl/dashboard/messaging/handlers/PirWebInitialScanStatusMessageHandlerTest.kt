@@ -31,6 +31,7 @@ import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvi
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
+import com.duckduckgo.pir.impl.notifications.PirScanCompleteNotifier
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scan.PirForegroundScanServiceStarter
 import com.duckduckgo.pir.impl.store.PirRepository
@@ -45,6 +46,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -71,6 +73,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
     private val mockPirRemoteFeatures: PirRemoteFeatures = mock()
     private val resumeToggle: Toggle = mock()
     private val mockForegroundScanServiceStarter: PirForegroundScanServiceStarter = mock()
+    private val mockPirScanCompleteNotifier: PirScanCompleteNotifier = mock()
 
     @Before
     fun setUp() = runTest {
@@ -86,6 +89,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
             pirPixelSender = mockPirPixelSender,
             pirRemoteFeatures = mockPirRemoteFeatures,
             foregroundScanServiceStarter = mockForegroundScanServiceStarter,
+            pirScanCompleteNotifier = mockPirScanCompleteNotifier,
         )
         fakeJsMessaging.reset()
     }
@@ -461,6 +465,56 @@ class PirWebInitialScanStatusMessageHandlerTest {
         testee.process(jsMessage, fakeJsMessaging, mockJsMessageCallback)
 
         verify(mockForegroundScanServiceStarter, never()).startResumeScan()
+    }
+
+    @Test
+    fun whenShouldRestartAndToggleEnabledThenScanCompleteNotificationIsMarkedPendingBeforeStartingScan() = runTest {
+        val jsMessage = createJsMessage("", PirDashboardWebMessages.INITIAL_SCAN_STATUS)
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
+        whenever(mockStateProvider.getScanResults()).thenReturn(emptyList())
+        whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(1)
+        whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(3)
+        whenever(mockStateProvider.getAllScannedBrokersStatus()).thenReturn(emptyList())
+        whenever(mockStateProvider.shouldRestartInitialScan()).thenReturn(true)
+        whenever(resumeToggle.isEnabled()).thenReturn(true)
+
+        testee.process(jsMessage, fakeJsMessaging, mockJsMessageCallback)
+
+        inOrder(mockPirScanCompleteNotifier, mockForegroundScanServiceStarter) {
+            verify(mockPirScanCompleteNotifier).onInitialScanStarted()
+            verify(mockForegroundScanServiceStarter).startResumeScan()
+        }
+    }
+
+    @Test
+    fun whenShouldRestartButToggleDisabledThenScanCompleteNotificationIsNotMarkedPending() = runTest {
+        val jsMessage = createJsMessage("", PirDashboardWebMessages.INITIAL_SCAN_STATUS)
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
+        whenever(mockStateProvider.getScanResults()).thenReturn(emptyList())
+        whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(1)
+        whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(3)
+        whenever(mockStateProvider.getAllScannedBrokersStatus()).thenReturn(emptyList())
+        whenever(mockStateProvider.shouldRestartInitialScan()).thenReturn(true)
+        whenever(resumeToggle.isEnabled()).thenReturn(false)
+
+        testee.process(jsMessage, fakeJsMessaging, mockJsMessageCallback)
+
+        verify(mockPirScanCompleteNotifier, never()).onInitialScanStarted()
+    }
+
+    @Test
+    fun whenShouldNotRestartThenScanCompleteNotificationIsNotMarkedPending() = runTest {
+        val jsMessage = createJsMessage("", PirDashboardWebMessages.INITIAL_SCAN_STATUS)
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
+        whenever(mockStateProvider.getScanResults()).thenReturn(emptyList())
+        whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(3)
+        whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(3)
+        whenever(mockStateProvider.getAllScannedBrokersStatus()).thenReturn(emptyList())
+        whenever(mockStateProvider.shouldRestartInitialScan()).thenReturn(false)
+
+        testee.process(jsMessage, fakeJsMessaging, mockJsMessageCallback)
+
+        verify(mockPirScanCompleteNotifier, never()).onInitialScanStarted()
     }
 
     private fun verifyInitialScanResponse(

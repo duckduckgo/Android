@@ -126,7 +126,7 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
 
             // marked before the scan starts, as the run that finishes this scan is the one that takes it
             if (runMode != null) {
-                pirScanCompleteNotifier.onProfileSaved()
+                pirScanCompleteNotifier.onInitialScanStarted()
             }
 
             // start the initial scan at this point as startScanAndOptOut message is not reliable

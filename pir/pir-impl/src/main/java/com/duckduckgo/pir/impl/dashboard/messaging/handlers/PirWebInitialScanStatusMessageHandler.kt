@@ -30,6 +30,7 @@ import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.S
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.ScanResult.ScanResultAddress
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.ScannedBroker
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider
+import com.duckduckgo.pir.impl.notifications.PirScanCompleteNotifier
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scan.PirForegroundScanServiceStarter
 import com.duckduckgo.pir.impl.store.PirRepository
@@ -56,6 +57,7 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
     private val pirPixelSender: PirPixelSender,
     private val pirRemoteFeatures: PirRemoteFeatures,
     private val foregroundScanServiceStarter: PirForegroundScanServiceStarter,
+    private val pirScanCompleteNotifier: PirScanCompleteNotifier,
 ) : PirWebJsMessageHandler() {
 
     override val message = PirDashboardWebMessages.INITIAL_SCAN_STATUS
@@ -116,6 +118,8 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
 
         if (pirRemoteFeatures.resumeInitialScanOnDashboardOpen().isEnabled()) {
             logcat { "PIR-WEB: Resuming interrupted initial scan via foreground service" }
+            // marked here too, as a free user who subscribes resumes their initial scan without saving a profile
+            pirScanCompleteNotifier.onInitialScanStarted()
             foregroundScanServiceStarter.startResumeScan()
         } else {
             logcat { "PIR-WEB: Resume-on-dashboard-open is disabled; not starting scan" }

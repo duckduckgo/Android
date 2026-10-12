@@ -1083,7 +1083,7 @@ class PirEndToEndTest {
     }
 
     private object NoOpPirScanCompleteNotifier : PirScanCompleteNotifier {
-        override fun onProfileSaved() = Unit
+        override fun onInitialScanStarted() = Unit
         override suspend fun onRunCompleted(runMode: PirRunMode) = Unit
     }
 
