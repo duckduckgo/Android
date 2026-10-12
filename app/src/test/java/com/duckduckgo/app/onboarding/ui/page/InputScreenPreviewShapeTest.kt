@@ -28,10 +28,10 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.applyInputScreenPreviewInsets
-import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.applyInputScreenPreviewShape
-import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.applyInputTextMode
-import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.updateInputModePreservingSelection
+import com.duckduckgo.app.onboarding.ui.page.welcome.binders.applyInputScreenPreviewInsets
+import com.duckduckgo.app.onboarding.ui.page.welcome.binders.applyInputScreenPreviewShape
+import com.duckduckgo.app.onboarding.ui.page.welcome.binders.applyInputTextMode
+import com.duckduckgo.app.onboarding.ui.page.welcome.binders.updateInputModePreservingSelection
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.RelativeCornerSize
 import com.google.android.material.shape.ShapeAppearanceModel

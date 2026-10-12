@@ -557,7 +557,7 @@
         errorLine1="import com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/test/java/com/duckduckgo/app/onboarding/ui/page/configdriven/ConfigDrivenOnboardingPageViewModelTest.kt"
+            file="src/test/java/com/duckduckgo/app/onboarding/ui/page/welcome/WelcomePageViewModelTest.kt"
             line="44"
             column="1"/>
     </issue>

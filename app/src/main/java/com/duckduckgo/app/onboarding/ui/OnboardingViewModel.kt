@@ -52,7 +52,7 @@ class OnboardingViewModel @Inject constructor(
     val viewState = _viewState.asStateFlow()
 
     suspend fun initializePages() {
-        pageLayoutManager.buildConfigDrivenPageBlueprints()
+        pageLayoutManager.buildPageBlueprints()
     }
 
     fun pageCount(): Int {

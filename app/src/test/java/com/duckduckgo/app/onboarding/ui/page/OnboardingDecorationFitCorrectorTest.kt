@@ -389,7 +389,7 @@ class OnboardingDecorationFitCorrectorTest {
 
     @Test
     fun whenSideDecorationLeavesCardBottomAnchoredThenCardStillReservesTheInset() {
-        // Config-driven phone regime with a side decoration (LeftWing, BobbingDax): the card stays pinned
+        // Phone regime with a side decoration (LeftWing, BobbingDax): the card stays pinned
         // to the parent bottom while the decoration sits beside it, covering nothing below the card, so
         // the card must still clear the full inset — the keyboard.
         val h = harness(
