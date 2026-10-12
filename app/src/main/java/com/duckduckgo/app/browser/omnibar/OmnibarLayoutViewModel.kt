@@ -132,8 +132,6 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
     private val isProgressBarUpgradeEnabled = progressBarUpgradeFeature.behaviourUpdate().isEnabled()
-    private val isProgressBarIndeterminateEnabled =
-        isProgressBarUpgradeEnabled && progressBarUpgradeFeature.indeterminateFallback().isEnabled()
     private val isAnimationUpdateEnabled =
         isProgressBarUpgradeEnabled && progressBarUpgradeFeature.animationConfigUpdate().isEnabled()
     private val addressBarRebrandToggle = appBrandDesignUpdateToggles.addressBar()
@@ -149,7 +147,6 @@ class OmnibarLayoutViewModel @Inject constructor(
             showTabsMenu = !isSplitOmnibarEnabled,
             showBrowserMenu = !isSplitOmnibarEnabled,
             isProgressBarUpgradeEnabled = isProgressBarUpgradeEnabled,
-            isProgressBarIndeterminateEnabled = isProgressBarIndeterminateEnabled,
             isAddressBarRebrandEnabled = addressBarRebrandToggle.isEnabled(),
             isAnimationUpdateEnabled = isAnimationUpdateEnabled,
         ),
@@ -268,7 +265,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         val isNativeChatInputEnabled: Boolean = false,
         val useSoftwareRenderingMode: Boolean = false,
         val isProgressBarUpgradeEnabled: Boolean = false,
-        val isProgressBarIndeterminateEnabled: Boolean = false,
         val enabledState: EnabledState = EnabledState.ALL,
         val isAddressBarRebrandEnabled: Boolean = false,
         val isAnimationUpdateEnabled: Boolean = false,
