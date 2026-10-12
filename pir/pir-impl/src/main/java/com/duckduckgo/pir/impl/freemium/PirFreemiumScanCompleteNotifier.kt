@@ -63,7 +63,7 @@ class RealPirFreemiumScanCompleteNotifier @Inject constructor(
                         return@withLock
                     }
 
-                    if (pirNotificationManager.showFreemiumScanCompleteNotification()) {
+                    if (pirNotificationManager.showScanCompleteNotification(PirRunMode.SCAN_ONLY)) {
                         pirPixelSender.reportFreemiumScanCompleteNotificationSent()
                     }
                 }

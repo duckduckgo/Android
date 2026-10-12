@@ -31,6 +31,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.R
+import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewActivity
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -47,7 +48,7 @@ interface PirNotificationManager {
         message: String,
     ): Notification
 
-    fun showFreemiumScanCompleteNotification(): Boolean
+    fun showScanCompleteNotification(runMode: PirRunMode): Boolean
 
     fun cancelNotifications()
 }
@@ -92,21 +93,10 @@ class RealPirNotificationManager @Inject constructor(
         title: String,
         message: String,
     ): Notification {
-        val notificationIntent = Intent(
-            context,
-            PirDashboardWebViewActivity::class.java,
-        )
-        val pendingIntent = PendingIntent.getActivity(
-            context,
-            0,
-            notificationIntent,
-            PendingIntent.FLAG_IMMUTABLE,
-        )
-
-        return buildNotification(title = title, message = message, contentIntent = pendingIntent)
+        return buildNotification(title = title, message = message, contentIntent = dashboardPendingIntent())
     }
 
-    override fun showFreemiumScanCompleteNotification(): Boolean = runCatching {
+    override fun showScanCompleteNotification(runMode: PirRunMode): Boolean = runCatching {
         val hasPermission = VERSION.SDK_INT < 33 || ActivityCompat.checkSelfPermission(context, POST_NOTIFICATIONS) == PERMISSION_GRANTED
         if (hasPermission) {
             // the scan can finish in a :pir process that never ran the dashboard, which is where the channel is otherwise created
@@ -114,7 +104,7 @@ class RealPirNotificationManager @Inject constructor(
             notificationManagerCompat.checkPermissionAndNotify(
                 context,
                 PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE,
-                createFreemiumScanCompleteNotification(),
+                createScanCompleteNotification(runMode),
             )
         }
         hasPermission
@@ -123,6 +113,23 @@ class RealPirNotificationManager @Inject constructor(
     override fun cancelNotifications() {
         notificationManagerCompat.cancel(PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE)
     }
+
+    private fun createScanCompleteNotification(runMode: PirRunMode): Notification = when (runMode) {
+        PirRunMode.SCAN_ONLY -> createFreemiumScanCompleteNotification()
+        PirRunMode.SCAN_AND_OPT_OUT -> buildNotification(
+            title = context.getString(R.string.pirNotificationTitleComplete),
+            message = context.getString(R.string.pirNotificationMessageComplete),
+            contentIntent = dashboardPendingIntent(),
+            autoCancel = true,
+        )
+    }
+
+    private fun dashboardPendingIntent(): PendingIntent = PendingIntent.getActivity(
+        context,
+        0,
+        Intent(context, PirDashboardWebViewActivity::class.java),
+        PendingIntent.FLAG_IMMUTABLE,
+    )
 
     private fun createFreemiumScanCompleteNotification(): Notification {
         val notificationIntent = Intent(context, PirDashboardWebViewActivity::class.java)

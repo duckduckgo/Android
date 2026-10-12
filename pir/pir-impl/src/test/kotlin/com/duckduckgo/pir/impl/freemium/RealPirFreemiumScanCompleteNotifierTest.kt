@@ -35,6 +35,7 @@ import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -55,7 +56,7 @@ class RealPirFreemiumScanCompleteNotifierTest {
 
     @Before
     fun setUp() {
-        whenever(mockNotificationManager.showFreemiumScanCompleteNotification()).thenReturn(true)
+        whenever(mockNotificationManager.showScanCompleteNotification(SCAN_ONLY)).thenReturn(true)
         testee = notifierWith(fakeDataStore, coroutineRule.testDispatcherProvider)
     }
 
@@ -63,7 +64,7 @@ class RealPirFreemiumScanCompleteNotifierTest {
     fun whenNotPendingThenNothingIsPosted() = runTest {
         testee.onScanCompleted(SCAN_ONLY)
 
-        verify(mockNotificationManager, never()).showFreemiumScanCompleteNotification()
+        verify(mockNotificationManager, never()).showScanCompleteNotification(any())
         verifyNoInteractions(mockPixelSender)
     }
 
@@ -73,7 +74,7 @@ class RealPirFreemiumScanCompleteNotifierTest {
 
         testee.onScanCompleted(SCAN_ONLY)
 
-        verify(mockNotificationManager).showFreemiumScanCompleteNotification()
+        verify(mockNotificationManager).showScanCompleteNotification(SCAN_ONLY)
         verify(mockPixelSender).reportFreemiumScanCompleteNotificationSent()
     }
 
@@ -84,13 +85,13 @@ class RealPirFreemiumScanCompleteNotifierTest {
         testee.onScanCompleted(SCAN_ONLY)
         testee.onScanCompleted(SCAN_ONLY)
 
-        verify(mockNotificationManager, times(1)).showFreemiumScanCompleteNotification()
+        verify(mockNotificationManager, times(1)).showScanCompleteNotification(SCAN_ONLY)
     }
 
     @Test
     fun whenNotificationIsNotPostedThenFlagIsStillTakenAndNoPixelFires() = runTest {
         fakeDataStore.markScanCompleteNotificationPending()
-        whenever(mockNotificationManager.showFreemiumScanCompleteNotification()).thenReturn(false)
+        whenever(mockNotificationManager.showScanCompleteNotification(SCAN_ONLY)).thenReturn(false)
 
         testee.onScanCompleted(SCAN_ONLY)
 
@@ -105,7 +106,7 @@ class RealPirFreemiumScanCompleteNotifierTest {
         testee.onScanCompleted(SCAN_AND_OPT_OUT)
 
         assertFalse(fakeDataStore.isNotificationPending)
-        verify(mockNotificationManager, never()).showFreemiumScanCompleteNotification()
+        verify(mockNotificationManager, never()).showScanCompleteNotification(any())
         verifyNoInteractions(mockPixelSender)
     }
 
@@ -116,7 +117,7 @@ class RealPirFreemiumScanCompleteNotifierTest {
 
         testee.onScanCompleted(SCAN_ONLY)
 
-        verify(mockNotificationManager, never()).showFreemiumScanCompleteNotification()
+        verify(mockNotificationManager, never()).showScanCompleteNotification(any())
     }
 
     @Test
@@ -144,7 +145,7 @@ class RealPirFreemiumScanCompleteNotifierTest {
             async { notifier.onScanCompleted(SCAN_ONLY) },
         ).awaitAll()
 
-        verify(mockNotificationManager, times(1)).showFreemiumScanCompleteNotification()
+        verify(mockNotificationManager, times(1)).showScanCompleteNotification(SCAN_ONLY)
     }
 
     private fun notifierWith(
