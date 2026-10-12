@@ -167,6 +167,8 @@ class NativeCrashInit @Inject constructor(
                             "v" to "${appBuildConfig.versionName}-${appBuildConfig.flavor}",
                             "pn" to processName,
                             "customTab" to "$isCustomTab",
+                            "webViewPackage" to webViewPackage,
+                            "webViewVersion" to webViewVersion,
                         ),
                     )
                 },
