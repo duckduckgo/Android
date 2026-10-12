@@ -146,7 +146,6 @@ import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.app.browser.commands.Command.SendSms
 import com.duckduckgo.app.browser.commands.Command.SetBrowserBackground
 import com.duckduckgo.app.browser.commands.Command.SetContentAllowsSwipeToRefresh
-import com.duckduckgo.app.browser.commands.Command.SetOnboardingDialogBackground
 import com.duckduckgo.app.browser.commands.Command.ShareLink
 import com.duckduckgo.app.browser.commands.Command.ShowAppLinkPrompt
 import com.duckduckgo.app.browser.commands.Command.ShowAutoconsentAnimation
@@ -259,24 +258,23 @@ import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Acti
 import com.duckduckgo.app.browser.webview.SCAM_PROTECTION_LEARN_MORE_URL
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
+import com.duckduckgo.app.cta.ui.ContextualDaxDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
-import com.duckduckgo.app.cta.ui.DaxDuckAiEndBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiEndBubbleCta
-import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
-import com.duckduckgo.app.cta.ui.DaxEndBrandDesignUpdateBubbleCta
-import com.duckduckgo.app.cta.ui.DaxFireButtonBrandDesignUpdateContextualCta
-import com.duckduckgo.app.cta.ui.DaxMainNetworkBrandDesignUpdateContextualCta
-import com.duckduckgo.app.cta.ui.DaxNoTrackersBrandDesignUpdateContextualCta
-import com.duckduckgo.app.cta.ui.DaxSerpBrandDesignUpdateContextualCta
-import com.duckduckgo.app.cta.ui.DaxSiteSuggestionsBrandDesignUpdateContextualCta
-import com.duckduckgo.app.cta.ui.DaxSubscriptionBrandDesignUpdateBubbleCta
-import com.duckduckgo.app.cta.ui.DaxTrackersBlockedBrandDesignUpdateContextualCta
-import com.duckduckgo.app.cta.ui.DaxTryASearchBrandDesignUpdateBubbleCta
-import com.duckduckgo.app.cta.ui.DaxVisitSiteOptionsBrandDesignUpdateBubbleCta
+import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonContextualCta
+import com.duckduckgo.app.cta.ui.DaxEndBubbleCta
+import com.duckduckgo.app.cta.ui.DaxFireButtonContextualCta
+import com.duckduckgo.app.cta.ui.DaxMainNetworkContextualCta
+import com.duckduckgo.app.cta.ui.DaxNoTrackersContextualCta
+import com.duckduckgo.app.cta.ui.DaxSerpContextualCta
+import com.duckduckgo.app.cta.ui.DaxSiteSuggestionsContextualCta
+import com.duckduckgo.app.cta.ui.DaxSubscriptionBubbleCta
+import com.duckduckgo.app.cta.ui.DaxTrackersBlockedContextualCta
+import com.duckduckgo.app.cta.ui.DaxTryASearchBubbleCta
+import com.duckduckgo.app.cta.ui.DaxVisitSiteOptionsBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.cta.ui.SubscriptionPromoFlow
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -300,7 +298,6 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY
@@ -607,7 +604,6 @@ class BrowserTabViewModel @Inject constructor(
     private val cachedFileDownloader: CachedFileDownloader,
     private val newDownloadState: NewDownloadState,
     private val downloadsRepository: DownloadsRepository,
-    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val onboardingStore: OnboardingStore,
     private val autocompleteHistoryDeleteFeature: AutocompleteHistoryDeleteFeature,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
@@ -769,12 +765,8 @@ class BrowserTabViewModel @Inject constructor(
             ctaViewState.asFlow().map { state ->
                 when {
                     // The trackers dialog points at the privacy shield; a fire pulse would compete.
-                    state.cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta ||
-                        state.cta is DaxTrackersBlockedBrandDesignUpdateContextualCta -> PulseCtaEffect.SUPPRESS
-
-                    state.cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta ||
-                        state.cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta -> PulseCtaEffect.FORCE
-
+                    state.cta is DaxTrackersBlockedContextualCta -> PulseCtaEffect.SUPPRESS
+                    state.cta is DaxDuckAiFireButtonContextualCta -> PulseCtaEffect.FORCE
                     else -> PulseCtaEffect.DEFAULT
                 }
             }.distinctUntilChanged(),
@@ -1537,23 +1529,20 @@ class BrowserTabViewModel @Inject constructor(
 
         val cta = currentCtaViewState().cta
 
-        if (cta is OnboardingDaxDialogCta) {
+        if (cta is ContextualDaxDialogCta) {
             onDismissOnboardingDaxDialog(cta)
         }
 
         when (cta) {
-            is DaxBubbleCta.DaxIntroSearchOptionsCta,
-            is DaxTryASearchBrandDesignUpdateBubbleCta,
+            is DaxTryASearchBubbleCta,
             -> {
                 if (!ctaViewModel.isSuggestedSearchOption(query)) {
                     pixel.fire(ONBOARDING_SEARCH_CUSTOM, type = Unique())
                 }
             }
 
-            is DaxBubbleCta.DaxIntroVisitSiteOptionsCta,
-            is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta,
-            is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
-            is DaxSiteSuggestionsBrandDesignUpdateContextualCta,
+            is DaxVisitSiteOptionsBubbleCta,
+            is DaxSiteSuggestionsContextualCta,
             -> {
                 if (!ctaViewModel.isSuggestedSiteOption(query)) {
                     pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
@@ -3958,7 +3947,7 @@ class BrowserTabViewModel @Inject constructor(
         val onboardingCommand =
             when (cta) {
                 is HomePanelCta.AddWidgetInstructions, is HomePanelCta.AddWidgetAutoOnboarding -> LaunchAddWidgetOnboarding
-                is OnboardingDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
+                is ContextualDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
                 is DaxBubbleCta -> {
                     onDaxBubbleCtaOkButtonClicked(cta)
                     null
@@ -3985,7 +3974,7 @@ class BrowserTabViewModel @Inject constructor(
                 onBrokenSiteCtaDismissButtonClicked(cta)
             }
 
-            if (cta is DaxEndBrandDesignUpdateBubbleCta) {
+            if (cta is DaxEndBubbleCta) {
                 val updatedCta = refreshCta()
                 if (updatedCta != null) {
                     showOrHideKeyboard(updatedCta)
@@ -4007,9 +3996,9 @@ class BrowserTabViewModel @Inject constructor(
             ctaViewModel.onUserDismissedCta(cta, viaCloseBtn = true)
             if (cta is DaxBubbleCta) {
                 command.value = HideOnboardingDaxBubbleCta(cta)
-            } else if (cta is OnboardingDaxDialogCta) {
+            } else if (cta is ContextualDaxDialogCta) {
                 command.value = HideOnboardingDaxDialog(cta)
-                if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta || cta is DaxTrackersBlockedBrandDesignUpdateContextualCta) {
+                if (cta is DaxTrackersBlockedContextualCta) {
                     if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
                         browserViewState.value =
                             currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
@@ -4025,7 +4014,7 @@ class BrowserTabViewModel @Inject constructor(
             viewModelScope.launch {
                 ctaViewModel.onUserDismissedCta(it)
             }
-            if ((cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta || cta is DaxTrackersBlockedBrandDesignUpdateContextualCta) &&
+            if (cta is DaxTrackersBlockedContextualCta &&
                 currentBrowserViewState().showPrivacyShield.isHighlighted()
             ) {
                 browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
@@ -4708,12 +4697,8 @@ class BrowserTabViewModel @Inject constructor(
                 forceRenderingTicker = System.currentTimeMillis(),
             )
         if (!orientationChanged) return
-        viewModelScope.launch(dispatchers.io()) {
-            if (onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
-                withContext(dispatchers.main()) {
-                    command.value = Command.ReinflateBrandDesignContextualDialog
-                }
-            }
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = Command.ReinflateBrandDesignContextualDialog
         }
     }
 
@@ -5492,9 +5477,9 @@ class BrowserTabViewModel @Inject constructor(
         return null
     }
 
-    private fun onOnboardingCtaOkButtonClicked(onboardingCta: OnboardingDaxDialogCta): Command? {
+    private fun onOnboardingCtaOkButtonClicked(onboardingCta: ContextualDaxDialogCta): Command? {
         val shouldDismiss = when (onboardingCta) {
-            is DaxDuckAiFireButtonBrandDesignUpdateContextualCta -> false
+            is DaxDuckAiFireButtonContextualCta -> false
             else -> true
         }
         if (shouldDismiss) {
@@ -5502,17 +5487,12 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         return when (onboardingCta) {
-            is OnboardingDaxDialogCta.DaxSerpCta,
-            is DaxSerpBrandDesignUpdateContextualCta,
+            is DaxSerpContextualCta,
             -> {
                 viewModelScope.launch {
                     val cta =
                         withContext(dispatchers.io()) {
-                            ctaViewModel.getSiteSuggestionsDialogCta(
-                                onSiteSuggestionOptionClicked = { index ->
-                                    onUserSelectedOnboardingSiteSuggestionOption(index)
-                                },
-                            )
+                            ctaViewModel.getSiteSuggestionsDialogCta()
                         }
                     ctaViewState.value = currentCtaViewState().copy(cta = cta)
                     if (cta == null) {
@@ -5522,12 +5502,9 @@ class BrowserTabViewModel @Inject constructor(
                 null
             }
 
-            is OnboardingDaxDialogCta.DaxTrackersBlockedCta,
-            is DaxTrackersBlockedBrandDesignUpdateContextualCta,
-            is OnboardingDaxDialogCta.DaxNoTrackersCta,
-            is DaxNoTrackersBrandDesignUpdateContextualCta,
-            is OnboardingDaxDialogCta.DaxMainNetworkCta,
-            is DaxMainNetworkBrandDesignUpdateContextualCta,
+            is DaxTrackersBlockedContextualCta,
+            is DaxNoTrackersContextualCta,
+            is DaxMainNetworkContextualCta,
             -> {
                 viewModelScope.launch {
                     val cta =
@@ -5542,10 +5519,9 @@ class BrowserTabViewModel @Inject constructor(
                 null
             }
 
-            is OnboardingDaxDialogCta.DaxFireButtonCta,
-            is DaxFireButtonBrandDesignUpdateContextualCta,
+            is DaxFireButtonContextualCta,
             -> LaunchFireDialogFromOnboardingDialog(onboardingCta)
-            is DaxDuckAiFireButtonBrandDesignUpdateContextualCta,
+            is DaxDuckAiFireButtonContextualCta,
             -> LaunchDuckAiOnboardingFireDialog
 
             else -> HideOnboardingDaxDialog(onboardingCta)
@@ -5561,8 +5537,7 @@ class BrowserTabViewModel @Inject constructor(
             }
         }
         when (cta) {
-            is DaxBubbleCta.DaxSubscriptionCta,
-            is DaxSubscriptionBrandDesignUpdateBubbleCta,
+            is DaxSubscriptionBubbleCta,
             -> {
                 viewModelScope.launch {
                     val uri = "https://duckduckgo.com/pro".toUri().buildUpon()
@@ -5577,13 +5552,11 @@ class BrowserTabViewModel @Inject constructor(
                     command.value = LaunchSubscription(uri)
                 }
             }
-            is DaxBubbleCta.DaxEndCta,
             is DaxDuckAiEndBubbleCta,
-            is DaxDuckAiEndBrandDesignUpdateBubbleCta,
             -> {
                 refresh()
             }
-            is DaxEndBrandDesignUpdateBubbleCta -> {
+            is DaxEndBubbleCta -> {
                 if (cta.segmentedPathWithAiInput == DownloadReasonSelection.SEARCH) {
                     viewModelScope.launch {
                         ctaViewState.value = currentCtaViewState().copy(cta = null)
@@ -5599,7 +5572,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun onDismissOnboardingDaxDialog(cta: OnboardingDaxDialogCta) {
+    private fun onDismissOnboardingDaxDialog(cta: ContextualDaxDialogCta) {
         onUserDismissedCta(cta)
         command.value = HideOnboardingDaxDialog(cta)
     }
@@ -5615,13 +5588,13 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         // Defer cleanup (CTA dismiss, highlight removal) until the fire action actually completes.
-        if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
+        if (cta is DaxDuckAiFireButtonContextualCta) {
             return
         }
 
-        if (cta is OnboardingDaxDialogCta.DaxFireButtonCta || cta is DaxFireButtonBrandDesignUpdateContextualCta) {
+        if (cta is DaxFireButtonContextualCta) {
             onUserDismissedCta(cta)
-            command.value = HideOnboardingDaxDialog(cta as OnboardingDaxDialogCta)
+            command.value = HideOnboardingDaxDialog(cta as ContextualDaxDialogCta)
         }
 
         if (currentBrowserViewState().fireButton.isHighlighted()) {
@@ -5647,7 +5620,7 @@ class BrowserTabViewModel @Inject constructor(
         if (cta != null) {
             ctaViewModel.onContextualSiteLinkTapped(cta)
         }
-        if (cta is OnboardingDaxDialogCta) {
+        if (cta is ContextualDaxDialogCta) {
             onDismissOnboardingDaxDialog(cta)
         }
     }
@@ -5745,7 +5718,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun setBrowserBackground(lightModeEnabled: Boolean) {
         val cta = ctaViewState.value?.cta
-        if (cta is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
+        if (cta is DaxBubbleCta) {
             command.value = SetBrowserBackground(
                 cta.backgroundRes,
                 useRebrandBackground = true,
@@ -5756,10 +5729,6 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
         }
-    }
-
-    fun setOnboardingDialogBackground(lightModeEnabled: Boolean) {
-        command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
     }
 
     private fun getBackgroundResource(lightModeEnabled: Boolean): Int =
@@ -6087,17 +6056,6 @@ class BrowserTabViewModel @Inject constructor(
         // No-op: experiment pixel tracking removed
     }
 
-    fun onUserSelectedOnboardingDialogOption(
-        cta: Cta,
-        index: Int?,
-    ) {
-        // No-op: experiment pixel tracking removed
-    }
-
-    fun onUserSelectedOnboardingSiteSuggestionOption(index: Int) {
-        // No-op: experiment pixel tracking removed
-    }
-
     fun onLogoReceived(serpLogo: SerpLogo) {
         omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = serpLogo)
     }
@@ -6126,7 +6084,7 @@ class BrowserTabViewModel @Inject constructor(
             if (customAiOnboardingStore.isEnabled()) return@launch
 
             val cta = ctaViewState.value?.cta ?: return@launch
-            if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
+            if (cta is DaxDuckAiFireButtonContextualCta) {
                 ctaViewModel.onUserDismissedCta(cta = cta)
             }
         }

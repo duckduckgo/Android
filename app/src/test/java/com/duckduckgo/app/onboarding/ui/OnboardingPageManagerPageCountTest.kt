@@ -47,7 +47,7 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
     fun ensurePageCountAsExpected() {
         configureDefaultBrowserPageConfig()
 
-        testee.buildPageBlueprints()
+        testee.buildConfigDrivenPageBlueprints()
         assertEquals(testCase.expectedPageCount, testee.pageCount())
     }
 

@@ -22,7 +22,6 @@ import androidx.core.content.edit
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.R.drawable
@@ -33,7 +32,6 @@ import javax.inject.Inject
 @SingleInstanceIn(scope = AppScope::class)
 class OnboardingStoreImpl @Inject constructor(
     private val context: Context,
-    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : OnboardingStore {
 
@@ -53,18 +51,10 @@ class OnboardingStoreImpl @Inject constructor(
 
         return listOf(
             DaxDialogIntroOption(
-                optionText = if (onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
-                    if (language == "en") {
-                        context.getString(R.string.onboardingSearchDaxDialogOption1EnglishQuoted)
-                    } else {
-                        context.getString(R.string.onboardingSearchDaxDialogOption1Quoted)
-                    }
+                optionText = if (language == "en") {
+                    context.getString(R.string.onboardingSearchDaxDialogOption1EnglishQuoted)
                 } else {
-                    if (language == "en") {
-                        context.getString(R.string.onboardingSearchDaxDialogOption1English)
-                    } else {
-                        context.getString(R.string.onboardingSearchDaxDialogOption1)
-                    }
+                    context.getString(R.string.onboardingSearchDaxDialogOption1Quoted)
                 },
                 iconRes = drawable.ic_find_search_16,
                 link = if (language == "en") "how to say duck in spanish" else context.getString(R.string.onboardingSearchQueryOption1),

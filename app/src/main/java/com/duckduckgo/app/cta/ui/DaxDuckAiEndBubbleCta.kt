@@ -16,46 +16,66 @@
 
 package com.duckduckgo.app.cta.ui
 
-import android.text.Html
+import android.content.Context
 import android.view.View
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.appendIconToText
+import com.duckduckgo.common.utils.device.DeviceInfo
+import com.google.android.material.button.MaterialButton
 import com.duckduckgo.mobile.android.R as CommonR
 
 data class DaxDuckAiEndBubbleCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
+    override val isLightTheme: Boolean,
+    override val deviceInfo: DeviceInfo,
+    val isCustomAiOnboardingFlow: Boolean,
+    val segmentedPath: DownloadReasonSelection?,
 ) : DaxBubbleCta(
     ctaId = CtaId.DAX_DUCK_AI_END,
     title = R.string.onboardingDuckAiEndCtaTitle,
-    description = R.string.onboardingDuckAiEndCtaDescription,
-    primaryCta = R.string.onboardingDuckAiEndCtaButton,
+    description = when {
+        isCustomAiOnboardingFlow -> R.string.onboardingEndCustomAiFlowDaxDialogDescription
+        segmentedPath == DownloadReasonSelection.AI_CHAT -> R.string.aiPathWithToggleEnabledContextualEndDescription
+        else -> R.string.onboardingDuckAiEndCtaDescription
+    },
+    backgroundRes = CommonR.drawable.bg_onboarding_end,
     shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
     okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
     ctaPixelParam = Pixel.PixelValues.DUCK_AI_END_CTA,
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
-) {
-    override val markAsReadOnShow: Boolean = true
+    isLightTheme = isLightTheme,
+    deviceInfo = deviceInfo,
+),
+    DaxBubbleCta.ShowsWavingDax {
+    override val activeIncludeIds: List<Int> = listOf(R.id.primaryCta)
+    override val showArrow: Boolean = true
+    override val wavingDaxSpec = WavingDaxSpec(
+        rotationDegrees = 0f,
+        translationXDp = -40f,
+        translationYDp = -150f,
+        minHeightDp = 178f,
+        maxHeightDp = 178f,
+        anchorToCardOnTablet = true,
+    )
 
-    override fun showCta(
-        view: View,
-        onTypingAnimationFinished: () -> Unit,
-    ) {
-        // Animator types plain String only, so apply the icon-suffixed description after it finishes.
-        val wrappedCallback = {
-            val context = view.context
-            val descriptionHtml = Html.fromHtml(context.getString(R.string.onboardingDuckAiEndCtaDescription), Html.FROM_HTML_MODE_COMPACT)
-            view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta)?.text =
-                context.appendIconToText(descriptionHtml, CommonR.drawable.ic_ai_chat_16)
-            onTypingAnimationFinished()
-        }
-        super.showCta(view, wrappedCallback)
+    override fun configureContentViews(view: View) {
+        view.findViewById<MaterialButton>(R.id.primaryCta)?.setText(R.string.onboardingDuckAiEndCtaButton)
+    }
+
+    override fun decorateDescription(
+        context: Context,
+        text: CharSequence,
+    ): CharSequence = if (segmentedPath == DownloadReasonSelection.AI_CHAT) {
+        text
+    } else {
+        context.appendIconToText(text, CommonR.drawable.ic_ai_chat_16)
     }
 }
