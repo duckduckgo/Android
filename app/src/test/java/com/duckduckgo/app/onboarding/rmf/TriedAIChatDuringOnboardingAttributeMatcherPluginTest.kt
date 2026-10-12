@@ -33,7 +33,7 @@ class TriedAIChatDuringOnboardingAttributeMatcherPluginTest {
 
     @Test
     fun `when user tried AI chat during onboarding and remote value true, then returns true`() = runTest {
-        whenever(mockOnboardingStore.isDuckAiOnboardingFlow()).thenReturn(true)
+        whenever(mockOnboardingStore.getTriedAIChat()).thenReturn(true)
 
         val result = testee.evaluate(TriedAIChatDuringOnboardingMatchingAttribute(remoteValue = true))
 
@@ -42,7 +42,7 @@ class TriedAIChatDuringOnboardingAttributeMatcherPluginTest {
 
     @Test
     fun `when user did not try AI chat during onboarding and remote value true, then returns false`() = runTest {
-        whenever(mockOnboardingStore.isDuckAiOnboardingFlow()).thenReturn(false)
+        whenever(mockOnboardingStore.getTriedAIChat()).thenReturn(false)
 
         val result = testee.evaluate(TriedAIChatDuringOnboardingMatchingAttribute(remoteValue = true))
 
@@ -51,7 +51,7 @@ class TriedAIChatDuringOnboardingAttributeMatcherPluginTest {
 
     @Test
     fun `when user tried AI chat during onboarding and remote value false, then returns false`() = runTest {
-        whenever(mockOnboardingStore.isDuckAiOnboardingFlow()).thenReturn(true)
+        whenever(mockOnboardingStore.getTriedAIChat()).thenReturn(true)
 
         val result = testee.evaluate(TriedAIChatDuringOnboardingMatchingAttribute(remoteValue = false))
 
@@ -60,7 +60,7 @@ class TriedAIChatDuringOnboardingAttributeMatcherPluginTest {
 
     @Test
     fun `when user did not try AI chat during onboarding and remote value false, then returns true`() = runTest {
-        whenever(mockOnboardingStore.isDuckAiOnboardingFlow()).thenReturn(false)
+        whenever(mockOnboardingStore.getTriedAIChat()).thenReturn(false)
 
         val result = testee.evaluate(TriedAIChatDuringOnboardingMatchingAttribute(remoteValue = false))
 
@@ -68,13 +68,13 @@ class TriedAIChatDuringOnboardingAttributeMatcherPluginTest {
     }
 
     @Test
-    fun `when onboarding flow changes between evaluations, then result reflects current state`() = runTest {
-        whenever(mockOnboardingStore.isDuckAiOnboardingFlow()).thenReturn(false)
+    fun `when tried AI chat flag changes between evaluations, then result reflects current state`() = runTest {
+        whenever(mockOnboardingStore.getTriedAIChat()).thenReturn(false)
         val attribute = TriedAIChatDuringOnboardingMatchingAttribute(remoteValue = true)
 
         assertEquals(false, testee.evaluate(attribute))
 
-        whenever(mockOnboardingStore.isDuckAiOnboardingFlow()).thenReturn(true)
+        whenever(mockOnboardingStore.getTriedAIChat()).thenReturn(true)
 
         assertEquals(true, testee.evaluate(attribute))
     }
@@ -84,6 +84,6 @@ class TriedAIChatDuringOnboardingAttributeMatcherPluginTest {
         val result = testee.evaluate(DefaultBrowser(value = true))
 
         assertNull(result)
-        verify(mockOnboardingStore, never()).isDuckAiOnboardingFlow()
+        verify(mockOnboardingStore, never()).getTriedAIChat()
     }
 }

@@ -33,7 +33,7 @@ class TriedAIChatDuringOnboardingAttributeMatcherPlugin @Inject constructor(
         if (matchingAttribute !is TriedAIChatDuringOnboardingMatchingAttribute) {
             return null
         }
-        return onboardingStore.isDuckAiOnboardingFlow() == matchingAttribute.remoteValue
+        return onboardingStore.getTriedAIChat() == matchingAttribute.remoteValue
     }
 }
 
