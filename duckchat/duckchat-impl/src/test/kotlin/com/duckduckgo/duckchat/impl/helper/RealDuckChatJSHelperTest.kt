@@ -359,6 +359,36 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenGetAIChatNativeConfigValuesAndPromoCampaignsEnabledThenSupportsBonusOfferIsTrue() = runTest {
+        mockDuckChatFeature.duckAiPromoCampaigns().setRawStoredState(Toggle.State(enable = true))
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertTrue(result!!.params.getBoolean("supportsBonusOffer"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndPromoCampaignsDisabledThenSupportsBonusOfferIsFalse() = runTest {
+        mockDuckChatFeature.duckAiPromoCampaigns().setRawStoredState(Toggle.State(enable = false))
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsBonusOffer"))
+    }
+
+    @Test
     fun whenGetAIChatNativeConfigValuesAndAllUsageWarningGatesPassThenSupportsNativeUsageWarningsIsTrue() = runTest {
         mockDuckChatFeature.duckAiUsageWarnings().setRawStoredState(Toggle.State(enable = true))
         whenever(mockDuckChat.isNativeChatInputEnabled()).thenReturn(true)
