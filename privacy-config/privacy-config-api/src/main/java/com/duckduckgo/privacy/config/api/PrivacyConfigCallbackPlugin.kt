@@ -26,14 +26,9 @@ interface PrivacyConfigCallbackPlugin {
     fun onPrivacyConfigDownloaded()
 
     /**
-     * Called after an actual config write commits, with the persisted version, ETag, and download source (null for bundled config).
-     * Unlike the no-argument callback, this is not called when persistence is skipped.
+     * Notifies that onPrivacyConfigPersisted event occurred.
+     * This method will be called every time it persists a new version of the privacy config.
      */
-    fun onPrivacyConfigPersisted(version: Long, eTag: String?, source: String?) {
-        // Default NO-OP
-    }
-
-    /** Notifies after processing a config, including when persistence is skipped. */
     fun onPrivacyConfigPersisted() {
         // Default NO-OP
     }

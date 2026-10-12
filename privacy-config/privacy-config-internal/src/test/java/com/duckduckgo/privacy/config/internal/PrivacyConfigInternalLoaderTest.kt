@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,19 @@
 package com.duckduckgo.privacy.config.internal
 
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
+import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader.ConfigDownloadResult
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader.ConfigDownloadResult.Success
 import com.duckduckgo.privacy.config.internal.store.DevPrivacyConfigSettingsDataStore
+import com.duckduckgo.privacy.config.store.PrivacyConfig
+import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class PrivacyConfigInternalLoaderTest {
     private val store = object : DevPrivacyConfigSettingsDataStore {
@@ -33,14 +38,24 @@ class PrivacyConfigInternalLoaderTest {
         override var canUrlBeChanged = false
     }
     private var downloads = 0
+    private var downloadResult: ConfigDownloadResult = Success
     private val downloader = object : PrivacyConfigDownloader {
-        override suspend fun download(force: Boolean): PrivacyConfigDownloader.ConfigDownloadResult {
+        override suspend fun download(force: Boolean): ConfigDownloadResult {
             assertTrue(force)
             downloads++
-            return Success
+            return downloadResult
         }
     }
-    private val testee = PrivacyConfigInternalLoader(downloader, store)
+    private val repository = mock<PrivacyConfigRepository>().apply {
+        whenever(get()).thenReturn(PrivacyConfig(version = 42, readme = "", eTag = "local-etag", timestamp = ""))
+    }
+    private val lines = mutableListOf<String>()
+    private val marker = object : PrivacyConfigOverrideMarker {
+        override fun emit(line: String) {
+            lines.add(line)
+        }
+    }
+    private val testee = PrivacyConfigInternalLoader(downloader, store, repository, marker)
 
     @Test
     fun whenSetUrlThenEnableOverrideAndForceLoad() = runTest {
@@ -91,5 +106,46 @@ class PrivacyConfigInternalLoaderTest {
     fun whenUnknownActionThenDoNothing() = runTest {
         assertFalse(testee.handleCommand("unknown", "https://example.com/config.json"))
         assertEquals(0, downloads)
+    }
+
+    @Test
+    fun whenSetUrlAppliedThenEmitAppliedLineWithStoredMetadata() = runTest {
+        testee.handleCommand("com.duckduckgo.privacy.config.internal.SET_URL", "http://10.0.2.2:8080/android-config.json")
+        assertEquals(
+            listOf("CONFIG_OVERRIDE_APPLIED stage=config version=42 etag=local-etag source=http://10.0.2.2:8080/android-config.json"),
+            lines,
+        )
+    }
+
+    @Test
+    fun whenResetAppliedThenEmitResetLine() = runTest {
+        testee.handleCommand("com.duckduckgo.privacy.config.internal.RESET", null)
+        assertEquals(listOf("CONFIG_OVERRIDE_RESET stage=config version=42 etag=local-etag"), lines)
+    }
+
+    @Test
+    fun whenDownloadFailsThenEmitFailedLine() = runTest {
+        downloadResult = ConfigDownloadResult.Error("offline")
+        testee.handleCommand("com.duckduckgo.privacy.config.internal.SET_URL", "https://example.com/config.json")
+        testee.handleCommand("com.duckduckgo.privacy.config.internal.RESET", null)
+        assertEquals(
+            listOf(
+                "CONFIG_OVERRIDE_FAILED action=set_url reason=download_failed",
+                "CONFIG_OVERRIDE_FAILED action=reset reason=download_failed",
+            ),
+            lines,
+        )
+    }
+
+    @Test
+    fun whenInvalidUrlThenEmitFailedLine() = runTest {
+        testee.handleCommand("com.duckduckgo.privacy.config.internal.SET_URL", "not a url")
+        assertEquals(listOf("CONFIG_OVERRIDE_FAILED action=set_url reason=invalid_url"), lines)
+    }
+
+    @Test
+    fun whenManualLoadThenEmitNothing() = runTest {
+        testee.load()
+        assertEquals(emptyList<String>(), lines)
     }
 }

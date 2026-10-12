@@ -156,7 +156,7 @@ class RealPrivacyConfigDownloaderTest {
     fun whenDownloadIsSuccessfulThenPersistPrivacyConfigCalled() = runTest {
         testee.download()
 
-        verify(mockPrivacyConfigPersister).persistPrivacyConfig(any(), any(), any())
+        verify(mockPrivacyConfigPersister).persistPrivacyConfig(any(), any())
     }
 
     @Test
@@ -172,7 +172,7 @@ class RealPrivacyConfigDownloaderTest {
 
     @Test
     fun whenPersistFailsThenProcessFinishedNotReported() = runTest {
-        whenever(mockPrivacyConfigPersister.persistPrivacyConfig(any(), any(), any())).thenThrow(RuntimeException())
+        whenever(mockPrivacyConfigPersister.persistPrivacyConfig(any(), any())).thenThrow(RuntimeException())
 
         testee.download()
 
@@ -181,7 +181,7 @@ class RealPrivacyConfigDownloaderTest {
 
     @Test
     fun whenDownloadStoreErrorThenFireStoreErrorPixel() = runTest {
-        whenever(mockPrivacyConfigPersister.persistPrivacyConfig(any(), any(), any())).thenThrow(RuntimeException())
+        whenever(mockPrivacyConfigPersister.persistPrivacyConfig(any(), any())).thenThrow(RuntimeException())
 
         testee.download()
         verify(pixel).fire("m_privacy_config_store_error")
