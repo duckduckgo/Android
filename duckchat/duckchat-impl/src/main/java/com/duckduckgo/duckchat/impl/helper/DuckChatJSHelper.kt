@@ -462,11 +462,6 @@ class RealDuckChatJSHelper @Inject constructor(
                 false
             }
         }
-        val supportsSuggestions = withContext(dispatcherProvider.io()) {
-            duckChat.isDuckChatContextualModeEnabled() &&
-                mode == Mode.CONTEXTUAL &&
-                duckChatFeature.contextualSuggestedPrompts().isEnabled()
-        }
         val supportsNativeUsageWarnings = withContext(dispatcherProvider.io()) {
             browserMode != BrowserMode.FIRE &&
                 duckChat.isNativeChatInputEnabled() &&
@@ -496,7 +491,7 @@ class RealDuckChatJSHelper @Inject constructor(
                     duckChat.isDuckChatContextualModeEnabled() &&
                         duckChat.areMultipleContentAttachmentsEnabled(),
                 )
-                put(SUPPORTS_SUGGESTIONS, supportsSuggestions)
+                put(SUPPORTS_SUGGESTIONS, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
                 put(SUPPORTS_SUBSCRIPTION, supportsSubscription)
                 put(INSTALL_TYPE, if (appBuildConfig.isAppReinstall()) INSTALL_TYPE_RETURNING else INSTALL_TYPE_NEW)
                 getInstallAgeBucket()?.let { put(INSTALL_AGE, it) }

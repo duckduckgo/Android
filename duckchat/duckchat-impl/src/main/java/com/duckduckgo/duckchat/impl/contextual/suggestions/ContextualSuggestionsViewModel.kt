@@ -19,9 +19,7 @@ package com.duckduckgo.duckchat.impl.contextual.suggestions
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.SelectionSubmissionAction
@@ -32,7 +30,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.util.Locale
 import javax.inject.Inject
@@ -40,8 +37,6 @@ import javax.inject.Inject
 @ContributesViewModel(ViewScope::class)
 class ContextualSuggestionsViewModel @Inject constructor(
     private val suggestedPromptsProvider: ContextualSuggestedPromptsProvider,
-    private val duckChatFeature: DuckChatFeature,
-    private val dispatchers: DispatcherProvider,
     private val duckChatPixels: DuckChatPixels,
     private val selectionJourney: DuckAiSelectionJourneyWideEvent,
 ) : ViewModel() {
@@ -71,10 +66,6 @@ class ContextualSuggestionsViewModel @Inject constructor(
         loadJob?.cancel()
         resetResolvedState()
         loadJob = viewModelScope.launch {
-            if (!suggestionsEnabled()) {
-                hideSuggestions()
-                return@launch
-            }
             _viewState.value = ViewState(suggestions = emptyList(), loading = true)
             delay(TIMEOUT_MS)
             if (_viewState.value.loading) {
@@ -138,10 +129,6 @@ class ContextualSuggestionsViewModel @Inject constructor(
     }
 
     private suspend fun loadSuggestions() {
-        if (!suggestionsEnabled()) {
-            hideSuggestions()
-            return
-        }
         if (textSelectionCount > 0) resolveTextSelectionSuggestions() else resolvePageSuggestions()
     }
 
@@ -183,10 +170,6 @@ class ContextualSuggestionsViewModel @Inject constructor(
         url: String?,
         pageTypeSignals: PageTypeSignals?,
     ) {
-        if (!suggestionsEnabled()) {
-            hideSuggestions()
-            return
-        }
         lastInput = ResolvePageSuggestionsInput(
             pageTypeSignals = pageTypeSignals,
             url = url,
@@ -199,9 +182,6 @@ class ContextualSuggestionsViewModel @Inject constructor(
         fetchSuggestions(url, pageTypeSignals)
         showSuggestions()
     }
-
-    private suspend fun suggestionsEnabled(): Boolean =
-        withContext(dispatchers.io()) { duckChatFeature.contextualSuggestedPrompts().isEnabled() }
 
     private suspend fun fetchSuggestions(
         url: String?,

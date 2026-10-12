@@ -1049,7 +1049,7 @@ class RealDuckChatJSHelperTest {
             put("supportsNativeStorage", false)
             put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
-            put("supportsSuggestions", false)
+            put("supportsSuggestions", true)
             put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
@@ -1064,10 +1064,9 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeConfigValuesAndSuggestedPromptsEnabledInContextualModeThenSupportsSuggestionsTrue() = runTest {
+    fun whenGetAIChatNativeConfigValuesAndContextualModeThenSupportsSuggestionsTrue() = runTest {
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(true)
-        mockDuckChatFeature.contextualSuggestedPrompts().setRawStoredState(Toggle.State(enable = true))
 
         val result = testee.processJsCallbackMessage(
             "aiChat",
@@ -1082,10 +1081,9 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeConfigValuesAndSuggestedPromptsEnabledButModeFullThenSupportsSuggestionsFalse() = runTest {
+    fun whenGetAIChatNativeConfigValuesAndModeFullThenSupportsSuggestionsFalse() = runTest {
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(true)
-        mockDuckChatFeature.contextualSuggestedPrompts().setRawStoredState(Toggle.State(enable = true))
 
         val result = testee.processJsCallbackMessage(
             "aiChat",
@@ -1100,10 +1098,9 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeConfigValuesAndSuggestedPromptsEnabledButContextualModeDisabledThenSupportsSuggestionsFalse() = runTest {
+    fun whenGetAIChatNativeConfigValuesAndContextualModeDisabledThenSupportsSuggestionsFalse() = runTest {
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(false)
-        mockDuckChatFeature.contextualSuggestedPrompts().setRawStoredState(Toggle.State(enable = true))
 
         val result = testee.processJsCallbackMessage(
             "aiChat",
@@ -1154,7 +1151,7 @@ class RealDuckChatJSHelperTest {
             put("supportsNativeStorage", false)
             put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", true)
-            put("supportsSuggestions", false)
+            put("supportsSuggestions", true)
             put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)

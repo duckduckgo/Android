@@ -231,13 +231,6 @@ interface DuckChatFeature {
     fun duckAiVoiceChatService(): Toggle
 
     /**
-     * @return `true` when context-aware suggested prompts are shown on the contextual Duck.ai start surface.
-     * If the remote feature is not present defaults to `internal`.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun contextualSuggestedPrompts(): Toggle
-
-    /**
      * @return `true` when the native controls for AI Features are enabled in the app.
      * If the remote feature is not present defaults to `internal`
      */
