@@ -57,7 +57,6 @@ import com.duckduckgo.pir.impl.email.PirEmailConfirmationJobsRunner
 import com.duckduckgo.pir.impl.email.RealPirEmailConfirmation
 import com.duckduckgo.pir.impl.email.RealPirEmailConfirmationJobsRunner
 import com.duckduckgo.pir.impl.freemium.PirFreeScanWorkWindow
-import com.duckduckgo.pir.impl.freemium.PirFreemiumScanCompleteNotifier
 import com.duckduckgo.pir.impl.freemium.RealPirFreeScanBrokerFilter
 import com.duckduckgo.pir.impl.integration.fakes.FakeCurrentTimeProvider
 import com.duckduckgo.pir.impl.integration.fakes.FakeDbpService
@@ -77,6 +76,7 @@ import com.duckduckgo.pir.impl.models.Address
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
+import com.duckduckgo.pir.impl.notifications.PirScanCompleteNotifier
 import com.duckduckgo.pir.impl.optout.RealPirOptOut
 import com.duckduckgo.pir.impl.pixels.PirPixel
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
@@ -403,7 +403,7 @@ class PirEndToEndTest {
             pirFreeScanWorkWindow = NoOpPirFreeScanWorkWindow,
             pirScanScheduler = NoOpPirScanScheduler,
             pirFreemiumDataStore = NoOpPirFreemiumDataStore,
-            pirFreemiumScanCompleteNotifier = NoOpPirFreemiumScanCompleteNotifier,
+            pirScanCompleteNotifier = NoOpPirScanCompleteNotifier,
         )
 
         pirEmailConfirmation = RealPirEmailConfirmation(
@@ -1082,8 +1082,9 @@ class PirEndToEndTest {
         override suspend fun isOpen(): Boolean = true
     }
 
-    private object NoOpPirFreemiumScanCompleteNotifier : PirFreemiumScanCompleteNotifier {
-        override suspend fun onScanCompleted(runMode: PirRunMode) = Unit
+    private object NoOpPirScanCompleteNotifier : PirScanCompleteNotifier {
+        override fun onProfileSaved() = Unit
+        override suspend fun onRunCompleted(runMode: PirRunMode) = Unit
     }
 
     private object NoOpPirFreemiumDataStore : PirFreemiumDataStore {

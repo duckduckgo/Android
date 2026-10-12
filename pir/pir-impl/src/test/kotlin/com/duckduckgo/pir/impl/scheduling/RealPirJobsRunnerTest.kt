@@ -30,7 +30,6 @@ import com.duckduckgo.pir.impl.common.PirRendererGoneException
 import com.duckduckgo.pir.impl.common.PirWebViewCountProvider
 import com.duckduckgo.pir.impl.freemium.PirFreeScanBrokerFilter
 import com.duckduckgo.pir.impl.freemium.PirFreeScanWorkWindow
-import com.duckduckgo.pir.impl.freemium.PirFreemiumScanCompleteNotifier
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
@@ -38,6 +37,7 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
+import com.duckduckgo.pir.impl.notifications.PirScanCompleteNotifier
 import com.duckduckgo.pir.impl.optout.PirOptOut
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scan.PirScan
@@ -104,7 +104,7 @@ class RealPirJobsRunnerTest {
     private val mockPirFreeScanWorkWindow: PirFreeScanWorkWindow = mock()
     private val mockPirScanScheduler: PirScanScheduler = mock()
     private val mockPirFreemiumDataStore: PirFreemiumDataStore = mock()
-    private val mockPirFreemiumScanCompleteNotifier: PirFreemiumScanCompleteNotifier = mock()
+    private val mockPirScanCompleteNotifier: PirScanCompleteNotifier = mock()
 
     @Before
     fun setUp() = kotlinx.coroutines.runBlocking {
@@ -141,7 +141,7 @@ class RealPirJobsRunnerTest {
             pirFreeScanWorkWindow = mockPirFreeScanWorkWindow,
             pirScanScheduler = mockPirScanScheduler,
             pirFreemiumDataStore = mockPirFreemiumDataStore,
-            pirFreemiumScanCompleteNotifier = mockPirFreemiumScanCompleteNotifier,
+            pirScanCompleteNotifier = mockPirScanCompleteNotifier,
         )
     }
 
@@ -2282,7 +2282,19 @@ class RealPirJobsRunnerTest {
 
         testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
 
-        verify(mockPirFreemiumScanCompleteNotifier).onScanCompleted(PirRunMode.SCAN_ONLY)
+        verify(mockPirScanCompleteNotifier).onRunCompleted(PirRunMode.SCAN_ONLY)
+    }
+
+    @Test
+    fun whenScanOnlyRunCompletesThenNotifierIsToldAfterFirstScanResultIsRecorded() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        inOrder(mockPirFreemiumDataStore, mockPirScanCompleteNotifier) {
+            verify(mockPirFreemiumDataStore).recordFirstScanResult(NO_MATCHES)
+            verify(mockPirScanCompleteNotifier).onRunCompleted(PirRunMode.SCAN_ONLY)
+        }
     }
 
     @Test
@@ -2291,16 +2303,7 @@ class RealPirJobsRunnerTest {
 
         testee.runEligibleJobs(mockContext, SCHEDULED, PirRunMode.SCAN_ONLY)
 
-        verify(mockPirFreemiumScanCompleteNotifier).onScanCompleted(PirRunMode.SCAN_ONLY)
-    }
-
-    @Test
-    fun whenScanAndOptOutRunCompletesThenNotifierIsToldWithScanAndOptOut() = runTest {
-        givenAScanOnlyRunWithOneUngatedBroker()
-
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
-
-        verify(mockPirFreemiumScanCompleteNotifier).onScanCompleted(PirRunMode.SCAN_AND_OPT_OUT)
+        verify(mockPirScanCompleteNotifier).onRunCompleted(PirRunMode.SCAN_ONLY)
     }
 
     @Test
@@ -2313,7 +2316,74 @@ class RealPirJobsRunnerTest {
 
         testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
 
-        verify(mockPirFreemiumScanCompleteNotifier).onScanCompleted(PirRunMode.SCAN_ONLY)
+        verify(mockPirScanCompleteNotifier).onRunCompleted(PirRunMode.SCAN_ONLY)
+    }
+
+    @Test
+    fun whenScanAndOptOutRunCompletesItsOptOutPhaseThenNotifierIsToldWithScanAndOptOut() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
+
+        verify(mockPirScanWideEvent).onOptOutCompleted(eq(MANUAL_INITIAL), any())
+        verify(mockPirScanCompleteNotifier).onRunCompleted(PirRunMode.SCAN_AND_OPT_OUT)
+    }
+
+    @Test
+    fun whenScanAndOptOutRunHasNoBrokersToOptOutOfThenNotifierIsToldWithScanAndOptOut() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
+
+        verify(mockPirScanWideEvent).onOptOutSkipped(MANUAL_INITIAL)
+        verify(mockPirScanCompleteNotifier).onRunCompleted(PirRunMode.SCAN_AND_OPT_OUT)
+    }
+
+    @Test
+    fun whenScanAndOptOutRunExecutesOptOutsThenNotifierIsToldAfterThem() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        givenTheUngatedBrokerHasAnOptOutableMatch()
+        whenever(mockPirOptOut.executeOptOutForJobs(any(), any())).thenReturn(Result.success(Unit))
+
+        testee.runEligibleJobs(mockContext, SCHEDULED, PirRunMode.SCAN_AND_OPT_OUT)
+
+        inOrder(mockPirOptOut, mockPirScanCompleteNotifier) {
+            verify(mockPirOptOut).executeOptOutForJobs(any(), any())
+            verify(mockPirScanCompleteNotifier).onRunCompleted(PirRunMode.SCAN_AND_OPT_OUT)
+        }
+    }
+
+    @Test
+    fun whenScanAndOptOutRunFailsDuringOptOutsThenNotifierIsNotTold() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        givenTheUngatedBrokerHasAnOptOutableMatch()
+        whenever(mockPirOptOut.executeOptOutForJobs(any(), any())).thenAnswer { throw IllegalStateException("boom") }
+
+        try {
+            testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
+            fail("Expected IllegalStateException to propagate")
+        } catch (_: IllegalStateException) {
+            // expected
+        }
+
+        verify(mockPirScanCompleteNotifier, never()).onRunCompleted(any())
+    }
+
+    @Test
+    fun whenScanAndOptOutRunIsCancelledDuringOptOutsThenNotifierIsNotTold() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        givenTheUngatedBrokerHasAnOptOutableMatch()
+        whenever(mockPirOptOut.executeOptOutForJobs(any(), any())).thenAnswer { throw CancellationException("cancelled") }
+
+        try {
+            testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
+            fail("Expected CancellationException to propagate")
+        } catch (_: CancellationException) {
+            // expected
+        }
+
+        verify(mockPirScanCompleteNotifier, never()).onRunCompleted(any())
     }
 
     @Test
@@ -2323,7 +2393,17 @@ class RealPirJobsRunnerTest {
 
         testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
 
-        verify(mockPirFreemiumScanCompleteNotifier, never()).onScanCompleted(any())
+        verify(mockPirScanCompleteNotifier, never()).onRunCompleted(any())
+    }
+
+    @Test
+    fun whenScanAndOptOutRunHasNoProfileQueriesThenNotifierIsNotTold() = runTest {
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(testActiveBrokers)
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(emptyList())
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
+
+        verify(mockPirScanCompleteNotifier, never()).onRunCompleted(any())
     }
 
     @Test
@@ -2336,7 +2416,18 @@ class RealPirJobsRunnerTest {
 
         testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
 
-        verify(mockPirFreemiumScanCompleteNotifier, never()).onScanCompleted(any())
+        verify(mockPirScanCompleteNotifier, never()).onRunCompleted(any())
+    }
+
+    @Test
+    fun whenScanAndOptOutRunHasNoActiveBrokersThenNotifierIsNotTold() = runTest {
+        whenever(mockEnsureBrokerDataToggle.isEnabled()).thenReturn(false)
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(emptyList())
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
+
+        verify(mockPirScanCompleteNotifier, never()).onRunCompleted(any())
     }
 
     @Test
@@ -2352,7 +2443,7 @@ class RealPirJobsRunnerTest {
             // expected
         }
 
-        verify(mockPirFreemiumScanCompleteNotifier, never()).onScanCompleted(any())
+        verify(mockPirScanCompleteNotifier, never()).onRunCompleted(any())
     }
 
     @Test
@@ -2368,7 +2459,7 @@ class RealPirJobsRunnerTest {
             // expected
         }
 
-        verify(mockPirFreemiumScanCompleteNotifier, never()).onScanCompleted(any())
+        verify(mockPirScanCompleteNotifier, never()).onRunCompleted(any())
     }
 
     @Test
@@ -2379,7 +2470,7 @@ class RealPirJobsRunnerTest {
 
         testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
 
-        verify(mockPirFreemiumScanCompleteNotifier, never()).onScanCompleted(any())
+        verify(mockPirScanCompleteNotifier, never()).onRunCompleted(any())
     }
 
     private suspend fun givenAScanRunWithUngatedBrokers(vararg brokerNames: String) {
