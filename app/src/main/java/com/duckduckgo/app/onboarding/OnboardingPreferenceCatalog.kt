@@ -30,7 +30,6 @@ import com.duckduckgo.settings.api.HideAiGeneratedImages
 import com.duckduckgo.settings.api.SafeSearch
 import com.duckduckgo.settings.api.SearchAssistVisibility
 import com.duckduckgo.settings.api.SerpSettingsDataProvider
-import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.settings.api.observeSetting
 import com.duckduckgo.settings.api.setSetting
 import com.squareup.anvil.annotations.ContributesBinding
@@ -58,7 +57,6 @@ interface OnboardingPreferenceCatalog {
 class OnboardingPreferenceCatalogImpl @Inject constructor(
     private val navigationHistory: NavigationHistory,
     private val serpSettingsDataProvider: SerpSettingsDataProvider,
-    private val serpSettingsFeature: SerpSettingsFeature,
     private val booleanPreferencePlugins: ActivePluginPoint<OnboardingBooleanPreferencePlugin>,
     private val dispatcherProvider: DispatcherProvider,
 ) : OnboardingPreferenceCatalog {
@@ -81,8 +79,6 @@ class OnboardingPreferenceCatalogImpl @Inject constructor(
      * to make sure that all the preconditions are checked just-in-time and allow maximal window for potential remote config flags loads, etc.
      */
     private val definitions: Map<OnboardingPreference, Definition> by lazy {
-        val serpAvailable: suspend () -> Boolean = { serpSettingsFeature.storeSerpSettings().isEnabled() }
-
         mapOf(
             OnboardingPreference.SEARCH_HISTORY to definition(
                 iconRes = CommonR.drawable.history_color_24,
@@ -97,7 +93,7 @@ class OnboardingPreferenceCatalogImpl @Inject constructor(
                 iconRes = CommonR.drawable.exclamation_color_24,
                 primary = R.string.searchPathPreferenceSafePrimary,
                 secondary = R.string.searchPathPreferenceSafeSecondary,
-                available = serpAvailable,
+                available = { true },
                 seed = ::safeSearchEnabled,
                 apply = { enabled -> serpSettingsDataProvider.setSetting(if (enabled) SafeSearch.ON else SafeSearch.OFF) },
             ),
@@ -106,7 +102,7 @@ class OnboardingPreferenceCatalogImpl @Inject constructor(
                 iconRes = CommonR.drawable.search_assist_color_24,
                 primary = R.string.noAiPathPreferenceSearchAssistPrimary,
                 secondary = R.string.noAiPathPreferenceSearchAssistSecondary,
-                available = serpAvailable,
+                available = { true },
                 seed = { false },
                 apply = { enabled ->
                     serpSettingsDataProvider.setSetting(
@@ -119,7 +115,7 @@ class OnboardingPreferenceCatalogImpl @Inject constructor(
                 iconRes = CommonR.drawable.ai_images_strikethrough_color_24,
                 primary = R.string.noAiPathPreferenceHideAiGeneratedImagesPrimary,
                 secondary = R.string.noAiPathPreferenceHideAiGeneratedImagesSecondary,
-                available = serpAvailable,
+                available = { true },
                 seed = { true },
                 apply = { enabled ->
                     serpSettingsDataProvider.setSetting(

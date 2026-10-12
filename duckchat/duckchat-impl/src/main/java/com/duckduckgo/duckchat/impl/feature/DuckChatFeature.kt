@@ -83,12 +83,6 @@ interface DuckChatFeature {
     fun standaloneMigration(): Toggle
 
     /**
-     * @return `true` when the "Hide AI Generated Images" option should be visible in AI Features Settings.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun showHideAiGeneratedImages(): Toggle
-
-    /**
      * @return `true` when the Native Input Field should be used instead of the web-based input.
      * If the remote feature is not present defaults to `true`.
      */

@@ -79,7 +79,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         val shouldShowShortcuts: Boolean = false,
         val shouldShowInputScreenToggle: Boolean = false,
         val isSearchSectionVisible: Boolean = true,
-        val isHideGeneratedImagesOptionVisible: Boolean = false,
         val isAutomaticContextVisible: Boolean = false,
         val isAutomaticContextEnabled: Boolean = false,
         val isDefaultTogglePositionVisible: Boolean = false,
@@ -99,7 +98,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     )
 
     private data class FeatureVisibility(
-        val isHideGeneratedImagesOptionVisible: Boolean,
         val isNativeControlsEnabled: Boolean,
     )
 
@@ -122,7 +120,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         flow {
             emit(
                 FeatureVisibility(
-                    isHideGeneratedImagesOptionVisible = duckChatFeature.showHideAiGeneratedImages().isEnabled(),
                     isNativeControlsEnabled = duckChatFeature.aiFeaturesNativeControls().isEnabled(),
                 ),
             )
@@ -149,7 +146,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 shouldShowShortcuts = isDuckChatUserEnabled,
                 shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
                 isSearchSectionVisible = isSearchSectionVisible(duckChatActivityParams, featureVisibility.isNativeControlsEnabled),
-                isHideGeneratedImagesOptionVisible = featureVisibility.isHideGeneratedImagesOptionVisible,
                 isAutomaticContextEnabled = featureState.isAutomaticContextEnabled,
                 isAutomaticContextVisible = isDuckChatUserEnabled && duckChatFeature.automaticContextAttachment().isEnabled(),
                 isDefaultTogglePositionVisible = isDuckChatUserEnabled && isInputScreenEnabled &&
@@ -246,11 +242,10 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
 
     fun duckChatSearchAISettingsClicked() {
         viewModelScope.launch {
-            val (nativeControlsEnabled, embeddedSettingsEnabled, showHideAiGeneratedImages) = withContext(dispatcherProvider.io()) {
-                Triple(
+            val (nativeControlsEnabled, embeddedSettingsEnabled) = withContext(dispatcherProvider.io()) {
+                Pair(
                     duckChatFeature.aiFeaturesNativeControls().isEnabled(),
                     settingsPageFeature.embeddedSettingsWebView().isEnabled(),
-                    duckChatFeature.showHideAiGeneratedImages().isEnabled(),
                 )
             }
 
@@ -259,16 +254,8 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             } else if (embeddedSettingsEnabled) {
                 commandChannel.send(
                     OpenLink(
-                        link = if (showHideAiGeneratedImages) {
-                            DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED
-                        } else {
-                            LEGACY_DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED
-                        },
-                        titleRes = if (showHideAiGeneratedImages) {
-                            R.string.duckAiSerpSettingsTitle
-                        } else {
-                            R.string.duck_chat_assist_settings_title
-                        },
+                        link = DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED,
+                        titleRes = R.string.duckAiSerpSettingsTitle,
                     ),
                 )
             } else {
@@ -425,7 +412,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         private val DEFAULT_SEARCH_ASSIST_VISIBILITY = SearchAssistVisibility.SOMETIMES
         const val DUCK_CHAT_LEARN_MORE_LINK = "https://duckduckgo.com/duckduckgo-help-pages/aichat/"
         const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK = "https://duckduckgo.com/settings?ko=-1#aifeatures"
-        const val LEGACY_DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED = "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbe#aifeatures"
         const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED =
             "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbe&hideduckai=1#aifeatures"
         const val DUCK_CHAT_HIDE_GENERATED_IMAGES_LINK_EMBEDDED =

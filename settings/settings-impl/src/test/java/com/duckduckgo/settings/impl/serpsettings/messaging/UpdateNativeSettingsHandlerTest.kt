@@ -16,32 +16,25 @@
 
 package com.duckduckgo.settings.impl.serpsettings.messaging
 
-import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.JsMessage
-import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.settings.impl.serpsettings.fakes.FakeJsMessaging
 import com.duckduckgo.settings.impl.serpsettings.fakes.FakeSerpSettingsDataStore
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class UpdateNativeSettingsHandlerTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val fakeSerpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
     private lateinit var fakeDataStore: FakeSerpSettingsDataStore
     private lateinit var fakeJsMessaging: FakeJsMessaging
     private lateinit var handler: UpdateNativeSettingsHandler
@@ -54,7 +47,6 @@ class UpdateNativeSettingsHandlerTest {
         handler = UpdateNativeSettingsHandler(
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             appScope = coroutineTestRule.testScope,
-            serpSettingsFeature = fakeSerpSettingsFeature,
             serpSettingsDataStore = fakeDataStore,
         )
     }
@@ -79,24 +71,7 @@ class UpdateNativeSettingsHandlerTest {
     }
 
     @Test
-    fun `when feature flag is disabled then settings are not stored`() = runTest {
-        fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = false))
-        val settingsJson = """{"isDuckAiEnabled":true,"duckAiTitle":"Duck.AI"}"""
-        val jsMessage = createJsMessage(JSONObject(settingsJson))
-
-        handler.getJsMessageHandler().process(
-            jsMessage = jsMessage,
-            jsMessaging = fakeJsMessaging,
-            jsMessageCallback = null,
-        )
-        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-
-        assertNull(fakeDataStore.getSerpSettings())
-    }
-
-    @Test
     fun `when valid settings provided then stores them as JSON string`() = runTest {
-        fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
         val settingsJson = """{"isDuckAiEnabled":true,"duckAiTitle":"Duck.AI"}"""
         val jsMessage = createJsMessage(JSONObject(settingsJson))
 
@@ -113,7 +88,6 @@ class UpdateNativeSettingsHandlerTest {
 
     @Test
     fun `when empty params provided then stores empty object`() = runTest {
-        fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
         val jsMessage = createJsMessage(JSONObject())
 
         handler.getJsMessageHandler().process(
@@ -129,8 +103,6 @@ class UpdateNativeSettingsHandlerTest {
 
     @Test
     fun `when settings updated multiple times then stores latest settings`() = runTest {
-        fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
-
         val firstSettings = """{"isDuckAiEnabled":true}"""
         handler.getJsMessageHandler().process(
             jsMessage = createJsMessage(JSONObject(firstSettings)),
