@@ -56,7 +56,10 @@ import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SO
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_ENABLED
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteAccount
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteServerData
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskEditDevice
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskTurnOffSync
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskTurnOffThisDevice
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
@@ -186,6 +189,7 @@ class SyncActivityViewModel @Inject constructor(
         val autoRestoreState = if (initialAutoRestoreEnabled == null) loadAutoRestoreState() else null
         val showAccount = syncAccountRepository.isSignedIn()
         val thisDevice = syncAccountRepository.getThisConnectedDevice()
+        val isImprovedSyncFlow = isImprovedSyncFlow()
         val signedOutState = signedOutState()
 
         viewState.update { current ->
@@ -198,6 +202,7 @@ class SyncActivityViewModel @Inject constructor(
                 showAutoRestoreToggle = autoRestoreState?.showToggle ?: autoRestoreAvailable,
                 autoRestoreEnabled = autoRestoreState?.enabled ?: current.autoRestoreEnabled,
                 isThisDeviceSyncing = current.isThisDeviceSyncing,
+                isImprovedSyncFlow = isImprovedSyncFlow,
             )
         }
     }
@@ -234,6 +239,7 @@ class SyncActivityViewModel @Inject constructor(
         val showAutoRestoreToggle: Boolean = false,
         val autoRestoreEnabled: Boolean = false,
         val isThisDeviceSyncing: Boolean = false,
+        val isImprovedSyncFlow: Boolean = false,
     )
 
     sealed class SetupFlows {
@@ -249,6 +255,9 @@ class SyncActivityViewModel @Inject constructor(
         data class IntroCreateAccount(val isAuthRequired: Boolean) : Command()
         data class IntroRecoverSyncData(val isAuthRequired: Boolean) : Command()
         data object AskDeleteAccount : Command()
+        data class AskTurnOffSync(val device: ConnectedDevice, val isOnlyDevice: Boolean) : Command()
+        data class AskTurnOffThisDevice(val device: ConnectedDevice) : Command()
+        data object AskDeleteServerData : Command()
         data object CheckIfUserHasStoragePermission : Command()
         data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
         data class AskEditDevice(val device: ConnectedDevice) : Command()
@@ -404,8 +413,30 @@ class SyncActivityViewModel @Inject constructor(
     fun onDeleteAccountClicked() {
         viewModelScope.launch {
             withAuthentication {
-                command.send(AskDeleteAccount)
+                if (isImprovedSyncFlow()) {
+                    askTurnOffSync()
+                } else {
+                    command.send(AskDeleteAccount)
+                }
             }
+        }
+    }
+
+    private suspend fun askTurnOffSync() {
+        val thisDevice = withContext(dispatchers.io()) { syncAccountRepository.getThisConnectedDevice() } ?: return
+        val syncedDeviceCount = viewState.value.syncedDevices.count { it is SyncedDevice }
+        command.send(AskTurnOffSync(device = thisDevice, isOnlyDevice = syncedDeviceCount <= 1))
+    }
+
+    fun onTurnOffThisDeviceClicked(device: ConnectedDevice) {
+        viewModelScope.launch {
+            command.send(AskTurnOffThisDevice(device))
+        }
+    }
+
+    fun onTurnOffAndDeleteServerDataClicked() {
+        viewModelScope.launch {
+            command.send(AskDeleteServerData)
         }
     }
 
@@ -606,10 +637,11 @@ class SyncActivityViewModel @Inject constructor(
         return emptyList()
     }
 
-    private fun signedOutState(): ViewState = ViewState(
+    private suspend fun signedOutState(): ViewState = ViewState(
         disabledSetupFlows = disabledSetupFlows(),
         aiChatSyncEnabled = syncFeatureToggle.allowAiChatSync(),
         newDesktopBrowserSettingEnabled = settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled(),
+        isImprovedSyncFlow = isImprovedSyncFlow(),
     )
 
     private suspend fun withAuthentication(

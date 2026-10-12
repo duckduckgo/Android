@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/turnOffSyncSheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/turnOffSyncContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/removeDeviceTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:layout_marginEnd="@dimen/keyline_3"
+                app:layout_constraintEnd_toStartOf="@id/closeButton"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:typography="h2"
+                tools:text="Remove Pixel 9 from Sync &amp; Backup?" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/removeDeviceBody"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_1"
+                app:layout_constraintEnd_toEndOf="@id/removeDeviceTitle"
+                app:layout_constraintStart_toStartOf="@id/removeDeviceTitle"
+                app:layout_constraintTop_toBottomOf="@id/removeDeviceTitle"
+                app:textType="secondary"
+                app:typography="body2"
+                tools:text="“Pixel 9” will no longer be able to access your synced data on other devices." />
+
+            <com.duckduckgo.common.ui.view.button.IconButton
+                android:id="@+id/closeButton"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:background="@drawable/background_turn_off_sync_sheet_close_button"
+                android:contentDescription="@string/closeButtonContentDescription"
+                android:padding="6dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_close_24_small" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/removeDeviceDivider"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_5"
+                app:defaultPadding="false"
+                app:fullWidth="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/removeDeviceBody" />
+
+            <View
+                android:id="@+id/removeDeviceItemIconBackground"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="@dimen/keyline_5"
+                android:background="@drawable/list_item_image_circular_background"
+                android:importantForAccessibility="no"
+                app:layout_constraintBottom_toBottomOf="@id/removeDeviceItemHint"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/removeDeviceItemTitle" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/removeDeviceItemTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginTop="28dp"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:text="@string/sync_simplified_settings_turn_off_sheet_remove_item"
+                app:layout_constraintEnd_toStartOf="@id/deleteServerDataSwitch"
+                app:layout_constraintStart_toEndOf="@id/removeDeviceItemIconBackground"
+                app:layout_constraintTop_toBottomOf="@id/removeDeviceDivider"
+                app:typography="body1" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/removeDeviceItemHint"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_0"
+                android:layout_marginBottom="22dp"
+                android:text="@string/sync_simplified_settings_turn_off_sheet_remove_item_hint"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/removeDeviceItemTitle"
+                app:layout_constraintStart_toStartOf="@id/removeDeviceItemTitle"
+                app:layout_constraintTop_toBottomOf="@id/removeDeviceItemTitle"
+                app:textType="secondary"
+                app:typography="body2" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/turnOffTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_7"
+                android:layout_marginTop="40dp"
+                android:gravity="center"
+                android:text="@string/sync_simplified_settings_turn_off_sheet_title"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:typography="h2" />
+
+            <View
+                android:id="@+id/turnOffItemBackground"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginHorizontal="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:background="@drawable/background_turn_off_sync_sheet_item"
+                android:importantForAccessibility="no"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/turnOffItemBottomSpace"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/turnOffTitle" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/turnOffItemTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="72dp"
+                android:layout_marginTop="42dp"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:text="@string/sync_simplified_settings_turn_off_sheet_item"
+                android:visibility="gone"
+                app:layout_constraintEnd_toStartOf="@id/deleteServerDataSwitch"
+                app:layout_constraintStart_toStartOf="@id/turnOffItemBackground"
+                app:layout_constraintTop_toBottomOf="@id/turnOffTitle"
+                app:typography="body1" />
+
+            <Space
+                android:id="@+id/turnOffItemBottomSpace"
+                android:layout_width="0dp"
+                android:layout_height="18dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/turnOffItemTitle" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/turnOffBody"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="40dp"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:text="@string/sync_simplified_settings_turn_off_sheet_body"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/turnOffItemBackground"
+                app:textType="secondary"
+                app:typography="body2" />
+
+            <ImageView
+                android:id="@+id/deleteServerDataIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_trash_24"
+                app:layout_constraintBottom_toBottomOf="@id/removeDeviceItemIconBackground"
+                app:layout_constraintEnd_toEndOf="@id/removeDeviceItemIconBackground"
+                app:layout_constraintStart_toStartOf="@id/removeDeviceItemIconBackground"
+                app:layout_constraintTop_toTopOf="@id/removeDeviceItemIconBackground" />
+
+            <com.duckduckgo.common.ui.view.DaxSwitch
+                android:id="@+id/deleteServerDataSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/keyline_5"
+                app:layout_constraintBottom_toBottomOf="@id/removeDeviceItemHint"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/removeDeviceItemTitle" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <FrameLayout
+            android:id="@+id/turnOffButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="@dimen/keyline_5"
+            android:paddingBottom="@dimen/keyline_4">
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonDestructiveSecondary
+                android:id="@+id/turnOffButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                app:daxButtonSize="small"
+                tools:text="Remove Device" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
+                android:id="@+id/turnOffAndDeleteButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:alpha="0"
+                android:visibility="invisible"
+                app:daxButtonSize="small"
+                tools:text="Turn Off and Delete" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>
