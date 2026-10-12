@@ -21,6 +21,7 @@ import android.app.Application
 import android.app.Notification
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -178,6 +179,39 @@ class RealPirNotificationManagerTest {
         val notification = testee.createScanStatusNotification(title = "title", message = "message")
 
         assertFalse(notification.flags and Notification.FLAG_AUTO_CANCEL != 0)
+    }
+
+    @Test
+    fun whenFreemiumScanCompleteNotificationIsTappedThenItReplacesAnOpenDashboard() {
+        shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
+
+        testee.showScanCompleteNotification(SCAN_ONLY)
+
+        assertTapReplacesAnOpenDashboard(capturePostedNotification())
+    }
+
+    @Test
+    fun whenPaidScanCompleteNotificationIsTappedThenItReplacesAnOpenDashboard() {
+        shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
+
+        testee.showScanCompleteNotification(SCAN_AND_OPT_OUT)
+
+        assertTapReplacesAnOpenDashboard(capturePostedNotification())
+    }
+
+    @Test
+    fun whenScanStatusNotificationIsTappedThenItReplacesAnOpenDashboard() {
+        val notification = testee.createScanStatusNotification(title = "title", message = "message")
+
+        assertTapReplacesAnOpenDashboard(notification)
+    }
+
+    private fun assertTapReplacesAnOpenDashboard(notification: Notification) {
+        val flags = shadowOf(notification.contentIntent).savedIntent.flags
+        assertTrue(flags and Intent.FLAG_ACTIVITY_NEW_TASK != 0)
+        assertTrue(flags and Intent.FLAG_ACTIVITY_CLEAR_TOP != 0)
+        // SINGLE_TOP would reuse the open dashboard instead of recreating it, skipping onCreate
+        assertFalse(flags and Intent.FLAG_ACTIVITY_SINGLE_TOP != 0)
     }
 
     private fun capturePostedNotification(): Notification {
