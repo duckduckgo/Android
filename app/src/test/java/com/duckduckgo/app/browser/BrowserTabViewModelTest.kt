@@ -382,7 +382,6 @@ import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -401,7 +400,6 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import org.json.JSONObject
 import org.junit.After
 import org.junit.Assert.assertArrayEquals
@@ -10445,7 +10443,9 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenAutoConsentPopupHandledOffMainThreadThenPostCommandOnMainThread() {
+    fun whenAutoConsentPopupHandledOffMainThreadThenPostCommandOnMainThread() = runTest(
+        StandardTestDispatcher(coroutineRule.testDispatcher.scheduler),
+    ) {
         givenCurrentSite("https://example.com")
         testee.browserViewState.value =
             testee.browserViewState.value?.copy(
@@ -10463,8 +10463,7 @@ class BrowserTabViewModelTest {
                 override fun isMainThread() = Thread.currentThread() == mainThread
             },
         )
-        val mainDispatcher = StandardTestDispatcher(coroutineRule.testDispatcher.scheduler)
-        Dispatchers.setMain(mainDispatcher)
+        coroutineRule.setMainDispatcher(StandardTestDispatcher(testScheduler))
 
         var backgroundFailure: Throwable? = null
         val jsBridgeThread = Thread {
@@ -10476,7 +10475,7 @@ class BrowserTabViewModelTest {
         }
         jsBridgeThread.start()
         jsBridgeThread.join()
-        mainDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         assertNull(backgroundFailure)
         assertCommandIssued<ShowAutoconsentAnimation>()
