@@ -123,6 +123,7 @@ class DaxBubbleCtaTest {
 
     @Test
     fun applyFit_showsWavingDax_createsAndUsesController() {
+        whenever(dax.layoutParams).thenReturn(mock())
         val cta = WavingDaxBubbleCta().apply { attachCtaView(container) }
 
         cta.applyFit()
