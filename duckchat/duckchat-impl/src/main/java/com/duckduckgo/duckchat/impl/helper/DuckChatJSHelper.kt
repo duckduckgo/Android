@@ -493,6 +493,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 )
                 put(SUPPORTS_SUGGESTIONS, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
                 put(SUPPORTS_SUBSCRIPTION, supportsSubscription)
+                put(SUPPORTS_BONUS_OFFER, duckChatFeature.duckAiPromoCampaigns().isEnabled())
                 put(INSTALL_TYPE, if (appBuildConfig.isAppReinstall()) INSTALL_TYPE_RETURNING else INSTALL_TYPE_NEW)
                 getInstallAgeBucket()?.let { put(INSTALL_AGE, it) }
             }.also { logcat { "DuckChat-Sync: getAIChatNativeConfigValues $it" } }
@@ -784,6 +785,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_NATIVE_STORAGE = "supportsNativeStorage"
         private const val SUPPORTS_NATIVE_USAGE_WARNINGS = "supportsNativeUsageWarnings"
         private const val SUPPORTS_SUBSCRIPTION = "supportsSubscription"
+        private const val SUPPORTS_BONUS_OFFER = "supportsBonusOffer"
         private const val INSTALL_TYPE = "installType"
         private const val INSTALL_TYPE_NEW = "new"
         private const val INSTALL_TYPE_RETURNING = "returning"
