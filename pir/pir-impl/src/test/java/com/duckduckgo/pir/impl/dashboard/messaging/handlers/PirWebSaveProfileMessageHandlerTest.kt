@@ -900,7 +900,7 @@ class PirWebSaveProfileMessageHandlerTest {
 
         // Then the run that finishes this scan takes the flag, so it has to be marked before the scan starts
         inOrder(mockPirScanCompleteNotifier, mockContext) {
-            verify(mockPirScanCompleteNotifier).onProfileSaved()
+            verify(mockPirScanCompleteNotifier).onInitialScanStarted()
             verify(mockContext).startForegroundService(any())
         }
     }
@@ -917,7 +917,7 @@ class PirWebSaveProfileMessageHandlerTest {
 
         // Then
         inOrder(mockPirScanCompleteNotifier, mockContext) {
-            verify(mockPirScanCompleteNotifier).onProfileSaved()
+            verify(mockPirScanCompleteNotifier).onInitialScanStarted()
             verify(mockContext).startForegroundService(any())
         }
     }
@@ -935,7 +935,7 @@ class PirWebSaveProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, null)
 
         // Then
-        verify(mockPirScanCompleteNotifier).onProfileSaved()
+        verify(mockPirScanCompleteNotifier).onInitialScanStarted()
         val intentCaptor = argumentCaptor<Intent>()
         verify(mockContext).startForegroundService(intentCaptor.capture())
         assertEquals(PirExecutionType.MANUAL_EDIT_PROFILE.name, intentCaptor.firstValue.getStringExtra("extra_execution_type"))
@@ -955,7 +955,7 @@ class PirWebSaveProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, null)
 
         // Then
-        verify(mockPirScanCompleteNotifier, never()).onProfileSaved()
+        verify(mockPirScanCompleteNotifier, never()).onInitialScanStarted()
     }
 
     @Test
@@ -970,7 +970,7 @@ class PirWebSaveProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, null)
 
         // Then
-        verify(mockPirScanCompleteNotifier, never()).onProfileSaved()
+        verify(mockPirScanCompleteNotifier, never()).onInitialScanStarted()
     }
 
     private suspend fun givenSuccessfulProfileSave() {

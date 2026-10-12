@@ -32,12 +32,12 @@ import logcat.logcat
 import javax.inject.Inject
 
 interface PirScanCompleteNotifier {
-    /** Called by every profile save, before its scan starts, so the run that finishes it can notify. */
-    fun onProfileSaved()
+    /** Called before every initial scan starts, from a profile save or a dashboard resume, so the run that finishes it can notify. */
+    fun onInitialScanStarted()
 
     /**
      * Called when a run finishes normally, for either run mode. Posts that mode's scan-complete notification at
-     * most once per profile save. Never throws, except for cancellation.
+     * most once per [onInitialScanStarted]. Never throws, except for cancellation.
      */
     suspend fun onRunCompleted(runMode: PirRunMode)
 }
@@ -54,7 +54,7 @@ class RealPirScanCompleteNotifier @Inject constructor(
     // Both callers, the foreground scan service and the scheduled worker, run in :pir, so an in-process lock makes take-and-post exact.
     private val mutex = Mutex()
 
-    override fun onProfileSaved() {
+    override fun onInitialScanStarted() {
         pirDataStore.markScanCompleteNotificationPending()
     }
 

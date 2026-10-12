@@ -52,7 +52,7 @@ interface PirDataStore {
     /** Number of scheduled worker runs that have contributed to the open completion flow. */
     var initialScanCompletionScheduledRunCount: Int
 
-    /** Marked by every profile save; the next run that finishes normally takes it. */
+    /** Marked before every initial scan starts; the next run that finishes normally takes it. */
     fun markScanCompleteNotificationPending()
 
     /** Returns whether a scan-complete notification was pending, and clears it. */
