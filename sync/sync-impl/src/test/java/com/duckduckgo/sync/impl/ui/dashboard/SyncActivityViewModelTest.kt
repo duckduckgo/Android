@@ -301,7 +301,7 @@ class SyncActivityViewModelTest {
         givenUserHasDeviceAuthentication(true)
         testee.commands().test {
             testee.onSyncThisDevice()
-            assertEquals(IntroCreateAccount(isAuthRequired = false), awaitItem())
+            assertEquals(IntroCreateAccount(isAuthRequired = false, isImprovedSyncFlow = false), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -311,7 +311,7 @@ class SyncActivityViewModelTest {
         givenImprovedSyncFlowEnabled()
         testee.commands().test {
             testee.onSyncThisDevice()
-            assertEquals(IntroCreateAccount(isAuthRequired = true), awaitItem())
+            assertEquals(IntroCreateAccount(isAuthRequired = true, isImprovedSyncFlow = true), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }

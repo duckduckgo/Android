@@ -252,7 +252,10 @@ class SyncActivityViewModel @Inject constructor(
         data object AddAnotherDevice : Command()
         data class DeepLinkIntoSetup(val barcodeSyncUrl: SyncBarcodeUrl, val isSignedIn: Boolean) : Command()
         data class AskSetupSyncDeepLink(val syncBarcodeUrl: SyncBarcodeUrl) : Command()
-        data class IntroCreateAccount(val isAuthRequired: Boolean) : Command()
+        data class IntroCreateAccount(
+            val isAuthRequired: Boolean,
+            val isImprovedSyncFlow: Boolean,
+        ) : Command()
         data class IntroRecoverSyncData(val isAuthRequired: Boolean) : Command()
         data object AskDeleteAccount : Command()
         data class AskTurnOffSync(val device: ConnectedDevice, val isOnlyDevice: Boolean) : Command()
@@ -274,7 +277,10 @@ class SyncActivityViewModel @Inject constructor(
         data class LaunchSyncGetOnOtherPlatforms(val source: SyncGetOnOtherPlatformsLaunchSource) : Command()
         data class LaunchLearnMore(val url: String) : Command()
         data class ShowPreviousSessionReady(val syncEntryPoint: SyncEntryPoint) : Command()
-        data class LaunchOriginalFlow(val syncEntryPoint: SyncEntryPoint) : Command()
+        data class LaunchOriginalFlow(
+            val syncEntryPoint: SyncEntryPoint,
+            val isImprovedSyncFlow: Boolean,
+        ) : Command()
     }
 
     fun onSyncWithAnotherDevice() {
@@ -310,10 +316,10 @@ class SyncActivityViewModel @Inject constructor(
                 }
             } else {
                 if (isImprovedSyncFlow()) {
-                    command.send(IntroCreateAccount(isAuthRequired = true))
+                    command.send(IntroCreateAccount(isAuthRequired = true, isImprovedSyncFlow = true))
                 } else {
                     withAuthentication(flow = AuthFlow.SyncThisDevice) {
-                        command.send(IntroCreateAccount(isAuthRequired = false))
+                        command.send(IntroCreateAccount(isAuthRequired = false, isImprovedSyncFlow = false))
                     }
                 }
             }
@@ -348,7 +354,7 @@ class SyncActivityViewModel @Inject constructor(
             when (val result = syncAutoRestoreManager.clearAutoRestoreData()) {
                 is Success -> {
                     syncPixels.fireAutoRestorePreservedAccountCleared(source)
-                    command.send(Command.LaunchOriginalFlow(syncEntryPoint))
+                    command.send(Command.LaunchOriginalFlow(syncEntryPoint, isImprovedSyncFlow()))
                 }
                 is Error -> {
                     viewState.update { it.setThisDeviceSyncIdle() }

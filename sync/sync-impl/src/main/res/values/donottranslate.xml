@@ -15,6 +15,10 @@
   -->
 
 <resources>
+    <!-- Setup screen -->
+    <string name="sync_simplified_setup_header_headline_v2">Do you have another device nearby? Sync your devices.</string>
+    <string name="sync_simplified_setup_header_body_v2">No other device right now? Sync this device only and sync with another one later.</string>
+
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_example_code">eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNjgwRDQ1QjUtNUU2RS00MzQ3LTlDNDQtQjZGQkU4MEZDNEE3IiwicHJpbWFyelkasd92V9rZXkiOiJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFPSJ9fQ==</string>
 
