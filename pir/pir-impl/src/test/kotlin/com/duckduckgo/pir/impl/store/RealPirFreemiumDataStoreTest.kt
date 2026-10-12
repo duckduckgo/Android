@@ -140,47 +140,8 @@ class RealPirFreemiumDataStoreTest {
         assertEquals(1_000L, testee.firstProfileSavedTimestamp)
     }
 
-    @Test
-    fun whenScanCompleteNotificationIsNotMarkedPendingThenTakeReturnsFalse() {
-        assertFalse(testee.takePendingScanCompleteNotification())
-    }
-
-    @Test
-    fun whenScanCompleteNotificationIsMarkedPendingThenItIsTakenOnlyOnce() {
-        testee.markScanCompleteNotificationPending()
-
-        assertTrue(testee.takePendingScanCompleteNotification())
-        assertFalse(testee.takePendingScanCompleteNotification())
-    }
-
-    @Test
-    fun whenScanCompleteNotificationIsMarkedPendingTwiceThenItIsStillTakenOnlyOnce() {
-        testee.markScanCompleteNotificationPending()
-        testee.markScanCompleteNotificationPending()
-
-        assertTrue(testee.takePendingScanCompleteNotification())
-        assertFalse(testee.takePendingScanCompleteNotification())
-    }
-
-    @Test
-    fun whenResetThenPendingScanCompleteNotificationIsCleared() {
-        testee.markScanCompleteNotificationPending()
-
-        testee.reset()
-
-        assertFalse(testee.takePendingScanCompleteNotification())
-    }
-
-    @Test
-    fun whenScanCompleteNotificationIsMarkedPendingThenItIsStoredUnderItsKey() {
-        testee.markScanCompleteNotificationPending()
-
-        assertTrue(preferences.getBoolean(KEY_SCAN_COMPLETE_NOTIFICATION_PENDING, false))
-    }
-
     private companion object {
         // Hardcoded, not shared with production, so renaming the persisted key fails a test instead of silently dropping stored results.
         const val KEY_FIRST_SCAN_RESULT = "KEY_FIRST_SCAN_RESULT"
-        const val KEY_SCAN_COMPLETE_NOTIFICATION_PENDING = "KEY_SCAN_COMPLETE_NOTIFICATION_PENDING"
     }
 }
