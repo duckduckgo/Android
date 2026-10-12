@@ -131,14 +131,12 @@ class RealPirNotificationManager @Inject constructor(
         PendingIntent.FLAG_IMMUTABLE,
     )
 
-    // CLEAR_TOP without SINGLE_TOP recreates an open dashboard instead of stacking a second one on top of it
     private fun dashboardIntent(): Intent = Intent(context, PirDashboardWebViewActivity::class.java)
         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
     private fun createFreemiumScanCompleteNotification(): Notification {
         val notificationIntent = dashboardIntent()
             .putExtra(PirDashboardWebViewActivity.EXTRA_FROM_FREEMIUM_SCAN_COMPLETE_NOTIFICATION, true)
-        // PendingIntent matching ignores extras, so sharing the scan status request code would hand back that intent without the extra
         val pendingIntent = PendingIntent.getActivity(
             context,
             FREEMIUM_SCAN_COMPLETE_REQUEST_CODE,
