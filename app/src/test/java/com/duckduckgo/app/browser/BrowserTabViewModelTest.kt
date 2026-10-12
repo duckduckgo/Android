@@ -34,6 +34,8 @@ import android.webkit.WebBackForwardList
 import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebHistoryItem
 import android.webkit.WebView
+import androidx.arch.core.executor.ArchTaskExecutor
+import androidx.arch.core.executor.TaskExecutor
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
@@ -393,6 +395,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -881,7 +884,6 @@ class BrowserTabViewModelTest {
             whenever(mockDuckChatInputModeState.inputModeCapability).thenReturn(mockInputModeCapability)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
-            runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false) }
             whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
 
             ctaViewModel =
@@ -6145,7 +6147,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenPrivacyOnIsFalse() {
-        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
         whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
         whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
         loadUrl("https://example.com")
@@ -6154,7 +6155,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserPreferenceDisabledThenTrackersAnimationDisabled() {
-        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
         whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
         whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
         loadUrl("https://example.com")
@@ -6163,7 +6163,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserPreferenceEnabledAndPrivacyProtectionActiveThenTrackersAnimationEnabled() {
-        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
         whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
         whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
         whenever(mockContentBlocking.isAnException("example.com")).thenReturn(false)
@@ -6173,7 +6172,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserPreferenceDisabledEvenWithPrivacyProtectionActiveThenTrackersAnimationDisabled() {
-        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
         whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
         whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
         whenever(mockContentBlocking.isAnException("example.com")).thenReturn(false)
@@ -6183,7 +6181,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserPreferenceEnabledButPrivacyProtectionDisabledThenTrackersAnimationDisabled() {
-        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
         whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
         whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
         whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
@@ -6193,7 +6190,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserPreferenceDisabledAndPrivacyProtectionDisabledThenTrackersAnimationDisabled() {
-        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
         whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
         whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
         whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
@@ -10447,9 +10443,46 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenAutoConsentPopupHandledWithFeatureToggleEnabledAndTrackersBlockedThenEnqueueCookiesAnimation() {
-        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
+    fun whenAutoConsentPopupHandledOffMainThreadThenPostCommandOnMainThread() = runTest(
+        StandardTestDispatcher(coroutineRule.testDispatcher.scheduler),
+    ) {
+        givenCurrentSite("https://example.com")
+        testee.browserViewState.value =
+            testee.browserViewState.value?.copy(
+                browserShowing = true,
+                maliciousSiteBlocked = false,
+                maliciousSiteStatus = null,
+            )
+        // Autoconsent reports from its JS bridge thread; restore LiveData's main-thread check and a queuing Main
+        // dispatcher so posting a command from that thread fails instead of passing silently.
+        val mainThread = Thread.currentThread()
+        ArchTaskExecutor.getInstance().setDelegate(
+            object : TaskExecutor() {
+                override fun executeOnDiskIO(runnable: Runnable) = runnable.run()
+                override fun postToMainThread(runnable: Runnable) = runnable.run()
+                override fun isMainThread() = Thread.currentThread() == mainThread
+            },
+        )
+        coroutineRule.setMainDispatcher(StandardTestDispatcher(testScheduler))
 
+        var backgroundFailure: Throwable? = null
+        val jsBridgeThread = Thread {
+            try {
+                testee.onAutoConsentPopUpHandled(false)
+            } catch (e: Throwable) {
+                backgroundFailure = e
+            }
+        }
+        jsBridgeThread.start()
+        jsBridgeThread.join()
+        advanceUntilIdle()
+
+        assertNull(backgroundFailure)
+        assertCommandIssued<ShowAutoconsentAnimation>()
+    }
+
+    @Test
+    fun whenAutoConsentPopupHandledWithTrackersBlockedThenEnqueueCookiesAnimation() {
         testee.browserViewState.value =
             testee.browserViewState.value?.copy(
                 browserShowing = true,
@@ -10469,9 +10502,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenAutoConsentPopupHandledWithFeatureToggleDisabledThenShowAutoconsentAnimation() {
-        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false) }
-
+    fun whenAutoConsentPopupHandledWithNoTrackersBlockedThenShowAutoconsentAnimation() {
         givenCurrentSite("https://example.com")
         testee.browserViewState.value =
             testee.browserViewState.value?.copy(
@@ -10486,9 +10517,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenAutoConsentPopupHandledWithFeatureToggleEnabledButNoTrackersThenShowAutoconsentAnimation() {
-        runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true) }
-
+    fun whenAutoConsentPopupHandledWithNoTrackersThenShowAutoconsentAnimation() {
         testee.browserViewState.value =
             testee.browserViewState.value?.copy(
                 browserShowing = true,
@@ -10551,7 +10580,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenLoadingUrlWithTrackersAnimationEnabledThenLastAnimatedUrlIsUpdatedImmediately() = runTest {
-        whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
         whenever(mockAddressBarTrackersAnimationManager.shouldShowAnimation(anyOrNull(), anyOrNull())).thenReturn(true)
 
         loadUrl("https://www.example.com")
