@@ -40,7 +40,11 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncFeatureToggle
+import com.duckduckgo.sync.impl.auth.AuthPrompt
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Request
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
@@ -52,12 +56,10 @@ import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SO
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskEditDevice
-import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskToCopyRecoveryCode
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
-import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.RequestSetupAuthentication
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowDeviceUnsupported
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowMessage
@@ -74,6 +76,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -119,6 +122,8 @@ class SyncActivityViewModel @Inject constructor(
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
+
+    val authPrompts: StateFlow<AuthPrompt?> = deviceAuthenticator.currentPrompt
 
     init {
         syncPixels.fireSyncSettingsShown()
@@ -244,8 +249,7 @@ class SyncActivityViewModel @Inject constructor(
         data object AskDeleteAccount : Command()
         data object CheckIfUserHasStoragePermission : Command()
         data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
-        data object AskToCopyRecoveryCode : Command()
-        data class AskEditDevice(val device: ConnectedDevice, val requireAuthentication: Boolean) : Command()
+        data class AskEditDevice(val device: ConnectedDevice) : Command()
         data class ShowError(
             @StringRes val message: Int,
             val reason: String = "",
@@ -256,7 +260,6 @@ class SyncActivityViewModel @Inject constructor(
         ) : Command()
 
         data object ShowDeviceUnsupported : Command()
-        data class RequestSetupAuthentication(val forSyncThisDevice: Boolean) : Command()
         data class LaunchSyncGetOnOtherPlatforms(val source: SyncGetOnOtherPlatformsLaunchSource) : Command()
         data class LaunchLearnMore(val url: String) : Command()
         data class ShowPreviousSessionReady(val syncEntryPoint: SyncEntryPoint) : Command()
@@ -265,10 +268,12 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onSyncWithAnotherDevice() {
         viewModelScope.launch(dispatchers.io()) {
-            requiresSetupAuthentication {
-                if (syncAutoRestore.canRestore()) {
+            if (syncAutoRestore.canRestore()) {
+                withAuthentication(flow = AuthFlow.SyncSetup) {
                     command.send(ShowPreviousSessionReady(SyncEntryPoint.ADD_DEVICE))
-                } else {
+                }
+            } else {
+                withAuthentication {
                     command.send(Command.SyncWithAnotherDevice)
                 }
             }
@@ -277,7 +282,7 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onAddAnotherDevice() {
         viewModelScope.launch {
-            requiresSetupAuthentication {
+            withAuthentication {
                 command.send(Command.AddAnotherDevice)
             }
         }
@@ -288,10 +293,7 @@ class SyncActivityViewModel @Inject constructor(
         viewState.update { it.setThisDeviceSyncInProgress() }
         viewModelScope.launch(dispatchers.io()) {
             syncSetupWideEvent.onFlowStarted(source)
-            requiresSetupAuthentication(
-                forSyncThisDevice = true,
-                onDeviceAuthNotEnrolled = { syncSetupWideEvent.onDeviceAuthNotEnrolled() },
-            ) {
+            withAuthentication(flow = AuthFlow.SyncThisDevice) {
                 if (syncAutoRestore.canRestore()) {
                     command.send(ShowPreviousSessionReady(SyncEntryPoint.SYNC_NEW_ACCOUNT))
                 } else {
@@ -304,10 +306,12 @@ class SyncActivityViewModel @Inject constructor(
     fun onRecoverYourSyncedData() {
         syncPixels.fireRecoverSyncDataTapped()
         viewModelScope.launch(dispatchers.io()) {
-            requiresSetupAuthentication {
-                if (syncAutoRestore.canRestore()) {
+            if (syncAutoRestore.canRestore()) {
+                withAuthentication(flow = AuthFlow.SyncSetup) {
                     command.send(ShowPreviousSessionReady(SyncEntryPoint.RECOVER_SYNCED_DATA))
-                } else {
+                }
+            } else {
+                withAuthentication {
                     syncPixels.fireAutoRestoreSettingsManualRecoveryShown()
                     command.send(Command.IntroRecoverSyncData)
                 }
@@ -384,13 +388,9 @@ class SyncActivityViewModel @Inject constructor(
         showAccountDetailsIfNeeded()
     }
 
-    fun onDeleteAccountClicked(requireAuth: Boolean) {
+    fun onDeleteAccountClicked() {
         viewModelScope.launch {
-            if (requireAuth) {
-                requiresSetupAuthentication {
-                    command.send(AskDeleteAccount)
-                }
-            } else {
+            withAuthentication {
                 command.send(AskDeleteAccount)
             }
         }
@@ -418,32 +418,26 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onSaveRecoveryCodeClicked() {
         viewModelScope.launch {
-            requiresSetupAuthentication {
+            withAuthentication {
                 command.send(CheckIfUserHasStoragePermission)
             }
         }
     }
 
     fun onCopyRecoveryCodeClicked() {
-        viewModelScope.launch {
-            requiresSetupAuthentication {
-                command.send(AskToCopyRecoveryCode)
-            }
-        }
-    }
-
-    fun onCopyRecoveryCodeAuthenticated() {
         viewModelScope.launch(dispatchers.io()) {
-            when (val result = syncAccountRepository.getRecoveryCode()) {
-                is Success -> {
-                    val isNotificationShown = clipboard.copyToClipboard(result.data.rawCode, isSensitive = true)
-                    if (!isNotificationShown) {
-                        command.send(ShowMessage(R.string.sync_code_copied_message))
+            withAuthentication {
+                when (val result = syncAccountRepository.getRecoveryCode()) {
+                    is Success -> {
+                        val isNotificationShown = clipboard.copyToClipboard(result.data.rawCode, isSensitive = true)
+                        if (!isNotificationShown) {
+                            command.send(ShowMessage(R.string.sync_code_copied_message))
+                        }
                     }
-                }
 
-                is Error -> {
-                    command.send(ShowError(R.string.sync_general_error, result.reason))
+                    is Error -> {
+                        command.send(ShowError(R.string.sync_general_error, result.reason))
+                    }
                 }
             }
         }
@@ -506,15 +500,10 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    fun onEditDeviceClicked(device: ConnectedDevice, requireAuth: Boolean) {
+    fun onEditDeviceClicked(device: ConnectedDevice) {
         viewModelScope.launch {
-            val askEditCommand = AskEditDevice(device, requireAuthentication = requireAuth)
-            if (requireAuth) {
-                requiresSetupAuthentication {
-                    command.send(askEditCommand)
-                }
-            } else {
-                command.send(askEditCommand)
+            withAuthentication {
+                command.send(AskEditDevice(device))
             }
         }
     }
@@ -610,18 +599,58 @@ class SyncActivityViewModel @Inject constructor(
         newDesktopBrowserSettingEnabled = settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled(),
     )
 
-    private suspend fun requiresSetupAuthentication(
-        forSyncThisDevice: Boolean = false,
-        onDeviceAuthNotEnrolled: suspend () -> Unit = {},
+    private suspend fun withAuthentication(
+        request: Request = Request(),
+        flow: AuthFlow = AuthFlow.Default,
         action: suspend () -> Unit,
     ) {
-        val hasValidDeviceAuthentication = deviceAuthenticator.hasValidDeviceAuthentication()
-        if (hasValidDeviceAuthentication.not() && deviceAuthenticator.isAuthenticationRequired()) {
-            onDeviceAuthNotEnrolled()
-            command.send(RequestSetupAuthentication(forSyncThisDevice))
-        } else {
-            action()
+        val response = deviceAuthenticator.authenticate(request) { event ->
+            viewModelScope.launch {
+                when (event) {
+                    Event.EnrollmentNeeded -> syncSetupWideEvent.onDeviceAuthNotEnrolled()
+                    Event.EnrollmentShown -> syncSetupWideEvent.onEnrollDeviceAuthDialogShown()
+                    Event.VerificationShown -> Unit
+                }
+            }
         }
+
+        val isSetupFlow = flow != AuthFlow.Default
+        val isSyncThisDeviceFlow = flow == AuthFlow.SyncThisDevice
+
+        when (response) {
+            is Response.Allowed -> {
+                if (isSetupFlow) syncSetupWideEvent.onUserAuthSuccess()
+                action()
+            }
+
+            is Response.Cancelled.VerificationDismissed -> {
+                if (isSetupFlow) onSetupAuthCancelled()
+            }
+
+            is Response.Cancelled.EnrollmentClosed -> {
+                if (isSyncThisDeviceFlow) viewState.update { it.setThisDeviceSyncIdle() }
+            }
+
+            is Response.Failed -> {
+                if (isSetupFlow) onSetupAuthCancelled()
+                command.send(ShowError(R.string.sync_simplified_error_dialog_generic_body, response.reason))
+            }
+        }
+    }
+
+    private suspend fun onSetupAuthCancelled() {
+        viewState.update { it.setThisDeviceSyncIdle() }
+        syncSetupWideEvent.onUserAuthCancelled()
+    }
+
+    private enum class AuthFlow {
+        Default,
+
+        // Flows that lead into setting up sync, which report the authentication outcome to the setup wide event.
+        SyncSetup,
+
+        // SyncSetup that also drives the "Sync This Device" toggle.
+        SyncThisDevice,
     }
 
     private fun ViewState.setDevices(devices: List<SyncDeviceListItem>) = copy(syncedDevices = devices)
@@ -676,7 +705,7 @@ class SyncActivityViewModel @Inject constructor(
                     // V2 exchanges have their own user confirmation built into the protocol
                     // (the Joiner/Host confirmation surfaced by the runner)
                     logcat { "Sync-setup: v2 deep link; bypassing legacy confirmation dialog" }
-                    requiresSetupAuthentication {
+                    withAuthentication(DEEP_LINK_AUTH_REQUEST) {
                         command.send(Command.DeepLinkIntoSetup(parsed, syncAccountRepository.isSignedIn()))
                     }
                 }
@@ -686,7 +715,7 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onUserAgreedToDeepLinkIntoSync(barcodeSyncUrl: SyncBarcodeUrl) {
         viewModelScope.launch(dispatchers.io()) {
-            requiresSetupAuthentication {
+            withAuthentication(DEEP_LINK_AUTH_REQUEST) {
                 command.send(Command.DeepLinkIntoSetup(barcodeSyncUrl, syncAccountRepository.isSignedIn()))
             }
         }
@@ -694,6 +723,10 @@ class SyncActivityViewModel @Inject constructor(
 
     companion object {
         private const val SETTINGS_REFRESH_RATE_MS = 5_000L
+        private val DEEP_LINK_AUTH_REQUEST = Request(
+            verifyPromptTitle = R.string.sync_simplified_deep_link_auth_prompt_title,
+            verifyPromptMessage = R.string.sync_simplified_deep_link_auth_prompt_message,
+        )
         private const val LEARN_MORE_URL =
             "https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/recovery-codes-and-troubleshooting#data-expiration"
     }

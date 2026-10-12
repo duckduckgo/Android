@@ -43,13 +43,8 @@ class NativeInputHostLayoutTest {
     }
 
     @Test
-    fun whenTopInputLayoutInflatesThenCardAndFooterStructureIsPreservedWithoutClipping() {
+    fun whenInputLayoutInflatesThenCardAndFooterStructureIsPreservedWithoutClipping() {
         assertInputLayout(R.layout.input_mode_widget_card_view)
-    }
-
-    @Test
-    fun whenBottomInputLayoutInflatesThenCardAndFooterStructureIsPreservedWithoutClipping() {
-        assertInputLayout(R.layout.input_mode_widget_card_view_bottom)
     }
 
     private fun assertInputLayout(layoutId: Int) {

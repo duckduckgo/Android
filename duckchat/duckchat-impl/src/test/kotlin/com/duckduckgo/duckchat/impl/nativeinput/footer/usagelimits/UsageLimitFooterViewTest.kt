@@ -95,13 +95,6 @@ class UsageLimitFooterViewTest {
         assertTrue(dismissed)
     }
 
-    @Test
-    fun whenCreatedThenContentStartsBelowTheHostOverlap() {
-        val content = testee.getChildAt(0)
-
-        assertEquals(context.resources.getDimensionPixelSize(R.dimen.nativeInputFooterOverlap), content.paddingTop)
-    }
-
     private fun approaching() = UsageLimitFooterMessage(
         title = "75% of weekly limit",
         resetText = "Resets in 2 days",

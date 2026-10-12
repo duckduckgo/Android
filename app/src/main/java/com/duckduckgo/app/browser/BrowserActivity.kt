@@ -90,6 +90,7 @@ import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.orchestrator.NewUserBrowserOnboardingViewModel
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
+import com.duckduckgo.app.permissions.PermissionsScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
 import com.duckduckgo.app.pixels.AppReturnPixelSender
@@ -120,9 +121,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.dataclearing.api.fire.FireDialog
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
@@ -138,6 +137,7 @@ import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.feedback.api.FeedbackScreenNoParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
+import com.duckduckgo.site.permissions.impl.feature.SitePermissionsDialogRedesignFeature
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
 import com.duckduckgo.sync.api.SyncActivityFromSetupUrl
 import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
@@ -204,6 +204,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
+    lateinit var sitePermissionsDialogRedesignFeature: SitePermissionsDialogRedesignFeature
+
+    @Inject
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
 
@@ -237,9 +240,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var currentBrowserMode: BrowserMode
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -943,23 +943,21 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun configureEdgeToEdge() {
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
-            val toolbarColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
-            val barStyle = if (isDarkThemeEnabled()) {
-                SystemBarStyle.dark(toolbarColor)
-            } else {
-                SystemBarStyle.light(toolbarColor, toolbarColor)
-            }
-            enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(
-                binding.root,
-                installScrim = false,
-                isFullScreen = { isFullScreen() },
-            )
-            edgeToEdgeHandler.applyNavigationBarInsets(binding.navigationBarMockup.root)
-            edgeToEdgeHandler.applyNavigationBarInsets(binding.bottomMockupToolbar.appBarLayoutMockup)
-            applyDisplayCutoutMode(resources.configuration.orientation)
+        val toolbarColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
+        val barStyle = if (isDarkThemeEnabled()) {
+            SystemBarStyle.dark(toolbarColor)
+        } else {
+            SystemBarStyle.light(toolbarColor, toolbarColor)
         }
+        enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
+        edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(
+            binding.root,
+            installScrim = false,
+            isFullScreen = { isFullScreen() },
+        )
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.navigationBarMockup.root)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.bottomMockupToolbar.appBarLayoutMockup)
+        applyDisplayCutoutMode(resources.configuration.orientation)
     }
 
     private fun configureObservers() {
@@ -1099,7 +1097,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchSitePermissionsSettings() {
-        globalActivityStarter.start(this, SitePermissionScreenNoParams)
+        val screen = if (sitePermissionsDialogRedesignFeature.permissionSettingsRedesign().isEnabled()) {
+            PermissionsScreenNoParams
+        } else {
+            SitePermissionScreenNoParams
+        }
+        globalActivityStarter.start(this, screen)
     }
 
     fun launchBookmarks() {
@@ -1799,7 +1802,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     )
 
     private fun showSetAsDefaultBrowserDialog() {
-        val dialog = DefaultBrowserBottomSheetDialog(context = this, edgeToEdgeProvider = edgeToEdgeProvider)
+        val dialog = DefaultBrowserBottomSheetDialog(context = this)
         dialog.eventListener =
             object : EventListener {
                 override fun onShown() {

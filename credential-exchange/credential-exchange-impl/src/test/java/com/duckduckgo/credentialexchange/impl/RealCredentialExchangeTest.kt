@@ -66,7 +66,16 @@ class RealCredentialExchangeTest {
         assertTrue(testee.isImportSupported())
     }
 
-    private fun givenFeatureEnabled(enabled: Boolean) {
+    @Test
+    fun whenCanImportPasswordsDisabledThenNotSupportedEvenWithAnExporterInstalled() = runTest {
+        givenFeatureEnabled(true, canImportPasswords = false)
+        whenever(exporterAppDetector.exporterApps()) doReturn listOf("com.example.exporter")
+
+        assertFalse(testee.isImportSupported())
+    }
+
+    private fun givenFeatureEnabled(enabled: Boolean, canImportPasswords: Boolean = true) {
         credentialExchangeFeature.self().setRawStoredState(State(enabled))
+        credentialExchangeFeature.canImportPasswords().setRawStoredState(State(canImportPasswords))
     }
 }

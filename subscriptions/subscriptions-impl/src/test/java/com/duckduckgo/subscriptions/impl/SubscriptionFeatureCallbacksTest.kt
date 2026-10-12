@@ -17,6 +17,7 @@
 package com.duckduckgo.subscriptions.impl
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboardingExperimentMetrics
 import com.duckduckgo.subscriptions.impl.wideevents.FreeTrialConversionWideEvent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -34,11 +35,13 @@ class SubscriptionFeatureCallbacksTest {
     val coroutineRule = CoroutineTestRule()
 
     private val freeTrialConversionWideEvent: FreeTrialConversionWideEvent = mock()
+    private val subscriptionOnboardingExperimentMetrics: SubscriptionOnboardingExperimentMetrics = mock()
 
     private val testee = SubscriptionFeatureCallbacks(
         freeTrialConversionWideEvent = freeTrialConversionWideEvent,
         coroutineScope = coroutineRule.testScope,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
+        subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
     )
 
     @Test
@@ -59,6 +62,7 @@ class SubscriptionFeatureCallbacksTest {
         advanceUntilIdle()
 
         verify(freeTrialConversionWideEvent).onDuckAiPaidPromptSubmitted()
+        verify(subscriptionOnboardingExperimentMetrics).fireDuckAiPaidUsed()
     }
 
     @Test
@@ -71,6 +75,7 @@ class SubscriptionFeatureCallbacksTest {
         advanceUntilIdle()
 
         verify(freeTrialConversionWideEvent, never()).onDuckAiPaidPromptSubmitted()
+        verify(subscriptionOnboardingExperimentMetrics, never()).fireDuckAiPaidUsed()
     }
 
     @Test
@@ -83,5 +88,6 @@ class SubscriptionFeatureCallbacksTest {
         advanceUntilIdle()
 
         verify(freeTrialConversionWideEvent, never()).onDuckAiPaidPromptSubmitted()
+        verify(subscriptionOnboardingExperimentMetrics, never()).fireDuckAiPaidUsed()
     }
 }

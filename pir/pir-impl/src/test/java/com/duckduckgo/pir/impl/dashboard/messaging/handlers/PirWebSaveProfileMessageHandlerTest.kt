@@ -30,6 +30,7 @@ import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import com.duckduckgo.pir.impl.models.Address
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
+import com.duckduckgo.pir.impl.onboarding.experiment.SubscriptionOnboardingExperimentMetrics
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
@@ -66,6 +67,7 @@ class PirWebSaveProfileMessageHandlerTest {
     private val mockJsMessaging: JsMessaging = mock()
     private val mockJsMessageCallback: JsMessageCallback = mock()
     private val mockJobRecordUpdater: JobRecordUpdater = mock()
+    private val mockSubscriptionOnboardingExperimentMetrics: SubscriptionOnboardingExperimentMetrics = mock()
     private val testScope = TestScope()
 
     @Before
@@ -81,6 +83,7 @@ class PirWebSaveProfileMessageHandlerTest {
             currentTimeProvider = mockCurrentTimeProvider,
             appCoroutineScope = testScope,
             jobRecordUpdater = mockJobRecordUpdater,
+            subscriptionOnboardingExperimentMetrics = mockSubscriptionOnboardingExperimentMetrics,
         )
     }
 
@@ -170,7 +173,29 @@ class PirWebSaveProfileMessageHandlerTest {
             )
             verifyResponse(jsMessage, true, mockJsMessaging)
             verifyStartAndScheduleInitialScan(PirExecutionType.MANUAL_INITIAL)
+            verify(mockSubscriptionOnboardingExperimentMetrics).firePirActivated()
             verify(mockPirWebProfileStateHolder).clear()
+        }
+
+    @Test
+    fun whenProcessWithCompleteProfileButUserAlreadyHadProfilesThenDoesNotFirePirActivated() =
+        runTest {
+            // Given an existing profile (profile edit, not first-time activation)
+            val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+            val currentDateTime = LocalDateTime.of(2025, 6, 15, 10, 30)
+            whenever(mockPirWebProfileStateHolder.isProfileComplete).thenReturn(true)
+            whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(currentDateTime)
+            whenever(mockPirWebProfileStateHolder.toProfileQueries(2025)).thenReturn(listOf(createProfileQuery()))
+            whenever(mockRepository.getAllUserProfileQueries()).thenReturn(listOf(createProfileQuery()))
+            whenever(mockRepository.getValidUserProfileQueries()).thenReturn(emptyList())
+            whenever(mockRepository.getAllExtractedProfiles()).thenReturn(emptyList())
+            whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(true)
+
+            // When
+            testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+            // Then
+            verify(mockSubscriptionOnboardingExperimentMetrics, never()).firePirActivated()
         }
 
     @Test

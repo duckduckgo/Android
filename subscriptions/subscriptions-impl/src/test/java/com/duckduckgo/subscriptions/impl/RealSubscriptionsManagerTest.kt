@@ -25,6 +25,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.api.model.Entitlement
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ADVANCED_SUBSCRIPTION
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PRO_PLAN_US
@@ -49,6 +50,7 @@ import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Failure
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Purchased
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
 import com.duckduckgo.subscriptions.impl.notification.VpnReminderNotificationScheduler
+import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboardingExperiments
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
@@ -97,10 +99,12 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -154,6 +158,7 @@ class RealSubscriptionsManagerTest {
     private val timeProvider = FakeTimeProvider()
     private val backgroundTokenRefresh: BackgroundTokenRefresh = mock()
     private val crossProcessLock: CrossProcessLock = mock()
+    private val subscriptionOnboardingExperiments: SubscriptionOnboardingExperiments = mock()
     private lateinit var subscriptionsManager: RealSubscriptionsManager
 
     @Before
@@ -183,6 +188,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
     }
 
@@ -345,7 +351,7 @@ class RealSubscriptionsManagerTest {
         givenUserIsSignedIn()
         givenSubscriptionExists()
         givenAccessTokenIsExpired()
-        givenV2AccessTokenRefreshFails(errorCode = "invalid_token")
+        givenV2AccessTokenRefreshFails(error = "invalid_token")
         givenNoActivePurchase()
 
         val result = subscriptionsManager.getAccessToken()
@@ -364,7 +370,7 @@ class RealSubscriptionsManagerTest {
         givenUserIsSignedIn()
         givenSubscriptionExists()
         givenAccessTokenIsExpired()
-        givenV2AccessTokenRefreshFails(errorCode = "invalid_token")
+        givenV2AccessTokenRefreshFails(error = "invalid_token")
         givenPurchaseInfoUnknown()
 
         val result = subscriptionsManager.getAccessToken()
@@ -381,7 +387,7 @@ class RealSubscriptionsManagerTest {
     fun whenRefreshTokenWithUseQueryPurchasesAndActivePurchaseThenRecoversTokens() = runTest {
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
-        givenV2AccessTokenRefreshFails(errorCode = "invalid_token")
+        givenV2AccessTokenRefreshFails(error = "invalid_token")
         givenActivePurchase()
         givenStoreLoginSucceeds(newAccessToken = "new access token")
 
@@ -537,6 +543,64 @@ class RealSubscriptionsManagerTest {
                     ),
                 ),
             )
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenFreeTrialPurchaseConfirmedThenEnrollsOnboardingExperimentAsFreeTrialBeforeConfirm() = runTest {
+        givenSubscriptionConcurrentExperimentsEnabled(true)
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        givenConfirmPurchaseSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase(offerId = MONTHLY_FREE_TRIAL_OFFER_US)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Success)
+
+            inOrder(subscriptionOnboardingExperiments, subscriptionsService) {
+                verify(subscriptionOnboardingExperiments).enroll(true)
+                verify(subscriptionsService).confirm(any())
+            }
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPaidPurchaseConfirmedThenEnrollsOnboardingExperimentAsPaidBeforeConfirm() = runTest {
+        givenSubscriptionConcurrentExperimentsEnabled(true)
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        givenConfirmPurchaseSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase(offerId = null)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Success)
+
+            inOrder(subscriptionOnboardingExperiments, subscriptionsService) {
+                verify(subscriptionOnboardingExperiments).enroll(false)
+                verify(subscriptionsService).confirm(any())
+            }
 
             cancelAndConsumeRemainingEvents()
         }
@@ -922,6 +986,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.subscriptionStatus.test {
@@ -957,6 +1022,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.subscriptionStatus.test {
@@ -996,6 +1062,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.currentPurchaseState.test {
@@ -1049,6 +1116,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.currentPurchaseState.test {
@@ -1097,6 +1165,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.currentPurchaseState.test {
@@ -1140,6 +1209,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.currentPurchaseState.test {
@@ -1176,6 +1246,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.currentPurchaseState.test {
@@ -1234,7 +1305,7 @@ class RealSubscriptionsManagerTest {
     fun whenGetAccessTokenIfAccessTokenIsExpiredAndRefreshFailsWithAuthErrorThenGetNewTokenUsingStoreLoginAndReturnSuccess() = runTest {
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
-        givenV2AccessTokenRefreshFails(errorCode = "invalid_token")
+        givenV2AccessTokenRefreshFails(error = "invalid_token")
         givenPurchaseStored()
         givenStoreLoginSucceeds(newAccessToken = "new access token")
 
@@ -1251,7 +1322,7 @@ class RealSubscriptionsManagerTest {
         givenUserIsSignedIn()
         givenSubscriptionExists()
         givenAccessTokenIsExpired()
-        givenV2AccessTokenRefreshFails(errorCode = "invalid_token")
+        givenV2AccessTokenRefreshFails(error = "invalid_token")
         givenPurchaseStored()
         givenStoreLoginFails()
 
@@ -1274,7 +1345,7 @@ class RealSubscriptionsManagerTest {
         givenAccessTokenIsExpired()
 
         // Simulating the scenario where account was removed from BE.
-        givenV2AccessTokenRefreshFails(errorCode = "unknown_account")
+        givenV2AccessTokenRefreshFails(error = "unknown_account")
 
         val result = subscriptionsManager.getAccessToken()
 
@@ -1295,6 +1366,67 @@ class RealSubscriptionsManagerTest {
         verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenDetected()
         verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenSignedOut()
         verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenRecovered()
+    }
+
+    @Test
+    fun whenRefreshFailsWithErrorAndErrorCodeThenBothAreReportedToWideEvent() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(errorBody = """{"error":"invalid_token_request","error_code":2}""")
+
+        subscriptionsManager.getAccessToken()
+
+        verify(tokenRefreshWideEvent).onBackendErrorResponse(backendErrorResponse = "invalid_token_request", backendErrorCode = 2)
+    }
+
+    @Test
+    fun whenRefreshFailsWithErrorCodeOutsideKnownRangeThenItIsReportedAsIs() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(errorBody = """{"error":"invalid_token_request","error_code":7}""")
+
+        subscriptionsManager.getAccessToken()
+
+        verify(tokenRefreshWideEvent).onBackendErrorResponse(backendErrorResponse = "invalid_token_request", backendErrorCode = 7)
+    }
+
+    @Test
+    fun whenRefreshFailsWithNonNumericErrorCodeThenErrorIsStillHandled() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionExists()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(errorBody = """{"error":"unknown_account","error_code":"x"}""")
+
+        subscriptionsManager.getAccessToken()
+
+        verify(tokenRefreshWideEvent).onBackendErrorResponse(backendErrorResponse = "unknown_account", backendErrorCode = null)
+        verify(tokenRefreshWideEvent).onUnknownAccountError()
+        assertFalse(subscriptionsManager.isSignedIn())
+    }
+
+    @Test
+    fun whenRefreshFailsWithErrorCodeOnlyThenItIsReportedAndStoreLoginIsAttempted() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(errorBody = """{"error_code":1}""")
+        givenPurchaseStored()
+        givenStoreLoginSucceeds(newAccessToken = "new access token")
+
+        val result = subscriptionsManager.getAccessToken()
+
+        verify(tokenRefreshWideEvent).onBackendErrorResponse(backendErrorResponse = null, backendErrorCode = 1)
+        assertTrue(result is AccessTokenResult.Success)
+    }
+
+    @Test
+    fun whenRefreshFailsWithUnparseableBodyThenNoBackendErrorIsReported() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(errorBody = "not json")
+
+        subscriptionsManager.getAccessToken()
+
+        verify(tokenRefreshWideEvent, never()).onBackendErrorResponse(anyOrNull(), anyOrNull())
     }
 
     @Test
@@ -1513,6 +1645,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
         manager.signOut()
         verify(mockRepo).setSubscription(null)
@@ -1565,6 +1698,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         manager.subscriptionStatus.test {
@@ -1916,6 +2050,7 @@ class RealSubscriptionsManagerTest {
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
+            subscriptionOnboardingExperiments,
         )
 
         assertFalse(subscriptionsManager.canSupportEncryption())
@@ -2258,9 +2393,12 @@ class RealSubscriptionsManagerTest {
         givenValidateV2TokensSucceeds()
     }
 
-    private suspend fun givenV2AccessTokenRefreshFails(errorCode: String? = null) {
-        val exception = if (errorCode != null) {
-            val responseBody = """{"error":"$errorCode"}""".toResponseBody("text/json".toMediaTypeOrNull())
+    private suspend fun givenV2AccessTokenRefreshFails(
+        error: String? = null,
+        errorBody: String? = error?.let { """{"error":"$it"}""" },
+    ) {
+        val exception = if (errorBody != null) {
+            val responseBody = errorBody.toResponseBody("text/json".toMediaTypeOrNull())
             HttpException(Response.error<Void>(400, responseBody))
         } else {
             RuntimeException()

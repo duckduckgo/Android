@@ -19,9 +19,9 @@ package com.duckduckgo.app.browser.indexeddb
 import android.content.Context
 import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
-import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.file.FileDeleter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.squareup.anvil.annotations.ContributesBinding

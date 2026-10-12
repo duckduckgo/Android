@@ -33,9 +33,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementDisabledBinding
 import com.duckduckgo.common.ui.DuckDuckGoFragment
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import logcat.LogPriority.WARN
 import logcat.asLog
@@ -47,9 +45,6 @@ class AutofillManagementDisabledMode : DuckDuckGoFragment() {
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -70,9 +65,7 @@ class AutofillManagementDisabledMode : DuckDuckGoFragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.AUTOFILL)) {
-            edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.root)
-        }
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.root)
         binding.disabledCta.setOnClickListener {
             launchDeviceAuthEnrollment()
         }

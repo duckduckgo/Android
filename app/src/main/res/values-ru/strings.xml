@@ -264,6 +264,7 @@
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Разрешения</string>
+    <string name="permissionsGeneralPermissionsTitle" instruction="Section header on the Permissions settings screen, above the Notifications and Open Links in Apps settings">Общие разрешения</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Внешний вид</string>

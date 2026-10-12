@@ -325,6 +325,7 @@ import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
@@ -12070,9 +12071,9 @@ class BrowserTabViewModelTest {
     fun whenOpenDuckChatHistoryAndAvailableThenLaunchDuckChatHistoryCommandEmitted() = runTest {
         testee.browserViewState.value = browserViewState().copy(showDuckChatHistoryOption = true)
 
-        testee.openDuckChatHistory()
+        testee.openDuckChatHistory(DuckChatHistorySource.BROWSER_MENU)
 
-        assertCommandIssued<Command.LaunchDuckChatHistory>()
+        assertCommandIssued<Command.LaunchDuckChatHistory> { assertEquals(DuckChatHistorySource.BROWSER_MENU, source) }
         verify(mockDuckChatJSHelper, never()).onNativeAction(NativeAction.SIDEBAR)
     }
 
@@ -12086,7 +12087,7 @@ class BrowserTabViewModelTest {
         testee.browserViewState.value = browserViewState().copy(showDuckChatHistoryOption = false)
         whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)).thenReturn(expectedEvent)
 
-        testee.openDuckChatHistory()
+        testee.openDuckChatHistory(DuckChatHistorySource.BROWSER_MENU)
 
         assertCommandNotIssued<Command.LaunchDuckChatHistory>()
         testee.subscriptionEventDataFlow.test {
@@ -12104,7 +12105,7 @@ class BrowserTabViewModelTest {
 
         testee.onDuckChatSidebarButtonPressed()
 
-        assertCommandIssued<Command.LaunchDuckChatHistory>()
+        assertCommandIssued<Command.LaunchDuckChatHistory> { assertEquals(DuckChatHistorySource.SIDEBAR, source) }
         verify(mockDuckChatJSHelper, never()).onNativeAction(NativeAction.SIDEBAR)
     }
 

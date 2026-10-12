@@ -39,9 +39,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityReportBreakageAppListBinding
@@ -74,9 +72,6 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
     lateinit var breakageCategories: List<AppBreakageCategory>
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val viewModel: ReportBreakageAppListViewModel by bindViewModel()
@@ -96,10 +91,7 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.VPN)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         reportBreakage = registerForActivityResult(reportBreakageContract.get()) { result ->
             if (!result.isEmpty()) {
@@ -123,9 +115,7 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
         setupViews()
         observeViewModel()
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
     }
 
     private fun configureEdgeToEdgeInsets() {

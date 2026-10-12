@@ -28,6 +28,7 @@ interface DuckAiModelsService {
     suspend fun getModels(
         @Url url: String,
         @Header("Authorization") authorization: String?,
+        @Header("Cookie") cookies: String?,
     ): AIChatModelsResponse
 
     companion object {

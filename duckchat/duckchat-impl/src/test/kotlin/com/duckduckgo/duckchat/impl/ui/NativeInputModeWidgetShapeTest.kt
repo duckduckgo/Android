@@ -112,7 +112,7 @@ class NativeInputModeWidgetShapeTest {
         subject.renderDuckAi()
 
         assertEquals(
-            subject.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius),
+            subject.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.extraLargeShapeCornerRadius),
             subject.cornerSize(),
         )
     }
@@ -125,7 +125,20 @@ class NativeInputModeWidgetShapeTest {
         subject.renderDuckAi()
 
         assertEquals(
-            subject.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius),
+            subject.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.extraLargeShapeCornerRadius),
+            subject.cornerSize(),
+        )
+    }
+
+    @Test
+    fun `when address bar rebrand is disabled bottom Duck AI uses extra large radius`() {
+        val subject = createSubject(inputPosition = NativeInputState.InputPosition.BOTTOM)
+
+        subject.render(rebrandEnabled = false)
+        subject.renderDuckAi()
+
+        assertEquals(
+            subject.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.extraLargeShapeCornerRadius),
             subject.cornerSize(),
         )
     }

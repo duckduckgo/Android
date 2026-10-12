@@ -22,7 +22,6 @@
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingStart="@dimen/keyline_4"
-    android:paddingTop="@dimen/nativeInputFooterOverlap"
     android:paddingEnd="@dimen/keyline_2"
     android:paddingBottom="@dimen/keyline_empty">
 

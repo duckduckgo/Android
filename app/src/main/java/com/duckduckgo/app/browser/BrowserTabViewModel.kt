@@ -393,6 +393,7 @@ import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
@@ -5231,7 +5232,7 @@ class BrowserTabViewModel @Inject constructor(
                             unblockDuckAiOnboardingCta()
                         }
                     }
-                    duckChatJSHelper.consumeTabContextPromptOnHandoff(method)?.let { event ->
+                    duckChatJSHelper.consumeTabContextPromptOnHandoff(method, browserMode)?.let { event ->
                         // There is a pending tab context prompt waiting to be sent
                         withContext(dispatchers.main()) {
                             _subscriptionEventDataChannel.send(event)
@@ -5924,7 +5925,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onDuckChatSidebarButtonPressed() {
         if (duckAiFeatureState.nativeDuckAiSidebar.value) {
-            openDuckChatHistory()
+            openDuckChatHistory(DuckChatHistorySource.SIDEBAR)
         } else {
             openDuckChatSidebar()
         }
@@ -5937,9 +5938,9 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun openDuckChatHistory() {
+    fun openDuckChatHistory(source: DuckChatHistorySource) {
         if (currentBrowserViewState().showDuckChatHistoryOption) {
-            command.value = Command.LaunchDuckChatHistory
+            command.value = Command.LaunchDuckChatHistory(source)
         } else {
             viewModelScope.launch {
                 val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)

@@ -33,6 +33,7 @@ import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
 import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.OnboardingPreferenceCatalog
+import com.duckduckgo.app.onboarding.OnboardingPrivacyConfigPersistedGate
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentMetrics
@@ -81,6 +82,7 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.nextsteps.api.NextSteps
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Completed
 import com.duckduckgo.onboarding.api.LinearOnboardingState.InProgress
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Skipped
@@ -132,6 +134,8 @@ class NewUserOnboardingPlanProviderTest {
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo = mock()
     private val segmentedOnboardingExperiment: SegmentedOnboardingExperimentManager = mock()
     private val segmentedOnboardingMetrics: SegmentedOnboardingExperimentMetrics = mock()
+    private val nextSteps: NextSteps = mock()
+    private val privacyConfigPersistedGate: OnboardingPrivacyConfigPersistedGate = mock()
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog = mock {
         onBlocking { offer(any()) } doReturn emptyList()
     }
@@ -175,6 +179,7 @@ class NewUserOnboardingPlanProviderTest {
             whenever(customAiOnboardingResolver.resolve()).thenReturn(false)
             whenever(segmentedOnboardingExperiment.enroll()).thenReturn(null)
             whenever(passwordImportExperiment.enroll()).thenReturn(null)
+            whenever(privacyConfigPersistedGate.awaitPersisted()).thenReturn(true)
         }
         provider = NewUserOnboardingPlanProvider(
             syncAutoRestore = syncAutoRestore,
@@ -197,6 +202,8 @@ class NewUserOnboardingPlanProviderTest {
             duckAiOnboardingDemo = duckAiOnboardingDemo,
             segmentedOnboardingExperimentManager = segmentedOnboardingExperiment,
             segmentedOnboardingExperimentMetrics = segmentedOnboardingMetrics,
+            nextSteps = nextSteps,
+            onboardingPrivacyConfigPersistedGate = privacyConfigPersistedGate,
             onboardingPasswordImportExperimentManager = passwordImportExperiment,
             onboardingPreferenceCatalog = onboardingPreferenceCatalog,
             singleChoiceDataPlugins = singleChoiceDataPlugins,
@@ -2127,6 +2134,37 @@ class NewUserOnboardingPlanProviderTest {
             ONBOARDING_PREFERENCES_DUCK_AI,
             OnboardingPixelAction.SingleChoiceClicked(duckAiStateOptions[1].id),
         )
+    }
+
+    @Test
+    fun `when new user then the next steps items experiment is enrolled once`() = runTest {
+        start()
+
+        verify(nextSteps, times(1)).enroll()
+    }
+
+    @Test
+    fun `when reinstall user then the next steps items experiment is never enrolled`() = runTest {
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
+        start()
+
+        verify(nextSteps, never()).enroll()
+    }
+
+    @Test
+    fun `when privacy config is not persisted in time then the next steps items experiment is never enrolled`() = runTest {
+        whenever(privacyConfigPersistedGate.awaitPersisted()).thenReturn(false)
+        start()
+
+        verify(nextSteps, never()).enroll()
+    }
+
+    @Test
+    fun `when custom ai path and new user then the next steps items experiment is enrolled once`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        start()
+
+        verify(nextSteps, times(1)).enroll()
     }
 
     // endregion

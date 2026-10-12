@@ -23,6 +23,7 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.nativeinput.footer.FooterCategory
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooter
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterHost
@@ -61,6 +62,7 @@ class HighUsageModelFooterPlugin @Inject constructor(
 ) : NativeInputFooterPlugin {
 
     override val priority: Int = 100
+    override val category: FooterCategory = FooterCategory.USAGE_NOTICE
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun createFooter(

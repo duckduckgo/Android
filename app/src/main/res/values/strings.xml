@@ -257,6 +257,7 @@
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Permissions</string>
+    <string name="permissionsGeneralPermissionsTitle" instruction="Section header on the Permissions settings screen, above the Notifications and Open Links in Apps settings">General Permissions</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Appearance</string>

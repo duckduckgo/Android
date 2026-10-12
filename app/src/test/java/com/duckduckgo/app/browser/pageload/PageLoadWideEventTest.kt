@@ -97,6 +97,7 @@ class PageLoadWideEventTest {
             flowEntryPoint = null,
             metadata = emptyMap(),
             cleanupPolicy = CleanupPolicy.OnTimeout(5.minutes),
+            samplingProbability = 0.05f,
             definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
         )
         verify(wideEventClient).flowStep(
@@ -110,6 +111,21 @@ class PageLoadWideEventTest {
         verify(wideEventClient).intervalStart(eq(123L), eq("elapsed_time_to_escaped_fixed_progress_ms_bucketed"), eq(null), any())
         verify(wideEventClient, never()).intervalStart(eq(123L), eq("elapsed_time_to_content_scope_experiments_ms_bucketed"), any(), any())
         verify(wideEventClient, never()).intervalStart(eq(123L), eq("elapsed_time_to_js_injection_complete_ms_bucketed"), any(), any())
+    }
+
+    @Test
+    fun `when onPageStarted called then samples the flow at five percent`() = runTest {
+        pageLoadWideEvent.onPageStarted("tab_1", "https://reddit.com", 1L)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(wideEventClient).flowStart(
+            name = any(),
+            flowEntryPoint = anyOrNull(),
+            metadata = any(),
+            cleanupPolicy = any(),
+            samplingProbability = eq(0.05f),
+            definition = any(),
+        )
     }
 
     @Test
@@ -691,6 +707,7 @@ class PageLoadWideEventTest {
             flowEntryPoint = null,
             metadata = emptyMap(),
             cleanupPolicy = CleanupPolicy.OnTimeout(5.minutes),
+            samplingProbability = 0.05f,
             definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
         )
     }

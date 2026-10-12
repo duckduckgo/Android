@@ -46,7 +46,4 @@ interface ExtendedOnboardingFeatureToggles {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     @Experiment
     fun freeTrialCopy(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun duckAiOnboarding(): Toggle
 }

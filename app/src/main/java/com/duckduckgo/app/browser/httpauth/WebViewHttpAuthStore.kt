@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.httpauth
 
 import android.webkit.WebView
 import androidx.annotation.UiThread
-import androidx.annotation.WorkerThread
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.WebViewDatabaseProvider
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -63,7 +62,6 @@ interface WebViewHttpAuthStore {
     @UiThread
     fun clearHttpAuthUsernamePassword(webView: WebView)
 
-    @WorkerThread
     suspend fun cleanHttpAuthDatabase()
 }
 

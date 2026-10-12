@@ -47,6 +47,8 @@ import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter.CsvCredentialImportResult
 import com.duckduckgo.autofill.impl.importing.InternalInBrowserPromoStore
 import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
+import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportResult
+import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangePasswordImporter
 import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordConfigStore
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.Companion.RESULT_KEY_DETAILS
@@ -70,9 +72,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.extensions.launchAutofillProviderSystemSettings
-import com.duckduckgo.credentialexchange.api.CredentialExchange
 import com.duckduckgo.credentialexchange.api.CredentialExchangeLauncher
-import com.duckduckgo.credentialexchange.api.CredentialExchangeResult
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -151,7 +151,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     @Inject
-    lateinit var credentialExchange: CredentialExchange
+    lateinit var credentialExchangePasswordImporter: CredentialExchangePasswordImporter
 
     @Inject
     lateinit var credentialExchangeLauncher: CredentialExchangeLauncher
@@ -375,16 +375,20 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
 
         binding.importPasswordsCredentialExchangeButton.setClickListener {
             lifecycleScope.launch {
-                if (!credentialExchange.isImportSupported()) {
+                if (!credentialExchangePasswordImporter.isSupported()) {
                     getString(R.string.autofillDevSettingsCredentialExchangeNotSupported).showSnackbar()
                     return@launch
                 }
 
-                when (val result = credentialExchangeLauncher.launchImportFlow()) {
-                    is CredentialExchangeResult.Success ->
-                        "Received ${result.credentials.size} credentials from ${result.exporterPackageName}".showSnackbar()
-                    is CredentialExchangeResult.Cancelled -> "Cancelled".showSnackbar()
-                    is CredentialExchangeResult.Failure -> "Failed: ${result.reason}".showSnackbar()
+                val exchangeResult = credentialExchangeLauncher.launchImportFlow()
+                when (val result = credentialExchangePasswordImporter.convertAndDeduplicate(exchangeResult)) {
+                    is CredentialExchangeImportResult.Success -> {
+                        importStartTime = System.currentTimeMillis()
+                        credentialImporter.import(result.credentials, result.originalCount, Unknown)
+                        observePasswordInputUpdates()
+                    }
+                    is CredentialExchangeImportResult.Cancelled -> "Cancelled".showSnackbar()
+                    is CredentialExchangeImportResult.Failure -> "Failed: ${result.reason}".showSnackbar()
                 }
             }
         }

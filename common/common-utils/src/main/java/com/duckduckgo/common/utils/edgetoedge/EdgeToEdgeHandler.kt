@@ -38,9 +38,8 @@ import javax.inject.Inject
  * system-bar inset on top of the view's *original* padding (captured once), so repeated inset
  * dispatches never accumulate padding. Insets are requested as soon as the view is attached.
  *
- * Callers should only invoke these when edge-to-edge is enabled for the screen's bucket
- * (see [EdgeToEdgeProvider]); when disabled the window reserves the bars itself and no padding
- * should be added.
+ * Callers should only invoke these on screens that enable edge-to-edge; otherwise the window
+ * reserves the bars itself and no padding should be added.
  */
 class EdgeToEdgeHandler @Inject constructor() {
 

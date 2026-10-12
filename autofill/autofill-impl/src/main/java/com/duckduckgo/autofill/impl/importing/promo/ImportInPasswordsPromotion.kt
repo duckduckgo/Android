@@ -31,6 +31,7 @@ import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin.Call
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin.Companion.PRIORITY_KEY_IMPORT_PROMO
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ViewImportPasswordsPromoBinding
+import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangePasswordImporter
 import com.duckduckgo.autofill.impl.importing.promo.ImportInPasswordsPromotionViewModel.Command
 import com.duckduckgo.autofill.impl.importing.promo.ImportInPasswordsPromotionViewModel.Command.DismissImport
 import com.duckduckgo.autofill.impl.importing.resolvePasswordsKeychainAnimationAsset
@@ -56,6 +57,7 @@ import javax.inject.Inject
 @PriorityKey(PRIORITY_KEY_IMPORT_PROMO)
 class ImportInPasswordsPromotion @Inject constructor(
     private val importInPasswordsVisibility: ImportInPasswordsVisibility,
+    private val credentialExchangePasswordImporter: CredentialExchangePasswordImporter,
 ) : PasswordsScreenPromotionPlugin {
 
     override suspend fun getView(
@@ -64,7 +66,9 @@ class ImportInPasswordsPromotion @Inject constructor(
     ): View? {
         if (importInPasswordsVisibility.canShowImportInPasswords(numberSavedPasswords).not()) return null
         logcat { "Autofill: returning view for ImportInPasswordsPromotion" }
-        return ImportInPasswordsPromotionView(context)
+        return ImportInPasswordsPromotionView(context).apply {
+            usesCredentialExchange = credentialExchangePasswordImporter.isSupported()
+        }
     }
 }
 
@@ -94,6 +98,8 @@ class ImportInPasswordsPromotionView @JvmOverloads constructor(
     }
 
     private var job: ConflatedJob = ConflatedJob()
+
+    internal var usesCredentialExchange: Boolean = false
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
@@ -126,12 +132,18 @@ class ImportInPasswordsPromotionView @JvmOverloads constructor(
         val isPictogramsEnabled = appBrandDesignUpdateToggles.pictograms().isEnabled()
         val animationAsset = resolvePasswordsKeychainAnimationAsset(isPictogramsEnabled)
 
+        val subtitle = if (usesCredentialExchange) {
+            R.string.passwords_import_promo_subtitle_device_auth
+        } else {
+            R.string.passwords_import_promo_subtitle
+        }
+
         with(binding.importPromo) {
             setMessage(
                 Message(
                     topAnimation = animationAsset.animationRes,
                     title = context.getString(R.string.passwords_import_promo_title),
-                    subtitle = context.getString(R.string.passwords_import_promo_subtitle),
+                    subtitle = context.getString(subtitle),
                     action = context.getString(R.string.passwords_import_promo_action),
                     messageType = REMOTE_MESSAGE,
                 ),

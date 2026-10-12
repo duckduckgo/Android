@@ -38,9 +38,7 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature.APPTP_VPN
@@ -92,8 +90,6 @@ class TrackingProtectionExclusionListActivity :
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
-    @Inject lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
     @Inject lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val binding: ActivityTrackingProtectionExclusionListBinding by viewBinding()
@@ -108,10 +104,7 @@ class TrackingProtectionExclusionListActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.VPN)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         reportBreakage = registerForActivityResult(reportBreakageContract.get()) { result ->
             if (!result.isEmpty()) {
@@ -126,9 +119,7 @@ class TrackingProtectionExclusionListActivity :
         bindViews()
         observeViewModel()
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         viewModel.applyAppsFilter(getAppsFilterOrDefault())
 

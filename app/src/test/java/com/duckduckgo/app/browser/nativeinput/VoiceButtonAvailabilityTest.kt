@@ -76,12 +76,19 @@ class VoiceButtonAvailabilityTest {
     }
 
     @Test
-    fun whenOnActiveDuckChatThenVoiceChatSuppressedRegardlessOfFlag() {
-        val withFlag = compute(isOnActiveDuckChat = true, voiceChatEntry = true)
-        val withoutFlag = compute(isOnActiveDuckChat = true, voiceChatEntry = false)
+    fun whenOnNewDuckChatThenVoiceChatGatedByFlag() {
+        val withFlag = compute(isOnActiveDuckChat = true, isNewDuckAiChat = true, voiceChatEntry = true)
+        val withoutFlag = compute(isOnActiveDuckChat = true, isNewDuckAiChat = true, voiceChatEntry = false)
 
-        assertEquals(false, withFlag.voiceChatAvailable)
+        assertEquals(true, withFlag.voiceChatAvailable)
         assertEquals(false, withoutFlag.voiceChatAvailable)
+    }
+
+    @Test
+    fun whenOnExistingDuckChatThenVoiceChatSuppressedRegardlessOfFlag() {
+        val state = compute(isOnActiveDuckChat = true, isNewDuckAiChat = false, voiceChatEntry = true)
+
+        assertEquals(false, state.voiceChatAvailable)
     }
 
     @Test
@@ -103,12 +110,14 @@ class VoiceButtonAvailabilityTest {
 
     private fun compute(
         isOnActiveDuckChat: Boolean = false,
+        isNewDuckAiChat: Boolean = true,
         deviceAvailable: Boolean = true,
         duckAiVoiceSearch: Boolean = true,
         voiceChatEntry: Boolean = true,
         isDuckAiTabSelected: Boolean = false,
     ): VoiceButtonAvailability = computeVoiceButtonAvailability(
         isOnActiveDuckChat = isOnActiveDuckChat,
+        isNewDuckAiChat = isNewDuckAiChat,
         isVoiceSearchDeviceAvailable = deviceAvailable,
         isVoiceSearchDuckAiEnabled = duckAiVoiceSearch,
         isVoiceChatEntryEnabled = voiceChatEntry,

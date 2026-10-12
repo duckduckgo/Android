@@ -344,6 +344,23 @@
         <!--Rebrand Status-->
         <item name="daxColorRebrandStatusIndicatorOff">@color/white40</item>
         <item name="daxColorStatusRed">@color/alertRedOnDarkDefault</item>
+
+        <item name="daxContainerRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="daxDialogRadius">@dimen/dialogBorderRadius</item>
+        <item name="daxSheetRadius">@dimen/dialogBorderRadius</item>
+        <item name="daxLargeSheetRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="daxMenuRadius">@dimen/smallShapeCornerRadius</item>
+        <item name="daxSearchBarRadius">@dimen/smallShapeCornerRadius</item>
+        <item name="daxChipRadius">@dimen/keyline_2</item>
+        <item name="daxDuckAiPromptRadius">@dimen/mediumShapeCornerRadius</item>
+        <item name="daxWhatsNewCardRadius">@dimen/mediumShapeCornerRadius</item>
+        <item name="daxMenuClipToOutline">false</item>
+        <item name="daxOnboardingSheetRadius">@dimen/onboardingBottomSheetCornerRadius</item>
+        <item name="daxInfoPanelRadius">@dimen/smallShapeCornerRadius</item>
+        <item name="daxMessageCtaCloseButtonSize">@dimen/messageCtaCloseButtonSize</item>
+        <item name="daxMessageCtaCloseButtonBackground">?attr/selectableItemBackground</item>
+        <item name="daxMessageCtaClipToPadding">true</item>
+        <item name="daxPillRadius">@dimen/daxYellowPillCornerRadius</item>
     </style>
 
     <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
@@ -509,6 +526,23 @@
         <!--Rebrand Status-->
         <item name="daxColorRebrandStatusIndicatorOff">@color/black36</item>
         <item name="daxColorStatusRed">@color/rb_red50</item>
+
+        <item name="daxContainerRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="daxDialogRadius">@dimen/dialogBorderRadius</item>
+        <item name="daxSheetRadius">@dimen/dialogBorderRadius</item>
+        <item name="daxLargeSheetRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="daxMenuRadius">@dimen/smallShapeCornerRadius</item>
+        <item name="daxSearchBarRadius">@dimen/smallShapeCornerRadius</item>
+        <item name="daxChipRadius">@dimen/keyline_2</item>
+        <item name="daxDuckAiPromptRadius">@dimen/mediumShapeCornerRadius</item>
+        <item name="daxWhatsNewCardRadius">@dimen/mediumShapeCornerRadius</item>
+        <item name="daxMenuClipToOutline">false</item>
+        <item name="daxOnboardingSheetRadius">@dimen/onboardingBottomSheetCornerRadius</item>
+        <item name="daxInfoPanelRadius">@dimen/smallShapeCornerRadius</item>
+        <item name="daxMessageCtaCloseButtonSize">@dimen/messageCtaCloseButtonSize</item>
+        <item name="daxMessageCtaCloseButtonBackground">?attr/selectableItemBackground</item>
+        <item name="daxMessageCtaClipToPadding">true</item>
+        <item name="daxPillRadius">@dimen/daxYellowPillCornerRadius</item>
     </style>
 
     <style name="Theme.DuckDuckGo.Survey" parent="Theme.DuckDuckGo.Light">

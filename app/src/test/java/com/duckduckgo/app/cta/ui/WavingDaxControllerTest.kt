@@ -65,6 +65,31 @@ class WavingDaxControllerTest {
         assertEquals(1f, controller.daxHorizontalScale(heightPx = 400, maxHeightPx = 0), 0f)
     }
 
+    @Test
+    fun deferFitDuringIme_false_whenImeNotAnimating() {
+        assertFalse(controller.deferFitDuringIme(imeAnimating = false, daxVisible = true, currentHeightPx = 400, newHeightPx = 800))
+    }
+
+    @Test
+    fun deferFitDuringIme_true_whenGrowingWhileImeAnimates() {
+        assertTrue(controller.deferFitDuringIme(imeAnimating = true, daxVisible = true, currentHeightPx = 400, newHeightPx = 800))
+    }
+
+    @Test
+    fun deferFitDuringIme_true_whenReshowingWhileImeAnimates() {
+        assertTrue(controller.deferFitDuringIme(imeAnimating = true, daxVisible = false, currentHeightPx = 800, newHeightPx = 400))
+    }
+
+    @Test
+    fun deferFitDuringIme_false_whenShrinkingWhileImeAnimates() {
+        assertFalse(controller.deferFitDuringIme(imeAnimating = true, daxVisible = true, currentHeightPx = 800, newHeightPx = 400))
+    }
+
+    @Test
+    fun deferFitDuringIme_false_whenHidingWhileImeAnimates() {
+        assertFalse(controller.deferFitDuringIme(imeAnimating = true, daxVisible = true, currentHeightPx = 800, newHeightPx = null))
+    }
+
     // develop / V2-off daxFits tests
 
     @Test

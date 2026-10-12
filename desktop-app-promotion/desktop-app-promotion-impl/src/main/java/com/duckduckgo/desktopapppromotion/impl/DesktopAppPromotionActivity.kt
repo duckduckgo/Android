@@ -31,9 +31,7 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.desktopapppromotion.api.DesktopAppPromotionParams
 import com.duckduckgo.desktopapppromotion.impl.DesktopAppPromotionShareBroadcastReceiver.Companion.EXTRA_HANDLER_ID
 import com.duckduckgo.desktopapppromotion.impl.DesktopAppPromotionViewModel.Command
@@ -54,9 +52,6 @@ class DesktopAppPromotionActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var promotionViewModelFactory: DesktopAppPromotionViewModel.Factory
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -84,18 +79,13 @@ class DesktopAppPromotionActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
         supportActionBar?.title = content.toolbarTitle
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         setupObservers()
         setupBackNavigationHandler()

@@ -21,8 +21,6 @@ import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.LinearLayout
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
 import androidx.test.core.app.ApplicationProvider
@@ -46,31 +44,6 @@ class ContextualNativeInputHostLayoutTest {
         ApplicationProvider.getApplicationContext(),
         com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Light,
     )
-
-    @Test
-    fun whenContextualNativeLayoutInflatesThenCardAndFooterStructureIsPreserved() {
-        assertInputLayout(
-            layoutId = R.layout.fragment_contextual_duck_ai_native,
-            cardId = R.id.contextualNativeInputCard,
-            footerId = R.id.contextualNativeInputFooter,
-        )
-    }
-
-    @Test
-    fun whenContextualNativeLayoutInflatesThenLegacyComposerRemainsAStackedSibling() {
-        val root = LayoutInflater.from(context).inflate(R.layout.fragment_contextual_duck_ai_native, null)
-
-        val inputContainer = root.findViewById<FrameLayout>(R.id.contextualInputContainer)
-        val nativeCard = root.findViewById<MaterialCardView>(R.id.contextualNativeInputCard)
-        val nativeFooter = root.findViewById<NativeInputFooterView>(R.id.contextualNativeInputFooter)
-        val nativeDock = nativeCard.parent as LinearLayout
-        val legacyComposer = root.findViewById<View>(R.id.contextualModeNativeContent)
-
-        assertTrue(nativeDock is NativeInputFooterDockLayout)
-        assertSame(nativeDock, nativeFooter.parent)
-        assertSame(inputContainer, nativeDock.parent)
-        assertSame(inputContainer, legacyComposer.parent)
-    }
 
     @Test
     fun whenContextualWebViewLayoutInflatesThenCardAndFooterStructureIsPreserved() {

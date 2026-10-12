@@ -28,7 +28,6 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItem
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItemPlugin
-import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.ui.ChatTabSuggestions
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatHistoryShortcutAdapter
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSearchSuggestionAdapter
@@ -48,7 +47,6 @@ import javax.inject.Inject
 class NativeInputChatSuggestionsBinder @Inject constructor(
     private val chatItemPlugins: ActivePluginPoint<NativeInputChatTabItemPlugin>,
     private val inputModeState: DuckChatInputModeState,
-    private val duckChatFeature: DuckChatFeature,
     private val duckAiFeatureState: DuckAiFeatureState,
 ) {
 
@@ -180,23 +178,21 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
         onChatSuggestionDeleteClicked: (ChatSuggestion) -> Unit = {},
         onChatUrlSuggestionDeleteClicked: (AutoCompleteSuggestion) -> Unit = {},
     ): Binding {
-        val removeChatHistoryEnabled = duckChatFeature.removeChatHistory().isEnabled()
         val chatSuggestionsAdapter = ChatSuggestionsAdapter(
             // Only show the per-row delete (fire) icon when deletion will actually run. The delete
             // path (clearSelectedDuckAiChats) no-ops unless showClearDuckAIChatHistory is on, so
             // gating the icon on the same signal avoids a delete that looks done but did nothing.
-            showDeleteButton = removeChatHistoryEnabled && duckAiFeatureState.showClearDuckAIChatHistory.value,
+            showDeleteButton = duckAiFeatureState.showClearDuckAIChatHistory.value,
             onChatClicked = { onChatSuggestionSelected(it) },
             onDeleteClicked = { onChatSuggestionDeleteClicked(it) },
         )
         val urlAdapter = BrowserAutoCompleteSuggestionsAdapter(
             immediateSearchClickListener = { onChatUrlSuggestionClicked(it) },
             editableSearchClickListener = { },
-            autoCompleteDeleteClickListener = { if (removeChatHistoryEnabled) onChatUrlSuggestionDeleteClicked(it) },
+            autoCompleteDeleteClickListener = { onChatUrlSuggestionDeleteClicked(it) },
             omnibarType = OmnibarType.SINGLE_TOP,
             hideEditQueryArrow = true,
             hideSectionDividers = true,
-            isDeleteButtonVisible = removeChatHistoryEnabled,
         )
         val urlDivider = SectionDividerAdapter()
         val searchDivider = SectionDividerAdapter()

@@ -21,8 +21,8 @@ import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.SyncBuildConfig
 import com.duckduckgo.sync.impl.SyncFeature
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.FLOW_VERSION_V1
 import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.FLOW_VERSION_V2
 import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.FLOW_VERSION_V2_1
@@ -62,7 +62,7 @@ class SyncSetupWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
     private val syncFeature: Lazy<SyncFeature>,
     private val dispatchers: DispatcherProvider,
-    private val deviceAuthenticator: DeviceAuthenticator,
+    private val buildConfig: SyncBuildConfig,
 ) : SyncSetupWideEvent {
 
     private var cachedFlowId: Long? = null
@@ -96,7 +96,7 @@ class SyncSetupWideEventImpl @Inject constructor(
             name = FLOW_NAME,
             flowEntryPoint = source,
             metadata = buildMap {
-                put(KEY_USER_AUTH_REQUIRED, deviceAuthenticator.isAuthenticationRequired().toString())
+                put(KEY_USER_AUTH_REQUIRED, buildConfig.isAuthRequired.toString())
                 putAll(uiMetadata())
                 putAll(flowMetadata())
             },

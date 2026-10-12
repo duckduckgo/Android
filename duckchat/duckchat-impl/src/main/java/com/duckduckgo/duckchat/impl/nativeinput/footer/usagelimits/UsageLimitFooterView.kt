@@ -20,6 +20,7 @@ import android.content.Context
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.widget.FrameLayout
 import android.widget.ImageView
 import com.duckduckgo.common.ui.view.button.DaxButtonSecondary
 import com.duckduckgo.common.ui.view.getColorFromAttr
@@ -27,13 +28,12 @@ import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageLimitFooterMessage.Icon
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageLimitFooterMessage.Severity
-import com.google.android.material.card.MaterialCardView
 
 class UsageLimitFooterView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : MaterialCardView(context, attrs, defStyleAttr) {
+) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val ring: UsageRingView
     private val alert: ImageView
@@ -43,18 +43,6 @@ class UsageLimitFooterView @JvmOverloads constructor(
     private val dismiss: ImageView
 
     init {
-        val cornerRadius = resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
-        shapeAppearanceModel = shapeAppearanceModel.toBuilder()
-            .setTopLeftCornerSize(0f)
-            .setTopRightCornerSize(0f)
-            .setBottomLeftCornerSize(cornerRadius)
-            .setBottomRightCornerSize(cornerRadius)
-            .build()
-        cardElevation = resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_0)
-        setCardBackgroundColor(context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface))
-        strokeColor = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorOmnibarAccent)
-        strokeWidth = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarOutlineWidth)
-        useCompatPadding = false
         LayoutInflater.from(context).inflate(R.layout.view_usage_limit_footer, this, true)
         ring = findViewById(R.id.usageLimitFooterRing)
         alert = findViewById(R.id.usageLimitFooterAlert)

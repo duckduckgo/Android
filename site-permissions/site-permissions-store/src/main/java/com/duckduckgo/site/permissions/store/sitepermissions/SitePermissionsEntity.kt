@@ -18,15 +18,17 @@ package com.duckduckgo.site.permissions.store.sitepermissions
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType.ASK_EVERY_TIME
 
+/**
+ * A null setting means the user never chose one for this site; ASK_EVERY_TIME is an explicit choice.
+ */
 @Entity(tableName = "site_permissions")
 data class SitePermissionsEntity(
     @PrimaryKey val domain: String,
-    val askCameraSetting: String = ASK_EVERY_TIME.name,
-    val askMicSetting: String = ASK_EVERY_TIME.name,
-    val askDrmSetting: String = ASK_EVERY_TIME.name,
-    val askLocationSetting: String = ASK_EVERY_TIME.name,
+    val askCameraSetting: String? = null,
+    val askMicSetting: String? = null,
+    val askDrmSetting: String? = null,
+    val askLocationSetting: String? = null,
 )
 
 enum class SitePermissionAskSettingType {

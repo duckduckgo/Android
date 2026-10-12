@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">O website \"%1$s\" quer aceder à tua câmara</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">O website \"%1$s\" quer aceder ao teu microfone</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">O site \"%1$s\" quer aceder à tua câmara e ao teu microfone</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" quer aceder à tua localização neste website</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" quer aceder à tua câmara neste site</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" quer aceder ao teu microfone neste website</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">O site \"%1$s\" quer aceder à tua câmara e ao teu microfone neste site</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" quer aceder ao teu software de Gestão de Direitos Digitais (DRM) neste website</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Se não permitires, os vídeos no site podem tornar-se inutilizáveis, mas este site não terá acesso aos identificadores de dispositivo fornecidos pelo software de DRM.</string>
 
     <!-- Reminder dialog -->
@@ -104,5 +109,22 @@
     <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">O DuckDuckGo não conseguiu dar acesso à câmara a este site</string>
     <string name="sitePermissionsTieredMicDeniedSnackBarMessage">O DuckDuckGo não conseguiu dar acesso ao microfone a este site</string>
     <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">O DuckDuckGo não conseguiu dar acesso à câmara e ao microfone a este site</string>
+
+    <!-- Permission settings redesign -->
+    <string name="permissionSettingsAlwaysAllow" instruction="Permission setting option: the site gets the permission without asking">Permitir sempre</string>
+    <string name="permissionSettingsAskEachTime" instruction="Permission setting option: the site has to ask for the permission every time">Perguntar sempre</string>
+    <string name="permissionSettingsLocationDialogTitle">Permitir que os sites solicitem permissão de localização</string>
+    <string name="permissionSettingsLocationDialogMessage">Se escolheres “Nunca permitir”, não poderás utilizar determinadas funcionalidades nos sites, como direções em mapas ou lojas nas proximidades.</string>
+    <string name="permissionSettingsCameraDialogTitle">Permitir que os sites peçam permissão de utilização da câmara</string>
+    <string name="permissionSettingsCameraDialogMessage">Se escolheres “Nunca permitir”, não poderás utilizar funcionalidades como videochamadas em sites.</string>
+    <string name="permissionSettingsMicrophoneDialogTitle">Permitir que os sites peçam permissão de utilização do microfone</string>
+    <string name="permissionSettingsMicrophoneDialogMessage">Se escolheres “Nunca permitir”, não poderás usar funcionalidades como conversação por voz em sites.</string>
+    <string name="permissionSettingsDrmDialogTitle">Permitir que os sites peçam permissão de Gestão de Direitos Digitais (DRM)</string>
+    <string name="permissionSettingsDrmTitle" instruction="Name of a permission setting for playing protected video content">Gestão de Direitos Digitais (DRM)</string>
+    <string name="permissionsPerWebsiteRedesignHeader" instruction="Placeholder is the name of a website">Permissões para %1$s</string>
+    <string name="permissionsPerWebsiteRemovePermissions" instruction="Button that removes all saved permissions for the website shown on the screen">Remover Permissões</string>
+    <string name="permissionsRemovedForSiteSnackbar" instruction="Placeholder is the name of a website">Permissões removidas para &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="permissionsRemovedForAllSitesSnackbar">As permissões foram removidas para todos os sites</string>
+    <string name="permissionSettingsDrmDialogMessage">Se escolheres “Nunca permitir”, os vídeos no site podem tornar-se inutilizáveis.</string>
 
 </resources>

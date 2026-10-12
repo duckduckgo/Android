@@ -51,12 +51,11 @@ class BrowserMenuBottomSheet(
     private val faviconManager: FaviconManager,
     private val onDismissListener: () -> Unit,
     private val onMenuItemClickListener: () -> Unit,
-    private val edgeToEdgeEnabled: Boolean,
     private val topInContextSections: Collection<TopInContextSection> = emptyList(),
     private val currentUrl: Uri? = null,
 ) : BottomSheetDialog(
     context,
-    if (edgeToEdgeEnabled) com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge else 0,
+    com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge,
 ) {
     private val binding = BottomSheetBrowserMenuBinding.inflate(LayoutInflater.from(context))
 
@@ -70,9 +69,7 @@ class BrowserMenuBottomSheet(
 
     init {
         setContentView(binding.root)
-        if (edgeToEdgeEnabled) {
-            binding.root.applyBottomSystemBarInsetPadding()
-        }
+        binding.root.applyBottomSystemBarInsetPadding()
 
         // Set VPN menu item size to medium like other menu items
         binding.includeVpnMenuItem.vpnMenuItem
@@ -83,12 +80,10 @@ class BrowserMenuBottomSheet(
 
         setOnShowListener { dialogInterface ->
             (dialogInterface as BottomSheetDialog).setRoundCorners()
-            if (edgeToEdgeEnabled) {
-                edgeToEdgeHandler.applyNavigationBarScrim(
-                    binding.root,
-                    context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface),
-                )
-            }
+            edgeToEdgeHandler.applyNavigationBarScrim(
+                binding.root,
+                context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface),
+            )
 
             behavior.apply {
                 isDraggable = true

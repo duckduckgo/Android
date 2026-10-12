@@ -23,17 +23,12 @@ import android.view.ViewGroup
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementDeviceUnsupportedBinding
 import com.duckduckgo.common.ui.DuckDuckGoFragment
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class AutofillManagementDeviceUnsupportedMode : DuckDuckGoFragment() {
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -54,9 +49,7 @@ class AutofillManagementDeviceUnsupportedMode : DuckDuckGoFragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.AUTOFILL)) {
-            edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.root)
-        }
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.root)
     }
 
     companion object {

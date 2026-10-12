@@ -82,6 +82,9 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
             themingDataStore.theme,
             applyFireTheme,
             appBrandDesignUpdateToggles.theme().isEnabled(),
+            listOfNotNull(
+                R.style.ThemeOverlay_Rebrand_Radius.takeIf { appBrandDesignUpdateToggles.radius().isEnabled() },
+            ),
         )
         super.onCreate(savedInstanceState)
     }

@@ -65,6 +65,8 @@ Every pixel fired in code **must** have a corresponding entry in a definition fi
 - Find the appropriate definition file for your feature area (or create a new one)
 - Add an entry keyed by the full pixel name
 - Include `description`, `owners`, `triggers`, `parameters`, and `suffixes` fields
+- Choose `triggers` with the decision procedure in `.claude/rules/pixel-definitions.md` — classify by
+  the event that causes the pixel to fire, and never default to `["other"]`
 - The `owners` field must contain the author's GitHub username
 - Match the format of existing entries in the same file
 

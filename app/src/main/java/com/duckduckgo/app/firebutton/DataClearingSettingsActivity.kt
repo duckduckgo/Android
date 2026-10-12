@@ -36,9 +36,7 @@ import com.duckduckgo.app.settings.clear.FireAnimation.HeroAbstract.getAnimation
 import com.duckduckgo.app.settings.clear.displayLabelResId
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.Settings
 import com.duckduckgo.di.scopes.ActivityScope
@@ -55,9 +53,6 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
     lateinit var fireDialogProvider: FireDialogProvider
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val viewModel: DataClearingSettingsViewModel by bindViewModel()
@@ -71,16 +66,11 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
         supportActionBar?.setTitle(R.string.dataClearingActivityTitle)
 
         configureUiEventHandlers()

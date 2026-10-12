@@ -24,6 +24,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.bookmarks.BookmarkAddedDialogPlugin
 import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -48,6 +49,7 @@ class SetupSyncBookmarkAddedPromo @Inject constructor(
     private val syncPromotions: SyncPromotions,
     private val syncStateMonitor: SyncStateMonitor,
     private val syncPixels: SyncPixels,
+    private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
 ) : BookmarkAddedDialogPlugin {
 
     @SuppressLint("InflateParams")
@@ -57,6 +59,9 @@ class SetupSyncBookmarkAddedPromo @Inject constructor(
         }
 
         val root = LayoutInflater.from(activity).inflate(R.layout.view_sync_setup_bookmark_added_promo, null) as OneLineListItem
+        if (appBrandDesignUpdateToggles.radius().isEnabled()) {
+            root.setBackgroundResource(R.drawable.sync_bookmark_added_promo_background)
+        }
         root.setOnClickListener {
             onLaunchSyncFlow(activity)
             syncPixels.fireSetupSyncPromoBookmarkAddedDialogConfirmed()

@@ -22,8 +22,8 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.sync.impl.SyncBuildConfig
 import com.duckduckgo.sync.impl.SyncFeature
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import kotlinx.coroutines.test.runTest
@@ -32,6 +32,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -46,20 +47,23 @@ class SyncSetupWideEventImplTest {
 
     private val wideEventClient: WideEventClient = mock()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
-    private val deviceAuthenticator: DeviceAuthenticator = mock()
+
+    var isAuthRequired = true
+    private val buildConfig = mock<SyncBuildConfig> {
+        on { isAuthRequired } doAnswer { isAuthRequired }
+    }
 
     private lateinit var wideEvent: SyncSetupWideEventImpl
 
     @Before
     fun setup() {
         syncFeature.sendSyncSetupWideEvent().setRawStoredState(State(true))
-        whenever(deviceAuthenticator.isAuthenticationRequired()).thenReturn(true)
 
         wideEvent = SyncSetupWideEventImpl(
             wideEventClient = wideEventClient,
             syncFeature = { syncFeature },
             dispatchers = coroutineRule.testDispatcherProvider,
-            deviceAuthenticator = deviceAuthenticator,
+            buildConfig = buildConfig,
         )
     }
 

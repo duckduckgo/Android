@@ -16,8 +16,7 @@ from asana_release_utils import (
     extract_asana_task_links,
     extract_task_id_from_url,
     get_latest_public_release_tag,
-    get_public_release_tag_before,
-    is_ancestor,
+    collect_shipped_task_ids,
 )
 
 
@@ -63,20 +62,12 @@ def main():
         task_links = extract_asana_task_links(commits, args.trigger_phrase)
         task_links_with_url = [link for link in task_links if link.url]
 
-        # If `start_tag` is not an ancestor of `end_commit` (e.g. a hotfix branch
-        # that hasn't been merged back to develop), commits unique to that branch
-        # still show up in `start_tag..end_commit`, so tasks they reference would
-        # be wrongly reported as new. Exclude task IDs already shipped in
-        # `prior_release..start_tag`.
-        already_released_task_ids: set[str] = set()
-        if not is_ancestor(args.android_repo_path, start_tag, args.end_commit):
-            prior_tag = get_public_release_tag_before(args.android_repo_path, start_tag)
-            if prior_tag:
-                prior_commits = get_commits_between(args.android_repo_path, prior_tag, start_tag)
-                prior_links = extract_asana_task_links(prior_commits, args.trigger_phrase)
-                already_released_task_ids = {
-                    extract_task_id_from_url(link.url) for link in prior_links if link.url
-                }
+        # A task can already have shipped in a release tag even though its
+        # commit is also reachable from develop (e.g. a hotfix merged back).
+        # Exclude by task ID, not commit SHA, so it stays excluded either way.
+        already_released_task_ids = collect_shipped_task_ids(
+            args.android_repo_path, start_tag, args.trigger_phrase
+        )
 
         filtered_links = [
             link for link in task_links_with_url

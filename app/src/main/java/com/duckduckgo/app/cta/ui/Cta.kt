@@ -1774,6 +1774,14 @@ sealed class DaxBubbleCta(
             wavingDaxController?.applyFit(container)
         }
 
+        fun onImeAnimationStarted() {
+            wavingDaxController?.onImeAnimationStarted()
+        }
+
+        fun onImeAnimationEnded() {
+            wavingDaxController?.onImeAnimationEnded()
+        }
+
         fun onOrientationChanged() {
             if (!onboardingImprovementsEnabled) return
             val container = ctaView ?: return

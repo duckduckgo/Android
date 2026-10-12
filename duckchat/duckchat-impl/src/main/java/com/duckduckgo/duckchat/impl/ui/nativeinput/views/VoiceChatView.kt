@@ -42,7 +42,7 @@ class VoiceChatView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : FrameLayout(context, attrs, defStyle) {
+) : FrameLayout(context, attrs, defStyle), CompactableControl {
 
     @Inject lateinit var viewModelFactory: ViewViewModelFactory
 
@@ -59,6 +59,11 @@ class VoiceChatView @JvmOverloads constructor(
     init {
         inflate(context, R.layout.view_native_input_voice_chat_button, this)
     }
+
+    override fun setCompactLevel(level: Int) = Unit
+
+    // Shown only while the input is empty, when the submit button is not, so its room is counted by the submit button.
+    override fun worstCaseWidth(level: Int): Int = 0
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)

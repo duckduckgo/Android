@@ -258,6 +258,7 @@
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">İzinler</string>
+    <string name="permissionsGeneralPermissionsTitle" instruction="Section header on the Permissions settings screen, above the Notifications and Open Links in Apps settings">Genel İzinler</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Görünüm</string>
