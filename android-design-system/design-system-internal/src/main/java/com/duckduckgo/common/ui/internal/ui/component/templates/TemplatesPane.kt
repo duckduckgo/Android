@@ -130,7 +130,6 @@ fun TemplatesPane(modifier: Modifier = Modifier) {
                             onClick = {
                                 Toast.makeText(context, "Bookmark clicked", Toast.LENGTH_SHORT).show()
                             },
-                            showDivider = true,
                         )
                         DaxInsetItem(
                             text = "Copy link",
@@ -138,13 +137,11 @@ fun TemplatesPane(modifier: Modifier = Modifier) {
                                 Toast.makeText(context, "Copy link clicked", Toast.LENGTH_SHORT).show()
                             },
                             trailingIcon = { Icon(painterResource(CommonR.drawable.ic_copy_24), null) },
-                            showDivider = true,
                         )
                         DaxDefaultItem(
                             text = "Unavailable",
                             onClick = { },
                             enabled = false,
-                            showDivider = true,
                         )
                         DaxDefaultItem(
                             text = "Delete",

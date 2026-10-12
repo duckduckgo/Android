@@ -676,13 +676,11 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                                     text = "Bookmark",
                                     painterLeadingIcon = painterResource(CommonR.drawable.ic_bookmark_24),
                                     onClick = { Toast.makeText(context, "Bookmark pressed", Toast.LENGTH_SHORT).show() },
-                                    showDivider = true,
                                 )
                                 DaxInsetItem(
                                     text = "Copy link",
                                     onClick = { Toast.makeText(context, "Copy link pressed", Toast.LENGTH_SHORT).show() },
                                     trailingIcon = { Icon(painterResource(CommonR.drawable.ic_copy_24), null) },
-                                    showDivider = true,
                                 )
                                 DaxDefaultItem(text = "Unavailable", onClick = {}, enabled = false)
                             }
@@ -712,7 +710,6 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                                 DaxDefaultItem(
                                     text = "Share",
                                     onClick = { Toast.makeText(context, "Share pressed", Toast.LENGTH_SHORT).show() },
-                                    showDivider = true,
                                 )
                                 DaxDefaultItem(
                                     text = "Delete",
