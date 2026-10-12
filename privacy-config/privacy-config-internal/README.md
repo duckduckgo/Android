@@ -18,7 +18,7 @@ adb shell am broadcast --include-stopped-packages \
 
 Use `--include-stopped-packages` when the app has been force-stopped or has never
 been launched. Substitute the installed package name for other internal builds.
-HTTP and HTTPS URLs with a host are accepted; invalid URLs leave settings unchanged.
+HTTP and HTTPS URLs with a host are accepted.
 The receiver queues one immediate load, enables the developer override, and resets
 the stored version and ETag before downloading. Commands are processed in order.
 There is no command retry, polling, or new periodic work; the existing hourly
@@ -29,22 +29,6 @@ Serve `generated/v5/android-config.json` from `duckduckgo/privacy-configuration`
 (after running `node index.js`) with `Cache-Control: no-store` so subsequent commands
 fetch your latest file. `10.0.2.2` is the Android emulator's host address.
 
-On debuggable builds, wait for persistence with:
-
-```bash
-adb logcat | grep CONFIG_OVERRIDE_APPLIED
-```
-
-Each actual persistence while an override is active emits one message:
-
-```text
-CONFIG_OVERRIDE_APPLIED stage=config version=<config version> etag=<etag> source=<override URL>
-```
-
-The ETag is empty if the server omits it. Broadcast completion means the command
-was queued; the marker means the config was persisted. A failed load emits no
-marker and keeps the selected override for the next command or manual load.
-
 Clear the override and immediately load the default config:
 
 ```bash
@@ -53,7 +37,25 @@ adb shell am broadcast --include-stopped-packages \
   -p com.duckduckgo.mobile.android.debug
 ```
 
-RESET emits no override marker because the override is no longer active.
+### Result lines
+
+Every SET_URL and RESET command logs exactly one line under the tag
+`PrivacyConfigOverride`, on debug and release internal builds alike:
+
+```bash
+adb logcat -s PrivacyConfigOverride:I
+```
+
+```text
+CONFIG_OVERRIDE_APPLIED stage=config version=<version> etag=<etag> source=<override URL>
+CONFIG_OVERRIDE_RESET stage=config version=<version> etag=<etag>
+CONFIG_OVERRIDE_FAILED action=set_url|reset reason=invalid_url|download_failed
+```
+
+Broadcast completion means the command was queued; the result line means it
+finished. The ETag is empty if the server omits it. A failed SET_URL download
+keeps the selected override for the next command or manual load; an invalid URL
+leaves settings unchanged. Loads started from Developer Settings log nothing.
 
 ## Local remote config patches
 

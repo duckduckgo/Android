@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,9 @@ package com.duckduckgo.privacy.config.internal
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
+import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader.ConfigDownloadResult
 import com.duckduckgo.privacy.config.internal.store.DevPrivacyConfigSettingsDataStore
+import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -30,15 +32,20 @@ import javax.inject.Inject
 class PrivacyConfigInternalLoader @Inject constructor(
     private val downloader: PrivacyConfigDownloader,
     private val store: DevPrivacyConfigSettingsDataStore,
+    private val repository: PrivacyConfigRepository,
+    private val marker: PrivacyConfigOverrideMarker,
 ) {
     private val mutex = Mutex()
 
-    suspend fun load(): PrivacyConfigDownloader.ConfigDownloadResult = mutex.withLock { forceLoad() }
+    suspend fun load(): ConfigDownloadResult = mutex.withLock { forceLoad() }
 
     suspend fun handleCommand(action: String?, url: String?): Boolean = mutex.withLock {
         when (action) {
             ACTION_SET_URL -> {
-                if (!isValidUrl(url)) return@withLock false
+                if (!isValidUrl(url)) {
+                    marker.emit("$FAILED action=set_url reason=invalid_url")
+                    return@withLock false
+                }
                 store.remotePrivacyConfigUrl = url
                 store.useCustomPrivacyConfigUrl = true
                 store.canUrlBeChanged = true
@@ -50,10 +57,20 @@ class PrivacyConfigInternalLoader @Inject constructor(
             }
             else -> return@withLock false
         }
-        forceLoad() is PrivacyConfigDownloader.ConfigDownloadResult.Success
+        val result = forceLoad()
+        marker.emit(resultLine(action, url, result))
+        result is ConfigDownloadResult.Success
     }
 
-    private suspend fun forceLoad(): PrivacyConfigDownloader.ConfigDownloadResult {
+    private fun resultLine(action: String, url: String?, result: ConfigDownloadResult): String {
+        val command = if (action == ACTION_SET_URL) "set_url" else "reset"
+        if (result is ConfigDownloadResult.Error) return "$FAILED action=$command reason=download_failed"
+        val stored = repository.get()
+        val fields = "stage=config version=${stored?.version} etag=${stored?.eTag.orEmpty()}"
+        return if (action == ACTION_SET_URL) "$APPLIED $fields source=$url" else "$RESET $fields"
+    }
+
+    private suspend fun forceLoad(): ConfigDownloadResult {
         // The downloader resets version and ETag under its shared download lock.
         return downloader.download(force = true)
     }
@@ -62,6 +79,9 @@ class PrivacyConfigInternalLoader @Inject constructor(
         const val ACTION_SET_URL = "com.duckduckgo.privacy.config.internal.SET_URL"
         const val ACTION_RESET = "com.duckduckgo.privacy.config.internal.RESET"
         const val EXTRA_URL = "url"
+        private const val APPLIED = "CONFIG_OVERRIDE_APPLIED"
+        private const val RESET = "CONFIG_OVERRIDE_RESET"
+        private const val FAILED = "CONFIG_OVERRIDE_FAILED"
 
         fun isValidUrl(url: String?): Boolean = runCatching {
             val uri = URI(url ?: return false)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalLoader.Companion.EXTRA_URL
 import kotlinx.coroutines.withContext
-import logcat.LogPriority.WARN
-import logcat.logcat
 import javax.inject.Inject
 
 @ContributesWorker(AppScope::class)
@@ -36,13 +34,8 @@ class PrivacyConfigOverrideWorker(context: Context, parameters: WorkerParameters
 
     override suspend fun doWork(): Result = withContext(dispatcherProvider.io()) {
         // Completing command processing successfully keeps later queued commands runnable.
-        val applied = loader.handleCommand(inputData.getString(KEY_ACTION), inputData.getString(EXTRA_URL))
-        if (applied) {
-            Result.success()
-        } else {
-            logcat(WARN) { "Privacy config override command failed" }
-            Result.success()
-        }
+        loader.handleCommand(inputData.getString(KEY_ACTION), inputData.getString(EXTRA_URL))
+        Result.success()
     }
 
     companion object {

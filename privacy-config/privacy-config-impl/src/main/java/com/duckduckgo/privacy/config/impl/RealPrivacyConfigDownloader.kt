@@ -86,8 +86,7 @@ class RealPrivacyConfigDownloader @Inject constructor(
             val eTag = response.headers().extractETag()
             response.body()?.let {
                 runCatching {
-                    val source = generateSequence(response.raw()) { raw -> raw.priorResponse }.last().request.url.toString()
-                    privacyConfigPersister.persistPrivacyConfig(it, eTag, source)
+                    privacyConfigPersister.persistPrivacyConfig(it, eTag)
                     telemetry.onProcessFinished()
                     privacyConfigCallbacks.getPlugins().forEach { callback -> callback.onPrivacyConfigDownloaded() }
                 }.onFailure {

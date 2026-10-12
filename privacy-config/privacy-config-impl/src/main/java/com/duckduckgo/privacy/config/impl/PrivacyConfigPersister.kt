@@ -50,7 +50,6 @@ interface PrivacyConfigPersister {
     suspend fun persistPrivacyConfig(
         jsonPrivacyConfig: JsonPrivacyConfig,
         eTag: String? = null,
-        source: String? = null,
     )
 }
 
@@ -73,7 +72,6 @@ class RealPrivacyConfigPersister @Inject constructor(
     override suspend fun persistPrivacyConfig(
         jsonPrivacyConfig: JsonPrivacyConfig,
         eTag: String?,
-        source: String?,
     ) {
         val privacyConfig = privacyConfigRepository.get()
         val newVersion = jsonPrivacyConfig.version
@@ -124,9 +122,6 @@ class RealPrivacyConfigPersister @Inject constructor(
                         }
                     }
                 }
-            }
-            privacyConfigCallbackPlugin.getPlugins().forEach {
-                it.onPrivacyConfigPersisted(jsonPrivacyConfig.version, eTag, source)
             }
         }
         privacyConfigCallbackPlugin.getPlugins().forEach {

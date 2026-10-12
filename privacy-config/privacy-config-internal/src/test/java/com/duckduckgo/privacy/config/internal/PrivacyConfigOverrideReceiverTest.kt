@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,17 +26,6 @@ import org.mockito.kotlin.whenever
 class PrivacyConfigOverrideReceiverTest {
     private val workManager = mock<WorkManager>()
     private val receiver = PrivacyConfigOverrideReceiver().apply { workManager = this@PrivacyConfigOverrideReceiverTest.workManager }
-
-    @Test
-    fun whenSetUrlIsInvalidThenDoNotEnqueueWork() {
-        listOf(null, "", "file:///tmp/config.json", "http://", "https:///config.json").forEach { url ->
-            val intent = mock<Intent>()
-            whenever(intent.action).thenReturn("com.duckduckgo.privacy.config.internal.SET_URL")
-            whenever(intent.getStringExtra("url")).thenReturn(url)
-            receiver.onReceive(mock(), intent)
-        }
-        verifyNoInteractions(workManager)
-    }
 
     @Test
     fun whenActionUnknownThenDoNotEnqueueWork() {
