@@ -21,7 +21,6 @@
     <string name="newTabReturnHatchFireTabTitle">Posljednja korištena Fire kartica</string>
     <string name="newTabReturnHatchTabClosed">Kartica je zatvorena</string>
     <string name="newTabReturnHatchUndo">Poništi</string>
-    <string name="hatchMenuReturnToLastUsedTab">Povratak na posljednju korištenu karticu</string>
     <string name="hatchMenuAfterInactivitySettings">Nakon neaktivnosti</string>
     <string name="hatchMenuAfterInactivityOpenNewTab">Otvori novu karticu</string>
     <string name="hatchMenuAfterInactivityLastUsedTab">Posljednja korištena kartica</string>

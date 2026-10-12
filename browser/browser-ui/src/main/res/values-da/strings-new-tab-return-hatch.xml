@@ -21,7 +21,6 @@
     <string name="newTabReturnHatchFireTabTitle">Sidst brugte Fire-fane</string>
     <string name="newTabReturnHatchTabClosed">Fanen er lukket</string>
     <string name="newTabReturnHatchUndo">Fortryd</string>
-    <string name="hatchMenuReturnToLastUsedTab">Gå tilbage til sidst brugte fane</string>
     <string name="hatchMenuAfterInactivitySettings">Efter inaktivitet</string>
     <string name="hatchMenuAfterInactivityOpenNewTab">Åbn ny fane</string>
     <string name="hatchMenuAfterInactivityLastUsedTab">Sidst brugte fane</string>

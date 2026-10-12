@@ -21,7 +21,6 @@
     <string name="newTabReturnHatchFireTabTitle">Paskutinį kartą naudotas „Fire“ skirtukas</string>
     <string name="newTabReturnHatchTabClosed">Skirtukas uždarytas</string>
     <string name="newTabReturnHatchUndo">Anuliuoti</string>
-    <string name="hatchMenuReturnToLastUsedTab">Grįžti į paskutinį naudotą skirtuką</string>
     <string name="hatchMenuAfterInactivitySettings">Po neaktyvumo</string>
     <string name="hatchMenuAfterInactivityOpenNewTab">Atidaryti naują skirtuką</string>
     <string name="hatchMenuAfterInactivityLastUsedTab">Paskutinis naudotas skirtukas</string>

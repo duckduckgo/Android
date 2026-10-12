@@ -21,7 +21,6 @@
     <string name="newTabReturnHatchFireTabTitle">Viimati kasutatud Fire vahekaart</string>
     <string name="newTabReturnHatchTabClosed">Vaheleht on suletud</string>
     <string name="newTabReturnHatchUndo">Võta tagasi</string>
-    <string name="hatchMenuReturnToLastUsedTab">Tagasi viimati kasutatud vahelehele</string>
     <string name="hatchMenuAfterInactivitySettings">Pärast tegevusetust</string>
     <string name="hatchMenuAfterInactivityOpenNewTab">Ava uus vaheleht</string>
     <string name="hatchMenuAfterInactivityLastUsedTab">Viimati kasutatud vahekaart</string>

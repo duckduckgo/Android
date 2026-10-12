@@ -21,7 +21,6 @@
     <string name="newTabReturnHatchFireTabTitle">Ostatnio używana karta Fire</string>
     <string name="newTabReturnHatchTabClosed">Karta zamknięta</string>
     <string name="newTabReturnHatchUndo">Cofnij</string>
-    <string name="hatchMenuReturnToLastUsedTab">Wróć do ostatnio używanej karty</string>
     <string name="hatchMenuAfterInactivitySettings">Po braku aktywności</string>
     <string name="hatchMenuAfterInactivityOpenNewTab">Otwórz nową kartę</string>
     <string name="hatchMenuAfterInactivityLastUsedTab">Ostatnio używana karta</string>

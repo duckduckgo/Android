@@ -21,7 +21,6 @@
     <string name="newTabReturnHatchFireTabTitle">Laatst gebruikte Fire Tab</string>
     <string name="newTabReturnHatchTabClosed">Tabblad gesloten</string>
     <string name="newTabReturnHatchUndo">Ongedaan maken</string>
-    <string name="hatchMenuReturnToLastUsedTab">Terug naar laatst gebruikte tabblad</string>
     <string name="hatchMenuAfterInactivitySettings">Na inactiviteit</string>
     <string name="hatchMenuAfterInactivityOpenNewTab">Nieuw tabblad openen</string>
     <string name="hatchMenuAfterInactivityLastUsedTab">Laatst gebruikte tabblad</string>

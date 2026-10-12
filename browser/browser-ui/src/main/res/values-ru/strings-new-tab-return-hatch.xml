@@ -21,7 +21,6 @@
     <string name="newTabReturnHatchFireTabTitle">Последняя использованная Fire-вкладка</string>
     <string name="newTabReturnHatchTabClosed">Вкладка закрыта</string>
     <string name="newTabReturnHatchUndo">Отменить</string>
-    <string name="hatchMenuReturnToLastUsedTab">Вернуться к последней использованной вкладке</string>
     <string name="hatchMenuAfterInactivitySettings">После бездействия</string>
     <string name="hatchMenuAfterInactivityOpenNewTab">Открыть новую вкладку</string>
     <string name="hatchMenuAfterInactivityLastUsedTab">Последняя использованная вкладка</string>

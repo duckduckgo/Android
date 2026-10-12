@@ -21,7 +21,6 @@
     <string name="newTabReturnHatchFireTabTitle">Utoljára használt Fire lap</string>
     <string name="newTabReturnHatchTabClosed">Lap bezárva</string>
     <string name="newTabReturnHatchUndo">Visszavonás</string>
-    <string name="hatchMenuReturnToLastUsedTab">Vissza az utoljára használt lapra</string>
     <string name="hatchMenuAfterInactivitySettings">Inaktivitás után</string>
     <string name="hatchMenuAfterInactivityOpenNewTab">Új lap megnyitása</string>
     <string name="hatchMenuAfterInactivityLastUsedTab">Utoljára használt lap</string>

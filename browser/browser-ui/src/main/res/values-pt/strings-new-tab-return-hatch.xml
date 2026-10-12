@@ -21,7 +21,6 @@
     <string name="newTabReturnHatchFireTabTitle">Último separador Fire utilizado</string>
     <string name="newTabReturnHatchTabClosed">Separador fechado</string>
     <string name="newTabReturnHatchUndo">Anular</string>
-    <string name="hatchMenuReturnToLastUsedTab">Regressar ao último separador utilizado</string>
     <string name="hatchMenuAfterInactivitySettings">Após inatividade</string>
     <string name="hatchMenuAfterInactivityOpenNewTab">Abrir novo separador</string>
     <string name="hatchMenuAfterInactivityLastUsedTab">Último separador utilizado</string>

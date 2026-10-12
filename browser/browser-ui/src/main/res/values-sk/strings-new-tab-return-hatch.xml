@@ -21,7 +21,6 @@
     <string name="newTabReturnHatchFireTabTitle">Naposledy použitá karta Fire</string>
     <string name="newTabReturnHatchTabClosed">Karta bola zatvorená</string>
     <string name="newTabReturnHatchUndo">Zrušiť zmenu</string>
-    <string name="hatchMenuReturnToLastUsedTab">Návrat na naposledy použitú kartu</string>
     <string name="hatchMenuAfterInactivitySettings">Po nečinnosti</string>
     <string name="hatchMenuAfterInactivityOpenNewTab">Otvoriť novú kartu</string>
     <string name="hatchMenuAfterInactivityLastUsedTab">Naposledy použitá karta</string>

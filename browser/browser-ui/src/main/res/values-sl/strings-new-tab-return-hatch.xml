@@ -21,7 +21,6 @@
     <string name="newTabReturnHatchFireTabTitle">Zadnja uporaba zavihka Fire</string>
     <string name="newTabReturnHatchTabClosed">Zavihek zaprt</string>
     <string name="newTabReturnHatchUndo">Razveljavi</string>
-    <string name="hatchMenuReturnToLastUsedTab">Nazaj na nazadnje uporabljeni zavihek</string>
     <string name="hatchMenuAfterInactivitySettings">Po neaktivnosti</string>
     <string name="hatchMenuAfterInactivityOpenNewTab">Odpri nov zavihek</string>
     <string name="hatchMenuAfterInactivityLastUsedTab">Nazadnje uporabljeni zavihek</string>

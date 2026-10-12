@@ -21,7 +21,6 @@
     <string name="newTabReturnHatchFireTabTitle">Ultima scheda Fire usata</string>
     <string name="newTabReturnHatchTabClosed">Scheda chiusa</string>
     <string name="newTabReturnHatchUndo">Annulla</string>
-    <string name="hatchMenuReturnToLastUsedTab">Torna all\'ultima scheda usata</string>
     <string name="hatchMenuAfterInactivitySettings">Dopo l\'inattività</string>
     <string name="hatchMenuAfterInactivityOpenNewTab">Apri una nuova scheda</string>
     <string name="hatchMenuAfterInactivityLastUsedTab">Ultima scheda usata</string>

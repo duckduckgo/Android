@@ -21,7 +21,6 @@
     <string name="newTabReturnHatchFireTabTitle">Pēdējā izmantotā Fire cilne</string>
     <string name="newTabReturnHatchTabClosed">Cilne aizvērta</string>
     <string name="newTabReturnHatchUndo">Atsaukt</string>
-    <string name="hatchMenuReturnToLastUsedTab">Atgriezties pēdējā izmantotajā cilnē</string>
     <string name="hatchMenuAfterInactivitySettings">Pēc neaktivitātes perioda</string>
     <string name="hatchMenuAfterInactivityOpenNewTab">Atvērt jaunu cilni</string>
     <string name="hatchMenuAfterInactivityLastUsedTab">Pēdējā lietotā cilne</string>

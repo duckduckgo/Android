@@ -21,7 +21,6 @@
     <string name="newTabReturnHatchFireTabTitle">Последно използван раздел Fire</string>
     <string name="newTabReturnHatchTabClosed">Разделът е затворен</string>
     <string name="newTabReturnHatchUndo">Отмяна</string>
-    <string name="hatchMenuReturnToLastUsedTab">Връщане към последно използвания раздел</string>
     <string name="hatchMenuAfterInactivitySettings">След неактивност</string>
     <string name="hatchMenuAfterInactivityOpenNewTab">Отвори нов раздел</string>
     <string name="hatchMenuAfterInactivityLastUsedTab">Последно използван раздел</string>

@@ -21,7 +21,6 @@
     <string name="newTabReturnHatchFireTabTitle">Viimeksi käytetty Fire-välilehti</string>
     <string name="newTabReturnHatchTabClosed">Välilehti suljettu</string>
     <string name="newTabReturnHatchUndo">Kumoa</string>
-    <string name="hatchMenuReturnToLastUsedTab">Palaa viimeksi käytettyyn välilehteen</string>
     <string name="hatchMenuAfterInactivitySettings">Toimettomuuden jälkeen</string>
     <string name="hatchMenuAfterInactivityOpenNewTab">Avaa uusi välilehti</string>
     <string name="hatchMenuAfterInactivityLastUsedTab">Viimeksi käytetty välilehti</string>

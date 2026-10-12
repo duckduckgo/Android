@@ -20,7 +20,6 @@
     <string name="newTabReturnHatchFireTabTitle">Last used Fire Tab</string>
     <string name="newTabReturnHatchTabClosed">Tab closed</string>
     <string name="newTabReturnHatchUndo">Undo</string>
-    <string name="hatchMenuReturnToLastUsedTab">Return to Last Used Tab</string>
     <string name="hatchMenuAfterInactivitySettings">After Inactivity</string>
     <string name="hatchMenuAfterInactivityOpenNewTab">Open New Tab</string>
     <string name="hatchMenuAfterInactivityLastUsedTab">Last Used Tab</string>

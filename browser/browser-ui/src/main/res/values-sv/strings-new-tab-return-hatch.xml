@@ -21,7 +21,6 @@
     <string name="newTabReturnHatchFireTabTitle">Senast använda Fire Tab</string>
     <string name="newTabReturnHatchTabClosed">Fliken är stängd</string>
     <string name="newTabReturnHatchUndo">Ångra</string>
-    <string name="hatchMenuReturnToLastUsedTab">Återgå till den senaste använda fliken</string>
     <string name="hatchMenuAfterInactivitySettings">Efter inaktivitet</string>
     <string name="hatchMenuAfterInactivityOpenNewTab">Öppna ny flik</string>
     <string name="hatchMenuAfterInactivityLastUsedTab">Senast använda flik</string>

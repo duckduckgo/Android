@@ -21,7 +21,6 @@
     <string name="newTabReturnHatchFireTabTitle">Fila Fire utilizată ultima dată</string>
     <string name="newTabReturnHatchTabClosed">Filă închisă</string>
     <string name="newTabReturnHatchUndo">Anulează</string>
-    <string name="hatchMenuReturnToLastUsedTab">Revino la ultima filă utilizată</string>
     <string name="hatchMenuAfterInactivitySettings">După inactivitate</string>
     <string name="hatchMenuAfterInactivityOpenNewTab">Deschide o filă nouă</string>
     <string name="hatchMenuAfterInactivityLastUsedTab">Ultima filă utilizată</string>

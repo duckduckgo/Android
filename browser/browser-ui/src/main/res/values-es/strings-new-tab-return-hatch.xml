@@ -21,7 +21,6 @@
     <string name="newTabReturnHatchFireTabTitle">Última Fire Tab utilizada</string>
     <string name="newTabReturnHatchTabClosed">Pestaña cerrada</string>
     <string name="newTabReturnHatchUndo">Deshacer</string>
-    <string name="hatchMenuReturnToLastUsedTab">Volver a la última pestaña utilizada</string>
     <string name="hatchMenuAfterInactivitySettings">Después de inactividad</string>
     <string name="hatchMenuAfterInactivityOpenNewTab">Abrir una nueva pestaña</string>
     <string name="hatchMenuAfterInactivityLastUsedTab">Última pestaña utilizada</string>

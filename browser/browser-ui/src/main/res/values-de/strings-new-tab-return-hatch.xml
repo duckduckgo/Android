@@ -21,7 +21,6 @@
     <string name="newTabReturnHatchFireTabTitle">Zuletzt verwendeter Fire-Tab</string>
     <string name="newTabReturnHatchTabClosed">Tab geschlossen</string>
     <string name="newTabReturnHatchUndo">Rückgängig machen</string>
-    <string name="hatchMenuReturnToLastUsedTab">Zurück zum zuletzt verwendeten Tab</string>
     <string name="hatchMenuAfterInactivitySettings">Nach Inaktivität</string>
     <string name="hatchMenuAfterInactivityOpenNewTab">Neuen Tab öffnen</string>
     <string name="hatchMenuAfterInactivityLastUsedTab">Zuletzt verwendeter Tab</string>
