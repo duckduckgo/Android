@@ -27,6 +27,7 @@ import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.customtabs.api.CustomTabDetector
@@ -128,6 +129,8 @@ class NativeCrashInit @Inject constructor(
                             "v" to "${appBuildConfig.versionName}-${appBuildConfig.flavor}",
                             "pn" to processName,
                             "customTab" to "$isCustomTab",
+                            "webViewPackage" to webViewPackage,
+                            "webViewVersion" to webViewVersion,
                         ),
                     )
                 },
