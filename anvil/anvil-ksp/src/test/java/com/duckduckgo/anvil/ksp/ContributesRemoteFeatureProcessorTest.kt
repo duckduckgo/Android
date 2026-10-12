@@ -54,6 +54,7 @@ class ContributesRemoteFeatureProcessorTest {
                 val remoteEnableState: Boolean? = null,
                 val enable: Boolean? = null,
                 val minSupportedVersion: Int? = null,
+                val maxSupportedVersion: Int? = null,
                 val targets: List<Target> = emptyList(),
                 val cohorts: List<Cohort> = emptyList(),
                 val settings: String? = null,
