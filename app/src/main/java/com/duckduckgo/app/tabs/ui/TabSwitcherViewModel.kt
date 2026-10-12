@@ -319,6 +319,8 @@ class TabSwitcherViewModel @Inject constructor(
         } else {
             if (viewState.value.tabSwitcherItems.find { it.id == tabId } is DuckAiTab) {
                 duckChat.reportDuckChatEntry(DuckChatEntryPoint.TAB_SWITCHER_EXISTING_CHAT, opensNewTab = false, hasPrompt = false)
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_COUNT)
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_DAILY, type = Daily())
             }
             tabRepository.select(tabId)
             command.value = Command.Close
@@ -527,6 +529,10 @@ class TabSwitcherViewModel @Inject constructor(
             pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_SWIPED, browserModeParams)
         } else {
             pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED, browserModeParams)
+        }
+        if (tab is DuckAiTab) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_CLOSE_AI_TAB_COUNT)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_CLOSE_AI_TAB_DAILY, type = Daily())
         }
 
         if (viewState.value.mode is Selection) {
