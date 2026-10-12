@@ -131,7 +131,7 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
                 return@launch
             }
             val result = pirJobsRunner.runEligibleJobs(this@PirForegroundScanService, executionType, runMode)
-            // a scan-only run's notification comes from PirFreemiumScanCompleteNotifier, on whichever path finishes the scan
+            // freemium handles a notification in a different way
             if (result.isSuccess && runMode == PirRunMode.SCAN_AND_OPT_OUT) {
                 pirNotificationManager.showScanStatusNotification(
                     title = getString(R.string.pirNotificationTitleComplete),

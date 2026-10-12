@@ -141,39 +141,39 @@ class RealPirFreemiumDataStoreTest {
     }
 
     @Test
-    fun whenScanCompleteNotificationIsNotArmedThenConsumeReturnsFalse() {
-        assertFalse(testee.consumeScanCompleteNotification())
+    fun whenScanCompleteNotificationIsNotMarkedPendingThenTakeReturnsFalse() {
+        assertFalse(testee.takePendingScanCompleteNotification())
     }
 
     @Test
-    fun whenScanCompleteNotificationIsArmedThenItIsConsumedOnlyOnce() {
-        testee.armScanCompleteNotification()
+    fun whenScanCompleteNotificationIsMarkedPendingThenItIsTakenOnlyOnce() {
+        testee.markScanCompleteNotificationPending()
 
-        assertTrue(testee.consumeScanCompleteNotification())
-        assertFalse(testee.consumeScanCompleteNotification())
+        assertTrue(testee.takePendingScanCompleteNotification())
+        assertFalse(testee.takePendingScanCompleteNotification())
     }
 
     @Test
-    fun whenScanCompleteNotificationIsArmedTwiceThenItIsStillConsumedOnlyOnce() {
-        testee.armScanCompleteNotification()
-        testee.armScanCompleteNotification()
+    fun whenScanCompleteNotificationIsMarkedPendingTwiceThenItIsStillTakenOnlyOnce() {
+        testee.markScanCompleteNotificationPending()
+        testee.markScanCompleteNotificationPending()
 
-        assertTrue(testee.consumeScanCompleteNotification())
-        assertFalse(testee.consumeScanCompleteNotification())
+        assertTrue(testee.takePendingScanCompleteNotification())
+        assertFalse(testee.takePendingScanCompleteNotification())
     }
 
     @Test
-    fun whenResetThenArmedScanCompleteNotificationIsCleared() {
-        testee.armScanCompleteNotification()
+    fun whenResetThenPendingScanCompleteNotificationIsCleared() {
+        testee.markScanCompleteNotificationPending()
 
         testee.reset()
 
-        assertFalse(testee.consumeScanCompleteNotification())
+        assertFalse(testee.takePendingScanCompleteNotification())
     }
 
     @Test
-    fun whenScanCompleteNotificationIsArmedThenItIsStoredUnderItsKey() {
-        testee.armScanCompleteNotification()
+    fun whenScanCompleteNotificationIsMarkedPendingThenItIsStoredUnderItsKey() {
+        testee.markScanCompleteNotificationPending()
 
         assertTrue(preferences.getBoolean(KEY_SCAN_COMPLETE_NOTIFICATION_PENDING, false))
     }

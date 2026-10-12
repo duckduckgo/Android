@@ -2252,7 +2252,7 @@
         ]
     },
     "m_dbp_freemium_notification_sent_first_scan_complete": {
-        "description": "Fired when the Freemium PIR scan-complete notification is posted after a free user's scan finishes, at most once per profile save. Only fires when POST_NOTIFICATIONS is already granted: Android never prompts for it here, so unlike iOS's provisional notifications it does not reach every free scan.",
+        "description": "Fired when the Freemium PIR scan-complete notification is posted after a free user's scan finishes, at most once per profile save.",
         "owners": ["landomen"],
         "triggers": ["impression"],
         "suffixes": ["count_short", "form_factor"],

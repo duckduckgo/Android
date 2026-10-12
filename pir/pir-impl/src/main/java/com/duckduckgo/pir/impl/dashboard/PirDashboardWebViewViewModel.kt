@@ -104,7 +104,9 @@ class PirDashboardWebViewViewModel @Inject constructor(
         fromFreemiumScanCompleteNotification: Boolean,
     ) {
         // a restored dashboard keeps its launch intent, and the tap was already counted when it was first created
-        if (isRestored || !fromFreemiumScanCompleteNotification) return
+        if (isRestored || !fromFreemiumScanCompleteNotification) {
+            return
+        }
 
         pirPixelSender.reportFreemiumScanCompleteNotificationOpened()
     }

@@ -882,7 +882,7 @@ class PirWebSaveProfileMessageHandlerTest {
     }
 
     @Test
-    fun whenSavingProfileAsFreeUserThenScanCompleteNotificationIsArmedBeforeStartingScan() = runTest {
+    fun whenSavingProfileAsFreeUserThenScanCompleteNotificationIsMarkedPendingBeforeStartingScan() = runTest {
         // Given
         val jsMessage = createJsMessage("""""", SAVE_PROFILE)
         givenSuccessfulProfileSave()
@@ -895,15 +895,15 @@ class PirWebSaveProfileMessageHandlerTest {
         // When
         testee.process(jsMessage, mockJsMessaging, null)
 
-        // Then the run that finishes this scan consumes the flag, so it has to be armed before the scan starts
+        // Then the run that finishes this scan takes the flag, so it has to be marked before the scan starts
         inOrder(mockPirFreemiumDataStore, mockContext) {
-            verify(mockPirFreemiumDataStore).armScanCompleteNotification()
+            verify(mockPirFreemiumDataStore).markScanCompleteNotificationPending()
             verify(mockContext).startForegroundService(any())
         }
     }
 
     @Test
-    fun whenFreeUserEditsProfileThenScanCompleteNotificationIsArmed() = runTest {
+    fun whenFreeUserEditsProfileThenScanCompleteNotificationIsMarkedPending() = runTest {
         // Given an already activated free user with a saved profile
         val jsMessage = createJsMessage("""""", SAVE_PROFILE)
         givenSuccessfulProfileSave()
@@ -915,14 +915,14 @@ class PirWebSaveProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, null)
 
         // Then
-        verify(mockPirFreemiumDataStore).armScanCompleteNotification()
+        verify(mockPirFreemiumDataStore).markScanCompleteNotificationPending()
         val intentCaptor = argumentCaptor<Intent>()
         verify(mockContext).startForegroundService(intentCaptor.capture())
         assertEquals(PirExecutionType.MANUAL_EDIT_PROFILE.name, intentCaptor.firstValue.getStringExtra("extra_execution_type"))
     }
 
     @Test
-    fun whenSavingProfileAsSubscriberThenScanCompleteNotificationIsNotArmed() = runTest {
+    fun whenSavingProfileAsSubscriberThenScanCompleteNotificationIsNotMarkedPending() = runTest {
         // Given
         val jsMessage = createJsMessage("""""", SAVE_PROFILE)
         givenSuccessfulProfileSave()
@@ -932,11 +932,11 @@ class PirWebSaveProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, null)
 
         // Then
-        verify(mockPirFreemiumDataStore, never()).armScanCompleteNotification()
+        verify(mockPirFreemiumDataStore, never()).markScanCompleteNotificationPending()
     }
 
     @Test
-    fun whenSavingProfileAndRunModeCannotBeResolvedThenScanCompleteNotificationIsNotArmed() = runTest {
+    fun whenSavingProfileAndRunModeCannotBeResolvedThenScanCompleteNotificationIsNotMarkedPending() = runTest {
         // Given
         val jsMessage = createJsMessage("""""", SAVE_PROFILE)
         givenSuccessfulProfileSave()
@@ -949,11 +949,11 @@ class PirWebSaveProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, null)
 
         // Then
-        verify(mockPirFreemiumDataStore, never()).armScanCompleteNotification()
+        verify(mockPirFreemiumDataStore, never()).markScanCompleteNotificationPending()
     }
 
     @Test
-    fun whenSaveFailsThenScanCompleteNotificationIsNotArmed() = runTest {
+    fun whenSaveFailsThenScanCompleteNotificationIsNotMarkedPending() = runTest {
         // Given
         val jsMessage = createJsMessage("""""", SAVE_PROFILE)
         givenSuccessfulProfileSave()
@@ -965,7 +965,7 @@ class PirWebSaveProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, null)
 
         // Then
-        verify(mockPirFreemiumDataStore, never()).armScanCompleteNotification()
+        verify(mockPirFreemiumDataStore, never()).markScanCompleteNotificationPending()
     }
 
     private suspend fun givenSuccessfulProfileSave() {

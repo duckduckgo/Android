@@ -24,6 +24,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.os.Build.VERSION
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -46,10 +47,6 @@ interface PirNotificationManager {
         message: String,
     ): Notification
 
-    /**
-     * Tells a free user their scan is complete, replacing the scan-complete notification (the paid "Scan complete!" one shares its ID).
-     * Returns false when POST_NOTIFICATIONS is not granted; a post that fails after that check is still reported as true.
-     */
     fun showFreemiumScanCompleteNotification(): Boolean
 
     fun cancelNotifications()
@@ -110,7 +107,7 @@ class RealPirNotificationManager @Inject constructor(
     }
 
     override fun showFreemiumScanCompleteNotification(): Boolean = runCatching {
-        val hasPermission = ActivityCompat.checkSelfPermission(context, POST_NOTIFICATIONS) == PERMISSION_GRANTED
+        val hasPermission = VERSION.SDK_INT < 33 || ActivityCompat.checkSelfPermission(context, POST_NOTIFICATIONS) == PERMISSION_GRANTED
         if (hasPermission) {
             // the scan can finish in a :pir process that never ran the dashboard, which is where the channel is otherwise created
             createNotificationChannel()
