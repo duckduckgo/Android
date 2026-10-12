@@ -65,17 +65,6 @@ class SegmentedOnboardingExperimentManagerTest {
     }
 
     @Test
-    fun `when config driven dialogs disabled then enroll returns null`() = runTest {
-        givenPrerequisitesMet()
-        brandDesignToggles.configDrivenDialogs().setRawStoredState(Toggle.State(enable = false))
-        givenCohortEnabled(Cohorts.TREATMENT)
-
-        privacyConfigPersistedGate.onPrivacyConfigPersisted()
-
-        assertNull(testee.enroll())
-    }
-
-    @Test
     fun `when brand design update disabled then enroll returns null`() = runTest {
         givenPrerequisitesMet()
         brandDesignToggles.brandDesignUpdate().setRawStoredState(Toggle.State(enable = false))
@@ -150,7 +139,6 @@ class SegmentedOnboardingExperimentManagerTest {
 
     private suspend fun givenPrerequisitesMet() {
         brandDesignToggles.brandDesignUpdate().setRawStoredState(Toggle.State(enable = true))
-        brandDesignToggles.configDrivenDialogs().setRawStoredState(Toggle.State(enable = true))
         whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
         passwordImportToggles.passwordImportExperimentAug25().setRawStoredState(Toggle.State(enable = false))
     }
