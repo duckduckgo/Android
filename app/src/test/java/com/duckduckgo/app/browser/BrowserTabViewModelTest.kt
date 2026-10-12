@@ -363,7 +363,6 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
-import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.serp.logos.api.SerpLogos
 import com.duckduckgo.settings.api.SerpSettingsFeature
@@ -767,12 +766,9 @@ class BrowserTabViewModelTest {
     private val mockCachedFileDownloader: CachedFileDownloader = mock()
     private val mockNewDownloadState: NewDownloadState = mock()
     private val mockDownloadsRepository: DownloadsRepository = mock()
-    private val mockSerpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
-    private val mockSetFavouriteToggle: Toggle = mock()
     private val mockSerpLogos: SerpLogos = mock()
     private val mockTabVisitedSitesRepository: TabVisitedSitesRepository = mock()
     private val favouriteLogoFlow = MutableStateFlow<String?>(null)
-    private val setFavouriteEnabledFlow = MutableStateFlow(false)
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
 
     @Before
@@ -952,9 +948,6 @@ class BrowserTabViewModelTest {
             whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(subscriptionStatusFlow)
 
             // SERP favourite logo mocks
-            whenever(mockSerpEasterEggLogosToggles.setFavourite()).thenReturn(mockSetFavouriteToggle)
-            whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(false)
-            whenever(mockSetFavouriteToggle.enabled()).thenReturn(setFavouriteEnabledFlow)
             whenever(mockSerpLogos.favouriteSerpEasterEggLogoUrlFlow).thenReturn(favouriteLogoFlow)
 
             initialiseViewModel()
@@ -1087,7 +1080,6 @@ class BrowserTabViewModelTest {
                 syncStatusChangedObserver = mockSyncStatusChangedObserver,
                 pageContextJSHelper = mockPageContextJSHelper,
                 tabPageContextRepository = mockTabPageContextRepository,
-                serpEasterEggLogosToggles = mockSerpEasterEggLogosToggles,
                 serpLogos = mockSerpLogos,
                 tabVisitedSitesRepository = mockTabVisitedSitesRepository,
                 pageLoadWideEvent = mockPageLoadWideEvent,
@@ -11349,9 +11341,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenFavouriteLogoSetAndFeatureEnabledThenExtractSerpLogoNotIssued() = runTest {
-        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
-        setFavouriteEnabledFlow.value = true
+    fun whenFavouriteLogoSetThenExtractSerpLogoNotIssued() = runTest {
         favouriteLogoFlow.value = "https://example.com/favourite-logo.png"
 
         val ddgUrl = "https://duckduckgo.com/?q=test"
@@ -11362,15 +11352,13 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val commands = commandCaptor.allValues
         assertFalse(
-            "ExtractSerpLogo command should NOT be issued when favourite is set and feature is enabled",
+            "ExtractSerpLogo command should NOT be issued when a favourite is set",
             commands.any { it is Command.ExtractSerpLogo },
         )
     }
 
     @Test
-    fun whenFavouriteLogoSetAndFeatureEnabledThenSerpLogoIsSetToFavourite() = runTest {
-        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
-        setFavouriteEnabledFlow.value = true
+    fun whenFavouriteLogoSetThenSerpLogoIsSetToFavourite() = runTest {
         val favouriteUrl = "https://example.com/favourite-logo.png"
         favouriteLogoFlow.value = favouriteUrl
 
@@ -11381,35 +11369,25 @@ class BrowserTabViewModelTest {
         testee.pageFinished(mockWebView, webViewNavState, ddgUrl)
 
         assertEquals(
-            "serpLogo should be set to favourite EasterEgg when favourite is set and feature is enabled",
+            "serpLogo should be set to the favourite EasterEgg when a favourite is set",
             SerpLogo.EasterEgg(logoUrl = favouriteUrl, isFavourite = true),
             omnibarViewState().serpLogo,
         )
     }
 
     @Test
-    fun whenFavouriteLogoSetButFeatureDisabledThenExtractSerpLogoIssued() = runTest {
-        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(false)
-        favouriteLogoFlow.value = "https://example.com/favourite-logo.png"
+    fun whenFavouriteLogoSetAndSerpLoadsAfterNonSerpPageThenFavouriteShownBeforePageFinishes() = runTest {
+        val favouriteUrl = "https://example.com/favourite-logo.png"
+        favouriteLogoFlow.value = favouriteUrl
+        loadUrl("https://example.com/page")
 
-        givenCurrentSite("https://duckduckgo.com/?q=test")
-        val ddgUrl = "https://duckduckgo.com/?q=test"
-        val webViewNavState = WebViewNavigationState(mockStack, 100)
+        loadUrl("https://duckduckgo.com/?q=test")
 
-        testee.pageFinished(mockWebView, webViewNavState, ddgUrl)
-
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val commands = commandCaptor.allValues
-        assertTrue(
-            "ExtractSerpLogo command should be issued when feature is disabled even if favourite is set",
-            commands.any { it is Command.ExtractSerpLogo && it.currentUrl == ddgUrl },
-        )
+        assertEquals(SerpLogo.EasterEgg(logoUrl = favouriteUrl, isFavourite = true), omnibarViewState().serpLogo)
     }
 
     @Test
-    fun whenNoFavouriteLogoSetAndFeatureEnabledThenExtractSerpLogoIssued() = runTest {
-        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
-        setFavouriteEnabledFlow.value = true
+    fun whenNoFavouriteLogoSetThenExtractSerpLogoIssued() = runTest {
         favouriteLogoFlow.value = null
 
         givenCurrentSite("https://duckduckgo.com/?q=test")
@@ -11421,18 +11399,16 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val commands = commandCaptor.allValues
         assertTrue(
-            "ExtractSerpLogo command should be issued when no favourite is set even if feature is enabled",
+            "ExtractSerpLogo command should be issued when no favourite is set",
             commands.any { it is Command.ExtractSerpLogo && it.currentUrl == ddgUrl },
         )
     }
 
     @Test
     fun whenFavouriteLogoClearedOnSerpPageThenSerpLogoSetToNormal() = runTest {
-        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
         val ddgUrl = "https://duckduckgo.com/?q=test"
         loadUrl(ddgUrl)
 
-        setFavouriteEnabledFlow.value = true
         val favouriteUrl = "https://example.com/favourite-logo.png"
         favouriteLogoFlow.value = favouriteUrl
 
@@ -11460,8 +11436,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenFavouriteLogoClearedOnNonSerpPageThenSerpLogoUnchanged() = runTest {
-        whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
-        setFavouriteEnabledFlow.value = true
         val favouriteUrl = "https://example.com/favourite-logo.png"
         favouriteLogoFlow.value = favouriteUrl
 
