@@ -65,6 +65,7 @@ class NativeCrashInitTest {
         whenever(mockCrashpadInitializer.initialize(any(), any(), anyOrNull())).thenReturn(true)
         whenever(mockNativeCrashFeature.nativeCrashHandling()).thenReturn(mockEnabledToggle)
         whenever(mockNativeCrashFeature.nativeCrashHandlingSecondaryProcess()).thenReturn(mockEnabledToggle)
+        whenever(mockNativeCrashFeature.useCrashpad()).thenReturn(mockEnabledToggle)
         whenever(mockCrashpadInitializer.initialize(any(), anyOrNull())).thenReturn(true)
     }
 
@@ -112,21 +113,21 @@ class NativeCrashInitTest {
     fun `onCreate skips Crashpad init when main process toggle disabled`() {
         whenever(mockNativeCrashFeature.nativeCrashHandling()).thenReturn(mockToggle)
         buildNativeCrashInit(isMainProcess = true).onCreate(mockLifecycleOwner)
-        verify(mockCrashpadInitializer, never()).initialize(any(), anyOrNull())
+        verify(mockCrashpadInitializer, never()).initialize(any(), any(), anyOrNull())
     }
 
     @Test
     fun `onVpnProcessCreated skips Crashpad init when secondary process toggle disabled`() {
         whenever(mockNativeCrashFeature.nativeCrashHandlingSecondaryProcess()).thenReturn(mockToggle)
         buildNativeCrashInit(isMainProcess = false).onVpnProcessCreated()
-        verify(mockCrashpadInitializer, never()).initialize(any(), anyOrNull())
+        verify(mockCrashpadInitializer, never()).initialize(any(), any(), anyOrNull())
     }
 
     @Test
     fun `onPirProcessCreated skips Crashpad init when secondary process toggle disabled`() {
         whenever(mockNativeCrashFeature.nativeCrashHandlingSecondaryProcess()).thenReturn(mockToggle)
         buildNativeCrashInit(isMainProcess = false).onPirProcessCreated()
-        verify(mockCrashpadInitializer, never()).initialize(any(), anyOrNull())
+        verify(mockCrashpadInitializer, never()).initialize(any(), any(), anyOrNull())
     }
 
     // ── Handler registered pixel ───────────────────────────────────────────────
@@ -147,7 +148,7 @@ class NativeCrashInitTest {
 
     @Test
     fun `initializer throwing does not propagate and no pixel is fired`() {
-        whenever(mockCrashpadInitializer.initialize(any(), anyOrNull())).thenThrow(UnsatisfiedLinkError("boom"))
+        whenever(mockCrashpadInitializer.initialize(any(), any(), anyOrNull())).thenThrow(UnsatisfiedLinkError("boom"))
         buildNativeCrashInit().onCreate(mockLifecycleOwner)
         verify(mockPixel, never()).fire(eq(APPLICATION_CRASH_NATIVE_HANDLER_REGISTERED), any(), any(), any())
     }
