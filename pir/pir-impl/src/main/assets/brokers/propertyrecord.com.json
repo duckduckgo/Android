@@ -1,7 +1,7 @@
 {
   "name": "PropertyRecord",
   "url": "propertyrecord.com",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "addedDatetime": 1775736000000,
   "optOutUrl": "https://dashboard.propertyrecord.com/opt-out",
   "steps": [
@@ -11,29 +11,8 @@
       "actions": [
         {
           "actionType": "navigate",
-          "_comment": "Forwarding page source: https://github.com/duckduckgo/privacy-test-pages/blob/main/pir/opt-out/index.html",
-          "url": "https://privacy-test-pages.site/pir/opt-out/?name=${firstName}%20${lastName}&city=${city|downcase}&state=${state|upcase}&cityState=${city},%20${state|upcase}&to=https%3A%2F%2Fdashboard.propertyrecord.com%2Fopt-out%2Frecords",
+          "url": "https://dashboard.propertyrecord.com/opt-out/records?name=${firstName}%20${lastName}&city=${city|downcase}&state=${state|upcase}&cityState=${city},%20${state|upcase}",
           "id": "d0030ece-5888-40ae-8b93-3f9f157da3cd"
-        },
-        {
-          "actionType": "expectation",
-          "expectations": [
-            {
-              "type": "element",
-              "selector": "#forward"
-            }
-          ],
-          "id": "f3c33407-a4a5-4989-88ab-b9ec69c59065"
-        },
-        {
-          "actionType": "click",
-          "elements": [
-            {
-              "type": "button",
-              "selector": "#forward"
-            }
-          ],
-          "id": "1116b900-277d-42cb-8fdb-7f7e4dc95c56"
         },
         {
           "actionType": "expectation",
@@ -115,28 +94,8 @@
       "actions": [
         {
           "actionType": "navigate",
-          "url": "https://privacy-test-pages.site/pir/opt-out/?name=${firstName}%20${lastName}&city=${city|downcase}&state=${state|upcase}&cityState=${city},%20${state|upcase}&to=https%3A%2F%2Fdashboard.propertyrecord.com%2Fopt-out%2Frecords",
+          "url": "https://dashboard.propertyrecord.com/opt-out/records?name=${firstName}%20${lastName}&city=${city|downcase}&state=${state|upcase}&cityState=${city},%20${state|upcase}",
           "id": "ee4a70fa-f0da-4f6b-a5d0-db42a0bca5a0"
-        },
-        {
-          "actionType": "expectation",
-          "expectations": [
-            {
-              "type": "element",
-              "selector": "#forward"
-            }
-          ],
-          "id": "926cad35-d4e1-4d14-a2e9-56bf37c90862"
-        },
-        {
-          "actionType": "click",
-          "elements": [
-            {
-              "type": "button",
-              "selector": "#forward"
-            }
-          ],
-          "id": "2c4e1be5-1b9e-43f6-8f40-c581c5eeaa6f"
         },
         {
           "actionType": "expectation",
