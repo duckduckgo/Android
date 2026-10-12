@@ -93,7 +93,8 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
 
         pirNotificationManager.createNotificationChannel()
         lifecycle.addObserver(viewModel)
-        // a relaunch from Recents replays the original notification intent, which must not count as another tap
+
+        // avoid counting relaunch from Recents as fresh launch
         val launchedFromRecents = (intent.flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0
         viewModel.onLaunched(
             isRestored = savedInstanceState != null || launchedFromRecents,

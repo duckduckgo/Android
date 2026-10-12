@@ -46,11 +46,11 @@ interface PirFreemiumDataStore {
     /** Forgets the recorded outcome but keeps activation, so a tester can record either result. */
     fun clearFirstScanResult()
 
-    /** Armed by a free user's profile save; the next scan that completes normally consumes it. */
-    fun armScanCompleteNotification()
+    /** Marked by a free user's profile save; the next scan that completes normally takes it. */
+    fun markScanCompleteNotificationPending()
 
     /** Returns whether a scan-complete notification was pending, and clears it. */
-    fun consumeScanCompleteNotification(): Boolean
+    fun takePendingScanCompleteNotification(): Boolean
 
     fun reset()
 }
@@ -102,14 +102,14 @@ internal class RealPirFreemiumDataStore(
         }
     }
 
-    override fun armScanCompleteNotification() {
-        // committed synchronously as the dashboard (:main) arms it and the scan (:pir) consumes it
+    override fun markScanCompleteNotificationPending() {
+        // committed synchronously as the dashboard (:main) marks it and the scan (:pir) takes it
         preferences.edit(commit = true) {
             putBoolean(KEY_SCAN_COMPLETE_NOTIFICATION_PENDING, true)
         }
     }
 
-    override fun consumeScanCompleteNotification(): Boolean {
+    override fun takePendingScanCompleteNotification(): Boolean {
         if (!preferences.getBoolean(KEY_SCAN_COMPLETE_NOTIFICATION_PENDING, false)) return false
 
         preferences.edit(commit = true) {

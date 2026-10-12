@@ -56,9 +56,12 @@ class RealPirFreemiumScanCompleteNotifier @Inject constructor(
         withContext(dispatcherProvider.io()) {
             try {
                 mutex.withLock {
-                    if (!pirFreemiumDataStore.consumeScanCompleteNotification()) return@withLock
-                    // A user who subscribed mid-scan: clearing without posting stops a later lapse announcing a stale free scan.
-                    if (runMode != PirRunMode.SCAN_ONLY) return@withLock
+                    if (!pirFreemiumDataStore.takePendingScanCompleteNotification()) {
+                        return@withLock
+                    }
+                    if (runMode != PirRunMode.SCAN_ONLY) {
+                        return@withLock
+                    }
 
                     if (pirNotificationManager.showFreemiumScanCompleteNotification()) {
                         pirPixelSender.reportFreemiumScanCompleteNotificationSent()

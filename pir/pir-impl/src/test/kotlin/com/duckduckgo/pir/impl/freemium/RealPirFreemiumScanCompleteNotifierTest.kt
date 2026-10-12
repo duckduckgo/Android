@@ -60,7 +60,7 @@ class RealPirFreemiumScanCompleteNotifierTest {
     }
 
     @Test
-    fun whenNotArmedThenNothingIsPosted() = runTest {
+    fun whenNotPendingThenNothingIsPosted() = runTest {
         testee.onScanCompleted(SCAN_ONLY)
 
         verify(mockNotificationManager, never()).showFreemiumScanCompleteNotification()
@@ -68,8 +68,8 @@ class RealPirFreemiumScanCompleteNotifierTest {
     }
 
     @Test
-    fun whenArmedAndScanOnlyThenNotificationIsPostedAndSentPixelFires() = runTest {
-        fakeDataStore.armScanCompleteNotification()
+    fun whenPendingAndScanOnlyThenNotificationIsPostedAndSentPixelFires() = runTest {
+        fakeDataStore.markScanCompleteNotificationPending()
 
         testee.onScanCompleted(SCAN_ONLY)
 
@@ -78,8 +78,8 @@ class RealPirFreemiumScanCompleteNotifierTest {
     }
 
     @Test
-    fun whenArmedAndScanOnlyThenALaterCompletionPostsNothing() = runTest {
-        fakeDataStore.armScanCompleteNotification()
+    fun whenPendingAndScanOnlyThenALaterCompletionPostsNothing() = runTest {
+        fakeDataStore.markScanCompleteNotificationPending()
 
         testee.onScanCompleted(SCAN_ONLY)
         testee.onScanCompleted(SCAN_ONLY)
@@ -88,8 +88,8 @@ class RealPirFreemiumScanCompleteNotifierTest {
     }
 
     @Test
-    fun whenNotificationIsNotPostedThenFlagIsStillConsumedAndNoPixelFires() = runTest {
-        fakeDataStore.armScanCompleteNotification()
+    fun whenNotificationIsNotPostedThenFlagIsStillTakenAndNoPixelFires() = runTest {
+        fakeDataStore.markScanCompleteNotificationPending()
         whenever(mockNotificationManager.showFreemiumScanCompleteNotification()).thenReturn(false)
 
         testee.onScanCompleted(SCAN_ONLY)
@@ -99,8 +99,8 @@ class RealPirFreemiumScanCompleteNotifierTest {
     }
 
     @Test
-    fun whenArmedAndScanAndOptOutThenFlagIsClearedWithoutPosting() = runTest {
-        fakeDataStore.armScanCompleteNotification()
+    fun whenPendingAndScanAndOptOutThenFlagIsClearedWithoutPosting() = runTest {
+        fakeDataStore.markScanCompleteNotificationPending()
 
         testee.onScanCompleted(SCAN_AND_OPT_OUT)
 
@@ -111,8 +111,8 @@ class RealPirFreemiumScanCompleteNotifierTest {
 
     @Test
     fun whenDataStoreFailsThenNothingIsPostedAndNoExceptionEscapes() = runTest {
-        fakeDataStore.armScanCompleteNotification()
-        fakeDataStore.consumeError = IllegalStateException("prefs")
+        fakeDataStore.markScanCompleteNotificationPending()
+        fakeDataStore.takeError = IllegalStateException("prefs")
 
         testee.onScanCompleted(SCAN_ONLY)
 
@@ -120,9 +120,9 @@ class RealPirFreemiumScanCompleteNotifierTest {
     }
 
     @Test
-    fun whenCancelledWhileConsumingThenCancellationPropagates() = runTest {
-        fakeDataStore.armScanCompleteNotification()
-        fakeDataStore.consumeError = CancellationException("cancelled")
+    fun whenCancelledWhileTakingThenCancellationPropagates() = runTest {
+        fakeDataStore.markScanCompleteNotificationPending()
+        fakeDataStore.takeError = CancellationException("cancelled")
 
         try {
             testee.onScanCompleted(SCAN_ONLY)
@@ -136,7 +136,7 @@ class RealPirFreemiumScanCompleteNotifierTest {
     fun whenTwoRunsCompleteConcurrentlyThenNotificationIsPostedOnce() = runBlocking<Unit> {
         // Holding the flag between the read and the clear makes both runs see it as pending unless the notifier serialises them.
         val racyDataStore = FakePirFreemiumDataStore(beforeClear = { Thread.sleep(100) })
-        racyDataStore.armScanCompleteNotification()
+        racyDataStore.markScanCompleteNotificationPending()
         val notifier = notifierWith(racyDataStore, DefaultDispatcherProvider())
 
         listOf(
@@ -162,7 +162,7 @@ class RealPirFreemiumScanCompleteNotifierTest {
     ) : PirFreemiumDataStore {
         @Volatile
         var isNotificationPending = false
-        var consumeError: Exception? = null
+        var takeError: Exception? = null
 
         override val didActivate: Boolean = false
         override val firstProfileSavedTimestamp: Long = 0L
@@ -175,12 +175,12 @@ class RealPirFreemiumScanCompleteNotifierTest {
             isNotificationPending = false
         }
 
-        override fun armScanCompleteNotification() {
+        override fun markScanCompleteNotificationPending() {
             isNotificationPending = true
         }
 
-        override fun consumeScanCompleteNotification(): Boolean {
-            consumeError?.let { throw it }
+        override fun takePendingScanCompleteNotification(): Boolean {
+            takeError?.let { throw it }
             if (!isNotificationPending) return false
             beforeClear()
             isNotificationPending = false
