@@ -166,15 +166,14 @@ class RealPirDashboardInitialScanStateProvider @Inject constructor(
             return false
         }
 
-        // A gated broker's NOT_EXECUTED record can never run for a scan-only user (e.g. a lapsed subscriber),
-        // so it must not count here or this would report an incomplete scan forever.
-        val runMode = pirWorkHandler.canRunPir().firstOrNull().runModeOrNull
-        val scannableBrokerNames = if (runMode == PirRunMode.SCAN_ONLY) getScannableActiveBrokerNames() else null
+        // A NOT_EXECUTED record for a broker that can't be scanned (gated for a scan-only user, inactive, or with an
+        // unparseable scan step) never runs, so it must not count here or every dashboard open would resume a scan.
+        val scannableBrokerNames = getScannableActiveBrokerNames()
 
         val notExecutedJobs = pirSchedulingRepository.getAllValidScanJobRecords().filter { record ->
             record.status == ScanJobStatus.NOT_EXECUTED &&
                 record.lastScanDateInMillis == 0L &&
-                (scannableBrokerNames == null || record.brokerName in scannableBrokerNames)
+                record.brokerName in scannableBrokerNames
         }
 
         if (notExecutedJobs.isEmpty()) {
