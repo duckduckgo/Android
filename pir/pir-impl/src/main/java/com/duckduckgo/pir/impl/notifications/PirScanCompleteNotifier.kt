@@ -51,7 +51,7 @@ class RealPirScanCompleteNotifier @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : PirScanCompleteNotifier {
 
-    // Both callers, the foreground scan service and the scheduled worker, run in :pir, so an in-process lock makes take-and-post exact.
+    // Make sure the foreground scan service and the scheduled worker don't both post a notification
     private val mutex = Mutex()
 
     override fun onInitialScanStarted() {

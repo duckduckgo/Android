@@ -208,7 +208,9 @@ internal class RealPirDataStore(
     }
 
     override fun takePendingScanCompleteNotification(): Boolean {
-        if (!preferences.getBoolean(KEY_SCAN_COMPLETE_NOTIFICATION_PENDING, false)) return false
+        if (!preferences.getBoolean(KEY_SCAN_COMPLETE_NOTIFICATION_PENDING, false)) {
+            return false
+        }
 
         preferences.edit(commit = true) {
             remove(KEY_SCAN_COMPLETE_NOTIFICATION_PENDING)
