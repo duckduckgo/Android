@@ -138,6 +138,7 @@ class NewTabPageViewModel @AssistedInject constructor(
         ) : Command()
 
         data object LaunchDefaultCredentialProvider : Command()
+        data object LaunchAddWidget : Command()
     }
 
     private var lastRemoteMessageSeen: RemoteMessage? = null

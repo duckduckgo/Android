@@ -225,5 +225,6 @@ class CardsListRemoteMessageViewModel @Inject constructor(
         ) : Command()
 
         data object LaunchDefaultCredentialProvider : Command()
+        data object LaunchAddWidget : Command()
     }
 }

@@ -96,7 +96,6 @@ import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupAddressBarPositionBo
 import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupSearchOptionsBottomSheet
 import com.duckduckgo.app.onboardingquicksetup.ui.RemoveWidgetInstructionsBottomSheet
 import com.duckduckgo.app.widget.AddWidgetLauncher
-import com.duckduckgo.app.widget.AddWidgetSource
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.AppTheme
@@ -673,7 +672,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         openDefaultBrowserSystemSettings()
                     }
                     BrandDesignUpdatePageViewModel.Command.LaunchAddWidgetPrompt -> {
-                        addWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt = true, source = AddWidgetSource.ONBOARDING)
+                        addWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt = true)
                     }
                     BrandDesignUpdatePageViewModel.Command.ShowRemoveWidgetBottomSheet -> {
                         showRemoveWidgetInstructionsBottomSheet()

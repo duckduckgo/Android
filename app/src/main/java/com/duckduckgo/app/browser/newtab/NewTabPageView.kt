@@ -18,8 +18,10 @@ package com.duckduckgo.app.browser.newtab
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
@@ -39,6 +41,7 @@ import com.duckduckgo.app.browser.databinding.ViewNewTabBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.DismissMessage
+import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchAddWidget
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchAppTPOnboarding
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchDefaultBrowser
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchDefaultCredentialProvider
@@ -53,6 +56,7 @@ import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.ui.store.AppTheme
@@ -116,6 +120,9 @@ class NewTabPageView @JvmOverloads constructor(
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var addWidgetLauncher: AddWidgetLauncher
 
     @Inject
     lateinit var androidBrowserConfig: AndroidBrowserConfigFeature
@@ -263,15 +270,12 @@ class NewTabPageView @JvmOverloads constructor(
         }
     }
 
-    private fun showNextStepsSection(newMessage: Boolean) {
+    // The section counts its own impressions, so no onMessageShown here.
+    private fun showNextStepsSection() {
         if (binding.nextStepsContainer.childCount == 0) {
             inflateNextStepsSection()
         } else {
-            val wasHidden = binding.nextStepsContainer.isGone
             binding.nextStepsContainer.show()
-            if (newMessage || wasHidden) {
-                viewModel.onMessageShown()
-            }
         }
     }
 
@@ -281,7 +285,6 @@ class NewTabPageView @JvmOverloads constructor(
             val section = nextSteps.provideSectionView(context) ?: return@launch
             binding.nextStepsContainer.addView(section)
             binding.nextStepsContainer.show()
-            viewModel.onMessageShown()
         }
     }
 
@@ -320,7 +323,7 @@ class NewTabPageView @JvmOverloads constructor(
         }
         if (viewState.showNextSteps) {
             binding.messageCta.gone()
-            showNextStepsSection(viewState.newMessage)
+            showNextStepsSection()
         } else if (viewState.message != null && viewState.onboardingComplete) {
             binding.nextStepsContainer.gone()
             showRemoteMessage(viewState.message, viewState.messageImageFilePath, viewState.newMessage)
@@ -349,6 +352,7 @@ class NewTabPageView @JvmOverloads constructor(
             is SharePromoLinkRMF -> launchSharePromoRMFPageChooser(command.url, command.shareTitle)
             is SubmitUrl -> submitUrl(command.url)
             is LaunchDefaultCredentialProvider -> launchDefaultCredentialProvider()
+            is LaunchAddWidget -> addWidgetLauncher.launchAddWidget(context.findActivity())
         }
     }
 
@@ -480,4 +484,10 @@ class NewTabPageView @JvmOverloads constructor(
     private fun removeLowPriorityMessage() {
         binding.messageCta.gone()
     }
+}
+
+private tailrec fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
 }

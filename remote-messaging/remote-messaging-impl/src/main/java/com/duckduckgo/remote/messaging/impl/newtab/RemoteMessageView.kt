@@ -17,9 +17,11 @@
 package com.duckduckgo.remote.messaging.impl.newtab
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
@@ -35,6 +37,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
@@ -97,6 +100,9 @@ class RemoteMessageView @JvmOverloads constructor(
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
+    @Inject
+    lateinit var addWidgetLauncher: AddWidgetLauncher
+
     private val binding: ViewRemoteMessageBinding by viewBinding()
 
     private val viewModel: RemoteMessageViewModel by lazy {
@@ -147,6 +153,7 @@ class RemoteMessageView @JvmOverloads constructor(
             is SharePromoLinkRMF -> launchSharePromoRMFPageChooser(command.url, command.shareTitle)
             is SubmitUrl -> submitUrl(command.url)
             is Command.LaunchDefaultCredentialProvider -> launchDefaultCredentialProvider()
+            is Command.LaunchAddWidget -> addWidgetLauncher.launchAddWidget(context.findActivity())
         }
     }
 
@@ -278,4 +285,10 @@ class RemoteMessageNewTabSectionPlugin @Inject constructor(
         val message = remoteMessageModel.getActiveMessage()
         return message != null
     }
+}
+
+private tailrec fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
 }
