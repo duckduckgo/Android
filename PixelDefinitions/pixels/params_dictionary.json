@@ -132,7 +132,7 @@
             "duck_ai_new_chat",
             "recent_chat_tab_switcher",
             "recent_chat_contextual",
-            "recent_chat_input"
+            "chat_suggestion_input"
         ]
     },
     "osVersion": {

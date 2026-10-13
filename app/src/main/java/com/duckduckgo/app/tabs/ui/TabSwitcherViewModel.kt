@@ -679,23 +679,27 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onDuckAIButtonClicked() {
-        if (_viewState.value.isDuckAiChatsMenuEnabled) {
-            command.value = Command.ShowDuckAiChatsMenu
-        } else {
-            onDuckAiNewChatSelected()
-        }
-    }
-
-    fun onDuckAiNewChatSelected() {
         viewModelScope.launch {
             val params = duckChat.createWasUsedBeforePixelParams()
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, parameters = params)
 
-            val url = duckChat.getDuckChatUrl("", false)
-            duckChat.reportDuckChatEntry(DuckChatEntryPoint.TAB_SWITCHER, opensNewTab = true, hasPrompt = false)
-            tabRepository.add(url, true)
-            command.value = Command.Close
+            if (_viewState.value.isDuckAiChatsMenuEnabled) {
+                command.value = Command.ShowDuckAiChatsMenu
+            } else {
+                openNewDuckAiChat()
+            }
         }
+    }
+
+    fun onDuckAiNewChatSelected() {
+        viewModelScope.launch { openNewDuckAiChat() }
+    }
+
+    private suspend fun openNewDuckAiChat() {
+        val url = duckChat.getDuckChatUrl("", false)
+        duckChat.reportDuckChatEntry(DuckChatEntryPoint.TAB_SWITCHER, opensNewTab = true, hasPrompt = false)
+        tabRepository.add(url, true)
+        command.value = Command.Close
     }
 
     fun onDuckAiChatSelected(chatUrl: String) {

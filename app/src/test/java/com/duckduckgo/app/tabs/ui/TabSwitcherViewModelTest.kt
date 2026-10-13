@@ -958,6 +958,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun `when Duck Chat button clicked and chats menu enabled then chats menu shown`() = runTest {
         givenDuckAiChatsMenuEnabled(true)
+        whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
         val testee = createViewModel()
         testee.command.observeForever(mockCommandObserver)
 
@@ -997,27 +998,36 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun `when Duck Chat menu new chat selected and it wasn't used before then send a pixel`() = runTest {
+    fun `when Duck Chat button clicked and chats menu disabled and it wasn't used before then send a pixel`() = runTest {
+        givenDuckAiChatsMenuEnabled(false)
         whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
+        val testee = createViewModel()
 
-        testee.onDuckAiNewChatSelected()
+        testee.onDuckAIButtonClicked()
 
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, mapOf("was_used_before" to "0"))
     }
 
     @Test
-    fun `when Duck Chat menu new chat selected and it was used before then send a pixel`() = runTest {
+    fun `when Duck Chat button clicked and chats menu enabled and it was used before then send a pixel`() = runTest {
+        givenDuckAiChatsMenuEnabled(true)
         whenever(duckChatMock.wasOpenedBefore()).thenReturn(true)
+        val testee = createViewModel()
 
-        testee.onDuckAiNewChatSelected()
+        testee.onDuckAIButtonClicked()
 
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, mapOf("was_used_before" to "1"))
     }
 
     @Test
-    fun `when Duck Chat menu new chat selected then new tab created and screen closed`() = runTest {
-        whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
+    fun `when Duck Chat menu new chat selected then button pixel not sent`() = runTest {
+        testee.onDuckAiNewChatSelected()
 
+        verify(mockPixel, never()).fire(eq(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB), any(), any(), any())
+    }
+
+    @Test
+    fun `when Duck Chat menu new chat selected then new tab created and screen closed`() = runTest {
         val duckChatURL = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
         whenever(duckChatMock.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
 

@@ -9865,7 +9865,7 @@ class BrowserTabViewModelTest {
         assertCommandIssued<Command.OpenInNewTab> {
             assertEquals(chatUrl, query)
         }
-        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.RECENT_CHAT_INPUT, opensNewTab = true, hasPrompt = false)
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.CHAT_SUGGESTION_INPUT, opensNewTab = true, hasPrompt = false)
     }
 
     @Test
