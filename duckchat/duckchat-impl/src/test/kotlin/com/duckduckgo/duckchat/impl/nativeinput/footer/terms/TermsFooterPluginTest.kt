@@ -22,6 +22,7 @@ import android.text.Spanned
 import android.text.style.ClickableSpan
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -41,6 +42,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -163,6 +165,14 @@ class TermsFooterPluginTest {
         val vertical = context.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
         assertEquals(listOf(horizontal, vertical, horizontal, vertical), listOf(row.paddingStart, row.paddingTop, row.paddingEnd, row.paddingBottom))
         assertEquals(context.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_7), row.minimumHeight)
+    }
+
+    @Test
+    fun whenFooterIsCreatedThenTheShieldIsNotTinted() {
+        val footer = testee.createFooter(context, hostContext, FakeNativeInputFooterHost())
+        val icon = (footer.view as ViewGroup).findViewById<ImageView>(R.id.termsFooterIcon)
+
+        assertNull(icon.imageTintList)
     }
 
     @Test
