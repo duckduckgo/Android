@@ -35,7 +35,7 @@ interface DuckAiChatsMenu {
     /**
      * @param chatHistorySource the surface showing the menu, reported when View all opens the chat history screen.
      * @param showNewChat whether the menu offers New Chat.
-     * @param menuStyle how the menu presents its sections;
+     * @param menuStyle how the menu presents its sections.
      */
     data class Options(
         val chatHistorySource: DuckChatHistorySource,
