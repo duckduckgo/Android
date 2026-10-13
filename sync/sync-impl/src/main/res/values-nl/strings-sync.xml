@@ -306,6 +306,7 @@
     <string name="sync_simplified_settings_download_recovery_code_item_hint">Gebruik deze code om je gegevens te herstellen als je de toegang tot dit apparaat verliest — bewaar hem veilig.</string>
     <string name="sync_simplified_settings_data_expiration_notice">Sync &amp; Backup-gegevens kunnen niet worden hersteld na 18 maanden inactiviteit. <annotation type="learn_more_link">Meer informatie</annotation></string>
     <string name="sync_simplified_settings_delete_account_item">Servergegevens uitschakelen en verwijderen</string>
+    <string name="sync_simplified_settings_turn_off_item">Sync &amp; Backup uitschakelen</string>
     <string name="sync_simplified_settings_storage_permission_message">We hebben toegang tot je opslag nodig om het PDF-bestand met herstelgegevens op te slaan</string>
     <string name="sync_simplified_settings_learn_more_screen_title">Synchronisatie en back-up</string>
 
@@ -320,6 +321,29 @@
     <string name="sync_simplified_settings_delete_server_data_dialog_body">De verbinding met alle apparaten die Sync &amp; Backup gebruiken wordt verbroken en je gesynchroniseerde gegevens worden van de server verwijderd.</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Servergegevens verwijderen</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">Annuleren</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_title_v2">Je kunt deze actie niet ongedaan maken.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body_v2">De verbinding met alle apparaten die Sync &amp; Backup gebruiken wordt verbroken en je gesynchroniseerde gegevens worden van de server verwijderd.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button_v2">Definitief verwijderen</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button_v2">Annuleren</string>
+
+    <!-- Sync settings screen: turn off sheet -->
+    <string name="sync_simplified_settings_turn_off_sheet_remove_title" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s verwijderen uit Sync &amp; Backup?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_body" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” heeft geen toegang meer tot je gesynchroniseerde gegevens op andere apparaten.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item">Wil je ook de servergegevens verwijderen?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Sync &amp; Backup uitschakelen en alle gesynchroniseerde gegevens van de server verwijderen en je herstelcode deactiveren.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Apparaat verwijderen</string>
+    <string name="sync_simplified_settings_turn_off_sheet_title">Sync &amp; Backup uitschakelen?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_item">Servergegevens verwijderen</string>
+    <string name="sync_simplified_settings_turn_off_sheet_body">De verbinding met alle apparaten die Sync &amp; Backup gebruiken wordt verbroken en je gesynchroniseerde gegevens worden van de server verwijderd.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button">Dit apparaat uitschakelen</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Uitschakelen en verwijderen</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete_all">Alle apparaten uitschakelen en verwijderen</string>
+
+    <!-- Sync settings screen: turn off this device dialog -->
+    <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s verwijderen uit Sync &amp; Backup?</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">\'%1$s\' heeft geen toegang meer tot je gesynchroniseerde gegevens. Bladwijzers, automatisch ingevulde gegevens en Duck.ai-chats blijven op je apparaten staan.</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_primary_button">Verwijderen</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_secondary_button">Annuleren</string>
 
     <!-- Sync settings screen: require device passcode dialog -->
     <string name="sync_simplified_settings_require_passcode_dialog_title">Beveilig je apparaat om Sync &amp; Backup te gebruiken</string>
@@ -329,6 +353,8 @@
     <!-- Sync This Device screen -->
     <string name="sync_simplified_setup_header_headline">Synchroniseer dit apparaat met een computer in de buurt.</string>
     <string name="sync_simplified_setup_header_body">We helpen je bij het synchroniseren van je apparaten.</string>
+    <string name="sync_simplified_setup_header_headline_v2">Heb je een ander apparaat in de buurt? Synchroniseer je apparaten.</string>
+    <string name="sync_simplified_setup_header_body_v2">Geen ander apparaat bij de hand? Synchroniseer alleen dit apparaat en synchroniseer later met een ander apparaat.</string>
     <string name="sync_simplified_setup_primary_button">Synchroniseren met een ander apparaat</string>
     <string name="sync_simplified_setup_secondary_button">Alleen dit apparaat synchroniseren</string>
     <string name="sync_simplified_setup_secondary_button_syncing">Er wordt verbinding gemaakt ...</string>
@@ -353,10 +379,14 @@
     <string name="sync_simplified_scanner_camera_header_headline">Scan de QR code om te synchroniseren</string>
     <string name="sync_simplified_scanner_camera_header_body">Open <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo voor desktop</annotation></b>\n<annotation type="gap">\n</annotation>en ga naar <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synchroniseren met een ander apparaat</annotation></string>
     <string name="sync_simplified_scanner_camera_primary_button">Ik ben klaar om te scannen</string>
+    <string name="sync_simplified_scanner_camera_primary_button_v2">Ik snap het</string>
     <string name="sync_simplified_scanner_camera_invalid_code_message">Sorry, de gescande code is ongeldig.</string>
     <string name="sync_simplified_scanner_no_permission_headline">Cameramachtiging is vereist</string>
     <string name="sync_simplified_scanner_no_permission_body">Ga naar je apparaatinstellingen om deze app toegang te geven tot je camera.</string>
     <string name="sync_simplified_scanner_no_permission_primary_button">Ga naar Instellingen</string>
+    <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo heeft toegang tot je camera nodig.</string>
+    <string name="sync_simplified_scanner_no_permission_body_v2">Cameratoestemming is vereist om de QR-code te scannen.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button_v2">Toestemmingen wijzigen</string>
     <string name="sync_simplified_scanner_no_hardware_headline">Camera niet beschikbaar</string>
 
     <!-- Scanner screen: manual entry tab -->
@@ -422,6 +452,8 @@
     <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">\'%1$s\' heeft geen toegang meer tot je gesynchroniseerde gegevens.</string>
     <string name="sync_simplified_edit_device_remove_dialog_primary_button">Verwijderen</string>
     <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Annuleren</string>
+    <string name="sync_simplified_edit_device_remove_dialog_title_v2" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s verwijderen uit Sync &amp; Backup?</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body_v2" instruction="Placeholder is a device name. e.g., Samsung S23">\'%1$s\' heeft geen toegang meer tot je gesynchroniseerde gegevens. Bladwijzers, automatisch ingevulde gegevens en Duck.ai-chats blijven op je apparaten staan.</string>
 
     <!-- Edit Device screen: turn off sync dialog -->
     <string name="sync_simplified_edit_device_turn_off_dialog_title">Sync &amp; Backup uitschakelen?</string>

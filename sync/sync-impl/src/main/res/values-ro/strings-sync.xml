@@ -306,6 +306,7 @@
     <string name="sync_simplified_settings_download_recovery_code_item_hint">Folosește acest cod pentru a-ți recupera datele dacă pierzi accesul la acest dispozitiv – păstrează-l în siguranță.</string>
     <string name="sync_simplified_settings_data_expiration_notice">Datele din Sync &amp; Backup nu pot fi recuperate după 18 luni de inactivitate. <annotation type="learn_more_link">Află mai multe</annotation></string>
     <string name="sync_simplified_settings_delete_account_item">Oprește și șterge datele serverului</string>
+    <string name="sync_simplified_settings_turn_off_item">Oprește Sync &amp; Backup</string>
     <string name="sync_simplified_settings_storage_permission_message">Salvarea PDF-ului de recuperare necesită permisiunea de stocare</string>
     <string name="sync_simplified_settings_learn_more_screen_title">Sync &amp; Backup</string>
 
@@ -320,6 +321,29 @@
     <string name="sync_simplified_settings_delete_server_data_dialog_body">Toate dispozitivele care folosesc Sync &amp; Backup vor fi deconectate, iar datele tale sincronizate vor fi șterse de pe server.</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Șterge datele de pe server</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">Anulează</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_title_v2">Nu poți anula această acțiune.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body_v2">Toate dispozitivele care folosesc Sync &amp; Backup vor fi deconectate, iar datele tale sincronizate vor fi șterse de pe server.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button_v2">Șterge definitiv</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button_v2">Anulează</string>
+
+    <!-- Sync settings screen: turn off sheet -->
+    <string name="sync_simplified_settings_turn_off_sheet_remove_title" instruction="Placeholder is a device name. e.g., Samsung S23">Elimini %1$s din Sync &amp; Backup?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_body" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s” nu va mai putea accesa datele tale sincronizate pe alte dispozitive.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item">Ștergi și datele serverului?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Oprește Sync &amp; Backup și șterge toate datele sincronizate de pe server și dezactivează codul de recuperare.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Elimină dispozitivul</string>
+    <string name="sync_simplified_settings_turn_off_sheet_title">Oprești Sync &amp; Backup?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_item">Șterge datele de pe server</string>
+    <string name="sync_simplified_settings_turn_off_sheet_body">Toate dispozitivele care folosesc Sync &amp; Backup vor fi deconectate, iar datele tale sincronizate vor fi șterse de pe server.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button">Oprește acest dispozitiv</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Oprește și șterge</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete_all">Oprește toate dispozitivele și șterge</string>
+
+    <!-- Sync settings screen: turn off this device dialog -->
+    <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">Elimini %1$s din Sync &amp; Backup?</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s” nu va mai putea accesa datele tale sincronizate. Marcajele, datele de completare automată și chaturile Duck.ai vor rămâne pe dispozitivele tale.</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_primary_button">Elimină</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_secondary_button">Anulează</string>
 
     <!-- Sync settings screen: require device passcode dialog -->
     <string name="sync_simplified_settings_require_passcode_dialog_title">Securizează-ți dispozitivul pentru a utiliza Sync &amp; Backup</string>
@@ -329,6 +353,8 @@
     <!-- Sync This Device screen -->
     <string name="sync_simplified_setup_header_headline">Sincronizează acest dispozitiv cu un computer din apropiere.</string>
     <string name="sync_simplified_setup_header_body">Te vom ajuta să-ți sincronizezi dispozitivele.</string>
+    <string name="sync_simplified_setup_header_headline_v2">Ai un alt dispozitiv în apropiere? Sincronizează-ți dispozitivele.</string>
+    <string name="sync_simplified_setup_header_body_v2">Nu ai alt dispozitiv acum? Sincronizează doar acest dispozitiv și sincronizează-l cu un alt dispozitiv mai târziu.</string>
     <string name="sync_simplified_setup_primary_button">Sincronizează cu un alt dispozitiv</string>
     <string name="sync_simplified_setup_secondary_button">Sincronizează doar acest dispozitiv</string>
     <string name="sync_simplified_setup_secondary_button_syncing">Se conectează…</string>
@@ -353,10 +379,14 @@
     <string name="sync_simplified_scanner_camera_header_headline">Scanează codul QR pentru sincronizare</string>
     <string name="sync_simplified_scanner_camera_header_body">Deschide <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo pentru desktop</annotation></b>\n<annotation type="gap">\n</annotation>și accesează <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sincronizează cu un alt dispozitiv</annotation></string>
     <string name="sync_simplified_scanner_camera_primary_button">Sunt gata de scanare</string>
+    <string name="sync_simplified_scanner_camera_primary_button_v2">Am înțeles</string>
     <string name="sync_simplified_scanner_camera_invalid_code_message">Ne pare rău, codul scanat este incorect.</string>
     <string name="sync_simplified_scanner_no_permission_headline">Este necesară permisiunea pentru cameră</string>
     <string name="sync_simplified_scanner_no_permission_body">Accesează setările dispozitivului și acordă permisiunea ca această aplicație să îți acceseze camera.</string>
     <string name="sync_simplified_scanner_no_permission_primary_button">Mergi la Setări</string>
+    <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo are nevoie de acces la cameră.</string>
+    <string name="sync_simplified_scanner_no_permission_body_v2">Sunt necesare permisiuni pentru cameră pentru a scana codul QR.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button_v2">Modifică permisiunile</string>
     <string name="sync_simplified_scanner_no_hardware_headline">Cameră indisponibilă</string>
 
     <!-- Scanner screen: manual entry tab -->
@@ -422,6 +452,8 @@
     <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s” nu va mai putea accesa datele tale sincronizate.</string>
     <string name="sync_simplified_edit_device_remove_dialog_primary_button">Elimină</string>
     <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Anulează</string>
+    <string name="sync_simplified_edit_device_remove_dialog_title_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Elimini %1$s din Sync &amp; Backup?</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body_v2" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s” nu va mai putea accesa datele tale sincronizate. Marcajele, datele de completare automată și chaturile Duck.ai vor rămâne pe dispozitivele tale.</string>
 
     <!-- Edit Device screen: turn off sync dialog -->
     <string name="sync_simplified_edit_device_turn_off_dialog_title">Oprești Sync &amp; Backup?</string>

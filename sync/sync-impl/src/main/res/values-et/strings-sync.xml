@@ -306,6 +306,7 @@
     <string name="sync_simplified_settings_download_recovery_code_item_hint">Kasuta seda koodi oma andmete taastamiseks, kui kaotad juurdepääsu sellele seadmele – hoia seda turvalises kohas.</string>
     <string name="sync_simplified_settings_data_expiration_notice">Funktsiooni Sync &amp; Backup andmeid ei saa taastada pärast 18-kuulist mitteaktiivsust. <annotation type="learn_more_link">Lisateave</annotation></string>
     <string name="sync_simplified_settings_delete_account_item">Lülita välja ja kustuta serveri andmed</string>
+    <string name="sync_simplified_settings_turn_off_item">Lülita Sync &amp; Backup välja</string>
     <string name="sync_simplified_settings_storage_permission_message">Taaste-PDF-i salvestamiseks on vaja salvestusluba</string>
     <string name="sync_simplified_settings_learn_more_screen_title">Sync &amp; Backup</string>
 
@@ -320,6 +321,29 @@
     <string name="sync_simplified_settings_delete_server_data_dialog_body">Kõigi Sync &amp; Backup kasutavate seadmete ühendus katkestatakse ja sinu sünkroonitud andmed kustutatakse serverist.</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Kustuta serveri andmed</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">Tühista</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_title_v2">Sa ei saa seda toimingut tagasi võtta.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body_v2">Kõigi Sync &amp; Backup kasutavate seadmete ühendus katkestatakse ja sinu sünkroonitud andmed kustutatakse serverist.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button_v2">Kustuta jäädavalt</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button_v2">Tühista</string>
+
+    <!-- Sync settings screen: turn off sheet -->
+    <string name="sync_simplified_settings_turn_off_sheet_remove_title" instruction="Placeholder is a device name. e.g., Samsung S23">Kas eemaldada %1$s funktsioonist Sync &amp; Backup?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_body" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s” ei pääse enam sinu sünkroonitud andmetele teistes seadmetes ligi.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item">Kas kustutada ka serveri andmed?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Lülita Sync &amp; Backup välja ning kustuta serverist kõik sünkroonitud andmed ja deaktiveeri oma taastekood.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Eemalda seade</string>
+    <string name="sync_simplified_settings_turn_off_sheet_title">Kas lülitada Sync &amp; Backup välja?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_item">Kustuta serveri andmed</string>
+    <string name="sync_simplified_settings_turn_off_sheet_body">Kõigi Sync &amp; Backup kasutavate seadmete ühendus katkestatakse ja sinu sünkroonitud andmed kustutatakse serverist.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button">Lülita see seade välja</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Lülita välja ja kustuta</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete_all">Lülita kõik seadmed välja ja kustuta</string>
+
+    <!-- Sync settings screen: turn off this device dialog -->
+    <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">Kas eemaldada %1$s funktsioonist Sync &amp; Backup?</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s“ ei pääse enam sinu sünkroonitud andmetele ligi. Järjehoidjad, automaatse täitmise andmed ja Duck.ai vestlused jäävad sinu seadmetesse.</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_primary_button">Eemalda</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_secondary_button">Tühista</string>
 
     <!-- Sync settings screen: require device passcode dialog -->
     <string name="sync_simplified_settings_require_passcode_dialog_title">Funktsiooni Sync &amp; Backup kasutamiseks kindlusta oma seade</string>
@@ -329,6 +353,8 @@
     <!-- Sync This Device screen -->
     <string name="sync_simplified_setup_header_headline">Sünkrooni see seade lähedalasuva arvutiga.</string>
     <string name="sync_simplified_setup_header_body">Aitame sul seadmed sünkroonida.</string>
+    <string name="sync_simplified_setup_header_headline_v2">Kas sul on läheduses mõni teine seade? Sünkrooni oma seadmed.</string>
+    <string name="sync_simplified_setup_header_body_v2">Pole praegu teist seadet? Sünkrooni ainult see seade ja sünkrooni hiljem mõne teise seadmega.</string>
     <string name="sync_simplified_setup_primary_button">Sünkrooni teise seadmega</string>
     <string name="sync_simplified_setup_secondary_button">Sünkrooni ainult see seade</string>
     <string name="sync_simplified_setup_secondary_button_syncing">Ühendamine...</string>
@@ -353,10 +379,14 @@
     <string name="sync_simplified_scanner_camera_header_headline">Sünkroonimiseks skanni QR-kood</string>
     <string name="sync_simplified_scanner_camera_header_body">Ava <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo for Desktop</annotation></b>\n<annotation type="gap">\n</annotation>ja mine <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sünkrooni teise seadmega</annotation></string>
     <string name="sync_simplified_scanner_camera_primary_button">Olen skannimiseks valmis</string>
+    <string name="sync_simplified_scanner_camera_primary_button_v2">Sain aru</string>
     <string name="sync_simplified_scanner_camera_invalid_code_message">Kahjuks on skannitud kood kehtetu.</string>
     <string name="sync_simplified_scanner_no_permission_headline">Kaamera luba on vajalik</string>
     <string name="sync_simplified_scanner_no_permission_body">Ava oma seadme seaded ja anna sellele rakendusele luba juurdepääsuks kaamerale.</string>
     <string name="sync_simplified_scanner_no_permission_primary_button">Ava Sätted</string>
+    <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo vajab juurdepääsu sinu kaamerale.</string>
+    <string name="sync_simplified_scanner_no_permission_body_v2">QR-koodi skannimiseks on vaja kaamera luba.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button_v2">Muuda lubasid</string>
     <string name="sync_simplified_scanner_no_hardware_headline">Kaamera pole saadaval</string>
 
     <!-- Scanner screen: manual entry tab -->
@@ -422,6 +452,8 @@
     <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s“ ei pääse enam sinu sünkroonitud andmetele ligi.</string>
     <string name="sync_simplified_edit_device_remove_dialog_primary_button">Eemalda</string>
     <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Tühista</string>
+    <string name="sync_simplified_edit_device_remove_dialog_title_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Kas eemaldada %1$s funktsioonist Sync &amp; Backup?</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body_v2" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s“ ei pääse enam sinu sünkroonitud andmetele ligi. Järjehoidjad, automaatse täitmise andmed ja Duck.ai vestlused jäävad sinu seadmetesse.</string>
 
     <!-- Edit Device screen: turn off sync dialog -->
     <string name="sync_simplified_edit_device_turn_off_dialog_title">Kas lülitada Sync &amp; Backup välja?</string>
