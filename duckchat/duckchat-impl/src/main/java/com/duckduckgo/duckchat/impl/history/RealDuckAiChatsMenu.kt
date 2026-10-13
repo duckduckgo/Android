@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.history
 
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiChatsMenu
@@ -25,29 +26,36 @@ import com.duckduckgo.duckchat.api.DuckChatHistoryParams
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @ContributesBinding(ActivityScope::class)
 class RealDuckAiChatsMenu @Inject constructor(
     private val activity: AppCompatActivity,
-    private val chatHistoryRepository: ChatHistoryRepository,
+    chatHistoryRepository: ChatHistoryRepository,
     private val duckChat: DuckChatInternal,
     private val globalActivityStarter: GlobalActivityStarter,
-    private val dispatchers: DispatcherProvider,
+    dispatchers: DispatcherProvider,
 ) : DuckAiChatsMenu {
+
+    // Loaded from creation so show() doesn't wait on parsing the chat history when the user taps.
+    private val recentChats: StateFlow<List<ChatHistoryItem>?> = chatHistoryRepository.observeChats()
+        .map { chats -> chats.sortedByDescending { it.lastEditMillis }.take(MAX_RECENT_CHATS) }
+        .flowOn(dispatchers.io())
+        .stateIn(activity.lifecycleScope, SharingStarted.Eagerly, null)
 
     override suspend fun show(
         anchorView: View,
         options: DuckAiChatsMenu.Options,
         listener: DuckAiChatsMenu.Listener,
     ) {
-        val recentChats = withContext(dispatchers.io()) {
-            chatHistoryRepository.observeChats().firstOrNull().orEmpty()
-                .sortedByDescending { it.lastEditMillis }
-                .take(MAX_RECENT_CHATS)
-        }
+        val recentChats = recentChats.filterNotNull().firstOrNull().orEmpty()
         DuckAiChatsPopupMenu(
             layoutInflater = activity.layoutInflater,
             recentChats = recentChats,
