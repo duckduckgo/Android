@@ -76,7 +76,7 @@ object EventHubConfigParser {
 
     private fun parseTelemetryEntry(name: String, pixelValue: Any?): TelemetryPixelConfig? {
         return try {
-            val pixelJson = pixelAdapter.fromJsonValue(pixelValue) ?: return null
+            val pixelJson = pixelAdapter.fromJsonValue(pixelValue) ?: return skipEntry(name, "null entry")
             toTelemetryPixelConfig(name, pixelJson)
         } catch (e: Exception) {
             logcat(WARN) { "Skipping eventHub telemetry entry $name: ${e.message}" }

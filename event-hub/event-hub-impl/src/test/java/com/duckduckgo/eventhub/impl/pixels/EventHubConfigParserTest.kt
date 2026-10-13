@@ -447,6 +447,22 @@ class EventHubConfigParserTest {
         assertEquals(listOf("webTelemetry_period"), telemetry.map { it.name })
     }
 
+    @Test
+    fun `null entry is skipped without affecting sibling entries`() {
+        val json = """
+            {
+                "telemetry": {
+                    "webTelemetry_null": null,
+                    "webTelemetry_period": $periodPixelJson
+                }
+            }
+        """.trimIndent()
+
+        val telemetry = EventHubConfigParser.parseTelemetry(json)
+
+        assertEquals(listOf("webTelemetry_period"), telemetry.map { it.name })
+    }
+
     private val counterParametersJson = """
         {
             "c": {
