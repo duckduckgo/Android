@@ -164,7 +164,7 @@
     "widePixelAppVersion": {
         "key": "app.version",
         "type": "string",
-        "description": "The version of the app sending the pixel"
+        "description": "The version of the app when the wide event's flow started"
     },
     "widePixelDevMode": {
         "key": "app.dev_mode",
