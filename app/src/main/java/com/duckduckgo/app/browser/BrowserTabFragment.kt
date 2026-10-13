@@ -6455,7 +6455,7 @@ class BrowserTabFragment :
                 if (brandDesignKeyboardCallback?.isAnimating != true) clipWavingDaxAtCover()
             }
             brandDesignFitLayoutListener = listener
-            brandDesignDialogScrollView.viewTreeObserver.addOnGlobalLayoutListener(listener)
+            requireActivity().window.decorView.viewTreeObserver.addOnGlobalLayoutListener(listener)
             var imeCta: DaxBubbleCta.BrandDesignUpdateBubbleCta? = null
             // The tab shrinks before the keyboard arrives, briefly uncovering what's behind it.
             var restoreBehindTab: (() -> Unit)? = null
@@ -6500,7 +6500,7 @@ class BrowserTabFragment :
 
         fun removeBrandDesignFitListener() {
             brandDesignFitLayoutListener?.let {
-                brandDesignDialogScrollView.viewTreeObserver.removeOnGlobalLayoutListener(it)
+                requireActivity().window.decorView.viewTreeObserver.removeOnGlobalLayoutListener(it)
             }
             brandDesignFitLayoutListener = null
             brandDesignKeyboardCallback?.restore()
