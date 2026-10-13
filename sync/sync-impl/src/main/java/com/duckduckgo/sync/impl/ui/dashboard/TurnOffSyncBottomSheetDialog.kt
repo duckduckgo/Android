@@ -92,6 +92,9 @@ class TurnOffSyncBottomSheetDialog : BottomSheetDialogFragment() {
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
+        if (savedInstanceState == null) {
+            binding.deleteServerDataSwitch.isChecked = args.allDevices.size <= 1
+        }
         render(deleteServerData = binding.deleteServerDataSwitch.isChecked, animate = false)
         binding.deleteServerDataSwitch.setOnCheckedChangeListener { _, isChecked ->
             render(deleteServerData = isChecked, animate = true)
