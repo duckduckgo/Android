@@ -25,7 +25,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.PirRemoteFeatures
-import com.duckduckgo.pir.impl.brokers.BundledBrokerDataLoader
+import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
 import com.duckduckgo.pir.impl.checker.DisabledReason
 import com.duckduckgo.pir.impl.checker.PirEligibility
 import com.duckduckgo.pir.impl.checker.PirRunMode
@@ -85,7 +85,7 @@ class PirWebSaveProfileMessageHandlerTest {
     private val mockFreemiumToggle: Toggle = mock()
     private val mockPirFreemiumDataStore: PirFreemiumDataStore = mock()
     private val mockPirScanCompleteNotifier: PirScanCompleteNotifier = mock()
-    private val mockBundledBrokerDataLoader: BundledBrokerDataLoader = mock()
+    private val mockBrokerJsonUpdater: BrokerJsonUpdater = mock()
     private val mockUseBundledBrokerJsonsToggle: Toggle = mock()
     private val testScope = TestScope()
 
@@ -114,7 +114,7 @@ class PirWebSaveProfileMessageHandlerTest {
             pirRemoteFeatures = mockPirRemoteFeatures,
             pirFreemiumDataStore = mockPirFreemiumDataStore,
             pirScanCompleteNotifier = mockPirScanCompleteNotifier,
-            bundledBrokerDataLoader = mockBundledBrokerDataLoader,
+            brokerJsonUpdater = mockBrokerJsonUpdater,
         )
     }
 
@@ -981,7 +981,7 @@ class PirWebSaveProfileMessageHandlerTest {
     }
 
     @Test
-    fun whenSavingProfileWithNoBrokersStoredThenBundledBrokersAreLoadedBeforeRespondingSuccess() = runTest {
+    fun whenSavingProfileWithNoBrokersStoredThenBrokerDataIsUpdatedBeforeRespondingSuccess() = runTest {
         // Given
         val jsMessage = createJsMessage("""""", SAVE_PROFILE)
         givenSuccessfulProfileSave()
@@ -991,14 +991,14 @@ class PirWebSaveProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then the dashboard reads the scan total from stored brokers as soon as the save succeeds
-        val inOrder = inOrder(mockBundledBrokerDataLoader, mockJsMessaging)
-        inOrder.verify(mockBundledBrokerDataLoader).loadBundledBrokerData()
+        val inOrder = inOrder(mockBrokerJsonUpdater, mockJsMessaging)
+        inOrder.verify(mockBrokerJsonUpdater).update()
         inOrder.verify(mockJsMessaging).onResponse(any())
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
     @Test
-    fun whenSavingProfileWithBrokersAlreadyStoredThenBundledBrokersAreNotLoaded() = runTest {
+    fun whenSavingProfileWithBrokersAlreadyStoredThenBrokerDataIsNotUpdated() = runTest {
         // Given
         val jsMessage = createJsMessage("""""", SAVE_PROFILE)
         givenSuccessfulProfileSave()
@@ -1008,12 +1008,12 @@ class PirWebSaveProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockBundledBrokerDataLoader, never()).loadBundledBrokerData()
+        verify(mockBrokerJsonUpdater, never()).update()
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
     @Test
-    fun whenSavingProfileWithNoBrokersStoredButBundledBrokersDisabledThenBundledBrokersAreNotLoaded() = runTest {
+    fun whenSavingProfileWithNoBrokersStoredAndBundledBrokersDisabledThenBrokerDataIsStillUpdated() = runTest {
         // Given
         val jsMessage = createJsMessage("""""", SAVE_PROFILE)
         givenSuccessfulProfileSave()
@@ -1023,13 +1023,13 @@ class PirWebSaveProfileMessageHandlerTest {
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
-        // Then
-        verify(mockBundledBrokerDataLoader, never()).loadBundledBrokerData()
+        // Then the toggle only governs the bundled fallback, never the network fetch
+        verify(mockBrokerJsonUpdater).update()
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
     @Test
-    fun whenSaveFailsThenBundledBrokersAreNotLoaded() = runTest {
+    fun whenSaveFailsThenBrokerDataIsNotUpdated() = runTest {
         // Given
         val jsMessage = createJsMessage("""""", SAVE_PROFILE)
         givenSuccessfulProfileSave()
@@ -1040,7 +1040,7 @@ class PirWebSaveProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockBundledBrokerDataLoader, never()).loadBundledBrokerData()
+        verify(mockBrokerJsonUpdater, never()).update()
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 

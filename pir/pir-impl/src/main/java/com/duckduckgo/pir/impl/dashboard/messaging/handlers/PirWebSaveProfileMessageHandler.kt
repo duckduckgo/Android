@@ -25,7 +25,7 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.PirRemoteFeatures
-import com.duckduckgo.pir.impl.brokers.BundledBrokerDataLoader
+import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
 import com.duckduckgo.pir.impl.checker.DisabledReason
 import com.duckduckgo.pir.impl.checker.PirEligibility
 import com.duckduckgo.pir.impl.checker.PirRunMode
@@ -71,7 +71,7 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
     private val pirRemoteFeatures: PirRemoteFeatures,
     private val pirFreemiumDataStore: PirFreemiumDataStore,
     private val pirScanCompleteNotifier: PirScanCompleteNotifier,
-    private val bundledBrokerDataLoader: BundledBrokerDataLoader,
+    private val brokerJsonUpdater: BrokerJsonUpdater,
 ) : PirWebJsMessageHandler() {
 
     override val message = PirDashboardWebMessages.SAVE_PROFILE
@@ -109,7 +109,7 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
             }
 
             // ensure broker data is present so dashboard is displayed correctly
-            seedBundledBrokersIfNoneStored()
+            updateBrokerDataIfNoneStored()
 
             jsMessaging.sendResponse(
                 jsMessage,
@@ -219,13 +219,11 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
     /**
      * Ensure broker data is present before starting scan to prevent invalid dashboard state.
      */
-    private suspend fun seedBundledBrokersIfNoneStored() {
-        if (repository.getAllActiveBrokers().isNotEmpty() || !pirRemoteFeatures.useBundledBrokerJsons().isEnabled()) {
-            return
-        }
+    private suspend fun updateBrokerDataIfNoneStored() {
+        if (repository.getAllActiveBrokers().isNotEmpty()) return
 
-        logcat { "PIR-WEB: PirWebSaveProfileMessageHandler: no brokers stored, loading bundled broker data" }
-        bundledBrokerDataLoader.loadBundledBrokerData()
+        logcat { "PIR-WEB: PirWebSaveProfileMessageHandler: no brokers stored, updating broker data" }
+        brokerJsonUpdater.update()
     }
 
     /**
