@@ -130,8 +130,8 @@
 
     </LinearLayout>
 
-    <nl.dionsegijn.konfetti.KonfettiView
-        android:id="@+id/subscriptionOnboardingCompletionKonfetti"
+    <com.duckduckgo.subscriptions.impl.onboarding.confetti.ConfettiView
+        android:id="@+id/subscriptionOnboardingCompletionConfetti"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="false"
