@@ -25,6 +25,7 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.brokers.BundledBrokerDataLoader
 import com.duckduckgo.pir.impl.checker.DisabledReason
 import com.duckduckgo.pir.impl.checker.PirEligibility
 import com.duckduckgo.pir.impl.checker.PirRunMode
@@ -70,6 +71,7 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
     private val pirRemoteFeatures: PirRemoteFeatures,
     private val pirFreemiumDataStore: PirFreemiumDataStore,
     private val pirScanCompleteNotifier: PirScanCompleteNotifier,
+    private val bundledBrokerDataLoader: BundledBrokerDataLoader,
 ) : PirWebJsMessageHandler() {
 
     override val message = PirDashboardWebMessages.SAVE_PROFILE
@@ -105,6 +107,9 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
                 )
                 return@launch
             }
+
+            // ensure broker data is present so dashboard is displayed correctly
+            seedBundledBrokersIfNoneStored()
 
             jsMessaging.sendResponse(
                 jsMessage,
@@ -209,6 +214,18 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
                 jobRecordUpdater.removeScanJobRecordsWithNoMatchesForProfiles(profileQueriesToUpdate.map { it.id })
             }
         }
+    }
+
+    /**
+     * Ensure broker data is present before starting scan to prevent invalid dashboard state.
+     */
+    private suspend fun seedBundledBrokersIfNoneStored() {
+        if (repository.getAllActiveBrokers().isNotEmpty() || !pirRemoteFeatures.useBundledBrokerJsons().isEnabled()) {
+            return
+        }
+
+        logcat { "PIR-WEB: PirWebSaveProfileMessageHandler: no brokers stored, loading bundled broker data" }
+        bundledBrokerDataLoader.loadBundledBrokerData()
     }
 
     /**
