@@ -23,6 +23,8 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.checker.PirEligibility
+import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.GetDataBrokersResponse.DataBroker
@@ -36,10 +38,11 @@ import com.duckduckgo.pir.impl.scan.PirForegroundScanServiceStarter
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import logcat.logcat
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
 /**
@@ -58,10 +61,11 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
     private val pirRemoteFeatures: PirRemoteFeatures,
     private val foregroundScanServiceStarter: PirForegroundScanServiceStarter,
     private val pirScanCompleteNotifier: PirScanCompleteNotifier,
+    private val pirWorkHandler: PirWorkHandler,
 ) : PirWebJsMessageHandler() {
 
     override val message = PirDashboardWebMessages.INITIAL_SCAN_STATUS
-    private val checkedForResumeScan: AtomicBoolean = AtomicBoolean(false)
+    private val eligibilityCheckedForResumeScan = AtomicReference<PirEligibility?>(null)
 
     override fun process(
         jsMessage: JsMessage,
@@ -79,8 +83,10 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
                 return@launch
             }
 
-            // Check once per PirDashboardWebViewActivity launch if we need to resume a scan that was interrupted (e.g., by app kill)
-            if (!checkedForResumeScan.getAndSet(true)) {
+            // Check once per PirDashboardWebViewActivity launch if we need to resume a scan that was interrupted (e.g., by app kill),
+            // and again if eligibility changes, as a free user who subscribes from the dashboard has it reloaded in place
+            val eligibility = pirWorkHandler.canRunPir().firstOrNull()
+            if (eligibilityCheckedForResumeScan.getAndSet(eligibility) != eligibility) {
                 checkForIncompleteInitialScan()
             }
 
