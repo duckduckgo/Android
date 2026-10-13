@@ -25,7 +25,7 @@
         android:id="@+id/hatchMenuReturnToTab"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_return_24"
+        app:leadingIcon="@drawable/ic_return_16"
         app:primaryText="@string/hatchMenuAfterInactivityLastUsedTab" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
@@ -47,7 +47,7 @@
         android:id="@+id/hatchMenuAfterInactivity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_settings_24"
+        app:leadingIcon="@drawable/ic_settings_16"
         app:leadingIconSize="small"
         app:primaryText="@string/hatchMenuAfterInactivitySettings" />
 
@@ -55,7 +55,7 @@
         android:id="@+id/hatchMenuHideShortcut"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_eye_closed_24"
+        app:leadingIcon="@drawable/eye_closed_16"
         app:primaryText="@string/hatchMenuHideReturnToShortcut" />
 
 </LinearLayout>
