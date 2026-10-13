@@ -555,5 +555,6 @@ class ApiWideEventSenderTest {
         metaType = metaType,
         metaVersion = metaVersion,
         isFirstDailyOccurrence = isFirstDailyOccurrence,
+        appVersion = "5.123.0",
     )
 }

@@ -91,6 +91,7 @@ class WideEventCleanerTest {
                     createdAt = timeProvider.currentTime,
                     metaType = "android-test",
                     metaVersion = "1.0.0",
+                    appVersion = "5.123.0",
                 )
             whenever(wideEventRepository.getActiveWideEventIds()).thenReturn(listOf(1L))
             whenever(wideEventRepository.getWideEvents(setOf(1L))).thenReturn(listOf(event))
@@ -135,6 +136,7 @@ class WideEventCleanerTest {
                     createdAt = start,
                     metaType = "android-test",
                     metaVersion = "1.0.0",
+                    appVersion = "5.123.0",
                 )
             whenever(wideEventRepository.getActiveWideEventIds()).thenReturn(listOf(6L))
             whenever(wideEventRepository.getWideEvents(setOf(6L))).thenReturn(listOf(event))
@@ -176,6 +178,7 @@ class WideEventCleanerTest {
                     createdAt = start,
                     metaType = "android-test",
                     metaVersion = "1.0.0",
+                    appVersion = "5.123.0",
                 )
             whenever(wideEventRepository.getActiveWideEventIds()).thenReturn(listOf(7L))
             whenever(wideEventRepository.getWideEvents(setOf(7L))).thenReturn(listOf(event))
@@ -214,6 +217,7 @@ class WideEventCleanerTest {
                     createdAt = createdAt,
                     metaType = "android-test",
                     metaVersion = "1.0.0",
+                    appVersion = "5.123.0",
                 )
             whenever(wideEventRepository.getActiveWideEventIds()).thenReturn(listOf(3L))
             whenever(wideEventRepository.getWideEvents(setOf(3L))).thenReturn(listOf(event))
@@ -258,6 +262,7 @@ class WideEventCleanerTest {
                     createdAt = start,
                     metaType = "android-test",
                     metaVersion = "1.0.0",
+                    appVersion = "5.123.0",
                 )
             whenever(wideEventRepository.getActiveWideEventIds()).thenReturn(listOf(4L))
             whenever(wideEventRepository.getWideEvents(setOf(4L))).thenReturn(listOf(event))
@@ -293,6 +298,7 @@ class WideEventCleanerTest {
                     createdAt = timeProvider.currentTime,
                     metaType = "android-test",
                     metaVersion = "1.0.0",
+                    appVersion = "5.123.0",
                 )
             whenever(wideEventRepository.getActiveWideEventIds()).thenReturn(listOf(5L))
             whenever(wideEventRepository.getWideEvents(setOf(5L))).thenReturn(listOf(event))
