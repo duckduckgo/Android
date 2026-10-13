@@ -351,6 +351,7 @@ import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualSharedViewModel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.terms.DuckAiTermsConsent
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -663,6 +664,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var duckChat: DuckChat
+
+    @Inject
+    lateinit var termsConsent: DuckAiTermsConsent
 
     @Inject
     lateinit var duckChatContextual: DuckChatContextual
@@ -1429,6 +1433,7 @@ class BrowserTabFragment :
                                 if (selectionsJson != null) {
                                     put("selections", selectionsJson)
                                 }
+                                termsConsent.carry(this, browserMode)
                             },
                         ),
                     )
