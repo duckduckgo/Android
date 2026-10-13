@@ -24,7 +24,7 @@ import android.view.View
 interface DuckAiChatsMenu {
 
     /**
-     * Loads the chats menu for the host activity's browser mode and shows the menu anchored to [anchorView],
+     * Loads the chats menu for the host activity's browser mode and shows the menu anchored to [anchorView].
      */
     suspend fun show(
         anchorView: View,
@@ -35,13 +35,18 @@ interface DuckAiChatsMenu {
     /**
      * @param chatHistorySource the surface showing the menu, reported when View all opens the chat history screen.
      * @param showNewChat whether the menu offers New Chat.
-     * @param showRecentChatsHeader whether the recent chats are titled with a header.
+     * @param menuStyle how the menu presents its sections;
      */
     data class Options(
         val chatHistorySource: DuckChatHistorySource,
         val showNewChat: Boolean = true,
-        val showRecentChatsHeader: Boolean = true,
+        val menuStyle: ChatsMenuStyle = ChatsMenuStyle.FULL,
     )
+
+    enum class ChatsMenuStyle {
+        FULL,
+        COMPACT,
+    }
 
     interface Listener {
         /** The user picked New Chat. */

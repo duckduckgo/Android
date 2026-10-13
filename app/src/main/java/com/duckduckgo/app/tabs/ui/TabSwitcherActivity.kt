@@ -941,7 +941,7 @@ class TabSwitcherActivity :
                 anchorView = findViewById(R.id.duckAIToolbarButton),
                 options = DuckAiChatsMenu.Options(
                     chatHistorySource = DuckChatHistorySource.TAB_SWITCHER,
-                    showRecentChatsHeader = false,
+                    menuStyle = DuckAiChatsMenu.ChatsMenuStyle.COMPACT,
                 ),
                 listener = object : DuckAiChatsMenu.Listener {
                     override fun onNewChatSelected() = viewModel.onDuckAiNewChatSelected()

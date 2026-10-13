@@ -55,7 +55,7 @@ class RealDuckAiChatsMenu @Inject constructor(
             onOpenDuckAi = null,
             onRecentChat = { chatId -> listener.onChatSelected(duckChat.buildChatUrl(chatId)) },
             onViewAllChats = { globalActivityStarter.start(activity, DuckChatHistoryParams(options.chatHistorySource)) },
-            showRecentChatsHeader = options.showRecentChatsHeader,
+            showRecentChatsHeader = options.menuStyle == DuckAiChatsMenu.ChatsMenuStyle.FULL,
         ).show(activity, activity.window.decorView, anchorView)
     }
 
