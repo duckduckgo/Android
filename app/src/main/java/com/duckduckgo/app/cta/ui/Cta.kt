@@ -1385,16 +1385,21 @@ class BrokenSitePromptDialogCta : Cta {
         onCtaShown: () -> Unit,
     ) {
         val daxDialog = binding.includeBrokenSitePromptDialog
-        daxDialog.dismissButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-            width = ConstraintLayout.LayoutParams.WRAP_CONTENT
+        val buttons = listOf(daxDialog.reportButton, daxDialog.dismissButton)
+        buttons.forEach { button ->
+            button.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                width = ConstraintLayout.LayoutParams.WRAP_CONTENT
+            }
         }
         daxDialog.root.show()
         daxDialog.root.doOnLayout {
             if (daxDialog.dismissButton.top > daxDialog.reportButton.top) {
-                daxDialog.dismissButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    width = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
-                    matchConstraintDefaultWidth = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT_PERCENT
-                    matchConstraintPercentWidth = 1f
+                buttons.forEach { button ->
+                    button.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        width = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
+                        matchConstraintDefaultWidth = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT_PERCENT
+                        matchConstraintPercentWidth = 1f
+                    }
                 }
             }
         }
