@@ -21,6 +21,8 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.common.utils.CurrentTimeProvider
@@ -51,6 +53,7 @@ class RealContextualOnboardingTimeLimitTest {
     private val userStageStore: UserStageStore = mock()
     private val appInstallStore: AppInstallStore = mock()
     private val toggles = FakeFeatureToggleFactory.create(ExtendedOnboardingFeatureToggles::class.java)
+    private val appBuildConfig: AppBuildConfig = mock { on { flavor } doReturn BuildFlavor.PLAY }
     private val preferences = InMemorySharedPreferences()
     private val sharedPreferencesProvider: SharedPreferencesProvider = mock {
         on { getSharedPreferences(any(), any(), any()) } doReturn preferences
@@ -67,6 +70,7 @@ class RealContextualOnboardingTimeLimitTest {
         userStageStore = userStageStore,
         appInstallStore = appInstallStore,
         extendedOnboardingFeatureToggles = toggles,
+        appBuildConfig = appBuildConfig,
         sharedPreferencesProvider = sharedPreferencesProvider,
         currentTimeProvider = currentTimeProvider,
         dispatchers = coroutineRule.testDispatcherProvider,
@@ -238,6 +242,43 @@ class RealContextualOnboardingTimeLimitTest {
 
         assertFalse(testee.wasOnboardingEndedByTimeLimit())
         verify(userStageStore, never()).stageCompleted(any())
+    }
+
+    @Test
+    fun whenInternalBuildAndOneDaySinceInstallThenOnboardingEndedByTimeLimit() = runTest {
+        givenInternalBuild()
+        givenInstalledDaysAgo(days = 1)
+
+        testee.endOnboardingIfTimeLimitReached()
+
+        verify(userStageStore).stageCompleted(AppStage.DAX_ONBOARDING)
+    }
+
+    @Test
+    fun whenInternalBuildAndAppOpensExceedThreeThenOnboardingEndedByTimeLimit() = runTest {
+        givenInternalBuild()
+        givenInstalledAgo(TimeUnit.HOURS.toMillis(1))
+
+        repeat(3) { testee.onStart(lifecycleOwner) }
+        verify(userStageStore, never()).stageCompleted(any())
+
+        testee.onStart(lifecycleOwner)
+        verify(userStageStore).stageCompleted(AppStage.DAX_ONBOARDING)
+    }
+
+    @Test
+    fun whenInternalBuildThenRemoteLimitsIgnored() = runTest {
+        givenInternalBuild()
+        givenTimeLimitEnabled(settings = """{"maxDaysSinceInstall": 30, "maxAppOpens": 100}""")
+        givenInstalledDaysAgo(days = 1)
+
+        testee.endOnboardingIfTimeLimitReached()
+
+        verify(userStageStore).stageCompleted(AppStage.DAX_ONBOARDING)
+    }
+
+    private fun givenInternalBuild() {
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
     }
 
     private fun givenTimeLimitEnabled(settings: String? = null) {

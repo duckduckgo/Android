@@ -26,6 +26,8 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.daxOnboardingActive
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
@@ -64,6 +66,7 @@ class RealContextualOnboardingTimeLimit @Inject constructor(
     private val userStageStore: UserStageStore,
     private val appInstallStore: AppInstallStore,
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
+    private val appBuildConfig: AppBuildConfig,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val currentTimeProvider: CurrentTimeProvider,
     private val dispatchers: DispatcherProvider,
@@ -138,6 +141,11 @@ class RealContextualOnboardingTimeLimit @Inject constructor(
     }
 
     private fun Toggle.limits(): Limits {
+        // Short fixed limits so testers can reach the end of onboarding.
+        if (appBuildConfig.isInternalBuild()) {
+            return Limits(maxDaysSinceInstall = INTERNAL_MAX_DAYS_SINCE_INSTALL, maxAppOpens = INTERNAL_MAX_APP_OPENS)
+        }
+
         val settings = runCatching { getSettings()?.let { JSONObject(it) } }.getOrNull()
         return Limits(
             maxDaysSinceInstall = settings.positiveIntOrDefault(KEY_MAX_DAYS_SINCE_INSTALL, DEFAULT_MAX_DAYS_SINCE_INSTALL),
@@ -162,5 +170,7 @@ class RealContextualOnboardingTimeLimit @Inject constructor(
         private const val KEY_MAX_APP_OPENS = "maxAppOpens"
         private const val DEFAULT_MAX_DAYS_SINCE_INSTALL = 7
         private const val DEFAULT_MAX_APP_OPENS = 28
+        private const val INTERNAL_MAX_DAYS_SINCE_INSTALL = 1
+        private const val INTERNAL_MAX_APP_OPENS = 3
     }
 }
