@@ -209,7 +209,7 @@ class TurnOffSyncBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     @Parcelize
-    private class Args(
+    class Args(
         val thisDevice: ParcelableDevice,
         val allDevices: List<ParcelableDevice>,
     ) : Parcelable
