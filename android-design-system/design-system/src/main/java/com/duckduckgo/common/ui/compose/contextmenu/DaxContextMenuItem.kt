@@ -26,10 +26,14 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.LocalRippleConfiguration
+import androidx.compose.material3.RippleConfiguration
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,8 +43,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.divider.DaxHorizontalDivider
 import com.duckduckgo.common.ui.compose.text.DaxText
+import com.duckduckgo.common.ui.compose.theme.Black6
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTextStyle
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+import com.duckduckgo.common.ui.compose.theme.White12
 import com.duckduckgo.mobile.android.R
 import androidx.compose.material3.Icon as M3Icon
 
@@ -78,51 +84,53 @@ internal fun DaxContextMenuItem(
     val colors = DaxContextMenuItemDefaults.colors
     val trailingScope = DaxContextMenuItemTrailingScope(enabled)
 
-    Column(modifier = modifier.fillMaxWidth()) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = DaxContextMenuItemDefaults.ContainerHeight)
-                .clickable(enabled = enabled, onClick = onClick)
-                .padding(
-                    start = startPadding,
-                    end = endPadding,
-                    top = DaxContextMenuItemDefaults.VerticalPadding,
-                    bottom = DaxContextMenuItemDefaults.VerticalPadding,
-                ),
-        ) {
-            if (leadingIcon != null) {
-                M3Icon(
-                    painter = leadingIcon,
-                    contentDescription = null,
-                    tint = when {
-                        !enabled -> colors.disabledIcon
-                        isDestructive -> colors.destructiveIcon
-                        else -> colors.icon
-                    },
-                    modifier = Modifier.size(DaxContextMenuItemDefaults.LeadingIconSize),
+    CompositionLocalProvider(LocalRippleConfiguration provides DaxContextMenuItemDefaults.rippleConfiguration()) {
+        Column(modifier = modifier.fillMaxWidth()) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = DaxContextMenuItemDefaults.ContainerHeight)
+                    .clickable(enabled = enabled, onClick = onClick)
+                    .padding(
+                        start = startPadding,
+                        end = endPadding,
+                        top = DaxContextMenuItemDefaults.VerticalPadding,
+                        bottom = DaxContextMenuItemDefaults.VerticalPadding,
+                    ),
+            ) {
+                if (leadingIcon != null) {
+                    M3Icon(
+                        painter = leadingIcon,
+                        contentDescription = null,
+                        tint = when {
+                            !enabled -> colors.disabledIcon
+                            isDestructive -> colors.destructiveIcon
+                            else -> colors.icon
+                        },
+                        modifier = Modifier.size(DaxContextMenuItemDefaults.LeadingIconSize),
+                    )
+                    Spacer(Modifier.width(DaxContextMenuItemDefaults.ContentGap))
+                }
+
+                DaxText(
+                    text = text,
+                    style = DaxContextMenuItemDefaults.textStyle,
+                    color = textColor,
+                    modifier = Modifier.weight(1f),
                 )
-                Spacer(Modifier.width(DaxContextMenuItemDefaults.ContentGap))
+
+                if (trailingIcon != null) {
+                    Spacer(Modifier.width(DaxContextMenuItemDefaults.ContentGap))
+                    trailingScope.trailingIcon()
+                }
             }
 
-            DaxText(
-                text = text,
-                style = DaxContextMenuItemDefaults.textStyle,
-                color = textColor,
-                modifier = Modifier.weight(1f),
-            )
-
-            if (trailingIcon != null) {
-                Spacer(Modifier.width(DaxContextMenuItemDefaults.ContentGap))
-                trailingScope.trailingIcon()
+            if (showDivider) {
+                Spacer(Modifier.height(DaxContextMenuItemDefaults.DividerSpacing))
+                DaxHorizontalDivider()
+                Spacer(Modifier.height(DaxContextMenuItemDefaults.DividerSpacing))
             }
-        }
-
-        if (showDivider) {
-            Spacer(Modifier.height(DaxContextMenuItemDefaults.DividerSpacing))
-            DaxHorizontalDivider()
-            Spacer(Modifier.height(DaxContextMenuItemDefaults.DividerSpacing))
         }
     }
 }
@@ -208,6 +216,12 @@ internal object DaxContextMenuItemDefaults {
             disabledIcon = DuckDuckGoTheme.iconColors.disabled,
             destructiveIcon = DuckDuckGoTheme.iconColors.destructive,
         )
+
+    @Composable
+    fun rippleConfiguration(): RippleConfiguration {
+        val color = if (DuckDuckGoTheme.colors.isDark) White12 else Black6
+        return remember(color) { RippleConfiguration(color = color) }
+    }
 }
 
 @Immutable
