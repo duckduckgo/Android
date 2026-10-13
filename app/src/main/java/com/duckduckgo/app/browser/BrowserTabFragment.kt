@@ -1493,13 +1493,16 @@ class BrowserTabFragment :
                     )
                 },
                 onInputFocusChanged = { focused ->
-                    contentScopeScripts.sendSubscriptionEvent(
-                        SubscriptionEventData(
-                            featureName = "aiChat",
-                            subscriptionName = "submitNativeInputFocused",
-                            params = JSONObject().put("focused", focused),
-                        ),
-                    )
+                    // The widget also runs on regular pages; only Duck.ai should receive the event.
+                    if (omnibar.viewMode == ViewMode.DuckAI) {
+                        contentScopeScripts.sendSubscriptionEvent(
+                            SubscriptionEventData(
+                                featureName = "aiChat",
+                                subscriptionName = "submitNativeInputFocused",
+                                params = JSONObject().put("focused", focused),
+                            ),
+                        )
+                    }
                 },
                 onChangeModelSubmitted = { modelId ->
                     contentScopeScripts.sendSubscriptionEvent(
