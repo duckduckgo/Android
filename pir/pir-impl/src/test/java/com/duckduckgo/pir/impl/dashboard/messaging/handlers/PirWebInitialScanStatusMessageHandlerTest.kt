@@ -22,6 +22,9 @@ import com.duckduckgo.common.test.json.JSONObjectAdapter
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.checker.PirEligibility
+import com.duckduckgo.pir.impl.checker.PirRunMode
+import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.createJsMessage
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.InitialScanResponse
@@ -37,6 +40,7 @@ import com.duckduckgo.pir.impl.scan.PirForegroundScanServiceStarter
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
@@ -74,12 +78,14 @@ class PirWebInitialScanStatusMessageHandlerTest {
     private val resumeToggle: Toggle = mock()
     private val mockForegroundScanServiceStarter: PirForegroundScanServiceStarter = mock()
     private val mockPirScanCompleteNotifier: PirScanCompleteNotifier = mock()
+    private val mockPirWorkHandler: PirWorkHandler = mock()
 
     @Before
     fun setUp() = runTest {
         whenever(mockStateProvider.shouldRestartInitialScan()).thenReturn(false)
         whenever(mockPirRemoteFeatures.resumeInitialScanOnDashboardOpen()).thenReturn(resumeToggle)
         whenever(resumeToggle.isEnabled()).thenReturn(true)
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)))
 
         testee = PirWebInitialScanStatusMessageHandler(
             dispatcherProvider = coroutineRule.testDispatcherProvider,
@@ -90,6 +96,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
             pirRemoteFeatures = mockPirRemoteFeatures,
             foregroundScanServiceStarter = mockForegroundScanServiceStarter,
             pirScanCompleteNotifier = mockPirScanCompleteNotifier,
+            pirWorkHandler = mockPirWorkHandler,
         )
         fakeJsMessaging.reset()
     }
@@ -416,6 +423,28 @@ class PirWebInitialScanStatusMessageHandlerTest {
         // and pixel should also only have been emitted once
         verify(mockStateProvider).shouldRestartInitialScan()
         verify(mockPirPixelSender).reportInitialScanIncomplete()
+    }
+
+    @Test
+    fun whenRunModeChangesAfterResumeCheckThenChecksForResumeAgain() = runTest {
+        // Given - a free user's dashboard already checked once and had nothing to resume
+        val jsMessage = createJsMessage("", PirDashboardWebMessages.INITIAL_SCAN_STATUS)
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
+        whenever(mockStateProvider.getScanResults()).thenReturn(emptyList())
+        whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(1)
+        whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(3)
+        whenever(mockStateProvider.getAllScannedBrokersStatus()).thenReturn(emptyList())
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_ONLY)))
+        whenever(mockStateProvider.shouldRestartInitialScan()).thenReturn(false)
+        testee.process(jsMessage, fakeJsMessaging, mockJsMessageCallback)
+
+        // When - they subscribe from the same dashboard, which reloads it with gated brokers left to scan
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)))
+        whenever(mockStateProvider.shouldRestartInitialScan()).thenReturn(true)
+        testee.process(jsMessage, fakeJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockForegroundScanServiceStarter).startResumeScan()
     }
 
     @Test
