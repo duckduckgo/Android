@@ -33,6 +33,7 @@ import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData
@@ -179,6 +180,8 @@ class TabSwitcherViewModelTest {
 
     private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
+
+    private val tabManagerFeatureFlags = FakeFeatureToggleFactory.create(TabManagerFeatureFlags::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
 
     private lateinit var testee: TabSwitcherViewModel
@@ -235,6 +238,10 @@ class TabSwitcherViewModelTest {
         testee.tabSwitcherItemsLiveData.observeForever(mockTabSwitcherItemsObserver)
     }
 
+    private fun givenDuckAiChatsMenuEnabled(enabled: Boolean) {
+        tabManagerFeatureFlags.duckAiChatsMenu().setRawStoredState(State(enable = enabled))
+    }
+
     private fun createViewModel(tabSwitcherDataStore: TabSwitcherDataStore = mockTabSwitcherPrefsDataStore): TabSwitcherViewModel {
         return TabSwitcherViewModel(
             mockTabRepositoryProvider,
@@ -256,6 +263,7 @@ class TabSwitcherViewModelTest {
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
+            tabManagerFeatureFlags,
         )
     }
 
@@ -945,6 +953,35 @@ class TabSwitcherViewModelTest {
         testee.onTabMoved(fromIndex, toIndex)
 
         verify(mockTabRepository).updateTabPosition(fromIndex, toIndex)
+    }
+
+    @Test
+    fun `when Duck Chat button clicked and chats menu enabled then chats menu shown`() = runTest {
+        givenDuckAiChatsMenuEnabled(true)
+        val testee = createViewModel()
+        testee.command.observeForever(mockCommandObserver)
+
+        testee.onDuckAIButtonClicked()
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.ShowDuckAiChatsMenu, commandCaptor.lastValue)
+        verify(mockTabRepository, never()).add(any(), any())
+    }
+
+    @Test
+    fun `when Duck Chat button clicked and chats menu disabled then new chat tab opened and screen closed`() = runTest {
+        givenDuckAiChatsMenuEnabled(false)
+        whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
+        val duckChatURL = "https://duck.ai"
+        whenever(duckChatMock.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
+        val testee = createViewModel()
+        testee.command.observeForever(mockCommandObserver)
+
+        testee.onDuckAIButtonClicked()
+
+        verify(mockTabRepository).add(duckChatURL, true)
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
     @Test
@@ -2320,6 +2357,7 @@ class TabSwitcherViewModelTest {
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
+            tabManagerFeatureFlags,
         )
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             isolatedViewModel.viewState.collect()
@@ -2366,6 +2404,7 @@ class TabSwitcherViewModelTest {
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
+            tabManagerFeatureFlags,
         )
 
         assertFalse(isolatedViewModel.viewState.value.isBrowserModeToggleVisible)
@@ -2441,6 +2480,7 @@ class TabSwitcherViewModelTest {
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
+            tabManagerFeatureFlags,
         )
 
         isolatedViewModel.onBrowserModeToggled(BrowserMode.FIRE, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)

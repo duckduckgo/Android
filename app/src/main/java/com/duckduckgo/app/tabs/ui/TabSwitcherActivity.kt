@@ -931,6 +931,7 @@ class TabSwitcherActivity :
                 viewModel.onBrowserModeToggled(BrowserMode.REGULAR, BrowserModeSwitchSource.TAB_SWITCHER_EXIT)
                 finishAfterTransition()
             }
+            Command.ShowDuckAiChatsMenu -> showDuckAiChatsMenu()
         }
     }
 
@@ -980,6 +981,10 @@ class TabSwitcherActivity :
             navigationBar = binding.navigationBar,
         )
 
+        if (viewState.isDuckAiChatsMenuEnabled) {
+            menu.findItem(R.id.duckAIToolbarButton).setIcon(CommonR.drawable.ic_chats_24)
+        }
+
         menu.findItem(R.id.newTabToolbarButton).setTitle(
             when (currentBrowserMode) {
                 BrowserMode.FIRE -> R.string.fireTabsNewTabButton
@@ -1012,7 +1017,7 @@ class TabSwitcherActivity :
             R.id.fireToolbarButton -> viewModel.onFireButtonTapped()
             R.id.popupMenuToolbarButton -> showPopupMenu(item.itemId)
             R.id.newTabToolbarButton -> onNewTabRequested(fromOverflowMenu = false)
-            R.id.duckAIToolbarButton -> showDuckAiChatsMenu()
+            R.id.duckAIToolbarButton -> viewModel.onDuckAIButtonClicked()
             android.R.id.home -> {
                 viewModel.onUpButtonPressed()
                 return true

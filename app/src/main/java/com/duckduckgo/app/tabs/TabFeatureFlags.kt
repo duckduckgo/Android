@@ -40,4 +40,10 @@ interface TabManagerFeatureFlags {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     @Toggle.InternalAlwaysEnabled
     fun tabMaxReuseDistancePixel(): Toggle
+
+    /**
+     * The Duck.ai button opens the chats menu (New Chat, recent chats, View all) instead of opening a new Duck.ai tab.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiChatsMenu(): Toggle
 }

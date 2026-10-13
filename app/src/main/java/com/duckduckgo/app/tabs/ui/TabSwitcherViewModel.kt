@@ -34,6 +34,7 @@ import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
@@ -119,6 +120,7 @@ class TabSwitcherViewModel @Inject constructor(
     @param:AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val fireTabsPromos: FireTabsPromos,
     private val remoteMessageModel: RemoteMessageModel,
+    private val tabManagerFeatureFlags: TabManagerFeatureFlags,
 ) : ViewModel() {
 
     private val fireModeAvailable = fireModeAvailability.isAvailable()
@@ -171,6 +173,12 @@ class TabSwitcherViewModel @Inject constructor(
                 pixel.fire(AppPixelName.FIRE_TABS_PROMO_TAB_SWITCHER_SHOWN)
                 _viewState.update { it.copy(isFireTabsPromoVisible = true) }
             }
+        }
+        viewModelScope.launch {
+            val isDuckAiChatsMenuEnabled = withContext(dispatcherProvider.io()) {
+                tabManagerFeatureFlags.duckAiChatsMenu().isEnabled()
+            }
+            _viewState.update { it.copy(isDuckAiChatsMenuEnabled = isDuckAiChatsMenuEnabled) }
         }
     }
 
@@ -248,6 +256,7 @@ class TabSwitcherViewModel @Inject constructor(
         data object ShowFireBottomSheet : Command()
         data object DismissSnackbar : Command()
         data object SwitchToRegularModeAndClose : Command()
+        data object ShowDuckAiChatsMenu : Command()
     }
 
     fun onNewTabRequested(fromOverflowMenu: Boolean = false) = viewModelScope.launch {
@@ -669,6 +678,14 @@ class TabSwitcherViewModel @Inject constructor(
         return@withContext null
     }
 
+    fun onDuckAIButtonClicked() {
+        if (_viewState.value.isDuckAiChatsMenuEnabled) {
+            command.value = Command.ShowDuckAiChatsMenu
+        } else {
+            onDuckAiNewChatSelected()
+        }
+    }
+
     fun onDuckAiNewChatSelected() {
         viewModelScope.launch {
             val params = duckChat.createWasUsedBeforePixelParams()
@@ -775,6 +792,7 @@ class TabSwitcherViewModel @Inject constructor(
         val regularTabCount: Int? = null,
         val isBrowserModeToggleVisible: Boolean = false,
         val isFireTabsPromoVisible: Boolean = false,
+        val isDuckAiChatsMenuEnabled: Boolean = false,
     ) {
         val tabSwitcherItems: List<TabSwitcherItem> = tabItems.itemsOrEmpty
         val tabs: List<Tab> = tabSwitcherItems.filterIsInstance<Tab>()
