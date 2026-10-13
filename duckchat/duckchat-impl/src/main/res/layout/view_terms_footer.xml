@@ -20,13 +20,26 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
+    android:minHeight="@dimen/keyline_7"
     android:orientation="horizontal"
-    android:padding="@dimen/keyline_4">
+    android:paddingStart="@dimen/keyline_4"
+    android:paddingTop="@dimen/keyline_2"
+    android:paddingEnd="@dimen/keyline_4"
+    android:paddingBottom="@dimen/keyline_2">
+
+    <ImageView
+        android:id="@+id/termsFooterIcon"
+        android:layout_width="@dimen/keyline_4"
+        android:layout_height="@dimen/keyline_4"
+        android:importantForAccessibility="no"
+        app:srcCompat="@drawable/ic_shield_16"
+        app:tint="?attr/daxColorSecondaryIcon" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/termsFooterMessage"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
         android:layout_weight="1"
         app:textType="secondary"
         app:typography="caption" />
