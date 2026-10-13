@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -33,12 +34,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.divider.DaxHorizontalDivider
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTextStyle
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+import com.duckduckgo.mobile.android.R
 import androidx.compose.material3.Icon as M3Icon
 
 /**
@@ -80,6 +83,7 @@ internal fun DaxContextMenuItem(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
+                .heightIn(min = DaxContextMenuItemDefaults.ContainerHeight)
                 .clickable(enabled = enabled, onClick = onClick)
                 .padding(
                     start = startPadding,
@@ -165,6 +169,11 @@ internal object DaxContextMenuItemDefaults {
     val VerticalPadding: Dp = 12.dp
     val ContentGap: Dp = 16.dp
     val DividerSpacing: Dp = 4.dp
+
+    val ContainerHeight: Dp
+        @Composable
+        @ReadOnlyComposable
+        get() = dimensionResource(R.dimen.popupMenuItemHeight)
 
     val DefaultStartPadding: Dp = 16.dp
     val DefaultEndPadding: Dp = 16.dp
