@@ -523,7 +523,7 @@ class RealDuckChatJSHelper @Inject constructor(
         val jsonPayload = JSONObject().apply {
             put(PLATFORM, ANDROID)
             if (pending != null) {
-                termsConsent.carry(this, browserMode)
+                if (pending.carriesTermsConsent) termsConsent.carry(this, browserMode)
                 put("tool", "query")
                 put(
                     "query",

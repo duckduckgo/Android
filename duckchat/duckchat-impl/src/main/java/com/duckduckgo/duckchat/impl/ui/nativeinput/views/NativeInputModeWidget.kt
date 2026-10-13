@@ -1569,7 +1569,17 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val files = attachmentViewModel?.getFileAttachments()?.map {
             PendingNativeFile(base64Data = it.base64Data, fileName = it.fileName, mimeType = it.mimeType)
         } ?: emptyList()
-        viewModel.storePendingPrompt(query, getSelectedModelId(), getResolvedReasoningEffort(), getSelectedTool(), images, files)
+        // Only the Duck.ai tab shows the ToS footer. A chat sent from elsewhere (the search-only address bar) has not
+        // shown the terms, so it must not accept them.
+        viewModel.storePendingPrompt(
+            query,
+            getSelectedModelId(),
+            getResolvedReasoningEffort(),
+            getSelectedTool(),
+            images,
+            files,
+            carriesTermsConsent = isChatTabSelected(),
+        )
         attachmentViewModel?.clearAttachmentsForNewChat()
         viewModel.setSelectedTool(null)
     }

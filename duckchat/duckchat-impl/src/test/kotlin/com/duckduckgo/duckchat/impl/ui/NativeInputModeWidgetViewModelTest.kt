@@ -655,6 +655,15 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenStorePendingPromptWithoutTermsConsentThenTheStoreIsToldNotToCarryIt() = runTest {
+        val viewModel = createViewModel(plugins = emptyList())
+
+        viewModel.storePendingPrompt("hello", null, null, carriesTermsConsent = false)
+
+        verify(pendingNativePromptStore).store("hello", null, null, null, emptyList(), emptyList(), false)
+    }
+
+    @Test
     fun whenStorePendingPromptWithReasoningEffortThenForwardsEffort() = runTest {
         val viewModel = createViewModel(plugins = emptyList())
 

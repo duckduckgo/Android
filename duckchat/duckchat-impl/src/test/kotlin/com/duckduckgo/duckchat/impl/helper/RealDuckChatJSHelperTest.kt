@@ -2502,6 +2502,17 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenGetAIChatNativePromptWithPendingPromptThatDoesNotCarryTermsThenTheConsentIsNotCarried() = runTest {
+        whenever(mockPendingNativePromptStore.consume())
+            .thenReturn(PendingNativePrompt("test prompt", null, null, carriesTermsConsent = false))
+
+        val result = testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext)
+
+        assertEquals("test prompt", result!!.params.getJSONObject("query").getString("prompt"))
+        verify(mockTermsConsent, never()).carry(any(), any())
+    }
+
+    @Test
     fun whenGetAIChatNativePromptWithPendingPromptThenTheTermsConsentIsCarriedOnThePayload() = runTest {
         whenever(mockPendingNativePromptStore.consume()).thenReturn(PendingNativePrompt("test prompt", null, null))
 
