@@ -143,6 +143,27 @@ class PixelWideEventSenderTest {
     }
 
     @Test
+    fun `when event has stored app version then stored app version is sent`() = runTest {
+        val event = createWideEvent(
+            id = 790L,
+            name = "some-event",
+            status = WideEventRepository.WideEventStatus.SUCCESS,
+            appVersion = "5.100.0",
+        )
+
+        pixelWideEventSender.sendWideEvent(event)
+
+        listOf("wide_some-event_c", "wide_some-event_d").forEach { pixelName ->
+            verify(pixel).enqueueFire(
+                pixelName = eq(pixelName),
+                parameters = argThat { get("app.version") == "5.100.0" },
+                encodedParameters = any(),
+                type = any(),
+            )
+        }
+    }
+
+    @Test
     fun `when event is the first daily occurrence then count and daily pixels report it`() = runTest {
         val event = createWideEvent(
             id = 456L,
@@ -205,6 +226,7 @@ class PixelWideEventSenderTest {
         metaType: String = "android-$name",
         metaVersion: String = "1.0.0",
         isFirstDailyOccurrence: Boolean = false,
+        appVersion: String = "5.123.0",
     ) = WideEventRepository.WideEvent(
         id = id,
         name = name,
@@ -224,6 +246,6 @@ class PixelWideEventSenderTest {
         metaType = metaType,
         metaVersion = metaVersion,
         isFirstDailyOccurrence = isFirstDailyOccurrence,
-        appVersion = "5.123.0",
+        appVersion = appVersion,
     )
 }

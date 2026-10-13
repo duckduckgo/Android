@@ -62,7 +62,7 @@ class ApiWideEventSender @Inject constructor(
             ),
             app = AppSection(
                 name = APP_NAME,
-                version = appBuildConfig.versionName,
+                version = event.appVersion,
                 formFactor = deviceInfo.formFactor().description,
                 devMode = appBuildConfig.isDebug,
             ),

@@ -36,6 +36,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -472,6 +473,20 @@ class ApiWideEventSenderTest {
     }
 
     @Test
+    fun `when event has stored app version then stored app version is sent`() = runTest {
+        val event = createWideEvent(
+            id = 750L,
+            name = "some-event",
+            status = WideEventRepository.WideEventStatus.SUCCESS,
+            appVersion = "5.100.0",
+        )
+
+        apiWideEventSender.sendWideEvent(event)
+
+        verify(wideEventService).sendWideEvent(argThat { app.version == "5.100.0" })
+    }
+
+    @Test
     fun `when event is the first daily occurrence then it is included in request`() = runTest {
         val event = createWideEvent(
             id = 800L,
@@ -537,6 +552,7 @@ class ApiWideEventSenderTest {
         metaType: String = "android-$name",
         metaVersion: String = "1.0.0",
         isFirstDailyOccurrence: Boolean = false,
+        appVersion: String = "5.123.0",
     ) = WideEventRepository.WideEvent(
         id = id,
         name = name,
@@ -555,6 +571,6 @@ class ApiWideEventSenderTest {
         metaType = metaType,
         metaVersion = metaVersion,
         isFirstDailyOccurrence = isFirstDailyOccurrence,
-        appVersion = "5.123.0",
+        appVersion = appVersion,
     )
 }
