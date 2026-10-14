@@ -1307,7 +1307,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun focusInput(activity: Activity?) {
         inputField.requestFocus()
-        activity?.showKeyboard(inputField)
+        if (activity != null) activity.showKeyboard(inputField) else showKeyboard()
     }
 
     override fun hasInputFocus(): Boolean = inputField.hasFocus()
@@ -2038,15 +2038,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun showAttachmentChooser(showing: Boolean) {
         onAttachmentChooserStateChanged?.invoke(showing)
-    }
-
-    override fun restoreInputFocus() {
-        // Picker results are delivered in onActivityResult, before the host activity resumes, and the IME
-        // ignores a show request until then. Posting runs this once that transaction completes.
-        post {
-            requestInputFocus()
-            showKeyboard()
-        }
     }
 
     override fun attachmentChanged(

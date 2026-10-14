@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.net.Uri
@@ -420,13 +421,21 @@ class AttachmentView(
     private fun buildImagePickerCallback(source: AttachmentViewModel.ImageSource): ValueCallback<Array<Uri>> = ValueCallback { uris ->
         val list = uris?.toList()
         if (!list.isNullOrEmpty()) viewModel?.onImagesPicked(list, source)
-        host?.restoreInputFocus()
+        restoreInputFocus()
     }
 
     private fun buildFilePickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->
         val list = uris?.toList()
         if (!list.isNullOrEmpty()) viewModel?.onFilesPicked(list)
-        host?.restoreInputFocus()
+        restoreInputFocus()
+    }
+
+    private fun restoreInputFocus() {
+        // Picker results are delivered in onActivityResult, before the host activity resumes, and the IME
+        // ignores a show request until then. Posting runs this once that transaction completes.
+        post {
+            if (resources.configuration.keyboard == Configuration.KEYBOARD_NOKEYS) host?.focusInput() else host?.requestInputFocus()
+        }
     }
 }
 
