@@ -72,13 +72,13 @@
                     android:layout_marginTop="@dimen/keyline_5"
                     android:background="@drawable/background_grey_rounded_corners"
                     android:orientation="vertical"
-                    android:paddingHorizontal="@dimen/keyline_5"
                     android:paddingVertical="@dimen/keyline_5">
 
                     <com.duckduckgo.common.ui.view.text.DaxTextView
                         android:id="@+id/subscriptionOnboardingCompletionPercentage"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/keyline_5"
                         app:typography="title"
                         tools:text="75%" />
 
@@ -86,6 +86,7 @@
                         android:id="@+id/subscriptionOnboardingCompletionPercentageLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/keyline_5"
                         android:text="@string/subscriptionOnboardingCompletionPercentageLabel"
                         app:textType="secondary"
                         app:typography="body1" />
@@ -94,6 +95,7 @@
                         android:id="@+id/subscriptionOnboardingCompletionProgressTrack"
                         android:layout_width="match_parent"
                         android:layout_height="12dp"
+                        android:layout_marginHorizontal="@dimen/keyline_5"
                         android:layout_marginTop="@dimen/keyline_4"
                         android:background="@drawable/background_subscription_onboarding_progress_track">
 
