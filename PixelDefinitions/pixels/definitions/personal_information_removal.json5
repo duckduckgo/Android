@@ -325,23 +325,11 @@
         "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_first_scan_u": {
-        "description": "Fired once per install when the user starts their first PIR scan.",
+        "description": "Fired once per install when the user starts their first PIR scan, whether it runs as a free scan or under a subscription that includes PIR.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["feature_lifecycle"],
         "suffixes": ["form_factor"],
-        "parameters": [
-            "appVersion",
-            {
-                "key": "is_authenticated",
-                "description": "Whether the user is authenticated (has an active subscription). Always true on Android, which has no freemium PIR.",
-                "type": "boolean"
-            },
-            {
-                "key": "free_scan",
-                "description": "Whether this is a freemium (unauthenticated) scan. Always false on Android, which has no freemium PIR.",
-                "type": "boolean"
-            }
-        ]
+        "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_freemium_upsell_u": {
         "description": "Fired once per install when a user who had activated Freemium PIR is first seen holding an active subscription, bought from any entry point.",

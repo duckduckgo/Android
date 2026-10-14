@@ -177,9 +177,10 @@ class RealPirJobsRunner @Inject constructor(
             emptyList()
         }
 
-        // Activation pixel: once per install when the user starts their first scan.
+        // Activation pixel: once per install when the user starts their first scan. The tier comes from the run mode,
+        // not a fresh subscription read, so it describes the scan that is actually starting.
         if (executionType == PirExecutionType.MANUAL_INITIAL && eligibleJobs.isNotEmpty()) {
-            pixelSender.reportFirstScanStarted()
+            pixelSender.reportFirstScanStarted(isAuthenticated = runMode == PirRunMode.SCAN_AND_OPT_OUT)
         }
 
         val isPowerSavingEnabled = context.isPowerSavingModeEnabled()

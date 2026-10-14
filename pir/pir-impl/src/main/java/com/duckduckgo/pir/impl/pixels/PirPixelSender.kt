@@ -481,8 +481,10 @@ interface PirPixelSender {
 
     /**
      * Emits a unique pixel (once per install) when the user starts their first PIR scan.
+     *
+     * @param isAuthenticated whether the scan runs under a subscription that includes PIR rather than as a free scan
      */
-    fun reportFirstScanStarted()
+    fun reportFirstScanStarted(isAuthenticated: Boolean)
 
     /**
      * Emits a pixel to report weekly data on orphaned opt-out records on child data brokers that don't have matching profiles on their parent broker.
@@ -1139,8 +1141,8 @@ class RealPirPixelSender @Inject constructor(
         enqueueFire(PIR_INTERACTION_MAU, usageParams(isAuthenticated))
     }
 
-    override fun reportFirstScanStarted() {
-        enqueueFire(PIR_FIRST_SCAN_STARTED, usageParams(isAuthenticated = true))
+    override fun reportFirstScanStarted(isAuthenticated: Boolean) {
+        enqueueFire(PIR_FIRST_SCAN_STARTED, usageParams(isAuthenticated))
     }
 
     override fun reportWeeklyChildOrphanedOptOuts(

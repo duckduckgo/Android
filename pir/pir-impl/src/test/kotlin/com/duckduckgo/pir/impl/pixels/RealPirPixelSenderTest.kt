@@ -1277,7 +1277,7 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportFirstScanStartedThenEnqueuesUniquePixelWithAuthParams() = runTest {
-        testee.reportFirstScanStarted()
+        testee.reportFirstScanStarted(isAuthenticated = true)
 
         val pixelNameCaptor = argumentCaptor<String>()
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -1293,6 +1293,21 @@ class RealPirPixelSenderTest {
         assert(typeCaptor.firstValue is Pixel.PixelType.Unique)
         assert(paramsCaptor.firstValue["is_authenticated"] == "true")
         assert(paramsCaptor.firstValue["free_scan"] == "false")
+    }
+
+    @Test
+    fun whenReportFirstScanStartedForFreeScanThenEnqueuesPixelWithFreeParams() = runTest {
+        testee.reportFirstScanStarted(isAuthenticated = false)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).enqueueFire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        assertEquals(mapOf("is_authenticated" to "false", "free_scan" to "true"), paramsCaptor.firstValue)
     }
 
     @Test
