@@ -31,9 +31,7 @@ interface PirUserUtils {
     suspend fun isActiveUser(): Boolean
 
     /**
-     * Whether the user holds an active subscription that includes PIR, the condition [PirWorkHandler]
-     * grants scans and opt-outs under. An access token is not enough: a purchase that fails after
-     * account creation leaves one behind with no subscription, and that user still runs PIR scan-only.
+     * Whether the user holds an active subscription that includes PIR.
      */
     suspend fun hasPirSubscription(): Boolean
 }
