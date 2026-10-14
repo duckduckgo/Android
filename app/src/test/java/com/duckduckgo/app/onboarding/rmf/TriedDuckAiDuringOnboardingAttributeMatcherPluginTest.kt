@@ -32,7 +32,7 @@ class TriedDuckAiDuringOnboardingAttributeMatcherPluginTest {
     private val testee = TriedDuckAiDuringOnboardingAttributeMatcherPlugin(mockOnboardingStore)
 
     @Test
-    fun `when user tried Duck.ai during onboarding and remote value true, then returns true`() = runTest {
+    fun `when user tried DuckAi during onboarding and remote value true, then returns true`() = runTest {
         whenever(mockOnboardingStore.getTriedDuckAi()).thenReturn(true)
 
         val result = testee.evaluate(TriedDuckAiDuringOnboardingMatchingAttribute(remoteValue = true))
@@ -41,7 +41,7 @@ class TriedDuckAiDuringOnboardingAttributeMatcherPluginTest {
     }
 
     @Test
-    fun `when user did not try Duck.ai during onboarding and remote value true, then returns false`() = runTest {
+    fun `when user did not try DuckAi during onboarding and remote value true, then returns false`() = runTest {
         whenever(mockOnboardingStore.getTriedDuckAi()).thenReturn(false)
 
         val result = testee.evaluate(TriedDuckAiDuringOnboardingMatchingAttribute(remoteValue = true))
@@ -50,7 +50,7 @@ class TriedDuckAiDuringOnboardingAttributeMatcherPluginTest {
     }
 
     @Test
-    fun `when user tried Duck.ai during onboarding and remote value false, then returns false`() = runTest {
+    fun `when user tried DuckAi during onboarding and remote value false, then returns false`() = runTest {
         whenever(mockOnboardingStore.getTriedDuckAi()).thenReturn(true)
 
         val result = testee.evaluate(TriedDuckAiDuringOnboardingMatchingAttribute(remoteValue = false))
@@ -59,7 +59,7 @@ class TriedDuckAiDuringOnboardingAttributeMatcherPluginTest {
     }
 
     @Test
-    fun `when user did not try Duck.ai during onboarding and remote value false, then returns true`() = runTest {
+    fun `when user did not try DuckAi during onboarding and remote value false, then returns true`() = runTest {
         whenever(mockOnboardingStore.getTriedDuckAi()).thenReturn(false)
 
         val result = testee.evaluate(TriedDuckAiDuringOnboardingMatchingAttribute(remoteValue = false))
@@ -68,7 +68,7 @@ class TriedDuckAiDuringOnboardingAttributeMatcherPluginTest {
     }
 
     @Test
-    fun `when tried Duck.ai flag changes between evaluations, then result reflects current state`() = runTest {
+    fun `when tried DuckAi flag changes between evaluations, then result reflects current state`() = runTest {
         whenever(mockOnboardingStore.getTriedDuckAi()).thenReturn(false)
         val attribute = TriedDuckAiDuringOnboardingMatchingAttribute(remoteValue = true)
 
