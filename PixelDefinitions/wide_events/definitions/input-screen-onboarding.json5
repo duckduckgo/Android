@@ -1,0 +1,31 @@
+{
+    "android-input-screen-onboarding": {
+        "description": "User enables Input Screen during onboarding",
+        "owners": ["joshliebe"],
+        "meta": {
+            "type": "android-input-screen-onboarding",
+            "version": "0.0"
+        },
+        "feature": {
+            "name": "input-screen-onboarding",
+            "status": ["SUCCESS", "CANCELLED", "UNKNOWN"],
+            "data": {
+                "ext": {
+                    "reinstallUser": {
+                        "type": "string",
+                        "description": "true if the user tapped 'I've been here before', false otherwise",
+                        "enum": ["true", "false"]
+                    },
+                    "enabled": {
+                        "type": "string",
+                        "description": "true if the Input Screen is enabled, false otherwise. Only present on CANCELLED events.",
+                        "enum": ["true", "false"]
+                    }
+                }
+            }
+        },
+        "context": {
+            "name": ["onboarding"]
+        }
+    }
+}

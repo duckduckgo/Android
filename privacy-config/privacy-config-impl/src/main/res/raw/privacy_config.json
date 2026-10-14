@@ -948,26 +948,26 @@
                 }
             ]
         },
-        "onboardingPrompts": {
+        "segmentedOnboarding": {
             "state": "enabled",
             "features": {
-                "addToDockAndWidgetExperimentJul25": {
+                "onboardingFlowByDownloadReasonExperiment": {
                     "state": "enabled",
+                    "minSupportedVersion": 52970000,
+                    "targets": [
+                        {
+                            "localeCountry": "us",
+                            "localeLanguage": "en",
+                            "isReturningUser": false
+                        }
+                    ],
                     "cohorts": [
                         {
                             "name": "control",
                             "weight": 1
                         },
                         {
-                            "name": "treatmentDockOnly",
-                            "weight": 1
-                        },
-                        {
-                            "name": "treatmentWidgetOnly",
-                            "weight": 1
-                        },
-                        {
-                            "name": "treatmentDockAndWidget",
+                            "name": "treatment",
                             "weight": 1
                         }
                     ]

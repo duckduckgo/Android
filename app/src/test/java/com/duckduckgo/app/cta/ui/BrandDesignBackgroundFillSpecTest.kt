@@ -40,15 +40,13 @@ class BrandDesignBackgroundFillSpecTest {
     @Test
     fun endBubbleHasFillSpec() {
         val cta =
-            DaxEndBrandDesignUpdateBubbleCta(
+            DaxEndBubbleCta(
                 onboardingStore,
                 appInstallStore,
                 isLightTheme = true,
                 deviceInfo,
-                onboardingImprovementsEnabled = true,
-                onboardingImprovementsV2Enabled = true,
                 isOmnibarBottom = false,
-                isSegmentedSearchPathWithToggleEnabled = false,
+                segmentedPathWithAiInput = null,
             )
         assertEquals(280f, cta.backgroundFillSpec?.fillHeightDp)
     }
@@ -56,28 +54,27 @@ class BrandDesignBackgroundFillSpecTest {
     @Test
     fun subscriptionBubbleHasFillSpec() {
         val cta =
-            DaxSubscriptionBrandDesignUpdateBubbleCta(
+            DaxSubscriptionBubbleCta(
                 onboardingStore,
                 appInstallStore,
                 isLightTheme = true,
                 deviceInfo,
                 isCustomAiOnboardingFlow = false,
                 isFreeTrialCopy = false,
-                onboardingImprovementsEnabled = true,
-                onboardingImprovementsV2Enabled = true,
+                segmentedPath = null,
             )
         assertEquals(190f, cta.backgroundFillSpec?.fillHeightDp)
     }
 
     @Test
     fun contextualEndHasFillSpec() {
-        val cta = DaxEndBrandDesignUpdateContextualCta(onboardingStore, appInstallStore, isLightTheme = true, deviceInfo)
+        val cta = DaxEndContextualCta(onboardingStore, appInstallStore, isLightTheme = true, deviceInfo)
         assertEquals(160f, cta.backgroundFillSpec?.fillHeightDp)
     }
 
     @Test
     fun tryASearchBubbleHasNoFillSpec() {
-        val cta = DaxTryASearchBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, isLightTheme = true, deviceInfo)
+        val cta = DaxTryASearchBubbleCta(onboardingStore, appInstallStore, isLightTheme = true, deviceInfo)
         assertNull(cta.backgroundFillSpec)
     }
 }

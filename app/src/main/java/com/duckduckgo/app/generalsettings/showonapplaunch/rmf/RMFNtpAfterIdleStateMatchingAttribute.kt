@@ -64,10 +64,8 @@ class RMFNtpAfterIdleStateMatchingAttribute @Inject constructor(
         jsonMatchingAttribute: JsonMatchingAttribute,
     ): MatchingAttribute? {
         if (key != NtpAfterIdleStateMatchingAttribute.KEY) return null
-        // Rollout gate: when either flag is off, leave the attribute unmapped so RMF treats it as Unknown(fallback).
-        val rolloutEnabled = androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled() &&
-            androidBrowserConfigFeature.ntpAsDefaultAfterIdleReturn().isEnabled()
-        if (!rolloutEnabled) return null
+        // Rollout gate: when the flag is off, leave the attribute unmapped so RMF treats it as Unknown(fallback).
+        if (!androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) return null
         val value = jsonMatchingAttribute.value
         if (value is List<*>) {
             val states = value.filterIsInstance<String>()

@@ -256,6 +256,26 @@ class DuckChatFeatureRepositoryTest {
     }
 
     @Test
+    fun whenIsFirstPromptSubmissionCalledForTheFirstTimeThenReturnTrueAndMarkSubmitted() = runTest {
+        whenever(mockDataStore.hasSubmittedPromptBefore()).thenReturn(false)
+
+        val result = testee.checkAndMarkFirstPromptSubmission()
+
+        assertTrue(result)
+        verify(mockDataStore).setPromptSubmitted()
+    }
+
+    @Test
+    fun whenIsFirstPromptSubmissionCalledAfterAPriorSubmissionThenReturnFalseAndDoNotMarkAgain() = runTest {
+        whenever(mockDataStore.hasSubmittedPromptBefore()).thenReturn(true)
+
+        val result = testee.checkAndMarkFirstPromptSubmission()
+
+        assertFalse(result)
+        verify(mockDataStore, never()).setPromptSubmitted()
+    }
+
+    @Test
     fun whenLastSessionTimestampCheckedThenReturnDataFromTheStore() = runTest {
         whenever(mockDataStore.lastSessionTimestamp()).thenReturn(12345L)
 

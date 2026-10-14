@@ -75,16 +75,16 @@
     <string name="bookmarkFolderDeleteDialogMessage">"Czy na pewno chcesz usunąć "</string>
     <string name="bookmarkFolderEmpty">Pusty</string>
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s %2$s i %3$d element?</item>
+        <item quantity="one" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s %2$s i %3$d element?</item>
         <item quantity="few">%1$s %2$s i %3$d elementy?</item>
         <item quantity="many">%1$s %2$s i %3$d elementów?</item>
-        <item quantity="other">%1$s %2$s i %3$d elementu?</item>
+        <item quantity="other" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s %2$s i %3$d elementu?</item>
     </plurals>
     <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d element</item>
+        <item quantity="one" instruction="Placeholder is the number of items">%1$d element</item>
         <item quantity="few">%1$d elementy</item>
         <item quantity="many">%1$d elementów</item>
-        <item quantity="other">%1$d elementu</item>
+        <item quantity="other" instruction="Placeholder is the number of items">%1$d elementu</item>
     </plurals>
 
     <!-- Bookmarks -->
@@ -99,10 +99,10 @@
     <string name="removeFromFavorites">Usuń z ulubionych</string>
     <string name="addToFavoritesMenu">Dodaj do ulubionych</string>
     <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">Czy na pewno chcesz usunąć ten folder i %1$d element?</item>
+        <item quantity="one" instruction="%1$d is the number of items inside the folder">Czy na pewno chcesz usunąć ten folder i %1$d element?</item>
         <item quantity="few">Czy na pewno chcesz usunąć ten folder i %1$d elementy?</item>
         <item quantity="many">Czy na pewno chcesz usunąć ten folder i %1$d elementów?</item>
-        <item quantity="other">Czy na pewno chcesz usunąć ten folder i %1$d elementu?</item>
+        <item quantity="other" instruction="%1$d is the number of items inside the folder">Czy na pewno chcesz usunąć ten folder i %1$d elementu?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Czy na pewno chcesz usunąć zakładkę &lt;b&gt;%1$s&lt;/b&gt;?</string>
 

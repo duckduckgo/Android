@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl.exchange.v2
 
 import android.util.Base64
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
@@ -34,7 +35,7 @@ import javax.inject.Inject
  * The outer `code2` value is URL-safe + no-padding base64 (the fragment isn't safe for `+`/`/`/`=`).
  */
 interface ExchangeV2QrCode {
-    fun buildLinkingCode(channelId: String, publicKeyBase64Url: String, version: String = "2"): String
+    fun buildLinkingCode(channelId: String, publicKeyBase64Url: String, version: ExchangeProtocolVersion.V2): String
     fun parse(text: String): ExchangeV2CodeParseResult
 }
 
@@ -43,7 +44,7 @@ sealed interface ExchangeV2CodeParseResult {
     data class LinkingV2(
         val channelId: String,
         val publicKey: String,
-        val version: String,
+        val version: ExchangeProtocolVersion.V2,
     ) : ExchangeV2CodeParseResult
 
     /** v1 linking code (legacy <code=...>); fall back to v1 stack. */
@@ -59,9 +60,9 @@ sealed interface ExchangeV2CodeParseResult {
 @ContributesBinding(AppScope::class)
 class RealExchangeV2QrCode @Inject constructor() : ExchangeV2QrCode {
 
-    override fun buildLinkingCode(channelId: String, publicKeyBase64Url: String, version: String): String {
+    override fun buildLinkingCode(channelId: String, publicKeyBase64Url: String, version: ExchangeProtocolVersion.V2): String {
         val payload = linkingCodeAdapter.toJson(
-            V2LinkingCodePayload(version = version, channelId = channelId, publicKey = publicKeyBase64Url),
+            V2LinkingCodePayload(version = version.toString(), channelId = channelId, publicKey = publicKeyBase64Url),
         )
         val encoded = Base64.encodeToString(
             payload.toByteArray(Charsets.UTF_8),
@@ -97,10 +98,10 @@ class RealExchangeV2QrCode @Inject constructor() : ExchangeV2QrCode {
         }
 
         // Accept any same-major (2.x) version per Transport TD 1214486492252757 §Versioning.
-        val version = json.optString("version")
+        val version = ExchangeProtocolVersion.parseOrUnsupported(json.optString("version"))
         val channelId = json.optString("channel_id")
         val publicKey = json.optString("public_key")
-        if (majorVersion(version) == 2 && channelId.isNotEmpty() && publicKey.isNotEmpty()) {
+        if (version is ExchangeProtocolVersion.V2 && channelId.isNotEmpty() && publicKey.isNotEmpty()) {
             return ExchangeV2CodeParseResult.LinkingV2(
                 channelId = channelId,
                 publicKey = publicKey,
@@ -128,9 +129,6 @@ class RealExchangeV2QrCode @Inject constructor() : ExchangeV2QrCode {
             .firstOrNull { it.startsWith("$PARAM_V2=") || it.startsWith("$PARAM_V1=") }
             ?.substringAfter('=')
     }
-
-    /** Major component of a "major.minor" version string (e.g. "2.1" → 2), or null if unparseable. */
-    private fun majorVersion(version: String): Int? = version.substringBefore(".").toIntOrNull()
 
     companion object {
         private const val URL_PREFIX = "https://duckduckgo.com/sync/pairing/"

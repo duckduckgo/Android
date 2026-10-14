@@ -39,6 +39,15 @@ interface WebViewClientListener {
 
     fun pageRefreshed(refreshedUrl: String)
 
+    /**
+     * Called synchronously when a main-frame load starts, with the id identifying that load for
+     * [com.duckduckgo.app.browser.pageload.PageLoadWideEvent]. A redirect hop starts a load of its own, so this fires
+     * more than once per navigation. Progress reported from here until the next call belongs to [navigationId].
+     */
+    fun onMainFrameLoadStarted(navigationId: Long)
+
+    fun onPageLoadTimeout()
+
     fun progressChanged(
         newProgress: Int,
         webViewNavigationState: WebViewNavigationState,

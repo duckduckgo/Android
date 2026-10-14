@@ -21,7 +21,7 @@ import android.util.Base64
 import androidx.annotation.VisibleForTesting
 import androidx.work.CoroutineWorker
 import androidx.work.Data
-import androidx.work.Data.MAX_DATA_BYTES
+import androidx.work.Data.Companion.MAX_DATA_BYTES
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.browsermode.api.BrowserMode

@@ -51,6 +51,7 @@
             <!-- Using TextView instead of DaxTextView as the text color has to be the same regardless
              of the Theme. This text is placed on top of an image that is always light colored -->
             <TextView
+                android:id="@+id/homeScreenWidgetBottomSheetDialogSearchText"
                 android:layout_width="140dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

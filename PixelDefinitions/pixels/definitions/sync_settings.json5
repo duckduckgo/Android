@@ -9,7 +9,7 @@
             {
                 "key": "ui_version",
                 "type": "string",
-                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "description": "Which sync setup UI the user is on: always v2 in current app versions; v1 is only sent by older versions that still had the legacy setup screens",
                 "enum": ["v1", "v2"]
             }
         ]
@@ -24,7 +24,7 @@
             {
                 "key": "ui_version",
                 "type": "string",
-                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "description": "Which sync setup UI the user is on: always v2 in current app versions; v1 is only sent by older versions that still had the legacy setup screens",
                 "enum": ["v1", "v2"]
             }
         ]
@@ -39,7 +39,7 @@
             {
                 "key": "ui_version",
                 "type": "string",
-                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "description": "Which sync setup UI the user is on: always v2 in current app versions; v1 is only sent by older versions that still had the legacy setup screens",
                 "enum": ["v1", "v2"]
             }
         ]
@@ -54,7 +54,7 @@
             {
                 "key": "ui_version",
                 "type": "string",
-                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "description": "Which sync setup UI the user is on: always v2 in current app versions; v1 is only sent by older versions that still had the legacy setup screens",
                 "enum": ["v1", "v2"]
             }
         ]
@@ -69,7 +69,7 @@
             {
                 "key": "ui_version",
                 "type": "string",
-                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "description": "Which sync setup UI the user is on: always v2 in current app versions; v1 is only sent by older versions that still had the legacy setup screens",
                 "enum": ["v1", "v2"]
             }
         ]
@@ -90,7 +90,7 @@
             {
                 "key": "ui_version",
                 "type": "string",
-                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "description": "Which sync setup UI the user is on: always v2 in current app versions; v1 is only sent by older versions that still had the legacy setup screens",
                 "enum": ["v1", "v2"]
             }
         ]

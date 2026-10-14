@@ -42,12 +42,16 @@ class RealDuckChatPixelsAttachmentsTest {
     private val testee = RealDuckChatPixels(
         pixel = pixel,
         duckChatFeatureRepository = duckChatFeatureRepository,
-        duckChatInternal = mock(),
         appCoroutineScope = coroutineTestRule.testScope,
         dispatcherProvider = coroutineTestRule.testDispatcherProvider,
         statisticsUpdater = statisticsUpdater,
         duckAiMetricCollector = duckAiMetricCollector,
         termsOfServiceHandler = termsOfServiceHandler,
+        duckAiTabSessionRepository = mock(),
+        appBuildConfig = mock(),
+        browserInteractionsPlugins = mock(),
+        duckAiNewChatMetricPixelsPlugin = mock(),
+        duckAiSessionCallback = mock(),
     )
 
     @Test

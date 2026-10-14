@@ -1,0 +1,191 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "User clears browsing data through various entry points (Fire button, single tab burn, Duck.ai chat deletion, app shortcuts, automatic clearing)",
+    "$comment": "{\"owners\":[\"lmac012\"]}",
+    "type": "object",
+    "required": ["meta", "global", "feature", "app", "context"],
+    "additionalProperties": false,
+    "properties": {
+        "meta": {
+            "type": "object",
+            "required": ["type", "version"],
+            "additionalProperties": false,
+            "properties": { "type": { "const": "android-data-clearing" }, "version": { "const": "1.1.0" } }
+        },
+        "app": {
+            "type": "object",
+            "required": ["name", "version"],
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the application sending the event",
+                    "enum": ["DuckDuckGo Android"]
+                },
+                "version": {
+                    "type": "string",
+                    "description": "The version of the app sending the event. Release builds are X.Y.Z; internal and nightly builds append the build number and channel suffix.",
+                    "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+(-[a-z]+)?)?$"
+                },
+                "form_factor": { "type": "string", "description": "The form factor of the current device", "enum": ["phone", "tablet"] },
+                "dev_mode": { "type": "boolean", "description": "Whether the app is a debug build" }
+            }
+        },
+        "global": {
+            "type": "object",
+            "required": ["platform", "type", "sample_rate"],
+            "additionalProperties": false,
+            "properties": {
+                "platform": { "type": "string", "description": "The platform the app is running on", "enum": ["Android"] },
+                "type": { "type": "string", "description": "The type of software sending the event", "enum": ["app"] },
+                "sample_rate": {
+                    "type": "number",
+                    "description": "Sample rate for this event, between 0 and 1",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "is_first_daily_occurrence": {
+                    "type": "boolean",
+                    "description": "Whether this is the first event completed with this feature name and status in the current UTC calendar day"
+                }
+            }
+        },
+        "feature": {
+            "type": "object",
+            "required": ["name", "status", "data"],
+            "additionalProperties": false,
+            "properties": {
+                "name": { "type": "string", "description": "The feature name for this event", "enum": ["data-clearing"] },
+                "status": { "type": "string", "description": "The terminal status of the flow", "enum": ["SUCCESS", "FAILURE", "UNKNOWN"] },
+                "data": {
+                    "type": "object",
+                    "required": ["ext"],
+                    "additionalProperties": false,
+                    "properties": {
+                        "ext": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "clear_options": {
+                                    "type": "string",
+                                    "description": "Comma-separated list of data types being cleared. Values: tabs,data,duckai_chats"
+                                },
+                                "browser_mode": {
+                                    "type": "string",
+                                    "description": "Whether this clear applies to Fire Mode or Regular Mode. Absent for flows that clear both in one pass (automatic foreground/background clearing).",
+                                    "enum": ["regular", "fire"]
+                                },
+                                "tab_type": {
+                                    "type": "string",
+                                    "description": "Type of the active tab when the burn was confirmed. Only present for dialog-driven flows.",
+                                    "enum": ["web", "ai"]
+                                },
+                                "tab_count": {
+                                    "type": "string",
+                                    "description": "Number of open tabs when the burn was confirmed, bucketed like the tab_count pixel parameter. Only present for dialog-driven flows.",
+                                    "enum": ["1", "2-5", "6-10", "11-20", "21-40", "41-60", "61-80", "81+"]
+                                },
+                                "total_duration_ms_bucketed": {
+                                    "type": "string",
+                                    "description": "Duration of the data clearing operation, bucketed using the lower bucket boundary. Does not include process restart duration.",
+                                    "enum": [
+                                        "-1",
+                                        "0",
+                                        "1000",
+                                        "2000",
+                                        "3000",
+                                        "4000",
+                                        "5000",
+                                        "10000",
+                                        "30000",
+                                        "60000",
+                                        "300000",
+                                        "600000"
+                                    ]
+                                },
+                                "failure_reason": {
+                                    "type": "string",
+                                    "description": "Reason for failure. Only present on FAILURE events. Exception class name, or feature_not_supported / tab_not_found when the clear ended without an exception."
+                                },
+                                "step.web_storage_clear_success": {
+                                    "type": "string",
+                                    "description": "true if the step completed successfully, false otherwise. The implementation swallows exceptions so it does not affect the overall outcome of the data clearing operation, represented by feature.status.",
+                                    "enum": ["true", "false"]
+                                },
+                                "web_storage_clear_error": {
+                                    "type": "string",
+                                    "description": "Error message (exception class) - only present if success=false for this step"
+                                },
+                                "step.webview_app_webview_clear_success": {
+                                    "type": "string",
+                                    "description": "true if the step completed successfully, false otherwise. The implementation swallows exceptions so it does not affect the overall outcome of the data clearing operation, represented by feature.status.",
+                                    "enum": ["true", "false"]
+                                },
+                                "webview_app_webview_clear_error": {
+                                    "type": "string",
+                                    "description": "Error message (exception class) - only present if success=false for this step"
+                                },
+                                "step.webview_default_clear_success": {
+                                    "type": "string",
+                                    "description": "true if the step completed successfully, false otherwise. The implementation swallows exceptions so it does not affect the overall outcome of the data clearing operation, represented by feature.status.",
+                                    "enum": ["true", "false"]
+                                },
+                                "webview_default_clear_error": {
+                                    "type": "string",
+                                    "description": "Error message (exception class) - only present if success=false for this step"
+                                },
+                                "step.indexeddb_clear_selective_success": {
+                                    "type": "string",
+                                    "description": "true if the step completed successfully, false otherwise. The implementation swallows exceptions so it does not affect the overall outcome of the data clearing operation, represented by feature.status.",
+                                    "enum": ["true", "false"]
+                                },
+                                "indexeddb_clear_selective_error": {
+                                    "type": "string",
+                                    "description": "Error message (exception class) - only present if success=false for this step"
+                                },
+                                "step.indexeddb_clear_duckai_only_success": {
+                                    "type": "string",
+                                    "description": "true if the step completed successfully, false otherwise. The implementation swallows exceptions so it does not affect the overall outcome of the data clearing operation, represented by feature.status.",
+                                    "enum": ["true", "false"]
+                                },
+                                "indexeddb_clear_duckai_only_error": {
+                                    "type": "string",
+                                    "description": "Error message (exception class) - only present if success=false for this step"
+                                },
+                                "step.app_cache_clear_success": {
+                                    "type": "string",
+                                    "description": "true if the step completed successfully, false otherwise. The implementation swallows exceptions so it does not affect the overall outcome of the data clearing operation, represented by feature.status.",
+                                    "enum": ["true", "false"]
+                                },
+                                "app_cache_clear_error": {
+                                    "type": "string",
+                                    "description": "Error message (exception class) - only present if success=false for this step"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "context": {
+            "type": "object",
+            "required": ["name"],
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Entry point the flow was started from",
+                    "enum": [
+                        "single_tab_fire_dialog",
+                        "single_tab_burn",
+                        "duckai_chat_deletion",
+                        "app_shortcut",
+                        "fire_tabs_emptied",
+                        "auto_foreground",
+                        "auto_background"
+                    ]
+                }
+            }
+        }
+    }
+}

@@ -132,6 +132,15 @@ class SyncInvalidTokenInterceptorTest {
         assertNull(notificationManager.activeNotifications.find { it.id == SYNC_USER_LOGGED_OUT_NOTIFICATION_ID })
     }
 
+    @Test
+    fun whenInterceptingExchangeChannelRequestWithInvalidTokenThenDoNotNotifyUser() {
+        val chain = givenGetRequest(EXCHANGE_CHANNEL_URL, INVALID_LOGIN_CREDENTIALS.code)
+
+        invalidTokenInterceptor.intercept(chain)
+
+        assertNull(notificationManager.activeNotifications.find { it.id == SYNC_USER_LOGGED_OUT_NOTIFICATION_ID })
+    }
+
     private fun givenGetRequest(
         url: String,
         expectedResponseCode: Int? = null,
@@ -166,5 +175,9 @@ class SyncInvalidTokenInterceptorTest {
         return object : FakeChain(url, expectedResponseCode) {
             override fun request() = Request.Builder().url(url).method("POST", "".toRequestBody()).build()
         }
+    }
+
+    private companion object {
+        const val EXCHANGE_CHANNEL_URL = "$SYNC_PROD_ENVIRONMENT_URL/sync/v2/exchange/channel-id"
     }
 }

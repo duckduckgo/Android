@@ -1,47 +1,29 @@
 name: Privacy Tests
 
-run-name: 'Privacy Tests (${{ inputs.ddg_di || ''default DI'' }})'
-
-# The pull_request trigger lives in privacy-pr-content-scope-changed.yml, which runs this
-# workflow once per DI framework — a trigger here could only ever run one DI.
 on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+    paths:
+      - 'node_modules/@duckduckgo/content-scope-scripts/**'
   workflow_call:
     inputs:
       commit:
         description: 'Specific commit SHA to checkout (optional, defaults to latest)'
         required: true
         type: string
-      ddg_di:
-        description: 'DI framework to build with. Leave empty to use ddg.di from gradle.properties; set AnvilDagger or Metro to pin one.'
-        required: false
-        type: string
-        default: ''
   workflow_dispatch:
     inputs:
       commit:
         description: 'Specific commit SHA to checkout (optional, defaults to latest)'
         required: false
         type: string
-      ddg_di:
-        description: 'DI framework to build with. Leave empty to use ddg.di from gradle.properties; set AnvilDagger or Metro to pin one.'
-        required: false
-        type: string
-        default: ''
 
-# The DI framework is part of the group because a single caller runs this workflow once per DI
 concurrency:
-  group: ${{ github.workflow_ref }}-${{ github.ref }}-${{ inputs.ddg_di || 'default' }}
+  group: ${{ github.workflow_ref }}-${{ github.ref }}
   cancel-in-progress: true
-
-# An empty `ddg_di` omits the flag so Gradle uses ddg.di from gradle.properties; `-Pddg.di=`
-# with an empty value would instead hit build.gradle's AnvilDagger fallback. Suffixes stay
-# empty for the default and AnvilDagger paths so artifact/task names are unchanged. Pattern
-# uses truthy-first ternary because `A && '' || X` is broken in GHA expressions (empty string
-# is falsy).
-env:
-  DI_FLAG: ${{ inputs.ddg_di != '' && format('-Pddg.di={0}', inputs.ddg_di) || '' }}
-  DI_HYPHEN_SUFFIX: ${{ (inputs.ddg_di || 'AnvilDagger') != 'AnvilDagger' && format('-{0}', inputs.ddg_di) || '' }}
-  DI_PAREN_SUFFIX: ${{ (inputs.ddg_di || 'AnvilDagger') != 'AnvilDagger' && format(' ({0})', inputs.ddg_di) || '' }}
 
 jobs:
   privacy_tests:
@@ -96,10 +78,10 @@ jobs:
           force: true
 
       - name: Set up JDK version
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version-file: .github/.java-version
-          distribution: 'adopt'
+          distribution: 'temurin'
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -118,15 +100,15 @@ jobs:
 
       - name: Build
         if: ${{ steps.tests-exist.outputs.run == 'true' }}
-        run: ./gradlew ${{ matrix.build-task }} ${{ env.DI_FLAG }}
+        run: ./gradlew ${{ matrix.build-task }}
 
       - name: Run Android Tests
         if: ${{ steps.tests-exist.outputs.run == 'true' }}
-        run: ./gradlew ${{ matrix.flank-task }} --no-configuration-cache ${{ env.DI_FLAG }}
+        run: ./gradlew ${{ matrix.flank-task }} --no-configuration-cache
 
       - name: Bundle the Android CI tests report
         if: ${{ always() && steps.tests-exist.outputs.run == 'true' }}
-        run: find . -type d -name 'fladleResults' | zip -@ -r ${{ matrix.artifact-name }}${{ env.DI_HYPHEN_SUFFIX }}.zip
+        run: find . -type d -name 'fladleResults' | zip -@ -r ${{ matrix.artifact-name }}.zip
 
       - name: Generate json file with failures
         if: ${{ failure() && steps.tests-exist.outputs.run == 'true' }}
@@ -141,8 +123,8 @@ jobs:
         if: ${{ always() && steps.tests-exist.outputs.run == 'true' }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact-name }}${{ env.DI_HYPHEN_SUFFIX }}
-          path: ${{ matrix.artifact-name }}${{ env.DI_HYPHEN_SUFFIX }}.zip
+          name: ${{ matrix.artifact-name }}
+          path: ${{ matrix.artifact-name }}.zip
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() && github.event_name != 'workflow_dispatch' }}
@@ -152,8 +134,8 @@ jobs:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
           asana-section: ${{ secrets.GH_ASANA_INCOMING_ID }}
-          asana-task-name: ${{ matrix.asana-task-name }}${{ env.DI_PAREN_SUFFIX }}
-          asana-task-description: The ${{ matrix.name }}${{ env.DI_PAREN_SUFFIX }} workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-name: ${{ matrix.asana-task-name }}
+          asana-task-description: The ${{ matrix.name }} workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'
 
       - name: Adding as a release blocker

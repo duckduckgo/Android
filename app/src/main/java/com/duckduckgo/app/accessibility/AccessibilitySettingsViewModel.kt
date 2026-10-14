@@ -110,7 +110,6 @@ class AccessibilitySettingsViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             voiceSearchRepository.setVoiceSearchUserEnabled(checked)
             if (checked) {
-                voiceSearchRepository.resetVoiceSearchDismissed()
                 pixel.fire(VOICE_SEARCH_ON)
             } else {
                 pixel.fire(VOICE_SEARCH_OFF)

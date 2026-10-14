@@ -34,6 +34,7 @@
     <dimen name="largeShapeCornerRadius">16dp</dimen>
     <dimen name="extraLargeShapeCornerRadius">24dp</dimen>
     <dimen name="pillShapeCornerRadius">1000dp</dimen>
+    <dimen name="onboardingBottomSheetCornerRadius">36dp</dimen>
 
     <!-- App Components -->
     <dimen name="changeAppIconSize">64dp</dimen>
@@ -121,6 +122,10 @@
     <dimen name="dialogContentPaddingBottom">18dp</dimen>
     <dimen name="dialogContentPaddingStart">@dimen/keyline_5</dimen>
     <dimen name="dialogContentPaddingEnd">@dimen/keyline_5</dimen>
+    <dimen name="rebrandDialogMaxWidth">300dp</dimen>
+    <dimen name="rebrandDialogBorderRadius">28dp</dimen>
+    <dimen name="rebrandDialogButtonSidePadding">0dp</dimen>
+    <dimen name="rebrandDialogIconInset">@dimen/keyline_2</dimen>
 
     <!-- Dax Dialog -->
     <dimen name="daxDialogContentPaddingTop">20dp</dimen>

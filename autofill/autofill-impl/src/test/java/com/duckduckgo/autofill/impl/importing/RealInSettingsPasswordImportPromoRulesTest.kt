@@ -3,7 +3,7 @@ package com.duckduckgo.autofill.impl.importing
 import android.annotation.SuppressLint
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.importing.RealInSettingsPasswordImportPromoRules.Companion.MAX_CREDENTIALS_FOR_PROMO
-import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
+import com.duckduckgo.autofill.impl.importing.capability.PasswordImportAvailability
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -20,7 +20,7 @@ import org.mockito.kotlin.whenever
 @SuppressLint("DenyListedApi")
 class RealInSettingsPasswordImportPromoRulesTest {
 
-    private val importPasswordCapabilityChecker: ImportGooglePasswordsCapabilityChecker = mock()
+    private val passwordImportAvailability: PasswordImportAvailability = mock()
     private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
     private val autofillStore: InternalAutofillStore = mock()
 
@@ -36,7 +36,7 @@ class RealInSettingsPasswordImportPromoRulesTest {
         autofillStore = autofillStore,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         autofillFeature = autofillFeature,
-        importPasswordCapabilityChecker = importPasswordCapabilityChecker,
+        passwordImportAvailability = passwordImportAvailability,
     )
 
     @Test
@@ -89,7 +89,7 @@ class RealInSettingsPasswordImportPromoRulesTest {
     }
 
     private suspend fun configureWebViewImportSupport(isAvailable: Boolean) {
-        whenever(importPasswordCapabilityChecker.webViewCapableOfImporting()).thenReturn(isAvailable)
+        whenever(passwordImportAvailability.canImport()).thenReturn(isAvailable)
     }
 
     private suspend fun configureAllConditionsToAllowPromo() {

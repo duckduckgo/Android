@@ -31,6 +31,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.mode.FavoritesWidget
 import com.duckduckgo.app.global.DuckDuckGoApplication
+import com.duckduckgo.app.pixels.toPixelLaunchSourceValue
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -196,6 +197,7 @@ class FavoritesWidgetItemFactory(
             BrowserActivity.LAUNCH_REQUIRES_REGULAR_MODE,
             FavoritesWidget.requiresRegularMode,
         )
+        bundle.putString(BrowserActivity.LAUNCH_SOURCE_PIXEL_VALUE, FavoritesWidget.toPixelLaunchSourceValue())
         val intent = Intent()
         intent.putExtras(bundle)
         remoteViews.setOnClickFillInIntent(R.id.quickAccessFaviconContainer, intent)

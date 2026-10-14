@@ -23,10 +23,14 @@ import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command.LaunchWebsiteAllowed
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command.ShowRemovedSiteConfirmationSnackbar
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
+import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -64,6 +68,23 @@ class SitePermissionsViewModelTest {
     }
 
     @Test
+    fun whenAllowedSitesLoadedThenViewStateMarkedAsLoaded() = runTest {
+        viewModel.viewState.test {
+            assertTrue(awaitItem().sitesLoaded)
+        }
+    }
+
+    @Test
+    fun whenAllowedSitesCalledAgainWhileCollectingThenDoesNotStartAnotherCollector() = runTest {
+        whenever(mockSitePermissionsRepository.sitePermissionsWebsitesFlow()).thenReturn(MutableStateFlow(emptyList()))
+
+        viewModel.allowedSites()
+        viewModel.allowedSites()
+
+        verify(mockSitePermissionsRepository, times(2)).sitePermissionsWebsitesFlow()
+    }
+
+    @Test
     fun whenRemoveAllWebsitesThenDeleteAllSitePermissionsIsCalled() = runTest {
         viewModel.viewState.test {
             viewModel.removeAllSitesSelected()
@@ -76,12 +97,55 @@ class SitePermissionsViewModelTest {
     }
 
     @Test
+    fun whenAllowedSitesChangeAfterRemoveAllThenDoesNotDeleteAgain() = runTest {
+        val allowedSites = MutableStateFlow(listOf(SitePermissionAllowedEntity("www.website2.com", "tab", "camera", 0L)))
+        whenever(mockSitePermissionsRepository.sitePermissionsAllowedFlow()).thenReturn(allowedSites)
+
+        viewModel.commands.test {
+            viewModel.removeAllSitesSelected()
+            awaitItem()
+            allowedSites.value = emptyList()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(mockSitePermissionsRepository, times(1)).deleteAll()
+    }
+
+    @Test
     fun whenRemoveAllWebsitesThenShowRemoveAllSnackBar() = runTest {
         viewModel.removeAllSitesSelected()
 
         viewModel.commands.test {
             assertTrue(awaitItem() is ShowRemovedAllConfirmationSnackbar)
         }
+    }
+
+    @Test
+    fun whenRemoveSiteThenDeletesSiteAndShowsSnackbar() = runTest {
+        whenever(mockSitePermissionsRepository.getSitePermissionsForWebsite("www.website2.com")).thenReturn(SitePermissionsEntity("www.website2.com"))
+
+        viewModel.removeSiteSelected("www.website2.com")
+
+        verify(mockSitePermissionsRepository).deletePermissionsForSite("www.website2.com")
+        viewModel.commands.test {
+            assertEquals("www.website2.com", (awaitItem() as ShowRemovedSiteConfirmationSnackbar).domain)
+        }
+    }
+
+    @Test
+    fun whenUndoRemoveSiteThenRestoresRemovedSite() = runTest {
+        val site = SitePermissionsEntity("www.website2.com")
+        val allowed = SitePermissionAllowedEntity("www.website2.com", "tab", "camera", 0L)
+        whenever(mockSitePermissionsRepository.getSitePermissionsForWebsite("www.website2.com")).thenReturn(site)
+        whenever(mockSitePermissionsRepository.sitePermissionsAllowedFlow())
+            .thenReturn(flowOf(listOf(allowed, allowed.copy(domain = "www.website3.com"))))
+        viewModel.commands.test {
+            viewModel.removeSiteSelected("www.website2.com")
+
+            viewModel.onSnackBarUndoRemoveSite(awaitItem() as ShowRemovedSiteConfirmationSnackbar)
+        }
+
+        verify(mockSitePermissionsRepository).undoDeleteAll(listOf(site), listOf(allowed))
     }
 
     @Test

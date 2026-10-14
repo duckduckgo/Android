@@ -36,20 +36,8 @@ class SubscriptionsCheckWorkerTest {
         }
 
     @Test
-    fun `when user is signed in using auth v1 and subscription is active then refreshes subscription data`() = runTest {
+    fun `when user is signed in and subscription is active then refreshes subscription data`() = runTest {
         whenever(subscriptionsManager.isSignedIn()).thenReturn(true)
-        whenever(subscriptionsManager.isSignedInV2()).thenReturn(false)
-        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
-
-        subscriptionCheckWorker.doWork()
-
-        verify(subscriptionsManager).fetchAndStoreAllData()
-    }
-
-    @Test
-    fun `when user is signed in using auth v2 and subscription is active then refreshes subscription data`() = runTest {
-        whenever(subscriptionsManager.isSignedIn()).thenReturn(true)
-        whenever(subscriptionsManager.isSignedInV2()).thenReturn(true)
         whenever(subscriptionsManager.subscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
 
         subscriptionCheckWorker.doWork()
@@ -58,20 +46,8 @@ class SubscriptionsCheckWorkerTest {
     }
 
     @Test
-    fun `when user is signed in using auth v1 and subscription has WAITING status then refreshes subscription data`() = runTest {
+    fun `when user is signed in and subscription has WAITING status then refreshes subscription data`() = runTest {
         whenever(subscriptionsManager.isSignedIn()).thenReturn(true)
-        whenever(subscriptionsManager.isSignedInV2()).thenReturn(false)
-        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(SubscriptionStatus.WAITING)
-
-        subscriptionCheckWorker.doWork()
-
-        verify(subscriptionsManager).fetchAndStoreAllData()
-    }
-
-    @Test
-    fun `when user is signed in using auth v2 and subscription has WAITING status then refreshes subscription data`() = runTest {
-        whenever(subscriptionsManager.isSignedIn()).thenReturn(true)
-        whenever(subscriptionsManager.isSignedInV2()).thenReturn(true)
         whenever(subscriptionsManager.subscriptionStatus()).thenReturn(SubscriptionStatus.WAITING)
 
         subscriptionCheckWorker.doWork()
@@ -87,33 +63,17 @@ class SubscriptionsCheckWorkerTest {
         subscriptionCheckWorker.doWork()
 
         verify(subscriptionsManager, never()).refreshSubscriptionData()
-        verify(subscriptionsManager, never()).fetchAndStoreAllData()
         verify(workManager).cancelUniqueWork(RealSubscriptionsChecker.TAG_WORKER_SUBSCRIPTION_CHECK)
     }
 
     @Test
-    fun `when user is signed using auth v1 and subscription has UNKNOWN status then cancels work`() = runTest {
+    fun `when subscription has UNKNOWN status then cancels work`() = runTest {
         whenever(subscriptionsManager.isSignedIn()).thenReturn(true)
-        whenever(subscriptionsManager.isSignedInV2()).thenReturn(false)
         whenever(subscriptionsManager.subscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
 
         subscriptionCheckWorker.doWork()
 
         verify(subscriptionsManager, never()).refreshSubscriptionData()
-        verify(subscriptionsManager, never()).fetchAndStoreAllData()
-        verify(workManager).cancelUniqueWork(RealSubscriptionsChecker.TAG_WORKER_SUBSCRIPTION_CHECK)
-    }
-
-    @Test
-    fun `when user is signed using auth v2 and subscription has UNKNOWN status then cancels work`() = runTest {
-        whenever(subscriptionsManager.isSignedIn()).thenReturn(true)
-        whenever(subscriptionsManager.isSignedInV2()).thenReturn(true)
-        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
-
-        subscriptionCheckWorker.doWork()
-
-        verify(subscriptionsManager, never()).refreshSubscriptionData()
-        verify(subscriptionsManager, never()).fetchAndStoreAllData()
         verify(workManager).cancelUniqueWork(RealSubscriptionsChecker.TAG_WORKER_SUBSCRIPTION_CHECK)
     }
 }

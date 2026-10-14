@@ -168,7 +168,6 @@ class GeneralSettingsViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             voiceSearchRepository.setVoiceSearchUserEnabled(checked)
             if (checked) {
-                voiceSearchRepository.resetVoiceSearchDismissed()
                 pixel.fire(VOICE_SEARCH_GENERAL_SETTINGS_ON)
             } else {
                 pixel.fire(VOICE_SEARCH_GENERAL_SETTINGS_OFF)

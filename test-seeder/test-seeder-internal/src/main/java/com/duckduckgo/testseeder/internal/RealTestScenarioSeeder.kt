@@ -50,11 +50,12 @@ class RealTestScenarioSeeder @Inject constructor(
     }
 
     override suspend fun seedIfNeeded(extras: Map<String, String>) {
-        if (extras[TestSeederKey.IS_MAESTRO.key] != "true") return
+        val gateKeys = setOf(TestSeederKey.IS_MAESTRO.key, TestSeederKey.IS_MACROBENCHMARK.key)
+        if (gateKeys.none { extras[it] == "true" }) return
 
         withContext(dispatchers.io()) {
             extras
-                .filterKeys { it != TestSeederKey.IS_MAESTRO.key }
+                .filterKeys { it !in gateKeys }
                 .toSortedMap()
                 .forEach { (key, value) ->
                     val plugin = pluginsByKey[key]

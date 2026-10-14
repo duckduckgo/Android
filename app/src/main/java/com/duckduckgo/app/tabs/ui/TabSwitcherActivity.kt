@@ -101,15 +101,16 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.TabSwitcher
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsScreens.DownloadsScreenNoParams
+import com.duckduckgo.duckchat.api.DuckAiChatsMenu
+import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
+import dagger.Lazy
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
@@ -169,13 +170,13 @@ class TabSwitcherActivity :
         get() = currentBrowserMode == BrowserMode.FIRE
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var duckAiChatsMenu: Lazy<DuckAiChatsMenu>
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
@@ -296,15 +297,12 @@ class TabSwitcherActivity :
 
         if (switchToRequestedModeIfNeeded(savedInstanceState)) return
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)
-        if (edgeToEdgeEnabled) {
-            val barStyle = if (isDarkThemeEnabled()) {
-                SystemBarStyle.dark(Color.TRANSPARENT)
-            } else {
-                SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-            }
-            enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
+        val barStyle = if (isDarkThemeEnabled()) {
+            SystemBarStyle.dark(Color.TRANSPARENT)
+        } else {
+            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
         }
+        enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
 
         setContentView(binding.root)
 
@@ -329,9 +327,7 @@ class TabSwitcherActivity :
         configureNavigationBar()
         configureFireTabsEmptyState()
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         configureObservers()
         observeBrowserModeChanges()
@@ -936,6 +932,23 @@ class TabSwitcherActivity :
                 viewModel.onBrowserModeToggled(BrowserMode.REGULAR, BrowserModeSwitchSource.TAB_SWITCHER_EXIT)
                 finishAfterTransition()
             }
+            Command.ShowDuckAiChatsMenu -> showDuckAiChatsMenu()
+        }
+    }
+
+    private fun showDuckAiChatsMenu() {
+        lifecycleScope.launch {
+            duckAiChatsMenu.get().show(
+                anchorView = findViewById(R.id.duckAIToolbarButton),
+                options = DuckAiChatsMenu.Options(
+                    chatHistorySource = DuckChatHistorySource.TAB_SWITCHER,
+                    menuStyle = DuckAiChatsMenu.ChatsMenuStyle.COMPACT,
+                ),
+                listener = object : DuckAiChatsMenu.Listener {
+                    override fun onNewChatSelected() = viewModel.onDuckAiNewChatSelected()
+                    override fun onChatSelected(chatUrl: String) = viewModel.onDuckAiChatSelected(chatUrl)
+                },
+            )
         }
     }
 
@@ -968,6 +981,12 @@ class TabSwitcherActivity :
             dynamicMenu = viewState.dynamicInterface,
             navigationBar = binding.navigationBar,
         )
+
+        if (viewState.isDuckAiChatsMenuEnabled) {
+            menu.findItem(R.id.duckAIToolbarButton).setIcon(CommonR.drawable.ic_chats_24)
+            // Creating the menu starts loading recent chats, so the popup opens without waiting on the read.
+            duckAiChatsMenu.get()
+        }
 
         menu.findItem(R.id.newTabToolbarButton).setTitle(
             when (currentBrowserMode) {

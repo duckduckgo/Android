@@ -22,6 +22,9 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
 import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.survey.api.SurveyEndpointDataStore
+import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
+import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.traces.api.StartupTraces
 import com.duckduckgo.user.agent.api.UserAgentProvider
@@ -32,6 +35,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
@@ -42,6 +46,9 @@ class DevSettingsViewModel @Inject constructor(
     private val startupTraces: StartupTraces,
     private val userAgentProvider: UserAgentProvider,
     private val surveyEndpointDataStore: SurveyEndpointDataStore,
+    private val trackerDataDownloader: TrackerDataDownloader,
+    private val tdsMetadataDao: TdsMetadataDao,
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(
@@ -52,7 +59,6 @@ class DevSettingsViewModel @Inject constructor(
     )
 
     sealed class Command {
-        data object SendTdsIntent : Command()
         data object OpenUASelector : Command()
         data object ChangePrivacyConfigUrl : Command()
         data object CustomTabs : Command()
@@ -127,6 +133,24 @@ class DevSettingsViewModel @Inject constructor(
         devSettingsDataStore.selectedUA = userAgent
         viewModelScope.launch {
             viewState.emit(currentViewState().copy(userAgent = userAgentProvider.userAgent("", false)))
+        }
+    }
+
+    fun onResetTdsClicked() {
+        viewModelScope.launch {
+            command.send(Command.Toast("Downloading TDS…"))
+            val result = withContext(dispatchers.io()) {
+                runCatching {
+                    // downloadTds() only persists when the eTag changes, so clear it to force a redownload
+                    tdsMetadataDao.deleteAll()
+                    trackerDataDownloader.downloadTds().blockingAwait()
+                }
+            }
+            val message = result.fold(
+                onSuccess = { "TDS redownloaded" },
+                onFailure = { "TDS download failed: ${it.localizedMessage}" },
+            )
+            command.send(Command.Toast(message))
         }
     }
 

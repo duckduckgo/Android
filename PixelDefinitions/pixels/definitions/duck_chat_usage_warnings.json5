@@ -1,0 +1,225 @@
+{
+    "m_aichat_usage_warning_approaching_shown": {
+        "description": "Fires when the approaching-limit card appears under the Duck.ai input. One per appearance: refocusing the input reports again, a refresh that only fills in the card's CTA does not.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            { "key": "window", "type": "string", "description": "Which allowance the message was about.", "enum": ["daily", "weekly"] },
+            {
+                "key": "percent_bucket",
+                "type": "string",
+                "description": "The rung of the approaching ladder the card was shown at.",
+                "enum": ["50", "75", "90"]
+            }
+        ]
+    },
+    "m_aichat_usage_warning_approaching_dismissed": {
+        "description": "Fires when the user closes the approaching-limit card with its close button. Not a terminal outcome: a prompt sent afterwards in the same input session is still reported against this exposure.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            { "key": "window", "type": "string", "description": "Which allowance the message was about.", "enum": ["daily", "weekly"] },
+            {
+                "key": "percent_bucket",
+                "type": "string",
+                "description": "The rung of the approaching ladder the card was shown at.",
+                "enum": ["50", "75", "90"]
+            }
+        ]
+    },
+    "m_aichat_usage_warning_approaching_prompt_submitted": {
+        "description": "Fires for the first prompt the user sends after seeing the approaching-limit card, in the same input session. Once per exposure.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            { "key": "window", "type": "string", "description": "Which allowance the message was about.", "enum": ["daily", "weekly"] },
+            {
+                "key": "percent_bucket",
+                "type": "string",
+                "description": "The rung of the approaching ladder the card was shown at.",
+                "enum": ["50", "75", "90"]
+            }
+        ]
+    },
+    "m_aichat_usage_warning_approaching_model_switched": {
+        "description": "Fires when the user changes model themselves after seeing the approaching-limit card, in the same input session. Once per exposure, never for the switch the card's own CTA performs.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            { "key": "window", "type": "string", "description": "Which allowance the message was about.", "enum": ["daily", "weekly"] },
+            {
+                "key": "percent_bucket",
+                "type": "string",
+                "description": "The rung of the approaching ladder the card was shown at.",
+                "enum": ["50", "75", "90"]
+            }
+        ]
+    },
+    "m_aichat_usage_warning_approaching_abandoned": {
+        "description": "Fires when an approaching-limit card's exposure ends with no follow-through (no prompt, no model change, no CTA taken): the input session ends, or a different card replaces it on screen, for example the rung moving from 50 to 75 because of a prompt sent elsewhere.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            { "key": "window", "type": "string", "description": "Which allowance the message was about.", "enum": ["daily", "weekly"] },
+            {
+                "key": "percent_bucket",
+                "type": "string",
+                "description": "The rung of the approaching ladder the card was shown at.",
+                "enum": ["50", "75", "90"]
+            }
+        ]
+    },
+    "m_aichat_usage_warning_limit_reached_shown": {
+        "description": "Fires when the limit-reached card appears under the Duck.ai input. One per appearance.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            { "key": "window", "type": "string", "description": "Which allowance the message was about.", "enum": ["daily", "weekly"] }
+        ]
+    },
+    "m_aichat_usage_warning_limit_reached_prompt_submitted": {
+        "description": "Fires for the first prompt the user sends after seeing the limit-reached card, in the same input session. Once per exposure.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            { "key": "window", "type": "string", "description": "Which allowance the message was about.", "enum": ["daily", "weekly"] }
+        ]
+    },
+    "m_aichat_usage_warning_limit_reached_model_switched": {
+        "description": "Fires when the user changes model themselves after seeing the limit-reached card, in the same input session. Once per exposure.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            { "key": "window", "type": "string", "description": "Which allowance the message was about.", "enum": ["daily", "weekly"] }
+        ]
+    },
+    "m_aichat_usage_warning_limit_reached_abandoned": {
+        "description": "Fires when a limit-reached card's exposure ends with no follow-through (no prompt, no model change, no CTA taken): the input session ends, or a different card replaces it on screen.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            { "key": "window", "type": "string", "description": "Which allowance the message was about.", "enum": ["daily", "weekly"] }
+        ]
+    },
+    "m_aichat_usage_warning_switch_model_tapped": {
+        "description": "Fires when the user taps the card's Switch Model CTA. The rung is present when the card is an approaching one.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            { "key": "window", "type": "string", "description": "Which allowance the message was about.", "enum": ["daily", "weekly"] },
+            {
+                "key": "percent_bucket",
+                "type": "string",
+                "description": "The rung of the approaching ladder the card was shown at.",
+                "enum": ["50", "75", "90"]
+            }
+        ]
+    },
+    "m_aichat_usage_warning_upsell_tapped": {
+        "description": "Fires when the user taps the card's subscription CTA (Try Subscription for Free / Subscribe), offered on a limit-reached card to a user without a paid tier.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            { "key": "window", "type": "string", "description": "Which allowance the message was about.", "enum": ["daily", "weekly"] }
+        ]
+    },
+    "m_aichat_usage_warning_weekly_limit_tapped": {
+        "description": "Fires when the user taps Start Using Weekly Limit on the daily limit-reached card. Counts as follow-through for the exposure.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            { "key": "window", "type": "string", "description": "Which allowance the message was about.", "enum": ["daily", "weekly"] }
+        ]
+    },
+    "m_aichat_high_usage_model_notice_shown": {
+        "description": "Fires when the high-usage model notice appears under the Duck.ai input. Keyed off the selected model rather than an allowance, shown once per model until dismissed.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            { "key": "model_id", "type": "string", "description": "The id of the high-usage model the notice is about." }
+        ]
+    },
+    "m_aichat_high_usage_model_notice_dismissed": {
+        "description": "Fires when the user closes the high-usage model notice with its close button, which retires it for that model.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            { "key": "model_id", "type": "string", "description": "The id of the high-usage model the notice is about." }
+        ]
+    },
+    "m_aichat_high_usage_model_notice_prompt_submitted": {
+        "description": "Fires for the first prompt the user sends after seeing the high-usage model notice, in the same input session. Once per exposure.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            { "key": "model_id", "type": "string", "description": "The id of the high-usage model the notice is about." }
+        ]
+    },
+    "m_aichat_high_usage_model_notice_model_switched": {
+        "description": "Fires when the user changes model after seeing the high-usage model notice, in the same input session. model_id is the model the user switched away from.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            { "key": "model_id", "type": "string", "description": "The id of the high-usage model the notice is about." }
+        ]
+    },
+    "m_aichat_high_usage_model_notice_abandoned": {
+        "description": "Fires when a high-usage model notice's exposure ends with no follow-through (no prompt, no model change): the input session ends, or a different card replaces it on screen.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            { "key": "model_id", "type": "string", "description": "The id of the high-usage model the notice is about." }
+        ]
+    }
+}

@@ -28,6 +28,9 @@ abstract class TdsMetadataDao {
     @Query("SELECT eTag FROM tdsMetadata limit 1")
     abstract fun eTag(): String?
 
+    @Query("DELETE FROM tdsMetadata")
+    abstract fun deleteAll()
+
     @Transaction
     open fun tdsDownloadSuccessful(tdsMetadata: TdsMetadata) {
         insert(tdsMetadata)

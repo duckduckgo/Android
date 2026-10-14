@@ -28,6 +28,8 @@ class JsObjectIdlingResource(
     private val objectName: String,
     private val timeoutMillis: Long = DEFAULT_TIMEOUT_MILLIS,
     private val failOnTimeout: Boolean = true,
+    // Defaults to waiting for the object to exist; pass an expression to wait for a specific state instead
+    private val condition: String = "typeof $objectName !== 'undefined'",
 ) : IdlingResource {
 
     @Volatile
@@ -54,15 +56,15 @@ class JsObjectIdlingResource(
             isIdle = true
             callback?.onTransitionToIdle()
             if (failOnTimeout) {
-                // fail test if the object is not found within the timeout if opted-in
-                throw AssertionError("JS object '$objectName' did not appear within ${timeoutMillis}ms.")
+                // fail test if the condition is not met within the timeout if opted-in
+                throw AssertionError("JS condition '$condition' was not met within ${timeoutMillis}ms.")
             }
-            logcat { "JsObjectIdlingResource: '$objectName' did not appear within ${timeoutMillis}ms; proceeding" }
+            logcat { "JsObjectIdlingResource: '$condition' was not met within ${timeoutMillis}ms; proceeding" }
             return
         }
 
         webView.evaluateJavascript(
-            "(typeof $objectName !== 'undefined')",
+            "($condition)",
         ) { result ->
             if (result == "true") {
                 isIdle = true

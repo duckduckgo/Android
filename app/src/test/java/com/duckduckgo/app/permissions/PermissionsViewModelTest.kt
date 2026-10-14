@@ -34,7 +34,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class PermissionsViewModelTest {
 
@@ -101,6 +103,10 @@ class PermissionsViewModelTest {
 
     @Test
     fun whenAppLinksSetToAskEverytimeThenDataStoreIsUpdatedAndPixelIsSent() {
+        whenever(mockAppSettingsDataStore.appLinksEnabled).thenReturn(false)
+        whenever(mockAppSettingsDataStore.showAppLinksPrompt).thenReturn(false)
+        testee.start()
+
         testee.onAppLinksSettingChanged(AppLinkSettingType.ASK_EVERYTIME)
 
         verify(mockAppSettingsDataStore).appLinksEnabled = true
@@ -111,6 +117,10 @@ class PermissionsViewModelTest {
 
     @Test
     fun whenAppLinksSetToAlwaysThenDataStoreIsUpdatedAndPixelIsSent() {
+        whenever(mockAppSettingsDataStore.appLinksEnabled).thenReturn(false)
+        whenever(mockAppSettingsDataStore.showAppLinksPrompt).thenReturn(false)
+        testee.start()
+
         testee.onAppLinksSettingChanged(AppLinkSettingType.ALWAYS)
 
         verify(mockAppSettingsDataStore).appLinksEnabled = true
@@ -121,12 +131,28 @@ class PermissionsViewModelTest {
 
     @Test
     fun whenAppLinksSetToNeverThenDataStoreIsUpdatedAndPixelIsSent() {
+        whenever(mockAppSettingsDataStore.appLinksEnabled).thenReturn(true)
+        whenever(mockAppSettingsDataStore.showAppLinksPrompt).thenReturn(false)
+        testee.start()
+
         testee.onAppLinksSettingChanged(AppLinkSettingType.NEVER)
 
         verify(mockAppSettingsDataStore).appLinksEnabled = false
         verify(mockAppSettingsDataStore).showAppLinksPrompt = false
         verify(mockPixel).fire(AppPixelName.SETTINGS_APP_LINKS_NEVER_SELECTED)
         verify(mockPixel).fire(AppPixelName.SETTINGS_APP_LINKS_NEVER_SELECTED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenAppLinksSetToSameSettingThenNoPixelIsSent() {
+        whenever(mockAppSettingsDataStore.appLinksEnabled).thenReturn(true)
+        whenever(mockAppSettingsDataStore.showAppLinksPrompt).thenReturn(true)
+        testee.start()
+
+        testee.onAppLinksSettingChanged(AppLinkSettingType.ASK_EVERYTIME)
+
+        verify(mockPixel, never()).fire(AppPixelName.SETTINGS_APP_LINKS_ASK_EVERY_TIME_SELECTED)
+        verify(mockPixel, never()).fire(AppPixelName.SETTINGS_APP_LINKS_ASK_EVERY_TIME_SELECTED_DAILY, type = Daily())
     }
 
     @Test

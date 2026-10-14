@@ -5,6 +5,7 @@
     <application>
         <activity android:name=".DuckAiUrlSettingsActivity" android:exported="false"/>
         <activity android:name=".DuckAiDevActivity" android:exported="false"/>
+        <activity android:name=".DuckAiUsageWarningsDevActivity" android:exported="false"/>
     </application>
 
 </manifest>

@@ -26,7 +26,6 @@ import android.view.View
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.ViewCompat
-import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -143,7 +142,6 @@ class SerpEasterEggLogoActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         with(binding) {
-            favouriteButton.isVisible = viewState.isSetFavouriteEnabled
             favouriteButton.text = if (viewState.isFavourite) {
                 getString(R.string.serpLogoResetToDefault)
             } else {

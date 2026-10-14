@@ -85,7 +85,7 @@ private fun DaxBigTwoActionsMessagePreview() {
         DaxBigTwoActionsMessage(
             title = "Big Two Actions Message",
             body = "Body text goes here. This component has two buttons and showcases an app update",
-            topIllustration = painterResource(R.drawable.ic_app_update),
+            topIllustration = painterResource(R.drawable.update_96),
             primaryAction = DaxAction(text = "Action", onClick = {}),
             secondaryAction = DaxAction(text = "Secondary", onClick = {}),
             onDismissed = {},

@@ -31,6 +31,8 @@ import com.duckduckgo.app.browser.mode.ExternalUrl
 import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.dispatchers.IntentDispatcherViewModel.ViewState
 import com.duckduckgo.app.global.sanitize
+import com.duckduckgo.app.pixels.AppReturnPixelSender
+import com.duckduckgo.app.pixels.toPixelLaunchSourceValue
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.customtabs.api.CustomTabsSessionRegistry
 import com.duckduckgo.di.scopes.ActivityScope
@@ -51,11 +53,16 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var customTabsSessionRegistry: CustomTabsSessionRegistry
 
+    @Inject
+    lateinit var appReturnPixelSender: AppReturnPixelSender
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // Sanitize before super.onCreate so lifecycle callbacks dispatched from there don't trip over
         // Parcelable extras whose classes are absent from our classpath.
         intent?.sanitize()
         super.onCreate(savedInstanceState)
+
+        appReturnPixelSender.fireIfNeeded(ExternalUrl.toPixelLaunchSourceValue())
 
         logcat { "onCreate called with intent $intent" }
 
@@ -93,6 +100,10 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
         // apply the trusted-caller carve-out in handleAppLink.
         val clientPackage = CustomTabsSessionToken.getSessionTokenFromIntent(intent)
             ?.let { customTabsSessionRegistry.lookupClientPackage(it) }
+        // Best-effort caller identity from the android-app:// referrer, available even when the launcher never
+        // bound the service (e.g. apps that open a login Custom Tab without a session). The launcher can set the
+        // referrer, so this is used only for the low-stakes prompt-skip decision, never the launch carve-out.
+        val referrerPackage = referrer?.takeIf { it.scheme == "android-app" }?.host
 
         // As customizations we only support the toolbar color at the moment.
         startActivity(
@@ -103,6 +114,7 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
                 toolbarColor = toolbarColor,
                 isExternal = isExternal,
                 clientPackage = clientPackage,
+                referrerPackage = referrerPackage,
             ),
         )
 

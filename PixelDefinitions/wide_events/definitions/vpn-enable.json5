@@ -1,0 +1,75 @@
+{
+    "android-vpn-enable": {
+        "description": "User attempts to enable VPN",
+        "owners": ["lmac012"],
+        "meta": {
+            "type": "android-vpn-enable",
+            "version": "0.0"
+        },
+        "feature": {
+            "name": "vpn-enable",
+            "status": ["SUCCESS", "FAILURE", "CANCELLED", "UNKNOWN"],
+            "data": {
+                "ext": {
+                    "subscription_status": {
+                        "type": "string",
+                        "description": "User's subscription status at the time of VPN enable attempt",
+                        "enum": ["Auto-Renewable", "Not Auto-Renewable", "Grace Period", "Inactive", "Expired", "Unknown", "Waiting"]
+                    },
+                    "is_first_setup": {
+                        "type": "string",
+                        "description": "true if the user is launching the VPN for the first time, false otherwise",
+                        "enum": ["true", "false"]
+                    },
+                    "cancellation_reason": {
+                        "type": "string",
+                        "description": "Reason for cancellation. Only present on CANCELLED events.",
+                        "enum": ["vpn_conflict", "permission_denied"]
+                    },
+                    "failure_reason": {
+                        "type": "string",
+                        "description": "Error message indicating cause of the failure. Based on VpnStopReason enum, but could be a different static message. Only present on FAILURE events."
+                    },
+                    "service_start_duration_ms_bucketed": {
+                        "type": "string",
+                        "description": "The duration of TrackerBlockingVpnService (re)start in milliseconds, bucketed using the lower bucket boundary",
+                        "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                    },
+                    "step.show_vpn_conflict_dialog": {
+                        "type": "string",
+                        "description": "Parameter present if the user was asked if they want to disable existing 3rd party VPN",
+                        "enum": ["true"]
+                    },
+                    "step.ask_for_vpn_permission": {
+                        "type": "string",
+                        "description": "Parameter present if the user was asked to grant the VPN permission",
+                        "enum": ["true"]
+                    },
+                    "step.vpn_start_attempt": {
+                        "type": "string",
+                        "description": "Parameter present if the app attempted to (re)start VPN service. This happens after ensuring app has VPN permissions",
+                        "enum": ["true"]
+                    },
+                    "step.notify_vpn_start": {
+                        "type": "string",
+                        "description": "Parameter present if notifyVpnStart() in TrackerBlockingVpnService completed successfully",
+                        "enum": ["true"]
+                    },
+                    "step.null_tunnel_created": {
+                        "type": "string",
+                        "description": "Parameter present if null tunnel was successfully created.",
+                        "enum": ["true"]
+                    },
+                    "step.network_stack_initialized": {
+                        "type": "string",
+                        "description": "Parameter present if network stack was successfully initialized.",
+                        "enum": ["true"]
+                    }
+                }
+            }
+        },
+        "context": {
+            "name": ["app_settings", "system_tile", "notification"]
+        }
+    }
+}

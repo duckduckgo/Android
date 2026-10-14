@@ -29,14 +29,11 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.getActivityParams
-import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import com.duckduckgo.settings.impl.databinding.ActivitySettingsWebviewBinding
 import kotlinx.coroutines.flow.launchIn
@@ -62,12 +59,6 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
     lateinit var settingsWebViewClient: SettingsWebViewClient
 
     @Inject
-    lateinit var serpSettingsFeature: SerpSettingsFeature
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val binding: ActivitySettingsWebviewBinding by viewBinding()
@@ -83,17 +74,12 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
         val url = params?.url
         title = params?.screenTitle.orEmpty()
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.WEBVIEW)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         setContentView(binding.root)
         setupToolbar(toolbar)
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         lifecycleScope.launch {
             setupWebView()
@@ -176,23 +162,21 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
                 setSupportZoom(true)
             }
 
-            if (serpSettingsFeature.storeSerpSettings().isEnabled()) {
-                webView.webViewClient = settingsWebViewClient
+            webView.webViewClient = settingsWebViewClient
 
-                contentScopeScripts.register(
-                    webView,
-                    object : JsMessageCallback() {
-                        override fun process(
-                            featureName: String,
-                            method: String,
-                            id: String?,
-                            data: JSONObject?,
-                        ) {
-                            // No-op
-                        }
-                    },
-                )
-            }
+            contentScopeScripts.register(
+                webView,
+                object : JsMessageCallback() {
+                    override fun process(
+                        featureName: String,
+                        method: String,
+                        id: String?,
+                        data: JSONObject?,
+                    ) {
+                        // No-op
+                    }
+                },
+            )
         }
     }
 

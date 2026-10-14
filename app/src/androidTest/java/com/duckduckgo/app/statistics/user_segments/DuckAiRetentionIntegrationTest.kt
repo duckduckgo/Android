@@ -32,6 +32,7 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities.loadText
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.data.store.impl.SharedPreferencesProviderImpl
 import com.duckduckgo.experiments.api.VariantManager
@@ -87,6 +88,7 @@ class DuckAiRetentionIntegrationTest {
     private val mockVariantManager: VariantManager = mock()
     private val mockEmailManager: EmailManager = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
+    private val mockDeviceInfo: DeviceInfo = mock()
 
     @Before
     fun setup() {
@@ -116,6 +118,7 @@ class DuckAiRetentionIntegrationTest {
         )
 
         whenever(mockVariantManager.getVariantKey()).thenReturn("ma")
+        whenever(mockDeviceInfo.formFactor()).thenReturn(DeviceInfo.FormFactor.PHONE)
         runBlocking {
             whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
         }
@@ -149,6 +152,7 @@ class DuckAiRetentionIntegrationTest {
             mockEmailManager,
             coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
+            mockDeviceInfo,
         )
     }
 

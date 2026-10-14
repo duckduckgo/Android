@@ -37,7 +37,6 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsNewBinding
 import com.duckduckgo.app.browser.mode.InAppNavigation
-import com.duckduckgo.app.desktopbrowser.GetDesktopBrowserActivityParams
 import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedScreenNoParams
 import com.duckduckgo.app.firebutton.DataClearingSettingsScreenNoParams
 import com.duckduckgo.app.generalsettings.GeneralSettingsScreenNoParams
@@ -88,9 +87,7 @@ import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
@@ -115,6 +112,7 @@ import kotlinx.coroutines.flow.onEach
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 private const val OTHER_PLATFORMS_URL = "https://duckduckgo.com/app"
 
@@ -127,9 +125,6 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var pixel: Pixel
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -215,17 +210,12 @@ class SettingsActivity : DuckDuckGoActivity() {
             }
         }
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         configureUiEventHandlers()
         configureInternalFeatures()
@@ -313,6 +303,10 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureSettings() {
+        viewsPrivacy.vpnSetting.setLeadingIconResource(
+            resolveAppTpSettingsIcon(appBrandDesignUpdateToggles.pictograms().isEnabled()),
+        )
+
         if (proSettingsPlugin.isEmpty()) {
             viewsPro.gone()
         } else {
@@ -554,7 +548,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is LaunchOtherPlatforms -> launchActivityAndFinish(
                 BrowserActivity.intent(context = this, launchSource = InAppNavigation, queryExtra = OTHER_PLATFORMS_URL),
             )
-            is Command.LaunchGetDesktopBrowser -> launchScreen(GetDesktopBrowserActivityParams(source = GetDesktopBrowserActivityParams.Source.OTHER))
+            is Command.LaunchGetDesktopBrowser -> launchScreen(SettingsDesktopBrowserPromotionParams.forSettingsListItem())
             is Command.LaunchWhatsNew -> launchScreen(ModalSurfaceActivityFromMessageId(it.messageId, it.messageType, launchedFromSettings = true))
         }
     }
@@ -609,3 +603,6 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 }
+
+internal fun resolveAppTpSettingsIcon(isPictogramsEnabled: Boolean): Int =
+    if (isPictogramsEnabled) CommonR.drawable.homescreen_lock_color_24 else CommonR.drawable.lock_color_24

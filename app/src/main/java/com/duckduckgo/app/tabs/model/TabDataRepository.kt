@@ -37,11 +37,13 @@ import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.toStringDropScheme
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -49,11 +51,15 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.LogPriority.WARN
 import logcat.logcat
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class TabDataRepository(
     private val tabsDao: TabsDao,
@@ -70,6 +76,8 @@ class TabDataRepository(
     private val duckChatContextualDataStore: DuckChatContextualDataStore,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
     private val nativeInputStatePublisher: NativeInputStatePublisher,
+    private val duckAiTabSessionRepository: DuckAiTabSessionRepository,
+    private val pageTitleFetcher: PageTitleFetcher,
 ) : TabRepository, TabAtomicOperations {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()
@@ -93,6 +101,10 @@ class TabDataRepository(
     override val tabSwitcherData: Flow<TabSwitcherData> = tabSwitcherDataStore.data
 
     private val siteData: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
+
+    // Seeded only by update(), never by insertion, or a background tab's first update could match its
+    // inserted title and never get viewed=true.
+    private val lastUpdatedTabState = ConcurrentHashMap<String, TabUpdateState>()
 
     private var purgeDeletableTabsJob = ConflatedJob()
 
@@ -227,6 +239,7 @@ class TabDataRepository(
                 ),
                 updateIfBlankParent = updateIfBlankParent,
             )
+            duckAiTabSessionRepository.tryClaimEntryPointSource(tabId, data.value?.url)
         }
     }
 
@@ -276,14 +289,13 @@ class TabDataRepository(
         url: String?,
         tabId: String,
     ) {
+        val newTabId = generateTabId()
         databaseExecutor().scheduleDirect {
             val position = tabsDao.tab(tabId)?.position ?: -1
-            val uri = Uri.parse(url)
-            val title = uri.host?.removePrefix("www.") ?: url
             val tab = TabEntity(
-                tabId = generateTabId(),
+                tabId = newTabId,
                 url = url,
-                title = title,
+                title = Uri.parse(url).toStringDropScheme().removePrefix("www."),
                 skipHome = false,
                 viewed = false,
                 position = position + 1,
@@ -291,14 +303,40 @@ class TabDataRepository(
             )
             tabsDao.insertTabAtPosition(tab)
         }
+
+        if (url != null) {
+            prefetchTitleAndIcon(newTabId, url)
+        }
+    }
+
+    private fun prefetchTitleAndIcon(newTabId: String, url: String) {
+        appCoroutineScope.launch {
+            if (tabManagerFeatureFlags.backgroundTabPrefetch().isEnabled()) {
+                launch { faviconManager.tryFetchFaviconForUrl(newTabId, url) }
+
+                pageTitleFetcher.fetchTitle(url)?.let { title ->
+                    databaseExecutor().scheduleDirect {
+                        if (tabsDao.tab(newTabId)?.viewed == false) {
+                            tabsDao.updateUrlAndTitle(newTabId, url, title, viewed = false)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override suspend fun update(
         tabId: String,
         site: Site?,
     ) {
+        val url = site?.url
+        val title = site?.title
         databaseExecutor().scheduleDirect {
-            tabsDao.updateUrlAndTitle(tabId, site?.url, site?.title, viewed = true)
+            val state = TabUpdateState(url, title)
+            if (lastUpdatedTabState.put(tabId, state) == state) return@scheduleDirect
+
+            tabsDao.updateUrlAndTitle(tabId, url, title, viewed = true)
+            duckAiTabSessionRepository.tryClaimEntryPointSource(tabId, url)
         }
     }
 
@@ -333,6 +371,7 @@ class TabDataRepository(
             deleteOldPreviewImages(tab.tabId)
             deleteOldFavicon(tab.tabId)
             tabsDao.deleteTabAndUpdateSelection(tab)
+            lastUpdatedTabState.remove(tab.tabId)
         }
         siteData.remove(tab.tabId)
         tabVisitedSitesRepository.clearTab(tab.tabId)
@@ -360,6 +399,22 @@ class TabDataRepository(
         nativeInputStatePublisher.clearTab(tabId)
     }
 
+    override suspend fun deleteSelectedBlankTabAndSelectTarget(
+        currentTabId: String,
+        targetTabId: String,
+    ): Boolean = withContext(dispatchers.io() + NonCancellable) {
+        val didDelete = try {
+            awaitDatabaseOperation { tabsDao.deleteSelectedBlankTabAndSelectTarget(currentTabId, targetTabId) }
+        } catch (_: Exception) {
+            false
+        }
+        if (!didDelete) return@withContext false
+        clearAllSiteData(listOf(currentTabId))
+        tabVisitedSitesRepository.clearTab(currentTabId)
+        nativeInputStatePublisher.clearTab(currentTabId)
+        true
+    }
+
     private fun clearAllSiteData(tabIds: List<String>) {
         tabIds.forEach { tabId ->
             webViewSessionStorage.deleteSession(tabId)
@@ -367,6 +422,7 @@ class TabDataRepository(
             deleteOldPreviewImages(tabId)
             deleteOldFavicon(tabId)
             siteData.remove(tabId)
+            lastUpdatedTabState.remove(tabId)
             duckChatContextualDataStore.clearTabChatUrl(tabId)
         }
     }
@@ -428,6 +484,7 @@ class TabDataRepository(
                 }
             tabsDao.deleteTabAndUpdateSelection(tabToDelete, tabToSelect)
             siteData.remove(tabToDelete.tabId)
+            lastUpdatedTabState.remove(tabToDelete.tabId)
 
             tabToSelect?.let {
                 appCoroutineScope.launch(dispatchers.io()) {
@@ -447,6 +504,7 @@ class TabDataRepository(
         adClickManager.clearAll()
         webViewSessionStorage.deleteAllSessions()
         siteData.clear()
+        lastUpdatedTabState.clear()
         duckChatContextualDataStore.clearAll()
         tabVisitedSitesRepository.clearAll()
         nativeInputStatePublisher.clearAll()
@@ -531,4 +589,21 @@ class TabDataRepository(
     private fun databaseExecutor(): Scheduler {
         return Schedulers.single()
     }
+
+    private suspend fun <T> awaitDatabaseOperation(operation: () -> T): T =
+        suspendCancellableCoroutine { continuation ->
+            val disposable = databaseExecutor().scheduleDirect {
+                try {
+                    continuation.resume(operation())
+                } catch (error: Exception) {
+                    continuation.resumeWithException(error)
+                }
+            }
+            continuation.invokeOnCancellation { disposable.dispose() }
+        }
 }
+
+private data class TabUpdateState(
+    val url: String?,
+    val title: String?,
+)

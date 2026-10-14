@@ -7,4 +7,18 @@
     <string name="devSettingsDuckAiUrlSet">Custom Duck.ai URL set</string>
     <string name="devSettingsDuckAiUrlCleared">Duck.ai URL reset to default</string>
     <string name="devSettingsDuckAiUrlEmpty">Enter a URL</string>
+
+    <string name="devSettingsDuckAiUsageWarningsCapabilityTitle">Usage Warnings</string>
+    <string name="devSettingsDuckAiUsageWarningsCapabilitySubtitle">Inspect and reset native usage warning state</string>
+    <string name="devSettingsDuckAiUsageWarningsTitle">Duck.ai Usage Warnings</string>
+    <string name="devSettingsDuckAiUsageWarningsHighUsageDismissals">Dismissed high-usage models</string>
+    <string name="devSettingsDuckAiUsageWarningsNoDismissals">None</string>
+    <string name="devSettingsDuckAiUsageWarningsResetHighUsageDismissals">Reset high-usage dismissals</string>
+    <string name="devSettingsDuckAiUsageWarningsDismissalsReset">High-usage dismissals reset</string>
+    <string name="devSettingsDuckAiUsageWarningsUsageDismissal">Dismissed usage notice</string>
+    <string name="devSettingsDuckAiUsageWarningsUsageDismissalValue" instruction="%1$s is the notice id, %2$s the window (daily or weekly), %3$d the percent band it was dismissed at">%1$s, %2$s window, dismissed at %3$d%% band</string>
+    <string name="devSettingsDuckAiUsageWarningsUsageActedOn">Acted-on usage snapshot</string>
+    <string name="devSettingsDuckAiUsageWarningsUsageActedOnRecorded">Recorded. Card hidden until the snapshot changes</string>
+    <string name="devSettingsDuckAiUsageWarningsResetUsageDismissal">Reset usage notice state</string>
+    <string name="devSettingsDuckAiUsageWarningsUsageDismissalReset">Usage notice dismissal and acted-on state reset</string>
 </resources>

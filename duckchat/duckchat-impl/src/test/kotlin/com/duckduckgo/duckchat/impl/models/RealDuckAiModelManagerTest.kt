@@ -16,15 +16,23 @@
 
 package com.duckduckgo.duckchat.impl.models
 
+import android.webkit.CookieManager
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.store.SelectedModel
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.model.Entitlement
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -35,9 +43,13 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -52,14 +64,19 @@ class RealDuckAiModelManagerTest {
     private val dataStore: DuckChatDataStore = mock()
     private val subscriptions: Subscriptions = mock()
     private val duckAiHostProvider: DuckAiHostProvider = mock()
+    private val cookiesManager: CookieManagerProvider = mock()
 
     private val entitlementFlow = MutableSharedFlow<Set<Entitlement>>()
+    private val subscriptionStatusFlow = MutableStateFlow(SubscriptionStatus.UNKNOWN)
+    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
+    private val duckChatPixels: DuckChatPixels = mock()
 
     private lateinit var testee: RealDuckAiModelManager
 
     @Before
     fun setUp() {
         whenever(subscriptions.getEntitlements()).thenReturn(entitlementFlow)
+        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(subscriptionStatusFlow)
         whenever(duckAiHostProvider.getHost()).thenReturn("duck.ai")
         subscriptions.stub { onBlocking { isEligible() }.thenReturn(true) }
         dataStore.stub { onBlocking { hasClearedPinnedDefaultModel() }.thenReturn(true) }
@@ -71,6 +88,9 @@ class RealDuckAiModelManagerTest {
             dataStore = dataStore,
             subscriptions = subscriptions,
             duckAiHostProvider = duckAiHostProvider,
+            duckChatFeature = { duckChatFeature },
+            duckChatPixels = { duckChatPixels },
+            cookiesManager = cookiesManager,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             appCoroutineScope = coroutineRule.testScope,
         )
@@ -136,7 +156,7 @@ class RealDuckAiModelManagerTest {
     fun whenFetchModelsThenModelsResolvedAndStateUpdated() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel("id1", accessTier = listOf("free"), entityHasAccess = true),
@@ -159,7 +179,7 @@ class RealDuckAiModelManagerTest {
     fun whenEmptyAccessTierThenFallsBackToEntityHasAccess() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(remoteModel("id", accessTier = emptyList(), entityHasAccess = true)),
             ),
@@ -176,7 +196,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
         whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "plus", product = "Duck.ai"))))
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(remoteModel("id", accessTier = listOf("plus", "pro"), entityHasAccess = false)),
             ),
@@ -192,7 +212,7 @@ class RealDuckAiModelManagerTest {
     fun whenNonEmptyAccessTierAndTierDoesNotMatchThenNotAccessibleDespiteEntityHasAccess() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(remoteModel("id", accessTier = listOf("plus", "pro"), entityHasAccess = true)),
             ),
@@ -208,7 +228,7 @@ class RealDuckAiModelManagerTest {
     fun whenDisplayNameNullThenFallsBackToName() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(remoteModel("id", displayName = null, shortName = null)),
             ),
@@ -226,7 +246,7 @@ class RealDuckAiModelManagerTest {
     fun whenNoSelectionPersistedThenFirstAccessibleModelSelected() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel("id1", accessTier = listOf("plus"), entityHasAccess = false),
@@ -246,7 +266,7 @@ class RealDuckAiModelManagerTest {
     fun whenNoSelectionPersistedAndListReorderedThenDefaultFollowsNewFirstAccessible() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel("id1", accessTier = listOf("free"), entityHasAccess = true),
@@ -260,7 +280,7 @@ class RealDuckAiModelManagerTest {
 
         assertEquals("id1", testee.modelState.value.selectedModelId)
 
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel("id2", accessTier = listOf("free"), entityHasAccess = true),
@@ -279,7 +299,7 @@ class RealDuckAiModelManagerTest {
     fun whenUserPickedModelAndListReorderedThenPickPreserved() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("id2", "model2"))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel("id1", accessTier = listOf("free"), entityHasAccess = true),
@@ -300,7 +320,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("id", "model"))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
         whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "plus", product = "Duck.ai"))))
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(remoteModel("id", accessTier = listOf("plus"), entityHasAccess = true)),
             ),
@@ -317,7 +337,7 @@ class RealDuckAiModelManagerTest {
     fun whenSelectedModelNoLongerAccessibleThenFallsBackToFirstAccessible() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("id1", "model1"))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel("id1", accessTier = listOf("plus"), entityHasAccess = false),
@@ -337,7 +357,7 @@ class RealDuckAiModelManagerTest {
     fun whenSelectedModelRemovedThenFallsBackToFirstAccessible() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("removed", "removed"))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(remoteModel("id", accessTier = listOf("free"), entityHasAccess = true)),
             ),
@@ -354,7 +374,7 @@ class RealDuckAiModelManagerTest {
     fun whenNoAccessibleModelsThenSelectedModelIdIsNull() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(remoteModel("id", accessTier = listOf("plus"), entityHasAccess = false)),
             ),
@@ -370,7 +390,7 @@ class RealDuckAiModelManagerTest {
     fun whenFetchModelsFailsThenStateUnchanged() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenThrow(RuntimeException("Network error"))
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenThrow(RuntimeException("Network error"))
 
         testee = createManager()
         testee.fetchModels()
@@ -414,7 +434,7 @@ class RealDuckAiModelManagerTest {
     fun whenSubscriptionInactiveThenTierIsFree() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(AIChatModelsResponse(emptyList()))
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(AIChatModelsResponse(emptyList()))
 
         testee = createManager()
         testee.fetchModels()
@@ -427,7 +447,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
         whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "plus", product = "Duck.ai"))))
-        whenever(modelsService.getModels(any())).thenReturn(AIChatModelsResponse(emptyList()))
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(AIChatModelsResponse(emptyList()))
 
         testee = createManager()
         testee.fetchModels()
@@ -440,7 +460,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
         whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "pro", product = "Duck.ai"))))
-        whenever(modelsService.getModels(any())).thenReturn(AIChatModelsResponse(emptyList()))
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(AIChatModelsResponse(emptyList()))
 
         testee = createManager()
         testee.fetchModels()
@@ -452,7 +472,7 @@ class RealDuckAiModelManagerTest {
     fun whenModelHasEmptyAccessTierAndEntityHasNoAccessThenModelIsFilteredOut() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel("visible", accessTier = listOf("free"), entityHasAccess = true),
@@ -473,7 +493,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
         whenever(subscriptions.isEligible()).thenReturn(false)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel("free", accessTier = listOf("free"), entityHasAccess = true),
@@ -494,7 +514,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
         whenever(subscriptions.isEligible()).thenReturn(true)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel("free", accessTier = listOf("free"), entityHasAccess = true),
@@ -518,7 +538,7 @@ class RealDuckAiModelManagerTest {
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
         whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "plus", product = "Duck.ai"))))
         whenever(subscriptions.isEligible()).thenReturn(false)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel("free", accessTier = listOf("free", "plus", "pro"), entityHasAccess = true),
@@ -540,7 +560,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
         whenever(subscriptions.isEligible()).thenThrow(RuntimeException("Error"))
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel("free", accessTier = listOf("free"), entityHasAccess = true),
@@ -561,7 +581,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
         whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "subscriber", product = "Network Protection"))))
-        whenever(modelsService.getModels(any())).thenReturn(AIChatModelsResponse(emptyList()))
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(AIChatModelsResponse(emptyList()))
 
         testee = createManager()
         testee.fetchModels()
@@ -574,7 +594,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
         whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "premium", product = "Duck.ai"))))
-        whenever(modelsService.getModels(any())).thenReturn(AIChatModelsResponse(emptyList()))
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(AIChatModelsResponse(emptyList()))
 
         testee = createManager()
         testee.fetchModels()
@@ -587,7 +607,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
         whenever(subscriptions.getEntitlements()).thenReturn(flowOf(emptySet()))
-        whenever(modelsService.getModels(any())).thenReturn(AIChatModelsResponse(emptyList()))
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(AIChatModelsResponse(emptyList()))
 
         testee = createManager()
         testee.fetchModels()
@@ -607,7 +627,7 @@ class RealDuckAiModelManagerTest {
                 ),
             ),
         )
-        whenever(modelsService.getModels(any())).thenReturn(AIChatModelsResponse(emptyList()))
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(AIChatModelsResponse(emptyList()))
 
         testee = createManager()
         testee.fetchModels()
@@ -619,7 +639,7 @@ class RealDuckAiModelManagerTest {
     fun whenSubscriptionExpiredThenTierIsFree() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.EXPIRED)
-        whenever(modelsService.getModels(any())).thenReturn(AIChatModelsResponse(emptyList()))
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(AIChatModelsResponse(emptyList()))
 
         testee = createManager()
         testee.fetchModels()
@@ -632,7 +652,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.GRACE_PERIOD)
         whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "plus", product = "Duck.ai"))))
-        whenever(modelsService.getModels(any())).thenReturn(AIChatModelsResponse(emptyList()))
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(AIChatModelsResponse(emptyList()))
 
         testee = createManager()
         testee.fetchModels()
@@ -644,7 +664,7 @@ class RealDuckAiModelManagerTest {
     fun whenSubscriptionStatusThrowsThenTierDefaultsToFree() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenThrow(RuntimeException("Error"))
-        whenever(modelsService.getModels(any())).thenReturn(AIChatModelsResponse(emptyList()))
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(AIChatModelsResponse(emptyList()))
 
         testee = createManager()
         testee.fetchModels()
@@ -656,7 +676,7 @@ class RealDuckAiModelManagerTest {
     fun whenFetchModelsThenProviderResolvedFromRemoteFields() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel("gpt-5-mini", provider = "openai"),
@@ -682,10 +702,254 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
+    fun whenAccessTokenExistsThenModelsFetchedWithBearerHeader() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptions.getAccessToken()).thenReturn("token123")
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(listOf(remoteModel("id", accessTier = listOf("free"), entityHasAccess = true))),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        verify(modelsService).getModels("https://duck.ai/duckchat/v1/models", "Bearer token123", null)
+    }
+
+    @Test
+    fun whenNoAccessTokenThenModelsFetchedWithoutAuthorizationHeader() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptions.getAccessToken()).thenReturn(null)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(listOf(remoteModel("id", accessTier = listOf("free"), entityHasAccess = true))),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        verify(modelsService).getModels("https://duck.ai/duckchat/v1/models", null, null)
+    }
+
+    @Test
+    fun whenAccessTokenLookupFailsThenModelsStillFetchedUnauthenticated() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        subscriptions.stub { onBlocking { getAccessToken() }.thenThrow(RuntimeException("boom")) }
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(listOf(remoteModel("id", accessTier = listOf("free"), entityHasAccess = true))),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        verify(modelsService).getModels("https://duck.ai/duckchat/v1/models", null, null)
+        assertEquals(1, testee.modelState.value.models.size)
+    }
+
+    @Test
+    fun whenUpdatedPickersDisabledThenAccessTokenNotSent() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = false))
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(listOf(remoteModel("id", accessTier = listOf("free"), entityHasAccess = true))),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        verify(modelsService).getModels("https://duck.ai/duckchat/v1/models", null, null)
+        verify(subscriptions, never()).getAccessToken()
+    }
+
+    @Test
+    fun whenSubscriptionStatusChangesThenModelsRefetched() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(listOf(remoteModel("id", accessTier = listOf("free"), entityHasAccess = true))),
+        )
+
+        testee = createManager()
+        entitlementFlow.emit(emptySet())
+
+        subscriptionStatusFlow.value = SubscriptionStatus.AUTO_RENEWABLE
+
+        verify(modelsService, times(2)).getModels(any(), anyOrNull(), anyOrNull())
+    }
+
+    @Test
+    fun whenModelHasKnownLabelThenLabelParsed() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("everyday", label = "EVERYDAY_USE"),
+                    remoteModel("hungry", label = "USES_LIMITS_FASTER"),
+                    remoteModel("plain", label = null),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        val models = testee.modelState.value.models
+        assertEquals(ModelLabel.EVERYDAY_USE, models.first { it.id == "everyday" }.label)
+        assertEquals(ModelLabel.USES_LIMITS_FASTER, models.first { it.id == "hungry" }.label)
+        assertNull(models.first { it.id == "plain" }.label)
+    }
+
+    @Test
+    fun whenModelHasUnrecognisedLabelThenLabelIsUnknown() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(listOf(remoteModel("id", label = "BRAND_NEW_LABEL"))),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals(ModelLabel.UNKNOWN, testee.modelState.value.models[0].label)
+    }
+
+    @Test
+    fun whenUpdatedPickersEnabledThenLabelledModelsSortFirstKeepingEndpointOrder() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("plain1"),
+                    remoteModel("labelled1", label = "EVERYDAY_USE"),
+                    remoteModel("plain2"),
+                    remoteModel("labelled2", label = "USES_LIMITS_FASTER"),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals(
+            listOf("labelled1", "labelled2", "plain1", "plain2"),
+            testee.modelState.value.models.map { it.id },
+        )
+    }
+
+    @Test
+    fun whenUpdatedPickersDisabledThenEndpointOrderKept() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = false))
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(
+                listOf(remoteModel("plain"), remoteModel("labelled", label = "EVERYDAY_USE")),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals(listOf("plain", "labelled"), testee.modelState.value.models.map { it.id })
+    }
+
+    @Test
+    fun whenLabelledModelSortsFirstThenDerivedDefaultStillFollowsEndpointOrder() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("first-in-response"),
+                    remoteModel("labelled", label = "EVERYDAY_USE"),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals("first-in-response", testee.modelState.value.selectedModelId)
+        assertEquals("labelled", testee.modelState.value.models[0].id)
+    }
+
+    @Test
+    fun whenLabelIsUnrecognisedThenDebugPixelReportsIt() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(listOf(remoteModel("id", label = "EXTRA_PRIVACY"))),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        verify(duckChatPixels).fireUnknownModelLabel("EXTRA_PRIVACY")
+    }
+
+    @Test
+    fun whenSeveralLabelsAreUnrecognisedThenEachIsReportedOncePerResponse() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("a", label = "EXTRA_PRIVACY"),
+                    remoteModel("b", label = "EXTRA_PRIVACY"),
+                    remoteModel("c", label = "FASTEST_YET"),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        verify(duckChatPixels).fireUnknownModelLabel("EXTRA_PRIVACY")
+        verify(duckChatPixels).fireUnknownModelLabel("FASTEST_YET")
+    }
+
+    @Test
+    fun whenLabelIsRecognisedThenNoDebugPixel() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(listOf(remoteModel("id", label = "EVERYDAY_USE"))),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        verify(duckChatPixels, never()).fireUnknownModelLabel(any())
+    }
+
+    @Test
+    fun whenUnrecognisedLabelHasUnexpectedShapeThenItIsSanitisedBeforeReporting() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(listOf(remoteModel("id", label = "new label (beta)!"))),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        verify(duckChatPixels).fireUnknownModelLabel("NEWLABELBETA")
+    }
+
+    @Test
     fun whenEntitlementsChangeThenModelsFetched() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(listOf(remoteModel("id", accessTier = listOf("free"), entityHasAccess = true))),
         )
 
@@ -700,7 +964,7 @@ class RealDuckAiModelManagerTest {
     fun whenModelHasSupportedFileTypesThenResolvedModel() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel("claude", supportedFileTypes = listOf("application/pdf")),
@@ -723,7 +987,7 @@ class RealDuckAiModelManagerTest {
     fun whenAttachmentLimitsProvidedThenResolvedForFreeTier() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 models = listOf(remoteModel("id")),
                 attachmentLimits = mapOf(
@@ -755,7 +1019,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
         whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "plus", product = "Duck.ai"))))
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 models = listOf(remoteModel("id")),
                 attachmentLimits = mapOf(
@@ -785,7 +1049,7 @@ class RealDuckAiModelManagerTest {
     fun whenNoAttachmentLimitsThenDefaultsUsed() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(models = listOf(remoteModel("id"))),
         )
 
@@ -804,7 +1068,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
         whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "plus", product = "Duck.ai"))))
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 models = listOf(remoteModel("id")),
                 attachmentLimits = mapOf(
@@ -828,7 +1092,7 @@ class RealDuckAiModelManagerTest {
     fun whenModelSupportsImageUploadThenResolvedModelHasImageUploadEnabledAndNativeFormats() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(remoteModel("id", supportsImageUpload = true)),
             ),
@@ -846,7 +1110,7 @@ class RealDuckAiModelManagerTest {
     fun whenModelDoesNotSupportImageUploadThenResolvedModelHasImageUploadDisabledAndEmptyFormats() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(remoteModel("id", supportsImageUpload = false)),
             ),
@@ -871,6 +1135,7 @@ class RealDuckAiModelManagerTest {
         supportedFileTypes: List<String>? = null,
         supportedReasoningEffort: List<String>? = null,
         reasoningEffortAccess: List<RemoteReasoningEffortAccess>? = null,
+        label: String? = null,
     ) = RemoteAIChatModel(
         id = id,
         name = id,
@@ -883,13 +1148,14 @@ class RealDuckAiModelManagerTest {
         supportedFileTypes = supportedFileTypes,
         supportedReasoningEffort = supportedReasoningEffort,
         reasoningEffortAccess = reasoningEffortAccess,
+        label = label,
     )
 
     @Test
     fun whenRemoteHasUnknownReasoningEffortThenUnknownDropped() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel(
@@ -913,7 +1179,7 @@ class RealDuckAiModelManagerTest {
     fun whenRemoteReasoningEffortAccessMissingThenDomainListIsEmpty() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(remoteModel("id", reasoningEffortAccess = null)),
             ),
@@ -929,7 +1195,7 @@ class RealDuckAiModelManagerTest {
     fun whenRemoteReasoningEffortAccessHasUnknownIdThenUnknownDropped() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel(
@@ -955,7 +1221,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
         whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "plus", product = "Duck.ai"))))
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel(
@@ -990,7 +1256,7 @@ class RealDuckAiModelManagerTest {
         // The "model takes precedence" rule lives at tap-handling time, not in the data layer.
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel(
@@ -1050,12 +1316,58 @@ class RealDuckAiModelManagerTest {
     fun whenRestoreCachedSelectionThrowsThenEntitlementCollectorStillStarts() = runTest {
         whenever(dataStore.getSelectedModel()).thenThrow(RuntimeException("disk error"))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(AIChatModelsResponse(emptyList()))
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(AIChatModelsResponse(emptyList()))
 
         testee = createManager()
         entitlementFlow.emit(emptySet())
 
-        verify(modelsService).getModels(any())
+        verify(modelsService).getModels(any(), anyOrNull(), anyOrNull())
+    }
+
+    @Test
+    fun whenHostIsCustomThenCookiesSentWithRequest() = runTest {
+        val cookieManager = mock<CookieManager>()
+        whenever(duckAiHostProvider.getHost()).thenReturn("staging.duck.ai")
+        whenever(duckAiHostProvider.isCustomHost()).thenReturn(true)
+        whenever(cookiesManager.forMode(BrowserMode.REGULAR)).thenReturn(cookieManager)
+        whenever(cookieManager.getCookie("https://staging.duck.ai/duckchat/v1/models")).thenReturn("dcs=abc")
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(AIChatModelsResponse(emptyList()))
+
+        testee = createManager()
+        testee.fetchModels()
+
+        verify(modelsService).getModels(eq("https://staging.duck.ai/duckchat/v1/models"), eq(null), eq("dcs=abc"))
+    }
+
+    @Test
+    fun whenHostIsCustomAndNoCookieManagerAvailableThenModelsRequestedWithoutCookies() = runTest {
+        whenever(duckAiHostProvider.getHost()).thenReturn("staging.duck.ai")
+        whenever(duckAiHostProvider.isCustomHost()).thenReturn(true)
+        whenever(cookiesManager.forMode(BrowserMode.REGULAR)).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(AIChatModelsResponse(emptyList()))
+
+        testee = createManager()
+        testee.fetchModels()
+
+        verify(modelsService).getModels(eq("https://staging.duck.ai/duckchat/v1/models"), eq(null), eq(null))
+    }
+
+    @Test
+    fun whenHostIsNotCustomThenCookiesNotSentWithRequest() = runTest {
+        val cookieManager = mock<CookieManager>()
+        whenever(duckAiHostProvider.isCustomHost()).thenReturn(false)
+        whenever(cookiesManager.forMode(BrowserMode.REGULAR)).thenReturn(cookieManager)
+        whenever(cookieManager.getCookie(any())).thenReturn("dcs=abc")
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(AIChatModelsResponse(emptyList()))
+
+        testee = createManager()
+        testee.fetchModels()
+
+        verify(modelsService).getModels(eq("https://duck.ai/duckchat/v1/models"), eq(null), eq(null))
+        verify(cookieManager, never()).getCookie(any())
     }
 
     @Test
@@ -1074,7 +1386,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
         whenever(dataStore.getSelectedReasoningMode()).thenReturn(ReasoningMode.REASONING.rawValue)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel(
@@ -1101,7 +1413,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
         whenever(dataStore.getSelectedReasoningMode()).thenReturn(ReasoningMode.EXTENDED_REASONING.rawValue)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel(
@@ -1128,7 +1440,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
         whenever(dataStore.getSelectedReasoningMode()).thenReturn(ReasoningMode.REASONING.rawValue)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel(
@@ -1202,7 +1514,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
         whenever(dataStore.getSelectedReasoningMode()).thenReturn(ReasoningMode.REASONING.rawValue)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel(
@@ -1227,7 +1539,7 @@ class RealDuckAiModelManagerTest {
     fun whenSelectReasoningModeAndUnsupportedThenIgnored() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel(
@@ -1278,7 +1590,7 @@ class RealDuckAiModelManagerTest {
         // fetchModels rebuilds modelState — must not silently drop in-session chat-scoped picks.
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(remoteModel("id", accessTier = listOf("free"), entityHasAccess = true)),
             ),
@@ -1298,7 +1610,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
         whenever(dataStore.getSelectedReasoningMode()).thenReturn(ReasoningMode.FAST.rawValue)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel(
@@ -1329,7 +1641,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedReasoningMode()).thenReturn(ReasoningMode.REASONING.rawValue)
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel(
@@ -1354,7 +1666,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedReasoningMode()).thenReturn(null)
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel(
@@ -1370,5 +1682,117 @@ class RealDuckAiModelManagerTest {
         testee.fetchModels()
 
         assertEquals("low", testee.getResolvedReasoningEffort())
+    }
+
+    @Test
+    fun whenProviderPersistedAndNoModelPickedThenAModelOfThatProviderIsSelected() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(dataStore.getSelectedProvider()).thenReturn(ModelProvider.ANTHROPIC.name)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("gpt", provider = "openai"),
+                    remoteModel("claude", provider = "anthropic"),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals("claude", testee.modelState.value.selectedModelId)
+    }
+
+    @Test
+    fun whenBothAModelAndAProviderArePersistedThenTheModelWins() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("gpt", "gpt"))
+        whenever(dataStore.getSelectedProvider()).thenReturn(ModelProvider.ANTHROPIC.name)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("gpt", provider = "openai"),
+                    remoteModel("claude", provider = "anthropic"),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals("gpt", testee.modelState.value.selectedModelId)
+    }
+
+    @Test
+    fun whenPersistedProviderHasNoModelInTheResponseThenTheDefaultIsUsedAndThePreferenceKept() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(dataStore.getSelectedProvider()).thenReturn(ModelProvider.MISTRAL.name)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(listOf(remoteModel("gpt", provider = "openai"))),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals("gpt", testee.modelState.value.selectedModelId)
+        verify(dataStore, never()).setSelectedProvider(null)
+    }
+
+    @Test
+    fun whenProviderSelectedThenItReplacesAnyPersistedModelPick() = runTest {
+        givenProviderStore()
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("gpt", provider = "openai"),
+                    remoteModel("claude", provider = "anthropic"),
+                ),
+            ),
+        )
+        testee = createManager()
+        testee.fetchModels()
+
+        testee.selectProvider(ModelProvider.ANTHROPIC)
+
+        verify(dataStore).setSelectedProvider(ModelProvider.ANTHROPIC.name)
+        verify(dataStore, atLeastOnce()).setSelectedModel(null)
+        assertEquals("claude", testee.modelState.value.selectedModelId)
+    }
+
+    @Test
+    fun whenModelSelectedThenTheProviderPreferenceIsCleared() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        testee = createManager()
+
+        testee.selectModel(
+            AIChatModel(
+                id = "gpt",
+                name = "gpt",
+                displayName = "gpt",
+                shortName = "gpt",
+                accessTier = listOf("free"),
+                isAccessible = true,
+                provider = ModelProvider.OPENAI,
+            ),
+        )
+
+        verify(dataStore).setSelectedProvider(null)
+    }
+
+    /** [DuckChatDataStore] is a mock, so the provider key has to remember what was written to it. */
+    private fun givenProviderStore() {
+        var stored: String? = null
+        dataStore.stub {
+            onBlocking { getSelectedProvider() }.thenAnswer { stored }
+            onBlocking { setSelectedProvider(anyOrNull()) }.thenAnswer {
+                stored = it.arguments[0] as String?
+                Unit
+            }
+        }
     }
 }

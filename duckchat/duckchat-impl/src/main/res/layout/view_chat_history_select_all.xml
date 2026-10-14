@@ -3,10 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/chatHistorySelectAllRow"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground"
+    android:background="?attr/daxColorBackground"
+    android:foreground="?attr/selectableItemBackground"
     android:minHeight="@dimen/oneLineItemHeight"
     android:paddingHorizontal="@dimen/keyline_4"
     android:paddingVertical="@dimen/keyline_2">

@@ -16,7 +16,6 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
     id 'com.squareup.anvil'
 }
 
@@ -36,6 +35,7 @@ dependencies {
     implementation project(':statistics-api')
 
     implementation "com.squareup.logcat:logcat:_"
+    implementation Square.okHttp3.okHttp
     implementation Square.retrofit2.converter.moshi
 
     implementation KotlinX.coroutines.core

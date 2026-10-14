@@ -50,7 +50,7 @@ data class DaxTextAlertDialogCheckboxState(
  * `Dax*Button` composables from `com.duckduckgo.common.ui.compose.button`.
  *
  * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1214735774211999
- * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=685-956&t=DvV3Fi7Mi45nLle2-4
+ * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=685-956
  */
 @Composable
 fun DaxTextAlertDialog(

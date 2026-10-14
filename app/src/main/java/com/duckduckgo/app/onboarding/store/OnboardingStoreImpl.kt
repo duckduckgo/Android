@@ -21,7 +21,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
+import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.R.drawable
@@ -32,7 +32,6 @@ import javax.inject.Inject
 @SingleInstanceIn(scope = AppScope::class)
 class OnboardingStoreImpl @Inject constructor(
     private val context: Context,
-    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : OnboardingStore {
 
@@ -52,18 +51,10 @@ class OnboardingStoreImpl @Inject constructor(
 
         return listOf(
             DaxDialogIntroOption(
-                optionText = if (onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
-                    if (language == "en") {
-                        context.getString(R.string.onboardingSearchDaxDialogOption1EnglishQuoted)
-                    } else {
-                        context.getString(R.string.onboardingSearchDaxDialogOption1Quoted)
-                    }
+                optionText = if (language == "en") {
+                    context.getString(R.string.onboardingSearchDaxDialogOption1EnglishQuoted)
                 } else {
-                    if (language == "en") {
-                        context.getString(R.string.onboardingSearchDaxDialogOption1English)
-                    } else {
-                        context.getString(R.string.onboardingSearchDaxDialogOption1)
-                    }
+                    context.getString(R.string.onboardingSearchDaxDialogOption1Quoted)
                 },
                 iconRes = drawable.ic_find_search_16,
                 link = if (language == "en") "how to say duck in spanish" else context.getString(R.string.onboardingSearchQueryOption1),
@@ -230,12 +221,18 @@ class OnboardingStoreImpl @Inject constructor(
         return preferences.getBoolean(KEY_DUCK_AI_ONBOARDING_FLOW, false)
     }
 
-    override fun setSegmentedSearchPathWithToggleEnabled(enabled: Boolean) {
-        preferences.edit { putBoolean(KEY_SEGMENTED_SEARCH_PATH_WITH_TOGGLE_ENABLED, enabled) }
+    override fun setDownloadReason(reason: DownloadReasonSelection?) {
+        preferences.edit { putString(KEY_DOWNLOAD_REASON, reason?.name) }
     }
 
-    override fun isSegmentedSearchPathWithToggleEnabled(): Boolean {
-        return preferences.getBoolean(KEY_SEGMENTED_SEARCH_PATH_WITH_TOGGLE_ENABLED, false)
+    override fun getDownloadReason(): DownloadReasonSelection? {
+        val stored = preferences.getString(KEY_DOWNLOAD_REASON, null) ?: return null
+        return DownloadReasonSelection.entries.firstOrNull { it.name == stored }
+    }
+
+    override fun getSegmentedPathWithAiInput(): DownloadReasonSelection? {
+        if (getInputScreenSelection() != true) return null
+        return getDownloadReason()?.takeIf { it == DownloadReasonSelection.SEARCH || it == DownloadReasonSelection.AI_CHAT }
     }
 
     companion object {
@@ -245,6 +242,6 @@ class OnboardingStoreImpl @Inject constructor(
         private const val KEY_INPUT_SCREEN_SELECTION_OVERRIDDEN_BY_USER = "inputScreenSelectionOverriddenByUser"
         private const val KEY_DUCK_AI_ONBOARDING_FLOW = "duckAiOnboardingFlow"
         private const val KEY_LINEAR_PLAN_WIDGET_PROMPT_SHOWN = "linearPlanWidgetPromptShown"
-        private const val KEY_SEGMENTED_SEARCH_PATH_WITH_TOGGLE_ENABLED = "segmentedSearchPathWithToggleEnabled"
+        private const val KEY_DOWNLOAD_REASON = "downloadReason"
     }
 }

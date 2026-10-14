@@ -28,6 +28,7 @@ interface RemoteMessagingPixels {
 
     fun fireRemoteMessageShownPixel(remoteMessage: RemoteMessage)
     fun fireRemoteMessageDismissedPixel(remoteMessage: RemoteMessage)
+    fun fireRemoteMessageAutoDismissedPixel(remoteMessage: RemoteMessage)
     fun fireRemoteMessagePrimaryActionClickedPixel(remoteMessage: RemoteMessage)
     fun fireRemoteMessageSecondaryActionClickedPixel(remoteMessage: RemoteMessage)
     fun fireRemoteMessageActionClickedPixel(remoteMessage: RemoteMessage)
@@ -49,6 +50,10 @@ class RealRemoteMessagingPixels @Inject constructor(
 
     override fun fireRemoteMessageDismissedPixel(remoteMessage: RemoteMessage) {
         pixel.fire(pixel = RemoteMessagingPixelName.REMOTE_MESSAGE_DISMISSED, parameters = remoteMessage.asPixelParams())
+    }
+
+    override fun fireRemoteMessageAutoDismissedPixel(remoteMessage: RemoteMessage) {
+        pixel.fire(pixel = RemoteMessagingPixelName.REMOTE_MESSAGE_AUTO_DISMISSED, parameters = remoteMessage.asPixelParams())
     }
 
     override fun fireRemoteMessagePrimaryActionClickedPixel(remoteMessage: RemoteMessage) {

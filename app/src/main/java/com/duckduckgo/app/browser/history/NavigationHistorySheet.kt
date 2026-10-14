@@ -36,10 +36,9 @@ class NavigationHistorySheet(
     private val tabId: String,
     private val history: ShowBackNavigationHistory,
     private val listener: NavigationHistorySheetListener,
-    private val edgeToEdgeEnabled: Boolean,
 ) : BottomSheetDialog(
     context,
-    if (edgeToEdgeEnabled) com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge else 0,
+    com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge,
 ) {
 
     private val binding = NavigationHistoryPopupViewBinding.inflate(LayoutInflater.from(context))
@@ -52,9 +51,7 @@ class NavigationHistorySheet(
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
-        if (edgeToEdgeEnabled) {
-            binding.root.applyBottomSystemBarInsetPadding()
-        }
+        binding.root.applyBottomSystemBarInsetPadding()
 
         binding.historyRecycler.also { recycler ->
             NavigationHistoryAdapter(

@@ -21,4 +21,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 internal enum class CrashPixel(override val pixelName: String) : PixelName {
     APPLICATION_CRASH_GLOBAL("m_d_ac_g"),
     APPLICATION_CRASH_GLOBAL_VERIFIED_INSTALL("m_app_crashed_on_verified_play_store_install"),
+    APPLICATION_CRASH_NATIVE("m_app_native_crash"),
+    APPLICATION_CRASH_NATIVE_HANDLER_REGISTERED("m_app_register_native_crash_handler"),
 }

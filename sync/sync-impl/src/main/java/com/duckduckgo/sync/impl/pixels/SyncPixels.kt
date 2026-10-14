@@ -19,6 +19,8 @@ package com.duckduckgo.sync.impl.pixels
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.Companion.removeAtb
@@ -28,14 +30,20 @@ import com.duckduckgo.sync.api.engine.SyncFeatureType
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes
 import com.duckduckgo.sync.impl.DispatchOutcome
+import com.duckduckgo.sync.impl.DispatchOutcome.AlreadyConnected
+import com.duckduckgo.sync.impl.DispatchOutcome.Failed
+import com.duckduckgo.sync.impl.DispatchOutcome.UpgradeRequired
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY_SUCCESS_RATE_PIXEL
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_OBJECT_LIMIT_EXCEEDED_DAILY
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.CONNECTED_DEVICES_WHEN_DELETING
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_FEATURE_PROMOTION_SOURCE
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SCANNER_CAMERA_PERMISSION_AFTER_REQUESTING
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SCANNER_CAMERA_PERMISSION_BEFORE_REQUESTING
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_CODE_TYPE
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_CODE_VERSION
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_FLOW_VERSION
@@ -62,6 +70,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import java.time.Instant
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.Inject
@@ -125,6 +134,7 @@ interface SyncPixels {
     fun fireTimeoutOnDeepLinkSetup()
     fun fireScanCodeScreenShown(screenType: ScreenType)
     fun fireSyncBarcodeScreenShown(screenType: ScreenType)
+    fun fireScannerCameraPermissionState(beforeRequesting: Boolean, afterRequesting: Boolean)
     fun fireSyncSetupFinishedSuccessfully(
         screenType: ScreenType,
         path: SetupPath? = null,
@@ -155,6 +165,22 @@ interface SyncPixels {
         myRole: SetupRole? = null,
         peerKind: PeerKind? = null,
         timeoutStage: TimeoutStage? = null,
+    )
+
+    fun fireSyncSetupJoinerSuccess(
+        hostHasAccount: Boolean,
+        hostKind: PeerKind,
+        joinerHasAccount: Boolean,
+        joinerKind: PeerKind,
+        negotiatedVersion: ExchangeProtocolVersion,
+    )
+
+    fun fireSyncSetupJoinerFailure(
+        hostHasAccount: Boolean,
+        hostKind: PeerKind,
+        joinerHasAccount: Boolean,
+        joinerKind: PeerKind,
+        negotiatedVersion: ExchangeProtocolVersion,
     )
 
     enum class ScreenType(val value: String) {
@@ -247,6 +273,8 @@ interface SyncPixels {
     fun fireAiChatActive()
     fun fireAiChatsRescopeTokenError(error: Error)
 
+    fun fireUnifiedDeviceListPixel(event: UnifiedDeviceListPixel)
+
     fun fireAutoRestoreSetupToggleShown()
     fun fireAutoRestoreSetupToggleOptedOut()
     fun fireAutoRestoreSettingsReadyShown(source: String)
@@ -281,24 +309,30 @@ class RealSyncPixels @Inject constructor(
      * - [SYNC_SETUP_FLOW_VERSION]: "v2" when the device is on the v2 connect/exchange stack
      *   ([SyncFeature.canUseV2ConnectFlow]), "v1" otherwise. Independent of which code version is
      *   actually displayed (that is gated separately by [SyncFeature.canShowV2ConnectCode]).
-     * - [SYNC_SETUP_UI_VERSION]: "v2" when the simplified sync UI is enabled ([SyncFeature.useSimplifiedSync])
-     *   and "v1" on the legacy setup screens.
+     * - [SYNC_SETUP_UI_VERSION]: always "v2"; the simplified sync UI is the only setup UI, so "v1"
+     *   is reported only by older app versions.
      * - [SYNC_SETUP_MY_KIND]: always "ddg" — this is the native DuckDuckGo client.
      */
     private fun setupFlowMetadata(): Map<String, String> = buildMap {
-        put(SYNC_SETUP_FLOW_VERSION, if (syncFeature.canUseV2ConnectFlow().isEnabled()) FLOW_VERSION_V2 else FLOW_VERSION_V1)
+        val flowVersion = if (syncFeature.canUseV2ConnectFlow().isEnabled()) {
+            if (syncFeature.canUseExchangeV2Point1().isEnabled()) {
+                FLOW_VERSION_V2_1
+            } else {
+                FLOW_VERSION_V2
+            }
+        } else {
+            FLOW_VERSION_V1
+        }
+        put(SYNC_SETUP_FLOW_VERSION, flowVersion)
         put(SYNC_SETUP_MY_KIND, MY_KIND_DDG)
         putAll(setupUiMetadata())
     }
 
     /**
-     * Which sync setup UI the user is looking at: [SYNC_SETUP_UI_VERSION] is "v2" when the simplified
-     * sync UI is enabled ([SyncFeature.useSimplifiedSync]) and "v1" on the legacy setup screens.
+     * Which sync setup UI the user is looking at: [SYNC_SETUP_UI_VERSION] is always "v2", the simplified
+     * sync UI being the only setup UI. Older app versions can still report "v1".
      */
-    private fun setupUiMetadata(): Map<String, String> = buildMap {
-        val version = if (syncFeature.useSimplifiedSync().isEnabled()) UI_VERSION_V2 else UI_VERSION_V1
-        put(SYNC_SETUP_UI_VERSION, version)
-    }
+    private fun setupUiMetadata(): Map<String, String> = mapOf(SYNC_SETUP_UI_VERSION to UI_VERSION_V2)
 
     /**
      * Params for the "Code recognized" pixels (scanner/manual-entry success): the screen [source],
@@ -413,28 +447,28 @@ class RealSyncPixels @Inject constructor(
             API_CODE.COUNT_LIMIT.code -> {
                 pixel.fire(
                     String.format(Locale.US, SYNC_OBJECT_LIMIT_EXCEEDED_DAILY.pixelName, feature.field),
-                    type = Pixel.PixelType.Daily(),
+                    type = PixelType.Daily(),
                 )
             }
 
             API_CODE.CONTENT_TOO_LARGE.code -> {
                 pixel.fire(
                     String.format(Locale.US, SyncPixelName.SYNC_REQUEST_SIZE_LIMIT_EXCEEDED_DAILY.pixelName, feature.field),
-                    type = Pixel.PixelType.Daily(),
+                    type = PixelType.Daily(),
                 )
             }
 
             API_CODE.VALIDATION_ERROR.code -> {
                 pixel.fire(
                     String.format(Locale.US, SyncPixelName.SYNC_VALIDATION_ERROR_DAILY.pixelName, feature.field),
-                    type = Pixel.PixelType.Daily(),
+                    type = PixelType.Daily(),
                 )
             }
 
             API_CODE.TOO_MANY_REQUESTS_1.code, API_CODE.TOO_MANY_REQUESTS_2.code -> {
                 pixel.fire(
                     String.format(Locale.US, SyncPixelName.SYNC_TOO_MANY_REQUESTS_DAILY.pixelName, feature.field),
-                    type = Pixel.PixelType.Daily(),
+                    type = PixelType.Daily(),
                 )
             }
         }
@@ -507,7 +541,7 @@ class RealSyncPixels @Inject constructor(
 
     private fun getUtcIsoLocalDate(): String {
         // returns YYYY-MM-dd
-        return Instant.now().atOffset(java.time.ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE)
+        return Instant.now().atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE)
     }
 
     private fun String.appendTimestampSuffix(): String {
@@ -669,6 +703,16 @@ class RealSyncPixels @Inject constructor(
         )
     }
 
+    override fun fireScannerCameraPermissionState(beforeRequesting: Boolean, afterRequesting: Boolean) {
+        pixel.fire(
+            SyncPixelName.SYNC_SCANNER_CAMERA_PERMISSION_STATE,
+            parameters = mapOf(
+                SYNC_SCANNER_CAMERA_PERMISSION_BEFORE_REQUESTING to beforeRequesting.toString(),
+                SYNC_SCANNER_CAMERA_PERMISSION_AFTER_REQUESTING to afterRequesting.toString(),
+            ),
+        )
+    }
+
     override fun fireSyncSetupAbandoned(screenType: ScreenType, reason: CancellationReason?) {
         pixel.fire(
             SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
@@ -768,7 +812,7 @@ class RealSyncPixels @Inject constructor(
     }
 
     override fun fireAiChatActive() {
-        pixel.fire(SyncPixelName.SYNC_AI_CHAT_ACTIVE, type = Pixel.PixelType.Daily())
+        pixel.fire(SyncPixelName.SYNC_AI_CHAT_ACTIVE, type = PixelType.Daily())
     }
 
     override fun fireAiChatsRescopeTokenError(error: Error) {
@@ -922,11 +966,94 @@ class RealSyncPixels @Inject constructor(
         )
     }
 
+    override fun fireUnifiedDeviceListPixel(event: UnifiedDeviceListPixel) {
+        val parameter = event.parameter
+        pixel.fire(
+            event.pixelName,
+            parameters = parameter?.let { mapOf(it.first to it.second) }.orEmpty(),
+            type = if (event.isDaily) {
+                PixelType.Daily(tag = event.tag)
+            } else {
+                PixelType.Count
+            },
+        )
+    }
+
+    override fun fireSyncSetupJoinerSuccess(
+        hostHasAccount: Boolean,
+        hostKind: PeerKind,
+        joinerHasAccount: Boolean,
+        joinerKind: PeerKind,
+        negotiatedVersion: ExchangeProtocolVersion,
+    ) {
+        val pixels = mapOf(
+            SyncPixelName.SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_SUCCESS to PixelType.Count,
+            SyncPixelName.SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_SUCCESS_DAILY to PixelType.Daily(),
+        )
+        for ((name, type) in pixels) {
+            fireSyncSetupJoinerOutcome(
+                pixelName = name,
+                pixelType = type,
+                hostHasAccount = hostHasAccount,
+                hostKind = hostKind,
+                joinerHasAccount = joinerHasAccount,
+                joinerKind = joinerKind,
+                negotiatedVersion = negotiatedVersion,
+            )
+        }
+    }
+
+    override fun fireSyncSetupJoinerFailure(
+        hostHasAccount: Boolean,
+        hostKind: PeerKind,
+        joinerHasAccount: Boolean,
+        joinerKind: PeerKind,
+        negotiatedVersion: ExchangeProtocolVersion,
+    ) {
+        val pixels = mapOf(
+            SyncPixelName.SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_FAILED to PixelType.Count,
+            SyncPixelName.SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_FAILED_DAILY to PixelType.Daily(),
+        )
+        for ((name, type) in pixels) {
+            fireSyncSetupJoinerOutcome(
+                pixelName = name,
+                pixelType = type,
+                hostHasAccount = hostHasAccount,
+                hostKind = hostKind,
+                joinerHasAccount = joinerHasAccount,
+                joinerKind = joinerKind,
+                negotiatedVersion = negotiatedVersion,
+            )
+        }
+    }
+
+    private fun fireSyncSetupJoinerOutcome(
+        pixelName: SyncPixelName,
+        pixelType: PixelType,
+        hostHasAccount: Boolean,
+        hostKind: PeerKind,
+        joinerHasAccount: Boolean,
+        joinerKind: PeerKind,
+        negotiatedVersion: ExchangeProtocolVersion,
+    ) {
+        pixel.fire(
+            pixelName,
+            parameters = mapOf(
+                SyncPixelParameters.SYNC_SETUP_HOST_HAS_ACCOUNT to hostHasAccount.toString(),
+                SyncPixelParameters.SYNC_SETUP_HOST_KIND to hostKind.value,
+                SyncPixelParameters.SYNC_SETUP_JOINER_HAS_ACCOUNT to joinerHasAccount.toString(),
+                SyncPixelParameters.SYNC_SETUP_JOINER_KIND to joinerKind.value,
+                SyncPixelParameters.SYNC_SETUP_PROTOCOL_VERSION to negotiatedVersion.toString(),
+            ),
+            type = pixelType,
+        )
+    }
+
     companion object {
         private const val SYNC_PIXELS_PREF_FILE = "com.duckduckgo.sync.pixels.v1"
-        private const val FLOW_VERSION_V1 = "v1"
-        private const val FLOW_VERSION_V2 = "v2"
-        const val UI_VERSION_V1 = "v1"
+        const val FLOW_VERSION_V1 = "v1"
+        const val FLOW_VERSION_V2 = "v2"
+        const val FLOW_VERSION_V2_1 = "v2.1"
         const val UI_VERSION_V2 = "v2"
         private const val MY_KIND_DDG = "ddg"
         private const val CODE_TYPE_RECOVERY = "recovery"
@@ -948,7 +1075,7 @@ enum class SyncAccountOperation {
 }
 
 // https://app.asana.com/0/72649045549333/1205649300615861
-enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
+enum class SyncPixelName(override val pixelName: String) : PixelName {
     SYNC_DAILY("m_sync_daily"),
     SYNC_DAILY_SUCCESS_RATE_PIXEL("m_sync_success_rate_daily"),
     SYNC_TIMESTAMP_RESOLUTION_TRIGGERED("m_sync_%s_local_timestamp_resolution_triggered"),
@@ -994,6 +1121,7 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_SETTINGS_RECOVER_SYNC_DATA_TAPPED("m_settings_sync_recover_synced_data_tapped"),
     SYNC_SETTINGS_RECOVER_SYNC_DATA_CONFIRMED("m_settings_sync_recovery_confirmed_tapped"),
     SYNC_SETUP_SCAN_QR_SCREEN_SHOWN("sync_setup_scan_qr_screen_shown"),
+    SYNC_SCANNER_CAMERA_PERMISSION_STATE("sync_scanner_camera_permission_state"),
     SYNC_SETUP_BARCODE_SCREEN_SHOWN("sync_setup_barcode_screen_shown"),
     SYNC_SETUP_BARCODE_SCANNER_SUCCESS("sync_setup_barcode_scanner_success"),
     SYNC_SETUP_BARCODE_SCANNER_FAILED("sync_setup_barcode_scanner_failed"),
@@ -1011,7 +1139,30 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_CONFIRMED("sync_setup_promo_bookmark_added_dialog_confirmed"),
     SYNC_SETUP_ANOTHER_DEVICE_PROMPT_SHOWN("m_settings_sync_another_device_prompt_shown"),
     SYNC_SETUP_ANOTHER_DEVICE_PROMPT_OPTION_TAPPED("m_settings_sync_another_device_prompt_option_tapped"),
+    SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_SUCCESS("sync_setup_joiner_recovery_code_done_success_count"),
+    SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_SUCCESS_DAILY("sync_setup_joiner_recovery_code_done_success_daily"),
+    SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_FAILED("sync_setup_joiner_recovery_code_done_failed_count"),
+    SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_FAILED_DAILY("sync_setup_joiner_recovery_code_done_failed_daily"),
     SYNC_AI_CHAT_ACTIVE("sync_ai_chat_active"),
+
+    SYNC_UNIFIED_DEVICES_OWN_ROW_RESOLVED_DEVICE_INFO("sync_unified_devices_own_row_resolved_device_info"),
+    SYNC_UNIFIED_DEVICES_OWN_ROW_RESOLVED_LEGACY("sync_unified_devices_own_row_resolved_legacy"),
+    SYNC_UNIFIED_DEVICES_OWN_ROW_RESOLVED_PLACEHOLDER("sync_unified_devices_own_row_resolved_placeholder"),
+    SYNC_UNIFIED_DEVICES_ACCOUNT_INFO_KEY_UNAVAILABLE("sync_unified_devices_account_info_key_unavailable"),
+    SYNC_UNIFIED_DEVICES_OTHER_ROW_DEVICE_INFO_FAILED_DECRYPTION("sync_unified_devices_other_row_device_info_failed_decryption"),
+    SYNC_UNIFIED_DEVICES_OTHER_ROW_RESOLVED_PLACEHOLDER("sync_unified_devices_other_row_resolved_placeholder"),
+    SYNC_UNIFIED_DEVICES_ACCOUNT_INFO_KEY_CREATE_SUCCESS("sync_unified_devices_account_info_key_create_success"),
+    SYNC_UNIFIED_DEVICES_ACCOUNT_INFO_KEY_CREATE_FAILED("sync_unified_devices_account_info_key_create_failed"),
+    SYNC_UNIFIED_DEVICES_ACCOUNT_INFO_KEY_WRAP_SUCCESS("sync_unified_devices_account_info_key_wrap_success"),
+    SYNC_UNIFIED_DEVICES_ACCOUNT_INFO_KEY_WRAP_FAILED("sync_unified_devices_account_info_key_wrap_failed"),
+    SYNC_UNIFIED_DEVICES_ACCOUNT_INFO_KEY_ADOPT_SUCCESS("sync_unified_devices_account_info_key_adopt_success"),
+    SYNC_UNIFIED_DEVICES_ACCOUNT_INFO_KEY_ADOPT_FAILED("sync_unified_devices_account_info_key_adopt_failed"),
+    SYNC_UNIFIED_DEVICES_OWN_ROW_DEVICE_INFO_FIRST_WRITE_SUCCESS("sync_unified_devices_own_row_device_info_first_write_success"),
+    SYNC_UNIFIED_DEVICES_OWN_ROW_DEVICE_INFO_FIRST_WRITE_FAILED("sync_unified_devices_own_row_device_info_first_write_failed"),
+    SYNC_UNIFIED_DEVICES_OWN_ROW_DEVICE_INFO_UPDATE_SUCCESS("sync_unified_devices_own_row_device_info_update_success"),
+    SYNC_UNIFIED_DEVICES_OWN_ROW_DEVICE_INFO_UPDATE_FAILED("sync_unified_devices_own_row_device_info_update_failed"),
+    SYNC_UNIFIED_DEVICES_OWN_ROW_DEVICE_INFO_REPAIR_SUCCESS("sync_unified_devices_own_row_device_info_repair_success"),
+    SYNC_UNIFIED_DEVICES_OWN_ROW_DEVICE_INFO_REPAIR_FAILED("sync_unified_devices_own_row_device_info_repair_failed"),
 
     SYNC_AUTO_RESTORE_TOGGLE_SHOWN("sync-auto-restore_toggle_shown"),
     SYNC_AUTO_RESTORE_TOGGLE_OPTED_OUT("sync-auto-restore_toggle_opted_out"),
@@ -1050,6 +1201,8 @@ object SyncPixelParameters {
     const val SYNC_FEATURE_PROMOTION_DISMISS_REASON = "reason"
     const val GET_OTHER_DEVICES_SCREEN_LAUNCH_SOURCE = "source"
     const val SYNC_SETUP_SCREEN_TYPE = "source"
+    const val SYNC_SCANNER_CAMERA_PERMISSION_BEFORE_REQUESTING = "before_requesting"
+    const val SYNC_SCANNER_CAMERA_PERMISSION_AFTER_REQUESTING = "after_requesting"
     const val SYNC_SETUP_FLOW_VERSION = "flow_version"
     const val SYNC_SETUP_UI_VERSION = "ui_version"
     const val SYNC_SETUP_MY_KIND = "my_kind"
@@ -1060,6 +1213,11 @@ object SyncPixelParameters {
     const val SYNC_SETUP_PEER_KIND = "peer_kind"
     const val SYNC_SETUP_REASON = "reason"
     const val SYNC_SETUP_TIMEOUT_STAGE = "timeout_stage"
+    const val SYNC_SETUP_HOST_HAS_ACCOUNT = "host_has_account"
+    const val SYNC_SETUP_HOST_KIND = "host_kind"
+    const val SYNC_SETUP_JOINER_HAS_ACCOUNT = "joiner_has_account"
+    const val SYNC_SETUP_JOINER_KIND = "joiner_kind"
+    const val SYNC_SETUP_PROTOCOL_VERSION = "protocol_version"
     const val CONNECTED_DEVICES_WHEN_DELETING = "connected_devices"
 
     const val AUTO_RESTORE_SOURCE = "source"
@@ -1127,14 +1285,14 @@ internal fun Int.toSetupFailureReason(): SetupFailureReason = when (this) {
 
 internal fun SyncPixels.fireSetupFailed(screenType: ScreenType, outcome: DispatchOutcome) {
     when (outcome) {
-        is DispatchOutcome.UpgradeRequired ->
+        is UpgradeRequired ->
             fireSyncSetupFailed(screenType, SetupFailureReason.NEEDS_UPGRADE, outcome.path, outcome.myRole, outcome.peerKind)
-        is DispatchOutcome.AlreadyConnected ->
+        is AlreadyConnected ->
             // v2 same-account case: both devices exchanged intros and discovered a matching user_id.
             // Per spec, we report a failed pixel with reason=already_paired even though the user-facing
             // outcome is a benign "Connected" — the flow did not produce a new pairing.
             fireSyncSetupFailed(screenType, SetupFailureReason.ALREADY_PAIRED, path = SetupPath.PAIRING)
-        is DispatchOutcome.Failed -> {
+        is Failed -> {
             if (outcome.code == AccountErrorCodes.PAIRING_CANCELLED.code || outcome.code == AccountErrorCodes.PAIRING_REJECTED.code) {
                 return
             }
@@ -1155,7 +1313,7 @@ internal fun SyncPixels.fireSetupFailed(screenType: ScreenType, outcome: Dispatc
 // setup ended via denial. PAIRING_CANCELLED is this device's own denial; PAIRING_REJECTED is the peer's
 // denial received on the wire.
 internal fun SyncPixels.fireSetupCancelledIfDenied(screenType: ScreenType, outcome: DispatchOutcome) {
-    if (outcome is DispatchOutcome.Failed &&
+    if (outcome is Failed &&
         (outcome.code == AccountErrorCodes.PAIRING_CANCELLED.code || outcome.code == AccountErrorCodes.PAIRING_REJECTED.code)
     ) {
         fireSyncSetupAbandoned(screenType, CancellationReason.CONFIRMATION_DENIED)

@@ -16,44 +16,79 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:paddingStart="@dimen/keyline_4"
-    android:paddingEnd="@dimen/keyline_4"
     android:paddingTop="6dp"
-    android:paddingBottom="6dp">
+    android:paddingEnd="@dimen/keyline_4"
+    android:paddingBottom="6dp"
+    tools:ignore="HardcodedText">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/summaryRow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:clickable="true"
         android:focusable="true">
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/summaryTextView"
+            android:id="@+id/eventTypeTextView"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/keyline_2"
+            app:layout_constraintEnd_toStartOf="@id/timestampTextView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:textType="secondary"
+            app:typography="caption_allCaps" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/timestampTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBaseline_toBaselineOf="@id/eventTypeTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:textType="secondary"
+            app:typography="caption" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/eventSummaryTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_0"
+            android:layout_marginEnd="@dimen/keyline_2"
+            app:layout_constraintEnd_toStartOf="@id/chevronTextView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/eventTypeTextView"
             app:typography="body2" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/chevronTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingStart="8dp"
             android:text="▸"
+            app:layout_constraintBottom_toBottomOf="@id/eventSummaryTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/eventSummaryTextView"
             app:typography="body2" />
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
-        android:id="@+id/rawDetail"
+        android:id="@+id/expandedDetail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="gone">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/detailsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:textIsSelectable="true"
+            app:typography="caption" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/rawJsonTextView"
@@ -62,13 +97,15 @@
             android:layout_marginTop="6dp"
             android:fontFamily="monospace"
             android:textIsSelectable="true"
+            android:visibility="gone"
             app:typography="caption" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-            android:id="@+id/copyRawButton"
+            android:id="@+id/copyJsonButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Copy JSON" />
+            android:layout_marginTop="@dimen/keyline_1"
+            android:text="Copy JSON"
+            android:visibility="gone" />
     </LinearLayout>
 </LinearLayout>

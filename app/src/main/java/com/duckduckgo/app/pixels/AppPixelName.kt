@@ -20,6 +20,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 
 enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     APP_LAUNCH("ml"),
+    APP_RETURN_COUNT("m_app_return_count"),
+    APP_RETURN_DAILY("m_app_return_daily"),
     PROCESS_CREATED_MAIN("m_process_created_main"),
     PROCESS_CREATED_VPN("m_process_created_vpn"),
 
@@ -55,7 +57,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     PREONBOARDING_SYNC_RESTORE_SHOWN_UNIQUE("sync-auto-restore_onboarding_prompt_shown_unique"),
     PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE("sync-auto-restore_onboarding_restore_tapped_unique"),
     PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE("sync-auto-restore_onboarding_skip_tapped_unique"),
-    PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE("m_preonboarding_skip_onboarding_shown_unique"),
     PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE("m_preonboarding_choose_search_experience_impressions_unique"),
     PREONBOARDING_AICHAT_SELECTED("m_preonboarding_aichat_selected"),
     PREONBOARDING_SEARCH_ONLY_SELECTED("m_preonboarding_search_only_selected"),
@@ -68,8 +69,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     AI_CHAT_UNIFIED_INPUT_CHAT_HEADER_UPGRADE_TAPPED("m_aichat_unified_input_chat_header_upgrade_tapped"),
     AI_CHAT_UNIFIED_INPUT_FREE_LABEL_SHOWN("m_aichat_unified_input_free_label_shown"),
     PREONBOARDING_SKIP_ONBOARDING_PRESSED("m_preonboarding_skip-onboarding-pressed"),
-    PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED("m_preonboarding_confirm-skip-onboarding-pressed"),
-    PREONBOARDING_RESUME_ONBOARDING_PRESSED("m_preonboarding_resume-onboarding-pressed"),
     ONBOARDING_SEARCH_CUSTOM("m_onboarding_search_custom"),
     ONBOARDING_VISIT_SITE_CUSTOM("m_onboarding_visit_site_custom"),
     ONBOARDING_DAX_CTA_SHOWN("m_odc_s"),
@@ -247,7 +246,9 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     APP_FEEDBACK_DIALOG_USER_CANCELLED("mrp_f_d%d_c"),
 
     APP_LINKS_SNACKBAR_SHOWN("m_app_links_snackbar_shown"),
+    APP_LINKS_SNACKBAR_SHOWN_DAILY("app_links_snackbar_shown_daily"),
     APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED("m_app_links_snackbar_open_action_pressed"),
+    APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED_DAILY("app_links_snackbar_open_action_pressed_daily"),
 
     AUTOCOMPLETE_TOGGLED_OFF("m_autocomplete_recent_sites_toggled_off"),
     AUTOCOMPLETE_TOGGLED_ON("m_autocomplete_recent_sites_toggled_on"),
@@ -453,6 +454,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SWIPE_TABS_USED("m_swipe_tabs_used"),
     SWIPE_TABS_USED_DAILY("m_swipe_tabs_used_daily"),
 
+    TAB_MAX_REUSE_DISTANCE("tab_max_reuse_distance"),
+
     DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE("duckplayer_setting_always_overlay_youtube"),
     DUCK_PLAYER_SETTING_ALWAYS_SERP("duckplayer_setting_always_overlay_serp"),
     DUCK_PLAYER_SETTING_NEVER_SERP("duckplayer_setting_never_overlay_serp"),
@@ -507,8 +510,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     APP_VERSION_AT_SEARCH_TIME("app_version_at_search_time"),
 
-    BLOCKLIST_TDS_FAILURE("blocklist_experiment_tds_download_failure"),
-
     SET_AS_DEFAULT_SYSTEM_DIALOG_IMPRESSION("m_set-as-default_system-dialog_impression"),
     SET_AS_DEFAULT_SYSTEM_DIALOG_CLICK("m_set-as-default_system-dialog_click"),
     SET_AS_DEFAULT_SYSTEM_DIALOG_DISMISSED("m_set-as-default_system-dialog_dismissed"),
@@ -544,8 +545,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     GET_DESKTOP_BROWSER_COMPLETE_SETUP_IMPRESSION("m_get_desktop_browser_complete_setup_impression"),
     GET_DESKTOP_BROWSER_CLICKED("m_get_desktop_browser_clicked"),
     GET_DESKTOP_BROWSER_DISMISSED("m_get_desktop_browser_dismissed"),
-    GET_DESKTOP_BROWSER_SHARE_DOWNLOAD_LINK_CLICK("m_get_desktop_browser_share_download_link_click"),
-    GET_DESKTOP_BROWSER_LINK_CLICK("m_get_desktop_browser_link_click"),
 
     AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED("m_aichat_voice_session_digital-assistant_started"),
 

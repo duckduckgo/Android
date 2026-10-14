@@ -74,16 +74,21 @@ class DuckChatVoiceMicrophoneService : Service() {
         startId: Int,
     ): Int {
         val tabId = intent?.getStringExtra(EXTRA_TAB_ID)?.takeIf { it.isNotBlank() }
-        ServiceCompat.startForeground(
-            this,
-            NOTIFICATION_ID,
-            buildNotification(tabId),
-            if (appBuildConfig.sdkInt >= 30) {
-                FOREGROUND_SERVICE_TYPE_MICROPHONE
-            } else {
-                0
-            },
-        )
+        try {
+            ServiceCompat.startForeground(
+                this,
+                NOTIFICATION_ID,
+                buildNotification(tabId),
+                if (appBuildConfig.sdkInt >= 30) {
+                    FOREGROUND_SERVICE_TYPE_MICROPHONE
+                } else {
+                    0
+                },
+            )
+        } catch (_: Exception) {
+            duckChatPixels.reportVoiceServiceStartFailed()
+            stopSelf()
+        }
         return START_NOT_STICKY
     }
 

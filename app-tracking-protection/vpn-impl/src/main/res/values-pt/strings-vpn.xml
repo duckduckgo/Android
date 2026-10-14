@@ -46,8 +46,8 @@
     <string name="atp_OnInitialNotification">"A App Tracking Protection está ativada e a bloquear tentativas de rastreamento nas tuas aplicações"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"A procurar atividade de rastreamento… bip… bop"</string>
     <plurals name="atp_OnNotification">
-        <item quantity="one"><![CDATA[ Tentativas de rastreamento bloqueadas <b>em %1$d aplicação</b> (última hora).]]></item>
-        <item quantity="other"><![CDATA[ Tentativas de rastreamento bloqueadas <b>em %1$d aplicações</b> (última hora).]]></item>
+        <item quantity="one" instruction="Placeholder is a number"><![CDATA[ Tentativas de rastreamento bloqueadas <b>em %1$d aplicação</b> (última hora).]]></item>
+        <item quantity="other" instruction="Placeholder is a number"><![CDATA[ Tentativas de rastreamento bloqueadas <b>em %1$d aplicações</b> (última hora).]]></item>
     </plurals>
     <string name="atp_DisabledNotification">A App Tracking Protection está desativada. Toca para continuar a bloquear tentativas de rastreamento.</string>
     <string name="atp_RevokedNotification">Uma aplicação de VPN no teu dispositivo desativou a App Tracking Protection. Toca para reativar.</string>
@@ -59,13 +59,13 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ A App Tracking Protection bloqueou <b>%1$d tentativas de rastreamento em %2$d aplicações, incluindo %3$s</b> (último dia).]]></string>
 
     <plurals name="atp_DailyTopCompanyNotification">
-        <item quantity="one"><![CDATA[%1$s tentou rastrear o teu dispositivo <b>em %2$d aplicação</b> (último dia). <b>Mais informações</b>]]></item>
-        <item quantity="other"><![CDATA[%1$s tentou rastrear o teu dispositivo <b>em %2$d aplicações</b> (último dia). <b>Mais informações</b>]]></item>
+        <item quantity="one" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[%1$s tentou rastrear o teu dispositivo <b>em %2$d aplicação</b> (último dia). <b>Mais informações</b>]]></item>
+        <item quantity="other" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[%1$s tentou rastrear o teu dispositivo <b>em %2$d aplicações</b> (último dia). <b>Mais informações</b>]]></item>
     </plurals>
 
     <plurals name="atp_DailyCompanyBlockedNotification">
-        <item quantity="one"><![CDATA[A App Tracking Protection bloqueou o maior número de tentativas de rastreamento no <b>%1$s</b> (último dia).]]></item>
-        <item quantity="other"><![CDATA[A App Tracking Protection bloqueou o maior número de tentativas de rastreamento no <b>%1$s</b> e <b>%2$s</b> (último dia).]]></item>
+        <item quantity="one" instruction="Placeholder is the name of an app"><![CDATA[A App Tracking Protection bloqueou o maior número de tentativas de rastreamento no <b>%1$s</b> (último dia).]]></item>
+        <item quantity="other" instruction="Both placeholders are the name of an app"><![CDATA[A App Tracking Protection bloqueou o maior número de tentativas de rastreamento no <b>%1$s</b> e <b>%2$s</b> (último dia).]]></item>
     </plurals>
 
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$s %2$d vez em %3$s</b> (último dia).]]></string>
@@ -85,8 +85,8 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$d tentativas de rastreamento em %2$s</b> e em mais %3$d aplicações (semana passada).]]></string>
 
     <plurals name="atp_WeeklyCompanyTeaserNotification">
-        <item quantity="one"><![CDATA[A App Tracking Protection bloqueou <b>%1$s em %2$d aplicação, %3$s</b> (semana passada).]]></item>
-        <item quantity="other"><![CDATA[A App Tracking Protection bloqueou <b>%1$s em %2$d aplicações, incluindo %3$s</b> (semana passada).]]></item>
+        <item quantity="one" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$s em %2$d aplicação, %3$s</b> (semana passada).]]></item>
+        <item quantity="other" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of one of the apps where it happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$s em %2$d aplicações, incluindo %3$s</b> (semana passada).]]></item>
     </plurals>
 
     <string name="atp_EnableCTA">Ativar a App Tracking Protection</string>
@@ -269,12 +269,12 @@
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">
-        <item quantity="one">%1$d tentativa. Conhecido por recolher:</item>
-        <item quantity="other">%1$d tentativas. Conhecido por recolher:</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d tentativa. Conhecido por recolher:</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d tentativas. Conhecido por recolher:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">O DuckDuckGo bloqueou %1$d tentativa de rastreamento</item>
-        <item quantity="other">O DuckDuckGo bloqueou %1$d tentativas de rastreamento</item>
+        <item quantity="one" instruction="Placeholder is a number">O DuckDuckGo bloqueou %1$d tentativa de rastreamento</item>
+        <item quantity="other" instruction="Placeholder is a number">O DuckDuckGo bloqueou %1$d tentativas de rastreamento</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Comunicar um problema com esta aplicação</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Mostrar mais %1$d</string>

@@ -16,7 +16,6 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
     id 'com.squareup.anvil'
     id 'com.google.devtools.ksp'
 }
@@ -40,11 +39,13 @@ dependencies {
     implementation project(':content-scope-scripts-api')
     implementation project(':subscriptions-api')
     implementation project(':new-tab-page-api')
+    implementation project(':onboarding-api')
     implementation project(':voice-search-api')
     implementation project(':browser-api')
     implementation project(':history-api')
     implementation project(':saved-sites-api')
     implementation project(':remote-messaging-api')
+    implementation project(':survey-api')
     implementation project(':attributed-metrics-api')
     implementation project(':navigation-api')
     implementation project(':sync-api')

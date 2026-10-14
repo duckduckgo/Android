@@ -202,7 +202,6 @@
     <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Cómo sincronizar las contraseñas de escritorio</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Importa contraseñas en la versión de escritorio del navegador DuckDuckGo y, a continuación, sincronízalas entre dispositivos.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Obtén el navegador de escritorio</string>
-    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Enlace copiado</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Consigue el navegador DuckDuckGo para Mac o Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Busca de forma privada y bloquea los rastreadores con el navegador de escritorio DuckDuckGo. Visita este enlace en tu ordenador para descargarlo hoy mismo.\n\n%1$s</string>
     <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Sincronizar con el escritorio</string>
@@ -215,8 +214,6 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Obtener la aplicación de escritorio</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Consigue DuckDuckGo para Mac o Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">En tu ordenador, ve a:</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Compartir enlace de descarga</string>
 
     <string name="autofillManagementReportBreakagePromptTitle">Informar de un problema con la función Autocompletar</string>
     <string name="autofillManagementReportBreakagePromptSubtitle">Informar de forma anónima de que la función Autocompletar no funciona en esta página. Las contraseñas nunca se comparten.</string>

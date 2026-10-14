@@ -30,26 +30,18 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionOnboardingBinding
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingViewModel.Command
+import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingViewModel.ToolbarState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
-/**
- * Hosts the native subscription onboarding flow. It observes the orchestrator-driven state exposed by
- * [SubscriptionOnboardingViewModel] and swaps the current step's Fragment (supplied by the step's
- * [SubscriptionOnboardingStepPlugin], which may live in another module) into the container. Steps report
- * back through [SubscriptionOnboardingController].
- */
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SubscriptionOnboardingScreenWithEmptyParams::class, screenName = "subscriptions.onboarding")
 class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
@@ -61,9 +53,6 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
     lateinit var controller: SubscriptionOnboardingController
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val viewModel: SubscriptionOnboardingViewModel by bindViewModel()
@@ -72,10 +61,7 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
@@ -84,11 +70,9 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
         binding.includeToolbar.appBarLayout.setBackgroundColor(surfaceColor)
         binding.includeToolbar.toolbar.setBackgroundColor(surfaceColor)
 
-        if (edgeToEdgeEnabled) {
-            edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
-            edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout, installScrim = false)
-            edgeToEdgeHandler.applyNavigationBarInsets(binding.subscriptionOnboardingContainer, drawBehindGestureNav = false)
-        }
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout, installScrim = false)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.subscriptionOnboardingContainer, drawBehindGestureNav = false)
 
         // System back and the toolbar up arrow both go through the controller.
         onBackPressedDispatcher.addCallback(
@@ -105,6 +89,11 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
 
+        viewModel.toolbarState
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { renderToolbar(it) }
+            .launchIn(lifecycleScope)
+
         viewModel.start()
     }
 
@@ -119,19 +108,30 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
     private fun processCommand(command: Command) {
         when (command) {
             is Command.ShowStep -> showStep(command)
+            is Command.RunHandoff -> {
+                command.action()
+                finish()
+            }
             is Command.FinishToSettings -> finishToSettings()
             is Command.Finish -> finish()
         }
     }
 
-    private fun showStep(command: Command.ShowStep) {
-        val navIcon = if (command.canGoBack) {
-            com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24
+    private fun renderToolbar(state: ToolbarState) {
+        if (state.showNavigationIcon) {
+            val navIcon = if (state.canGoBack) {
+                com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24
+            } else {
+                com.duckduckgo.mobile.android.R.drawable.ic_close_24
+            }
+            binding.includeToolbar.toolbar.setNavigationIcon(navIcon)
         } else {
-            com.duckduckgo.mobile.android.R.drawable.ic_close_24
+            binding.includeToolbar.toolbar.navigationIcon = null
         }
-        binding.includeToolbar.toolbar.setNavigationIcon(navIcon)
-        supportActionBar?.title = command.stepPlugin.titleResId?.let { getString(it) } ?: ""
+        supportActionBar?.title = state.titleResId?.let { getString(it) } ?: ""
+    }
+
+    private fun showStep(command: Command.ShowStep) {
         supportFragmentManager.commit {
             replace(binding.subscriptionOnboardingContainer.id, command.stepPlugin.createFragment(), command.stepPlugin.stepId)
         }

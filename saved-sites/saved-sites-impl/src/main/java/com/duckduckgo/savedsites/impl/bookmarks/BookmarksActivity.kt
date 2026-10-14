@@ -45,6 +45,7 @@ import com.duckduckgo.autofill.api.ImportFromGoogle.ImportFromGoogleResult
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
@@ -54,9 +55,7 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
@@ -137,9 +136,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     lateinit var importFromGoogle: ImportFromGoogle
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private lateinit var bookmarksAdapter: BookmarksAdapter
@@ -185,15 +181,10 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         contentBookmarksBinding = ContentBookmarksBinding.bind(binding.root)
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
         configureToolbar()
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         setupBookmarksRecycler()
         observeViewModel()
@@ -388,7 +379,11 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                 viewModel.onSelected(bookmark)
             },
             onBookmarkOverflowClick = { anchor, bookmark ->
-                showBookmarkOverFlowMenu(anchor, bookmark)
+                if (appBrandDesignUpdateToggles.radius().isEnabled()) {
+                    showBookmarkPopupMenu(anchor, bookmark)
+                } else {
+                    showBookmarkOverFlowMenu(anchor, bookmark)
+                }
             },
             onLongClick = {
                 if (viewModel.viewState.value?.sortingMode == NAME) {
@@ -399,7 +394,11 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                 viewModel.onBookmarkFolderSelected(bookmarkFolder)
             },
             onBookmarkFolderOverflowClick = { anchor, bookmarkFolder ->
-                showFolderOverflowMenu(anchor, bookmarkFolder)
+                if (appBrandDesignUpdateToggles.radius().isEnabled()) {
+                    showFolderPopupMenu(anchor, bookmarkFolder)
+                } else {
+                    showFolderOverflowMenu(anchor, bookmarkFolder)
+                }
             },
         )
         contentBookmarksBinding.recycler.adapter = bookmarksAdapter
@@ -486,7 +485,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                     }
                 },
             )
-            .setEdgeToEdgeEnabled(edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS))
         faviconPrompt.show()
     }
 
@@ -860,6 +858,46 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         }
         // Show the popup menu.
         popup.show()
+    }
+
+    private fun showFolderPopupMenu(
+        anchor: View,
+        bookmarkFolder: BookmarkFolder,
+    ) {
+        val popup = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
+        popup.apply {
+            onMenuItemClicked(contentView.findViewById(R.id.edit)) {
+                viewModel.onEditBookmarkFolderRequested(bookmarkFolder)
+            }
+            onMenuItemClicked(contentView.findViewById(R.id.delete)) {
+                viewModel.onDeleteBookmarkFolderRequested(bookmarkFolder)
+            }
+            showAnchoredView(this@BookmarksActivity, binding.root, anchor)
+        }
+    }
+
+    private fun showBookmarkPopupMenu(
+        anchor: View,
+        bookmark: SavedSite.Bookmark,
+    ) {
+        val popup = PopupMenu(layoutInflater, R.layout.popup_window_edit_favorite_delete_menu)
+        val favoriteItem = popup.contentView.findViewById<PopupMenuItemView>(R.id.addRemoveFavorite)
+        favoriteItem.setPrimaryText(
+            getString(if (bookmark.isFavorite) R.string.removeFromFavorites else R.string.addToFavoritesMenu),
+        )
+        popup.apply {
+            onMenuItemClicked(contentView.findViewById(R.id.edit)) {
+                viewModel.onEditSavedSiteRequested(bookmark)
+            }
+            onMenuItemClicked(favoriteItem) {
+                addRemoveFavorite(bookmark)
+            }
+            onMenuItemClicked(contentView.findViewById(R.id.delete)) {
+                viewModel.onDeleteSavedSiteRequested(bookmark)
+                viewModel.onBookmarkItemDeletedFromOverflowMenu()
+            }
+            showAnchoredView(this@BookmarksActivity, binding.root, anchor)
+        }
     }
 
     private fun addRemoveFavorite(bookmark: SavedSite.Bookmark) {

@@ -35,7 +35,7 @@
         android:layout_width="@dimen/keyline_6"
         android:layout_height="@dimen/keyline_6"
         android:importantForAccessibility="no"
-        app:srcCompat="@drawable/ic_document_color_24" />
+        app:srcCompat="@drawable/document_color_24" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/fileName"

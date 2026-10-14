@@ -42,7 +42,7 @@ class RemoteMessagingConfigMatcher(
 
         remoteConfig.messages.filter { !dismissedMessages.contains(it.id) }.forEach { message ->
             val matchingRules = if (message.matchingRules.isEmpty() && message.exclusionRules.isEmpty()) {
-                val processed = filterCardsListMessage(message, rules)
+                val processed = filterListItems(message, rules)
                 if (processed != null) return processed
                 return@forEach
             } else {
@@ -53,7 +53,7 @@ class RemoteMessagingConfigMatcher(
             val excludeResult = message.exclusionRules.evaluateExclusionRules(message.id, rules)
 
             if (matchingResult == EvaluationResult.Match && excludeResult == EvaluationResult.Fail) {
-                val processed = filterCardsListMessage(message, rules)
+                val processed = filterListItems(message, rules)
                 if (processed != null) return processed
                 return@forEach
             }
@@ -62,14 +62,18 @@ class RemoteMessagingConfigMatcher(
         return null
     }
 
-    private suspend fun filterCardsListMessage(
+    private suspend fun filterListItems(
         message: RemoteMessage,
         rules: List<Rule>,
     ): RemoteMessage? {
-        val cardsList = message.content as? Content.CardsList ?: return message
+        val listItems = when (val content = message.content) {
+            is Content.CardsList -> content.listItems
+            is Content.ActionableItems -> content.listItems
+            else -> return message
+        }
 
         // First pass: filter list items based on matching/exclusion rules
-        val filteredListItems = cardsList.listItems.filter { cardItem ->
+        val filteredListItems = listItems.filter { cardItem ->
             if (cardItem !is CardItem.ListItem) {
                 true
             } else if (cardItem.matchingRules.isEmpty() && cardItem.exclusionRules.isEmpty()) {
@@ -107,8 +111,13 @@ class RemoteMessagingConfigMatcher(
             return null
         }
 
-        logcat(INFO) { "RMF: Filtered ${cardsList.listItems.size - filteredItems.size} CardItems for message ${message.id}." }
-        return message.copy(content = cardsList.copy(listItems = filteredItems))
+        logcat(INFO) { "RMF: Filtered ${listItems.size - filteredItems.size} CardItems for message ${message.id}." }
+        val filteredContent = when (val content = message.content) {
+            is Content.CardsList -> content.copy(listItems = filteredItems)
+            is Content.ActionableItems -> content.copy(listItems = filteredItems)
+            else -> content
+        }
+        return message.copy(content = filteredContent)
     }
 
     private suspend fun Iterable<Int>.evaluateMatchingRules(

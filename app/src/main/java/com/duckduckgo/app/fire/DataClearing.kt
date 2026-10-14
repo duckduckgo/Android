@@ -78,6 +78,7 @@ class DataClearing @Inject constructor(
     private val contextualDataStore: DuckChatContextualDataStore,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val dataClearingTrigger: DataClearingTrigger,
+    private val fireModeDataClearingState: FireModeDataClearingState,
 ) : ManualDataClearing, AutomaticDataClearing {
 
     override suspend fun clearSingleTabData(tabId: String, replaceCurrentTab: Boolean, browserMode: BrowserMode): ClearDataResult {
@@ -319,12 +320,16 @@ class DataClearing @Inject constructor(
 
         val fireModeCleared = fireModeAvailability.isAvailable()
         if (fireModeCleared) {
-            val fireTypes = setOf(
-                ClearableData.Tabs.AllForMode(BrowserMode.FIRE),
-                ClearableData.BrowserData.AllForMode(BrowserMode.FIRE),
-                ClearableData.DuckChats.AllForMode(BrowserMode.FIRE),
+            // avoids duplicate burn when tabs removed
+            fireModeDataClearingState.onDataCleared()
+
+            dataClearingTrigger.clearData(
+                setOf(
+                    ClearableData.Tabs.AllForMode(BrowserMode.FIRE),
+                    ClearableData.BrowserData.AllForMode(BrowserMode.FIRE),
+                    ClearableData.DuckChats.AllForMode(BrowserMode.FIRE),
+                ),
             )
-            dataClearingTrigger.clearData(fireTypes)
         }
 
         logcat { "Fire mode clear completed" }

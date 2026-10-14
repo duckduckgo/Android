@@ -110,6 +110,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <com.duckduckgo.common.ui.view.MessageCta
+            android:id="@+id/wide_desktop_promo_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.MessageCta
+            android:id="@+id/wide_top_illustration_remote_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

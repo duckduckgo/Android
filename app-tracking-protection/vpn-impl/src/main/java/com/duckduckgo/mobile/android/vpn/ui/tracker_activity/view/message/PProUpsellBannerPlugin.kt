@@ -69,7 +69,7 @@ class PProUpsellBannerPlugin @Inject constructor(
                 .apply {
                     this.setMessage(
                         Message(
-                            topIllustration = com.duckduckgo.mobile.android.R.drawable.ic_privacy_pro,
+                            topIllustration = com.duckduckgo.mobile.android.R.drawable.subscription_96,
                             title = context.getString(R.string.apptp_PproUpsellBannerTitle),
                             subtitle = context.getString(R.string.apptp_PproUpsellBannerMessage_freeTrial),
                             action = actionText,

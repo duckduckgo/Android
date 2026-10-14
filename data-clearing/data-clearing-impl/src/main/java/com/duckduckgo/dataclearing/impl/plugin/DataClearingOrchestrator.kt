@@ -42,7 +42,7 @@ class DataClearingOrchestrator @Inject constructor(
                 plugin.onClearData(types)
             } catch (e: Exception) {
                 currentCoroutineContext().ensureActive()
-                logcat(ERROR) { "Plugin ${plugin::class.simpleName} failed: ${e.asLog()}" }
+                logcat(ERROR) { "Plugin ${plugin::class.simpleName} failed to clear $types: ${e.asLog()}" }
             }
         }
     }

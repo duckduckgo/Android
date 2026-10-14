@@ -34,6 +34,7 @@ import com.duckduckgo.pir.impl.common.PirWorkDistributor
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
+import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
 import com.duckduckgo.pir.impl.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -80,6 +81,7 @@ class RealPirEmailConfirmation @Inject constructor(
     private val webViewDataCleaner: PirWebViewDataCleaner,
     private val pirWebViewCountProvider: PirWebViewCountProvider,
     private val pirWorkDistributor: PirWorkDistributor,
+    private val jobRecordUpdater: JobRecordUpdater,
     callbacks: PluginPoint<PirCallbacks>,
 ) : PirJob(callbacks),
     PirEmailConfirmation {
@@ -169,6 +171,9 @@ class RealPirEmailConfirmation @Inject constructor(
             if (profileQuery != null && brokerStep != null) {
                 profileQuery to brokerStep
             } else {
+                // Count the skipped job as an attempt, otherwise a record we can never run is retried on every
+                // execution instead of ageing out through the max-attempt cleanup.
+                jobRecordUpdater.recordEmailConfirmationAttempt(it.extractedProfileId)
                 null
             }
         }

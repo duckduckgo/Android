@@ -44,9 +44,7 @@ import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
@@ -56,14 +54,14 @@ import com.duckduckgo.duckchat.impl.databinding.IncludeDuckAiInputScreenSettings
 import com.duckduckgo.duckchat.impl.metric.nativeinput.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
-import com.duckduckgo.duckchat.impl.store.HideAiGeneratedImages
-import com.duckduckgo.duckchat.impl.store.SearchAssistVisibility
 import com.duckduckgo.duckchat.impl.store.getDefaultTogglePositionForIndex
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.DuckChatSettingsViewModelFactory
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.ViewState
 import com.duckduckgo.feedback.api.FeedbackScreenNoParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.settings.api.HideAiGeneratedImages
+import com.duckduckgo.settings.api.SearchAssistVisibility
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import kotlinx.coroutines.flow.launchIn
@@ -123,26 +121,18 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     lateinit var inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         setContentView(binding.root)
 
         setupToolbar(binding.includeToolbar.toolbar)
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         observeViewModel()
 
@@ -337,23 +327,18 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                     }
                 }
 
-                if (viewState.isHideGeneratedImagesOptionVisible) {
-                    searchSettingsSectionHeader.isVisible = true
+                searchSettingsSectionHeader.isVisible = true
 
-                    with(duckAiHideAiGeneratedImagesLink) {
-                        isVisible = true
-                        // When native controls are on the row reflects the current On/Off state and opens the
-                        // native dialog; otherwise it keeps its static description and opens the SERP webview.
-                        if (viewState.isNativeControlsEnabled) {
-                            setSecondaryText(getString(viewState.hideAiGeneratedImages.toDisplayNameRes()))
-                        }
-                        setOnClickListener {
-                            viewModel.onDuckAiHideAiGeneratedImagesClicked()
-                        }
+                with(duckAiHideAiGeneratedImagesLink) {
+                    isVisible = true
+                    // When native controls are on the row reflects the current On/Off state and opens the
+                    // native dialog; otherwise it keeps its static description and opens the SERP webview.
+                    if (viewState.isNativeControlsEnabled) {
+                        setSecondaryText(getString(viewState.hideAiGeneratedImages.toDisplayNameRes()))
                     }
-                } else {
-                    searchSettingsSectionHeader.isGone = true
-                    duckAiHideAiGeneratedImagesLink.isGone = true
+                    setOnClickListener {
+                        viewModel.onDuckAiHideAiGeneratedImagesClicked()
+                    }
                 }
             } else {
                 inputScreenSettingsBinding.divider2.isGone = true

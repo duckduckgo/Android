@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.history
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -44,11 +45,13 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class ChatHistoryViewModelTest {
 
     @get:Rule
@@ -478,17 +481,17 @@ class ChatHistoryViewModelTest {
 
     @Test
     fun `onChatRowClicked in select mode toggles selection instead of opening DuckAi`() = runTest {
-        source.value = listOf(item("a"))
+        source.value = listOf(item("a"), item("b"))
         viewModel.uiState.test {
             awaitInitialLoaded()
-            viewModel.onEnterSelectMode()
-            awaitItem()
+            viewModel.onChatRowLongClicked("b")
+            awaitItem() // Selecting({b})
 
             viewModel.onChatRowClicked("a")
 
             val loaded = awaitItem() as Loaded
             val mode = loaded.mode as ChatHistoryUiState.Mode.Selecting
-            assertEquals(setOf("a"), mode.selectedChatIds)
+            assertEquals(setOf("a", "b"), mode.selectedChatIds)
             verifyNoInteractions(tabRepository)
         }
     }
@@ -525,9 +528,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a"), item("b"), item("c"))
         viewModel.uiState.test {
             awaitInitialLoaded()
-            viewModel.onEnterSelectMode()
-            awaitItem()
-            viewModel.onSelectionToggled("a")
+            viewModel.onChatRowLongClicked("a")
             awaitItem()
             viewModel.onSelectionToggled("b")
             awaitItem()
@@ -543,32 +544,15 @@ class ChatHistoryViewModelTest {
     // --- Select-mode ---
 
     @Test
-    fun `onEnterSelectMode transitions to Selecting with empty selection`() = runTest {
-        source.value = listOf(item("a"), item("b"))
-
-        viewModel.uiState.test {
-            awaitInitialLoaded()
-
-            viewModel.onEnterSelectMode()
-
-            val loaded = awaitItem() as Loaded
-            val mode = loaded.mode as ChatHistoryUiState.Mode.Selecting
-            assertEquals(emptySet<String>(), mode.selectedChatIds)
-        }
-    }
-
-    @Test
     fun `onSelectionToggled deselecting the last selected row exits to Default`() = runTest {
         source.value = listOf(item("a"), item("b"))
 
         viewModel.uiState.test {
             awaitInitialLoaded()
-            viewModel.onEnterSelectMode()
-            awaitItem() // Selecting({})
 
-            viewModel.onSelectionToggled("a")
-            val afterAdd = awaitItem() as Loaded
-            assertEquals(setOf("a"), (afterAdd.mode as ChatHistoryUiState.Mode.Selecting).selectedChatIds)
+            viewModel.onChatRowLongClicked("a")
+            val entered = awaitItem() as Loaded
+            assertEquals(setOf("a"), (entered.mode as ChatHistoryUiState.Mode.Selecting).selectedChatIds)
 
             viewModel.onSelectionToggled("a")
             val afterRemove = awaitItem() as Loaded
@@ -582,8 +566,8 @@ class ChatHistoryViewModelTest {
 
         viewModel.uiState.test {
             awaitInitialLoaded()
-            viewModel.onEnterSelectMode()
-            awaitItem() // Selecting({})
+            viewModel.onChatRowLongClicked("a")
+            awaitItem() // Selecting({a})
 
             viewModel.onSelectAllToggled()
 
@@ -599,8 +583,8 @@ class ChatHistoryViewModelTest {
 
         viewModel.uiState.test {
             awaitInitialLoaded()
-            viewModel.onEnterSelectMode()
-            awaitItem() // Selecting({})
+            viewModel.onChatRowLongClicked("a")
+            awaitItem() // Selecting({a})
             viewModel.onSelectAllToggled()
             awaitItem() // Selecting({a, b})
 
@@ -617,9 +601,7 @@ class ChatHistoryViewModelTest {
 
         viewModel.uiState.test {
             awaitInitialLoaded()
-            viewModel.onEnterSelectMode()
-            awaitItem() // Selecting({})
-            viewModel.onSelectionToggled("a")
+            viewModel.onChatRowLongClicked("a")
             awaitItem() // Selecting({a})
             viewModel.onSelectionToggled("b")
             awaitItem() // Selecting({a, b})
@@ -638,8 +620,8 @@ class ChatHistoryViewModelTest {
 
         viewModel.uiState.test {
             awaitInitialLoaded()
-            viewModel.onEnterSelectMode()
-            awaitItem() // Selecting({})
+            viewModel.onChatRowLongClicked("a")
+            awaitItem() // Selecting({a})
             viewModel.onSelectAllToggled()
             awaitItem() // Selecting({a, b, c})
 
@@ -659,9 +641,7 @@ class ChatHistoryViewModelTest {
 
         viewModel.uiState.test {
             awaitInitialLoaded()
-            viewModel.onEnterSelectMode()
-            awaitItem()
-            viewModel.onSelectionToggled("a")
+            viewModel.onChatRowLongClicked("a")
             awaitItem()
 
             viewModel.onSelectModeCancelled()
@@ -673,13 +653,11 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
-    fun `onDeleteSelectedRequested with empty selection is a no-op`() = runTest {
+    fun `onDeleteSelectedRequested outside select mode is a no-op`() = runTest {
         source.value = listOf(item("a"))
 
         viewModel.uiState.test {
             awaitInitialLoaded()
-            viewModel.onEnterSelectMode()
-            awaitItem() // Selecting({})
 
             viewModel.onDeleteSelectedRequested()
 
@@ -694,9 +672,7 @@ class ChatHistoryViewModelTest {
 
         viewModel.uiState.test {
             awaitInitialLoaded()
-            viewModel.onEnterSelectMode()
-            awaitItem()
-            viewModel.onSelectionToggled("a")
+            viewModel.onChatRowLongClicked("a")
             awaitItem()
 
             viewModel.onDeleteSelectedRequested()
@@ -717,9 +693,7 @@ class ChatHistoryViewModelTest {
 
         viewModel.uiState.test {
             awaitInitialLoaded()
-            viewModel.onEnterSelectMode()
-            awaitItem()
-            viewModel.onSelectionToggled("a")
+            viewModel.onChatRowLongClicked("a")
             awaitItem()
             viewModel.onSelectionToggled("b")
             awaitItem()
@@ -740,9 +714,7 @@ class ChatHistoryViewModelTest {
 
         viewModel.uiState.test {
             awaitInitialLoaded()
-            viewModel.onEnterSelectMode()
-            awaitItem()
-            viewModel.onSelectionToggled("a")
+            viewModel.onChatRowLongClicked("a")
             awaitItem()
             viewModel.onSelectionToggled("c")
             awaitItem()
@@ -765,9 +737,7 @@ class ChatHistoryViewModelTest {
 
         viewModel.uiState.test {
             awaitInitialLoaded()
-            viewModel.onEnterSelectMode()
-            awaitItem()
-            viewModel.onSelectionToggled("a")
+            viewModel.onChatRowLongClicked("a")
             awaitItem()
             viewModel.onSelectionToggled("c")
             awaitItem()
@@ -851,9 +821,7 @@ class ChatHistoryViewModelTest {
 
         viewModel.uiState.test {
             awaitInitialLoaded()
-            viewModel.onEnterSelectMode()
-            awaitItem()
-            viewModel.onSelectionToggled("a")
+            viewModel.onChatRowLongClicked("a")
             awaitItem()
 
             viewModel.onDeleteSelectedRequested()
@@ -874,9 +842,7 @@ class ChatHistoryViewModelTest {
 
         viewModel.uiState.test {
             awaitInitialLoaded()
-            viewModel.onEnterSelectMode()
-            awaitItem() // Selecting({})
-            viewModel.onSelectionToggled("a")
+            viewModel.onChatRowLongClicked("a")
             awaitItem() // Selecting({a})
 
             viewModel.onDeleteSelectedRequested()
@@ -1183,7 +1149,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a"))
         viewModel.uiState.test {
             awaitInitialLoaded()
-            viewModel.onEnterSelectMode()
+            viewModel.onChatRowLongClicked("a")
             awaitItem()
             viewModel.onFireIconClicked()
             cancelAndIgnoreRemainingEvents()
@@ -1211,9 +1177,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a"), item("b"))
         viewModel.uiState.test {
             awaitInitialLoaded()
-            viewModel.onEnterSelectMode()
-            awaitItem()
-            viewModel.onSelectionToggled("a")
+            viewModel.onChatRowLongClicked("a")
             awaitItem()
             viewModel.onDeleteSelectedRequested()
             cancelAndIgnoreRemainingEvents()
@@ -1227,9 +1191,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a"), item("b"), item("c"))
         viewModel.uiState.test {
             awaitInitialLoaded()
-            viewModel.onEnterSelectMode()
-            awaitItem()
-            viewModel.onSelectionToggled("a")
+            viewModel.onChatRowLongClicked("a")
             awaitItem()
             viewModel.onSelectionToggled("b")
             awaitItem()
@@ -1286,13 +1248,6 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
-    fun `onEnterSelectMode fires select mode entered`() = runTest {
-        viewModel.onEnterSelectMode()
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_MODE_ENTERED_COUNT)
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_MODE_ENTERED_DAILY, type = Daily())
-    }
-
-    @Test
     fun `onChatRowLongClicked entering from default mode fires select mode entered`() = runTest {
         source.value = listOf(item("a"))
         viewModel.uiState.test {
@@ -1309,7 +1264,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a"), item("b"))
         viewModel.uiState.test {
             awaitInitialLoaded()
-            viewModel.onEnterSelectMode()
+            viewModel.onChatRowLongClicked("a")
             awaitItem()
             viewModel.onSelectAllToggled()
             cancelAndIgnoreRemainingEvents()
@@ -1341,9 +1296,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a"), item("b"))
         viewModel.uiState.test {
             awaitInitialLoaded()
-            viewModel.onEnterSelectMode()
-            awaitItem()
-            viewModel.onSelectionToggled("a")
+            viewModel.onChatRowLongClicked("a")
             cancelAndIgnoreRemainingEvents()
         }
         viewModel.onDownloadSelectedRequested()
@@ -1472,6 +1425,7 @@ private class FakeDuckAiModelManager : DuckAiModelManager {
     }
 
     override suspend fun selectModel(model: AIChatModel) = Unit
+    override suspend fun selectProvider(provider: ModelProvider) = Unit
     override suspend fun selectReasoningMode(mode: ReasoningMode) = Unit
     override suspend fun setChatScopedReasoningMode(mode: ReasoningMode?) = Unit
     override fun getSelectedModelId(): String? = null

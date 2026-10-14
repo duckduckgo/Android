@@ -26,7 +26,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.R
-import com.google.android.material.card.MaterialCardView
 
 class NativeInputLayoutCoordinator(
     private val rootView: ViewGroup,
@@ -60,6 +59,8 @@ class NativeInputLayoutCoordinator(
     private var contentTransitionGroup: ViewGroup? = null
     private var suspendedContentTransition: LayoutTransition? = null
     private var isContentReflowSuspended: Boolean = false
+    private var isReflowSuspendRequested: Boolean = false
+    private var isImeAnimating: Boolean = false
 
     fun buildWidgetLayoutParams(isBottom: Boolean, topInsetPx: Int = 0): ViewGroup.LayoutParams {
         return CoordinatorLayout.LayoutParams(
@@ -80,32 +81,6 @@ class NativeInputLayoutCoordinator(
         ).apply {
             gravity = Gravity.TOP
         }
-    }
-
-    fun applyBottomCardCorners(widgetView: View, isBottom: Boolean) {
-        if (!isBottom) return
-        val card = widgetView.findViewById<MaterialCardView?>(R.id.inputModeWidgetCard) ?: return
-        val radius = card.resources.getDimension(R.dimen.extraLargeShapeCornerRadius)
-        card.shapeAppearanceModel =
-            card.shapeAppearanceModel
-                .toBuilder()
-                .setTopLeftCornerSize(radius)
-                .setTopRightCornerSize(radius)
-                .setBottomLeftCornerSize(0f)
-                .setBottomRightCornerSize(0f)
-                .build()
-    }
-
-    fun applyBottomCardShape(widgetView: View, isBottom: Boolean) {
-        if (!isBottom) return
-        applyBottomCardCorners(widgetView, isBottom)
-        val card = widgetView.findViewById<MaterialCardView?>(R.id.inputModeWidgetCard) ?: return
-        val params = card.layoutParams as? ViewGroup.MarginLayoutParams ?: return
-        params.width = ViewGroup.LayoutParams.MATCH_PARENT
-        params.marginStart = 0
-        params.marginEnd = 0
-        params.bottomMargin = 0
-        card.layoutParams = params
     }
 
     fun configureAutocompleteLayout(widgetView: View, isBottom: Boolean) {
@@ -219,6 +194,7 @@ class NativeInputLayoutCoordinator(
             ).map { Target(it, it.snapshotPadding()) }
         if (targets.isEmpty()) return
         val anchor = widgetView.findViewById(R.id.inputModeWidgetCard) ?: widgetView
+        val footer = widgetView.findViewById<View?>(R.id.nativeInputFooter)
 
         // Cached once: isLogoOnlyContent runs on every layout pass and findViewById walks the tree.
         // Safe to cache (they inflate with newTabContent); live visibility/height are read each pass.
@@ -231,11 +207,10 @@ class NativeInputLayoutCoordinator(
             rootView.findViewById(R.id.indonesiaNewTabSectionView),
             rootView.findViewById(R.id.messageCta),
         )
-        // Onboarding CTA bubbles live inside newTabContent and must clear the widget, so a visible
-        // one overrides the logo-only suppression below.
+        // CTA bubbles live inside newTabContent and must clear the widget, so a visible one
+        // overrides the logo-only suppression below.
         val onboardingCtaViews = listOfNotNull(
             rootView.findViewById(R.id.brandDesignDialogScrollView),
-            rootView.findViewById(R.id.includeOnboardingDaxDialogBubble),
         )
 
         // Animate content reflow when the widget toggles Search ↔ DuckAI. Staged here but only assigned
@@ -247,7 +222,9 @@ class NativeInputLayoutCoordinator(
         // transition owner so begin/endNavBarSlide can suspend it.
         contentTransitionGroup = ntpGroup
         isContentReflowSuspended = false
+        isReflowSuspendRequested = false
         suspendedContentTransition = null
+        syncContentReflow()
         if (ntpGroup != null) {
             pendingContentLayoutTransition =
                 ntpGroup to
@@ -307,6 +284,12 @@ class NativeInputLayoutCoordinator(
             }
         }
 
+        fun visibleFooterExtent(anchorBottomInWindow: Int): Int {
+            val visibleFooter = footer?.takeIf { it.isVisible } ?: return 0
+            val footerLocation = IntArray(2).also { visibleFooter.getLocationInWindow(it) }
+            return maxOf(0, footerLocation[1] + visibleFooter.height - anchorBottomInWindow)
+        }
+
         fun applyOffset() {
             if (!widgetView.isShown) {
                 targets.forEach { applyPadding(it.view, it.basePadding, deltaTop = 0, deltaBottom = 0) }
@@ -314,7 +297,12 @@ class NativeInputLayoutCoordinator(
                 return
             }
             val anchorLocation = IntArray(2).also { anchor.getLocationInWindow(it) }
-            val anchorBottomInWindow = anchorLocation[1] + anchor.height
+            val widgetBottomInWindow = anchorLocation[1] + anchor.height
+            val anchorBottomInWindow = contentAnchorBottom(
+                isBottom = isBottom,
+                widgetBottomInWindow = widgetBottomInWindow,
+                visibleFooterExtent = visibleFooterExtent(widgetBottomInWindow),
+            )
             applyOffsetWithBottom(anchorTopInWindow = anchorLocation[1], anchorBottomInWindow = anchorBottomInWindow)
         }
 
@@ -333,7 +321,11 @@ class NativeInputLayoutCoordinator(
             }
             val parentLocation = IntArray(2).also { parent.getLocationInWindow(it) }
             val cardVisualTopInWindow = parentLocation[1] + params.topMargin + card.translationY.toInt()
-            val cardVisualBottomInWindow = cardVisualTopInWindow + params.height
+            val cardVisualBottomInWindow = contentAnchorBottom(
+                isBottom = isBottom,
+                widgetBottomInWindow = cardVisualTopInWindow + params.height,
+                visibleFooterExtent = visibleFooterExtent(cardVisualTopInWindow + params.height),
+            )
             applyOffsetWithBottom(anchorTopInWindow = cardVisualTopInWindow, anchorBottomInWindow = cardVisualBottomInWindow)
         }
 
@@ -362,7 +354,11 @@ class NativeInputLayoutCoordinator(
                 if (isWidgetAnimating) return@OnGlobalLayoutListener
                 applyOffset()
             }
-        ntpContentView?.viewTreeObserver?.addOnGlobalLayoutListener(globalLayoutListener)
+        // Keep the observer we registered on. When the fragment view detaches, the NTP content is
+        // gone before the widget, so `ntpContentView.viewTreeObserver` at cleanup time is a new
+        // object and removing from it would be no-op and leak this listener.
+        val ntpObserver = ntpContentView?.viewTreeObserver
+        ntpObserver?.addOnGlobalLayoutListener(globalLayoutListener)
         widgetView.addOnAttachStateChangeListener(
             object : View.OnAttachStateChangeListener {
                 override fun onViewAttachedToWindow(v: View) = Unit
@@ -377,13 +373,14 @@ class NativeInputLayoutCoordinator(
                     contentTransitionGroup = null
                     suspendedContentTransition = null
                     isContentReflowSuspended = false
+                    isReflowSuspendRequested = false
                     targets.forEach { target ->
                         applyPadding(target.view, target.basePadding, deltaTop = 0, deltaBottom = 0)
                     }
                     clearNtpScrollArtifacts()
                     v.removeOnLayoutChangeListener(layoutListener)
                     rootView.removeOnLayoutChangeListener(layoutListener)
-                    ntpContentView?.viewTreeObserver?.takeIf { it.isAlive }?.removeOnGlobalLayoutListener(globalLayoutListener)
+                    ntpObserver?.takeIf { it.isAlive }?.removeOnGlobalLayoutListener(globalLayoutListener)
                     v.removeOnAttachStateChangeListener(this)
                 }
             },
@@ -432,18 +429,41 @@ class NativeInputLayoutCoordinator(
      * clock and lagging the driver. Idempotent; paired with [resumeContentReflow].
      */
     fun suspendContentReflow() {
-        if (isContentReflowSuspended) return
-        val group = contentTransitionGroup ?: return
-        isContentReflowSuspended = true
-        suspendedContentTransition = group.layoutTransition
-        group.layoutTransition = null
+        isReflowSuspendRequested = true
+        syncContentReflow()
     }
 
+    /**
+     * Ends a [suspendContentReflow]. Reflow stays suspended while the keyboard is still animating
+     * ([setImeAnimating]), so the keyboard ending can't re-enable it mid-exit and vice versa.
+     */
     fun resumeContentReflow() {
-        if (!isContentReflowSuspended) return
-        isContentReflowSuspended = false
-        contentTransitionGroup?.layoutTransition = suspendedContentTransition
-        suspendedContentTransition = null
+        isReflowSuspendRequested = false
+        syncContentReflow()
+    }
+
+    fun setImeAnimating(animating: Boolean) {
+        isImeAnimating = animating
+        syncContentReflow()
+    }
+
+    /**
+     * Single writer of the suspended state: the transition is parked while either a [suspendContentReflow] caller
+     * or the keyboard needs it off, and only reinstalled once both have ended. Called without a group (no widget attached)
+     * it no-ops; the next [configureContentOffset] re-applies the current reasons to the new group.
+     */
+    private fun syncContentReflow() {
+        val suspend = isReflowSuspendRequested || isImeAnimating
+        if (suspend == isContentReflowSuspended) return
+        val group = contentTransitionGroup ?: return
+        isContentReflowSuspended = suspend
+        if (suspend) {
+            suspendedContentTransition = group.layoutTransition
+            group.layoutTransition = null
+        } else {
+            group.layoutTransition = suspendedContentTransition
+            suspendedContentTransition = null
+        }
     }
 
     /**
@@ -473,7 +493,8 @@ class NativeInputLayoutCoordinator(
 
     fun enableContentLayoutTransition() {
         val (ntpGroup, transition) = pendingContentLayoutTransition ?: return
-        ntpGroup.layoutTransition = transition
+        // The enter often completes while the keyboard is still opening; hand it to the resume rather than install it mid-suspension.
+        if (isContentReflowSuspended) suspendedContentTransition = transition else ntpGroup.layoutTransition = transition
         pendingContentLayoutTransition = null
     }
 
@@ -488,6 +509,9 @@ class NativeInputLayoutCoordinator(
             return
         }
         fun applyOffset() {
+            // Before the first layout there is no bottom to measure, and translating by the full root
+            // height would throw the host off screen.
+            if (widgetView.bottom == 0) return
             val gap = maxOf(0, rootView.height - widgetView.bottom)
             if (widgetView.translationY != gap.toFloat()) {
                 widgetView.translationY = gap.toFloat()
@@ -498,13 +522,18 @@ class NativeInputLayoutCoordinator(
             View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
                 applyOffset()
             }
+        // Both views matter: the root resizes when the keyboard hides, and the host is re-laid out a
+        // frame later. Listening to the root alone measured the gap against the host's pre-resize
+        // bottom and left the input parked below the screen.
         rootView.addOnLayoutChangeListener(layoutListener)
+        widgetView.addOnLayoutChangeListener(layoutListener)
         widgetView.addOnAttachStateChangeListener(
             object : View.OnAttachStateChangeListener {
                 override fun onViewAttachedToWindow(v: View) = Unit
 
                 override fun onViewDetachedFromWindow(v: View) {
                     rootView.removeOnLayoutChangeListener(layoutListener)
+                    v.removeOnLayoutChangeListener(layoutListener)
                     v.removeOnAttachStateChangeListener(this)
                 }
             },
@@ -539,6 +568,9 @@ internal fun contentTopInset(isBottom: Boolean, isLogoOnly: Boolean, navBarInset
         isBottom -> navBarInsetPx
         else -> maxOf(0, widgetTopOffsetPx)
     }
+
+internal fun contentAnchorBottom(isBottom: Boolean, widgetBottomInWindow: Int, visibleFooterExtent: Int): Int =
+    if (isBottom) widgetBottomInWindow else widgetBottomInWindow + visibleFooterExtent
 
 /**
  * Top padding the autocomplete list needs to clear the top chrome.

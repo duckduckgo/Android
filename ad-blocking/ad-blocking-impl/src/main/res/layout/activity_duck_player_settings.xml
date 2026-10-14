@@ -99,7 +99,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="24dp"
                     android:importantForAccessibility="no"
-                    android:src="@drawable/clean_tube_128" />
+                    android:src="@drawable/youtube_clean_128" />
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/duckPlayerSettingsTitle"

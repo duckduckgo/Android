@@ -19,10 +19,11 @@ package com.duckduckgo.common.ui.compose.button
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.RippleConfiguration
@@ -33,10 +34,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.isSpecified
 import com.duckduckgo.common.ui.compose.theme.Black6
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.theme.White12
@@ -57,6 +60,7 @@ import com.duckduckgo.mobile.android.R
  * @param contentDescription Accessibility description, or null if decorative.
  * @param modifier Modifier for this button.
  * @param enabled Whether the button is enabled.
+ * @param iconSize [Dp.Unspecified] (the default) draws the painter at its own intrinsic size.
  * @param colors Container and content colors; defaults to [DaxIconButtonDefaults.iconButtonColors].
  * @param interactionSource The interaction source for this button.
  *
@@ -70,6 +74,7 @@ fun DaxIconButton(
     contentDescription: String?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    iconSize: Dp = Dp.Unspecified,
     colors: DaxIconButtonColors = DaxIconButtonDefaults.iconButtonColors,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
@@ -80,10 +85,10 @@ fun DaxIconButton(
         IconButton(
             onClick = onClick,
             modifier = modifier,
-            colors = IconButtonDefaults.iconButtonColors(
-                containerColor = colors.containerColor,
+            colors = IconButtonColors(
+                containerColor = colors.containerColor.takeOrElse { Color.Transparent },
                 contentColor = colors.contentColor,
-                disabledContainerColor = colors.disabledContainerColor,
+                disabledContainerColor = colors.disabledContainerColor.takeOrElse { Color.Transparent },
                 disabledContentColor = colors.disabledContentColor,
             ),
             enabled = enabled,
@@ -92,6 +97,7 @@ fun DaxIconButton(
             Icon(
                 painter = iconPainter,
                 contentDescription = contentDescription,
+                modifier = if (iconSize.isSpecified) Modifier.size(iconSize) else Modifier,
             )
         }
     }

@@ -62,7 +62,7 @@ class LowPriorityMessagingModelImpl @Inject constructor(
                 logcat { "evaluate: show low priority message" }
                 DefaultBrowserMessage(
                     Message(
-                        topIllustration = com.duckduckgo.mobile.android.R.drawable.ic_device_mobile_default,
+                        topIllustration = com.duckduckgo.mobile.android.R.drawable.mobile_device_default_96,
                         title = context.getString(R.string.newTabPageDefaultBrowserMessageHeading).preventWidows(),
                         action = context.getString(R.string.newTabPageDefaultBrowserMessagePrimaryCta),
                         action2 = context.getString(R.string.newTabPageDefaultBrowserMessageSecondaryCta),

@@ -57,4 +57,10 @@
     <string name="browserMenuForward">Forward</string>
     <string name="browserMenuRefresh">Refresh</string>
     <string name="browserMenuFireTabsData">Delete Tabs and Data</string>
+
+    <!-- Duck.ai tab + menu -->
+    <string name="chatMenuPopupNewVoiceChat">New Voice Chat</string>
+    <string name="chatMenuPopupNewImage">New Image</string>
+    <string name="chatMenuPopupNewTab">New Tab</string>
+    <string name="chatMenuPopupNewFireTab">New Fire Tab</string>
 </resources>

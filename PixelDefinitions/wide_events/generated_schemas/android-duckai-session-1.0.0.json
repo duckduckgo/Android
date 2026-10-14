@@ -1,0 +1,105 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "Captures every visit to a full Duck.ai tab, from becoming visible to a confirmed exit, app background, or app termination.",
+    "$comment": "{\"owners\":[\"YoussefKeyrouz\"]}",
+    "type": "object",
+    "required": ["meta", "global", "feature", "app"],
+    "additionalProperties": false,
+    "properties": {
+        "meta": {
+            "type": "object",
+            "required": ["type", "version"],
+            "additionalProperties": false,
+            "properties": { "type": { "const": "android-duckai-session" }, "version": { "const": "1.0.0" } }
+        },
+        "app": {
+            "type": "object",
+            "required": ["name", "version"],
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the application sending the event",
+                    "enum": ["DuckDuckGo Android"]
+                },
+                "version": {
+                    "type": "string",
+                    "description": "The version of the app sending the event. Release builds are X.Y.Z; internal and nightly builds append the build number and channel suffix.",
+                    "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+(-[a-z]+)?)?$"
+                },
+                "form_factor": { "type": "string", "description": "The form factor of the current device", "enum": ["phone", "tablet"] },
+                "dev_mode": { "type": "boolean", "description": "Whether the app is a debug build" }
+            }
+        },
+        "global": {
+            "type": "object",
+            "required": ["platform", "type", "sample_rate"],
+            "additionalProperties": false,
+            "properties": {
+                "platform": { "type": "string", "description": "The platform the app is running on", "enum": ["Android"] },
+                "type": { "type": "string", "description": "The type of software sending the event", "enum": ["app"] },
+                "sample_rate": {
+                    "type": "number",
+                    "description": "Sample rate for this event, between 0 and 1",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "is_first_daily_occurrence": {
+                    "type": "boolean",
+                    "description": "Whether this is the first event completed with this feature name and status in the current UTC calendar day"
+                }
+            }
+        },
+        "feature": {
+            "type": "object",
+            "required": ["name", "status", "data"],
+            "additionalProperties": false,
+            "properties": {
+                "name": { "type": "string", "description": "The feature name for this event", "enum": ["duckai_session"] },
+                "status": {
+                    "type": "string",
+                    "description": "The terminal status of the flow",
+                    "enum": ["SUCCESS", "CANCELLED", "UNKNOWN"]
+                },
+                "data": {
+                    "type": "object",
+                    "required": ["ext"],
+                    "additionalProperties": false,
+                    "properties": {
+                        "ext": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "status_reason": {
+                                    "type": "string",
+                                    "description": "Reason the session ended",
+                                    "enum": ["left_duckai", "app_backgrounded", "app_terminated"]
+                                },
+                                "exit_trigger": {
+                                    "type": "string",
+                                    "description": "Action that caused the transition away from Duck.ai. Present only when status_reason is left_duckai",
+                                    "enum": ["back_or_close", "tab_switched", "new_tab_opened", "fire_tab_opened", "other_navigation"]
+                                },
+                                "step.prompt_submitted": {
+                                    "type": "string",
+                                    "description": "Parameter present when a Duck.ai prompt was submitted at least once during the session",
+                                    "enum": ["true"]
+                                },
+                                "step.new_chat_created": {
+                                    "type": "string",
+                                    "description": "Parameter present when a new chat was created from the active Duck.ai session at least once",
+                                    "enum": ["true"]
+                                },
+                                "step.chat_id_changed": {
+                                    "type": "string",
+                                    "description": "Parameter present when the active Duck.ai URL's chatID changed at least once, including a change between missing and present. The identifier itself is never sent",
+                                    "enum": ["true"]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -19,7 +19,7 @@ package com.duckduckgo.app.trackerdetection
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.pixels.remoteconfig.CachedEntityLookupRCWrapper
+import com.duckduckgo.app.trackerdetection.flags.CachedEntityLookupRCWrapper
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any

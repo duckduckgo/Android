@@ -66,6 +66,7 @@ import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.PromoBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
+import com.duckduckgo.common.ui.view.dialog.RadioListOption
 import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -154,6 +155,33 @@ class DialogsFragment : Fragment() {
                             CommonR.string.text_dialog_option,
                             CommonR.string.text_dialog_option,
                             CommonR.string.text_dialog_option,
+                        ),
+                    )
+                    .addEventListener(
+                        object : RadioListAlertDialogBuilder.EventListener() {
+                            override fun onRadioItemSelected(selectedItem: Int) {
+                                Snackbar.make(it, "Radio Button $selectedItem selected", Snackbar.LENGTH_SHORT).show()
+                            }
+                        },
+                    )
+                    .show()
+            }
+        }
+
+        view.findViewById<Button>(R.id.radioButtonAlertDialogRebrand)?.let {
+            it.setOnClickListener {
+                RadioListAlertDialogBuilder(requireContext())
+                    .setRebrandUpdate(true)
+                    .setHeaderImageResource(CommonR.drawable.ic_location_24)
+                    .setTitle(CommonR.string.text_dialog_title)
+                    .setMessage(CommonR.string.text_dialog_message)
+                    .setPositiveButton(CommonR.string.text_dialog_positive)
+                    .setNegativeButton(CommonR.string.text_dialog_negative)
+                    .setOptions(
+                        listOf(
+                            RadioListOption(CommonR.string.text_dialog_option, isSelected = true),
+                            RadioListOption(CommonR.string.text_dialog_option),
+                            RadioListOption(CommonR.string.text_dialog_option),
                         ),
                     )
                     .addEventListener(
@@ -739,9 +767,9 @@ class DialogsFragment : Fragment() {
                     content = {
                         item {
                             DaxOneLineListItem(
-                                text = "Primary Item",
-                                leadingIcon = {
-                                    DaxListItemTrailingIcon(
+                                primaryText = "Primary Item",
+                                leadingContent = {
+                                    Icon(
                                         painter = painterResource(CommonR.drawable.ic_add_24),
                                         contentDescription = null,
                                     )
@@ -750,9 +778,9 @@ class DialogsFragment : Fragment() {
                         }
                         item {
                             DaxOneLineListItem(
-                                text = "Secondary Item",
-                                leadingIcon = {
-                                    DaxListItemTrailingIcon(
+                                primaryText = "Secondary Item",
+                                leadingContent = {
+                                    Icon(
                                         painter = painterResource(CommonR.drawable.ic_add_24),
                                         contentDescription = null,
                                     )

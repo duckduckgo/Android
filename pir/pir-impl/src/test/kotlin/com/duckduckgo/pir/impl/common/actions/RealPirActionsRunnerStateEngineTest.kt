@@ -1061,4 +1061,41 @@ class RealPirActionsRunnerStateEngineTest {
             profileQuery = profileQuery,
         )
     }
+
+    @Test
+    fun whenEventHandlerThrowsThenEngineSurvivesAndCompletesExecution() = runTest {
+        val handler1: EventHandler = mock()
+        val handler2: EventHandler = mock()
+        var secondHandlerInvoked = false
+
+        whenever(handler1.event).thenReturn(Event.Started::class)
+        whenever(handler1.invoke(any(), any())).thenAnswer {
+            throw IndexOutOfBoundsException("Index 0 out of bounds for length 0")
+        }
+
+        whenever(handler2.event).thenReturn(Event.ExecuteBrokerStep::class)
+        whenever(handler2.invoke(any(), any())).thenAnswer {
+            secondHandlerInvoked = true
+            Next(nextState = testState)
+        }
+
+        whenever(mockEventHandlers.getPlugins()).thenReturn(listOf(handler1, handler2))
+
+        testee = createEngine()
+
+        val sideEffects = mutableListOf<SideEffect>()
+        val collectJob = launch { testee.sideEffect.toList(sideEffects) }
+
+        testee.dispatch(Event.Started)
+        advanceUntilIdle()
+
+        // The engine must not be torn down by a failing handler
+        testee.dispatch(Event.ExecuteBrokerStep)
+        advanceUntilIdle()
+
+        assertTrue(secondHandlerInvoked)
+        assertTrue(sideEffects.contains(SideEffect.CompleteExecution))
+
+        collectJob.cancel()
+    }
 }

@@ -18,14 +18,16 @@ package com.duckduckgo.autofill.impl.importing.gpm.webflow
 
 import android.os.Parcelable
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter.CsvCredentialImportResult
+import com.duckduckgo.autofill.impl.importing.PasswordImportExperimentMetrics
 import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordConfigStore
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.Command.InjectCredentialsFromReauth
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.Command.NoCredentialsAvailable
@@ -36,8 +38,11 @@ import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsW
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.UserCancelledImportFlow
 import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
 import com.duckduckgo.autofill.impl.store.ReauthenticationHandler
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.FragmentScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -48,10 +53,9 @@ import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import logcat.LogPriority.WARN
 import logcat.logcat
-import javax.inject.Inject
 
-@ContributesViewModel(FragmentScope::class)
-class ImportGooglePasswordsWebFlowViewModel @Inject constructor(
+class ImportGooglePasswordsWebFlowViewModel @AssistedInject constructor(
+    @Assisted private val launchSource: AutofillImportLaunchSource,
     private val dispatchers: DispatcherProvider,
     private val credentialImporter: CredentialImporter,
     private val csvCredentialConverter: CsvCredentialConverter,
@@ -59,6 +63,8 @@ class ImportGooglePasswordsWebFlowViewModel @Inject constructor(
     private val urlToStageMapper: ImportGooglePasswordUrlToStageMapper,
     private val reauthenticationHandler: ReauthenticationHandler,
     private val autofillFeature: AutofillFeature,
+    private val importPasswordsPixelSender: ImportPasswordsPixelSender,
+    private val passwordImportExperimentMetrics: PasswordImportExperimentMetrics,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow<ViewState>(Initializing)
@@ -70,6 +76,7 @@ class ImportGooglePasswordsWebFlowViewModel @Inject constructor(
     fun onViewCreated() {
         viewModelScope.launch(dispatchers.io()) {
             _viewState.value = ViewState.LoadStartPage(autofillImportConfigStore.getConfig().launchUrlGooglePasswords)
+            passwordImportExperimentMetrics.fireImportStartedMetric()
         }
     }
 
@@ -81,18 +88,22 @@ class ImportGooglePasswordsWebFlowViewModel @Inject constructor(
     }
 
     private suspend fun onCsvParsed(parseResult: CsvCredentialImportResult.Success) {
-        credentialImporter.import(parseResult.loginCredentialsToImport, parseResult.numberCredentialsInSource)
+        credentialImporter.import(parseResult.loginCredentialsToImport, parseResult.numberCredentialsInSource, launchSource)
         _viewState.value = ViewState.UserFinishedImportFlow
     }
 
     fun onCsvError() {
         logcat(WARN) { "Error decoding CSV" }
+        importPasswordsPixelSender.onImportFailed(ErrorParsingCsv, launchSource)
         _viewState.value = ViewState.UserFinishedCannotImport(ErrorParsingCsv)
+        viewModelScope.launch { passwordImportExperimentMetrics.fireImportFailedMetric() }
     }
 
     fun onWebViewCrash() {
         logcat(WARN) { "WebView has crashed during password import flow" }
+        importPasswordsPixelSender.onImportFailed(WebViewCrash, launchSource)
         _viewState.value = ViewState.UserFinishedCannotImport(WebViewCrash)
+        viewModelScope.launch { passwordImportExperimentMetrics.fireImportFailedMetric() }
     }
 
     fun onCloseButtonPressed(url: String?) {
@@ -114,7 +125,10 @@ class ImportGooglePasswordsWebFlowViewModel @Inject constructor(
 
     private fun terminateFlowAsCancellation(url: String) {
         viewModelScope.launch {
-            _viewState.value = UserCancelledImportFlow(urlToStageMapper.getStage(url))
+            val stage = urlToStageMapper.getStage(url)
+            importPasswordsPixelSender.onUserCancelledImportWebFlow(stage, launchSource)
+            _viewState.value = UserCancelledImportFlow(stage)
+            passwordImportExperimentMetrics.fireImportCancelledMetric()
         }
     }
 
@@ -250,5 +264,21 @@ class ImportGooglePasswordsWebFlowViewModel @Inject constructor(
 
     sealed interface BackButtonAction {
         data object NavigateBack : BackButtonAction
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(launchSource: AutofillImportLaunchSource): ImportGooglePasswordsWebFlowViewModel
+
+        class Provider(
+            private val assistedFactory: Factory,
+            private val launchSource: AutofillImportLaunchSource,
+        ) : ViewModelProvider.Factory {
+
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return assistedFactory.create(launchSource) as T
+            }
+        }
     }
 }

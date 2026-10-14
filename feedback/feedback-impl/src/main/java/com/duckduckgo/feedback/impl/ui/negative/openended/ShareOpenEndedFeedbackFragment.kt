@@ -19,17 +19,20 @@ package com.duckduckgo.feedback.impl.ui.negative.openended
 import android.os.Bundle
 import androidx.core.view.doOnNextLayout
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.feedback.impl.R
 import com.duckduckgo.feedback.impl.databinding.ContentFeedbackOpenEndedFeedbackBinding
 import com.duckduckgo.feedback.impl.ui.common.FeedbackFragment
 import com.duckduckgo.feedback.impl.ui.common.LayoutScrollingTouchListener
+import com.duckduckgo.feedback.impl.ui.common.resolveFeedbackFaceAsset
 import com.duckduckgo.feedback.impl.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.feedback.impl.ui.negative.FeedbackType.SubReason
 import com.duckduckgo.feedback.impl.ui.negative.FeedbackTypeDisplay.Companion.mainReasons
 import com.duckduckgo.feedback.impl.ui.negative.FeedbackTypeDisplay.Companion.subReasons
 import com.duckduckgo.feedback.impl.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel.Command
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class ShareOpenEndedFeedbackFragment : FeedbackFragment(R.layout.content_feedback_open_ended_feedback) {
@@ -56,6 +59,9 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment(R.layout.content_feedbac
 
     private var mainReason: MainReason? = null
     private var subReason: SubReason? = null
+
+    @Inject
+    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     override fun configureViewModelObservers() {
         viewModel.command.observe(this) { command ->
@@ -86,6 +92,12 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment(R.layout.content_feedbac
             } else {
                 updateDisplayForNegativeFeedback(args)
             }
+        }
+
+        if (appBrandDesignUpdateToggles.pictograms().isEnabled()) {
+            binding.emoticonImage.setImageResource(
+                resolveFeedbackFaceAsset(isPositive = isPositiveFeedback, isPictogramsEnabled = true),
+            )
         }
     }
 

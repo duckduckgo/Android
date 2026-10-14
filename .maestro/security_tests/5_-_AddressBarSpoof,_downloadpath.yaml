@@ -11,7 +11,7 @@ tags:
             - runFlow: ../shared/skip_all_onboarding.yaml
             # Test 1
             - tapOn:
-                id: "omnibarTextInput"
+                id: "omnibarTextInput|inputField"
             - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-js-download-url.html"
             - pressKey: Enter
 
@@ -22,7 +22,7 @@ tags:
                 timeout: 10000
             - tapOn: "Save to Downloads"
             - copyTextFrom:
-                id: "omnibarTextInput"
+                id: "omnibarTextInput|inputField"
             - assertTrue: ${maestro.copiedText == "Search"} # Downloads should occur in empty origin.
             - pressKey: Back
             # Download Cancel Flow:
@@ -33,7 +33,7 @@ tags:
             - tapOn: "Cancel"
             # Should redirect back to the last page.
             - tapOn:
-                id: "omnibarTextInput"
+                id: "omnibarTextInput|inputField"
             - copyTextFrom:
-                id: "omnibarTextInput"
+                id: "omnibarTextInput|inputField"
             - assertTrue: ${maestro.copiedText.indexOf("https://staticcdn.duckduckgo.com") == -1}

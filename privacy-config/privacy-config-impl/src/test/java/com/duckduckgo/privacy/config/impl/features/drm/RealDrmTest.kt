@@ -29,6 +29,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -49,6 +50,38 @@ class RealDrmTest {
 
         val url = "https://open.spotify.com"
         assertTrue(testee.isDrmAllowedForUrl(url))
+    }
+
+    @Test
+    fun whenIsDrmAllowedForUrlIfSubdomainOfExceptionThenTrueIsReturned() {
+        giveFeatureIsEnabled()
+        givenUrlIsInExceptionList("foxnews.com")
+
+        assertTrue(testee.isDrmAllowedForUrl("https://static.foxnews.com"))
+    }
+
+    @Test
+    fun whenIsDrmAllowedForUrlIfNestedSubdomainOfExceptionThenTrueIsReturned() {
+        giveFeatureIsEnabled()
+        givenUrlIsInExceptionList("foxnews.com")
+
+        assertTrue(testee.isDrmAllowedForUrl("https://a.b.foxnews.com"))
+    }
+
+    @Test
+    fun whenIsDrmAllowedForUrlIfParentDomainOfExceptionThenFalseIsReturned() {
+        giveFeatureIsEnabled()
+        givenUrlIsInExceptionList("open.spotify.com")
+
+        assertFalse(testee.isDrmAllowedForUrl("https://spotify.com"))
+    }
+
+    @Test
+    fun whenIsDrmAllowedForUrlIfUnrelatedDomainSharesSuffixThenFalseIsReturned() {
+        giveFeatureIsEnabled()
+        givenUrlIsInExceptionList("foxnews.com")
+
+        assertFalse(testee.isDrmAllowedForUrl("https://notfoxnews.com"))
     }
 
     @Test
@@ -87,12 +120,22 @@ class RealDrmTest {
         assertTrue(testee.isDrmAllowedForUrl(url))
     }
 
+    @Test
+    fun whenIsDrmAllowedForUrlThenEmeFeatureDefaultsToDisabled() {
+        givenUrlIsInExceptionList()
+
+        testee.isDrmAllowedForUrl("https://open.spotify.com")
+
+        // An unset toggle means eme was dropped from the config, so the stored exceptions must stop granting
+        verify(mockFeatureToggle).isFeatureEnabled(PrivacyFeatureName.DrmFeatureName.value, false)
+    }
+
     private fun giveFeatureIsEnabled() {
         whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.DrmFeatureName.value), any())).thenReturn(true)
     }
 
-    private fun givenUrlIsInExceptionList() {
-        val exceptions = CopyOnWriteArrayList<FeatureException>().apply { add(FeatureException("open.spotify.com", "my reason here")) }
+    private fun givenUrlIsInExceptionList(domain: String = "open.spotify.com") {
+        val exceptions = CopyOnWriteArrayList<FeatureException>().apply { add(FeatureException(domain, "my reason here")) }
         whenever(mockDrmRepository.exceptions).thenReturn(exceptions)
     }
 

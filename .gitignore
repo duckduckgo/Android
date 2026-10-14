@@ -106,6 +106,9 @@ report
 
 # Pixel processing results
 PixelDefinitions/pixels/pixel_processing_results/*
+
+# perf-benchmarks/pageload_benchmark.py --out default (CI artifact, produced fresh each run)
+/pageload-results.json
 PixelDefinitions/node_modules/
 
 # LLM

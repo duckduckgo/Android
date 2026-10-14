@@ -28,6 +28,9 @@ interface AutoconsentSettingsDataStore {
     var userSetting: Boolean
     var clickAcceptEnabled: Boolean
     var firstPopupHandled: Boolean
+    var optInPromptShownCount: Int
+    var optInPromptFirstShownAt: Long
+    var optInPromptChoiceMade: Boolean
     fun invalidateCache()
 }
 
@@ -94,6 +97,30 @@ class RealAutoconsentSettingsDataStore constructor(
             }
         }
 
+    override var optInPromptShownCount: Int
+        get() = preferences.getInt(AUTOCONSENT_OPT_IN_PROMPT_SHOWN_COUNT, 0)
+        set(value) {
+            preferences.edit(commit = true) {
+                putInt(AUTOCONSENT_OPT_IN_PROMPT_SHOWN_COUNT, value)
+            }
+        }
+
+    override var optInPromptFirstShownAt: Long
+        get() = preferences.getLong(AUTOCONSENT_OPT_IN_PROMPT_FIRST_SHOWN_AT, 0L)
+        set(value) {
+            preferences.edit(commit = true) {
+                putLong(AUTOCONSENT_OPT_IN_PROMPT_FIRST_SHOWN_AT, value)
+            }
+        }
+
+    override var optInPromptChoiceMade: Boolean
+        get() = preferences.getBoolean(AUTOCONSENT_OPT_IN_PROMPT_CHOICE_MADE, false)
+        set(value) {
+            preferences.edit(commit = true) {
+                putBoolean(AUTOCONSENT_OPT_IN_PROMPT_CHOICE_MADE, value)
+            }
+        }
+
     override fun invalidateCache() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             _defaultValue = autoconsentFeature.onByDefault().isEnabled()
@@ -115,5 +142,8 @@ class RealAutoconsentSettingsDataStore constructor(
         private const val AUTOCONSENT_USER_SETTING = "AutoconsentUserSetting"
         private const val AUTOCONSENT_CLICK_ACCEPT_ENABLED = "AutoconsentClickAcceptEnabled"
         private const val AUTOCONSENT_FIRST_POPUP_HANDLED = "AutoconsentFirstPopupHandled"
+        private const val AUTOCONSENT_OPT_IN_PROMPT_SHOWN_COUNT = "AutoconsentOptInPromptShownCount"
+        private const val AUTOCONSENT_OPT_IN_PROMPT_FIRST_SHOWN_AT = "AutoconsentOptInPromptFirstShownAt"
+        private const val AUTOCONSENT_OPT_IN_PROMPT_CHOICE_MADE = "AutoconsentOptInPromptChoiceMade"
     }
 }

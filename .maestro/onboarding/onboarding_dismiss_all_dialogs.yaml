@@ -13,17 +13,17 @@ tags:
           clearState: true
       - runFlow: ../shared/pre_onboarding.yaml
       - tapOn:
-          id: "daxDialogDismissButton|contextualBrandDesignDismissButton"
+          id: "contextualBrandDesignDismissButton"
       - tapOn:
-          id: "omnibarTextInput"
+          id: "omnibarTextInput|inputField"
       - inputText: "https://www.search-company.site/#ad-id-14"
       - pressKey: Enter
       - assertVisible:
           text: ".*As you tap and scroll, I'll block pesky trackers..*"
       - assertVisible:
-          id: "daxDialogDismissButton|contextualBrandDesignDismissButton"
+          id: "contextualBrandDesignDismissButton"
       - tapOn:
-          id: "daxDialogDismissButton|contextualBrandDesignDismissButton"
+          id: "contextualBrandDesignDismissButton"
       - assertNotVisible:
           text: ".*As you tap and scroll, I'll block pesky trackers..*"
       - assertVisible:
@@ -33,9 +33,9 @@ tags:
       - assertVisible:
           text: ".*was trying to track you here. I blocked them!.*"
       - assertVisible:
-          id: "daxDialogDismissButton|contextualBrandDesignDismissButton"
+          id: "contextualBrandDesignDismissButton"
       - tapOn:
-          id: "daxDialogDismissButton|contextualBrandDesignDismissButton"
+          id: "contextualBrandDesignDismissButton"
       - assertNotVisible:
           text: ".*was trying to track you here. I blocked them!.*"
       - assertVisible:
@@ -45,12 +45,17 @@ tags:
       - assertVisible:
           text: ".*Remember: every time you browse with me a creepy ad loses its.wings..*"
       - assertVisible:
-          id: "daxDialogDismissButton|contextualBrandDesignDismissButton"
+          id: "contextualBrandDesignDismissButton"
       - tapOn:
-          id: "daxDialogDismissButton|contextualBrandDesignDismissButton"
+          id: "contextualBrandDesignDismissButton"
       - assertNotVisible:
           text: ".*Remember: every time you browse with me a creepy ad loses its.wings..*"
       - runFlow: ../shared/browser_screen/click_on_tabs_button.yaml
       - tapOn: "New Tab"
-      - assertVisible:
+      - extendedWaitUntil:
+          visible:
+            text: ".*Try our Home screen widget!.*"
+          timeout: 3000
+          optional: true
+      - assertNotVisible:
           text: ".*Try our Home screen widget!.*"

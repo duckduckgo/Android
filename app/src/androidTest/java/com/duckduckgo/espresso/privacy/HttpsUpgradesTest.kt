@@ -34,6 +34,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.common.utils.isHttps
+import com.duckduckgo.espresso.JsObjectIdlingResource
 import com.duckduckgo.espresso.PrivacyTest
 import com.duckduckgo.espresso.WebViewIdlingResource
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
@@ -80,7 +81,9 @@ class HttpsUpgradesTest {
             .check(webMatches(getText(), containsString("Start test")))
             .perform(webClick())
 
-        val idlingResourceForScript = WebViewIdlingResource(testWebView)
+        // The page loads before its tests finish, so page progress alone does not mean the results are
+        // populated: upgrade-navigation resolves only once the popup it opens posts its URL back.
+        val idlingResourceForScript = JsObjectIdlingResource(testWebView, RESULTS_OBJECT, condition = RESULTS_POPULATED)
         IdlingRegistry.getInstance().register(idlingResourceForScript)
 
         val results = onWebView(testWebViewMatcher)
@@ -105,6 +108,13 @@ class HttpsUpgradesTest {
     companion object {
         const val SCRIPT = "return results.results;"
         val compatibleIds = listOf("upgrade-navigation")
+
+        // The page declares `results` with const, so it is a global binding rather than a window property
+        private const val RESULTS_OBJECT = "results"
+        private val RESULTS_POPULATED = compatibleIds.joinToString(
+            separator = " && ",
+            prefix = "typeof $RESULTS_OBJECT !== 'undefined' && ",
+        ) { "!!$RESULTS_OBJECT.results?.find(r => r.id === '$it')?.value" }
     }
 
     data class TestJson(val status: Int, val value: List<HttpsUpgradeTest>)

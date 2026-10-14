@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl.exchange.v2
 
 import com.duckduckgo.sync.impl.ExchangeEnvelope
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Test
@@ -32,19 +33,20 @@ class RealExchangeV2EnvelopeTest {
     private val jweCrypto: SyncJweCrypto = mock()
     private val envelope = RealExchangeV2Envelope(jweCrypto)
 
-    @Test fun `seal produces envelope with our version and JWE payload`() {
+    @Test fun `seal produces envelope with message version and JWE payload`() {
+        val message = ExchangeV2Message.Hello.create("chanelId", "publicKey", ExchangeProtocolVersion.V2_1)
         whenever(jweCrypto.jweEncryptRsaOaep(any(), any(), any())).thenReturn("jwe-bytes")
 
         val result = envelope.seal(
-            messageJson = """{"type":"hello"}""",
+            message = message,
             peerPublicKeyBase64 = "peer-pub",
             senderChannelId = "our-channel",
         )
 
-        assertEquals(OUR_VERSION_STRING, result.version)
+        assertEquals(message.protocolVersion.toString(), result.version)
         assertEquals("jwe-bytes", result.payload)
         verify(jweCrypto).jweEncryptRsaOaep(
-            plaintext = """{"type":"hello"}""".toByteArray(Charsets.UTF_8),
+            plaintext = message.rawJson.toByteArray(Charsets.UTF_8),
             recipientPublicKeyBase64 = "peer-pub",
             kid = "our-channel",
         )
@@ -71,14 +73,14 @@ class RealExchangeV2EnvelopeTest {
         val ex = assertThrows(EnvelopeVersionTooNew::class.java) {
             envelope.open(ExchangeEnvelope(version = "3", payload = "anything"), "k")
         }
-        assertEquals("3", ex.version)
+        assertEquals(ExchangeProtocolVersion.Unsupported("3"), ex.version)
     }
 
     @Test fun `open throws EnvelopeVersionTooNew even when minor is set`() {
         val ex = assertThrows(EnvelopeVersionTooNew::class.java) {
             envelope.open(ExchangeEnvelope(version = "4.2", payload = "anything"), "k")
         }
-        assertEquals("4.2", ex.version)
+        assertEquals(ExchangeProtocolVersion.Unsupported("4.2"), ex.version)
     }
 
     @Test fun `open rejects obsolete (lower major) versions`() {

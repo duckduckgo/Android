@@ -521,4 +521,37 @@ class DuckDuckGoAppLinksHandlerTest {
         )
         verify(mockCallback).invoke()
     }
+
+    @Test
+    fun whenTrustedCallerViaComponentPackageMatchesClientThenReturnTrue() {
+        val appIntent = Intent().setComponent(ComponentName("com.example.app", "com.example.app.MainActivity"))
+        assertTrue(testee.isTrustedCaller(AppLink(uriString = "example.com", appIntent = appIntent), "com.example.app"))
+    }
+
+    @Test
+    fun whenTrustedCallerViaIntentPackageMatchesClientThenReturnTrue() {
+        val appIntent = Intent().setPackage("com.example.app")
+        assertTrue(testee.isTrustedCaller(AppLink(uriString = "example.com", appIntent = appIntent), "com.example.app"))
+    }
+
+    @Test
+    fun whenTargetPackageDoesNotMatchClientThenReturnFalse() {
+        val appIntent = Intent().setPackage("com.example.app")
+        assertFalse(testee.isTrustedCaller(AppLink(uriString = "example.com", appIntent = appIntent), "com.different.app"))
+    }
+
+    @Test
+    fun whenTargetPackageIsNullThenReturnFalse() {
+        assertFalse(testee.isTrustedCaller(AppLink(uriString = "example.com", appIntent = null), "com.example.app"))
+    }
+
+    @Test
+    fun whenDomainInAlwaysTriggerListThenIsAlwaysTriggerDomainReturnsTrue() {
+        assertTrue(testee.isAlwaysTriggerDomain(AppLink(uriString = "https://app.digid.nl/path")))
+    }
+
+    @Test
+    fun whenDomainNotInAlwaysTriggerListThenIsAlwaysTriggerDomainReturnsFalse() {
+        assertFalse(testee.isAlwaysTriggerDomain(AppLink(uriString = "https://example.com/path")))
+    }
 }

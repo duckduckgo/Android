@@ -35,7 +35,7 @@
             android:id="@+id/subscriptionBuy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:leadingIcon="@drawable/ic_privacy_pro_color_24"
+            app:leadingIcon="@drawable/subscription_color_24"
             app:primaryText="@string/subscriptionSettingSubscribe"
             app:primaryTextTruncated="false" />
 
@@ -65,7 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:primaryText="@string/subscriptionSetting"
-            app:leadingIcon="@drawable/ic_privacy_pro_color_24"
+            app:leadingIcon="@drawable/subscription_color_24"
             android:visibility="gone"
             tools:visibility="visible"
             tools:ignore="RtlSymmetry" />
@@ -76,7 +76,7 @@
             android:layout_height="wrap_content"
             android:clickable="false"
             app:primaryText="@string/subscriptionSetting"
-            app:leadingIcon="@drawable/ic_privacy_pro_color_24"
+            app:leadingIcon="@drawable/subscription_color_24"
             app:trailingIconSize="small"
             tools:ignore="RtlSymmetry" />
 

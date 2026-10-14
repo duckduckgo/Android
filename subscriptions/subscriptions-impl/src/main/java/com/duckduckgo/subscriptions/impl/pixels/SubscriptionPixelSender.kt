@@ -17,15 +17,18 @@
 package com.duckduckgo.subscriptions.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.extensions.toSanitizedLanguageTag
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FUNNEL_ORIGIN_ALLOWLIST
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ORIGIN_APP_SETTINGS
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ORIGIN_QUERY_PARAM_KEY
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ACTIVATE_SUBSCRIPTION_ENTER_EMAIL_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ACTIVATE_SUBSCRIPTION_RESTORE_PURCHASE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_GET_SUBSCRIPTION_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_IDTR_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_PARTNER_BENEFITS_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_PIR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_RESTORE_PURCHASE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_DETECTED
@@ -121,6 +124,7 @@ interface SubscriptionPixelSender {
     fun reportAppSettingsIdtrClick()
     fun reportAppSettingsGetSubscriptionClick()
     fun reportAppSettingsRestorePurchaseClick()
+    fun reportAppSettingsPartnerBenefitsClick()
     fun reportSubscriptionSettingsChangePlanOrBillingClick()
     fun reportSubscriptionSettingsRemoveFromDeviceClick()
     fun reportMonthlyPriceClick()
@@ -141,6 +145,9 @@ interface SubscriptionPixelSender {
     fun reportFreeTrialStart()
     fun reportFreeTrialVpnActivation(activationDay: String, platform: String)
     fun reportFreeTrialDuckAiPaidUsed(activationDay: String, platform: String)
+    fun reportOnboardingStepShown(step: SubscriptionOnboardingStepPixels.Step, isFreeTrial: Boolean)
+    fun reportOnboardingStepCompleted(step: SubscriptionOnboardingStepPixels.Step, isFreeTrial: Boolean)
+    fun reportOnboardingStepSkipped(step: SubscriptionOnboardingStepPixels.Step, isFreeTrial: Boolean)
     fun reportPaywallNotSeen(dayBucket: String, returningUser: Boolean, privacyDashboardEverOpened: Boolean, subscriptionPromoShown: Boolean)
     fun reportExpirationReminderScheduled()
     fun reportExpirationReminderSchedulingError()
@@ -160,7 +167,7 @@ class SubscriptionPixelSenderImpl @Inject constructor(
             SUBSCRIPTION_ACTIVE,
             mapOf(
                 SubscriptionPixelParameter.OS_VERSION to appBuildConfig.sdkInt.toString(),
-                SubscriptionPixelParameter.PETAL to "true",
+                Pixel.PixelParameter.PETAL to Pixel.PixelValues.PETAL_KANON,
             ),
         )
 
@@ -181,7 +188,7 @@ class SubscriptionPixelSenderImpl @Inject constructor(
     // value so a web page cannot inject a unique per-user identifier that would follow the user downstream.
     private fun funnelOriginParams(origin: String?): Map<String, String> =
         origin?.takeIf { it in FUNNEL_ORIGIN_ALLOWLIST }
-            ?.let { mapOf("origin" to it) } ?: emptyMap()
+            ?.let { mapOf(ORIGIN_QUERY_PARAM_KEY to it) } ?: emptyMap()
 
     override fun reportPurchaseFailureOther(
         errorType: String,
@@ -219,7 +226,7 @@ class SubscriptionPixelSenderImpl @Inject constructor(
             SubscriptionPixelParameter.FREE_TRIAL to isFreeTrial.toString(),
         )
         origin?.let {
-            map.put("origin", origin)
+            map.put(ORIGIN_QUERY_PARAM_KEY, origin)
         }
         fire(PURCHASE_SUCCESS_ORIGIN, map)
     }
@@ -279,10 +286,13 @@ class SubscriptionPixelSenderImpl @Inject constructor(
         fire(APP_SETTINGS_IDTR_CLICK)
 
     override fun reportAppSettingsGetSubscriptionClick() =
-        fire(APP_SETTINGS_GET_SUBSCRIPTION_CLICK, mapOf("origin" to ORIGIN_APP_SETTINGS))
+        fire(APP_SETTINGS_GET_SUBSCRIPTION_CLICK, mapOf(ORIGIN_QUERY_PARAM_KEY to ORIGIN_APP_SETTINGS))
 
     override fun reportAppSettingsRestorePurchaseClick() =
         fire(APP_SETTINGS_RESTORE_PURCHASE_CLICK)
+
+    override fun reportAppSettingsPartnerBenefitsClick() =
+        fire(APP_SETTINGS_PARTNER_BENEFITS_CLICK)
 
     override fun reportSubscriptionSettingsChangePlanOrBillingClick() =
         fire(SUBSCRIPTION_SETTINGS_CHANGE_PLAN_OR_BILLING_CLICK)
@@ -393,6 +403,15 @@ class SubscriptionPixelSenderImpl @Inject constructor(
     override fun reportExpirationReminderNotFiredPermissionsRejected() =
         fire(SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_PERMISSIONS_REJECTED)
 
+    override fun reportOnboardingStepShown(step: SubscriptionOnboardingStepPixels.Step, isFreeTrial: Boolean) =
+        fireOnboardingStep(SubscriptionOnboardingStepPixels.Action.SHOWN, step, isFreeTrial)
+
+    override fun reportOnboardingStepCompleted(step: SubscriptionOnboardingStepPixels.Step, isFreeTrial: Boolean) =
+        fireOnboardingStep(SubscriptionOnboardingStepPixels.Action.COMPLETED, step, isFreeTrial)
+
+    override fun reportOnboardingStepSkipped(step: SubscriptionOnboardingStepPixels.Step, isFreeTrial: Boolean) =
+        fireOnboardingStep(SubscriptionOnboardingStepPixels.Action.SKIPPED, step, isFreeTrial)
+
     private fun fire(
         pixel: SubscriptionPixel,
         params: Map<String, String> = emptyMap(),
@@ -404,5 +423,18 @@ class SubscriptionPixelSenderImpl @Inject constructor(
                 pixelSender.fire(pixelName = pixelName, type = pixelType, parameters = params)
             }
         }
+    }
+
+    private fun fireOnboardingStep(
+        action: SubscriptionOnboardingStepPixels.Action,
+        step: SubscriptionOnboardingStepPixels.Step,
+        isFreeTrial: Boolean,
+    ) {
+        val baseName = SubscriptionOnboardingStepPixels.baseName(action, step)
+        pixelSender.fire(
+            pixelName = "${baseName}_c",
+            type = Count,
+            parameters = mapOf(SubscriptionPixelParameter.FREE_TRIAL to isFreeTrial.toString()),
+        )
     }
 }

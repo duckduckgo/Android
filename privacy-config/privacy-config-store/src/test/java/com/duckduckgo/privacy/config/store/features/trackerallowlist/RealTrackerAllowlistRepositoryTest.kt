@@ -54,7 +54,7 @@ class RealTrackerAllowlistRepositoryTest {
     }
 
     @Test
-    fun whenRepositoryIsCreatedThenExceptionsLoadedIntoMemory() {
+    fun whenRepositoryIsCreatedThenRulesLoadedIntoMemory() {
         givenHttpsDaoContainsExceptions()
 
         testee =
@@ -65,7 +65,7 @@ class RealTrackerAllowlistRepositoryTest {
                 isMainProcess = true,
             )
 
-        assertEquals(trackerAllowlistEntity, testee.exceptions.first())
+        assertEquals(setOf("domain"), testee.rulesByDomain.keys)
     }
 
     @Test
@@ -85,7 +85,7 @@ class RealTrackerAllowlistRepositoryTest {
         }
 
     @Test
-    fun whenUpdateAllThenPreviousExceptionsAreCleared() =
+    fun whenUpdateAllThenPreviousRulesAreCleared() =
         runTest {
             givenHttpsDaoContainsExceptions()
             testee =
@@ -95,12 +95,12 @@ class RealTrackerAllowlistRepositoryTest {
                     coroutineRule.testDispatcherProvider,
                     isMainProcess = true,
                 )
-            assertEquals(1, testee.exceptions.size)
+            assertEquals(1, testee.rulesByDomain.size)
             reset(mockTrackerAllowlistDao)
 
             testee.updateAll(listOf())
 
-            assertEquals(0, testee.exceptions.size)
+            assertEquals(0, testee.rulesByDomain.size)
         }
 
     @Test

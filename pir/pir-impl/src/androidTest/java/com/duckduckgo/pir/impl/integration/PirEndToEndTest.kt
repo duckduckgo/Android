@@ -400,6 +400,7 @@ class PirEndToEndTest {
             webViewDataCleaner = fakePirWebViewDataCleaner,
             pirWebViewCountProvider = pirWebViewCountProvider,
             pirWorkDistributor = pirWorkDistributor,
+            jobRecordUpdater = jobRecordUpdater,
         )
 
         pirEmailConfirmationJobsRunner = RealPirEmailConfirmationJobsRunner(

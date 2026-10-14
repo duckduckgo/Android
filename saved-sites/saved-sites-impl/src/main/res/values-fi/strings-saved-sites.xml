@@ -73,12 +73,12 @@
     <string name="bookmarkFolderDeleteDialogMessage">"Haluatko varmasti poistaa "</string>
     <string name="bookmarkFolderEmpty">Tyhjä</string>
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s ja %3$d kohteen?</item>
-        <item quantity="other">%1$s%2$s ja %3$d kohdetta?</item>
+        <item quantity="one" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s ja %3$d kohteen?</item>
+        <item quantity="other" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s ja %3$d kohdetta?</item>
     </plurals>
     <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d kohde</item>
-        <item quantity="other">%1$d kohdetta</item>
+        <item quantity="one" instruction="Placeholder is the number of items">%1$d kohde</item>
+        <item quantity="other" instruction="Placeholder is the number of items">%1$d kohdetta</item>
     </plurals>
 
     <!-- Bookmarks -->
@@ -93,8 +93,8 @@
     <string name="removeFromFavorites">Poista suosikeista</string>
     <string name="addToFavoritesMenu">Lisää suosikkeihin</string>
     <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">Haluatko varmasti poistaa tämän kansion ja %1$d kohteen?</item>
-        <item quantity="other">Haluatko varmasti poistaa tämän kansion ja %1$d kohdetta?</item>
+        <item quantity="one" instruction="%1$d is the number of items inside the folder">Haluatko varmasti poistaa tämän kansion ja %1$d kohteen?</item>
+        <item quantity="other" instruction="%1$d is the number of items inside the folder">Haluatko varmasti poistaa tämän kansion ja %1$d kohdetta?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Haluatko varmasti poistaa kirjanmerkin &lt;b&gt;%1$s&lt;/b&gt;?</string>
 

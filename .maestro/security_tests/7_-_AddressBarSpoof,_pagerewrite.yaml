@@ -11,7 +11,7 @@ tags:
             - runFlow: ../shared/skip_all_onboarding.yaml
             # Test 1
             - tapOn:
-                id: "omnibarTextInput"
+                id: "omnibarTextInput|inputField"
             - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-js-page-rewrite.html"
             - pressKey: Enter
 
@@ -21,7 +21,7 @@ tags:
             - assertNotVisible: "DDG."
             # Now check the address bar hasn't been updated too early resulting in spoofed content
             - tapOn:
-                id: "omnibarTextInput"
+                id: "omnibarTextInput|inputField"
             - copyTextFrom:
-                id: "omnibarTextInput"
+                id: "omnibarTextInput|inputField"
             - assertTrue: ${maestro.copiedText == "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-js-page-rewrite.html"}

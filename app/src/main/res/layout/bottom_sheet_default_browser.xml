@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
-            app:srcCompat="@drawable/ic_device_mobile_default_128"
+            app:srcCompat="@drawable/mobile_device_default_128"
             tools:ignore="ContentDescription" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView

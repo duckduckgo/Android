@@ -131,7 +131,6 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogoAnimator
-import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogos
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.card.MaterialCardView
@@ -171,7 +170,6 @@ class OmnibarLayout @JvmOverloads constructor(
         val showChatMenu: Boolean,
         val showSpacer: Boolean,
         val showDuckSidebar: Boolean,
-        val showDuckBack: Boolean,
         val isDuckAiMode: Boolean,
         val isNativeInputEnabled: Boolean,
         val isNativeChatInputEnabled: Boolean,
@@ -203,9 +201,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
     @Inject
     lateinit var serpLogos: SerpLogos
-
-    @Inject
-    lateinit var serpEasterEggLogosToggles: SerpEasterEggLogosToggles
 
     @Inject
     lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
@@ -247,6 +242,9 @@ class OmnibarLayout @JvmOverloads constructor(
     private var customTabToolbarColor: Int = 0
     private var lastAnimatedLogoUrl: String? = null
     private var easterEggLogoAnimator: ObjectAnimator? = null
+    private val playEasterEggLogoWiggle = Runnable {
+        easterEggLogoAnimator = SerpEasterEggLogoAnimator.playWiggle(daxIcon)
+    }
 
     private val omnibarCardShadow: MaterialCardView by lazy { findViewById(R.id.omniBarContainerShadow) }
     private val omnibarCardView: MaterialCardView by lazy { findViewById(R.id.omniBarContainer) }
@@ -259,7 +257,6 @@ class OmnibarLayout @JvmOverloads constructor(
     private val duckAIHeader: View by lazy { findViewById(R.id.duckAIHeader) }
     private val duckAIFreePill: View by lazy { findViewById(R.id.duckAIFreePill) }
     private val duckAISidebar: View by lazy { findViewById(R.id.duckAiSidebar) }
-    private val duckAIBack: View by lazy { findViewById(R.id.duckAiBack) }
 
     private var isFindInPageVisible = false
     private val findInPageLayoutVisibilityChangeListener =
@@ -357,7 +354,6 @@ class OmnibarLayout @JvmOverloads constructor(
     internal val fireIconImageView: ImageView by lazy { findViewById(R.id.fireIconImageView) }
     internal val placeholder: View by lazy { findViewById(R.id.placeholder) }
     internal val voiceSearchButton: ImageView by lazy { findViewById(R.id.voiceSearchButton) }
-    internal val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
     internal val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
     internal val omniBarButtonTransitionSet: TransitionSet by lazy {
         TransitionSet().apply {
@@ -379,7 +375,6 @@ class OmnibarLayout @JvmOverloads constructor(
                     addTarget(aiChatMenu)
                     addTarget(browserMenu)
                     addTarget(duckAISidebar)
-                    addTarget(duckAIBack)
                 },
             )
         }
@@ -641,9 +636,6 @@ class OmnibarLayout @JvmOverloads constructor(
         duckAISidebar.setOnClickListener {
             omnibarItemPressedListener?.onDuckAISidebarButtonPressed()
         }
-        duckAIBack.setOnClickListener {
-            omnibarItemPressedListener?.onDuckAIBackButtonPressed()
-        }
     }
 
     override fun setLogoClickListener(logoClickListener: LogoClickListener) {
@@ -721,13 +713,6 @@ class OmnibarLayout @JvmOverloads constructor(
                 }
             }
 
-            duckAIBack.updateLayoutParams {
-                (this as MarginLayoutParams).apply {
-                    topMargin = omnibarCardMarginBottom
-                    bottomMargin = omnibarCardMarginTop
-                }
-            }
-
             shieldIconPulseAnimationContainer.updateLayoutParams {
                 flipOmnibarMargins()
             }
@@ -767,7 +752,6 @@ class OmnibarLayout @JvmOverloads constructor(
                 startTrackersAnimation(
                     command.entities,
                     command.isCustomTab,
-                    command.isAddressBarTrackersAnimationEnabled,
                     command.useSoftwareRenderingMode,
                 )
             }
@@ -777,6 +761,7 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             is Command.EasterEggLogoClicked -> {
+                cancelEasterEggLogoAnimation()
                 onLogoClicked(command.url)
             }
 
@@ -909,7 +894,6 @@ class OmnibarLayout @JvmOverloads constructor(
                 showChatMenu = viewState.showChatMenu,
                 showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
                 showDuckSidebar = viewState.showDuckAISidebar,
-                showDuckBack = viewState.showDuckAISidebar,
                 isDuckAiMode = viewState.viewMode is ViewMode.DuckAI,
                 isNativeInputEnabled = viewState.isNativeInputEnabled,
                 isNativeChatInputEnabled = viewState.isNativeChatInputEnabled,
@@ -953,7 +937,6 @@ class OmnibarLayout @JvmOverloads constructor(
         applyAiChatMenuStyling(viewState.showContextualSheetIcon)
         aiChatDivider.isVisible = (viewState.showVoiceSearch || viewState.showClearButton) && viewState.showChatMenu
         duckAISidebar.isVisible = newTransitionState.showDuckSidebar
-        duckAIBack.isVisible = newTransitionState.showDuckBack
 
         if (omnibarAnimationManager.isFeatureEnabled()) {
             toolbarContainer.requestLayout()
@@ -1003,15 +986,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
         isScrollingEnabled = viewState.scrollingEnabled
 
-        if (viewState.isAddressBarTrackersAnimationEnabled) {
-            shieldIconPulseAnimationContainer.updateLayoutParams {
-                (this as MarginLayoutParams).apply {
-                    // TODO when the animation is made permanent we should add this adjustment to the actual layout
-                    marginStart = 1.toPx()
-                }
-            }
-        }
-
         renderTabIcon(viewState)
         renderPulseAnimation(viewState)
 
@@ -1047,12 +1021,11 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun updatePageLoadProgressBar(viewState: ViewState) {
-        pageLoadProgressBar.setStallDetectionEnabled(viewState.isProgressBarIndeterminateEnabled)
         if (viewState.isLoading) {
             if (!pageLoadProgressBar.isStarted) {
-                pageLoadProgressBar.start()
+                pageLoadProgressBar.start(viewState.isAnimationUpdateEnabled)
             }
-            pageLoadProgressBar.onProgressUpdate(viewState.loadingProgress.toFloat())
+            pageLoadProgressBar.onProgressUpdate(progress = viewState.loadingProgress.toFloat())
         } else {
             if (pageLoadProgressBar.isStarted) {
                 pageLoadProgressBar.triggerCompletion()
@@ -1221,6 +1194,7 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun cancelEasterEggLogoAnimation() {
+        daxIcon.removeCallbacks(playEasterEggLogoWiggle)
         easterEggLogoAnimator?.cancel()
         easterEggLogoAnimator = null
         daxIcon.rotation = 0f
@@ -1229,55 +1203,32 @@ class OmnibarLayout @JvmOverloads constructor(
     private fun startTrackersAnimation(
         events: List<Entity>?,
         isCustomTab: Boolean,
-        isAddressBarTrackersAnimationEnabled: Boolean,
         useSoftwareRenderingMode: Boolean,
     ) {
         if (!isCustomTab) {
-            if (isAddressBarTrackersAnimationEnabled) {
-                animatorHelper.startAddressBarTrackersAnimation(
-                    context = context,
-                    addressBarTrackersBlockedAnimationShieldIcon = addressBarTrackersBlockedAnimationShieldIcon,
-                    sceneRoot = sceneRoot,
-                    animatedIconBackgroundView = animatedIconBackgroundView,
-                    omnibarViews = omnibarViews(),
-                    shieldViews = shieldViews(),
-                    entities = events,
-                    useSoftwareRenderingMode = useSoftwareRenderingMode,
-                )
-            } else {
-                animatorHelper.startTrackersAnimation(
-                    context = context,
-                    shieldAnimationView = shieldIcon,
-                    trackersAnimationView = trackersAnimation,
-                    omnibarViews = omnibarViews(),
-                    entities = events,
-                    useLightAnimation = if (browserMode == BrowserMode.FIRE) false else null,
-                )
-            }
+            animatorHelper.startAddressBarTrackersAnimation(
+                context = context,
+                addressBarTrackersBlockedAnimationShieldIcon = addressBarTrackersBlockedAnimationShieldIcon,
+                sceneRoot = sceneRoot,
+                animatedIconBackgroundView = animatedIconBackgroundView,
+                omnibarViews = omnibarViews(),
+                shieldViews = shieldViews(),
+                entities = events,
+                useSoftwareRenderingMode = useSoftwareRenderingMode,
+            )
         } else if (omnibarRepository.isNewCustomTabEnabled) {
             val animationBackgroundColor = calculateAnimationBackgroundColor(customTabToolbarColor)
-            if (isAddressBarTrackersAnimationEnabled) {
-                animatorHelper.startAddressBarTrackersAnimation(
-                    context = context,
-                    addressBarTrackersBlockedAnimationShieldIcon = newCustomTabToolbarContainer.addressBarTrackersBlockedAnimationShieldIcon,
-                    sceneRoot = newCustomTabToolbarContainer.customTabSceneRoot,
-                    animatedIconBackgroundView = newCustomTabToolbarContainer.animatedIconBackgroundView,
-                    omnibarViews = customTabViews(),
-                    shieldViews = customTabShieldViews(),
-                    entities = events,
-                    customBackgroundColor = animationBackgroundColor,
-                    useSoftwareRenderingMode = useSoftwareRenderingMode,
-                )
-            } else {
-                animatorHelper.startTrackersAnimation(
-                    context = context,
-                    shieldAnimationView = newCustomTabToolbarContainer.customTabShieldIcon,
-                    trackersAnimationView = newCustomTabToolbarContainer.trackersAnimation,
-                    omnibarViews = customTabViews(),
-                    entities = events,
-                    useLightAnimation = isColorLight(animationBackgroundColor),
-                )
-            }
+            animatorHelper.startAddressBarTrackersAnimation(
+                context = context,
+                addressBarTrackersBlockedAnimationShieldIcon = newCustomTabToolbarContainer.addressBarTrackersBlockedAnimationShieldIcon,
+                sceneRoot = newCustomTabToolbarContainer.customTabSceneRoot,
+                animatedIconBackgroundView = newCustomTabToolbarContainer.animatedIconBackgroundView,
+                omnibarViews = customTabViews(),
+                shieldViews = customTabShieldViews(),
+                entities = events,
+                customBackgroundColor = animationBackgroundColor,
+                useSoftwareRenderingMode = useSoftwareRenderingMode,
+            )
         }
     }
 
@@ -1317,12 +1268,16 @@ class OmnibarLayout @JvmOverloads constructor(
                 useLightAnimation,
                 isAddressBarRebrandEnabled,
             )
-            if (boxed) {
+            val rebrandLayout = resolveRebrandPrivacyShieldLayout(privacyShieldState, isAddressBarRebrandEnabled)
+            if (boxed && rebrandLayout != null) {
+                val slotSize = rebrandLayout.slotSizeDp.toPx(context)
+                val contentInset = rebrandLayout.contentInsetDp.toPx(context)
                 shieldIconView.updateLayoutParams<MarginLayoutParams> {
-                    width = shieldIconBoxSize
-                    height = shieldIconBoxSize
-                    marginStart = 2.toPx(context)
+                    width = slotSize
+                    height = slotSize
+                    marginStart = 0
                 }
+                shieldIconView.setPadding(contentInset, contentInset, contentInset, contentInset)
                 shieldIconView.scaleType = ImageView.ScaleType.CENTER_INSIDE
             } else if (privacyShieldState != PrivacyShieldState.UNKNOWN) {
                 val isNewCustomTab =
@@ -1336,6 +1291,7 @@ class OmnibarLayout @JvmOverloads constructor(
                     height = LayoutParams.MATCH_PARENT
                     marginStart = 0
                 }
+                shieldIconView.setPadding(0, 0, 0, 0)
                 shieldIconView.scaleType =
                     if (isNewCustomTab) {
                         ImageView.ScaleType.MATRIX
@@ -1631,7 +1587,6 @@ class OmnibarLayout @JvmOverloads constructor(
         findInPage.findIcon.isSaveEnabled = false
 
         newCustomTabToolbarContainer.customTabCloseIcon.isSaveEnabled = false
-        newCustomTabToolbarContainer.trackersAnimation.isSaveEnabled = false
         newCustomTabToolbarContainer.customTabShieldIcon.isSaveEnabled = false
         newCustomTabToolbarContainer.addressBarTrackersBlockedAnimationShieldIcon.isSaveEnabled = false
         newCustomTabToolbarContainer.customTabDuckPlayerIcon.isSaveEnabled = false
@@ -1692,7 +1647,6 @@ class OmnibarLayout @JvmOverloads constructor(
         applyEnabled(duckAISidebar, nonFireEnabled)
         applyEnabled(duckAIHeader, nonFireEnabled)
         applyEnabled(duckAIFreePill, nonFireEnabled)
-        applyEnabled(duckAIBack, nonFireEnabled)
         applyEnabled(shieldIcon, nonFireEnabled)
         applyEnabled(plusIconMenu, nonFireEnabled)
         applyEnabled(fireIconMenu, fireEnabled)
@@ -1798,15 +1752,8 @@ class OmnibarLayout @JvmOverloads constructor(
             isFirstResource: Boolean,
         ): Boolean {
             if (!leadingIconState.isFavourite && logoUrl != lastAnimatedLogoUrl) {
-                if (serpEasterEggLogosToggles.setFavourite().isEnabled()) {
-                    lastAnimatedLogoUrl = logoUrl
-                    daxIcon.postDelayed(
-                        {
-                            easterEggLogoAnimator = SerpEasterEggLogoAnimator.playWiggle(daxIcon)
-                        },
-                        EASTER_EGG_ANIMATION_DELAY_MS,
-                    )
-                }
+                lastAnimatedLogoUrl = logoUrl
+                daxIcon.postDelayed(playEasterEggLogoWiggle, EASTER_EGG_ANIMATION_DELAY_MS)
             }
             return false
         }
@@ -1826,6 +1773,26 @@ internal fun shouldUseCustomTabToolbarColorForShield(
     !isNewCustomTabEnabled || !isDefaultToolbarColor
 } else {
     isNewCustomTabEnabled && !isDefaultToolbarColor
+}
+
+internal data class RebrandPrivacyShieldLayout(
+    val slotSizeDp: Int,
+    val contentInsetDp: Int,
+)
+
+internal fun resolveRebrandPrivacyShieldLayout(
+    privacyShieldState: PrivacyShieldState,
+    isAddressBarRebrandEnabled: Boolean,
+): RebrandPrivacyShieldLayout? {
+    if (!isAddressBarRebrandEnabled) return null
+
+    return when (privacyShieldState) {
+        PrivacyShieldState.PROTECTED -> RebrandPrivacyShieldLayout(slotSizeDp = 44, contentInsetDp = 0)
+        PrivacyShieldState.UNPROTECTED,
+        PrivacyShieldState.MALICIOUS,
+        -> RebrandPrivacyShieldLayout(slotSizeDp = 44, contentInsetDp = 2)
+        PrivacyShieldState.UNKNOWN -> null
+    }
 }
 
 /**
@@ -1856,5 +1823,5 @@ internal fun resolveDuckPlayerIcon(isAddressBarRebrandEnabled: Boolean): Int =
     if (isAddressBarRebrandEnabled) {
         R.drawable.video_player_color_24_brand_update
     } else {
-        R.drawable.ic_video_player_color_24
+        R.drawable.video_player_color_24
     }

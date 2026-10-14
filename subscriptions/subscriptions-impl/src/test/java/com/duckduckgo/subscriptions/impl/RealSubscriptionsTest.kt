@@ -35,9 +35,12 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.api.model.Entitlement
 import com.duckduckgo.subscriptions.impl.internal.DefaultSubscriptionsBaseUrl
+import com.duckduckgo.subscriptions.impl.internal.RealPaywallPathProvider
 import com.duckduckgo.subscriptions.impl.internal.RealSubscriptionsUrlProvider
+import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -69,6 +72,14 @@ class RealSubscriptionsTest {
     private val globalActivityStarter: GlobalActivityStarter = mock()
     private val pixel: SubscriptionPixelSender = mock()
     private val subscriptionsUrlProvider = RealSubscriptionsUrlProvider(DefaultSubscriptionsBaseUrl())
+    private val stagingUrlProvider = object : SubscriptionsUrlProvider {
+        override val buyUrl = "https://duckduckgo.com/subscriptions?environment=staging"
+        override val welcomeUrl = ""
+        override val activateUrl = ""
+        override val manageUrl = ""
+        override val plansUrl = ""
+        override val upgradeToProUrl = ""
+    }
     private lateinit var subscriptions: RealSubscriptions
     private val subscriptionFeature: SubscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
 
@@ -87,12 +98,18 @@ class RealSubscriptionsTest {
         whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(true)
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
         subscriptions = RealSubscriptions(
-            mockSubscriptionsManager,
-            globalActivityStarter,
-            pixel,
-            { subscriptionFeature },
-            coroutineRule.testDispatcherProvider,
-            subscriptionsUrlProvider,
+            subscriptionsManager = mockSubscriptionsManager,
+            globalActivityStarter = globalActivityStarter,
+            pixel = pixel,
+            subscriptionsFeature = { subscriptionFeature },
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
+            subscriptionsUrlProvider = subscriptionsUrlProvider,
+            paywallPathProvider = {
+                RealPaywallPathProvider(
+                    subscriptionsFeature = subscriptionFeature,
+                    moshi = Moshi.Builder().build(),
+                )
+            },
         )
     }
 
@@ -363,6 +380,210 @@ class RealSubscriptionsTest {
         assertNull((captor.lastValue as SubscriptionsWebViewActivityWithParams).origin)
     }
 
+    @Test
+    fun whenPerformanceOptimizedPaywallsOnThenConfiguredPathIsASubscriptionUrl() = runTest {
+        givenPerformanceOptimizedPaywalls(enabled = true)
+
+        assertTrue(subscriptions.isSubscriptionUrl("https://duckduckgo.com/subscriptions/new/mobile/vpn".toUri()))
+        assertTrue(subscriptions.isSubscriptionUrl("https://duckduckgo.com/subscriptions/new/mobile/duckai?trial=true".toUri()))
+    }
+
+    @Test
+    fun whenPerformanceOptimizedPaywallsOffThenConfiguredPathIsNotASubscriptionUrl() = runTest {
+        givenPerformanceOptimizedPaywalls(enabled = false)
+
+        assertFalse(subscriptions.isSubscriptionUrl("https://duckduckgo.com/subscriptions/new/mobile/vpn".toUri()))
+    }
+
+    @Test
+    fun whenPathIsNotConfiguredThenItIsNotASubscriptionUrl() = runTest {
+        givenPerformanceOptimizedPaywalls(enabled = true)
+
+        assertFalse(subscriptions.isSubscriptionUrl("https://duckduckgo.com/subscriptions/new/mobile/itr".toUri()))
+        assertFalse(subscriptions.isSubscriptionUrl("https://duckduckgo.com/subscriptions/welcome".toUri()))
+    }
+
+    @Test
+    fun whenConfiguredPathIsOnAnotherDomainThenItIsNotASubscriptionUrl() = runTest {
+        givenPerformanceOptimizedPaywalls(enabled = true)
+
+        assertFalse(subscriptions.isSubscriptionUrl("https://example.com/subscriptions/new/mobile/vpn".toUri()))
+    }
+
+    @Test
+    fun whenLaunchingFromAConfiguredPathThenItsFeaturePageIsCarriedToActivity() = runTest {
+        givenPerformanceOptimizedPaywalls(enabled = true)
+        whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
+
+        val captor = argumentCaptor<ActivityParams>()
+        subscriptions.launchSubscription(context, "https://duckduckgo.com/subscriptions/new/mobile/duckai".toUri())
+
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
+        assertEquals(
+            subscriptionsUrlProvider.buyUrl.appendQueryParams("featurePage=duckai"),
+            (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
+        )
+    }
+
+    @Test
+    fun whenLaunchingFromAConfiguredPathThenOtherParamsAreKept() = runTest {
+        givenPerformanceOptimizedPaywalls(enabled = true)
+        whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
+
+        val captor = argumentCaptor<ActivityParams>()
+        subscriptions.launchSubscription(context, "https://duckduckgo.com/subscriptions/new/mobile/duckai?origin=test".toUri())
+
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
+        val params = captor.lastValue as SubscriptionsWebViewActivityWithParams
+        assertEquals(subscriptionsUrlProvider.buyUrl.appendQueryParams("origin=test&featurePage=duckai"), params.url)
+        assertEquals("test", params.origin)
+    }
+
+    @Test
+    fun whenLaunchingFromAConfiguredPathThatAlreadyStatesFeaturePageThenItIsNotDuplicated() = runTest {
+        givenPerformanceOptimizedPaywalls(enabled = true)
+        whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
+
+        val captor = argumentCaptor<ActivityParams>()
+        subscriptions.launchSubscription(context, "https://duckduckgo.com/subscriptions/new/mobile/duckai?featurePage=duckai".toUri())
+
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
+        assertEquals(
+            subscriptionsUrlProvider.buyUrl.appendQueryParams("featurePage=duckai"),
+            (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
+        )
+    }
+
+    @Test
+    fun whenLaunchingFromAConfiguredPathThenEncodedParamValuesSurviveIntact() = runTest {
+        givenPerformanceOptimizedPaywalls(enabled = true)
+        whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
+
+        val captor = argumentCaptor<ActivityParams>()
+        subscriptions.launchSubscription(context, "https://duckduckgo.com/subscriptions/new/mobile/duckai?origin=a%26b".toUri())
+
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
+        assertEquals(
+            subscriptionsUrlProvider.buyUrl.appendQueryParams("origin=a%26b&featurePage=duckai"),
+            (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
+        )
+    }
+
+    @Test
+    fun whenPerformanceOptimizedPaywallsOnThenConfiguredPathLaunchesTheSubscriptionFlow() = runTest {
+        givenPerformanceOptimizedPaywalls(enabled = true)
+        subscriptionFeature.allowPurchase().setRawStoredState(State(true))
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
+
+        assertTrue(subscriptions.shouldLaunchSubscriptionForUrl("https://duckduckgo.com/subscriptions/new/mobile/vpn"))
+        assertTrue(subscriptions.shouldLaunchSubscriptionForUrl("https://duckduckgo.com/subscriptions/new/mobile/duckai?origin=test"))
+        assertFalse(subscriptions.shouldLaunchSubscriptionForUrl("https://duckduckgo.com/subscriptions/new/mobile/itr"))
+    }
+
+    @Test
+    fun whenPerformanceOptimizedPaywallsOffThenConfiguredPathDoesNotLaunchTheSubscriptionFlow() = runTest {
+        givenPerformanceOptimizedPaywalls(enabled = false)
+        subscriptionFeature.allowPurchase().setRawStoredState(State(true))
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
+
+        assertFalse(subscriptions.shouldLaunchSubscriptionForUrl("https://duckduckgo.com/subscriptions/new/mobile/vpn"))
+    }
+
+    @Test
+    fun whenLaunchSubscriptionWithNoUriThenBuyUrlIsUsed() = runTest {
+        whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
+
+        val captor = argumentCaptor<ActivityParams>()
+        subscriptions.launchSubscription(context, null)
+
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
+        val params = captor.lastValue as SubscriptionsWebViewActivityWithParams
+        assertEquals(subscriptionsUrlProvider.buyUrl, params.url)
+        assertNull(params.origin)
+    }
+
+    @Test
+    fun whenPerformanceOptimizedPaywallsOffThenNoFeaturePageIsAddedForAConfiguredPath() = runTest {
+        givenPerformanceOptimizedPaywalls(enabled = false)
+        whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
+
+        val captor = argumentCaptor<ActivityParams>()
+        subscriptions.launchSubscription(context, "https://duckduckgo.com/subscriptions/new/mobile/duckai?origin=test".toUri())
+
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
+        assertEquals(
+            subscriptionsUrlProvider.buyUrl.appendQueryParams("origin=test"),
+            (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
+        )
+    }
+
+    @Test
+    fun whenFeaturePageInQueryIsBlankThenItIsTakenFromThePath() = runTest {
+        givenPerformanceOptimizedPaywalls(enabled = true)
+        whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
+
+        val captor = argumentCaptor<ActivityParams>()
+        subscriptions.launchSubscription(context, "https://duckduckgo.com/subscriptions/new/mobile/duckai?featurePage=".toUri())
+
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
+        assertEquals(
+            subscriptionsUrlProvider.buyUrl.appendQueryParams("featurePage=duckai"),
+            (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
+        )
+    }
+
+    @Test
+    fun whenFeaturePageInQueryIsBlankThenOtherParamsAreKept() = runTest {
+        givenPerformanceOptimizedPaywalls(enabled = true)
+        whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
+
+        val captor = argumentCaptor<ActivityParams>()
+        subscriptions.launchSubscription(context, "https://duckduckgo.com/subscriptions/new/mobile/duckai?featurePage=&origin=test".toUri())
+
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
+        assertEquals(
+            subscriptionsUrlProvider.buyUrl.appendQueryParams("origin=test&featurePage=duckai"),
+            (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
+        )
+    }
+
+    @Test
+    fun whenBuyUrlAlreadyHasQueryParamsThenTheyAreKept() = runTest {
+        givenPerformanceOptimizedPaywalls(enabled = true)
+        whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
+        val subscriptionsOnStaging = RealSubscriptions(
+            subscriptionsManager = mockSubscriptionsManager,
+            globalActivityStarter = globalActivityStarter,
+            pixel = pixel,
+            subscriptionsFeature = { subscriptionFeature },
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
+            subscriptionsUrlProvider = stagingUrlProvider,
+            paywallPathProvider = {
+                RealPaywallPathProvider(
+                    subscriptionsFeature = subscriptionFeature,
+                    moshi = Moshi.Builder().build(),
+                )
+            },
+        )
+
+        val captor = argumentCaptor<ActivityParams>()
+        subscriptionsOnStaging.launchSubscription(context, "https://duckduckgo.com/subscriptions/new/mobile/duckai?origin=test".toUri())
+
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
+        assertEquals(
+            "https://duckduckgo.com/subscriptions?environment=staging&origin=test&featurePage=duckai",
+            (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
+        )
+    }
+
+    private fun givenPerformanceOptimizedPaywalls(enabled: Boolean) {
+        subscriptionFeature.performanceOptimizedPaywalls().setRawStoredState(
+            State(remoteEnableState = enabled, settings = ENTRY_POINTS_SETTINGS),
+        )
+    }
+
     private fun fakeIntent(): Intent {
         return Intent().also { it.addFlags(FLAG_ACTIVITY_NEW_TASK) }
     }
@@ -370,5 +591,16 @@ class RealSubscriptionsTest {
     private fun String.appendQueryParams(queryParams: String): String {
         val separator = if (this.contains("?")) "&" else "?"
         return this + separator + queryParams
+    }
+
+    private companion object {
+        val ENTRY_POINTS_SETTINGS = """
+            {
+                "entryPoints": {
+                    "vpn": { "path": "/subscriptions/new/mobile/vpn" },
+                    "duckai": { "path": "/subscriptions/new/mobile/duckai" }
+                }
+            }
+        """.trimIndent()
     }
 }

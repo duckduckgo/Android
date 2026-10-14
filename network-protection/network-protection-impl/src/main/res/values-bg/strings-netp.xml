@@ -89,8 +89,8 @@
     <string name="netpManagementManageItemExclusion">Изключени приложения</string>
     <string name="netpManagementManageItemExclusionSubtitleEmpty">Няма</string>
     <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
-        <item quantity="one">%1$d приложение</item>
-        <item quantity="other">%1$d приложения</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d приложение</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d приложения</item>
     </plurals>
     <string name="netpManagementVpnSettings">Настройки на VPN</string>
 
@@ -242,14 +242,14 @@
     <string name="netpAutoExcludePromptTitle">Искате ли да изключите приложенията, които не са съвместими с VPN?</string>
     <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">Намерихме %1$s, докато VPN връзката е активна.</string>
     <plurals name="netpAutoExcludeAppLabel">
-        <item quantity="one">%1$d ново приложение, което не е съвместимо с VPN. Определете това приложение като изключение, за да го използвате</item>
-        <item quantity="other">%1$d нови приложения, които не са съвместими с VPN. Определете тези приложения като изключения, за да ги използвате</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d ново приложение, което не е съвместимо с VPN. Определете това приложение като изключение, за да го използвате</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d нови приложения, които не са съвместими с VPN. Определете тези приложения като изключения, за да ги използвате</item>
     </plurals>
 
     <string name="netpAutoExcludePromptExcludeAllTitle">Искате ли да изключите всички приложения, които не са съвместими с VPN?</string>
     <plurals name="netpAutoExcludeAllAppLabel">
-        <item quantity="one">%1$d друго приложение, което не е съвместимо с VPN. Определете това приложение като изключение, за да го използвате</item>
-        <item quantity="other">%1$d други приложения, които не са съвместими с VPN. Определете тези приложения като изключения, за да ги използвате</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d друго приложение, което не е съвместимо с VPN. Определете това приложение като изключение, за да го използвате</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d други приложения, които не са съвместими с VPN. Определете тези приложения като изключения, за да ги използвате</item>
     </plurals>
     <string name="netpAutoExcludePromptOptionEnable">Автоматично изключване на несъвместими приложения</string>
     <string name="netpAutoExcludePromptActionAdd">Изключване на приложения</string>

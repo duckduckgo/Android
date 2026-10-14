@@ -48,6 +48,7 @@ class RetentionMetricsAtbLifecyclePlugin @Inject constructor(
     override fun onDuckAiRetentionAtbRefreshed(oldAtb: String, newAtb: String, metadata: Map<String, String?>) {
         appCoroutineScope.launch {
             duckAiPromptSentMetricPixelsPlugin.getMetrics().forEach { it.send() }
+            searchMetricPixelsPlugin.getMetrics().forEach { it.send() }
         }
     }
 }

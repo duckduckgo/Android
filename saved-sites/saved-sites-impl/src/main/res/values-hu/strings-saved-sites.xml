@@ -73,12 +73,12 @@
     <string name="bookmarkFolderDeleteDialogMessage">"Biztosan törlöd a(z) "</string>
     <string name="bookmarkFolderEmpty">Üres</string>
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s és a(z) %3$d elemet?</item>
-        <item quantity="other">%1$s%2$s és a(z) %3$d elemet?</item>
+        <item quantity="one" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s és a(z) %3$d elemet?</item>
+        <item quantity="other" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s és a(z) %3$d elemet?</item>
     </plurals>
     <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d elem</item>
-        <item quantity="other">%1$d elem</item>
+        <item quantity="one" instruction="Placeholder is the number of items">%1$d elem</item>
+        <item quantity="other" instruction="Placeholder is the number of items">%1$d elem</item>
     </plurals>
 
     <!-- Bookmarks -->
@@ -93,8 +93,8 @@
     <string name="removeFromFavorites">Eltávolítás a kedvencek közül</string>
     <string name="addToFavoritesMenu">Hozzáadás a kedvencekhez</string>
     <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">Biztos, hogy törölni akarod ezt a mappát és annak %1$d elemét?</item>
-        <item quantity="other">Biztos, hogy törölni akarod ezt a mappát és annak %1$d elemét?</item>
+        <item quantity="one" instruction="%1$d is the number of items inside the folder">Biztos, hogy törölni akarod ezt a mappát és annak %1$d elemét?</item>
+        <item quantity="other" instruction="%1$d is the number of items inside the folder">Biztos, hogy törölni akarod ezt a mappát és annak %1$d elemét?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Biztosan törlöd a(z) &lt;b&gt;%1$s&lt;/b&gt; könyvjelzőjét?</string>
 

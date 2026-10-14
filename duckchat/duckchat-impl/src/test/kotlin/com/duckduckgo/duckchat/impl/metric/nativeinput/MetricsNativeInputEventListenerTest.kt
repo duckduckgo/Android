@@ -16,25 +16,36 @@
 
 package com.duckduckgo.duckchat.impl.metric.nativeinput
 
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.metric.nativeinput.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.metric.nativeinput.usage.InputScreenSessionUsageMetric
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 
 class MetricsNativeInputEventListenerTest {
 
     private val duckChatPixels: DuckChatPixels = mock()
+    private val duckChatInputModeState: DuckChatInputModeState = mock()
+    private val inputModeCapability = MutableStateFlow(NativeInputState.InputMode.SEARCH_ONLY)
     private val sessionUsageMetric: InputScreenSessionUsageMetric = mock()
     private val discoveryFunnel: InputScreenDiscoveryFunnel = mock()
 
     private val testee = MetricsNativeInputEventListener(
         duckChatPixels = duckChatPixels,
+        duckChatInputModeState = duckChatInputModeState,
         sessionUsageMetric = sessionUsageMetric,
         discoveryFunnel = discoveryFunnel,
     )
+
+    init {
+        whenever(duckChatInputModeState.inputModeCapability).thenReturn(inputModeCapability)
+    }
 
     @Test
     fun whenSearchSubmittedThenUsageAndDiscoveryMetricsAreUpdated() {
@@ -43,5 +54,23 @@ class MetricsNativeInputEventListenerTest {
         verify(sessionUsageMetric).onSearchSubmitted()
         verify(discoveryFunnel).onSearchSubmitted()
         verifyNoInteractions(duckChatPixels)
+    }
+
+    @Test
+    fun whenNativeInputShownWithToggleCapabilityThenOmnibarShownReportsToggleVisible() {
+        inputModeCapability.value = NativeInputState.InputMode.SEARCH_AND_DUCK_AI
+
+        testee.onNativeInputShown(landscape = false)
+
+        verify(duckChatPixels).fireOmnibarShown(toggleVisible = true)
+    }
+
+    @Test
+    fun whenNativeInputShownWithSearchOnlyCapabilityThenOmnibarShownReportsToggleNotVisible() {
+        inputModeCapability.value = NativeInputState.InputMode.SEARCH_ONLY
+
+        testee.onNativeInputShown(landscape = false)
+
+        verify(duckChatPixels).fireOmnibarShown(toggleVisible = false)
     }
 }

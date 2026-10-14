@@ -34,7 +34,6 @@ import com.duckduckgo.js.messaging.api.JsRequestResponse
 import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.subscriptions.impl.AccessTokenResult
-import com.duckduckgo.subscriptions.impl.AuthTokenResult
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
@@ -70,7 +69,6 @@ class SubscriptionMessagingInterface @Inject constructor(
     private val handlers = listOf(
         SubscriptionsHandler(),
         GetSubscriptionMessage(subscriptionsManager, dispatcherProvider),
-        SetSubscriptionMessage(subscriptionsManager, appCoroutineScope, dispatcherProvider, pixelSender, subscriptionsChecker),
         SetAuthTokensMessage(subscriptionsManager, appCoroutineScope, dispatcherProvider, pixelSender, subscriptionsChecker),
         InformationalEventsMessage(subscriptionsManager, appCoroutineScope, pixelSender),
         GetAccessTokenMessage(subscriptionsManager),
@@ -169,22 +167,20 @@ class SubscriptionMessagingInterface @Inject constructor(
         override fun process(jsMessage: JsMessage, jsMessaging: JsMessaging, jsMessageCallback: JsMessageCallback?) {
             if (jsMessage.id == null) return
 
-            val authToken: String? = runBlocking(dispatcherProvider.io()) {
-                val pat = subscriptionsManager.getAuthToken()
-                when (pat) {
-                    is AuthTokenResult.Success -> pat.authToken
-                    is AuthTokenResult.Failure.TokenExpired -> pat.authToken
-                    else -> null
+            val accessToken: String? = runBlocking(dispatcherProvider.io()) {
+                when (val result = subscriptionsManager.getAccessToken()) {
+                    is AccessTokenResult.Success -> result.accessToken
+                    is AccessTokenResult.Failure -> null
                 }
             }
 
-            val data = if (authToken != null) {
+            val data = if (accessToken != null) {
                 JsRequestResponse.Success(
                     context = jsMessage.context,
                     featureName = featureName,
                     method = jsMessage.method,
                     id = jsMessage.id!!,
-                    result = JSONObject("""{ "token":"$authToken"}"""),
+                    result = JSONObject("""{ "token":"$accessToken"}"""),
                 )
             } else {
                 JsRequestResponse.Success(
@@ -202,32 +198,6 @@ class SubscriptionMessagingInterface @Inject constructor(
         override val allowedDomains: List<String> = emptyList()
         override val featureName: String = "useSubscription"
         override val methods: List<String> = listOf("getSubscription")
-    }
-
-    inner class SetSubscriptionMessage(
-        private val subscriptionsManager: SubscriptionsManager,
-        @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-        private val dispatcherProvider: DispatcherProvider,
-        private val pixelSender: SubscriptionPixelSender,
-        private val subscriptionsChecker: SubscriptionsChecker,
-    ) : JsMessageHandler {
-        override fun process(jsMessage: JsMessage, jsMessaging: JsMessaging, jsMessageCallback: JsMessageCallback?) {
-            try {
-                val token = jsMessage.params.getString("token")
-                appCoroutineScope.launch(dispatcherProvider.io()) {
-                    subscriptionsManager.signInV1(token)
-                    subscriptionsChecker.runChecker()
-                    pixelSender.reportRestoreUsingEmailSuccess()
-                    pixelSender.reportSubscriptionActivated()
-                }
-            } catch (e: Exception) {
-                logcat { "Error parsing the token" }
-            }
-        }
-
-        override val allowedDomains: List<String> = emptyList()
-        override val featureName: String = "useSubscription"
-        override val methods: List<String> = listOf("setSubscription")
     }
 
     inner class SetAuthTokensMessage(
@@ -410,12 +380,11 @@ class SubscriptionMessagingInterface @Inject constructor(
         ) {
             val jsMessageId = jsMessage.id ?: return
 
-            val authV2Enabled = subscriptionsFeature.enableSubscriptionFlowsV2().isEnabled()
             val duckAiSubscriberModelsEnabled = subscriptionsFeature.duckAiPlus().isEnabled()
             val supportsAlternateStripePaymentFlow = subscriptionsFeature.supportsAlternateStripePaymentFlow().isEnabled()
             val useGetSubscriptionTierOptions = subscriptionsFeature.tierMessagingEnabled().isEnabled()
             val resultJson = JSONObject().apply {
-                put("useSubscriptionsAuthV2", authV2Enabled)
+                put("useSubscriptionsAuthV2", true)
                 put("usePaidDuckAi", duckAiSubscriberModelsEnabled)
                 put("useAlternateStripePaymentFlow", supportsAlternateStripePaymentFlow)
                 put("useGetSubscriptionTierOptions", useGetSubscriptionTierOptions)

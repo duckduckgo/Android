@@ -28,6 +28,7 @@ import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import com.duckduckgo.pir.impl.models.ProfileQuery
+import com.duckduckgo.pir.impl.onboarding.experiment.SubscriptionOnboardingExperimentMetrics
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
@@ -55,6 +56,7 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
     private val currentTimeProvider: CurrentTimeProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val jobRecordUpdater: JobRecordUpdater,
+    private val subscriptionOnboardingExperimentMetrics: SubscriptionOnboardingExperimentMetrics,
 ) : PirWebJsMessageHandler() {
 
     override val message = PirDashboardWebMessages.SAVE_PROFILE
@@ -104,6 +106,10 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
 
             // start the initial scan at this point as startScanAndOptOut message is not reliable
             startAndScheduleInitialScan(executionType)
+
+            if (!hadExistingProfiles) {
+                subscriptionOnboardingExperimentMetrics.firePirActivated()
+            }
 
             pirWebProfileStateHolder.clear()
         }

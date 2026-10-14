@@ -110,6 +110,8 @@ class PermissionsViewModel @Inject constructor(
     }
 
     fun onAppLinksSettingChanged(appLinkSettingType: AppLinkSettingType) {
+        if (appLinkSettingType == viewState.value.appLinksSettingType) return
+
         logcat(INFO) { "User changed app links setting, is now: ${appLinkSettingType.name}" }
 
         val (pixelName, dailyPixelName) =

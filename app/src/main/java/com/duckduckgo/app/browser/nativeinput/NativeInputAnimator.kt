@@ -30,6 +30,7 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.shape.RelativeCornerSize
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -98,9 +99,8 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
 
     private var omnibarCornerRadius = 0f
     private var widgetCornerRadius = 0f
+    private var widgetUsesRelativeCornerSize = false
     private var widgetCardElevation = 0f
-    private var widgetCompatPaddingWidth = 0
-    private var widgetCompatPaddingHeight = 0
     private var isBottomCard = false
 
     // The card is a weighted LinearLayout child (width=0dp), which ignores an
@@ -124,9 +124,8 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         val margins = Margins(params.topMargin, params.bottomMargin)
 
         detachWeightForMorph(params)
-        shrinkCardToMatchOmnibar(params, omnibarWidth, omnibarHeight, isBottom)
-
         animateCornerRadius(widgetCard, omnibarCornerRadius)
+        shrinkCardToMatchOmnibar(widgetCard, params, omnibarWidth, omnibarHeight, isBottom)
         widgetCard.visibility = View.INVISIBLE
 
         return margins
@@ -327,7 +326,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
 
                 widgetCard.translationX = lerpF(holdTranslation.x, endTranslation.x, fraction)
                 widgetCard.translationY = lerpF(holdTranslation.y, endTranslation.y, fraction)
-                (widgetCard as? MaterialCardView)?.radius = lerpF(widgetCornerRadius, omnibarCornerRadius, fraction)
+                animateCornerRadius(widgetCard, lerpF(widgetCornerRadius, omnibarCornerRadius, fraction))
                 widgetContent?.alpha = 1 - fraction
                 omnibarCard.alpha = fraction
                 onUpdate(fraction)
@@ -375,21 +374,22 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
     }
 
     private fun captureCardProperties(widgetCard: View, omnibarCard: View) {
-        widgetCornerRadius = (widgetCard as? MaterialCardView)?.radius ?: 0f
+        val materialCard = widgetCard as? MaterialCardView
+        widgetUsesRelativeCornerSize = materialCard?.shapeAppearanceModel?.topLeftCornerSize is RelativeCornerSize
+        widgetCornerRadius = materialCard?.radius ?: 0f
         omnibarCornerRadius = (omnibarCard as? MaterialCardView)?.radius ?: 0f
-        widgetCardElevation = (widgetCard as? MaterialCardView)?.cardElevation ?: 0f
-        widgetCompatPaddingWidth = widgetCard.paddingLeft + widgetCard.paddingRight
-        widgetCompatPaddingHeight = widgetCard.paddingTop + widgetCard.paddingBottom
+        widgetCardElevation = materialCard?.cardElevation ?: 0f
     }
 
     private fun shrinkCardToMatchOmnibar(
+        card: View,
         params: ViewGroup.MarginLayoutParams,
         omnibarWidth: Int,
         omnibarHeight: Int,
         isBottom: Boolean,
     ) {
-        params.width = omnibarWidth + widgetCompatPaddingWidth
-        params.height = omnibarHeight + widgetCompatPaddingHeight
+        params.width = omnibarWidth + card.paddingLeft + card.paddingRight
+        params.height = omnibarHeight + card.paddingTop + card.paddingBottom
         params.topMargin = 0
         params.bottomMargin = 0
         // Gravity only applies to FrameLayout children. For the LinearLayout case the
@@ -441,14 +441,18 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         val materialCard = card as? MaterialCardView
         val savedRadius = materialCard?.radius ?: 0f
         val savedMaxElevation = materialCard?.maxCardElevation ?: 0f
-        materialCard?.apply {
-            radius = widgetCornerRadius
-            maxCardElevation = savedMaxElevation
+        if (!widgetUsesRelativeCornerSize) {
+            materialCard?.apply {
+                radius = widgetCornerRadius
+                maxCardElevation = savedMaxElevation
+            }
         }
         val fullHeight = measureUnconstrainedHeight(card, fullWidth)
-        materialCard?.apply {
-            radius = savedRadius
-            maxCardElevation = savedMaxElevation
+        if (!widgetUsesRelativeCornerSize) {
+            materialCard?.apply {
+                radius = savedRadius
+                maxCardElevation = savedMaxElevation
+            }
         }
 
         runAnimator(
@@ -462,7 +466,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
 
                 card.translationX = offsetToOmnibar.x * (1 - fraction)
                 card.translationY = offsetToOmnibar.y * (1 - fraction)
-                (card as? MaterialCardView)?.radius = lerpF(omnibarCornerRadius, widgetCornerRadius, fraction)
+                animateCornerRadius(card, lerpF(omnibarCornerRadius, widgetCornerRadius, fraction))
                 widgetContent?.alpha = fraction
                 omnibarCard.alpha = 1 - fraction
                 onUpdate(fraction)
@@ -521,6 +525,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
     }
 
     private fun animateCornerRadius(card: View, topRadius: Float) {
+        if (widgetUsesRelativeCornerSize) return
         val materialCard = card as? MaterialCardView ?: return
         materialCard.radius = topRadius
     }

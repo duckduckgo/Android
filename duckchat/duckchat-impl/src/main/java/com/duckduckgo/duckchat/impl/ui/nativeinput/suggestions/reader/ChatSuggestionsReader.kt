@@ -29,6 +29,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.maxHistoryCount
+import com.duckduckgo.duckchat.impl.feature.recentDaysCutoff
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -231,8 +232,9 @@ class RealChatSuggestionsReader @Inject constructor(
                 put("query", query)
             }
             put("max_chats", maxSuggestions)
-            if (query.isEmpty()) {
-                put("since", System.currentTimeMillis() - SEVEN_DAYS_MS)
+            val cutoffDays = duckAiChatHistoryFeature.recentDaysCutoff()
+            if (query.isEmpty() && cutoffDays > 0) {
+                put("since", System.currentTimeMillis() - cutoffDays * DAY_MS)
             }
         }
     }
@@ -309,7 +311,7 @@ class RealChatSuggestionsReader @Inject constructor(
         private const val METHOD_CHATS_RESULT = "duckAiChatsResult"
         private const val DEFAULT_MAX_SUGGESTIONS = 10
         private const val FETCH_TIMEOUT_MS = 3000L
-        private const val SEVEN_DAYS_MS = 7L * 24 * 60 * 60 * 1000
+        private const val DAY_MS = 24L * 60 * 60 * 1000
         private const val EMPTY_HTML = "<html></html>"
         private const val JS_FILE_NAME = "duckAiChatHistory.js"
         private const val CONTENT_SCOPE_PLACEHOLDER = "\$CONTENT_SCOPE$"

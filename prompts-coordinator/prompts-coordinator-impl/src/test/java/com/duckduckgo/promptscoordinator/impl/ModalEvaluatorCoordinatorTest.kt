@@ -21,6 +21,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import com.duckduckgo.promptscoordinator.api.ModalTrigger
+import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
 import com.duckduckgo.promptscoordinator.api.PromptType
 import com.duckduckgo.promptscoordinator.api.PromptsCoordinator
 import com.duckduckgo.promptscoordinator.impl.store.ModalEvaluatorCompletionStore
@@ -31,6 +32,8 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 class ModalEvaluatorCoordinatorTest {
@@ -42,6 +45,7 @@ class ModalEvaluatorCoordinatorTest {
     private val mockPluginPoint: PluginPoint<ModalEvaluator> = mock()
     private val mockLifecycleOwner: LifecycleOwner = mock()
     private val mockPromptsCoordinator: PromptsCoordinator = mock()
+    private val mockPromptExposureReporter: PromptExposureReporter = mock()
 
     private lateinit var testee: ModalEvaluatorCoordinator
 
@@ -55,6 +59,7 @@ class ModalEvaluatorCoordinatorTest {
             completionStore = mockCompletionStore,
             promptsCoordinator = mockPromptsCoordinator,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
+            promptExposureReporter = mockPromptExposureReporter,
         )
     }
 
@@ -96,6 +101,45 @@ class ModalEvaluatorCoordinatorTest {
         verify(evaluator1).evaluate()
         verify(evaluator2, never()).evaluate()
         verify(mockCompletionStore).recordCompletion()
+    }
+
+    @Test
+    fun whenModalShownWithCoordinatorDisabledThenExposureIsReportedWithTheEvaluatorId() = runTest {
+        whenever(mockCompletionStore.isBlockedBy24HourWindow()).thenReturn(false)
+        val skipped = createMockEvaluator("first", 1, ModalEvaluator.EvaluationResult.Skipped)
+        val shown = createMockEvaluator("second", 2, ModalEvaluator.EvaluationResult.ModalShown)
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(skipped, shown))
+
+        testee.onResume(mockLifecycleOwner)
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPromptExposureReporter).reportPromptShown("second")
+        verifyNoMoreInteractions(mockPromptExposureReporter)
+    }
+
+    @Test
+    fun whenModalShownWithCoordinatorEnabledThenExposureIsReported() = runTest {
+        whenever(mockPromptsCoordinator.isEnabled()).thenReturn(true)
+        whenever(mockPromptsCoordinator.tryClaim(PromptType.MODAL)).thenReturn(true)
+        val shown = createMockEvaluator("shown", 1, ModalEvaluator.EvaluationResult.ModalShown)
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(shown))
+
+        testee.onResume(mockLifecycleOwner)
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPromptExposureReporter).reportPromptShown("shown")
+    }
+
+    @Test
+    fun whenNoModalShownThenNoExposureIsReported() = runTest {
+        whenever(mockCompletionStore.isBlockedBy24HourWindow()).thenReturn(false)
+        val skipped = createMockEvaluator("skipped", 1, ModalEvaluator.EvaluationResult.Skipped)
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(skipped))
+
+        testee.onResume(mockLifecycleOwner)
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verifyNoInteractions(mockPromptExposureReporter)
     }
 
     @Test

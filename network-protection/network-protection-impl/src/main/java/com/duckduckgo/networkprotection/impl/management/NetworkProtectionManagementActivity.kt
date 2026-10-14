@@ -41,9 +41,7 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.isPrivateDnsStrict
 import com.duckduckgo.common.utils.extensions.launchAlwaysOnSystemSettings
 import com.duckduckgo.di.scopes.ActivityScope
@@ -99,9 +97,6 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     lateinit var dispatcherProvider: DispatcherProvider
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val binding: ActivityNetpManagementBinding by viewBinding()
@@ -124,16 +119,11 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.VPN)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
         bindViews()
         intent.getActivityParams(NetworkProtectionManagementScreenAndEnable::class.java)?.enable?.let { shouldEnable ->
             if (shouldEnable) {
@@ -329,6 +319,14 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             binding.netpStatusImage.setAnimation(R.raw.vpn_header)
         } else {
             binding.netpStatusImage.setAnimation(R.raw.vpn_header_dark)
+        }
+
+        if (appBrandDesignUpdateToggles.pictograms().isEnabled()) {
+            binding.netpStatusImage.setAnimation(R.raw.vpn_header_brand_update)
+            binding.netpStatusImage.layoutParams = binding.netpStatusImage.layoutParams.apply {
+                width = resources.getDimensionPixelSize(R.dimen.netp_header_animation_width)
+                height = resources.getDimensionPixelSize(R.dimen.netp_header_animation_height)
+            }
         }
     }
 

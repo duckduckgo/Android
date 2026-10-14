@@ -1,0 +1,114 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "Monitors free trial user journey from activation to conversion or expiration",
+    "$comment": "{\"owners\":[\"nalcalag\"]}",
+    "type": "object",
+    "required": ["meta", "global", "feature", "app"],
+    "additionalProperties": false,
+    "properties": {
+        "meta": {
+            "type": "object",
+            "required": ["type", "version"],
+            "additionalProperties": false,
+            "properties": { "type": { "const": "android-free-trial-conversion" }, "version": { "const": "1.0.0" } }
+        },
+        "app": {
+            "type": "object",
+            "required": ["name", "version"],
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the application sending the event",
+                    "enum": ["DuckDuckGo Android"]
+                },
+                "version": {
+                    "type": "string",
+                    "description": "The version of the app sending the event. Release builds are X.Y.Z; internal and nightly builds append the build number and channel suffix.",
+                    "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+(-[a-z]+)?)?$"
+                },
+                "form_factor": { "type": "string", "description": "The form factor of the current device", "enum": ["phone", "tablet"] },
+                "dev_mode": { "type": "boolean", "description": "Whether the app is a debug build" }
+            }
+        },
+        "global": {
+            "type": "object",
+            "required": ["platform", "type", "sample_rate"],
+            "additionalProperties": false,
+            "properties": {
+                "platform": { "type": "string", "description": "The platform the app is running on", "enum": ["Android"] },
+                "type": { "type": "string", "description": "The type of software sending the event", "enum": ["app"] },
+                "sample_rate": {
+                    "type": "number",
+                    "description": "Sample rate for this event, between 0 and 1",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "is_first_daily_occurrence": {
+                    "type": "boolean",
+                    "description": "Whether this is the first event completed with this feature name and status in the current UTC calendar day"
+                }
+            }
+        },
+        "feature": {
+            "type": "object",
+            "required": ["name", "status", "data"],
+            "additionalProperties": false,
+            "properties": {
+                "name": { "type": "string", "description": "The feature name for this event", "enum": ["free-trial-conversion"] },
+                "status": { "type": "string", "description": "The terminal status of the flow", "enum": ["SUCCESS", "FAILURE"] },
+                "data": {
+                    "type": "object",
+                    "required": ["ext"],
+                    "additionalProperties": false,
+                    "properties": {
+                        "ext": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "free_trial_plan": {
+                                    "type": "string",
+                                    "description": "The base plan ID of the free trial product activated",
+                                    "enum": [
+                                        "ddg-privacy-pro-monthly-renews-us",
+                                        "ddg-privacy-pro-monthly-renews-row",
+                                        "ddg-privacy-pro-yearly-renews-us",
+                                        "ddg-privacy-pro-yearly-renews-row",
+                                        "ddg-privacy-pro-sandbox-monthly-renews-us",
+                                        "ddg-privacy-pro-sandbox-monthly-renews-row",
+                                        "ddg-privacy-pro-sandbox-yearly-renews-us",
+                                        "ddg-privacy-pro-sandbox-yearly-renews-row",
+                                        "ddg-subscription-pro-yearly-renews-us",
+                                        "ddg-subscription-pro-monthly-renews-us",
+                                        "ddg-subscription-pro-yearly-renews-row",
+                                        "ddg-subscription-pro-monthly-renews-row"
+                                    ]
+                                },
+                                "failure_reason": {
+                                    "type": "string",
+                                    "description": "Reason for failure. Only present on FAILURE events.",
+                                    "enum": ["expired", "timeout"]
+                                },
+                                "step.vpn_activated_d1": {
+                                    "type": "string",
+                                    "description": "true if VPN was successfully activated within first day of Free Trial",
+                                    "enum": ["true", "false"]
+                                },
+                                "step.vpn_activated_d2_to_d7": {
+                                    "type": "string",
+                                    "description": "true if VPN was successfully activated between D2-D7 of Free Trial",
+                                    "enum": ["true", "false"]
+                                },
+                                "step.duck_ai_paid_used": {
+                                    "type": "string",
+                                    "description": "true if paid duck.ai model has been used within a Free Trial",
+                                    "enum": ["true", "false"]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

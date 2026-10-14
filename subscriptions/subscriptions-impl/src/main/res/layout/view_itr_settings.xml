@@ -20,5 +20,5 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:indicatorStatus="on"
-    app:leadingIcon="@drawable/ic_identity_theft_restoration_color_24"
+    app:leadingIcon="@drawable/identity_theft_restoration_color_24"
     app:primaryText="@string/itrSettingTitle" />

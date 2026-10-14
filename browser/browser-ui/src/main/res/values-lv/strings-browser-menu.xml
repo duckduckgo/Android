@@ -58,4 +58,10 @@
     <string name="browserMenuForward">Uz priekšu</string>
     <string name="browserMenuRefresh">Atsvaidzināt</string>
     <string name="browserMenuFireTabsData">Dzēst cilnes un datus</string>
+
+    <!-- Duck.ai tab + menu -->
+    <string name="chatMenuPopupNewVoiceChat">Jauna balss tērzēšana</string>
+    <string name="chatMenuPopupNewImage">Jauns attēls</string>
+    <string name="chatMenuPopupNewTab">Jauna cilne</string>
+    <string name="chatMenuPopupNewFireTab">Jauna Fire cilne</string>
 </resources>

@@ -27,16 +27,17 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.generalsettings.showonapplaunch.rmf.AfterIdleMessageTriggerProvider
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
 import com.duckduckgo.promptscoordinator.api.PromptType
 import com.duckduckgo.promptscoordinator.api.PromptsCoordinator
 import com.duckduckgo.remote.messaging.api.Action
+import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.Surface
@@ -81,9 +82,9 @@ class NewTabPageViewModel @AssistedInject constructor(
     private val lowPriorityMessagingModel: LowPriorityMessagingModel,
     private val appTrackingProtection: AppTrackingProtection,
     private val pixel: Pixel,
-    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val ctaViewModel: CtaViewModel,
     private val promptsCoordinator: PromptsCoordinator,
+    private val promptExposureReporter: PromptExposureReporter,
     browserMode: BrowserMode,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -106,6 +107,7 @@ class NewTabPageViewModel @AssistedInject constructor(
         private val hasLowPriorityMessage = lowPriorityMessage != null
 
         val showFireTabEmptyState = isFireMode
+        val showNextSteps = onboardingComplete && message?.content is Content.ActionableItems
         val shouldShowLogo = !isFireMode && !isLoadingContent && !hasContentThatDisplacesHomeLogo && showDaxLogo
         val hasContent = isFireMode ||
             isLoadingContent ||
@@ -137,6 +139,7 @@ class NewTabPageViewModel @AssistedInject constructor(
     }
 
     private var lastRemoteMessageSeen: RemoteMessage? = null
+    private var lastRemoteMessageReportedId: String? = null
     private val _viewState = MutableStateFlow(
         ViewState(showDaxLogo = showDaxLogo, isFireMode = browserMode == BrowserMode.FIRE),
     )
@@ -185,13 +188,15 @@ class NewTabPageViewModel @AssistedInject constructor(
 
                     withContext(dispatchers.io()) {
                         val messageImageFilePath = remoteMessagingModel.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)
+                        val onboardingComplete = isHomeOnboardingComplete()
+                        reportRemoteMessageCardExposure(message, onboardingComplete)
                         _viewState.emit(
                             viewState.value.copy(
                                 message = message,
                                 messageImageFilePath = messageImageFilePath,
                                 newMessage = newMessage,
                                 favourites = snapshot.favourites,
-                                onboardingComplete = isHomeOnboardingComplete(),
+                                onboardingComplete = onboardingComplete,
                                 lowPriorityMessage = if (!newMessage && !awaitingSurface) lowPriorityMessagingModel.getMessage() else null,
                             ),
                         )
@@ -208,15 +213,16 @@ class NewTabPageViewModel @AssistedInject constructor(
         }
     }
 
+    private fun reportRemoteMessageCardExposure(message: RemoteMessage?, onboardingComplete: Boolean) {
+        if (message == null || !onboardingComplete || message.id == lastRemoteMessageReportedId) return
+        lastRemoteMessageReportedId = message.id
+        promptExposureReporter.reportNewTabPageCardShown(message.id)
+    }
+
     // We only want to show New Tab when the Home CTAs from Onboarding has finished
     // https://app.asana.com/0/1157893581871903/1207769731595075/f
     private suspend fun isHomeOnboardingComplete(): Boolean {
-        val lastDialogShown = if (onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
-            ctaViewModel.areBubbleDaxDialogsCompleted()
-        } else {
-            dismissedCtaDao.exists(CtaId.DAX_END)
-        }
-        return lastDialogShown ||
+        return ctaViewModel.areBubbleDaxDialogsCompleted() ||
             settingsDataStore.hideTips ||
             dismissedCtaDao.exists(CtaId.ADD_WIDGET)
     }

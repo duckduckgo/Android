@@ -30,8 +30,8 @@ class AdBlockingTelemetryPixelInterceptorTest {
     private val interceptor = AdBlockingTelemetryPixelInterceptor(statusChecker)
 
     @Test
-    fun whenUserEnabledAndPixelMatchesThenPixelProceeds() {
-        whenever(statusChecker.currentState()).thenReturn(AdBlockingState.Enabled.UserEnabled)
+    fun whenEnabledWithPixelConsentAndPixelMatchesThenPixelProceeds() {
+        whenever(statusChecker.currentState()).thenReturn(AdBlockingState.Enabled.WithPixelConsent)
 
         val url = "$PIXEL_BASE/webTelemetry_youtubeInterference_day.buffering_android_phone"
         val response = interceptor.intercept(FakeChain(url))
@@ -40,8 +40,8 @@ class AdBlockingTelemetryPixelInterceptorTest {
     }
 
     @Test
-    fun whenUserEnabledAndPixelMatchesIgnoringCaseThenPixelProceeds() {
-        whenever(statusChecker.currentState()).thenReturn(AdBlockingState.Enabled.UserEnabled)
+    fun whenEnabledWithPixelConsentAndPixelMatchesIgnoringCaseThenPixelProceeds() {
+        whenever(statusChecker.currentState()).thenReturn(AdBlockingState.Enabled.WithPixelConsent)
 
         val url = "$PIXEL_BASE/webtelemetry_youtubetinterference_day.buffering_android_phone"
         val response = interceptor.intercept(FakeChain(url))
@@ -59,6 +59,17 @@ class AdBlockingTelemetryPixelInterceptorTest {
         assertEquals(200, response.code)
         assertEquals("Dropped ad blocking telemetry pixel", response.message)
         assertEquals("Ad blocking telemetry pixel dropped", response.body?.string())
+    }
+
+    @Test
+    fun whenEnabledWithoutPixelConsentAndPixelMatchesThenPixelIsDropped() {
+        whenever(statusChecker.currentState()).thenReturn(AdBlockingState.Enabled.WithoutPixelConsent)
+
+        val url = "$PIXEL_BASE/webTelemetry_youtubeInterference_day.buffering_android_phone"
+        val response = interceptor.intercept(FakeChain(url))
+
+        assertEquals(200, response.code)
+        assertEquals("Dropped ad blocking telemetry pixel", response.message)
     }
 
     @Test
@@ -94,8 +105,8 @@ class AdBlockingTelemetryPixelInterceptorTest {
     }
 
     @Test
-    fun whenUserEnabledAndPixelDoesNotMatchThenPixelProceeds() {
-        whenever(statusChecker.currentState()).thenReturn(AdBlockingState.Enabled.UserEnabled)
+    fun whenEnabledWithPixelConsentAndPixelDoesNotMatchThenPixelProceeds() {
+        whenever(statusChecker.currentState()).thenReturn(AdBlockingState.Enabled.WithPixelConsent)
 
         val url = "$PIXEL_BASE/m_unrelated_pixel_android_phone"
         val response = interceptor.intercept(FakeChain(url))

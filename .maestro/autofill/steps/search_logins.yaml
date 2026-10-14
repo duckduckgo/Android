@@ -32,7 +32,7 @@ name: "Autofill: Search credentials"
 - assertVisible: user
 
 - tapOn:
-    id: omnibarTextInput
+    id: "omnibarTextInput|inputField"
 - inputText: "no match"
 
 - assertVisible: "No results for.*"
@@ -40,7 +40,7 @@ name: "Autofill: Search credentials"
 - eraseText
 
 - tapOn:
-      id: omnibarTextInput
+      id: "omnibarTextInput|inputField"
 - inputText: "192"
 
 - assertVisible: 192.168.0.100

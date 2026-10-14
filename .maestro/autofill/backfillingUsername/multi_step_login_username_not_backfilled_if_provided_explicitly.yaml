@@ -17,7 +17,7 @@ tags:
 
       # get to autofill form
       - tapOn:
-          id: "omnibarTextInput"
+          id: "omnibarTextInput|inputField"
       - inputText: "https://autofill.me/form/login-simple"
       - pressKey: Enter
 

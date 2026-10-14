@@ -105,6 +105,8 @@ interface DuckChatFeatureRepository {
     suspend fun setLastUsedTogglePosition(position: String)
 
     fun observeLastUsedTogglePosition(): StateFlow<String?>
+
+    suspend fun checkAndMarkFirstPromptSubmission(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -223,6 +225,14 @@ class RealDuckChatFeatureRepository @Inject constructor(
     }
 
     override fun observeLastUsedTogglePosition(): StateFlow<String?> = duckChatDataStore.observeLastUsedTogglePosition()
+
+    override suspend fun checkAndMarkFirstPromptSubmission(): Boolean {
+        val isFirst = !duckChatDataStore.hasSubmittedPromptBefore()
+        if (isFirst) {
+            duckChatDataStore.setPromptSubmitted()
+        }
+        return isFirst
+    }
 
     private fun updateWidgets() {
         val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)

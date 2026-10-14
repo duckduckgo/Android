@@ -46,6 +46,10 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentProcessor
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -87,6 +91,8 @@ class AttachmentViewModelTest {
     private val context: Context = mock<Context>().also {
         whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckChatImageAttachmentLimitPerConversation, 5))
             .thenReturn("Conversation limit reached")
+        whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckAiTextSelectionLimitReached, TextSelectionRepository.MAX_SELECTIONS))
+            .thenReturn("Selection limit reached")
         whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckChatImageAttachmentLimitPerMessage, 3))
             .thenReturn("Per-message limit reached")
         whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckChatFileAttachmentLimitPerConversation, 2))
@@ -120,9 +126,14 @@ class AttachmentViewModelTest {
     private val nativeInputStateStore = RealNativeInputStateStore(
         dagger.Lazy { tabRepositoryProvider },
         browserModeStateHolder,
+        RealTextSelectionRepository(dagger.Lazy { mock() }, mock()),
     )
 
     private lateinit var viewModel: AttachmentViewModel
+
+    private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
+    private val textSelectionRepository = RealTextSelectionRepository(dagger.Lazy { duckChatPixels }, selectionJourney)
+    private val textSelectionPayloadBuilder: TextSelectionPayloadBuilder = mock()
 
     @Before
     fun setUp() {
@@ -136,6 +147,9 @@ class AttachmentViewModelTest {
             appBuildConfig = appBuildConfig,
             nativeInputStateProvider = nativeInputStateStore,
             duckChatPixels = duckChatPixels,
+            textSelectionRepository = textSelectionRepository,
+            textSelectionPayloadBuilder = textSelectionPayloadBuilder,
+            selectionJourney = selectionJourney,
         )
     }
 
@@ -275,6 +289,124 @@ class AttachmentViewModelTest {
         addFiles(aFileAttachment())
 
         assertTrue(viewModel.attachmentState.value.hasAttachments)
+    }
+
+    @Test
+    fun whenAtSelectionLimitThenNoLimitErrorUntilAnotherIsAttempted() = runTest {
+        viewModel.bindTextSelections("tab-1", textSelection = null)
+        repeat(TextSelectionRepository.MAX_SELECTIONS) { textSelectionRepository.add("tab-1", "selection $it", "https://example.com") }
+
+        assertNull(viewModel.attachmentState.value.textSelectionLimitError)
+    }
+
+    @Test
+    fun whenSelectionRefusedAtLimitThenLimitErrorShown() = runTest {
+        viewModel.bindTextSelections("tab-1", textSelection = null)
+        repeat(TextSelectionRepository.MAX_SELECTIONS) { textSelectionRepository.add("tab-1", "selection $it", "https://example.com") }
+
+        textSelectionRepository.add("tab-1", "one too many", "https://example.com")
+
+        assertEquals("Selection limit reached", viewModel.attachmentState.value.textSelectionLimitError)
+    }
+
+    @Test
+    fun whenSelectionRemovedAfterLimitThenLimitErrorCleared() = runTest {
+        viewModel.bindTextSelections("tab-1", textSelection = null)
+        repeat(TextSelectionRepository.MAX_SELECTIONS) { textSelectionRepository.add("tab-1", "selection $it", "https://example.com") }
+        textSelectionRepository.add("tab-1", "one too many", "https://example.com")
+        val target = textSelectionRepository.selections("tab-1").value.first()
+
+        viewModel.removeTextSelection(target.id)
+
+        assertNull(viewModel.attachmentState.value.textSelectionLimitError)
+    }
+
+    @Test
+    fun whenOnlyTextSelectionsAttachedThenHasNoStandaloneAttachments() = runTest {
+        viewModel.bindTextSelections("tab-1", "selected words")
+
+        assertTrue(viewModel.attachmentState.value.hasAttachments)
+        assertFalse(viewModel.attachmentState.value.hasStandaloneAttachments)
+    }
+
+    @Test
+    fun whenOnlyPageContextAttachedThenHasNoStandaloneAttachments() = runTest {
+        viewModel.setPageContext(PageContextAttachment(title = "Title", url = "https://example.com", tabId = "tab-1"))
+
+        assertTrue(viewModel.attachmentState.value.hasAttachments)
+        assertFalse(viewModel.attachmentState.value.hasStandaloneAttachments)
+    }
+
+    @Test
+    fun whenImagesAddedThenHasStandaloneAttachments() = runTest {
+        addImages(1)
+
+        assertTrue(viewModel.attachmentState.value.hasStandaloneAttachments)
+    }
+
+    @Test
+    fun whenFilesAddedThenHasStandaloneAttachments() = runTest {
+        addFiles(aFileAttachment())
+
+        assertTrue(viewModel.attachmentState.value.hasStandaloneAttachments)
+    }
+
+    @Test
+    fun whenBoundWithTextSelectionThenItIsAttachedToThatTab() = runTest {
+        viewModel.bindTextSelections("tab-1", "selected words")
+
+        assertEquals(listOf("selected words"), viewModel.attachmentState.value.textSelections.map { it.text })
+    }
+
+    @Test
+    fun whenBoundWithoutTextSelectionThenNothingIsAttached() = runTest {
+        viewModel.bindTextSelections("tab-1", textSelection = null)
+
+        assertTrue(viewModel.attachmentState.value.textSelections.isEmpty())
+    }
+
+    @Test
+    fun whenBoundToADifferentTabThenOtherTabsSelectionsAreNotShown() = runTest {
+        textSelectionRepository.add("tab-other", "not mine", "https://example.com")
+
+        viewModel.bindTextSelections("tab-1", textSelection = null)
+
+        assertTrue(viewModel.attachmentState.value.textSelections.isEmpty())
+    }
+
+    @Test
+    fun whenTextSelectionRemovedThenItIsDroppedFromState() = runTest {
+        viewModel.bindTextSelections("tab-1", "keep me")
+        viewModel.bindTextSelections("tab-1", "remove me")
+        val idToRemove = viewModel.attachmentState.value.textSelections.last().id
+
+        viewModel.removeTextSelection(idToRemove)
+
+        assertEquals(listOf("keep me"), viewModel.attachmentState.value.textSelections.map { it.text })
+    }
+
+    @Test
+    fun whenTextSelectionsConsumedThenTheyAreClearedFromState() = runTest {
+        viewModel.bindTextSelections("tab-1", "selected words")
+
+        viewModel.getTextSelectionsJson()
+
+        assertTrue(viewModel.attachmentState.value.textSelections.isEmpty())
+        verify(selectionJourney).onPromptSubmitted("tab-1")
+    }
+
+    @Test
+    fun whenNoTextSelectionsToConsumeThenJourneyNotSubmitted() = runTest {
+        viewModel.bindTextSelections("tab-1", textSelection = null)
+
+        viewModel.getTextSelectionsJson()
+
+        verify(selectionJourney, never()).onPromptSubmitted(any())
+    }
+
+    @Test
+    fun whenNotBoundThenTextSelectionsJsonIsNull() = runTest {
+        assertNull(viewModel.getTextSelectionsJson())
     }
 
     @Test

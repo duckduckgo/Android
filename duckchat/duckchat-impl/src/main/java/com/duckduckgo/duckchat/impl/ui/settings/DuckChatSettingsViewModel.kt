@@ -32,26 +32,27 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.pixel.fireCountAndDaily
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
-import com.duckduckgo.duckchat.impl.store.HideAiGeneratedImages
-import com.duckduckgo.duckchat.impl.store.SearchAssistVisibility
+import com.duckduckgo.duckchat.impl.subscriptiononboarding.experiment.SubscriptionOnboardingExperimentMetrics
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenShortcutSettings
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.ShowSearchAssistDialog
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.settings.api.HideAiGeneratedImages
+import com.duckduckgo.settings.api.SearchAssistVisibility
 import com.duckduckgo.settings.api.SerpSettingsDataProvider
 import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.settings.api.observeSetting
+import com.duckduckgo.settings.api.setSetting
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -67,6 +68,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val duckChatFeature: DuckChatFeature,
     private val serpSettingsDataProvider: SerpSettingsDataProvider,
+    private val subscriptionOnboardingExperimentMetrics: SubscriptionOnboardingExperimentMetrics,
 ) : ViewModel() {
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
@@ -77,7 +79,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         val shouldShowShortcuts: Boolean = false,
         val shouldShowInputScreenToggle: Boolean = false,
         val isSearchSectionVisible: Boolean = true,
-        val isHideGeneratedImagesOptionVisible: Boolean = false,
         val isAutomaticContextVisible: Boolean = false,
         val isAutomaticContextEnabled: Boolean = false,
         val isDefaultTogglePositionVisible: Boolean = false,
@@ -97,7 +98,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     )
 
     private data class FeatureVisibility(
-        val isHideGeneratedImagesOptionVisible: Boolean,
         val isNativeControlsEnabled: Boolean,
     )
 
@@ -120,7 +120,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         flow {
             emit(
                 FeatureVisibility(
-                    isHideGeneratedImagesOptionVisible = duckChatFeature.showHideAiGeneratedImages().isEnabled(),
                     isNativeControlsEnabled = duckChatFeature.aiFeaturesNativeControls().isEnabled(),
                 ),
             )
@@ -131,16 +130,15 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             featureState,
             featureVisibility,
             duckChat.observeDefaultTogglePosition(),
-            observeSearchAssistVisibility(),
-            observeHideAiGeneratedImages(),
+            serpSettingsDataProvider.observeSetting(DEFAULT_SEARCH_ASSIST_VISIBILITY),
+            serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.OFF),
         ) { featureState, featureVisibility, defaultTogglePosition, searchAssistVisibility, hideAiGeneratedImages ->
             val isDuckChatUserEnabled = featureState.isDuckChatUserEnabled
             val isInputScreenEnabled = featureState.isCosmeticInputScreenEnabled ?: featureState.isInputScreenEnabled
-            val resolvedSearchAssistVisibility = searchAssistVisibility ?: DEFAULT_SEARCH_ASSIST_VISIBILITY
             // The "Use DuckDuckGo Without AI" action turns everything off at once; once Duck.ai is off,
             // Search Assist is Never and AI-generated images are hidden, there's nothing left to do.
             val isAlreadyWithoutAi = !isDuckChatUserEnabled &&
-                resolvedSearchAssistVisibility == SearchAssistVisibility.NEVER &&
+                searchAssistVisibility == SearchAssistVisibility.NEVER &&
                 hideAiGeneratedImages == HideAiGeneratedImages.ON
             ViewState(
                 isDuckChatUserEnabled = isDuckChatUserEnabled,
@@ -148,17 +146,16 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 shouldShowShortcuts = isDuckChatUserEnabled,
                 shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
                 isSearchSectionVisible = isSearchSectionVisible(duckChatActivityParams, featureVisibility.isNativeControlsEnabled),
-                isHideGeneratedImagesOptionVisible = featureVisibility.isHideGeneratedImagesOptionVisible,
                 isAutomaticContextEnabled = featureState.isAutomaticContextEnabled,
                 isAutomaticContextVisible = isDuckChatUserEnabled && duckChatFeature.automaticContextAttachment().isEnabled(),
                 isDefaultTogglePositionVisible = isDuckChatUserEnabled && isInputScreenEnabled &&
                     duckChat.isInputScreenFeatureAvailable(),
                 defaultTogglePosition = defaultTogglePosition,
                 isNativeControlsEnabled = featureVisibility.isNativeControlsEnabled,
-                searchAssistVisibility = resolvedSearchAssistVisibility,
+                searchAssistVisibility = searchAssistVisibility,
                 hideAiGeneratedImages = hideAiGeneratedImages,
                 isUseWithoutAiActionEnabled = !isAlreadyWithoutAi,
-                isDuckAiWebSettingsVisible = isDuckChatUserEnabled && duckChatFeature.duckAiSettings().isEnabled(),
+                isDuckAiWebSettingsVisible = isDuckChatUserEnabled,
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
@@ -209,6 +206,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             countPixel = DuckChatPixelName.AI_FEATURES_DISABLED_COUNT,
             dailyPixel = DuckChatPixelName.AI_FEATURES_DISABLED_DAILY,
         )
+        viewModelScope.launch { subscriptionOnboardingExperimentMetrics.fireAiFeaturesDisabled() }
         // Only disable Duck.ai if it's currently on, so we don't fire a spurious aichat_disabled when
         // the action is reachable purely because Search Assist or Hide AI Images is still non-no-AI.
         if (viewState.value.isDuckChatUserEnabled) {
@@ -244,11 +242,10 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
 
     fun duckChatSearchAISettingsClicked() {
         viewModelScope.launch {
-            val (nativeControlsEnabled, embeddedSettingsEnabled, showHideAiGeneratedImages) = withContext(dispatcherProvider.io()) {
-                Triple(
+            val (nativeControlsEnabled, embeddedSettingsEnabled) = withContext(dispatcherProvider.io()) {
+                Pair(
                     duckChatFeature.aiFeaturesNativeControls().isEnabled(),
                     settingsPageFeature.embeddedSettingsWebView().isEnabled(),
-                    duckChatFeature.showHideAiGeneratedImages().isEnabled(),
                 )
             }
 
@@ -257,16 +254,8 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             } else if (embeddedSettingsEnabled) {
                 commandChannel.send(
                     OpenLink(
-                        link = if (showHideAiGeneratedImages) {
-                            DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED
-                        } else {
-                            LEGACY_DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED
-                        },
-                        titleRes = if (showHideAiGeneratedImages) {
-                            R.string.duckAiSerpSettingsTitle
-                        } else {
-                            R.string.duck_chat_assist_settings_title
-                        },
+                        link = DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED,
+                        titleRes = R.string.duckAiSerpSettingsTitle,
                     ),
                 )
             } else {
@@ -317,14 +306,9 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         }
         viewModelScope.launch {
             // The SERP blob is the single source of truth, so the web reflects this on its next getNativeSettings.
-            serpSettingsDataProvider.setSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY, option.serpCode)
+            serpSettingsDataProvider.setSetting(option)
         }
     }
-
-    // Defaults to OFF (show) until the user (or SERP) has provided a value.
-    private fun observeHideAiGeneratedImages(): Flow<HideAiGeneratedImages> =
-        serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY)
-            .map { HideAiGeneratedImages.fromSerpCode(it) }
 
     fun onDuckAiShortcutsClicked() {
         viewModelScope.launch {
@@ -383,7 +367,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         }
         viewModelScope.launch {
             // The SERP blob is the single source of truth, so the web reflects this on its next getNativeSettings.
-            serpSettingsDataProvider.setSetting(SearchAssistVisibility.SERP_SETTINGS_KEY, visibility.serpCode)
+            serpSettingsDataProvider.setSetting(visibility)
         }
     }
 
@@ -398,11 +382,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             SearchAssistVisibility.OFTEN ->
                 DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_OFTEN_COUNT to DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_OFTEN_DAILY
         }
-
-    // Emits null until the user (or SERP) has provided a value; callers default it.
-    private fun observeSearchAssistVisibility(): Flow<SearchAssistVisibility?> =
-        serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY)
-            .map { SearchAssistVisibility.fromSerpCode(it) }
 
     fun duckAiInputScreenShareFeedbackClicked() {
         viewModelScope.launch {
@@ -433,7 +412,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         private val DEFAULT_SEARCH_ASSIST_VISIBILITY = SearchAssistVisibility.SOMETIMES
         const val DUCK_CHAT_LEARN_MORE_LINK = "https://duckduckgo.com/duckduckgo-help-pages/aichat/"
         const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK = "https://duckduckgo.com/settings?ko=-1#aifeatures"
-        const val LEGACY_DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED = "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbe#aifeatures"
         const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED =
             "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbe&hideduckai=1#aifeatures"
         const val DUCK_CHAT_HIDE_GENERATED_IMAGES_LINK_EMBEDDED =

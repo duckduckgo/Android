@@ -32,7 +32,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.model.AppCacheExclusionPlugin
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
-import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
@@ -41,9 +40,10 @@ import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
+import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
 import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.file.FileDeleter
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.di.scopes.AppScope
@@ -80,7 +80,7 @@ object PrivacyModule {
         savedSitesRepository: SavedSitesRepository,
         navigationHistory: NavigationHistory,
         dispatcherProvider: DispatcherProvider,
-        webTrackingRepository: WebTrackersBlockedRepository,
+        webTrackersBlockedHistory: WebTrackersBlockedHistory,
         tabVisitedSitesRepository: TabVisitedSitesRepository,
         webViewCapabilityChecker: WebViewCapabilityChecker,
         duckAiHostProvider: DuckAiHostProvider,
@@ -104,7 +104,7 @@ object PrivacyModule {
             savedSitesRepository,
             navigationHistory,
             dispatcherProvider,
-            webTrackingRepository,
+            webTrackersBlockedHistory,
             tabVisitedSitesRepository,
             webViewCapabilityChecker,
             duckAiHostProvider,

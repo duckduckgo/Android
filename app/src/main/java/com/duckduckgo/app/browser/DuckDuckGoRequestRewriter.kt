@@ -18,13 +18,12 @@ package com.duckduckgo.app.browser
 
 import android.net.Uri
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.AppUrl.ParamKey
 import com.duckduckgo.common.utils.AppUrl.ParamValue
-import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.device.isTablet
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.referral.api.AppReferrer
-import com.duckduckgo.settings.api.SerpSettingsFeature
 import logcat.logcat
 
 interface RequestRewriter {
@@ -38,12 +37,8 @@ class DuckDuckGoRequestRewriter(
     private val statisticsStore: StatisticsDataStore,
     private val variantManager: VariantManager,
     private val appReferrer: AppReferrer,
-    private val duckChat: DuckChat,
-    private val androidConfigFeatures: AndroidBrowserConfigFeature,
-    private val serpSettingsFeature: SerpSettingsFeature,
+    private val deviceInfo: DeviceInfo,
 ) : RequestRewriter {
-
-    private val hideDuckAiSerpKillSwitch by lazy { androidConfigFeatures.hideDuckAiInSerpKillSwitch().isEnabled() }
 
     override fun rewriteRequestWithCustomQueryParams(request: Uri): Uri {
         val builder = Uri.Builder()
@@ -79,15 +74,13 @@ class DuckDuckGoRequestRewriter(
             builder.appendQueryParameter(ParamKey.ATB, atb.formatWithVariant(variantManager.getVariantKey()))
         }
 
-        val sourceValue = if (appReferrer.isInstalledFromEuAuction()) ParamValue.SOURCE_EU_AUCTION else ParamValue.SOURCE
+        val sourceValue = if (appReferrer.isInstalledFromEuAuction()) {
+            ParamValue.SOURCE_EU_AUCTION
+        } else {
+            if (deviceInfo.isTablet()) ParamValue.SOURCE_TABLET else ParamValue.SOURCE
+        }
 
         builder.appendQueryParameter(ParamKey.HIDE_SERP, ParamValue.HIDE_SERP)
-        if (!serpSettingsFeature.storeSerpSettings().isEnabled()) {
-            // Once serpSettingsSync feature is permanently enabled this can be removed.
-            if (!duckChat.isEnabled() && hideDuckAiSerpKillSwitch) {
-                builder.appendQueryParameter(ParamKey.HIDE_DUCK_AI, ParamValue.HIDE_DUCK_AI)
-            }
-        }
         builder.appendQueryParameter(ParamKey.SOURCE, sourceValue)
     }
 }

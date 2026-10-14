@@ -33,7 +33,7 @@ class OmnibarDuckPlayerIconTest {
     @Test
     fun whenAddressBarRebrandIsDisabledThenDuckPlayerUsesLegacyIcon() {
         assertEquals(
-            R.drawable.ic_video_player_color_24,
+            R.drawable.video_player_color_24,
             resolveDuckPlayerIcon(isAddressBarRebrandEnabled = false),
         )
     }

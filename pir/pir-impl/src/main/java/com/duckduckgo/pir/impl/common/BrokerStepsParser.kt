@@ -163,16 +163,25 @@ class RealBrokerStepsParser @Inject constructor(
             if (profile != null) {
                 adapter.fromJson(optOutStepJson)?.run {
                     val optOutStepActions = this as OptOutStepActions
-                    EmailConfirmationStep(
-                        broker = broker,
-                        step = OptOutStepActions(
-                            stepType = optOutStepActions.stepType,
-                            actions = optOutStepActions.actions.dropWhile { it !is BrokerAction.EmailConfirmation },
-                            optOutType = optOutStepActions.optOutType,
-                        ),
-                        emailConfirmationJob = emailConfirmationJob,
-                        profileToOptOut = profile,
-                    )
+                    val confirmationActions = optOutStepActions.actions.dropWhile { it !is BrokerAction.EmailConfirmation }
+                    if (confirmationActions.isEmpty()) {
+                        // The broker's opt-out flow no longer has an email confirmation action, so a job recorded
+                        // against an earlier broker version can never run. This happens when a broker becomes a
+                        // mirror of another one and its opt-out flow is replaced by an empty parentSiteOptOut step.
+                        logcat(ERROR) { "PIR-SCAN: No email confirmation action left for ${broker.name}" }
+                        null
+                    } else {
+                        EmailConfirmationStep(
+                            broker = broker,
+                            step = OptOutStepActions(
+                                stepType = optOutStepActions.stepType,
+                                actions = confirmationActions,
+                                optOutType = optOutStepActions.optOutType,
+                            ),
+                            emailConfirmationJob = emailConfirmationJob,
+                            profileToOptOut = profile,
+                        )
+                    }
                 }
             } else {
                 null

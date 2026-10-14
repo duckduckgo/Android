@@ -17,15 +17,25 @@
 package com.duckduckgo.subscriptions.impl.onboarding.welcome
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
+import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.onboarding.welcome.SubscriptionOnboardingWelcomeStepPlugin.Companion.WELCOME_STEP_ID
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
@@ -33,22 +43,54 @@ import javax.inject.Inject
 class SubscriptionOnboardingWelcomeViewModel @Inject constructor(
     private val controller: SubscriptionOnboardingController,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val onboardingStore: SubscriptionOnboardingStore,
+    private val subscriptionsManager: SubscriptionsManager,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(
+        val isFreeTrial: Boolean = false,
         val formattedBillingDate: String = "",
         val freeTrialDayLabels: List<String> = emptyList(),
     )
 
-    private val _viewState = MutableStateFlow(buildViewState())
+    sealed interface Command {
+        data object LaunchConfetti : Command
+    }
+
+    private val _viewState = MutableStateFlow(ViewState())
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
 
-    private fun buildViewState(): ViewState {
+    private val _commands = Channel<Command>(1, DROP_OLDEST)
+    val commands: Flow<Command> = _commands.receiveAsFlow()
+
+    private var confettiRequested = false
+
+    init {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val isFreeTrial = subscriptionsManager.getSubscription()?.activeOffers?.contains(ActiveOfferType.TRIAL) == true
+            _viewState.value = if (isFreeTrial) freeTrialViewState() else ViewState(isFreeTrial = false)
+        }
+    }
+
+    private fun freeTrialViewState(): ViewState {
         val startDate = currentTimeProvider.localDateTimeNow().toLocalDate()
         return ViewState(
+            isFreeTrial = true,
             formattedBillingDate = startDate.plusDays(FREE_TRIAL_DAYS.toLong()).format(DATE_FORMATTER),
             freeTrialDayLabels = (0 until FREE_TRIAL_DAYS).map { startDate.plusDays(it.toLong()).dayOfMonth.toString() },
         )
+    }
+
+    fun onScreenShown() {
+        if (confettiRequested) return
+        confettiRequested = true
+
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (!onboardingStore.isStepCompleted(WELCOME_STEP_ID)) {
+                _commands.send(Command.LaunchConfetti)
+            }
+        }
     }
 
     fun onPrimaryCtaClicked() {

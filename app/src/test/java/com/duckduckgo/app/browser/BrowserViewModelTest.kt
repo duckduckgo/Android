@@ -45,6 +45,8 @@ import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -109,6 +111,7 @@ class BrowserViewModelTest {
         on { currentMode } doReturn browserModeFlow
     }
     private val mockFireModeAvailability: FireModeAvailability = mock()
+    private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
 
     // The activity's frozen BrowserMode value injected into BrowserViewModel; defaults to REGULAR.
     private var browserMode = BrowserMode.REGULAR
@@ -152,6 +155,33 @@ class BrowserViewModelTest {
         whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
         testee.onNewTabRequested()
         verify(mockTabRepository).add()
+    }
+
+    @Test
+    fun whenNewTabRequestedThenPendingNewTabOpenedExitRecordedForCurrentlySelectedTab() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(TabEntity(tabId = "current-tab", url = "https://duck.ai/"))
+
+        testee.onNewTabRequested()
+
+        verify(mockDuckAiSessionCallback).onExitIntent("current-tab", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+    }
+
+    @Test
+    fun whenOpenInNewTabRequestedThenPendingNewTabOpenedExitRecordedForCurrentlySelectedTab() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(TabEntity(tabId = "current-tab", url = "https://duck.ai/"))
+
+        testee.onOpenInNewTabRequested(query = "https://example.com")
+
+        verify(mockDuckAiSessionCallback).onExitIntent("current-tab", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+    }
+
+    @Test
+    fun whenOpenInNewTabRequestedWithNoSelectedTabThenNoPendingExitRecorded() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(null)
+
+        testee.onOpenInNewTabRequested(query = "https://example.com")
+
+        verify(mockDuckAiSessionCallback, never()).onExitIntent(any(), any())
     }
 
     // --- selectedTab flow → NtpAfterIdleManager.onNtpShown ---
@@ -740,6 +770,7 @@ class BrowserViewModelTest {
             browserModeStateHolder = mockBrowserModeStateHolder,
             fireModeAvailability = mockFireModeAvailability,
             browserMode = browserMode,
+            duckAiSessionCallback = mockDuckAiSessionCallback,
         )
     }
 
@@ -764,6 +795,7 @@ class BrowserViewModelTest {
             browserModeStateHolder = mockBrowserModeStateHolder,
             fireModeAvailability = mockFireModeAvailability,
             browserMode = browserMode,
+            duckAiSessionCallback = mockDuckAiSessionCallback,
         )
     }
 

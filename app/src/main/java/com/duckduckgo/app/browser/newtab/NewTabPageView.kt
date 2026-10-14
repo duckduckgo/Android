@@ -72,9 +72,11 @@ import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreen
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.duckduckgo.newtabpage.api.interactions.HatchInteractionsPlugin
+import com.duckduckgo.nextsteps.api.NextSteps
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.SharePromoLinkIntentFactory
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -130,6 +132,12 @@ class NewTabPageView @JvmOverloads constructor(
     @Inject
     lateinit var hatchInteractionsPlugins: PluginPoint<HatchInteractionsPlugin>
 
+    @Inject
+    lateinit var ntpEngagementTracker: NtpEngagementTracker
+
+    @Inject
+    lateinit var nextSteps: NextSteps
+
     private val binding: ViewNewTabBinding by viewBinding()
 
     private val homeBackgroundLogo by lazy { HomeBackgroundLogo(binding.ddgLogo) }
@@ -149,12 +157,10 @@ class NewTabPageView @JvmOverloads constructor(
 
     private var lastSelectedMode: InputMode? = null
     private var logoAnimator: ValueAnimator? = null
-
-    private var pageEngagedFiredForCurrentAttachment = false
+    private var nextStepsSectionJob: Job? = null
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        if (ev.actionMasked == MotionEvent.ACTION_DOWN && !pageEngagedFiredForCurrentAttachment) {
-            pageEngagedFiredForCurrentAttachment = true
+        if (ev.actionMasked == MotionEvent.ACTION_DOWN && ntpEngagementTracker.shouldReportEngagement()) {
             hatchInteractionsPlugins.getPlugins().forEach { it.onNtpEngaged() }
         }
         return super.dispatchTouchEvent(ev)
@@ -191,8 +197,6 @@ class NewTabPageView @JvmOverloads constructor(
             .onEach { mode -> updateLogoForMode(mode) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
-        pageEngagedFiredForCurrentAttachment = false
-
         disableViewStateSaving()
     }
 
@@ -204,6 +208,8 @@ class NewTabPageView @JvmOverloads constructor(
         conflatedCommandJob.cancel()
         conflatedNativeInputJob.cancel()
         conflatedChatModeJob.cancel()
+        nextStepsSectionJob?.cancel()
+        nextStepsSectionJob = null
         logoAnimator?.cancel()
         logoAnimator = null
         lastSelectedMode = null
@@ -257,6 +263,28 @@ class NewTabPageView @JvmOverloads constructor(
         }
     }
 
+    private fun showNextStepsSection(newMessage: Boolean) {
+        if (binding.nextStepsContainer.childCount == 0) {
+            inflateNextStepsSection()
+        } else {
+            val wasHidden = binding.nextStepsContainer.isGone
+            binding.nextStepsContainer.show()
+            if (newMessage || wasHidden) {
+                viewModel.onMessageShown()
+            }
+        }
+    }
+
+    private fun inflateNextStepsSection() {
+        if (nextStepsSectionJob?.isActive == true) return
+        nextStepsSectionJob = findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+            val section = nextSteps.provideSectionView(context) ?: return@launch
+            binding.nextStepsContainer.addView(section)
+            binding.nextStepsContainer.show()
+            viewModel.onMessageShown()
+        }
+    }
+
     private fun updateLogoMargin(nativeInputEnabled: Boolean) {
         val baseMargin = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.homeTabDdgLogoTopMargin)
         val extraMargin = if (nativeInputEnabled) 48.toPx() else 0
@@ -277,6 +305,7 @@ class NewTabPageView @JvmOverloads constructor(
             binding.appTrackingProtectionStateView.gone()
             binding.ddgLogo.gone()
             binding.messageCta.gone()
+            binding.nextStepsContainer.gone()
             binding.focusedFavourites.gone()
             return
         }
@@ -289,9 +318,14 @@ class NewTabPageView @JvmOverloads constructor(
         } else {
             homeBackgroundLogo.hideLogo()
         }
-        if (viewState.message != null && viewState.onboardingComplete) {
+        if (viewState.showNextSteps) {
+            binding.messageCta.gone()
+            showNextStepsSection(viewState.newMessage)
+        } else if (viewState.message != null && viewState.onboardingComplete) {
+            binding.nextStepsContainer.gone()
             showRemoteMessage(viewState.message, viewState.messageImageFilePath, viewState.newMessage)
         } else {
+            binding.nextStepsContainer.gone()
             binding.messageCta.gone()
             if (viewState.lowPriorityMessage != null) {
                 showLowPriorityMessage(viewState.lowPriorityMessage)

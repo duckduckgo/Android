@@ -1,7 +1,3 @@
-appStartup:
-  enabled: false
-appSize:
-  enabled: false
 disableRetries: false
 
 flows:

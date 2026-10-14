@@ -45,11 +45,6 @@
                 "enum": ["true", "false", ""]
             },
             {
-                "key": "feature.data.ext.serialization_enabled",
-                "description": "Whether refreshes were being serialized across processes with a cross-process lock, i.e. the value of the serializeTokenRefresh flag when the refresh started.",
-                "type": "boolean"
-            },
-            {
                 "key": "feature.data.ext.lock_outcome",
                 "description": "Outcome of acquiring the cross-process refresh lock. 'timeout' means another process held it for longer than the wait limit; the refresh then proceeds unserialized.",
                 "enum": ["acquired", "timeout", "error"]
@@ -79,6 +74,11 @@
                 "description": "Backend-supplied error code from the `error` field of the token endpoint's error body. Free-form as far as the app is concerned - the app only special-cases 'unknown_account'.",
                 "type": "string",
                 "examples": ["unknown_account", "invalid_token_request"]
+            },
+            {
+                "key": "feature.data.ext.backend_error_code",
+                "description": "Backend-supplied numeric code from the `error_code` field of the token endpoint's error body, sent alongside `error`.",
+                "enum": ["0", "1", "2", "3", "4"]
             },
             {
                 "key": "feature.data.ext.play_login_error",

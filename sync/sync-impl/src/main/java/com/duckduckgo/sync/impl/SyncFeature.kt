@@ -96,6 +96,20 @@ interface SyncFeature {
     fun canShowV2ConnectCode(): Toggle
 
     /**
+     * Global switch for the v2.1 exchange protocol.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun canUseExchangeV2Point1(): Toggle
+
+    /**
+     * Kill switch for sending the exchange channel secret as the `Authorization` header on the v2.0
+     * exchange relay endpoints. Independent of [canUseExchangeV2Point1] so the header can be turned
+     * on (or off) without moving the protocol version.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun canSendExchangeChannelSecret(): Toggle
+
+    /**
      * When enabled, the sync barcode scanner only attempts to decode QR codes. Sync codes are
      * always encoded as QR, so other formats only add noise (and false-positive decodes) to
      * the scanner.
@@ -103,25 +117,19 @@ interface SyncFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun restrictScannedBarcodesToQrTypes(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun useSimplifiedSync(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun updateSyncActivityViewStateAtomically(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun preventStaleTokenLogout(): Toggle
 
     /**
      * Gates writing `device_info`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun canWriteUnifiedDeviceList(): Toggle
 
     /**
      * Gates reading from `device_info`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun canReadUnifiedDeviceList(): Toggle
 
     /**
@@ -133,6 +141,15 @@ interface SyncFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun canUsePatchEndpointForLegacyDeviceRename(): Toggle
+
+    /**
+     * When enabled:
+     *   - On-device authentication is moved from the sync settings to the last possible moment before syncing.
+     *   - Camera permission is request upfront when opening barcode scanner.
+     *   - Account deletion flow is explicit about deletion results.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun canUseImprovedSyncFlow(): Toggle
 }
 
 /**

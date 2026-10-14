@@ -88,6 +88,7 @@ import logcat.LogcatKt;
  *     hidden until a limit is reached (<code>TabManager.MAX_ACTIVE_TABS</code>). When the limit is
  *     reached, the oldest fragment is removed
  * <li>The list of fragments to remove is managed by a FIFO queue (<code>itemIdQueue</code>)
+ * <li>Subclasses can observe that queue's activation order through {@link #onItemPlaced(long)}
  * </ul>
  */
 public abstract class FragmentStateAdapter extends RecyclerView.Adapter<FragmentViewHolder>
@@ -180,6 +181,13 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
     public abstract @NonNull Fragment createFragment(int position);
 
     public abstract @NonNull Boolean shouldPlaceFragmentInViewHolder(int position);
+
+    /**
+     * Called whenever an item is placed in a view holder, immediately after it has been promoted to
+     * the most recent entry of {@link #itemIdQueue}. Subclasses can use this to observe the
+     * activation order that drives eviction.
+     */
+    protected void onItemPlaced(long itemId) {}
 
     @NonNull
     @Override
@@ -314,6 +322,7 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
         long itemId = holder.getItemId();
         itemIdQueue.remove(itemId);
         itemIdQueue.add(itemId);
+        onItemPlaced(itemId);
 
         Fragment fragment = mFragments.get(itemId);
         if (fragment == null) {

@@ -24,6 +24,10 @@ enum class AutoConsentPixel(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_AUTOCONSENT_ON("m_settings_autoconsent_on"),
     SETTINGS_AUTOCONSENT_OFF("m_settings_autoconsent_off"),
 
+    COOKIE_POPUP_OPT_IN_SHOWN_FIRST("cookie_popup_opt_in_shown_first"),
+    COOKIE_POPUP_OPT_IN_SHOWN_REPEAT("cookie_popup_opt_in_shown_repeat"),
+    COOKIE_POPUP_OPT_IN_OPTION_CONFIRMED("cookie_popup_opt_in_option_confirmed"),
+
     AUTOCONSENT_INIT_DAILY("m_autoconsent_init_daily"),
     AUTOCONSENT_DISABLED_FOR_SITE_DAILY("m_autoconsent_disabled-for-site_daily"),
     AUTOCONSENT_POPUP_FOUND_DAILY("m_autoconsent_popup-found_daily"),
@@ -41,4 +45,10 @@ enum class AutoConsentPixel(override val pixelName: String) : Pixel.PixelName {
     AUTOCONSENT_DETECTED_ONLY_RULES_DAILY("m_autoconsent_detected-only-rules_daily"),
     AUTOCONSENT_ERROR_RELOAD_LOOP_DAILY("m_autoconsent_error_reload-loop_daily"),
     AUTOCONSENT_SUMMARY("m_autoconsent_summary"),
+}
+
+object AutoconsentPixelParameters {
+    const val AUTOCONSENT_ENABLED = "autoconsent_enabled"
+    const val COOKIE_POPUP_PREFERENCE = "cookie_popup_preference"
+    const val TIME_SINCE_SHOWN = "time_since_shown"
 }

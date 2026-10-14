@@ -66,6 +66,21 @@ class RealTestScenarioSeederTest {
     }
 
     @Test
+    fun whenIsMacrobenchmarkIsTrueThenPluginIsApplied() = runTest {
+        val plugin = RecordingPlugin(TestSeederKey.OMNIBAR_POSITION.key)
+        val seeder = newSeeder(plugin)
+
+        seeder.seedIfNeeded(
+            mapOf(
+                TestSeederKey.IS_MACROBENCHMARK.key to "true",
+                TestSeederKey.OMNIBAR_POSITION.key to "bottom",
+            ),
+        )
+
+        assertEquals(listOf(TestSeederKey.OMNIBAR_POSITION.key to "bottom"), plugin.calls)
+    }
+
+    @Test
     fun whenKeyHasPluginThenPluginIsAppliedWithKeyAndValue() = runTest {
         val plugin = RecordingPlugin(TestSeederKey.OMNIBAR_POSITION.key)
         val seeder = newSeeder(plugin)

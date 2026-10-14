@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl
 
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
@@ -104,6 +105,10 @@ enum class SyncCodeType { RECOVERY, LINKING }
  * [HostConfirmationRequested] (role is elected by the runner), then exactly one terminal
  * ([LoggedIn] / [AlreadyConnected] / [Failed]).
  *
+ * Either side elected Host may additionally emit zero or one [JoinOutcomeUnknown] before its
+ * terminal outcome: v2.1 keeps the session open after the recovery code is sent, so the wait for the
+ * Joiner's report is surfaced without ending the flow.
+ *
  * v2 RecoveryCode flows (cid=ddg, cid=3party) have no confirmation phase — only a terminal outcome.
  *
  * v2 does not surface a v1-style `AskToSwitchAccount` prompt; the spec's Confirmations phase is the
@@ -114,14 +119,26 @@ sealed interface DispatchOutcome {
     /**
      * SM reached Joiner.Confirming. Caller must prompt the user ("Sync your data with [peerName]?")
      * then call [SyncCodeDispatcher.confirmJoiner] or [SyncCodeDispatcher.denyJoiner] to resume.
+     * [protocolVersion] is the session's negotiated exchange version, letting the caller pick the
+     * post-confirmation UX (v2.1+ skips the acknowledgment dialog).
      */
-    data class JoinerConfirmationRequested(val peerName: String?, val peerKind: PeerKind? = null) : DispatchOutcome
+    data class JoinerConfirmationRequested(
+        val peerName: String?,
+        val protocolVersion: ExchangeProtocolVersion.V2,
+        val peerKind: PeerKind? = null,
+    ) : DispatchOutcome
 
     /**
      * SM reached Host.Confirming. Caller must prompt the user ("Allow [peerName] to join your
      * sync & backup?") then call [SyncCodeDispatcher.confirmHost] or [SyncCodeDispatcher.denyHost].
+     * [protocolVersion] is the session's negotiated exchange version, letting the caller pick the
+     * post-confirmation UX (v2.1+ skips the acknowledgment dialog).
      */
-    data class HostConfirmationRequested(val peerName: String?, val peerKind: PeerKind? = null) : DispatchOutcome
+    data class HostConfirmationRequested(
+        val peerName: String?,
+        val protocolVersion: ExchangeProtocolVersion.V2,
+        val peerKind: PeerKind? = null,
+    ) : DispatchOutcome
 
     /**
      * Emitted once per [SyncCodeDispatcher.presentV2] session, before any confirmation or
@@ -129,6 +146,16 @@ sealed interface DispatchOutcome {
      * to scan. Non-terminal — the Flow continues.
      */
     data class LinkingCodeReady(val linkingCode: String) : DispatchOutcome
+
+    /**
+     * The Host shared its recovery code and 30s passed without a `recovery_code_done`.
+     *
+     * The session keeps polling, so a late report still follows with [LoggedIn]. If nothing arrives,
+     * the 5-minute session deadline closes the flow with [Failed].
+     */
+    data class JoinOutcomeUnknown(
+        val peerKind: PeerKind? = null,
+    ) : DispatchOutcome
 
     /**
      * Terminal — login completed (recovery code applied; account state updated). Carries telemetry

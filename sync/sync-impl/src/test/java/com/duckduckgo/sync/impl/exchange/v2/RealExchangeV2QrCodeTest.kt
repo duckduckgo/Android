@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl.exchange.v2
 
 import android.util.Base64
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -33,7 +34,7 @@ class RealExchangeV2QrCodeTest {
     // ---- parse: LinkingV2 ----
 
     @Test fun `parse identifies a well-formed v2 linking URL`() {
-        val url = qrCode.buildLinkingCode(channelId = "abc", publicKeyBase64Url = "pubkey", version = "2")
+        val url = qrCode.buildLinkingCode(channelId = "abc", publicKeyBase64Url = "pubkey", version = ExchangeProtocolVersion.V2_0)
 
         val result = qrCode.parse(url)
 
@@ -41,11 +42,11 @@ class RealExchangeV2QrCodeTest {
         result as ExchangeV2CodeParseResult.LinkingV2
         assertEquals("abc", result.channelId)
         assertEquals("pubkey", result.publicKey)
-        assertEquals("2", result.version)
+        assertEquals(ExchangeProtocolVersion.V2_0, result.version)
     }
 
     @Test fun `parse tolerates leading whitespace and prefix text before the URL`() {
-        val url = qrCode.buildLinkingCode("c", "k")
+        val url = qrCode.buildLinkingCode("c", "k", version = ExchangeProtocolVersion.V2_0)
         val noisy = "   Linking code: $url"
 
         val result = qrCode.parse(noisy)
@@ -133,7 +134,7 @@ class RealExchangeV2QrCodeTest {
         parsed as ExchangeV2CodeParseResult.LinkingV2
         assertEquals("chan", parsed.channelId)
         assertEquals("pub", parsed.publicKey)
-        assertEquals("2.1", parsed.version)
+        assertEquals(ExchangeProtocolVersion.V2_1, parsed.version)
     }
 
     @Test fun `parse rejects a v2 code with an empty public_key`() {
@@ -149,7 +150,7 @@ class RealExchangeV2QrCodeTest {
     // ---- buildLinkingCode round-trip ----
 
     @Test fun `buildLinkingCode emits a URL parse can decode back to its inputs`() {
-        val built = qrCode.buildLinkingCode(channelId = "chan-123", publicKeyBase64Url = "pubkey-456")
+        val built = qrCode.buildLinkingCode(channelId = "chan-123", publicKeyBase64Url = "pubkey-456", version = ExchangeProtocolVersion.V2_0)
 
         val parsed = qrCode.parse(built) as ExchangeV2CodeParseResult.LinkingV2
 
@@ -158,20 +159,20 @@ class RealExchangeV2QrCodeTest {
     }
 
     @Test fun `buildLinkingCode produces the documented URL shape`() {
-        val built = qrCode.buildLinkingCode(channelId = "c", publicKeyBase64Url = "k")
+        val built = qrCode.buildLinkingCode(channelId = "c", publicKeyBase64Url = "k", version = ExchangeProtocolVersion.V2_0)
         assertTrue("expected URL prefix, got: $built", built.startsWith("https://duckduckgo.com/sync/pairing/#&code2="))
     }
 
     @Test fun `buildLinkingCode emits the expected compact JSON shape`() {
         // Field order is not contractual (codes are parse-only, never byte-compared); this pins the current serializer output.
-        val built = qrCode.buildLinkingCode(channelId = "c", publicKeyBase64Url = "k", version = "2")
+        val built = qrCode.buildLinkingCode(channelId = "c", publicKeyBase64Url = "k", version = ExchangeProtocolVersion.V2_0)
         val fragment = built.substringAfter("code2=")
         val decoded = String(Base64.decode(fragment, Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP))
         assertEquals("""{"channel_id":"c","public_key":"k","version":"2"}""", decoded)
     }
 
     @Test fun `buildLinkingCode does not escape forward slashes (defense-in-depth)`() {
-        val built = qrCode.buildLinkingCode(channelId = "chan/123", publicKeyBase64Url = "pub/key+raw")
+        val built = qrCode.buildLinkingCode(channelId = "chan/123", publicKeyBase64Url = "pub/key+raw", version = ExchangeProtocolVersion.V2_0)
         val fragment = built.substringAfter("code2=")
         val decoded = String(Base64.decode(fragment, Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP))
         assertFalse("linking JSON must not contain escaped slashes (\\/): $decoded", decoded.contains("\\/"))
@@ -180,7 +181,7 @@ class RealExchangeV2QrCodeTest {
     }
 
     @Test fun `buildLinkingCode honours custom version`() {
-        val built = qrCode.buildLinkingCode("c", "k", version = "2.1")
+        val built = qrCode.buildLinkingCode("c", "k", version = ExchangeProtocolVersion.V2_1)
         val fragment = built.substringAfter("code2=")
         val decoded = Base64.decode(fragment, Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP)
         assertTrue(String(decoded).contains("\"version\":\"2.1\""))

@@ -1,0 +1,27 @@
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="?attr/daxColorDestructive"
+        android:pathData="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M11.611 13.5c-0.202 0-0.367-0.159-0.375-0.361l-0.253-6.62C10.972 6.236 11.199 6 11.482 6h1.033c0.283 0 0.51 0.236 0.499 0.519l-0.25 6.62c-0.008 0.202-0.174 0.361-0.375 0.361h-0.778zM12 18c0.69 0 1.25-0.56 1.25-1.25S12.69 15.5 12 15.5s-1.25 0.56-1.25 1.25S11.31 18 12 18z" />
+</vector>

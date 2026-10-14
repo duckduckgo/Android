@@ -110,6 +110,14 @@
                 app:secondaryText="@string/devSettingsScreenPrivacyRemoteConfigUrlOverrideSubtitle"
                 />
 
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/resetTds"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/devSettingsScreenResetTds"
+                app:secondaryText="@string/devSettingsScreenResetTdsSubtitle"
+                />
+
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

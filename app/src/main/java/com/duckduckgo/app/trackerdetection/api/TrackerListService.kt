@@ -18,14 +18,22 @@ package com.duckduckgo.app.trackerdetection.api
 
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Streaming
 
 @ContributesServiceApi(AppScope::class)
 interface TrackerListService {
+    /**
+     * Returns the raw body rather than a parsed [TdsJson]: the tracker-detection JSON needs
+     * adapters that are not registered on the app-wide Retrofit converter. Streamed, so the
+     * body is parsed as it arrives instead of being buffered whole first.
+     */
     @GET("$TDS_BASE_URL$TDS_PATH")
     @TdsRequired
-    fun tds(): Call<TdsJson>
+    @Streaming
+    fun tds(): Call<ResponseBody>
 
     @GET("/contentblocking/trackers-unprotected-temporary.txt")
     fun temporaryAllowList(): Call<String>

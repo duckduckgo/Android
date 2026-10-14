@@ -16,7 +16,9 @@
 
 package com.duckduckgo.subscriptions.impl.onboarding.features
 
+import android.Manifest
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.annotation.DrawableRes
 import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
@@ -25,9 +27,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingFeature
@@ -46,12 +46,18 @@ import javax.inject.Inject
 class SubscriptionOnboardingFeatureInfoActivity : DuckDuckGoActivity() {
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val binding: ActivitySubscriptionOnboardingFeatureInfoBinding by viewBinding()
+
+    private val summaryOfBenefitsFooter: SummaryOfBenefitsFooterView
+        get() = binding.subscriptionOnboardingFeatureInfoContent.findViewById(R.id.subscriptionOnboardingFeatureInfoLegalFooter)
+
+    private val writeStoragePermission = registerForActivityResult(RequestPermission()) { granted ->
+        if (granted) {
+            summaryOfBenefitsFooter.onWriteStoragePermissionGranted()
+        }
+    }
 
     private val feature: OnboardingFeature by lazy {
         val screenFeature = intent.getActivityParams(SubscriptionOnboardingFeatureInfoScreen::class.java)?.feature
@@ -67,10 +73,7 @@ class SubscriptionOnboardingFeatureInfoActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
@@ -85,11 +88,15 @@ class SubscriptionOnboardingFeatureInfoActivity : DuckDuckGoActivity() {
         binding.subscriptionOnboardingFeatureInfoDescription.setText(feature.descriptionRes)
         layoutInflater.inflate(feature.contentRes, binding.subscriptionOnboardingFeatureInfoContent, true)
 
-        if (edgeToEdgeEnabled) {
-            edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
-            edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout, installScrim = false)
-            edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.subscriptionOnboardingFeatureInfoScrollView)
+        if (feature == OnboardingFeature.ITR) {
+            summaryOfBenefitsFooter.onWriteStoragePermissionRequired = {
+                writeStoragePermission.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            }
         }
+
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout, installScrim = false)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.subscriptionOnboardingFeatureInfoScrollView)
     }
 }
 

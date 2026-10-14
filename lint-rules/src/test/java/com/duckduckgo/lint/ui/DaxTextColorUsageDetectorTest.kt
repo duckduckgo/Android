@@ -60,8 +60,13 @@ class DaxTextColorUsageDetectorTest {
             val tertiary: Color
         )
 
+        data class DuckDuckGoBrandColors(
+            val accentBlue: Color
+        )
+
         data class DuckDuckGoColors(
-            val text: DuckDuckGoTextColors
+            val text: DuckDuckGoTextColors,
+            val brand: DuckDuckGoBrandColors
         )
 
         object DuckDuckGoTheme {
@@ -80,13 +85,17 @@ class DaxTextColorUsageDetectorTest {
                         primary = Color(0xFF000000),
                         secondary = Color(0xFF666666),
                         tertiary = Color(0xFF999999)
-                    )
+                    ),
+                    brand = DuckDuckGoBrandColors(accentBlue = Color(0xFF3969EF))
                 )
         }
 
         val AlertGreen: Color
             @Composable
             get() = Color(0xFF21C000)
+
+        val Black48: Color = Color(0x7A000000)
+        val White48: Color = Color(0x7AFFFFFF)
         """.trimIndent()
     ).indented()
 
@@ -585,5 +594,395 @@ class DaxTextColorUsageDetectorTest {
             .issues(INVALID_DAX_TEXT_COLOR_USAGE)
             .run()
             .expectClean()
+    }
+
+    @Test
+    fun whenColorIsParameterWithThemeDefaultThenNoWarning() {
+        lint()
+            .files(
+                composeStubs,
+                themeStubs,
+                daxTextStub,
+                TestFiles.kotlin(
+                    """
+                    package com.duckduckgo.test
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+                    import com.duckduckgo.common.ui.compose.component.core.text.DaxText
+                    import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+
+                    @Composable
+                    fun Row(textColor: Color = DuckDuckGoTheme.textColors.primary) {
+                        DaxText(text = "x", color = textColor)
+                    }
+                    """.trimIndent()
+                ).indented()
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_TEXT_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE)
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun whenColorIsParameterWithoutDefaultThenNoWarning() {
+        lint()
+            .files(
+                composeStubs,
+                themeStubs,
+                daxTextStub,
+                TestFiles.kotlin(
+                    """
+                    package com.duckduckgo.test
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+                    import com.duckduckgo.common.ui.compose.component.core.text.DaxText
+                    import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+
+                    @Composable
+                    fun Row(textColor: Color) {
+                        DaxText(text = "x", color = textColor)
+                    }
+                    """.trimIndent()
+                ).indented()
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_TEXT_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE)
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun whenColorFromDefaultsObjectUsingNonTextThemeColorThenNoWarning() {
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+                    import com.duckduckgo.common.ui.compose.component.core.text.DaxText
+                    import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+
+                    object ExampleDefaults {
+                        val learnMoreColor: Color
+                            @Composable
+                            get() = DuckDuckGoTheme.colors.brand.accentBlue
+                    }
+
+                    @Composable
+                    fun TestScreen() {
+                        DaxText(
+                            text = "Hello",
+                            color = ExampleDefaults.learnMoreColor
+                        )
+                    }
+                    """.trimIndent()
+                ).indented(),
+                composeStubs,
+                themeStubs,
+                daxTextStub
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_TEXT_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE)
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun whenColorFromDefaultsObjectUsingLightDarkSwitchOfThemeColorsThenNoWarning() {
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+                    import com.duckduckgo.common.ui.compose.component.core.text.DaxText
+                    import com.duckduckgo.common.ui.compose.theme.Black48
+                    import com.duckduckgo.common.ui.compose.theme.White48
+
+                    object ExampleDefaults {
+                        val isDark: Boolean = false
+
+                        val titleColor: Color
+                            @Composable
+                            get() = if (isDark) White48 else Black48
+                    }
+
+                    @Composable
+                    fun TestScreen() {
+                        DaxText(
+                            text = "Hello",
+                            color = ExampleDefaults.titleColor
+                        )
+                    }
+                    """.trimIndent()
+                ).indented(),
+                composeStubs,
+                themeStubs,
+                daxTextStub
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_TEXT_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE)
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun whenColorFromDefaultsObjectUsingBlockBranchesOfThemeColorsThenNoWarning() {
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+                    import com.duckduckgo.common.ui.compose.component.core.text.DaxText
+                    import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+                    import com.duckduckgo.common.ui.compose.theme.AlertGreen
+
+                    object ExampleDefaults {
+                        val isDark: Boolean = false
+
+                        val titleColor: Color
+                            @Composable
+                            get() = if (isDark) {
+                                AlertGreen
+                            } else {
+                                DuckDuckGoTheme.colors.text.secondary
+                            }
+                    }
+
+                    @Composable
+                    fun TestScreen() {
+                        DaxText(
+                            text = "Hello",
+                            color = ExampleDefaults.titleColor
+                        )
+                    }
+                    """.trimIndent()
+                ).indented(),
+                composeStubs,
+                themeStubs,
+                daxTextStub
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_TEXT_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE)
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun whenColorIsInlineLightDarkSwitchOfThemeColorsThenNoWarning() {
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.runtime.Composable
+                    import com.duckduckgo.common.ui.compose.component.core.text.DaxText
+                    import com.duckduckgo.common.ui.compose.theme.Black48
+                    import com.duckduckgo.common.ui.compose.theme.White48
+
+                    @Composable
+                    fun TestScreen(isDark: Boolean) {
+                        DaxText(
+                            text = "Hello",
+                            color = if (isDark) White48 else Black48
+                        )
+                    }
+                    """.trimIndent()
+                ).indented(),
+                composeStubs,
+                themeStubs,
+                daxTextStub
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_TEXT_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE)
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun whenLightDarkSwitchHasOneArbitraryBranchThenWarning() {
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+                    import com.duckduckgo.common.ui.compose.component.core.text.DaxText
+                    import com.duckduckgo.common.ui.compose.theme.Black48
+
+                    object OtherColors {
+                        val custom: Color = Color(0xFF123456)
+                    }
+
+                    object ExampleDefaults {
+                        val isDark: Boolean = false
+
+                        val titleColor: Color
+                            @Composable
+                            get() = if (isDark) OtherColors.custom else Black48
+                    }
+
+                    @Composable
+                    fun TestScreen() {
+                        DaxText(
+                            text = "Hello",
+                            color = ExampleDefaults.titleColor
+                        )
+                    }
+                    """.trimIndent()
+                ).indented(),
+                composeStubs,
+                themeStubs,
+                daxTextStub
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_TEXT_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE, TestMode.FULLY_QUALIFIED)
+            .run()
+            .expectWarningCount(1)
+            .expectContains("color = ExampleDefaults.titleColor")
+    }
+
+    @Test
+    fun whenLightDarkSwitchHasArbitraryColorLiteralBranchThenWarning() {
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+                    import com.duckduckgo.common.ui.compose.component.core.text.DaxText
+                    import com.duckduckgo.common.ui.compose.theme.Black48
+
+                    object ExampleDefaults {
+                        val isDark: Boolean = false
+
+                        val titleColor: Color
+                            @Composable
+                            get() = if (isDark) Black48 else Color.Red
+                    }
+
+                    @Composable
+                    fun TestScreen() {
+                        DaxText(
+                            text = "Hello",
+                            color = ExampleDefaults.titleColor
+                        )
+                    }
+                    """.trimIndent()
+                ).indented(),
+                composeStubs,
+                themeStubs,
+                daxTextStub
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_TEXT_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE, TestMode.FULLY_QUALIFIED)
+            .run()
+            .expectWarningCount(1)
+            .expectContains("color = ExampleDefaults.titleColor")
+    }
+
+    @Test
+    fun whenLightDarkSwitchMixesSemanticThemeColorWithArbitraryLiteralThenWarning() {
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+                    import com.duckduckgo.common.ui.compose.component.core.text.DaxText
+                    import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+
+                    object ExampleDefaults {
+                        val isDark: Boolean = false
+
+                        val titleColor: Color
+                            @Composable
+                            get() = if (isDark) DuckDuckGoTheme.colors.text.primary else Color.Red
+                    }
+
+                    @Composable
+                    fun TestScreen() {
+                        DaxText(
+                            text = "Hello",
+                            color = ExampleDefaults.titleColor
+                        )
+                    }
+                    """.trimIndent()
+                ).indented(),
+                composeStubs,
+                themeStubs,
+                daxTextStub
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_TEXT_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE, TestMode.FULLY_QUALIFIED)
+            .run()
+            .expectWarningCount(1)
+            .expectContains("color = ExampleDefaults.titleColor")
+    }
+
+    @Test
+    fun whenLightDarkSwitchInPropertyInitializerMixesSemanticThemeColorWithArbitraryLiteralThenWarning() {
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+                    import com.duckduckgo.common.ui.compose.component.core.text.DaxText
+                    import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+
+                    object ExampleDefaults {
+                        val isDark: Boolean = false
+
+                        val titleColor: Color = if (isDark) DuckDuckGoTheme.colors.text.primary else Color.Red
+                    }
+
+                    @Composable
+                    fun TestScreen() {
+                        DaxText(
+                            text = "Hello",
+                            color = ExampleDefaults.titleColor
+                        )
+                    }
+                    """.trimIndent()
+                ).indented(),
+                composeStubs,
+                themeStubs,
+                daxTextStub
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_TEXT_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE, TestMode.FULLY_QUALIFIED)
+            .run()
+            .expectWarningCount(1)
+            .expectContains("color = ExampleDefaults.titleColor")
     }
 }

@@ -1,0 +1,127 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "User attempts to restore their Privacy Pro subscription",
+    "$comment": "{\"owners\":[\"lmac012\"]}",
+    "type": "object",
+    "required": ["meta", "global", "feature", "app", "context"],
+    "additionalProperties": false,
+    "properties": {
+        "meta": {
+            "type": "object",
+            "required": ["type", "version"],
+            "additionalProperties": false,
+            "properties": { "type": { "const": "android-subscription-restore" }, "version": { "const": "1.0.0" } }
+        },
+        "app": {
+            "type": "object",
+            "required": ["name", "version"],
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the application sending the event",
+                    "enum": ["DuckDuckGo Android"]
+                },
+                "version": {
+                    "type": "string",
+                    "description": "The version of the app sending the event. Release builds are X.Y.Z; internal and nightly builds append the build number and channel suffix.",
+                    "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+(-[a-z]+)?)?$"
+                },
+                "form_factor": { "type": "string", "description": "The form factor of the current device", "enum": ["phone", "tablet"] },
+                "dev_mode": { "type": "boolean", "description": "Whether the app is a debug build" }
+            }
+        },
+        "global": {
+            "type": "object",
+            "required": ["platform", "type", "sample_rate"],
+            "additionalProperties": false,
+            "properties": {
+                "platform": { "type": "string", "description": "The platform the app is running on", "enum": ["Android"] },
+                "type": { "type": "string", "description": "The type of software sending the event", "enum": ["app"] },
+                "sample_rate": {
+                    "type": "number",
+                    "description": "Sample rate for this event, between 0 and 1",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "is_first_daily_occurrence": {
+                    "type": "boolean",
+                    "description": "Whether this is the first event completed with this feature name and status in the current UTC calendar day"
+                }
+            }
+        },
+        "feature": {
+            "type": "object",
+            "required": ["name", "status", "data"],
+            "additionalProperties": false,
+            "properties": {
+                "name": { "type": "string", "description": "The feature name for this event", "enum": ["subscription-restore"] },
+                "status": { "type": "string", "description": "The terminal status of the flow", "enum": ["SUCCESS", "FAILURE", "UNKNOWN"] },
+                "data": {
+                    "type": "object",
+                    "required": ["ext"],
+                    "additionalProperties": false,
+                    "properties": {
+                        "ext": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "restore_platform": {
+                                    "type": "string",
+                                    "description": "The platform used to restore the subscription",
+                                    "enum": ["google_play", "email_address"]
+                                },
+                                "is_purchase_attempt": {
+                                    "type": "string",
+                                    "description": "true if the restore was triggered during a purchase attempt, false otherwise",
+                                    "enum": ["true", "false"]
+                                },
+                                "use_query_purchases": {
+                                    "type": "string",
+                                    "description": "Value of the `useQueryPurchases` feature flag at flow start. When true, storeLogin() reads from PlayBillingManager.getLatestPurchase() (queryPurchases, active subscriptions only) and may surface the new NoActivePurchase / PurchaseInfoNotAvailable failure types. When false, the legacy purchaseHistory path is used.",
+                                    "enum": ["true", "false"]
+                                },
+                                "restore_latency_ms_bucketed": {
+                                    "type": "string",
+                                    "description": "The duration of the restore flow in milliseconds, bucketed using the lower bucket boundary",
+                                    "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                                },
+                                "failure_reason": {
+                                    "type": "string",
+                                    "description": "Error message indicating cause of the failure. Only present on FAILURE events."
+                                },
+                                "step.activation_flow_started": {
+                                    "type": "string",
+                                    "description": "Parameter present if the activation flow page was displayed during restore using email address.",
+                                    "enum": ["true"]
+                                },
+                                "step.email_address_input": {
+                                    "type": "string",
+                                    "description": "Parameter present if the email address input page was displayed during restore using email address.",
+                                    "enum": ["true"]
+                                },
+                                "step.one_time_password_input": {
+                                    "type": "string",
+                                    "description": "Parameter present if the otp input page was displayed during restore using email address.",
+                                    "enum": ["true"]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "context": {
+            "type": "object",
+            "required": ["name"],
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Entry point the flow was started from",
+                    "enum": ["funnel_appsettings_android", "funnel_purchase_offer_page_android"]
+                }
+            }
+        }
+    }
+}

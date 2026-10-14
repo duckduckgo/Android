@@ -112,6 +112,14 @@ class NtpAfterIdleManagerImpl @Inject constructor(
         hatchInteractionsPlugins.getPlugins().forEach { it.onTabSwitcherSelected() }
     }
 
+    override fun onCloseTabTapped() {
+        hatchInteractionsPlugins.getPlugins().forEach { it.onCloseTabTapped() }
+    }
+
+    override fun onBurnTabTapped() {
+        hatchInteractionsPlugins.getPlugins().forEach { it.onBurnTabTapped() }
+    }
+
     override fun onNtpSearchSubmitted() {
         if (_isAfterIdleReturn.value) {
             pixel.fire(BAR_USED_FROM_NTP_AFTER_IDLE, type = Count)

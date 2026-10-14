@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "messages": [
+    {
+      "id": "android_complete_your_setup",
+      "surfaces": [
+        "new_tab_page"
+      ],
+      "matchingRules": [
+        1
+      ],
+      "exclusionRules": [],
+      "content": {
+        "messageType": "actionable_items",
+        "titleText": "Complete your setup",
+        "listItems": [
+          {
+            "id": "setup_default_browser",
+            "type": "one_action_item",
+            "titleText": "Set as default browser",
+            "descriptionText": "Open links in DuckDuckGo.",
+            "placeholder": "Announce",
+            "imageUrl": "https://example.com/default_browser.png",
+            "primaryActionText": "Set as default",
+            "primaryAction": {
+              "type": "defaultBrowser",
+              "value": ""
+            }
+          },
+          {
+            "id": "setup_add_widget",
+            "type": "one_action_item",
+            "titleText": "Add widget",
+            "descriptionText": "Search from your home screen.",
+            "placeholder": "Radar",
+            "primaryActionText": "Add widget",
+            "primaryAction": {
+              "type": "url",
+              "value": "https://duckduckgo.com/widget"
+            }
+          }
+        ]
+      },
+      "translations": {
+        "de": {
+          "titleText": "Einrichtung abschließen",
+          "listItems": {
+            "setup_default_browser": {
+              "titleText": "Als Standardbrowser festlegen",
+              "descriptionText": "Links in DuckDuckGo öffnen.",
+              "primaryActionText": "Als Standard festlegen"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "rules": []
+}

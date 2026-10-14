@@ -16,13 +16,16 @@
 
 package com.duckduckgo.feedback.impl.ui.positive.initial
 
+import android.os.Bundle
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.feedback.impl.R
 import com.duckduckgo.feedback.impl.databinding.ContentFeedbackPositiveLandingBinding
 import com.duckduckgo.feedback.impl.ui.common.FeedbackFragment
+import com.duckduckgo.feedback.impl.ui.common.resolveFeedbackFaceAsset
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
@@ -43,6 +46,19 @@ class PositiveFeedbackLandingFragment : FeedbackFragment(R.layout.content_feedba
 
     @Inject
     lateinit var playStoreUtils: PlayStoreUtils
+
+    @Inject
+    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        if (appBrandDesignUpdateToggles.pictograms().isEnabled()) {
+            binding.emoticonImage.setImageResource(
+                resolveFeedbackFaceAsset(isPositive = true, isPictogramsEnabled = true),
+            )
+        }
+    }
 
     override fun configureViewModelObservers() {
         viewModel.command.observe(this) { command ->

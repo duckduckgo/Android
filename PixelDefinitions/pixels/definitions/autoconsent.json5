@@ -112,6 +112,42 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion", "consentHeuristicEnabled"]
     },
+    "cookie_popup_opt_in_shown_first": {
+        "description": "Fires the first time the Cookie Pop-up Protection opt-in dialog is shown on app launch (once per install).",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "autoconsentEnabled"]
+    },
+    "cookie_popup_opt_in_shown_repeat": {
+        "description": "Fires when the Cookie Pop-up Protection opt-in dialog is shown again on app launch (any presentation after the first).",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "autoconsentEnabled"]
+    },
+    "cookie_popup_opt_in_option_confirmed": {
+        "description": "Fires when the user confirms the Cookie Pop-up Protection opt-in dialog. cookie_popup_preference is the resulting preference; autoconsent_enabled is the feature state when the dialog was shown; time_since_shown is the bucketed time from when the dialog was first shown to confirmation.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "autoconsentEnabled",
+            {
+                "key": "cookie_popup_preference",
+                "type": "string",
+                "description": "The resulting Cookie Pop-up Protection preference after the user confirms the opt-in dialog.",
+                "enum": ["max", "default", "off"]
+            },
+            {
+                "key": "time_since_shown",
+                "type": "string",
+                "description": "Bucketed time elapsed from when the opt-in dialog was first shown to when it was confirmed.",
+                "enum": ["0-1min", "1-5min", "5-60min", "1h-1d", "1d+"]
+            }
+        ]
+    },
     "m_autoconsent_summary": {
         "description": "Fires periodically with counts of autoconsent metrics accumulated over 2 minutes.",
         "owners": ["muodov"],

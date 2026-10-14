@@ -28,7 +28,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.BackPressed
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.StepFinished
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingPlanProvider.Companion.SUBSCRIPTION_ONBOARDING_PLAN_ID
-import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -37,7 +37,7 @@ import org.junit.Test
 
 class SubscriptionOnboardingPlanProviderTest {
 
-    private val stepStore = SubscriptionOnboardingStepStore(FakeSharedPreferencesProvider())
+    private val onboardingStore = SubscriptionOnboardingStore(FakeSharedPreferencesProvider())
 
     @Test
     fun whenPlanBuiltThenIdSetAndOnlyShownPluginsBecomeStepsInOrder() = runTest {
@@ -49,6 +49,14 @@ class SubscriptionOnboardingPlanProviderTest {
 
         assertEquals(SUBSCRIPTION_ONBOARDING_PLAN_ID, plan.id)
         assertEquals(listOf("welcome", "vpn"), plan.steps.map { it.id })
+    }
+
+    @Test
+    fun whenPluginShouldNotShowThenItIsRecordedAsCompleted() = runTest {
+        providerWith(stubPlugin("welcome"), stubPlugin("duck_ai", shouldShow = false)).buildPlan()
+
+        assertTrue(onboardingStore.isStepCompleted("duck_ai"))
+        assertFalse(onboardingStore.isStepCompleted("welcome"))
     }
 
     @Test
@@ -69,7 +77,7 @@ class SubscriptionOnboardingPlanProviderTest {
 
     @Test
     fun whenStepAlreadyCompletedThenItsPreconditionIsFalse() = runTest {
-        stepStore.setCompleted("welcome")
+        onboardingStore.setStepCompleted("welcome")
 
         val steps = providerWith(stubPlugin("welcome"), stubPlugin("vpn")).buildPlan().steps
 
@@ -78,7 +86,7 @@ class SubscriptionOnboardingPlanProviderTest {
     }
 
     private fun providerWith(vararg stepPlugins: SubscriptionOnboardingStepPlugin) =
-        SubscriptionOnboardingPlanProvider(pluginPoint(stepPlugins.toList()), stepStore)
+        SubscriptionOnboardingPlanProvider(pluginPoint(stepPlugins.toList()), onboardingStore)
 
     private fun pluginPoint(stepPlugins: List<SubscriptionOnboardingStepPlugin>) =
         object : PluginPoint<SubscriptionOnboardingStepPlugin> {

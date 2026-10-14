@@ -31,6 +31,7 @@ class RmfCampaignPixelParamsAdditionPlugin @Inject constructor() : CampaignPixel
         "m_remote_message_shown",
         "m_remote_message_shown_unique",
         "m_remote_message_dismissed",
+        "m_remote_message_auto_dismissed",
         "m_remote_message_primary_action_clicked",
         "m_remote_message_secondary_action_clicked",
         "m_remote_message_action_clicked",

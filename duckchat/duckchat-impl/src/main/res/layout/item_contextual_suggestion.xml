@@ -25,7 +25,8 @@
     android:layout_marginBottom="@dimen/keyline_2"
     android:background="@drawable/duck_ai_prompt_background"
     android:drawablePadding="@dimen/keyline_2"
-    android:padding="@dimen/keyline_2"
+    android:paddingVertical="@dimen/keyline_2"
+    android:paddingHorizontal="@dimen/keyline_3"
     app:typography="body2_bold"
     tools:drawableStart="@drawable/ic_summarize_16"
     tools:text="Summarize this page" />

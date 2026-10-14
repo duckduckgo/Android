@@ -20,9 +20,8 @@
     <string name="devSettingsSubtitle">Features useful for devs and debugging</string>
     <string name="devSettingsScreenPrivacySection">Privacy</string>
     <string name="devSettingsScreenGeneralSection">General</string>
-    <string name="devSettingsScreenTdsVersion">TDS version</string>
-    <string name="devSettingsScreenTdsVersionSubtitle">Use next TDS version</string>
-    <string name="devSettingsScreenTdsWait">Please wait while we download the tds version</string>
+    <string name="devSettingsScreenResetTds">Reset tracker data (TDS)</string>
+    <string name="devSettingsScreenResetTdsSubtitle">Clear the stored TDS and download it again</string>
     <string name="devStartupTracing">Start-up tracing</string>
     <string name="devStartupTracingByline">Enable/disable start-up tracing</string>
     <string name="devSettingsTriggerAnr">Trigger ANR</string>
@@ -134,4 +133,10 @@
     <string name="onboardingDevSettingsCompletedTitle">Onboarding completed</string>
     <string name="onboardingDevSettingsSkippedTitle">Onboarding skipped</string>
     <string name="onboardingDevSettingsDialogsSection">Dialogs shown</string>
+
+    <!-- Modal Coordinator Dev Settings -->
+    <string name="modalCoordinatorDevSettingsTitle">Modal Coordinator Dev Settings</string>
+    <string name="modalCoordinatorDevSettingsResetCooldownDescription">Once a prompt is shown, further modals are blocked: by the prompts coordinator quiet gap, or by the internal 24-hour window when the coordinator is off. This clears both, so modals are evaluated again on the next app resume.</string>
+    <string name="modalCoordinatorDevSettingsResetCooldown">Reset modal cooldown</string>
+    <string name="modalCoordinatorDevSettingsResetCooldownDone">Modal cooldown reset</string>
 </resources>

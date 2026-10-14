@@ -6,7 +6,7 @@ inputs:
     description: "'restore' (run before the build) or 'store' (run after the build)"
     required: true
   image-name:
-    description: 'Explicit Artifact Cache image name, e.g. android-unit-tests-Metro'
+    description: 'Explicit Artifact Cache image name, e.g. android-unit-tests-v1'
     required: true
   develocity-access-key:
     description: 'Develocity access key (DEVELOCITY_ACCESS_KEY)'

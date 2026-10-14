@@ -18,15 +18,11 @@ package com.duckduckgo.downloads.impl
 
 import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.AnyThread
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.FileProvider
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.AppScope
@@ -42,6 +38,11 @@ import javax.inject.Inject
 private const val DOWNLOAD_IN_PROGRESS_GROUP = "com.duckduckgo.downloads.IN_PROGRESS"
 private const val SUMMARY_ID = 0
 
+// PendingIntent identity uses Intent.filterEquals, which ignores extras. Request code must differ
+// from the failed notification's delete intent (downloadId.toInt().inv()) or FLAG_UPDATE_CURRENT
+// would let one overwrite the other's CTA.
+private const val DOWNLOAD_SEEN_REQUEST_CODE_MASK = Int.MIN_VALUE
+
 @AnyThread
 @ContributesBinding(
     scope = AppScope::class,
@@ -55,7 +56,6 @@ private const val SUMMARY_ID = 0
 class DefaultFileDownloadNotificationManager @Inject constructor(
     private val notificationManager: NotificationManagerCompat,
     private val applicationContext: Context,
-    private val appBuildConfig: AppBuildConfig,
 ) : FileDownloadNotificationManager, BrowserLifecycleObserver {
 
     // Group notifications are not automatically cleared when the last notification in the group is removed. So we need to do this manually.
@@ -115,7 +115,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
     override fun showDownloadFinishedNotification(downloadId: Long, file: File, mimeType: String?) {
         val filename = file.name
 
-        val intent = createIntentToOpenFile(applicationContext, file)
+        val intent = OpenDownloadedFileActivity.intent(applicationContext, file)
 
         val pendingIntentFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
@@ -126,6 +126,14 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .setContentText(applicationContext.getString(R.string.notificationDownloadComplete))
             .setContentIntent(PendingIntent.getActivity(applicationContext, downloadId.toInt(), intent, pendingIntentFlags))
             .setAutoCancel(true)
+            .setDeleteIntent(
+                PendingIntent.getBroadcast(
+                    applicationContext,
+                    downloadId.toInt() xor DOWNLOAD_SEEN_REQUEST_CODE_MASK,
+                    FileDownloadNotificationActionReceiver.downloadSeenIntent(applicationContext, downloadId),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                ),
+            )
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .build()
 
@@ -216,19 +224,6 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             next = updateFunction.update(prev)
         } while (!compareAndSet(prev, next))
         return next
-    }
-
-    private fun createIntentToOpenFile(applicationContext: Context, file: File): Intent {
-        val fileUri = getFilePathUri(applicationContext, file)
-        return Intent().apply {
-            setDataAndType(fileUri, applicationContext.contentResolver?.getType(fileUri))
-            action = Intent.ACTION_VIEW
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
-        }
-    }
-
-    private fun getFilePathUri(context: Context, file: File): Uri {
-        return FileProvider.getUriForFile(context, "${appBuildConfig.applicationId}.provider", file)
     }
 
     private fun interface UpdateInProgress {

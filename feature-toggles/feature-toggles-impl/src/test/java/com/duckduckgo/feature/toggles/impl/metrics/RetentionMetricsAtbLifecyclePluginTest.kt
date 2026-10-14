@@ -189,8 +189,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
 
         val expected = duckAiPromptSentMetricPixelsPlugin.getMetrics()
         assertTrue(expected.isNotEmpty())
-        assertEquals(expected.size, fakeMetricsPixelExtension.sentMetrics.size)
-        assertTrue(fakeMetricsPixelExtension.sentMetrics.all { it.metric == "duck_ai_prompt_sent" })
+        assertEquals(expected.size, fakeMetricsPixelExtension.sentMetrics.count { it.metric == "duck_ai_prompt_sent" })
     }
 
     @Test
@@ -258,6 +257,16 @@ class RetentionMetricsAtbLifecyclePluginTest {
                 assignedCohort = cohort,
             ),
         )
+    }
+
+    @Test
+    fun `when duck ai atb refreshed then search metrics are also sent`() = runTest {
+        setCohorts(ZonedDateTime.now(ZoneId.of("America/New_York")).toString())
+
+        atbLifecyclePlugin.onDuckAiRetentionAtbRefreshed("", "", emptyMap())
+
+        assertTrue(fakeMetricsPixelExtension.sentMetrics.any { it.metric == "search" })
+        assertTrue(fakeMetricsPixelExtension.sentMetrics.any { it.metric == "duck_ai_prompt_sent" })
     }
 }
 

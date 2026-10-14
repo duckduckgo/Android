@@ -12,13 +12,13 @@ tags:
       - runFlow: ../shared/skip_all_onboarding.yaml
 
       - tapOn:
-          id: "omnibarTextInput"
+          id: "omnibarTextInput|inputField"
       - inputText: "http://privacy-test-pages.site/security/address-bar-spoofing/spoof-about-blank-emptyaddress.html"
       - pressKey: Enter
 
       - tapOn: "run"
 
       - copyTextFrom:
-          id: "omnibarTextInput"
+          id: "omnibarTextInput|inputField"
 
       - assertTrue: ${maestro.copiedText == "about:blank" }

@@ -1,0 +1,54 @@
+{
+    "wide_duckai_session": {
+        "description": "Captures every visit to a full Duck.ai tab, from becoming visible to a confirmed exit, app background, or app termination.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelAppVersion",
+            "widePixelAppName",
+            "widePixelFormFactor",
+            "widePixelDevMode",
+            "widePixelMetaType",
+            "widePixelMetaVersion",
+            "widePixelIsFirstDailyOccurrence",
+            {
+                "key": "feature.name",
+                "type": "string",
+                "description": "Feature identifier for this wide event",
+                "enum": ["duckai_session"]
+            },
+            {
+                "key": "feature.data.ext.status_reason",
+                "type": "string",
+                "description": "Reason the session ended",
+                "enum": ["left_duckai", "app_backgrounded", "app_terminated"]
+            },
+            {
+                "key": "feature.data.ext.exit_trigger",
+                "type": "string",
+                "description": "Action that caused the transition away from Duck.ai. Present only when status_reason is left_duckai",
+                "enum": ["back_or_close", "tab_switched", "new_tab_opened", "fire_tab_opened", "other_navigation"]
+            },
+            {
+                "key": "feature.data.ext.step.prompt_submitted",
+                "type": "boolean",
+                "description": "Parameter present when a Duck.ai prompt was submitted at least once during the session"
+            },
+            {
+                "key": "feature.data.ext.step.new_chat_created",
+                "type": "boolean",
+                "description": "Parameter present when a new chat was created from the active Duck.ai session at least once"
+            },
+            {
+                "key": "feature.data.ext.step.chat_id_changed",
+                "type": "boolean",
+                "description": "Parameter present when the active Duck.ai URL's chatID changed at least once, including a change between missing and present. The identifier itself is never sent"
+            }
+        ]
+    }
+}

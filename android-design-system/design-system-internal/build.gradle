@@ -16,7 +16,6 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
     id 'com.squareup.anvil'
     id 'org.jetbrains.kotlin.plugin.compose'
 }
@@ -52,6 +51,7 @@ dependencies {
     implementation "androidx.datastore:datastore-preferences:_"
 
     implementation "com.airbnb.android:lottie-compose:_"
+    implementation "com.facebook.shimmer:shimmer:_"
 
     implementation AndroidX.activity.compose
     implementation AndroidX.appCompat

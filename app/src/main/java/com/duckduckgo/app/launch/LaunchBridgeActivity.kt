@@ -23,18 +23,26 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.mode.AppLauncher
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
+import com.duckduckgo.app.pixels.AppReturnPixelSender
+import com.duckduckgo.app.pixels.toPixelLaunchSourceValue
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class LaunchBridgeActivity : DuckDuckGoActivity() {
 
     private val viewModel: LaunchViewModel by bindViewModel()
 
+    @Inject
+    lateinit var appReturnPixelSender: AppReturnPixelSender
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         splashScreen.setKeepOnScreenCondition { true }
+
+        appReturnPixelSender.fireIfNeeded(AppLauncher.toPixelLaunchSourceValue())
 
         setContentView(R.layout.activity_launch)
 

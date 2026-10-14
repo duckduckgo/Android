@@ -57,6 +57,9 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Spletna mesta lahko uporabljajo vašo kamero in mikrofon le, če dovolite, da DuckDuckGo zaprosi za dostop.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Odpri nastavitve</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Preklic</string>
+    <string name="duckAiMicPermissionDeniedSnackBarMessage">Za glasovne funkcije je potrebno dovoljenje za mikrofon</string>
+    <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo potrebuje dostop do mikrofona</string>
+    <string name="duckAiMicPermissionDeniedDialogContent">Dovoljenja za mikrofon so potrebna, če želite uporabljati glasovni klepet v Duck.ai</string>
 
     <string name="sitePermissionsSettingsDescription">Spletna mesta, ki jih obiščete, lahko zahtevajo dostop do lokacije, kamere, mikrofona ali programske opreme DRM (Digital Rights Management) vaše naprave. Do njih ne bodo mogla dostopati, razen če jim to izrecno dovolite.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Dovoli vsem mestom, da zahtevajo:</string>
@@ -72,5 +75,56 @@
     <string name="permissionsPerWebsiteAllowSetting">Dovoli</string>
     <string name="permissionsPerWebsiteAskDisabledSetting">Onemogočeno za vsa spletna mesta</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s dovoljenje za %2$s</string>
+
+    <!-- Tiered permission dialog -->
+    <string name="sitePermissionsDialogAllowWhileUsingSiteButton" instruction="Button granting a website a permission for every visit, until the user changes it">Dovoli med uporabo spletnega mesta</string>
+    <string name="sitePermissionsDialogAllowThisTimeButton" instruction="Button granting a website a permission for the current visit only">Dovoli tokrat</string>
+    <string name="sitePermissionsDialogNeverAllowButton" instruction="Button refusing a website a permission for every visit, until the user changes it">Nikoli ne dovoli</string>
+    <string name="sitePermissionsTieredLocationDialogTitle" instruction="Placeholder is a website">Spletno mesto »%1$s« želi dostopati do vaše lokacije</string>
+    <string name="sitePermissionsTieredDdgLocationDialogTitle" instruction="Placeholder is a website">»%1$s« želi dostopati do vaše lokacije</string>
+    <string name="sitePermissionsTieredDdgLocationDialogSubtitle">Vašo lokacijo bomo anonimizirali in jo uporabili za zagotavljanje boljših rezultatov v vaši bližini.</string>
+    <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Spletno mesto »%1$s« želi dostopati do vašega fotoaparata</string>
+    <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Spletno mesto »%1$s« želi dostopati do vašega mikrofona</string>
+    <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Spletno mesto »%1$s« želi dostopati do vašega fotoaparata in mikrofona</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">»%1$s« želi na tem spletnem mestu dostopati do vaše lokacije</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">»%1$s« želi na tem spletnem mestu dostopati do vašega fotoaparata</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">»%1$s« želi na tem spletnem mestu dostopati do vašega mikrofona</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">»%1$s« želi na tem spletnem mestu dostopati do vaše kamere in mikrofona</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">»%1$s« želi na tem spletnem mestu dostopati do vaše programske opreme za upravljanje digitalnih pravic (DRM)</string>
+    <string name="sitePermissionsTieredDrmDialogSubtitle">Če ne dovolite, videoposnetkov na spletnem mestu morda ne bo mogoče predvajati, vendar to spletno mesto ne bo imelo dostopa do identifikatorjev naprav, ki jih zagotavlja programska oprema DRM.</string>
+
+    <!-- Reminder dialog -->
+    <string name="sitePermissionsDialogChangePermissionsButton" instruction="Button opening the DuckDuckGo permission settings in the Android system settings app">Sprememba dovoljenj</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationTitle">DuckDuckGo potrebuje dostop do lokacije</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationContent">Če želite uporabljati lokacijske funkcije na tem spletnem mestu, so potrebna dovoljenja za lokacijo.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraTitle">DuckDuckGo potrebuje dostop do fotoaparata</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraContent">Če želite uporabljati funkcije fotoaparata na tem spletnem mestu, so potrebna dovoljenja za fotoaparat.</string>
+    <string name="sitePermissionsTieredSystemDeniedMicTitle">DuckDuckGo potrebuje dostop do mikrofona</string>
+    <string name="sitePermissionsTieredSystemDeniedMicContent">Dovoljenja za mikrofon so potrebna, če želite uporabljati funkcije mikrofona na tem spletnem mestu.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicTitle">DuckDuckGo potrebuje dostop do kamere in mikrofona</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicContent">Dovoljenja za fotoaparat in mikrofon so potrebna, če želite uporabljati funkcije fotoaparata in mikrofona na tem spletnem mestu.</string>
+
+    <!-- Denial snackbar -->
+    <string name="sitePermissionsTieredLocationDeniedSnackBarMessage">DuckDuckGo ni mogel deliti lokacije s tem spletnim mestom</string>
+    <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">DuckDuckGo temu spletnemu mestu ni mogel omogočiti dostopa do fotoaparata</string>
+    <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo temu spletnemu mestu ni mogel omogočiti dostopa do mikrofona</string>
+    <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo temu spletnemu mestu ni mogel omogočiti dostopa do kamere in mikrofona</string>
+
+    <!-- Permission settings redesign -->
+    <string name="permissionSettingsAlwaysAllow" instruction="Permission setting option: the site gets the permission without asking">Vedno dovoli</string>
+    <string name="permissionSettingsAskEachTime" instruction="Permission setting option: the site has to ask for the permission every time">Vprašaj vsakič</string>
+    <string name="permissionSettingsLocationDialogTitle">Dovoli spletnim mestom, da zahtevajo dovoljenje za lokacijo</string>
+    <string name="permissionSettingsLocationDialogMessage">Če izberete »Nikoli ne dovoli«, na spletnih mestih ne boste mogli uporabljati določenih funkcij, kot so navodila za pot na zemljevidih ali trgovine v bližini.</string>
+    <string name="permissionSettingsCameraDialogTitle">Dovoli spletnim mestom, da zahtevajo dovoljenje za kamero</string>
+    <string name="permissionSettingsCameraDialogMessage">Če izberete »Nikoli ne dovoli«, na spletnih mestih ne boste mogli uporabljati funkcij, kot je videoklepet.</string>
+    <string name="permissionSettingsMicrophoneDialogTitle">Dovolite, da lahko spletna mesta zahtevajo dovoljenje za mikrofon</string>
+    <string name="permissionSettingsMicrophoneDialogMessage">Če izberete »Nikoli ne dovoli«, na spletnih mestih ne boste mogli uporabljati funkcij, kot je glasovni klepet.</string>
+    <string name="permissionSettingsDrmDialogTitle">Dovoli spletnim mestom, da zahtevajo dovoljenje za upravljanje digitalnih pravic (DRM)</string>
+    <string name="permissionSettingsDrmTitle" instruction="Name of a permission setting for playing protected video content">Upravljanje digitalnih pravic (DRM)</string>
+    <string name="permissionsPerWebsiteRedesignHeader" instruction="Placeholder is the name of a website">Dovoljenja za %1$s</string>
+    <string name="permissionsPerWebsiteRemovePermissions" instruction="Button that removes all saved permissions for the website shown on the screen">Odstranitev dovoljenj</string>
+    <string name="permissionsRemovedForSiteSnackbar" instruction="Placeholder is the name of a website">Dovoljenja so odstranjena za &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="permissionsRemovedForAllSitesSnackbar">Dovoljenja so odstranjena za vsa spletna mesta</string>
+    <string name="permissionSettingsDrmDialogMessage">Če izberete »Nikoli ne dovoli«, videoposnetkov na spletnem mestu morda ne bo mogoče predvajati.</string>
 
 </resources>

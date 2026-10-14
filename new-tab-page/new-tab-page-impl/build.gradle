@@ -16,7 +16,6 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
     id 'com.squareup.anvil'
     id 'com.google.devtools.ksp'
 }
@@ -27,6 +26,7 @@ dependencies {
     ksp project(':anvil-ksp')
     implementation project(":new-tab-page-api")
     implementation project(':browser-api')
+    implementation project(':duckchat-api')
     implementation project(':browser-mode-api')
     implementation project(':common-utils')
     implementation project(':saved-sites-api')

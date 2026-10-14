@@ -32,4 +32,24 @@ interface TabManagerFeatureFlags {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun tabInsertionFixes(): Toggle
+
+    /**
+     * Kill switch for fetching the page title and favicon of tabs opened in the background, before they are loaded.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun backgroundTabPrefetch(): Toggle
+
+    /**
+     * Reports the furthest a user went back in the tab activation order, so that the effect of
+     * lowering the retained fragment limit can be sized before it is changed.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.InternalAlwaysEnabled
+    fun tabMaxReuseDistancePixel(): Toggle
+
+    /**
+     * The Duck.ai button opens the chats menu (New Chat, recent chats, View all) instead of opening a new Duck.ai tab.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiChatsMenu(): Toggle
 }

@@ -28,6 +28,7 @@ import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Loaded
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Mode
@@ -101,6 +102,7 @@ class ChatHistoryViewModel @Inject constructor(
             // Open the chat as a new tab anchored to the tab the user was on, so closing it returns there.
             viewModelScope.launch {
                 val sourceTabId = tabRepository.getSelectedTab()?.tabId
+                duckChat.reportDuckChatEntry(DuckChatEntryPoint.CHAT_HISTORY_OPEN_CHAT, opensNewTab = true, hasPrompt = false)
                 navigationChannel.trySend(NavigationEvent.OpenChat(url = duckChat.buildChatUrl(chatId), sourceTabId = sourceTabId))
             }
         }
@@ -133,13 +135,13 @@ class ChatHistoryViewModel @Inject constructor(
             DuckChatPixelName.DUCK_CHAT_HISTORY_EMPTY_CTA_TAPPED_COUNT,
             DuckChatPixelName.DUCK_CHAT_HISTORY_EMPTY_CTA_TAPPED_DAILY,
         )
-        duckChat.openDuckChat()
+        duckChat.openDuckChat(DuckChatEntryPoint.CHAT_HISTORY_NEW_CHAT)
     }
 
     /** Toolbar "New chat" action. Kept separate from [onOpenDuckAiClicked] so the two surfaces stay independently instrumentable. */
     fun onNewChatRequested() {
         pixel.fireCountAndDaily(DuckChatPixelName.DUCK_CHAT_HISTORY_NEW_CHAT_TAPPED_COUNT, DuckChatPixelName.DUCK_CHAT_HISTORY_NEW_CHAT_TAPPED_DAILY)
-        duckChat.openDuckChat()
+        duckChat.openDuckChat(DuckChatEntryPoint.CHAT_HISTORY_NEW_CHAT)
     }
 
     fun onFireIconClicked() {
@@ -277,14 +279,6 @@ class ChatHistoryViewModel @Inject constructor(
         controls.update { it.copy(confirmation = null) }
     }
 
-    fun onEnterSelectMode() {
-        pixel.fireCountAndDaily(
-            DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_MODE_ENTERED_COUNT,
-            DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_MODE_ENTERED_DAILY,
-        )
-        controls.update { it.copy(mode = Mode.Selecting(emptySet())) }
-    }
-
     fun onSelectionToggled(chatId: String) {
         controls.update { c ->
             val mode = c.mode as? Mode.Selecting ?: return@update c
@@ -366,7 +360,8 @@ class ChatHistoryViewModel @Inject constructor(
         if (items.isEmpty()) return ChatHistoryUiState.Empty
         val (pinned, recent) = items.partition { it.pinned }
         val effectiveMode = when (val mode = controls.mode) {
-            // Keep Selecting even when empty — collapsing here would make onEnterSelectMode emit no state change.
+            // Keep Selecting even when the reconciled selection is empty — controls is still in select
+            // mode, and collapsing only the derived mode would desync it from isSelectMode() and back handling.
             is Mode.Selecting -> Mode.Selecting(mode.selectedChatIds intersect items.mapTo(mutableSetOf()) { it.chatId })
             Mode.Default -> Mode.Default
         }

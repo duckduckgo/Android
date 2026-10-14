@@ -24,6 +24,7 @@ import com.duckduckgo.remote.messaging.api.JsonMessageAction
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.Surface.NEW_TAB_PAGE
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aJsonMessage
+import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.actionableItemsJsonContent
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.bigSingleActionJsonContent
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.bigTwoActionJsonContent
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.cardsListJsonContent
@@ -37,6 +38,7 @@ import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aCardsListMessag
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aMediumMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aPromoSingleActionMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aSmallMessage
+import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.anActionableItemsMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.bigSingleActionContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.bigTwoActionsContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.cardsListContent
@@ -78,6 +80,7 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                     aJsonMessage(id = "id4", content = bigTwoActionJsonContent()),
                     aJsonMessage(id = "id5", content = promoSingleActionJsonContent()),
                     aJsonMessage(id = "id6", content = cardsListJsonContent()),
+                    aJsonMessage(id = "id7", content = actionableItemsJsonContent()),
                 ),
                 listOf(
                     aSmallMessage(id = "id1", surfaces = listOf(NEW_TAB_PAGE)),
@@ -86,6 +89,7 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                     aBigTwoActionsMessage(id = "id4", surfaces = listOf(NEW_TAB_PAGE)),
                     aPromoSingleActionMessage(id = "id5", surfaces = listOf(NEW_TAB_PAGE)),
                     aCardsListMessage(id = "id6", surfaces = listOf(NEW_TAB_PAGE)),
+                    anActionableItemsMessage(id = "id7", surfaces = listOf(NEW_TAB_PAGE)),
                 ),
             ),
             TestCase(

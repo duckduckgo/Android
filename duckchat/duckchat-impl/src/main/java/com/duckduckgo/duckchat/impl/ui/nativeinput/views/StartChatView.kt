@@ -29,11 +29,14 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.api.DuckChatContextual
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
@@ -45,6 +48,8 @@ class StartChatView @JvmOverloads constructor(
 
     @Inject lateinit var viewModelFactory: ViewViewModelFactory
 
+    @Inject lateinit var duckChatContextual: DuckChatContextual
+
     private val viewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[StartChatViewModel::class.java]
     }
@@ -52,7 +57,7 @@ class StartChatView @JvmOverloads constructor(
     private val icon: ImageView by lazy { findViewById(R.id.aiChatIconMenu) }
     private var visibilityJob: Job? = null
 
-    var onIconClicked: (() -> Unit)? = null
+    var host: NativeInputHost? = null
 
     init {
         inflate(context, R.layout.view_start_chat, this)
@@ -61,7 +66,7 @@ class StartChatView @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
-        icon.setOnClickListener { onIconClicked?.invoke() }
+        icon.setOnClickListener { onIconTapped() }
         observeVisibility()
     }
 
@@ -69,6 +74,20 @@ class StartChatView @JvmOverloads constructor(
         super.onDetachedFromWindow()
         visibilityJob?.cancel()
         visibilityJob = null
+    }
+
+    private fun onIconTapped() {
+        val host = host ?: return
+        val tabId = host.tabId()
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope
+        val showMenu = viewModel.onIconClicked(inputEmpty = host.isInputEmpty()) == StartChatViewModel.IconAction.SHOW_MENU
+        if (!showMenu || tabId == null || scope == null) {
+            host.submit()
+            return
+        }
+        // No page behind the new tab page, so the menu drops Ask About Page and offers New Chat and
+        // Chats. Submitting stays the fallback for when the menu itself declines to show.
+        scope.launch { duckChatContextual.launch(tabId, sourceUrl = null, anchor = icon) { host.submit() } }
     }
 
     private fun observeVisibility() {

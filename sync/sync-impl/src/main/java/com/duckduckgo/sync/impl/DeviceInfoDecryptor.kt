@@ -32,7 +32,7 @@ import javax.inject.Inject
  */
 @WorkerThread
 interface DeviceInfoDecryptor {
-    fun openSession(): Result<Session>
+    fun openSession(): DeviceInfoSessionResult
 
     /** Decrypts `device_info` blobs with a private key held only for this session's lifetime. */
     @WorkerThread
@@ -41,16 +41,22 @@ interface DeviceInfoDecryptor {
     }
 }
 
+sealed interface DeviceInfoSessionResult {
+    data class Available(val session: DeviceInfoDecryptor.Session) : DeviceInfoSessionResult
+    data class Unavailable(val reason: AccountInfoKeyUnavailableReason) : DeviceInfoSessionResult
+}
+
 @ContributesBinding(AppScope::class)
 class RealDeviceInfoDecryptor @Inject constructor(
     private val accountInfoPrivateKeyProvider: AccountInfoPrivateKeyProvider,
     private val syncJweCrypto: SyncJweCrypto,
 ) : DeviceInfoDecryptor {
 
-    override fun openSession(): Result<DeviceInfoDecryptor.Session> =
+    override fun openSession(): DeviceInfoSessionResult =
         when (val result = accountInfoPrivateKeyProvider.privateKey()) {
-            is Success -> Success(RealSession(privateKeyBase64Url = result.data, syncJweCrypto = syncJweCrypto))
-            is Error -> result
+            is AccountInfoPrivateKeyResult.Available ->
+                DeviceInfoSessionResult.Available(RealSession(privateKeyBase64Url = result.privateKey, syncJweCrypto = syncJweCrypto))
+            is AccountInfoPrivateKeyResult.Unavailable -> DeviceInfoSessionResult.Unavailable(result.reason)
         }
 
     private class RealSession(

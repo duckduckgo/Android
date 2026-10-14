@@ -19,16 +19,13 @@
     <dimen name="toolbar_horizontal_margin">8dp</dimen>
     <dimen name="recyclerViewOneFabBottomPadding">76dp</dimen>
     <dimen name="recyclerViewTwoFabsBottomPadding">136dp</dimen>
-    <dimen name="extraLargeShapeCornerRadius">24dp</dimen>
     <dimen name="getDesktopBrowserMaxItemWidth">600dp</dimen>
     <dimen name="onboardingBackgroundMaxHeight">126dp</dimen>
     <dimen name="preOnboardingDaxCtaPaddingTop">40dp</dimen>
     <dimen name="preOnboardingWidgetPromptMediaMaxHeight">120dp</dimen>
     <dimen name="preOnboardingWidgetPromptMediaMaxWidth">280dp</dimen>
-    <dimen name="preOnboardingAddToDockVideoMaxWidth">280dp</dimen>
     <dimen name="onboardingContextualBackgroundOverlap">90dp</dimen>
     <dimen name="contextualOptionsCappedHeight">100dp</dimen>
-    <dimen name="onboardingBottomSheetCornerRadius">36dp</dimen>
     <dimen name="quickSetupBottomSheetHorizontalPadding">40dp</dimen>
     <dimen name="quickSetupRemoveWidgetStepNumberSize">28dp</dimen>
     <dimen name="quickSetupTwoLineRowVerticalPadding">6dp</dimen>
@@ -39,4 +36,6 @@
     <dimen name="changeAppIconSpacing">24dp</dimen>
     <dimen name="changeAppIconSelectionStrokeWidth">2dp</dimen>
     <dimen name="changeAppIconSelectionGap">2dp</dimen>
+    <dimen name="brandDesignTabTileStrokeWidth">1px</dimen>
+    <dimen name="brandDesignTabTileStrokeWidthSelected">1dp</dimen>
 </resources>

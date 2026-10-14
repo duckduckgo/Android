@@ -30,5 +30,6 @@ class SubscriptionPixelParamRemovalPlugin @Inject constructor() : PixelParamRemo
             .map { pixel -> pixel.baseName to EnumSet.complementOf(EnumSet.copyOf(pixel.includedParameters)) }
             .filter { (_, removedParameters) -> removedParameters.isNotEmpty() }
             .plus("m_ppro_feedback" to PixelParameter.removeAtb())
+            .plus(SubscriptionOnboardingStepPixels.allBaseNames().map { baseName -> baseName to PixelParameter.removeAtb() })
     }
 }

@@ -66,10 +66,10 @@ jobs:
           submodules: recursive
 
       - name: Set up JDK version
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version-file: .github/.java-version
-          distribution: 'adopt'
+          distribution: 'temurin'
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
@@ -113,166 +113,134 @@ jobs:
           exit "$failed"
 
   unit_tests:
-    name: ${{ matrix.di == 'AnvilDagger' && 'Unit tests' || format('Unit tests ({0})', matrix.di) }}
+    name: Unit tests
     needs: [check_changes]
-    # NOTE: no job-level `if` here on purpose. This is a matrix job whose check name
-    # depends on `matrix.di`. If we skipped the whole job, GitHub wouldn't expand the
-    # matrix and the required checks ("Unit tests" / "Unit tests (Metro)") would never
-    # be reported, blocking the PR. Instead, we always run the job (so the matrix expands
-    # and both check names report) and gate each step on should_run — a job with all
-    # steps skipped reports success and satisfies the required check.
+    if: needs.check_changes.outputs.should_run == 'true'
     runs-on: android-large-runner
-    strategy:
-      fail-fast: false
-      matrix:
-        di: [AnvilDagger, Metro]
     env:
       DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Checkout repository
-        if: needs.check_changes.outputs.should_run == 'true'
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Set up JDK version
-        if: needs.check_changes.outputs.should_run == 'true'
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version-file: .github/.java-version
-          distribution: 'adopt'
+          distribution: 'temurin'
 
       - name: Setup Gradle
-        if: needs.check_changes.outputs.should_run == 'true'
         uses: gradle/actions/setup-gradle@v5
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: JVM tests
-        if: needs.check_changes.outputs.should_run == 'true'
         # Predictive test selection narrows the suite to the tests a change set can affect, so it
         # only applies to PRs and merge groups. Pushes and manual runs get the full suite.
-        run: ./gradlew jvm_tests -Pddg.di=${{ matrix.di }} -Dpts.enabled=${{ contains(fromJSON('["pull_request", "merge_group"]'), github.event_name) }}
+        run: ./gradlew jvm_tests -Dpts.enabled=${{ contains(fromJSON('["pull_request", "merge_group"]'), github.event_name) }}
 
       - name: Bundle the JVM checks report
-        if: always() && needs.check_changes.outputs.should_run == 'true'
-        run: find . -type d -name 'reports' | zip -@ -r unit-tests-report-${{ matrix.di }}.zip
+        if: always()
+        run: find . -type d -name 'reports' | zip -@ -r unit-tests-report.zip
 
       - name: Upload the JVM checks report
-        if: always() && needs.check_changes.outputs.should_run == 'true'
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: unit-tests-report-${{ matrix.di }}
-          path: unit-tests-report-${{ matrix.di }}.zip
+          name: unit-tests-report
+          path: unit-tests-report.zip
 
   lint:
-    name: ${{ matrix.di == 'AnvilDagger' && 'Lint' || format('Lint ({0})', matrix.di) }}
+    name: Lint
     needs: [check_changes]
+    if: needs.check_changes.outputs.should_run == 'true'
     runs-on: android-large-runner
-    strategy:
-      fail-fast: false
-      matrix:
-        di: [AnvilDagger, Metro]
     env:
       DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Checkout repository
-        if: needs.check_changes.outputs.should_run == 'true'
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Set up JDK version
-        if: needs.check_changes.outputs.should_run == 'true'
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version-file: .github/.java-version
-          distribution: 'adopt'
+          distribution: 'temurin'
 
       - name: Set up Go
-        if: needs.check_changes.outputs.should_run == 'true'
         uses: actions/setup-go@v5
         with:
           go-version: '1.18.3'
 
       - name: Setup Gradle
-        if: needs.check_changes.outputs.should_run == 'true'
         uses: gradle/actions/setup-gradle@v5
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Lint
-        if: needs.check_changes.outputs.should_run == 'true'
-        run: ./gradlew lint -Pddg.di=${{ matrix.di }}
+        run: ./gradlew lint
 
       - name: Bundle the lint report
-        if: always() && needs.check_changes.outputs.should_run == 'true'
-        run: find . -name lint-results\* | zip -@ -r lint-report-${{ matrix.di }}.zip
+        if: always()
+        run: find . -name lint-results\* | zip -@ -r lint-report.zip
 
       - name: Upload the JVM lint report
-        if: always() && needs.check_changes.outputs.should_run == 'true'
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lint-report-${{ matrix.di }}
-          path: lint-report-${{ matrix.di }}.zip
+          name: lint-report
+          path: lint-report.zip
 
   android_tests:
     needs: [check_changes]
+    if: needs.check_changes.outputs.should_run == 'true'
     runs-on: android-large-runner
-    name: ${{ matrix.di == 'AnvilDagger' && 'Android CI tests' || format('Android CI tests ({0})', matrix.di) }}
-    strategy:
-      fail-fast: false
-      matrix:
-        di: [AnvilDagger, Metro]
+    name: Android CI tests
     env:
       DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Checkout repository
-        if: needs.check_changes.outputs.should_run == 'true'
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Setup jq
-        if: needs.check_changes.outputs.should_run == 'true'
         uses: dcarbone/install-jq-action@v1.0.1
         with:
           force: true
 
       - name: Set up JDK version
-        if: needs.check_changes.outputs.should_run == 'true'
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version-file: .github/.java-version
-          distribution: 'adopt'
+          distribution: 'temurin'
 
       - name: Set up Go
-        if: needs.check_changes.outputs.should_run == 'true'
         uses: actions/setup-go@v5
         with:
           go-version: '1.18.3'
 
       - name: Decode secret
-        if: needs.check_changes.outputs.should_run == 'true'
         env:
           FLANK: ${{ secrets.FLANK }}
         run: echo "$FLANK" > flank.json
 
       - name: Setup Gradle
-        if: needs.check_changes.outputs.should_run == 'true'
         uses: gradle/actions/setup-gradle@v5
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Build
-        if: needs.check_changes.outputs.should_run == 'true'
-        run: ./gradlew androidTestsBuild -Pddg.di=${{ matrix.di }}
+        run: ./gradlew androidTestsBuild
 
       - name: Find test APK path
-        if: needs.check_changes.outputs.should_run == 'true'
         id: find-apk
         run: |
           TEST_APK_PATH=$(find . -path '*/build/outputs/apk/play/debug/*.apk' -type f -print -quit)
@@ -280,11 +248,9 @@ jobs:
           echo "apk_path=$TEST_APK_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Make script executable
-        if: needs.check_changes.outputs.should_run == 'true'
         run: chmod +x scripts/check_elf_alignment.sh
 
       - name: Check native libraries alignment
-        if: needs.check_changes.outputs.should_run == 'true'
         id: check-alignment
         continue-on-error: true
         run: ./scripts/check_elf_alignment.sh ${{ steps.find-apk.outputs.apk_path }}
@@ -298,13 +264,13 @@ jobs:
 
       - name: Run Android Tests
         if: steps.check-alignment.outcome == 'success'
-        run: ./gradlew runFlankAndroidTests --no-configuration-cache -Pddg.di=${{ matrix.di }}
+        run: ./gradlew runFlankAndroidTests --no-configuration-cache
 
       - name: Bundle the Android CI tests report
         if: |
           always() &&
           steps.check-alignment.outcome == 'success'
-        run: find . -type d -name 'fladleResults' | zip -@ -r android-tests-report-${{ matrix.di }}.zip
+        run: find . -type d -name 'fladleResults' | zip -@ -r android-tests-report.zip
 
       - name: Generate json file with failures
         if: |
@@ -325,5 +291,5 @@ jobs:
           steps.check-alignment.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
-          name: android-tests-report-${{ matrix.di }}
-          path: android-tests-report-${{ matrix.di }}.zip
+          name: android-tests-report
+          path: android-tests-report.zip

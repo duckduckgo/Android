@@ -37,9 +37,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.dataclearing.api.fire.FireDialog
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
@@ -82,9 +80,6 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
     lateinit var browserNav: BrowserNav
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val binding: FragmentChatHistoryBinding by viewBinding()
@@ -96,7 +91,6 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         onChatClicked = { item -> viewModel.onChatRowClicked(item.chatId) },
         onChatMoreClicked = { item, anchor -> showRowPopup(item, anchor) },
         onChatLongClicked = { item -> viewModel.onChatRowLongClicked(item.chatId) },
-        onSelectAllClicked = { viewModel.onSelectAllToggled() },
     )
 
     private val onBackPressedCallback = object : OnBackPressedCallback(enabled = false) {
@@ -121,11 +115,9 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)) {
-            edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
-            edgeToEdgeHandler.applyStatusBarInsets(binding.appBarLayout)
-            edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.chatHistoryList)
-        }
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.appBarLayout)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.chatHistoryList)
 
         binding.toolbar.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
         binding.toolbar.setNavigationOnClickListener { requireActivity().onBackPressedDispatcher.onBackPressed() }
@@ -135,6 +127,8 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
 
         binding.chatHistoryList.layoutManager = LinearLayoutManager(requireContext())
         binding.chatHistoryList.adapter = adapter
+
+        binding.chatHistorySelectAll.root.setOnClickListener { viewModel.onSelectAllToggled() }
 
         binding.chatHistoryEmptyState.setOnPrimaryCtaClickListener { viewModel.onOpenDuckAiClicked() }
 
@@ -238,23 +232,19 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
 
     private fun render(state: ChatHistoryUiState) {
         logcat { "ChatHistory: render ${state::class.simpleName}" }
+        binding.chatHistoryList.isVisible = state is ChatHistoryUiState.Loaded
+        binding.chatHistoryEmptyState.isVisible = state is ChatHistoryUiState.Empty
         when (state) {
             ChatHistoryUiState.Loading -> {
-                binding.chatHistoryList.visibility = View.GONE
-                binding.chatHistoryEmptyState.visibility = View.GONE
                 applyDefaultToolbar()
                 setFireActionVisible(false)
             }
             ChatHistoryUiState.Empty -> {
-                binding.chatHistoryList.visibility = View.GONE
-                binding.chatHistoryEmptyState.visibility = View.VISIBLE
                 adapter.submitList(emptyList())
                 applyDefaultToolbar()
                 setFireActionVisible(false)
             }
             is ChatHistoryUiState.Loaded -> {
-                binding.chatHistoryList.visibility = View.VISIBLE
-                binding.chatHistoryEmptyState.visibility = View.GONE
                 val selectMode = state.mode as? ChatHistoryUiState.Mode.Selecting
                 adapter.submitList(buildEntries(state, selectMode))
                 if (selectMode != null) {
@@ -268,6 +258,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
                 renderConfirmation(state.confirmation)
             }
         }
+        renderSelectAllHeader(state)
         // Re-derive every render so a transition out of Loaded (e.g. last chat deleted externally)
         // can't leave us intercepting back presses with no overlay to dismiss.
         onBackPressedCallback.isEnabled = shouldInterceptBack(state)
@@ -300,15 +291,31 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         binding.toolbar.menu.findItem(R.id.chat_history_action_download_selected)?.isVisible = true
     }
 
+    private fun renderSelectAllHeader(state: ChatHistoryUiState) {
+        val loaded = state as? ChatHistoryUiState.Loaded
+        val selectMode = loaded?.mode as? ChatHistoryUiState.Mode.Selecting
+        if (loaded == null || selectMode == null) {
+            setSelectAllHeaderVisible(false)
+            return
+        }
+        val visibleIds = (loaded.pinned + loaded.recent).map { it.chatId }.toSet()
+        val allSelected = visibleIds.isNotEmpty() && selectMode.selectedChatIds == visibleIds
+        binding.chatHistorySelectAll.root.isSelected = allSelected
+        binding.chatHistorySelectAll.chatHistorySelectAllLabel.setText(
+            if (allSelected) R.string.duck_ai_chat_history_unselect_all else R.string.duck_ai_chat_history_select_all,
+        )
+        setSelectAllHeaderVisible(true)
+    }
+
+    private fun setSelectAllHeaderVisible(visible: Boolean) {
+        binding.chatHistorySelectAll.root.isVisible = visible
+        binding.chatHistorySelectAllDivider.isVisible = visible
+    }
+
     private fun buildEntries(
         state: ChatHistoryUiState.Loaded,
         selectMode: ChatHistoryUiState.Mode.Selecting?,
     ): List<ChatHistoryListEntry> = buildList {
-        if (selectMode != null) {
-            val visibleIds = (state.pinned + state.recent).map { it.chatId }.toSet()
-            val allSelected = visibleIds.isNotEmpty() && selectMode.selectedChatIds == visibleIds
-            add(ChatHistoryListEntry.SelectAllHeader(allSelected = allSelected))
-        }
         if (state.pinned.isNotEmpty()) {
             if (!state.searchActive) add(ChatHistoryListEntry.Header(R.string.duck_ai_chat_history_section_pinned))
             state.pinned.forEach { item ->

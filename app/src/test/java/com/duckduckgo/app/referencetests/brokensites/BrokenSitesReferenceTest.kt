@@ -24,9 +24,11 @@ import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.trackerdetection.TdsMetadataProvider
+import com.duckduckgo.app.trackerdetection.blocklist.BlockListPixelsPlugin
 import com.duckduckgo.app.trackerdetection.blocklist.FakeFeatureTogglesInventory
+import com.duckduckgo.app.trackerdetection.blocklist.RealBlockListExperiment
 import com.duckduckgo.app.trackerdetection.blocklist.TestBlockListFeature
-import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.brokensite.api.BrokenSite
 import com.duckduckgo.brokensite.api.ReportFlow.MENU
@@ -76,7 +78,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
 
     private val mockVariantManager: VariantManager = mock()
 
-    private val mockTdsMetadataDao: TdsMetadataDao = mock()
+    private val mockTdsMetadataProvider: TdsMetadataProvider = mock()
 
     private val mockGpc: Gpc = mock()
 
@@ -143,7 +145,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         testee = BrokenSiteSubmitter(
             mockStatisticsDataStore,
             mockVariantManager,
-            mockTdsMetadataDao,
+            mockTdsMetadataProvider,
             mockGpc,
             mockFeatureToggle,
             mockPixel,
@@ -158,7 +160,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             networkProtectionState,
             webViewVersionProvider,
             ampLinks = mock(),
-            inventory,
+            RealBlockListExperiment(inventory, BlockListPixelsPlugin(inventory)),
             sitePermissionsRepository = sitePermissionsRepository,
         )
     }
@@ -170,7 +172,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         whenever(mockAppBuildConfig.model).thenReturn(testCase.model)
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
         whenever(mockGpc.isEnabled()).thenReturn(testCase.gpcEnabled)
-        whenever(mockTdsMetadataDao.eTag()).thenReturn(testCase.blocklistVersion)
+        whenever(mockTdsMetadataProvider.eTag()).thenReturn(testCase.blocklistVersion)
         whenever(mockStatisticsDataStore.atb).thenReturn(Atb("v123-456"))
         whenever(mockVariantManager.getVariantKey()).thenReturn("g")
         whenever(mockPrivacyConfig.privacyConfigData()).thenReturn(

@@ -30,8 +30,24 @@ class DuckChatContextualSharedViewModel() : ViewModel() {
         _command.tryEmit(Command.PageContextAttached(tabId, pageContext, isStorePageContextEnabled))
     }
 
-    fun onOpenRequested() {
-        _command.tryEmit(Command.OpenSheet)
+    /**
+     * Emitted by the host once it has shown the sheet, telling the sheet fragment to reload its chat
+     * content (reopen the chat, consume any parked entry prompt). The content-side counterpart of
+     * [requestShowSheet]: [Command.ShowSheet] asks the host to show the sheet UI; [Command.ReloadChat]
+     * then tells the now-visible sheet to load its chat.
+     */
+    fun onReloadChatRequested() {
+        _command.tryEmit(Command.ReloadChat)
+    }
+
+    /**
+     * Asks the host to show the contextual sheet UI (un-hide its container and embed/show the sheet
+     * fragment) for [tabId]. Used by the New Chat → entry-dialog handoff, which runs while the sheet is
+     * hidden: the host must show the container before the sheet can reload, otherwise the chat loads into
+     * a hidden container. The host then emits [Command.ReloadChat] so the sheet loads its chat content.
+     */
+    fun requestShowSheet(tabId: String) {
+        _command.tryEmit(Command.ShowSheet(tabId))
     }
 
     fun requestPageContext() {
@@ -54,7 +70,11 @@ class DuckChatContextualSharedViewModel() : ViewModel() {
             val isStorePageContextEnabled: Boolean = false,
         ) : Command()
 
-        data object OpenSheet : Command()
+        // Host → sheet: the sheet has been shown; (re)load its chat content.
+        data object ReloadChat : Command()
+
+        // Sheet → host: show the sheet UI (un-hide the container and embed/show the fragment).
+        data class ShowSheet(val tabId: String) : Command()
 
         data object CollectPageContext : Command()
 

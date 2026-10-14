@@ -53,6 +53,7 @@ class EnqueuedPixelWorkerTest {
     private val androidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val isVerifiedPlayStoreInstall: IsVerifiedPlayStoreInstall = mock()
     private val appBuildConfig: AppBuildConfig = mock()
+    private val appReturnPixelSender: AppReturnPixelSender = mock()
 
     private lateinit var enqueuedPixelWorker: EnqueuedPixelWorker
 
@@ -62,6 +63,7 @@ class EnqueuedPixelWorkerTest {
             workManager,
             { pixel },
             unsentForgetAllPixelStore,
+            appReturnPixelSender,
             webViewVersionProvider,
             defaultBrowserDetector,
             customTabDetector,
@@ -97,7 +99,7 @@ class EnqueuedPixelWorkerTest {
     @Test
     fun whenOnStartAndLaunchByFireActionThenDoNotSendAppLaunchPixel() {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
-        whenever(unsentForgetAllPixelStore.lastClearTimestamp).thenReturn(System.currentTimeMillis())
+        whenever(appReturnPixelSender.isLaunchByFireAction()).thenReturn(true)
 
         enqueuedPixelWorker.onCreate(lifecycleOwner)
         enqueuedPixelWorker.onStart(lifecycleOwner)
@@ -257,7 +259,7 @@ class EnqueuedPixelWorkerTest {
     @Test
     fun whenOnStartAndLaunchByFireActionFollowedByAppLaunchThenSendOneAppLaunchPixel() {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
-        whenever(unsentForgetAllPixelStore.lastClearTimestamp).thenReturn(System.currentTimeMillis())
+        whenever(appReturnPixelSender.isLaunchByFireAction()).thenReturn(true)
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
         whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
 

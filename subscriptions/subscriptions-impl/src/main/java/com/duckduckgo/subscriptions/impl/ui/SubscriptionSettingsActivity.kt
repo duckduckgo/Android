@@ -19,6 +19,7 @@ package com.duckduckgo.subscriptions.impl.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.Gravity
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -31,17 +32,17 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.SubscriptionFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
@@ -63,6 +64,8 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.LaunchOnboarding
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.OnboardingEntryPoint
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState
@@ -86,9 +89,6 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
     lateinit var subscriptionsUrlProvider: SubscriptionsUrlProvider
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val viewModel: SubscriptionSettingsViewModel by bindViewModel()
@@ -100,16 +100,16 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         setContentView(binding.root)
         setupToolbar(toolbar)
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+
+        val surfaceColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface)
+        binding.includeToolbar.appBarLayout.setBackgroundColor(surfaceColor)
+        toolbar.setBackgroundColor(surfaceColor)
+
+        configureEdgeToEdgeInsets()
 
         lifecycle.addObserver(viewModel)
 
@@ -158,6 +158,10 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             goToPrivacyPolicy()
         }
 
+        binding.onboardingProgressButton.setOnClickListener {
+            viewModel.onContinueSetupClicked()
+        }
+
         if (savedInstanceState == null) {
             pixelSender.reportSubscriptionSettingsShown()
         }
@@ -165,7 +169,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
-        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout, installScrim = false)
         edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = true)
     }
 
@@ -184,6 +188,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderView(viewState: ViewState.Ready) {
+        renderOnboardingEntryPoint(viewState.onboardingEntryPoint)
         binding.subscriptionSettingsProductName.setText(string.ddg_subscription)
         binding.activateOnOtherDevices.setText(string.activateOnOtherDevices)
         binding.faq.setPrimaryText(getString(string.privacyProFaq))
@@ -335,6 +340,16 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun renderOnboardingEntryPoint(card: OnboardingEntryPoint?) {
+        binding.onboardingProgressCard.isVisible = card != null
+        if (card == null) return
+        binding.onboardingProgressTitle.text = getString(string.subscriptionOnboardingSettingsCardTitle, card.percentage)
+        val inProgress = card.percentage < 100
+        binding.onboardingProgressDescription.isVisible = inProgress
+        binding.onboardingProgressButton.isVisible = inProgress
+        binding.onboardingProgressHeader.gravity = if (inProgress) Gravity.TOP else Gravity.CENTER_VERTICAL
+    }
+
     private fun processCommand(command: Command) {
         when (command) {
             is FinishSignOut -> {
@@ -354,6 +369,8 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                     ),
                 )
             }
+
+            LaunchOnboarding -> globalActivityStarter.start(this, SubscriptionOnboardingScreenWithEmptyParams)
         }
     }
 

@@ -34,10 +34,11 @@
             android:layout_marginEnd="24dp"
             android:layout_marginBottom="100dp"
             android:importantForAccessibility="no"
-            android:src="@drawable/ic_yeti_light"
+            android:src="@drawable/dax_accident_light"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintWidth_max="296dp"
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -70,6 +71,23 @@
             app:typography="body1"
             app:textType="secondary"
             tools:text="@string/webViewErrorBadUrl" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/redirect_suggestion_message"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
+            android:gravity="center"
+            android:paddingBottom="@dimen/keyline_5"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/error_message"
+            app:typography="body1"
+            app:textType="secondary"
+            tools:text="@string/webViewErrorRedirectSuggestionMessage"
+            tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

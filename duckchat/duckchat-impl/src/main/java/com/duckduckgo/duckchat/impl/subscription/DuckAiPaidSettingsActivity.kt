@@ -34,12 +34,11 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.R.string
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckAiPaidSettingsBinding
@@ -52,7 +51,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
-import com.duckduckgo.duckchat.impl.R as DuckChatR
 import com.duckduckgo.mobile.android.R as CommonR
 
 object DuckAiPaidSettingsNoParams : GlobalActivityStarter.ActivityParams
@@ -64,9 +62,6 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
     @Inject lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject lateinit var duckChat: DuckChat
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -92,17 +87,12 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         setContentView(binding.root)
         setupToolbar(toolbar)
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         configureUiEventHandlers()
         configureClickableLink()
@@ -138,8 +128,6 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         with(binding) {
-            duckAiPaidSettingsIcon.setImageResource(DuckChatR.drawable.duckai_128)
-
             statusIndicator.setStatus(viewState.isDuckAIEnabled)
             duckAiPaidSettingsOpenDuckAi.isVisible = viewState.isDuckAIEnabled
             duckAiPaidSettingsEnableInSettings.isVisible = true
@@ -168,7 +156,7 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
             }
 
             OpenDuckAi -> {
-                duckChat.openDuckChat()
+                duckChat.openDuckChat(DuckChatEntryPoint.PAID_SETTINGS)
             }
 
             OpenDuckChatSettings -> {

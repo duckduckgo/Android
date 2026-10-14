@@ -48,6 +48,7 @@ import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ClickResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ConditionResponse
+import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExecuteScriptResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExpectationResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.FillFormResponse
@@ -695,5 +696,27 @@ class JsActionSuccessEventHandlerTest {
                 ),
             ),
         )
+    }
+
+    @Test
+    fun whenExecuteScriptSucceedsThenRecordSuccessAndAdvance() = runTest {
+        val action = BrokerAction.ExecuteScript("script-1", "root.body.textContent = 'done'")
+        val step = testScanStep.copy(step = testScanStep.step.copy(actions = listOf(action)))
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStep = step,
+            profileQuery = testProfileQuery,
+            actionRetryCount = 2,
+            stageStatus = PirStageStatus(PirStage.OTHER, 0L),
+        )
+        val response = ExecuteScriptResponse(action.id, "executeScript")
+
+        val result = testee.invoke(state, JsActionSuccess(response))
+
+        assertEquals(state.copy(currentActionIndex = 1, actionRetryCount = 0), result.nextState)
+        assertEquals(ExecuteBrokerStepAction(UserProfile(testProfileQuery)), result.nextEvent)
+        assertNull(result.sideEffect)
+        verify(mockPirRunStateHandler).handleState(BrokerScanActionSucceeded(testBroker1, testProfileQueryId, response))
+        verifyNoMoreInteractions(mockPirRunStateHandler)
     }
 }
