@@ -185,8 +185,8 @@ class RealPirDashboardInitialScanStateProvider @Inject constructor(
             return true
         }
 
-        if (hasBrokersLeftUnscannedByFreeScan(scanJobs, scannableBrokerNames)) {
-            logcat { "PIR-WEB: Brokers skipped by the free scan have no scan jobs, should resume initial scan" }
+        if (hasScannableBrokersWithoutScanJobs(scanJobs, scannableBrokerNames)) {
+            logcat { "PIR-WEB: Scannable brokers have no scan jobs, should resume initial scan" }
             return true
         }
 
@@ -195,16 +195,19 @@ class RealPirDashboardInitialScanStateProvider @Inject constructor(
     }
 
     /**
-     * A free scan creates no scan jobs for subscription-gated brokers, so once that user subscribes those brokers count
-     * toward the dashboard total with no job left to resume. A profile with no jobs at all is skipped, as the scan that
-     * creates its jobs creates them all at once and is about to run.
+     * Brokers can count toward the dashboard total with no scan job to resume: a free scan creates none for
+     * subscription-gated brokers, which a free user who subscribes can then scan, and a broker data update can add brokers
+     * after the scan created its jobs. A free user's scan worker is retired once their initial scan finishes, so nothing
+     * else ever scans those brokers. A paid user who never ran a free scan is skipped, as their scheduled scan picks up
+     * added brokers. A profile with no jobs at all is skipped, as the scan that creates its jobs creates them all at once
+     * and is about to run.
      */
-    private suspend fun hasBrokersLeftUnscannedByFreeScan(
+    private suspend fun hasScannableBrokersWithoutScanJobs(
         scanJobs: List<ScanJobRecord>,
         scannableBrokerNames: Set<String>,
     ): Boolean {
         if (!pirFreemiumDataStore.didActivate) return false
-        if (pirWorkHandler.canRunPir().firstOrNull().runModeOrNull != PirRunMode.SCAN_AND_OPT_OUT) return false
+        if (pirWorkHandler.canRunPir().firstOrNull().runModeOrNull == null) return false
 
         return scanJobs.groupBy { it.userProfileId }.values.any { jobsForProfile ->
             !jobsForProfile.mapTo(hashSetOf()) { it.brokerName }.containsAll(scannableBrokerNames)
