@@ -678,48 +678,71 @@ class RealPirPixelSenderTest {
     }
 
     @Test
-    fun whenReportDAUThenEnqueuesCorrectPixel() = runTest {
-        testee.reportDAU()
+    fun whenReportDAUForPaidUserThenEnqueuesPixelWithPaidParams() = runTest {
+        testee.reportDAU(isAuthenticated = true)
 
+        val pixelNameCaptor = argumentCaptor<String>()
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).enqueueFire(
-            pixelName = any(),
+            pixelName = pixelNameCaptor.capture(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
             type = any(),
         )
 
-        assert(paramsCaptor.firstValue.isEmpty())
+        assertEquals("m_dbp_engagement_dau_c", pixelNameCaptor.firstValue)
+        assertEquals(mapOf("is_authenticated" to "true", "free_scan" to "false"), paramsCaptor.firstValue)
     }
 
     @Test
-    fun whenReportWAUThenEnqueuesCorrectPixel() = runTest {
-        testee.reportWAU()
+    fun whenReportDAUForFreeUserThenEnqueuesPixelWithFreeParams() = runTest {
+        testee.reportDAU(isAuthenticated = false)
 
+        val pixelNameCaptor = argumentCaptor<String>()
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).enqueueFire(
-            pixelName = any(),
+            pixelName = pixelNameCaptor.capture(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
             type = any(),
         )
 
-        assert(paramsCaptor.firstValue.isEmpty())
+        assertEquals("m_dbp_engagement_dau_c", pixelNameCaptor.firstValue)
+        assertEquals(mapOf("is_authenticated" to "false", "free_scan" to "true"), paramsCaptor.firstValue)
     }
 
     @Test
-    fun whenReportMAUThenEnqueuesCorrectPixel() = runTest {
-        testee.reportMAU()
+    fun whenReportWAUForFreeUserThenEnqueuesPixelWithFreeParams() = runTest {
+        testee.reportWAU(isAuthenticated = false)
 
+        val pixelNameCaptor = argumentCaptor<String>()
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).enqueueFire(
-            pixelName = any(),
+            pixelName = pixelNameCaptor.capture(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
             type = any(),
         )
 
-        assert(paramsCaptor.firstValue.isEmpty())
+        assertEquals("m_dbp_engagement_wau_c", pixelNameCaptor.firstValue)
+        assertEquals(mapOf("is_authenticated" to "false", "free_scan" to "true"), paramsCaptor.firstValue)
+    }
+
+    @Test
+    fun whenReportMAUForFreeUserThenEnqueuesPixelWithFreeParams() = runTest {
+        testee.reportMAU(isAuthenticated = false)
+
+        val pixelNameCaptor = argumentCaptor<String>()
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).enqueueFire(
+            pixelName = pixelNameCaptor.capture(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        assertEquals("m_dbp_engagement_mau_c", pixelNameCaptor.firstValue)
+        assertEquals(mapOf("is_authenticated" to "false", "free_scan" to "true"), paramsCaptor.firstValue)
     }
 
     @Test
