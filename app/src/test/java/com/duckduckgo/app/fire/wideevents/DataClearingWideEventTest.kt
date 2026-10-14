@@ -363,7 +363,7 @@ class DataClearingWideEventTest {
     }
 
     @Test
-    fun `finishCancelled ends interval and finishes flow as cancelled with cancel reason`() = runTest {
+    fun `finishCancelled ends interval and finishes flow as cancelled with status reason`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(900L))
 
@@ -374,12 +374,12 @@ class DataClearingWideEventTest {
         verify(wideEventClient).flowFinish(
             wideEventId = 900L,
             status = FlowStatus.Cancelled,
-            metadata = mapOf("cancel_reason" to "cancelled_by_app"),
+            metadata = mapOf("status_reason" to "cancelled_by_app"),
         )
     }
 
     @Test
-    fun `finishCancelled maps stop reasons to bounded cancel reasons`() = runTest {
+    fun `finishCancelled maps stop reasons to bounded status reasons`() = runTest {
         val expected = mapOf(
             WorkInfo.STOP_REASON_CANCELLED_BY_APP to "cancelled_by_app",
             WorkInfo.STOP_REASON_PREEMPT to "preempt",
@@ -395,7 +395,7 @@ class DataClearingWideEventTest {
             WorkInfo.STOP_REASON_CONSTRAINT_CHARGING to "other",
         )
 
-        expected.forEach { (stopReason, cancelReason) ->
+        expected.forEach { (stopReason, statusReason) ->
             reset(wideEventClient)
             whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
                 .thenReturn(Result.success(901L))
@@ -406,7 +406,7 @@ class DataClearingWideEventTest {
             verify(wideEventClient).flowFinish(
                 wideEventId = 901L,
                 status = FlowStatus.Cancelled,
-                metadata = mapOf("cancel_reason" to cancelReason),
+                metadata = mapOf("status_reason" to statusReason),
             )
         }
     }

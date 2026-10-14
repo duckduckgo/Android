@@ -211,7 +211,7 @@ class DataClearingWideEventImpl @Inject constructor(
         wideEventClient.flowFinish(
             wideEventId = flowId,
             status = FlowStatus.Cancelled,
-            metadata = mapOf(KEY_CANCEL_REASON to stopReason.asCancelReason()),
+            metadata = mapOf(KEY_STATUS_REASON to stopReason.asStatusReason()),
         )
 
         cachedFlowId = null
@@ -253,7 +253,7 @@ class DataClearingWideEventImpl @Inject constructor(
 
     private fun Throwable.toErrorClass(): String = javaClass.simpleName
 
-    private fun Int.asCancelReason(): String = when (this) {
+    private fun Int.asStatusReason(): String = when (this) {
         WorkInfo.STOP_REASON_CANCELLED_BY_APP -> "cancelled_by_app"
         WorkInfo.STOP_REASON_PREEMPT -> "preempt"
         WorkInfo.STOP_REASON_TIMEOUT -> "timeout"
@@ -298,7 +298,7 @@ class DataClearingWideEventImpl @Inject constructor(
         const val SAMPLING_PROBABILITY = 0.05f
         const val KEY_CLEAR_OPTIONS = "clear_options"
         const val KEY_TOTAL_DURATION_MS_BUCKETED = "total_duration_ms_bucketed"
-        const val KEY_CANCEL_REASON = "cancel_reason"
+        const val KEY_STATUS_REASON = "status_reason"
         const val KEY_BROWSER_MODE = "browser_mode"
         const val KEY_TAB_TYPE = "tab_type"
         const val KEY_TAB_COUNT = "tab_count"

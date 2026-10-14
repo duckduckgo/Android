@@ -39,9 +39,9 @@
                         "type": "string",
                         "description": "Reason for failure. Only present on FAILURE events. Exception class name, or feature_not_supported / tab_not_found when the clear ended without an exception."
                     },
-                    "cancel_reason": {
+                    "status_reason": {
                         "type": "string",
-                        "description": "Why WorkManager stopped the background clear worker, mapped from its stop reason. Only present on CANCELLED events. cancelled_by_app means the app cancelled the scheduled clear because the user returned to the app; the other values are system-initiated stops. unknown is reported for system stops before Android 12.",
+                        "description": "Why WorkManager stopped the background clear worker, mapped from its stop reason. Only present on CANCELLED events.",
                         "enum": [
                             "cancelled_by_app",
                             "preempt",
