@@ -115,6 +115,7 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
 
         val lifecycleOwner = findViewTreeLifecycleOwner()!!.also { this.lifecycleOwner = it }
         lifecycleOwner.lifecycle.addObserver(viewModel)
+        viewModel.onViewAttached()
         conflatedStateJob += viewModel.viewState
             .onEach { render(it) }
             .launchIn(lifecycleOwner.lifecycleScope)
@@ -125,12 +126,12 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
     }
 
     override fun onDetachedFromWindow() {
-        viewModel.onSectionDetached()
         binding.frontCard.root.animate().cancel()
         binding.backCard.root.animate().cancel()
         dismissAnimationRunning = false
         conflatedStateJob.cancel()
         conflatedCommandJob.cancel()
+        viewModel.onViewDetached()
         defaultBrowserDialogLauncher?.unregister()
         defaultBrowserDialogLauncher = null
         lifecycleOwner?.lifecycle?.removeObserver(viewModel)

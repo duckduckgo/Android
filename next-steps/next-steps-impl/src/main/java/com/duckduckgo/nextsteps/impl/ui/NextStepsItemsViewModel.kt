@@ -33,6 +33,7 @@ import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.Surface
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -93,8 +94,11 @@ class NextStepsItemsViewModel @Inject constructor(
         .map { message -> message?.takeIf { it.isNextStepsForNewTabPage() } }
         .combine(itemsStore.dismissedItemIds()) { message, dismissedIds -> message to dismissedIds }
 
-    init {
-        activeMessage
+    private var sectionJob: Job? = null
+
+    fun onViewAttached() {
+        sectionJob?.cancel()
+        sectionJob = activeMessage
             .combine(refresh) { messageAndDismissed, _ -> messageAndDismissed }
             .onEach { (message, dismissedIds) ->
                 val items = visibleItems(message, dismissedIds)
@@ -119,7 +123,9 @@ class NextStepsItemsViewModel @Inject constructor(
         pendingCompletionItemId = null
     }
 
-    fun onSectionDetached() {
+    fun onViewDetached() {
+        sectionJob?.cancel()
+        sectionJob = null
         pendingCompletionItemId = null
         animatingCompletionItemId = null
     }
@@ -180,7 +186,8 @@ class NextStepsItemsViewModel @Inject constructor(
         val completedIds = completedItemIds(supportedItems, checks)
         val remaining = supportedItems.filter { it.id !in completedIds && it.id !in dismissedIds }
         val onScreen = _viewState.value.items
-        return if (onScreen.isEmpty()) {
+        val isNewMessage = _viewState.value.message?.id != message.id
+        return if (onScreen.isEmpty() || isNewMessage) {
             loadItems(message, remaining)
         } else {
             refreshOnScreenItems(onScreen, remaining, completedIds)
@@ -206,6 +213,7 @@ class NextStepsItemsViewModel @Inject constructor(
         message: RemoteMessage,
         remaining: List<CardItem.ListItem>,
     ): List<CardItem.ListItem> = withContext(dispatchers.io()) {
+        if (remaining.isEmpty()) return@withContext emptyList()
         val visible = remaining.sortedByOrder(itemsStore.itemOrder()).rotatedIfDue()
         itemsStore.saveItemOrder(visible.map { it.id })
         visible.firstOrNull()?.let { recordImpression(message, it.id) }

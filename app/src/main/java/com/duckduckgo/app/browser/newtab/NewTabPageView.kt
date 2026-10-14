@@ -279,6 +279,14 @@ class NewTabPageView @JvmOverloads constructor(
         }
     }
 
+    // Dropping the view stops its view model listening to RMF, so a hidden section cannot count impressions.
+    private fun hideNextStepsSection() {
+        nextStepsSectionJob?.cancel()
+        nextStepsSectionJob = null
+        binding.nextStepsContainer.removeAllViews()
+        binding.nextStepsContainer.gone()
+    }
+
     private fun inflateNextStepsSection() {
         if (nextStepsSectionJob?.isActive == true) return
         nextStepsSectionJob = findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
@@ -308,7 +316,7 @@ class NewTabPageView @JvmOverloads constructor(
             binding.appTrackingProtectionStateView.gone()
             binding.ddgLogo.gone()
             binding.messageCta.gone()
-            binding.nextStepsContainer.gone()
+            hideNextStepsSection()
             binding.focusedFavourites.gone()
             return
         }
@@ -325,10 +333,10 @@ class NewTabPageView @JvmOverloads constructor(
             binding.messageCta.gone()
             showNextStepsSection()
         } else if (viewState.message != null && viewState.onboardingComplete) {
-            binding.nextStepsContainer.gone()
+            hideNextStepsSection()
             showRemoteMessage(viewState.message, viewState.messageImageFilePath, viewState.newMessage)
         } else {
-            binding.nextStepsContainer.gone()
+            hideNextStepsSection()
             binding.messageCta.gone()
             if (viewState.lowPriorityMessage != null) {
                 showLowPriorityMessage(viewState.lowPriorityMessage)

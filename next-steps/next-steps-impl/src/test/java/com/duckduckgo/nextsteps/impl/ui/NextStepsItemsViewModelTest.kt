@@ -79,7 +79,63 @@ class NextStepsItemsViewModelTest {
         itemsStore = itemsStore,
         completionChecks = completionChecks,
         defaultRoleBrowserDialog = defaultRoleBrowserDialog,
-    )
+    ).also { it.onViewAttached() }
+
+    @Test
+    fun `when the section is detached then a new message is ignored`() = runTest {
+        val message = aMessage(content = nextStepsContent())
+        activeMessage.value = message
+        advanceUntilIdle()
+        testee.onViewDetached()
+
+        activeMessage.value = message.copy(id = "android_complete_your_setup_v2")
+        advanceUntilIdle()
+
+        assertEquals(message, testee.viewState.value.message)
+        assertEquals(1, itemsStore.frontImpressions(defaultBrowserItem.id))
+        verify(remoteMessageModel, times(1)).onMessageShown(any())
+    }
+
+    @Test
+    fun `when the section is reattached with the same message then the cards are kept and no impression is counted`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        testee.onViewDetached()
+
+        testee.onViewAttached()
+        advanceUntilIdle()
+
+        assertEquals(listOf(defaultBrowserItem, addWidgetItem), testee.viewState.value.items)
+        assertEquals(1, itemsStore.frontImpressions(defaultBrowserItem.id))
+        verify(remoteMessageModel, times(1)).onMessageShown(any())
+    }
+
+    @Test
+    fun `when a different message replaces the one on screen then it loads fresh and counts an impression`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        assertEquals(1, itemsStore.frontImpressions(defaultBrowserItem.id))
+
+        val newMessage = aMessage(content = Content.ActionableItems(titleText = "Complete your setup", listItems = listOf(syncItem, addWidgetItem)))
+            .copy(id = "android_complete_your_setup_v2")
+        activeMessage.value = newMessage
+        advanceUntilIdle()
+
+        assertEquals(listOf(addWidgetItem, syncItem), testee.viewState.value.items)
+        assertEquals(1, itemsStore.frontImpressions(addWidgetItem.id))
+        verify(remoteMessageModel).onMessageShown(newMessage)
+    }
+
+    @Test
+    fun `when the last card goes and the message re-emits then the stored order is not wiped`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        testee.onFrontCardDismissed()
+        testee.onFrontCardDismissed()
+        advanceUntilIdle()
+
+        assertEquals(listOf(defaultBrowserItem.id, addWidgetItem.id), itemsStore.itemOrder())
+    }
 
     @Test
     fun `when no active message then state is empty`() = runTest {
@@ -580,7 +636,7 @@ class NextStepsItemsViewModelTest {
     }
 
     @Test
-    fun `when section detaches after tapping then completed front item is dropped silently`() = runTest {
+    fun `when section detaches and reattaches after tapping then completed front item is dropped silently`() = runTest {
         val message = aMessage(content = nextStepsContent())
         activeMessage.value = message
         advanceUntilIdle()
@@ -588,10 +644,10 @@ class NextStepsItemsViewModelTest {
         assertEquals(Command.LaunchDefaultBrowserSettings, testee.commands().first())
         val commands = mutableListOf<Command>()
         val job = testee.commands().onEach { commands.add(it) }.launchIn(this)
-        testee.onSectionDetached()
+        testee.onViewDetached()
         defaultBrowserCheck.completed = true
 
-        activeMessage.value = message.copy(matchingRules = listOf(1))
+        testee.onViewAttached()
         advanceUntilIdle()
 
         assertEquals(emptyList<Command>(), commands)
