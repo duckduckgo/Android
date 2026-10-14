@@ -26,6 +26,7 @@ import com.duckduckgo.pir.impl.PirConstants.DEFAULT_PROFILE_QUERIES
 import com.duckduckgo.pir.impl.callbacks.PirCallbacks
 import com.duckduckgo.pir.impl.common.BrokerStepsParser
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.impl.common.PirActionsRunner
 import com.duckduckgo.pir.impl.common.PirJob
 import com.duckduckgo.pir.impl.common.PirJob.RunType
@@ -55,6 +56,7 @@ interface PirScan {
         jobRecords: List<ScanJobRecord>,
         context: Context,
         runType: RunType,
+        isFreeScan: Boolean,
         onJobCompleted: suspend () -> Unit = {},
         onScanJobsResolved: suspend (Int) -> Unit = {},
     ): Result<Unit>
@@ -130,6 +132,7 @@ class RealPirScan @Inject constructor(
         jobRecords: List<ScanJobRecord>,
         context: Context,
         runType: RunType,
+        isFreeScan: Boolean,
         onJobCompleted: suspend () -> Unit,
         onScanJobsResolved: suspend (Int) -> Unit,
     ) = withContext(dispatcherProvider.io()) {
@@ -156,7 +159,7 @@ class RealPirScan @Inject constructor(
 
         cleanPreviousRun()
 
-        val processedJobRecords = processJobRecords(jobRecords, activeBrokers)
+        val processedJobRecords = processJobRecords(jobRecords, activeBrokers, isFreeScan)
         logcat { "PIR-SCAN: Total processed records ${processedJobRecords.size}" }
         onScanJobsResolved(processedJobRecords.size)
 
@@ -242,6 +245,7 @@ class RealPirScan @Inject constructor(
     private suspend fun processJobRecords(
         jobRecords: List<ScanJobRecord>,
         activeBrokers: Map<String, Broker>,
+        isFreeScan: Boolean,
     ): List<Pair<ProfileQuery, BrokerStep>> {
         val relevantBrokerSteps = jobRecords.mapTo(mutableSetOf()) { it.brokerName }.mapNotNull {
             val broker = activeBrokers[it] ?: return@mapNotNull null
@@ -250,7 +254,8 @@ class RealPirScan @Inject constructor(
                 brokerStepsParser.parseStep(broker, this)
             }
             if (!steps.isNullOrEmpty()) {
-                it to steps[0]
+                val step = steps[0]
+                it to if (step is ScanStep) step.copy(isFreeScan = isFreeScan) else step
             } else {
                 null
             }

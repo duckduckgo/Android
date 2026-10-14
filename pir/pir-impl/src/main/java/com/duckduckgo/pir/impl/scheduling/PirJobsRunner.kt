@@ -107,6 +107,7 @@ class RealPirJobsRunner @Inject constructor(
         runMode: PirRunMode,
     ): Result<Unit> = withContext(dispatcherProvider.io()) {
         val startTimeInMillis = currentTimeProvider.currentTimeMillis()
+        val isFreeScan = runMode == PirRunMode.SCAN_ONLY
 
         // Multiple profile support (includes deprecated profiles as we need to process opt-out for them if there are extracted profiles)
         val profileQueries = obtainProfiles()
@@ -253,6 +254,7 @@ class RealPirJobsRunner @Inject constructor(
                 context = context,
                 executionType = executionType,
                 eligibleJobs = eligibleJobs,
+                isFreeScan = isFreeScan,
                 onJobCompleted = onJobCompletedCallback,
                 onScanJobsResolved = onScanJobsResolvedCallback,
             )
@@ -495,6 +497,7 @@ class RealPirJobsRunner @Inject constructor(
         context: Context,
         executionType: PirExecutionType,
         eligibleJobs: List<ScanJobRecord>,
+        isFreeScan: Boolean,
         onJobCompleted: suspend () -> Unit = {},
         onScanJobsResolved: suspend (Int) -> Unit = {},
     ): Int {
@@ -505,7 +508,7 @@ class RealPirJobsRunner @Inject constructor(
         }
         if (eligibleJobs.isNotEmpty()) {
             logcat { "PIR-JOB-RUNNER: Executing scan for ${eligibleJobs.size} eligible scan jobs." }
-            pirScan.executeScanForJobs(eligibleJobs, context, runType, onJobCompleted, onScanJobsResolved)
+            pirScan.executeScanForJobs(eligibleJobs, context, runType, isFreeScan, onJobCompleted, onScanJobsResolved)
         } else {
             logcat { "PIR-JOB-RUNNER: No eligible scan jobs to execute." }
             onScanJobsResolved(0)
