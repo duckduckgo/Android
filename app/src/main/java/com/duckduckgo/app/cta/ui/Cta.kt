@@ -1384,6 +1384,18 @@ class BrokenSitePromptDialogCta : Cta {
         onDismissCtaClicked: () -> Unit,
         onCtaShown: () -> Unit,
     ) {
+        binding.includeBrokenSitePromptDialog.root.show()
+        stretchButtonsWhenTheyWrap(binding)
+        binding.includeBrokenSitePromptDialog.reportButton.setOnClickListener { onReportBrokenSiteClicked.invoke() }
+        binding.includeBrokenSitePromptDialog.dismissButton.setOnClickListener { onDismissCtaClicked.invoke() }
+        onCtaShown()
+    }
+
+    fun onOrientationChanged(binding: FragmentBrowserTabBinding) {
+        stretchButtonsWhenTheyWrap(binding)
+    }
+
+    private fun stretchButtonsWhenTheyWrap(binding: FragmentBrowserTabBinding) {
         val daxDialog = binding.includeBrokenSitePromptDialog
         val buttons = listOf(daxDialog.reportButton, daxDialog.dismissButton)
         buttons.forEach { button ->
@@ -1391,7 +1403,6 @@ class BrokenSitePromptDialogCta : Cta {
                 width = ConstraintLayout.LayoutParams.WRAP_CONTENT
             }
         }
-        daxDialog.root.show()
         daxDialog.root.doOnLayout {
             if (daxDialog.dismissButton.top > daxDialog.reportButton.top) {
                 buttons.forEach { button ->
@@ -1403,9 +1414,6 @@ class BrokenSitePromptDialogCta : Cta {
                 }
             }
         }
-        binding.includeBrokenSitePromptDialog.reportButton.setOnClickListener { onReportBrokenSiteClicked.invoke() }
-        binding.includeBrokenSitePromptDialog.dismissButton.setOnClickListener { onDismissCtaClicked.invoke() }
-        onCtaShown()
     }
 }
 
