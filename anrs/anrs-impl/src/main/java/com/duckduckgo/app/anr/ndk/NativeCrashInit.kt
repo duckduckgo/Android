@@ -21,6 +21,7 @@ import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.anr.CrashPixel.APPLICATION_CRASH_NATIVE
 import com.duckduckgo.app.anr.CrashPixel.APPLICATION_CRASH_NATIVE_HANDLER_REGISTERED
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
@@ -30,6 +31,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
@@ -37,9 +39,12 @@ import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.library.loader.LibraryLoader.LibraryLoaderListener
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import org.json.JSONObject
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -65,6 +70,9 @@ class NativeCrashInit @Inject constructor(
     @param:ProcessName private val processName: String,
     private val crashpadInitializer: CrashpadInitializer,
     private val pixel: Pixel,
+    private val minidumpUploader: MinidumpUploader,
+    @param:AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver, VpnProcessLifecycleObserver, LibraryLoaderListener, PirProcessLifecycleObserver {
 
     private val isCustomTab: Boolean by lazy { customTabDetector.isCustomTab() }
@@ -143,6 +151,20 @@ class NativeCrashInit @Inject constructor(
         logcat(ERROR) { "ndk-crash: error loading library in process $processName: ${t.asLog()}" }
     }
 
+    internal fun crashMetadata(): String = JSONObject()
+        .put("ExceptionType", "AndroidNativeCrash")
+        .put("AppVersion", "${appBuildConfig.versionName}-${appBuildConfig.flavor}")
+        .put("OsVersion", "Android SDK ${appBuildConfig.sdkInt}")
+        .put(
+            "tags",
+            JSONObject()
+                .put("pn", processName)
+                .put("customTab", isCustomTab)
+                .put("webViewPackage", webViewPackage)
+                .put("webViewVersion", webViewVersion),
+        )
+        .toString()
+
     private fun initCrashpad() {
         val initialized = runCatching {
             crashpadInitializer.initialize(
@@ -150,6 +172,7 @@ class NativeCrashInit @Inject constructor(
                     "customTab" to "$isCustomTab",
                     "webViewPackage" to webViewPackage,
                     "webViewVersion" to webViewVersion,
+                    "crash_metadata" to crashMetadata(),
                 ),
                 onCrash = {
                     pixel.enqueueFire(
@@ -167,6 +190,10 @@ class NativeCrashInit @Inject constructor(
         }.onFailure {
             logcat(ERROR) { "ndk-crash: error initializing Crashpad: ${it.asLog()}" }
         }.getOrDefault(false)
+
+        if (initialized && isMainProcess) {
+            appCoroutineScope.launch(dispatcherProvider.io()) { minidumpUploader.uploadPending(crashMetadata()) }
+        }
 
         if (initialized) {
             pixel.fire(
