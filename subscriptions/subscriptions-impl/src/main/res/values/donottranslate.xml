@@ -131,17 +131,17 @@
 
     <!-- Feature detail: Personal Information Removal -->
     <string name="subscriptionOnboardingFeatureInfoPirTitle">Personal Information Removal</string>
-    <string name="subscriptionOnboardingFeatureInfoPirDescription">DuckDuckGo helps find and remove your personal info from data broker sites, fighting identity theft and spam.</string>
+    <string name="subscriptionOnboardingFeatureInfoPirDescription">DuckDuckGo finds and removes your personal info from data broker sites, helping to combat identity theft and spam.</string>
     <string name="subscriptionOnboardingFeatureInfoPirItem1Title">Platforms</string>
-    <string name="subscriptionOnboardingFeatureInfoPirItem1Description">Personal Information Removal is only available on Mac and Windows</string>
+    <string name="subscriptionOnboardingFeatureInfoPirItem1Description">Personal Information Removal is only available on iOS, Mac, and Windows.</string>
     <string name="subscriptionOnboardingFeatureInfoPirItem2Title">Repeatedly scans many data broker sites that sell your information</string>
     <string name="subscriptionOnboardingFeatureInfoPirItem2Description">Find and remove your personal information from data broker sites around the web. DuckDuckGo re-scans regularly to minimize the risk of your info reappearing.</string>
     <string name="subscriptionOnboardingFeatureInfoPirItem3Title">Your info stays on your device, not our servers</string>
-    <string name="subscriptionOnboardingFeatureInfoPirItem3Description">Unlike other services, the removal process happens entirely on your device, not remote servers — your device stores the personal information you provide during setup and initiates removal requests.</string>
-    <string name="subscriptionOnboardingFeatureInfoPirItem4Title">We automate many removals &amp; help you manually remove the rest</string>
-    <string name="subscriptionOnboardingFeatureInfoPirItem4Description">Let us help handle the time, effort, and complexity typically required to get your details removed. We scan for your info, request its removal where possible, then receive and handle confirmation emails for you.</string>
-    <string name="subscriptionOnboardingFeatureInfoPirItem5Title">Monitor removal progress in real time</string>
-    <string name="subscriptionOnboardingFeatureInfoPirItem5Description">It can take a while for sites to update, so we made it easy to keep tabs on progress of ongoing removals and see the personal info we\'ve removed in real time on your personal dashboard.</string>
+    <string name="subscriptionOnboardingFeatureInfoPirItem3Description">Unlike other services, the automated removal process happens entirely on your device, not remote servers — your device stores the personal information you provide during setup and initiates removal requests.</string>
+    <string name="subscriptionOnboardingFeatureInfoPirItem4Title">Automated removals save you time and effort</string>
+    <string name="subscriptionOnboardingFeatureInfoPirItem4Description">We hunt down your personal info on data broker sites that are trying to sell it, and we work to get your details removed by submitting removal requests for you.</string>
+    <string name="subscriptionOnboardingFeatureInfoPirItem5Title">You monitor removal progress in real time</string>
+    <string name="subscriptionOnboardingFeatureInfoPirItem5Description">It can take a while for sites to update, but your personal dashboard makes it easy to keep tabs on progress of ongoing automated removals in real time and see where any manual follow ups may be needed.</string>
 
     <!-- Onboarding completion summary -->
     <string name="subscriptionOnboardingCompletionTitle">Nice work!</string>
@@ -156,7 +156,7 @@
 
     <!-- Onboarding settings entry-point card -->
     <string name="subscriptionOnboardingSettingsCardTitle" instruction="Placeholder is the whole-number percentage of onboarding completed, e.g. 75">Setup %1$d%% complete</string>
-    <string name="subscriptionOnboardingSettingsCardDescription">Some premium protections aren\'t active yet</string>
+    <string name="subscriptionOnboardingSettingsCardDescription">Some premium protections aren\'t active yet.</string>
     <string name="subscriptionOnboardingSettingsCardButton">Continue Setup</string>
 
 </resources>
