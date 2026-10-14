@@ -22,13 +22,11 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.pir.impl.PirUserUtils
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.createJsMessage
-import com.duckduckgo.subscriptions.api.Product
-import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.api.model.Entitlement
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -51,6 +49,7 @@ class PirWebHandshakeMessageHandlerTest {
     private lateinit var testee: PirWebHandshakeMessageHandler
 
     private val mockSubscriptions: Subscriptions = mock()
+    private val mockPirUserUtils: PirUserUtils = mock()
     private val mockJsMessaging: JsMessaging = mock()
     private val mockJsMessageCallback: JsMessageCallback = mock()
     private val testScope = TestScope()
@@ -59,6 +58,7 @@ class PirWebHandshakeMessageHandlerTest {
     fun setUp() {
         testee = PirWebHandshakeMessageHandler(
             subscriptions = mockSubscriptions,
+            pirUserUtils = mockPirUserUtils,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             appCoroutineScope = testScope,
         )
@@ -70,57 +70,17 @@ class PirWebHandshakeMessageHandlerTest {
     }
 
     @Test
-    fun whenSignedInWithNoSubscriptionThenHandshakeReportsUnauthenticated() = runTest {
-        // A failed purchase leaves an account and a valid access token behind with no subscription.
-        // The run gate resolves that user to SCAN_ONLY, so the dashboard must render freemium too —
-        // otherwise the page offers removals the native side will refuse to run.
-        val jsMessage = createJsMessage("", PirDashboardWebMessages.HANDSHAKE)
-        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
-        whenever(mockSubscriptions.getCurrentEntitlements()).thenReturn(emptySet())
-        whenever(mockSubscriptions.isFreeTrialEligible()).thenReturn(false)
-
-        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
-
-        verifyHandshakeResponse(jsMessage, isAuthenticated = false, isEligibleForTrial = false)
-    }
-
-    @Test
-    fun whenSubscribedWithPirEntitlementThenHandshakeReportsAuthenticated() = runTest {
-        val jsMessage = createJsMessage("", PirDashboardWebMessages.HANDSHAKE)
-        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
-        whenever(mockSubscriptions.getCurrentEntitlements()).thenReturn(setOf(Entitlement("", Product.PIR.value)))
-        whenever(mockSubscriptions.isFreeTrialEligible()).thenReturn(false)
-
-        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
-
-        verifyHandshakeResponse(jsMessage, isAuthenticated = true, isEligibleForTrial = false)
-    }
-
-    @Test
-    fun whenSubscribedWithoutPirEntitlementThenHandshakeReportsUnauthenticated() = runTest {
-        val jsMessage = createJsMessage("", PirDashboardWebMessages.HANDSHAKE)
-        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
-        whenever(mockSubscriptions.getCurrentEntitlements()).thenReturn(emptySet())
-        whenever(mockSubscriptions.isFreeTrialEligible()).thenReturn(false)
-
-        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
-
-        verifyHandshakeResponse(jsMessage, isAuthenticated = false, isEligibleForTrial = false)
-    }
-
-    @Test
     fun whenProcessWithAuthenticatedUserEligibleForTrialThenSendsCorrectResponse() = runTest {
         // Given
         val jsMessage = createJsMessage("""""", PirDashboardWebMessages.HANDSHAKE)
-        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
-        whenever(mockSubscriptions.getCurrentEntitlements()).thenReturn(setOf(Entitlement("", Product.PIR.value)))
+        whenever(mockPirUserUtils.hasPirSubscription()).thenReturn(true)
         whenever(mockSubscriptions.isFreeTrialEligible()).thenReturn(true)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockSubscriptions).getSubscriptionStatus()
+        verify(mockPirUserUtils).hasPirSubscription()
         verify(mockSubscriptions).isFreeTrialEligible()
         verifyHandshakeResponse(jsMessage, isAuthenticated = true, isEligibleForTrial = true)
     }
@@ -129,15 +89,14 @@ class PirWebHandshakeMessageHandlerTest {
     fun whenProcessWithAuthenticatedUserNotEligibleForTrialThenSendsCorrectResponse() = runTest {
         // Given
         val jsMessage = createJsMessage("""""", PirDashboardWebMessages.HANDSHAKE)
-        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
-        whenever(mockSubscriptions.getCurrentEntitlements()).thenReturn(setOf(Entitlement("", Product.PIR.value)))
+        whenever(mockPirUserUtils.hasPirSubscription()).thenReturn(true)
         whenever(mockSubscriptions.isFreeTrialEligible()).thenReturn(false)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockSubscriptions).getSubscriptionStatus()
+        verify(mockPirUserUtils).hasPirSubscription()
         verify(mockSubscriptions).isFreeTrialEligible()
         verifyHandshakeResponse(jsMessage, isAuthenticated = true, isEligibleForTrial = false)
     }
@@ -146,15 +105,14 @@ class PirWebHandshakeMessageHandlerTest {
     fun whenProcessWithNonAuthenticatedUserEligibleForTrialThenSendsCorrectResponse() = runTest {
         // Given
         val jsMessage = createJsMessage("""""", PirDashboardWebMessages.HANDSHAKE)
-        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
-        whenever(mockSubscriptions.getCurrentEntitlements()).thenReturn(emptySet())
+        whenever(mockPirUserUtils.hasPirSubscription()).thenReturn(false)
         whenever(mockSubscriptions.isFreeTrialEligible()).thenReturn(true)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockSubscriptions).getSubscriptionStatus()
+        verify(mockPirUserUtils).hasPirSubscription()
         verify(mockSubscriptions).isFreeTrialEligible()
         verifyHandshakeResponse(jsMessage, isAuthenticated = false, isEligibleForTrial = true)
     }
@@ -163,15 +121,14 @@ class PirWebHandshakeMessageHandlerTest {
     fun whenProcessWithNonAuthenticatedUserNotEligibleForTrialThenSendsCorrectResponse() = runTest {
         // Given
         val jsMessage = createJsMessage("""""", PirDashboardWebMessages.HANDSHAKE)
-        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
-        whenever(mockSubscriptions.getCurrentEntitlements()).thenReturn(emptySet())
+        whenever(mockPirUserUtils.hasPirSubscription()).thenReturn(false)
         whenever(mockSubscriptions.isFreeTrialEligible()).thenReturn(false)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockSubscriptions).getSubscriptionStatus()
+        verify(mockPirUserUtils).hasPirSubscription()
         verify(mockSubscriptions).isFreeTrialEligible()
         verifyHandshakeResponse(jsMessage, isAuthenticated = false, isEligibleForTrial = false)
     }
