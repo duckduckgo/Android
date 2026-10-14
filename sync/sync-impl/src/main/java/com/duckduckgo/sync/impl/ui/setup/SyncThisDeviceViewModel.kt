@@ -26,12 +26,13 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.auth.AuthPrompt
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Request
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
+import com.duckduckgo.sync.impl.auth.SyncDeviceAuthenticator
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AnotherDevicePromptOption
+import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationSource
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -50,7 +51,7 @@ import logcat.logcat
 
 class SyncThisDeviceViewModel @AssistedInject constructor(
     @Assisted private val isAuthRequired: Boolean,
-    private val deviceAuthenticator: DeviceAuthenticator,
+    private val deviceAuthenticator: SyncDeviceAuthenticator,
     private val syncAccountRepository: SyncAccountRepository,
     private val syncPixels: SyncPixels,
     private val dispatchers: DispatcherProvider,
@@ -144,7 +145,7 @@ class SyncThisDeviceViewModel @AssistedInject constructor(
 
     private suspend fun authenticate(): Boolean {
         if (!isAuthRequired) return true
-        val response = deviceAuthenticator.authenticate(Request()) { event ->
+        val response = deviceAuthenticator.authenticate(AuthenticationSource.THIS_DEVICE, Request()) { event ->
             viewModelScope.launch {
                 when (event) {
                     Event.EnrollmentNeeded -> syncSetupWideEvent.onDeviceAuthNotEnrolled()

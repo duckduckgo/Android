@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.auth
 
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Request
@@ -24,8 +25,10 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationResult
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationSource
+import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface SyncDeviceAuthenticator {
     val currentPrompt: StateFlow<AuthPrompt?>
@@ -37,7 +40,8 @@ interface SyncDeviceAuthenticator {
     ): Response
 }
 
-class RealSyncDeviceAuthenticator(
+@ContributesBinding(AppScope::class)
+class RealSyncDeviceAuthenticator @Inject constructor(
     private val authenticator: DeviceAuthenticator,
     private val syncPixels: SyncPixels,
     private val syncFeature: SyncFeature,

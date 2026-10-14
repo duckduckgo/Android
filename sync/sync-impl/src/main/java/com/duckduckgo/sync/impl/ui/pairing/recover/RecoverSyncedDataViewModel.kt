@@ -20,10 +20,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.sync.impl.auth.AuthPrompt
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Request
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
+import com.duckduckgo.sync.impl.auth.SyncDeviceAuthenticator
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationSource
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -37,7 +38,7 @@ import logcat.logcat
 
 class RecoverSyncedDataViewModel @AssistedInject constructor(
     @Assisted private val isAuthRequired: Boolean,
-    private val deviceAuthenticator: DeviceAuthenticator,
+    private val deviceAuthenticator: SyncDeviceAuthenticator,
     private val syncPixels: SyncPixels,
 ) : ViewModel() {
     private val _commands = Channel<Command>()
@@ -55,7 +56,7 @@ class RecoverSyncedDataViewModel @AssistedInject constructor(
                 _commands.send(Command.ReadSyncCode)
                 return@launch
             }
-            when (val response = deviceAuthenticator.authenticate(Request())) {
+            when (val response = deviceAuthenticator.authenticate(AuthenticationSource.RECOVER, Request())) {
                 is Response.Allowed -> _commands.send(Command.ReadSyncCode)
                 is Response.Cancelled -> Unit
                 is Response.Failed -> {

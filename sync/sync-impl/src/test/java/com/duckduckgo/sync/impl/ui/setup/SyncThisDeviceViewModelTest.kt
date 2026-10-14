@@ -24,7 +24,7 @@ import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
-import com.duckduckgo.sync.impl.auth.FakeDeviceAuthenticator
+import com.duckduckgo.sync.impl.auth.FakeSyncDeviceAuthenticator
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AnotherDevicePromptOption
 import com.duckduckgo.sync.impl.ui.setup.SyncThisDeviceViewModel.Command.AbortSyncing
@@ -61,7 +61,7 @@ class SyncThisDeviceViewModelTest {
     private val syncAccountRepository = mock<SyncAccountRepository>()
     private val syncPixels = mock<SyncPixels>()
     private val syncSetupWideEvent = mock<SyncSetupWideEvent>()
-    private val deviceAuthenticator = FakeDeviceAuthenticator()
+    private val deviceAuthenticator = FakeSyncDeviceAuthenticator()
 
     private fun createTestee(isAuthRequired: Boolean = true) = SyncThisDeviceViewModel(
         isAuthRequired = isAuthRequired,

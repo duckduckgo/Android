@@ -19,7 +19,7 @@ package com.duckduckgo.sync.impl.ui.pairing.recover
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
-import com.duckduckgo.sync.impl.auth.FakeDeviceAuthenticator
+import com.duckduckgo.sync.impl.auth.FakeSyncDeviceAuthenticator
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.pairing.recover.RecoverSyncedDataViewModel.Command.ReadSyncCode
 import com.duckduckgo.sync.impl.ui.pairing.recover.RecoverSyncedDataViewModel.Command.ShowAuthError
@@ -36,7 +36,7 @@ class RecoverSyncedDataViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val deviceAuthenticator = FakeDeviceAuthenticator()
+    private val deviceAuthenticator = FakeSyncDeviceAuthenticator()
     private val syncPixels = mock<SyncPixels>()
 
     private fun createTestee(isAuthRequired: Boolean = true) = RecoverSyncedDataViewModel(
