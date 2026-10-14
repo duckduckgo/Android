@@ -34,6 +34,10 @@
     <string name="sync_simplified_edit_device_remove_dialog_title_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Remove %1$s from Sync&#160;&amp;&#160;Backup?</string>
     <string name="sync_simplified_edit_device_remove_dialog_body_v2" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” will no longer be able to access your synced data. Bookmarks, Autofill data and Duck.ai chats will remain on your devices.</string>
 
+    <!-- Edit Device screen: remove notice -->
+    <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” will no longer be able to access your synced data on other devices if this is turned off.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” will no longer be able to access your synced data on other devices.</string>
+
     <!-- Settings screen: turn off sheet -->
     <string name="sync_simplified_settings_turn_off_sheet_remove_title" instruction="Placeholder is a device name. e.g., Samsung S23">Remove %1$s from Sync&#160;&amp;&#160;Backup?</string>
     <string name="sync_simplified_settings_turn_off_sheet_remove_body" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” will no longer be able to access your synced data on other devices.</string>

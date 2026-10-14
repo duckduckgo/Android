@@ -410,6 +410,7 @@ class SyncActivity : DuckDuckGoActivity() {
                 editDeviceLauncher.launch(
                     EditDeviceContract.Input(
                         device = command.device,
+                        isImprovedSyncFlow = command.isImprovedSyncFlow,
                     ),
                 )
             }

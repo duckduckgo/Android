@@ -18,14 +18,11 @@ package com.duckduckgo.sync.impl.ui.devices
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.DeviceType
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.ui.devices.EditDeviceViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.devices.EditDeviceViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.devices.EditDeviceViewModel.Command.AskTurnOffSync
@@ -37,7 +34,6 @@ import com.duckduckgo.sync.impl.ui.devices.EditDeviceViewModel.Command.SetSyncTu
 import com.duckduckgo.sync.impl.ui.devices.EditDeviceViewModel.Command.ShowError
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -61,13 +57,10 @@ class EditDeviceViewModelTest {
 
     private val syncAccountRepository = mock<SyncAccountRepository>()
 
-    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java, ioDispatcher = coroutineTestRule.testDispatcher)
-
     private fun createTestee() = EditDeviceViewModel(
         device = device,
         syncAccountRepository = syncAccountRepository,
         dispatchers = coroutineTestRule.testDispatcherProvider,
-        syncFeature = syncFeature,
     )
 
     @Test
@@ -79,36 +72,6 @@ class EditDeviceViewModelTest {
 
             cancel()
         }
-    }
-
-    @Test
-    fun `when the improved sync flow is enabled then the view state reflects it`() = runTest {
-        syncFeature.canUseImprovedSyncFlow().setRawStoredState(State(enable = true))
-
-        val testee = createTestee()
-
-        assertTrue(testee.viewState.value.isImprovedSyncEnabled)
-    }
-
-    @Test
-    fun `when the improved sync flow is disabled then the view state reflects it`() = runTest {
-        syncFeature.canUseImprovedSyncFlow().setRawStoredState(State(enable = false))
-
-        val testee = createTestee()
-
-        assertFalse(testee.viewState.value.isImprovedSyncEnabled)
-    }
-
-    @Test
-    fun `when the device is renamed then the improved sync flag is preserved`() = runTest {
-        syncFeature.canUseImprovedSyncFlow().setRawStoredState(State(enable = true))
-        whenever(syncAccountRepository.renameDevice(any())).thenReturn(Result.Success(true))
-
-        val testee = createTestee()
-
-        testee.confirmNewDeviceName("New Device Name")
-
-        assertTrue(testee.viewState.value.isImprovedSyncEnabled)
     }
 
     @Test

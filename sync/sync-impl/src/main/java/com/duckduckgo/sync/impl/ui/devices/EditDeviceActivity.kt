@@ -85,6 +85,8 @@ class EditDeviceActivity : DuckDuckGoActivity() {
 
     private val currentDevice get() = viewModel.viewState.value.device
 
+    private val isImprovedSyncFlow get() = intent.getBooleanExtra(IS_IMPROVED_SYNC_FLOW_EXTRA_KEY, false)
+
     private val turnOffSyncListener = OnCheckedChangeListener { _, isChecked ->
         if (!isChecked) viewModel.onTurnOffSync()
     }
@@ -139,13 +141,23 @@ class EditDeviceActivity : DuckDuckGoActivity() {
         binding.editThisDeviceNameDivider.isVisible = viewState.device.thisDevice
         binding.syncThisDeviceToggle.isVisible = viewState.device.thisDevice
 
-        binding.removeNoticeLabel.setText(
-            if (viewState.device.thisDevice) {
-                R.string.sync_simplified_edit_device_remove_notice_this_device
-            } else {
-                R.string.sync_simplified_edit_device_remove_notice_another_device
-            },
-        )
+        binding.removeNoticeLabel.text = when {
+            isImprovedSyncFlow && viewState.device.thisDevice -> {
+                getString(R.string.sync_simplified_edit_device_remove_notice_this_device_v2, viewState.device.deviceName)
+            }
+
+            isImprovedSyncFlow -> {
+                getString(R.string.sync_simplified_edit_device_remove_notice_another_device_v2, viewState.device.deviceName)
+            }
+
+            viewState.device.thisDevice -> {
+                getString(R.string.sync_simplified_edit_device_remove_notice_this_device)
+            }
+
+            else -> {
+                getString(R.string.sync_simplified_edit_device_remove_notice_another_device)
+            }
+        }
     }
 
     private fun processCommand(command: Command) {
@@ -213,7 +225,7 @@ class EditDeviceActivity : DuckDuckGoActivity() {
                 viewModel.onRemoveDeviceConfirmed()
             }
         }
-        if (viewModel.viewState.value.isImprovedSyncEnabled) {
+        if (isImprovedSyncFlow) {
             askRemoveDeviceForImprovedUi(listener)
         } else {
             TextAlertDialogBuilder(this)
@@ -241,7 +253,7 @@ class EditDeviceActivity : DuckDuckGoActivity() {
                 viewModel.onTurnOffSyncCanceled()
             }
         }
-        if (viewModel.viewState.value.isImprovedSyncEnabled) {
+        if (isImprovedSyncFlow) {
             askRemoveDeviceForImprovedUi(listener)
         } else {
             TextAlertDialogBuilder(this)
@@ -303,11 +315,17 @@ class EditDeviceActivity : DuckDuckGoActivity() {
     }
 
     companion object {
+        private const val IS_IMPROVED_SYNC_FLOW_EXTRA_KEY = "is_improved_sync_flow"
+
         fun intent(
             context: Context,
             device: ParcelableDevice,
+            isImprovedSyncFlow: Boolean,
         ): Intent {
-            return Intent(context, EditDeviceActivity::class.java).putExtra(DEVICE_EXTRA_KEY, device)
+            return Intent(context, EditDeviceActivity::class.java).apply {
+                putExtra(DEVICE_EXTRA_KEY, device)
+                putExtra(IS_IMPROVED_SYNC_FLOW_EXTRA_KEY, isImprovedSyncFlow)
+            }
         }
     }
 }
