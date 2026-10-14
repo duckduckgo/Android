@@ -74,6 +74,8 @@ interface BrokerStepsParser {
         data class ScanStep(
             override val broker: Broker,
             override val step: ScanStepActions,
+            // The parser has no run context; PirScan sets the run's tier when it queues the step.
+            val isFreeScan: Boolean = false,
         ) : BrokerStep(broker, step)
 
         data class OptOutStep(
