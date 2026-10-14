@@ -265,7 +265,6 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
-import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.AutoconsentResult
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
@@ -511,8 +510,6 @@ class BrowserTabViewModelTest {
     private val mockAutoCompleteService: AutoCompleteService = mock()
 
     private val mockAutoCompleteScorer: AutoCompleteScorer = mock()
-
-    private val mockWidgetCapabilities: WidgetCapabilities = mock()
 
     private val mockSubscriptionPromoModalDecider: SubscriptionPromoModalDecider = mock()
 
@@ -1210,8 +1207,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenViewBecomesVisibleAndHomeShowingThenKeyboardShown() =
         runTest {
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
-
             setBrowserShowing(false)
 
             testee.onViewVisible()
@@ -1223,7 +1218,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenViewBecomesVisibleAndMaliciousSiteBlockedThenKeyboardNotShown() =
         runTest {
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             testee.browserViewState.value = browserViewState().copy(maliciousSiteBlocked = true)
 
             testee.onViewVisible()
@@ -1234,7 +1228,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenOmnibarTypeSplitThenThenKeyboardShownOnlyTheFirstTimeNtpIsVisible() =
         runTest {
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             testee.browserViewState.value = browserViewState().copy(browserShowing = false)
             whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SPLIT)
 
@@ -1251,7 +1244,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenOmnibarTypeNotSplitThenThenKeyboardNotHiddenWhenOpenedMultipleTimes() =
         runTest {
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             testee.browserViewState.value = browserViewState().copy(browserShowing = false)
             whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
 
@@ -1267,7 +1259,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenViewBecomesVisibleAndDuckAIPoCIsEnabledThenKeyboardNotShown() =
         runTest {
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(MutableStateFlow(true))
 
             testee.onViewVisible()
@@ -1278,7 +1269,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenViewBecomesVisibleAndInputModeTargetArmedThenTargetDoesNotForceKeyboardOverInputScreen() =
         runTest {
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(MutableStateFlow(true))
             testee.loadData("abc", null, false, false, InputMode.SEARCH)
 
@@ -1301,7 +1291,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenViewBecomesVisibleAndInputModeTargetNotArmedThenConsumeReturnsNull() =
         runTest {
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             testee.loadData("abc", null, false, false)
 
             testee.onViewVisible()
@@ -4027,10 +4016,9 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenCtaRefreshedAndOnlyStandardAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() =
+    fun whenCtaRefreshedWithoutActiveOnboardingThenCtaIsNull() =
         runTest {
-            whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+            whenever(mockUserStageStore.getUserAppStage()).thenReturn(ESTABLISHED)
             testee.refreshCta()
             assertNull(testee.ctaViewState.value!!.cta)
         }
@@ -4039,8 +4027,6 @@ class BrowserTabViewModelTest {
     fun whenCtaRefreshedAndIsNewTabIsFalseThenReturnNull() =
         runTest {
             setBrowserShowing(true)
-            whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
             testee.refreshCta()
             assertNull(testee.ctaViewState.value!!.cta)
         }
@@ -4048,8 +4034,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenCtaRefreshedAndOnboardingCompleteThenViewStateUpdated() =
         runTest {
-            whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
             whenever(mockDismissedCtaDao.exists(DAX_DIALOG_TRACKERS_FOUND)).thenReturn(true)
             testee.refreshCta()
@@ -4062,8 +4046,6 @@ class BrowserTabViewModelTest {
     fun whenCtaRefreshedAndBrowserShowingThenViewStateUpdated() =
         runTest {
             setBrowserShowing(true)
-            whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
             whenever(mockDismissedCtaDao.exists(DAX_DIALOG_NETWORK)).thenReturn(true)
             testee.refreshCta()
@@ -4090,8 +4072,6 @@ class BrowserTabViewModelTest {
     fun whenCtaRefreshedGetUserRefreshesCalled() =
         runTest {
             setBrowserShowing(true)
-            whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             val expectedRefreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
             whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(expectedRefreshPatterns)
             testee.refreshCta()
