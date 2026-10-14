@@ -283,25 +283,25 @@
         ]
     },
     "m_dbp_engagement_dau": {
-        "description": "Pixel for PIR daily active users.",
+        "description": "Pixel for PIR daily active users. Fired by the periodic PIR stats worker, at most once per calendar day, for a user who can run PIR (paid or free) and has a profile saved.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["scheduled"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_engagement_wau": {
-        "description": "Pixel for PIR weekly active users.",
+        "description": "Pixel for PIR weekly active users. Fired by the periodic PIR stats worker, at most once every 7 calendar days, for a user who can run PIR (paid or free) and has a profile saved.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["scheduled"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_engagement_mau": {
-        "description": "Pixel for PIR monthly active users.",
+        "description": "Pixel for PIR monthly active users. Fired by the periodic PIR stats worker, at most once every 28 calendar days, for a user who can run PIR (paid or free) and has a profile saved.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["scheduled"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_interaction_dau": {
         "description": "Pixel for PIR user-interacted daily active users. Fired when the PIR dashboard is presented to the user.",

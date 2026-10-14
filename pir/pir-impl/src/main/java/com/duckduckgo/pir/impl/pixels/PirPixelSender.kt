@@ -439,18 +439,24 @@ interface PirPixelSender {
 
     /**
      * Emits a pixel to report Daily Active Users for PIR.
+     *
+     * @param isAuthenticated whether the user holds an active subscription that includes PIR, see [com.duckduckgo.pir.impl.PirUserUtils.hasPirSubscription]
      */
-    fun reportDAU()
+    fun reportDAU(isAuthenticated: Boolean)
 
     /**
      * Emits a pixel to report Weekly Active Users for PIR.
+     *
+     * @param isAuthenticated whether the user holds an active subscription that includes PIR, see [com.duckduckgo.pir.impl.PirUserUtils.hasPirSubscription]
      */
-    fun reportWAU()
+    fun reportWAU(isAuthenticated: Boolean)
 
     /**
      * Emits a pixel to report Monthly Active Users for PIR.
+     *
+     * @param isAuthenticated whether the user holds an active subscription that includes PIR, see [com.duckduckgo.pir.impl.PirUserUtils.hasPirSubscription]
      */
-    fun reportMAU()
+    fun reportMAU(isAuthenticated: Boolean)
 
     /**
      * Emits a pixel to report user-interacted Daily Active Users for PIR (the PIR dashboard was presented).
@@ -1098,32 +1104,32 @@ class RealPirPixelSender @Inject constructor(
         enqueueFire(PIR_CAN_RUN_PIR)
     }
 
-    override fun reportDAU() {
-        enqueueFire(PIR_ENGAGEMENT_DAU)
+    override fun reportDAU(isAuthenticated: Boolean) {
+        enqueueFire(PIR_ENGAGEMENT_DAU, usageParams(isAuthenticated))
     }
 
-    override fun reportWAU() {
-        enqueueFire(PIR_ENGAGEMENT_WAU)
+    override fun reportWAU(isAuthenticated: Boolean) {
+        enqueueFire(PIR_ENGAGEMENT_WAU, usageParams(isAuthenticated))
     }
 
-    override fun reportMAU() {
-        enqueueFire(PIR_ENGAGEMENT_MAU)
+    override fun reportMAU(isAuthenticated: Boolean) {
+        enqueueFire(PIR_ENGAGEMENT_MAU, usageParams(isAuthenticated))
     }
 
     override fun reportInteractionDAU() {
-        enqueueFire(PIR_INTERACTION_DAU, usageParams())
+        enqueueFire(PIR_INTERACTION_DAU, usageParams(isAuthenticated = true))
     }
 
     override fun reportInteractionWAU() {
-        enqueueFire(PIR_INTERACTION_WAU, usageParams())
+        enqueueFire(PIR_INTERACTION_WAU, usageParams(isAuthenticated = true))
     }
 
     override fun reportInteractionMAU() {
-        enqueueFire(PIR_INTERACTION_MAU, usageParams())
+        enqueueFire(PIR_INTERACTION_MAU, usageParams(isAuthenticated = true))
     }
 
     override fun reportFirstScanStarted() {
-        enqueueFire(PIR_FIRST_SCAN_STARTED, usageParams())
+        enqueueFire(PIR_FIRST_SCAN_STARTED, usageParams(isAuthenticated = true))
     }
 
     override fun reportWeeklyChildOrphanedOptOuts(
@@ -1699,10 +1705,9 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_NOTIFICATION_SENT_FIRST_SCAN_COMPLETE)
     }
 
-    private fun usageParams(): Map<String, String> = mapOf(
-        // hardcoded values for now until we support freemium
-        PARAM_KEY_IS_AUTHENTICATED to "true",
-        PARAM_KEY_FREE_SCAN to "false",
+    private fun usageParams(isAuthenticated: Boolean): Map<String, String> = mapOf(
+        PARAM_KEY_IS_AUTHENTICATED to isAuthenticated.toString(),
+        PARAM_KEY_FREE_SCAN to (!isAuthenticated).toString(),
     )
 
     private fun fire(
