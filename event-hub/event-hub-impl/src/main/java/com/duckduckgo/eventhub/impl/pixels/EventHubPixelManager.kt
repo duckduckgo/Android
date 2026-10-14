@@ -34,7 +34,6 @@ import logcat.LogPriority.DEBUG
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import org.json.JSONObject
-import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 interface EventHubPixelManager {
@@ -75,8 +74,7 @@ class RealEventHubPixelManager @Inject constructor(
 
     private var cachedTelemetryConfigs: List<TelemetryPixelConfig>? = null
 
-    private val dedupSeen = ConcurrentHashMap<String, MutableSet<String>>()
-    private val webViewCurrentUrl = ConcurrentHashMap<String, String>()
+    private val deduplicator = WebEventDeduplicator()
     private val schedulerJob = ConflatedJob()
 
     @Volatile
@@ -111,11 +109,8 @@ class RealEventHubPixelManager @Inject constructor(
 
     override fun onNavigationStarted(webViewId: String, url: String) {
         if (!isEnabled()) return
-        if (webViewId.isEmpty() || url.isEmpty()) return
-        val previousUrl = webViewCurrentUrl.put(webViewId, url)
-        if (previousUrl != null && previousUrl != url) {
-            logcat(VERBOSE) { "EventHub: navigation detected for tab $webViewId ($previousUrl -> $url), clearing dedup" }
-            dedupSeen.remove(webViewId)
+        if (deduplicator.onNavigation(webViewId, url)) {
+            logcat(VERBOSE) { "EventHub: tab $webViewId navigated to a different URL, clearing dedup" }
         }
     }
 
@@ -124,6 +119,12 @@ class RealEventHubPixelManager @Inject constructor(
         if (eventType.isEmpty()) return
 
         if (!isEnabled()) return
+
+        // Decided as the event arrives, so it is checked against the page its tab is on at that moment
+        if (!deduplicator.isFirstOccurrence(eventType, data.opt("data"), webViewId)) {
+            logcat(VERBOSE) { "EventHub: dropping duplicate $eventType on tab $webViewId" }
+            return
+        }
 
         appCoroutineScope.launch(pixelDispatcher) {
             val nowMillis = timeProvider.currentTimeMillis()
@@ -138,7 +139,6 @@ class RealEventHubPixelManager @Inject constructor(
                     if (paramConfig.isCounter && paramConfig.source == eventType) {
                         val paramState = updatedParams[paramName] ?: ParamState(0)
                         if (paramState.stopCounting) continue
-                        if (isDuplicateEvent(pixelState.pixelName, paramName, eventType, webViewId)) continue
 
                         changed = true
                         if (BucketCounter.shouldStopCounting(paramState.value, paramConfig.buckets)) {
@@ -158,17 +158,6 @@ class RealEventHubPixelManager @Inject constructor(
                 }
             }
         }
-    }
-
-    private fun isDuplicateEvent(pixelName: String, paramName: String, source: String, webViewId: String): Boolean {
-        if (webViewId.isEmpty()) return false
-        val key = "$pixelName:$paramName:$source"
-        val perTab = dedupSeen.computeIfAbsent(webViewId) { ConcurrentHashMap.newKeySet() }
-        if (!perTab.add(key)) {
-            logcat(VERBOSE) { "EventHub: dedup $key:$webViewId (already seen on current page)" }
-            return true
-        }
-        return false
     }
 
     private fun processPixelStates(): Long {
@@ -209,8 +198,7 @@ class RealEventHubPixelManager @Inject constructor(
                 logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
                 schedulerJob.cancel()
                 repository.deleteAllPixelStates()
-                dedupSeen.clear()
-                webViewCurrentUrl.clear()
+                deduplicator.clear()
                 return@launch
             }
 
