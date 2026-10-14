@@ -2238,7 +2238,7 @@
     "wide_pir-initial-scan": {
         "description": "Wide event tracking the lifecycle of a manually-triggered PIR run (initial scan or post-profile-edit), covering scan progress in 10% increments, scan completion, and the follow-on opt-out scheduling phase. Used to measure end-to-end success rate, drop-off, and per-phase latency.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "widePixelPlatform",
@@ -2344,6 +2344,11 @@
                 "key": "feature.data.ext.tracker_blocking_state",
                 "description": "Whether tracker blocking was enabled or disabled during the run",
                 "enum": ["enabled", "disabled"]
+            },
+            {
+                "key": "feature.data.ext.free_scan",
+                "description": "Whether the run was a free (freemium) scan: scan-only mode for a user without a PIR subscription. Absent on runs cancelled before they started.",
+                "enum": ["true", "false"]
             },
             {
                 "key": "feature.data.ext.last_step",
@@ -2570,7 +2575,7 @@
     "wide_pir-scheduled-scan": {
         "description": "Wide event tracking the lifecycle of a scheduled (background, WorkManager-triggered) PIR run, covering scan progress in 10% increments, scan completion, and the follow-on opt-out scheduling phase. Sampled client-side at 20% (hardcoded in PirScanWideEventImpl.SCHEDULED_SCAN_SAMPLE_RATE) to keep pixel volume manageable.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "widePixelPlatform",
@@ -2676,6 +2681,11 @@
                 "key": "feature.data.ext.tracker_blocking_state",
                 "description": "Whether tracker blocking was enabled or disabled during the run",
                 "enum": ["enabled", "disabled"]
+            },
+            {
+                "key": "feature.data.ext.free_scan",
+                "description": "Whether the run was a free (freemium) scan: scan-only mode for a user without a PIR subscription. Absent on runs cancelled before they started.",
+                "enum": ["true", "false"]
             },
             {
                 "key": "feature.data.ext.last_step",

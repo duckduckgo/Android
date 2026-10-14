@@ -201,6 +201,7 @@ class RealPirJobsRunner @Inject constructor(
             batteryOptimizationsEnabled = batteryOptimizationsEnabled,
             notificationsPermissionGranted = notificationsPermissionGranted,
             isTrackerBlockingEnabled = isTrackerBlockingEnabled,
+            isFreeScan = isFreeScan,
         )
 
         pirInitialScanCompletionWideEvent.onRunStarted(

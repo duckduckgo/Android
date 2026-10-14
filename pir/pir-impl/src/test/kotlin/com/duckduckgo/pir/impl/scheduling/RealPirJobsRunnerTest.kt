@@ -476,6 +476,7 @@ class RealPirJobsRunnerTest {
             batteryOptimizationsEnabled = any(),
             notificationsPermissionGranted = any(),
             isTrackerBlockingEnabled = any(),
+            isFreeScan = any(),
         )
         verify(mockPirInitialScanCompletionWideEvent).onRunStarted(
             executionType = eq(MANUAL_INITIAL_RESUME),
@@ -1425,6 +1426,7 @@ class RealPirJobsRunnerTest {
             batteryOptimizationsEnabled = false,
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
+            isFreeScan = false,
         )
         verify(mockPirScanWideEvent).onScanCompleted(any())
         verify(mockPirScanWideEvent).onOptOutStarted(any())
@@ -1465,6 +1467,7 @@ class RealPirJobsRunnerTest {
             batteryOptimizationsEnabled = false,
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
+            isFreeScan = false,
         )
         verify(mockPirScanWideEvent).onScanCompleted(any())
         verify(mockPirScanWideEvent).onOptOutSkipped(any())
@@ -1514,6 +1517,7 @@ class RealPirJobsRunnerTest {
             batteryOptimizationsEnabled = false,
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
+            isFreeScan = false,
         )
         verify(mockPirScanWideEvent).onScanCompleted(SCHEDULED)
         verify(mockPirScanWideEvent).onOptOutSkipped(SCHEDULED)
@@ -1544,6 +1548,7 @@ class RealPirJobsRunnerTest {
             batteryOptimizationsEnabled = false,
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
+            isFreeScan = false,
         )
         verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.NO_ACTIVE_BROKERS), anyOrNull())
         verify(mockPirScanWideEvent, never()).onScanCompleted(any())
@@ -1594,6 +1599,7 @@ class RealPirJobsRunnerTest {
             batteryOptimizationsEnabled = false,
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
+            isFreeScan = false,
         )
         verify(mockPirScanWideEvent).onRunCancelled(any(), any())
         verify(mockPirScanWideEvent, never()).onScanCompleted(any())
@@ -1643,6 +1649,7 @@ class RealPirJobsRunnerTest {
             batteryOptimizationsEnabled = false,
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
+            isFreeScan = false,
         )
         verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.ILLEGAL_STATE_EXCEPTION), anyOrNull())
         verify(mockPirScanWideEvent, never()).onScanCompleted(any())
@@ -2029,6 +2036,30 @@ class RealPirJobsRunnerTest {
     }
 
     @Test
+    fun whenScanOnlyRunStartsThenWideEventIsFreeScan() = runTest {
+        givenAScanRunWithUngatedBrokers("Fresh")
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(ScanJobRecord(brokerName = "Fresh", userProfileId = testProfileQuery.id)),
+        )
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPirScanWideEvent).onRunStarted(
+            executionType = any(),
+            profileQueriesCount = any(),
+            brokerCount = any(),
+            totalScanJobs = any(),
+            webViewCount = any(),
+            isPowerSavingEnabled = any(),
+            isVpnConnected = any(),
+            batteryOptimizationsEnabled = any(),
+            notificationsPermissionGranted = any(),
+            isTrackerBlockingEnabled = any(),
+            isFreeScan = eq(true),
+        )
+    }
+
+    @Test
     fun whenScanOnlyInitialScanCompletesThenDurationPixelReportsFreeScan() = runTest {
         givenAScanRunWithUngatedBrokers("Fresh")
         whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
@@ -2105,6 +2136,7 @@ class RealPirJobsRunnerTest {
             batteryOptimizationsEnabled = any(),
             notificationsPermissionGranted = any(),
             isTrackerBlockingEnabled = any(),
+            isFreeScan = any(),
         )
         verify(mockPirScanWideEvent).onOptOutSkipped(MANUAL_INITIAL)
     }

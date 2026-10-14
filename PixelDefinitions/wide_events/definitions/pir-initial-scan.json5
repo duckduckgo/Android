@@ -4,7 +4,7 @@
         "owners": ["karlenDimla", "landomen"],
         "meta": {
             "type": "android-pir-initial-scan",
-            "version": "0.0"
+            "version": "0.1"
         },
         "feature": {
             "name": "pir-initial-scan",
@@ -70,6 +70,11 @@
                         "type": "string",
                         "description": "Whether tracker blocking was enabled or disabled during the run",
                         "enum": ["enabled", "disabled"]
+                    },
+                    "free_scan": {
+                        "type": "string",
+                        "description": "Whether the run was a free (freemium) scan: scan-only mode for a user without a PIR subscription. Absent on runs cancelled before they started.",
+                        "enum": ["true", "false"]
                     },
                     "last_step": {
                         "type": "string",
