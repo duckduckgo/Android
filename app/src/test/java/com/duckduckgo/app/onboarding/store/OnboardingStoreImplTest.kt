@@ -92,12 +92,12 @@ class OnboardingStoreImplTest {
     }
 
     @Test
-    fun `when tried Duck.ai not set then getTriedDuckAi returns false`() {
+    fun `when tried DuckAi not set then getTriedDuckAi returns false`() {
         assertFalse(testee.getTriedDuckAi())
     }
 
     @Test
-    fun `when tried Duck.ai set then getTriedDuckAi returns true`() {
+    fun `when tried DuckAi set then getTriedDuckAi returns true`() {
         testee.setTriedDuckAi()
 
         assertTrue(testee.getTriedDuckAi())
