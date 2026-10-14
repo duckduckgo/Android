@@ -357,6 +357,129 @@ class PageLoadTimeoutWatchdogTest {
     }
 
     @Test
+    fun whenPageIsVisibleThenSamePageRequestDoesNotArm() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFirstContentVisible(URL)
+        advanceToSeconds(5)
+
+        watchdog.onMainFrameRequest(URL)
+
+        advanceToSeconds(60)
+        assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
+    fun whenPageIsFinishedThenSamePageRequestWithTrailingSlashDoesNotArm() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+
+        watchdog.onMainFrameRequest("$URL/")
+        watchdog.onMainFrameRequest(URL.trimEnd('/'))
+
+        advanceToSeconds(60)
+        assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
+    fun whenUserInitiatedLoadAnnouncedThenSamePageRequestArms() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+
+        watchdog.onUserInitiatedLoad()
+        watchdog.onMainFrameRequest(URL)
+
+        advanceToMs(45_000)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenUserInitiatedLoadIsConsumedThenLaterSamePageRequestDoesNotArm() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+        watchdog.onUserInitiatedLoad()
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+
+        watchdog.onMainFrameRequest(URL)
+
+        advanceToSeconds(60)
+        assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
+    fun whenPageIsLoadedThenDifferentUrlRequestArms() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+
+        watchdog.onMainFrameRequest("https://other.example.com/")
+
+        advanceToMs(45_000)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenLoadedPageIsLeftForAnotherThenReturnsToItWatchdogArms() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+        watchdog.onMainFrameRequest("https://other.example.com/")
+        watchdog.onEngineError()
+
+        watchdog.onMainFrameRequest(URL)
+
+        advanceToMs(45_000)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenSamePageRequestRepeatsBeforeAnyContentThenClockRestarts() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        advanceToSeconds(10)
+        watchdog.onMainFrameRequest(URL)
+
+        advanceToMs(54_999)
+        assertTrue(timeouts.isEmpty())
+        advanceToMs(55_000)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenPageIsLoadedThenSamePageCommitDoesNotArm() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onCommitted(URL)
+
+        advanceToSeconds(120)
+        assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
+    fun whenUserInitiatedLoadIsServedWithoutRequestThenCommitArms() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+
+        watchdog.onUserInitiatedLoad()
+        watchdog.onCommitted(URL)
+
+        advanceToMs(45_000)
+        assertEquals(listOf(TimedOut(COMMITTED_NO_CONTENT)), timeouts)
+    }
+
+    @Test
+    fun whenUserInitiatedLoadIsServedWithoutRequestThenContentVisibleDisarms() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+
+        watchdog.onUserInitiatedLoad()
+        watchdog.onCommitted(URL)
+        watchdog.onFirstContentVisible(URL)
+
+        advanceToMs(120_000)
+        assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
     fun whenNothingIsArmedThenCommitArmsAsFallback() = watchdogTest { watchdog ->
         advanceToSeconds(10)
         watchdog.onCommitted(URL)

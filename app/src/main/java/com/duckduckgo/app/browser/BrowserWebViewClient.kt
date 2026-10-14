@@ -282,6 +282,8 @@ class BrowserWebViewClient @Inject constructor(
         return overridden
     }
 
+    fun onUserInitiatedLoad() = pageLoadTimeoutWatchdog.onUserInitiatedLoad()
+
     fun destroy() {
         pageLoadTimeoutWatchdog.onNavigatedAway()
         pageLoadTimeoutsJob.cancel()

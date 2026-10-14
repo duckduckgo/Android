@@ -2255,6 +2255,13 @@ class BrowserWebViewClientTest {
     }
 
     @Test
+    fun whenUserInitiatedLoadThenWatchdogIsTold() {
+        testee.onUserInitiatedLoad()
+
+        verify(mockPageLoadTimeoutWatchdog).onUserInitiatedLoad()
+    }
+
+    @Test
     fun whenOnPageStartedCalledThenWatchdogIsToldTheNavigationCommitted() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
 
