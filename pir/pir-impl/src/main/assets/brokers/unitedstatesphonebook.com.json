@@ -1,0 +1,149 @@
+{
+  "name": "United States Phone Book",
+  "url": "unitedstatesphonebook.com",
+  "version": "0.1.2",
+  "addedDatetime": 1758585600000,
+  "optOutUrl": "https://www.unitedstatesphonebook.com/search.php",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "d26cada7-9968-4285-a909-ed95bbfbdff0",
+          "url": "https://www.unitedstatesphonebook.com/search.php?first=${firstName}&last=${lastName}&city=${city}&state=${state}"
+        },
+        {
+          "_comment": "guard on the results row shape or the explicit no-results banner, not something present on every page state",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//tr[td/form[@action='delete.php']] | //*[contains(., 'no match in our free White Pages database')]"
+            }
+          ],
+          "id": "e8c357ec-45c9-4f98-bd83-f54364554c78"
+        },
+        {
+          "actionType": "extract",
+          "id": "19aac632-53c7-487a-97c9-4925cf53728b",
+          "selector": "//tr[td/form[@action='delete.php']]",
+          "noResultsSelector": "//*[contains(., 'no match in our free White Pages database')]",
+          "profile": {
+            "name": {
+              "selector": ".//td[1]"
+            },
+            "addressFull": {
+              "selector": ".//td[2]"
+            },
+            "phone": {
+              "selector": ".//td[3]"
+            },
+            "profileUrl": {
+              "identifierType": "hash"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "35751f3d-27db-49c9-8242-5a31d848f9e8",
+          "url": "https://www.unitedstatesphonebook.com/search.php?first=${firstName}&last=${lastName}&city=${city}&state=${state}"
+        },
+        {
+          "_comment": "guard on the results row shape or the explicit no-results banner, not something present on every page state",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//tr[td/form[@action='delete.php']] | //*[contains(., 'no match in our free White Pages database')]"
+            }
+          ],
+          "id": "89d44195-02d5-4a91-8bfc-10bb49d86be8"
+        },
+        {
+          "_comment": "dismiss Google Funding Choices consent dialog if present",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//button[contains(@class,'fc-cta-do-not-consent')]",
+              "failSilently": true
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "click",
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//button[contains(@class,'fc-cta-do-not-consent')]",
+                  "failSilently": true
+                }
+              ],
+              "id": "b1c2d3e4-5f6a-4b7c-8d9e-0f1a2b3c4d5e"
+            }
+          ],
+          "id": "a0b1c2d3-4e5f-4a6b-8c7d-9e0f1a2b3c4d"
+        },
+        {
+          "_comment": "executeScript is a separate JS world; inject a <script> tag so window.confirm override runs in the page's world",
+          "actionType": "executeScript",
+          "script": "var s = root.createElement('script'); s.textContent = \"window.confirm = function () { return true; };\"; (root.head || root.documentElement).appendChild(s); s.remove();",
+          "id": "6a1e2f3d-8b4c-4a5e-9d6f-7c2b1a3e4f5d"
+        },
+        {
+          "_comment": "the site's own 'Remove Listing' button submits delete.php directly from the results row, no separate opt-out page or confirmation email",
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//form[@action='delete.php']//input[@type='submit']",
+              "parent": {
+                "profileMatch": {
+                  "selector": "//tr[td/form[@action='delete.php']]",
+                  "profile": {
+                    "name": {
+                      "selector": ".//td[1]"
+                    },
+                    "addressFull": {
+                      "selector": ".//td[2]"
+                    },
+                    "phone": {
+                      "selector": ".//td[3]"
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "id": "1fd23311-fcb9-45fc-9456-6d510fc8f342"
+        },
+        {
+          "_comment": "delete.php replies with one of two banners: a fresh submission, or one already queued from an earlier request for the same number",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//*[contains(., 'Removal request has been recorded') or contains(., 'Request already in queue')]"
+            }
+          ],
+          "id": "cf7b6a1e-3a2b-4b1e-9b9a-6f1a4e6b2a11"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

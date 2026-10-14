@@ -18,27 +18,13 @@ package com.duckduckgo.duckchat.impl.terms
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiTermsConsent
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import javax.inject.Inject
-
-/**
- * Sending a prompt from the native input is how the user accepts the Duck.ai terms. Every place that builds a prompt
- * for the page goes through here, so the page is told and native storage is updated whichever surface was used.
- */
-interface DuckAiTermsConsent {
-    /**
-     * When native ToS consent is on, marks [params] as carrying the user's acceptance and records it in native storage.
-     * Does nothing otherwise, which leaves the payload exactly as it was.
-     */
-    fun carry(
-        params: JSONObject,
-        browserMode: BrowserMode,
-    )
-}
 
 @ContributesBinding(AppScope::class)
 class RealDuckAiTermsConsent @Inject constructor(

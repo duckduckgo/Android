@@ -22,6 +22,7 @@ import android.text.Spanned
 import android.text.style.ClickableSpan
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -41,6 +42,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -155,12 +157,31 @@ class TermsFooterPluginTest {
     }
 
     @Test
-    fun whenFooterIsCreatedThenItHasTheSamePaddingOnEverySide() {
+    fun whenFooterIsCreatedThenItUsesTheDesignPaddings() {
         val footer = testee.createFooter(context, hostContext, FakeNativeInputFooterHost())
         val row = (footer.view as ViewGroup).getChildAt(0)
 
-        val padding = context.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_4)
-        assertEquals(listOf(padding, padding, padding, padding), listOf(row.paddingStart, row.paddingTop, row.paddingEnd, row.paddingBottom))
+        val horizontal = context.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_4)
+        val vertical = context.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
+        assertEquals(listOf(horizontal, vertical, horizontal, vertical), listOf(row.paddingStart, row.paddingTop, row.paddingEnd, row.paddingBottom))
+        assertEquals(context.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_7), row.minimumHeight)
+    }
+
+    @Test
+    fun whenFooterIsCreatedThenTheShieldIsNotTinted() {
+        val footer = testee.createFooter(context, hostContext, FakeNativeInputFooterHost())
+        val icon = (footer.view as ViewGroup).findViewById<ImageView>(R.id.termsFooterIcon)
+
+        assertNull(icon.imageTintList)
+    }
+
+    @Test
+    fun whenFooterIsCreatedThenItShowsTheShieldIconBeforeTheMessage() {
+        val footer = testee.createFooter(context, hostContext, FakeNativeInputFooterHost())
+        val row = (footer.view as ViewGroup).getChildAt(0) as ViewGroup
+
+        assertEquals(R.id.termsFooterIcon, row.getChildAt(0).id)
+        assertEquals(R.id.termsFooterMessage, row.getChildAt(1).id)
     }
 
     @Test

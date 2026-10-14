@@ -1,7 +1,7 @@
 {
   "name": "Nuwber",
   "url": "nuwber.com",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "optOutUrl": "https://nuwber.com/removal/link",
   "steps": [
     {
@@ -210,6 +210,6 @@
     "maintenanceScan": 120,
     "maxAttempts": -1
   },
-  "removedAt": null,
+  "removedAt": 1791554012281,
   "addedDatetime": 1785513051781
 }

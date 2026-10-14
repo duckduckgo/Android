@@ -21,14 +21,14 @@
 
     <!-- Inactivity timeout -->
     <string name="afterInactivityOptionTitle">Pēc neaktivitātes perioda</string>
-    <string name="afterInactivityTimeoutRowTitle">Izvēlies neaktivitātes taimeri</string>
-    <string name="afterInactivityScreenSectionHeader">Izvēlies, ko redzēt, atgriežoties pēc neaktivitātes</string>
+    <string name="afterInactivityTimeoutTitle">Neaktivitātes taimeris</string>
+    <string name="afterInactivityScreenDescription">Izvēlies, ko redzēt, atgriežoties pie DuckDuckGo pēc neaktivitātes perioda</string>
     <string name="afterInactivityOptionMessage" instruction="&apos;%1$s&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;after 5 minutes of inactivity&apos;">Izvēlies, ko redzēt, kad atgriezies pēc %1$s minūšu neaktivitātes.</string>
     <string name="afterInactivityTimeoutAlways">Vienmēr</string>
     <string name="afterInactivityTimeout1Minute">1 minūte</string>
     <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d minūtes</string>
     <string name="afterInactivityTimeout1Hour">1 stunda</string>
     <string name="afterInactivityTimeoutXHours" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of hours, e.g. &apos;2 hours&apos;">%1$d stundas</string>
-    <string name="returnToLastTabSettingTitle">Atgriezties pie pēdējās cilnes</string>
-    <string name="returnToLastTabSettingSubtitle">Rādīt saiti uz tavu pēdējo cilni jaunas cilnes lapā, kad atkārtoti atver lietotni</string>
+    <string name="returnToLastTabShortcutSettingTitle">Saīsne „Atgriezties”</string>
+    <string name="returnToLastTabShortcutSettingSubtitle">Rāda saiti, lai atgrieztos pēdējā izmantotajā cilnē, atverot lietotni pēc neaktivitātes perioda.</string>
 </resources>

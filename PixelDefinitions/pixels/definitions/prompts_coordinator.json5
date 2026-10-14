@@ -14,7 +14,8 @@
                 "enum": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11_15", "16_20", "21_plus"]
             },
             "petal",
-            "promptExposureVersion"
+            "promptExposureVersion",
+            "appVersion"
         ]
     },
     "m_prompt_shown": {
@@ -45,7 +46,8 @@
                 ]
             },
             "petal",
-            "promptExposureVersion"
+            "promptExposureVersion",
+            "appVersion"
         ]
     },
     "m_prompt_user_week": {
@@ -53,7 +55,7 @@
         "owners": ["aibrahim-"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["promptDaysSinceInstall", "promptExposureVersion"]
+        "parameters": ["promptDaysSinceInstall", "promptExposureVersion", "appVersion"]
     },
     "m_prompt_gap": {
         "description": "Fires when a prompt arbitrated by the Prompts Coordinator finishes, measuring the time since the previous one finished. Modals finish when they appear; the New Tab Page card finishes when it goes away. Only fires while the coordinator is enabled.",
@@ -75,7 +77,8 @@
                 "enum": ["MODAL", "NTP_CARD"]
             },
             "petal",
-            "promptExposureVersion"
+            "promptExposureVersion",
+            "appVersion"
         ]
     },
     "m_prompt_session": {
@@ -91,7 +94,8 @@
                 "description": "Whether an app-originated prompt was shown during the session. A remote message card only counts in the session where it is first reported."
             },
             "petal",
-            "promptExposureVersion"
+            "promptExposureVersion",
+            "appVersion"
         ]
     }
 }

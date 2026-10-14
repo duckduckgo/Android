@@ -128,6 +128,48 @@ class DuckChatContextualEntryViewModelTest {
     }
 
     @Test
+    fun whenSuggestionSubmittedThenTermsConsentIsNotCarried() = runTest {
+        viewModel.start("tab-1")
+
+        viewModel.commands.test {
+            viewModel.onSuggestionSubmitted(samplePrompt)
+            assertEquals(DuckChatContextualEntryViewModel.Command.HandOffToSheet, awaitItem())
+        }
+
+        val captor = argumentCaptor<ContextualEntryPrompt>()
+        verify(store).store(captor.capture())
+        assertFalse(captor.firstValue.carriesTermsConsent)
+    }
+
+    @Test
+    fun whenSummarizeSubmittedThenTermsConsentIsNotCarried() = runTest {
+        viewModel.start("tab-1")
+
+        viewModel.commands.test {
+            viewModel.onSummarizeSubmitted(samplePrompt)
+            assertEquals(DuckChatContextualEntryViewModel.Command.HandOffToSheet, awaitItem())
+        }
+
+        val captor = argumentCaptor<ContextualEntryPrompt>()
+        verify(store).store(captor.capture())
+        assertFalse(captor.firstValue.carriesTermsConsent)
+    }
+
+    @Test
+    fun whenPromptTypedThenTermsConsentIsCarried() = runTest {
+        viewModel.start("tab-1")
+
+        viewModel.commands.test {
+            viewModel.onPromptSubmitted(samplePrompt)
+            assertEquals(DuckChatContextualEntryViewModel.Command.HandOffToSheet, awaitItem())
+        }
+
+        val captor = argumentCaptor<ContextualEntryPrompt>()
+        verify(store).store(captor.capture())
+        assertTrue(captor.firstValue.carriesTermsConsent)
+    }
+
+    @Test
     fun whenSuggestionSubmittedThenUnifiedInputPromptSubmittedPixelFired() = runTest {
         viewModel.start("tab-1")
         whenever(modelManager.getSelectedModelId()).thenReturn("gpt-5.2")

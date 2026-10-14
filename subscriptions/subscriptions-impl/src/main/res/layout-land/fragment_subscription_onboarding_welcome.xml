@@ -252,8 +252,8 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <nl.dionsegijn.konfetti.KonfettiView
-        android:id="@+id/subscriptionOnboardingWelcomeKonfetti"
+    <com.duckduckgo.subscriptions.impl.onboarding.confetti.ConfettiView
+        android:id="@+id/subscriptionOnboardingWelcomeConfetti"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="false"
