@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl.ui.dashboard
 
 import android.app.Dialog
 import android.os.Bundle
+import android.os.Parcelable
 import android.transition.ChangeBounds
 import android.transition.Fade
 import android.transition.TransitionManager
@@ -34,9 +35,8 @@ import androidx.constraintlayout.widget.ConstraintSet.TOP
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResult
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
-import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.common.ui.view.toPx
@@ -46,13 +46,10 @@ import com.duckduckgo.sync.impl.ui.devices.ParcelableDevice
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlinx.parcelize.Parcelize
 import com.duckduckgo.mobile.android.R as CommonR
 
 class TurnOffSyncBottomSheetDialog : BottomSheetDialogFragment() {
-    private val viewModel by activityViewModels<SyncActivityViewModel> {
-        (requireActivity() as DuckDuckGoActivity).viewModelFactory
-    }
-
     private val device: ParcelableDevice
         get() = requireNotNull(BundleCompat.getParcelable(requireArguments(), DEVICE_ARG, ParcelableDevice::class.java)) {
             "Missing fragment argument: '$DEVICE_ARG'"
@@ -190,14 +187,13 @@ class TurnOffSyncBottomSheetDialog : BottomSheetDialogFragment() {
 
     private fun configureButtons() {
         binding.closeButton.setOnClickListener { dismiss() }
-        binding.turnOffButton.setOnClickListener {
-            viewModel.onTurnOffThisDeviceClicked(device.toConnectedDevice())
-            dismiss()
-        }
-        binding.turnOffAndDeleteButton.setOnClickListener {
-            viewModel.onTurnOffAndDeleteServerDataClicked()
-            dismiss()
-        }
+        binding.turnOffButton.setOnClickListener { selectChoice(Choice.TurnOffThisDevice(device)) }
+        binding.turnOffAndDeleteButton.setOnClickListener { selectChoice(Choice.TurnOffAndDeleteServerData) }
+    }
+
+    private fun selectChoice(choice: Choice) {
+        setFragmentResult(REQUEST_KEY, bundleOf(RESULT_KEY_CHOICE to choice))
+        dismiss()
     }
 
     private fun createTurnOffConstraints() = ConstraintSet().apply {
@@ -227,8 +223,18 @@ class TurnOffSyncBottomSheetDialog : BottomSheetDialogFragment() {
         .setDuration(STATE_TRANSITION_DURATION_MS)
         .setInterpolator(FastOutSlowInInterpolator())
 
+    sealed interface Choice : Parcelable {
+        @Parcelize
+        data class TurnOffThisDevice(val device: ParcelableDevice) : Choice
+
+        @Parcelize
+        data object TurnOffAndDeleteServerData : Choice
+    }
+
     companion object {
         const val TAG = "TurnOffSyncBottomSheetDialog"
+        const val REQUEST_KEY = "TurnOffSyncResult"
+        const val RESULT_KEY_CHOICE = "choice"
 
         private const val DEVICE_ARG = "device"
         private const val IS_ONLY_DEVICE_ARG = "isOnlyDevice"

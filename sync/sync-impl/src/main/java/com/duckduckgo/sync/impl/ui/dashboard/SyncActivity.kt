@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.core.os.BundleCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.plusAssign
@@ -86,6 +87,7 @@ import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.SyncW
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.dashboard.TurnOffSyncBottomSheetDialog.Choice
 import com.duckduckgo.sync.impl.ui.devices.EditDeviceContract
 import com.duckduckgo.sync.impl.ui.devices.ParcelableDevice
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
@@ -307,6 +309,7 @@ class SyncActivity : DuckDuckGoActivity() {
         configureGetOnOtherPlatformsItem()
         configureDataExpirationNotice()
         configureDataDeletionItem()
+        configureTurnOffSyncResultListener()
 
         observeViewModel()
         authPromptRenderer.bind(viewModel.authPrompts)
@@ -684,6 +687,21 @@ class SyncActivity : DuckDuckGoActivity() {
                 },
             ),
         )
+    }
+
+    private fun configureTurnOffSyncResultListener() {
+        supportFragmentManager.setFragmentResultListener(TurnOffSyncBottomSheetDialog.REQUEST_KEY, this) { _, bundle ->
+            BundleCompat.getParcelable(bundle, TurnOffSyncBottomSheetDialog.RESULT_KEY_CHOICE, Choice::class.java)?.let { choice ->
+                when (choice) {
+                    is Choice.TurnOffThisDevice -> {
+                        viewModel.onTurnOffThisDeviceClicked(choice.device.toConnectedDevice())
+                    }
+                    is Choice.TurnOffAndDeleteServerData -> {
+                        viewModel.onTurnOffAndDeleteServerDataClicked()
+                    }
+                }
+            }
+        }
     }
 
     private fun configureDataDeletionItem() {
