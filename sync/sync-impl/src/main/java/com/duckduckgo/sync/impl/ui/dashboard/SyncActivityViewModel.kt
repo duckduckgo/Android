@@ -52,6 +52,7 @@ import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationSource
+import com.duckduckgo.sync.impl.pixels.SyncPixels.TurnOffOption
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_DISABLED
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_ENABLED
@@ -438,19 +439,33 @@ class SyncActivityViewModel @Inject constructor(
     private suspend fun askTurnOffSync() {
         val allDevices = viewState.value.syncedDevices.filterIsInstance<SyncedDevice>().map { it.device }
         val thisDevice = allDevices.firstOrNull { it.thisDevice } ?: return
+        syncPixels.fireTurnOffSheetShown()
         command.send(AskTurnOffSync(thisDevice = thisDevice, allDevices = allDevices))
     }
 
     fun onTurnOffThisDeviceClicked(device: ConnectedDevice) {
+        syncPixels.fireTurnOffOptionSelected(TurnOffOption.THIS_DEVICE)
         viewModelScope.launch {
             command.send(AskTurnOffThisDevice(device))
         }
     }
 
     fun onTurnOffAndDeleteServerDataClicked() {
+        syncPixels.fireTurnOffOptionSelected(TurnOffOption.ALL_DEVICES_AND_SERVER_DATA)
+        syncPixels.fireDeleteServerDataConfirmationShown()
         viewModelScope.launch {
             command.send(AskDeleteServerData)
         }
+    }
+
+    fun onDeleteServerDataConfirmed() {
+        syncPixels.fireDeleteServerDataConfirmationConfirmed()
+        onDeleteAccountConfirmed()
+    }
+
+    fun onDeleteServerDataCancelled() {
+        syncPixels.fireDeleteServerDataConfirmationDismissed()
+        onDeleteAccountCancelled()
     }
 
     fun onDeleteAccountConfirmed() {

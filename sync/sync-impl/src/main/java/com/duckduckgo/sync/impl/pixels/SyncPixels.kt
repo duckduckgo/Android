@@ -68,6 +68,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
+import com.duckduckgo.sync.impl.pixels.SyncPixels.TurnOffOption
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import com.squareup.anvil.annotations.ContributesBinding
@@ -155,6 +156,11 @@ interface SyncPixels {
     fun fireBarcodeScannerParseSuccess(screenType: ScreenType, codeVersion: CodeVersion, codeType: SyncCodeType? = null)
     fun fireSyncAnotherDevicePromptShown()
     fun fireSyncAnotherDevicePromptOptionTapped(option: AnotherDevicePromptOption)
+    fun fireTurnOffSheetShown()
+    fun fireTurnOffOptionSelected(option: TurnOffOption)
+    fun fireDeleteServerDataConfirmationShown()
+    fun fireDeleteServerDataConfirmationConfirmed()
+    fun fireDeleteServerDataConfirmationDismissed()
 
     /**
      * "Setup failed" — a v2 setup that started (code recognized) then failed with an error (not a
@@ -231,6 +237,11 @@ interface SyncPixels {
     enum class AnotherDevicePromptOption(val value: String) {
         THIS_DEVICE_ONLY("this_device_only"),
         WITH_ANOTHER_DEVICE("sync_another_device"),
+    }
+
+    enum class TurnOffOption(val value: String) {
+        THIS_DEVICE("this_device"),
+        ALL_DEVICES_AND_SERVER_DATA("all_devices_and_server_data"),
     }
 
     enum class SetupFailureReason(val value: String) {
@@ -996,6 +1007,29 @@ class RealSyncPixels @Inject constructor(
         )
     }
 
+    override fun fireTurnOffSheetShown() {
+        pixel.fire(SyncPixelName.SYNC_TURN_OFF_SHEET_SHOWN)
+    }
+
+    override fun fireTurnOffOptionSelected(option: TurnOffOption) {
+        pixel.fire(
+            SyncPixelName.SYNC_TURN_OFF_OPTION_SELECTED,
+            parameters = mapOf(SyncPixelParameters.OPTION to option.value),
+        )
+    }
+
+    override fun fireDeleteServerDataConfirmationShown() {
+        pixel.fire(SyncPixelName.SYNC_DELETE_SERVER_DATA_CONFIRMATION_SHOWN)
+    }
+
+    override fun fireDeleteServerDataConfirmationConfirmed() {
+        pixel.fire(SyncPixelName.SYNC_DELETE_SERVER_DATA_CONFIRMATION_CONFIRMED)
+    }
+
+    override fun fireDeleteServerDataConfirmationDismissed() {
+        pixel.fire(SyncPixelName.SYNC_DELETE_SERVER_DATA_CONFIRMATION_DISMISSED)
+    }
+
     override fun fireUnifiedDeviceListPixel(event: UnifiedDeviceListPixel) {
         val parameter = event.parameter
         pixel.fire(
@@ -1170,6 +1204,11 @@ enum class SyncPixelName(override val pixelName: String) : PixelName {
     SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_CONFIRMED("sync_setup_promo_bookmark_added_dialog_confirmed"),
     SYNC_SETUP_ANOTHER_DEVICE_PROMPT_SHOWN("m_settings_sync_another_device_prompt_shown"),
     SYNC_SETUP_ANOTHER_DEVICE_PROMPT_OPTION_TAPPED("m_settings_sync_another_device_prompt_option_tapped"),
+    SYNC_TURN_OFF_SHEET_SHOWN("sync_turn_off_sheet_shown"),
+    SYNC_TURN_OFF_OPTION_SELECTED("sync_turn_off_option_selected"),
+    SYNC_DELETE_SERVER_DATA_CONFIRMATION_SHOWN("sync_delete_server_data_confirmation_shown"),
+    SYNC_DELETE_SERVER_DATA_CONFIRMATION_CONFIRMED("sync_delete_server_data_confirmation_confirmed"),
+    SYNC_DELETE_SERVER_DATA_CONFIRMATION_DISMISSED("sync_delete_server_data_confirmation_dismissed"),
     SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_SUCCESS("sync_setup_joiner_recovery_code_done_success_count"),
     SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_SUCCESS_DAILY("sync_setup_joiner_recovery_code_done_success_daily"),
     SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_FAILED("sync_setup_joiner_recovery_code_done_failed_count"),

@@ -750,15 +750,15 @@ class SyncActivity : DuckDuckGoActivity() {
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
-                        viewModel.onDeleteAccountConfirmed()
+                        viewModel.onDeleteServerDataConfirmed()
                     }
 
                     override fun onNegativeButtonClicked() {
-                        viewModel.onDeleteAccountCancelled()
+                        viewModel.onDeleteServerDataCancelled()
                     }
 
                     override fun onDialogCancelled() {
-                        viewModel.onDeleteAccountCancelled()
+                        viewModel.onDeleteServerDataCancelled()
                     }
                 },
             )
