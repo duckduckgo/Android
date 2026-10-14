@@ -670,6 +670,25 @@ class DuckChatContextualWebViewViewModelTest {
     }
 
     @Test
+    fun `onRecentChatClicked opens the chat and reports the contextual recent chat entry point`() = runTest {
+        whenever(duckChatInternal.buildChatUrl("chat-1")).thenReturn("https://duckduckgo.com/?ia=chat&chatID=chat-1")
+        testee.onSheetOpened("tab-1")
+
+        testee.commands.test {
+            testee.onRecentChatClicked("chat-1")
+
+            val command = expectMostRecentItem()
+            assertTrue(command is DuckChatContextualWebViewViewModel.Command.OpenChatUrl)
+            command as DuckChatContextualWebViewViewModel.Command.OpenChatUrl
+            assertEquals("https://duckduckgo.com/?ia=chat&chatID=chat-1", command.url)
+            assertEquals("tab-1", command.sourceTabId)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(duckChatPixels).reportContextualRecentChatSelected()
+        verify(duckChatInternal).reportDuckChatEntry(DuckChatEntryPoint.RECENT_CHAT_CONTEXTUAL, opensNewTab = true, hasPrompt = false)
+    }
+
+    @Test
     fun `onChatsIconClicked with no recent chats launches chat history`() = runTest {
         testee.commands.test {
             testee.onChatsIconClicked()
