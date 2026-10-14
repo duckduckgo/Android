@@ -207,11 +207,10 @@ class NativeInputLayoutCoordinator(
             rootView.findViewById(R.id.indonesiaNewTabSectionView),
             rootView.findViewById(R.id.messageCta),
         )
-        // Onboarding CTA bubbles live inside newTabContent and must clear the widget, so a visible
-        // one overrides the logo-only suppression below.
+        // CTA bubbles live inside newTabContent and must clear the widget, so a visible one
+        // overrides the logo-only suppression below.
         val onboardingCtaViews = listOfNotNull(
             rootView.findViewById(R.id.brandDesignDialogScrollView),
-            rootView.findViewById(R.id.includeOnboardingDaxDialogBubble),
         )
 
         // Animate content reflow when the widget toggles Search ↔ DuckAI. Staged here but only assigned
@@ -355,7 +354,11 @@ class NativeInputLayoutCoordinator(
                 if (isWidgetAnimating) return@OnGlobalLayoutListener
                 applyOffset()
             }
-        ntpContentView?.viewTreeObserver?.addOnGlobalLayoutListener(globalLayoutListener)
+        // Keep the observer we registered on. When the fragment view detaches, the NTP content is
+        // gone before the widget, so `ntpContentView.viewTreeObserver` at cleanup time is a new
+        // object and removing from it would be no-op and leak this listener.
+        val ntpObserver = ntpContentView?.viewTreeObserver
+        ntpObserver?.addOnGlobalLayoutListener(globalLayoutListener)
         widgetView.addOnAttachStateChangeListener(
             object : View.OnAttachStateChangeListener {
                 override fun onViewAttachedToWindow(v: View) = Unit
@@ -377,7 +380,7 @@ class NativeInputLayoutCoordinator(
                     clearNtpScrollArtifacts()
                     v.removeOnLayoutChangeListener(layoutListener)
                     rootView.removeOnLayoutChangeListener(layoutListener)
-                    ntpContentView?.viewTreeObserver?.takeIf { it.isAlive }?.removeOnGlobalLayoutListener(globalLayoutListener)
+                    ntpObserver?.takeIf { it.isAlive }?.removeOnGlobalLayoutListener(globalLayoutListener)
                     v.removeOnAttachStateChangeListener(this)
                 }
             },

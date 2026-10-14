@@ -171,6 +171,48 @@ class BrowserMenuBottomSheetTest {
     }
 
     @Test
+    fun whenRenderBrowserMenuWithInternalFeedbackThenInternalFeedbackMenuItemIsVisible() {
+        dialog.render(BrowserMenuViewState.Browser(showInternalFeedback = true))
+
+        assertTrue(dialog.internalFeedbackMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderBrowserMenuWithoutInternalFeedbackThenInternalFeedbackMenuItemIsHidden() {
+        dialog.render(BrowserMenuViewState.Browser(showInternalFeedback = false))
+
+        assertFalse(dialog.internalFeedbackMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderNewTabPageMenuWithInternalFeedbackThenInternalFeedbackMenuItemIsVisible() {
+        dialog.render(BrowserMenuViewState.NewTabPage(showInternalFeedback = true))
+
+        assertTrue(dialog.internalFeedbackMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderNewTabPageMenuWithoutInternalFeedbackThenInternalFeedbackMenuItemIsHidden() {
+        dialog.render(BrowserMenuViewState.NewTabPage(showInternalFeedback = false))
+
+        assertFalse(dialog.internalFeedbackMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderDuckAiMenuThenInternalFeedbackMenuItemIsHidden() {
+        dialog.render(BrowserMenuViewState.DuckAi())
+
+        assertFalse(dialog.internalFeedbackMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderCustomTabsMenuThenInternalFeedbackMenuItemIsHidden() {
+        dialog.render(BrowserMenuViewState.CustomTabs())
+
+        assertFalse(dialog.internalFeedbackMenuItem.isVisible)
+    }
+
+    @Test
     fun whenRenderNewTabPageMenuWithEmailSignedInThenCreateAliasMenuItemIsVisible() {
         val viewState = BrowserMenuViewState.NewTabPage(isEmailSignedIn = true)
 

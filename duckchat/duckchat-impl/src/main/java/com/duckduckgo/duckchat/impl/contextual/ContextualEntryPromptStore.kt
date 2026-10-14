@@ -30,12 +30,16 @@ import javax.inject.Inject
  * [serializedPageContext] is the page context the dialog had attached at submit time, so "Ask about
  * page" keeps its context across the hand-off. When it is null the dialog had no context attached
  * (never available, or the user removed it), and the sheet must not auto-attach one on hand-off.
+ *
+ * [carriesTermsConsent] is false for canned prompts (a suggestion or Summarize): the user never typed
+ * them, so sending one must not record ToS consent and Duck.ai shows the terms instead.
  */
 data class ContextualEntryPrompt(
     val tabId: String,
     val prompt: NativeInputPrompt,
     val serializedPageContext: String?,
     val selectionsJson: JSONArray? = null,
+    val carriesTermsConsent: Boolean = true,
 )
 
 /**

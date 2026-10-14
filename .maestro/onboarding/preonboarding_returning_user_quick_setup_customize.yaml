@@ -11,14 +11,14 @@ tags:
           clearState: true
       # Wait for the welcome dialog so we create the reinstaller marker before relaunch
       - assertVisible:
-          text: "(let's get started!|Let's do it!)"
+          text: "let's get started!"
       # Relaunch with app data cleared
       - launchApp:
           clearState: true
       - assertVisible:
-          text: ".*(Ready for a faster browser that protects you and lets you decide when and how to use.AI|Ready for a faster browser that puts you in.control).*"
+          text: ".*Ready for a faster browser that puts you in.control.*"
       - assertVisible:
-          text: "(let's get started!|Let's do it!)"
+          text: "let's get started!"
       # Wait for privacy config to download
       - extendedWaitUntil:
           visible:

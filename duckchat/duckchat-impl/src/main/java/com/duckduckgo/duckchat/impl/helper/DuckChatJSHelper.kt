@@ -29,6 +29,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
+import com.duckduckgo.duckchat.api.DuckAiTermsConsent
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
@@ -47,7 +48,6 @@ import com.duckduckgo.duckchat.impl.models.AIChatAttachmentUsage
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
-import com.duckduckgo.duckchat.impl.terms.DuckAiTermsConsent
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
@@ -462,11 +462,6 @@ class RealDuckChatJSHelper @Inject constructor(
                 false
             }
         }
-        val supportsSuggestions = withContext(dispatcherProvider.io()) {
-            duckChat.isDuckChatContextualModeEnabled() &&
-                mode == Mode.CONTEXTUAL &&
-                duckChatFeature.contextualSuggestedPrompts().isEnabled()
-        }
         val supportsNativeUsageWarnings = withContext(dispatcherProvider.io()) {
             browserMode != BrowserMode.FIRE &&
                 duckChat.isNativeChatInputEnabled() &&
@@ -485,6 +480,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_CHAT_ID_RESTORATION, duckChat.isDuckChatFullScreenModeEnabled())
                 put(SUPPORTS_IMAGE_UPLOAD, duckChat.isImageUploadEnabled())
                 put(SUPPORTS_STANDALONE_MIGRATION, duckChat.isStandaloneMigrationEnabled())
+                put(SUPPORTS_CANONICAL_CHAT_FORMAT, true)
                 put(SUPPORTS_CHAT_FULLSCREEN_MODE, duckChat.isDuckChatFullScreenModeEnabled() && mode == Mode.FULL)
                 put(SUPPORTS_CHAT_CONTEXTUAL_MODE, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
                 put(SUPPORTS_CHAT_SYNC, duckChat.isChatSyncFeatureEnabled() && browserMode.isSyncable)
@@ -496,7 +492,7 @@ class RealDuckChatJSHelper @Inject constructor(
                     duckChat.isDuckChatContextualModeEnabled() &&
                         duckChat.areMultipleContentAttachmentsEnabled(),
                 )
-                put(SUPPORTS_SUGGESTIONS, supportsSuggestions)
+                put(SUPPORTS_SUGGESTIONS, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
                 put(SUPPORTS_SUBSCRIPTION, supportsSubscription)
                 put(INSTALL_TYPE, if (appBuildConfig.isAppReinstall()) INSTALL_TYPE_RETURNING else INSTALL_TYPE_NEW)
                 getInstallAgeBucket()?.let { put(INSTALL_AGE, it) }
@@ -528,7 +524,7 @@ class RealDuckChatJSHelper @Inject constructor(
         val jsonPayload = JSONObject().apply {
             put(PLATFORM, ANDROID)
             if (pending != null) {
-                termsConsent.carry(this, browserMode)
+                if (pending.carriesTermsConsent) termsConsent.carry(this, browserMode)
                 put("tool", "query")
                 put(
                     "query",
@@ -780,6 +776,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_IMAGE_UPLOAD = "supportsImageUpload"
         private const val SUPPORTS_CHAT_ID_RESTORATION = "supportsURLChatIDRestoration"
         private const val SUPPORTS_STANDALONE_MIGRATION = "supportsStandaloneMigration"
+        private const val SUPPORTS_CANONICAL_CHAT_FORMAT = "supportsCanonicalChatFormat"
         private const val SUPPORTS_CHAT_FULLSCREEN_MODE = "supportsAIChatFullMode"
         private const val SUPPORTS_CHAT_CONTEXTUAL_MODE = "supportsAIChatContextualMode"
         private const val SUPPORTS_CHAT_SYNC = "supportsAIChatSync"

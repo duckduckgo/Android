@@ -70,6 +70,7 @@ data class JsonToggleCohort(
 data class JsonToggle(
     val state: String?,
     val minSupportedVersion: Double?,
+    val maxSupportedVersion: Double?,
     val rollout: JsonToggleRollout?,
     val targets: List<JsonToggleTarget>,
     val cohorts: List<JsonToggleCohort>,
@@ -81,6 +82,7 @@ data class JsonFeature(
     val state: String?,
     val hash: String?,
     val minSupportedVersion: Int?,
+    val maxSupportedVersion: Int?,
     val settings: JSONObject?,
     val exceptions: List<JsonException>,
     val features: Map<String, JsonToggle>?,

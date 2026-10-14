@@ -81,8 +81,8 @@ class SubscriptionOnboardingWelcomeFragment : DuckDuckGoFragment(R.layout.fragme
 
     private fun processCommand(command: Command) {
         when (command) {
-            Command.LaunchConfetti -> binding.subscriptionOnboardingWelcomeKonfetti.doOnLayout {
-                binding.subscriptionOnboardingWelcomeKonfetti.launchOnboardingConfetti()
+            Command.LaunchConfetti -> binding.subscriptionOnboardingWelcomeConfetti.doOnLayout {
+                binding.subscriptionOnboardingWelcomeConfetti.fire()
             }
         }
     }

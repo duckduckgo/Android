@@ -1,9 +1,25 @@
 {
   "name": "PeopleFinders",
   "url": "peoplefinders.com",
-  "version": "0.13.0",
+  "version": "0.16.0",
   "addedDatetime": 1677132000000,
   "optOutUrl": "https://www.peoplefinders.com/opt-out",
+  "mirrorSites": [
+    {
+      "name": "PrivateEye",
+      "url": "privateeye.com",
+      "addedAt": 1791244800000,
+      "removedAt": null,
+      "optOutUrl": "https://www.peoplefinders.com/opt-out"
+    },
+    {
+      "name": "PublicRecordsNow",
+      "url": "publicrecordsnow.com",
+      "addedAt": 1791417600000,
+      "removedAt": null,
+      "optOutUrl": "https://www.peoplefinders.com/opt-out"
+    }
+  ],
   "steps": [
     {
       "stepType": "scan",
@@ -49,7 +65,7 @@
               "findElements": true
             },
             "age": {
-              "selector": ".col-lg-3 > .text-dark"
+              "selector": ".col-lg-1 > .text-dark"
             },
             "addressCityStateList": {
               "selector": ".//div[@class='col-lg-2 col-xl-3']//li[@class='text-dark']",
@@ -209,22 +225,6 @@
           "dataSource": "userProfile",
           "elements": [
             {
-              "type": "$generated_phone_number$",
-              "selector": ".//input[@type='tel']"
-            },
-            {
-              "type": "$generated_random_number$",
-              "selector": ".//select[option[1][text()='Month']]",
-              "min": "1",
-              "max": "12"
-            },
-            {
-              "type": "$generated_random_number$",
-              "selector": ".//input[@name='day']",
-              "min": "1",
-              "max": "28"
-            },
-            {
               "type": "birthYear",
               "selector": ".//input[@name='year']"
             },
@@ -241,7 +241,8 @@
               "selector": ".//select[option[1][text()='State']]"
             }
           ],
-          "id": "6ba153e8-676c-4b81-8a4b-5b6689fd978c"
+          "id": "6ba153e8-676c-4b81-8a4b-5b6689fd978c",
+          "_comment": "Phone and DOB month/day are optional on the site. Leave them empty: PeopleFinders matches on the submitted details, and the site sends dob as null unless month, day and year are all set, so fabricated values only prevent a match."
         },
         {
           "actionType": "click",

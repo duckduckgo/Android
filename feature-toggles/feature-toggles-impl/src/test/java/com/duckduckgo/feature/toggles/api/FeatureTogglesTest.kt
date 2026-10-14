@@ -230,6 +230,51 @@ class FeatureTogglesTest {
     }
 
     @Test
+    fun whenAboveMaxVersionThenReturnDisabled() {
+        provider.version = 10
+        feature.enabledByDefault().setRawStoredState(Toggle.State(enable = true, maxSupportedVersion = 9))
+        assertFalse(feature.enabledByDefault().isEnabled())
+    }
+
+    @Test
+    fun whenAtMaxVersionThenReturnEnabled() {
+        provider.version = 10
+        feature.enabledByDefault().setRawStoredState(Toggle.State(enable = true, maxSupportedVersion = 10))
+        assertTrue(feature.enabledByDefault().isEnabled())
+    }
+
+    @Test
+    fun whenBelowMaxVersionThenReturnEnabled() {
+        provider.version = 10
+        feature.enabledByDefault().setRawStoredState(Toggle.State(enable = true, maxSupportedVersion = 11))
+        assertTrue(feature.enabledByDefault().isEnabled())
+    }
+
+    @Test
+    fun whenWithinMinAndMaxVersionThenReturnEnabled() {
+        provider.version = 10
+        feature.enabledByDefault().setRawStoredState(Toggle.State(enable = true, minSupportedVersion = 10, maxSupportedVersion = 10))
+        assertTrue(feature.enabledByDefault().isEnabled())
+    }
+
+    @Test
+    fun whenOutsideMinAndMaxVersionThenReturnDisabled() {
+        feature.enabledByDefault().setRawStoredState(Toggle.State(enable = true, minSupportedVersion = 9, maxSupportedVersion = 11))
+
+        provider.version = 8
+        assertFalse(feature.enabledByDefault().isEnabled())
+        provider.version = 12
+        assertFalse(feature.enabledByDefault().isEnabled())
+    }
+
+    @Test
+    fun whenDisabledAndWithinMaxVersionThenReturnDisabled() {
+        provider.version = 10
+        feature.enabledByDefault().setRawStoredState(Toggle.State(remoteEnableState = false, enable = false, maxSupportedVersion = 11))
+        assertFalse(feature.enabledByDefault().isEnabled())
+    }
+
+    @Test
     fun testInternalAlwaysEnabledAnnotation() {
         assertFalse(feature.internal().isEnabled())
 

@@ -106,8 +106,11 @@ import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.TabSwitcher
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsScreens.DownloadsScreenNoParams
+import com.duckduckgo.duckchat.api.DuckAiChatsMenu
+import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
+import dagger.Lazy
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
@@ -171,6 +174,9 @@ class TabSwitcherActivity :
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var duckAiChatsMenu: Lazy<DuckAiChatsMenu>
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
@@ -926,6 +932,23 @@ class TabSwitcherActivity :
                 viewModel.onBrowserModeToggled(BrowserMode.REGULAR, BrowserModeSwitchSource.TAB_SWITCHER_EXIT)
                 finishAfterTransition()
             }
+            Command.ShowDuckAiChatsMenu -> showDuckAiChatsMenu()
+        }
+    }
+
+    private fun showDuckAiChatsMenu() {
+        lifecycleScope.launch {
+            duckAiChatsMenu.get().show(
+                anchorView = findViewById(R.id.duckAIToolbarButton),
+                options = DuckAiChatsMenu.Options(
+                    chatHistorySource = DuckChatHistorySource.TAB_SWITCHER,
+                    menuStyle = DuckAiChatsMenu.ChatsMenuStyle.COMPACT,
+                ),
+                listener = object : DuckAiChatsMenu.Listener {
+                    override fun onNewChatSelected() = viewModel.onDuckAiNewChatSelected()
+                    override fun onChatSelected(chatUrl: String) = viewModel.onDuckAiChatSelected(chatUrl)
+                },
+            )
         }
     }
 
@@ -958,6 +981,12 @@ class TabSwitcherActivity :
             dynamicMenu = viewState.dynamicInterface,
             navigationBar = binding.navigationBar,
         )
+
+        if (viewState.isDuckAiChatsMenuEnabled) {
+            menu.findItem(R.id.duckAIToolbarButton).setIcon(CommonR.drawable.ic_chats_24)
+            // Creating the menu starts loading recent chats, so the popup opens without waiting on the read.
+            duckAiChatsMenu.get()
+        }
 
         menu.findItem(R.id.newTabToolbarButton).setTitle(
             when (currentBrowserMode) {

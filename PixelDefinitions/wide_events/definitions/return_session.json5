@@ -109,7 +109,10 @@
                             "system_search",
                             "digital_assistant",
                             "deep_link_other",
-                            "paid_settings"
+                            "paid_settings",
+                            "recent_chat_tab_switcher",
+                            "recent_chat_contextual",
+                            "chat_suggestion_input"
                         ]
                     }
                 }

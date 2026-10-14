@@ -55,7 +55,7 @@ class NativeInputFooterView @JvmOverloads constructor(
             .setBottomRightCornerSize(cornerRadius)
             .build()
         card.cardElevation = resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_0)
-        card.setCardBackgroundColor(context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface))
+        card.setCardBackgroundColor(context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurfaceSecondary))
         card.strokeColor = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorOmnibarAccent)
         card.strokeWidth = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarOutlineWidth)
         card.useCompatPadding = false
