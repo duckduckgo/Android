@@ -1160,11 +1160,13 @@ class BrowserTabFragment :
         logcat { "Resuming webview: $tabId" }
 
         if (omnibar.viewMode == ViewMode.DuckAI) {
+            val returningFromAttachmentPicker = nativeInputManager.isPickingAttachment()
             logcat { "Duck.ai: resume in Duck.ai mode" }
             appCoroutineScope.launch(dispatchers.main()) {
                 delay(100)
                 webView?.onResume()
-                webView?.requestFocus()
+                // The native input restores its own focus after the attachment picker; taking it here would close the keyboard.
+                if (!returningFromAttachmentPicker) webView?.requestFocus()
             }
         }
 

@@ -25,6 +25,7 @@ import android.net.Uri
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewTreeObserver
 import android.webkit.ValueCallback
 import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
@@ -431,11 +432,24 @@ class AttachmentView(
     }
 
     private fun restoreInputFocus() {
-        // Picker results are delivered in onActivityResult, before the host activity resumes, and the IME
-        // ignores a show request until then. Posting runs this once that transaction completes.
-        post {
+        val restore = {
             if (resources.configuration.keyboard == Configuration.KEYBOARD_NOKEYS) host?.focusInput() else host?.requestInputFocus()
         }
+        if (hasWindowFocus()) {
+            restore()
+            return
+        }
+        // Picker results arrive before the window regains focus, and the IME ignores show requests from a view
+        // it is not serving yet. Posting from the focus callback lets the IME attach to the window first.
+        viewTreeObserver.addOnWindowFocusChangeListener(
+            object : ViewTreeObserver.OnWindowFocusChangeListener {
+                override fun onWindowFocusChanged(hasFocus: Boolean) {
+                    if (!hasFocus) return
+                    viewTreeObserver.removeOnWindowFocusChangeListener(this)
+                    post { restore() }
+                }
+            },
+        )
     }
 }
 

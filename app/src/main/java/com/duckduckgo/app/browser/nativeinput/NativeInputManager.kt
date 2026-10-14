@@ -167,6 +167,7 @@ interface NativeInputManager {
     fun handleDuckAiVoiceResult(query: String)
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
     fun setPickingImage(picking: Boolean)
+    fun isPickingAttachment(): Boolean
     fun setText(text: String)
 
     /**
@@ -349,6 +350,8 @@ class RealNativeInputManager @Inject constructor(
     override fun setPickingImage(picking: Boolean) {
         isPickingImage = picking
     }
+
+    override fun isPickingAttachment(): Boolean = isPickingImage
 
     override fun setText(text: String) {
         if (!::rootView.isInitialized) return
