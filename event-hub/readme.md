@@ -11,3 +11,7 @@ Handles web events from Content Scope Scripts (C-S-S) via the eventHub feature, 
 4. Counters are incremented per matching event
 5. On app foreground, the lifecycle observer checks if any pixel periods have elapsed
 6. If elapsed, a pixel is fired with bucketed parameter values and an `attributionPeriod` timestamp
+
+## Remote config parsing
+- Only `period` triggers (an absent `type` means `period`) with `counter` parameters are supported. Entries with any other trigger type, such as `immediate` or `immediate_v2`, are skipped.
+- Each `telemetry` entry is parsed on its own, so an entry this client can't parse is skipped and logged without affecting the others.
