@@ -94,6 +94,16 @@ interface PageLoadTimeoutWatchdog {
      */
     fun onNavigatedAway()
 
+    /**
+     * The tab is no longer visible. The clock stops, and a load that is still pending is not timed out while backgrounded.
+     */
+    fun onBackgrounded()
+
+    /**
+     * The tab is visible again. A load still pending gets a fresh clock.
+     */
+    fun onForegrounded()
+
     sealed interface Event {
         data class TimedOut(val phase: Phase) : Event
         data class Recovered(val elapsedSinceTimeoutMs: Long) : Event
@@ -129,6 +139,7 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
     private var loadedUrl: String? = null
     private var userInitiatedLoadPending = false
     private var timedOutAt = 0L
+    private var backgrounded = false
 
     override fun onMainFrameRequest(url: String) {
         val userInitiated = consumeUserInitiatedLoad()
@@ -182,12 +193,27 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
 
     override fun onNavigatedAway() = disarm()
 
+    override fun onBackgrounded() {
+        backgrounded = true
+        watchJob.cancel()
+    }
+
+    override fun onForegrounded() {
+        if (!backgrounded) return
+        backgrounded = false
+        if (state == State.ARMED) startWatching()
+    }
+
     private fun arm(url: String, committed: Boolean) {
         loadedUrl = null
         state = State.ARMED
         this.url = url
         this.committed = committed
         pendingRedirectUrl = null
+        if (backgrounded) watchJob.cancel() else startWatching()
+    }
+
+    private fun startWatching() {
         watchJob += scope.launch(dispatchers.main()) { watch() }
     }
 

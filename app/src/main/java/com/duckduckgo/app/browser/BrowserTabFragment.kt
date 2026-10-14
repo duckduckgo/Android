@@ -2036,6 +2036,11 @@ class BrowserTabFragment :
         tabSwitcherActivityResult.launch(intent)
     }
 
+    override fun onStart() {
+        super.onStart()
+        if (fragmentIsVisible()) webViewClient.onTabForegrounded()
+    }
+
     override fun onResume() {
         super.onResume()
 
@@ -2074,6 +2079,7 @@ class BrowserTabFragment :
     }
 
     override fun onStop() {
+        webViewClient.onTabBackgrounded()
         alertDialog?.dismiss()
         super.onStop()
     }
@@ -5203,12 +5209,14 @@ class BrowserTabFragment :
     private fun onTabHidden() {
         if (!isAdded) return
         viewModel.onViewHidden()
+        webViewClient.onTabBackgrounded()
         downloadMessagesJob.cancel()
         webView?.onPause()
     }
 
     private fun onTabVisible() {
         if (!isAdded) return
+        webViewClient.onTabForegrounded()
         webView?.onResume()
         // ViewPager2 can keep neighbors STARTED/RESUMED; expand so a bottom omnibar that was scrolled
         // away on a previous visit isn't left as an icons-only strip.

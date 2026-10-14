@@ -630,6 +630,102 @@ class PageLoadTimeoutWatchdogTest {
         assertTrue(timeouts.isEmpty())
     }
 
+    @Test
+    fun whenBackgroundedThenNoTimeoutWhileBackgrounded() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        advanceToSeconds(5)
+        watchdog.onBackgrounded()
+
+        advanceToSeconds(65)
+
+        assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
+    fun whenForegroundedThenClockRestartsAndTimesOutFortyFiveSecondsLater() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        advanceToSeconds(20)
+        watchdog.onBackgrounded()
+        advanceToSeconds(100)
+        watchdog.onForegrounded()
+
+        advanceToMs(100_000 + 44_999)
+        assertTrue(timeouts.isEmpty())
+
+        advanceToMs(100_000 + 45_000)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenFinishedWhileBackgroundedThenForegroundingFiresNothing() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onBackgrounded()
+        advanceToSeconds(10)
+        watchdog.onFinished(URL)
+        watchdog.onForegrounded()
+
+        advanceToSeconds(200)
+
+        assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
+    fun whenMainFrameRequestedWhileBackgroundedThenClockStartsOnlyWhenForegrounded() = watchdogTest { watchdog ->
+        watchdog.onBackgrounded()
+        watchdog.onMainFrameRequest(URL)
+        advanceToSeconds(120)
+        assertTrue(timeouts.isEmpty())
+
+        watchdog.onForegrounded()
+        advanceToMs(120_000 + 44_999)
+        assertTrue(timeouts.isEmpty())
+
+        advanceToMs(120_000 + 45_000)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenSameUrlRequestedAgainAfterFinishWhileBackgroundedThenItDoesNotArm() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+        watchdog.onBackgrounded()
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onForegrounded()
+
+        advanceToSeconds(200)
+
+        assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
+    fun whenUserInitiatedSameUrlRequestedWhileBackgroundedThenItArmsOnlyWhenForegrounded() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+        watchdog.onBackgrounded()
+        watchdog.onUserInitiatedLoad()
+        watchdog.onMainFrameRequest(URL)
+        advanceToSeconds(200)
+        assertTrue(timeouts.isEmpty())
+
+        watchdog.onForegrounded()
+        advanceToSeconds(400)
+
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenBackgroundedAndForegroundedTwiceThenOnlyOneTimeoutFires() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onBackgrounded()
+        watchdog.onBackgrounded()
+        watchdog.onForegrounded()
+        watchdog.onForegrounded()
+
+        advanceToSeconds(200)
+
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
     private inner class VirtualTimeProvider : CurrentTimeProvider {
         override fun elapsedRealtime(): Long = coroutineRule.testScope.testScheduler.currentTime
         override fun currentTimeMillis(): Long = elapsedRealtime()
