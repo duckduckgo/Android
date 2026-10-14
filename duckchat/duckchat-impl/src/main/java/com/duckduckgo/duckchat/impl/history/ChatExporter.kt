@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.history
 
 import com.duckduckgo.duckchat.impl.models.ChatType
 import com.duckduckgo.duckchat.impl.models.ModelDisplay
+import org.json.JSONArray
 import org.json.JSONObject
 import java.time.Instant
 import java.time.ZoneId
@@ -101,7 +102,7 @@ internal class ChatExporter(private val zoneId: ZoneId = ZoneId.systemDefault())
         }
     }
 
-    private fun extractTurns(messages: org.json.JSONArray?): List<Turn> {
+    private fun extractTurns(messages: JSONArray?): List<Turn> {
         if (messages == null || messages.length() == 0) return emptyList()
         val turns = mutableListOf<Turn>()
         var i = 0
@@ -109,7 +110,7 @@ internal class ChatExporter(private val zoneId: ZoneId = ZoneId.systemDefault())
             val msg = messages.getJSONObject(i)
             if (msg.optString("role") == "user") {
                 val createdAt = msg.optString("createdAt")
-                val userText = msg.optString("content")
+                val userText = msg.contentText()
                 val nextIsAssistant = i + 1 < messages.length() &&
                     messages.getJSONObject(i + 1).optString("role") == "assistant"
                 val assistantText = if (nextIsAssistant) extractAssistantText(messages.getJSONObject(i + 1)) else ""
@@ -124,14 +125,22 @@ internal class ChatExporter(private val zoneId: ZoneId = ZoneId.systemDefault())
 
     private fun extractAssistantText(assistantMsg: JSONObject): String {
         val parts = assistantMsg.optJSONArray("parts")
-        if (parts == null || parts.length() == 0) return assistantMsg.optString("content")
-        val textParts = buildList {
-            for (i in 0 until parts.length()) {
-                val part = parts.getJSONObject(i)
-                if (part.optString("type") == "text") add(part.optString("text"))
-            }
+        if (parts == null || parts.length() == 0) return assistantMsg.contentText()
+        val textParts = parts.textEntries()
+        return if (textParts.isNotEmpty()) textParts.joinToString(separator = "\n") else assistantMsg.contentText()
+    }
+
+    private fun JSONObject.contentText(): String = when (val content = opt("content")) {
+        is JSONArray -> content.textEntries().joinToString(separator = "\n")
+        is JSONObject -> content.optString("text")
+        else -> optString("content")
+    }
+
+    private fun JSONArray.textEntries(): List<String> = buildList {
+        for (i in 0 until length()) {
+            val entry = getJSONObject(i)
+            if (entry.optString("type") == "text") add(entry.optString("text"))
         }
-        return if (textParts.isNotEmpty()) textParts.joinToString(separator = "\n") else assistantMsg.optString("content")
     }
 
     private fun formatTimestamp(iso: String): String {

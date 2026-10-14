@@ -480,6 +480,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_CHAT_ID_RESTORATION, duckChat.isDuckChatFullScreenModeEnabled())
                 put(SUPPORTS_IMAGE_UPLOAD, duckChat.isImageUploadEnabled())
                 put(SUPPORTS_STANDALONE_MIGRATION, duckChat.isStandaloneMigrationEnabled())
+                put(SUPPORTS_CANONICAL_CHAT_FORMAT, true)
                 put(SUPPORTS_CHAT_FULLSCREEN_MODE, duckChat.isDuckChatFullScreenModeEnabled() && mode == Mode.FULL)
                 put(SUPPORTS_CHAT_CONTEXTUAL_MODE, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
                 put(SUPPORTS_CHAT_SYNC, duckChat.isChatSyncFeatureEnabled() && browserMode.isSyncable)
@@ -775,6 +776,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_IMAGE_UPLOAD = "supportsImageUpload"
         private const val SUPPORTS_CHAT_ID_RESTORATION = "supportsURLChatIDRestoration"
         private const val SUPPORTS_STANDALONE_MIGRATION = "supportsStandaloneMigration"
+        private const val SUPPORTS_CANONICAL_CHAT_FORMAT = "supportsCanonicalChatFormat"
         private const val SUPPORTS_CHAT_FULLSCREEN_MODE = "supportsAIChatFullMode"
         private const val SUPPORTS_CHAT_CONTEXTUAL_MODE = "supportsAIChatContextualMode"
         private const val SUPPORTS_CHAT_SYNC = "supportsAIChatSync"
