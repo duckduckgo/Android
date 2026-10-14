@@ -60,7 +60,6 @@ class OnboardingDevSettingsViewModel @Inject constructor(
             CtaId.DAX_INTRO_VISIT_SITE,
             CtaId.DAX_DIALOG_NETWORK,
             CtaId.DAX_DIALOG_OTHER,
-            CtaId.ADD_WIDGET,
         ).filterNot { it in requiredDialogs }
         return requiredDialogs + extraDialogs
     }
@@ -136,7 +135,6 @@ class OnboardingDevSettingsViewModel @Inject constructor(
                 val wasCompletedByCtas = _viewState.value.onboardingCompleted && !settingsDataStore.hideTips
 
                 when {
-                    ctaId == CtaId.ADD_WIDGET -> { /* noop */ }
                     isDismissed && allRequiredDismissed -> {
                         userStageStore.moveToStage(AppStage.ESTABLISHED)
                         settingsDataStore.hideTips = false
@@ -149,6 +147,4 @@ class OnboardingDevSettingsViewModel @Inject constructor(
             }
         }
     }
-
-    fun isIndependentCta(ctaId: CtaId): Boolean = ctaId == CtaId.ADD_WIDGET
 }

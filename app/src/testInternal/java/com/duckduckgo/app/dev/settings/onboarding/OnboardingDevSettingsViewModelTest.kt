@@ -31,9 +31,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -61,7 +59,6 @@ class OnboardingDevSettingsViewModelTest {
         CtaId.DAX_INTRO_VISIT_SITE,
         CtaId.DAX_DIALOG_NETWORK,
         CtaId.DAX_DIALOG_OTHER,
-        CtaId.ADD_WIDGET,
     )
 
     private val testee = OnboardingDevSettingsViewModel(
@@ -217,25 +214,5 @@ class OnboardingDevSettingsViewModelTest {
         testee.onCtaDismissedToggled(CtaId.DAX_INTRO, isDismissed = false)
 
         verify(dismissedCtaDao).delete(CtaId.DAX_INTRO)
-    }
-
-    @Test
-    fun whenAddWidgetToggledThenOnlyDaoUpdatedNoStageChange() = runTest {
-        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
-        whenever(settingsDataStore.hideTips).thenReturn(false)
-        whenever(ctaViewModel.requiredDaxOnboardingCtas()).thenReturn(requiredCtas)
-        allCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(false) }
-
-        testee.onCtaDismissedToggled(CtaId.ADD_WIDGET, isDismissed = true)
-
-        verify(dismissedCtaDao).insert(DismissedCta(CtaId.ADD_WIDGET))
-        verify(userStageStore, never()).moveToStage(any())
-    }
-
-    @Test
-    fun isIndependentCtaReturnsTrueOnlyForAddWidget() {
-        assertTrue(testee.isIndependentCta(CtaId.ADD_WIDGET))
-        assertFalse(testee.isIndependentCta(CtaId.DAX_INTRO))
-        assertFalse(testee.isIndependentCta(CtaId.DAX_END))
     }
 }

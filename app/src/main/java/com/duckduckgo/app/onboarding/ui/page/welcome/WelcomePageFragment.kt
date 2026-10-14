@@ -58,7 +58,6 @@ import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupAddressBarPositionBo
 import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupSearchOptionsBottomSheet
 import com.duckduckgo.app.onboardingquicksetup.ui.RemoveWidgetInstructionsBottomSheet
 import com.duckduckgo.app.widget.AddWidgetLauncher
-import com.duckduckgo.app.widget.AddWidgetSource
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Onboarding
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillImportPasswordsScreen
@@ -310,7 +309,7 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
             is WelcomePageViewModel.Command.ShowDefaultBrowserDialog ->
                 defaultBrowserRoleManagerDialog.launch(command.intent)
             WelcomePageViewModel.Command.LaunchAddWidgetPrompt ->
-                addWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt = true, source = AddWidgetSource.ONBOARDING)
+                addWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt = true)
             WelcomePageViewModel.Command.Finish -> onContinuePressed()
             is WelcomePageViewModel.Command.FinishAndSubmitSearchQuery ->
                 (activity as? OnboardingActivity)?.finishAndSubmitSearchQuery(command.query)

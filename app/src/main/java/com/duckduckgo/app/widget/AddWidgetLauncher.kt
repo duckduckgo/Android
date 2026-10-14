@@ -37,25 +37,12 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import javax.inject.Named
 
-enum class AddWidgetSource {
-    ONBOARDING,
-    HOME_SCREEN_PROMPT,
-    SETTINGS,
-    UNKNOWN,
-    ;
-
-    companion object {
-        fun fromName(name: String?): AddWidgetSource = entries.firstOrNull { it.name == name } ?: UNKNOWN
-    }
-}
-
 interface AddWidgetLauncher {
     fun launchAddWidget(
         activity: Activity?,
         simpleWidgetPrompt: Boolean = false,
         searchOnlyWidgetPrompt: Boolean = false,
         duckAiOnlyWidgetPrompt: Boolean = false,
-        source: AddWidgetSource = AddWidgetSource.UNKNOWN,
     )
 }
 
@@ -71,12 +58,11 @@ class AddWidgetCompatLauncher @Inject constructor(
         simpleWidgetPrompt: Boolean,
         searchOnlyWidgetPrompt: Boolean,
         duckAiOnlyWidgetPrompt: Boolean,
-        source: AddWidgetSource,
     ) {
         if (widgetCapabilities.supportsAutomaticWidgetAdd) {
-            defaultAddWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt, searchOnlyWidgetPrompt, duckAiOnlyWidgetPrompt, source)
+            defaultAddWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt, searchOnlyWidgetPrompt, duckAiOnlyWidgetPrompt)
         } else {
-            legacyAddWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt, searchOnlyWidgetPrompt, duckAiOnlyWidgetPrompt, source)
+            legacyAddWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt, searchOnlyWidgetPrompt, duckAiOnlyWidgetPrompt)
         }
     }
 }
@@ -89,7 +75,6 @@ class AppWidgetManagerAddWidgetLauncher @Inject constructor(
     companion object {
         const val ACTION_ADD_WIDGET = "actionWidgetAdded"
         const val EXTRA_WIDGET_ADDED_LABEL = "extraWidgetAddedLabel"
-        const val EXTRA_WIDGET_ADD_SOURCE = "extraWidgetAddSource"
         private const val CODE_ADD_WIDGET = 11922
     }
 
@@ -99,7 +84,6 @@ class AppWidgetManagerAddWidgetLauncher @Inject constructor(
         simpleWidgetPrompt: Boolean,
         searchOnlyWidgetPrompt: Boolean,
         duckAiOnlyWidgetPrompt: Boolean,
-        source: AddWidgetSource,
     ) {
         activity?.let {
             val widgetLabel: String
@@ -121,15 +105,14 @@ class AppWidgetManagerAddWidgetLauncher @Inject constructor(
                     ComponentName(it, SearchAndFavoritesWidget::class.java)
                 }
             }
-            AppWidgetManager.getInstance(it).requestPinAppWidget(provider, null, buildPendingIntent(it, widgetLabel, source))
+            AppWidgetManager.getInstance(it).requestPinAppWidget(provider, null, buildPendingIntent(it, widgetLabel))
         }
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
-    private fun buildPendingIntent(context: Context, widgetLabel: String, source: AddWidgetSource): PendingIntent? {
+    private fun buildPendingIntent(context: Context, widgetLabel: String): PendingIntent? {
         val intent = Intent(ACTION_ADD_WIDGET).run {
             putExtra(EXTRA_WIDGET_ADDED_LABEL, widgetLabel)
-            putExtra(EXTRA_WIDGET_ADD_SOURCE, source.name)
         }
         return PendingIntent.getBroadcast(
             context,
@@ -148,9 +131,7 @@ class LegacyAddWidgetLauncher @Inject constructor() : AddWidgetLauncher {
         simpleWidgetPrompt: Boolean,
         searchOnlyWidgetPrompt: Boolean,
         duckAiOnlyWidgetPrompt: Boolean,
-        source: AddWidgetSource,
     ) {
-        // Legacy path opens manual instructions and does not broadcast ACTION_ADD_WIDGET, so [source] cannot be attributed here.
         activity?.let {
             val options = ActivityOptions.makeSceneTransitionAnimation(it).toBundle()
             it.startActivity(AddWidgetInstructionsActivity.intent(it), options)
