@@ -72,12 +72,10 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
 import androidx.annotation.AttrRes
-import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getColor
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
@@ -121,7 +119,6 @@ import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
-import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
@@ -211,13 +208,13 @@ import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
 import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
+import com.duckduckgo.app.cta.ui.ContextualDaxDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
-import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonContextualCta
 import com.duckduckgo.app.cta.ui.KeyboardFollowingCallback
-import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.cta.ui.PrivacyProSkippedOnboardingBottomSheetDialog
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -225,10 +222,10 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchScreenNoParams
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
-import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.internalfeedback.InternalFeedbackScreenshotCapturer
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -338,10 +335,12 @@ import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckAiTermsConsent
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatContextual
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
-import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
+import com.duckduckgo.duckchat.api.DuckChatHistoryParams
+import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualSharedViewModel
@@ -494,6 +493,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var pdfPreviewGenerator: PdfPreviewGenerator
+
+    @Inject
+    lateinit var internalFeedbackScreenshotCapturer: InternalFeedbackScreenshotCapturer
 
     @Inject
     lateinit var previewPersister: WebViewPreviewPersister
@@ -651,6 +653,9 @@ class BrowserTabFragment :
     lateinit var duckChat: DuckChat
 
     @Inject
+    lateinit var termsConsent: DuckAiTermsConsent
+
+    @Inject
     lateinit var duckChatContextual: DuckChatContextual
 
     @Inject
@@ -685,9 +690,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var browserMenuViewStateFactory: BrowserMenuViewStateFactory
-
-    @Inject
-    lateinit var addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager
 
     @Inject
     lateinit var addressDisplayFormatter: AddressDisplayFormatter
@@ -793,14 +795,8 @@ class BrowserTabFragment :
     private val daxDialogIntroBubble
         get() = binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble
 
-    private val daxDialogIntroBubbleBrandDesign
-        get() = binding.includeNewBrowserTab.includeOnboardingDaxDialogBubbleBrandDesignUpdate
-
     private val brandDesignDialogScrollView
         get() = binding.includeNewBrowserTab.brandDesignDialogScrollView
-
-    private val daxDialogInContext
-        get() = binding.includeOnboardingInContextDaxDialog
 
     private val daxDialogInContextBrandDesign
         get() = binding.includeOnboardingInContextDaxDialogBrandDesign
@@ -1275,47 +1271,17 @@ class BrowserTabFragment :
 
                 newBrowserTab.newTabContainerScrollView.isSaveEnabled = false
 
-                daxDialogIntroBubble.daxDialogOption1.isSaveEnabled = false
-                daxDialogIntroBubble.daxDialogOption2.isSaveEnabled = false
-                daxDialogIntroBubble.daxDialogOption3.isSaveEnabled = false
-                daxDialogIntroBubble.daxDialogOption4.isSaveEnabled = false
+                daxDialogIntroBubble.brandDesignTitle.isSaveEnabled = false
+                daxDialogIntroBubble.brandDesignHiddenTitle.isSaveEnabled = false
+                daxDialogIntroBubble.brandDesignDescription.isSaveEnabled = false
+                daxDialogIntroBubble.brandDesignDismissButton.isSaveEnabled = false
+                daxDialogIntroBubble.optionsContent.brandDesignOption1.isSaveEnabled = false
+                daxDialogIntroBubble.optionsContent.brandDesignOption2.isSaveEnabled = false
+                daxDialogIntroBubble.optionsContent.brandDesignOption3.isSaveEnabled = false
+                daxDialogIntroBubble.optionsContent.brandDesignOption4.isSaveEnabled = false
                 daxDialogIntroBubble.primaryCta.isSaveEnabled = false
-                daxDialogIntroBubble.secondaryCta.isSaveEnabled = false
-                daxDialogIntroBubble.placeholder.isSaveEnabled = false
-                daxDialogIntroBubble.dialogTextCta.isSaveEnabled = false
-                daxDialogIntroBubble.hiddenTextCta.isSaveEnabled = false
-                daxDialogIntroBubble.daxBubbleDialogTitle.isSaveEnabled = false
-                daxDialogIntroBubble.daxDialogDismissButton.isSaveEnabled = false
-                daxDialogIntroBubble.logo.isSaveEnabled = false
 
-                daxDialogIntroBubbleBrandDesign.brandDesignTitle.isSaveEnabled = false
-                daxDialogIntroBubbleBrandDesign.brandDesignHiddenTitle.isSaveEnabled = false
-                daxDialogIntroBubbleBrandDesign.brandDesignDescription.isSaveEnabled = false
-                daxDialogIntroBubbleBrandDesign.brandDesignDismissButton.isSaveEnabled = false
-                daxDialogIntroBubbleBrandDesign.optionsContent.brandDesignOption1.isSaveEnabled = false
-                daxDialogIntroBubbleBrandDesign.optionsContent.brandDesignOption2.isSaveEnabled = false
-                daxDialogIntroBubbleBrandDesign.optionsContent.brandDesignOption3.isSaveEnabled = false
-                daxDialogIntroBubbleBrandDesign.optionsContent.brandDesignOption4.isSaveEnabled = false
-                daxDialogIntroBubbleBrandDesign.primaryCta.isSaveEnabled = false
-
-                daxDialogIntroBubbleBrandDesign.brandDesignHeaderImage.isSaveEnabled = false
-
-                daxDialogInContext.daxDialogOption1.isSaveEnabled = false
-                daxDialogInContext.daxDialogOption2.isSaveEnabled = false
-                daxDialogInContext.daxDialogOption3.isSaveEnabled = false
-                daxDialogInContext.daxDialogOption4.isSaveEnabled = false
-                daxDialogInContext.suggestionsDialogTextCta.isSaveEnabled = false
-                daxDialogInContext.suggestionsHiddenTextCta.isSaveEnabled = false
-                daxDialogInContext.daxBubbleDialogTitle.isSaveEnabled = false
-                daxDialogInContext.onboardingDaxDialogBackground.isSaveEnabled = false
-                daxDialogInContext.logo.isSaveEnabled = false
-                daxDialogInContext.daxDialogDismissButton.isSaveEnabled = false
-                daxDialogInContext.cardView.isSaveEnabled = false
-                daxDialogInContext.onboardingDialogTitle.isSaveEnabled = false
-                daxDialogInContext.hiddenTextCta.isSaveEnabled = false
-                daxDialogInContext.dialogTextCta.isSaveEnabled = false
-                daxDialogInContext.secondaryCta.isSaveEnabled = false
-                daxDialogInContext.primaryCta.isSaveEnabled = false
+                daxDialogIntroBubble.brandDesignHeaderImage.isSaveEnabled = false
 
                 binding.autoCompleteSuggestionsList.isSaveEnabled = false
                 binding.daxDialogOnboardingCtaContent.isSaveEnabled = false
@@ -1451,6 +1417,7 @@ class BrowserTabFragment :
                                 if (selectionsJson != null) {
                                     put("selections", selectionsJson)
                                 }
+                                termsConsent.carry(this, browserMode)
                             },
                         ),
                     )
@@ -1462,7 +1429,7 @@ class BrowserTabFragment :
                 onChatUrlSuggestionClicked = { suggestion -> viewModel.userSelectedAutocomplete(suggestion, firePixel = false) },
                 onChatHistoryShortcutClicked = {
                     pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
-                    viewModel.openDuckChatHistory()
+                    viewModel.openDuckChatHistory(DuckChatHistorySource.ADDRESS_BAR)
                 },
                 onChatSuggestionDelete = { chatUrl -> showChatSuggestionFireDialog(chatUrl) },
                 onStopTapped = {
@@ -1473,6 +1440,18 @@ class BrowserTabFragment :
                             params = JSONObject("{}"),
                         ),
                     )
+                },
+                onInputFocusChanged = { focused ->
+                    // The widget also runs on regular pages; only Duck.ai should receive the event.
+                    if (omnibar.viewMode == ViewMode.DuckAI) {
+                        contentScopeScripts.sendSubscriptionEvent(
+                            SubscriptionEventData(
+                                featureName = "aiChat",
+                                subscriptionName = "submitNativeInputFocused",
+                                params = JSONObject().put("focused", focused),
+                            ),
+                        )
+                    }
                 },
                 onChangeModelSubmitted = { modelId ->
                     contentScopeScripts.sendSubscriptionEvent(
@@ -1619,8 +1598,7 @@ class BrowserTabFragment :
     private fun onFireButtonPressed() {
         val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
         val cta = viewModel.ctaViewState.value?.cta
-        val isDuckAiOnboarding =
-            cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta
+        val isDuckAiOnboarding = cta is DaxDuckAiFireButtonContextualCta
         browserActivity?.launchFire(launchedFromFocusedNtp = isFocusedNtp, isDuckAiOnboarding = isDuckAiOnboarding)
         viewModel.onFireMenuSelected(omnibar.viewMode)
     }
@@ -1891,13 +1869,19 @@ class BrowserTabFragment :
             }
             onMenuItemClicked(duckChatHistoryMenuItem) {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
-                viewModel.openDuckChatHistory()
+                viewModel.openDuckChatHistory(DuckChatHistorySource.BROWSER_MENU)
             }
             onMenuItemClicked(duckChatSettingsMenuItem) {
                 viewModel.openDuckChatSettings(omnibar.viewMode)
             }
             onMenuItemClicked(fireMenuItem) {
                 onFireButtonPressed()
+            }
+            onMenuItemClicked(internalFeedbackMenuItem) {
+                launch {
+                    internalFeedbackScreenshotCapturer.capture(requireActivity().window)
+                    viewModel.onInternalFeedbackSelected()
+                }
             }
         }
         if (!tabDisplayedInCustomTabScreen) {
@@ -3067,8 +3051,6 @@ class BrowserTabFragment :
                 }
             }
 
-            is Command.SetOnboardingDialogBackground -> setOnboardingDialogBackgroundRes(it.backgroundRes)
-            is Command.SetOnboardingDialogBackgroundColor -> setOnboardingDialogBackgroundColor(it.colorRes)
             is Command.ReinflateBrandDesignContextualDialog -> renderer.reinflateContextualBrandDesignDialog()
             is Command.LaunchFireDialogFromOnboardingDialog -> {
                 hideOnboardingDaxDialog(it.onboardingCta)
@@ -3099,7 +3081,7 @@ class BrowserTabFragment :
             }
 
             is Command.RefreshOmnibar -> renderer.refreshOmnibar()
-            is Command.LaunchDuckChatHistory -> globalActivityStarter.start(requireContext(), DuckChatHistoryNoParams)
+            is Command.LaunchDuckChatHistory -> globalActivityStarter.start(requireContext(), DuckChatHistoryParams(it.source))
 
             is Command.ExtractSerpLogo -> extractSerpLogo(webView, it.currentUrl)
             is Command.ShowSerpEasterEggLogo -> launchSerpEasterEggLogoActivity(it.logoUrl)
@@ -3241,16 +3223,6 @@ class BrowserTabFragment :
             com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Dark_Onboarding
         }
         return ContextThemeWrapper(context, themeRes)
-    }
-
-    private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
-        daxDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
-    }
-
-    private fun setOnboardingDialogBackgroundColor(
-        @ColorRes colorRes: Int,
-    ) {
-        daxDialogInContext.onboardingDaxDialogContainer.setBackgroundColor(getColor(requireContext(), colorRes))
     }
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
@@ -4025,10 +3997,6 @@ class BrowserTabFragment :
                     pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_SIDEBAR_TAPPED)
                     viewModel.onDuckChatSidebarButtonPressed()
                 }
-
-                override fun onDuckAIBackButtonPressed() {
-                    onBackArrowClicked()
-                }
             },
         )
     }
@@ -4423,7 +4391,7 @@ class BrowserTabFragment :
         faviconPrompt.show()
     }
 
-    private fun hideOnboardingDaxDialog(onboardingCta: OnboardingDaxDialogCta) {
+    private fun hideOnboardingDaxDialog(onboardingCta: ContextualDaxDialogCta) {
         onboardingCta.hideOnboardingCta(binding)
     }
 
@@ -4444,7 +4412,7 @@ class BrowserTabFragment :
     }
 
     private fun hideDaxBubbleCta(cta: DaxBubbleCta?) {
-        (cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.cancelRunningAnimations()
+        (cta as? DaxBubbleCta)?.cancelRunningAnimations()
         renderer.removeBrandDesignFitListener()
         newBrowserTab.browserBackground.setImageResource(0)
         val wasBrandDesign = newBrowserTab.rebrandBrowserBackground.isVisible
@@ -4456,7 +4424,6 @@ class BrowserTabFragment :
             newBrowserTab.newTabLayout.setBackgroundColor(0)
         }
         daxDialogIntroBubble.root.gone()
-        daxDialogIntroBubbleBrandDesign.root.gone()
         brandDesignDialogScrollView.gone()
     }
 
@@ -5302,6 +5269,7 @@ class BrowserTabFragment :
         privacyProSkippedOnboardingBottomSheet?.dismiss()
         browserAutofill.removeJsInterface()
         destroyWebView()
+        webViewClient.destroy()
         super.onDestroy()
     }
 
@@ -6130,9 +6098,7 @@ class BrowserTabFragment :
                 } else {
                     if (viewState.progress == MAX_PROGRESS) {
                         lifecycleScope.launch {
-                            if (addressBarTrackersAnimationManager.isFeatureEnabled()) {
-                                viewModel.refreshCta()
-                            }
+                            viewModel.refreshCta()
                         }
                     }
                 }
@@ -6161,14 +6127,8 @@ class BrowserTabFragment :
                     lastSeenBrowserViewState?.browserShowing == true &&
                     lastSeenBrowserViewState?.maliciousSiteBlocked == false
                 ) {
-                    val site = viewModel.siteLiveData.value
-                    val events = site?.orderedTrackerBlockedEntities()
-                    activity?.let { activity ->
-                        if (addressBarTrackersAnimationManager.isFeatureEnabled()) {
-                            viewModel.onStartTrackersAnimation()
-                        } else {
-                            omnibar.startTrackersAnimation(events)
-                        }
+                    if (activity != null) {
+                        viewModel.onStartTrackersAnimation()
                     }
                 }
             }
@@ -6337,13 +6297,13 @@ class BrowserTabFragment :
 
         fun reinflateContextualBrandDesignDialog() {
             if (!isAdded) return
-            val cta = lastSeenCtaViewState?.cta as? OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta ?: return
+            val cta = lastSeenCtaViewState?.cta as? ContextualDaxDialogCta ?: return
 
             val existingRoot = daxDialogInContextBrandDesign.root
             if (!existingRoot.isVisible) return
             val parent = existingRoot.parent as? ViewGroup ?: return
             val fresh = LayoutInflater.from(requireContext())
-                .inflate(R.layout.include_onboarding_in_context_dax_dialog_brand_design_update, parent, false)
+                .inflate(R.layout.include_onboarding_in_context_dax_dialog, parent, false)
                 as? ViewGroup ?: return
 
             existingRoot.setPadding(fresh.paddingLeft, fresh.paddingTop, fresh.paddingRight, fresh.paddingBottom)
@@ -6366,33 +6326,20 @@ class BrowserTabFragment :
             when (configuration) {
                 is SubscriptionPromoModalCta -> showPrivacyProSkippedOnboardingBottomSheet(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
-                is OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta ->
+                is ContextualDaxDialogCta ->
                     showOnboardingDialogCta(configuration, instantShow = instantShow)
-
-                is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
                 is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)
             }
         }
 
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideNewTab()
-            val container = if (configuration is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
-                daxDialogIntroBubble.root.gone()
-                brandDesignDialogScrollView.show()
-                daxDialogIntroBubbleBrandDesign.daxCtaContainer
-            } else {
-                daxDialogIntroBubbleBrandDesign.root.gone()
-                brandDesignDialogScrollView.gone()
-                daxDialogIntroBubble.daxCtaContainer
-            }
+            brandDesignDialogScrollView.show()
+            val container = daxDialogIntroBubble.daxCtaContainer
             configuration.apply {
                 showCta(container) {
-                    setOnOptionClicked(
-                        onboardingExperimentEnabled = false,
-                        configuration = configuration,
-                    ) { option, index ->
+                    setOnOptionClicked { option, _ ->
                         submitQuery(option.link)
-                        viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
                     }
                 }
 
@@ -6408,32 +6355,27 @@ class BrowserTabFragment :
                 }
             }
 
-            if (configuration is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
-                setBrowserBackgroundRes(
-                    configuration.backgroundRes,
-                    useRebrandBackground = true,
-                    fillHeightDp = configuration.backgroundFillSpec?.heightDpFor(configuration.deviceInfo.isTablet()) ?: 0f,
-                    fillMaxHeightFraction = configuration.backgroundFillSpec?.maxHeightFraction ?: 1f,
-                )
-                setNewTabBackgroundColor(com.duckduckgo.mobile.android.R.attr.onboardingSurfaceBackdrop)
-                configureBrandDesignFitListener()
-                brandDesignDialogScrollView.post { configuration.applyFit() }
-            } else {
-                removeBrandDesignFitListener()
-                viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
-            }
+            setBrowserBackgroundRes(
+                configuration.backgroundRes,
+                useRebrandBackground = true,
+                fillHeightDp = configuration.backgroundFillSpec?.heightDpFor(configuration.deviceInfo.isTablet()) ?: 0f,
+                fillMaxHeightFraction = configuration.backgroundFillSpec?.maxHeightFraction ?: 1f,
+            )
+            setNewTabBackgroundColor(com.duckduckgo.mobile.android.R.attr.onboardingSurfaceBackdrop)
+            configureBrandDesignFitListener()
+            brandDesignDialogScrollView.post { configuration.applyFit() }
             viewModel.onCtaShown()
         }
 
         fun configureBrandDesignFitListener() {
             removeBrandDesignFitListener()
             val listener = ViewTreeObserver.OnGlobalLayoutListener {
-                (lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.applyFit()
+                (lastSeenCtaViewState?.cta as? DaxBubbleCta)?.applyFit()
                 if (brandDesignKeyboardCallback?.isAnimating != true) clipWavingDaxAtCover()
             }
             brandDesignFitLayoutListener = listener
-            brandDesignDialogScrollView.viewTreeObserver.addOnGlobalLayoutListener(listener)
-            var imeCta: DaxBubbleCta.BrandDesignUpdateBubbleCta? = null
+            requireActivity().window.decorView.viewTreeObserver.addOnGlobalLayoutListener(listener)
+            var imeCta: DaxBubbleCta? = null
             // The tab shrinks before the keyboard arrives, briefly uncovering what's behind it.
             var restoreBehindTab: (() -> Unit)? = null
             val callback = KeyboardFollowingCallback(
@@ -6446,7 +6388,7 @@ class BrowserTabFragment :
                 layoutBottomInset = { (binding.rootView.layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin ?: 0 },
                 onStarted = {
                     nativeInputManager.onKeyboardAnimationChanged(true)
-                    imeCta = (lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.also { it.onImeAnimationStarted() }
+                    imeCta = (lastSeenCtaViewState?.cta as? DaxBubbleCta)?.also { it.onImeAnimationStarted() }
                     val behindTab = binding.rootView.parent as? View
                     val fill = newBrowserTab.newTabLayout.background as? ColorDrawable
                     val insets = ViewCompat.getRootWindowInsets(binding.rootView)
@@ -6477,7 +6419,7 @@ class BrowserTabFragment :
 
         fun removeBrandDesignFitListener() {
             brandDesignFitLayoutListener?.let {
-                brandDesignDialogScrollView.viewTreeObserver.removeOnGlobalLayoutListener(it)
+                requireActivity().window.decorView.viewTreeObserver.removeOnGlobalLayoutListener(it)
             }
             brandDesignFitLayoutListener = null
             brandDesignKeyboardCallback?.restore()
@@ -6505,7 +6447,7 @@ class BrowserTabFragment :
         private fun View.windowY(): Int = IntArray(2).also(::getLocationInWindow)[1]
 
         fun reapplyBubbleForOrientation() {
-            (lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.onOrientationChanged()
+            (lastSeenCtaViewState?.cta as? DaxBubbleCta)?.onOrientationChanged()
         }
 
         private fun showPrivacyProSkippedOnboardingBottomSheet(configuration: SubscriptionPromoModalCta) {
@@ -6543,45 +6485,8 @@ class BrowserTabFragment :
         }
 
         @SuppressLint("ClickableViewAccessibility")
-        private fun showOnboardingDialogCta(configuration: OnboardingDaxDialogCta) {
-            hideNewTab()
-            // Brand-design path disables APPEARING/DISAPPEARING on this container; the legacy
-            // path expects them enabled, so restore here in case the previous CTA was brand-design.
-            binding.daxDialogOnboardingCtaContent.layoutTransition.apply {
-                enableTransitionType(LayoutTransition.APPEARING)
-                enableTransitionType(LayoutTransition.DISAPPEARING)
-            }
-            // Both layouts live in the tree; only one should be visible at a time.
-            daxDialogInContextBrandDesign.root.gone()
-            val onTypingAnimationFinished =
-                if (configuration is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
-                    { viewModel.onOnboardingDaxTypingAnimationFinished() }
-                } else {
-                    {}
-                }
-            val onSuggestedOptionsSelected: ((DaxDialogIntroOption) -> Unit)? =
-                if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
-                    { option: DaxDialogIntroOption -> submitQuery(option.link) }
-                } else {
-                    null
-                }
-            configuration.showOnboardingCta(
-                binding,
-                { viewModel.onUserClickCtaOkButton(configuration) },
-                { viewModel.onUserClickCtaSecondaryButton(configuration) },
-                onTypingAnimationFinished,
-                onSuggestedOptionsSelected,
-                {
-                    viewModel.onUserClickCtaDismissButton(configuration)
-                },
-            )
-            viewModel.setOnboardingDialogBackground(appTheme.isLightModeEnabled())
-            viewModel.onCtaShown()
-        }
-
-        @SuppressLint("ClickableViewAccessibility")
         private fun showOnboardingDialogCta(
-            configuration: OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta,
+            configuration: ContextualDaxDialogCta,
             instantShow: Boolean = false,
         ) {
             hideNewTab()
@@ -6589,8 +6494,6 @@ class BrowserTabFragment :
                 disableTransitionType(LayoutTransition.APPEARING)
                 disableTransitionType(LayoutTransition.DISAPPEARING)
             }
-            // Both layouts live in the tree; only one should be visible at a time.
-            daxDialogInContext.root.gone()
             configuration.showOnboardingCta(
                 binding = binding,
                 onPrimaryCtaClicked = { viewModel.onUserClickCtaOkButton(configuration) },
@@ -6603,7 +6506,6 @@ class BrowserTabFragment :
                 onDismissCtaClicked = { viewModel.onUserClickCtaDismissButton(configuration) },
                 instantShow = instantShow,
             )
-            viewModel.setOnboardingDialogBackground(appTheme.isLightModeEnabled())
             if (!instantShow) {
                 viewModel.onCtaShown()
             }
@@ -6662,13 +6564,11 @@ class BrowserTabFragment :
         }
 
         private fun hideDaxCta() {
-            daxDialogInContext.dialogTextCta.cancelAnimation()
-            daxDialogInContext.daxCtaContainer.gone()
-            val cta = lastSeenCtaViewState?.cta as? OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta
+            val cta = lastSeenCtaViewState?.cta as? ContextualDaxDialogCta
             if (cta != null) {
                 cta.hideOnboardingCta(binding)
             } else {
-                OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta.hideContainer(binding)
+                ContextualDaxDialogCta.hideContainer(binding)
             }
         }
 

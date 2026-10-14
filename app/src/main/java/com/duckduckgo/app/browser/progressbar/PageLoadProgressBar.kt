@@ -106,10 +106,6 @@ class PageLoadProgressBar @JvmOverloads constructor(
      */
     val isStarted: Boolean get() = _isStarted
 
-    fun setStallDetectionEnabled(enabled: Boolean) {
-        engine.stallDetectionEnabled = enabled
-    }
-
     private val frameCallback = object : Choreographer.FrameCallback {
         override fun doFrame(frameTimeNanos: Long) {
             val dtSeconds = if (lastFrameTimeNanos == 0L) {

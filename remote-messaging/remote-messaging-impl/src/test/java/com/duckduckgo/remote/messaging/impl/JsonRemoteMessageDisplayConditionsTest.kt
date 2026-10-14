@@ -111,6 +111,34 @@ class JsonRemoteMessageDisplayConditionsTest {
     }
 
     @Test
+    fun whenDismissAfterUniqueDailyImpressionsPresentThenParsed() {
+        val conditions = displayConditionsOf(JsonDisplayConditions(dismissAfterUniqueDailyImpressions = 3))
+
+        assertEquals(3, conditions?.dismissAfterUniqueDailyImpressions)
+    }
+
+    @Test
+    fun whenDismissAfterUniqueDailyImpressionsAbsentThenNull() {
+        val conditions = displayConditionsOf(JsonDisplayConditions(dismissAfterDaysShown = 5))
+
+        assertNull(conditions?.dismissAfterUniqueDailyImpressions)
+    }
+
+    @Test
+    fun whenDismissAfterUniqueDailyImpressionsIsZeroThenNull() {
+        val conditions = displayConditionsOf(JsonDisplayConditions(dismissAfterUniqueDailyImpressions = 0))
+
+        assertNull(conditions?.dismissAfterUniqueDailyImpressions)
+    }
+
+    @Test
+    fun whenDismissAfterUniqueDailyImpressionsIsNegativeThenNull() {
+        val conditions = displayConditionsOf(JsonDisplayConditions(dismissAfterUniqueDailyImpressions = -1))
+
+        assertNull(conditions?.dismissAfterUniqueDailyImpressions)
+    }
+
+    @Test
     fun whenMaxImpressionsCombinedWithTriggerAndExpiryThenAllParsed() {
         val conditions = displayConditionsOf(
             JsonDisplayConditions(

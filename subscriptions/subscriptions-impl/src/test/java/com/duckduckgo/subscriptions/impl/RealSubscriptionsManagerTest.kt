@@ -99,6 +99,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.doThrow
@@ -350,7 +351,7 @@ class RealSubscriptionsManagerTest {
         givenUserIsSignedIn()
         givenSubscriptionExists()
         givenAccessTokenIsExpired()
-        givenV2AccessTokenRefreshFails(errorCode = "invalid_token")
+        givenV2AccessTokenRefreshFails(error = "invalid_token")
         givenNoActivePurchase()
 
         val result = subscriptionsManager.getAccessToken()
@@ -369,7 +370,7 @@ class RealSubscriptionsManagerTest {
         givenUserIsSignedIn()
         givenSubscriptionExists()
         givenAccessTokenIsExpired()
-        givenV2AccessTokenRefreshFails(errorCode = "invalid_token")
+        givenV2AccessTokenRefreshFails(error = "invalid_token")
         givenPurchaseInfoUnknown()
 
         val result = subscriptionsManager.getAccessToken()
@@ -386,7 +387,7 @@ class RealSubscriptionsManagerTest {
     fun whenRefreshTokenWithUseQueryPurchasesAndActivePurchaseThenRecoversTokens() = runTest {
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
-        givenV2AccessTokenRefreshFails(errorCode = "invalid_token")
+        givenV2AccessTokenRefreshFails(error = "invalid_token")
         givenActivePurchase()
         givenStoreLoginSucceeds(newAccessToken = "new access token")
 
@@ -1304,7 +1305,7 @@ class RealSubscriptionsManagerTest {
     fun whenGetAccessTokenIfAccessTokenIsExpiredAndRefreshFailsWithAuthErrorThenGetNewTokenUsingStoreLoginAndReturnSuccess() = runTest {
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
-        givenV2AccessTokenRefreshFails(errorCode = "invalid_token")
+        givenV2AccessTokenRefreshFails(error = "invalid_token")
         givenPurchaseStored()
         givenStoreLoginSucceeds(newAccessToken = "new access token")
 
@@ -1321,7 +1322,7 @@ class RealSubscriptionsManagerTest {
         givenUserIsSignedIn()
         givenSubscriptionExists()
         givenAccessTokenIsExpired()
-        givenV2AccessTokenRefreshFails(errorCode = "invalid_token")
+        givenV2AccessTokenRefreshFails(error = "invalid_token")
         givenPurchaseStored()
         givenStoreLoginFails()
 
@@ -1344,7 +1345,7 @@ class RealSubscriptionsManagerTest {
         givenAccessTokenIsExpired()
 
         // Simulating the scenario where account was removed from BE.
-        givenV2AccessTokenRefreshFails(errorCode = "unknown_account")
+        givenV2AccessTokenRefreshFails(error = "unknown_account")
 
         val result = subscriptionsManager.getAccessToken()
 
@@ -1365,6 +1366,67 @@ class RealSubscriptionsManagerTest {
         verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenDetected()
         verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenSignedOut()
         verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenRecovered()
+    }
+
+    @Test
+    fun whenRefreshFailsWithErrorAndErrorCodeThenBothAreReportedToWideEvent() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(errorBody = """{"error":"invalid_token_request","error_code":2}""")
+
+        subscriptionsManager.getAccessToken()
+
+        verify(tokenRefreshWideEvent).onBackendErrorResponse(backendErrorResponse = "invalid_token_request", backendErrorCode = 2)
+    }
+
+    @Test
+    fun whenRefreshFailsWithErrorCodeOutsideKnownRangeThenItIsReportedAsIs() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(errorBody = """{"error":"invalid_token_request","error_code":7}""")
+
+        subscriptionsManager.getAccessToken()
+
+        verify(tokenRefreshWideEvent).onBackendErrorResponse(backendErrorResponse = "invalid_token_request", backendErrorCode = 7)
+    }
+
+    @Test
+    fun whenRefreshFailsWithNonNumericErrorCodeThenErrorIsStillHandled() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionExists()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(errorBody = """{"error":"unknown_account","error_code":"x"}""")
+
+        subscriptionsManager.getAccessToken()
+
+        verify(tokenRefreshWideEvent).onBackendErrorResponse(backendErrorResponse = "unknown_account", backendErrorCode = null)
+        verify(tokenRefreshWideEvent).onUnknownAccountError()
+        assertFalse(subscriptionsManager.isSignedIn())
+    }
+
+    @Test
+    fun whenRefreshFailsWithErrorCodeOnlyThenItIsReportedAndStoreLoginIsAttempted() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(errorBody = """{"error_code":1}""")
+        givenPurchaseStored()
+        givenStoreLoginSucceeds(newAccessToken = "new access token")
+
+        val result = subscriptionsManager.getAccessToken()
+
+        verify(tokenRefreshWideEvent).onBackendErrorResponse(backendErrorResponse = null, backendErrorCode = 1)
+        assertTrue(result is AccessTokenResult.Success)
+    }
+
+    @Test
+    fun whenRefreshFailsWithUnparseableBodyThenNoBackendErrorIsReported() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(errorBody = "not json")
+
+        subscriptionsManager.getAccessToken()
+
+        verify(tokenRefreshWideEvent, never()).onBackendErrorResponse(anyOrNull(), anyOrNull())
     }
 
     @Test
@@ -2331,9 +2393,12 @@ class RealSubscriptionsManagerTest {
         givenValidateV2TokensSucceeds()
     }
 
-    private suspend fun givenV2AccessTokenRefreshFails(errorCode: String? = null) {
-        val exception = if (errorCode != null) {
-            val responseBody = """{"error":"$errorCode"}""".toResponseBody("text/json".toMediaTypeOrNull())
+    private suspend fun givenV2AccessTokenRefreshFails(
+        error: String? = null,
+        errorBody: String? = error?.let { """{"error":"$it"}""" },
+    ) {
+        val exception = if (errorBody != null) {
+            val responseBody = errorBody.toResponseBody("text/json".toMediaTypeOrNull())
             HttpException(Response.error<Void>(400, responseBody))
         } else {
             RuntimeException()

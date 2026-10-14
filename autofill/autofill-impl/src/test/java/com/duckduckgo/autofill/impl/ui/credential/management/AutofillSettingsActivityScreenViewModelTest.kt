@@ -662,6 +662,35 @@ class AutofillSettingsActivityScreenViewModelTest {
     }
 
     @Test
+    fun whenLaunchDeviceAuthWithAuthPromptSuppressedThenIsUnlockedAndAuthNotLaunched() = runTest {
+        configureDeviceToBeSupported()
+        configureDeviceToHaveValidAuthentication(true)
+        configureStoreToHaveThisManyCredentialsStored(1)
+        testee.launchDeviceAuth(suppressAuthPrompt = true)
+
+        testee.commands.test {
+            val commands = this.awaitItem()
+            assertTrue(commands.contains(ExitLockedMode))
+            assertFalse(commands.contains(LaunchDeviceAuth))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLaunchDeviceAuthWithAuthPromptSuppressedButNoValidAuthThenDisabledShown() = runTest {
+        configureDeviceToBeSupported()
+        configureDeviceToHaveValidAuthentication(false)
+        testee.launchDeviceAuth(suppressAuthPrompt = true)
+
+        testee.commands.test {
+            val commands = this.awaitItem()
+            assertTrue(commands.contains(ShowDisabledMode))
+            assertFalse(commands.contains(LaunchDeviceAuth))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenLaunchDeviceAuthWithNoValidAuthThenDisabledShown() = runTest {
         configureDeviceToBeSupported()
         configureDeviceToHaveValidAuthentication(false)

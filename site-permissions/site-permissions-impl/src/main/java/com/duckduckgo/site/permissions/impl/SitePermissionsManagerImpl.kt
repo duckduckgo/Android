@@ -145,18 +145,18 @@ class SitePermissionsManagerImpl @Inject constructor(
 
     override suspend fun clearAllButFireproof(fireproofDomains: List<String>) {
         drmSessionStore.clear()
-        sitePermissionsRepository.sitePermissionsForAllWebsites().forEach { permission ->
-            if (!fireproofDomains.contains(permission.domain)) {
-                sitePermissionsRepository.deletePermissionsForSite(permission.domain)
+        sitePermissionsRepository.domainsWithPermissions().forEach { domain ->
+            if (!fireproofDomains.contains(domain)) {
+                sitePermissionsRepository.deletePermissionsForSite(domain)
             }
         }
     }
 
     override suspend fun clearForDomainsButFireproof(domains: Set<String>, fireproofDomains: List<String>) {
         if (!withContext(dispatcherProvider.io()) { sitePermissionsDialogRedesignFeature.singleTabBurnClearing().isEnabled() }) return
-        sitePermissionsRepository.sitePermissionsForAllWebsites().forEach { permission ->
-            if (permission.domain.toTldPlusOneOrSelf() in domains && permission.domain !in fireproofDomains) {
-                sitePermissionsRepository.deletePermissionsForSite(permission.domain)
+        sitePermissionsRepository.domainsWithPermissions().forEach { domain ->
+            if (domain.toTldPlusOneOrSelf() in domains && domain !in fireproofDomains) {
+                sitePermissionsRepository.deletePermissionsForSite(domain)
             }
         }
     }

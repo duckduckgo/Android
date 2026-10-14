@@ -17,7 +17,6 @@
 package com.duckduckgo.app.onboarding
 
 import androidx.core.content.edit
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -70,7 +69,6 @@ class CustomAiOnboardingStoreImpl @Inject constructor(
     private val referrerStateListener: Lazy<AppInstallationReferrerStateListener>,
     private val dispatcherProvider: DispatcherProvider,
     private val customAiOnboardingFeature: CustomAiOnboardingFeature,
-    private val brandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
 ) : CustomAiOnboardingStore, CustomAiOnboardingResolver, ReferrerParserPlugin {
 
     private val preferences by lazy { sharedPreferencesProvider.getSharedPreferences(PREFS_FILENAME) }
@@ -93,9 +91,8 @@ class CustomAiOnboardingStoreImpl @Inject constructor(
             val referrerExists = preferences.getBoolean(PREFS_KEY_REFERRER_PARAM_PRESENT, false)
 
             val customAiOnboardingEnabled = customAiOnboardingFeature.self().isEnabled()
-            val brandDesignEnabled = brandDesignUpdateToggles.brandDesignUpdate().isEnabled()
 
-            val resolution = referrerExists && customAiOnboardingEnabled && brandDesignEnabled
+            val resolution = referrerExists && customAiOnboardingEnabled
             preferences.edit { putBoolean(PREFS_KEY_ENABLED, resolution) }
 
             return@withContext resolution

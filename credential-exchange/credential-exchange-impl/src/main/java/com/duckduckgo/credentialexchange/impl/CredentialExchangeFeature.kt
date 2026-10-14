@@ -37,4 +37,12 @@ interface CredentialExchangeFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun self(): Toggle
+
+    /**
+     * Rollout control for importing passwords through the OS credential exchange.
+     *
+     * @return `true` when the remote config has the "canImportPasswords" sub-feature of "credentialExchange" enabled.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun canImportPasswords(): Toggle
 }

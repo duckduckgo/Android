@@ -261,6 +261,7 @@
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Permisiuni</string>
+    <string name="permissionsGeneralPermissionsTitle" instruction="Section header on the Permissions settings screen, above the Notifications and Open Links in Apps settings">Permisiuni generale</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Aspect</string>
@@ -725,10 +726,6 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Sistemul de operare al dispozitivului tău nu are încredere în certificatul de securitate pentru %1$s. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Salut!<br/><br/>Ești gata pentru un browser mai rapid care îți asigură protecție?]]></string>
-    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Hai să o facem!</string>
-    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1ButtonBrandDesign">Să începem!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Am mai fost aici</string>
     <string name="preOnboardingDaxDialog2Title">Mecanismele de protecție au fost activate!</string>
@@ -756,8 +753,6 @@
     <string name="highlightsPreOnboardingAddressBarOption2Description">Ușor de accesat</string>
     <string name="onboardingSearchDaxDialogTitle">Încearcă o căutare!</string>
     <string name="onboardingSearchDaxDialogDescription">Căutările tale DuckDuckGo sunt întotdeauna private.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"cum se spune rață în engleză"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"cum se spune rață în spaniolă"</string>
     <string name="onboardingSearchQueryOption1">cum se spune rață în engleză</string>
     <string name="onboardingSearchQueryOption1English">cum se spune rață în spaniolă</string>
     <string name="onboardingSearchDaxDialogOption2">distribuția din avatar</string>
@@ -837,8 +832,8 @@
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Afișează la lansarea aplicației</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab">Ultima filă deschisă</string>
-    <string name="showOnAppLaunchOptionNewTabPage">Filă nouă</string>
+    <string name="showOnAppLaunchOptionLastUsedTab">Ultima filă utilizată</string>
+    <string name="showOnAppLaunchOptionOpenNewTab">Filă nouă</string>
     <string name="showOnAppLaunchOptionSpecificPage">Pagină specifică</string>
 
     <!-- Privacy Dashboard -->

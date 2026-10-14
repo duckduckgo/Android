@@ -176,9 +176,6 @@ interface AndroidBrowserConfigFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun handleIntentScheme(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun hideDuckAiInSerpKillSwitch(): Toggle
-
     /**
      * Kill switch for intent resolution validation in SpecialUrlDetector
      * @return `true` when the remote config has the global "validateIntentResolution" androidBrowserConfig

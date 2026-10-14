@@ -194,8 +194,8 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
 
     private fun setShowOnAppLaunchOptionSecondaryText(showOnAppLaunchOption: ShowOnAppLaunchOption) {
         val optionString = when (showOnAppLaunchOption) {
-            is LastOpenedTab -> getString(R.string.showOnAppLaunchOptionLastOpenedTab)
-            is NewTabPage -> getString(R.string.showOnAppLaunchOptionNewTabPage)
+            is LastOpenedTab -> getString(R.string.showOnAppLaunchOptionLastUsedTab)
+            is NewTabPage -> getString(R.string.showOnAppLaunchOptionOpenNewTab)
             is SpecificPage -> showOnAppLaunchOption.url
         }
         binding.showOnAppLaunchButton.setSecondaryText(optionString)

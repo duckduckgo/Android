@@ -113,12 +113,12 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     fun onSuggestionSubmitted(prompt: NativeInputPrompt) {
         if (_viewState.value.attachedContext == null && !hasTextSelections()) latestValidPageContext?.let { attach(it) }
         fireUnifiedInputPromptSubmitted()
-        submit(prompt)
+        submit(prompt, carriesTermsConsent = false)
     }
 
     fun onSummarizeSubmitted(prompt: NativeInputPrompt) {
         fireUnifiedInputPromptSubmitted()
-        submit(prompt)
+        submit(prompt, carriesTermsConsent = false)
     }
 
     fun onPromptSubmitted(prompt: NativeInputPrompt) {
@@ -141,7 +141,10 @@ class DuckChatContextualEntryViewModel @Inject constructor(
         )
     }
 
-    private fun submit(prompt: NativeInputPrompt) {
+    private fun submit(
+        prompt: NativeInputPrompt,
+        carriesTermsConsent: Boolean = true,
+    ) {
         val selectionsJson = prompt.selectionsJson ?: selectionPayloadBuilder.toJson(textSelectionRepository.consume(tabId))
         selectionsJson?.length()?.takeIf { it > 0 }?.let {
             duckChatPixels.reportContextualPromptSubmittedWithSelections(it)
@@ -153,6 +156,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
                 prompt = prompt,
                 serializedPageContext = _viewState.value.attachedContext?.serialized,
                 selectionsJson = selectionsJson,
+                carriesTermsConsent = carriesTermsConsent,
             ),
         )
         duckChatPixels.reportContextualFloatingInputPromotedToSheet()

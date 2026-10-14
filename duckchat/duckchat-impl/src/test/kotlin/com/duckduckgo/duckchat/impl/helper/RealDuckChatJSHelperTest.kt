@@ -27,6 +27,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
+import com.duckduckgo.duckchat.api.DuckAiTermsConsent
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
@@ -45,7 +46,6 @@ import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_C
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_GET_PAGE_CONTEXT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
-import com.duckduckgo.duckchat.impl.terms.DuckAiTermsConsent
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
@@ -337,6 +337,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
@@ -780,6 +781,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
@@ -880,6 +882,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", true)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", true)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
@@ -1042,6 +1045,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", true)
             put("supportsAIChatSync", false)
@@ -1049,7 +1053,7 @@ class RealDuckChatJSHelperTest {
             put("supportsNativeStorage", false)
             put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
-            put("supportsSuggestions", false)
+            put("supportsSuggestions", true)
             put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
@@ -1064,10 +1068,9 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeConfigValuesAndSuggestedPromptsEnabledInContextualModeThenSupportsSuggestionsTrue() = runTest {
+    fun whenGetAIChatNativeConfigValuesAndContextualModeThenSupportsSuggestionsTrue() = runTest {
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(true)
-        mockDuckChatFeature.contextualSuggestedPrompts().setRawStoredState(Toggle.State(enable = true))
 
         val result = testee.processJsCallbackMessage(
             "aiChat",
@@ -1082,10 +1085,9 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeConfigValuesAndSuggestedPromptsEnabledButModeFullThenSupportsSuggestionsFalse() = runTest {
+    fun whenGetAIChatNativeConfigValuesAndModeFullThenSupportsSuggestionsFalse() = runTest {
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(true)
-        mockDuckChatFeature.contextualSuggestedPrompts().setRawStoredState(Toggle.State(enable = true))
 
         val result = testee.processJsCallbackMessage(
             "aiChat",
@@ -1100,10 +1102,9 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeConfigValuesAndSuggestedPromptsEnabledButContextualModeDisabledThenSupportsSuggestionsFalse() = runTest {
+    fun whenGetAIChatNativeConfigValuesAndContextualModeDisabledThenSupportsSuggestionsFalse() = runTest {
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(false)
-        mockDuckChatFeature.contextualSuggestedPrompts().setRawStoredState(Toggle.State(enable = true))
 
         val result = testee.processJsCallbackMessage(
             "aiChat",
@@ -1147,6 +1148,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", true)
             put("supportsAIChatSync", false)
@@ -1154,7 +1156,7 @@ class RealDuckChatJSHelperTest {
             put("supportsNativeStorage", false)
             put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", true)
-            put("supportsSuggestions", false)
+            put("supportsSuggestions", true)
             put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
@@ -1195,6 +1197,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", true)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
@@ -1243,6 +1246,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
@@ -1785,6 +1789,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", true)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
@@ -1830,6 +1835,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
@@ -1875,6 +1881,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", true)
@@ -1921,6 +1928,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
@@ -2502,6 +2510,17 @@ class RealDuckChatJSHelperTest {
         assertTrue(query.getBoolean("autoSubmit"))
         assertEquals("model", query.getString("modelId"))
         assertFalse(query.has("reasoningEffort"))
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithPendingPromptThatDoesNotCarryTermsThenTheConsentIsNotCarried() = runTest {
+        whenever(mockPendingNativePromptStore.consume())
+            .thenReturn(PendingNativePrompt("test prompt", null, null, carriesTermsConsent = false))
+
+        val result = testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext)
+
+        assertEquals("test prompt", result!!.params.getJSONObject("query").getString("prompt"))
+        verify(mockTermsConsent, never()).carry(any(), any())
     }
 
     @Test

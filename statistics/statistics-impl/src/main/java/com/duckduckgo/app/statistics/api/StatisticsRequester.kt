@@ -212,6 +212,7 @@ class StatisticsRequester @Inject constructor(
         onSuccess: (Atb) -> Unit,
     ) {
         val fullAtb = atb.formatWithVariant(variantManager.getVariantKey())
+        logcat(INFO) { "$logLabel atb refresh request: atb=$fullAtb set_atb=$oldRetentionAtb" }
 
         updateCall(fullAtb, oldRetentionAtb, emailSignInState())
             .subscribeOn(Schedulers.io())
@@ -227,6 +228,7 @@ class StatisticsRequester @Inject constructor(
 
     private fun storeUpdateVersionIfPresent(retrievedAtb: Atb) {
         retrievedAtb.updateVersion?.let { updateVersion ->
+            logcat(WARN) { "ATB updateVersion=$updateVersion; variant ${store.variant} -> default" }
             store.atb = Atb(updateVersion)
             store.variant = variantManager.defaultVariantKey()
         }

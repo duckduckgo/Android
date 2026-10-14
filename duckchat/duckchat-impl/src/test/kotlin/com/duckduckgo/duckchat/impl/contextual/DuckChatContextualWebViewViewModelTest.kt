@@ -20,6 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckAiTermsConsent
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -31,7 +32,6 @@ import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.ChatType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
-import com.duckduckgo.duckchat.impl.terms.DuckAiTermsConsent
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelection
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
@@ -670,6 +670,25 @@ class DuckChatContextualWebViewViewModelTest {
     }
 
     @Test
+    fun `onRecentChatClicked opens the chat and reports the contextual recent chat entry point`() = runTest {
+        whenever(duckChatInternal.buildChatUrl("chat-1")).thenReturn("https://duckduckgo.com/?ia=chat&chatID=chat-1")
+        testee.onSheetOpened("tab-1")
+
+        testee.commands.test {
+            testee.onRecentChatClicked("chat-1")
+
+            val command = expectMostRecentItem()
+            assertTrue(command is DuckChatContextualWebViewViewModel.Command.OpenChatUrl)
+            command as DuckChatContextualWebViewViewModel.Command.OpenChatUrl
+            assertEquals("https://duckduckgo.com/?ia=chat&chatID=chat-1", command.url)
+            assertEquals("tab-1", command.sourceTabId)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(duckChatPixels).reportContextualRecentChatSelected()
+        verify(duckChatInternal).reportDuckChatEntry(DuckChatEntryPoint.RECENT_CHAT_CONTEXTUAL, opensNewTab = true, hasPrompt = false)
+    }
+
+    @Test
     fun `onChatsIconClicked with no recent chats launches chat history`() = runTest {
         testee.commands.test {
             testee.onChatsIconClicked()
@@ -744,6 +763,36 @@ class DuckChatContextualWebViewViewModelTest {
     @Test
     fun `when prompt sent then the terms consent is carried on the event`() = runTest {
         testee.onPromptSent("Hello Duck.ai")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(termsConsent).carry(any(), eq(BrowserMode.REGULAR))
+    }
+
+    @Test
+    fun `when a canned entry prompt is sent then the terms consent is not carried`() = runTest {
+        val prompt = NativeInputPrompt("Translate this page", null, null, null, null, null)
+        whenever(contextualEntryPromptStore.consume("tab-1"))
+            .thenReturn(ContextualEntryPrompt("tab-1", prompt, serializedPageContext = null, carriesTermsConsent = false))
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onWebAppReady()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(termsConsent, never()).carry(any(), any())
+    }
+
+    @Test
+    fun `when a typed entry prompt is sent then the terms consent is carried`() = runTest {
+        val prompt = NativeInputPrompt("hello", null, null, null, null, null)
+        whenever(contextualEntryPromptStore.consume("tab-1"))
+            .thenReturn(ContextualEntryPrompt("tab-1", prompt, serializedPageContext = null))
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onWebAppReady()
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(termsConsent).carry(any(), eq(BrowserMode.REGULAR))

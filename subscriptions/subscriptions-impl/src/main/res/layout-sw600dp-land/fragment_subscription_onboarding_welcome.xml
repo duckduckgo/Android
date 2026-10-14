@@ -227,8 +227,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintWidth_percent="0.66" />
 
-    <nl.dionsegijn.konfetti.KonfettiView
-        android:id="@+id/subscriptionOnboardingWelcomeKonfetti"
+    <com.duckduckgo.subscriptions.impl.onboarding.confetti.ConfettiView
+        android:id="@+id/subscriptionOnboardingWelcomeConfetti"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clickable="false"

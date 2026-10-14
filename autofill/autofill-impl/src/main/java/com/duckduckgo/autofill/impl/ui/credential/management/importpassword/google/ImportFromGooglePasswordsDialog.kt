@@ -114,6 +114,9 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     @Inject
     lateinit var credentialExchangeLauncher: CredentialExchangeLauncher
 
+    @Inject
+    lateinit var externalImportAuthSuppressor: ExternalImportAuthSuppressor
+
     private var _binding: ContentImportFromGooglePasswordDialogBinding? = null
 
     private val binding get() = _binding!!
@@ -402,15 +405,13 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
 
     private fun startCredentialExchangeImport() {
         viewLifecycleOwner.lifecycleScope.launch {
-            authorizationGracePeriod.requestExtendedGracePeriod()
-            val exchangeResult = try {
-                credentialExchangeLauncher.launchImportFlow()
-            } finally {
-                authorizationGracePeriod.removeRequestForExtendedGracePeriod()
-            }
-            viewLifecycleOwner.lifecycle.withResumed {
-                val launchSource = getLaunchSource()
-                viewModel.onCredentialExchangeFinished(exchangeResult, launchSource, canShowPreImportDialog(launchSource))
+            externalImportAuthSuppressor.suppressAuthPromptWhileRunning {
+                val exchangeResult = credentialExchangeLauncher.launchImportFlow()
+                // the result can arrive before the host restarts; staying in the block until resumed keeps the suppression available to its onStart
+                viewLifecycleOwner.lifecycle.withResumed {
+                    val launchSource = getLaunchSource()
+                    viewModel.onCredentialExchangeFinished(exchangeResult, launchSource, canShowPreImportDialog(launchSource))
+                }
             }
         }
     }

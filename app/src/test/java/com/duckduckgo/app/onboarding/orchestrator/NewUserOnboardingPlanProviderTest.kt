@@ -31,6 +31,7 @@ import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
 import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.OnboardingPreferenceCatalog
+import com.duckduckgo.app.onboarding.OnboardingPrivacyConfigPersistedGate
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentMetrics
@@ -40,9 +41,9 @@ import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.PasswordImportErrorAction
-import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig
-import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
-import com.duckduckgo.app.onboarding.ui.page.configdriven.TextConfig
+import com.duckduckgo.app.onboarding.ui.page.welcome.ContentConfig
+import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
+import com.duckduckgo.app.onboarding.ui.page.welcome.TextConfig
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
@@ -79,6 +80,8 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.nextsteps.api.NextSteps
+import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Completed
 import com.duckduckgo.onboarding.api.LinearOnboardingState.InProgress
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Skipped
@@ -130,6 +133,8 @@ class NewUserOnboardingPlanProviderTest {
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo = mock()
     private val segmentedOnboardingExperiment: SegmentedOnboardingExperimentManager = mock()
     private val segmentedOnboardingMetrics: SegmentedOnboardingExperimentMetrics = mock()
+    private val nextSteps: NextSteps = mock()
+    private val privacyConfigPersistedGate: OnboardingPrivacyConfigPersistedGate = mock()
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog = mock {
         onBlocking { offer(any()) } doReturn emptyList()
     }
@@ -173,6 +178,7 @@ class NewUserOnboardingPlanProviderTest {
             whenever(customAiOnboardingResolver.resolve()).thenReturn(false)
             whenever(segmentedOnboardingExperiment.enroll()).thenReturn(null)
             whenever(passwordImportExperiment.enroll()).thenReturn(null)
+            whenever(privacyConfigPersistedGate.awaitPersisted()).thenReturn(true)
         }
         provider = NewUserOnboardingPlanProvider(
             syncAutoRestore = syncAutoRestore,
@@ -195,6 +201,8 @@ class NewUserOnboardingPlanProviderTest {
             duckAiOnboardingDemo = duckAiOnboardingDemo,
             segmentedOnboardingExperimentManager = segmentedOnboardingExperiment,
             segmentedOnboardingExperimentMetrics = segmentedOnboardingMetrics,
+            nextSteps = nextSteps,
+            onboardingPrivacyConfigPersistedGate = privacyConfigPersistedGate,
             onboardingPasswordImportExperimentManager = passwordImportExperiment,
             onboardingPreferenceCatalog = onboardingPreferenceCatalog,
             singleChoiceDataPlugins = singleChoiceDataPlugins,
@@ -202,8 +210,11 @@ class NewUserOnboardingPlanProviderTest {
         )
     }
 
-    private suspend fun start() {
-        orchestrator.startPlan(provider.buildRootPlan(onCompleted = {}, onSkipped = {}))
+    private suspend fun start(
+        onCompleted: suspend () -> Unit = {},
+        onSkipped: suspend () -> Unit = {},
+    ) {
+        orchestrator.startPlan(provider.buildRootPlan(onCompleted = onCompleted, onSkipped = onSkipped))
     }
 
     private fun assertStep(id: String) {
@@ -221,7 +232,8 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when initial user then walks full happy path to completed`() = runTest {
-        start()
+        var callbackState: LinearOnboardingState? = null
+        start(onCompleted = { callbackState = orchestrator.state.value })
         assertStep(NewUserOnboardingStepIds.INTRO_ANIMATION)
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         assertStep(NewUserOnboardingStepIds.NOTIFICATION_PERMISSION)
@@ -240,7 +252,19 @@ class NewUserOnboardingPlanProviderTest {
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN)
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = false))
         // input_screen_preview precondition is false (not AI) -> plan exhausts.
+        assertTrue(callbackState is InProgress)
         assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+    }
+
+    @Test
+    fun `when dev skip aborts real root plan then supplied callback runs while orchestrator is in progress`() = runTest {
+        var callbackState: LinearOnboardingState? = null
+        start(onSkipped = { callbackState = orchestrator.state.value })
+
+        orchestrator.onEvent(NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked)
+
+        assertTrue(callbackState is InProgress)
+        assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
     }
 
     @Test
@@ -2107,6 +2131,37 @@ class NewUserOnboardingPlanProviderTest {
             ONBOARDING_PREFERENCES_DUCK_AI,
             OnboardingPixelAction.SingleChoiceClicked(duckAiStateOptions[1].id),
         )
+    }
+
+    @Test
+    fun `when new user then the next steps items experiment is enrolled once`() = runTest {
+        start()
+
+        verify(nextSteps, times(1)).enroll()
+    }
+
+    @Test
+    fun `when reinstall user then the next steps items experiment is never enrolled`() = runTest {
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
+        start()
+
+        verify(nextSteps, never()).enroll()
+    }
+
+    @Test
+    fun `when privacy config is not persisted in time then the next steps items experiment is never enrolled`() = runTest {
+        whenever(privacyConfigPersistedGate.awaitPersisted()).thenReturn(false)
+        start()
+
+        verify(nextSteps, never()).enroll()
+    }
+
+    @Test
+    fun `when custom ai path and new user then the next steps items experiment is enrolled once`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        start()
+
+        verify(nextSteps, times(1)).enroll()
     }
 
     // endregion

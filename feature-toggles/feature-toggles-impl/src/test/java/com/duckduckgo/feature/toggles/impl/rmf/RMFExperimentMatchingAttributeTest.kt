@@ -186,13 +186,76 @@ class RMFExperimentMatchingAttributeTest {
         assertTrue(result!!)
     }
 
-    private suspend fun Toggle.setCohort(isActive: Boolean = true) {
+    @Test
+    fun `evaluate - when value has cohort and user is enrolled in that cohort, return true`() = runTest {
+        testFeature.subFeature1().setCohort(cohortName = "stacked_cards")
+        val attribute = ExperimentMatchingAttribute(listOf("subFeature1:stacked_cards"))
+
+        val result = matcher.evaluate(attribute)
+
+        assertTrue(result!!)
+    }
+
+    @Test
+    fun `evaluate - when value has cohort and user is enrolled in another cohort, return false`() = runTest {
+        testFeature.subFeature1().setCohort(cohortName = "control")
+        val attribute = ExperimentMatchingAttribute(listOf("subFeature1:stacked_cards"))
+
+        val result = matcher.evaluate(attribute)
+
+        assertFalse(result!!)
+    }
+
+    @Test
+    fun `evaluate - when value has cohort but experiment is not active, return false`() = runTest {
+        testFeature.subFeature1().setCohort(isActive = false, cohortName = "stacked_cards")
+        val attribute = ExperimentMatchingAttribute(listOf("subFeature1:stacked_cards"))
+
+        val result = matcher.evaluate(attribute)
+
+        assertFalse(result!!)
+    }
+
+    @Test
+    fun `evaluate - when cohort differs only in case, return true`() = runTest {
+        testFeature.subFeature1().setCohort(cohortName = "stacked_cards")
+        val attribute = ExperimentMatchingAttribute(listOf("subFeature1:STACKED_CARDS"))
+
+        val result = matcher.evaluate(attribute)
+
+        assertTrue(result!!)
+    }
+
+    @Test
+    fun `evaluate - when any of the cohorts matches, return true`() = runTest {
+        testFeature.subFeature1().setCohort(cohortName = "check_list")
+        val attribute = ExperimentMatchingAttribute(listOf("subFeature1:stacked_cards", "subFeature1:check_list"))
+
+        val result = matcher.evaluate(attribute)
+
+        assertTrue(result!!)
+    }
+
+    @Test
+    fun `evaluate - when value has no cohort, any enrolled cohort matches`() = runTest {
+        testFeature.subFeature1().setCohort(cohortName = "control")
+        val attribute = ExperimentMatchingAttribute(listOf("subFeature1"))
+
+        val result = matcher.evaluate(attribute)
+
+        assertTrue(result!!)
+    }
+
+    private suspend fun Toggle.setCohort(
+        isActive: Boolean = true,
+        cohortName: String = "control",
+    ) {
         val zdt = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         setRawStoredState(
             State(
                 remoteEnableState = isActive,
                 enable = isActive,
-                cohorts = listOf(State.Cohort(name = "control", weight = 1, enrollmentDateET = zdt)),
+                cohorts = listOf(State.Cohort(name = cohortName, weight = 1, enrollmentDateET = zdt)),
             ),
         )
         enroll()

@@ -17,7 +17,7 @@
 package com.duckduckgo.app.onboarding.store
 
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
-import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
+import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
 
 interface OnboardingStore {
     var onboardingDialogJourney: String?

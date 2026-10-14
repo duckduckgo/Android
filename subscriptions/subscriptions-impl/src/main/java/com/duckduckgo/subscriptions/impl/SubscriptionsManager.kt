@@ -51,6 +51,7 @@ import com.duckduckgo.subscriptions.impl.auth.CrossProcessLock
 import com.duckduckgo.subscriptions.impl.auth.PkceGenerator
 import com.duckduckgo.subscriptions.impl.auth.RefreshTokenClaims
 import com.duckduckgo.subscriptions.impl.auth.ResponseError
+import com.duckduckgo.subscriptions.impl.auth.ResponseErrorCode
 import com.duckduckgo.subscriptions.impl.auth.TokenPair
 import com.duckduckgo.subscriptions.impl.billing.LatestPurchaseResult
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
@@ -284,7 +285,9 @@ class RealSubscriptionsManager @Inject constructor(
     private val featureTogglesInventory: FeatureTogglesInventory,
     private val subscriptionOnboardingExperiments: SubscriptionOnboardingExperiments,
 ) : SubscriptionsManager {
-    private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
+    private val moshi = Moshi.Builder().build()
+    private val adapter = moshi.adapter(ResponseError::class.java)
+    private val errorCodeAdapter = moshi.adapter(ResponseErrorCode::class.java)
 
     private var pendingOnboardingEnrollmentIsFreeTrial: Boolean? = null
 
@@ -762,8 +765,9 @@ class RealSubscriptionsManager @Inject constructor(
             validateTokens(tokens, jwks)
                 .also { tokenRefreshWideEvent.onTokensValidated() }
         } catch (e: HttpException) {
-            val backendErrorResponse = parseError(e)?.error
-                ?.also { tokenRefreshWideEvent.onBackendErrorResponse(backendErrorResponse = it) }
+            val parsedError = parseError(e)
+                ?.also { tokenRefreshWideEvent.onBackendErrorResponse(backendErrorResponse = it.error, backendErrorCode = it.errorCode) }
+            val backendErrorResponse = parsedError?.error
 
             if (e.code() == 400) {
                 if (backendErrorResponse == "unknown_account") {
@@ -1265,14 +1269,15 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
-    private fun parseError(e: HttpException): ResponseError? {
-        return try {
-            val error = adapter.fromJson(e.response()?.errorBody()?.string().orEmpty())
-            error
-        } catch (e: Exception) {
-            null
-        }
+    private fun parseError(e: HttpException): ParsedResponseError? {
+        val body = runCatching { e.response()?.errorBody()?.string() }.getOrNull().orEmpty()
+        // Parsed separately so an unexpected error_code can't prevent reading error, which drives sign-out and recovery.
+        val error = runCatching { adapter.fromJson(body)?.error }.getOrNull()
+        val errorCode = runCatching { errorCodeAdapter.fromJson(body)?.errorCode }.getOrNull()
+        return if (error != null || errorCode != null) ParsedResponseError(error, errorCode) else null
     }
+
+    private data class ParsedResponseError(val error: String?, val errorCode: Int?)
 
     private data class SignedPurchase(val signature: String, val originalJson: String)
 

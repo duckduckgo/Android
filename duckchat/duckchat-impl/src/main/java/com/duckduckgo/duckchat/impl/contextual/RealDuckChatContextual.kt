@@ -31,7 +31,8 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChatContextual
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
-import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
+import com.duckduckgo.duckchat.api.DuckChatHistoryParams
+import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
@@ -146,7 +147,7 @@ class RealDuckChatContextual @Inject constructor(
         if (duckChatInternal.isContextualMenuAllChatsEnabled()) {
             popup.onMenuItemClicked(content.findViewById(R.id.contextualChatMenuAllChats)) {
                 duckChatPixels.reportContextualAddressBarMenuAllChatsSelected()
-                globalActivityStarter.start(activity, DuckChatHistoryNoParams)
+                globalActivityStarter.start(activity, DuckChatHistoryParams(DuckChatHistorySource.ADDRESS_BAR))
             }
         } else {
             content.findViewById<View>(R.id.contextualChatMenuAllChats).gone()
