@@ -1108,20 +1108,21 @@ class RealPirPixelSenderTest {
     }
 
     @Test
-    fun whenReportDashboardOpenedThenFiresCorrectPixel() = runTest {
-        testee.reportDashboardOpened()
+    fun whenReportDashboardOpenedThenFiresCountAndDailyWithTierParams() = runTest {
+        testee.reportDashboardOpened(isAuthenticated = false)
 
+        val pixelNameCaptor = argumentCaptor<String>()
         val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixelSender, org.mockito.kotlin.times(2)).fire(
-            pixelName = any(),
+        verify(mockPixelSender, times(2)).fire(
+            pixelName = pixelNameCaptor.capture(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
             type = any(),
         )
 
-        // Check both captured values are empty
+        assertEquals(setOf("pir_webui_dashboard_opened_c", "pir_webui_dashboard_opened_d"), pixelNameCaptor.allValues.toSet())
         paramsCaptor.allValues.forEach { params ->
-            assert(params.isEmpty())
+            assertEquals(mapOf("is_authenticated" to "false", "free_scan" to "true"), params)
         }
     }
 
@@ -1213,7 +1214,7 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportInteractionDAUThenEnqueuesPixelWithAuthParams() = runTest {
-        testee.reportInteractionDAU()
+        testee.reportInteractionDAU(isAuthenticated = true)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).enqueueFire(
@@ -1229,7 +1230,7 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportInteractionWAUThenEnqueuesPixelWithAuthParams() = runTest {
-        testee.reportInteractionWAU()
+        testee.reportInteractionWAU(isAuthenticated = true)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).enqueueFire(
@@ -1245,7 +1246,7 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportInteractionMAUThenEnqueuesPixelWithAuthParams() = runTest {
-        testee.reportInteractionMAU()
+        testee.reportInteractionMAU(isAuthenticated = true)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).enqueueFire(
@@ -1257,6 +1258,21 @@ class RealPirPixelSenderTest {
 
         assert(paramsCaptor.firstValue["is_authenticated"] == "true")
         assert(paramsCaptor.firstValue["free_scan"] == "false")
+    }
+
+    @Test
+    fun whenReportInteractionDAUForFreeUserThenEnqueuesPixelWithFreeParams() = runTest {
+        testee.reportInteractionDAU(isAuthenticated = false)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).enqueueFire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        assertEquals(mapOf("is_authenticated" to "false", "free_scan" to "true"), paramsCaptor.firstValue)
     }
 
     @Test

@@ -304,61 +304,25 @@
         "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_interaction_dau": {
-        "description": "Pixel for PIR user-interacted daily active users. Fired when the PIR dashboard is presented to the user.",
+        "description": "Pixel for PIR user-interacted daily active users. Fired when the PIR dashboard is presented to the user, at most once per calendar day, for paid and free users alike.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["user_interaction"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": [
-            "appVersion",
-            {
-                "key": "is_authenticated",
-                "description": "Whether the user is authenticated (has an active subscription). Always true on Android, which has no freemium PIR.",
-                "type": "boolean"
-            },
-            {
-                "key": "free_scan",
-                "description": "Whether this is a freemium (unauthenticated) scan. Always false on Android, which has no freemium PIR.",
-                "type": "boolean"
-            }
-        ]
+        "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_interaction_wau": {
-        "description": "Pixel for PIR user-interacted weekly active users. Fired when the PIR dashboard is presented to the user.",
+        "description": "Pixel for PIR user-interacted weekly active users. Fired when the PIR dashboard is presented to the user, at most once every 7 calendar days, for paid and free users alike.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["user_interaction"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": [
-            "appVersion",
-            {
-                "key": "is_authenticated",
-                "description": "Whether the user is authenticated (has an active subscription). Always true on Android, which has no freemium PIR.",
-                "type": "boolean"
-            },
-            {
-                "key": "free_scan",
-                "description": "Whether this is a freemium (unauthenticated) scan. Always false on Android, which has no freemium PIR.",
-                "type": "boolean"
-            }
-        ]
+        "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_interaction_mau": {
-        "description": "Pixel for PIR user-interacted monthly active users. Fired when the PIR dashboard is presented to the user.",
+        "description": "Pixel for PIR user-interacted monthly active users. Fired when the PIR dashboard is presented to the user, at most once every 28 calendar days, for paid and free users alike.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["user_interaction"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": [
-            "appVersion",
-            {
-                "key": "is_authenticated",
-                "description": "Whether the user is authenticated (has an active subscription). Always true on Android, which has no freemium PIR.",
-                "type": "boolean"
-            },
-            {
-                "key": "free_scan",
-                "description": "Whether this is a freemium (unauthenticated) scan. Always false on Android, which has no freemium PIR.",
-                "type": "boolean"
-            }
-        ]
+        "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_first_scan_u": {
         "description": "Fired once per install when the user starts their first PIR scan.",
@@ -1338,11 +1302,11 @@
         ]
     },
     "pir_webui_dashboard_opened": {
-        "description": "Android specific pixel which is fired when the PIR dashboard is opened",
+        "description": "Android specific pixel fired every time the PIR dashboard is presented to the user (count) and once per day (daily), for paid and free users alike. The count variant is the 'starts' metric that m_mac_dbp_dashboard_open / m_ios_dbp_dashboard_open report on Apple.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["user_interaction"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_initial_scan_duration": {
         "description": "Fired when the initial scan for all brokers and profile combination are completed.",
