@@ -33,7 +33,7 @@
     <string name="pirOnboardingStepPlatformMac">Mac</string>
     <string name="pirOnboardingStepPlatformWindows">Windows</string>
     <string name="pirOnboardingStepItem1Title">Platforms</string>
-    <string name="pirOnboardingStepItem1Description">Personal Information Removal is only available on iOS, Mac, and Windows.</string>
+    <string name="pirOnboardingStepItem1Description">Personal Information Removal is only available on iOS, Mac and Windows.</string>
     <string name="pirOnboardingStepItem2Title">Repeatedly scans many data broker sites that sell your information</string>
     <string name="pirOnboardingStepItem2Description">Find and remove your personal information from data broker sites around the web. DuckDuckGo re-scans regularly to minimize the risk of your info reappearing.</string>
     <string name="pirOnboardingStepItem3Title">Your info stays on your device, not our servers</string>
