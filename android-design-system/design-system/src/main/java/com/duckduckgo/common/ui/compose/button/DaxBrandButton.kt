@@ -30,7 +30,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -45,7 +44,9 @@ import com.duckduckgo.common.ui.compose.theme.Pollen100
 import com.duckduckgo.common.ui.compose.theme.Pollen40
 import com.duckduckgo.common.ui.compose.theme.Pollen60
 import com.duckduckgo.common.ui.compose.theme.ProvideDuckDuckGoTheme
+import com.duckduckgo.common.ui.compose.theme.Typography
 import com.duckduckgo.common.ui.compose.theme.White
+import com.duckduckgo.common.ui.compose.theme.asTextStyle
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
@@ -104,13 +105,14 @@ private object DaxBrandButtonDefaults {
 
     private const val DisabledAlpha = 0.38f
 
-    private val SmallTextStyle = TextStyle(
-        fontSize = 15.sp,
-        lineHeight = 20.sp,
-        fontWeight = FontWeight.Medium,
+    private val SmallTextStyle = DuckDuckGoTextStyle(
+        Typography.button.asTextStyle.copy(fontWeight = FontWeight.Medium),
     )
 
-    private val LargeTextStyle = SmallTextStyle.copy(fontSize = 16.sp)
+    // Matches the View Typography.DuckDuckGo.Rebrand.ButtonLarge, which is 1sp larger than the Figma button style.
+    private val LargeTextStyle = DuckDuckGoTextStyle(
+        SmallTextStyle.asTextStyle.copy(fontSize = 16.sp),
+    )
 
     val shape: Shape = RoundedCornerShape(percent = 50)
 
@@ -147,8 +149,8 @@ private object DaxBrandButtonDefaults {
     }
 
     fun textStyle(size: DaxButtonSize): DuckDuckGoTextStyle = when (size) {
-        DaxButtonSize.Small -> DuckDuckGoTextStyle(SmallTextStyle)
-        DaxButtonSize.Large -> DuckDuckGoTextStyle(LargeTextStyle)
+        DaxButtonSize.Small -> SmallTextStyle
+        DaxButtonSize.Large -> LargeTextStyle
     }
 
     @Composable @ReadOnlyComposable
