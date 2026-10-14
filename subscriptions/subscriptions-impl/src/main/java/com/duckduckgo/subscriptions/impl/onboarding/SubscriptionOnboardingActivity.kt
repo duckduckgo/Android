@@ -113,7 +113,6 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
                 finish()
             }
             is Command.FinishToSettings -> finishToSettings()
-            is Command.Finish -> finish()
         }
     }
 
