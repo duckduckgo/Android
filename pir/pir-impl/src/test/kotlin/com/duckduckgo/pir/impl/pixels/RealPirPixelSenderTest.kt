@@ -1071,6 +1071,7 @@ class RealPirPixelSenderTest {
         testee.reportUpdateBrokerJsonSuccess(
             brokerJsonFileName = "broker.json",
             removedAtMs = 123456789L,
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -1082,6 +1083,8 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
+
+        assert(params["free_scan"] == "false")
         assert(params["data_broker_json_file"] == "broker.json")
         assert(params["removed_at"] == "123456789")
     }
@@ -1091,6 +1094,7 @@ class RealPirPixelSenderTest {
         testee.reportUpdateBrokerJsonFailure(
             brokerJsonFileName = "broker.json",
             removedAtMs = 987654321L,
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -1102,8 +1106,28 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
+
+        assert(params["free_scan"] == "false")
         assert(params["data_broker_json_file"] == "broker.json")
         assert(params["removed_at"] == "987654321")
+    }
+
+    @Test
+    fun whenReportUpdateBrokerJsonSuccessWithUnknownTierThenOmitsFreeScan() = runTest {
+        testee.reportUpdateBrokerJsonSuccess(
+            brokerJsonFileName = "broker.json",
+            removedAtMs = 0L,
+            isFreeScan = null,
+        )
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).fire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+        assertFalse(paramsCaptor.firstValue.containsKey("free_scan"))
     }
 
     @Test
@@ -1203,6 +1227,7 @@ class RealPirPixelSenderTest {
             brokerCount = 10,
             executionType = PirExecutionType.MANUAL_INITIAL,
             notificationsPermissionGranted = true,
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -1214,6 +1239,8 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
+
+        assert(params["free_scan"] == "false")
         assert(params["duration_in_ms"] == "45000")
         assert(params["profile_queries"] == "3")
         assert(params["tracker_blocking_state"] == "disabled")
@@ -1223,6 +1250,31 @@ class RealPirPixelSenderTest {
         assert(params["scan_trigger"] == "onboarding")
         assert(params["vpn_connection_state"] == "disconnected")
         assert(params["notifications_permission_granted"] == "true")
+    }
+
+    @Test
+    fun whenReportInitialScanDurationForFreeScanThenSendsFreeScan() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(false)
+
+        testee.reportInitialScanDuration(
+            durationMs = 45000L,
+            profileQueryCount = 1,
+            isPowerSavingEnabled = false,
+            batteryOptimizationsEnabled = false,
+            brokerCount = 10,
+            executionType = PirExecutionType.MANUAL_INITIAL,
+            notificationsPermissionGranted = true,
+            isFreeScan = true,
+        )
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).fire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+        assertEquals("true", paramsCaptor.firstValue["free_scan"])
     }
 
     @Test
@@ -1237,6 +1289,7 @@ class RealPirPixelSenderTest {
             brokerCount = 0,
             executionType = PirExecutionType.MANUAL_EDIT_PROFILE,
             notificationsPermissionGranted = false,
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -1264,6 +1317,7 @@ class RealPirPixelSenderTest {
             brokerCount = 1,
             executionType = PirExecutionType.MANUAL_INITIAL_RESUME,
             notificationsPermissionGranted = true,
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()

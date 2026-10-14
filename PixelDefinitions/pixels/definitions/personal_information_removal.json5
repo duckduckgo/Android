@@ -1123,12 +1123,13 @@
         ]
     },
     "m_dbp_update_databrokers_success": {
-        "description": "Fired when a data broker JSON is updated successfuly.",
+        "description": "Fired when a data broker JSON is updated successfuly. free_scan is omitted when the PIR subscription state can't be read.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
+            "pirIsFreeScan",
             {
                 "key": "data_broker_json_file",
                 "description": "The JSON file name for the data broker that this action was operating on",
@@ -1142,12 +1143,13 @@
         ]
     },
     "m_dbp_update_databrokers_failure": {
-        "description": "Fired when a data broker JSON update has failed.",
+        "description": "Fired when a data broker JSON update has failed. free_scan is omitted when the PIR subscription state can't be read.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["exception"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
+            "pirIsFreeScan",
             {
                 "key": "data_broker_json_file",
                 "description": "The JSON file name for the data broker that this action was operating on",
@@ -1307,10 +1309,11 @@
     "m_dbp_initial_scan_duration": {
         "description": "Fired when the initial scan for all brokers and profile combination are completed.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
+            "pirIsFreeScan",
             {
                 "key": "duration_in_ms",
                 "description": "Total duration of the initial scan in ms",

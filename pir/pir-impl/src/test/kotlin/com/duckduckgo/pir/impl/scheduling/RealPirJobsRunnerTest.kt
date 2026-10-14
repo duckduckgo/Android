@@ -331,7 +331,7 @@ class RealPirJobsRunnerTest {
         verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
         verify(mockPixelSender).reportFirstScanStarted(isAuthenticated = true)
         // we just dont attempt what the mock for time provider is giving us
-        verify(mockPixelSender).reportInitialScanDuration(eq(0L), eq(2), eq(false), eq(false), eq(1), eq(MANUAL_INITIAL), any())
+        verify(mockPixelSender).reportInitialScanDuration(eq(0L), eq(2), eq(false), eq(false), eq(1), eq(MANUAL_INITIAL), any(), any())
         verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         verify(mockPirScan).executeScanForJobs(
             eq(listOf(testScanJobRecord)),
@@ -390,7 +390,7 @@ class RealPirJobsRunnerTest {
         verify(mockPixelSender).reportFirstScanStarted(isAuthenticated = true)
         verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         // we just dont attempt what the mock for time provider is giving us
-        verify(mockPixelSender).reportInitialScanDuration(eq(0L), eq(2), eq(false), eq(false), eq(2), eq(MANUAL_INITIAL), any())
+        verify(mockPixelSender).reportInitialScanDuration(eq(0L), eq(2), eq(false), eq(false), eq(2), eq(MANUAL_INITIAL), any(), any())
         verify(mockPirScan).executeScanForJobs(
             eq(listOf(testScanJobRecord)),
             eq(mockContext),
@@ -429,7 +429,7 @@ class RealPirJobsRunnerTest {
 
         // Then
         verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_EDIT_PROFILE), any())
-        verify(mockPixelSender).reportInitialScanDuration(any(), any(), any(), any(), any(), eq(MANUAL_EDIT_PROFILE), any())
+        verify(mockPixelSender).reportInitialScanDuration(any(), any(), any(), any(), any(), eq(MANUAL_EDIT_PROFILE), any(), any())
         verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_EDIT_PROFILE), any())
         verify(mockPixelSender, never()).reportFirstScanStarted(any())
     }
@@ -462,7 +462,7 @@ class RealPirJobsRunnerTest {
         // Then - a resume is a manual run (forwards the resume trigger to pixels and both wide events)
         // but must NOT re-fire the once-per-install first-scan pixel.
         verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL_RESUME), any())
-        verify(mockPixelSender).reportInitialScanDuration(any(), any(), any(), any(), any(), eq(MANUAL_INITIAL_RESUME), any())
+        verify(mockPixelSender).reportInitialScanDuration(any(), any(), any(), any(), any(), eq(MANUAL_INITIAL_RESUME), any(), any())
         verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL_RESUME), any())
         verify(mockPixelSender, never()).reportFirstScanStarted(any())
         verify(mockPirScanWideEvent).onRunStarted(
@@ -1929,7 +1929,7 @@ class RealPirJobsRunnerTest {
 
         testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
 
-        verify(mockPixelSender).reportInitialScanDuration(any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
+        verify(mockPixelSender).reportInitialScanDuration(any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any(), any())
     }
 
     @Test
@@ -2026,6 +2026,18 @@ class RealPirJobsRunnerTest {
             verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any(), any())
             assertEquals(setOf("Matched", "NoMatch"), firstValue.map { it.brokerName }.toSet())
         }
+    }
+
+    @Test
+    fun whenScanOnlyInitialScanCompletesThenDurationPixelReportsFreeScan() = runTest {
+        givenAScanRunWithUngatedBrokers("Fresh")
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(ScanJobRecord(brokerName = "Fresh", userProfileId = testProfileQuery.id)),
+        )
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPixelSender).reportInitialScanDuration(any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any(), eq(true))
     }
 
     @Test

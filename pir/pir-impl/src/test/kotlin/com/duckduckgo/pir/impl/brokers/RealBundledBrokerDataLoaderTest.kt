@@ -19,6 +19,7 @@ package com.duckduckgo.pir.impl.brokers
 import android.content.Context
 import android.content.res.AssetManager
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.pir.impl.PirUserUtils
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.store.PirRepository
@@ -27,6 +28,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -42,6 +45,9 @@ class RealBundledBrokerDataLoaderTest {
     private val mockAssetManager: AssetManager = mock()
     private val mockPirRepository: PirRepository = mock()
     private val mockPixelSender: PirPixelSender = mock()
+    private val mockPirUserUtils: PirUserUtils = mock {
+        onBlocking { hasPirSubscription() } doReturn true
+    }
 
     private lateinit var testee: RealBundledBrokerDataLoader
 
@@ -51,7 +57,7 @@ class RealBundledBrokerDataLoaderTest {
         testee = RealBundledBrokerDataLoader(
             context = mockContext,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            brokerJsonProcessor = RealBrokerJsonProcessor(mockPirRepository, mockPixelSender),
+            brokerJsonProcessor = RealBrokerJsonProcessor(mockPirRepository, mockPixelSender, mockPirUserUtils),
         )
     }
 
@@ -91,8 +97,8 @@ class RealBundledBrokerDataLoaderTest {
         testee.loadBundledBrokerData()
 
         verify(mockPirRepository, never()).updateBrokerData(any(), any())
-        verify(mockPixelSender, never()).reportUpdateBrokerJsonSuccess(any(), any())
-        verify(mockPixelSender, never()).reportUpdateBrokerJsonFailure(any(), any())
+        verify(mockPixelSender, never()).reportUpdateBrokerJsonSuccess(any(), any(), anyOrNull())
+        verify(mockPixelSender, never()).reportUpdateBrokerJsonFailure(any(), any(), anyOrNull())
     }
 
     @Test
@@ -104,7 +110,7 @@ class RealBundledBrokerDataLoaderTest {
         testee.loadBundledBrokerData()
 
         verify(mockPirRepository).updateBrokerData(eq("broker.json"), any())
-        verify(mockPixelSender).reportUpdateBrokerJsonSuccess(eq("broker.json"), any())
+        verify(mockPixelSender).reportUpdateBrokerJsonSuccess(eq("broker.json"), any(), anyOrNull())
     }
 
     @Test
@@ -116,7 +122,7 @@ class RealBundledBrokerDataLoaderTest {
         testee.loadBundledBrokerData()
 
         verify(mockPirRepository).updateBrokerData(eq("broker.json"), any())
-        verify(mockPixelSender).reportUpdateBrokerJsonSuccess(eq("broker.json"), any())
+        verify(mockPixelSender).reportUpdateBrokerJsonSuccess(eq("broker.json"), any(), anyOrNull())
     }
 
     @Test

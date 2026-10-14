@@ -656,14 +656,22 @@ interface PirPixelSender {
         durationMs: Long,
     )
 
+    /**
+     * @param isFreeScan whether the user has no PIR subscription, or null when that couldn't be read; null omits `free_scan`
+     */
     fun reportUpdateBrokerJsonSuccess(
         brokerJsonFileName: String,
         removedAtMs: Long,
+        isFreeScan: Boolean?,
     )
 
+    /**
+     * @param isFreeScan whether the user has no PIR subscription, or null when that couldn't be read; null omits `free_scan`
+     */
     fun reportUpdateBrokerJsonFailure(
         brokerJsonFileName: String,
         removedAtMs: Long,
+        isFreeScan: Boolean?,
     )
 
     suspend fun reportDownloadMainConfigBEFailure(
@@ -713,6 +721,7 @@ interface PirPixelSender {
         brokerCount: Int,
         executionType: PirExecutionType,
         notificationsPermissionGranted: Boolean,
+        isFreeScan: Boolean,
     )
 
     fun reportBackgroundScanStats(
@@ -1548,25 +1557,17 @@ class RealPirPixelSender @Inject constructor(
     override fun reportUpdateBrokerJsonSuccess(
         brokerJsonFileName: String,
         removedAtMs: Long,
+        isFreeScan: Boolean?,
     ) {
-        val params = mapOf(
-            PARAM_KEY_BROKER_JSON_FILE to brokerJsonFileName,
-            PARAM_KEY_REMOVED_AT to removedAtMs.toString(),
-        )
-
-        fire(PIR_UPDATE_BROKER_SUCCESS, params)
+        fire(PIR_UPDATE_BROKER_SUCCESS, brokerUpdateParams(brokerJsonFileName, removedAtMs, isFreeScan))
     }
 
     override fun reportUpdateBrokerJsonFailure(
         brokerJsonFileName: String,
         removedAtMs: Long,
+        isFreeScan: Boolean?,
     ) {
-        val params = mapOf(
-            PARAM_KEY_BROKER_JSON_FILE to brokerJsonFileName,
-            PARAM_KEY_REMOVED_AT to removedAtMs.toString(),
-        )
-
-        fire(PIR_UPDATE_BROKER_FAILURE, params)
+        fire(PIR_UPDATE_BROKER_FAILURE, brokerUpdateParams(brokerJsonFileName, removedAtMs, isFreeScan))
     }
 
     override suspend fun reportDownloadMainConfigBEFailure(errorCode: String) {
@@ -1650,6 +1651,7 @@ class RealPirPixelSender @Inject constructor(
         brokerCount: Int,
         executionType: PirExecutionType,
         notificationsPermissionGranted: Boolean,
+        isFreeScan: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_DURATION_MS to durationMs.toString(),
@@ -1661,6 +1663,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_SCAN_TRIGGER to executionType.toScanTriggerParam(),
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
             PARAM_KEY_NOTIFICATIONS_PERMISSION to notificationsPermissionGranted.toString(),
+            PARAM_KEY_FREE_SCAN to isFreeScan.toString(),
         )
 
         fire(PIR_INITIAL_SCAN_DURATION, params)
@@ -1734,6 +1737,16 @@ class RealPirPixelSender @Inject constructor(
         PARAM_KEY_IS_AUTHENTICATED to isAuthenticated.toString(),
         PARAM_KEY_FREE_SCAN to (!isAuthenticated).toString(),
     )
+
+    private fun brokerUpdateParams(
+        brokerJsonFileName: String,
+        removedAtMs: Long,
+        isFreeScan: Boolean?,
+    ): Map<String, String> = buildMap {
+        put(PARAM_KEY_BROKER_JSON_FILE, brokerJsonFileName)
+        put(PARAM_KEY_REMOVED_AT, removedAtMs.toString())
+        isFreeScan?.let { put(PARAM_KEY_FREE_SCAN, it.toString()) }
+    }
 
     private fun fire(
         pixel: PirPixel,
