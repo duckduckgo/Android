@@ -51,4 +51,11 @@ interface CustomTabsFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun handleTrustedCallersNonHttpLinks(): Toggle
+
+    /**
+     * When enabled together with [handleTrustedCallers] (and [handleTrustedCallersNonHttpLinks] for non-HTTP links),
+     * links that return to the verified custom tab caller can open even when "Open Links in Apps" is set to "Never".
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun handleTrustedCallersWhenAppLinksDisabled(): Toggle
 }
