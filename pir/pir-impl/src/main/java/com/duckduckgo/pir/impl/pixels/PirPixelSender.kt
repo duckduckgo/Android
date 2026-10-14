@@ -658,7 +658,7 @@ interface PirPixelSender {
     )
 
     /**
-     * @param isFreeScan whether the user has no PIR subscription, or null when that couldn't be read; null omits `free_scan`
+     * @param isFreeScan whether the user has no PIR subscription
      */
     fun reportUpdateBrokerJsonSuccess(
         brokerJsonFileName: String,
@@ -667,7 +667,7 @@ interface PirPixelSender {
     )
 
     /**
-     * @param isFreeScan whether the user has no PIR subscription, or null when that couldn't be read; null omits `free_scan`
+     * @param isFreeScan whether the user has no PIR subscription
      */
     fun reportUpdateBrokerJsonFailure(
         brokerJsonFileName: String,
