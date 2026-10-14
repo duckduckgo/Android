@@ -690,6 +690,7 @@ class NewUserOnboardingPlanProviderTest {
             Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, result = NewUserOnboardingResult.LaunchSearch(query = "weather")),
             orchestrator.state.value,
         )
+        verify(onboardingStore, never()).setTriedDuckAi()
     }
 
     @Test
@@ -724,6 +725,7 @@ class NewUserOnboardingPlanProviderTest {
             ),
             orchestrator.state.value,
         )
+        verify(onboardingStore).setTriedDuckAi()
     }
 
     @Test
@@ -1069,6 +1071,7 @@ class NewUserOnboardingPlanProviderTest {
             Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, result = NewUserOnboardingResult.LaunchSearch(query = "weather")),
             orchestrator.state.value,
         )
+        verify(onboardingStore, never()).setTriedDuckAi()
     }
 
     @Test
@@ -1092,6 +1095,7 @@ class NewUserOnboardingPlanProviderTest {
             ),
             orchestrator.state.value,
         )
+        verify(onboardingStore).setTriedDuckAi()
     }
 
     @Test
@@ -1650,6 +1654,20 @@ class NewUserOnboardingPlanProviderTest {
             ONBOARDING_SEARCH_CHAT_TOGGLE,
             OnboardingPixelAction.TryInputClicked(fromSuggestion = false, isChat = true),
         )
+    }
+
+    @Test
+    fun `when custom ai input screen preview demo submitted then marks duck ai as tried`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // ai_comparison_chart
+
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "hello", isChat = true, fromSuggestion = false))
+
+        verify(onboardingStore).setTriedDuckAi()
     }
 
     @Test
