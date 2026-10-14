@@ -117,7 +117,7 @@ class RealBrokerJsonProcessor @Inject constructor(
         !pirUserUtils.hasPirSubscription()
     } catch (e: CancellationException) {
         throw e
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
         logcat(ERROR) { "PIR-update: Failed to read the PIR subscription: $e" }
         null
     }

@@ -189,6 +189,17 @@ class BrokerJsonProcessorTest {
         verify(mockPixelSender).reportUpdateBrokerJsonSuccess(eq("broker.json"), eq(0L), isNull())
     }
 
+    @Test
+    fun whenSubscriptionReadThrowsErrorThenBrokerIsStoredAndPixelOmitsTier() = runTest {
+        whenever(mockPirUserUtils.hasPirSubscription()).thenThrow(ExceptionInInitializerError("crypto provider"))
+        whenever(mockPirRepository.getBrokerForName("Broker One")).thenReturn(null)
+
+        testee.processAndStoreBroker("broker.json", brokerJsonSource("Broker One", "1.0"))
+
+        verify(mockPirRepository).updateBrokerData(eq("broker.json"), any())
+        verify(mockPixelSender).reportUpdateBrokerJsonSuccess(eq("broker.json"), eq(0L), isNull())
+    }
+
     // endregion
 
     // region helpers
