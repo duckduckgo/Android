@@ -2228,6 +2228,14 @@
         "suffixes": ["count_short", "form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_dbp_freemium_pir_maintenance_scan_skipped": {
+        "description": "Temporary telemetry fired at most once per PIR run when a free (freemium) user's run skips at least one maintenance scan, a repeat scan of a broker that already has a result, because free users get one completed scan per broker. Android counterpart of m_ios_dbp_freemium_pir_maintenance_scan_skipped; the count variant counts runs, not broker jobs.",
+        "owners": ["landomen"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2027-03-31"
+    },
     "m_dbp_notification_sent_first_scan_complete": {
         "description": "Fired when the PIR scan-complete notification is posted after a subscriber's run finishes, at most once per profile save.",
         "owners": ["landomen"],

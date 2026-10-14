@@ -70,6 +70,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
@@ -2033,6 +2034,88 @@ class RealPirJobsRunnerTest {
             verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any(), any())
             assertEquals(setOf("Matched", "NoMatch"), firstValue.map { it.brokerName }.toSet())
         }
+    }
+
+    @Test
+    fun whenScanOnlySkipsMaintenanceJobsThenReportsItOncePerRun() = runTest {
+        givenAScanRunWithUngatedBrokers("Matched", "NoMatch", "Fresh")
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(
+                ScanJobRecord(
+                    brokerName = "Matched",
+                    userProfileId = testProfileQuery.id,
+                    status = ScanJobStatus.MATCHES_FOUND,
+                    lastScanDateInMillis = 500L,
+                ),
+                ScanJobRecord(
+                    brokerName = "NoMatch",
+                    userProfileId = testProfileQuery.id,
+                    status = ScanJobStatus.NO_MATCH_FOUND,
+                    lastScanDateInMillis = 500L,
+                ),
+                ScanJobRecord(brokerName = "Fresh", userProfileId = testProfileQuery.id),
+            ),
+        )
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPixelSender, times(1)).reportFreemiumMaintenanceScanSkipped()
+        argumentCaptor<List<ScanJobRecord>>().apply {
+            verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any(), any())
+            assertEquals(listOf("Fresh"), firstValue.map { it.brokerName })
+        }
+    }
+
+    @Test
+    fun whenScanOnlyAndEveryEligibleJobIsMaintenanceThenReportsSkipAndRunsNoScan() = runTest {
+        givenAScanRunWithUngatedBrokers("Scanned")
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(
+                ScanJobRecord(
+                    brokerName = "Scanned",
+                    userProfileId = testProfileQuery.id,
+                    status = ScanJobStatus.MATCHES_FOUND,
+                    lastScanDateInMillis = 500L,
+                ),
+            ),
+        )
+
+        val result = testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        assertTrue(result.isSuccess)
+        verify(mockPixelSender).reportFreemiumMaintenanceScanSkipped()
+        verify(mockPirScan, never()).executeScanForJobs(any(), any(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenScanOnlyHasNoMaintenanceJobsThenDoesNotReportSkip() = runTest {
+        givenAScanRunWithUngatedBrokers("Fresh")
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(ScanJobRecord(brokerName = "Fresh", userProfileId = testProfileQuery.id)),
+        )
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPixelSender, never()).reportFreemiumMaintenanceScanSkipped()
+    }
+
+    @Test
+    fun whenScanAndOptOutHasMaintenanceJobsThenDoesNotReportSkip() = runTest {
+        givenAScanRunWithUngatedBrokers("Matched")
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(
+                ScanJobRecord(
+                    brokerName = "Matched",
+                    userProfileId = testProfileQuery.id,
+                    status = ScanJobStatus.MATCHES_FOUND,
+                    lastScanDateInMillis = 500L,
+                ),
+            ),
+        )
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
+
+        verify(mockPixelSender, never()).reportFreemiumMaintenanceScanSkipped()
     }
 
     @Test

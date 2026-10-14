@@ -170,10 +170,16 @@ class RealPirJobsRunner @Inject constructor(
         // total_scan_jobs count at flowStart.
         val eligibleJobs = if (activeBrokers.isNotEmpty()) {
             attemptCreateScanJobs(activeBrokers, profileQueries)
-            eligibleScanJobProvider.getAllEligibleScanJobs(currentTimeProvider.currentTimeMillis())
+            val activeBrokerJobs = eligibleScanJobProvider.getAllEligibleScanJobs(currentTimeProvider.currentTimeMillis())
                 .filter { it.brokerName in activeBrokers }
+            if (isFreeScan) {
                 // Repeat scans only serve removals, so a scan-only user gets one successful scan per broker.
-                .filter { runMode == PirRunMode.SCAN_AND_OPT_OUT || !it.hasTerminalResult }
+                val (maintenanceJobs, firstScanJobs) = activeBrokerJobs.partition { it.hasTerminalResult }
+                if (maintenanceJobs.isNotEmpty()) pixelSender.reportFreemiumMaintenanceScanSkipped()
+                firstScanJobs
+            } else {
+                activeBrokerJobs
+            }
         } else {
             emptyList()
         }
