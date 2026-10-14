@@ -1126,6 +1126,20 @@ class RealPirDashboardInitialScanStateProviderTest {
         assertFalse(testee.shouldRestartInitialScan())
     }
 
+    @Test
+    fun whenScanOnlyUserHasNoScanJobForFreeBrokerThenShouldRestartScan() = runTest {
+        // Given - a broker data update added a free broker after the free scan created its jobs
+        whenever(mockPirFreemiumDataStore.didActivate).thenReturn(true)
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_ONLY)))
+        whenever(mockPirFreeScanBrokerFilter.freeScannableBrokerNames()).thenReturn(setOf("FreeBroker", "NewFreeBroker"))
+        setupBrokersWithScannableSteps(listOf(createBroker("FreeBroker"), createBroker("NewFreeBroker")))
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords())
+            .thenReturn(listOf(createScanJobRecord("FreeBroker", 1L, ScanJobStatus.NO_MATCH_FOUND, 1000L)))
+
+        // When / Then
+        assertTrue(testee.shouldRestartInitialScan())
+    }
+
     private suspend fun setupForEmptyBrokersAndJobs() {
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(emptyList())
         whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
