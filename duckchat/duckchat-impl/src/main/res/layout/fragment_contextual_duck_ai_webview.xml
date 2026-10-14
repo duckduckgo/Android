@@ -146,6 +146,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/keyline_2"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -154,7 +155,6 @@
                 android:layout_width="@dimen/toolbarIcon"
                 android:layout_height="@dimen/toolbarIcon"
                 android:layout_marginStart="@dimen/keyline_2"
-                android:layout_marginBottom="@dimen/keyline_2"
                 android:background="@drawable/selectable_item_rounded_corner_background"
                 android:contentDescription="@string/duckAIContextualFireButtonContentDescription"
                 android:scaleType="center"
@@ -170,7 +170,6 @@
                 android:layout_weight="1"
                 android:layout_gravity="bottom"
                 android:layout_marginHorizontal="@dimen/keyline_2"
-                android:layout_marginBottom="@dimen/keyline_2"
                 app:cardBackgroundColor="?attr/daxColorWindow"
                 app:cardElevation="4dp"
                 app:cardUseCompatPadding="false">

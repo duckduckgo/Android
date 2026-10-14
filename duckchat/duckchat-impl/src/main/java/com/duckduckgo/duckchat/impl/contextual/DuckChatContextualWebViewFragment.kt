@@ -655,7 +655,6 @@ class DuckChatContextualWebViewFragment :
         }
 
         binding.contextualNewChat.show()
-        renderFireButton()
         contextualNativeInputManager.onWebViewMode()
 
         if (viewState.showContext && viewState.contextTitle.isNotEmpty()) {
