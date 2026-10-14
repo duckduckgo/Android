@@ -302,4 +302,11 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun nativeToSConsent(): Toggle
+
+    /**
+     * @return `true` when Duck.ai promo campaigns are supported. Exposed to Duck.ai as `supportsBonusOffer`.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiPromoCampaigns(): Toggle
 }
