@@ -221,6 +221,8 @@ sealed class Command {
         val nonHttpAppLink: NonHttpAppLink,
         val headers: Map<String, String>,
         val showConfirmation: Boolean = true,
+        val trustedCallerPackage: String? = null,
+        val finishCustomTabOnTrustedCallerLaunch: Boolean = false,
     ) : Command()
 
     class ShowAppLinkPrompt(

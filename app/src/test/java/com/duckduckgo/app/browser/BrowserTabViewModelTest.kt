@@ -796,6 +796,7 @@ class BrowserTabViewModelTest {
             fakeRememberDesktopModeFeature.self().setRawStoredState(State(enable = true))
 
             fakeCustomTabsFeature.handleTrustedCallers().setRawStoredState(State(enable = true))
+            fakeCustomTabsFeature.handleTrustedCallersNonHttpLinks().setRawStoredState(State(enable = true))
 
             whenever(mockDuckChatJSHelper.enrichPageContextIfPossible(any(), any())).thenAnswer { it.getArgument<String>(1) }
             whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.NotApplicable)
@@ -6028,6 +6029,95 @@ class BrowserTabViewModelTest {
         val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("market://details?id=com.example", Intent(), exampleUrl)
         assertTrue(testee.handleNonHttpAppLink(urlType))
         assertCommandNotIssued<Command.HandleNonHttpAppLink>()
+    }
+
+    @Test
+    fun whenHandleNonHttpAppLinkCalledInCustomTabThenTrustedCallerPackageForwarded() {
+        whenever(ctaViewModelMockSettingsStore.appLinksEnabled).thenReturn(true)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.app")
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("example://details", Intent(), exampleUrl)
+        assertTrue(testee.handleNonHttpAppLink(urlType))
+        assertCommandIssued<Command.HandleNonHttpAppLink> {
+            assertEquals("com.example.app", this.trustedCallerPackage)
+        }
+    }
+
+    @Test
+    fun whenHandleNonHttpAppLinkCalledInCustomTabWithNoSessionThenReferrerForwardedAsTrustedCaller() {
+        whenever(ctaViewModelMockSettingsStore.appLinksEnabled).thenReturn(true)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = null, referrerPackage = "com.example.app")
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("example://details", Intent(), exampleUrl)
+        assertTrue(testee.handleNonHttpAppLink(urlType))
+        assertCommandIssued<Command.HandleNonHttpAppLink> {
+            assertEquals("com.example.app", this.trustedCallerPackage)
+        }
+    }
+
+    @Test
+    fun whenHandleNonHttpAppLinkCalledOutsideCustomTabThenNoTrustedCallerPackageForwarded() {
+        whenever(ctaViewModelMockSettingsStore.appLinksEnabled).thenReturn(true)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        testee.setIsCustomTab(isCustomTab = false)
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("example://details", Intent(), exampleUrl)
+        assertTrue(testee.handleNonHttpAppLink(urlType))
+        assertCommandIssued<Command.HandleNonHttpAppLink> {
+            assertNull(this.trustedCallerPackage)
+            assertTrue(this.showConfirmation)
+        }
+    }
+
+    @Test
+    fun whenHandleNonHttpAppLinkCalledInCustomTabAndHandleTrustedCallersDisabledThenNoTrustedCallerPackageForwarded() {
+        fakeCustomTabsFeature.handleTrustedCallers().setRawStoredState(State(enable = false))
+        whenever(ctaViewModelMockSettingsStore.appLinksEnabled).thenReturn(true)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.app")
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("example://details", Intent(), exampleUrl)
+        assertTrue(testee.handleNonHttpAppLink(urlType))
+        assertCommandIssued<Command.HandleNonHttpAppLink> {
+            assertNull(this.trustedCallerPackage)
+        }
+    }
+
+    @Test
+    fun whenHandleNonHttpAppLinkCalledInCustomTabAndNonHttpLinksDisabledThenNoTrustedCallerPackageForwarded() {
+        fakeCustomTabsFeature.handleTrustedCallersNonHttpLinks().setRawStoredState(State(enable = false))
+        whenever(ctaViewModelMockSettingsStore.appLinksEnabled).thenReturn(true)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.app")
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("example://details", Intent(), exampleUrl)
+        assertTrue(testee.handleNonHttpAppLink(urlType))
+        assertCommandIssued<Command.HandleNonHttpAppLink> {
+            assertNull(this.trustedCallerPackage)
+        }
+    }
+
+    @Test
+    fun whenHandleNonHttpAppLinkCalledAndCloseTabAfterTrustedCallerNavigationEnabledThenFinishCustomTabOnTrustedCallerLaunch() {
+        fakeCustomTabsFeature.closeTabAfterTrustedCallerNavigation().setRawStoredState(State(enable = true))
+        whenever(ctaViewModelMockSettingsStore.appLinksEnabled).thenReturn(true)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.app")
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("example://details", Intent(), exampleUrl)
+        assertTrue(testee.handleNonHttpAppLink(urlType))
+        assertCommandIssued<Command.HandleNonHttpAppLink> {
+            assertTrue(this.finishCustomTabOnTrustedCallerLaunch)
+        }
+    }
+
+    @Test
+    fun whenHandleNonHttpAppLinkCalledAndCloseTabAfterTrustedCallerNavigationDisabledThenDoNotFinishCustomTab() {
+        fakeCustomTabsFeature.closeTabAfterTrustedCallerNavigation().setRawStoredState(State(enable = false))
+        whenever(ctaViewModelMockSettingsStore.appLinksEnabled).thenReturn(true)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.app")
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("example://details", Intent(), exampleUrl)
+        assertTrue(testee.handleNonHttpAppLink(urlType))
+        assertCommandIssued<Command.HandleNonHttpAppLink> {
+            assertFalse(this.finishCustomTabOnTrustedCallerLaunch)
+        }
     }
 
     @Test
