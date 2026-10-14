@@ -55,11 +55,11 @@ class SubscriptionOnboardingWelcomeFragment : DuckDuckGoFragment(R.layout.fragme
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.subscriptionOnboardingWelcomeBackground.setImageResource(
+        binding.subscriptionOnboardingWelcomeDax.setImageResource(
             if (appTheme.isLightModeEnabled()) {
-                R.drawable.onboarding_welcome_background
+                R.drawable.subscription_onboarding_dax_light
             } else {
-                R.drawable.onboarding_welcome_background_dark
+                R.drawable.subscription_onboarding_dax_dark
             },
         )
 
