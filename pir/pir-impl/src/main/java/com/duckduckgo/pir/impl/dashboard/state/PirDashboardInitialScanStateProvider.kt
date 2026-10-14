@@ -206,8 +206,13 @@ class RealPirDashboardInitialScanStateProvider @Inject constructor(
         scanJobs: List<ScanJobRecord>,
         scannableBrokerNames: Set<String>,
     ): Boolean {
-        if (!pirFreemiumDataStore.didActivate) return false
-        if (pirWorkHandler.canRunPir().firstOrNull().runModeOrNull == null) return false
+        if (!pirFreemiumDataStore.didActivate) {
+            return false
+        }
+
+        if (pirWorkHandler.canRunPir().firstOrNull().runModeOrNull == null) {
+            return false
+        }
 
         return scanJobs.groupBy { it.userProfileId }.values.any { jobsForProfile ->
             !jobsForProfile.mapTo(hashSetOf()) { it.brokerName }.containsAll(scannableBrokerNames)
