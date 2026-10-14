@@ -333,11 +333,8 @@
     <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Išjungia „Sync &amp; Backup“ ir ištrina visus sinchronizuotus duomenis iš serverio bei deaktyvuoja jūsų atkūrimo kodą.</string>
     <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Šalinti įrenginį</string>
     <string name="sync_simplified_settings_turn_off_sheet_title">Ar išjungti „Sync &amp; Backup“?</string>
-    <string name="sync_simplified_settings_turn_off_sheet_item">Ištrinti duomenis serveryje</string>
     <string name="sync_simplified_settings_turn_off_sheet_body">Visi įrenginiai, naudojantys „Sync &amp; Backup“, bus atjungti, o jūsų sinchronizuoti duomenys bus ištrinti iš serverio.</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button">Išjungti šį įrenginį</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Išjungti ir ištrinti</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete_all">Išjungti visus įrenginius ir ištrinti</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Išjungti ir ištrinti duomenis serveryje</string>
 
     <!-- Sync settings screen: turn off this device dialog -->
     <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">Ar šalinti įrenginį „ %1$s“ iš „Sync &amp; Backup“?</string>
@@ -441,6 +438,8 @@
     <string name="sync_simplified_edit_device_sync_this_device_item">Sinchronizuoti šį įrenginį</string>
     <string name="sync_simplified_edit_device_remove_notice_this_device">Pašalinus šį įrenginį, jis nebegalės pasiekti jūsų sinchronizuotų duomenų.</string>
     <string name="sync_simplified_edit_device_remove_notice_another_device">Jeigu išjungsite, šis įrenginys nebegalės pasiekti jūsų sinchronizuotų duomenų.</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Įrenginys „%1$s“ nebegalės pasiekti jūsų sinchronizuotų duomenų kituose įrenginiuose, jei tai bus išjungta.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Įrenginys „%1$s“ nebegalės pasiekti jūsų sinchronizuotų duomenų kituose įrenginiuose.</string>
 
     <!-- Edit Device screen: edit name dialog -->
     <string name="sync_simplified_edit_device_edit_name_dialog_title">Redaguoti pavadinimą</string>

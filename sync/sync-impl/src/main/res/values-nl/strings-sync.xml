@@ -333,11 +333,8 @@
     <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Sync &amp; Backup uitschakelen en alle gesynchroniseerde gegevens van de server verwijderen en je herstelcode deactiveren.</string>
     <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Apparaat verwijderen</string>
     <string name="sync_simplified_settings_turn_off_sheet_title">Sync &amp; Backup uitschakelen?</string>
-    <string name="sync_simplified_settings_turn_off_sheet_item">Servergegevens verwijderen</string>
     <string name="sync_simplified_settings_turn_off_sheet_body">De verbinding met alle apparaten die Sync &amp; Backup gebruiken wordt verbroken en je gesynchroniseerde gegevens worden van de server verwijderd.</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button">Dit apparaat uitschakelen</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Uitschakelen en verwijderen</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete_all">Alle apparaten uitschakelen en verwijderen</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Servergegevens uitschakelen en verwijderen</string>
 
     <!-- Sync settings screen: turn off this device dialog -->
     <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s verwijderen uit Sync &amp; Backup?</string>
@@ -441,6 +438,8 @@
     <string name="sync_simplified_edit_device_sync_this_device_item">Dit apparaat synchroniseren</string>
     <string name="sync_simplified_edit_device_remove_notice_this_device">Als je dit apparaat verwijdert, heeft het geen toegang meer tot je gesynchroniseerde gegevens.</string>
     <string name="sync_simplified_edit_device_remove_notice_another_device">Als deze optie is uitgeschakeld, heeft dit apparaat geen toegang meer tot je gesynchroniseerde gegevens.</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Als dit is uitgeschakeld, heeft “%1$s” geen toegang meer tot je gesynchroniseerde gegevens op andere apparaten.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” heeft geen toegang meer tot je gesynchroniseerde gegevens op andere apparaten.</string>
 
     <!-- Edit Device screen: edit name dialog -->
     <string name="sync_simplified_edit_device_edit_name_dialog_title">Naam bewerken</string>
