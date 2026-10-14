@@ -167,9 +167,9 @@ class TabSwitcherAdapter(
 
     override fun getItemViewType(position: Int): Int =
         when (val item = differ.currentList[position]) {
-            is DuckAiTab -> when (layoutType) {
-                GRID if item.duckAiGridItemContent != null -> RICH_DUCK_AI_GRID
-                GRID -> DUCK_AI_GRID
+            is DuckAiTab -> when {
+                layoutType == GRID && item.duckAiGridItemContent != null -> RICH_DUCK_AI_GRID
+                layoutType == GRID -> DUCK_AI_GRID
                 else -> DUCK_AI_LIST
             }
             is SelectableTab -> when {
