@@ -20,7 +20,10 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.pixels.OnboardingPixelName
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -54,6 +57,7 @@ class RealContextualOnboardingTimeLimitTest {
     private val appInstallStore: AppInstallStore = mock()
     private val toggles = FakeFeatureToggleFactory.create(ExtendedOnboardingFeatureToggles::class.java)
     private val appBuildConfig: AppBuildConfig = mock { on { flavor } doReturn BuildFlavor.PLAY }
+    private val onboardingPixelSender: OnboardingPixelSender = mock()
     private val preferences = InMemorySharedPreferences()
     private val sharedPreferencesProvider: SharedPreferencesProvider = mock {
         on { getSharedPreferences(any(), any(), any()) } doReturn preferences
@@ -71,6 +75,7 @@ class RealContextualOnboardingTimeLimitTest {
         appInstallStore = appInstallStore,
         extendedOnboardingFeatureToggles = toggles,
         appBuildConfig = appBuildConfig,
+        onboardingPixelSender = onboardingPixelSender,
         sharedPreferencesProvider = sharedPreferencesProvider,
         currentTimeProvider = currentTimeProvider,
         dispatchers = coroutineRule.testDispatcherProvider,
@@ -279,6 +284,35 @@ class RealContextualOnboardingTimeLimitTest {
 
     private fun givenInternalBuild() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+    }
+
+    @Test
+    fun whenDaysLimitEndsOnboardingThenTimeLimitPixelFiredWithDays() = runTest {
+        givenInstalledDaysAgo(days = 7)
+
+        testee.endOnboardingIfTimeLimitReached()
+
+        verify(onboardingPixelSender).fire(
+            OnboardingPixelName.ONBOARDING_TIME_LIMIT,
+            OnboardingPixelAction.TimeLimitReached(byAppOpens = false),
+        )
+    }
+
+    @Test
+    fun whenAppOpensLimitEndsOnboardingThenTimeLimitPixelFiredWithAppOpens() = runTest {
+        repeat(29) { testee.onStart(lifecycleOwner) }
+
+        verify(onboardingPixelSender).fire(
+            OnboardingPixelName.ONBOARDING_TIME_LIMIT,
+            OnboardingPixelAction.TimeLimitReached(byAppOpens = true),
+        )
+    }
+
+    @Test
+    fun whenTimeLimitNotReachedThenTimeLimitPixelNotFired() = runTest {
+        repeat(28) { testee.onStart(lifecycleOwner) }
+
+        verify(onboardingPixelSender, never()).fire(any(), any())
     }
 
     private fun givenTimeLimitEnabled(settings: String? = null) {

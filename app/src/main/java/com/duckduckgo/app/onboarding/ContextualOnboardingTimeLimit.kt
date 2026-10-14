@@ -25,7 +25,10 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.daxOnboardingActive
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.pixels.OnboardingPixelName
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.CurrentTimeProvider
@@ -67,6 +70,7 @@ class RealContextualOnboardingTimeLimit @Inject constructor(
     private val appInstallStore: AppInstallStore,
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
     private val appBuildConfig: AppBuildConfig,
+    private val onboardingPixelSender: OnboardingPixelSender,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val currentTimeProvider: CurrentTimeProvider,
     private val dispatchers: DispatcherProvider,
@@ -86,11 +90,14 @@ class RealContextualOnboardingTimeLimit @Inject constructor(
     override suspend fun endOnboardingIfTimeLimitReached() {
         withContext(dispatchers.io()) {
             mutex.withLock {
-                if (isTimeLimitReached()) {
-                    logcat { "Contextual onboarding time limit reached, ending onboarding" }
-                    preferences.edit { putBoolean(KEY_ENDED_BY_TIME_LIMIT, true) }
-                    userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
-                }
+                val reachedLimit = reachedLimit() ?: return@withLock
+                logcat { "Contextual onboarding time limit reached ($reachedLimit), ending onboarding" }
+                preferences.edit { putBoolean(KEY_ENDED_BY_TIME_LIMIT, true) }
+                userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
+                onboardingPixelSender.fire(
+                    OnboardingPixelName.ONBOARDING_TIME_LIMIT,
+                    OnboardingPixelAction.TimeLimitReached(byAppOpens = reachedLimit == ReachedLimit.APP_OPENS),
+                )
             }
         }
     }
@@ -120,13 +127,17 @@ class RealContextualOnboardingTimeLimit @Inject constructor(
         }
     }
 
-    private suspend fun isTimeLimitReached(): Boolean {
-        if (!userStageStore.daxOnboardingActive()) return false
+    private suspend fun reachedLimit(): ReachedLimit? {
+        if (!userStageStore.daxOnboardingActive()) return null
         val toggle = extendedOnboardingFeatureToggles.contextualOnboardingTimeLimit()
-        if (!toggle.isEnabled()) return false
+        if (!toggle.isEnabled()) return null
 
         val limits = toggle.limits()
-        return isDaysLimitReached(limits.maxDaysSinceInstall) || preferences.getInt(KEY_APP_OPENS, 0) > limits.maxAppOpens
+        return when {
+            isDaysLimitReached(limits.maxDaysSinceInstall) -> ReachedLimit.DAYS
+            preferences.getInt(KEY_APP_OPENS, 0) > limits.maxAppOpens -> ReachedLimit.APP_OPENS
+            else -> null
+        }
     }
 
     private fun isDaysLimitReached(maxDaysSinceInstall: Int): Boolean {
@@ -160,6 +171,8 @@ class RealContextualOnboardingTimeLimit @Inject constructor(
         val maxDaysSinceInstall: Int,
         val maxAppOpens: Int,
     )
+
+    private enum class ReachedLimit { DAYS, APP_OPENS }
 
     companion object {
         private const val FILENAME = "com.duckduckgo.app.onboarding.contextual.timelimit"
