@@ -17,6 +17,7 @@
 package com.duckduckgo.pir.impl.brokers
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.PirUserUtils
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.service.DbpService.PirJsonBroker
 import com.duckduckgo.pir.impl.store.PirRepository
@@ -46,6 +47,7 @@ interface BrokerJsonProcessor {
 class RealBrokerJsonProcessor @Inject constructor(
     private val pirRepository: PirRepository,
     private val pirPixelSender: PirPixelSender,
+    private val pirUserUtils: PirUserUtils,
 ) : BrokerJsonProcessor {
     private val brokerAdapter by lazy {
         Moshi.Builder()
@@ -71,32 +73,52 @@ class RealBrokerJsonProcessor @Inject constructor(
         fileName: String,
         broker: PirJsonBroker?,
     ) {
-        if (broker != null) {
-            try {
-                val storedVersion = pirRepository.getBrokerForName(broker.name)?.version
-                if (storedVersion == broker.version) {
-                    logcat { "PIR-update: $fileName already at version ${broker.version}, skipping" }
-                    return
-                }
-                logcat { "PIR-update: $fileName version changed ($storedVersion → ${broker.version}), updating" }
-                pirRepository.updateBrokerData(fileName, broker)
-                pirPixelSender.reportUpdateBrokerJsonSuccess(
-                    brokerJsonFileName = fileName,
-                    removedAtMs = broker.removedAt ?: 0L,
-                )
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Throwable) {
-                pirPixelSender.reportUpdateBrokerJsonFailure(
-                    brokerJsonFileName = fileName,
-                    removedAtMs = broker.removedAt ?: 0L,
-                )
-            }
-        } else {
+        if (broker == null) {
             pirPixelSender.reportUpdateBrokerJsonFailure(
                 brokerJsonFileName = fileName,
                 removedAtMs = 0L,
+                isFreeScan = isFreeScan(),
+            )
+            return
+        }
+
+        val stored = try {
+            val storedVersion = pirRepository.getBrokerForName(broker.name)?.version
+            if (storedVersion == broker.version) {
+                logcat { "PIR-update: $fileName already at version ${broker.version}, skipping" }
+                return
+            }
+            logcat { "PIR-update: $fileName version changed ($storedVersion → ${broker.version}), updating" }
+            pirRepository.updateBrokerData(fileName, broker)
+            true
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Throwable) {
+            false
+        }
+
+        if (stored) {
+            pirPixelSender.reportUpdateBrokerJsonSuccess(
+                brokerJsonFileName = fileName,
+                removedAtMs = broker.removedAt ?: 0L,
+                isFreeScan = isFreeScan(),
+            )
+        } else {
+            pirPixelSender.reportUpdateBrokerJsonFailure(
+                brokerJsonFileName = fileName,
+                removedAtMs = broker.removedAt ?: 0L,
+                isFreeScan = isFreeScan(),
             )
         }
+    }
+
+    // Only labels the pixel, so a failed subscription read must never fail the broker update.
+    private suspend fun isFreeScan(): Boolean? = try {
+        !pirUserUtils.hasPirSubscription()
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        logcat(ERROR) { "PIR-update: Failed to read the PIR subscription: $e" }
+        null
     }
 }

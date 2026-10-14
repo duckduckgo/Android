@@ -278,6 +278,7 @@ class RealPirJobsRunner @Inject constructor(
                     brokerCount = activeBrokers.size,
                     executionType = executionType,
                     notificationsPermissionGranted = context.areNotificationsPermissionGranted(),
+                    isFreeScan = isFreeScan,
                 )
             }
 
