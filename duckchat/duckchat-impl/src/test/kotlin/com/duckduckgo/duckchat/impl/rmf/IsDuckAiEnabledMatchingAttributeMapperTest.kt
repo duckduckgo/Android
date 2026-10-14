@@ -22,26 +22,26 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Test
 
-class IsAIChatEnabledMatchingAttributeMapperTest {
-    private val testee = IsAIChatEnabledMatchingAttributeMapper()
+class IsDuckAiEnabledMatchingAttributeMapperTest {
+    private val testee = IsDuckAiEnabledMatchingAttributeMapper()
 
     @Test
     fun `when key matches and value is true, then returns attribute with remote value true`() {
-        val result = testee.map(IsAIChatEnabledMatchingAttribute.KEY, JsonMatchingAttribute(value = true))
+        val result = testee.map(IsDuckAiEnabledMatchingAttribute.KEY, JsonMatchingAttribute(value = true))
 
-        assertEquals(IsAIChatEnabledMatchingAttribute(remoteValue = true), result)
+        assertEquals(IsDuckAiEnabledMatchingAttribute(remoteValue = true), result)
     }
 
     @Test
     fun `when key matches and value is false, then returns attribute with remote value false`() {
-        val result = testee.map(IsAIChatEnabledMatchingAttribute.KEY, JsonMatchingAttribute(value = false))
+        val result = testee.map(IsDuckAiEnabledMatchingAttribute.KEY, JsonMatchingAttribute(value = false))
 
-        assertEquals(IsAIChatEnabledMatchingAttribute(remoteValue = false), result)
+        assertEquals(IsDuckAiEnabledMatchingAttribute(remoteValue = false), result)
     }
 
     @Test
     fun `when key matches and value is missing, then returns null`() {
-        val result = testee.map(IsAIChatEnabledMatchingAttribute.KEY, JsonMatchingAttribute(value = null, fallback = true))
+        val result = testee.map(IsDuckAiEnabledMatchingAttribute.KEY, JsonMatchingAttribute(value = null, fallback = true))
 
         assertNull(result)
     }
@@ -55,7 +55,7 @@ class IsAIChatEnabledMatchingAttributeMapperTest {
 
     @Test
     fun `when key differs only by case, then returns null`() {
-        val result = testee.map(IsAIChatEnabledMatchingAttribute.KEY.uppercase(), JsonMatchingAttribute(value = true))
+        val result = testee.map(IsDuckAiEnabledMatchingAttribute.KEY.uppercase(), JsonMatchingAttribute(value = true))
 
         assertNull(result)
     }
@@ -63,10 +63,10 @@ class IsAIChatEnabledMatchingAttributeMapperTest {
     @Test
     fun `when key matches and value is not a boolean, then throws ClassCastException`() {
         assertThrows(ClassCastException::class.java) {
-            testee.map(IsAIChatEnabledMatchingAttribute.KEY, JsonMatchingAttribute(value = "true"))
+            testee.map(IsDuckAiEnabledMatchingAttribute.KEY, JsonMatchingAttribute(value = "true"))
         }
         assertThrows(ClassCastException::class.java) {
-            testee.map(IsAIChatEnabledMatchingAttribute.KEY, JsonMatchingAttribute(value = 1.0))
+            testee.map(IsDuckAiEnabledMatchingAttribute.KEY, JsonMatchingAttribute(value = 1.0))
         }
     }
 }

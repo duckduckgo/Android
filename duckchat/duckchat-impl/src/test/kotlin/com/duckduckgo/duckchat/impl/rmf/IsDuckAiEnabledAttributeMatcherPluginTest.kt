@@ -29,16 +29,16 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class IsAIChatEnabledAttributeMatcherPluginTest {
+class IsDuckAiEnabledAttributeMatcherPluginTest {
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val mockDuckChatFeatureRepository: DuckChatFeatureRepository = mock()
-    private val testee = IsAIChatEnabledAttributeMatcherPlugin(duckChatFeature, mockDuckChatFeatureRepository)
+    private val testee = IsDuckAiEnabledAttributeMatcherPlugin(duckChatFeature, mockDuckChatFeatureRepository)
 
     @Test
     fun `when feature flag enabled and user setting enabled and remote value true, then returns true`() = runTest {
         givenDuckChatState(featureEnabled = true, userEnabled = true)
 
-        val result = testee.evaluate(IsAIChatEnabledMatchingAttribute(remoteValue = true))
+        val result = testee.evaluate(IsDuckAiEnabledMatchingAttribute(remoteValue = true))
 
         assertEquals(true, result)
     }
@@ -47,7 +47,7 @@ class IsAIChatEnabledAttributeMatcherPluginTest {
     fun `when feature flag enabled and user setting disabled and remote value true, then returns false`() = runTest {
         givenDuckChatState(featureEnabled = true, userEnabled = false)
 
-        val result = testee.evaluate(IsAIChatEnabledMatchingAttribute(remoteValue = true))
+        val result = testee.evaluate(IsDuckAiEnabledMatchingAttribute(remoteValue = true))
 
         assertEquals(false, result)
     }
@@ -56,7 +56,7 @@ class IsAIChatEnabledAttributeMatcherPluginTest {
     fun `when feature flag disabled and user setting enabled and remote value true, then returns false`() = runTest {
         givenDuckChatState(featureEnabled = false, userEnabled = true)
 
-        val result = testee.evaluate(IsAIChatEnabledMatchingAttribute(remoteValue = true))
+        val result = testee.evaluate(IsDuckAiEnabledMatchingAttribute(remoteValue = true))
 
         assertEquals(false, result)
     }
@@ -65,7 +65,7 @@ class IsAIChatEnabledAttributeMatcherPluginTest {
     fun `when feature flag disabled and user setting disabled and remote value true, then returns false`() = runTest {
         givenDuckChatState(featureEnabled = false, userEnabled = false)
 
-        val result = testee.evaluate(IsAIChatEnabledMatchingAttribute(remoteValue = true))
+        val result = testee.evaluate(IsDuckAiEnabledMatchingAttribute(remoteValue = true))
 
         assertEquals(false, result)
     }
@@ -74,7 +74,7 @@ class IsAIChatEnabledAttributeMatcherPluginTest {
     fun `when feature flag enabled and user setting enabled and remote value false, then returns false`() = runTest {
         givenDuckChatState(featureEnabled = true, userEnabled = true)
 
-        val result = testee.evaluate(IsAIChatEnabledMatchingAttribute(remoteValue = false))
+        val result = testee.evaluate(IsDuckAiEnabledMatchingAttribute(remoteValue = false))
 
         assertEquals(false, result)
     }
@@ -83,7 +83,7 @@ class IsAIChatEnabledAttributeMatcherPluginTest {
     fun `when feature flag enabled and user setting disabled and remote value false, then returns true`() = runTest {
         givenDuckChatState(featureEnabled = true, userEnabled = false)
 
-        val result = testee.evaluate(IsAIChatEnabledMatchingAttribute(remoteValue = false))
+        val result = testee.evaluate(IsDuckAiEnabledMatchingAttribute(remoteValue = false))
 
         assertEquals(true, result)
     }
@@ -92,7 +92,7 @@ class IsAIChatEnabledAttributeMatcherPluginTest {
     fun `when feature flag disabled and user setting enabled and remote value false, then returns true`() = runTest {
         givenDuckChatState(featureEnabled = false, userEnabled = true)
 
-        val result = testee.evaluate(IsAIChatEnabledMatchingAttribute(remoteValue = false))
+        val result = testee.evaluate(IsDuckAiEnabledMatchingAttribute(remoteValue = false))
 
         assertEquals(true, result)
     }
@@ -101,7 +101,7 @@ class IsAIChatEnabledAttributeMatcherPluginTest {
     fun `when feature flag disabled and user setting disabled and remote value false, then returns true`() = runTest {
         givenDuckChatState(featureEnabled = false, userEnabled = false)
 
-        val result = testee.evaluate(IsAIChatEnabledMatchingAttribute(remoteValue = false))
+        val result = testee.evaluate(IsDuckAiEnabledMatchingAttribute(remoteValue = false))
 
         assertEquals(true, result)
     }
@@ -109,7 +109,7 @@ class IsAIChatEnabledAttributeMatcherPluginTest {
     @Test
     fun `when user setting changes between evaluations, then result reflects current state`() = runTest {
         givenDuckChatState(featureEnabled = true, userEnabled = true)
-        val attribute = IsAIChatEnabledMatchingAttribute(remoteValue = true)
+        val attribute = IsDuckAiEnabledMatchingAttribute(remoteValue = true)
 
         assertEquals(true, testee.evaluate(attribute))
 
@@ -121,7 +121,7 @@ class IsAIChatEnabledAttributeMatcherPluginTest {
     @Test
     fun `when feature flag changes between evaluations, then result reflects current state`() = runTest {
         givenDuckChatState(featureEnabled = true, userEnabled = true)
-        val attribute = IsAIChatEnabledMatchingAttribute(remoteValue = true)
+        val attribute = IsDuckAiEnabledMatchingAttribute(remoteValue = true)
 
         assertEquals(true, testee.evaluate(attribute))
 

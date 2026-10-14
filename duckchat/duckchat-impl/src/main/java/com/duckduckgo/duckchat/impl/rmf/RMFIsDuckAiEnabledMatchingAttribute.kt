@@ -32,12 +32,12 @@ import javax.inject.Inject
  * upon a cold start-up.
  */
 @ContributesMultibinding(AppScope::class)
-class IsAIChatEnabledAttributeMatcherPlugin @Inject constructor(
+class IsDuckAiEnabledAttributeMatcherPlugin @Inject constructor(
     private val duckChatFeature: DuckChatFeature,
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
 ) : AttributeMatcherPlugin {
     override suspend fun evaluate(matchingAttribute: MatchingAttribute): Boolean? {
-        if (matchingAttribute !is IsAIChatEnabledMatchingAttribute) {
+        if (matchingAttribute !is IsDuckAiEnabledMatchingAttribute) {
             return null
         }
         val isEnabled = duckChatFeature.self().isEnabled() && duckChatFeatureRepository.isDuckChatUserEnabled()
@@ -46,21 +46,21 @@ class IsAIChatEnabledAttributeMatcherPlugin @Inject constructor(
 }
 
 @ContributesMultibinding(AppScope::class)
-class IsAIChatEnabledMatchingAttributeMapper @Inject constructor() : JsonToMatchingAttributeMapper {
+class IsDuckAiEnabledMatchingAttributeMapper @Inject constructor() : JsonToMatchingAttributeMapper {
     override fun map(
         key: String,
         jsonMatchingAttribute: JsonMatchingAttribute,
     ): MatchingAttribute? {
-        if (key != IsAIChatEnabledMatchingAttribute.KEY) {
+        if (key != IsDuckAiEnabledMatchingAttribute.KEY) {
             return null
         }
         val value = jsonMatchingAttribute.value ?: return null
-        return IsAIChatEnabledMatchingAttribute(remoteValue = value as Boolean)
+        return IsDuckAiEnabledMatchingAttribute(remoteValue = value as Boolean)
     }
 }
 
-internal data class IsAIChatEnabledMatchingAttribute(val remoteValue: Boolean) : MatchingAttribute {
+internal data class IsDuckAiEnabledMatchingAttribute(val remoteValue: Boolean) : MatchingAttribute {
     companion object {
-        const val KEY = "isAIChatEnabled"
+        const val KEY = "isDuckAiEnabled"
     }
 }
