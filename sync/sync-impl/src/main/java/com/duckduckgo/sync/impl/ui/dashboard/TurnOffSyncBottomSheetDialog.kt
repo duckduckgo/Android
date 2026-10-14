@@ -110,9 +110,6 @@ class TurnOffSyncBottomSheetDialog : BottomSheetDialogFragment() {
         deleteServerData: Boolean,
         animate: Boolean,
     ) {
-        if (deleteServerData) {
-            binding.devicesRecycler.scrollToPosition(0)
-        }
         if (animate) {
             val root = binding.root.rootView as? ViewGroup ?: binding.root
             TransitionManager.beginDelayedTransition(root, createStateTransition())
