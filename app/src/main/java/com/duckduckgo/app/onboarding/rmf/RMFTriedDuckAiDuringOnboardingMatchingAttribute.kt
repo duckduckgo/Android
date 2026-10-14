@@ -26,33 +26,33 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class TriedAIChatDuringOnboardingAttributeMatcherPlugin @Inject constructor(
+class TriedDuckAiDuringOnboardingAttributeMatcherPlugin @Inject constructor(
     private val onboardingStore: OnboardingStore,
 ) : AttributeMatcherPlugin {
     override suspend fun evaluate(matchingAttribute: MatchingAttribute): Boolean? {
-        if (matchingAttribute !is TriedAIChatDuringOnboardingMatchingAttribute) {
+        if (matchingAttribute !is TriedDuckAiDuringOnboardingMatchingAttribute) {
             return null
         }
-        return onboardingStore.getTriedAIChat() == matchingAttribute.remoteValue
+        return onboardingStore.getTriedDuckAi() == matchingAttribute.remoteValue
     }
 }
 
 @ContributesMultibinding(AppScope::class)
-class TriedAIChatDuringOnboardingMatchingAttributeMapper @Inject constructor() : JsonToMatchingAttributeMapper {
+class TriedDuckAiDuringOnboardingMatchingAttributeMapper @Inject constructor() : JsonToMatchingAttributeMapper {
     override fun map(
         key: String,
         jsonMatchingAttribute: JsonMatchingAttribute,
     ): MatchingAttribute? {
-        if (key != TriedAIChatDuringOnboardingMatchingAttribute.KEY) {
+        if (key != TriedDuckAiDuringOnboardingMatchingAttribute.KEY) {
             return null
         }
         val value = jsonMatchingAttribute.value ?: return null
-        return TriedAIChatDuringOnboardingMatchingAttribute(remoteValue = value as Boolean)
+        return TriedDuckAiDuringOnboardingMatchingAttribute(remoteValue = value as Boolean)
     }
 }
 
-internal data class TriedAIChatDuringOnboardingMatchingAttribute(val remoteValue: Boolean) : MatchingAttribute {
+internal data class TriedDuckAiDuringOnboardingMatchingAttribute(val remoteValue: Boolean) : MatchingAttribute {
     companion object {
-        const val KEY = "triedAIChatDuringOnboarding"
+        const val KEY = "triedDuckAiDuringOnboarding"
     }
 }

@@ -22,26 +22,26 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Test
 
-class TriedAIChatDuringOnboardingMatchingAttributeMapperTest {
-    private val testee = TriedAIChatDuringOnboardingMatchingAttributeMapper()
+class TriedDuckAiDuringOnboardingMatchingAttributeMapperTest {
+    private val testee = TriedDuckAiDuringOnboardingMatchingAttributeMapper()
 
     @Test
     fun `when key matches and value is true, then returns attribute with remote value true`() {
-        val result = testee.map(TriedAIChatDuringOnboardingMatchingAttribute.KEY, JsonMatchingAttribute(value = true))
+        val result = testee.map(TriedDuckAiDuringOnboardingMatchingAttribute.KEY, JsonMatchingAttribute(value = true))
 
-        assertEquals(TriedAIChatDuringOnboardingMatchingAttribute(remoteValue = true), result)
+        assertEquals(TriedDuckAiDuringOnboardingMatchingAttribute(remoteValue = true), result)
     }
 
     @Test
     fun `when key matches and value is false, then returns attribute with remote value false`() {
-        val result = testee.map(TriedAIChatDuringOnboardingMatchingAttribute.KEY, JsonMatchingAttribute(value = false))
+        val result = testee.map(TriedDuckAiDuringOnboardingMatchingAttribute.KEY, JsonMatchingAttribute(value = false))
 
-        assertEquals(TriedAIChatDuringOnboardingMatchingAttribute(remoteValue = false), result)
+        assertEquals(TriedDuckAiDuringOnboardingMatchingAttribute(remoteValue = false), result)
     }
 
     @Test
     fun `when key matches and value is missing, then returns null`() {
-        val result = testee.map(TriedAIChatDuringOnboardingMatchingAttribute.KEY, JsonMatchingAttribute(value = null, fallback = true))
+        val result = testee.map(TriedDuckAiDuringOnboardingMatchingAttribute.KEY, JsonMatchingAttribute(value = null, fallback = true))
 
         assertNull(result)
     }
@@ -55,7 +55,7 @@ class TriedAIChatDuringOnboardingMatchingAttributeMapperTest {
 
     @Test
     fun `when key differs only by case, then returns null`() {
-        val result = testee.map(TriedAIChatDuringOnboardingMatchingAttribute.KEY.uppercase(), JsonMatchingAttribute(value = true))
+        val result = testee.map(TriedDuckAiDuringOnboardingMatchingAttribute.KEY.uppercase(), JsonMatchingAttribute(value = true))
 
         assertNull(result)
     }
@@ -63,10 +63,10 @@ class TriedAIChatDuringOnboardingMatchingAttributeMapperTest {
     @Test
     fun `when key matches and value is not a boolean, then throws ClassCastException`() {
         assertThrows(ClassCastException::class.java) {
-            testee.map(TriedAIChatDuringOnboardingMatchingAttribute.KEY, JsonMatchingAttribute(value = "true"))
+            testee.map(TriedDuckAiDuringOnboardingMatchingAttribute.KEY, JsonMatchingAttribute(value = "true"))
         }
         assertThrows(ClassCastException::class.java) {
-            testee.map(TriedAIChatDuringOnboardingMatchingAttribute.KEY, JsonMatchingAttribute(value = 1.0))
+            testee.map(TriedDuckAiDuringOnboardingMatchingAttribute.KEY, JsonMatchingAttribute(value = 1.0))
         }
     }
 }

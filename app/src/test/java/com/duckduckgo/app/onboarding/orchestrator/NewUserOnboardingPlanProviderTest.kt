@@ -673,7 +673,7 @@ class NewUserOnboardingPlanProviderTest {
             Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, result = NewUserOnboardingResult.LaunchSearch(query = "weather")),
             orchestrator.state.value,
         )
-        verify(onboardingStore, never()).setTriedAIChat()
+        verify(onboardingStore, never()).setTriedDuckAi()
     }
 
     @Test
@@ -708,7 +708,7 @@ class NewUserOnboardingPlanProviderTest {
             ),
             orchestrator.state.value,
         )
-        verify(onboardingStore).setTriedAIChat()
+        verify(onboardingStore).setTriedDuckAi()
     }
 
     @Test
@@ -1054,7 +1054,7 @@ class NewUserOnboardingPlanProviderTest {
             Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, result = NewUserOnboardingResult.LaunchSearch(query = "weather")),
             orchestrator.state.value,
         )
-        verify(onboardingStore, never()).setTriedAIChat()
+        verify(onboardingStore, never()).setTriedDuckAi()
     }
 
     @Test
@@ -1078,7 +1078,7 @@ class NewUserOnboardingPlanProviderTest {
             ),
             orchestrator.state.value,
         )
-        verify(onboardingStore).setTriedAIChat()
+        verify(onboardingStore).setTriedDuckAi()
     }
 
     @Test
@@ -1640,7 +1640,7 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when custom ai input screen preview demo submitted then marks ai chat as tried`() = runTest {
+    fun `when custom ai input screen preview demo submitted then marks duck ai as tried`() = runTest {
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
@@ -1650,7 +1650,7 @@ class NewUserOnboardingPlanProviderTest {
 
         orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "hello", isChat = true, fromSuggestion = false))
 
-        verify(onboardingStore).setTriedAIChat()
+        verify(onboardingStore).setTriedDuckAi()
     }
 
     @Test

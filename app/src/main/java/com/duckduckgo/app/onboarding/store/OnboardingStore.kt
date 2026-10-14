@@ -44,12 +44,12 @@ interface OnboardingStore {
     fun getSegmentedPathWithAiInput(): DownloadReasonSelection?
 
     /**
-     * Should be called when the user submits an AI Chat prompt during the onboarding.
+     * Should be called when the user submits a Duck.ai prompt during the onboarding.
      */
-    fun setTriedAIChat()
+    fun setTriedDuckAi()
 
     /**
-     * @return whether the user submitted an AI Chat prompt during the onboarding.
+     * @return whether the user submitted a Duck.ai prompt during the onboarding.
      */
-    fun getTriedAIChat(): Boolean
+    fun getTriedDuckAi(): Boolean
 }
