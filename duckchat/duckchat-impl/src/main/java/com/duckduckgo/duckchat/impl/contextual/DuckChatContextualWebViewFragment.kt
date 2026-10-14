@@ -216,6 +216,8 @@ class DuckChatContextualWebViewFragment :
     private lateinit var backPressedCallback: OnBackPressedCallback
     internal val simpleWebview: WebView by lazy { binding.simpleWebview }
     private var chatsPopup: PopupMenu? = null
+    private var isNativeInputVisible = false
+    private var isNativeInputFocused = false
 
     private val bottomSheetCallback =
         object : BottomSheetBehavior.BottomSheetCallback() {
@@ -487,6 +489,14 @@ class DuckChatContextualWebViewFragment :
                 activity?.hideKeyboard()
                 voiceSearchLauncher.launch(requireActivity(), VoiceSearchMode.DUCK_AI)
             },
+            onInputFocusChanged = { focused ->
+                isNativeInputFocused = focused
+                renderFireButton()
+            },
+            onInputVisibilityChanged = { visible ->
+                isNativeInputVisible = visible
+                renderFireButton()
+            },
         )
         observeViewModel()
 
@@ -535,6 +545,9 @@ class DuckChatContextualWebViewFragment :
             viewModel.onChatsIconClicked()
         }
         binding.contextualFire.setOnClickListener {
+            viewModel.onFireButtonClicked()
+        }
+        binding.contextualInputFire.setOnClickListener {
             viewModel.onFireButtonClicked()
         }
         binding.contextualModeButtons.setOnClickListener { }
@@ -649,7 +662,7 @@ class DuckChatContextualWebViewFragment :
         }
 
         binding.contextualNewChat.show()
-        if (viewState.isFireButtonEnabled) binding.contextualFire.show() else binding.contextualFire.gone()
+        renderFireButton()
         contextualNativeInputManager.onWebViewMode()
 
         if (viewState.showContext && viewState.contextTitle.isNotEmpty()) {
@@ -659,6 +672,18 @@ class DuckChatContextualWebViewFragment :
             )
         } else {
             binding.contextualNativeInputWidget.clearPageContext()
+        }
+    }
+
+    // Matches Duck.ai by sitting next to the native input and hiding while it's focused. The web input is
+    // drawn inside the WebView, so a native button can't sit beside it and falls back to the header.
+    private fun renderFireButton() {
+        val isFireButtonEnabled = viewModel.viewState.value.isFireButtonEnabled
+        if (isFireButtonEnabled && !isNativeInputVisible) binding.contextualFire.show() else binding.contextualFire.gone()
+        if (isFireButtonEnabled && isNativeInputVisible && !isNativeInputFocused) {
+            binding.contextualInputFire.show()
+        } else {
+            binding.contextualInputFire.gone()
         }
     }
 
