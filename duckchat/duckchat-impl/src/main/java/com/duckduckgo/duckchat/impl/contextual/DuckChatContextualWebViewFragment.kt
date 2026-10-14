@@ -38,6 +38,7 @@ import android.webkit.WebView
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.AnyThread
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -216,8 +217,6 @@ class DuckChatContextualWebViewFragment :
     private lateinit var backPressedCallback: OnBackPressedCallback
     internal val simpleWebview: WebView by lazy { binding.simpleWebview }
     private var chatsPopup: PopupMenu? = null
-    private var isNativeInputVisible = false
-    private var isNativeInputFocused = false
 
     private val bottomSheetCallback =
         object : BottomSheetBehavior.BottomSheetCallback() {
@@ -489,14 +488,8 @@ class DuckChatContextualWebViewFragment :
                 activity?.hideKeyboard()
                 voiceSearchLauncher.launch(requireActivity(), VoiceSearchMode.DUCK_AI)
             },
-            onInputFocusChanged = { focused ->
-                isNativeInputFocused = focused
-                renderFireButton()
-            },
-            onInputVisibilityChanged = { visible ->
-                isNativeInputVisible = visible
-                renderFireButton()
-            },
+            onInputFocusChanged = { renderFireButton() },
+            onInputVisibilityChanged = { renderFireButton() },
         )
         observeViewModel()
 
@@ -679,6 +672,8 @@ class DuckChatContextualWebViewFragment :
     // drawn inside the WebView, so a native button can't sit beside it and falls back to the header.
     private fun renderFireButton() {
         val isFireButtonEnabled = viewModel.viewState.value.isFireButtonEnabled
+        val isNativeInputVisible = binding.contextualNativeInputCard.isVisible
+        val isNativeInputFocused = binding.contextualNativeInputWidget.hasInputFocus()
         if (isFireButtonEnabled && !isNativeInputVisible) binding.contextualFire.show() else binding.contextualFire.gone()
         if (isFireButtonEnabled && isNativeInputVisible && !isNativeInputFocused) {
             binding.contextualInputFire.show()
