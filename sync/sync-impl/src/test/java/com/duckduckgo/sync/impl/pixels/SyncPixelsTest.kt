@@ -33,6 +33,8 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AnotherDevicePromptOption
+import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationResult
+import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationSource
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
@@ -226,6 +228,22 @@ class RealSyncPixelsTest {
             mapOf(
                 SyncPixelParameters.SYNC_SCANNER_CAMERA_PERMISSION_BEFORE_REQUESTING to "false",
                 SyncPixelParameters.SYNC_SCANNER_CAMERA_PERMISSION_AFTER_REQUESTING to "true",
+            ),
+        )
+    }
+
+    @Test
+    fun `when setup authentication result is reported then the pixel carries the result and source`(
+        @TestParameter result: AuthenticationResult,
+        @TestParameter source: AuthenticationSource,
+    ) {
+        testee.fireSetupAuthenticationResult(result, source)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_AUTHENTICATION_RESULT,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_AUTHENTICATION_RESULT to result.value,
+                SyncPixelParameters.SYNC_SETUP_AUTHENTICATION_SOURCE to source.value,
             ),
         )
     }
