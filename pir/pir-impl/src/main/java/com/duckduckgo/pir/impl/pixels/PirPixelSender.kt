@@ -57,6 +57,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_LOW_MEMORY
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_START_FAILED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FREEMIUM_MAINTENANCE_SCAN_SKIPPED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FREEMIUM_NOTIFICATION_OPENED_FIRST_SCAN_COMPLETE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FREEMIUM_NOTIFICATION_SENT_FIRST_SCAN_COMPLETE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FREEMIUM_SETTINGS_ENTRY_POINT_CLICKED
@@ -703,6 +704,8 @@ interface PirPixelSender {
     )
 
     fun reportFreemiumUpsell()
+
+    fun reportFreemiumMaintenanceScanSkipped()
 
     /**
      * Emits a count and a daily pixel every time the PIR dashboard is presented.
@@ -1633,6 +1636,10 @@ class RealPirPixelSender @Inject constructor(
 
     override fun reportFreemiumUpsell() {
         fire(PIR_FREEMIUM_UPSELL)
+    }
+
+    override fun reportFreemiumMaintenanceScanSkipped() {
+        fire(PIR_FREEMIUM_MAINTENANCE_SCAN_SKIPPED)
     }
 
     override fun reportDashboardOpened(isAuthenticated: Boolean) {

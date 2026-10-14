@@ -1197,6 +1197,23 @@ class RealPirPixelSenderTest {
     }
 
     @Test
+    fun whenReportFreemiumMaintenanceScanSkippedThenFiresCountAndDaily() = runTest {
+        testee.reportFreemiumMaintenanceScanSkipped()
+
+        val pixelNameCaptor = argumentCaptor<String>()
+        verify(mockPixelSender, times(2)).fire(
+            pixelName = pixelNameCaptor.capture(),
+            parameters = any(),
+            encodedParameters = any(),
+            type = any(),
+        )
+        assertEquals(
+            setOf("m_dbp_freemium_pir_maintenance_scan_skipped_c", "m_dbp_freemium_pir_maintenance_scan_skipped_d"),
+            pixelNameCaptor.allValues.toSet(),
+        )
+    }
+
+    @Test
     fun whenReportDashboardOpenedThenFiresCountAndDailyWithTierParams() = runTest {
         testee.reportDashboardOpened(isAuthenticated = false)
 
