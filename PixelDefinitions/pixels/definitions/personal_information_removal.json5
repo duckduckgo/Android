@@ -379,10 +379,11 @@
     "m_dbp_scan_stage": {
         "description": "Pixel emitted for every stage of a scan for a broker x profile.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
+            "pirIsFreeScan",
             {
                 "key": "data_broker",
                 "description": "The URL of the broker the stage was for",
@@ -471,10 +472,12 @@
     "m_dbp_search_stage_main_status_success": {
         "description": "Pixel emitted when the scan is completed with results.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
+            "pirIsAuthenticated",
+            "pirIsFreeScan",
             {
                 "key": "data_broker",
                 "description": "The URL of the broker scanned",
@@ -523,10 +526,12 @@
     "m_dbp_search_stage_main_status_no_results": {
         "description": "Pixel emitted when the scan is completed with no results found.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
+            "pirIsAuthenticated",
+            "pirIsFreeScan",
             {
                 "key": "data_broker",
                 "description": "The URL of the broker scanned",
@@ -599,10 +604,12 @@
     "m_dbp_search_stage_main_status_error": {
         "description": "Pixel emitted when the scan is completed with an error.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
+            "pirIsAuthenticated",
+            "pirIsFreeScan",
             {
                 "key": "data_broker",
                 "description": "The URL of the broker scanned",
@@ -1252,10 +1259,11 @@
     "m_dbp_data_broker_action-failed_error": {
         "description": "Fired when a scan or opt-out action fails while processing a data broker.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["exception"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
+            "pirIsFreeScan",
             {
                 "key": "data_broker",
                 "description": "The URL of the data broker that this action was operating on",

@@ -319,6 +319,7 @@ class BrokerStepCompletedEventHandlerTest {
         assertEquals(testBrokerStartTime, capturedState.firstValue.startTimeInMillis)
         assertEquals(true, capturedState.firstValue.isManualRun)
         assertEquals(testAction2, capturedState.firstValue.lastAction)
+        assertEquals(false, capturedState.firstValue.isFreeScan)
     }
 
     @Test
@@ -395,6 +396,71 @@ class BrokerStepCompletedEventHandlerTest {
         assertEquals("validation-error", capturedState.firstValue.errorCategory)
         assertEquals("Test error", capturedState.firstValue.errorDetails)
         assertEquals(testAction2, capturedState.firstValue.failedAction)
+        assertEquals(false, capturedState.firstValue.isFreeScan)
+    }
+
+    @Test
+    fun whenFreeScanSucceedsThenEmittedSuccessIsFreeScan() = runTest {
+        val scanStep = ScanStep(
+            broker = testBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(testAction1, testAction2),
+                scanType = "initial",
+            ),
+            isFreeScan = true,
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStep = scanStep,
+            profileQuery = testProfileQuery,
+            currentActionIndex = 2,
+            brokerStepStartTime = testBrokerStartTime,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = testStageStartMs,
+            ),
+        )
+
+        testee.invoke(state, BrokerStepCompleted(needsEmailConfirmation = false, stepStatus = StepStatus.Success))
+
+        val capturedState = argumentCaptor<BrokerScanSuccess>()
+        verify(mockPirRunStateHandler).handleState(capturedState.capture())
+        assertEquals(true, capturedState.firstValue.isFreeScan)
+    }
+
+    @Test
+    fun whenFreeScanFailsThenEmittedFailureIsFreeScan() = runTest {
+        val scanStep = ScanStep(
+            broker = testBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(testAction1, testAction2),
+                scanType = "initial",
+            ),
+            isFreeScan = true,
+        )
+        val state = State(
+            runType = RunType.SCHEDULED,
+            brokerStep = scanStep,
+            profileQuery = testProfileQuery,
+            currentActionIndex = 1,
+            brokerStepStartTime = testBrokerStartTime,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = testStageStartMs,
+            ),
+        )
+        val event = BrokerStepCompleted(
+            needsEmailConfirmation = false,
+            stepStatus = StepStatus.Failure(error = PirError.JsError.ActionError("Test error")),
+        )
+
+        testee.invoke(state, event)
+
+        val capturedState = argumentCaptor<BrokerScanFailed>()
+        verify(mockPirRunStateHandler).handleState(capturedState.capture())
+        assertEquals(true, capturedState.firstValue.isFreeScan)
     }
 
     @Test

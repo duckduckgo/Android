@@ -24,6 +24,7 @@ import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -791,6 +792,7 @@ class RealPirPixelSenderTest {
             parentUrl = "https://parent.com",
             actionId = "action-scan-1",
             actionType = "navigate",
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -807,6 +809,7 @@ class RealPirPixelSenderTest {
         assert(params["tries"] == "2")
         assert(params["parent"] == "https://parent.com")
         assert(params["action_id"] == "action-scan-1")
+        assert(params["free_scan"] == "false")
         assert(params["action_type"] == "navigate")
     }
 
@@ -819,6 +822,7 @@ class RealPirPixelSenderTest {
             durationMs = 5000L,
             inManualStarted = true,
             parentUrl = "https://parent.com",
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -836,6 +840,8 @@ class RealPirPixelSenderTest {
         assert(params["is_manual_scan"] == "true")
         assert(params["parent"] == "https://parent.com")
         assert(params["vpn_connection_state"] == "disconnected")
+        assert(params["is_authenticated"] == "true")
+        assert(params["free_scan"] == "false")
         assert(params["tracker_blocking_state"] == "disabled")
     }
 
@@ -850,6 +856,7 @@ class RealPirPixelSenderTest {
             parentUrl = "https://parent.com",
             actionId = "action-scan-2",
             actionType = "extract",
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -869,6 +876,8 @@ class RealPirPixelSenderTest {
         assert(params["action_id"] == "action-scan-2")
         assert(params["action_type"] == "extract")
         assert(params["vpn_connection_state"] == "connected")
+        assert(params["is_authenticated"] == "true")
+        assert(params["free_scan"] == "false")
         assert(params["tracker_blocking_state"] == "disabled")
     }
 
@@ -885,6 +894,7 @@ class RealPirPixelSenderTest {
             parentUrl = "https://parent.com",
             actionId = "action-scan-3",
             actionType = "navigate",
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -906,7 +916,59 @@ class RealPirPixelSenderTest {
         assert(params["action_id"] == "action-scan-3")
         assert(params["action_type"] == "navigate")
         assert(params["vpn_connection_state"] == "disconnected")
+        assert(params["is_authenticated"] == "true")
+        assert(params["free_scan"] == "false")
         assert(params["tracker_blocking_state"] == "disabled")
+    }
+
+    @Test
+    fun whenReportScanErrorForFreeScanThenSendsFreeTier() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(false)
+        testee.reportScanError(
+            brokerUrl = "https://broker.com",
+            brokerVersion = "3.0",
+            durationMs = 2000L,
+            errorCategory = "network",
+            errorDetails = "timeout",
+            inManualStarted = true,
+            parentUrl = "https://parent.com",
+            actionId = "action-scan-3",
+            actionType = "navigate",
+            isFreeScan = true,
+        )
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).fire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+        assertEquals("false", paramsCaptor.firstValue["is_authenticated"])
+        assertEquals("true", paramsCaptor.firstValue["free_scan"])
+    }
+
+    @Test
+    fun whenReportScanStageForFreeScanThenSendsFreeScanOnly() = runTest {
+        testee.reportScanStage(
+            brokerUrl = "https://broker.com",
+            brokerVersion = "3.0",
+            tries = 2,
+            parentUrl = "https://parent.com",
+            actionId = "action-scan-1",
+            actionType = "navigate",
+            isFreeScan = true,
+        )
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).fire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+        assertEquals("true", paramsCaptor.firstValue["free_scan"])
+        assertFalse(paramsCaptor.firstValue.containsKey("is_authenticated"))
     }
 
     @Test
@@ -920,6 +982,7 @@ class RealPirPixelSenderTest {
             durationMs = 1000L,
             inManualStarted = false,
             parentUrl = "https://parent.com",
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -1088,6 +1151,7 @@ class RealPirPixelSenderTest {
             actionId = "action-fail-1",
             errorMessage = "Action failed due to error",
             stepType = "scan",
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -1104,6 +1168,7 @@ class RealPirPixelSenderTest {
         assert(params["broker_version"] == "5.0")
         assert(params["action_id"] == "action-fail-1")
         assert(params["message"] == "Action failed due to error")
+        assert(params["free_scan"] == "false")
         assert(params["stepType"] == "scan")
     }
 

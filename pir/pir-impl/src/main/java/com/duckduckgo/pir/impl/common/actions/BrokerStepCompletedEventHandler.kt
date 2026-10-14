@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirJob.RunType.EMAIL_CONFIRMATION
 import com.duckduckgo.pir.impl.common.PirJob.RunType.SCHEDULED
@@ -118,6 +119,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
         when (state.runType) {
             RunType.MANUAL, SCHEDULED -> {
                 val isManual = state.runType == RunType.MANUAL
+                val isFreeScan = (currentBrokerStep as? ScanStep)?.isFreeScan == true
                 if (lastAction == null) return
 
                 if (isSuccess) {
@@ -130,6 +132,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                             startTimeInMillis = brokerStartTime,
                             isManualRun = isManual,
                             lastAction = lastAction,
+                            isFreeScan = isFreeScan,
                         ),
                     )
                 } else {
@@ -146,6 +149,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                             errorCategory = failure.error.getCategory(),
                             errorDetails = failure.error.getDetails(),
                             failedAction = lastAction,
+                            isFreeScan = isFreeScan,
                         ),
                     )
                 }

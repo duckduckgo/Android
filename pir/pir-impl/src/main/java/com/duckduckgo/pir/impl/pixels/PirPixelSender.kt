@@ -510,6 +510,7 @@ interface PirPixelSender {
         parentUrl: String,
         actionId: String,
         actionType: String,
+        isFreeScan: Boolean,
     )
 
     fun reportScanStageEmailGetData(
@@ -527,6 +528,7 @@ interface PirPixelSender {
         durationMs: Long,
         inManualStarted: Boolean,
         parentUrl: String,
+        isFreeScan: Boolean,
     )
 
     suspend fun reportScanNoMatch(
@@ -537,6 +539,7 @@ interface PirPixelSender {
         parentUrl: String,
         actionId: String,
         actionType: String,
+        isFreeScan: Boolean,
     )
 
     suspend fun reportScanError(
@@ -549,6 +552,7 @@ interface PirPixelSender {
         parentUrl: String,
         actionId: String,
         actionType: String,
+        isFreeScan: Boolean,
     )
 
     fun reportOptOutStageStart(
@@ -687,6 +691,7 @@ interface PirPixelSender {
         actionId: String,
         errorMessage: String,
         stepType: String,
+        isFreeScan: Boolean,
     )
 
     fun reportFreemiumUpsell()
@@ -1174,6 +1179,7 @@ class RealPirPixelSender @Inject constructor(
         parentUrl: String,
         actionId: String,
         actionType: String,
+        isFreeScan: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -1182,6 +1188,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_PARENT to parentUrl,
             PARAM_ACTION_ID to actionId,
             PARAM_KEY_ACTION_TYPE to actionType,
+            PARAM_KEY_FREE_SCAN to isFreeScan.toString(),
         )
 
         fire(PIR_SCAN_STAGE, params)
@@ -1214,6 +1221,7 @@ class RealPirPixelSender @Inject constructor(
         durationMs: Long,
         inManualStarted: Boolean,
         parentUrl: String,
+        isFreeScan: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -1224,7 +1232,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_PARENT to parentUrl,
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
             PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
-        )
+        ) + usageParams(isAuthenticated = !isFreeScan)
 
         fire(PIR_SCAN_STAGE_RESULT_MATCHES, params)
     }
@@ -1237,6 +1245,7 @@ class RealPirPixelSender @Inject constructor(
         parentUrl: String,
         actionId: String,
         actionType: String,
+        isFreeScan: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -1248,7 +1257,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_ACTION_TYPE to actionType,
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
             PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
-        )
+        ) + usageParams(isAuthenticated = !isFreeScan)
 
         fire(PIR_SCAN_STAGE_RESULT_NO_MATCH, params)
     }
@@ -1263,6 +1272,7 @@ class RealPirPixelSender @Inject constructor(
         parentUrl: String,
         actionId: String,
         actionType: String,
+        isFreeScan: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -1276,7 +1286,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_ACTION_TYPE to actionType,
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
             PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
-        )
+        ) + usageParams(isAuthenticated = !isFreeScan)
 
         fire(PIR_SCAN_STAGE_RESULT_ERROR, params)
     }
@@ -1605,6 +1615,7 @@ class RealPirPixelSender @Inject constructor(
         actionId: String,
         errorMessage: String,
         stepType: String,
+        isFreeScan: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -1613,6 +1624,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_ACTION_ID to actionId,
             PARAM_KEY_MSG to errorMessage,
             PARAM_KEY_STEP to stepType,
+            PARAM_KEY_FREE_SCAN to isFreeScan.toString(),
         )
 
         fire(PIR_BROKER_ACTION_FAILED, params)

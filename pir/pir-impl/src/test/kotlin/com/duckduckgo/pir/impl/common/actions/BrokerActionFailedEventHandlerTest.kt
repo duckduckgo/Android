@@ -174,6 +174,66 @@ class BrokerActionFailedEventHandlerTest {
     }
 
     @Test
+    fun whenFreeScanActionFailsThenEmittedActionFailureIsFreeScan() = runTest {
+        val scanStep = ScanStep(
+            broker = testBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(testClickAction),
+                scanType = "initial",
+            ),
+            isFreeScan = true,
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStep = scanStep,
+            profileQuery = testProfileQuery,
+            currentActionIndex = 0,
+            actionRetryCount = 0,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+
+        testee.invoke(state, BrokerActionFailed(error = testError, allowRetry = false))
+
+        val captured = argumentCaptor<BrokerStepActionFailed>()
+        verify(mockPirRunStateHandler).handleState(captured.capture())
+        assertEquals(true, captured.firstValue.isFreeScan)
+    }
+
+    @Test
+    fun whenOptOutActionFailsThenEmittedActionFailureIsNeverFreeScan() = runTest {
+        val optOutStep = OptOutStep(
+            broker = testBroker,
+            step = OptOutStepActions(
+                stepType = "optout",
+                actions = listOf(testClickAction),
+                optOutType = "form",
+            ),
+            profileToOptOut = testExtractedProfile,
+        )
+        val state = State(
+            runType = RunType.OPTOUT,
+            brokerStep = optOutStep,
+            profileQuery = testProfileQuery,
+            currentActionIndex = 0,
+            actionRetryCount = 0,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+
+        testee.invoke(state, BrokerActionFailed(error = testError, allowRetry = false))
+
+        val captured = argumentCaptor<BrokerStepActionFailed>()
+        verify(mockPirRunStateHandler).handleState(captured.capture())
+        assertEquals(false, captured.firstValue.isFreeScan)
+    }
+
+    @Test
     fun whenOptOutActionFailedWithRetryCountBelowMaxThenRetries() = runTest {
         val optOutStep = OptOutStep(
             broker = testBroker,
