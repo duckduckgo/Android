@@ -1267,6 +1267,33 @@
             }
         ]
     },
+    "m_aichat_input_outcome": {
+        "description": "How a Duck.ai input session ended: a prompt was sent, a voice chat started, a suggested prompt was picked, or the input closed without any of them. A session is the input focused with Duck.ai selected. Only sent while native ToS consent is on.",
+        "owners": ["malmstein"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            {
+                "key": "tos_disclaimer_shown",
+                "type": "boolean",
+                "description": "Whether the ToS disclaimer was on screen at any point during the input session"
+            },
+            {
+                "key": "outcome",
+                "type": "string",
+                "description": "How the input session ended",
+                "enum": ["prompt_submitted", "voice_started", "abandoned", "suggested_prompt"]
+            },
+            {
+                "key": "submit_method",
+                "type": "string",
+                "description": "What the user did to send. Only present for prompt_submitted and suggested_prompt. other covers quick actions, suggested prompts, Paste and Go and dictation. Enter only counts when the keyboard submits, not when it inserts a newline.",
+                "enum": ["button", "enter", "other"]
+            }
+        ]
+    },
     "m_aichat_unified_input_prompt_submitted_count": {
         "description": "User submitted a prompt from the Unified Input",
         "owners": ["malmstein"],
