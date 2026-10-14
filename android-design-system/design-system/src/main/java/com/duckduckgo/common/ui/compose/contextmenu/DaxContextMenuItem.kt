@@ -26,8 +26,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.RippleConfiguration
+import androidx.compose.material3.RippleDefaults.RippleAlpha
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -220,7 +222,17 @@ internal object DaxContextMenuItemDefaults {
     @Composable
     fun rippleConfiguration(): RippleConfiguration {
         val color = if (DuckDuckGoTheme.colors.isDark) White12 else Black6
-        return remember(color) { RippleConfiguration(color = color) }
+        return remember(color) {
+            RippleConfiguration(
+                color = color.copy(alpha = 1f),
+                rippleAlpha = RippleAlpha(
+                    draggedAlpha = RippleAlpha.draggedAlpha,
+                    focusedAlpha = RippleAlpha.focusedAlpha,
+                    hoveredAlpha = RippleAlpha.hoveredAlpha,
+                    pressedAlpha = color.alpha,
+                ),
+            )
+        }
     }
 }
 
