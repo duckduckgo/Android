@@ -270,7 +270,6 @@ class NewTabPageView @JvmOverloads constructor(
         }
     }
 
-    // The section counts its own impressions, so no onMessageShown here.
     private fun showNextStepsSection() {
         if (binding.nextStepsContainer.childCount == 0) {
             inflateNextStepsSection()
@@ -279,7 +278,6 @@ class NewTabPageView @JvmOverloads constructor(
         }
     }
 
-    // Dropping the view stops its view model listening to RMF, so a hidden section cannot count impressions.
     private fun hideNextStepsSection() {
         nextStepsSectionJob?.cancel()
         nextStepsSectionJob = null
