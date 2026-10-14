@@ -49,7 +49,8 @@ interface OnboardingStore {
     fun setTriedDuckAi()
 
     /**
-     * @return whether the user submitted a Duck.ai prompt during the onboarding.
+     * @return whether the user submitted a Duck.ai prompt during the onboarding. Note that installations
+     * that have completed the onboarding prior to this flag being introduced will return false.
      */
     fun getTriedDuckAi(): Boolean
 }
