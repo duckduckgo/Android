@@ -66,8 +66,10 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Compa
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.DUCK_AI_LIST
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.GRID_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TAB
+import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.RICH_DUCK_AI_GRID
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.SELECTABLE_DUCK_AI_GRID
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.SELECTABLE_DUCK_AI_LIST
+import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.SELECTABLE_RICH_DUCK_AI_GRID
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.TRACKER_ANIMATION_TILE_INFO_PANEL
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.TabViewHolder
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
@@ -81,6 +83,12 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
+import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemCallbacks
+import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemRenderer
+import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemState
+import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemState.Selection
+import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemState.Selection.Selectable
+import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemView
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -101,6 +109,7 @@ class TabSwitcherAdapter(
     private val dispatchers: DispatcherProvider,
     private val trackerCountAnimator: TrackerCountAnimator,
     private val addressDisplayFormatter: AddressDisplayFormatter,
+    private val duckAiTabGridItemRenderer: DuckAiTabGridItemRenderer,
 ) : Adapter<ViewHolder>() {
 
     @Volatile
@@ -145,6 +154,9 @@ class TabSwitcherAdapter(
                 addExtraCloseButtonTouchArea(binding.close)
                 TabSwitcherViewHolder.DuckAiTabListViewHolder(binding)
             }
+            RICH_DUCK_AI_GRID, SELECTABLE_RICH_DUCK_AI_GRID -> {
+                TabSwitcherViewHolder.RichDuckAiGridViewHolder(duckAiTabGridItemRenderer.create(parent.context))
+            }
             TRACKER_ANIMATION_TILE_INFO_PANEL -> {
                 val binding = ItemTabSwitcherAnimationInfoPanelBinding.inflate(inflater, parent, false)
                 TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder(binding)
@@ -156,10 +168,12 @@ class TabSwitcherAdapter(
     override fun getItemViewType(position: Int): Int =
         when (val item = differ.currentList[position]) {
             is DuckAiTab -> when (layoutType) {
+                GRID if item.duckAiGridItemContent != null -> RICH_DUCK_AI_GRID
                 GRID -> DUCK_AI_GRID
-                LIST -> DUCK_AI_LIST
+                else -> DUCK_AI_LIST
             }
             is SelectableTab -> when {
+                item.isDuckAi && layoutType == GRID && item.duckAiGridItemContent != null -> SELECTABLE_RICH_DUCK_AI_GRID
                 item.isDuckAi && layoutType == GRID -> SELECTABLE_DUCK_AI_GRID
                 item.isDuckAi && layoutType == LIST -> SELECTABLE_DUCK_AI_LIST
                 layoutType == GRID -> GRID_TAB
@@ -187,6 +201,9 @@ class TabSwitcherAdapter(
             }
             is TabSwitcherViewHolder.DuckAiTabListViewHolder -> {
                 bindDuckAiListTab(holder, differ.currentList[position] as Tab)
+            }
+            is TabSwitcherViewHolder.RichDuckAiGridViewHolder -> {
+                bindRichDuckAiGridTab(holder, differ.currentList[position] as Tab)
             }
             is TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder -> {
                 val trackersAnimationInfoPanel = differ.currentList[position] as TabSwitcherItem.TrackersAnimationInfoPanel
@@ -289,6 +306,32 @@ class TabSwitcherAdapter(
         )
     }
 
+    private fun bindRichDuckAiGridTab(holder: TabSwitcherViewHolder.RichDuckAiGridViewHolder, tab: Tab) {
+        val content = tab.duckAiGridItemContent ?: return
+
+        holder.item.bind(
+            content = content,
+            state = DuckAiTabGridItemState(
+                isUnread = !tab.tabEntity.viewed,
+                selection = if (tab is SelectableTab) Selectable(tab.isSelected) else Selection.None,
+            ),
+            callbacks = object : DuckAiTabGridItemCallbacks {
+                override fun onClick() {
+                    if (!isDragging) {
+                        itemClickListener.onTabSelected(tab.id)
+                    }
+                }
+
+                override fun onClose() {
+                    val position = holder.bindingAdapterPosition
+                    if (position != RecyclerView.NO_POSITION) {
+                        itemClickListener.onTabDeleted(position = position, deletedBySwipe = false)
+                    }
+                }
+            },
+        )
+    }
+
     private fun attachTabClickListeners(tabViewHolder: TabViewHolder, bindingAdapterPosition: () -> Int, tabId: String) {
         tabViewHolder.rootView.setOnClickListener {
             if (!isDragging) {
@@ -365,6 +408,10 @@ class TabSwitcherAdapter(
                 viewHolder = holder as TabSwitcherViewHolder.DuckAiTabListViewHolder,
                 tab = differ.currentList[position] as Tab,
                 payloads = payloads,
+            )
+            RICH_DUCK_AI_GRID, SELECTABLE_RICH_DUCK_AI_GRID -> bindRichDuckAiGridTab(
+                holder = holder as TabSwitcherViewHolder.RichDuckAiGridViewHolder,
+                tab = differ.currentList[position] as Tab,
             )
             TRACKER_ANIMATION_TILE_INFO_PANEL -> {
                 for (payload in payloads) {
@@ -664,6 +711,8 @@ class TabSwitcherAdapter(
             const val DUCK_AI_LIST = 4
             const val SELECTABLE_DUCK_AI_GRID = 5
             const val SELECTABLE_DUCK_AI_LIST = 6
+            const val RICH_DUCK_AI_GRID = 7
+            const val SELECTABLE_RICH_DUCK_AI_GRID = 8
 
             const val EXTRA_CLOSE_BUTTON_TOUCH_AREA = 6 // dp
         }
@@ -764,6 +813,10 @@ class TabSwitcherAdapter(
         data class TrackerAnimationInfoPanelViewHolder(
             val binding: ItemTabSwitcherAnimationInfoPanelBinding,
         ) : TabSwitcherViewHolder(binding.root)
+
+        class RichDuckAiGridViewHolder(
+            val item: DuckAiTabGridItemView,
+        ) : TabSwitcherViewHolder(item.view)
     }
 }
 

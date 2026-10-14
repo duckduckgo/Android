@@ -108,6 +108,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.duckchat.api.DuckAiChatsMenu
 import com.duckduckgo.duckchat.api.DuckChatHistorySource
+import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemRenderer
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import dagger.Lazy
@@ -155,6 +156,9 @@ class TabSwitcherActivity :
     lateinit var addressDisplayFormatter: com.duckduckgo.app.browser.AddressDisplayFormatter
 
     @Inject
+    lateinit var duckAiTabGridItemRenderer: DuckAiTabGridItemRenderer
+
+    @Inject
     lateinit var urlDisplayRepository: com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 
     @Inject
@@ -189,6 +193,7 @@ class TabSwitcherActivity :
             dispatchers = dispatchers,
             trackerCountAnimator = trackerCountAnimator,
             addressDisplayFormatter = addressDisplayFormatter,
+            duckAiTabGridItemRenderer = duckAiTabGridItemRenderer,
         )
     }
 
