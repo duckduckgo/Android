@@ -342,6 +342,7 @@ import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckAiTermsConsent
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatContextual
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
@@ -663,6 +664,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var duckChat: DuckChat
+
+    @Inject
+    lateinit var termsConsent: DuckAiTermsConsent
 
     @Inject
     lateinit var duckChatContextual: DuckChatContextual
@@ -1429,6 +1433,7 @@ class BrowserTabFragment :
                                 if (selectionsJson != null) {
                                     put("selections", selectionsJson)
                                 }
+                                termsConsent.carry(this, browserMode)
                             },
                         ),
                     )

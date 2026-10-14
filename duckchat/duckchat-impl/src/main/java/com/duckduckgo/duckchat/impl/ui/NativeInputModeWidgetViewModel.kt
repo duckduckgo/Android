@@ -48,6 +48,7 @@ import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.EditPromptRequest
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.feature.maxUrlSuggestions
 import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
@@ -62,6 +63,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.terms.DuckAiTermsRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
@@ -120,8 +122,17 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val modelManager: DuckAiModelManager,
     private val duckAiChatStore: DuckAiChatStore,
     private val history: NavigationHistory,
+    private val termsRepository: DuckAiTermsRepository,
+    private val duckChatFeature: DuckChatFeature,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ViewModel() {
+
+    // The first prompt is the one that accepts the terms, so while they are pending the keyboard must not submit:
+    // Ask is the only way to send it.
+    val termsRequired: Flow<Boolean> = combine(
+        duckChatFeature.nativeToSConsent().enabled(),
+        termsRepository.observeTermsAccepted(browserMode),
+    ) { enabled, accepted -> enabled && !accepted }.distinctUntilChanged()
 
     private val autoComplete: AutoComplete = autoCompleteFactory.create(
         AutoComplete.Config(showInstalledApps = false),
@@ -648,8 +659,9 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         selectedTool: String? = null,
         images: List<PendingNativeImage> = emptyList(),
         files: List<PendingNativeFile> = emptyList(),
+        carriesTermsConsent: Boolean = true,
     ) {
-        pendingNativePromptStore.store(query, modelId, reasoningEffort, selectedTool, images, files)
+        pendingNativePromptStore.store(query, modelId, reasoningEffort, selectedTool, images, files, carriesTermsConsent)
     }
 
     fun configureContextual(tabId: String) {

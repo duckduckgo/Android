@@ -205,6 +205,7 @@
         <item name="daxColorBackground">@color/background_background_dark</item>
         <item name="daxColorBackgroundInverted">@color/gray0</item>
         <item name="daxColorSurface">@color/background_surface_dark</item>
+        <item name="daxColorSurfaceSecondary">@color/background_surface_secondary_dark</item>
         <item name="daxColorSurfaceTertiary">@color/background_surface_tertiary_dark</item>
         <item name="daxColorContainer">@color/white12</item>
         <item name="daxColorWindow">@color/background_window_dark</item>
@@ -380,6 +381,7 @@
         <item name="daxColorBackground">@color/background_background_light</item>
         <item name="daxColorBackgroundInverted">@color/gray100</item>
         <item name="daxColorSurface">@color/background_surface_light</item>
+        <item name="daxColorSurfaceSecondary">@color/background_surface_secondary_light</item>
         <item name="daxColorSurfaceTertiary">@color/background_surface_tertiary_light</item>
         <item name="daxColorContainer">@color/black6</item>
         <item name="daxColorWindow">@color/background_window_light</item>

@@ -359,6 +359,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var refreshChatSuggestionsAction: (() -> Unit)? = null
     private var voiceSearchAvailable: Boolean = false
     private var voiceChatAvailable: Boolean = false
+    private var termsRequired: Boolean = false
     private var widgetRoot: View? = null
     private var footerHost: NativeInputFooterView? = null
     override var onStopTapped: (() -> Unit)? = null
@@ -752,6 +753,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         pluginsJob?.cancel()
         val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
         pluginsJob = scope.launch {
+            launch { viewModel.termsRequired.collect(::onTermsRequiredChanged) }
             launch {
                 viewModel.plugins.collect { plugins ->
                     val pluginContext = currentPluginContext()
@@ -1227,7 +1229,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         // return affordance there. We read position from `isWidgetBottom()` (state-driven), and
         // `applyState` re-fires this on the first state emission / position change so a stale
         // value at tab-selection time gets corrected via `restartInput`.
-        val newLineOnEnter = isDuckAiPageContext() || isWidgetBottom()
+        val newLineOnEnter = isDuckAiPageContext() || isWidgetBottom() || termsAreBlockingKeyboardSubmit()
         val actionFlag = if (newLineOnEnter) EditorInfo.IME_ACTION_NONE else EditorInfo.IME_ACTION_GO
         imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or actionFlag
         val baseInputType = InputType.TYPE_CLASS_TEXT or
@@ -1239,7 +1241,18 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun shouldSubmitOnHardwareEnter(): Boolean =
-        !(isChatTabSelected() && (isDuckAiPageContext() || isWidgetBottom()))
+        !(isChatTabSelected() && (isDuckAiPageContext() || isWidgetBottom() || termsAreBlockingKeyboardSubmit()))
+
+    // The edit surface never shows Ask, so it keeps submitting from the keyboard.
+    private fun termsAreBlockingKeyboardSubmit(): Boolean = termsRequired && !isEditWidget
+
+    private fun onTermsRequiredChanged(required: Boolean) {
+        if (termsRequired == required) return
+        termsRequired = required
+        if (!isChatTabSelected()) return
+        inputField.applyChatInputType()
+        (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(inputField)
+    }
 
     override fun submitMessage(message: String?) {
         if (message == null && isChatTabSelected() && attachmentLimitExceeded) {
@@ -1561,7 +1574,17 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val files = attachmentViewModel?.getFileAttachments()?.map {
             PendingNativeFile(base64Data = it.base64Data, fileName = it.fileName, mimeType = it.mimeType)
         } ?: emptyList()
-        viewModel.storePendingPrompt(query, getSelectedModelId(), getResolvedReasoningEffort(), getSelectedTool(), images, files)
+        // Only the Duck.ai tab shows the ToS footer. A chat sent from elsewhere (the search-only address bar) has not
+        // shown the terms, so it must not accept them.
+        viewModel.storePendingPrompt(
+            query,
+            getSelectedModelId(),
+            getResolvedReasoningEffort(),
+            getSelectedTool(),
+            images,
+            files,
+            carriesTermsConsent = isChatTabSelected(),
+        )
         attachmentViewModel?.clearAttachmentsForNewChat()
         viewModel.setSelectedTool(null)
     }

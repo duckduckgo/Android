@@ -40,6 +40,8 @@ data class PendingNativePrompt(
     val selectedTool: String? = null,
     val images: List<PendingNativeImage> = emptyList(),
     val files: List<PendingNativeFile> = emptyList(),
+    /** False when the user could not have seen the terms (e.g. the search-only address bar), so sending must not accept them. */
+    val carriesTermsConsent: Boolean = true,
 )
 
 interface PendingNativePromptStore {
@@ -50,6 +52,7 @@ interface PendingNativePromptStore {
         selectedTool: String? = null,
         images: List<PendingNativeImage> = emptyList(),
         files: List<PendingNativeFile> = emptyList(),
+        carriesTermsConsent: Boolean = true,
     )
     fun consume(): PendingNativePrompt?
 }
@@ -67,8 +70,9 @@ class RealPendingNativePromptStore @Inject constructor() : PendingNativePromptSt
         selectedTool: String?,
         images: List<PendingNativeImage>,
         files: List<PendingNativeFile>,
+        carriesTermsConsent: Boolean,
     ) {
-        pending.set(PendingNativePrompt(prompt, modelId, reasoningEffort, selectedTool, images, files))
+        pending.set(PendingNativePrompt(prompt, modelId, reasoningEffort, selectedTool, images, files, carriesTermsConsent))
     }
 
     override fun consume(): PendingNativePrompt? {

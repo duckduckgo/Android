@@ -32,8 +32,7 @@
         android:layout_width="@dimen/keyline_4"
         android:layout_height="@dimen/keyline_4"
         android:importantForAccessibility="no"
-        app:srcCompat="@drawable/ic_shield_16"
-        app:tint="?attr/daxColorSecondaryIcon" />
+        app:srcCompat="@drawable/ic_privacy_shield_color_16" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/termsFooterMessage"
