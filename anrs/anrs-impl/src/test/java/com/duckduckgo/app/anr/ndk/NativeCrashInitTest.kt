@@ -60,7 +60,6 @@ class NativeCrashInitTest {
         whenever(mockNativeCrashFeature.nativeCrashReportsFullWebViewVersion()).thenReturn(mockToggle)
         whenever(mockNativeCrashFeature.nativeCrashHandling()).thenReturn(mockEnabledToggle)
         whenever(mockNativeCrashFeature.nativeCrashHandlingSecondaryProcess()).thenReturn(mockEnabledToggle)
-        whenever(mockNativeCrashFeature.useCrashpad()).thenReturn(mockEnabledToggle)
         whenever(mockCrashpadInitializer.initialize(any(), anyOrNull())).thenReturn(true)
     }
 
@@ -122,13 +121,6 @@ class NativeCrashInitTest {
     fun `onPirProcessCreated skips Crashpad init when secondary process toggle disabled`() {
         whenever(mockNativeCrashFeature.nativeCrashHandlingSecondaryProcess()).thenReturn(mockToggle)
         buildNativeCrashInit(isMainProcess = false).onPirProcessCreated()
-        verify(mockCrashpadInitializer, never()).initialize(any(), anyOrNull())
-    }
-
-    @Test
-    fun `onCreate skips Crashpad init when useCrashpad toggle disabled`() {
-        whenever(mockNativeCrashFeature.useCrashpad()).thenReturn(mockToggle)
-        buildNativeCrashInit(isMainProcess = true).onCreate(mockLifecycleOwner)
         verify(mockCrashpadInitializer, never()).initialize(any(), anyOrNull())
     }
 
@@ -211,7 +203,6 @@ class NativeCrashInitTest {
         isMainProcess: Boolean = true,
         processName: String = "com.example",
     ) = NativeCrashInit(
-        context = mock(),
         isMainProcess = isMainProcess,
         customTabDetector = mockCustomTabDetector,
         appBuildConfig = mockAppBuildConfig,
