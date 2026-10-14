@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import com.duckduckgo.common.ui.compose.button.DaxBrandButton
-import com.duckduckgo.common.ui.compose.button.DaxBrandButtonTypography
 import com.duckduckgo.common.ui.compose.button.DaxButtonSize
 import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostAltButton
 import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostButton
@@ -41,6 +40,7 @@ import com.duckduckgo.common.ui.compose.button.DaxIconButton
 import com.duckduckgo.common.ui.compose.button.DaxIconButtonDefaults
 import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
 import com.duckduckgo.common.ui.compose.button.DaxSecondaryButton
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.internal.databinding.ComponentButtonsBinding
 import com.duckduckgo.common.ui.internal.ui.appComponentsViewModel
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
@@ -140,7 +140,7 @@ class ComponentButtonsFragment : Fragment() {
                 DaxBrandButton(
                     text = "Brand DuckSans",
                     onClick = {},
-                    typography = DaxBrandButtonTypography.DuckSans,
+                    textStyle = DuckDuckGoTheme.typography.onboardingButton,
                 )
             }
         }

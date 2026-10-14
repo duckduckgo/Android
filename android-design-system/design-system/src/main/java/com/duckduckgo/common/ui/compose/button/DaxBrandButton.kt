@@ -45,7 +45,6 @@ import com.duckduckgo.common.ui.compose.theme.Pollen100
 import com.duckduckgo.common.ui.compose.theme.Pollen40
 import com.duckduckgo.common.ui.compose.theme.Pollen60
 import com.duckduckgo.common.ui.compose.theme.ProvideDuckDuckGoTheme
-import com.duckduckgo.common.ui.compose.theme.Typography
 import com.duckduckgo.common.ui.compose.theme.White
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
@@ -64,8 +63,8 @@ import com.duckduckgo.mobile.android.R
  * @param modifier Modifier for this button.
  * @param size The button size — [DaxButtonSize.Small] or [DaxButtonSize.Large].
  * @param enabled Whether the button is enabled for interaction.
- * @param typography The font style — [DaxBrandButtonTypography.Standard] (default) or
- *   [DaxBrandButtonTypography.DuckSans] for the proprietary DuckSans Product font.
+ * @param textStyle The label text style. Defaults to the brand button style for the given [size].
+ *   Pass [com.duckduckgo.common.ui.compose.theme.DuckDuckGoTypography.onboardingButton] for the DuckSans variant.
  * @param leadingIconPainter Optional icon [Painter] displayed before the button text.
  *   When non-null, renders a 16dp ([DaxButtonSize.Small]) or 24dp ([DaxButtonSize.Large])
  *   icon tinted with the button's content color.
@@ -78,14 +77,14 @@ fun DaxBrandButton(
     modifier: Modifier = Modifier,
     size: DaxButtonSize = DaxButtonSize.Small,
     enabled: Boolean = true,
-    typography: DaxBrandButtonTypography = DaxBrandButtonTypography.Standard,
+    textStyle: DuckDuckGoTextStyle = DaxBrandButtonDefaults.textStyle(size),
     leadingIconPainter: Painter? = null,
 ) {
     ProvideDuckDuckGoTheme(
         colors = DuckDuckGoTheme.colors,
         shapes = DuckDuckGoTheme.shapes.copy(medium = DaxBrandButtonDefaults.shape),
         typography = DuckDuckGoTheme.typography.copy(
-            button = DaxBrandButtonDefaults.textStyle(size = size, typography = typography),
+            button = textStyle,
         ),
     ) {
         DaxButton(
@@ -99,11 +98,6 @@ fun DaxBrandButton(
             enabled = enabled,
         )
     }
-}
-
-enum class DaxBrandButtonTypography {
-    Standard,
-    DuckSans,
 }
 
 private object DaxBrandButtonDefaults {
@@ -152,15 +146,9 @@ private object DaxBrandButtonDefaults {
         DaxButtonSize.Large -> 56.dp
     }
 
-    fun textStyle(
-        size: DaxButtonSize,
-        typography: DaxBrandButtonTypography,
-    ): DuckDuckGoTextStyle = when (typography) {
-        DaxBrandButtonTypography.DuckSans -> Typography.onboardingButton
-        DaxBrandButtonTypography.Standard -> when (size) {
-            DaxButtonSize.Small -> DuckDuckGoTextStyle(SmallTextStyle)
-            DaxButtonSize.Large -> DuckDuckGoTextStyle(LargeTextStyle)
-        }
+    fun textStyle(size: DaxButtonSize): DuckDuckGoTextStyle = when (size) {
+        DaxButtonSize.Small -> DuckDuckGoTextStyle(SmallTextStyle)
+        DaxButtonSize.Large -> DuckDuckGoTextStyle(LargeTextStyle)
     }
 
     @Composable @ReadOnlyComposable
@@ -248,7 +236,7 @@ private fun DaxBrandButtonDuckSansPreview(
             text = "Brand DuckSans",
             onClick = { },
             enabled = enabled,
-            typography = DaxBrandButtonTypography.DuckSans,
+            textStyle = DuckDuckGoTheme.typography.onboardingButton,
         )
     }
 }
