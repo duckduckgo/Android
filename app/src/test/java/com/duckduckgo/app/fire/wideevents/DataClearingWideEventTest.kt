@@ -17,6 +17,7 @@
 package com.duckduckgo.app.fire.wideevents
 
 import android.annotation.SuppressLint
+import androidx.work.WorkInfo
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent.EntryPoint
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy.OnProcessStart
@@ -29,6 +30,8 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -89,7 +92,7 @@ class DataClearingWideEventTest {
             metadata = mapOf("clear_options" to "tabs,data", "browser_mode" to "regular"),
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
             samplingProbability = 0.05f,
-            definition = WideEventDefinition(version = Version(minor = 1, patch = 0)),
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 1)),
         )
         verify(wideEventClient).intervalStart(
             wideEventId = 123L,
@@ -111,7 +114,7 @@ class DataClearingWideEventTest {
             metadata = mapOf("clear_options" to "tabs", "browser_mode" to "fire"),
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
             samplingProbability = 0.05f,
-            definition = WideEventDefinition(version = Version(minor = 1, patch = 0)),
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 1)),
         )
     }
 
@@ -139,7 +142,7 @@ class DataClearingWideEventTest {
             ),
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
             samplingProbability = 0.05f,
-            definition = WideEventDefinition(version = Version(minor = 1, patch = 0)),
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 1)),
         )
     }
 
@@ -162,7 +165,7 @@ class DataClearingWideEventTest {
                 metadata = mapOf("clear_options" to "", "browser_mode" to "regular", "tab_count" to bucket),
                 cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
                 samplingProbability = 0.05f,
-                definition = WideEventDefinition(version = Version(minor = 1, patch = 0)),
+                definition = WideEventDefinition(version = Version(minor = 1, patch = 1)),
             )
         }
     }
@@ -180,7 +183,7 @@ class DataClearingWideEventTest {
             metadata = mapOf("clear_options" to "", "browser_mode" to "regular"),
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
             samplingProbability = 0.05f,
-            definition = WideEventDefinition(version = Version(minor = 1, patch = 0)),
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 1)),
         )
     }
 
@@ -198,7 +201,7 @@ class DataClearingWideEventTest {
             metadata = mapOf("clear_options" to "duckai_chats", "browser_mode" to "regular"),
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
             samplingProbability = 0.05f,
-            definition = WideEventDefinition(version = Version(minor = 1, patch = 0)),
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 1)),
         )
     }
 
@@ -216,7 +219,7 @@ class DataClearingWideEventTest {
             metadata = mapOf("clear_options" to "tabs,data,duckai_chats", "browser_mode" to "regular"),
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
             samplingProbability = 0.05f,
-            definition = WideEventDefinition(version = Version(minor = 1, patch = 0)),
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 1)),
         )
         verify(wideEventClient).intervalStart(
             wideEventId = 124L,
@@ -362,6 +365,92 @@ class DataClearingWideEventTest {
     }
 
     @Test
+    fun `finishCancelled ends interval and finishes flow as cancelled with cancel reason`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(900L))
+
+        dataClearingWideEvent.start(EntryPoint.AUTO_BACKGROUND, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
+        dataClearingWideEvent.finishCancelled(WorkInfo.STOP_REASON_CANCELLED_BY_APP)
+
+        verify(wideEventClient).intervalEnd(wideEventId = 900L, key = "total_duration_ms_bucketed")
+        verify(wideEventClient).flowFinish(
+            wideEventId = 900L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf("cancel_reason" to "cancelled_by_app"),
+        )
+    }
+
+    @Test
+    fun `finishCancelled maps stop reasons to bounded cancel reasons`() = runTest {
+        val expected = mapOf(
+            WorkInfo.STOP_REASON_CANCELLED_BY_APP to "cancelled_by_app",
+            WorkInfo.STOP_REASON_PREEMPT to "preempt",
+            WorkInfo.STOP_REASON_TIMEOUT to "timeout",
+            WorkInfo.STOP_REASON_DEVICE_STATE to "device_state",
+            WorkInfo.STOP_REASON_QUOTA to "quota",
+            WorkInfo.STOP_REASON_BACKGROUND_RESTRICTION to "background_restriction",
+            WorkInfo.STOP_REASON_APP_STANDBY to "app_standby",
+            WorkInfo.STOP_REASON_USER to "user",
+            WorkInfo.STOP_REASON_SYSTEM_PROCESSING to "system_processing",
+            WorkInfo.STOP_REASON_NOT_STOPPED to "not_stopped",
+            WorkInfo.STOP_REASON_UNKNOWN to "unknown",
+            WorkInfo.STOP_REASON_CONSTRAINT_CHARGING to "other",
+        )
+
+        expected.forEach { (stopReason, cancelReason) ->
+            reset(wideEventClient)
+            whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+                .thenReturn(Result.success(901L))
+
+            dataClearingWideEvent.start(EntryPoint.AUTO_BACKGROUND, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
+            dataClearingWideEvent.finishCancelled(stopReason)
+
+            verify(wideEventClient).flowFinish(
+                wideEventId = 901L,
+                status = FlowStatus.Cancelled,
+                metadata = mapOf("cancel_reason" to cancelReason),
+            )
+        }
+    }
+
+    @Test
+    fun `finishCancelled records the flow when called from a cancelled coroutine`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(902L))
+
+        dataClearingWideEvent.start(EntryPoint.AUTO_BACKGROUND, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
+        runCatching {
+            coroutineScope {
+                cancel()
+                dataClearingWideEvent.finishCancelled(WorkInfo.STOP_REASON_CANCELLED_BY_APP)
+            }
+        }
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = 902L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf("cancel_reason" to "cancelled_by_app"),
+        )
+    }
+
+    @Test
+    fun `finishCancelled clears cached flow id`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(903L))
+
+        dataClearingWideEvent.start(EntryPoint.AUTO_BACKGROUND, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
+        dataClearingWideEvent.finishCancelled(WorkInfo.STOP_REASON_TIMEOUT)
+
+        reset(wideEventClient)
+        whenever(wideEventClient.getFlowIds(any()))
+            .thenReturn(Result.success(emptyList()))
+
+        dataClearingWideEvent.stepSuccess(DataClearingFlowStep.WEB_STORAGE_CLEAR)
+
+        verify(wideEventClient).getFlowIds("data-clearing")
+    }
+
+    @Test
     fun `getCurrentFlowId returns cached flow id`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(900L))
@@ -438,6 +527,7 @@ class DataClearingWideEventTest {
         dataClearingWideEvent.stepFailure(DataClearingFlowStep.WEB_STORAGE_CLEAR, RuntimeException("error"))
         dataClearingWideEvent.finishSuccess()
         dataClearingWideEvent.finishFailure(RuntimeException("error"))
+        dataClearingWideEvent.finishCancelled(WorkInfo.STOP_REASON_CANCELLED_BY_APP)
 
         verifyNoInteractions(wideEventClient)
     }

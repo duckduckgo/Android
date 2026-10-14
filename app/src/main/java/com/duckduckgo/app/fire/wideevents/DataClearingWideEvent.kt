@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.fire.wideevents
 
+import androidx.work.WorkInfo
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy.OnProcessStart
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
@@ -28,6 +29,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
@@ -60,6 +62,13 @@ interface DataClearingWideEvent {
     suspend fun finishFailure(error: Throwable)
 
     suspend fun finishFailure(reason: String)
+
+    /**
+     * Finishes the flow as cancelled. Safe to call from a cancelled coroutine.
+     *
+     * @param stopReason Why WorkManager stopped the worker running this clear, one of the `WorkInfo.STOP_REASON_*` values.
+     */
+    suspend fun finishCancelled(stopReason: Int)
 
     enum class EntryPoint(val value: String) {
         ALL_TABS_BURN("single_tab_fire_dialog"),
@@ -119,7 +128,7 @@ class DataClearingWideEventImpl @Inject constructor(
             metadata = metadata,
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
             samplingProbability = SAMPLING_PROBABILITY,
-            definition = WideEventDefinition(version = Version(minor = 1, patch = 0)),
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 1)),
         ).getOrNull()
 
         cachedFlowId?.let { flowId ->
@@ -191,6 +200,24 @@ class DataClearingWideEventImpl @Inject constructor(
         cachedFlowId = null
     }
 
+    override suspend fun finishCancelled(stopReason: Int) = withContext(NonCancellable) {
+        if (!isFeatureEnabled()) return@withContext
+        val flowId = getCurrentFlowId() ?: return@withContext
+
+        wideEventClient.intervalEnd(
+            wideEventId = flowId,
+            key = KEY_TOTAL_DURATION_MS_BUCKETED,
+        )
+
+        wideEventClient.flowFinish(
+            wideEventId = flowId,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf(KEY_CANCEL_REASON to stopReason.asCancelReason()),
+        )
+
+        cachedFlowId = null
+    }
+
     private suspend fun getCurrentFlowId(): Long? {
         if (cachedFlowId == null) {
             cachedFlowId = wideEventClient.getFlowIds(FLOW_NAME).getOrNull()?.lastOrNull()
@@ -227,6 +254,21 @@ class DataClearingWideEventImpl @Inject constructor(
 
     private fun Throwable.toErrorClass(): String = javaClass.simpleName
 
+    private fun Int.asCancelReason(): String = when (this) {
+        WorkInfo.STOP_REASON_CANCELLED_BY_APP -> "cancelled_by_app"
+        WorkInfo.STOP_REASON_PREEMPT -> "preempt"
+        WorkInfo.STOP_REASON_TIMEOUT -> "timeout"
+        WorkInfo.STOP_REASON_DEVICE_STATE -> "device_state"
+        WorkInfo.STOP_REASON_QUOTA -> "quota"
+        WorkInfo.STOP_REASON_BACKGROUND_RESTRICTION -> "background_restriction"
+        WorkInfo.STOP_REASON_APP_STANDBY -> "app_standby"
+        WorkInfo.STOP_REASON_USER -> "user"
+        WorkInfo.STOP_REASON_SYSTEM_PROCESSING -> "system_processing"
+        WorkInfo.STOP_REASON_NOT_STOPPED -> "not_stopped"
+        WorkInfo.STOP_REASON_UNKNOWN -> "unknown"
+        else -> "other"
+    }
+
     // Same bucket labels as TabStatsBucketing.TAB_COUNT_BUCKETS, applied to a caller-supplied count
     // (TabStatsBucketing reads the @RegularMode repo itself, which would be wrong for Fire-mode burns).
     private fun Int.asTabCountBucket(): String = when {
@@ -257,6 +299,7 @@ class DataClearingWideEventImpl @Inject constructor(
         const val SAMPLING_PROBABILITY = 0.05f
         const val KEY_CLEAR_OPTIONS = "clear_options"
         const val KEY_TOTAL_DURATION_MS_BUCKETED = "total_duration_ms_bucketed"
+        const val KEY_CANCEL_REASON = "cancel_reason"
         const val KEY_BROWSER_MODE = "browser_mode"
         const val KEY_TAB_TYPE = "tab_type"
         const val KEY_TAB_COUNT = "tab_count"

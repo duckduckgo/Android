@@ -33,6 +33,7 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 @ContributesWorker(AppScope::class)
 class DataClearingWorker(
@@ -74,6 +75,9 @@ class DataClearingWorker(
             try {
                 dataClearing.clearDataUsingAutomaticFireOptions()
                 dataClearingWideEvent.finishSuccess()
+            } catch (e: CancellationException) {
+                dataClearingWideEvent.finishCancelled(stopReason)
+                throw e
             } catch (e: Exception) {
                 dataClearingWideEvent.finishFailure(e)
                 throw e

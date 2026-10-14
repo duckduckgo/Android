@@ -66,6 +66,24 @@
                 "type": "string"
             },
             {
+                "key": "feature.data.ext.cancel_reason",
+                "description": "Why WorkManager stopped the background clear worker, mapped from its stop reason. Only present on CANCELLED events. cancelled_by_app means the app cancelled the scheduled clear because the user returned to the app; the other values are system-initiated stops. unknown is reported for system stops before Android 12.",
+                "enum": [
+                    "cancelled_by_app",
+                    "preempt",
+                    "timeout",
+                    "device_state",
+                    "quota",
+                    "background_restriction",
+                    "app_standby",
+                    "user",
+                    "system_processing",
+                    "not_stopped",
+                    "unknown",
+                    "other"
+                ]
+            },
+            {
                 "key": "feature.data.ext.step.web_storage_clear_success",
                 "description": "true if the step completed successfully, false otherwise. The implementation swallows exceptions so it does not affect the overall outcome of the data clearing operation, represented by feature.status.",
                 "type": "boolean"

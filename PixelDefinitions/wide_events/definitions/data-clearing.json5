@@ -4,11 +4,11 @@
         "owners": ["lmac012"],
         "meta": {
             "type": "android-data-clearing",
-            "version": "1.0"
+            "version": "1.1"
         },
         "feature": {
             "name": "data-clearing",
-            "status": ["SUCCESS", "FAILURE", "UNKNOWN"],
+            "status": ["SUCCESS", "FAILURE", "CANCELLED", "UNKNOWN"],
             "data": {
                 "ext": {
                     "clear_options": {
@@ -38,6 +38,24 @@
                     "failure_reason": {
                         "type": "string",
                         "description": "Reason for failure. Only present on FAILURE events. Exception class name, or feature_not_supported / tab_not_found when the clear ended without an exception."
+                    },
+                    "cancel_reason": {
+                        "type": "string",
+                        "description": "Why WorkManager stopped the background clear worker, mapped from its stop reason. Only present on CANCELLED events. cancelled_by_app means the app cancelled the scheduled clear because the user returned to the app; the other values are system-initiated stops. unknown is reported for system stops before Android 12.",
+                        "enum": [
+                            "cancelled_by_app",
+                            "preempt",
+                            "timeout",
+                            "device_state",
+                            "quota",
+                            "background_restriction",
+                            "app_standby",
+                            "user",
+                            "system_processing",
+                            "not_stopped",
+                            "unknown",
+                            "other"
+                        ]
                     },
                     "step.web_storage_clear_success": {
                         "type": "string",
