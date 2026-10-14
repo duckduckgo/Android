@@ -71,6 +71,8 @@ import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemContent
+import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemRenderer
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -80,6 +82,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -121,6 +124,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val fireTabsPromos: FireTabsPromos,
     private val remoteMessageModel: RemoteMessageModel,
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
+    private val duckAiTabGridItemRenderer: DuckAiTabGridItemRenderer,
 ) : ViewModel() {
 
     private val fireModeAvailable = fireModeAvailability.isAvailable()
@@ -746,15 +750,18 @@ class TabSwitcherViewModel @Inject constructor(
         mode: Mode,
         browserMode: BrowserMode,
     ): List<TabSwitcherItem> {
+        val duckAiTabs = tabEntities.filter { it.isDuckAi() }
+        val duckAiTabIds = duckAiTabs.map { it.tabId }.toSet()
+        val duckAiGridItemContents = resolveDuckAiGridItemContents(duckAiTabs, browserMode)
+
         if (mode is Selection) {
             return tabEntities.map { entity ->
-                val uri = entity.url?.toUri()
-                val isDuckAi = uri != null && duckChat.isDuckChatUrl(uri)
                 SelectableTab(
                     entity = entity,
                     isSelected = entity.tabId in mode.selectedTabs,
-                    isDuckAi = isDuckAi,
+                    isDuckAi = entity.tabId in duckAiTabIds,
                     title = tabTitleResolver.resolveTitle(entity, browserMode),
+                    duckAiGridItemContent = duckAiGridItemContents[entity.tabId],
                 )
             }
         }
@@ -762,9 +769,8 @@ class TabSwitcherViewModel @Inject constructor(
         val tabs = tabEntities.map { entity ->
             val isActive = entity.tabId == activeTab?.tabId
             val title = tabTitleResolver.resolveTitle(entity, browserMode)
-            val uri = entity.url?.toUri()
-            if (uri != null && duckChat.isDuckChatUrl(uri)) {
-                DuckAiTab(entity, isActive, title)
+            if (entity.tabId in duckAiTabIds) {
+                DuckAiTab(entity, isActive, title, duckAiGridItemContents[entity.tabId])
             } else {
                 NormalTab(entity, isActive, title)
             }
@@ -775,6 +781,23 @@ class TabSwitcherViewModel @Inject constructor(
             listOf(TrackersAnimationInfoPanel(trackerCountForLast7Days)) + tabs
         } else {
             tabs
+        }
+    }
+
+    private fun TabEntity.isDuckAi(): Boolean {
+        val uri = url?.toUri() ?: return false
+        return duckChat.isDuckChatUrl(uri)
+    }
+
+    private suspend fun resolveDuckAiGridItemContents(duckAiTabs: List<TabEntity>, browserMode: BrowserMode): Map<String, DuckAiTabGridItemContent> {
+        if (duckAiTabs.isEmpty()) return emptyMap()
+        val isRichCardEnabled = withContext(dispatcherProvider.io()) { tabManagerFeatureFlags.richDuckAiGridTabItem().isEnabled() }
+        if (!isRichCardEnabled) return emptyMap()
+
+        return coroutineScope {
+            duckAiTabs.map { entity ->
+                async { duckAiTabGridItemRenderer.resolve(entity.tabId, entity.url, browserMode)?.let { entity.tabId to it } }
+            }.awaitAll().filterNotNull().toMap()
         }
     }
 

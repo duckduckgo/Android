@@ -71,6 +71,7 @@ class TabSwitcherAdapterTest {
             dispatchers = dispatchers,
             trackerCountAnimator = trackerCountAnimator,
             addressDisplayFormatter = addressDisplayFormatter,
+            duckAiTabGridItemRenderer = mock(),
         )
     }
 

@@ -49,6 +49,15 @@ data class DuckAiChat(
 )
 
 /**
+ * [chat] metadata plus the trimmed text of its last message ([lastMessageText] is null when that message has no text),
+ * built from a single read and parse of the FE-owned chat JSON.
+ */
+data class DuckAiChatPreview(
+    val chat: DuckAiChat,
+    val lastMessageText: String?,
+)
+
+/**
  * Decoded payload of a chat fileRef — base64-decoded [bytes] plus FE-supplied [fileName] /
  * [mimeType] (either may be null when the FE omitted them).
  */
@@ -88,6 +97,12 @@ interface DuckAiChatStore {
 
     /** Returns the raw FE-owned JSON blob stored for [chatId], or null if the chat does not exist. */
     suspend fun getChatContent(chatId: String): String?
+
+    /**
+     * Returns [chatId]'s metadata and last message text from one read and one parse, or `null` if the chat doesn't exist
+     * or its stored JSON is malformed. Prefer it over [getChatById] + [getChatContent] when both are needed.
+     */
+    suspend fun getChatPreview(chatId: String): DuckAiChatPreview?
 
     /**
      * Reads the FE-written JSON envelope for [uuid] (a fileRef from [DuckAiChat.fileRefs]),
@@ -198,6 +213,16 @@ class RealDuckAiChatStore(
     override suspend fun getChatContent(chatId: String): String? =
         withContext(dispatchers.io()) { chatsDao.getById(chatId)?.data }
 
+    override suspend fun getChatPreview(chatId: String): DuckAiChatPreview? =
+        withContext(dispatchers.io()) {
+            val entity = chatsDao.getById(chatId) ?: return@withContext null
+            runCatching {
+                val json = JSONObject(entity.data)
+                val chat = json.toDuckAiChat() ?: return@runCatching null
+                DuckAiChatPreview(chat = chat, lastMessageText = json.lastMessageText())
+            }.getOrNull()
+        }
+
     override suspend fun readFileRef(uuid: String): FileRefContent? =
         withContext(dispatchers.io()) {
             val file = File(filesDir, uuid)
@@ -225,28 +250,56 @@ class RealDuckAiChatStore(
             }.getOrNull()
         }
 
-    private fun DuckAiBridgeChatEntity.toDuckAiChat(): DuckAiChat? = runCatching {
-        val json = JSONObject(data)
-        val chatId = json.optString("chatId").takeIf { it.isNotEmpty() } ?: return@runCatching null
-        val model = json.optString("model")
-        DuckAiChat(
+    private fun DuckAiBridgeChatEntity.toDuckAiChat(): DuckAiChat? = runCatching { JSONObject(data).toDuckAiChat() }.getOrNull()
+
+    private fun JSONObject.toDuckAiChat(): DuckAiChat? {
+        val chatId = optString("chatId").takeIf { it.isNotEmpty() } ?: return null
+        val model = optString("model")
+        return DuckAiChat(
             chatId = chatId,
-            title = json.optString("title").ifEmpty { "Untitled Chat" },
+            title = optString("title").ifEmpty { "Untitled Chat" },
             model = model,
-            lastEdit = json.optString("lastEdit"),
-            pinned = json.optBoolean("pinned", false),
-            fileRefs = json.optJSONArray("fileRefs")?.let { arr ->
+            lastEdit = optString("lastEdit"),
+            pinned = optBoolean("pinned", false),
+            fileRefs = optJSONArray("fileRefs")?.let { arr ->
                 (0 until arr.length()).map { arr.getString(it) }
             } ?: emptyList(),
-            reasoningMode = if (json.isNull("reasoningMode")) {
+            reasoningMode = if (isNull("reasoningMode")) {
                 null
             } else {
-                json.optString("reasoningMode").takeIf { it.isNotEmpty() }
+                optString("reasoningMode").takeIf { it.isNotEmpty() }
             },
-            isImageGeneration = json.hasGenerateImageUiComponent(),
+            isImageGeneration = hasGenerateImageUiComponent(),
             isVoice = model == VOICE_MODEL,
         )
-    }.getOrNull()
+    }
+
+    // Reasoning-model replies ship with an empty `content` and carry the response in `text` parts.
+    private fun JSONObject.lastMessageText(): String? {
+        val messages = optJSONArray("messages") ?: return null
+        val lastMessage = messages.optJSONObject(messages.length() - 1) ?: return null
+        val text = lastMessage.directContent() ?: lastMessage.textParts() ?: return null
+        return text.trim().takeIf { it.isNotEmpty() }
+    }
+
+    private fun JSONObject.directContent(): String? {
+        val text = when (val content = opt("content")) {
+            is String -> content
+            is JSONObject -> content.optString("text")
+            else -> null
+        }
+        return text?.takeIf { it.isNotEmpty() }
+    }
+
+    private fun JSONObject.textParts(): String? {
+        val parts = optJSONArray("parts") ?: return null
+        val texts = (0 until parts.length()).mapNotNull { index ->
+            val part = parts.optJSONObject(index) ?: return@mapNotNull null
+            if (part.optString("type") != TEXT_TYPE) return@mapNotNull null
+            part.optString("text").takeIf { it.isNotEmpty() }
+        }
+        return texts.takeIf { it.isNotEmpty() }?.joinToString(separator = "\n\n")
+    }
 
     private fun JSONObject.hasGenerateImageUiComponent(): Boolean {
         val messages = optJSONArray("messages") ?: return false
@@ -275,6 +328,7 @@ class RealDuckAiChatStore(
         const val VOICE_MODEL = "voice-mode"
         const val ASSISTANT_ROLE = "assistant"
         const val UI_COMPONENT_TYPE = "ui-component"
+        const val TEXT_TYPE = "text"
         const val GENERATE_IMAGE_NAME = "generate-image"
     }
 }
