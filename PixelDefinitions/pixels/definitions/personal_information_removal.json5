@@ -1300,7 +1300,7 @@
         ]
     },
     "pir_webui_dashboard_opened": {
-        "description": "Android specific pixel fired every time the PIR dashboard is presented to the user (count) and once per day (daily), for paid and free users alike. The count variant is the 'starts' metric that m_mac_dbp_dashboard_open / m_ios_dbp_dashboard_open report on Apple.",
+        "description": "Android specific pixel fired every time the PIR dashboard is presented to the user (count) and once per day (daily), for paid and free users alike.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["user_interaction"],
         "suffixes": ["daily_count_short", "form_factor"],
@@ -2229,7 +2229,7 @@
         "parameters": ["appVersion"]
     },
     "m_dbp_freemium_pir_maintenance_scan_skipped": {
-        "description": "Temporary telemetry fired at most once per PIR run when a free (freemium) user's run skips at least one maintenance scan, a repeat scan of a broker that already has a result, because free users get one completed scan per broker. Android counterpart of m_ios_dbp_freemium_pir_maintenance_scan_skipped; the count variant counts runs, not broker jobs.",
+        "description": "Temporary telemetry fired at most once per PIR run when a free (freemium) user's run skips at least one maintenance scan, a repeat scan of a broker that already has a result, because free users get one completed scan per broker.",
         "owners": ["landomen"],
         "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],

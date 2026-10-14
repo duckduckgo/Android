@@ -112,7 +112,6 @@ class RealBrokerJsonProcessor @Inject constructor(
         }
     }
 
-    // Only labels the pixel, so a failed subscription read must never fail the broker update.
     private suspend fun isFreeScan(): Boolean? = try {
         !pirUserUtils.hasPirSubscription()
     } catch (e: CancellationException) {
