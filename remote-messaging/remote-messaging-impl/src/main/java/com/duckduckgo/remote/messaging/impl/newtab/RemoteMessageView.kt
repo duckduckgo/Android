@@ -153,7 +153,7 @@ class RemoteMessageView @JvmOverloads constructor(
             is SharePromoLinkRMF -> launchSharePromoRMFPageChooser(command.url, command.shareTitle)
             is SubmitUrl -> submitUrl(command.url)
             is Command.LaunchDefaultCredentialProvider -> launchDefaultCredentialProvider()
-            is Command.LaunchAddWidget -> addWidgetLauncher.launchAddWidget(context.findActivity())
+            is Command.LaunchAddWidget -> addWidgetLauncher.launchAddWidget(context.findActivity(), simpleWidgetPrompt = true)
         }
     }
 
