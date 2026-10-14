@@ -333,11 +333,8 @@
     <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Poista Sync &amp; Backup käytöstä ja poista kaikki synkronoidut tiedot palvelimelta ja poista palautuskoodisi käytöstä.</string>
     <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Poista laite</string>
     <string name="sync_simplified_settings_turn_off_sheet_title">Poistetaanko Sync &amp; Backup käytöstä?</string>
-    <string name="sync_simplified_settings_turn_off_sheet_item">Poista palvelintiedot</string>
     <string name="sync_simplified_settings_turn_off_sheet_body">Kaikki Sync &amp; Backup -toimintoa käyttävien laitteiden yhteys katkaistaan ja synkronoidut tietosi poistetaan palvelimelta.</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button">Poista tämä laite käytöstä</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Poista käytöstä ja poista</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete_all">Poista kaikki laitteet käytöstä ja poista</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Poista palvelin käytöstä ja poista sen tiedot</string>
 
     <!-- Sync settings screen: turn off this device dialog -->
     <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">Poistetaanko %1$s Sync &amp; Backupista?</string>
@@ -441,6 +438,8 @@
     <string name="sync_simplified_edit_device_sync_this_device_item">Synkronoi tämä laite</string>
     <string name="sync_simplified_edit_device_remove_notice_this_device">Tämä laite ei enää voi käyttää synkronoituja tietojasi, jos poistat sen.</string>
     <string name="sync_simplified_edit_device_remove_notice_another_device">Tämä laite ei enää voi käyttää synkronoituja tietojasi, jos tämä ominaisuus on poistettu käytöstä.</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">”%1$s” ei enää voi käyttää muilla laitteilla olevia synkronoituja tietojasi, jos tämä poistetaan käytöstä.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">”%1$s” ei enää voi käyttää muilla laitteilla olevia synkronoituja tietojasi.</string>
 
     <!-- Edit Device screen: edit name dialog -->
     <string name="sync_simplified_edit_device_edit_name_dialog_title">Muokkaa nimeä</string>
