@@ -30,8 +30,6 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -411,26 +409,6 @@ class DataClearingWideEventTest {
                 metadata = mapOf("cancel_reason" to cancelReason),
             )
         }
-    }
-
-    @Test
-    fun `finishCancelled records the flow when called from a cancelled coroutine`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
-            .thenReturn(Result.success(902L))
-
-        dataClearingWideEvent.start(EntryPoint.AUTO_BACKGROUND, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
-        runCatching {
-            coroutineScope {
-                cancel()
-                dataClearingWideEvent.finishCancelled(WorkInfo.STOP_REASON_CANCELLED_BY_APP)
-            }
-        }
-
-        verify(wideEventClient).flowFinish(
-            wideEventId = 902L,
-            status = FlowStatus.Cancelled,
-            metadata = mapOf("cancel_reason" to "cancelled_by_app"),
-        )
     }
 
     @Test

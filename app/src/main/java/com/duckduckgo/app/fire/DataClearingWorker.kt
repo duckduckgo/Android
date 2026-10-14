@@ -29,6 +29,7 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.logcat
@@ -76,7 +77,9 @@ class DataClearingWorker(
                 dataClearing.clearDataUsingAutomaticFireOptions()
                 dataClearingWideEvent.finishSuccess()
             } catch (e: CancellationException) {
-                dataClearingWideEvent.finishCancelled(stopReason)
+                withContext(NonCancellable) {
+                    dataClearingWideEvent.finishCancelled(stopReason)
+                }
                 throw e
             } catch (e: Exception) {
                 dataClearingWideEvent.finishFailure(e)

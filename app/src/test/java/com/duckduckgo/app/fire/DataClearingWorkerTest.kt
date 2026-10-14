@@ -26,6 +26,10 @@ import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.job
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -33,10 +37,12 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 import kotlin.coroutines.cancellation.CancellationException
 
 class DataClearingWorkerTest {
@@ -88,6 +94,24 @@ class DataClearingWorkerTest {
         assertTrue(error is CancellationException)
         verify(dataClearingWideEvent).finishCancelled(WorkInfo.STOP_REASON_NOT_STOPPED)
         verify(dataClearingWideEvent, never()).finishFailure(any<Throwable>())
+    }
+
+    @Test
+    fun `when clear is cancelled then flow is finished outside the cancelled coroutine`() = runTest {
+        wheneverBlocking { dataClearing.clearDataUsingAutomaticFireOptions(any()) } doSuspendableAnswer {
+            currentCoroutineContext().job.cancel()
+            currentCoroutineContext().ensureActive()
+            true
+        }
+        var activeWhenFinishing = false
+        wheneverBlocking { dataClearingWideEvent.finishCancelled(any()) } doSuspendableAnswer {
+            activeWhenFinishing = currentCoroutineContext().isActive
+        }
+
+        runCatching { worker.doWork() }
+
+        verify(dataClearingWideEvent).finishCancelled(WorkInfo.STOP_REASON_NOT_STOPPED)
+        assertTrue(activeWhenFinishing)
     }
 
     @Test

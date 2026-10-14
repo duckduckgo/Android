@@ -29,7 +29,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
@@ -64,7 +63,7 @@ interface DataClearingWideEvent {
     suspend fun finishFailure(reason: String)
 
     /**
-     * Finishes the flow as cancelled. Safe to call from a cancelled coroutine.
+     * Finishes the flow as cancelled.
      *
      * @param stopReason Why WorkManager stopped the worker running this clear, one of the `WorkInfo.STOP_REASON_*` values.
      */
@@ -200,9 +199,9 @@ class DataClearingWideEventImpl @Inject constructor(
         cachedFlowId = null
     }
 
-    override suspend fun finishCancelled(stopReason: Int) = withContext(NonCancellable) {
-        if (!isFeatureEnabled()) return@withContext
-        val flowId = getCurrentFlowId() ?: return@withContext
+    override suspend fun finishCancelled(stopReason: Int) {
+        if (!isFeatureEnabled()) return
+        val flowId = getCurrentFlowId() ?: return
 
         wideEventClient.intervalEnd(
             wideEventId = flowId,
