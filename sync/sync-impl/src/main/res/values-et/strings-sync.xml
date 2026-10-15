@@ -333,11 +333,8 @@
     <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Lülita Sync &amp; Backup välja ning kustuta serverist kõik sünkroonitud andmed ja deaktiveeri oma taastekood.</string>
     <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Eemalda seade</string>
     <string name="sync_simplified_settings_turn_off_sheet_title">Kas lülitada Sync &amp; Backup välja?</string>
-    <string name="sync_simplified_settings_turn_off_sheet_item">Kustuta serveri andmed</string>
     <string name="sync_simplified_settings_turn_off_sheet_body">Kõigi Sync &amp; Backup kasutavate seadmete ühendus katkestatakse ja sinu sünkroonitud andmed kustutatakse serverist.</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button">Lülita see seade välja</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Lülita välja ja kustuta</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete_all">Lülita kõik seadmed välja ja kustuta</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Lülita välja ja kustuta serveri andmed</string>
 
     <!-- Sync settings screen: turn off this device dialog -->
     <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">Kas eemaldada %1$s funktsioonist Sync &amp; Backup?</string>
@@ -441,6 +438,8 @@
     <string name="sync_simplified_edit_device_sync_this_device_item">Sünkrooni see seade</string>
     <string name="sync_simplified_edit_device_remove_notice_this_device">See seade ei pääse enam sinu sünkroonitud andmetele ligi, kui selle eemaldad.</string>
     <string name="sync_simplified_edit_device_remove_notice_another_device">See seade ei pääse enam sinu sünkroonitud andmetele ligi, kui see on välja lülitatud.</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s” ei pääse enam sinu sünkroonitud andmetele teistes seadmetes ligi, kui see on välja lülitatud.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s” ei pääse enam sinu sünkroonitud andmetele teistes seadmetes ligi.</string>
 
     <!-- Edit Device screen: edit name dialog -->
     <string name="sync_simplified_edit_device_edit_name_dialog_title">Muuda nime</string>
