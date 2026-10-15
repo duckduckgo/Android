@@ -602,7 +602,17 @@ class SyncThisDeviceViewModelTest {
         testee.syncThisDevice(launchSource = null)
 
         verify(syncSetupWideEvent).onDeviceAuthNotEnrolled()
-        verify(syncSetupWideEvent).onEnrollDeviceAuthDialogShown()
+    }
+
+    @Test
+    fun `when the enroll dialog is shown then the setup flow is not aborted`() = runTest {
+        deviceAuthenticator.events = listOf(Event.EnrollmentNeeded, Event.EnrollmentShown)
+        deviceAuthenticator.response = Response.Cancelled.EnrollmentClosed
+
+        val testee = createTestee()
+        testee.syncThisDevice(launchSource = null)
+
+        verify(syncSetupWideEvent, never()).onEnrollDeviceAuthDialogShown()
     }
 
     @Test

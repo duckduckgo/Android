@@ -148,7 +148,7 @@ class SyncThisDeviceViewModel @AssistedInject constructor(
             viewModelScope.launch {
                 when (event) {
                     Event.EnrollmentNeeded -> syncSetupWideEvent.onDeviceAuthNotEnrolled()
-                    Event.EnrollmentShown -> syncSetupWideEvent.onEnrollDeviceAuthDialogShown()
+                    Event.EnrollmentShown -> Unit
                     Event.VerificationShown -> Unit
                 }
             }
