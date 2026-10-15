@@ -20,11 +20,12 @@ import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.pir.impl.PirFeatureDataCleaner
+import com.duckduckgo.pir.impl.checker.DisabledReason
 import com.duckduckgo.pir.impl.checker.PirEligibility
 import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -46,7 +47,6 @@ class PirEmailConfirmationRemoteWorkerTest {
 
     private val mockPirEmailConfirmationJobsRunner: PirEmailConfirmationJobsRunner = mock()
     private val mockPirWorkHandler: PirWorkHandler = mock()
-    private val mockPirFeatureDataCleaner: PirFeatureDataCleaner = mock()
     private val mockPirScanScheduler: PirScanScheduler = mock()
     private lateinit var context: Context
 
@@ -60,7 +60,6 @@ class PirEmailConfirmationRemoteWorkerTest {
         TestListenableWorkerBuilder<PirEmailConfirmationRemoteWorker>(context = context).build().also {
             it.pirEmailConfirmationJobsRunner = mockPirEmailConfirmationJobsRunner
             it.pirWorkHandler = mockPirWorkHandler
-            it.pirFeatureDataCleaner = mockPirFeatureDataCleaner
             it.dispatcherProvider = coroutineRule.testDispatcherProvider
             it.pirScanScheduler = mockPirScanScheduler
         }
@@ -113,5 +112,16 @@ class PirEmailConfirmationRemoteWorkerTest {
         assertEquals(ListenableWorker.Result.success(), result)
         verifyNoInteractions(mockPirEmailConfirmationJobsRunner)
         verify(mockPirScanScheduler, never()).cancelScheduledEmailConfirmation()
+    }
+
+    @Test
+    fun whenPirIsDisabledThenCancelsWorkAndFails() = runTest {
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED)))
+
+        val result = buildWorker().doRemoteWork()
+
+        assertEquals(ListenableWorker.Result.failure(), result)
+        verify(mockPirWorkHandler).cancelWork(CancellationReason.SUBSCRIPTION_EXPIRED)
+        verifyNoInteractions(mockPirEmailConfirmationJobsRunner)
     }
 }

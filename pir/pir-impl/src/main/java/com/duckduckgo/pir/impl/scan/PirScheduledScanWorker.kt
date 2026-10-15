@@ -23,7 +23,6 @@ import androidx.work.multiprocess.RemoteCoroutineWorker
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.checker.PirEligibility
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.checker.runModeOrNull
@@ -49,9 +48,6 @@ class PirScheduledScanRemoteWorker(
     lateinit var pirWorkHandler: PirWorkHandler
 
     @Inject
-    lateinit var pirFeatureDataCleaner: PirFeatureDataCleaner
-
-    @Inject
     lateinit var pirForegroundScanServiceMonitor: PirForegroundScanServiceMonitor
 
     override suspend fun doRemoteWork(): Result {
@@ -61,7 +57,6 @@ class PirScheduledScanRemoteWorker(
             if (eligibility is PirEligibility.Disabled) {
                 logcat { "PIR-WORKER ($this}: PIR not allowed to run!" }
                 pirWorkHandler.cancelWork(CancellationReason.fromDisabledReason(eligibility.reason))
-                pirFeatureDataCleaner.removeAllData()
                 return Result.failure()
             }
 

@@ -20,7 +20,6 @@ import androidx.lifecycle.Lifecycle.State.INITIALIZED
 import androidx.lifecycle.testing.TestLifecycleOwner
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
-import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.checker.DisabledReason
 import com.duckduckgo.pir.impl.checker.PirEligibility
 import com.duckduckgo.pir.impl.checker.PirRunMode
@@ -51,7 +50,6 @@ class PirDataUpdateObserverTest {
     private lateinit var lifecycleOwner: TestLifecycleOwner
     private val brokerJsonUpdater: BrokerJsonUpdater = mock()
     private val pirWorkHandler: PirWorkHandler = mock()
-    private val pirFeatureDataCleaner: PirFeatureDataCleaner = mock()
     private val pirRepository: PirRepository = mock()
     private val currentTimeProvider: CurrentTimeProvider = mock()
     private val pirPixelSender: PirPixelSender = mock()
@@ -75,7 +73,6 @@ class PirDataUpdateObserverTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokerJsonUpdater = brokerJsonUpdater,
             pirWorkHandler = pirWorkHandler,
-            pirFeatureDataCleaner = pirFeatureDataCleaner,
             pirRepository = pirRepository,
             currentTimeProvider = currentTimeProvider,
             pirPixelSender = pirPixelSender,
@@ -90,14 +87,13 @@ class PirDataUpdateObserverTest {
         canRunPirFlow.value = PirEligibility.Disabled(DisabledReason.FEATURE_DISABLED)
 
         verify(pirWorkHandler, never()).cancelWork(any())
-        verify(pirFeatureDataCleaner, never()).removeAllData()
         verify(brokerJsonUpdater, never()).update()
     }
 
     @Test
     fun whenOnCreateAndPIRStateChangesFromEnabledToDisabledThenCancelsWork() = runTest {
         whenever(brokerJsonUpdater.update()).thenReturn(true)
-        // First call (enabled): 0L so featureReceivedMs gets set; second call (disabled): non-zero to trigger cleanup
+        // First call (enabled): 0L so featureReceivedMs gets set; second call (disabled): non-zero so work is cancelled
         whenever(pirRepository.getFeatureReceivedMs()).thenReturn(0L, 1000L)
 
         canRunPirFlow.value = PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)
@@ -106,7 +102,6 @@ class PirDataUpdateObserverTest {
 
         canRunPirFlow.value = PirEligibility.Disabled(DisabledReason.FEATURE_DISABLED)
         verify(pirWorkHandler).cancelWork(CancellationReason.FEATURE_DISABLED)
-        verify(pirFeatureDataCleaner).removeAllData()
     }
 
     @Test
@@ -115,10 +110,9 @@ class PirDataUpdateObserverTest {
 
         pirDataUpdateObserver.onCreate(lifecycleOwner)
 
-        // PIR starts disabled — featureReceivedMs is 0L so no cleanup should happen
+        // PIR starts disabled — featureReceivedMs is 0L so no work is cancelled
         canRunPirFlow.value = PirEligibility.Disabled(DisabledReason.FEATURE_DISABLED)
         verify(pirWorkHandler, never()).cancelWork(any())
-        verify(pirFeatureDataCleaner, never()).removeAllData()
 
         // Then enable PIR
         canRunPirFlow.value = PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)
@@ -138,7 +132,6 @@ class PirDataUpdateObserverTest {
         canRunPirFlow.value = PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)
 
         verify(brokerJsonUpdater, times(1)).update()
-        verifyNoInteractions(pirFeatureDataCleaner)
     }
 
     @Test
@@ -147,7 +140,6 @@ class PirDataUpdateObserverTest {
 
         verify(pirWorkHandler, never()).cancelWork(any())
         verify(brokerJsonUpdater, never()).update()
-        verify(pirFeatureDataCleaner, never()).removeAllData()
     }
 
     @Test
@@ -159,7 +151,6 @@ class PirDataUpdateObserverTest {
 
         verify(brokerJsonUpdater).update()
         verify(pirWorkHandler, never()).cancelWork(any())
-        verifyNoInteractions(pirFeatureDataCleaner)
     }
 
     @Test
@@ -221,7 +212,7 @@ class PirDataUpdateObserverTest {
     }
 
     @Test
-    fun whenPirDisabledAndFeatureReceivedMsIsZeroButEtagPresentThenCleansUp() = runTest {
+    fun whenPirDisabledAndFeatureReceivedMsIsZeroButEtagPresentThenCancelsWork() = runTest {
         // Existing user upgrading from a version before featureReceivedMs was introduced:
         // featureReceivedMs is 0L but an etag exists, meaning broker data was previously downloaded
         whenever(pirRepository.getFeatureReceivedMs()).thenReturn(0L)
@@ -230,19 +221,37 @@ class PirDataUpdateObserverTest {
         pirDataUpdateObserver.onCreate(lifecycleOwner)
 
         verify(pirWorkHandler).cancelWork(CancellationReason.FEATURE_DISABLED)
-        verify(pirFeatureDataCleaner).removeAllData()
     }
 
     @Test
-    fun whenPirDisabledAndBothFeatureReceivedMsAndEtagAreUnsetThenDoesNotCleanUp() = runTest {
-        // Fresh install: no featureReceivedMs and no etag — nothing to clean up
+    fun whenPirDisabledAndBothFeatureReceivedMsAndEtagAreUnsetThenDoesNotCancelWork() = runTest {
+        // Fresh install: no featureReceivedMs and no etag — no work to cancel
         whenever(pirRepository.getFeatureReceivedMs()).thenReturn(0L)
         whenever(pirRepository.getCurrentMainEtag()).thenReturn(null)
 
         pirDataUpdateObserver.onCreate(lifecycleOwner)
 
         verify(pirWorkHandler, never()).cancelWork(any())
-        verify(pirFeatureDataCleaner, never()).removeAllData()
+    }
+
+    @Test
+    fun whenSubscriptionExpiresThenCancelsWorkWithSubscriptionExpired() = runTest {
+        whenever(pirRepository.getFeatureReceivedMs()).thenReturn(1000L)
+        canRunPirFlow.value = PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED)
+
+        pirDataUpdateObserver.onCreate(lifecycleOwner)
+
+        verify(pirWorkHandler).cancelWork(CancellationReason.SUBSCRIPTION_EXPIRED)
+    }
+
+    @Test
+    fun whenPirEntitlementIsLostThenCancelsWorkWithEntitlementLost() = runTest {
+        whenever(pirRepository.getFeatureReceivedMs()).thenReturn(1000L)
+        canRunPirFlow.value = PirEligibility.Disabled(DisabledReason.ENTITLEMENT_LOST)
+
+        pirDataUpdateObserver.onCreate(lifecycleOwner)
+
+        verify(pirWorkHandler).cancelWork(CancellationReason.ENTITLEMENT_LOST)
     }
 
     @Test

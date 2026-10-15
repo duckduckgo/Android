@@ -28,7 +28,6 @@ import android.os.Process
 import androidx.core.app.ServiceCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.di.scopes.ServiceScope
-import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.R
 import com.duckduckgo.pir.impl.checker.PirEligibility
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
@@ -59,9 +58,6 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
 
     @Inject
     lateinit var pirWorkHandler: PirWorkHandler
-
-    @Inject
-    lateinit var pirFeatureDataCleaner: PirFeatureDataCleaner
 
     @Inject
     lateinit var pirPixelSender: PirPixelSender
@@ -119,7 +115,6 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
                 // Record a one-shot Cancelled wide event for the run that never started.
                 pirScanWideEvent.onRunCancelledBeforeStart(executionType, reason)
                 pirWorkHandler.cancelWork(reason)
-                pirFeatureDataCleaner.removeAllData()
                 stopSelf()
                 return@launch
             }

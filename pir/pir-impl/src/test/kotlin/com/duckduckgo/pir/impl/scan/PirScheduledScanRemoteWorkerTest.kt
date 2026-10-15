@@ -20,12 +20,13 @@ import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.pir.impl.PirFeatureDataCleaner
+import com.duckduckgo.pir.impl.checker.DisabledReason
 import com.duckduckgo.pir.impl.checker.PirEligibility
 import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import com.duckduckgo.pir.impl.scheduling.PirJobsRunner
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -46,7 +47,6 @@ class PirScheduledScanRemoteWorkerTest {
 
     private val mockPirJobsRunner: PirJobsRunner = mock()
     private val mockPirWorkHandler: PirWorkHandler = mock()
-    private val mockPirFeatureDataCleaner: PirFeatureDataCleaner = mock()
     private val mockMonitor: PirForegroundScanServiceMonitor = mock()
     private lateinit var context: Context
 
@@ -60,7 +60,6 @@ class PirScheduledScanRemoteWorkerTest {
         TestListenableWorkerBuilder<PirScheduledScanRemoteWorker>(context = context).build().also {
             it.pirJobsRunner = mockPirJobsRunner
             it.pirWorkHandler = mockPirWorkHandler
-            it.pirFeatureDataCleaner = mockPirFeatureDataCleaner
             it.dispatcherProvider = coroutineRule.testDispatcherProvider
             it.pirForegroundScanServiceMonitor = mockMonitor
         }
@@ -97,5 +96,16 @@ class PirScheduledScanRemoteWorkerTest {
         buildWorker().doRemoteWork()
 
         verify(mockPirJobsRunner).runEligibleJobs(any(), eq(PirExecutionType.SCHEDULED), eq(PirRunMode.SCAN_ONLY))
+    }
+
+    @Test
+    fun whenPirIsDisabledThenCancelsWorkAndFailsWithoutRunningJobs() = runTest {
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Disabled(DisabledReason.ENTITLEMENT_LOST)))
+
+        val result = buildWorker().doRemoteWork()
+
+        assertEquals(ListenableWorker.Result.failure(), result)
+        verify(mockPirWorkHandler).cancelWork(CancellationReason.ENTITLEMENT_LOST)
+        verify(mockPirJobsRunner, never()).runEligibleJobs(any(), any(), any())
     }
 }

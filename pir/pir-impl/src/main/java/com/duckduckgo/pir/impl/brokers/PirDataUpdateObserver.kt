@@ -22,7 +22,6 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.checker.PirEligibility
 import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
@@ -47,7 +46,6 @@ class PirDataUpdateObserver @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val brokerJsonUpdater: BrokerJsonUpdater,
     private val pirWorkHandler: PirWorkHandler,
-    private val pirFeatureDataCleaner: PirFeatureDataCleaner,
     private val pirRepository: PirRepository,
     private val currentTimeProvider: CurrentTimeProvider,
     private val pirPixelSender: PirPixelSender,
@@ -97,11 +95,9 @@ class PirDataUpdateObserver @Inject constructor(
                             logcat { "PIR-update: PIR not enabled" }
                             // We also check the etag to handle scenarios where featureReceiveMs was not yet available
                             if (featureReceiveMs != 0L || pirRepository.getCurrentMainEtag() != null) {
-                                logcat { "PIR-update: resetting feature" }
-                                // This will also cancel any ongoing work that is currently running if PIR is not enabled
-                                // This will also clear the featureReceivedMs
+                                logcat { "PIR-update: cancelling work" }
+                                // Losing access is not a request to delete: the data stays until the user removes it
                                 pirWorkHandler.cancelWork(CancellationReason.fromDisabledReason(eligibility.reason))
-                                pirFeatureDataCleaner.removeAllData()
                             }
                         }
                     }

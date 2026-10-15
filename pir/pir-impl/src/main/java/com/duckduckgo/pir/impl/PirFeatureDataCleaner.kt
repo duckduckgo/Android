@@ -27,7 +27,10 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface PirFeatureDataCleaner {
-    suspend fun removeAllData()
+    /**
+     * Deletes the user's PIR profile, results and job records. Only an explicit user request may call this:
+     * expiry, entitlement loss and kill switches keep the data.
+     */
     suspend fun removeUserData()
 }
 
@@ -40,17 +43,6 @@ class RealPirFeatureDataCleaner @Inject constructor(
     private val pirInitialScanCompletionWideEvent: PirInitialScanCompletionWideEvent,
     private val pirFreemiumDataStore: PirFreemiumDataStore,
 ) : PirFeatureDataCleaner {
-
-    override suspend fun removeAllData() {
-        // keep data for freemium users
-        if (pirFreemiumDataStore.didActivate) return
-
-        pirScanWideEvent.onUserReset()
-        pirInitialScanCompletionWideEvent.onUserReset()
-        pirRepository.clearAllData()
-        pirSchedulingRepository.clearAllData()
-        pirEventsRepository.clearAllData()
-    }
 
     override suspend fun removeUserData() {
         pirFreemiumDataStore.reset()

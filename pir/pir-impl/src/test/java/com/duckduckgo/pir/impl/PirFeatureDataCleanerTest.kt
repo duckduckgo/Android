@@ -27,10 +27,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
-import org.mockito.kotlin.whenever
 
 class PirFeatureDataCleanerTest {
 
@@ -45,8 +42,6 @@ class PirFeatureDataCleanerTest {
 
     @Before
     fun setUp() {
-        whenever(pirFreemiumDataStore.didActivate).thenReturn(false)
-
         testee = RealPirFeatureDataCleaner(
             pirRepository = pirRepository,
             pirSchedulingRepository = pirSchedulingRepository,
@@ -58,19 +53,6 @@ class PirFeatureDataCleanerTest {
     }
 
     @Test
-    fun whenRemoveAllDataThenWideEventResetCalledBeforeRepositoryClear() = runTest {
-        testee.removeAllData()
-
-        inOrder(pirScanWideEvent, pirInitialScanCompletionWideEvent, pirRepository).run {
-            verify(pirScanWideEvent).onUserReset()
-            verify(pirInitialScanCompletionWideEvent).onUserReset()
-            verify(pirRepository).clearAllData()
-        }
-        verify(pirSchedulingRepository).clearAllData()
-        verify(pirEventsRepository).clearAllData()
-    }
-
-    @Test
     fun whenRemoveUserDataThenWideEventResetCalledBeforeRepositoryClear() = runTest {
         testee.removeUserData()
 
@@ -79,29 +61,6 @@ class PirFeatureDataCleanerTest {
             verify(pirInitialScanCompletionWideEvent).onUserReset()
             verify(pirRepository).clearUserData()
         }
-        verify(pirSchedulingRepository).clearAllData()
-        verify(pirEventsRepository).clearAllData()
-    }
-
-    @Test
-    fun whenUserActivatedFreemiumThenRemoveAllDataIsANoOp() = runTest {
-        whenever(pirFreemiumDataStore.didActivate).thenReturn(true)
-
-        testee.removeAllData()
-
-        verifyNoInteractions(pirRepository)
-        verifyNoInteractions(pirSchedulingRepository)
-        verifyNoInteractions(pirEventsRepository)
-        verify(pirScanWideEvent, never()).onUserReset()
-    }
-
-    @Test
-    fun whenUserNeverActivatedFreemiumThenRemoveAllDataStillWipes() = runTest {
-        whenever(pirFreemiumDataStore.didActivate).thenReturn(false)
-
-        testee.removeAllData()
-
-        verify(pirRepository).clearAllData()
         verify(pirSchedulingRepository).clearAllData()
         verify(pirEventsRepository).clearAllData()
     }
