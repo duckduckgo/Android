@@ -132,7 +132,7 @@
                                 },
                                 "free_scan": {
                                     "type": "string",
-                                    "description": "Whether the run was a free (freemium) scan: scan-only mode for a user without a PIR subscription. Absent on runs cancelled before they started.",
+                                    "description": "Whether the run was a free (freemium) scan.",
                                     "enum": ["true", "false"]
                                 },
                                 "last_step": {

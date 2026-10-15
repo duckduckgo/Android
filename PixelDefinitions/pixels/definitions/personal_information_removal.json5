@@ -283,49 +283,49 @@
         ]
     },
     "m_dbp_engagement_dau": {
-        "description": "Pixel for PIR daily active users. Fired by the periodic PIR stats worker, at most once per calendar day, for a user who can run PIR (paid or free) and has a profile saved.",
+        "description": "Pixel for PIR daily active users.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["scheduled"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_engagement_wau": {
-        "description": "Pixel for PIR weekly active users. Fired by the periodic PIR stats worker, at most once every 7 calendar days, for a user who can run PIR (paid or free) and has a profile saved.",
+        "description": "Pixel for PIR weekly active users.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["scheduled"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_engagement_mau": {
-        "description": "Pixel for PIR monthly active users. Fired by the periodic PIR stats worker, at most once every 28 calendar days, for a user who can run PIR (paid or free) and has a profile saved.",
+        "description": "Pixel for PIR monthly active users.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["scheduled"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_interaction_dau": {
-        "description": "Pixel for PIR user-interacted daily active users. Fired when the PIR dashboard is presented to the user, at most once per calendar day, for paid and free users alike.",
+        "description": "Pixel for PIR user-interacted daily active users. Fired when the PIR dashboard is presented to the user.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["user_interaction"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_interaction_wau": {
-        "description": "Pixel for PIR user-interacted weekly active users. Fired when the PIR dashboard is presented to the user, at most once every 7 calendar days, for paid and free users alike.",
+        "description": "Pixel for PIR user-interacted weekly active users. Fired when the PIR dashboard is presented to the user.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["user_interaction"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_interaction_mau": {
-        "description": "Pixel for PIR user-interacted monthly active users. Fired when the PIR dashboard is presented to the user, at most once every 28 calendar days, for paid and free users alike.",
+        "description": "Pixel for PIR user-interacted monthly active users. Fired when the PIR dashboard is presented to the user.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["user_interaction"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_first_scan_u": {
-        "description": "Fired once per install when the user starts their first PIR scan, whether it runs as a free scan or under a subscription that includes PIR.",
+        "description": "Fired once per install when the user starts their first PIR scan.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["feature_lifecycle"],
         "suffixes": ["form_factor"],
@@ -1123,7 +1123,7 @@
         ]
     },
     "m_dbp_update_databrokers_success": {
-        "description": "Fired when a data broker JSON is updated successfuly. free_scan is omitted when the PIR subscription state can't be read.",
+        "description": "Fired when a data broker JSON is updated successfuly.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
@@ -1143,7 +1143,7 @@
         ]
     },
     "m_dbp_update_databrokers_failure": {
-        "description": "Fired when a data broker JSON update has failed. free_scan is omitted when the PIR subscription state can't be read.",
+        "description": "Fired when a data broker JSON update has failed.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["exception"],
         "suffixes": ["daily_count_short", "form_factor"],
@@ -1300,7 +1300,7 @@
         ]
     },
     "pir_webui_dashboard_opened": {
-        "description": "Android specific pixel fired every time the PIR dashboard is presented to the user (count) and once per day (daily), for paid and free users alike.",
+        "description": "Android specific pixel which is fired when the PIR dashboard is opened",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["user_interaction"],
         "suffixes": ["daily_count_short", "form_factor"],
@@ -2229,7 +2229,7 @@
         "parameters": ["appVersion"]
     },
     "m_dbp_freemium_pir_maintenance_scan_skipped": {
-        "description": "Temporary telemetry fired at most once per PIR run when a free (freemium) user's run skips at least one maintenance scan, a repeat scan of a broker that already has a result, because free users get one completed scan per broker.",
+        "description": "Fired at most once per run when a free PIR user's run skips maintenance scans.",
         "owners": ["landomen"],
         "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
@@ -2355,7 +2355,7 @@
             },
             {
                 "key": "feature.data.ext.free_scan",
-                "description": "Whether the run was a free (freemium) scan: scan-only mode for a user without a PIR subscription. Absent on runs cancelled before they started.",
+                "description": "Whether the run was a free (freemium) scan.",
                 "enum": ["true", "false"]
             },
             {
@@ -2692,7 +2692,7 @@
             },
             {
                 "key": "feature.data.ext.free_scan",
-                "description": "Whether the run was a free (freemium) scan: scan-only mode for a user without a PIR subscription. Absent on runs cancelled before they started.",
+                "description": "Whether the run was a free (freemium) scan.",
                 "enum": ["true", "false"]
             },
             {
