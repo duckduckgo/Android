@@ -67,8 +67,22 @@ interface PirScanScheduler {
     /**
      * Re-applies the scheduled scan work spec (interval / constraints) to the already-enqueued
      * periodic scan so that changes are picked up by already-enrolled users after an app update.
+     *
+     * The scan-only counterpart of [rescheduleAllWork]: it never touches the email-confirmation
+     * worker, which is opt-out work.
      */
-    fun reschedulePirScans()
+    fun rescheduleScanWork()
+
+    /**
+     * Re-applies every periodic work spec a user who can run opt-outs gets. Also the path back for a
+     * freemium user who subscribes: they can be missing the scan worker (retired once their initial
+     * scan finished), the email-confirmation worker (never scheduled) and both stats workers, and
+     * nothing else re-enqueues them since [scheduleScans] only ever runs on profile save.
+     *
+     * Unlike [scheduleScans] this reports no pixel and logs no event, so it is safe to call on every
+     * app start.
+     */
+    fun rescheduleAllWork()
 
     fun cancelScheduledScans(context: Context)
 
@@ -103,26 +117,34 @@ class RealPirScanScheduler @Inject constructor(
     override fun scheduleScans() {
         logcat { "PIR-SCHEDULED: Scheduling periodic scan appId: ${appBuildConfig.applicationId}" }
 
-        schedulePirScans()
-        scheduleEmailConfirmation()
-        scheduleRecurringPixelStats()
-        scheduleBackgroundScanStats()
+        reportScheduledScan()
+        rescheduleAllWork()
     }
 
     override fun scheduleScanOnlyWork() {
         logcat { "PIR-SCHEDULED: Scheduling scan-only periodic work appId: ${appBuildConfig.applicationId}" }
 
-        schedulePirScans()
+        reportScheduledScan()
+        enqueueScheduledScanWork()
         scheduleRecurringPixelStats()
         scheduleBackgroundScanStats()
     }
 
-    override fun reschedulePirScans() {
+    override fun rescheduleScanWork() {
         logcat { "PIR-SCHEDULED: Re-applying scheduled scan work spec appId: ${appBuildConfig.applicationId}" }
         enqueueScheduledScanWork()
     }
 
-    private fun schedulePirScans() {
+    override fun rescheduleAllWork() {
+        logcat { "PIR-SCHEDULED: Re-applying all periodic work specs appId: ${appBuildConfig.applicationId}" }
+
+        enqueueScheduledScanWork()
+        scheduleEmailConfirmation()
+        scheduleRecurringPixelStats()
+        scheduleBackgroundScanStats()
+    }
+
+    private fun reportScheduledScan() {
         pirPixelSender.reportScheduledScanScheduled()
         coroutineScope.launch {
             eventsRepository.saveEventLog(
@@ -132,8 +154,6 @@ class RealPirScanScheduler @Inject constructor(
                 ),
             )
         }
-
-        enqueueScheduledScanWork()
     }
 
     private fun enqueueScheduledScanWork() {
