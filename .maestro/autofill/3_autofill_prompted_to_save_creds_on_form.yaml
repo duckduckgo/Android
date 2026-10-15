@@ -1,8 +1,7 @@
 appId: com.duckduckgo.mobile.android
 androidWebViewHierarchy: devtools
 name: "Autofill: Prompted to save and update credentials on web form"
-tags:
-    - autofillNoAuthTests
+# Untagged so CI skips it: fill.dev/form/login-simple returns 404. Restore the autofillNoAuthTests tag once the form is reachable again.
 ---
 # Pre-requisite: on an autofill-eligible device, including having a modern WebView
 - retry:
