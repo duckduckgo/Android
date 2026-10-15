@@ -706,6 +706,22 @@ class PirWebSaveProfileMessageHandlerTest {
     }
 
     @Test
+    fun whenSavedProfileAlreadyResolvesUserToScanOnlyThenStoresActivation() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_ONLY)))
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+        whenever(mockPirFreemiumDataStore.didActivate).thenReturn(false)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockPirFreemiumDataStore).activate(any())
+    }
+
+    @Test
     fun whenSaveSucceedsAndUserCanAlreadyRunOptOutsThenDoesNotStoreActivation() = runTest {
         // Given
         val jsMessage = createJsMessage("""""", SAVE_PROFILE)

@@ -30,7 +30,7 @@ import javax.inject.Inject
 
 interface PirFreeScanWorkWindow {
     /**
-     * Whether a scan-only user's initial scan still needs the periodic scan worker. A free user gets
+     * Whether an activated free user's initial scan still needs the periodic scan worker. A free user gets
      * background scans only so a killed foreground scan can resume, so the window closes once every
      * free-scannable broker holds a terminal result, or once the time bound expires.
      */
@@ -48,6 +48,8 @@ class RealPirFreeScanWorkWindow @Inject constructor(
 ) : PirFreeScanWorkWindow {
 
     override suspend fun isOpen(): Boolean = withContext(dispatcherProvider.io()) {
+        // A lapsed subscriber's initial scan ran while they paid; without an activation there is no free scan to finish.
+        if (!pirFreemiumDataStore.didActivate) return@withContext false
         if (hasTimeBoundExpired()) return@withContext false
 
         val scannableBrokers = pirFreeScanBrokerFilter.freeScannableBrokerNames()

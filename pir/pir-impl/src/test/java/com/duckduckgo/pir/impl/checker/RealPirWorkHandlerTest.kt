@@ -22,6 +22,7 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
@@ -62,6 +63,18 @@ class RealPirWorkHandlerTest {
     private val pirFreemiumDataStore: PirFreemiumDataStore = mock()
     private val pirEntitlement = Entitlement(name = "plus", product = Product.PIR.value)
     private val netPEntitlement = Entitlement(name = "plus", product = Product.NetP.value)
+    private val profileQuery = ProfileQuery(
+        id = 1L,
+        firstName = "John",
+        lastName = "Doe",
+        city = "New York",
+        state = "NY",
+        addresses = emptyList(),
+        birthYear = 1980,
+        fullName = "John Doe",
+        age = 46,
+        deprecated = false,
+    )
 
     private lateinit var pirWorkHandler: RealPirWorkHandler
 
@@ -70,6 +83,7 @@ class RealPirWorkHandlerTest {
         whenever(pirRemoteFeatures.pirBeta()).thenReturn(pirBetaToggle)
         whenever(pirRemoteFeatures.freemium()).thenReturn(freemiumToggle)
         whenever(pirRepository.isRepositoryAvailable()).thenReturn(true)
+        whenever(pirRepository.getValidUserProfileQueries()).thenReturn(emptyList())
 
         pirWorkHandler = RealPirWorkHandler(
             pirRemoteFeatures = pirRemoteFeatures,
@@ -458,6 +472,46 @@ class RealPirWorkHandlerTest {
         verify(context, times(2)).stopService(any<Intent>())
         verify(pirScanScheduler).cancelScheduledScans(context)
         verify(pirNotificationManager).cancelNotifications()
+    }
+
+    @Test
+    fun whenSubscriptionExpiredAndNeverActivatedButProfileKeptThenCanRunPirEnabledWithScanOnly() = runTest {
+        whenever(pirBetaToggle.isEnabled()).thenReturn(false)
+        whenever(freemiumToggle.isEnabled()).thenReturn(true)
+        whenever(pirFreemiumDataStore.didActivate).thenReturn(false)
+        whenever(pirRepository.getValidUserProfileQueries()).thenReturn(listOf(profileQuery))
+        givenSubscription(SubscriptionStatus.EXPIRED)
+
+        pirWorkHandler.canRunPir().test {
+            assertEquals(PirEligibility.Enabled(PirRunMode.SCAN_ONLY), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSubscriptionExpiredWithProfileKeptButFreemiumDisabledThenCanRunPirDisabledWithFeatureDisabled() = runTest {
+        whenever(pirBetaToggle.isEnabled()).thenReturn(false)
+        whenever(freemiumToggle.isEnabled()).thenReturn(false)
+        whenever(pirRepository.getValidUserProfileQueries()).thenReturn(listOf(profileQuery))
+        givenSubscription(SubscriptionStatus.EXPIRED)
+
+        pirWorkHandler.canRunPir().test {
+            assertEquals(PirEligibility.Disabled(DisabledReason.FEATURE_DISABLED), awaitItem())
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun whenSubscribedWithoutPirEntitlementAndProfileKeptThenCanRunPirDisabledWithEntitlementLost() = runTest {
+        whenever(pirBetaToggle.isEnabled()).thenReturn(true)
+        whenever(freemiumToggle.isEnabled()).thenReturn(true)
+        whenever(pirRepository.getValidUserProfileQueries()).thenReturn(listOf(profileQuery))
+        givenSubscription(SubscriptionStatus.AUTO_RENEWABLE, setOf(netPEntitlement))
+
+        pirWorkHandler.canRunPir().test {
+            assertEquals(PirEligibility.Disabled(DisabledReason.ENTITLEMENT_LOST), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private suspend fun givenSubscription(

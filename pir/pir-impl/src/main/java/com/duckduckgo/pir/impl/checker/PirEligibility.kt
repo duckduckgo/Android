@@ -27,7 +27,10 @@ sealed interface PirEligibility {
 enum class PirRunMode {
     SCAN_AND_OPT_OUT,
 
-    /** A freemium user: scans only, never opt-outs and never repeat maintenance scans. */
+    /**
+     * A user without a subscription who activated freemium or kept a profile from a lapsed subscription:
+     * scans only, never opt-outs and never repeat maintenance scans.
+     */
     SCAN_ONLY,
 }
 

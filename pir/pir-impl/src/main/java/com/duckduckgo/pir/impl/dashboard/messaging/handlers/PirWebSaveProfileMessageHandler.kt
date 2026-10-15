@@ -122,8 +122,7 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
                 PirExecutionType.MANUAL_INITIAL
             }
 
-            // must be stored before the scan starts, as the scan service resolves eligibility again
-            // and a free user is only allowed to scan once activated
+            // must be stored before the scan starts, as the run reads it to decide whether a free user keeps background scans
             storeFreemiumActivation()
 
             // re-resolved after activation, which is what turns a non-subscriber into a scan-only user
@@ -227,15 +226,16 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
     }
 
     /**
-     * A user without a subscription who saves a profile is activating freemium PIR, which is what
-     * later grants them scan-only runs. Any other disabled reason (e.g. an unavailable repository)
-     * says nothing about the subscription, so it must not activate.
+     * A user without a subscription who saves a profile is activating freemium PIR. The profile is already stored
+     * by now, which on its own resolves them to scan-only, so that counts as unsubscribed too. Any other disabled
+     * reason (e.g. an unavailable repository) says nothing about the subscription, so it must not activate.
      */
     private suspend fun storeFreemiumActivation() {
         if (!pirRemoteFeatures.freemium().isEnabled()) return
 
         val eligibility = pirWorkHandler.canRunPir().firstOrNull()
-        val isUnsubscribed = (eligibility as? PirEligibility.Disabled)?.reason == DisabledReason.SUBSCRIPTION_EXPIRED
+        val isUnsubscribed = eligibility.runModeOrNull == PirRunMode.SCAN_ONLY ||
+            (eligibility as? PirEligibility.Disabled)?.reason == DisabledReason.SUBSCRIPTION_EXPIRED
 
         if (isUnsubscribed && !pirFreemiumDataStore.didActivate) {
             logcat { "PIR-WEB: PirWebSaveProfileMessageHandler: activating freemium" }

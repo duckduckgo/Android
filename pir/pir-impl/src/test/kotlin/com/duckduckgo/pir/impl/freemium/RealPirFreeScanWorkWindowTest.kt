@@ -48,6 +48,7 @@ class RealPirFreeScanWorkWindowTest {
     fun setUp() {
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(NOW)
         whenever(mockPirFreemiumDataStore.firstProfileSavedTimestamp).thenReturn(NOW)
+        whenever(mockPirFreemiumDataStore.didActivate).thenReturn(true)
 
         testee = RealPirFreeScanWorkWindow(
             pirFreeScanBrokerFilter = mockPirFreeScanBrokerFilter,
@@ -56,6 +57,16 @@ class RealPirFreeScanWorkWindowTest {
             currentTimeProvider = mockCurrentTimeProvider,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
+    }
+
+    @Test
+    fun whenUserNeverActivatedFreemiumThenWindowIsClosedEvenWithAnErroredBroker() = runTest {
+        whenever(mockPirFreemiumDataStore.didActivate).thenReturn(false)
+        whenever(mockPirFreemiumDataStore.firstProfileSavedTimestamp).thenReturn(0L)
+        whenever(mockPirFreeScanBrokerFilter.freeScannableBrokerNames()).thenReturn(setOf("A"))
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(listOf(record("A", ScanJobStatus.ERROR)))
+
+        assertFalse(testee.isOpen())
     }
 
     @Test
