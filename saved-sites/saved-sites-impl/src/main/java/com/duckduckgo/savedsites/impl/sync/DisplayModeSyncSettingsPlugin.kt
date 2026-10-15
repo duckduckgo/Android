@@ -21,7 +21,7 @@ import android.view.*
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.sync.api.*
-import com.squareup.anvil.annotations.*
+import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.*
 
 @ContributesMultibinding(scope = ActivityScope::class)

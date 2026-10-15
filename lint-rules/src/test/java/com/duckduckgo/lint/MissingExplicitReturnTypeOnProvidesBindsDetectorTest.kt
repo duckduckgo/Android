@@ -18,6 +18,7 @@ package com.duckduckgo.lint
 
 import com.android.tools.lint.checks.infrastructure.TestFiles.kt
 import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
+import com.duckduckgo.lint.utils.METRO_DI_API
 import org.junit.Test
 
 @Suppress("UnstableApiUsage")
@@ -141,6 +142,31 @@ class MissingExplicitReturnTypeOnProvidesBindsDetectorTest {
             .issues(MissingExplicitReturnTypeOnProvidesBindsDetector.MISSING_EXPLICIT_RETURN_TYPE)
             .run()
             .expectClean()
+    }
+
+    @Test
+    fun whenMetroProvidesMethodOmitsReturnTypeThenFailWithError() {
+        lint()
+            .files(
+                METRO_DI_API,
+                depStubs,
+                kt(
+                    """
+                    package com.duckduckgo.example
+                    import dev.zacsweers.metro.BindingContainer
+                    import dev.zacsweers.metro.Provides
+
+                    @BindingContainer
+                    object FooModule {
+                        @Provides
+                        fun providesFoo() = RealFoo()
+                    }
+                    """,
+                ).indented(),
+            )
+            .issues(MissingExplicitReturnTypeOnProvidesBindsDetector.MISSING_EXPLICIT_RETURN_TYPE)
+            .run()
+            .expectErrorCount(1)
     }
 
     @Test

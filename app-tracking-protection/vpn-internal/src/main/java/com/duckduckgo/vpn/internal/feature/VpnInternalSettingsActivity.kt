@@ -57,7 +57,6 @@ import javax.inject.Inject
 
 @InjectWith(
     scope = ActivityScope::class,
-    delayGeneration = true,
 )
 @ContributeToActivityStarter(LaunchVpnInternalScreenWithEmptyParams::class)
 class VpnInternalSettingsActivity : DuckDuckGoActivity() {

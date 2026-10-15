@@ -23,7 +23,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.store.*
-import com.squareup.anvil.annotations.*
+import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import logcat.LogPriority.INFO

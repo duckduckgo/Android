@@ -49,9 +49,9 @@ import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.duckduckgo.sync.store.*
-import com.squareup.anvil.annotations.*
+import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.*
-import dagger.*
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
