@@ -333,11 +333,8 @@
     <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Inaktivera Sync &amp; Backup, radera alla synkroniserade data från servern och inaktivera din återställningskod.</string>
     <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Ta bort enhet</string>
     <string name="sync_simplified_settings_turn_off_sheet_title">Inaktivera Sync &amp; Backup?</string>
-    <string name="sync_simplified_settings_turn_off_sheet_item">Radera serverdata</string>
     <string name="sync_simplified_settings_turn_off_sheet_body">Alla enheter som använder Sync &amp; Backup kommer att kopplas från och dina synkroniserade data raderas från servern.</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button">Stäng av den här enheten</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Stäng av och radera</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete_all">Stäng av alla enheter och radera</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Stäng av och radera serverdata</string>
 
     <!-- Sync settings screen: turn off this device dialog -->
     <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">Ta bort %1$s från Sync &amp; Backup?</string>
@@ -441,6 +438,8 @@
     <string name="sync_simplified_edit_device_sync_this_device_item">Synkronisera den här enheten</string>
     <string name="sync_simplified_edit_device_remove_notice_this_device">Den här enheten kommer inte längre att få tillgång till dina synkroniserade data om du tar bort den.</string>
     <string name="sync_simplified_edit_device_remove_notice_another_device">Den här enheten kommer inte längre att få tillgång till dina synkroniserade data om detta stängs av.</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">”%1$s” kommer inte längre att få tillgång till dina synkroniserade data på andra enheter om detta stängs av.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">”%1$s” kommer inte längre att få tillgång till dina synkroniserade data på andra enheter.</string>
 
     <!-- Edit Device screen: edit name dialog -->
     <string name="sync_simplified_edit_device_edit_name_dialog_title">Redigera namn</string>
