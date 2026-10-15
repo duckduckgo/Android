@@ -32,6 +32,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.auth.AuthPromptRenderer
 import com.duckduckgo.sync.impl.databinding.ActivityPreviousSessionReadyBinding
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.setup.PreviousSessionReadyViewModel.Command
@@ -51,11 +52,15 @@ class PreviousSessionReadyActivity : DuckDuckGoActivity() {
 
     private val viewModel by viewModels<PreviousSessionReadyViewModel> {
         val launchSource = syncEntryPoint.toAutoRestorePixelSource()
-        Provider(vmFactory, launchSource)
+        val isAuthRequired = intent.getBooleanExtra(AUTH_REQUIRED_EXTRA_KEY, false)
+        Provider(vmFactory, launchSource, isAuthRequired)
     }
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
+    @Inject
+    lateinit var authPromptRenderer: AuthPromptRenderer
 
     private val syncEntryPoint
         get() = requireNotNull(IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, SyncEntryPoint::class.java)) {
@@ -74,6 +79,7 @@ class PreviousSessionReadyActivity : DuckDuckGoActivity() {
         configureBackNavigation()
 
         observeViewModel()
+        authPromptRenderer.bind(viewModel.authPrompts)
 
         if (savedInstanceState == null) {
             viewModel.onScreenShown()
@@ -146,13 +152,16 @@ class PreviousSessionReadyActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val ORIGINAL_FLOW_EXTRA_KEY = "original_flow"
+        private const val AUTH_REQUIRED_EXTRA_KEY = "auth_required"
 
         fun intent(
             context: Context,
             syncEntryPoint: SyncEntryPoint,
+            isAuthRequired: Boolean,
         ): Intent {
             return Intent(context, PreviousSessionReadyActivity::class.java).apply {
                 putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)
+                putExtra(AUTH_REQUIRED_EXTRA_KEY, isAuthRequired)
             }
         }
     }

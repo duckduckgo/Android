@@ -22,19 +22,31 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.auth.AuthPrompt
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Request
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
+import com.duckduckgo.sync.impl.auth.SyncDeviceAuthenticator
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationSource
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 class PreviousSessionReadyViewModel @AssistedInject constructor(
     @Assisted private val launchSource: String,
+    @Assisted private val isAuthRequired: Boolean,
     private val syncAutoRestoreManager: SyncAutoRestoreManager,
+    private val deviceAuthenticator: SyncDeviceAuthenticator,
     private val syncPixels: SyncPixels,
     private val syncSetupWideEvent: SyncSetupWideEvent,
     private val dispatchers: DispatcherProvider,
@@ -42,13 +54,20 @@ class PreviousSessionReadyViewModel @AssistedInject constructor(
     private val _commands = Channel<Command>(Channel.BUFFERED)
     val commands = _commands.receiveAsFlow()
 
+    val authPrompts: StateFlow<AuthPrompt?> = deviceAuthenticator.currentPrompt
+
+    private var authenticatedActionJob: Job? = null
+
     fun onScreenShown() {
         syncPixels.fireAutoRestoreSettingsReadyShown(launchSource)
     }
 
     fun onResumeClicked() {
+        if (authenticatedActionJob?.isActive == true) return
         syncPixels.fireAutoRestoreSettingsRestoreTapped(launchSource)
-        viewModelScope.launch(dispatchers.io()) {
+        authenticatedActionJob = viewModelScope.launch(dispatchers.io()) {
+            if (!authenticate()) return@launch
+
             syncSetupWideEvent.onSyncRestoreStarted()
             val payload = syncAutoRestoreManager.retrieveRecoveryPayload()
             if (payload != null) {
@@ -61,8 +80,11 @@ class PreviousSessionReadyViewModel @AssistedInject constructor(
     }
 
     fun onContinueSetupClicked() {
+        if (authenticatedActionJob?.isActive == true) return
         syncPixels.fireAutoRestoreSettingsSkipRestoreTapped(launchSource)
-        viewModelScope.launch {
+        authenticatedActionJob = viewModelScope.launch {
+            if (!authenticate()) return@launch
+
             _commands.send(Command.SetContinueSetupResult)
             _commands.send(Command.Close)
         }
@@ -72,6 +94,33 @@ class PreviousSessionReadyViewModel @AssistedInject constructor(
         syncPixels.fireAutoRestoreSettingsCancelled(launchSource)
         viewModelScope.launch {
             _commands.send(Command.Close)
+        }
+    }
+
+    private suspend fun authenticate(): Boolean {
+        if (!isAuthRequired) return true
+        val response = deviceAuthenticator.authenticate(AuthenticationSource.SETTINGS_NOT_SYNCED, Request()) { event ->
+            viewModelScope.launch {
+                when (event) {
+                    Event.EnrollmentNeeded -> syncSetupWideEvent.onDeviceAuthNotEnrolled()
+                    Event.EnrollmentShown -> Unit
+                    Event.VerificationShown -> Unit
+                }
+            }
+        }
+        return when (response) {
+            is Response.Allowed -> {
+                syncSetupWideEvent.onUserAuthSuccess()
+                true
+            }
+
+            is Response.Cancelled -> false
+
+            is Response.Failed -> {
+                logcat(WARN) { "Sync: device authentication failed: ${response.reason}" }
+                _commands.send(Command.ShowError(R.string.sync_simplified_error_dialog_generic_body))
+                false
+            }
         }
     }
 
@@ -91,16 +140,20 @@ class PreviousSessionReadyViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(launchSource: String): PreviousSessionReadyViewModel
+        fun create(
+            launchSource: String,
+            isAuthRequired: Boolean,
+        ): PreviousSessionReadyViewModel
 
         class Provider(
             private val assistedFactory: Factory,
             private val launchSource: String,
+            private val isAuthRequired: Boolean,
         ) : ViewModelProvider.Factory {
 
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(launchSource) as T
+                return assistedFactory.create(launchSource, isAuthRequired) as T
             }
         }
     }
