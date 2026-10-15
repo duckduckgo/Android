@@ -822,8 +822,8 @@ class BrowserTabViewModel @Inject constructor(
 
     /** Non-null while this tab is displayed inside a Custom Tab. [clientPackage] is the verified
      * calling package (when known), used by [handleAppLink]'s trusted-caller launch carve-out.
-     * [referrerPackage] is the best-effort, non-verified android-app:// referrer, used only to skip
-     * confirmation prompts (in [appLinkClicked] and for non-HTTP app links), never the launch carve-out. */
+     * [referrerPackage] is the best-effort, non-verified android-app:// referrer, used only for links back to the
+     * caller (skipping confirmation prompts, or overriding "Never" in Open Links in Apps), never the launch carve-out. */
     private data class CustomTabContext(val clientPackage: String?, val referrerPackage: String?)
     private var customTab: CustomTabContext? = null
 
@@ -4034,13 +4034,17 @@ class BrowserTabViewModel @Inject constructor(
         isForMainFrame: Boolean,
         hasGesture: Boolean,
     ): Boolean {
+        val appLinksEnabled = appSettingsPreferencesStore.appLinksEnabled
+        val trustedCallerOverridesDisabledAppLinks = !appLinksEnabled &&
+            appLinksHandler.isTrustedCaller(appLink, trustedCallerPackage(nonHttpLink = false, overridingDisabledAppLinks = true))
         return appLinksHandler.handleAppLink(
             isForMainFrame,
             appLink,
             hasGesture,
             customTab?.clientPackage,
-            appSettingsPreferencesStore.appLinksEnabled,
+            appLinksEnabled,
             !appSettingsPreferencesStore.showAppLinksPrompt,
+            trustedCallerOverridesDisabledAppLinks,
         ) { appLinkClicked(appLink) }
     }
 
@@ -4088,10 +4092,14 @@ class BrowserTabViewModel @Inject constructor(
         appLinksHandler.setUserQueryState(false)
     }
 
-    private fun trustedCallerPackage(): String? {
-        if (!customTabsFeature.handleTrustedCallers().isEnabled() || !customTabsFeature.handleTrustedCallersNonHttpLinks().isEnabled()) {
-            return null
-        }
+    private fun trustedCallerPackage(
+        nonHttpLink: Boolean,
+        overridingDisabledAppLinks: Boolean,
+    ): String? {
+        val enabled = customTabsFeature.handleTrustedCallers().isEnabled() &&
+            (!nonHttpLink || customTabsFeature.handleTrustedCallersNonHttpLinks().isEnabled()) &&
+            (!overridingDisabledAppLinks || customTabsFeature.handleTrustedCallersWhenAppLinksDisabled().isEnabled())
+        if (!enabled) return null
         return customTab?.let { it.clientPackage ?: it.referrerPackage }
     }
 
@@ -4103,19 +4111,37 @@ class BrowserTabViewModel @Inject constructor(
     fun nonHttpAppLinkClicked(appLink: NonHttpAppLink) {
         if (nonHttpAppLinkChecker.isPermitted(appLink.intent)) {
             if (!appSettingsPreferencesStore.appLinksEnabled) {
-                appLink.fallbackUrl?.let { fallbackUrl ->
-                    command.value = NavigationCommand.Navigate(fallbackUrl, getUrlHeaders(fallbackUrl))
+                val trustedCallerPackage = trustedCallerPackage(nonHttpLink = true, overridingDisabledAppLinks = true)
+                if (trustedCallerPackage != null) {
+                    command.value = HandleNonHttpAppLink(
+                        nonHttpAppLink = appLink,
+                        headers = getUrlHeaders(appLink.fallbackUrl),
+                        showConfirmation = false,
+                        trustedCallerPackage = trustedCallerPackage,
+                        finishCustomTabOnTrustedCallerLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
+                        trustedCallerOnly = true,
+                    )
+                    return
                 }
+                navigateToFallbackUrl(appLink.fallbackUrl)
                 return
             }
             command.value = HandleNonHttpAppLink(
                 nonHttpAppLink = appLink,
                 headers = getUrlHeaders(appLink.fallbackUrl),
                 showConfirmation = appSettingsPreferencesStore.showAppLinksPrompt,
-                trustedCallerPackage = trustedCallerPackage(),
+                trustedCallerPackage = trustedCallerPackage(nonHttpLink = true, overridingDisabledAppLinks = false),
                 finishCustomTabOnTrustedCallerLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
             )
         }
+    }
+
+    fun onTrustedCallerLaunchUnavailable(fallbackUrl: String?) {
+        navigateToFallbackUrl(fallbackUrl)
+    }
+
+    private fun navigateToFallbackUrl(fallbackUrl: String?) {
+        fallbackUrl?.let { command.value = NavigationCommand.Navigate(it, getUrlHeaders(it)) }
     }
 
     fun onPrintSelected() {

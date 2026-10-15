@@ -223,6 +223,7 @@ sealed class Command {
         val showConfirmation: Boolean = true,
         val trustedCallerPackage: String? = null,
         val finishCustomTabOnTrustedCallerLaunch: Boolean = false,
+        val trustedCallerOnly: Boolean = false,
     ) : Command()
 
     class ShowAppLinkPrompt(

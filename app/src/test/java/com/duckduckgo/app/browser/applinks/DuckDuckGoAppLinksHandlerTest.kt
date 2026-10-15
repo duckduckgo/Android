@@ -432,6 +432,78 @@ class DuckDuckGoAppLinksHandlerTest {
     }
 
     @Test
+    fun whenAppLinksDisabledAndOverrideAllowedAndTrustedCallerWithoutGestureThenLaunchAppLink() {
+        val appIntent = Intent().setPackage("com.example.app")
+        assertTrue(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                appLink = AppLink(uriString = "foo.com", appIntent = appIntent),
+                hasGesture = false,
+                clientPackage = "com.example.app",
+                appLinksEnabled = false,
+                shouldHaltWebNavigation = true,
+                trustedCallerOverridesDisabledAppLinks = true,
+                launchAppLink = mockCallback,
+            ),
+        )
+        verify(mockCallback).invoke()
+    }
+
+    @Test
+    fun whenAppLinksDisabledAndOverrideAllowedWithGestureButNoVerifiedCallerThenLaunchAppLink() {
+        val appIntent = Intent().setPackage("com.example.app")
+        assertTrue(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                appLink = AppLink(uriString = "foo.com", appIntent = appIntent),
+                hasGesture = true,
+                clientPackage = null,
+                appLinksEnabled = false,
+                shouldHaltWebNavigation = true,
+                trustedCallerOverridesDisabledAppLinks = true,
+                launchAppLink = mockCallback,
+            ),
+        )
+        verify(mockCallback).invoke()
+    }
+
+    @Test
+    fun whenAppLinksDisabledAndOverrideAllowedWithoutGestureOrVerifiedCallerThenReturnFalseAndDoNotLaunch() {
+        val appIntent = Intent().setPackage("com.example.app")
+        assertFalse(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                appLink = AppLink(uriString = "foo.com", appIntent = appIntent),
+                hasGesture = false,
+                clientPackage = null,
+                appLinksEnabled = false,
+                shouldHaltWebNavigation = true,
+                trustedCallerOverridesDisabledAppLinks = true,
+                launchAppLink = mockCallback,
+            ),
+        )
+        verifyNoInteractions(mockCallback)
+    }
+
+    @Test
+    fun whenAppLinksDisabledAndOverrideNotAllowedThenTrustedCallerReturnsFalseAndDoesNotLaunch() {
+        val appIntent = Intent().setPackage("com.example.app")
+        assertFalse(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                appLink = AppLink(uriString = "foo.com", appIntent = appIntent),
+                hasGesture = true,
+                clientPackage = "com.example.app",
+                appLinksEnabled = false,
+                shouldHaltWebNavigation = true,
+                trustedCallerOverridesDisabledAppLinks = false,
+                launchAppLink = mockCallback,
+            ),
+        )
+        verifyNoInteractions(mockCallback)
+    }
+
+    @Test
     fun whenNoGestureAndNotTrustedCallerButIsInAlwaysTriggerListThenLaunchAppLink() {
         testee.isAUserQuery = false
         testee.previousUrl = "foo.com"
