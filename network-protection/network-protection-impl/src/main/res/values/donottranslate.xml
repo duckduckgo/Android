@@ -27,7 +27,7 @@
     <string name="subscriptionOnboardingVpnBenefitHarmful">Blocking harmful sites</string>
     <string name="subscriptionOnboardingVpnTurnOn">Turn On VPN</string>
     <string name="subscriptionOnboardingVpnNext">Next</string>
-    <string name="subscriptionOnboardingVpnSkip">Not now</string>
+    <string name="subscriptionOnboardingVpnSkip">Not Now</string>
 
     <!-- Subscription onboarding - VPN step, "On" state -->
     <string name="subscriptionOnboardingVpnHeaderTitleOn">DuckDuckGo VPN is On</string>
