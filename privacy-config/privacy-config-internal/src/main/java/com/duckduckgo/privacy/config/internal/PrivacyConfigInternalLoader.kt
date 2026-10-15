@@ -58,19 +58,19 @@ class PrivacyConfigInternalLoader @Inject constructor(
             else -> return@withLock false
         }
         val result = forceLoad()
-        marker.emit(resultLine(action, url, result))
+        if (result is ConfigDownloadResult.Error) {
+            val command = if (action == ACTION_SET_URL) "set_url" else "reset"
+            marker.emit("$FAILED action=$command reason=download_failed")
+        } else if (action == ACTION_RESET) {
+            val stored = repository.get()
+            marker.emit("$RESET stage=config version=${stored?.version} etag=${stored?.eTag.orEmpty()}")
+        }
         result is ConfigDownloadResult.Success
     }
 
-    private fun resultLine(action: String, url: String?, result: ConfigDownloadResult): String {
-        val command = if (action == ACTION_SET_URL) "set_url" else "reset"
-        if (result is ConfigDownloadResult.Error) return "$FAILED action=$command reason=download_failed"
-        val stored = repository.get()
-        val fields = "stage=config version=${stored?.version} etag=${stored?.eTag.orEmpty()}"
-        return if (action == ACTION_SET_URL) "$APPLIED $fields source=$url" else "$RESET $fields"
-    }
-
     private suspend fun forceLoad(): ConfigDownloadResult {
+        // A forced download always persists, so make the next persisted config count as new even if it matches the last one.
+        store.lastSeenConfig = ""
         // The downloader resets version and ETag under its shared download lock.
         return downloader.download(force = true)
     }
@@ -79,7 +79,6 @@ class PrivacyConfigInternalLoader @Inject constructor(
         const val ACTION_SET_URL = "com.duckduckgo.privacy.config.internal.SET_URL"
         const val ACTION_RESET = "com.duckduckgo.privacy.config.internal.RESET"
         const val EXTRA_URL = "url"
-        private const val APPLIED = "CONFIG_OVERRIDE_APPLIED"
         private const val RESET = "CONFIG_OVERRIDE_RESET"
         private const val FAILED = "CONFIG_OVERRIDE_FAILED"
 

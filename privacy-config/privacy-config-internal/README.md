@@ -74,7 +74,7 @@ RESET is queued like SET_URL; it is finished when its result line appears.
 
 ### Result lines
 
-Every SET_URL and RESET command logs exactly one line under the tag
+Result lines are logged under the tag
 `PrivacyConfigOverride`, on both `internalDebug` and `internalRelease`:
 
 ```bash
@@ -87,10 +87,16 @@ CONFIG_OVERRIDE_RESET stage=config version=<version> etag=<etag>
 CONFIG_OVERRIDE_FAILED action=set_url|reset reason=invalid_url|download_failed
 ```
 
+`CONFIG_OVERRIDE_APPLIED` is logged once per persisted config while an override is
+active, not once per command. That includes the hourly background refresh and loads
+started from Developer Settings, so a newer build taken in the background logs a new
+line. Downloads that persist nothing (version not newer, failure) log no APPLIED line,
+and background refreshes never log `CONFIG_OVERRIDE_FAILED`. `RESET` logs only
+`CONFIG_OVERRIDE_RESET`. `FAILED` and `RESET` are logged once per command.
+
 Broadcast completion means the command was queued; the result line means it
 finished. The ETag is empty if the server omits it. A failed SET_URL download
-keeps the selected override for the next command or manual load. Loads started from
-Developer Settings log nothing.
+keeps the selected override for the next command or manual load.
 
 ### Known issue: DNS after a cold start
 

@@ -36,6 +36,7 @@ class PrivacyConfigInternalLoaderTest {
         override var remotePrivacyConfigUrl: String? = null
         override var useCustomPrivacyConfigUrl = false
         override var canUrlBeChanged = false
+        override var lastSeenConfig: String? = null
     }
     private var downloads = 0
     private var downloadResult: ConfigDownloadResult = Success
@@ -109,12 +110,9 @@ class PrivacyConfigInternalLoaderTest {
     }
 
     @Test
-    fun whenSetUrlAppliedThenEmitAppliedLineWithStoredMetadata() = runTest {
+    fun whenSetUrlSucceedsThenLoaderEmitsNothing() = runTest {
         testee.handleCommand("com.duckduckgo.privacy.config.internal.SET_URL", "http://10.0.2.2:8080/android-config.json")
-        assertEquals(
-            listOf("CONFIG_OVERRIDE_APPLIED stage=config version=42 etag=local-etag source=http://10.0.2.2:8080/android-config.json"),
-            lines,
-        )
+        assertEquals(emptyList<String>(), lines)
     }
 
     @Test
