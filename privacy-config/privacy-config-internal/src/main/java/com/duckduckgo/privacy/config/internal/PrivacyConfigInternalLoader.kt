@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.config.internal
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.PRIVACY_REMOTE_CONFIG_URL
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader.ConfigDownloadResult
 import com.duckduckgo.privacy.config.internal.store.DevPrivacyConfigSettingsDataStore
@@ -43,7 +44,7 @@ class PrivacyConfigInternalLoader @Inject constructor(
         when (action) {
             ACTION_SET_URL -> {
                 if (!isValidUrl(url)) {
-                    marker.emit("$FAILED action=set_url reason=invalid_url")
+                    marker.emit("$FAILED action=set_url reason=invalid_url source=${url.orEmpty().filterNot { it.isWhitespace() }}")
                     return@withLock false
                 }
                 store.remotePrivacyConfigUrl = url
@@ -59,8 +60,8 @@ class PrivacyConfigInternalLoader @Inject constructor(
         }
         val result = forceLoad()
         if (result is ConfigDownloadResult.Error) {
-            val command = if (action == ACTION_SET_URL) "set_url" else "reset"
-            marker.emit("$FAILED action=$command reason=download_failed")
+            val (command, source) = if (action == ACTION_SET_URL) "set_url" to url else "reset" to PRIVACY_REMOTE_CONFIG_URL
+            marker.emit("$FAILED action=$command reason=download_failed source=$source")
         } else if (action == ACTION_RESET) {
             val stored = repository.get()
             marker.emit("$RESET stage=config version=${stored?.version} etag=${stored?.eTag.orEmpty()}")
