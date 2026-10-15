@@ -18,11 +18,10 @@ package com.duckduckgo.networkprotection.impl.configuration
 
 import android.annotation.SuppressLint
 import com.duckduckgo.di.scopes.VpnScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Lazy
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import okhttp3.Dns
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -34,7 +33,7 @@ import retrofit2.http.Path
 import javax.inject.Named
 import javax.inject.Qualifier
 
-@Module
+@BindingContainer
 @ContributesTo(scope = VpnScope::class)
 object WgVpnControllerServiceModule {
 
@@ -44,7 +43,7 @@ object WgVpnControllerServiceModule {
 
     @Provides
     @WgInternalApi
-    @SingleInstanceIn(VpnScope::class)
+    @SingleIn(VpnScope::class)
     fun provideInternalCustomHttpClient(
         @Named("api") okHttpClient: OkHttpClient,
         dns: Dns,
@@ -55,14 +54,14 @@ object WgVpnControllerServiceModule {
     }
 
     @Provides
-    @SingleInstanceIn(VpnScope::class)
+    @SingleIn(VpnScope::class)
     @SuppressLint("NoRetrofitCreateMethodCallDetector")
     fun providesWgVpnControllerService(
         @Named(value = "api") retrofit: Retrofit,
         @WgInternalApi customClient: Lazy<OkHttpClient>,
     ): WgVpnControllerService {
         return retrofit.newBuilder()
-            .callFactory { customClient.get().newCall(it) }
+            .callFactory { customClient.value.newCall(it) }
             .build()
             .create(WgVpnControllerService::class.java)
     }

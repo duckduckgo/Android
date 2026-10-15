@@ -39,10 +39,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin.Companion.WEB_VIEW_DEV_SETTINGS_PRIO_KEY
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoMap(AppScope::class)
 @PriorityKey(WEB_VIEW_DEV_SETTINGS_PRIO_KEY)
 class WebViewDevSettings @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,

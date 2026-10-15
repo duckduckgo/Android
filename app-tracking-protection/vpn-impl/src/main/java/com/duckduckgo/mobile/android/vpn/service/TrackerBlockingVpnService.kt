@@ -63,10 +63,10 @@ import com.duckduckgo.mobile.android.vpn.pixels.VpnEnableWideEvent
 import com.duckduckgo.mobile.android.vpn.service.state.VpnStateMonitorService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnEnabledNotificationBuilder
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Binds
-import dagger.Module
 import dagger.android.AndroidInjection
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.Binds
+import dev.zacsweers.metro.ContributesTo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -935,7 +935,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     }
 }
 
-@Module
+@BindingContainer
 @ContributesTo(VpnScope::class)
 abstract class VpnSocketProtectorModule {
     @Binds

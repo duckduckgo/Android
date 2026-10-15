@@ -38,9 +38,9 @@ import com.duckduckgo.mobile.android.vpn.bugreport.NetworkTypeCollector.NetworkT
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.frybits.harmony.getHarmonySharedPreferences
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -52,8 +52,8 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@ContributesMultibinding(scope = VpnScope::class)
-@SingleInstanceIn(VpnScope::class)
+@ContributesIntoSet(scope = VpnScope::class)
+@SingleIn(VpnScope::class)
 class NetworkTypeMonitor @Inject constructor(
     private val context: Context,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,

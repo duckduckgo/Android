@@ -72,9 +72,9 @@ import com.duckduckgo.pir.impl.scripts.models.PirError.UnableToLoadBrokerUrl
 import com.duckduckgo.pir.impl.scripts.models.PirError.Unknown
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.AssistedInject
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable

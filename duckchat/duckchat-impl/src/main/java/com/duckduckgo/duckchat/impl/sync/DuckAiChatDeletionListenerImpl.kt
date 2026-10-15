@@ -24,16 +24,17 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
-@ContributesMultibinding(AppScope::class, boundType = DuckAiChatDeletionListener::class)
-@ContributesMultibinding(AppScope::class, boundType = MainProcessLifecycleObserver::class)
+@SingleIn(AppScope::class)
+@ContributesIntoSet(AppScope::class, binding = binding<DuckAiChatDeletionListener>())
+@ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
 class DuckAiChatDeletionListenerImpl @Inject constructor(
     private val duckChatSyncRepository: DuckChatSyncRepository,
     private val duckChatFeatureRepository: DuckChatFeatureRepository,

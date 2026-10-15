@@ -29,9 +29,10 @@ import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.sqlcipher.loader.api.SqlCipherLoader
 import com.duckduckgo.sqlcipher.loader.impl.SqlCipherPixelName.LIBRARY_LOAD_FAILURE_SQLCIPHER
 import com.duckduckgo.sqlcipher.loader.impl.SqlCipherPixelName.LIBRARY_LOAD_TIMEOUT_SQLCIPHER
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -43,10 +44,10 @@ import logcat.logcat
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, SqlCipherLoader::class)
-@ContributesMultibinding(AppScope::class, MainProcessLifecycleObserver::class)
-@ContributesMultibinding(AppScope::class, PirProcessLifecycleObserver::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<SqlCipherLoader>())
+@ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
+@ContributesIntoSet(AppScope::class, binding = binding<PirProcessLifecycleObserver>())
 class RealSqlCipherLoader @Inject constructor(
     private val context: Context,
     private val dispatchers: DispatcherProvider,

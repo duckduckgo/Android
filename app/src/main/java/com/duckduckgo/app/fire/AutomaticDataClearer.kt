@@ -37,9 +37,10 @@ import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -56,13 +57,13 @@ interface DataClearer {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = DataClearer::class,
+    binding = binding<DataClearer>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = BrowserLifecycleObserver::class,
+    binding = binding<BrowserLifecycleObserver>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class AutomaticDataClearer @Inject constructor(
     private val workManager: WorkManager,
     private val settingsDataStore: SettingsDataStore,

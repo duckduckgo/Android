@@ -24,8 +24,8 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.ZoneId
@@ -36,7 +36,7 @@ import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 @ContributesBinding(scope = AppScope::class)
-@SingleInstanceIn(scope = AppScope::class)
+@SingleIn(scope = AppScope::class)
 class DefaultBrowserPromptsAppUsageRepositoryImpl @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val defaultBrowserPromptsAppUsageDao: DefaultBrowserPromptsAppUsageDao,

@@ -20,12 +20,12 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.send
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class RetentionMetricsAtbLifecyclePlugin @Inject constructor(
     private val searchMetricPixelsPlugin: SearchMetricPixelsPlugin,
     private val appUseMetricPixelsPlugin: AppUseMetricPixelsPlugin,

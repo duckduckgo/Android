@@ -22,17 +22,17 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
-@ContributesMultibinding(AppScope::class)
+@SingleIn(AppScope::class)
+@ContributesIntoMap(AppScope::class)
 @PriorityKey(AtbInitializerListener.PRIORITY_REINSTALL_LISTENER)
 class ReinstallAtbListener @Inject constructor(
     private val backupDataStore: BackupServiceDataStore,

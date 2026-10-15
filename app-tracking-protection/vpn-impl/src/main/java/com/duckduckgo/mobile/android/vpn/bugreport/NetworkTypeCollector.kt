@@ -24,14 +24,14 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.bugreport.NetworkTypeMonitor.Companion
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.frybits.harmony.getHarmonySharedPreferences
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoSet(ActivityScope::class)
 class NetworkTypeCollector @Inject constructor(
     private val context: Context,
     private val dispatcherProvider: DispatcherProvider,

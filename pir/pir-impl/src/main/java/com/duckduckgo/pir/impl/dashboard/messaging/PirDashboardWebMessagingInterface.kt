@@ -34,9 +34,9 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.pir.impl.brokers.JSONObjectAdapter
 import com.duckduckgo.pir.impl.dashboard.PirDashboardUrlProvider
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirWebJsMessageHandler
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
 import javax.inject.Inject

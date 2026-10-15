@@ -19,14 +19,14 @@ package com.duckduckgo.sync.impl.di
 import com.duckduckgo.di.*
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.sync.api.*
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.multibindings.Multibinds
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Multibinds
 
-@Module
+@BindingContainer
 @ContributesTo(ActivityScope::class)
 abstract class SyncSettingsModule {
     // we use multibinds as the list of plugins can be empty
-    @Multibinds
+    @Multibinds(allowEmpty = true)
     abstract fun provideSyncSettingsPlugins(): DaggerMap<Int, SyncSettingsPlugin>
 }

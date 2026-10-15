@@ -30,8 +30,9 @@ import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
 interface SettingsDataStore {
@@ -131,13 +132,13 @@ interface SettingsDataStore {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = SettingsDataStore::class,
+    binding = binding<SettingsDataStore>(),
 )
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = AutoCompleteSettings::class,
+    binding = binding<AutoCompleteSettings>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class SettingsSharedPreferences @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,

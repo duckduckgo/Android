@@ -81,12 +81,11 @@ import com.duckduckgo.subscriptions.impl.wideevents.FreeTrialConversionWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.Moshi
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -259,7 +258,7 @@ interface SubscriptionsManager {
     suspend fun blackFridayOfferAvailable(): Boolean
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealSubscriptionsManager @Inject constructor(
     private val subscriptionsService: SubscriptionsService,
@@ -400,11 +399,11 @@ class RealSubscriptionsManager @Inject constructor(
         val freeTrialProductsAvailableInGooglePlay = getSubscriptionOffer().any {
             it.offerId in SubscriptionsConstants.LIST_OF_FREE_TRIAL_OFFERS
         }
-        return subscriptionsFeature.get().privacyProFreeTrial().isEnabled() && freeTrialProductsAvailableInGooglePlay
+        return subscriptionsFeature.value.privacyProFreeTrial().isEnabled() && freeTrialProductsAvailableInGooglePlay
     }
 
     override suspend fun blackFridayOfferAvailable(): Boolean = withContext(dispatcherProvider.io()) {
-        return@withContext subscriptionsFeature.get().blackFridayOffer2025().isEnabled()
+        return@withContext subscriptionsFeature.value.blackFridayOffer2025().isEnabled()
     }
 
     override suspend fun switchSubscriptionPlan(
@@ -629,7 +628,7 @@ class RealSubscriptionsManager @Inject constructor(
                 subscriptionPurchaseWideEvent.onPurchaseConfirmationSuccess()
                 if (isFreeTrial) {
                     freeTrialConversionWideEvent.onFreeTrialStarted(subscription.productId)
-                    if (subscriptionsFeature.get().vpnReminderNotification().isEnabled()) {
+                    if (subscriptionsFeature.value.vpnReminderNotification().isEnabled()) {
                         vpnReminderNotificationScheduler.scheduleVpnReminderNotification()
                     }
                 }
@@ -651,7 +650,7 @@ class RealSubscriptionsManager @Inject constructor(
     ): ConfirmationBody {
         val body = ConfirmationBody(packageName = packageName, purchaseToken = purchaseToken)
         return try {
-            if (subscriptionsFeature.get().subscriptionConcurrentExperiments().isEnabled()) {
+            if (subscriptionsFeature.value.subscriptionConcurrentExperiments().isEnabled()) {
                 body.copy(experiments = buildExperimentsToReport())
             } else {
                 body.copy(
@@ -1011,7 +1010,7 @@ class RealSubscriptionsManager @Inject constructor(
     private suspend fun activePlanIds(): List<String> =
         buildList {
             addAll(listOf(YEARLY_PLAN_US, MONTHLY_PLAN_US, YEARLY_PLAN_ROW, MONTHLY_PLAN_ROW))
-            if (subscriptionsFeature.get().allowProTierPurchase().isEnabled()) {
+            if (subscriptionsFeature.value.allowProTierPurchase().isEnabled()) {
                 addAll(LIST_OF_PRO_PLANS)
             }
         }
@@ -1019,7 +1018,7 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun getSubscriptionOffer(): List<SubscriptionOffer> =
         playBillingManager.products
             .filter {
-                if (subscriptionsFeature.get().allowProTierPurchase().isEnabled()) {
+                if (subscriptionsFeature.value.allowProTierPurchase().isEnabled()) {
                     it.productId == BASIC_SUBSCRIPTION || it.productId == ADVANCED_SUBSCRIPTION
                 } else {
                     it.productId == BASIC_SUBSCRIPTION
@@ -1069,7 +1068,7 @@ class RealSubscriptionsManager @Inject constructor(
      * When tierMessagingEnabled is OFF: Converts legacy features to entitlements with default tier "plus".
      */
     private suspend fun getEntitlementsForPlan(planId: String): Set<Entitlement> {
-        if (subscriptionsFeature.get().tierMessagingEnabled().isEnabled()) {
+        if (subscriptionsFeature.value.tierMessagingEnabled().isEnabled()) {
             val v2Entitlements = authRepository.getFeaturesV2(planId)
             if (v2Entitlements.isNotEmpty()) {
                 return v2Entitlements

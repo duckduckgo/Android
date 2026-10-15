@@ -21,25 +21,22 @@ import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.app.di.ActivityComponent.Factory
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesSubcomponent
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Binds
-import dagger.BindsInstance
-import dagger.Module
 import dagger.android.AndroidInjector
 import dagger.android.DaggerActivity
-import dagger.multibindings.ClassKey
-import dagger.multibindings.IntoMap
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.Binds
+import dev.zacsweers.metro.ClassKey
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.GraphExtension
+import dev.zacsweers.metro.IntoMap
+import dev.zacsweers.metro.Provides
 
-@ContributesSubcomponent(
-    scope = ActivityScope::class,
-    parentScope = AppScope::class,
-)
+@GraphExtension(scope = ActivityScope::class)
 interface ActivityComponent : AndroidInjector<DaggerActivity> {
 
-    @ContributesSubcomponent.Factory
+    @GraphExtension.Factory
     interface Factory : AndroidInjector.Factory<DaggerActivity, ActivityComponent> {
-        override fun create(@BindsInstance instance: DaggerActivity): ActivityComponent
+        override fun create(@Provides instance: DaggerActivity): ActivityComponent
     }
 
     @ContributesTo(AppScope::class)
@@ -48,7 +45,7 @@ interface ActivityComponent : AndroidInjector<DaggerActivity> {
     }
 }
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 abstract class DaggerActivityModule {
     @Binds
@@ -57,7 +54,7 @@ abstract class DaggerActivityModule {
     abstract fun bindsDaggerActivityComponent(factory: Factory): AndroidInjector.Factory<*, *>
 }
 
-@Module
+@BindingContainer
 @ContributesTo(ActivityScope::class)
 abstract class DaggerActivityScopedModule {
     @Binds

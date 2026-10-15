@@ -27,7 +27,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewActivity
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface PirNotificationManager {

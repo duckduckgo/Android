@@ -20,7 +20,7 @@ import androidx.room.withTransaction
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.CleanupPolicy
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import java.time.Duration
 import java.time.Instant

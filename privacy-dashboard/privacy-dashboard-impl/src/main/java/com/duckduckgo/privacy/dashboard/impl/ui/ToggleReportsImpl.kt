@@ -20,7 +20,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
 import com.duckduckgo.privacy.dashboard.impl.ToggleReportsDataStore
 import com.duckduckgo.privacy.dashboard.impl.ToggleReportsFeature
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)

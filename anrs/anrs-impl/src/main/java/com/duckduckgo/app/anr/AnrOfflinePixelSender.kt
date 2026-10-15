@@ -23,13 +23,13 @@ import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import io.reactivex.Completable
 import io.reactivex.Completable.complete
 import io.reactivex.Completable.defer
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class AnrOfflinePixelSender @Inject constructor(
     private val anrRepository: AnrRepository,
     private val pixelSender: PixelSender,

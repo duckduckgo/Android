@@ -28,7 +28,7 @@ import org.mockito.kotlin.mock
 class RealAppBuildConfigTest {
 
     private val testee = RealAppBuildConfig(
-        variantManager = dagger.Lazy { mock<VariantManager>() },
+        variantManager = lazy { mock<VariantManager>() },
         dispatcherProvider = mock(),
         sharedPreferencesProvider = mock(),
         context = mock(),

@@ -9,18 +9,19 @@ import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
-import dagger.multibindings.IntoSet
+import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.IntoSet
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlin.collections.List
 
-@Module
+@BindingContainer
 @ContributesTo(scope = AppScope::class)
 public object TestFeature_ProxyModule {
   @Provides
-  @SingleInstanceIn(scope = AppScope::class)
+  @SingleIn(scope = AppScope::class)
   public fun providesTestFeature(
     @RemoteFeatureStoreNamed(value = TestFeature::class) toggleStore: Toggle.Store,
     callback: FeatureTogglesCallback,
@@ -43,7 +44,7 @@ public object TestFeature_ProxyModule {
   public fun providesNoopSettingsStore(): FeatureSettings.Store = FeatureSettings.EMPTY_STORE
 
   @Provides
-  @SingleInstanceIn(scope = AppScope::class)
+  @SingleIn(scope = AppScope::class)
   @IntoSet
   public fun providesTestFeatureInventory(feature: TestFeature): FeatureTogglesInventory {
         return object : FeatureTogglesInventory {
@@ -55,4 +56,9 @@ public object TestFeature_ProxyModule {
             }
         }
   }
+
+  @Provides
+  @IntoSet
+  public fun providesTestFeaturePrivacyFeaturePlugin(remoteFeature: TestFeature_RemoteFeature):
+      PrivacyFeaturePlugin = remoteFeature
 }

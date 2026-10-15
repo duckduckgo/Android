@@ -31,7 +31,7 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filter
@@ -45,7 +45,7 @@ import kotlin.collections.chunked
 import kotlin.collections.toSet
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class CompletedWideEventsProcessor @Inject constructor(
     private val wideEventRepository: WideEventRepository,
     private val wideEventSender: WideEventSender,

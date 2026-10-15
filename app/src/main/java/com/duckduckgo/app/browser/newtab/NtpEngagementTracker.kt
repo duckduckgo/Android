@@ -19,12 +19,13 @@ package com.duckduckgo.app.browser.newtab
 import androidx.annotation.MainThread
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
-@ContributesMultibinding(AppScope::class, boundType = BrowserLifecycleObserver::class)
+@SingleIn(AppScope::class)
+@ContributesIntoSet(AppScope::class, binding = binding<BrowserLifecycleObserver>())
 class NtpEngagementTracker @Inject constructor() : BrowserLifecycleObserver {
 
     private var reported = false

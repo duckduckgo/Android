@@ -88,7 +88,6 @@ import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import javax.inject.Provider
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(AppTrackerActivityWithEmptyParams::class, screenName = "apptp.main")
@@ -104,7 +103,7 @@ class DeviceShieldTrackerActivity :
     @Inject
     lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
-    @Inject lateinit var reportBreakageContract: Provider<ReportBreakageContract>
+    @Inject lateinit var reportBreakageContract: () -> ReportBreakageContract
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
@@ -160,7 +159,7 @@ class DeviceShieldTrackerActivity :
         enableTransparentEdgeToEdge()
 
         reportBreakage =
-            registerForActivityResult(reportBreakageContract.get()) {
+            registerForActivityResult(reportBreakageContract()) {
                 if (!it.isEmpty()) {
                     Snackbar.make(binding.root, R.string.atp_ReportBreakageSent, Snackbar.LENGTH_LONG).show()
                 }

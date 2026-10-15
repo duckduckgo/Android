@@ -28,8 +28,8 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.subscriptions.internal.SubsSettingPlugin
 import com.duckduckgo.subscriptions.internal.SubscriptionsInternalStore
 import com.duckduckgo.subscriptions.internal.databinding.SubsOverrideUrlViewBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
@@ -63,7 +63,7 @@ class OverrideSubscriptionBaseUrlView @JvmOverloads constructor(
     }
 }
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoSet(ActivityScope::class)
 class OverrideSubscriptionBaseUrlViewPlugin @Inject constructor() : SubsSettingPlugin {
     override fun getView(context: Context): View {
         return OverrideSubscriptionBaseUrlView(context)

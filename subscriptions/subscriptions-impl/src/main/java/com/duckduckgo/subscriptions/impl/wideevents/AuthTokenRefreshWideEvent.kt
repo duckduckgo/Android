@@ -27,9 +27,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withContext
 import java.io.Closeable
@@ -62,7 +61,7 @@ interface AuthTokenRefreshWideEvent {
     suspend fun onFailure(e: Exception)
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class AuthTokenRefreshWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
@@ -87,8 +86,8 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
                 cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
                 metadata = mapOf(
                     KEY_SUBSCRIPTION_STATUS to subscriptionStatus.statusName,
-                    KEY_NETP_IS_ENABLED to runCatching { networkProtectionState.get().isEnabled().toString() }.getOrDefault(""),
-                    KEY_NETP_IS_RUNNING to runCatching { networkProtectionState.get().isRunning().toString() }.getOrDefault(""),
+                    KEY_NETP_IS_ENABLED to runCatching { networkProtectionState.value.isEnabled().toString() }.getOrDefault(""),
+                    KEY_NETP_IS_RUNNING to runCatching { networkProtectionState.value.isRunning().toString() }.getOrDefault(""),
                     KEY_PROCESS_NAME to processName,
                 ),
                 definition = WideEventDefinition(version = Version(minor = 1, patch = 1)),
@@ -227,7 +226,7 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        subscriptionsFeature.get().sendAuthTokenRefreshWideEvent().isEnabled()
+        subscriptionsFeature.value.sendAuthTokenRefreshWideEvent().isEnabled()
     }
 
     private companion object {

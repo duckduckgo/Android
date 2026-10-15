@@ -20,9 +20,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.service.DbpService.PirJsonBroker
 import com.duckduckgo.pir.impl.store.PirRepository
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CancellationException
 import logcat.LogPriority.ERROR
 import logcat.logcat

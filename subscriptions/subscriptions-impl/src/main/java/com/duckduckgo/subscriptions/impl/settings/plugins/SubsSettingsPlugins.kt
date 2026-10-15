@@ -27,10 +27,10 @@ import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.PartnerBenefitSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingView
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoMap(ActivityScope::class)
 @PriorityKey(100)
 class ProSettingsTitle @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
@@ -40,7 +40,7 @@ class ProSettingsTitle @Inject constructor() : ProSettingsPlugin {
     }
 }
 
-@ContributesMultibinding(scope = ActivityScope::class)
+@ContributesIntoMap(scope = ActivityScope::class)
 @PriorityKey(500)
 class ProSettings @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
@@ -48,7 +48,7 @@ class ProSettings @Inject constructor() : ProSettingsPlugin {
     }
 }
 
-@ContributesMultibinding(scope = ActivityScope::class)
+@ContributesIntoMap(scope = ActivityScope::class)
 @PriorityKey(300)
 class PIRSettings @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
@@ -56,7 +56,7 @@ class PIRSettings @Inject constructor() : ProSettingsPlugin {
     }
 }
 
-@ContributesMultibinding(scope = ActivityScope::class)
+@ContributesIntoMap(scope = ActivityScope::class)
 @PriorityKey(400)
 class ITRSettings @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
@@ -64,7 +64,7 @@ class ITRSettings @Inject constructor() : ProSettingsPlugin {
     }
 }
 
-@ContributesMultibinding(scope = ActivityScope::class)
+@ContributesIntoMap(scope = ActivityScope::class)
 @PriorityKey(450)
 class PartnerBenefitSettings @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {

@@ -26,9 +26,8 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.Subscription
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -54,7 +53,7 @@ interface FreeTrialConversionWideEvent {
     )
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class FreeTrialConversionWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
@@ -186,7 +185,7 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        subscriptionsFeature.get().sendFreeTrialConversionWideEvent().isEnabled()
+        subscriptionsFeature.value.sendFreeTrialConversionWideEvent().isEnabled()
     }
 
     private suspend fun getCurrentWideEventId(): Long? {

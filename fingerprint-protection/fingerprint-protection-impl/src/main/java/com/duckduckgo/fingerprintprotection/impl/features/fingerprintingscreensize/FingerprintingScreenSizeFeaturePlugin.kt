@@ -22,10 +22,10 @@ import com.duckduckgo.fingerprintprotection.impl.fingerprintProtectionFeatureVal
 import com.duckduckgo.fingerprintprotection.store.FingerprintingScreenSizeEntity
 import com.duckduckgo.fingerprintprotection.store.features.fingerprintingscreensize.FingerprintingScreenSizeRepository
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class FingerprintingScreenSizeFeaturePlugin @Inject constructor(
     private val fingerprintingScreenSizeRepository: FingerprintingScreenSizeRepository,
 ) : PrivacyFeaturePlugin {

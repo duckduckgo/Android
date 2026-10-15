@@ -18,8 +18,8 @@ package com.duckduckgo.duckchat.impl.contextual
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface DuckChatContextualSessionTimeoutProvider {
@@ -27,7 +27,7 @@ interface DuckChatContextualSessionTimeoutProvider {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealDuckChatContextualSessionTimeoutProvider @Inject constructor(
     private val duckChatInternal: DuckChatInternal,
 ) : DuckChatContextualSessionTimeoutProvider {
@@ -45,7 +45,7 @@ interface DuckChatContextualTimeProvider {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class SystemDuckChatContextualTimeProvider @Inject constructor() : DuckChatContextualTimeProvider {
     override fun currentTimeMillis(): Long = System.currentTimeMillis()
 }

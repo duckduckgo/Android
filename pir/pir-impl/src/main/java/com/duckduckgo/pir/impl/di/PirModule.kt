@@ -57,34 +57,34 @@ import com.duckduckgo.pir.impl.store.RealPirDataStore
 import com.duckduckgo.pir.impl.store.RealPirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.RealPirRepository
 import com.duckduckgo.pir.impl.store.secure.PirSecureStorageDatabaseFactory
-import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class PirModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providePirDataStore(
         sharedPreferencesProvider: SharedPreferencesProvider,
     ): PirDataStore = RealPirDataStore(sharedPreferencesProvider)
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providePirFreemiumDataStore(
         sharedPreferencesProvider: SharedPreferencesProvider,
     ): PirFreemiumDataStore = RealPirFreemiumDataStore(sharedPreferencesProvider)
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providePirRepository(
         pirDataStore: PirDataStore,
         dispatcherProvider: DispatcherProvider,
@@ -142,7 +142,7 @@ class PirModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Named("pir")
     fun providePirMoshi(moshi: Moshi): Moshi {
         return moshi.newBuilder()

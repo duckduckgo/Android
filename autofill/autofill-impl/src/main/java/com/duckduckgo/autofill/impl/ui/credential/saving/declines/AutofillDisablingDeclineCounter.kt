@@ -22,8 +22,8 @@ import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -64,7 +64,7 @@ interface AutofillDeclineCounter {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class AutofillDisablingDeclineCounter @Inject constructor(
     private val autofillPrefsStore: AutofillPrefsStore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,

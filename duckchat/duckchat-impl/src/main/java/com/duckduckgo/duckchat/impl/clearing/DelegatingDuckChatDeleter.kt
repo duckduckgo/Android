@@ -22,14 +22,13 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class, replaces = [RealDuckChatDeleter::class])
 class DelegatingDuckChatDeleter @Inject constructor(
     private val nativeDeleter: NativeDuckChatDeleter,
@@ -48,7 +47,7 @@ class DelegatingDuckChatDeleter @Inject constructor(
         val hasMigrated = store.hasMigrated()
         val deleter = if (hasMigrated && feature.useNativeStorageChatData().isEnabled()) nativeDeleter else webViewDeleter
         logcat { "DuckAI chat deletion: using ${if (deleter === nativeDeleter) "native store" else "WebView"} deleter" }
-        pixels.get().reportNativeStorageDeletionUsed(native = deleter === nativeDeleter)
+        pixels.value.reportNativeStorageDeletionUsed(native = deleter === nativeDeleter)
         if (hasMigrated && deleter != nativeDeleter) {
             // if we have migrated but we're using the WV deleter, we keep all data consistent by deleting in both places
             nativeDeleter.deleteChat(chatId)
@@ -60,7 +59,7 @@ class DelegatingDuckChatDeleter @Inject constructor(
         val hasMigrated = store.hasMigrated()
         val deleter = if (hasMigrated && feature.useNativeStorageChatData().isEnabled()) nativeDeleter else webViewDeleter
         logcat { "DuckAI delete all chats: using ${if (deleter === nativeDeleter) "native store" else "WebView"} deleter" }
-        pixels.get().reportNativeStorageDeletionUsed(native = deleter === nativeDeleter)
+        pixels.value.reportNativeStorageDeletionUsed(native = deleter === nativeDeleter)
         if (hasMigrated && deleter != nativeDeleter) {
             nativeDeleter.deleteAllChats()
         }

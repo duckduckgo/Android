@@ -23,7 +23,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.DeviceInfoMigrator
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,9 +33,9 @@ import javax.inject.Inject
  * Triggers the one-time unified-device-list migration on app foreground for signed-in users.
  * The migrator is idempotent so this stays a cheap no-op once the migration is done or while the feature is disabled.
  */
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class DeviceInfoMigrationObserver @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,

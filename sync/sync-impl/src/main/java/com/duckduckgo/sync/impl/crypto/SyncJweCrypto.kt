@@ -17,7 +17,7 @@
 package com.duckduckgo.sync.impl.crypto
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import io.jsonwebtoken.Jwts
 import logcat.logcat
 import org.json.JSONObject

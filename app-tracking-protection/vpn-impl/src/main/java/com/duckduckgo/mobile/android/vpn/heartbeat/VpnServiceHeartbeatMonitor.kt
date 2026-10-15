@@ -34,11 +34,11 @@ import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
 import dagger.android.AndroidInjection
-import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.IntoSet
+import dev.zacsweers.metro.Provides
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
@@ -46,7 +46,7 @@ import logcat.logcat
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class VpnServiceHeartbeatMonitorModule {
     @Provides

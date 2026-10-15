@@ -134,7 +134,7 @@ class RealSubscriptionsManagerTest {
     private val serpPromo = FakeSerpPromo()
 
     private val subscriptionsFeature: SubscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
-    private val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo, { subscriptionsFeature })
+    private val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo, lazy { subscriptionsFeature })
     private val playBillingManager: PlayBillingManager = mock()
     private val context: Context = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
@@ -174,7 +174,7 @@ class RealSubscriptionsManagerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { subscriptionsFeature },
+            lazy { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,
@@ -972,7 +972,7 @@ class RealSubscriptionsManagerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { subscriptionsFeature },
+            lazy { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,
@@ -1008,7 +1008,7 @@ class RealSubscriptionsManagerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { subscriptionsFeature },
+            lazy { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,
@@ -1048,7 +1048,7 @@ class RealSubscriptionsManagerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { subscriptionsFeature },
+            lazy { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,
@@ -1102,7 +1102,7 @@ class RealSubscriptionsManagerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { subscriptionsFeature },
+            lazy { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,
@@ -1151,7 +1151,7 @@ class RealSubscriptionsManagerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { subscriptionsFeature },
+            lazy { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,
@@ -1195,7 +1195,7 @@ class RealSubscriptionsManagerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { subscriptionsFeature },
+            lazy { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,
@@ -1232,7 +1232,7 @@ class RealSubscriptionsManagerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { subscriptionsFeature },
+            lazy { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,
@@ -1631,7 +1631,7 @@ class RealSubscriptionsManagerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { subscriptionsFeature },
+            lazy { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,
@@ -1684,7 +1684,7 @@ class RealSubscriptionsManagerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { subscriptionsFeature },
+            lazy { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,
@@ -2026,7 +2026,7 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenCanSupportEncryptionIfCannotThenReturnFalse() = runTest {
         val authDataStore: SubscriptionsDataStore = FakeSubscriptionsDataStore(supportEncryption = false)
-        val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo, { subscriptionsFeature })
+        val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo, lazy { subscriptionsFeature })
         whenever(playBillingManager.purchaseState).thenReturn(flowOf())
         subscriptionsManager = RealSubscriptionsManager(
             subscriptionsService,
@@ -2036,7 +2036,7 @@ class RealSubscriptionsManagerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { subscriptionsFeature },
+            lazy { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,

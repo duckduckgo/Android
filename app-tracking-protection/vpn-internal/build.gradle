@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -26,9 +26,6 @@ android {
     lintOptions {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
-    }
-    anvil {
-        generateDaggerFactories = true // default is false
     }
     namespace 'com.duckduckgo.vpn.internal'
 }

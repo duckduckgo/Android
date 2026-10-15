@@ -36,8 +36,8 @@ import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
 import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabShortcutsSettingItemBinding
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsNewTabSettingsViewModel.ViewState
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -87,7 +87,7 @@ class ShortcutsNewTabSettingView @JvmOverloads constructor(
     }
 }
 
-@ContributesMultibinding(scope = ActivityScope::class)
+@ContributesIntoMap(scope = ActivityScope::class)
 @PriorityKey(NewTabPageSectionSettingsPlugin.SHORTCUTS)
 class ShortcutsNewTabSettingViewPlugin @Inject constructor() : NewTabPageSectionSettingsPlugin {
     override val name = NewTabPageSection.SHORTCUTS.name

@@ -42,8 +42,8 @@ import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSet
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSettingView.State.DefaultBlockMalware
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSettingView.State.Idle
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsViewSettingViewModel.Factory
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -129,7 +129,7 @@ class VpnCustomDnsSettingView @JvmOverloads constructor(
     }
 }
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoMap(ActivityScope::class)
 @PriorityKey(CUSTOM_DNS_ITEM_PRIORITY)
 class VpnCustomDnsSettingViewPlugin @Inject constructor() : VpnSettingPlugin {
     override fun getView(context: Context): View {

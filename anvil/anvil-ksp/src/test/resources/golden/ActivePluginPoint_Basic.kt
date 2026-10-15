@@ -16,13 +16,13 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue.FALSE
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue.INTERNAL
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue.TRUE
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import dagger.Binds
-import dagger.Module
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.Binds
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesTo
 import javax.inject.Inject
 import kotlin.String
 import kotlin.Suppress
@@ -93,7 +93,7 @@ public class TestActivePlugin_ActivePluginPoint_RemoteFeature_MultiProcessStore 
   }
 }
 
-@Module
+@BindingContainer
 @ContributesTo(scope = AppScope::class)
 public abstract class TestActivePlugin_PluginPoint_ActiveWrapper_Binding_Module {
   @Binds

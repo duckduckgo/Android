@@ -45,14 +45,14 @@ import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewMo
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command.ReevalutePromo
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityWithSourceParams
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
-@ContributesMultibinding(scope = AppScope::class)
+@ContributesIntoMap(scope = AppScope::class)
 @PriorityKey(PRIORITY_KEY_SYNC_PROMO)
 class SyncPasswordsPromotion @Inject constructor(
     private val syncPromotions: SyncPromotions,

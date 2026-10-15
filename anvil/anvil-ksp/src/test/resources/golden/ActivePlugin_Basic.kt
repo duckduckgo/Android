@@ -13,11 +13,12 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue.FALSE
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue.INTERNAL
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue.TRUE
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 import kotlin.Boolean
 import kotlin.String
@@ -25,9 +26,9 @@ import kotlin.Unit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@ContributesMultibinding(
+@ContributesIntoSet(
   scope = AppScope::class,
-  boundType = TestActivePluginBase::class,
+  binding = binding<TestActivePluginBase>(),
 )
 public class MyPlugin_ActivePlugin @Inject constructor(
   private val activePlugin: MyPlugin,

@@ -32,21 +32,22 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.sync.api.SyncMessagePlugin
 import com.duckduckgo.sync.internal.databinding.TestSyncMessagePluginBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
 import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
-@ContributesMultibinding(scope = ActivityScope::class, boundType = SyncMessagePlugin::class)
+@ContributesIntoSet(scope = ActivityScope::class, binding = binding<SyncMessagePlugin>())
 class TestSyncWarningPlugin @Inject constructor() : SyncMessagePlugin {
     override fun getView(context: Context): View {
         return TestSyncMessageView(context)
     }
 
-    @SingleInstanceIn(scope = AppScope::class)
+    @SingleIn(scope = AppScope::class)
     class StateHolder @Inject constructor() {
         val isEnabled = MutableStateFlow(false)
     }

@@ -18,10 +18,10 @@ package com.duckduckgo.app.pixels.campaign
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class RmfCampaignPixelParamsAdditionPlugin @Inject constructor() : CampaignPixelParamsAdditionPlugin {
     override fun extractCampaign(queryParams: Map<String, String>): String? {
         return queryParams[Pixel.PixelParameter.MESSAGE_SHOWN]

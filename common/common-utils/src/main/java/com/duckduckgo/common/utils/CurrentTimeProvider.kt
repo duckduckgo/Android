@@ -18,7 +18,7 @@ package com.duckduckgo.common.utils
 
 import android.os.SystemClock
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.time.LocalDateTime
 import javax.inject.Inject
 

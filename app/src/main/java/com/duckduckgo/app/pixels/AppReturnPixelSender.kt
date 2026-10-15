@@ -47,14 +47,14 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Provider
 
 /**
  * Fires `m_app_return` on every foreground return, given the [LaunchSourceValues] classification
@@ -67,11 +67,11 @@ interface AppReturnPixelSender {
     fun isLaunchByFireAction(): Boolean
 }
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = AppReturnPixelSender::class)
-@ContributesMultibinding(AppScope::class, boundType = MainProcessLifecycleObserver::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<AppReturnPixelSender>())
+@ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
 class RealAppReturnPixelSender @Inject constructor(
-    private val pixel: Provider<Pixel>,
+    private val pixel: () -> Pixel,
     private val settingsDataStore: SettingsDataStore,
     private val idleThresholdResolver: IdleThresholdResolver,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
@@ -122,8 +122,8 @@ class RealAppReturnPixelSender @Inject constructor(
                 put(Pixel.PixelParameter.PETAL, Pixel.PixelValues.PETAL_RANDOMIZE)
             }
 
-            pixel.get().fire(pixel = AppPixelName.APP_RETURN_COUNT, parameters = params)
-            pixel.get().fire(pixel = AppPixelName.APP_RETURN_DAILY, parameters = params, type = Pixel.PixelType.Daily())
+            pixel().fire(pixel = AppPixelName.APP_RETURN_COUNT, parameters = params)
+            pixel().fire(pixel = AppPixelName.APP_RETURN_DAILY, parameters = params, type = Pixel.PixelType.Daily())
         }
     }
 

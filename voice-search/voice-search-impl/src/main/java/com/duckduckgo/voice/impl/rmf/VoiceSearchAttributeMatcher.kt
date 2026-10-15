@@ -22,7 +22,7 @@ import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.api.JsonToMatchingAttributeMapper
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
 import com.duckduckgo.voice.api.VoiceSearchAvailability
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
 data class VoiceSearchEnabledMatchingAttribute(
@@ -41,7 +41,7 @@ data class VoiceSearchSupportedMatchingAttribute(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class VoiceSearchAttributeMatcherPlugin @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
 ) : AttributeMatcherPlugin {
@@ -60,7 +60,7 @@ class VoiceSearchAttributeMatcherPlugin @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class VoiceSearchJsonMatchingAttributeMapper @Inject constructor() : JsonToMatchingAttributeMapper {
     override fun map(
         key: String,

@@ -32,22 +32,21 @@ import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.impl.mappers.ActionAdapter
 import com.duckduckgo.remote.messaging.impl.mappers.CardItemAdapter
 import com.duckduckgo.remote.messaging.impl.mappers.MessageMapper
-import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import dagger.Lazy
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object RMFMapperModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providesMessageMapper(
         messageAdapter: Lazy<JsonAdapter<RemoteMessage>>,
     ): MessageMapper {
@@ -55,7 +54,7 @@ object RMFMapperModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideMoshiAdapter(
         actionMappers: DaggerSet<MessageActionMapperPlugin>,
     ): JsonAdapter<RemoteMessage> {

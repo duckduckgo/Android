@@ -18,10 +18,10 @@ package com.duckduckgo.app.usage.search
 
 import androidx.room.*
 import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 
 @Dao
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 abstract class SearchCountDao {
 
     @Query("SELECT count FROM search_count LIMIT 1")

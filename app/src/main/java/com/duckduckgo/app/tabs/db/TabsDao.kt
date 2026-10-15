@@ -22,14 +22,14 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.common.utils.swap
 import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import logcat.logcat
 import java.time.LocalDateTime
 import kotlin.math.max
 
 @Dao
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 abstract class TabsDao {
 
     @Query("select * from tabs where deletable is 0 order by position limit 1")

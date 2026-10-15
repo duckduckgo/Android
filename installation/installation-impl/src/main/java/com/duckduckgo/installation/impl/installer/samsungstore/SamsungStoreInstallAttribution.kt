@@ -24,8 +24,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.installation.impl.installer.InstallSourceExtractor
 import com.duckduckgo.referral.api.AppReferrer
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.logcat
@@ -33,9 +33,9 @@ import javax.inject.Inject
 
 internal const val PRIORITY_SAMSUNG_STORE_INSTALL_ATTRIBUTION = 20
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoMap(AppScope::class)
 @PriorityKey(PRIORITY_SAMSUNG_STORE_INSTALL_ATTRIBUTION)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class SamsungStoreInstallAttribution @Inject constructor(
     private val feature: SamsungStoreInstallAttributionFeature,
     private val installSourceExtractor: InstallSourceExtractor,

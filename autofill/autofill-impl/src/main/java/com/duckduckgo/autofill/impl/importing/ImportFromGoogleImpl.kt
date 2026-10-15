@@ -26,7 +26,7 @@ import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookma
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import com.duckduckgo.autofill.api.ImportFromGoogle.ImportFromGoogleResult as PublicResult

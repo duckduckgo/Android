@@ -25,7 +25,7 @@ import com.duckduckgo.app.survey.model.Survey.Status.DONE
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.util.*
 import javax.inject.Inject
 
