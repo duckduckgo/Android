@@ -333,11 +333,8 @@
     <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Kapcsold ki a Sync &amp; Backup funkciót, töröld az összes szinkronizált adatot a szerverről és deaktiváld a helyreállítási kódodat.</string>
     <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Eszköz eltávolítása</string>
     <string name="sync_simplified_settings_turn_off_sheet_title">Kikapcsolod a Sync &amp; Backup funkciót?</string>
-    <string name="sync_simplified_settings_turn_off_sheet_item">Szerveradatok törlése</string>
     <string name="sync_simplified_settings_turn_off_sheet_body">A Sync &amp; Backup funkciót használó összes eszköz le lesz választva, és a szinkronizált adataid törlődnek a szerverről.</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button">Eszköz kikapcsolása</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Kikapcsolás és törlés</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete_all">Minden eszköz kikapcsolása és törlés</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Kikapcsolás és szerveradatok törlése</string>
 
     <!-- Sync settings screen: turn off this device dialog -->
     <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">Eltávolítod a(z) %1$s eszközt a Sync &amp; Backup funkcióból?</string>
@@ -441,6 +438,8 @@
     <string name="sync_simplified_edit_device_sync_this_device_item">Eszköz szinkronizálása</string>
     <string name="sync_simplified_edit_device_remove_notice_this_device">Ez az eszköz többé nem fog hozzáférni a szinkronizált adataidhoz, ha eltávolítod.</string>
     <string name="sync_simplified_edit_device_remove_notice_another_device">Ez az eszköz többé nem fog hozzáférni a szinkronizált adataidhoz, ha ezt kikapcsolod.</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">A(z) „%1$s” többé nem fog hozzáférni a szinkronizált adataidhoz a többi eszközön, ha ezt kikapcsolod.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">A(z) „%1$s” többé nem fog hozzáférni a szinkronizált adataidhoz a többi eszközön.</string>
 
     <!-- Edit Device screen: edit name dialog -->
     <string name="sync_simplified_edit_device_edit_name_dialog_title">Név szerkesztése</string>
