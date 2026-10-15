@@ -221,8 +221,19 @@ class AuthJwtValidatorImplTest {
             "aZHFrTkR5TDQ3TURPUUpINWhXSEFKNHc0VTBESnFYeXVEeGV4MDVycjdxdVU6ODMyM2RhNzItY2ZjZS00MjhlLTlkMDUtYWYxNDg3NTM2YzgxIn0.3rA2bAC-Rh-vwe9bSQTEj" +
             "-jgHM1Dtx9PE7Cv8GellHw1wqIrLpRifRDJVYiDZ1XuHzdPfxpedCh9AOAN-mcL3w"
 
-        const val JWK_SET = """{keys=[{kty=EC, crv=P-256, kid=d3278574-6492-46ff-8d65-da95bb291cc4, x=AM2J0W8piRoFBj17tvHcVtusFs6QQze9N_hGzBnpWZiv, y=
-            |AJTXf8ndxPVg7vocTIPI3i23LeRCpvr5UhYOD86FOD86}]}"""
+        const val JWK_SET = """
+            {
+                "keys": [
+                    {
+                        "crv": "P-256",
+                        "kid": "d3278574-6492-46ff-8d65-da95bb291cc4",
+                        "kty": "EC",
+                        "x": "AM2J0W8piRoFBj17tvHcVtusFs6QQze9N_hGzBnpWZiv",
+                        "y": "AJTXf8ndxPVg7vocTIPI3i23LeRCpvr5UhYOD86FOD86"
+                    }
+                ]
+            }
+        """
     }
 
     private object FakeCredentialsWithIncorrectAudience {
@@ -240,8 +251,19 @@ class AuthJwtValidatorImplTest {
             "XbXBJYVpkcWtORHlMNDdNRE9RSkg1aFdIQUo0dzRVMERKcVh5dUR4ZXgwNXJyN3F1VTo4MzIzZGE3Mi1jZmNlLTQyOGUtOWQwNS1hZjE0ODc1MzZjODEifQ.A1EP6hwV8Xusdf" +
             "d8hWKTADcurX3Y5SON5J98t4x9FyGDzu_fawoZLq9jmqXy0EDDP27iXtLt919QpPzFwCRo0w"
 
-        const val JWK_SET = """{keys=[{kty=EC, crv=P-256, kid=342a1b99-b551-4ec0-975c-984c40ad3073, x=a0csfZFP45WHyCRW8IhNkmbtvgT4I5afXFuuAtnV75M, y=A
-            |OMBpLXT0WIPmq1zME1NFONefBtwtXNJzM4mQaZDNXrO}]}"""
+        const val JWK_SET = """
+            {
+                "keys": [
+                    {
+                        "crv": "P-256",
+                        "kid": "342a1b99-b551-4ec0-975c-984c40ad3073",
+                        "kty": "EC",
+                        "x": "a0csfZFP45WHyCRW8IhNkmbtvgT4I5afXFuuAtnV75M",
+                        "y": "AOMBpLXT0WIPmq1zME1NFONefBtwtXNJzM4mQaZDNXrO"
+                    }
+                ]
+            }
+        """
     }
 
     private object FakeCredentialsWithIncorrectScope {
@@ -259,7 +281,18 @@ class AuthJwtValidatorImplTest {
             "xa05EeUw0N01ET1FKSDVoV0hBSjR3NFUwREpxWHl1RHhleDA1cnI3cXVVOjgzMjNkYTcyLWNmY2UtNDI4ZS05ZDA1LWFmMTQ4NzUzNmM4MSJ9.OEKrHqpgc6PVujwIHoj9OoDF" +
             "H-kRT79e0NE5eTmDwvnoHglweJigsKuWFxN6FoTfAKvC7tMPjy3EM3peYIRHXg"
 
-        const val JWK_SET = """{keys=[{kty=EC, crv=P-256, kid=3716729c-3135-4c92-88c4-fb13b9a0929c, x=HFzQVBbfBdeOYsMdRSx_3MxbZowmDG1OwyiFBYRubgE, y=e
-            |LlCqUJEVGgc0K7mjUo3Wk52C9mgRllnOfG_S6KSEck}]}"""
+        const val JWK_SET = """
+            {
+                "keys": [
+                    {
+                        "crv": "P-256",
+                        "kid": "3716729c-3135-4c92-88c4-fb13b9a0929c",
+                        "kty": "EC",
+                        "x": "HFzQVBbfBdeOYsMdRSx_3MxbZowmDG1OwyiFBYRubgE",
+                        "y": "eLlCqUJEVGgc0K7mjUo3Wk52C9mgRllnOfG_S6KSEck"
+                    }
+                ]
+            }
+        """
     }
 }
