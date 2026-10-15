@@ -42,7 +42,7 @@ object TrackerDetectionDatabaseModule {
             TrackerDetectionDatabase::class.java,
             "tracker_detection.db",
             config = RoomDatabaseConfig(
-                // Written from both the main and :pir processes; RoomDatabaseConfig defaults this to false.
+                // Written from both the main and :pir processes.
                 enableMultiInstanceInvalidation = true,
                 // Matches app.db, which these tables lived in and which is also shared with :pir.
                 journalMode = RoomDatabase.JournalMode.TRUNCATE,
