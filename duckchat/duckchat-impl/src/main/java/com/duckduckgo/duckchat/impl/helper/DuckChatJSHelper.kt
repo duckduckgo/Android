@@ -45,6 +45,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.messaging.sync.isSyncable
 import com.duckduckgo.duckchat.impl.models.AIChatAttachmentUsage
+import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
@@ -136,6 +137,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
     private val duckAiSessionCallback: DuckAiSessionCallback,
     private val termsConsent: DuckAiTermsConsent,
+    private val chatStateStore: ChatStateStore,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -207,9 +209,11 @@ class RealDuckChatJSHelper @Inject constructor(
             }
 
             METHOD_RESPONSE_STATE -> {
-                ChatState
-                    .fromValue(data?.optString("status"))
-                    ?.let { status -> duckChat.updateChatState(status) }
+                if (tabId.isNotEmpty()) {
+                    ChatState
+                        .fromValue(data?.optString("status"))
+                        ?.let { status -> chatStateStore.update(tabId, status) }
+                }
                 data?.optJSONObject("attachments")?.let { attachments ->
                     val usage = AIChatAttachmentUsage(
                         imagesUsed = attachments.optInt("imagesUsed", 0),
@@ -223,12 +227,12 @@ class RealDuckChatJSHelper @Inject constructor(
             }
 
             METHOD_HIDE_CHAT_INPUT -> {
-                duckChat.updateChatState(HIDE)
+                if (tabId.isNotEmpty()) chatStateStore.update(tabId, HIDE)
                 null
             }
 
             METHOD_SHOW_CHAT_INPUT -> {
-                duckChat.updateChatState(SHOW)
+                if (tabId.isNotEmpty()) chatStateStore.update(tabId, SHOW)
                 null
             }
             METHOD_DISABLE_CHAT_INPUT -> {

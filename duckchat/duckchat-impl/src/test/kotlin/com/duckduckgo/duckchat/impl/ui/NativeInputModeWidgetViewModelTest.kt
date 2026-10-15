@@ -57,6 +57,7 @@ import com.duckduckgo.duckchat.impl.models.ReasoningEffort
 import com.duckduckgo.duckchat.impl.models.ReasoningEffortAccess
 import com.duckduckgo.duckchat.impl.models.ReasoningMode
 import com.duckduckgo.duckchat.impl.models.Tool
+import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
@@ -145,10 +146,12 @@ class NativeInputModeWidgetViewModelTest {
     private val browserModeStateHolder: BrowserModeStateHolder = mock<BrowserModeStateHolder>().also {
         whenever(it.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
     }
+    private val chatStateStore = ChatStateStore()
     private val realNativeInputStateStore = RealNativeInputStateStore(
         dagger.Lazy { tabRepositoryProvider },
         browserModeStateHolder,
         RealTextSelectionRepository(dagger.Lazy { mock() }, mock()),
+        chatStateStore,
     )
     private val nativeInputStatePublisher: NativeInputStatePublisher = realNativeInputStateStore
     private val nativeInputStateProvider: NativeInputStateProvider = realNativeInputStateStore
@@ -156,7 +159,6 @@ class NativeInputModeWidgetViewModelTest {
     private val showSettingsFlow = MutableStateFlow(false)
     private val duckChatUserEnabledFlow = MutableStateFlow(false)
     private val inputScreenUserSettingFlow = MutableStateFlow(false)
-    private val chatStateFlow = MutableStateFlow(ChatState.READY)
     private val chatSuggestionsUserEnabledFlow = MutableStateFlow(true)
     private val entitlementsFlow = MutableStateFlow<List<Product>>(emptyList())
     private val modelStateFlow = MutableStateFlow(ModelState())
@@ -178,7 +180,6 @@ class NativeInputModeWidgetViewModelTest {
         whenever(duckChatInternal.observeEnableDuckChatUserSetting()).thenReturn(duckChatUserEnabledFlow)
         whenever(duckChatInternal.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenUserSettingFlow)
         whenever(duckChatInternal.observeChatSuggestionsUserSettingEnabled()).thenReturn(chatSuggestionsUserEnabledFlow)
-        whenever(duckChatInternal.chatState).thenReturn(chatStateFlow)
         whenever(duckChatInternal.showModelPickerEvents).thenReturn(showModelPickerEvents)
         whenever(duckChatInternal.editPromptRequests).thenReturn(editPromptRequestsFlow)
         whenever(subscriptions.getEntitlementStatus()).thenReturn(entitlementsFlow)
@@ -256,6 +257,7 @@ class NativeInputModeWidgetViewModelTest {
             termsRepository = termsRepository,
             duckChatFeature = duckChatFeature,
             appCoroutineScope = TestScope(coroutineRule.testDispatcher),
+            chatStateStore = chatStateStore,
         )
     }
 
@@ -697,51 +699,56 @@ class NativeInputModeWidgetViewModelTest {
 
     @Test
     fun `state isChatStreaming is true when chatState is STREAMING`() = runTest {
-        chatStateFlow.value = ChatState.STREAMING
+        chatStateStore.update("test-tab", ChatState.STREAMING)
         assertTrue(testee.state.firstOrNull()!!.isChatStreaming)
     }
 
     @Test
     fun `state isChatStreaming is true when chatState is LOADING`() = runTest {
-        chatStateFlow.value = ChatState.LOADING
+        chatStateStore.update("test-tab", ChatState.LOADING)
         assertTrue(testee.state.firstOrNull()!!.isChatStreaming)
     }
 
     @Test
     fun `state isChatStreaming is false when chatState is READY`() = runTest {
-        chatStateFlow.value = ChatState.READY
+        chatStateStore.update("test-tab", ChatState.READY)
         assertFalse(testee.state.firstOrNull()!!.isChatStreaming)
     }
 
     @Test
     fun `state isChatStreaming is false when chatState is HIDE`() = runTest {
-        chatStateFlow.value = ChatState.HIDE
+        chatStateStore.update("test-tab", ChatState.HIDE)
         assertFalse(testee.state.firstOrNull()!!.isChatStreaming)
     }
 
     @Test
     fun `state isChatStreaming is false for the edit widget even when chatState is STREAMING`() = runTest {
-        // chatState is global, not scoped to a tab — a real chat streaming on another tab must not
-        // leak into the edit widget's own synthetic-key state.
-        chatStateFlow.value = ChatState.STREAMING
+        chatStateStore.update("test-tab", ChatState.STREAMING)
         testee.configureForEdit(sessionId = "session-1")
 
         assertFalse(testee.state.firstOrNull()!!.isChatStreaming)
     }
 
     @Test
+    fun `state isChatStreaming ignores another tab streaming`() = runTest {
+        chatStateStore.update("other-tab", ChatState.STREAMING)
+
+        assertFalse(testee.state.firstOrNull()!!.isChatStreaming)
+    }
+
+    @Test
     fun whenChatStateFlowEmitsThenViewModelChatStateMirrorsIt() = runTest {
-        chatStateFlow.value = ChatState.STREAMING
+        chatStateStore.update("test-tab", ChatState.STREAMING)
 
         assertEquals(ChatState.STREAMING, testee.chatState.firstOrNull()!!)
     }
 
     @Test
     fun whenChatStateFlowFlipsThenSubsequentValueObserved() = runTest {
-        chatStateFlow.value = ChatState.LOADING
+        chatStateStore.update("test-tab", ChatState.LOADING)
         assertEquals(ChatState.LOADING, testee.chatState.firstOrNull()!!)
 
-        chatStateFlow.value = ChatState.HIDE
+        chatStateStore.update("test-tab", ChatState.HIDE)
 
         assertEquals(ChatState.HIDE, testee.chatState.firstOrNull()!!)
     }

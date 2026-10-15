@@ -44,6 +44,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KE
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_GET_PAGE_CONTEXT
+import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
@@ -123,6 +124,8 @@ class RealDuckChatJSHelperTest {
     private val mockBrowserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
     private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
     private val mockTermsConsent: DuckAiTermsConsent = mock()
+    private val chatStateStore = ChatStateStore()
+
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
@@ -144,6 +147,7 @@ class RealDuckChatJSHelperTest {
         browserInteractionsPlugins = mockBrowserInteractionsPlugins,
         duckAiSessionCallback = mockDuckAiSessionCallback,
         termsConsent = mockTermsConsent,
+        chatStateStore = chatStateStore,
     )
 
     init {
@@ -1370,10 +1374,11 @@ class RealDuckChatJSHelperTest {
                 id,
                 data,
                 pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
             ),
         )
 
-        verify(mockDuckChat).updateChatState(ChatState.START_STREAM_NEW_PROMPT)
+        assertEquals(ChatState.START_STREAM_NEW_PROMPT, chatStateStore.stateFor("tab-1").value)
     }
 
     @Test
@@ -1390,10 +1395,11 @@ class RealDuckChatJSHelperTest {
                 id,
                 data,
                 pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
             ),
         )
 
-        verify(mockDuckChat).updateChatState(ChatState.LOADING)
+        assertEquals(ChatState.LOADING, chatStateStore.stateFor("tab-1").value)
     }
 
     @Test
@@ -1410,10 +1416,11 @@ class RealDuckChatJSHelperTest {
                 id,
                 data,
                 pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
             ),
         )
 
-        verify(mockDuckChat).updateChatState(ChatState.STREAMING)
+        assertEquals(ChatState.STREAMING, chatStateStore.stateFor("tab-1").value)
     }
 
     @Test
@@ -1430,10 +1437,11 @@ class RealDuckChatJSHelperTest {
                 id,
                 data,
                 pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
             ),
         )
 
-        verify(mockDuckChat).updateChatState(ChatState.ERROR)
+        assertEquals(ChatState.ERROR, chatStateStore.stateFor("tab-1").value)
     }
 
     @Test
@@ -1450,10 +1458,11 @@ class RealDuckChatJSHelperTest {
                 id,
                 data,
                 pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
             ),
         )
 
-        verify(mockDuckChat).updateChatState(ChatState.READY)
+        assertEquals(ChatState.READY, chatStateStore.stateFor("tab-1").value)
     }
 
     @Test
@@ -1470,14 +1479,16 @@ class RealDuckChatJSHelperTest {
                 id,
                 data,
                 pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
             ),
         )
 
-        verify(mockDuckChat).updateChatState(ChatState.BLOCKED)
+        assertEquals(ChatState.BLOCKED, chatStateStore.stateFor("tab-1").value)
     }
 
     @Test
     fun whenHideChatInputThenUpdateChatStateWithHide() = runTest {
+        chatStateStore.update("tab-1", ChatState.SHOW)
         val featureName = "aiChat"
         val method = "hideChatInput"
         val id = "123"
@@ -1489,10 +1500,11 @@ class RealDuckChatJSHelperTest {
                 id,
                 null,
                 pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
             ),
         )
 
-        verify(mockDuckChat).updateChatState(ChatState.HIDE)
+        assertEquals(ChatState.HIDE, chatStateStore.stateFor("tab-1").value)
     }
 
     @Test
@@ -1508,10 +1520,30 @@ class RealDuckChatJSHelperTest {
                 id,
                 null,
                 pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
             ),
         )
 
-        verify(mockDuckChat).updateChatState(ChatState.SHOW)
+        assertEquals(ChatState.SHOW, chatStateStore.stateFor("tab-1").value)
+    }
+
+    @Test
+    fun whenResponseStateReceivedThenOtherTabsAreUnaffected() = runTest {
+        val data = JSONObject(mapOf("status" to "streaming"))
+
+        testee.processJsCallbackMessage("aiChat", "responseState", "123", data, tabId = "tab-1")
+
+        assertEquals(ChatState.STREAMING, chatStateStore.stateFor("tab-1").value)
+        assertEquals(ChatState.HIDE, chatStateStore.stateFor("tab-2").value)
+    }
+
+    @Test
+    fun whenResponseStateReceivedWithoutTabIdThenItIsDropped() = runTest {
+        val data = JSONObject(mapOf("status" to "streaming"))
+
+        testee.processJsCallbackMessage("aiChat", "responseState", "123", data)
+
+        assertEquals(ChatState.HIDE, chatStateStore.stateFor("").value)
     }
 
     @Test

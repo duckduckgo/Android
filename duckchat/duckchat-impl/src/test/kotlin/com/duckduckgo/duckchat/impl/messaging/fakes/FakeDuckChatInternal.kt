@@ -22,7 +22,6 @@ import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
-import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.EditPromptRequest
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
@@ -47,7 +46,6 @@ class FakeDuckChatInternal(
     private val showInAddressBarUserSetting = MutableStateFlow(false)
     private val showInVoiceSearchUserSetting = MutableStateFlow(false)
     private val showInVoiceChatUserSetting = MutableStateFlow(false)
-    private val _chatState = MutableStateFlow(ChatState.READY)
     private val inputScreenUserSettingEnabled = MutableStateFlow(false)
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
     private val nativeInputFieldUserSettingEnabled = MutableStateFlow(false)
@@ -160,12 +158,6 @@ class FakeDuckChatInternal(
     override fun isVoiceSearchEntryPointEnabled(): Boolean = false
 
     override fun isDuckChatUserEnabled(): Boolean = enableDuckChatUserSetting.value
-
-    override fun updateChatState(state: ChatState) {
-        _chatState.value = state
-    }
-
-    override val chatState: StateFlow<ChatState> = _chatState
 
     private val _showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
 

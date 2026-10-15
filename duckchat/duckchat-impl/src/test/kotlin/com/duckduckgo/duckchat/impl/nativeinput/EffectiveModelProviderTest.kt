@@ -63,6 +63,7 @@ class EffectiveModelProviderTest {
         dagger.Lazy { tabRepositoryProvider },
         browserModeStateHolder,
         RealTextSelectionRepository(dagger.Lazy { mock() }, mock()),
+        ChatStateStore(),
     )
     private val modelStateFlow = MutableStateFlow(
         ModelState(

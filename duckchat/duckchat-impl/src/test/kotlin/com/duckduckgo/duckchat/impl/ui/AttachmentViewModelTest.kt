@@ -36,6 +36,7 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.FileLimits
 import com.duckduckgo.duckchat.impl.models.ImageLimits
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ConversationFileUsage
@@ -127,6 +128,7 @@ class AttachmentViewModelTest {
         dagger.Lazy { tabRepositoryProvider },
         browserModeStateHolder,
         RealTextSelectionRepository(dagger.Lazy { mock() }, mock()),
+        ChatStateStore(),
     )
 
     private lateinit var viewModel: AttachmentViewModel
