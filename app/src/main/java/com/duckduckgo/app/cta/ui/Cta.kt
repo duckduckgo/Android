@@ -36,6 +36,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
@@ -1328,11 +1329,36 @@ class BrokenSitePromptDialogCta : Cta {
         onDismissCtaClicked: () -> Unit,
         onCtaShown: () -> Unit,
     ) {
-        val daxDialog = binding.includeBrokenSitePromptDialog
-        daxDialog.root.show()
+        binding.includeBrokenSitePromptDialog.root.show()
+        stretchButtonsWhenTheyWrap(binding)
         binding.includeBrokenSitePromptDialog.reportButton.setOnClickListener { onReportBrokenSiteClicked.invoke() }
         binding.includeBrokenSitePromptDialog.dismissButton.setOnClickListener { onDismissCtaClicked.invoke() }
         onCtaShown()
+    }
+
+    fun onOrientationChanged(binding: FragmentBrowserTabBinding) {
+        stretchButtonsWhenTheyWrap(binding)
+    }
+
+    private fun stretchButtonsWhenTheyWrap(binding: FragmentBrowserTabBinding) {
+        val daxDialog = binding.includeBrokenSitePromptDialog
+        val buttons = listOf(daxDialog.reportButton, daxDialog.dismissButton)
+        buttons.forEach { button ->
+            button.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                width = ConstraintLayout.LayoutParams.WRAP_CONTENT
+            }
+        }
+        daxDialog.root.doOnLayout {
+            if (daxDialog.dismissButton.top > daxDialog.reportButton.top) {
+                buttons.forEach { button ->
+                    button.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        width = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
+                        matchConstraintDefaultWidth = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT_PERCENT
+                        matchConstraintPercentWidth = 1f
+                    }
+                }
+            }
+        }
     }
 }
 
