@@ -163,6 +163,28 @@ class RealEventHubPixelManagerTest {
     }
 
     @Test
+    fun `handleWebEvent uses the arrival time, not the time the event is processed`() {
+        val queuedDispatcher = StandardTestDispatcher(coroutineTestRule.testScope.testScheduler)
+        val queuedManager = RealEventHubPixelManager(
+            repository,
+            pixel,
+            timeProvider,
+            coroutineTestRule.testScope,
+            queuedDispatcher,
+            eventHubFeature,
+        )
+        val periodEnd = 100_000L
+        stubPixelStates(pixelState("webTelemetry_testPixel1", mapOf("count" to 0), periodEnd = periodEnd))
+
+        timeProvider.time = periodEnd - 1
+        queuedManager.handleWebEvent(webEventData("test"), "")
+        timeProvider.time = periodEnd + 1
+        coroutineTestRule.testScope.testScheduler.runCurrent()
+
+        verify(repository).savePixelState(any())
+    }
+
+    @Test
     fun `handleWebEvent can increment multiple times below max bucket`() {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
         stubPixelStates(state)
@@ -284,7 +306,7 @@ class RealEventHubPixelManagerTest {
         verify(repository, never()).savePixelState(any())
     }
 
-    // --- deduplication (end-to-end cases are in EventHubDeduplicationTest) ---
+    // --- deduplication (spec cases are in EventHubDeduplicationSpecTest) ---
 
     @Test
     fun `same page same source - second event is deduplicated`() {
@@ -395,6 +417,41 @@ class RealEventHubPixelManagerTest {
 
         manager.handleWebEvent(webEventData("test"), "tab1")
         verify(repository, never()).savePixelState(any())
+    }
+
+    @Test
+    fun `dedup survives a period boundary`() {
+        manager.onNavigationStarted("tab1", "https://example.com/page1")
+        stubPixelStates(pixelState("webTelemetry_testPixel1", mapOf("count" to 0), periodStart = 0L, periodEnd = 1000L))
+        timeProvider.time = 500L
+        manager.handleWebEvent(webEventData("test"), "tab1")
+        verify(repository).savePixelState(any())
+
+        org.mockito.Mockito.reset(repository)
+        stubPixelStates(pixelState("webTelemetry_testPixel1", mapOf("count" to 0), periodStart = 1000L, periodEnd = 2000L))
+        timeProvider.time = 1500L
+        manager.handleWebEvent(webEventData("test"), "tab1")
+
+        verify(repository, never()).savePixelState(any())
+    }
+
+    @Test
+    fun `dedup still resets on navigation after a period boundary`() {
+        manager.onNavigationStarted("tab1", "https://example.com/page1")
+        stubPixelStates(pixelState("webTelemetry_testPixel1", mapOf("count" to 0), periodStart = 0L, periodEnd = 1000L))
+        timeProvider.time = 500L
+        manager.handleWebEvent(webEventData("test"), "tab1")
+        verify(repository).savePixelState(any())
+
+        org.mockito.Mockito.reset(repository)
+        stubPixelStates(pixelState("webTelemetry_testPixel1", mapOf("count" to 0), periodStart = 1000L, periodEnd = 2000L))
+        timeProvider.time = 1500L
+        manager.onNavigationStarted("tab1", "https://example.com/page2")
+        manager.handleWebEvent(webEventData("test"), "tab1")
+
+        val captor = argumentCaptor<PixelState>()
+        verify(repository).savePixelState(captor.capture())
+        assertEquals(1, captor.firstValue.params.getValue("count").value)
     }
 
     @Test

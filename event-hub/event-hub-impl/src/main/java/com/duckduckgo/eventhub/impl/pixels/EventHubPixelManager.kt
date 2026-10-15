@@ -126,9 +126,10 @@ class RealEventHubPixelManager @Inject constructor(
             return
         }
 
-        appCoroutineScope.launch(pixelDispatcher) {
-            val nowMillis = timeProvider.currentTimeMillis()
+        // Sampled on arrival: an event that arrives just before a period ends belongs to that period, even if it's processed after
+        val nowMillis = timeProvider.currentTimeMillis()
 
+        appCoroutineScope.launch(pixelDispatcher) {
             for (pixelState in repository.getAllPixelStates()) {
                 if (nowMillis >= pixelState.periodEndMillis) continue
 

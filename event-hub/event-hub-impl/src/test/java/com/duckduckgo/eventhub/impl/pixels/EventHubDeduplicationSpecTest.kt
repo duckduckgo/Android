@@ -38,11 +38,15 @@ import org.mockito.kotlin.verifyNoMoreInteractions
 import java.util.concurrent.TimeUnit
 
 /**
- * De-duplication end to end: events go through [RealEventHubPixelManager] and are observed through the counter pixel fired
- * when its period ends.
+ * Android's coverage of the cross-platform de-duplication specification
+ * (`docs/event-hub/tests/deduplication.md` in `duckduckgo/ddg-workflow`). Each case ID from that document leads the test
+ * name so coverage is greppable and a failure names the spec case. Events go through [RealEventHubPixelManager] and are
+ * observed through the spec's counter pixel, fired when its period ends.
+ *
+ * D-NAT-1 is not applicable: Android has no native (tab-less) event stream.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class EventHubDeduplicationTest {
+class EventHubDeduplicationSpecTest {
 
     @get:Rule
     val coroutineTestRule = CoroutineTestRule(StandardTestDispatcher())
@@ -71,7 +75,7 @@ class EventHubDeduplicationTest {
     }
 
     @Test
-    fun `repeated occurrences on one page are delivered once`() {
+    fun `D-DEL-1 repeated occurrences on one page are delivered once`() {
         manager.onNavigationStarted(TAB_1, URL_A)
         repeat(3) { probe(TAB_1, reason("overlay")) }
 
@@ -79,7 +83,7 @@ class EventHubDeduplicationTest {
     }
 
     @Test
-    fun `the payload is part of the key`() {
+    fun `D-DEL-2 the payload is part of the key`() {
         manager.onNavigationStarted(TAB_1, URL_A)
         probe(TAB_1, reason("overlay"))
         probe(TAB_1, reason("redirect"))
@@ -87,10 +91,10 @@ class EventHubDeduplicationTest {
         assertCounterReports("2")
     }
 
-    // The config only counts probeDetected, so this can't tell whether the type is part of the key. That is covered by
+    // The spec fixture only counts probeDetected, so this can't tell whether the type is part of the key. That is covered by
     // WebEventDeduplicatorTest and RealEventHubPixelManagerTest.
     @Test
-    fun `event types de-duplicate independently`() {
+    fun `D-DEL-3 event types de-duplicate independently`() {
         manager.onNavigationStarted(TAB_1, URL_A)
         probe(TAB_1, reason("overlay"))
         event("otherDetected", TAB_1, reason("overlay"))
@@ -100,7 +104,7 @@ class EventHubDeduplicationTest {
     }
 
     @Test
-    fun `every handler observes the same single delivery`() {
+    fun `D-DEL-4 every handler observes the same single delivery`() {
         manager.onNavigationStarted(TAB_1, URL_A)
         probe(TAB_1, reason("overlay"))
         probe(TAB_1, reason("overlay"))
@@ -111,7 +115,7 @@ class EventHubDeduplicationTest {
     // The JVM org.json keeps members in a HashMap, so both payloads iterate in the same order here. Android's keeps insertion
     // order, which is why keys are sorted; CanonicalJsonTest checks that sorting directly.
     @Test
-    fun `payload member order does not change the key`() {
+    fun `D-DEL-5 payload member order does not change the key`() {
         manager.onNavigationStarted(TAB_1, URL_A)
         probe(TAB_1, JSONObject("""{"reason": "overlay", "stage": 1}"""))
         probe(TAB_1, JSONObject("""{"stage": 1, "reason": "overlay"}"""))
@@ -120,7 +124,7 @@ class EventHubDeduplicationTest {
     }
 
     @Test
-    fun `an omitted payload and an empty payload are one key`() {
+    fun `D-DEL-6 an omitted payload and an empty payload are one key`() {
         manager.onNavigationStarted(TAB_1, URL_A)
         probe(TAB_1, data = null)
         probe(TAB_1, JSONObject())
@@ -129,7 +133,7 @@ class EventHubDeduplicationTest {
     }
 
     @Test
-    fun `navigating to a different URL makes the next occurrence deliverable`() {
+    fun `D-NAV-1 navigating to a different URL makes the next occurrence deliverable`() {
         manager.onNavigationStarted(TAB_1, URL_A)
         probe(TAB_1, reason("overlay"))
         manager.onNavigationStarted(TAB_1, URL_B)
@@ -141,7 +145,7 @@ class EventHubDeduplicationTest {
     }
 
     @Test
-    fun `a same-URL reload does not start a new page`() {
+    fun `D-NAV-2 a same-URL reload does not start a new page`() {
         manager.onNavigationStarted(TAB_1, URL_A)
         probe(TAB_1, reason("overlay"))
         manager.onNavigationStarted(TAB_1, URL_A)
@@ -151,7 +155,7 @@ class EventHubDeduplicationTest {
     }
 
     @Test
-    fun `returning to a previously seen URL delivers again`() {
+    fun `D-NAV-3 returning to a previously seen URL delivers again`() {
         manager.onNavigationStarted(TAB_1, URL_A)
         probe(TAB_1, reason("overlay"))
         manager.onNavigationStarted(TAB_1, URL_B)
@@ -162,7 +166,7 @@ class EventHubDeduplicationTest {
     }
 
     @Test
-    fun `separate tabs are independent`() {
+    fun `D-NAV-4 separate tabs are independent`() {
         listOf(TAB_1, TAB_2, TAB_3).forEach { tab ->
             manager.onNavigationStarted(tab, URL_A)
             probe(tab, reason("overlay"))
