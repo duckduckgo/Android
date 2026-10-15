@@ -266,7 +266,10 @@ class SyncActivityViewModel @Inject constructor(
         data object AskDeleteServerData : Command()
         data object CheckIfUserHasStoragePermission : Command()
         data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
-        data class AskEditDevice(val device: ConnectedDevice) : Command()
+        data class AskEditDevice(
+            val device: ConnectedDevice,
+            val isImprovedSyncFlow: Boolean,
+        ) : Command()
         data class ShowError(
             @StringRes val message: Int,
             val reason: String = "",
@@ -556,7 +559,7 @@ class SyncActivityViewModel @Inject constructor(
     fun onEditDeviceClicked(device: ConnectedDevice) {
         viewModelScope.launch {
             withAuthentication {
-                command.send(AskEditDevice(device))
+                command.send(AskEditDevice(device, isImprovedSyncFlow()))
             }
         }
     }
