@@ -1031,8 +1031,12 @@ class RealPirDashboardInitialScanStateProviderTest {
         // Given - a lapsed subscriber: the only unscanned job is for a broker they can no longer scan
         whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_ONLY)))
         whenever(mockPirFreeScanBrokerFilter.freeScannableBrokerNames()).thenReturn(setOf("FreeBroker"))
-        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords())
-            .thenReturn(listOf(createScanJobRecord("GatedBroker", 1L, ScanJobStatus.NOT_EXECUTED, 0L)))
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(
+            listOf(
+                createScanJobRecord("FreeBroker", 1L, ScanJobStatus.NO_MATCH_FOUND, 1000L),
+                createScanJobRecord("GatedBroker", 1L, ScanJobStatus.NOT_EXECUTED, 0L),
+            ),
+        )
 
         // When / Then
         assertFalse(testee.shouldRestartInitialScan())
@@ -1130,6 +1134,20 @@ class RealPirDashboardInitialScanStateProviderTest {
     fun whenScanOnlyUserHasNoScanJobForFreeBrokerThenShouldRestartScan() = runTest {
         // Given - a broker data update added a free broker after the free scan created its jobs
         whenever(mockPirFreemiumDataStore.didActivate).thenReturn(true)
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_ONLY)))
+        whenever(mockPirFreeScanBrokerFilter.freeScannableBrokerNames()).thenReturn(setOf("FreeBroker", "NewFreeBroker"))
+        setupBrokersWithScannableSteps(listOf(createBroker("FreeBroker"), createBroker("NewFreeBroker")))
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords())
+            .thenReturn(listOf(createScanJobRecord("FreeBroker", 1L, ScanJobStatus.NO_MATCH_FOUND, 1000L)))
+
+        // When / Then
+        assertTrue(testee.shouldRestartInitialScan())
+    }
+
+    @Test
+    fun whenLapsedSubscriberWhoNeverUsedFreeScanHasNoScanJobForFreeBrokerThenShouldRestartScan() = runTest {
+        // Given - a broker added after the last paid scan, and the scan-only fallback leaves no worker to scan it
+        whenever(mockPirFreemiumDataStore.didActivate).thenReturn(false)
         whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_ONLY)))
         whenever(mockPirFreeScanBrokerFilter.freeScannableBrokerNames()).thenReturn(setOf("FreeBroker", "NewFreeBroker"))
         setupBrokersWithScannableSteps(listOf(createBroker("FreeBroker"), createBroker("NewFreeBroker")))

@@ -198,19 +198,17 @@ class RealPirDashboardInitialScanStateProvider @Inject constructor(
      * Brokers can count toward the dashboard total with no scan job to resume: a free scan creates none for
      * subscription-gated brokers, which a free user who subscribes can then scan, and a broker data update can add brokers
      * after the scan created its jobs. A free user's scan worker is retired once their initial scan finishes, so nothing
-     * else ever scans those brokers. A paid user who never ran a free scan is skipped, as their scheduled scan picks up
-     * added brokers. A profile with no jobs at all is skipped, as the scan that creates its jobs creates them all at once
-     * and is about to run.
+     * else ever scans those brokers, and a lapsed subscriber's worker goes the same way once they fall back to scan-only.
+     * A paid user who never ran a free scan is skipped, as their scheduled scan picks up added brokers. A profile with no
+     * jobs at all is skipped, as the scan that creates its jobs creates them all at once and is about to run.
      */
     private suspend fun hasScannableBrokersWithoutScanJobs(
         scanJobs: List<ScanJobRecord>,
         scannableBrokerNames: Set<String>,
     ): Boolean {
-        if (!pirFreemiumDataStore.didActivate) {
-            return false
-        }
+        val runMode = pirWorkHandler.canRunPir().firstOrNull().runModeOrNull ?: return false
 
-        if (pirWorkHandler.canRunPir().firstOrNull().runModeOrNull == null) {
+        if (runMode == PirRunMode.SCAN_AND_OPT_OUT && !pirFreemiumDataStore.didActivate) {
             return false
         }
 
