@@ -452,6 +452,7 @@ class SyncActivity : DuckDuckGoActivity() {
                     SyncThisDeviceContract.Input(
                         launchSource = launchSource,
                         isAuthRequired = command.isAuthRequired,
+                        isImprovedSyncFlow = command.isImprovedSyncFlow,
                     ),
                 )
             }
@@ -482,6 +483,7 @@ class SyncActivity : DuckDuckGoActivity() {
                             SyncThisDeviceContract.Input(
                                 launchSource = launchSource,
                                 isAuthRequired = false,
+                                isImprovedSyncFlow = command.isImprovedSyncFlow,
                             ),
                         )
                     }

@@ -68,6 +68,8 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
 
     private val isAuthRequired get() = intent.getBooleanExtra(IS_AUTH_REQUIRED_EXTRA_KEY, true)
 
+    private val isImprovedSyncFlow get() = intent.getBooleanExtra(IS_IMPROVED_SYNC_FLOW_EXTRA_KEY, false)
+
     private val viewModel by viewModels<SyncThisDeviceViewModel> {
         Provider(vmFactory, isAuthRequired)
     }
@@ -95,6 +97,7 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
         configureEdgeToEdgeInsets()
 
         configureToolbar()
+        configureHeader()
         configureSyncWithAnotherCta()
         configureSyncWithThisCta()
 
@@ -166,6 +169,13 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun configureHeader() {
+        if (isImprovedSyncFlow) {
+            binding.headlineText.setText(R.string.sync_simplified_setup_header_headline_v2)
+            binding.bodyText.setText(R.string.sync_simplified_setup_header_body_v2)
+        }
+    }
+
     private fun configureSyncWithAnotherCta() {
         binding.syncWithAnotherDeviceButton.setOnClickListener {
             viewModel.onSyncWithAnotherDeviceClicked()
@@ -204,15 +214,18 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
     companion object {
         private const val LAUNCH_SOURCE_EXTRA_KEY = "launch_source"
         private const val IS_AUTH_REQUIRED_EXTRA_KEY = "is_auth_required"
+        private const val IS_IMPROVED_SYNC_FLOW_EXTRA_KEY = "is_improved_sync_flow"
 
         fun intent(
             context: Context,
             launchSource: String?,
             isAuthRequired: Boolean,
+            isImprovedSyncFlow: Boolean,
         ): Intent {
             return Intent(context, SyncThisDeviceActivity::class.java).apply {
                 putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
                 putExtra(IS_AUTH_REQUIRED_EXTRA_KEY, isAuthRequired)
+                putExtra(IS_IMPROVED_SYNC_FLOW_EXTRA_KEY, isImprovedSyncFlow)
             }
         }
     }
