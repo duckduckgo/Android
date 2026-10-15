@@ -822,8 +822,8 @@ class BrowserTabViewModel @Inject constructor(
 
     /** Non-null while this tab is displayed inside a Custom Tab. [clientPackage] is the verified
      * calling package (when known), used by [handleAppLink]'s trusted-caller launch carve-out.
-     * [referrerPackage] is the best-effort, non-verified android-app:// referrer, used only for the
-     * prompt-skip decision in [appLinkClicked], never the launch carve-out. */
+     * [referrerPackage] is the best-effort, non-verified android-app:// referrer, used only to skip
+     * confirmation prompts (in [appLinkClicked] and for non-HTTP app links), never the launch carve-out. */
     private data class CustomTabContext(val clientPackage: String?, val referrerPackage: String?)
     private var customTab: CustomTabContext? = null
 
@@ -4088,6 +4088,13 @@ class BrowserTabViewModel @Inject constructor(
         appLinksHandler.setUserQueryState(false)
     }
 
+    private fun trustedCallerPackage(): String? {
+        if (!customTabsFeature.handleTrustedCallers().isEnabled() || !customTabsFeature.handleTrustedCallersNonHttpLinks().isEnabled()) {
+            return null
+        }
+        return customTab?.let { it.clientPackage ?: it.referrerPackage }
+    }
+
     override fun handleNonHttpAppLink(nonHttpAppLink: NonHttpAppLink): Boolean {
         nonHttpAppLinkClicked(nonHttpAppLink)
         return true
@@ -4101,7 +4108,13 @@ class BrowserTabViewModel @Inject constructor(
                 }
                 return
             }
-            command.value = HandleNonHttpAppLink(appLink, getUrlHeaders(appLink.fallbackUrl), appSettingsPreferencesStore.showAppLinksPrompt)
+            command.value = HandleNonHttpAppLink(
+                nonHttpAppLink = appLink,
+                headers = getUrlHeaders(appLink.fallbackUrl),
+                showConfirmation = appSettingsPreferencesStore.showAppLinksPrompt,
+                trustedCallerPackage = trustedCallerPackage(),
+                finishCustomTabOnTrustedCallerLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
+            )
         }
     }
 

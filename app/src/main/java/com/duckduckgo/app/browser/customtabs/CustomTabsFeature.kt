@@ -44,4 +44,11 @@ interface CustomTabsFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun closeTabAfterTrustedCallerNavigation(): Toggle
+
+    /**
+     * When enabled together with [handleTrustedCallers], non-HTTP app links (intent:// and custom schemes) that return
+     * to the app that opened the tab launch without the external app confirmation prompt.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun handleTrustedCallersNonHttpLinks(): Toggle
 }
