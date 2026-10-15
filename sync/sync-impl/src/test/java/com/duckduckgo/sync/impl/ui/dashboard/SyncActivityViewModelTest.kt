@@ -53,6 +53,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskEditDevice
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.IntroRecoverSyncData
@@ -734,6 +735,79 @@ class SyncActivityViewModelTest {
 
         testee.commands().test {
             awaitItem().assertCommandType(Command.AskDeleteAccount::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDeleteAccountClickedWithImprovedFlowAndOnlyThisDeviceThenAskTurnOffSync() = runTest {
+        givenAuthenticatedUser()
+        givenImprovedSyncFlowEnabled()
+        givenUserHasDeviceAuthentication(true)
+
+        testee.viewState().test {
+            testee.commands().test {
+                testee.onDeleteAccountClicked()
+                assertEquals(AskTurnOffSync(device = connectedDevice, isOnlyDevice = true), awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDeleteAccountClickedWithImprovedFlowAndMultipleDevicesThenAskTurnOffSync() = runTest {
+        givenAuthenticatedUser()
+        givenImprovedSyncFlowEnabled()
+        givenUserHasDeviceAuthentication(true)
+        val otherDevice = connectedDevice.copy(thisDevice = false, deviceId = "otherDeviceId")
+        whenever(syncAccountRepository.getConnectedDevices()).thenReturn(Result.Success(listOf(connectedDevice, otherDevice)))
+
+        testee.viewState().test {
+            testee.commands().test {
+                testee.onDeleteAccountClicked()
+                assertEquals(AskTurnOffSync(device = connectedDevice, isOnlyDevice = false), awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTurnOffAndDeleteServerDataClickedThenAskDeleteServerData() = runTest {
+        testee.commands().test {
+            testee.onTurnOffAndDeleteServerDataClicked()
+            awaitItem().assertCommandType(Command.AskDeleteServerData::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTurnOffThisDeviceClickedThenAskTurnOffThisDevice() = runTest {
+        testee.commands().test {
+            testee.onTurnOffThisDeviceClicked(connectedDevice)
+            assertEquals(Command.AskTurnOffThisDevice(connectedDevice), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenImprovedSyncFlowEnabledAndSignedInThenViewStateReflectsImprovedFlow() = runTest {
+        givenAuthenticatedUser()
+        givenImprovedSyncFlowEnabled()
+
+        testee.viewState().test {
+            assertTrue(expectMostRecentItem().isImprovedSyncFlow)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenImprovedSyncFlowDisabledAndSignedInThenViewStateReflectsLegacyFlow() = runTest {
+        givenAuthenticatedUser()
+
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().isImprovedSyncFlow)
             cancelAndIgnoreRemainingEvents()
         }
     }

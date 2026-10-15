@@ -29,4 +29,32 @@
     <!-- Edit Device screen: remove device dialog -->
     <string name="sync_simplified_edit_device_remove_dialog_title_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Remove %1$s from Sync&#160;&amp;&#160;Backup?</string>
     <string name="sync_simplified_edit_device_remove_dialog_body_v2" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” will no longer be able to access your synced data. Bookmarks, Autofill data and Duck.ai chats will remain on your devices.</string>
+
+    <!-- Settings screen: turn off sheet -->
+    <string name="sync_simplified_settings_turn_off_sheet_remove_title" instruction="Placeholder is a device name. e.g., Samsung S23">Remove %1$s from Sync&#160;&amp;&#160;Backup?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_body" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” will no longer be able to access your synced data on other devices.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item">Also delete server data?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Turn off Sync&#160;&amp;&#160;Backup and delete all synced data from the server and deactivate your recovery code.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Remove Device</string>
+    <string name="sync_simplified_settings_turn_off_sheet_title">Turn Off Sync&#160;&amp;&#160;Backup?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_item">Delete Server Data</string>
+    <string name="sync_simplified_settings_turn_off_sheet_body">All devices using Sync&#160;&amp;&#160;Backup will be disconnected and your synced data will be deleted from the server.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button">Turn Off This Device</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Turn Off and Delete</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete_all">Turn Off All Devices and Delete</string>
+
+    <!-- Settings screen: turn off item -->
+    <string name="sync_simplified_settings_turn_off_item">Turn Off Sync&#160;&amp;&#160;Backup</string>
+
+    <!-- Settings screen: turn off this device dialog -->
+    <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">Remove %1$s from Sync&#160;&amp;&#160;Backup?</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” will no longer be able to access your synced data. Bookmarks, Autofill data and Duck.ai chats will remain on your devices.</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_primary_button">Remove</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_secondary_button">Cancel</string>
+
+    <!-- Settings screen: delete server data dialog -->
+    <string name="sync_simplified_settings_delete_server_data_dialog_title_v2">You Can’t Undo This Action.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body_v2">All devices using Sync&#160;&amp;&#160;Backup will be disconnected and your synced data will be deleted from the server.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button_v2">Permanently Delete</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button_v2">Cancel</string>
 </resources>
