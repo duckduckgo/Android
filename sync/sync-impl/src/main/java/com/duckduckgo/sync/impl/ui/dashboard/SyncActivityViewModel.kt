@@ -452,10 +452,13 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onTurnOffAndDeleteServerDataClicked() {
         syncPixels.fireTurnOffOptionSelected(TurnOffOption.ALL_DEVICES_AND_SERVER_DATA)
-        syncPixels.fireDeleteServerDataConfirmationShown()
         viewModelScope.launch {
             command.send(AskDeleteServerData)
         }
+    }
+
+    fun onDeleteServerDataConfirmationShown() {
+        syncPixels.fireDeleteServerDataConfirmationShown()
     }
 
     fun onDeleteServerDataConfirmed() {
