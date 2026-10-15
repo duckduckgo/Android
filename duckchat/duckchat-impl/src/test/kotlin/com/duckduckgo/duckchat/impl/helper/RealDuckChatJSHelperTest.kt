@@ -40,6 +40,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_I
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
+import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_GET_PAGE_CONTEXT
@@ -129,6 +130,8 @@ class RealDuckChatJSHelperTest {
     private val mockTermsRepository: DuckAiTermsRepository = mock()
     private val mockRegularChatStore: DuckAiChatStore = mock()
     private val mockFireChatStore: DuckAiChatStore = mock()
+    private val fakeChatHistoryFeature: DuckAiChatHistoryFeature =
+        FakeFeatureToggleFactory.create(DuckAiChatHistoryFeature::class.java)
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
@@ -152,6 +155,7 @@ class RealDuckChatJSHelperTest {
         termsRepository = mockTermsRepository,
         regularChatStore = mockRegularChatStore,
         fireChatStore = mockFireChatStore,
+        duckAiChatHistoryFeature = fakeChatHistoryFeature,
     )
 
     init {
@@ -2883,13 +2887,51 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatsWithMaxChatsThenRecentChatsAreCappedAndClamped() = runTest {
+    fun whenGetAIChatsWithMaxChatsThenChatsAreCappedAndClamped() = runTest {
         givenHomepageChatSuggestionsSupported()
         whenever(mockRegularChatStore.getChats()).thenReturn((0 until 30).map { chat("c$it", "Chat $it", minutesAgo = it.toLong()) })
 
         assertEquals(listOf("c0", "c1"), getAIChats(JSONObject().put("maxChats", 2)).getJSONArray("chats").chatIds())
         assertEquals(20, getAIChats(JSONObject().put("maxChats", 1000)).getJSONArray("chats").length())
-        assertEquals(5, getAIChats().getJSONArray("chats").length())
+    }
+
+    @Test
+    fun whenGetAIChatsWithoutMaxChatsThenCapIsRemoteMaxHistoryCount() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        fakeChatHistoryFeature.self().setRawStoredState(Toggle.State(enable = true, settings = """{"maxHistoryCount":3}"""))
+        whenever(mockRegularChatStore.getChats()).thenReturn((0 until 30).map { chat("c$it", "Chat $it", minutesAgo = it.toLong()) })
+
+        assertEquals(listOf("c0", "c1", "c2"), getAIChats().getJSONArray("chats").chatIds())
+    }
+
+    @Test
+    fun whenGetAIChatsThenPinnedChatsCountTowardMaxChats() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        whenever(mockRegularChatStore.getChats()).thenReturn(
+            listOf(
+                chat("recent", "Recent", daysAgo = 0),
+                chat("pinned", "Pinned", daysAgo = 30, pinned = true),
+                chat("recent-older", "Older", daysAgo = 1),
+            ),
+        )
+
+        val chats = getAIChats(JSONObject().put("maxChats", 2)).getJSONArray("chats")
+
+        assertEquals(listOf("pinned", "recent"), chats.chatIds())
+    }
+
+    @Test
+    fun whenGetAIChatsThenRecentWindowFollowsRemoteRecentDaysCutoff() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        fakeChatHistoryFeature.self().setRawStoredState(Toggle.State(enable = true, settings = """{"recentDaysCutoff":30}"""))
+        whenever(mockRegularChatStore.getChats()).thenReturn(
+            listOf(
+                chat("ten-days", "Ten days", daysAgo = 10),
+                chat("sixty-days", "Sixty days", daysAgo = 60),
+            ),
+        )
+
+        assertEquals(listOf("ten-days"), getAIChats().getJSONArray("chats").chatIds())
     }
 
     @Test

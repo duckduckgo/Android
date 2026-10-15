@@ -43,7 +43,10 @@ import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
+import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.feature.maxHistoryCount
+import com.duckduckgo.duckchat.impl.feature.recentDaysCutoff
 import com.duckduckgo.duckchat.impl.messaging.sync.isSyncable
 import com.duckduckgo.duckchat.impl.models.AIChatAttachmentUsage
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
@@ -53,8 +56,8 @@ import com.duckduckgo.duckchat.impl.terms.DuckAiTermsRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
+import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.selectChatSuggestions
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
-import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -69,9 +72,6 @@ import kotlinx.coroutines.withTimeoutOrNull
 import logcat.logcat
 import org.json.JSONArray
 import org.json.JSONObject
-import java.time.Duration
-import java.time.Instant
-import java.time.format.DateTimeParseException
 import java.util.concurrent.atomic.AtomicReference
 import java.util.regex.Pattern
 import javax.inject.Inject
@@ -142,6 +142,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val termsRepository: DuckAiTermsRepository,
     @RegularMode private val regularChatStore: DuckAiChatStore,
     @FireMode private val fireChatStore: DuckAiChatStore,
+    private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -527,8 +528,8 @@ class RealDuckChatJSHelper @Inject constructor(
     }
 
     /**
-     * Same contract as the other native apps: every pinned chat, then recent chats newest first, capped at
-     * `maxChats`. Without a query, recent chats are limited to the last week. Never returns message content.
+     * Applies the same selection as the omnibar chat suggestions ([selectChatSuggestions]), capped at the homepage's
+     * `maxChats` or the remote `maxHistoryCount` when it doesn't send one. Never returns message content.
      */
     private suspend fun getAIChats(
         featureName: String,
@@ -540,20 +541,20 @@ class RealDuckChatJSHelper @Inject constructor(
         val chats = JSONArray()
         if (supportsHomePageChatSuggestions(browserMode)) {
             val query = data?.optString(GET_AI_CHATS_QUERY).orEmpty().trim()
-            val maxChats = (data?.optInt(GET_AI_CHATS_MAX_CHATS, DEFAULT_MAX_CHATS) ?: DEFAULT_MAX_CHATS).coerceIn(1, MAX_CHATS_LIMIT)
-            val recentCutoff = Instant.now().minus(Duration.ofDays(RECENT_CHATS_DAYS))
-            val all = withContext(dispatcherProvider.io()) {
+            val maxChats = if (data?.has(GET_AI_CHATS_MAX_CHATS) == true) {
+                data.optInt(GET_AI_CHATS_MAX_CHATS).coerceIn(1, MAX_CHATS_LIMIT)
+            } else {
+                duckAiChatHistoryFeature.maxHistoryCount()
+            }
+            withContext(dispatcherProvider.io()) {
                 runCatching { chatStoreFor(browserMode).getChats() }
                     .onFailure { logcat { "Duck.ai: getAIChats failed to read chats: ${it.message}" } }
                     .getOrDefault(emptyList())
-            }.filter { query.isEmpty() || it.title.contains(query, ignoreCase = true) }
-            val byNewest = compareByDescending<DuckAiChat> { it.lastEditInstant() }
-            val pinned = all.filter { it.pinned }.sortedWith(byNewest)
-            val recent = all
-                .filter { !it.pinned && (query.isNotEmpty() || (it.lastEditInstant() ?: Instant.MIN) >= recentCutoff) }
-                .sortedWith(byNewest)
-                .take(maxChats)
-            (pinned + recent).forEach { chat ->
+            }.selectChatSuggestions(
+                query = query,
+                maxSuggestions = maxChats,
+                recentDaysCutoff = duckAiChatHistoryFeature.recentDaysCutoff(),
+            ).forEach { chat ->
                 chats.put(
                     JSONObject().apply {
                         put("chatId", chat.chatId)
@@ -566,12 +567,6 @@ class RealDuckChatJSHelper @Inject constructor(
             }
         }
         return JsCallbackData(JSONObject().put(GET_AI_CHATS_CHATS, chats), featureName, method, id)
-    }
-
-    private fun DuckAiChat.lastEditInstant(): Instant? = try {
-        Instant.parse(lastEdit)
-    } catch (_: DateTimeParseException) {
-        null
     }
 
     // Bucketed install age for the Duck.ai prompt pixel; null when there's no valid age (timestamp
@@ -830,9 +825,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val GET_AI_CHATS_QUERY = "query"
         private const val GET_AI_CHATS_MAX_CHATS = "maxChats"
         private const val GET_AI_CHATS_CHATS = "chats"
-        private const val DEFAULT_MAX_CHATS = 5
         private const val MAX_CHATS_LIMIT = 20
-        private const val RECENT_CHATS_DAYS = 7L
         private const val METHOD_EDIT_PROMPT = "editPrompt"
         private const val METHOD_CANCEL_EDIT = "cancelEdit"
 
