@@ -554,4 +554,45 @@ class DuckDuckGoAppLinksHandlerTest {
     fun whenDomainNotInAlwaysTriggerListThenIsAlwaysTriggerDomainReturnsFalse() {
         assertFalse(testee.isAlwaysTriggerDomain(AppLink(uriString = "https://example.com/path")))
     }
+
+    @Test
+    fun whenTrustedCallerAndNoGestureAndSameDomainAndHasTriggeredThenReturnTrueAndLaunchAppLink() {
+        testee.isAUserQuery = false
+        testee.hasTriggeredForDomain = true
+        testee.previousUrl = "https://example.com/login"
+        val appIntent = Intent().setPackage("com.example.app")
+        assertTrue(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                appLink = AppLink(uriString = "https://example.com/oauth/callback", appIntent = appIntent),
+                hasGesture = false,
+                clientPackage = "com.example.app",
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = false,
+                appLinksEnabled = true,
+            ),
+        )
+        assertEquals("https://example.com/oauth/callback", testee.previousUrl)
+        verify(mockCallback).invoke()
+    }
+
+    @Test
+    fun whenTrustedCallerAndShouldHaltWebNavigationIsFalseThenReturnTrueAndLaunchAppLink() {
+        testee.isAUserQuery = false
+        testee.previousUrl = "https://different.com/login"
+        val appIntent = Intent().setPackage("com.example.app")
+        assertTrue(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                appLink = AppLink(uriString = "https://example.com/oauth/callback", appIntent = appIntent),
+                hasGesture = false,
+                clientPackage = "com.example.app",
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = false,
+                appLinksEnabled = true,
+            ),
+        )
+        assertEquals("https://example.com/oauth/callback", testee.previousUrl)
+        verify(mockCallback).invoke()
+    }
 }

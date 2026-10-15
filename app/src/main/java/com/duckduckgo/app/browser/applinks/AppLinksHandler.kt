@@ -83,23 +83,24 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
 
         val urlString = appLink.uriString
         val isAlwaysTriggerDomain = isAlwaysTriggerDomain(appLink)
+        val isTrustedCaller = isTrustedCaller(appLink, clientPackage)
 
         // HTTP navigations shouldn't launch apps unless started with a user gesture. That is unless
         // the "trusted-caller" carve-out applies - if an app opens a Custom Tab, App Links that
         // point back to that same app should be allowed even without user interaction.
         if (!isAlwaysTriggerDomain && androidBrowserConfigFeature.customTabEndlessLoopFix().isEnabled()) {
-            if (!hasGesture && !isTrustedCaller(appLink, clientPackage)) {
+            if (!hasGesture && !isTrustedCaller) {
                 return false
             }
         }
 
         previousUrl?.let {
             if (isSameOrSubdomain(it, urlString)) {
-                if (isAUserQuery || !hasTriggeredForDomain || isAlwaysTriggerDomain) {
+                if (isAUserQuery || !hasTriggeredForDomain || isAlwaysTriggerDomain || isTrustedCaller) {
                     previousUrl = urlString
                     launchAppLink()
                     hasTriggeredForDomain = true
-                    if (isAlwaysTriggerDomain) return true
+                    if (isAlwaysTriggerDomain || isTrustedCaller) return true
                 }
                 return false
             }
@@ -108,7 +109,7 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
         previousUrl = urlString
         launchAppLink()
         hasTriggeredForDomain = true
-        return shouldHaltWebNavigation
+        return if (isTrustedCaller) true else shouldHaltWebNavigation
     }
 
     private fun isSameOrSubdomain(
