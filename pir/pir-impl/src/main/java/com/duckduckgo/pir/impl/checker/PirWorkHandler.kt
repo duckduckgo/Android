@@ -48,7 +48,7 @@ import javax.inject.Inject
 interface PirWorkHandler {
     /**
      * Checks if PIR can run based on remote features, subscription status, entitlement, freemium
-     * activation and repository availability.
+     * activation or a profile kept from a lapsed subscription, and repository availability.
      *
      * @return Flow that emits [PirEligibility.Enabled] (carrying the [PirRunMode] the user is
      * allowed to run) when PIR can run, or [PirEligibility.Disabled] (carrying the failing
@@ -158,7 +158,12 @@ class RealPirWorkHandler @Inject constructor(
 
     // A lapsed subscriber keeps their profile, and with it the same free-scan rules as a user who activated freemium.
     private suspend fun canRunFreemiumScans(): Boolean = withContext(dispatcherProvider.io()) {
-        pirRemoteFeatures.freemium().isEnabled() &&
-            (pirFreemiumDataStore.didActivate || pirRepository.getValidUserProfileQueries().isNotEmpty())
+        pirRemoteFeatures.freemium().isEnabled() && (pirFreemiumDataStore.didActivate || hasKeptProfile())
+    }
+
+    // Reading the profile opens the encrypted database, so it is skipped for installs that never ran PIR.
+    private suspend fun hasKeptProfile(): Boolean {
+        val hasRunPir = pirRepository.getFeatureReceivedMs() != 0L || pirRepository.getCurrentMainEtag() != null
+        return hasRunPir && pirRepository.getValidUserProfileQueries().isNotEmpty()
     }
 }

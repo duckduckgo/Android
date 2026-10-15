@@ -42,6 +42,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -84,6 +85,7 @@ class RealPirWorkHandlerTest {
         whenever(pirRemoteFeatures.freemium()).thenReturn(freemiumToggle)
         whenever(pirRepository.isRepositoryAvailable()).thenReturn(true)
         whenever(pirRepository.getValidUserProfileQueries()).thenReturn(emptyList())
+        whenever(pirRepository.getFeatureReceivedMs()).thenReturn(0L)
 
         pirWorkHandler = RealPirWorkHandler(
             pirRemoteFeatures = pirRemoteFeatures,
@@ -479,6 +481,7 @@ class RealPirWorkHandlerTest {
         whenever(pirBetaToggle.isEnabled()).thenReturn(false)
         whenever(freemiumToggle.isEnabled()).thenReturn(true)
         whenever(pirFreemiumDataStore.didActivate).thenReturn(false)
+        whenever(pirRepository.getFeatureReceivedMs()).thenReturn(1000L)
         whenever(pirRepository.getValidUserProfileQueries()).thenReturn(listOf(profileQuery))
         givenSubscription(SubscriptionStatus.EXPIRED)
 
@@ -492,6 +495,7 @@ class RealPirWorkHandlerTest {
     fun whenSubscriptionExpiredWithProfileKeptButFreemiumDisabledThenCanRunPirDisabledWithFeatureDisabled() = runTest {
         whenever(pirBetaToggle.isEnabled()).thenReturn(false)
         whenever(freemiumToggle.isEnabled()).thenReturn(false)
+        whenever(pirRepository.getFeatureReceivedMs()).thenReturn(1000L)
         whenever(pirRepository.getValidUserProfileQueries()).thenReturn(listOf(profileQuery))
         givenSubscription(SubscriptionStatus.EXPIRED)
 
@@ -505,11 +509,42 @@ class RealPirWorkHandlerTest {
     fun whenSubscribedWithoutPirEntitlementAndProfileKeptThenCanRunPirDisabledWithEntitlementLost() = runTest {
         whenever(pirBetaToggle.isEnabled()).thenReturn(true)
         whenever(freemiumToggle.isEnabled()).thenReturn(true)
+        whenever(pirRepository.getFeatureReceivedMs()).thenReturn(1000L)
         whenever(pirRepository.getValidUserProfileQueries()).thenReturn(listOf(profileQuery))
         givenSubscription(SubscriptionStatus.AUTO_RENEWABLE, setOf(netPEntitlement))
 
         pirWorkHandler.canRunPir().test {
             assertEquals(PirEligibility.Disabled(DisabledReason.ENTITLEMENT_LOST), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNonSubscriberNeverRanPirThenProfileIsNotReadAndCanRunPirDisabledWithSubscriptionExpired() = runTest {
+        whenever(freemiumToggle.isEnabled()).thenReturn(true)
+        whenever(pirFreemiumDataStore.didActivate).thenReturn(false)
+        whenever(pirRepository.getFeatureReceivedMs()).thenReturn(0L)
+        whenever(pirRepository.getCurrentMainEtag()).thenReturn(null)
+        givenSubscription(SubscriptionStatus.UNKNOWN)
+
+        pirWorkHandler.canRunPir().test {
+            assertEquals(PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(pirRepository, never()).getValidUserProfileQueries()
+    }
+
+    @Test
+    fun whenSubscriptionExpiredAndNeverActivatedButProfileKeptFromBeforeFeatureReceivedMsThenCanRunPirEnabledWithScanOnly() = runTest {
+        whenever(freemiumToggle.isEnabled()).thenReturn(true)
+        whenever(pirFreemiumDataStore.didActivate).thenReturn(false)
+        whenever(pirRepository.getFeatureReceivedMs()).thenReturn(0L)
+        whenever(pirRepository.getCurrentMainEtag()).thenReturn("etag")
+        whenever(pirRepository.getValidUserProfileQueries()).thenReturn(listOf(profileQuery))
+        givenSubscription(SubscriptionStatus.EXPIRED)
+
+        pirWorkHandler.canRunPir().test {
+            assertEquals(PirEligibility.Enabled(PirRunMode.SCAN_ONLY), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }
