@@ -70,8 +70,9 @@ class SurveyRepositoryImpl @Inject constructor(
             return 0L
         }
         // If any of the above, then remaining days since app install
-        if (survey.daysInstalled != null) {
-            return survey.daysInstalled - userBrowserProperties.daysSinceInstalled()
+        val daysInstalled = survey.daysInstalled
+        if (daysInstalled != null) {
+            return daysInstalled - userBrowserProperties.daysSinceInstalled()
         }
         return -1
     }

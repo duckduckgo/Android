@@ -20,7 +20,6 @@ import com.duckduckgo.app.browser.rating.db.AppEnjoymentDao
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentDatabaseRepository
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentRepository
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.rating.*
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
@@ -92,12 +91,6 @@ class RatingModule {
             dispatchers,
             appBuildConfig,
         )
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun appEnjoymentDao(database: AppDatabase): AppEnjoymentDao {
-        return database.appEnjoymentDao()
     }
 
     @SingleInstanceIn(AppScope::class)
