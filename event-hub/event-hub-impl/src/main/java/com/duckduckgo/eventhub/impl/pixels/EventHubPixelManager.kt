@@ -108,7 +108,8 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     override fun onNavigationStarted(webViewId: String, url: String) {
-        if (!isEnabled()) return
+        // Recorded even while the hub is off, so a page that was already open when it's switched on still has its URL and the
+        // tab's next navigation clears that page's keys
         if (deduplicator.onNavigation(webViewId, url)) {
             logcat(VERBOSE) { "EventHub: tab $webViewId navigated to a different URL, clearing dedup" }
         }

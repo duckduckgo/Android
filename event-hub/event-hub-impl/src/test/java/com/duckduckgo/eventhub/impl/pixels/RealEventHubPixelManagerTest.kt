@@ -455,6 +455,48 @@ class RealEventHubPixelManagerTest {
     }
 
     @Test
+    fun `navigation while the feature is disabled is recorded, so the next page counts again`() {
+        configureFeature(enabled = false)
+        manager.onNavigationStarted("tab1", "https://example.com/page1")
+        configureFeature()
+
+        stubPixelStates(pixelState("webTelemetry_testPixel1", mapOf("count" to 0)))
+        manager.handleWebEvent(webEventData("test"), "tab1")
+        verify(repository).savePixelState(any())
+
+        org.mockito.Mockito.reset(repository)
+        stubPixelStates(pixelState("webTelemetry_testPixel1", mapOf("count" to 1)))
+        manager.onNavigationStarted("tab1", "https://example.com/page2")
+        manager.handleWebEvent(webEventData("test"), "tab1")
+
+        verify(repository).savePixelState(any())
+    }
+
+    @Test
+    fun `dedup survives a period that fires while backgrounded`() {
+        manager.onNavigationStarted("tab1", "https://example.com/page1")
+        val firstPeriod = pixelState("webTelemetry_testPixel1", mapOf("count" to 0), periodStart = 0L, periodEnd = 1000L)
+        stubPixelStates(firstPeriod)
+        timeProvider.time = 500L
+        manager.handleWebEvent(webEventData("test"), "tab1")
+        verify(repository).savePixelState(any())
+
+        // The period fires from its timer while backgrounded, which starts no new period
+        manager.onAppBackgrounded()
+        timeProvider.time = 1500L
+        manager.onConfigChanged()
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+        verify(pixel).enqueueFire(eq("webTelemetry_testPixel1"), any(), any(), any())
+
+        org.mockito.Mockito.reset(repository)
+        stubPixelStates(pixelState("webTelemetry_testPixel1", mapOf("count" to 0), periodStart = 1500L, periodEnd = 2500L))
+        manager.onAppForegrounded()
+        manager.handleWebEvent(webEventData("test"), "tab1")
+
+        verify(repository, never()).savePixelState(any())
+    }
+
+    @Test
     fun `empty webViewId disables dedup`() {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
         stubPixelStates(state)
