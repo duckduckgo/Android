@@ -50,4 +50,7 @@
 
     <!-- Duck.ai ToS consent footer -->
     <string name="duckChatTermsFooterMessage" instruction="Disclaimer under the Duck.ai input. ^1 is the label of the submit button, so the sentence always names the button the user taps. The two annotated phrases are tappable links to the Privacy Policy and the Terms of Service.">DuckDuckGo anonymizes your chats. By clicking \'^1\' you agree to our <annotation type="privacy_link">Privacy Policy</annotation> &amp; <annotation type="terms_link">Terms of Service</annotation>.</string>
+
+    <!-- Duck.ai tab switcher card -->
+    <string name="duckAiTabCardChatTypeLabel" instruction="Label on a tab switcher card marking the Duck.ai tab as a text chat, as opposed to an image or voice chat.">Chat</string>
 </resources>
