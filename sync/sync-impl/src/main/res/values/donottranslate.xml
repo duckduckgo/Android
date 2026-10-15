@@ -41,11 +41,8 @@
     <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Turn off Sync&#160;&amp;&#160;Backup and delete all synced data from the server and deactivate your recovery code.</string>
     <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Remove Device</string>
     <string name="sync_simplified_settings_turn_off_sheet_title">Turn Off Sync&#160;&amp;&#160;Backup?</string>
-    <string name="sync_simplified_settings_turn_off_sheet_item">Delete Server Data</string>
     <string name="sync_simplified_settings_turn_off_sheet_body">All devices using Sync&#160;&amp;&#160;Backup will be disconnected and your synced data will be deleted from the server.</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button">Turn Off This Device</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Turn Off and Delete</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete_all">Turn Off All Devices and Delete</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Turn Off and Delete Server Data</string>
 
     <!-- Settings screen: turn off item -->
     <string name="sync_simplified_settings_turn_off_item">Turn Off Sync&#160;&amp;&#160;Backup</string>

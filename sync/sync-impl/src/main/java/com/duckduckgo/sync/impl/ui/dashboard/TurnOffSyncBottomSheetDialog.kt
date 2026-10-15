@@ -16,32 +16,34 @@
 
 package com.duckduckgo.sync.impl.ui.dashboard
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
+import android.animation.RectEvaluator
 import android.app.Dialog
+import android.graphics.Rect
 import android.os.Bundle
 import android.os.Parcelable
 import android.transition.ChangeBounds
 import android.transition.Fade
 import android.transition.TransitionManager
 import android.transition.TransitionSet
+import android.transition.TransitionValues
+import android.transition.Visibility
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.constraintlayout.widget.ConstraintSet
-import androidx.constraintlayout.widget.ConstraintSet.BOTTOM
-import androidx.constraintlayout.widget.ConstraintSet.END
-import androidx.constraintlayout.widget.ConstraintSet.PARENT_ID
-import androidx.constraintlayout.widget.ConstraintSet.START
-import androidx.constraintlayout.widget.ConstraintSet.TOP
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.setRoundCorners
-import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.BottomSheetTurnOffSyncBinding
+import com.duckduckgo.sync.impl.ui.dashboard.SyncDeviceListItem.SyncedDevice
 import com.duckduckgo.sync.impl.ui.devices.ParcelableDevice
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -50,19 +52,13 @@ import kotlinx.parcelize.Parcelize
 import com.duckduckgo.mobile.android.R as CommonR
 
 class TurnOffSyncBottomSheetDialog : BottomSheetDialogFragment() {
-    private val device: ParcelableDevice
-        get() = requireNotNull(BundleCompat.getParcelable(requireArguments(), DEVICE_ARG, ParcelableDevice::class.java)) {
-            "Missing fragment argument: '$DEVICE_ARG'"
+    private val args: Args
+        get() = requireNotNull(BundleCompat.getParcelable(requireArguments(), FRAGMENT_ARGS, Args::class.java)) {
+            "Missing fragment argument: '$FRAGMENT_ARGS'"
         }
-
-    private val isOnlyDevice: Boolean
-        get() = requireArguments().getBoolean(IS_ONLY_DEVICE_ARG)
 
     private var _binding: BottomSheetTurnOffSyncBinding? = null
     private val binding get() = _binding!!
-
-    private lateinit var removeDeviceConstraints: ConstraintSet
-    private lateinit var turnOffConstraints: ConstraintSet
 
     override fun getTheme(): Int = CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge
 
@@ -89,13 +85,16 @@ class TurnOffSyncBottomSheetDialog : BottomSheetDialogFragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         binding.turnOffSyncSheet.applyBottomSystemBarInsetPadding()
-        configureConstraints()
         configureCopy()
+        configureDevices()
         configureButtons()
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
+        if (savedInstanceState == null) {
+            binding.deleteServerDataSwitch.isChecked = args.allDevices.size <= 1
+        }
         render(deleteServerData = binding.deleteServerDataSwitch.isChecked, animate = false)
         binding.deleteServerDataSwitch.setOnCheckedChangeListener { _, isChecked ->
             render(deleteServerData = isChecked, animate = true)
@@ -111,21 +110,13 @@ class TurnOffSyncBottomSheetDialog : BottomSheetDialogFragment() {
         deleteServerData: Boolean,
         animate: Boolean,
     ) {
-        val isRemovingDevice = isOnlyDevice && !deleteServerData
-        val constraints = if (isRemovingDevice) removeDeviceConstraints else turnOffConstraints
         if (animate) {
             val root = binding.root.rootView as? ViewGroup ?: binding.root
             TransitionManager.beginDelayedTransition(root, createStateTransition())
         }
-        constraints.applyTo(binding.turnOffSyncContent)
+        binding.removeDeviceViews.forEach { it.isVisible = !deleteServerData }
+        binding.turnOffViews.forEach { it.isVisible = deleteServerData }
         renderButtons(deleteServerData, animate)
-        binding.deleteServerDataSwitch.contentDescription = getString(
-            if (isRemovingDevice) {
-                R.string.sync_simplified_settings_turn_off_sheet_remove_item
-            } else {
-                R.string.sync_simplified_settings_turn_off_sheet_item
-            },
-        )
     }
 
     private fun renderButtons(
@@ -160,34 +151,21 @@ class TurnOffSyncBottomSheetDialog : BottomSheetDialogFragment() {
             .start()
     }
 
-    private fun configureConstraints() {
-        removeDeviceConstraints = ConstraintSet().apply { clone(binding.turnOffSyncContent) }
-        turnOffConstraints = createTurnOffConstraints()
-    }
-
     private fun configureCopy() {
-        val deviceName = device.name
+        val deviceName = args.thisDevice.name
         binding.removeDeviceTitle.text = getString(R.string.sync_simplified_settings_turn_off_sheet_remove_title, deviceName)
         binding.removeDeviceBody.text = getString(R.string.sync_simplified_settings_turn_off_sheet_remove_body, deviceName)
-        binding.turnOffButton.setText(
-            if (isOnlyDevice) {
-                R.string.sync_simplified_settings_turn_off_sheet_remove_primary_button
-            } else {
-                R.string.sync_simplified_settings_turn_off_sheet_primary_button
-            },
-        )
-        binding.turnOffAndDeleteButton.setText(
-            if (isOnlyDevice) {
-                R.string.sync_simplified_settings_turn_off_sheet_primary_button_delete
-            } else {
-                R.string.sync_simplified_settings_turn_off_sheet_primary_button_delete_all
-            },
-        )
+    }
+
+    private fun configureDevices() {
+        val adapter = SyncedDeviceAdapter()
+        binding.devicesRecycler.adapter = adapter
+        adapter.submitList(args.allDevices.map { SyncedDevice(it.toConnectedDevice()) })
     }
 
     private fun configureButtons() {
         binding.closeButton.setOnClickListener { dismiss() }
-        binding.turnOffButton.setOnClickListener { selectChoice(Choice.TurnOffThisDevice(device)) }
+        binding.turnOffButton.setOnClickListener { selectChoice(Choice.TurnOffThisDevice(args.thisDevice)) }
         binding.turnOffAndDeleteButton.setOnClickListener { selectChoice(Choice.TurnOffAndDeleteServerData) }
     }
 
@@ -196,30 +174,26 @@ class TurnOffSyncBottomSheetDialog : BottomSheetDialogFragment() {
         dismiss()
     }
 
-    private fun createTurnOffConstraints() = ConstraintSet().apply {
-        clone(removeDeviceConstraints)
-        binding.removeDeviceViews.forEach { setVisibility(it.id, View.GONE) }
-        binding.turnOffViews.forEach { setVisibility(it.id, View.VISIBLE) }
-
-        val item = R.id.turnOffItemBackground
-        clear(R.id.deleteServerDataIcon, END)
-        connect(R.id.deleteServerDataIcon, START, item, START, 24.toPx())
-        connect(R.id.deleteServerDataIcon, TOP, item, TOP)
-        connect(R.id.deleteServerDataIcon, BOTTOM, item, BOTTOM)
-
-        connect(R.id.deleteServerDataSwitch, END, item, END, 16.toPx())
-        connect(R.id.deleteServerDataSwitch, TOP, item, TOP)
-        connect(R.id.deleteServerDataSwitch, BOTTOM, item, BOTTOM)
-
-        clear(R.id.removeDeviceItemHint, BOTTOM)
-        connect(R.id.turnOffBody, BOTTOM, PARENT_ID, BOTTOM, 42.toPx())
-    }
-
     private fun createStateTransition() = TransitionSet()
         .setOrdering(TransitionSet.ORDERING_TOGETHER)
-        .addTransition(Fade(Fade.OUT).excludeChildren(binding.turnOffButtons, true))
-        .addTransition(ChangeBounds().excludeChildren(binding.turnOffButtons, true))
-        .addTransition(Fade(Fade.IN).excludeChildren(binding.turnOffButtons, true))
+        .addTransition(
+            Fade(Fade.OUT)
+                .excludeChildren(binding.turnOffButtons, true)
+                .excludeTarget(binding.devicesSection, true)
+                .excludeChildren(binding.devicesSection, true),
+        )
+        .addTransition(
+            ChangeBounds()
+                .excludeChildren(binding.turnOffButtons, true)
+                .excludeChildren(binding.devicesSection, true),
+        )
+        .addTransition(
+            Fade(Fade.IN)
+                .excludeChildren(binding.turnOffButtons, true)
+                .excludeTarget(binding.devicesSection, true)
+                .excludeChildren(binding.devicesSection, true),
+        )
+        .addTransition(VerticalClipReveal().addTarget(binding.devicesSection))
         .setDuration(STATE_TRANSITION_DURATION_MS)
         .setInterpolator(FastOutSlowInInterpolator())
 
@@ -231,20 +205,27 @@ class TurnOffSyncBottomSheetDialog : BottomSheetDialogFragment() {
         data object TurnOffAndDeleteServerData : Choice
     }
 
+    @Parcelize
+    class Args(
+        val thisDevice: ParcelableDevice,
+        val allDevices: List<ParcelableDevice>,
+    ) : Parcelable
+
     companion object {
         const val TAG = "TurnOffSyncBottomSheetDialog"
         const val REQUEST_KEY = "TurnOffSyncResult"
         const val RESULT_KEY_CHOICE = "choice"
 
-        private const val DEVICE_ARG = "device"
-        private const val IS_ONLY_DEVICE_ARG = "isOnlyDevice"
+        private const val FRAGMENT_ARGS = "${TAG}Args"
         private const val STATE_TRANSITION_DURATION_MS = 300L
 
         fun newInstance(
-            device: ParcelableDevice,
-            isOnlyDevice: Boolean,
+            thisDevice: ParcelableDevice,
+            allDevices: List<ParcelableDevice>,
         ) = TurnOffSyncBottomSheetDialog().apply {
-            arguments = bundleOf(DEVICE_ARG to device, IS_ONLY_DEVICE_ARG to isOnlyDevice)
+            arguments = Bundle().apply {
+                putParcelable(FRAGMENT_ARGS, Args(thisDevice, allDevices))
+            }
         }
     }
 }
@@ -253,17 +234,46 @@ private val BottomSheetTurnOffSyncBinding.removeDeviceViews
     get() = listOf(
         removeDeviceTitle,
         removeDeviceBody,
-        removeDeviceDivider,
-        removeDeviceItemIconBackground,
-        removeDeviceItemTitle,
-        removeDeviceItemHint,
     )
 
 private val BottomSheetTurnOffSyncBinding.turnOffViews
     get() = listOf(
         turnOffTitle,
-        turnOffItemBackground,
-        turnOffItemTitle,
-        turnOffItemBottomSpace,
         turnOffBody,
+        devicesSection,
     )
+
+private class VerticalClipReveal : Visibility() {
+    override fun onAppear(
+        sceneRoot: ViewGroup,
+        view: View,
+        startValues: TransitionValues?,
+        endValues: TransitionValues?,
+    ): Animator = createClipAnimator(view, fromHeight = 0, toHeight = view.height)
+
+    override fun onDisappear(
+        sceneRoot: ViewGroup,
+        view: View,
+        startValues: TransitionValues?,
+        endValues: TransitionValues?,
+    ): Animator = createClipAnimator(view, fromHeight = view.height, toHeight = 0)
+
+    private fun createClipAnimator(
+        view: View,
+        fromHeight: Int,
+        toHeight: Int,
+    ): Animator {
+        val from = Rect(0, 0, view.width, fromHeight)
+        val to = Rect(0, 0, view.width, toHeight)
+        view.clipBounds = from
+        return ObjectAnimator.ofObject(view, "clipBounds", RectEvaluator(), from, to).apply {
+            addListener(
+                object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        view.clipBounds = null
+                    }
+                },
+            )
+        }
+    }
+}

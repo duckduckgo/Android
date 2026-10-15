@@ -258,7 +258,10 @@ class SyncActivityViewModel @Inject constructor(
         ) : Command()
         data class IntroRecoverSyncData(val isAuthRequired: Boolean) : Command()
         data object AskDeleteAccount : Command()
-        data class AskTurnOffSync(val device: ConnectedDevice, val isOnlyDevice: Boolean) : Command()
+        data class AskTurnOffSync(
+            val thisDevice: ConnectedDevice,
+            val allDevices: List<ConnectedDevice>,
+        ) : Command()
         data class AskTurnOffThisDevice(val device: ConnectedDevice) : Command()
         data object AskDeleteServerData : Command()
         data object CheckIfUserHasStoragePermission : Command()
@@ -429,9 +432,9 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     private suspend fun askTurnOffSync() {
-        val thisDevice = withContext(dispatchers.io()) { syncAccountRepository.getThisConnectedDevice() } ?: return
-        val syncedDeviceCount = viewState.value.syncedDevices.count { it is SyncedDevice }
-        command.send(AskTurnOffSync(device = thisDevice, isOnlyDevice = syncedDeviceCount <= 1))
+        val allDevices = viewState.value.syncedDevices.filterIsInstance<SyncedDevice>().map { it.device }
+        val thisDevice = allDevices.firstOrNull { it.thisDevice } ?: return
+        command.send(AskTurnOffSync(thisDevice = thisDevice, allDevices = allDevices))
     }
 
     fun onTurnOffThisDeviceClicked(device: ConnectedDevice) {

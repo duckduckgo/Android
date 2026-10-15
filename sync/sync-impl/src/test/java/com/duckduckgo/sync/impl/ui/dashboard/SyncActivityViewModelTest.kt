@@ -748,7 +748,7 @@ class SyncActivityViewModelTest {
         testee.viewState().test {
             testee.commands().test {
                 testee.onDeleteAccountClicked()
-                assertEquals(AskTurnOffSync(device = connectedDevice, isOnlyDevice = true), awaitItem())
+                assertEquals(AskTurnOffSync(thisDevice = connectedDevice, allDevices = listOf(connectedDevice)), awaitItem())
                 cancelAndIgnoreRemainingEvents()
             }
             cancelAndIgnoreRemainingEvents()
@@ -766,7 +766,7 @@ class SyncActivityViewModelTest {
         testee.viewState().test {
             testee.commands().test {
                 testee.onDeleteAccountClicked()
-                assertEquals(AskTurnOffSync(device = connectedDevice, isOnlyDevice = false), awaitItem())
+                assertEquals(AskTurnOffSync(thisDevice = connectedDevice, allDevices = listOf(connectedDevice, otherDevice)), awaitItem())
                 cancelAndIgnoreRemainingEvents()
             }
             cancelAndIgnoreRemainingEvents()

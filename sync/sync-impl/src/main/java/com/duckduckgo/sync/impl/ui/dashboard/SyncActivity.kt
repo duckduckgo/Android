@@ -788,8 +788,8 @@ class SyncActivity : DuckDuckGoActivity() {
 
         TurnOffSyncBottomSheetDialog
             .newInstance(
-                device = ParcelableDevice.fromConnectedDevice(command.device),
-                isOnlyDevice = command.isOnlyDevice,
+                thisDevice = ParcelableDevice.fromConnectedDevice(command.thisDevice),
+                allDevices = command.allDevices.map(ParcelableDevice::fromConnectedDevice),
             )
             .show(supportFragmentManager, TurnOffSyncBottomSheetDialog.TAG)
     }
