@@ -21,6 +21,7 @@ import android.content.Intent
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.isPirEnabled
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.optout.PirForegroundOptOutService
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
@@ -86,7 +87,7 @@ class RealPirWorkHandler @Inject constructor(
         return withContext(dispatcherProvider.io()) {
             // pirBeta is config-targeted to the PIR entitlement, so it is never on for a free user;
             // each run mode is still gated on its own conditions in resolveEligibility.
-            if (pirRemoteFeatures.pirBeta().isEnabled() || pirRemoteFeatures.freemium().isEnabled()) {
+            if (pirRemoteFeatures.isPirEnabled()) {
                 // User could have a valid subscription but is not entitled to PIR,
                 // so we have to check both
                 // The flows only signal a change: their first value is whatever this process cached earlier,

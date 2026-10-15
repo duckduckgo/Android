@@ -77,6 +77,12 @@ interface PirRemoteFeatures {
     fun freemium(): Toggle
 }
 
+/**
+ * Paid and free PIR share one remote gate, so turning off the whole `pir` feature is the only kill switch:
+ * while `freemium` is on, paid PIR keeps running with `pirBeta` off.
+ */
+internal fun PirRemoteFeatures.isPirEnabled(): Boolean = pirBeta().isEnabled() || freemium().isEnabled()
+
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(
     scope = AppScope::class,
@@ -89,8 +95,7 @@ class PirRemoteFeatureImpl @Inject constructor(
 ) : PirFeature {
 
     override suspend fun getPirFeatureState(): PirFeatureState = withContext(dispatcherProvider.io()) {
-        val isEnabled = pirRemoteFeatures.pirBeta().isEnabled()
-        if (!isEnabled) {
+        if (!pirRemoteFeatures.isPirEnabled()) {
             return@withContext PirFeatureState.DISABLED
         }
 
