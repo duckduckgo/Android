@@ -99,7 +99,7 @@ class PreviousSessionReadyViewModel @AssistedInject constructor(
 
     private suspend fun authenticate(): Boolean {
         if (!isAuthRequired) return true
-        val response = deviceAuthenticator.authenticate(AuthenticationSource.SETTINGS_NOT_SYNCED, Request()) { event ->
+        val response = deviceAuthenticator.authenticate(AuthenticationSource.SESSION_RESTORE, Request()) { event ->
             viewModelScope.launch {
                 when (event) {
                     Event.EnrollmentNeeded -> syncSetupWideEvent.onDeviceAuthNotEnrolled()

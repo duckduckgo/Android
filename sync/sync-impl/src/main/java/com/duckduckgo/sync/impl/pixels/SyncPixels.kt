@@ -283,6 +283,7 @@ interface SyncPixels {
         THIS_DEVICE("this_device"),
         RECOVER("recover"),
         DEEP_LINK("deep_link"),
+        SESSION_RESTORE("session_restore"),
     }
 
     enum class TimeoutStage(val value: String) {

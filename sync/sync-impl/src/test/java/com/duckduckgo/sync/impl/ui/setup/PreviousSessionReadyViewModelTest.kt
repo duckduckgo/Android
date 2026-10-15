@@ -24,6 +24,7 @@ import com.duckduckgo.sync.impl.auth.FakeSyncDeviceAuthenticator
 import com.duckduckgo.sync.impl.autorestore.RestorePayload
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationSource
 import com.duckduckgo.sync.impl.ui.setup.PreviousSessionReadyViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.setup.PreviousSessionReadyViewModel.Command.SetContinueSetupResult
 import com.duckduckgo.sync.impl.ui.setup.PreviousSessionReadyViewModel.Command.SetResumeResult
@@ -147,6 +148,18 @@ class PreviousSessionReadyViewModelTest {
             skipItems(2)
 
             assertEquals(1, deviceAuthenticator.requests.size)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the user is asked to authenticate then the session restore source is used`() = runTest {
+        testee.commands.test {
+            testee.onContinueSetupClicked()
+            skipItems(2)
+
+            assertEquals(listOf(AuthenticationSource.SESSION_RESTORE), deviceAuthenticator.sources)
 
             cancel()
         }
