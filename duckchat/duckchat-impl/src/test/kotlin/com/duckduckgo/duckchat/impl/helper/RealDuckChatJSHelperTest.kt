@@ -2941,12 +2941,14 @@ class RealDuckChatJSHelperTest {
             listOf(
                 chat("a", "Sourdough recipe", daysAgo = 30),
                 chat("b", "Trip ideas", daysAgo = 0),
+                chat("pinned-match", "Pinned bread recipe", daysAgo = 60, pinned = true),
+                chat("pinned-miss", "Pinned trip", daysAgo = 0, pinned = true),
             ),
         )
 
         val chats = getAIChats(JSONObject().put("query", "  RECIPE ")).getJSONArray("chats")
 
-        assertEquals(listOf("a"), chats.chatIds())
+        assertEquals(listOf("pinned-match", "a"), chats.chatIds())
     }
 
     @Test
