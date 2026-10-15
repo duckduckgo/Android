@@ -121,6 +121,13 @@ class RealDuckAiTabGridItemRendererTest {
     }
 
     @Test
+    fun whenAwaitingReplyThenThinkingContent() = runTest {
+        whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(lastMessageText = "Question", isAwaitingReply = true))
+
+        assertEquals(RealDuckAiTabGridItemContent.Thinking("Title"), testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+    }
+
+    @Test
     fun whenTextChatWithoutContentThenEmptyContent() = runTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(lastMessageText = null))
 
@@ -195,6 +202,7 @@ class RealDuckAiTabGridItemRendererTest {
         isImageGeneration: Boolean = false,
         fileRefs: List<String> = emptyList(),
         lastMessageText: String? = null,
+        isAwaitingReply: Boolean = false,
     ) = DuckAiChatPreview(
         chat = DuckAiChat(
             chatId = CHAT_ID,
@@ -206,6 +214,7 @@ class RealDuckAiTabGridItemRendererTest {
             isImageGeneration = isImageGeneration,
         ),
         lastMessageText = lastMessageText,
+        isAwaitingReply = isAwaitingReply,
     )
 
     private companion object {
