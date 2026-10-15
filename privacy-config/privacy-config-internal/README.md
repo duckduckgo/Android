@@ -84,8 +84,12 @@ adb logcat -s PrivacyConfigOverride:I
 ```text
 CONFIG_OVERRIDE_APPLIED stage=config version=<version> etag=<etag> source=<override URL>
 CONFIG_OVERRIDE_RESET stage=config version=<version> etag=<etag>
-CONFIG_OVERRIDE_FAILED action=set_url|reset reason=invalid_url|download_failed
+CONFIG_OVERRIDE_FAILED action=set_url|reset reason=invalid_url|download_failed source=<failing URL>
 ```
+
+`source` is the last field of a FAILED line. For `set_url` it is the URL as passed, or,
+for `invalid_url`, the raw `url` extra with all whitespace removed (empty if missing). For
+`reset` it is the production config URL the RESET download used.
 
 `CONFIG_OVERRIDE_APPLIED` is logged once per persisted config while an override is
 active, not once per command. That includes the hourly background refresh and loads

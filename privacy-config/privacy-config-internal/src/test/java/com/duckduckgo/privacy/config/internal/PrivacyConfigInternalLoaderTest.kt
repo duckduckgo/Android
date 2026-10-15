@@ -128,8 +128,9 @@ class PrivacyConfigInternalLoaderTest {
         testee.handleCommand("com.duckduckgo.privacy.config.internal.RESET", null)
         assertEquals(
             listOf(
-                "CONFIG_OVERRIDE_FAILED action=set_url reason=download_failed",
-                "CONFIG_OVERRIDE_FAILED action=reset reason=download_failed",
+                "CONFIG_OVERRIDE_FAILED action=set_url reason=download_failed source=https://example.com/config.json",
+                "CONFIG_OVERRIDE_FAILED action=reset reason=download_failed " +
+                    "source=https://staticcdn.duckduckgo.com/trackerblocking/config/v5/android-config.json",
             ),
             lines,
         )
@@ -138,7 +139,13 @@ class PrivacyConfigInternalLoaderTest {
     @Test
     fun whenInvalidUrlThenEmitFailedLine() = runTest {
         testee.handleCommand("com.duckduckgo.privacy.config.internal.SET_URL", "not a url")
-        assertEquals(listOf("CONFIG_OVERRIDE_FAILED action=set_url reason=invalid_url"), lines)
+        assertEquals(listOf("CONFIG_OVERRIDE_FAILED action=set_url reason=invalid_url source=notaurl"), lines)
+    }
+
+    @Test
+    fun whenUrlMissingThenEmitFailedLineWithEmptySource() = runTest {
+        testee.handleCommand("com.duckduckgo.privacy.config.internal.SET_URL", null)
+        assertEquals(listOf("CONFIG_OVERRIDE_FAILED action=set_url reason=invalid_url source="), lines)
     }
 
     @Test
