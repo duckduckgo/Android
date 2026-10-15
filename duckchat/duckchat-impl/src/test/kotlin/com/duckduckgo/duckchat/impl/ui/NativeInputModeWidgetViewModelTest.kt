@@ -64,6 +64,8 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.pixel.InputOutcomeTracker
+import com.duckduckgo.duckchat.impl.pixel.InputSubmitMethod
 import com.duckduckgo.duckchat.impl.terms.DuckAiTermsRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.ChatSuggestionsReader
@@ -132,6 +134,7 @@ class NativeInputModeWidgetViewModelTest {
     private val duckAiChatStore: DuckAiChatStore = mock()
     private val history: NavigationHistory = mock()
     private val termsRepository: DuckAiTermsRepository = mock()
+    private val inputOutcomeTracker: InputOutcomeTracker = mock()
     private val termsAccepted = MutableStateFlow(true)
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java, ioDispatcher = coroutineRule.testDispatcher)
 
@@ -255,6 +258,7 @@ class NativeInputModeWidgetViewModelTest {
             history = history,
             termsRepository = termsRepository,
             duckChatFeature = duckChatFeature,
+            inputOutcomeTracker = inputOutcomeTracker,
             appCoroutineScope = TestScope(coroutineRule.testDispatcher),
         )
     }
@@ -835,6 +839,7 @@ class NativeInputModeWidgetViewModelTest {
 
     @Test
     fun whenBrowserModeIsFireThenFooterContextReportsFireMode() = runTest {
+        whenever(termsRepository.observeTermsAccepted(BrowserMode.FIRE)).thenReturn(termsAccepted)
         val viewModel = createViewModel(browserMode = BrowserMode.FIRE)
 
         assertEquals(BrowserMode.FIRE, viewModel.footerContext.value.browserMode)
@@ -1895,6 +1900,7 @@ class NativeInputModeWidgetViewModelTest {
             hasImageAttachment = true,
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
         )
 
         verify(duckChatPixels).firePromptSubmitted(
@@ -1928,6 +1934,7 @@ class NativeInputModeWidgetViewModelTest {
             hasImageAttachment = false,
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
         )
 
         verify(duckChatPixels).firePromptSubmitted(
@@ -1961,6 +1968,7 @@ class NativeInputModeWidgetViewModelTest {
             hasImageAttachment = false,
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
         )
 
         verify(duckChatPixels).firePromptSubmitted(
@@ -1988,6 +1996,7 @@ class NativeInputModeWidgetViewModelTest {
             hasImageAttachment = false,
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
         )
 
         verify(duckChatPixels).firePromptSubmitted(
@@ -2020,6 +2029,7 @@ class NativeInputModeWidgetViewModelTest {
             hasImageAttachment = false,
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
         )
 
         verify(duckChatPixels).firePromptSubmitted(

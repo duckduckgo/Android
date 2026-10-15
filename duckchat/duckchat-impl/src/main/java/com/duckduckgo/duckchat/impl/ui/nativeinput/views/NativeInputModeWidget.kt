@@ -90,6 +90,7 @@ import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterDraft
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterView
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.InputSubmitMethod
 import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
@@ -783,6 +784,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
         filePickerCallback = onFilePickerRequested
     }
 
+    override fun onWindowVisibilityChanged(visibility: Int) {
+        super.onWindowVisibilityChanged(visibility)
+        if (visibility == VISIBLE) viewModel.onInputWindowShown() else viewModel.onInputWindowHidden()
+    }
+
     override fun onDetachedFromWindow() {
         inputModeSwitch.removeOnTabSelectedListener(duckChatTabSelectedListener)
         if (!isEditWidget) {
@@ -896,7 +902,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                     keyEvent.action == KeyEvent.ACTION_DOWN
 
             if (actionId == EditorInfo.IME_ACTION_GO || (isHardwareEnter && shouldSubmitOnHardwareEnter())) {
-                submitMessage(message = null)
+                submitMessage(message = null, submitMethod = InputSubmitMethod.ENTER)
                 viewModel.fireKeyboardGoPressed(isSearchMode())
                 true
             } else {
@@ -1254,7 +1260,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
         (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(inputField)
     }
 
-    override fun submitMessage(message: String?) {
+    override fun submitMessage(message: String?) = submitMessage(message, InputSubmitMethod.OTHER)
+
+    private fun submitMessage(
+        message: String?,
+        submitMethod: InputSubmitMethod,
+    ) {
         if (message == null && isChatTabSelected() && attachmentLimitExceeded) {
             logcat { "submitMessage: suppressed - attachment limit exceeded" }
             return
@@ -1262,7 +1273,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         // Capture text presence before any clearFocus / submission mutates the field.
         val hasText = !(message ?: inputField.text?.toString()).isNullOrBlank()
         if (message == null && inputField.text.isNullOrBlank() && hasStandaloneAttachments && isChatTabSelected()) {
-            fireSubmissionPixels(hasText = hasText)
+            fireSubmissionPixels(hasText = hasText, submitMethod = submitMethod)
             onChatSent?.invoke("")
             inputField.clearFocus()
         } else {
@@ -1270,7 +1281,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             // non-blank text. Fire the chat-submission pixels only for the chat-tab + has-text case so
             // we never fire for a search submit nor for a no-op blank submit.
             if (isChatTabSelected() && hasText) {
-                fireSubmissionPixels(hasText = true)
+                fireSubmissionPixels(hasText = true, submitMethod = submitMethod)
             }
             // Routes to onChatSent (chat tab) or onSearchSent (search tab), and only when there is
             // non-blank text to submit.
@@ -1289,7 +1300,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         hideKeyboard()
     }
 
-    private fun fireSubmissionPixels(hasText: Boolean) {
+    private fun fireSubmissionPixels(
+        hasText: Boolean,
+        submitMethod: InputSubmitMethod,
+    ) {
         val hasImageAttachment = attachmentViewModel?.getImageAttachments()?.isNotEmpty() == true
         val hasFileAttachment = attachmentViewModel?.getFileAttachments()?.isNotEmpty() == true
         viewModel.fireSubmissionPixels(
@@ -1297,6 +1311,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             hasImageAttachment = hasImageAttachment,
             hasFileAttachment = hasFileAttachment,
             addressBarEntryPoint = nextDuckAiEntryPoint,
+            submitMethod = submitMethod,
         )
         // Fires alongside prompt_submitted, but only when the input is in a Duck.ai chat context
         // (a prompt sent from within an active chat) — not omnibar submissions that start a new chat.
@@ -1998,7 +2013,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         // submitAsChat() returns true only when there is text to submit (a real prompt
         // submission), so an empty start-new-chat does not fire the submission pixels.
         if (submitAsChat()) {
-            fireSubmissionPixels(hasText = true)
+            fireSubmissionPixels(hasText = true, submitMethod = InputSubmitMethod.BUTTON)
         } else {
             viewModel.openNewChat()
         }
@@ -2024,7 +2039,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun onSubmitClicked() {
-        submitMessage(message = null)
+        submitMessage(message = null, submitMethod = InputSubmitMethod.BUTTON)
         viewModel.fireFloatingSubmitPressed(isSearchMode())
     }
 

@@ -246,6 +246,14 @@ interface DuckChatPixels {
 
     /** Prompt submitted while the unified input is in a Duck.ai chat context. Fires alongside [firePromptSubmitted]. */
     fun fireSentPromptInChat(surface: DuckChatPixelSurface)
+
+    /** How one Duck.ai input session ended. [submitMethod] is only set for outcomes that send something. */
+    fun fireInputOutcome(
+        surface: DuckChatPixelSurface,
+        outcome: InputOutcome,
+        submitMethod: InputSubmitMethod?,
+        tosDisclaimerShown: Boolean,
+    )
     fun fireModelSelected(modelId: String, surface: DuckChatPixelSurface)
     fun fireReasoningEffortSelected(effortLevel: String, surface: DuckChatPixelSurface)
 
@@ -1213,6 +1221,22 @@ class RealDuckChatPixels @Inject constructor(
         ),
     )
 
+    override fun fireInputOutcome(
+        surface: DuckChatPixelSurface,
+        outcome: InputOutcome,
+        submitMethod: InputSubmitMethod?,
+        tosDisclaimerShown: Boolean,
+    ) = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_INPUT_OUTCOME_COUNT,
+        DuckChatPixelName.DUCK_CHAT_INPUT_OUTCOME_DAILY,
+        buildMap {
+            put(DuckChatPixelParameters.SURFACE, surface.value)
+            put(DuckChatPixelParameters.OUTCOME, outcome.value)
+            put(DuckChatPixelParameters.TOS_DISCLAIMER_SHOWN, tosDisclaimerShown.toString())
+            submitMethod?.let { put(DuckChatPixelParameters.SUBMIT_METHOD, it.value) }
+        },
+    )
+
     override fun fireVoiceTapped(surface: DuckChatPixelSurface) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_VOICE_TAPPED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_VOICE_TAPPED_DAILY,
@@ -1618,6 +1642,8 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SUBMITTED_DAILY("m_aichat_unified_input_web_search_submitted_daily"),
     DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT("m_aichat_unified_input_prompt_submitted_count"),
     DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_DAILY("m_aichat_unified_input_prompt_submitted_daily"),
+    DUCK_CHAT_INPUT_OUTCOME_COUNT("m_aichat_input_outcome_count"),
+    DUCK_CHAT_INPUT_OUTCOME_DAILY("m_aichat_input_outcome_daily"),
     DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_COUNT("m_aichat_unified_input_sent_prompt_in_chat_count"),
     DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_DAILY("m_aichat_unified_input_sent_prompt_in_chat_daily"),
     DUCK_CHAT_UNIFIED_INPUT_MODEL_SELECTED("m_aichat_unified_input_model_selected"),
@@ -1719,6 +1745,9 @@ object DuckChatPixelParameters {
     const val ATTACHMENT_SOURCE = "source"
     const val FILE_VALIDATION_REASON = "reason"
     const val SURFACE = "surface"
+    const val OUTCOME = "outcome"
+    const val SUBMIT_METHOD = "submit_method"
+    const val TOS_DISCLAIMER_SHOWN = "tos_disclaimer_shown"
     const val UPSELL_SOURCE = "source"
     const val UPSELL_CURRENT_TIER = "current_tier"
     const val UPSELL_REQUIRED_TIER = "required_tier"
@@ -1988,6 +2017,8 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_CLOSE_AI_TAB_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_CLOSE_AI_TAB_DAILY.pixelName to PixelParameter.removeAtb(),
             "m_duck-ai_native-storage_" to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_INPUT_OUTCOME_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_INPUT_OUTCOME_DAILY.pixelName to PixelParameter.removeAtb(),
             // Prefix: covers every m_aichat_unified_input_* pixel (tools, submit, model/reasoning,
             // upsell, attachments, voice, stop) AND the app-side chat_header_upgrade_tapped, which
             // shares the prefix — the interceptor matches outgoing pixel names with startsWith.

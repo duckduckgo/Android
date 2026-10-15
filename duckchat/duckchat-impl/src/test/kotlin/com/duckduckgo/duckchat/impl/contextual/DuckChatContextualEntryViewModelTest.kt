@@ -23,6 +23,7 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.pixel.InputOutcomeTracker
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionPayloadBuilder
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
@@ -53,6 +54,7 @@ class DuckChatContextualEntryViewModelTest {
     private val duckChatPixels: DuckChatPixels = mock()
     private val modelManager: DuckAiModelManager = mock()
     private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
+    private val inputOutcomeTracker: InputOutcomeTracker = mock()
     private val textSelectionRepository = RealTextSelectionRepository(dagger.Lazy { duckChatPixels }, selectionJourney)
     private val viewModel = DuckChatContextualEntryViewModel(
         store,
@@ -61,6 +63,7 @@ class DuckChatContextualEntryViewModelTest {
         textSelectionRepository,
         RealTextSelectionPayloadBuilder(RuntimeEnvironment.getApplication(), object : DuckAiHostProvider {}),
         selectionJourney,
+        inputOutcomeTracker,
     )
 
     private val validContext = """{"title":"Example","url":"https://example.com","content":"some page content"}"""
@@ -557,5 +560,23 @@ class DuckChatContextualEntryViewModelTest {
         textSelectionRepository.remove("tab-1", target.id)
 
         assertEquals(listOf("keep me"), textSelectionRepository.consume("tab-1").map { it.text })
+    }
+
+    @Test
+    fun whenSuggestionSubmittedThenReportsSuggestedPromptOutcome() = runTest {
+        viewModel.start("tab-1")
+
+        viewModel.onSuggestionSubmitted(samplePrompt)
+
+        verify(inputOutcomeTracker).suggestedPrompt()
+    }
+
+    @Test
+    fun whenSummarizeSubmittedThenReportsSuggestedPromptOutcome() = runTest {
+        viewModel.start("tab-1")
+
+        viewModel.onSummarizeSubmitted(samplePrompt)
+
+        verify(inputOutcomeTracker).suggestedPrompt()
     }
 }
