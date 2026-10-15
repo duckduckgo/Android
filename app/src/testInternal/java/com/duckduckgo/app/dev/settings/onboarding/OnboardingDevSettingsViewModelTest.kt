@@ -21,6 +21,7 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.onboarding.ContextualOnboardingTimeLimit
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -31,6 +32,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -44,6 +46,7 @@ class OnboardingDevSettingsViewModelTest {
     private val settingsDataStore: SettingsDataStore = mock()
     private val dismissedCtaDao: DismissedCtaDao = mock()
     private val ctaViewModel: CtaViewModel = mock()
+    private val contextualOnboardingTimeLimit: ContextualOnboardingTimeLimit = mock()
 
     private val requiredCtas = listOf(
         CtaId.DAX_INTRO,
@@ -66,6 +69,7 @@ class OnboardingDevSettingsViewModelTest {
         settingsDataStore = settingsDataStore,
         dismissedCtaDao = dismissedCtaDao,
         ctaViewModel = ctaViewModel,
+        contextualOnboardingTimeLimit = contextualOnboardingTimeLimit,
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
 
@@ -169,6 +173,38 @@ class OnboardingDevSettingsViewModelTest {
 
         verify(userStageStore).moveToStage(AppStage.NEW)
         allCtaIds.forEach { ctaId -> verify(dismissedCtaDao).delete(ctaId) }
+    }
+
+    @Test
+    fun whenOnboardingCompletedToggledOffThenTimeLimitRestartedBeforeMovingToNew() = runTest {
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
+        whenever(settingsDataStore.hideTips).thenReturn(false)
+        whenever(ctaViewModel.requiredDaxOnboardingCtas()).thenReturn(requiredCtas)
+        allCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(true) }
+
+        testee.onOnboardingCompletedToggled(false)
+
+        inOrder(contextualOnboardingTimeLimit, userStageStore) {
+            verify(contextualOnboardingTimeLimit).restartTimeLimit()
+            verify(userStageStore).moveToStage(AppStage.NEW)
+        }
+    }
+
+    @Test
+    fun whenRequiredCtaUndismissedAfterCompletionThenTimeLimitRestartedBeforeMovingToDaxOnboarding() = runTest {
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
+        whenever(settingsDataStore.hideTips).thenReturn(false)
+        whenever(ctaViewModel.requiredDaxOnboardingCtas()).thenReturn(requiredCtas)
+        allCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(true) }
+        testee.start()
+        whenever(dismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(false)
+
+        testee.onCtaDismissedToggled(CtaId.DAX_END, isDismissed = false)
+
+        inOrder(contextualOnboardingTimeLimit, userStageStore) {
+            verify(contextualOnboardingTimeLimit).restartTimeLimit()
+            verify(userStageStore).moveToStage(AppStage.DAX_ONBOARDING)
+        }
     }
 
     @Test

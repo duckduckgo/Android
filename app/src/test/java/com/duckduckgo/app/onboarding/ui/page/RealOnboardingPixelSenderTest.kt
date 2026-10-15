@@ -39,6 +39,7 @@ import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_EXPERIENCE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SET_DEFAULT
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_TIME_LIMIT
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_VISIT_SITE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_WELCOME
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -141,6 +142,46 @@ class RealOnboardingPixelSenderTest {
                 "value" to "engage",
             ),
             type = Unique(tag = "onboarding_welcome_clicked_engage"),
+        )
+    }
+
+    @Test
+    fun whenFireTimeLimitReachedByAppOpensThenReachedEventWithAppOpensValue() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fire(ONBOARDING_TIME_LIMIT, OnboardingPixelAction.TimeLimitReached(byAppOpens = true))
+
+        verify(mockPixel).fire(
+            ONBOARDING_TIME_LIMIT,
+            mapOf(
+                "installType" to "new",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "0",
+                "event" to "reached",
+                "value" to "app-opens",
+            ),
+            type = Unique(tag = "onboarding_time-limit_reached"),
+        )
+    }
+
+    @Test
+    fun whenFireTimeLimitReachedByDaysThenReachedEventWithDaysValue() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(7))
+
+        testee.fire(ONBOARDING_TIME_LIMIT, OnboardingPixelAction.TimeLimitReached(byAppOpens = false))
+
+        verify(mockPixel).fire(
+            ONBOARDING_TIME_LIMIT,
+            mapOf(
+                "installType" to "new",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "4-10",
+                "event" to "reached",
+                "value" to "days",
+            ),
+            type = Unique(tag = "onboarding_time-limit_reached"),
         )
     }
 
