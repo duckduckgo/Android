@@ -333,11 +333,8 @@
     <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Vypni Sync &amp; Backup a smaž všechna synchronizovaná data ze serveru a deaktivuj svůj kód pro obnovení.</string>
     <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Smazat zařízení</string>
     <string name="sync_simplified_settings_turn_off_sheet_title">Vypnout Sync &amp; Backup?</string>
-    <string name="sync_simplified_settings_turn_off_sheet_item">Smazat data ze serveru</string>
     <string name="sync_simplified_settings_turn_off_sheet_body">Dojde k odpojení všech zařízení používajících Sync &amp; Backup a smazání synchronizovaných dat ze serveru.</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button">Vypnout toto zařízení</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Vypnout a smazat</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete_all">Vypnout všechna zařízení a smazat</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Vypnout a smazat data serveru</string>
 
     <!-- Sync settings screen: turn off this device dialog -->
     <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">Odebrat %1$s ze Sync &amp; Backup?</string>
@@ -441,6 +438,8 @@
     <string name="sync_simplified_edit_device_sync_this_device_item">Synchronizovat toto zařízení</string>
     <string name="sync_simplified_edit_device_remove_notice_this_device">Pokud toto zařízení odebereš, už nebude mít přístup k tvým synchronizovaným datům.</string>
     <string name="sync_simplified_edit_device_remove_notice_another_device">Pokud tuhle možnost vypneš, tohle zařízení už nebude mít přístup k tvým synchronizovaným datům.</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Pokud bude tahle možnost vypnutá, „%1$s“ už nebude mít přístup k tvým synchronizovaným datům na ostatních zařízeních.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s“ už nebude mít přístup k tvým synchronizovaným datům na ostatních zařízeních.</string>
 
     <!-- Edit Device screen: edit name dialog -->
     <string name="sync_simplified_edit_device_edit_name_dialog_title">Upravit název</string>
