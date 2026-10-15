@@ -311,7 +311,7 @@ class RealPirWorkHandlerTest {
     }
 
     @Test
-    fun whenFreemiumEnabledAndActivatedAndSubscribedButNotPirEntitledThenCanRunPirEnabledWithScanOnly() = runTest {
+    fun whenFreemiumEnabledAndActivatedAndSubscribedButNotPirEntitledThenCanRunPirDisabledWithEntitlementLost() = runTest {
         whenever(pirBetaToggle.isEnabled()).thenReturn(true)
         whenever(freemiumToggle.isEnabled()).thenReturn(true)
         whenever(pirFreemiumDataStore.didActivate).thenReturn(true)
@@ -319,7 +319,7 @@ class RealPirWorkHandlerTest {
         whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
 
         pirWorkHandler.canRunPir().test {
-            assertEquals(PirEligibility.Enabled(PirRunMode.SCAN_ONLY), awaitItem())
+            assertEquals(PirEligibility.Disabled(DisabledReason.ENTITLEMENT_LOST), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }
