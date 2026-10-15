@@ -19,10 +19,10 @@ package com.duckduckgo.app.di
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.app.di.ActivityComponent.Factory
+import com.duckduckgo.di.android.AndroidInjector
+import com.duckduckgo.di.android.InjectableActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
-import dagger.android.AndroidInjector
-import dagger.android.DaggerActivity
 import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.Binds
 import dev.zacsweers.metro.ClassKey
@@ -32,11 +32,11 @@ import dev.zacsweers.metro.IntoMap
 import dev.zacsweers.metro.Provides
 
 @GraphExtension(scope = ActivityScope::class)
-interface ActivityComponent : AndroidInjector<DaggerActivity> {
+interface ActivityComponent : AndroidInjector<InjectableActivity> {
 
     @GraphExtension.Factory
-    interface Factory : AndroidInjector.Factory<DaggerActivity, ActivityComponent> {
-        override fun create(@Provides instance: DaggerActivity): ActivityComponent
+    interface Factory : AndroidInjector.Factory<InjectableActivity, ActivityComponent> {
+        override fun create(@Provides instance: InjectableActivity): ActivityComponent
     }
 
     @ContributesTo(AppScope::class)
@@ -47,20 +47,20 @@ interface ActivityComponent : AndroidInjector<DaggerActivity> {
 
 @BindingContainer
 @ContributesTo(AppScope::class)
-abstract class DaggerActivityModule {
+abstract class InjectableActivityModule {
     @Binds
     @IntoMap
-    @ClassKey(DaggerActivity::class)
-    abstract fun bindsDaggerActivityComponent(factory: Factory): AndroidInjector.Factory<*, *>
+    @ClassKey(InjectableActivity::class)
+    abstract fun bindsInjectableActivityComponent(factory: Factory): AndroidInjector.Factory<*, *>
 }
 
 @BindingContainer
 @ContributesTo(ActivityScope::class)
-abstract class DaggerActivityScopedModule {
+abstract class InjectableActivityScopedModule {
     @Binds
-    abstract fun bindsDaggerActivity(daggerActivity: DaggerActivity): AppCompatActivity
+    abstract fun bindsInjectableActivity(activity: InjectableActivity): AppCompatActivity
 
     @Binds
     @ActivityContext
-    abstract fun bindsActivityContext(daggerActivity: DaggerActivity): Context
+    abstract fun bindsActivityContext(activity: InjectableActivity): Context
 }

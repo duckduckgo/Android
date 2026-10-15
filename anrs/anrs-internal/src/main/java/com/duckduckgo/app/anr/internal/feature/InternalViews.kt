@@ -17,8 +17,8 @@
 package com.duckduckgo.app.anr.internal.feature
 
 import android.content.Context
-import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.anr.internal.feature.CrashANRsInternalScreens.InternalCrashSettings
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin.Companion.CRASH_ANR_SETTINGS_PRIO_KEY

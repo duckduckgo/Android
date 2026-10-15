@@ -30,12 +30,12 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
+    ksp project(':codegen-ksp')
     implementation project(path: ':credential-exchange-api')
     implementation project(path: ':di')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':common-utils')
-    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':codegen-annotations')
 
     implementation KotlinX.coroutines.core
     implementation Square.logcat

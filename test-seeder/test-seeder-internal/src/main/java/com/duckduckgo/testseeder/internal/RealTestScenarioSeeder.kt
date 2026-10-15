@@ -17,7 +17,6 @@
 package com.duckduckgo.testseeder.internal
 
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.testseeder.api.TestScenarioSeeder
 import com.duckduckgo.testseeder.api.TestSeederKey
@@ -30,7 +29,7 @@ import javax.inject.Inject
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealTestScenarioSeeder @Inject constructor(
-    plugins: DaggerSet<TestSeederPlugin>,
+    plugins: Set<TestSeederPlugin>,
     private val dispatchers: DispatcherProvider,
 ) : TestScenarioSeeder {
 

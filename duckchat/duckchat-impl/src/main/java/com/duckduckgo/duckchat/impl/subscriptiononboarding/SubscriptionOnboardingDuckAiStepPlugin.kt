@@ -17,7 +17,7 @@
 package com.duckduckgo.duckchat.impl.subscriptiononboarding
 
 import androidx.fragment.app.Fragment
-import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.R

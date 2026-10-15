@@ -19,12 +19,12 @@ package com.duckduckgo.app.about
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_DDG_LEARN_MORE_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_DDG_PRIVACY_POLICY_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_DDG_VERSION_EASTER_EGG_PRESSED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel

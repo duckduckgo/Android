@@ -18,7 +18,7 @@ package com.duckduckgo.mobile.android.vpn.breakage
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST

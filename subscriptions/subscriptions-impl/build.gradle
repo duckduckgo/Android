@@ -32,9 +32,9 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
+    ksp project(':codegen-ksp')
     testImplementation 'junit:junit:4.13.1'
-    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':codegen-annotations')
 
     implementation project(path: ':di')
     implementation project(path: ':cookies-api')

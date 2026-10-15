@@ -22,7 +22,6 @@ import com.duckduckgo.app.statistics.api.*
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.common.utils.device.ContextDeviceInfo
 import com.duckduckgo.common.utils.device.DeviceInfo
-import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
@@ -35,7 +34,7 @@ object StatisticsModule {
 
     @Provides
     fun offlinePixelSender(
-        offlinePixels: DaggerSet<OfflinePixel>,
+        offlinePixels: Set<OfflinePixel>,
     ): OfflinePixelSender = OfflinePixelSender(offlinePixels)
 
     @Provides

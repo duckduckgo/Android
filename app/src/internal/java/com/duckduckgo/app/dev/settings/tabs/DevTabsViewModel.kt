@@ -18,12 +18,12 @@ package com.duckduckgo.app.dev.settings.tabs
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.dev.settings.tabs.DevTabsViewModel.Command.NoMoreCandidatesForBookmarks
 import com.duckduckgo.app.dev.settings.tabs.DevTabsViewModel.Command.NoMoreCandidatesForFavorites
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.browsermode.api.FireMode
 import com.duckduckgo.browsermode.api.RegularMode
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository

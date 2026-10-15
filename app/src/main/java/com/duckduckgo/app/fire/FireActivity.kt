@@ -22,9 +22,9 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.mode.FireRestart
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.view.fadeTransitionConfig
 import com.duckduckgo.common.ui.view.noAnimationConfig
 import com.duckduckgo.di.scopes.ActivityScope

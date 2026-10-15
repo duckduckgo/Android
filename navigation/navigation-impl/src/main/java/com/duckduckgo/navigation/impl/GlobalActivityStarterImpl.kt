@@ -21,7 +21,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
-import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
@@ -37,7 +36,7 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 @SingleIn(AppScope::class)
 class GlobalActivityStarterImpl @Inject constructor(
-    private val activityMappers: DaggerSet<GlobalActivityStarter.ParamToActivityMapper>,
+    private val activityMappers: Set<GlobalActivityStarter.ParamToActivityMapper>,
 ) : GlobalActivityStarter {
 
     override fun start(context: Context, params: GlobalActivityStarter.ActivityParams, options: Bundle?) {

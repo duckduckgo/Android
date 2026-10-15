@@ -27,10 +27,10 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
+    ksp project(':codegen-ksp')
 
     implementation project(':di')
-    implementation project(':anvil-annotations')
+    implementation project(':codegen-annotations')
     implementation project(':app-build-config-api')
     implementation project(':feature-toggles-api')
 

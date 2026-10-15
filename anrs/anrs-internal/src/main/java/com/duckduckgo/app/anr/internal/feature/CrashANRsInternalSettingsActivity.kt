@@ -19,8 +19,8 @@ package com.duckduckgo.app.anr.internal.feature
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.anr.internal.databinding.ActivityCrashAnrInternalSettingsBinding
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler

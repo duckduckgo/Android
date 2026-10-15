@@ -50,6 +50,6 @@ object WorkerModule {
     fun workerFactory(
         workerInjectorPluginPoint: PluginPoint<WorkerInjectorPlugin>,
     ): WorkerFactory {
-        return DaggerWorkerFactory(workerInjectorPluginPoint)
+        return InjectingWorkerFactory(workerInjectorPluginPoint)
     }
 }

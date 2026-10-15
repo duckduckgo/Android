@@ -41,10 +41,10 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
+    ksp project(':codegen-ksp')
     implementation project(':navigation-api')
     implementation project(':anrs-api')
-    implementation project(':anvil-annotations')
+    implementation project(':codegen-annotations')
     implementation project(':vpn-store')
     implementation project(':vpn-api')
     implementation project(':app-tracking-api')

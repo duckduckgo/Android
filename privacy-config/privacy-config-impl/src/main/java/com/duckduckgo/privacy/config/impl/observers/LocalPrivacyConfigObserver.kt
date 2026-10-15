@@ -19,9 +19,9 @@ package com.duckduckgo.privacy.config.impl.observers
 import android.content.Context
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.impl.PrivacyConfigPersister

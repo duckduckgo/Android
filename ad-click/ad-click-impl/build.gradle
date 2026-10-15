@@ -34,8 +34,8 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':browser-api')
     implementation project(path: ':ad-click-api')
     implementation project(path: ':di')

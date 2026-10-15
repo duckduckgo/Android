@@ -16,7 +16,7 @@
 
 package com.duckduckgo.httpsupgrade.impl
 
-import com.duckduckgo.anvil.annotations.ContributesServiceApi
+import com.duckduckgo.codegen.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpec
 import com.duckduckgo.httpsupgrade.store.HttpsFalsePositiveDomain

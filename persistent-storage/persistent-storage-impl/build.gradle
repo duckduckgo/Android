@@ -32,7 +32,7 @@ android {
 dependencies {
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
-    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':persistent-storage-api')
 
     implementation "com.squareup.logcat:logcat:_"

@@ -111,12 +111,12 @@ interface MyFeature : Feature {
   only access `AppScope` bindings — there is no `@ActivityContext` available.
 - `VpnScope` also parents to `AppComponent` and is only for the VPN secondary process.
 
-For the component diagram and for diagnosing "could not find dagger component" crashes, read
-`.claude/docs/dagger-scopes.md`.
+For the component diagram and for diagnosing "Could not find the injector" crashes, read
+`.claude/docs/di-scopes.md`.
 
 ### Activity Context
 
-`@ActivityContext Context` and `AppCompatActivity` are provided at `ActivityScope` via `DaggerActivityScopedModule`. Inject them with:
+`@ActivityContext Context` and `AppCompatActivity` are provided at `ActivityScope` via `InjectableActivityScopedModule`. Inject them with:
 
 ```kotlin
 @ContributesBinding(ActivityScope::class)
@@ -140,7 +140,7 @@ Never pass `Context` as a parameter through an interface if DI can provide it at
 ### Activity and Fragment base classes
 
 Activities extend `DuckDuckGoActivity`, fragments extend `DuckDuckGoFragment` (lint enforces the
-latter). These are not optional conveniences: they are the `DaggerActivity`/`DaggerFragment`
+latter). These are not optional conveniences: they are the `InjectableActivity`/`InjectableFragment`
 subclasses carrying
 `@HasMemberInjections`, so a screen that extends `AppCompatActivity` or `Fragment` directly gets no
 member injection and no `viewModelFactory`. `DuckDuckGoActivity` additionally applies the stored

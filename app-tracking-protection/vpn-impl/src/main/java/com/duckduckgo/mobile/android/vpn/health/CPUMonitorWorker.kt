@@ -19,8 +19,8 @@ package com.duckduckgo.mobile.android.vpn.health
 import android.content.Context
 import androidx.work.WorkerParameters
 import androidx.work.multiprocess.RemoteCoroutineWorker
-import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.di.ProcessName
+import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels

@@ -17,7 +17,7 @@
 package com.duckduckgo.app.dev.settings.onboarding
 
 import android.content.Context
-import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.navigation.api.GlobalActivityStarter

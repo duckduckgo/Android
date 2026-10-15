@@ -58,7 +58,7 @@ object VpnAppModule {
 
     /**
      * TODO this class should also not be needed in the AppScope.
-     * It is needed because the DaggerWorkerFactory is not modular. Easy to fix tho
+     * It is needed because the InjectingWorkerFactory is not modular. Easy to fix tho
      */
     @SingleIn(AppScope::class)
     @Provides

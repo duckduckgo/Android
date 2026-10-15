@@ -17,13 +17,13 @@
 package com.duckduckgo.app.statistics
 
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.StatisticsPixelName.ATB_PRE_INITIALIZER_PLUGIN_TIMEOUT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope

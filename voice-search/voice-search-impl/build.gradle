@@ -30,7 +30,7 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
+    ksp project(':codegen-ksp')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':common-utils')
     implementation project(path: ':design-system')
@@ -44,7 +44,7 @@ dependencies {
     implementation project(path: ':remote-messaging-api')
     implementation project(path: ':browser-ui')
 
-    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':codegen-annotations')
 
     implementation AndroidX.appCompat
     implementation AndroidX.room.runtime

@@ -29,7 +29,7 @@ ext {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
+    ksp project(':codegen-ksp')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':feature-toggles-api')
@@ -58,7 +58,7 @@ dependencies {
     implementation project(':cookies-api')
     implementation project(':browser-mode-api')
 
-    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':codegen-annotations')
 
     implementation AndroidX.security.crypto
     implementation Square.okio

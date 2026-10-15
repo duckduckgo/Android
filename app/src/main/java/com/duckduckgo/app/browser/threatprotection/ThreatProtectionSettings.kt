@@ -18,8 +18,8 @@ package com.duckduckgo.app.browser.threatprotection
 
 import android.content.Context
 import android.view.View
-import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.common.ui.view.listitem.SettingsListItem
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
