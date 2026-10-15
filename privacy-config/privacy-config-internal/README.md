@@ -7,7 +7,13 @@ Internal-only module with dev tools for testing the remote privacy config integr
 ## Load a privacy config with adb
 
 The manifest receiver is available only in the `internal` flavor and requires
-`android.permission.DUMP`. Send an explicit broadcast from `adb shell`:
+`android.permission.DUMP`. Send an explicit broadcast from `adb shell`. The package
+name depends on the build:
+
+| Build | Package |
+|---|---|
+| `internalDebug` | `com.duckduckgo.mobile.android.debug` |
+| `internalRelease` | `com.duckduckgo.mobile.android` |
 
 ```bash
 adb shell am broadcast --include-stopped-packages \
@@ -16,20 +22,47 @@ adb shell am broadcast --include-stopped-packages \
   --es url http://10.0.2.2:8080/android-config.json
 ```
 
+`10.0.2.2` is the Android emulator's alias for the host. On a physical device, or if you
+prefer `localhost`, forward the port instead:
+
+```bash
+adb reverse tcp:8080 tcp:8080
+adb shell am broadcast --include-stopped-packages \
+  -a com.duckduckgo.privacy.config.internal.SET_URL \
+  -p com.duckduckgo.mobile.android.debug \
+  --es url http://localhost:8080/android-config.json
+```
+
 Use `--include-stopped-packages` when the app has been force-stopped or has never
-been launched. Substitute the installed package name for other internal builds.
-HTTP and HTTPS URLs with a host are accepted.
-The receiver queues one immediate load, enables the developer override, and resets
-the stored version and ETag before downloading. Commands are processed in order.
-There is no command retry, polling, or new periodic work; the existing hourly
-worker is unchanged. The override setting remains until another command or a
-manual Developer Settings change.
+been launched.
+
+### URL validation
+
+`PrivacyConfigInternalLoader.isValidUrl` accepts a URL only if all of these hold:
+
+- the scheme is `http` or `https`, lower-case only (`HTTP://` is rejected);
+- it has a host;
+- the port, if given, is valid (0-65535);
+- it contains no whitespace.
+
+An invalid URL logs `CONFIG_OVERRIDE_FAILED action=set_url reason=invalid_url` and
+leaves settings unchanged.
+
+### Processing
+
+The broadcast does not load anything itself. It queues a `PrivacyConfigOverrideWorker`
+as unique work (`APPEND_OR_REPLACE`, not expedited), so commands run in order but start
+only when WorkManager schedules them. A valid SET_URL enables the developer override,
+and the worker then resets the stored version and ETag before downloading. There is no
+command retry, polling, or new periodic work; the existing hourly worker is unchanged.
+The override is persistent: it remains until a RESET or a manual Developer Settings
+change, including across app restarts.
 
 Serve `generated/v5/android-config.json` from `duckduckgo/privacy-configuration`
 (after running `node index.js`) with `Cache-Control: no-store` so subsequent commands
-fetch your latest file. `10.0.2.2` is the Android emulator's host address.
+fetch your latest file.
 
-Clear the override and immediately load the default config:
+Clear the override and load the default config:
 
 ```bash
 adb shell am broadcast --include-stopped-packages \
@@ -37,10 +70,12 @@ adb shell am broadcast --include-stopped-packages \
   -p com.duckduckgo.mobile.android.debug
 ```
 
+RESET is queued like SET_URL; it is finished when its result line appears.
+
 ### Result lines
 
 Every SET_URL and RESET command logs exactly one line under the tag
-`PrivacyConfigOverride`, on debug and release internal builds alike:
+`PrivacyConfigOverride`, on both `internalDebug` and `internalRelease`:
 
 ```bash
 adb logcat -s PrivacyConfigOverride:I
@@ -54,8 +89,15 @@ CONFIG_OVERRIDE_FAILED action=set_url|reset reason=invalid_url|download_failed
 
 Broadcast completion means the command was queued; the result line means it
 finished. The ETag is empty if the server omits it. A failed SET_URL download
-keeps the selected override for the next command or manual load; an invalid URL
-leaves settings unchanged. Loads started from Developer Settings log nothing.
+keeps the selected override for the next command or manual load. Loads started from
+Developer Settings log nothing.
+
+### Known issue: DNS after a cold start
+
+If the broadcast cold-starts the app process, the emulator may fail DNS resolution
+for the first request. A hostname URL, including the production URL loaded by RESET,
+can then log `CONFIG_OVERRIDE_FAILED ... reason=download_failed`. Running with the app in the
+foreground avoids it; otherwise re-send the command.
 
 ## Local remote config patches
 
