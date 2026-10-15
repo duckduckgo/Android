@@ -164,8 +164,9 @@ android {
             } else if (isValidSigningConfig(signingConfigs.release)) {
                 signingConfig = signingConfigs.release
             } else {
-                println "Signing properties not found, release artifacts will not be signed."
-                signingConfig = null
+                // TEMPORARY for local TDS timing runs. Do not merge.
+                println "Signing properties not found, signing release artifacts with the debug key."
+                signingConfig = signingConfigs.debug
             }
         }
     }

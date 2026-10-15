@@ -36,6 +36,7 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.privacy.model.TrustedSites
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
+import com.duckduckgo.app.trackerdetection.TdsTiming
 import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -149,6 +150,7 @@ class WebViewRequestInterceptor(
         val url: Uri = request.url
         val documentUrlString = documentUri.toString()
         val urlString = url.toString()
+        if (request.isForMainFrame) TdsTiming.log("main frame intercept host=${url.host}")
 
         if (!checkMaliciousAfterHttpsUpgrade) {
             maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri) { isMalicious ->

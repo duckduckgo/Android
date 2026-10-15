@@ -36,6 +36,8 @@ import dagger.SingleInstanceIn
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class, boundType = TrackerDetector::class)
@@ -57,6 +59,20 @@ class TrackerDetectorImpl @Inject constructor(
      */
     @Volatile
     private var blockingClients: List<Client> = emptyList()
+
+    private val evaluatedWithoutClient = AtomicInteger()
+    private val loggedFirstWithClient = AtomicBoolean()
+
+    private fun logTdsTiming(url: String) {
+        if (blockingClients.isEmpty()) {
+            val count = evaluatedWithoutClient.incrementAndGet()
+            if (count <= 5 || count % 25 == 0) {
+                TdsTiming.log("evaluated WITHOUT TdsClient #$count host=${Uri.parse(url).host}")
+            }
+        } else if (loggedFirstWithClient.compareAndSet(false, true)) {
+            TdsTiming.log("first evaluation WITH TdsClient; ${evaluatedWithoutClient.get()} evaluated without it before")
+        }
+    }
 
     /**
      * Adds a new client. If the client's name matches an existing client, old client is replaced
@@ -81,6 +97,7 @@ class TrackerDetectorImpl @Inject constructor(
             logcat(VERBOSE) { "$url is a first party url" }
             return null
         }
+        logTdsTiming(urlString)
 
         val result = blockingClients
             .firstNotNullOfOrNull { it.matches(cleanedUrl, documentUrl, requestHeaders) } ?: Client.Result.NO_MATCH
@@ -106,6 +123,7 @@ class TrackerDetectorImpl @Inject constructor(
             logcat(VERBOSE) { "$url is a first party url" }
             return null
         }
+        logTdsTiming(url)
 
         val result = blockingClients
             .firstNotNullOfOrNull { it.matches(cleanedUrl, documentUrl, requestHeaders) } ?: Client.Result.NO_MATCH

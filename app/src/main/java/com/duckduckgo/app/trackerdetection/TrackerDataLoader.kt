@@ -79,11 +79,13 @@ class TrackerDataLoader @Inject constructor(
 
     private fun loadData() {
         logcat { "Loading tracker data" }
+        TdsTiming.log("loader start")
         loadTds()
     }
 
     private fun loadTds() {
         val count = tdsTrackerDao.count()
+        TdsTiming.log("loader: tracker count in DB=$count")
         if (count == 0) {
             updateTdsFromFile()
         }
@@ -96,7 +98,9 @@ class TrackerDataLoader @Inject constructor(
             val adapter = moshi.adapter(TdsJson::class.java)
             val inputStream = context.resources.openRawResource(R.raw.tds).source()
 
+            val parseStart = TdsTiming.now()
             val tdsJson = adapter.fromJson(inputStream.buffer())
+            TdsTiming.log("bundled tds.json parsed in ${TdsTiming.now() - parseStart}ms")
             tdsJson?.let {
                 persistTds(DEFAULT_ETAG, it)
             }
@@ -106,26 +110,37 @@ class TrackerDataLoader @Inject constructor(
         eTag: String,
         tdsJson: TdsJson,
     ) {
+        val waitStart = TdsTiming.now()
         trackerDetectionDatabase.runInTransaction {
+            val writeStart = TdsTiming.now()
+            TdsTiming.log("persist eTag=$eTag: write lock after ${writeStart - waitStart}ms")
             tdsMetadataDao.tdsDownloadSuccessful(TdsMetadata(eTag = eTag))
             tdsEntityDao.updateAll(tdsJson.jsonToEntities())
             tdsDomainEntityDao.updateAll(tdsJson.jsonToDomainEntities())
             tdsTrackerDao.updateAll(tdsJson.jsonToTrackers().values)
             tdsCnameEntityDao.updateAll(tdsJson.jsonToCnameEntities())
+            TdsTiming.log("persist eTag=$eTag: rows written in ${TdsTiming.now() - writeStart}ms")
         }
     }
 
     fun loadTrackers() {
+        val readStart = TdsTiming.now()
         val trackers = tdsTrackerDao.getAll()
         logcat { "Loaded ${trackers.size} tds trackers from DB" }
+        TdsTiming.log("read ${trackers.size} trackers from DB in ${TdsTiming.now() - readStart}ms")
+        val buildStart = TdsTiming.now()
         val client = TdsClient(
             name = Client.ClientName.TDS,
             trackers = trackers,
             urlToTypeMapper = urlToTypeMapper,
         )
+        TdsTiming.log("TdsClient built (regexes compiled) in ${TdsTiming.now() - buildStart}ms")
         trackerDetectorClientProvider.addClient(client)
+        TdsTiming.log("TdsClient ADDED")
+        val refreshStart = TdsTiming.now()
         entityLookupRefresher.refresh()
         cloakedCnameRefresher.refresh()
+        TdsTiming.log("entity + CNAME caches refreshed in ${TdsTiming.now() - refreshStart}ms")
     }
 
     companion object {

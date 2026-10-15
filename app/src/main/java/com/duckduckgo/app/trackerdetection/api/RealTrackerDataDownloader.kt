@@ -17,6 +17,7 @@
 package com.duckduckgo.app.trackerdetection.api
 
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
+import com.duckduckgo.app.trackerdetection.TdsTiming
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.app.trackerdetection.db.TrackerDetectionDatabase
@@ -50,24 +51,32 @@ class RealTrackerDataDownloader @Inject constructor(
     override fun downloadTds(): Completable {
         return Completable.fromAction {
             logcat { "Downloading tds.json" }
+            TdsTiming.log("download start")
 
             val call = trackerListService.tds()
             val response = call.execute()
+            TdsTiming.log("download: response headers received, code=${response.code()}")
 
             if (!response.isSuccessful) {
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
 
+            val parseStart = TdsTiming.now()
             val tdsJson = response.body()!!.use { parseTds(it.source()) }
                 ?: throw IOException("Empty tds.json body")
+            TdsTiming.log("download: body read + parsed in ${TdsTiming.now() - parseStart}ms")
             val eTag = response.headers().extractETag()
             val oldEtag = metadataDao.eTag()
+            TdsTiming.log("download: eTag=$eTag, stored eTag=$oldEtag")
             if (eTag != oldEtag) {
                 logcat { "Updating tds data from server" }
+                val waitStart = TdsTiming.now()
                 trackerDetectionDatabase.runInTransaction {
+                    TdsTiming.log("download: transaction write lock after ${TdsTiming.now() - waitStart}ms")
                     trackerDataLoader.persistTds(eTag, tdsJson)
                     trackerDataLoader.loadTrackers()
                 }
+                TdsTiming.log("download: transaction committed")
             }
         }
     }
