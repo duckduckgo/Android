@@ -495,6 +495,11 @@
           return false;
         }
       }
+      if (feature.maxSupportedVersion && platform?.version) {
+        if (!isMaxSupportedVersion(feature.maxSupportedVersion, platform.version)) {
+          return false;
+        }
+      }
       if (isSelfGatingFeature(featureName)) {
         return isStateEnabled(feature.state, platform);
       }
