@@ -333,11 +333,8 @@
     <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Απενεργοποίηση του Sync &amp; Backup και διαγραφή όλων των συγχρονισμένων δεδομένων από τον διακομιστή και απενεργοποίηση του κωδικού ανάκτησής σου.</string>
     <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Αφαίρεση συσκευής</string>
     <string name="sync_simplified_settings_turn_off_sheet_title">Απενεργοποίηση του Sync &amp; Backup;</string>
-    <string name="sync_simplified_settings_turn_off_sheet_item">Διαγραφή δεδομένων διακομιστή</string>
     <string name="sync_simplified_settings_turn_off_sheet_body">Όλες οι συσκευές που χρησιμοποιούν το Sync &amp; Backup θα αποσυνδεθούν και τα συγχρονισμένα δεδομένα σου θα διαγραφούν από τον διακομιστή.</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button">Απενεργοποίηση αυτής της συσκευής</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Απενεργοποίηση και διαγραφή</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete_all">Απενεργοποίηση όλων των συσκευών και διαγραφή</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Απενεργοποίηση και διαγραφή δεδομένων διακομιστή</string>
 
     <!-- Sync settings screen: turn off this device dialog -->
     <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">Κατάργηση του %1$s από το Sync &amp; Backup;</string>
@@ -441,6 +438,8 @@
     <string name="sync_simplified_edit_device_sync_this_device_item">Συγχρονισμός αυτής της συσκευής</string>
     <string name="sync_simplified_edit_device_remove_notice_this_device">Αυτή η συσκευή δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας αν την αφαιρέσετε.</string>
     <string name="sync_simplified_edit_device_remove_notice_another_device">Αυτή η συσκευή δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας αν αυτό απενεργοποιηθεί.</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Το «%1$s» δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σου σε άλλες συσκευές αν αυτό απενεργοποιηθεί.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Το «%1$s» δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σου σε άλλες συσκευές.</string>
 
     <!-- Edit Device screen: edit name dialog -->
     <string name="sync_simplified_edit_device_edit_name_dialog_title">Επεξεργασία ονόματος</string>
