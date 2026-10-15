@@ -73,7 +73,7 @@ class ReadSyncCodeCameraIntroViewModelTest {
     }
 
     @Test
-    fun `when improved sync flow is enabled and permission is granted then the intro animation plays on resume`() = runTest {
+    fun `when improved sync flow is enabled and permission is granted then the camera resumes and the intro animation plays on resume`() = runTest {
         syncFeature.canUseImprovedSyncFlow().setRawStoredState(State(enable = true))
         whenever(cameraAccess.isHardwareAvailable()).thenReturn(true)
         whenever(cameraAccess.isPermissionGranted()).thenReturn(true)
@@ -82,11 +82,65 @@ class ReadSyncCodeCameraIntroViewModelTest {
         testee.commands.test {
             testee.refreshCameraPermissionState()
             testee.requestAnimationStart()
+            assertIs<ResumeCamera>(awaitItem())
             assertIs<PlayIntroAnimation>(awaitItem())
             expectNoEvents()
 
             cancel()
         }
+    }
+
+    @Test
+    fun `when improved sync flow is enabled and the intro is shown then the camera preview is active`() = runTest {
+        syncFeature.canUseImprovedSyncFlow().setRawStoredState(State(enable = true))
+        whenever(cameraAccess.isHardwareAvailable()).thenReturn(true)
+        whenever(cameraAccess.isPermissionGranted()).thenReturn(true)
+        val testee = createTestee()
+
+        assertEquals(ViewMode.Intro, testee.viewState.value.viewMode)
+        assertTrue(testee.viewState.value.showCameraPreview)
+    }
+
+    @Test
+    fun `when improved sync flow is disabled and the intro is shown then the camera preview is not active`() = runTest {
+        whenever(cameraAccess.isHardwareAvailable()).thenReturn(true)
+        whenever(cameraAccess.isPermissionGranted()).thenReturn(true)
+        val testee = createTestee()
+
+        assertEquals(ViewMode.Intro, testee.viewState.value.viewMode)
+        assertFalse(testee.viewState.value.showCameraPreview)
+    }
+
+    @Test
+    fun `when improved sync flow is enabled and the got it button is clicked during the intro then the camera is shown`() = runTest {
+        syncFeature.canUseImprovedSyncFlow().setRawStoredState(State(enable = true))
+        whenever(cameraAccess.isHardwareAvailable()).thenReturn(true)
+        whenever(cameraAccess.isPermissionGranted()).thenReturn(true)
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.onScanButtonClicked()
+            assertIs<ResumeCamera>(awaitItem())
+            assertIs<ExpandScannerCutout>(awaitItem())
+
+            cancel()
+        }
+        assertEquals(ViewMode.Camera, testee.viewState.value.viewMode)
+        assertTrue(testee.viewState.value.animationFinished)
+    }
+
+    @Test
+    fun `when improved sync flow is enabled and the camera runs behind the intro then the permission state pixel is fired once`() = runTest {
+        syncFeature.canUseImprovedSyncFlow().setRawStoredState(State(enable = true))
+        whenever(cameraAccess.isHardwareAvailable()).thenReturn(true)
+        whenever(cameraAccess.isPermissionGranted()).thenReturn(true)
+        val testee = createTestee()
+
+        testee.refreshCameraPermissionState()
+        testee.onAnimationFinished()
+
+        verify(syncPixels).fireScannerCameraPermissionState(beforeRequesting = true, afterRequesting = true)
+        verifyNoMoreInteractions(syncPixels)
     }
 
     @Test
@@ -134,18 +188,20 @@ class ReadSyncCodeCameraIntroViewModelTest {
     }
 
     @Test
-    fun `when improved sync flow is enabled and permission is granted from the request then the intro animation plays on resume`() = runTest {
+    fun `when improved sync flow is enabled and the request grants permission then the camera resumes and the intro plays`() = runTest {
         syncFeature.canUseImprovedSyncFlow().setRawStoredState(State(enable = true))
         whenever(cameraAccess.isHardwareAvailable()).thenReturn(true)
         whenever(cameraAccess.isPermissionGranted()).thenReturn(false)
         val testee = createTestee()
 
-        whenever(cameraAccess.isPermissionGranted()).thenReturn(true)
-        testee.onCameraPermissionResult()
-
         testee.commands.test {
+            whenever(cameraAccess.isPermissionGranted()).thenReturn(true)
+            testee.onCameraPermissionResult()
+            assertIs<ResumeCamera>(awaitItem())
+
             testee.refreshCameraPermissionState()
             testee.requestAnimationStart()
+            assertIs<ResumeCamera>(awaitItem())
             assertIs<PlayIntroAnimation>(awaitItem())
             expectNoEvents()
 
@@ -174,10 +230,12 @@ class ReadSyncCodeCameraIntroViewModelTest {
         whenever(cameraAccess.isHardwareAvailable()).thenReturn(true)
         whenever(cameraAccess.isPermissionGranted()).thenReturn(false)
         val testee = createTestee()
-        whenever(cameraAccess.isPermissionGranted()).thenReturn(true)
-        testee.onCameraPermissionResult()
 
         testee.commands.test {
+            whenever(cameraAccess.isPermissionGranted()).thenReturn(true)
+            testee.onCameraPermissionResult()
+            assertIs<ResumeCamera>(awaitItem())
+
             testee.onAnimationFinished()
             assertIs<ResumeCamera>(awaitItem())
             assertIs<ExpandScannerCutout>(awaitItem())
