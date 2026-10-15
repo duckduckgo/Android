@@ -43,6 +43,7 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncAuthCode
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
@@ -109,6 +110,7 @@ class SyncActivityViewModelTest {
     private val syncAutoRestore: SyncAutoRestore = mock()
 
     private val fakeSettingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
+    private val fakeSyncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
     private val stateFlow = MutableStateFlow(SyncState.READY)
 
@@ -131,6 +133,7 @@ class SyncActivityViewModelTest {
             syncAutoRestoreManager = syncAutoRestoreManager,
             syncAutoRestore = syncAutoRestore,
             appCoroutineScope = coroutineTestRule.testScope,
+            syncFeature = fakeSyncFeature,
         )
         whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())
         whenever(syncAccountRepository.isSyncSupported()).thenReturn(true)
@@ -288,6 +291,48 @@ class SyncActivityViewModelTest {
         testee.commands().test {
             testee.onSyncThisDevice()
             expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncThisDeviceThenIntroCreateAccountDoesNotRequireAuth() = runTest {
+        givenUserHasDeviceAuthentication(true)
+        testee.commands().test {
+            testee.onSyncThisDevice()
+            assertEquals(IntroCreateAccount(isAuthRequired = false), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncThisDeviceWithImprovedFlowThenIntroCreateAccountRequiresAuth() = runTest {
+        givenImprovedSyncFlowEnabled()
+        testee.commands().test {
+            testee.onSyncThisDevice()
+            assertEquals(IntroCreateAccount(isAuthRequired = true), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncThisDeviceWithImprovedFlowThenDoesNotAuthenticate() = runTest {
+        givenImprovedSyncFlowEnabled()
+        testee.commands().test {
+            testee.onSyncThisDevice()
+            awaitItem()
+            assertTrue(deviceAuthenticator.requests.isEmpty())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncThisDeviceWithImprovedFlowAndWithoutDeviceAuthenticationThenLaunchCreateAccountFlow() = runTest {
+        givenImprovedSyncFlowEnabled()
+        givenUserHasDeviceAuthentication(false)
+        testee.commands().test {
+            testee.onSyncThisDevice()
+            awaitItem().assertCommandType(IntroCreateAccount::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -535,6 +580,59 @@ class SyncActivityViewModelTest {
         testee.commands().test {
             testee.onRecoverYourSyncedData()
             expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenRecoverDataThenIntroRecoverSyncDataDoesNotRequireAuth() = runTest {
+        givenUserHasDeviceAuthentication(true)
+        testee.commands().test {
+            testee.onRecoverYourSyncedData()
+            assertEquals(IntroRecoverSyncData(isAuthRequired = false), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenRecoverDataWithImprovedFlowThenIntroRecoverSyncDataRequiresAuth() = runTest {
+        givenImprovedSyncFlowEnabled()
+        testee.commands().test {
+            testee.onRecoverYourSyncedData()
+            assertEquals(IntroRecoverSyncData(isAuthRequired = true), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenRecoverDataWithImprovedFlowThenDoesNotAuthenticate() = runTest {
+        givenImprovedSyncFlowEnabled()
+        testee.commands().test {
+            testee.onRecoverYourSyncedData()
+            awaitItem()
+            assertTrue(deviceAuthenticator.requests.isEmpty())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenRecoverDataWithImprovedFlowAndWithoutDeviceAuthenticationThenRecoverDataCommandSent() = runTest {
+        givenImprovedSyncFlowEnabled()
+        givenUserHasDeviceAuthentication(false)
+        testee.commands().test {
+            testee.onRecoverYourSyncedData()
+            awaitItem().assertCommandType(IntroRecoverSyncData::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenRecoverDataWithImprovedFlowThenManualRecoveryShownPixelFired() = runTest {
+        givenImprovedSyncFlowEnabled()
+        testee.commands().test {
+            testee.onRecoverYourSyncedData()
+            awaitItem()
+            verify(syncPixels).fireAutoRestoreSettingsManualRecoveryShown()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -1549,6 +1647,10 @@ class SyncActivityViewModelTest {
         whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
         whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
         whenever(syncAccountRepository.getConnectedDevices()).thenReturn(Success(listOf(connectedDevice)))
+    }
+
+    private fun givenImprovedSyncFlowEnabled() {
+        fakeSyncFeature.canUseImprovedSyncFlow().setRawStoredState(State(true))
     }
 
     private fun givenUserHasDeviceAuthentication(hasDeviceAuthentication: Boolean) {
