@@ -45,4 +45,6 @@
     <string name="duckChatOnboardingDuckAiStateOn">Turn Duck.ai On</string>
     <string name="duckChatOnboardingDuckAiStateOff">Keep Duck.ai Off</string>
 
+    <!-- Duck.ai tab switcher card -->
+    <string name="duckAiTabCardChatTypeLabel" instruction="Label on a tab switcher card marking the Duck.ai tab as a text chat, as opposed to an image or voice chat.">Chat</string>
 </resources>

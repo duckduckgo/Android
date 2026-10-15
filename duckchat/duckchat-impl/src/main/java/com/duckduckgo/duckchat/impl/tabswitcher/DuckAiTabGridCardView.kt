@@ -86,7 +86,7 @@ class DuckAiTabGridCardView(
         thumbnailJob.cancel()
 
         with(binding) {
-            snippet.gone()
+            tabChatItemDetails.gone()
             thumbnail.gone()
             thumbnail.setImageDrawable(null)
             tabChatItemEmptyLogo.gone()
@@ -97,8 +97,9 @@ class DuckAiTabGridCardView(
 
             when (content) {
                 is RealDuckAiTabGridItemContent.Chat -> {
+                    tabChatItemTitle.text = content.title
                     snippet.text = content.snippet
-                    snippet.show()
+                    tabChatItemDetails.show()
                 }
                 is RealDuckAiTabGridItemContent.ImageChat -> {
                     thumbnail.show()
