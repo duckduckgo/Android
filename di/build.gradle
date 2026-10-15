@@ -21,23 +21,11 @@ plugins {
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
-def diFramework = findProperty('ddg.di') ?: 'AnvilDagger'
-
 android {
     anvil {
         generateDaggerFactories = true // default is false
     }
     namespace 'com.duckduckgo.di'
-
-    sourceSets {
-        main {
-            if (diFramework == 'Metro') {
-                kotlin.srcDirs += 'src/metro/java'
-            } else {
-                kotlin.srcDirs += 'src/anvilDagger/java'
-            }
-        }
-    }
 }
 
 dependencies {

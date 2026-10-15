@@ -35,7 +35,7 @@ Enforced in the root `build.gradle`. Violations fail the build.
 | API modules cannot depend on `:di` | DI wiring belongs in `-impl` |
 | Only `:app` depends on `-impl` modules | Features communicate through `-api` only |
 | `-internal` modules use `internalImplementation` | Excluded from non-internal builds (Play, F-Droid) |
-| No KAPT anywhere (except `:app`) | Use KSP for annotation processing |
+| No KAPT anywhere | Use KSP for annotation processing |
 | No `strings.xml` outside `:app` | Use `strings-<feature>.xml` instead |
 | Android tests restricted | Only in: `app`, `sync-lib`, `httpsupgrade-impl`, `pir-impl`, `feature-toggles-impl` |
 | No module can depend on `:app` | App is the composition root |
