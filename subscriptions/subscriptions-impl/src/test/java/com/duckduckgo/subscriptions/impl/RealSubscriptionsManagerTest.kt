@@ -42,6 +42,8 @@ import com.duckduckgo.subscriptions.impl.auth.PkceGenerator
 import com.duckduckgo.subscriptions.impl.auth.PkceGeneratorImpl
 import com.duckduckgo.subscriptions.impl.auth.RefreshTokenClaims
 import com.duckduckgo.subscriptions.impl.auth.TokenPair
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationException
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason
 import com.duckduckgo.subscriptions.impl.billing.LatestPurchaseResult
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
@@ -105,6 +107,7 @@ import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
+import org.mockito.kotlin.isA
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -120,6 +123,7 @@ import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Duration.Companion.seconds
 
 class RealSubscriptionsManagerTest {
 
@@ -2148,6 +2152,74 @@ class RealSubscriptionsManagerTest {
 
         assertTrue(result is AccessTokenResult.Failure)
         verify(pixelSender).reportAuthV2TokenValidationError()
+    }
+
+    @Test
+    fun whenRefreshedAccessTokenFailsValidationThenOnlyAccessTokenFailureIsReportedToWideEvent() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshSucceeds()
+        val reason = TokenValidationFailureReason.Expired(clockSkew = 10.seconds)
+        whenever(authJwtValidator.validateAccessToken(any(), any())).thenThrow(TokenValidationException(reason))
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Failure)
+        verify(tokenRefreshWideEvent).onAccessTokenValidationFailed(reason)
+        verify(tokenRefreshWideEvent, never()).onRefreshTokenValidationFailed(any())
+        verify(tokenRefreshWideEvent, never()).onTokensValidated()
+        verify(tokenRefreshWideEvent).onFailure(isA<TokenValidationException>())
+        verify(pixelSender).reportAuthV2TokenValidationError()
+    }
+
+    @Test
+    fun whenRefreshedRefreshTokenFailsValidationThenOnlyRefreshTokenFailureIsReportedToWideEvent() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshSucceeds()
+        val reason = TokenValidationFailureReason.InvalidSignature
+        whenever(authJwtValidator.validateRefreshToken(any(), any())).thenThrow(TokenValidationException(reason))
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Failure)
+        verify(tokenRefreshWideEvent).onRefreshTokenValidationFailed(reason)
+        verify(tokenRefreshWideEvent, never()).onAccessTokenValidationFailed(any())
+        verify(tokenRefreshWideEvent, never()).onTokensValidated()
+        verify(tokenRefreshWideEvent).onFailure(isA<TokenValidationException>())
+        verify(pixelSender).reportAuthV2TokenValidationError()
+    }
+
+    @Test
+    fun whenStoreLoginTokensFailValidationThenTokenRefreshWideEventIsNotNotified() = runTest {
+        givenUserIsNotSignedIn()
+        givenPurchaseStored()
+        givenStoreLoginSucceeds()
+        whenever(authJwtValidator.validateAccessToken(any(), any()))
+            .thenThrow(TokenValidationException(TokenValidationFailureReason.KeyNotFound))
+
+        val result = subscriptionsManager.recoverSubscriptionFromStore()
+
+        assertTrue(result is RecoverSubscriptionResult.Failure)
+        verify(pixelSender).reportAuthV2TokenValidationError()
+        verify(tokenRefreshWideEvent, never()).onAccessTokenValidationFailed(any())
+        verify(tokenRefreshWideEvent, never()).onRefreshTokenValidationFailed(any())
+    }
+
+    @Test
+    fun whenSignInV2TokensFailValidationThenTokenRefreshWideEventIsNotNotified() = runTest {
+        givenUserIsNotSignedIn()
+        givenValidateV2TokensSucceeds()
+        whenever(authJwtValidator.validateRefreshToken(any(), any()))
+            .thenThrow(TokenValidationException(TokenValidationFailureReason.Malformed))
+
+        val result = runCatching { subscriptionsManager.signInV2(FAKE_ACCESS_TOKEN_V2, FAKE_REFRESH_TOKEN_V2) }
+
+        assertTrue(result.exceptionOrNull() is TokenValidationException)
+
+        verify(pixelSender).reportAuthV2TokenValidationError()
+        verify(tokenRefreshWideEvent, never()).onAccessTokenValidationFailed(any())
+        verify(tokenRefreshWideEvent, never()).onRefreshTokenValidationFailed(any())
     }
 
     @Test
