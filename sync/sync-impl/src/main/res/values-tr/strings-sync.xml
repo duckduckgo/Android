@@ -333,11 +333,8 @@
     <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Sync &amp; Backup\'ı kapat, sunucudaki tüm senkronize edilmiş verileri sil ve kurtarma kodunu devre dışı bırak.</string>
     <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Cihazı Kaldır</string>
     <string name="sync_simplified_settings_turn_off_sheet_title">Sync &amp; Backup kapatılsın mı?</string>
-    <string name="sync_simplified_settings_turn_off_sheet_item">Sunucu Verilerini Sil</string>
     <string name="sync_simplified_settings_turn_off_sheet_body">Sync &amp; Backup kullanan tüm cihazların bağlantısı kesilecek ve senkronize edilen verilerin sunucudan silinecektir.</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button">Bu Cihazı Kapat</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Kapat ve Sil</string>
-    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete_all">Tüm Cihazları Kapat ve Sil</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Sunucu Verilerini Kapat ve Sil</string>
 
     <!-- Sync settings screen: turn off this device dialog -->
     <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s, Sync &amp; Backup\'tan kaldırılsın mı?</string>
@@ -441,6 +438,8 @@
     <string name="sync_simplified_edit_device_sync_this_device_item">Bu Cihazı Senkronize Et</string>
     <string name="sync_simplified_edit_device_remove_notice_this_device">Bu cihazı kaldırırsanız, artık senkronize edilen verilerinize erişemeyecektir.</string>
     <string name="sync_simplified_edit_device_remove_notice_another_device">Bu özellik kapatılırsa, bu cihaz artık senkronize edilen verilerinize erişemeyecektir.</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Bu özellik kapatılırsa “%1$s” artık diğer cihazlarındaki senkronize verilerine erişemeyecek.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” artık diğer cihazlarındaki senkronize edilen verilerine erişemeyecek.</string>
 
     <!-- Edit Device screen: edit name dialog -->
     <string name="sync_simplified_edit_device_edit_name_dialog_title">Adı Düzenle</string>
