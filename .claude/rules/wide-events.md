@@ -14,7 +14,7 @@ Wide events measure a user's complete journey through a multi-step flow, sending
 Cross-platform design guidance on naming, status, data selection and latency bucketing lives in the
 `windows-browser` repository, not here — ask the user for it if you need it.
 
-The privacy invariants in CLAUDE.md apply to every field of a wide event, including bucketing all
+The privacy invariants in AGENTS.md apply to every field of a wide event, including bucketing all
 latency values.
 
 ---

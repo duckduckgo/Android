@@ -32,7 +32,7 @@ in the conversation context. If no task URL is present, ask for one before proce
 3. Read the task's Context to understand why this work is needed
 4. Follow the Approach section exactly; do not deviate or expand scope
 5. Respect the task's Constraints; do not touch anything listed there
-6. Make small, focused commits following the commit message rules in CLAUDE.md
+6. Make small, focused commits following the commit message rules in AGENTS.md
 
 ## Verify the work
 
