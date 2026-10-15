@@ -21,6 +21,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.PirUserUtils
 import logcat.logcat
 import javax.inject.Inject
 
@@ -41,10 +42,16 @@ class PirCustomStatsWorker(
     @Inject
     lateinit var weeklyPixelReporter: WeeklyPixelReporter
 
+    @Inject
+    lateinit var pirUserUtils: PirUserUtils
+
     override suspend fun doWork(): Result {
         logcat { "PIR-CUSTOM-STATS: Attempt to fire custom pixels" }
-        optOutSubmissionSuccessRateReporter.attemptFirePixel()
-        optOutConfirmationReporter.attemptFirePixel()
+        // Without a subscription opt-outs stall on purpose, which these would report as broker failures
+        if (pirUserUtils.hasPirSubscription()) {
+            optOutSubmissionSuccessRateReporter.attemptFirePixel()
+            optOutConfirmationReporter.attemptFirePixel()
+        }
         engagementReporter.attemptFirePixel()
         weeklyPixelReporter.attemptFirePixel()
 

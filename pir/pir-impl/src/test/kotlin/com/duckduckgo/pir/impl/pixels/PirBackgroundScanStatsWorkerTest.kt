@@ -21,6 +21,7 @@ import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.pir.impl.PirUserUtils
 import com.duckduckgo.pir.impl.common.PirJobConstants
 import com.duckduckgo.pir.impl.store.PirRepository
 import kotlinx.coroutines.test.runTest
@@ -30,6 +31,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
 
@@ -41,12 +43,14 @@ class PirBackgroundScanStatsWorkerTest {
     private val mockPirPixelSender: PirPixelSender = mock()
     private val mockPirRepository: PirRepository = mock()
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
+    private val mockPirUserUtils: PirUserUtils = mock()
 
     private lateinit var context: Context
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
         context = mock()
+        whenever(mockPirUserUtils.hasPirSubscription()).thenReturn(true)
     }
 
     @Test
@@ -59,6 +63,7 @@ class PirBackgroundScanStatsWorkerTest {
         worker.pirPixelSender = mockPirPixelSender
         worker.pirRepository = mockPirRepository
         worker.currentTimeProvider = mockCurrentTimeProvider
+        worker.pirUserUtils = mockPirUserUtils
 
         val result = worker.doWork()
 
@@ -77,6 +82,7 @@ class PirBackgroundScanStatsWorkerTest {
         worker.pirPixelSender = mockPirPixelSender
         worker.pirRepository = mockPirRepository
         worker.currentTimeProvider = mockCurrentTimeProvider
+        worker.pirUserUtils = mockPirUserUtils
 
         val result = worker.doWork()
 
@@ -95,6 +101,7 @@ class PirBackgroundScanStatsWorkerTest {
         worker.pirPixelSender = mockPirPixelSender
         worker.pirRepository = mockPirRepository
         worker.currentTimeProvider = mockCurrentTimeProvider
+        worker.pirUserUtils = mockPirUserUtils
 
         val result = worker.doWork()
 
@@ -113,6 +120,7 @@ class PirBackgroundScanStatsWorkerTest {
         worker.pirPixelSender = mockPirPixelSender
         worker.pirRepository = mockPirRepository
         worker.currentTimeProvider = mockCurrentTimeProvider
+        worker.pirUserUtils = mockPirUserUtils
 
         val result = worker.doWork()
 
@@ -129,9 +137,26 @@ class PirBackgroundScanStatsWorkerTest {
         worker.pirPixelSender = mockPirPixelSender
         worker.pirRepository = mockPirRepository
         worker.currentTimeProvider = mockCurrentTimeProvider
+        worker.pirUserUtils = mockPirUserUtils
 
         val result = worker.doWork()
 
         assertEquals(ListenableWorker.Result.success(), result)
+    }
+
+    @Test
+    fun whenUserHasNoPirSubscriptionThenNoPixelIsReported() = runTest {
+        whenever(mockPirUserUtils.hasPirSubscription()).thenReturn(false)
+
+        val worker = TestListenableWorkerBuilder<PirBackgroundScanStatsWorker>(context = context).build()
+        worker.pirPixelSender = mockPirPixelSender
+        worker.pirRepository = mockPirRepository
+        worker.currentTimeProvider = mockCurrentTimeProvider
+        worker.pirUserUtils = mockPirUserUtils
+
+        val result = worker.doWork()
+
+        assertEquals(ListenableWorker.Result.success(), result)
+        verifyNoInteractions(mockPirPixelSender)
     }
 }

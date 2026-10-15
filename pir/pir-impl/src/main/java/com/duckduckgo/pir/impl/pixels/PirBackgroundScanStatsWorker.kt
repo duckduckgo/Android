@@ -22,6 +22,7 @@ import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.PirUserUtils
 import com.duckduckgo.pir.impl.common.PirJobConstants
 import com.duckduckgo.pir.impl.store.PirRepository
 import java.util.concurrent.TimeUnit
@@ -41,7 +42,13 @@ class PirBackgroundScanStatsWorker(
     @Inject
     lateinit var currentTimeProvider: CurrentTimeProvider
 
+    @Inject
+    lateinit var pirUserUtils: PirUserUtils
+
     override suspend fun doWork(): Result {
+        // Only a subscriber's scan worker keeps running, so anyone else would always report a missed background scan
+        if (!pirUserUtils.hasPirSubscription()) return Result.success()
+
         /**
          * If lastRun is 0, that should be an invalid scenario. This runner gets scheduled after a successful initial scan run that should set
          * the first value for this data. In this case we consider the threshold not met and report accordingly.
