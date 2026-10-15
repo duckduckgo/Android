@@ -52,10 +52,5 @@ tags:
           text: ".*Remember: every time you browse with me a creepy ad loses its.wings..*"
       - runFlow: ../shared/browser_screen/click_on_tabs_button.yaml
       - tapOn: "New Tab"
-      - extendedWaitUntil:
-          visible:
-            text: ".*Try our Home screen widget!.*"
-          timeout: 3000
-          optional: true
-      - assertNotVisible:
-          text: ".*Try our Home screen widget!.*"
+      - assertVisible:
+          id: "newTabPage"

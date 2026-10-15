@@ -199,7 +199,6 @@ import com.duckduckgo.app.cta.ui.DaxSubscriptionBubbleCta
 import com.duckduckgo.app.cta.ui.DaxTrackersBlockedContextualCta
 import com.duckduckgo.app.cta.ui.DaxTryASearchBubbleCta
 import com.duckduckgo.app.cta.ui.DaxVisitSiteOptionsBubbleCta
-import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.SubscriptionPromoFlow
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalDecider
@@ -266,7 +265,6 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
-import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.AutoconsentResult
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
@@ -512,8 +510,6 @@ class BrowserTabViewModelTest {
     private val mockAutoCompleteService: AutoCompleteService = mock()
 
     private val mockAutoCompleteScorer: AutoCompleteScorer = mock()
-
-    private val mockWidgetCapabilities: WidgetCapabilities = mock()
 
     private val mockSubscriptionPromoModalDecider: SubscriptionPromoModalDecider = mock()
 
@@ -1211,8 +1207,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenViewBecomesVisibleAndHomeShowingThenKeyboardShown() =
         runTest {
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
-
             setBrowserShowing(false)
 
             testee.onViewVisible()
@@ -1224,7 +1218,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenViewBecomesVisibleAndMaliciousSiteBlockedThenKeyboardNotShown() =
         runTest {
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             testee.browserViewState.value = browserViewState().copy(maliciousSiteBlocked = true)
 
             testee.onViewVisible()
@@ -1235,7 +1228,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenOmnibarTypeSplitThenThenKeyboardShownOnlyTheFirstTimeNtpIsVisible() =
         runTest {
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             testee.browserViewState.value = browserViewState().copy(browserShowing = false)
             whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SPLIT)
 
@@ -1252,7 +1244,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenOmnibarTypeNotSplitThenThenKeyboardNotHiddenWhenOpenedMultipleTimes() =
         runTest {
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             testee.browserViewState.value = browserViewState().copy(browserShowing = false)
             whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
 
@@ -1268,7 +1259,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenViewBecomesVisibleAndDuckAIPoCIsEnabledThenKeyboardNotShown() =
         runTest {
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(MutableStateFlow(true))
 
             testee.onViewVisible()
@@ -1279,7 +1269,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenViewBecomesVisibleAndInputModeTargetArmedThenTargetDoesNotForceKeyboardOverInputScreen() =
         runTest {
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(MutableStateFlow(true))
             testee.loadData("abc", null, false, false, InputMode.SEARCH)
 
@@ -1302,7 +1291,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenViewBecomesVisibleAndInputModeTargetNotArmedThenConsumeReturnsNull() =
         runTest {
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             testee.loadData("abc", null, false, false)
 
             testee.onViewVisible()
@@ -4028,10 +4016,9 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenCtaRefreshedAndOnlyStandardAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() =
+    fun whenCtaRefreshedWithoutActiveOnboardingThenCtaIsNull() =
         runTest {
-            whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+            whenever(mockUserStageStore.getUserAppStage()).thenReturn(ESTABLISHED)
             testee.refreshCta()
             assertNull(testee.ctaViewState.value!!.cta)
         }
@@ -4040,8 +4027,6 @@ class BrowserTabViewModelTest {
     fun whenCtaRefreshedAndIsNewTabIsFalseThenReturnNull() =
         runTest {
             setBrowserShowing(true)
-            whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
             testee.refreshCta()
             assertNull(testee.ctaViewState.value!!.cta)
         }
@@ -4049,8 +4034,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenCtaRefreshedAndOnboardingCompleteThenViewStateUpdated() =
         runTest {
-            whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
             whenever(mockDismissedCtaDao.exists(DAX_DIALOG_TRACKERS_FOUND)).thenReturn(true)
             testee.refreshCta()
@@ -4063,8 +4046,6 @@ class BrowserTabViewModelTest {
     fun whenCtaRefreshedAndBrowserShowingThenViewStateUpdated() =
         runTest {
             setBrowserShowing(true)
-            whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
             whenever(mockDismissedCtaDao.exists(DAX_DIALOG_NETWORK)).thenReturn(true)
             testee.refreshCta()
@@ -4091,8 +4072,6 @@ class BrowserTabViewModelTest {
     fun whenCtaRefreshedGetUserRefreshesCalled() =
         runTest {
             setBrowserShowing(true)
-            whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             val expectedRefreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
             whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(expectedRefreshPatterns)
             testee.refreshCta()
@@ -4171,16 +4150,6 @@ class BrowserTabViewModelTest {
             testee.refreshCta()
 
             verify(mockBrokenSitePrompt, never()).shouldShowBrokenSitePrompt(any(), any())
-        }
-
-    @Test
-    fun whenCtaShownThenFirePixel() =
-        runTest {
-            val cta = HomePanelCta.AddWidgetAutoOnboarding
-            testee.ctaViewState.value = CtaViewState(cta = cta)
-
-            testee.onCtaShown()
-            verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
         }
 
     @Test
@@ -4301,22 +4270,6 @@ class BrowserTabViewModelTest {
         isOmnibarBottom = false,
         segmentedPathWithAiInput = segmentedPath,
     )
-
-    @Test
-    fun whenUserClickedAddWidgetCtaButtonThenLaunchAddWidgetCommand() {
-        val cta = HomePanelCta.AddWidgetAutoOnboarding
-        setCta(cta)
-        testee.onUserClickCtaOkButton(cta)
-        assertCommandIssued<Command.LaunchAddWidgetOnboarding>()
-    }
-
-    @Test
-    fun whenUserClickedLegacyAddWidgetCtaButtonThenLaunchAddWidgetCommand() {
-        val cta = HomePanelCta.AddWidgetInstructions
-        setCta(cta)
-        testee.onUserClickCtaOkButton(cta)
-        assertCommandIssued<Command.LaunchAddWidgetOnboarding>()
-    }
 
     @Test
     fun whenUserClickedLearnMoreExperimentBubbleCtaButtonThenLaunchSubscription() {
@@ -4532,18 +4485,6 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenShowAddWidgetModalCtaAndMaliciousSiteWarningShowingThenNotShown() =
-        runTest {
-            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
-            testee.browserViewState.value = browserViewState().copy(browserShowing = false, maliciousSiteBlocked = true)
-
-            val shown = testee.showAddWidgetPromo(supportsAutomaticAdd = true)
-
-            assertFalse(shown)
-            assertNull(testee.ctaViewState.value?.cta)
-        }
-
-    @Test
     fun whenShowSubscriptionPromoModalCtaWhileBrowsingAndCtaSlotOccupiedThenStillShown() =
         runTest {
             whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
@@ -4565,60 +4506,6 @@ class BrowserTabViewModelTest {
 
             assertTrue(shown)
             assertTrue(testee.ctaViewState.value?.cta is SubscriptionPromoModalCta)
-        }
-
-    @Test
-    fun whenShowAddWidgetModalCtaWhileBrowsingThenNotShown() =
-        runTest {
-            loadUrl(exampleUrl, isBrowserShowing = true)
-            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = false)
-
-            val shown = testee.showAddWidgetPromo(supportsAutomaticAdd = true)
-
-            assertFalse(shown)
-            assertFalse(testee.ctaViewState.value?.cta is HomePanelCta.AddWidgetAutoOnboarding)
-        }
-
-    @Test
-    fun whenShowAddWidgetModalCtaOnNewTabPageThenAccepted() =
-        runTest {
-            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
-            setBrowserShowing(false)
-
-            val shown = testee.showAddWidgetPromo(supportsAutomaticAdd = true)
-
-            assertTrue(shown)
-        }
-
-    @Test
-    fun whenShowAddWidgetModalCtaOnNewTabPageButCtaSlotOccupiedThenDeclined() =
-        runTest {
-            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
-            setBrowserShowing(false)
-            setCta(SubscriptionPromoModalCta(isFreeTrialCopy = false, flow = SubscriptionPromoFlow.NUDGE))
-
-            val shown = testee.showAddWidgetPromo(supportsAutomaticAdd = true)
-
-            assertFalse(shown)
-            assertTrue(testee.ctaViewState.value?.cta is SubscriptionPromoModalCta)
-        }
-
-    @Test
-    fun whenUserDismissedCtaThenFirePixel() =
-        runTest {
-            val cta = HomePanelCta.AddWidgetAutoOnboarding
-            setCta(cta)
-            testee.onUserDismissedCta(cta)
-            verify(mockPixel).fire(cta.cancelPixel!!, cta.pixelCancelParameters())
-        }
-
-    @Test
-    fun whenUserDismissedCtaThenRegisterInDatabase() =
-        runTest {
-            val cta = HomePanelCta.AddWidgetAutoOnboarding
-            setCta(cta)
-            testee.onUserDismissedCta(cta)
-            verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
         }
 
     @Test

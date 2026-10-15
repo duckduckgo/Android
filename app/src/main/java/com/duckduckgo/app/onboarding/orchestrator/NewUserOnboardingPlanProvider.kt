@@ -878,11 +878,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             resolveDialog = { NewUserOnboardingActivityDialog.WidgetPrompt },
             transition = { event ->
                 when (event) {
-                    is NewUserOnboardingEvent.Presented -> {
-                        onboardingStore.linearPlanWidgetPromptShown = true
-                        Stay
-                    }
-
                     is NewUserOnboardingEvent.AddWidgetRequested -> {
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
                         Advance
@@ -1164,9 +1159,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                             OnboardingPixelAction.TryInputClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
                         )
                         if (handsPromptToDemoStep) {
+                            onboardingStore.setTriedDuckAi()
                             ctx.pendingDuckAiPrompt = event.query
                         } else {
                             ctx.completionResult = if (event.isChat) {
+                                onboardingStore.setTriedDuckAi()
                                 NewUserOnboardingResult.LaunchChat(prompt = event.query)
                             } else {
                                 NewUserOnboardingResult.LaunchSearch(query = event.query)

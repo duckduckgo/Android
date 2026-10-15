@@ -47,6 +47,7 @@ import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboa
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fragment_subscription_onboarding_completion) {
@@ -136,6 +137,7 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
                 rowView.setLeadingIconResource(row.pendingIconResId)
             }
             if (row.clickable) {
+                rowView.setTrailingIconResource(CommonR.drawable.ic_chevron_right_24)
                 rowView.setClickListener { viewModel.onPirRowClicked() }
             }
             container.addView(rowView)

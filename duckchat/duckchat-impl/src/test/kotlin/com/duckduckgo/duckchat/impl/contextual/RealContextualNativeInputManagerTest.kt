@@ -173,6 +173,28 @@ class RealContextualNativeInputManagerTest {
     }
 
     @Test
+    fun `when native chat input flips off in web view mode then input visibility change is reported`() {
+        val enabled = MutableStateFlow(true)
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
+        val visibilityChanges = mutableListOf<Boolean>()
+        testee.init(
+            tabId = "tab",
+            card = mockCard(),
+            widget = mock<NativeInputModeWidget>(),
+            jsMessaging = mock<JsMessaging>(),
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+            onInputVisibilityChanged = { visibilityChanges += it },
+        )
+        testee.onWebViewMode()
+
+        enabled.value = false
+
+        assertEquals(listOf(true, false), visibilityChanges)
+    }
+
+    @Test
     fun `when contextual native input enabled and onInputMode then card shown`() {
         val enabled = MutableStateFlow(true)
         whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
@@ -510,6 +532,31 @@ class RealContextualNativeInputManagerTest {
         assertEquals("submitNativeInputFocused", events.firstValue.subscriptionName)
         assertTrue(events.firstValue.params.getBoolean("focused"))
         assertFalse(events.secondValue.params.getBoolean("focused"))
+    }
+
+    @Test
+    fun `when input focus changes then focus change is reported`() {
+        val enabled = MutableStateFlow(true)
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
+        val widget = mock<NativeInputModeWidget>()
+        val focusChanges = mutableListOf<Boolean>()
+        testee.init(
+            tabId = "tab",
+            card = mockCard(),
+            widget = widget,
+            jsMessaging = mock<JsMessaging>(),
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+            onInputFocusChanged = { focusChanges += it },
+        )
+
+        val listener = argumentCaptor<(Boolean) -> Unit>()
+        verify(widget).onInputFocusChanged = listener.capture()
+        listener.firstValue.invoke(true)
+        listener.firstValue.invoke(false)
+
+        assertEquals(listOf(true, false), focusChanges)
     }
 
     private fun mockCard(): MaterialCardView {

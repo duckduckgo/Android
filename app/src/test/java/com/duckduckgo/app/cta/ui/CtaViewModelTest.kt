@@ -67,7 +67,6 @@ import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -117,8 +116,6 @@ class CtaViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private lateinit var db: AppDatabase
-
-    private val mockWidgetCapabilities: WidgetCapabilities = mock()
 
     private lateinit var subscriptionPromoModalDecider: SubscriptionPromoModalDecider
 
@@ -293,24 +290,6 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenCtaShownAndCtaIsNotDaxThenPixelIsFired() = runTest {
-        testee.onCtaShown(HomePanelCta.AddWidgetAutoOnboarding)
-        verify(mockPixel).fire(eq(WIDGET_CTA_SHOWN), any(), any(), eq(Count))
-    }
-
-    @Test
-    fun whenCtaLaunchedPixelIsFired() = runTest {
-        testee.onUserClickCtaOkButton(HomePanelCta.AddWidgetAutoOnboarding)
-        verify(mockPixel).fire(eq(WIDGET_CTA_LAUNCHED), any(), any(), eq(Count))
-    }
-
-    @Test
-    fun whenCtaDismissedThenCancelPixelIsFired() = runTest {
-        testee.onUserDismissedCta(HomePanelCta.AddWidgetAutoOnboarding)
-        verify(mockPixel).fire(eq(WIDGET_CTA_DISMISSED), any(), any(), eq(Count))
-    }
-
-    @Test
     fun whenOnboardingCtaDismissedViaCloseBtnThenPixelIsFired() = runTest {
         val testCta = DaxTryASearchBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
 
@@ -326,12 +305,6 @@ class CtaViewModelTest {
         testee.onUserDismissedCta(testCta)
 
         verify(mockPixel, never()).fire(eq(ONBOARDING_DAX_CTA_DISMISS_BUTTON), any(), any(), eq(Count))
-    }
-
-    @Test
-    fun whenNonSurveyCtaDismissedCtaThenDatabaseNotified() = runTest {
-        testee.onUserDismissedCta(HomePanelCta.AddWidgetAutoOnboarding)
-        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.ADD_WIDGET))
     }
 
     @Test
@@ -1075,7 +1048,6 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1097,7 +1069,6 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1237,7 +1208,6 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1522,7 +1492,6 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1543,7 +1512,6 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(DownloadReasonSelection.AI_CHAT)
 
         val value = testee.refreshCta(

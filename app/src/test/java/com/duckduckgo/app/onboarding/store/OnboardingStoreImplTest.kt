@@ -21,7 +21,9 @@ import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -85,5 +87,17 @@ class OnboardingStoreImplTest {
 
         testee.setDownloadReason(DownloadReasonSelection.BLOCK_ADS)
         assertNull(testee.getSegmentedPathWithAiInput())
+    }
+
+    @Test
+    fun `when tried DuckAi not set then getTriedDuckAi returns false`() {
+        assertFalse(testee.getTriedDuckAi())
+    }
+
+    @Test
+    fun `when tried DuckAi set then getTriedDuckAi returns true`() {
+        testee.setTriedDuckAi()
+
+        assertTrue(testee.getTriedDuckAi())
     }
 }
