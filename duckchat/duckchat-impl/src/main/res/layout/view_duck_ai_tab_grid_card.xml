@@ -109,6 +109,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/keyline_1"
+                    android:drawablePadding="@dimen/keyline_1"
                     android:ellipsize="end"
                     android:maxLines="1"
                     app:layout_constraintEnd_toEndOf="parent"

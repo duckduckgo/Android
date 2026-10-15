@@ -98,7 +98,14 @@ class DuckAiTabGridCardView(
             when (content) {
                 is RealDuckAiTabGridItemContent.Chat -> {
                     tabChatItemTitle.text = content.title
+                    tabChatItemTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
                     snippet.text = content.snippet
+                    tabChatItemDetails.show()
+                }
+                is RealDuckAiTabGridItemContent.Thinking -> {
+                    tabChatItemTitle.setText(R.string.duckAiTabCardThinkingTitle)
+                    tabChatItemTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_thinking_16, 0, 0, 0)
+                    snippet.text = content.title
                     tabChatItemDetails.show()
                 }
                 is RealDuckAiTabGridItemContent.ImageChat -> {
