@@ -44,6 +44,8 @@ import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.CONNECTED_DEVICES_WHE
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_FEATURE_PROMOTION_SOURCE
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SCANNER_CAMERA_PERMISSION_AFTER_REQUESTING
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SCANNER_CAMERA_PERMISSION_BEFORE_REQUESTING
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_AUTHENTICATION_RESULT
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_AUTHENTICATION_SOURCE
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_CODE_TYPE
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_CODE_VERSION
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_FLOW_VERSION
@@ -56,6 +58,8 @@ import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_SCREEN_TYP
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_TIMEOUT_STAGE
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_UI_VERSION
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AnotherDevicePromptOption
+import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationResult
+import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationSource
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
@@ -64,6 +68,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
+import com.duckduckgo.sync.impl.pixels.SyncPixels.TurnOffOption
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import com.squareup.anvil.annotations.ContributesBinding
@@ -135,6 +140,7 @@ interface SyncPixels {
     fun fireScanCodeScreenShown(screenType: ScreenType)
     fun fireSyncBarcodeScreenShown(screenType: ScreenType)
     fun fireScannerCameraPermissionState(beforeRequesting: Boolean, afterRequesting: Boolean)
+    fun fireSetupAuthenticationResult(result: AuthenticationResult, source: AuthenticationSource)
     fun fireSyncSetupFinishedSuccessfully(
         screenType: ScreenType,
         path: SetupPath? = null,
@@ -150,6 +156,11 @@ interface SyncPixels {
     fun fireBarcodeScannerParseSuccess(screenType: ScreenType, codeVersion: CodeVersion, codeType: SyncCodeType? = null)
     fun fireSyncAnotherDevicePromptShown()
     fun fireSyncAnotherDevicePromptOptionTapped(option: AnotherDevicePromptOption)
+    fun fireTurnOffSheetShown()
+    fun fireTurnOffOptionSelected(option: TurnOffOption)
+    fun fireDeleteServerDataConfirmationShown()
+    fun fireDeleteServerDataConfirmationConfirmed()
+    fun fireDeleteServerDataConfirmationDismissed()
 
     /**
      * "Setup failed" — a v2 setup that started (code recognized) then failed with an error (not a
@@ -228,6 +239,11 @@ interface SyncPixels {
         WITH_ANOTHER_DEVICE("sync_another_device"),
     }
 
+    enum class TurnOffOption(val value: String) {
+        THIS_DEVICE("this_device"),
+        ALL_DEVICES_AND_SERVER_DATA("all_devices_and_server_data"),
+    }
+
     enum class SetupFailureReason(val value: String) {
         SESSION_TIMEOUT("session_timeout"),
         TRANSPORT_FAILURE("transport_failure"),
@@ -252,6 +268,21 @@ interface SyncPixels {
         RELAY_CHANNEL_UNAVAILABLE("relay_channel_unavailable"),
         PROTOCOL_ERROR("protocol_error"),
         UNEXPECTED_FAILURE("unexpected_failure"),
+    }
+
+    enum class AuthenticationResult(val value: String) {
+        SUCCEEDED("succeeded"),
+        CANCELLED("cancelled"),
+        FAILED("failed"),
+        UNCONFIGURED("unconfigured"),
+    }
+
+    enum class AuthenticationSource(val value: String) {
+        SETTINGS_NOT_SYNCED("settings_not_synced"),
+        SETTINGS_SYNCED("settings_synced"),
+        THIS_DEVICE("this_device"),
+        RECOVER("recover"),
+        DEEP_LINK("deep_link"),
     }
 
     enum class TimeoutStage(val value: String) {
@@ -713,6 +744,16 @@ class RealSyncPixels @Inject constructor(
         )
     }
 
+    override fun fireSetupAuthenticationResult(result: AuthenticationResult, source: AuthenticationSource) {
+        pixel.fire(
+            SyncPixelName.SYNC_SETUP_AUTHENTICATION_RESULT,
+            parameters = mapOf(
+                SYNC_SETUP_AUTHENTICATION_RESULT to result.value,
+                SYNC_SETUP_AUTHENTICATION_SOURCE to source.value,
+            ),
+        )
+    }
+
     override fun fireSyncSetupAbandoned(screenType: ScreenType, reason: CancellationReason?) {
         pixel.fire(
             SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
@@ -966,6 +1007,29 @@ class RealSyncPixels @Inject constructor(
         )
     }
 
+    override fun fireTurnOffSheetShown() {
+        pixel.fire(SyncPixelName.SYNC_TURN_OFF_SHEET_SHOWN)
+    }
+
+    override fun fireTurnOffOptionSelected(option: TurnOffOption) {
+        pixel.fire(
+            SyncPixelName.SYNC_TURN_OFF_OPTION_SELECTED,
+            parameters = mapOf(SyncPixelParameters.OPTION to option.value),
+        )
+    }
+
+    override fun fireDeleteServerDataConfirmationShown() {
+        pixel.fire(SyncPixelName.SYNC_DELETE_SERVER_DATA_CONFIRMATION_SHOWN)
+    }
+
+    override fun fireDeleteServerDataConfirmationConfirmed() {
+        pixel.fire(SyncPixelName.SYNC_DELETE_SERVER_DATA_CONFIRMATION_CONFIRMED)
+    }
+
+    override fun fireDeleteServerDataConfirmationDismissed() {
+        pixel.fire(SyncPixelName.SYNC_DELETE_SERVER_DATA_CONFIRMATION_DISMISSED)
+    }
+
     override fun fireUnifiedDeviceListPixel(event: UnifiedDeviceListPixel) {
         val parameter = event.parameter
         pixel.fire(
@@ -1122,6 +1186,7 @@ enum class SyncPixelName(override val pixelName: String) : PixelName {
     SYNC_SETTINGS_RECOVER_SYNC_DATA_CONFIRMED("m_settings_sync_recovery_confirmed_tapped"),
     SYNC_SETUP_SCAN_QR_SCREEN_SHOWN("sync_setup_scan_qr_screen_shown"),
     SYNC_SCANNER_CAMERA_PERMISSION_STATE("sync_scanner_camera_permission_state"),
+    SYNC_SETUP_AUTHENTICATION_RESULT("sync_setup_authentication_result"),
     SYNC_SETUP_BARCODE_SCREEN_SHOWN("sync_setup_barcode_screen_shown"),
     SYNC_SETUP_BARCODE_SCANNER_SUCCESS("sync_setup_barcode_scanner_success"),
     SYNC_SETUP_BARCODE_SCANNER_FAILED("sync_setup_barcode_scanner_failed"),
@@ -1139,6 +1204,11 @@ enum class SyncPixelName(override val pixelName: String) : PixelName {
     SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_CONFIRMED("sync_setup_promo_bookmark_added_dialog_confirmed"),
     SYNC_SETUP_ANOTHER_DEVICE_PROMPT_SHOWN("m_settings_sync_another_device_prompt_shown"),
     SYNC_SETUP_ANOTHER_DEVICE_PROMPT_OPTION_TAPPED("m_settings_sync_another_device_prompt_option_tapped"),
+    SYNC_TURN_OFF_SHEET_SHOWN("sync_turn_off_sheet_shown"),
+    SYNC_TURN_OFF_OPTION_SELECTED("sync_turn_off_option_selected"),
+    SYNC_DELETE_SERVER_DATA_CONFIRMATION_SHOWN("sync_delete_server_data_confirmation_shown"),
+    SYNC_DELETE_SERVER_DATA_CONFIRMATION_CONFIRMED("sync_delete_server_data_confirmation_confirmed"),
+    SYNC_DELETE_SERVER_DATA_CONFIRMATION_DISMISSED("sync_delete_server_data_confirmation_dismissed"),
     SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_SUCCESS("sync_setup_joiner_recovery_code_done_success_count"),
     SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_SUCCESS_DAILY("sync_setup_joiner_recovery_code_done_success_daily"),
     SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_FAILED("sync_setup_joiner_recovery_code_done_failed_count"),
@@ -1203,6 +1273,8 @@ object SyncPixelParameters {
     const val SYNC_SETUP_SCREEN_TYPE = "source"
     const val SYNC_SCANNER_CAMERA_PERMISSION_BEFORE_REQUESTING = "before_requesting"
     const val SYNC_SCANNER_CAMERA_PERMISSION_AFTER_REQUESTING = "after_requesting"
+    const val SYNC_SETUP_AUTHENTICATION_RESULT = "result"
+    const val SYNC_SETUP_AUTHENTICATION_SOURCE = "source"
     const val SYNC_SETUP_FLOW_VERSION = "flow_version"
     const val SYNC_SETUP_UI_VERSION = "ui_version"
     const val SYNC_SETUP_MY_KIND = "my_kind"

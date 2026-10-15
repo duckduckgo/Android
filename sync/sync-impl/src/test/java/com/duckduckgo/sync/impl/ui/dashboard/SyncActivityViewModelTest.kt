@@ -47,7 +47,7 @@ import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
-import com.duckduckgo.sync.impl.auth.FakeDeviceAuthenticator
+import com.duckduckgo.sync.impl.auth.FakeSyncDeviceAuthenticator
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
@@ -105,7 +105,7 @@ class SyncActivityViewModelTest {
     private val syncEngine: SyncEngine = mock()
     private val syncFeatureToggle: SyncFeatureToggle = mock()
     private val syncPixels: SyncPixels = mock()
-    private val deviceAuthenticator = FakeDeviceAuthenticator()
+    private val deviceAuthenticator = FakeSyncDeviceAuthenticator()
     private val syncSetupWideEvent: SyncSetupWideEvent = mock()
     private val syncAutoRestoreManager: SyncAutoRestoreManager = mock()
     private val syncAutoRestore: SyncAutoRestore = mock()

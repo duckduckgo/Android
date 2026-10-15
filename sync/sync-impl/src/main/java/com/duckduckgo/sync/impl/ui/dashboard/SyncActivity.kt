@@ -749,16 +749,20 @@ class SyncActivity : DuckDuckGoActivity() {
             .setNegativeButton(R.string.sync_simplified_settings_delete_server_data_dialog_secondary_button_v2, SECONDARY)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
+                    override fun onDialogShown() {
+                        viewModel.onDeleteServerDataConfirmationShown()
+                    }
+
                     override fun onPositiveButtonClicked() {
-                        viewModel.onDeleteAccountConfirmed()
+                        viewModel.onDeleteServerDataConfirmed()
                     }
 
                     override fun onNegativeButtonClicked() {
-                        viewModel.onDeleteAccountCancelled()
+                        viewModel.onDeleteServerDataCancelled()
                     }
 
                     override fun onDialogCancelled() {
-                        viewModel.onDeleteAccountCancelled()
+                        viewModel.onDeleteServerDataCancelled()
                     }
                 },
             )
