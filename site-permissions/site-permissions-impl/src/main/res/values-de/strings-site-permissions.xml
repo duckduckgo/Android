@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Die Website „%1$s“ möchte auf deine Kamera zugreifen</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Die Website „%1$s“ möchte auf dein Mikrofon zugreifen</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Die Website „%1$s“ möchte auf deine Kamera und dein Mikrofon zugreifen</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ möchte auf dieser Website auf deinen Standort zugreifen</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">\"%1$s\" möchte auf dieser Website auf deine Kamera zugreifen</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ möchte auf dieser Website auf dein Mikrofon zugreifen</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ möchte auf dieser Website auf deine Kamera und dein Mikrofon zugreifen</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ möchte auf dieser Website auf deine DRM-Software (Digital Rights Management) zugreifen</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Wenn du dies nicht erlaubst, können Videos auf der Website möglicherweise nicht mehr abgespielt werden, aber diese Website hat keinen Zugriff auf die von der DRM-Software bereitgestellten Gerätekennungen.</string>
 
     <!-- Reminder dialog -->
@@ -104,5 +109,22 @@
     <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">DuckDuckGo konnte dieser Website keinen Zugriff auf die Kamera gewähren</string>
     <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo konnte dieser Website keinen Zugriff auf das Mikrofon gewähren</string>
     <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo konnte dieser Website keinen Zugriff auf Kamera und Mikrofon gewähren</string>
+
+    <!-- Permission settings redesign -->
+    <string name="permissionSettingsAlwaysAllow" instruction="Permission setting option: the site gets the permission without asking">Immer erlauben</string>
+    <string name="permissionSettingsAskEachTime" instruction="Permission setting option: the site has to ask for the permission every time">Jedes Mal fragen</string>
+    <string name="permissionSettingsLocationDialogTitle">Websites erlauben, nach Standortberechtigung zu fragen</string>
+    <string name="permissionSettingsLocationDialogMessage">Wenn du „Nie zulassen“ auswählst, kannst du bestimmte Funktionen auf Websites wie Wegbeschreibungen auf Karten oder Geschäfte in der Nähe nicht nutzen.</string>
+    <string name="permissionSettingsCameraDialogTitle">Websites erlauben, um Kameraberechtigungen zu bitten</string>
+    <string name="permissionSettingsCameraDialogMessage">Wenn du „Nie erlauben“ auswählst, kannst du Funktionen wie Video-Chat auf Websites nicht nutzen.</string>
+    <string name="permissionSettingsMicrophoneDialogTitle">Websites erlauben, um Mikrofonberechtigung zu bitten</string>
+    <string name="permissionSettingsMicrophoneDialogMessage">Wenn du „Nie erlauben“ auswählst, kannst du Funktionen wie Sprach-Chat auf Websites nicht nutzen.</string>
+    <string name="permissionSettingsDrmDialogTitle">Websites erlauben, um Berechtigungen für Digital Rights Management (DRM) zu bitten</string>
+    <string name="permissionSettingsDrmTitle" instruction="Name of a permission setting for playing protected video content">Digital Rights Management (DRM)</string>
+    <string name="permissionsPerWebsiteRedesignHeader" instruction="Placeholder is the name of a website">Berechtigungen für %1$s</string>
+    <string name="permissionsPerWebsiteRemovePermissions" instruction="Button that removes all saved permissions for the website shown on the screen">Berechtigungen entfernen</string>
+    <string name="permissionsRemovedForSiteSnackbar" instruction="Placeholder is the name of a website">Berechtigungen für &lt;b&gt;%1$s&lt;/b&gt; entfernt</string>
+    <string name="permissionsRemovedForAllSitesSnackbar">Berechtigungen für alle Websites entfernt</string>
+    <string name="permissionSettingsDrmDialogMessage">Wenn du „Nie zulassen“ wählst, können Videos auf der Website möglicherweise nicht mehr abgespielt werden.</string>
 
 </resources>

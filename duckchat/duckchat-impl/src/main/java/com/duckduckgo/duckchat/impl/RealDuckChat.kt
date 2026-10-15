@@ -274,14 +274,8 @@ interface DuckChatInternal : DuckChat {
     fun isDuckChatContextualModeEnabled(): Boolean
 
     /**
-     * Returns whether the redesigned Duck.ai contextual entry (anchored menu) is enabled. Only
-     * meaningful when contextual mode is also enabled.
-     */
-    fun isContextualSheetRedesignEnabled(): Boolean
-
-    /**
      * Returns whether the All Chats entry is shown in the Duck.ai address bar menu. Only
-     * meaningful when the redesigned contextual entry is also enabled.
+     * meaningful when contextual mode is also enabled.
      */
     fun isContextualMenuAllChatsEnabled(): Boolean
 
@@ -528,7 +522,6 @@ class RealDuckChat @Inject constructor(
     private var keepSessionAliveInMinutes: Int = DEFAULT_SESSION_ALIVE
     private var clearChatHistory: Boolean = true
     private var isContextualModeEnabled: Boolean = false
-    private var contextualSheetRedesignEnabled: Boolean = false
     private var contextualMenuAllChatsEnabled: Boolean = false
     private var isAutomaticContextAttachmentEnabled: Boolean = false
     private var duckAiNativeStorage: Boolean = false
@@ -608,8 +601,6 @@ class RealDuckChat @Inject constructor(
     override fun isDuckChatFullScreenModeEnabled(): Boolean = isDuckChatFeatureEnabled
 
     override fun isDuckChatContextualModeEnabled(): Boolean = isContextualModeEnabled
-
-    override fun isContextualSheetRedesignEnabled(): Boolean = contextualSheetRedesignEnabled
 
     override fun isContextualMenuAllChatsEnabled(): Boolean = contextualMenuAllChatsEnabled
 
@@ -1141,12 +1132,10 @@ class RealDuckChat @Inject constructor(
             isContextualModeEnabled = showContextualMode && isContextualModeKillSwitch
             _showContextualMode.emit(isContextualModeEnabled)
 
-            contextualSheetRedesignEnabled = isContextualModeEnabled && duckChatFeature.contextualSheetRedesign().isEnabled()
-
-            contextualMenuAllChatsEnabled = contextualSheetRedesignEnabled && duckChatFeature.contextualMenuAllChats().isEnabled()
+            contextualMenuAllChatsEnabled = isContextualModeEnabled && duckChatFeature.contextualMenuAllChats().isEnabled()
 
             _showTextSelectionAction.emit(
-                contextualSheetRedesignEnabled &&
+                isContextualModeEnabled &&
                     isContextualNativeInputEnabled &&
                     duckChatFeature.duckAiTextSelectionAction().isEnabled(),
             )

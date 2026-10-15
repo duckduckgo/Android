@@ -39,7 +39,7 @@ class NativeInputFooterCoordinator @Inject constructor(
 
     private class Entry(
         val priority: Int,
-        val category: String,
+        val category: FooterCategory?,
         val footer: NativeInputFooter,
     )
 
@@ -58,13 +58,15 @@ class NativeInputFooterCoordinator @Inject constructor(
 
         emitAll(
             combine(footers.map { it.footer.state }) { states ->
-                // One footer per category, the highest priority among the visible ones; the rest stack in priority order.
-                val shown = states.indices
-                    .filter { states[it].visible }
-                    .groupBy { footers[it].category }
-                    .values
-                    .map { sameCategory -> sameCategory.minBy { footers[it].priority } }
-                    .sortedBy { footers[it].priority }
+                // A category shows only its highest priority visible footer; footers without one all show.
+                val visible = states.indices.filter { states[it].visible }
+                val shown = (
+                    visible.filter { footers[it].category == null } +
+                        visible.filter { footers[it].category != null }
+                            .groupBy { footers[it].category }
+                            .values
+                            .map { sameCategory -> sameCategory.minBy { footers[it].priority } }
+                    ).sortedBy { footers[it].priority }
 
                 State(
                     footers = shown.map { footers[it].footer },

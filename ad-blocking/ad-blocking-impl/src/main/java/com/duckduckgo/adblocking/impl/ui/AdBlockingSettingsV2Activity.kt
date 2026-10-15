@@ -60,7 +60,7 @@ class AdBlockingSettingsV2Activity : BaseAdBlockingSettingsActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        maybeEnableEdgeToEdge()
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
         setTitle(R.string.ad_blocking_settings_title_v2)
         binding.adBlockingStatusIndicator.setStatus(StatusIndicatorView.Status.ALWAYS_ON)

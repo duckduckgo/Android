@@ -38,4 +38,8 @@ interface SitePermissionsDialogRedesignFeature {
     @InternalAlwaysEnabled
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun permissionSettingsRedesign(): Toggle
+
+    @InternalAlwaysEnabled
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun explicitPermissionsOnly(): Toggle
 }

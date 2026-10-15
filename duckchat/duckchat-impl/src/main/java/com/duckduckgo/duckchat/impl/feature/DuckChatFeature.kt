@@ -83,12 +83,6 @@ interface DuckChatFeature {
     fun standaloneMigration(): Toggle
 
     /**
-     * @return `true` when the "Hide AI Generated Images" option should be visible in AI Features Settings.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun showHideAiGeneratedImages(): Toggle
-
-    /**
      * @return `true` when the Native Input Field should be used instead of the web-based input.
      * If the remote feature is not present defaults to `true`.
      */
@@ -231,25 +225,11 @@ interface DuckChatFeature {
     fun duckAiVoiceChatService(): Toggle
 
     /**
-     * @return `true` when context-aware suggested prompts are shown on the contextual Duck.ai start surface.
-     * If the remote feature is not present defaults to `internal`.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun contextualSuggestedPrompts(): Toggle
-
-    /**
      * @return `true` when the native controls for AI Features are enabled in the app.
      * If the remote feature is not present defaults to `internal`
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun aiFeaturesNativeControls(): Toggle
-
-    /**
-     * @return Toggle iseÉnabled `true` when the remove chat history feature is enabled.
-     * If the remote feature is not present defaults to `true`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun removeChatHistory(): Toggle
 
     /**
      * @return `true` when the Duck.ai contextual sheet's initial INPUT state should use the native
@@ -260,21 +240,6 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun contextualNativeInput(): Toggle
-
-    /**
-     * @return `true` when the native input attachment layout changes are enabled: the attachment row is
-     * placed above the text input, and the contextual sheet keeps its expanded padding regardless of focus.
-     * If the remote feature is not present defaults to `internal`.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun nativeInputAttachmentChanges(): Toggle
-
-    /**
-     * @return `true` when the redesigned Duck.ai contextual sheet UI and flow are enabled.
-     * If the remote feature is not present defaults to `INTERNAL`.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun contextualSheetRedesign(): Toggle
 
     /**
      * @return `true` when the All Chats entry (and its divider) is shown in the Duck.ai address bar menu.
@@ -344,4 +309,11 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun homepageChatSuggestions(): Toggle
+
+    /**
+     * @return `true` when Duck.ai promo campaigns are supported. Exposed to Duck.ai as `supportsBonusOffer`.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiPromoCampaigns(): Toggle
 }

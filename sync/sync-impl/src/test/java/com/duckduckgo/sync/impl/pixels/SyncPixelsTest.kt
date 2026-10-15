@@ -33,6 +33,8 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AnotherDevicePromptOption
+import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationResult
+import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationSource
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
@@ -40,6 +42,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
+import com.duckduckgo.sync.impl.pixels.SyncPixels.TurnOffOption
 import com.duckduckgo.sync.impl.stats.DailyStats
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.duckduckgo.sync.store.SharedPrefsProvider
@@ -226,6 +229,22 @@ class RealSyncPixelsTest {
             mapOf(
                 SyncPixelParameters.SYNC_SCANNER_CAMERA_PERMISSION_BEFORE_REQUESTING to "false",
                 SyncPixelParameters.SYNC_SCANNER_CAMERA_PERMISSION_AFTER_REQUESTING to "true",
+            ),
+        )
+    }
+
+    @Test
+    fun `when setup authentication result is reported then the pixel carries the result and source`(
+        @TestParameter result: AuthenticationResult,
+        @TestParameter source: AuthenticationSource,
+    ) {
+        testee.fireSetupAuthenticationResult(result, source)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_AUTHENTICATION_RESULT,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_AUTHENTICATION_RESULT to result.value,
+                SyncPixelParameters.SYNC_SETUP_AUTHENTICATION_SOURCE to source.value,
             ),
         )
     }
@@ -1042,6 +1061,46 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.OPTION to option.value,
             ),
         )
+    }
+
+    @Test
+    fun `when turn off sheet is shown then the pixel is fired`() {
+        testee.fireTurnOffSheetShown()
+
+        verify(pixel).fire(SyncPixelName.SYNC_TURN_OFF_SHEET_SHOWN)
+    }
+
+    @Test
+    fun `when turn off option is selected then the pixel carries the option`(
+        @TestParameter option: TurnOffOption,
+    ) {
+        testee.fireTurnOffOptionSelected(option)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_TURN_OFF_OPTION_SELECTED,
+            mapOf(SyncPixelParameters.OPTION to option.value),
+        )
+    }
+
+    @Test
+    fun `when delete server data confirmation is shown then the pixel is fired`() {
+        testee.fireDeleteServerDataConfirmationShown()
+
+        verify(pixel).fire(SyncPixelName.SYNC_DELETE_SERVER_DATA_CONFIRMATION_SHOWN)
+    }
+
+    @Test
+    fun `when delete server data confirmation is confirmed then the pixel is fired`() {
+        testee.fireDeleteServerDataConfirmationConfirmed()
+
+        verify(pixel).fire(SyncPixelName.SYNC_DELETE_SERVER_DATA_CONFIRMATION_CONFIRMED)
+    }
+
+    @Test
+    fun `when delete server data confirmation is dismissed then the pixel is fired`() {
+        testee.fireDeleteServerDataConfirmationDismissed()
+
+        verify(pixel).fire(SyncPixelName.SYNC_DELETE_SERVER_DATA_CONFIRMATION_DISMISSED)
     }
 
     @Test

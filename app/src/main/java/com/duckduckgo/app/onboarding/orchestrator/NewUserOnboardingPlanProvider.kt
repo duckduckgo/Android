@@ -34,6 +34,7 @@ import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
 import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.OnboardingPreferenceCatalog
+import com.duckduckgo.app.onboarding.OnboardingPrivacyConfigPersistedGate
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentMetrics
@@ -43,8 +44,8 @@ import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.PasswordImportErrorAction
-import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
-import com.duckduckgo.app.onboarding.ui.page.configdriven.Embellishment
+import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
+import com.duckduckgo.app.onboarding.ui.page.welcome.Embellishment
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
@@ -66,6 +67,7 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
+import com.duckduckgo.nextsteps.api.NextSteps
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
 import com.duckduckgo.onboarding.api.LinearOnboardingPlan
 import com.duckduckgo.onboarding.api.LinearOnboardingPlanId
@@ -116,6 +118,8 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
     private val segmentedOnboardingExperimentManager: SegmentedOnboardingExperimentManager,
     private val segmentedOnboardingExperimentMetrics: SegmentedOnboardingExperimentMetrics,
+    private val nextSteps: NextSteps,
+    private val onboardingPrivacyConfigPersistedGate: OnboardingPrivacyConfigPersistedGate,
     private val onboardingPasswordImportExperimentManager: OnboardingPasswordImportExperimentManager,
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog,
     private val singleChoiceDataPlugins: ActivePluginPoint<OnboardingSingleChoiceDataPlugin>,
@@ -135,6 +139,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         // CTAs and the segment retention metrics of a branch this run may never reach.
         onboardingPixelSender.clearFlowAttribution()
         onboardingStore.setDownloadReason(null)
+
+        if (!ctx.isReinstall && onboardingPrivacyConfigPersistedGate.awaitPersisted()) {
+            nextSteps.enroll()
+        }
 
         return if (customAiOnboardingResolver.resolve()) {
             // in custom AI onboarding path, the input toggle is enabled by default
@@ -870,11 +878,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             resolveDialog = { NewUserOnboardingActivityDialog.WidgetPrompt },
             transition = { event ->
                 when (event) {
-                    is NewUserOnboardingEvent.Presented -> {
-                        onboardingStore.linearPlanWidgetPromptShown = true
-                        Stay
-                    }
-
                     is NewUserOnboardingEvent.AddWidgetRequested -> {
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
                         Advance
@@ -1156,9 +1159,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                             OnboardingPixelAction.TryInputClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
                         )
                         if (handsPromptToDemoStep) {
+                            onboardingStore.setTriedDuckAi()
                             ctx.pendingDuckAiPrompt = event.query
                         } else {
                             ctx.completionResult = if (event.isChat) {
+                                onboardingStore.setTriedDuckAi()
                                 NewUserOnboardingResult.LaunchChat(prompt = event.query)
                             } else {
                                 NewUserOnboardingResult.LaunchSearch(query = event.query)

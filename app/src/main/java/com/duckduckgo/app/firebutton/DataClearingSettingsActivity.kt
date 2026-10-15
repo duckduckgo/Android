@@ -32,13 +32,10 @@ import com.duckduckgo.app.browser.databinding.ActivityDataClearingSettingsBindin
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.firebutton.DataClearingSettingsViewModel.Command
 import com.duckduckgo.app.settings.clear.FireAnimation
-import com.duckduckgo.app.settings.clear.FireAnimation.HeroAbstract.getAnimationForIndex
 import com.duckduckgo.app.settings.clear.displayLabelResId
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.Settings
 import com.duckduckgo.di.scopes.ActivityScope
@@ -55,9 +52,6 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
     lateinit var fireDialogProvider: FireDialogProvider
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val viewModel: DataClearingSettingsViewModel by bindViewModel()
@@ -71,16 +65,11 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
         supportActionBar?.setTitle(R.string.dataClearingActivityTitle)
 
         configureUiEventHandlers()
@@ -113,7 +102,7 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
             .onEach { viewState ->
                 viewState.let {
                     updateAutomaticClearingStatus(it.automaticallyClearingEnabled)
-                    updateSelectedFireAnimation(it.selectedFireAnimation, it.isFireAnimationUpdateEnabled)
+                    updateSelectedFireAnimation(it.selectedFireAnimation)
                     updateClearDuckAiDataSetting(it.clearDuckAiData, it.showClearDuckAiDataSetting)
                     updateFireproofWebsitesCount(it.fireproofWebsitesCount)
                 }
@@ -134,11 +123,8 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
         binding.automaticDataClearingSetting.setSecondaryText(statusText)
     }
 
-    private fun updateSelectedFireAnimation(
-        fireAnimation: FireAnimation,
-        isFireAnimationUpdateEnabled: Boolean,
-    ) {
-        binding.selectedFireAnimationSetting.setSecondaryText(getString(fireAnimation.displayLabelResId(isFireAnimationUpdateEnabled)))
+    private fun updateSelectedFireAnimation(fireAnimation: FireAnimation) {
+        binding.selectedFireAnimationSetting.setSecondaryText(getString(fireAnimation.displayLabelResId()))
     }
 
     private fun updateClearDuckAiDataSetting(
@@ -157,7 +143,10 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
     private fun processCommand(it: Command) {
         when (it) {
             is Command.LaunchFireproofWebsites -> launchFireproofWebsites()
-            is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation, it.isFireAnimationUpdateEnabled)
+            is Command.LaunchFireAnimationSettings -> launchBrandDesignFireAnimationSelector(
+                it.animation,
+                viewModel::onFireAnimationSelected,
+            )
             is Command.LaunchFireDialog -> launchFireDialog()
             is Command.LaunchAutomaticDataClearingSettings -> launchAutomaticDataClearingSettings()
         }
@@ -166,51 +155,6 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
     private fun launchFireproofWebsites() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(FireproofWebsitesActivity.intent(this), options)
-    }
-
-    private fun launchFireAnimationSelector(
-        animation: FireAnimation,
-        isFireAnimationUpdateEnabled: Boolean,
-    ) {
-        if (isFireAnimationUpdateEnabled) {
-            launchBrandDesignFireAnimationSelector(animation, viewModel::onFireAnimationSelected)
-        } else {
-            launchLegacyFireAnimationSelector(animation)
-        }
-    }
-
-    private fun launchLegacyFireAnimationSelector(animation: FireAnimation) {
-        val currentAnimationOption = animation.getOptionIndex()
-
-        com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder(this)
-            .setTitle(R.string.settingsSelectFireAnimationDialog)
-            .setOptions(
-                listOf(
-                    R.string.settingsHeroFireAnimation,
-                    R.string.settingsHeroWaterAnimation,
-                    R.string.settingsHeroAbstractAnimation,
-                    R.string.settingsNoneAnimation,
-                ),
-                currentAnimationOption,
-            )
-            .setPositiveButton(R.string.settingsSelectFireAnimationDialogSave)
-            .setNegativeButton(R.string.cancel)
-            .addEventListener(
-                object : com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked(selectedItem: Int) {
-                        val selectedAnimation = selectedItem.getAnimationForIndex()
-                        viewModel.onFireAnimationSelected(selectedAnimation)
-                    }
-
-                    override fun onRadioItemSelected(selectedItem: Int) {
-                        val selectedAnimation = selectedItem.getAnimationForIndex()
-                        if (selectedAnimation != FireAnimation.None) {
-                            startActivity(com.duckduckgo.app.settings.FireAnimationActivity.intent(baseContext, selectedAnimation))
-                        }
-                    }
-                },
-            )
-            .show()
     }
 
     private fun launchFireDialog() {

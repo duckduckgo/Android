@@ -152,7 +152,7 @@ android {
             ]
         }
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             manifestPlaceholders = [
                     appIcon     : "@mipmap/ic_launcher_red",
@@ -173,8 +173,6 @@ android {
     productFlavors {
         internal {
             dimension "store"
-            // use a separate proguard file for internal
-            proguardFiles 'proguard-rules-internal.pro'
         }
         fdroid {
             dimension "store"
@@ -241,15 +239,6 @@ if (diFramework != 'Metro') {
 
 base {
     archivesName = "duckduckgo-${buildVersionName()}"
-}
-
-androidComponents {
-    // only minify (enable R8) for internal release builds
-    beforeVariants(selector().withBuildType("release")) { variantBuilder ->
-        if (variantBuilder.productFlavors.any { it.second == "internal" }) {
-            variantBuilder.minifyEnabled = true
-        }
-    }
 }
 
 if (!rootProject.ext.proprietaryFontAvailable && !rootProject.ext.proprietaryFontOptOut) {
@@ -403,6 +392,7 @@ dependencies {
     implementation project(':sqlcipher-loader-api')
     implementation project(':sqlcipher-loader-impl')
     implementation project(':tracker-detection-api')
+    implementation project(':tracker-detection-impl')
     internalImplementation project(':privacy-config-internal')
 
     implementation project(':anrs-api')
@@ -567,6 +557,9 @@ dependencies {
 
     implementation project(':dax-prompts-api')
     implementation project(':dax-prompts-impl')
+
+    implementation project(':next-steps-api')
+    implementation project(':next-steps-impl')
 
     implementation project(':serp-logos-api')
     implementation project(':serp-logos-impl')

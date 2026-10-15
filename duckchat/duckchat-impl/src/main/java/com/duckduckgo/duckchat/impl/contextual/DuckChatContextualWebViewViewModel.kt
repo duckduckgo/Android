@@ -20,8 +20,10 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.api.DuckAiTermsConsent
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.toChatIdOrNull
@@ -82,6 +84,8 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     private val chatHistoryRepository: ChatHistoryRepository,
     private val contextualEntryPromptStore: ContextualEntryPromptStore,
     private val textSelectionRepository: TextSelectionRepository,
+    private val termsConsent: DuckAiTermsConsent,
+    private val browserMode: BrowserMode,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -123,6 +127,8 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
 
     // The selections the entry dialog had attached at hand-off.
     private var pendingEntrySelections: JSONArray? = null
+
+    private var pendingEntryCarriesTermsConsent: Boolean = true
 
     private var hidingSheetForNewChat = false
 
@@ -322,6 +328,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         pendingEntryPrompt = entry.prompt
         pendingEntryPageContext = entry.serializedPageContext
         pendingEntrySelections = entry.selectionsJson
+        pendingEntryCarriesTermsConsent = entry.carriesTermsConsent
         val handedOffWithoutContext = entry.serializedPageContext == null
         val chatUrl = duckChat.getDuckChatUrl("", false, sidebar = true)
         withContext(dispatchers.main()) {
@@ -348,6 +355,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         val entry = pendingEntryPrompt ?: return
         val entryPageContext = pendingEntryPageContext
         val entrySelections = pendingEntrySelections
+        val entryCarriesTermsConsent = pendingEntryCarriesTermsConsent
         pendingEntryPrompt = null
         pendingEntryPageContext = null
         pendingEntrySelections = null
@@ -360,6 +368,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             filesJson = entry.filesJson,
             pageContextSerialized = entryPageContext,
             selectionsJson = entrySelections,
+            carriesTermsConsent = entryCarriesTermsConsent,
         )
     }
 
@@ -388,10 +397,21 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         filesJson: JSONArray? = null,
         pageContextSerialized: String?,
         selectionsJson: JSONArray? = null,
+        carriesTermsConsent: Boolean = true,
     ) {
         viewModelScope.launch(dispatchers.io()) {
             val contextPrompt =
-                generateContextPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson, pageContextSerialized, selectionsJson)
+                generateContextPrompt(
+                    prompt,
+                    modelId,
+                    reasoningEffort,
+                    selectedTool,
+                    imagesJson,
+                    filesJson,
+                    pageContextSerialized,
+                    selectionsJson,
+                    carriesTermsConsent,
+                )
             val prefillText = followUpPrefill?.takeIf { it.isNotEmpty() }
             val prefillEvent = prefillText?.let { generatePrefillEvent(it) }
             withContext(dispatchers.main()) {
@@ -480,6 +500,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         filesJson: JSONArray? = null,
         pageContextSerialized: String?,
         selectionsJson: JSONArray? = null,
+        carriesTermsConsent: Boolean = true,
     ): SubscriptionEventData {
         val pageContext =
             pageContextSerialized
@@ -525,6 +546,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
                 pageContext?.let { put("pageContext", it) }
                 selectionsJson?.let { put("selections", it) }
             }
+        if (carriesTermsConsent) termsConsent.carry(params, browserMode)
 
         return SubscriptionEventData(
             featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
@@ -763,7 +785,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         duckChatPixels.reportContextualRecentChatSelected()
         val url = duckChatInternal.buildChatUrl(chatId)
         val sourceTabId = _viewState.value.tabId
-        duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.CHAT_HISTORY_OPEN_CHAT, opensNewTab = true, hasPrompt = false)
+        duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.RECENT_CHAT_CONTEXTUAL, opensNewTab = true, hasPrompt = false)
         commandChannel.trySend(Command.OpenChatUrl(url = url, sourceTabId = sourceTabId))
     }
 

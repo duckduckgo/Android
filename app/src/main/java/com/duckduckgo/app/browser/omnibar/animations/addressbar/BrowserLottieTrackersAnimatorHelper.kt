@@ -65,8 +65,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 ) : BrowserTrackersAnimatorHelper {
 
     private var listener: TrackersAnimatorListener? = null
-    private var trackersAnimation: LottieAnimationView? = null
-    private var shieldAnimation: LottieAnimationView? = null
 
     private lateinit var cookieView: LottieAnimationView
     private lateinit var cookieScene: ViewGroup
@@ -91,67 +89,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private var hasAdBlockingAnimationBeenCanceled = false
     private lateinit var adBlockingFirstScene: Scene
     private lateinit var adBlockingSecondScene: Scene
-
-    override fun startTrackersAnimation(
-        context: Context,
-        shieldAnimationView: LottieAnimationView,
-        trackersAnimationView: LottieAnimationView,
-        omnibarViews: List<View>,
-        entities: List<Entity>?,
-        useLightAnimation: Boolean?,
-    ) {
-        if (isCookiesAnimationRunning || isAdBlockingAnimationRunning) return // let an in-flight badge/cookie animation finish to avoid glitches
-        if (trackersAnimationView.isAnimating) return
-
-        this.trackersAnimation = trackersAnimationView
-        this.shieldAnimation = shieldAnimationView
-
-        if (entities.isNullOrEmpty()) { // no badge nor tracker animations
-            tryToStartCookiesAnimation(omnibarViews)
-            return
-        }
-
-        val logos = getLogos(context, entities)
-        if (logos.isEmpty()) {
-            tryToStartCookiesAnimation(omnibarViews)
-            return
-        }
-
-        val isLightMode = useLightAnimation ?: theme.isLightModeEnabled()
-        val animationRawRes = getVisualDesignAnimationRawRes(logos, isLightMode)
-
-        with(trackersAnimationView) {
-            this.setCacheComposition(false) // ensure assets are not cached
-            this.setAnimation(animationRawRes)
-            this.maintainOriginalImageBounds = true
-            this.setImageAssetDelegate(TrackersLottieAssetDelegate(context, logos))
-            this.removeAllAnimatorListeners()
-            this.addAnimatorListener(
-                object : AnimatorListener {
-                    override fun onAnimationStart(animation: Animator) {
-                        commonAddressBarAnimationHelper.animateViewsOut(omnibarViews).start()
-                    }
-
-                    override fun onAnimationEnd(animation: Animator) {
-                        commonAddressBarAnimationHelper.animateViewsIn(omnibarViews).start()
-                        tryToStartCookiesAnimation(omnibarViews)
-                        listener?.onAnimationFinished()
-                    }
-
-                    override fun onAnimationCancel(animation: Animator) {
-                    }
-
-                    override fun onAnimationRepeat(animation: Animator) {
-                    }
-                },
-            )
-
-            this.setMaxProgress(1f)
-            shieldAnimationView.setMaxProgress(1f)
-            shieldAnimationView.playAnimation()
-            this.playAnimation()
-        }
-    }
 
     override fun startAddressBarTrackersAnimation(
         context: Context,
@@ -205,7 +142,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 
         if (enqueueCookieAnimation) {
             this.enqueueCookiesAnimation = true
-        } else if (this.trackersAnimation?.isAnimating != true && !addressBarTrackersAnimator.isAnimationRunning) {
+        } else if (!addressBarTrackersAnimator.isAnimationRunning) {
             startCookiesAnimation(omnibarViews + shieldViews)
         } else {
             enqueueCookiesAnimation = false
@@ -225,7 +162,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         // Ad-blocking is exclusive: cancel any in-flight tracker/cookie animation before showing.
         conflatedJob.cancel()
         addressBarTrackersAnimator.cancelAnimation()
-        stopTrackersAnimation()
         stopCookiesAnimation()
 
         this.adBlockingScene = badgeScene
@@ -339,7 +275,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     ) {
         conflatedJob.cancel()
         addressBarTrackersAnimator.cancelAnimation()
-        stopTrackersAnimation()
         stopCookiesAnimation()
         stopAdBlockingAnimation()
         omnibarViews.forEach { it.alpha = 1f }
@@ -489,62 +424,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         return slideInCookiesTransition
     }
 
-    private fun getVisualDesignAnimationRawRes(
-        logos: List<TrackerLogo>,
-        isLightMode: Boolean,
-    ): Int {
-        val trackers = logos.size
-        return when {
-            trackers == 1 -> if (isLightMode) R.raw.light_trackers else R.raw.dark_trackers
-            trackers == 2 -> if (isLightMode) R.raw.light_trackers_1 else R.raw.dark_trackers_1
-            trackers >= 3 -> if (isLightMode) R.raw.light_trackers_2 else R.raw.dark_trackers_2
-            // we shouldn't be here but we also don't want to crash so we'll show the default
-            else -> if (isLightMode) R.raw.light_trackers else R.raw.dark_trackers
-        }
-    }
-
-    private fun getLogos(
-        context: Context,
-        entities: List<Entity>,
-    ): List<TrackerLogo> {
-        if (context.packageName == null) return emptyList()
-        val trackerLogoList = entities
-            .asSequence()
-            .distinct()
-            .take(MAX_LOGOS_SHOWN + 1)
-            .sortedWithDisplayNamesStartingWithVowelsToTheEnd()
-            .map {
-                val resId = TrackersRenderer().networkLogoIcon(context, it.name)
-                if (resId == null) {
-                    TrackerLogo.LetterLogo(it.displayName.take(1))
-                } else {
-                    TrackerLogo.ImageLogo(resId)
-                }
-            }.toMutableList()
-
-        return if (trackerLogoList.size <= MAX_LOGOS_SHOWN) {
-            trackerLogoList
-        } else {
-            trackerLogoList.take(MAX_LOGOS_SHOWN)
-                .toMutableList()
-                .apply { add(TrackerLogo.StackedLogo()) }
-        }
-    }
-
-    private fun stopTrackersAnimation() {
-        val trackersAnimation = this.trackersAnimation ?: return
-        val shieldAnimation = this.shieldAnimation ?: return
-
-        if (trackersAnimation.isAnimating) {
-            trackersAnimation.cancelAnimation()
-            trackersAnimation.progress = 1f
-        }
-        if (shieldAnimation.isAnimating) {
-            shieldAnimation.cancelAnimation()
-            shieldAnimation.progress = 0f
-        }
-    }
-
     private fun stopCookiesAnimation() {
         if (!::cookieViewBackground.isInitialized || !::cookieView.isInitialized) return
 
@@ -552,7 +431,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         if (this::firstScene.isInitialized) {
             TransitionManager.go(firstScene)
         }
-        shieldAnimation?.alpha = 1f
         cookieViewBackground.alpha = 0f
         cookieScene.gone()
         cookieView.gone()
@@ -565,14 +443,9 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         if (this::adBlockingFirstScene.isInitialized) {
             TransitionManager.go(adBlockingFirstScene)
         }
-        shieldAnimation?.alpha = 1f
         adBlockingViewBackground.alpha = 0f
         adBlockingScene.gone()
         adBlockingView.gone()
-    }
-
-    private fun Sequence<Entity>.sortedWithDisplayNamesStartingWithVowelsToTheEnd(): Sequence<Entity> {
-        return sortedWith(compareBy { "AEIOU".contains(it.displayName.take(1)) })
     }
 
     @RawRes
@@ -597,7 +470,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     }
 
     companion object {
-        private const val MAX_LOGOS_SHOWN = 3
         private const val COOKIES_ANIMATION_DELAY = 1000L
         private const val COOKIES_ANIMATION_DURATION = 300L
         private const val COOKIES_ANIMATION_FADE_OUT_DURATION = 800L

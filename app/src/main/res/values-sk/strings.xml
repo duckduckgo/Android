@@ -264,6 +264,7 @@
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Oprávnenia</string>
+    <string name="permissionsGeneralPermissionsTitle" instruction="Section header on the Permissions settings screen, above the Notifications and Open Links in Apps settings">Všeobecné povolenia</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Vzhľad</string>
@@ -333,11 +334,6 @@
     <string name="surveyLoadingErrorText">Prieskum sa momentálne nenačítava.\nSkúste to znova neskôr.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Vyskúšajte našu miniaplikáciu Vyhľadávanie.</string>
-    <string name="addWidgetCtaDescription">Na rýchly a jednoduchý prístup si pridajte miniaplikáciu vyhľadávania na domovskú obrazovku.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Pridať miniaplikáciu</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Zobraziť</string>
-    <string name="addWidgetCtaDismissButton">Odmietnuť</string>
     <string name="addWidgetInstructionsActivityTitle">Pridať miniaplikáciu</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Dlhým stlačením domovskej obrazovky otvorte ponuku miniaplikácií.</string>
@@ -746,10 +742,6 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Bezpečnostný certifikát pre %1$s nie je pre operačný systém vášho zariadenia dôveryhodný. Je možné, že webová lokalita je nesprávne nakonfigurovaná alebo že útočník ohrozil vaše pripojenie, alebo že vaše systémové hodiny nie sú správne.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Dobrý deň.<br/><br/>Si pripravený/-á na rýchlejší prehliadač, ktorý ťa ochráni?]]></string>
-    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Poďme na to!</string>
-    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1ButtonBrandDesign">Začnime!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Bol/-a som tu už predtým</string>
     <string name="preOnboardingDaxDialog2Title">Ochrany boli aktivované!</string>
@@ -777,8 +769,6 @@
     <string name="highlightsPreOnboardingAddressBarOption2Description">Ľahko dosiahnuteľné</string>
     <string name="onboardingSearchDaxDialogTitle">Skúste vyhľadávanie!</string>
     <string name="onboardingSearchDaxDialogDescription">Vaše vyhľadávania v službe DuckDuckGo sú vždy súkromné.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"ako sa povie „kačica“ po anglicky"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"ako sa povie „kačica“ po španielsky"</string>
     <string name="onboardingSearchQueryOption1">ako sa povie „kačica“ po anglicky</string>
     <string name="onboardingSearchQueryOption1English">ako sa povie „kačica“ po španielsky</string>
     <string name="onboardingSearchDaxDialogOption2">obsadenie avatara</string>
@@ -860,8 +850,8 @@
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Zobraziť pri spustení aplikácie</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab">Naposledy otvorená karta</string>
-    <string name="showOnAppLaunchOptionNewTabPage">Stránka na novej karte</string>
+    <string name="showOnAppLaunchOptionLastUsedTab">Naposledy použitá karta</string>
+    <string name="showOnAppLaunchOptionOpenNewTab">Stránka na novej karte</string>
     <string name="showOnAppLaunchOptionSpecificPage">Špecifická stránka</string>
 
     <!-- Privacy Dashboard -->
@@ -903,9 +893,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Vyskúšaj náš widget na úvodnej obrazovke!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Na rýchly a jednoduchý prístup si pridajte miniaplikáciu vyhľadávania na domovskú obrazovku.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Pridať miniaplikáciu</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Teraz nie</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Vyhľadať v DuckDuckGo</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Miniaplikácia úvodnej obrazovky</string>

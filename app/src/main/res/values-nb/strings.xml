@@ -258,6 +258,7 @@
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Tillatelser</string>
+    <string name="permissionsGeneralPermissionsTitle" instruction="Section header on the Permissions settings screen, above the Notifications and Open Links in Apps settings">Generelle tillatelser</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Utseende</string>
@@ -327,11 +328,6 @@
     <string name="surveyLoadingErrorText">Spørreundersøkelsen vår laster ikke for øyeblikket.\nPrøv igjen senere.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Prøv søke-widgeten vår!</string>
-    <string name="addWidgetCtaDescription">Legg søke-widgeten vår til på startskjermen for rask og enkel tilgang.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Legg til widget</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Vis meg</string>
-    <string name="addWidgetCtaDismissButton">Avvis</string>
     <string name="addWidgetInstructionsActivityTitle">Legg til widget</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Trykk lenge på startskjermen og åpne deretter widget-menyen.</string>
@@ -714,10 +710,6 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Sikkerhetssertifikatet for %1$s er ikke klarert av enhetens operativsystem. Det er mulig at nettstedet er feilkonfigurert, at en angriper har kompromittert tilkoblingen eller at systemklokken din er feil.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Heisann.<br/><br/>Klar for en raskere nettleser som beskytter deg?]]></string>
-    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Sett i gang!</string>
-    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1ButtonBrandDesign">Vi setter i gang!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Jeg har vært her før</string>
     <string name="preOnboardingDaxDialog2Title">Beskyttelser er aktivert!</string>
@@ -745,8 +737,6 @@
     <string name="highlightsPreOnboardingAddressBarOption2Description">Lett å nå</string>
     <string name="onboardingSearchDaxDialogTitle">Prøv et søk!</string>
     <string name="onboardingSearchDaxDialogDescription">DuckDuckGo-søkene dine er alltid private.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"hva heter and på engelsk"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"hva heter and på spansk"</string>
     <string name="onboardingSearchQueryOption1">hva heter and på engelsk</string>
     <string name="onboardingSearchQueryOption1English">hva heter and på spansk</string>
     <string name="onboardingSearchDaxDialogOption2">rollebesetningen i avatar</string>
@@ -824,8 +814,8 @@
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Vis ved lansering av appen</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab">Sist åpnet fane</string>
-    <string name="showOnAppLaunchOptionNewTabPage">Ny faneside</string>
+    <string name="showOnAppLaunchOptionLastUsedTab">Sist brukte fane</string>
+    <string name="showOnAppLaunchOptionOpenNewTab">Ny faneside</string>
     <string name="showOnAppLaunchOptionSpecificPage">Spesifikk side</string>
 
     <!-- Privacy Dashboard -->
@@ -867,9 +857,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Prøv startskjerm-widgeten vår!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Legg søke-widgeten vår til på startskjermen for rask og enkel tilgang.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Legg til widget</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ikke nå</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Søk med DuckDuckGo</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Startskjerm-widget</string>

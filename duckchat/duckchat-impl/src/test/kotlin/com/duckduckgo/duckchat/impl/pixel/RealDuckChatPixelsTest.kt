@@ -24,6 +24,7 @@ import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_ACCEPT_TERMS_AND_CONDITIONS
@@ -473,6 +474,28 @@ class RealDuckChatPixelsTest {
 
         verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_COUNT)
         verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportChatHistoryScreenShown then fires count and daily with source`() = runTest {
+        testee.reportChatHistoryScreenShown(DuckChatHistorySource.CONTEXTUAL_CHAT)
+
+        advanceUntilIdle()
+
+        val params = mapOf(DuckChatPixelParameters.ENTRY_SOURCE to "contextual_chat")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_COUNT, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportChatHistoryScreenShownFromDeeplink then fires count and daily with deeplink source`() = runTest {
+        testee.reportChatHistoryScreenShownFromDeeplink()
+
+        advanceUntilIdle()
+
+        val params = mapOf(DuckChatPixelParameters.ENTRY_SOURCE to "deeplink")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_COUNT, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_DAILY, params, type = Pixel.PixelType.Daily())
     }
 
     @Test
@@ -939,5 +962,35 @@ class RealDuckChatPixelsTest {
             DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_SUBSCRIBE_MODAL_IMPRESSION,
             parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__unknown"),
         )
+    }
+
+    @Test
+    fun whenFireInputOutcomeThenFiresCountAndDailyWithParams() = runTest {
+        testee.fireInputOutcome(DuckChatPixelSurface.DUCK_AI, InputOutcome.PROMPT_SUBMITTED, InputSubmitMethod.ENTER, true)
+
+        advanceUntilIdle()
+
+        val params = mapOf(
+            DuckChatPixelParameters.SURFACE to "duck_ai",
+            DuckChatPixelParameters.OUTCOME to "prompt_submitted",
+            DuckChatPixelParameters.TOS_DISCLAIMER_SHOWN to "true",
+            DuckChatPixelParameters.SUBMIT_METHOD to "enter",
+        )
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_INPUT_OUTCOME_COUNT, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_INPUT_OUTCOME_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenFireInputOutcomeWithoutMethodThenOmitsSubmitMethod() = runTest {
+        testee.fireInputOutcome(DuckChatPixelSurface.ADDRESS_BAR, InputOutcome.ABANDONED, null, false)
+
+        advanceUntilIdle()
+
+        val params = mapOf(
+            DuckChatPixelParameters.SURFACE to "address_bar",
+            DuckChatPixelParameters.OUTCOME to "abandoned",
+            DuckChatPixelParameters.TOS_DISCLAIMER_SHOWN to "false",
+        )
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_INPUT_OUTCOME_COUNT, params)
     }
 }

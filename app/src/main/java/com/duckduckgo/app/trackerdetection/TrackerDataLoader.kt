@@ -21,7 +21,6 @@ import androidx.annotation.WorkerThread
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
 import com.duckduckgo.app.trackerdetection.api.TdsJson
@@ -31,6 +30,7 @@ import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
+import com.duckduckgo.app.trackerdetection.db.TrackerDetectionDatabase
 import com.duckduckgo.app.trackerdetection.model.TdsMetadata
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -61,7 +61,7 @@ class TrackerDataLoader @Inject constructor(
     private val tdsCnameEntityDao: TdsCnameEntityDao,
     private val tdsMetadataDao: TdsMetadataDao,
     private val context: Context,
-    private val appDatabase: AppDatabase,
+    private val trackerDetectionDatabase: TrackerDetectionDatabase,
     @TrackerDetectionMoshi private val moshi: Moshi,
     private val urlToTypeMapper: UrlToTypeMapper,
     private val entityLookupRefresher: EntityLookupRefresher,
@@ -106,7 +106,7 @@ class TrackerDataLoader @Inject constructor(
         eTag: String,
         tdsJson: TdsJson,
     ) {
-        appDatabase.runInTransaction {
+        trackerDetectionDatabase.runInTransaction {
             tdsMetadataDao.tdsDownloadSuccessful(TdsMetadata(eTag = eTag))
             tdsEntityDao.updateAll(tdsJson.jsonToEntities())
             tdsDomainEntityDao.updateAll(tdsJson.jsonToDomainEntities())

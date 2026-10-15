@@ -29,7 +29,9 @@ import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.R
 import com.duckduckgo.pir.impl.checker.PirEligibility
+import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
+import com.duckduckgo.pir.impl.checker.runModeOrNull
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
 import dagger.android.AndroidInjection
@@ -101,6 +103,12 @@ class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {
                 logcat { "PIR-OPT-OUT: PIR opt-out not allowed to run!" }
                 pirWorkHandler.cancelWork(CancellationReason.fromDisabledReason(eligibility.reason))
                 pirFeatureDataCleaner.removeAllData()
+                stopSelf()
+                return@launch
+            }
+
+            if (eligibility.runModeOrNull != PirRunMode.SCAN_AND_OPT_OUT) {
+                logcat { "PIR-OPT-OUT: Scan-only user, opt-out is not allowed to run" }
                 stopSelf()
                 return@launch
             }

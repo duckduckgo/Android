@@ -15,11 +15,9 @@
  */
 package com.duckduckgo.duckchat.impl.nativeinput.footer.terms
 
-import android.content.ActivityNotFoundException
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooter
@@ -48,6 +46,7 @@ import javax.inject.Inject
 class TermsFooterPlugin @Inject constructor(
     private val termsRepository: DuckAiTermsRepository,
     private val duckChatFeature: DuckChatFeature,
+    private val browserNav: BrowserNav,
 ) : NativeInputFooterPlugin {
 
     // Ahead of the usage footers: acceptance has to come before any notice about using Duck.ai.
@@ -82,15 +81,10 @@ class TermsFooterPlugin @Inject constructor(
         }
     }
 
-    // Pinned to this app so the link opens in a DuckDuckGo tab, including from the contextual sheet.
     private fun openLink(
         context: Context,
         url: String,
     ) {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).setPackage(context.packageName)
-        try {
-            context.startActivity(intent)
-        } catch (_: ActivityNotFoundException) {
-        }
+        context.startActivity(browserNav.openInNewTab(context, url))
     }
 }

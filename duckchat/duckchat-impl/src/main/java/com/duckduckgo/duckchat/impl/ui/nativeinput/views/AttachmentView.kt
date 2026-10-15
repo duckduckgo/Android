@@ -18,12 +18,14 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.net.Uri
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewTreeObserver
 import android.webkit.ValueCallback
 import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
@@ -420,11 +422,34 @@ class AttachmentView(
     private fun buildImagePickerCallback(source: AttachmentViewModel.ImageSource): ValueCallback<Array<Uri>> = ValueCallback { uris ->
         val list = uris?.toList()
         if (!list.isNullOrEmpty()) viewModel?.onImagesPicked(list, source)
+        restoreInputFocus()
     }
 
     private fun buildFilePickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->
         val list = uris?.toList()
         if (!list.isNullOrEmpty()) viewModel?.onFilesPicked(list)
+        restoreInputFocus()
+    }
+
+    private fun restoreInputFocus() {
+        val restore = {
+            if (resources.configuration.keyboard == Configuration.KEYBOARD_NOKEYS) host?.focusInput() else host?.requestInputFocus()
+        }
+        if (hasWindowFocus()) {
+            restore()
+            return
+        }
+        // Picker results arrive before the window regains focus, and the IME ignores show requests from a view
+        // it is not serving yet. Posting from the focus callback lets the IME attach to the window first.
+        viewTreeObserver.addOnWindowFocusChangeListener(
+            object : ViewTreeObserver.OnWindowFocusChangeListener {
+                override fun onWindowFocusChanged(hasFocus: Boolean) {
+                    if (!hasFocus) return
+                    viewTreeObserver.removeOnWindowFocusChangeListener(this)
+                    post { restore() }
+                }
+            },
+        )
     }
 }
 

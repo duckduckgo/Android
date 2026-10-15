@@ -25,6 +25,7 @@ import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.optout.PirForegroundOptOutService
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
+import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
@@ -37,7 +38,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -46,11 +46,12 @@ import javax.inject.Inject
  */
 interface PirWorkHandler {
     /**
-     * Checks if PIR can run based on remote features, subscription status, entitlement and
-     * repository availability.
+     * Checks if PIR can run based on remote features, subscription status, entitlement, freemium
+     * activation and repository availability.
      *
-     * @return Flow that emits [PirEligibility.Enabled] when PIR can run, or
-     * [PirEligibility.Disabled] (carrying the failing [DisabledReason]) otherwise.
+     * @return Flow that emits [PirEligibility.Enabled] (carrying the [PirRunMode] the user is
+     * allowed to run) when PIR can run, or [PirEligibility.Disabled] (carrying the failing
+     * [DisabledReason]) otherwise.
      */
     suspend fun canRunPir(): Flow<PirEligibility>
 
@@ -77,6 +78,7 @@ class RealPirWorkHandler @Inject constructor(
     private val pirRepository: PirRepository,
     private val pirNotificationManager: PirNotificationManager,
     private val pirScanWideEvent: PirScanWideEvent,
+    private val pirFreemiumDataStore: PirFreemiumDataStore,
 ) : PirWorkHandler {
 
     override suspend fun canRunPir(): Flow<PirEligibility> {
@@ -84,17 +86,19 @@ class RealPirWorkHandler @Inject constructor(
             if (pirRemoteFeatures.pirBeta().isEnabled()) {
                 // User could have a valid subscription but is not entitled to PIR,
                 // so we have to check both
+                // The flows only signal a change: their first value is whatever this process cached earlier,
+                // which outside the main process can predate a purchase or expiry, so both are read from storage.
                 combine(
                     subscriptions.getSubscriptionStatusFlow()
                         .distinctUntilChanged(),
-                    subscriptions.getEntitlementStatus()
-                        .map { entitledProducts ->
-                            entitledProducts.contains(PIR)
-                        }
+                    subscriptions.getEntitlements()
                         .distinctUntilChanged(),
-                ) { subscriptionStatus, hasValidEntitlement ->
-                    resolveEligibility(subscriptionStatus, hasValidEntitlement)
-                }
+                ) { _, _ ->
+                    resolveEligibility(
+                        subscriptionStatus = subscriptions.getSubscriptionStatus(),
+                        hasValidEntitlement = subscriptions.getCurrentEntitlements().any { it.product == PIR.value },
+                    )
+                }.distinctUntilChanged()
             } else {
                 flowOf(PirEligibility.Disabled(DisabledReason.FEATURE_DISABLED))
             }
@@ -129,11 +133,26 @@ class RealPirWorkHandler @Inject constructor(
             -> true
         }
 
-        return when {
-            !subscriptionActive -> PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED)
-            !hasValidEntitlement -> PirEligibility.Disabled(DisabledReason.ENTITLEMENT_LOST)
-            !pirRepository.isRepositoryAvailable() -> PirEligibility.Disabled(DisabledReason.REPOSITORY_UNAVAILABLE)
-            else -> PirEligibility.Enabled
+        // Freemium is only for users without a subscription: a subscriber whose plan lacks PIR is not a free user.
+        val runMode = when {
+            subscriptionActive && hasValidEntitlement -> PirRunMode.SCAN_AND_OPT_OUT
+            !subscriptionActive && canRunFreemiumScans() -> PirRunMode.SCAN_ONLY
+            else -> null
         }
+
+        return when {
+            runMode == null -> if (subscriptionActive) {
+                PirEligibility.Disabled(DisabledReason.ENTITLEMENT_LOST)
+            } else {
+                PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED)
+            }
+
+            !pirRepository.isRepositoryAvailable() -> PirEligibility.Disabled(DisabledReason.REPOSITORY_UNAVAILABLE)
+            else -> PirEligibility.Enabled(runMode)
+        }
+    }
+
+    private suspend fun canRunFreemiumScans(): Boolean = withContext(dispatcherProvider.io()) {
+        pirRemoteFeatures.freemium().isEnabled() && pirFreemiumDataStore.didActivate
     }
 }

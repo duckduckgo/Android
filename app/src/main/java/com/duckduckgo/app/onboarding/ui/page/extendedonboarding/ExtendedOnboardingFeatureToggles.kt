@@ -47,6 +47,6 @@ interface ExtendedOnboardingFeatureToggles {
     @Experiment
     fun freeTrialCopy(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun duckAiOnboarding(): Toggle
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun contextualOnboardingTimeLimit(): Toggle
 }

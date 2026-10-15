@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.core.os.BundleCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.plusAssign
@@ -36,13 +37,13 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE_SECONDARY
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
+import com.duckduckgo.common.ui.view.button.ButtonType.SECONDARY
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.DaggerMap
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.ActivityScope
@@ -57,11 +58,7 @@ import com.duckduckgo.sync.api.SyncSettingsPlugin
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.ShareAction
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthConfiguration
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Error
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Success
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.UserCancelled
+import com.duckduckgo.sync.impl.auth.AuthPromptRenderer
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.promotion.SyncDesktopAppPromotionLauncher
 import com.duckduckgo.sync.impl.ui.DeviceUnsupportedActivity
@@ -69,9 +66,11 @@ import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AddAnotherDevice
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteAccount
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteServerData
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskSetupSyncDeepLink
-import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskToCopyRecoveryCode
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskTurnOffSync
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskTurnOffThisDevice
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.DeepLinkIntoSetup
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.IntroCreateAccount
@@ -80,7 +79,6 @@ import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.Launc
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchOriginalFlow
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
-import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.RequestSetupAuthentication
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowDeviceUnsupported
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowMessage
@@ -89,7 +87,9 @@ import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.SyncW
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.dashboard.TurnOffSyncBottomSheetDialog.Choice
 import com.duckduckgo.sync.impl.ui.devices.EditDeviceContract
+import com.duckduckgo.sync.impl.ui.devices.ParcelableDevice
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeContract
 import com.duckduckgo.sync.impl.ui.pairing.process.SyncCodeSource
@@ -99,7 +99,6 @@ import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.recoverycode.RecoveryCodeContract
 import com.duckduckgo.sync.impl.ui.setup.PreviousSessionReadyContract
 import com.duckduckgo.sync.impl.ui.setup.SyncThisDeviceContract
-import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -127,16 +126,7 @@ class SyncActivity : DuckDuckGoActivity() {
     lateinit var syncMessagesPlugin: DaggerSet<SyncMessagePlugin>
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
-
-    @Inject
-    lateinit var deviceAuthenticator: DeviceAuthenticator
-
-    @Inject
-    lateinit var syncSetupWideEvent: SyncSetupWideEvent
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
@@ -146,6 +136,9 @@ class SyncActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var authPromptRenderer: AuthPromptRenderer
 
     private val launchSource
         get() = intent.getActivityParams(SyncActivityWithSourceParams::class.java)?.source
@@ -285,7 +278,7 @@ class SyncActivity : DuckDuckGoActivity() {
     private val syncedDeviceAdapter = SyncedDeviceAdapter(
         object : SyncedDeviceAdapter.Listener {
             override fun onDeviceClicked(device: ConnectedDevice) {
-                viewModel.onEditDeviceClicked(device, requireAuth = true)
+                viewModel.onEditDeviceClicked(device)
             }
         },
     )
@@ -301,14 +294,9 @@ class SyncActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val isEdgeToEdge = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SYNC)
-        if (isEdgeToEdge) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
-        if (isEdgeToEdge) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         configureToolbar()
         configureSyncThisDeviceCta()
@@ -321,8 +309,10 @@ class SyncActivity : DuckDuckGoActivity() {
         configureGetOnOtherPlatformsItem()
         configureDataExpirationNotice()
         configureDataDeletionItem()
+        configureTurnOffSyncResultListener()
 
         observeViewModel()
+        authPromptRenderer.bind(viewModel.authPrompts)
 
         if (savedInstanceState == null) {
             val setupUrl = syncSetupUrl
@@ -367,6 +357,13 @@ class SyncActivity : DuckDuckGoActivity() {
             getOnOtherPlatformsItem.setState(
                 isNewDesktopBrowserAvailable = viewState.newDesktopBrowserSettingEnabled,
             )
+            deleteAccountItem.setPrimaryTextResource(
+                if (viewState.isImprovedSyncFlow) {
+                    R.string.sync_simplified_settings_turn_off_item
+                } else {
+                    R.string.sync_simplified_settings_delete_account_item
+                },
+            )
             restoreOnReinstallItem.isVisible = viewState.showAutoRestoreToggle
             if (viewState.showAutoRestoreToggle) {
                 restoreOnReinstallItem.quietlySetIsChecked(viewState.autoRestoreEnabled, autoRestoreListener)
@@ -393,40 +390,41 @@ class SyncActivity : DuckDuckGoActivity() {
     private fun processCommand(command: Command) {
         when (command) {
             is AddAnotherDevice -> {
-                authenticate {
-                    syncWithAnotherDeviceLauncher.launch(
-                        ReadSyncCodeContract.Input(
-                            syncEntryPoint = SyncEntryPoint.ADD_DEVICE,
-                            launchSource = launchSource,
-                        ),
-                    )
-                }
+                syncWithAnotherDeviceLauncher.launch(
+                    ReadSyncCodeContract.Input(
+                        syncEntryPoint = SyncEntryPoint.ADD_DEVICE,
+                        launchSource = launchSource,
+                    ),
+                )
             }
 
             is AskDeleteAccount -> {
-                authenticate {
-                    showDeleteAccountDialog()
-                }
+                showDeleteAccountDialog()
+            }
+
+            is AskDeleteServerData -> {
+                askDeleteServerData()
             }
 
             is AskEditDevice -> {
-                authenticate {
-                    editDeviceLauncher.launch(
-                        EditDeviceContract.Input(
-                            device = command.device,
-                        ),
-                    )
-                }
+                editDeviceLauncher.launch(
+                    EditDeviceContract.Input(
+                        device = command.device,
+                        isImprovedSyncFlow = command.isImprovedSyncFlow,
+                    ),
+                )
             }
 
             is AskSetupSyncDeepLink -> {
                 askSetupSyncDeepLink(command.syncBarcodeUrl)
             }
 
-            is AskToCopyRecoveryCode -> {
-                authenticate {
-                    viewModel.onCopyRecoveryCodeAuthenticated()
-                }
+            is AskTurnOffSync -> {
+                askTurnOffSync(command)
+            }
+
+            is AskTurnOffThisDevice -> {
+                askTurnOffThisDevice(command.device)
             }
 
             is CheckIfUserHasStoragePermission -> {
@@ -438,58 +436,35 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is DeepLinkIntoSetup -> {
-                val authConfig = AuthConfiguration(
-                    displayTitleResource = R.string.sync_simplified_deep_link_auth_prompt_title,
-                    displayTextResource = R.string.sync_simplified_deep_link_auth_prompt_message,
-                )
-                authenticate(config = authConfig) {
-                    val syncEntryPoint = if (command.isSignedIn) {
-                        SyncEntryPoint.ADD_DEVICE
-                    } else {
-                        SyncEntryPoint.SYNC_NEW_ACCOUNT
-                    }
-                    processSyncCodeLauncher.launch(
-                        ProcessSyncCodeContract.Input(
-                            source = SyncCodeSource.DeepLink(command.barcodeSyncUrl.asUrl(), syncEntryPoint),
-                        ),
-                    )
+                val syncEntryPoint = if (command.isSignedIn) {
+                    SyncEntryPoint.ADD_DEVICE
+                } else {
+                    SyncEntryPoint.SYNC_NEW_ACCOUNT
                 }
+                processSyncCodeLauncher.launch(
+                    ProcessSyncCodeContract.Input(
+                        source = SyncCodeSource.DeepLink(command.barcodeSyncUrl.asUrl(), syncEntryPoint),
+                    ),
+                )
             }
 
             is IntroCreateAccount -> {
-                authenticate(
-                    onCancelled = {
-                        viewModel.onSyncThisDeviceCanceled()
-                        lifecycleScope.launch { syncSetupWideEvent.onUserAuthCancelled() }
-                    },
-                    onError = { message ->
-                        viewModel.onSyncThisDeviceCanceled()
-                        lifecycleScope.launch { syncSetupWideEvent.onUserAuthCancelled() }
-                        showError(ShowError(R.string.sync_simplified_error_dialog_generic_body, message))
-                    },
-                    onSuccess = { hasValidAuth ->
-                        if (hasValidAuth) {
-                            // authenticate() also passes if device is not enrolled into auth,
-                            // so only notify that auth was successful if it actually happened
-                            lifecycleScope.launch { syncSetupWideEvent.onUserAuthSuccess() }
-                        }
-                        backUpNewAccountLauncher.launch(
-                            SyncThisDeviceContract.Input(
-                                launchSource = launchSource,
-                            ),
-                        )
-                    },
+                backUpNewAccountLauncher.launch(
+                    SyncThisDeviceContract.Input(
+                        launchSource = launchSource,
+                        isAuthRequired = command.isAuthRequired,
+                        isImprovedSyncFlow = command.isImprovedSyncFlow,
+                    ),
                 )
             }
 
             is IntroRecoverSyncData -> {
-                authenticate {
-                    recoverSyncedDataLauncher.launch(
-                        RecoverSyncedDataContract.Input(
-                            launchSource = launchSource,
-                        ),
-                    )
-                }
+                recoverSyncedDataLauncher.launch(
+                    RecoverSyncedDataContract.Input(
+                        launchSource = launchSource,
+                        isAuthRequired = command.isAuthRequired,
+                    ),
+                )
             }
 
             is LaunchLearnMore -> {
@@ -508,6 +483,8 @@ class SyncActivity : DuckDuckGoActivity() {
                         backUpNewAccountLauncher.launch(
                             SyncThisDeviceContract.Input(
                                 launchSource = launchSource,
+                                isAuthRequired = false,
+                                isImprovedSyncFlow = command.isImprovedSyncFlow,
                             ),
                         )
                     }
@@ -528,6 +505,7 @@ class SyncActivity : DuckDuckGoActivity() {
                         recoverSyncedDataLauncher.launch(
                             RecoverSyncedDataContract.Input(
                                 launchSource = launchSource,
+                                isAuthRequired = false,
                             ),
                         )
                     }
@@ -539,13 +517,7 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is RecoveryCodePDFSuccess -> {
-                authenticate {
-                    shareAction.shareFile(this, command.recoveryCodePDFFile)
-                }
-            }
-
-            is RequestSetupAuthentication -> {
-                launchDeviceAuthEnrollment(command.forSyncThisDevice)
+                shareAction.shareFile(this, command.recoveryCodePDFFile)
             }
 
             is ShowDeviceUnsupported -> {
@@ -562,40 +534,20 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is ShowPreviousSessionReady -> {
-                authenticate(
-                    onCancelled = {
-                        viewModel.onSyncThisDeviceCanceled()
-                        lifecycleScope.launch { syncSetupWideEvent.onUserAuthCancelled() }
-                    },
-                    onError = { message ->
-                        viewModel.onSyncThisDeviceCanceled()
-                        lifecycleScope.launch { syncSetupWideEvent.onUserAuthCancelled() }
-                        showError(ShowError(R.string.sync_simplified_error_dialog_generic_body, message))
-                    },
-                    onSuccess = { hasValidAuth ->
-                        if (hasValidAuth) {
-                            // authenticate() also passes if device is not enrolled into auth,
-                            // so only notify that auth was successful if it actually happened
-                            lifecycleScope.launch { syncSetupWideEvent.onUserAuthSuccess() }
-                        }
-                        restoreSavedAccountLauncher.launch(
-                            PreviousSessionReadyContract.Input(
-                                syncEntryPoint = command.syncEntryPoint,
-                            ),
-                        )
-                    },
+                restoreSavedAccountLauncher.launch(
+                    PreviousSessionReadyContract.Input(
+                        syncEntryPoint = command.syncEntryPoint,
+                    ),
                 )
             }
 
             is SyncWithAnotherDevice -> {
-                authenticate {
-                    syncWithAnotherDeviceLauncher.launch(
-                        ReadSyncCodeContract.Input(
-                            syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
-                            launchSource = launchSource,
-                        ),
-                    )
-                }
+                syncWithAnotherDeviceLauncher.launch(
+                    ReadSyncCodeContract.Input(
+                        syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
+                        launchSource = launchSource,
+                    ),
+                )
             }
         }
     }
@@ -740,38 +692,28 @@ class SyncActivity : DuckDuckGoActivity() {
         )
     }
 
+    private fun configureTurnOffSyncResultListener() {
+        supportFragmentManager.setFragmentResultListener(TurnOffSyncBottomSheetDialog.REQUEST_KEY, this) { _, bundle ->
+            BundleCompat.getParcelable(bundle, TurnOffSyncBottomSheetDialog.RESULT_KEY_CHOICE, Choice::class.java)?.let { choice ->
+                when (choice) {
+                    is Choice.TurnOffThisDevice -> {
+                        viewModel.onTurnOffThisDeviceClicked(choice.device.toConnectedDevice())
+                    }
+                    is Choice.TurnOffAndDeleteServerData -> {
+                        viewModel.onTurnOffAndDeleteServerDataClicked()
+                    }
+                }
+            }
+        }
+    }
+
     private fun configureDataDeletionItem() {
         val color = ColorStateList.valueOf(getColorFromAttr(CommonR.attr.daxColorDestructive))
         binding.includeEnabledView.deleteAccountItem.apply {
             leadingIcon().imageTintList = color
             setPrimaryTextColorStateList(color)
-            setOnClickListener { viewModel.onDeleteAccountClicked(requireAuth = true) }
+            setOnClickListener { viewModel.onDeleteAccountClicked() }
         }
-    }
-
-    private fun launchDeviceAuthEnrollment(forSyncThisDevice: Boolean) {
-        TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_simplified_settings_require_passcode_dialog_title)
-            .setMessage(getString(R.string.sync_simplified_settings_require_passcode_dialog_body))
-            .setPositiveButton(R.string.sync_simplified_settings_require_passcode_dialog_primary_button)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onDialogShown() {
-                        lifecycleScope.launch { syncSetupWideEvent.onEnrollDeviceAuthDialogShown() }
-                    }
-
-                    override fun onPositiveButtonClicked() {
-                        deviceAuthenticator.launchDeviceAuthEnrollment(this@SyncActivity)
-                    }
-
-                    override fun onDialogDismissed() {
-                        // Only the Sync This Device flow uses a toggle that must be reset; other flows must not touch it.
-                        if (forSyncThisDevice) viewModel.onSyncThisDeviceCanceled()
-                    }
-                },
-            )
-            .setCancellable(true)
-            .show()
     }
 
     private fun showDeleteAccountDialog() {
@@ -799,6 +741,64 @@ class SyncActivity : DuckDuckGoActivity() {
             .show()
     }
 
+    private fun askDeleteServerData() {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_simplified_settings_delete_server_data_dialog_title_v2)
+            .setMessage(getString(R.string.sync_simplified_settings_delete_server_data_dialog_body_v2))
+            .setPositiveButton(R.string.sync_simplified_settings_delete_server_data_dialog_primary_button_v2, DESTRUCTIVE)
+            .setNegativeButton(R.string.sync_simplified_settings_delete_server_data_dialog_secondary_button_v2, SECONDARY)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onDialogShown() {
+                        viewModel.onDeleteServerDataConfirmationShown()
+                    }
+
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onDeleteServerDataConfirmed()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onDeleteServerDataCancelled()
+                    }
+
+                    override fun onDialogCancelled() {
+                        viewModel.onDeleteServerDataCancelled()
+                    }
+                },
+            )
+            .setCancellable(true)
+            .show()
+    }
+
+    private fun askTurnOffThisDevice(device: ConnectedDevice) {
+        val deviceName = device.deviceName
+        TextAlertDialogBuilder(this)
+            .setTitle(getString(R.string.sync_simplified_settings_turn_off_device_dialog_title, deviceName))
+            .setMessage(getString(R.string.sync_simplified_settings_turn_off_device_dialog_body, deviceName))
+            .setPositiveButton(R.string.sync_simplified_settings_turn_off_device_dialog_primary_button, DESTRUCTIVE_SECONDARY)
+            .setNegativeButton(R.string.sync_simplified_settings_turn_off_device_dialog_secondary_button, SECONDARY)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onTurnOffSyncConfirmed(device)
+                    }
+                },
+            )
+            .setCancellable(true)
+            .show()
+    }
+
+    private fun askTurnOffSync(command: AskTurnOffSync) {
+        if (supportFragmentManager.findFragmentByTag(TurnOffSyncBottomSheetDialog.TAG) != null) return
+
+        TurnOffSyncBottomSheetDialog
+            .newInstance(
+                thisDevice = ParcelableDevice.fromConnectedDevice(command.thisDevice),
+                allDevices = command.allDevices.map(ParcelableDevice::fromConnectedDevice),
+            )
+            .show(supportFragmentManager, TurnOffSyncBottomSheetDialog.TAG)
+    }
+
     private fun askSetupSyncDeepLink(barcodeSyncUrl: SyncBarcodeUrl) {
         TextAlertDialogBuilder(this)
             .setTitle(R.string.sync_simplified_deep_link_confirmation_dialog_title)
@@ -821,26 +821,5 @@ class SyncActivity : DuckDuckGoActivity() {
             .setMessage(getString(error.message) + "\n" + error.reason)
             .setPositiveButton(R.string.sync_simplified_error_dialog_primary_button)
             .show()
-    }
-
-    private fun authenticate(
-        config: AuthConfiguration = AuthConfiguration(),
-        onError: (reason: String) -> Unit = { reason ->
-            showError(ShowError(R.string.sync_simplified_error_dialog_generic_body, reason))
-        },
-        onCancelled: () -> Unit = {},
-        onSuccess: (hasValidAuth: Boolean) -> Unit,
-    ) {
-        if (deviceAuthenticator.hasValidDeviceAuthentication()) {
-            deviceAuthenticator.authenticate(this, config) { result ->
-                when (result) {
-                    is Success -> onSuccess(true)
-                    is Error -> onError(result.reason)
-                    is UserCancelled -> onCancelled()
-                }
-            }
-        } else {
-            onSuccess(false)
-        }
     }
 }

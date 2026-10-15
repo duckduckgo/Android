@@ -258,6 +258,7 @@
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Berechtigungen</string>
+    <string name="permissionsGeneralPermissionsTitle" instruction="Section header on the Permissions settings screen, above the Notifications and Open Links in Apps settings">Allgemeine Berechtigungen</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Aussehen</string>
@@ -327,11 +328,6 @@
     <string name="surveyLoadingErrorText">Unsere Umfrage kann derzeit nicht geladen werden.\nBitte versuche es zu einem späteren Zeitpunkt erneut.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Probiere unser Such-Widget aus!</string>
-    <string name="addWidgetCtaDescription">Füge unser Such-Widget für einen schnellen und einfachen Zugriff zu deinem Startbildschirm hinzu.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Widget hinzufügen</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Anzeigen</string>
-    <string name="addWidgetCtaDismissButton">Verwerfen</string>
     <string name="addWidgetInstructionsActivityTitle">Widget hinzufügen</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Drücke lange auf eine Stelle auf deinem Startbildschirm, woraufhin sich das Widget-Menü öffnet.</string>
@@ -714,10 +710,6 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Das Sicherheitszertifikat für %1$s wird vom Betriebssystem deines Geräts als nicht vertrauenswürdig eingestuft. Es ist möglich, dass die Website falsch konfiguriert ist, ein Angreifer deine Verbindung kompromittiert hat oder deine Systemuhr falsch ist.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hallo.<br/><br/>Bereit für einen schnelleren Browser, der dich auch noch schützt?]]></string>
-    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Machen wir das!</string>
-    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1ButtonBrandDesign">Los geht\'s!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Ich war schon einmal hier</string>
     <string name="preOnboardingDaxDialog2Title">Schutz aktiviert!</string>
@@ -745,8 +737,6 @@
     <string name="highlightsPreOnboardingAddressBarOption2Description">Leicht erreichbar</string>
     <string name="onboardingSearchDaxDialogTitle">Suche ausprobieren!</string>
     <string name="onboardingSearchDaxDialogDescription">Deine Suchen über DuckDuckGo sind immer privat.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"wie sagt man Ente auf Englisch"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"wie sagt man „Ente“ auf Spanisch"</string>
     <string name="onboardingSearchQueryOption1">wie sagt man Ente auf Englisch</string>
     <string name="onboardingSearchQueryOption1English">wie sagt man „Ente“ auf Spanisch</string>
     <string name="onboardingSearchDaxDialogOption2">Besetzung von Avatar</string>
@@ -824,8 +814,8 @@
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Beim App-Start anzeigen</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab">Zuletzt geöffneter Tab</string>
-    <string name="showOnAppLaunchOptionNewTabPage">Neue Tab-Seite</string>
+    <string name="showOnAppLaunchOptionLastUsedTab">Zuletzt verwendeter Tab</string>
+    <string name="showOnAppLaunchOptionOpenNewTab">Neue Tab-Seite</string>
     <string name="showOnAppLaunchOptionSpecificPage">Bestimmte Seite</string>
 
     <!-- Privacy Dashboard -->
@@ -867,9 +857,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Probiere unser Startbildschirm-Widget aus!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Füge unser Such-Widget für einen schnellen und einfachen Zugriff zu deinem Startbildschirm hinzu.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Widget hinzufügen</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Jetzt nicht</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Mit DuckDuckGo suchen</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Widget für Startbildschirm</string>

@@ -48,10 +48,8 @@ abstract class OptionsBubbleCta(
     appInstallStore: AppInstallStore,
     isLightTheme: Boolean,
     deviceInfo: DeviceInfo,
-    onboardingImprovementsEnabled: Boolean = true,
-    onboardingImprovementsV2Enabled: Boolean = true,
     showArrow: Boolean,
-) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
+) : DaxBubbleCta(
     ctaId = ctaId,
     title = title,
     description = description,
@@ -64,8 +62,6 @@ abstract class OptionsBubbleCta(
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
     deviceInfo = deviceInfo,
-    onboardingImprovementsEnabled = onboardingImprovementsEnabled,
-    onboardingImprovementsV2Enabled = onboardingImprovementsV2Enabled,
 ) {
     override val activeIncludeIds: List<Int> = listOf(R.id.optionsContent)
     override val showArrow: Boolean = showArrow
@@ -90,8 +86,6 @@ abstract class OptionsBubbleCta(
     }
 
     override fun setOnOptionClicked(
-        onboardingExperimentEnabled: Boolean,
-        configuration: DaxBubbleCta?,
         onOptionClicked: (DaxDialogIntroOption, index: Int?) -> Unit,
     ) {
         options?.forEachIndexed { index, option ->

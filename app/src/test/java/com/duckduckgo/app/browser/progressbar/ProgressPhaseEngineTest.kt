@@ -172,6 +172,7 @@ class ProgressPhaseEngineTest {
 
     @Test
     fun `spring converges toward realProgress`() {
+        engine = ProgressPhaseEngine(config.copy(stallTimeoutMs = Long.MAX_VALUE), time)
         engine.start()
         time.advance(601)
         engine.tick(0.601f)
@@ -317,19 +318,7 @@ class ProgressPhaseEngineTest {
     // --- Indeterminate fallback ---
 
     @Test
-    fun `does not enter INDETERMINATE when stall detection disabled`() {
-        engine.start()
-        time.advance(601)
-        engine.tick(0.601f)
-        engine.onProgressUpdate(50f)
-        time.advance(config.stallTimeoutMs + 1000)
-        engine.tick(0.016f)
-        assertEquals(Phase.TRACKING, engine.phase)
-    }
-
-    @Test
     fun `enters INDETERMINATE after stall timeout with no forward progress`() {
-        engine.stallDetectionEnabled = true
         engine.start()
         time.advance(601)
         engine.tick(0.601f)
@@ -341,7 +330,6 @@ class ProgressPhaseEngineTest {
 
     @Test
     fun `forward progress before timeout keeps TRACKING and resets the stall timer`() {
-        engine.stallDetectionEnabled = true
         engine.start()
         time.advance(601)
         engine.tick(0.601f)
@@ -357,7 +345,6 @@ class ProgressPhaseEngineTest {
 
     @Test
     fun `becoming visible resets the stall timer after time spent in the background`() {
-        engine.stallDetectionEnabled = true
         engine.start()
         time.advance(601)
         engine.tick(0.601f)
@@ -377,18 +364,7 @@ class ProgressPhaseEngineTest {
     }
 
     @Test
-    fun `disabling stall detection mid-sweep exits the indeterminate phase`() {
-        enterIndeterminate(real = 50f)
-
-        engine.stallDetectionEnabled = false
-        engine.tick(0.016f)
-
-        assertEquals(Phase.RESUMING, engine.phase)
-    }
-
-    @Test
     fun `equal progress does not reset the stall timer`() {
-        engine.stallDetectionEnabled = true
         engine.start()
         time.advance(601)
         engine.tick(0.601f)
@@ -403,7 +379,6 @@ class ProgressPhaseEngineTest {
 
     @Test
     fun `forward progress stays INDETERMINATE with the fill frozen`() {
-        engine.stallDetectionEnabled = true
         engine.start()
         time.advance(601)
         engine.tick(0.601f)
@@ -427,7 +402,6 @@ class ProgressPhaseEngineTest {
 
     @Test
     fun `displayProgress is frozen during INDETERMINATE`() {
-        engine.stallDetectionEnabled = true
         engine.start()
         time.advance(601)
         engine.tick(0.601f)
@@ -546,7 +520,6 @@ class ProgressPhaseEngineTest {
     }
 
     private fun enterIndeterminate(real: Float) {
-        engine.stallDetectionEnabled = true
         engine.start()
         time.advance(601)
         engine.tick(0.601f)

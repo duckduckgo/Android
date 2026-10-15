@@ -68,8 +68,6 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.FragmentViewModelFactory
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.credentialexchange.api.CredentialExchangeLauncher
 import com.duckduckgo.di.scopes.FragmentScope
@@ -99,11 +97,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
      */
     private var ignoreCancellationEvents = false
 
-    override fun getTheme(): Int = if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-        R.style.AutofillBottomSheetDialogThemeEdgeToEdge
-    } else {
-        R.style.AutofillBottomSheetDialogTheme
-    }
+    override fun getTheme(): Int = R.style.AutofillBottomSheetDialogThemeEdgeToEdge
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -115,13 +109,13 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     lateinit var authorizationGracePeriod: AutofillAuthorizationGracePeriod
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     @Inject
     lateinit var credentialExchangeLauncher: CredentialExchangeLauncher
+
+    @Inject
+    lateinit var externalImportAuthSuppressor: ExternalImportAuthSuppressor
 
     private var _binding: ContentImportFromGooglePasswordDialogBinding? = null
 
@@ -152,9 +146,9 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     private fun ImportFromGooglePasswordsDialog.processImportFlowResult(data: Intent) {
         (IntentCompat.getParcelableExtra(data, ImportGooglePasswordResult.RESULT_KEY_DETAILS, ImportGooglePasswordResult::class.java)).let {
             when (it) {
-                is ImportGooglePasswordResult.Success -> viewModel.onImportFlowFinishedSuccessfully()
-                is ImportGooglePasswordResult.Error -> viewModel.onImportFlowFinishedWithError()
-                is ImportGooglePasswordResult.UserCancelled -> viewModel.onImportFlowCancelledByUser(canShowPreImportDialog(getLaunchSource()))
+                is ImportGooglePasswordResult.Success -> viewModel.onWebFlowFinishedSuccessfully()
+                is ImportGooglePasswordResult.Error -> viewModel.onWebFlowFinishedWithError(it.reason)
+                is ImportGooglePasswordResult.UserCancelled -> viewModel.onWebFlowCancelled(canShowPreImportDialog(getLaunchSource()))
                 else -> {}
             }
         }
@@ -298,7 +292,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         if (canShowPreImportDialog(launchSource)) {
             viewModel.shouldShowInitialInstructionalPrompt(launchSource)
         } else {
-            viewModel.onDirectImportRequested()
+            viewModel.onDirectImportRequested(launchSource)
         }
     }
 
@@ -316,9 +310,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     ): View {
         _binding = ContentImportFromGooglePasswordDialogBinding.inflate(inflater, container, false)
         configureViews(binding)
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-            binding.dialogRootView.applyBottomSystemBarInsetPadding()
-        }
+        binding.dialogRootView.applyBottomSystemBarInsetPadding()
         observeViewModel()
         logcat { "Creating ImportFromGooglePasswordsDialog with launch source: ${getLaunchSource()}" }
         return binding.root
@@ -407,21 +399,19 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     }
 
     private fun onImportGcmButtonClicked() {
-        viewModel.onImportButtonClicked()
+        viewModel.onImportButtonClicked(getLaunchSource())
         importPasswordsPixelSender.onImportPasswordsDialogImportButtonClicked(getLaunchSource())
     }
 
     private fun startCredentialExchangeImport() {
         viewLifecycleOwner.lifecycleScope.launch {
-            authorizationGracePeriod.requestExtendedGracePeriod()
-            val exchangeResult = try {
-                credentialExchangeLauncher.launchImportFlow()
-            } finally {
-                authorizationGracePeriod.removeRequestForExtendedGracePeriod()
-            }
-            viewLifecycleOwner.lifecycle.withResumed {
-                val launchSource = getLaunchSource()
-                viewModel.onCredentialExchangeFinished(exchangeResult, launchSource, canShowPreImportDialog(launchSource))
+            externalImportAuthSuppressor.suppressAuthPromptWhileRunning {
+                val exchangeResult = credentialExchangeLauncher.launchImportFlow()
+                // the result can arrive before the host restarts; staying in the block until resumed keeps the suppression available to its onStart
+                viewLifecycleOwner.lifecycle.withResumed {
+                    val launchSource = getLaunchSource()
+                    viewModel.onCredentialExchangeFinished(exchangeResult, launchSource, canShowPreImportDialog(launchSource))
+                }
             }
         }
     }

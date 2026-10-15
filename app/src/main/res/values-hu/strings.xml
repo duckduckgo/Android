@@ -258,6 +258,7 @@
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Engedélyek</string>
+    <string name="permissionsGeneralPermissionsTitle" instruction="Section header on the Permissions settings screen, above the Notifications and Open Links in Apps settings">Általános engedélyek</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Megjelenés</string>
@@ -327,11 +328,6 @@
     <string name="surveyLoadingErrorText">A kérdőívünk jelenleg nem töltődik be.\nKérjük, próbáld meg később.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Próbáld ki a Keresés minialkalmazást!</string>
-    <string name="addWidgetCtaDescription">A gyors és könnyű hozzáférés érdekében add hozzá kereső minialkalmazásunkat a kezdőképernyődhöz.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Minialkalmazás hozzáadása</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Mutasd</string>
-    <string name="addWidgetCtaDismissButton">Elutasítás</string>
     <string name="addWidgetInstructionsActivityTitle">Minialkalmazás hozzáadása</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Nyomd meg hosszan a kezdőképernyőt, majd nyisd meg a minialkalmazás menüt.</string>
@@ -714,10 +710,6 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">A megnyitni kívánt %1$s biztonsági tanúsítványát az eszköz operációs rendszere nem ítéli meg biztonságosnak. Lehetséges, hogy a webhely nincs megfelelően konfigurálva, esetleg egy támadó feltörte a kapcsolatodat, vagy a rendszeróra beállítása helytelen.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Szia!<br/><br/>Felkészültél egy gyorsabb böngészőre, amely védelmet is nyújt számodra?]]></string>
-    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Csináljuk!</string>
-    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1ButtonBrandDesign">Kezdjünk hozzá!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Már jártam itt korábban</string>
     <string name="preOnboardingDaxDialog2Title">Védelem aktiválva!</string>
@@ -745,8 +737,6 @@
     <string name="highlightsPreOnboardingAddressBarOption2Description">Könnyen elérhető</string>
     <string name="onboardingSearchDaxDialogTitle">Keress rá!</string>
     <string name="onboardingSearchDaxDialogDescription">A DuckDuckGo-kereséseid mindig privátak maradnak.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"hogyan mondják angolul, hogy kacsa"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"hogyan mondják spanyolul, hogy kacsa"</string>
     <string name="onboardingSearchQueryOption1">hogyan mondják angolul, hogy kacsa</string>
     <string name="onboardingSearchQueryOption1English">hogyan mondják spanyolul, hogy kacsa</string>
     <string name="onboardingSearchDaxDialogOption2">avatar szereposztása</string>
@@ -824,8 +814,8 @@
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Megjelenítés az alkalmazás indításakor</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab">Utoljára megnyitott lap</string>
-    <string name="showOnAppLaunchOptionNewTabPage">„Új lap” oldal</string>
+    <string name="showOnAppLaunchOptionLastUsedTab">Utoljára használt lap</string>
+    <string name="showOnAppLaunchOptionOpenNewTab">„Új lap” oldal</string>
     <string name="showOnAppLaunchOptionSpecificPage">Speciális oldal</string>
 
     <!-- Privacy Dashboard -->
@@ -867,9 +857,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Próbáld ki kezdőképernyő-minialkalmazásunkat!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">A gyors és könnyű hozzáférés érdekében add hozzá kereső minialkalmazásunkat a kezdőképernyődhöz.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Minialkalmazás hozzáadása</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Most nem</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Keresés a DuckDuckGo alkalmazásban</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Kezdőképernyő-minialkalmazás</string>

@@ -38,11 +38,12 @@ class OnboardingCompletedMetricObserver @Inject constructor(
     private val userStageStore: UserStageStore,
     private val segmentedOnboardingExperimentMetrics: SegmentedOnboardingExperimentMetrics,
     private val onboardingPasswordImportExperimentMetrics: OnboardingPasswordImportExperimentMetrics,
+    private val contextualOnboardingTimeLimit: ContextualOnboardingTimeLimit,
 ) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
         userStageStore.userAppStageFlow()
-            .filter { it == AppStage.ESTABLISHED }
+            .filter { it == AppStage.ESTABLISHED && !contextualOnboardingTimeLimit.wasOnboardingEndedByTimeLimit() }
             .onEach {
                 segmentedOnboardingExperimentMetrics.fireOnboardingCompletedMetric()
                 onboardingPasswordImportExperimentMetrics.fireOnboardingCompletedMetric()

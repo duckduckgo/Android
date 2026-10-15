@@ -41,6 +41,7 @@ tags:
       - assertVisible:
           text: "Where should I put your address.bar."
       - tapOn: "Next"
+      - hideKeyboard
       - assertVisible:
           text: "Ask anything privately.*"
       - assertVisible:

@@ -165,6 +165,15 @@ class RealCredentialExchangePasswordImporterTest {
         assertEquals(CredentialExchangeImportResult.Failure(CredentialExchangeFailure.MALFORMED_PAYLOAD), result)
     }
 
+    @Test
+    fun whenExchangeFailedAfterExporterRespondedThenExporterPassedThrough() = runTest {
+        val failure = CredentialExchangeResult.Failure(CredentialExchangeFailure.MALFORMED_PAYLOAD, exporterPackageName = "com.x8bit.bitwarden")
+
+        val result = testee.convertAndDeduplicate(failure)
+
+        assertEquals(CredentialExchangeImportResult.Failure(CredentialExchangeFailure.MALFORMED_PAYLOAD, "com.x8bit.bitwarden"), result)
+    }
+
     private suspend fun importedDomain(urls: List<String>): String? =
         convert(credential(urls = urls, username = "u")).credentials.single().domain
 

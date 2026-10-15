@@ -48,7 +48,7 @@ class BrowserMenuBottomSheetTest {
     fun setUp() {
         val appContext = ApplicationProvider.getApplicationContext<Application>()
         appContext.setTheme(MobileR.style.Theme_DuckDuckGo_Light)
-        dialog = BrowserMenuBottomSheet(appContext, mockFaviconManager, {}, {}, edgeToEdgeEnabled = false)
+        dialog = BrowserMenuBottomSheet(appContext, mockFaviconManager, {}, {})
         dialog.show()
     }
 
@@ -168,6 +168,48 @@ class BrowserMenuBottomSheetTest {
         dialog.render(viewState)
 
         assertFalse(dialog.vpnMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderBrowserMenuWithInternalFeedbackThenInternalFeedbackMenuItemIsVisible() {
+        dialog.render(BrowserMenuViewState.Browser(showInternalFeedback = true))
+
+        assertTrue(dialog.internalFeedbackMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderBrowserMenuWithoutInternalFeedbackThenInternalFeedbackMenuItemIsHidden() {
+        dialog.render(BrowserMenuViewState.Browser(showInternalFeedback = false))
+
+        assertFalse(dialog.internalFeedbackMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderNewTabPageMenuWithInternalFeedbackThenInternalFeedbackMenuItemIsVisible() {
+        dialog.render(BrowserMenuViewState.NewTabPage(showInternalFeedback = true))
+
+        assertTrue(dialog.internalFeedbackMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderNewTabPageMenuWithoutInternalFeedbackThenInternalFeedbackMenuItemIsHidden() {
+        dialog.render(BrowserMenuViewState.NewTabPage(showInternalFeedback = false))
+
+        assertFalse(dialog.internalFeedbackMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderDuckAiMenuThenInternalFeedbackMenuItemIsHidden() {
+        dialog.render(BrowserMenuViewState.DuckAi())
+
+        assertFalse(dialog.internalFeedbackMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderCustomTabsMenuThenInternalFeedbackMenuItemIsHidden() {
+        dialog.render(BrowserMenuViewState.CustomTabs())
+
+        assertFalse(dialog.internalFeedbackMenuItem.isVisible)
     }
 
     @Test

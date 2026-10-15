@@ -17,6 +17,7 @@ package com.duckduckgo.duckchat.impl.nativeinput.footer.terms
 
 import android.content.Context
 import android.text.SpannedString
+import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -41,7 +42,12 @@ class TermsFooterView @JvmOverloads constructor(
 
     fun render(onLinkClick: (String) -> Unit) {
         message.addClickableSpan(
-            textSequence = context.getText(R.string.duckChatTermsFooterMessage) as SpannedString,
+            textSequence = SpannedString(
+                TextUtils.expandTemplate(
+                    context.getText(R.string.duckChatTermsFooterMessage),
+                    context.getText(R.string.duckChatSubmitAskLabel),
+                ),
+            ),
             spans = listOf(
                 TERMS_ANNOTATION to clickable { onLinkClick(TERMS_URL) },
                 PRIVACY_ANNOTATION to clickable { onLinkClick(PRIVACY_URL) },

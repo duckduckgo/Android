@@ -23,6 +23,7 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.pixel.InputOutcomeTracker
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
@@ -49,6 +50,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     private val textSelectionRepository: TextSelectionRepository,
     private val selectionPayloadBuilder: TextSelectionPayloadBuilder,
     private val selectionJourney: DuckAiSelectionJourneyWideEvent,
+    private val inputOutcomeTracker: InputOutcomeTracker,
 ) : ViewModel() {
 
     data class ViewState(
@@ -113,12 +115,14 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     fun onSuggestionSubmitted(prompt: NativeInputPrompt) {
         if (_viewState.value.attachedContext == null && !hasTextSelections()) latestValidPageContext?.let { attach(it) }
         fireUnifiedInputPromptSubmitted()
-        submit(prompt)
+        inputOutcomeTracker.suggestedPrompt()
+        submit(prompt, carriesTermsConsent = false)
     }
 
     fun onSummarizeSubmitted(prompt: NativeInputPrompt) {
         fireUnifiedInputPromptSubmitted()
-        submit(prompt)
+        inputOutcomeTracker.suggestedPrompt()
+        submit(prompt, carriesTermsConsent = false)
     }
 
     fun onPromptSubmitted(prompt: NativeInputPrompt) {
@@ -141,7 +145,10 @@ class DuckChatContextualEntryViewModel @Inject constructor(
         )
     }
 
-    private fun submit(prompt: NativeInputPrompt) {
+    private fun submit(
+        prompt: NativeInputPrompt,
+        carriesTermsConsent: Boolean = true,
+    ) {
         val selectionsJson = prompt.selectionsJson ?: selectionPayloadBuilder.toJson(textSelectionRepository.consume(tabId))
         selectionsJson?.length()?.takeIf { it > 0 }?.let {
             duckChatPixels.reportContextualPromptSubmittedWithSelections(it)
@@ -153,6 +160,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
                 prompt = prompt,
                 serializedPageContext = _viewState.value.attachedContext?.serialized,
                 selectionsJson = selectionsJson,
+                carriesTermsConsent = carriesTermsConsent,
             ),
         )
         duckChatPixels.reportContextualFloatingInputPromotedToSheet()

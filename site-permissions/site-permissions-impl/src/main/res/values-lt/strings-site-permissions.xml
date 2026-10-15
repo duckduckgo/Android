@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Interneto svetainė „%1$s“ nori pasiekti tavo kamerą</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Interneto svetainė „%1$s“ nori pasiekti tavo mikrofoną</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Interneto svetainė „%1$s“ nori pasiekti tavo kamerą ir mikrofoną</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ nori gauti prieigą prie jūsų vietovės šioje interneto svetainėje</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ nori gauti prieigą prie jūsų kameros šioje interneto svetainėje</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ nori gauti prieigą prie jūsų mikrofono šioje interneto svetainėje</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ nori gauti prieigą prie jūsų kameros ir mikrofono šioje interneto svetainėje</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ nori gauti prieigą prie jūsų skaitmeninių teisių valdymo (angl. „Digital Rights Management“, DRM) programinės įrangos šioje interneto svetainėje</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Jei neleisi, vaizdo įrašai svetainėje gali nebeveikti, tačiau ši svetainė neturės prieigos prie įrenginio identifikatorių, kuriuos teikia DRM programinė įranga.</string>
 
     <!-- Reminder dialog -->
@@ -104,5 +109,22 @@
     <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">„DuckDuckGo“ nepavyko suteikti šiai svetainei prieigos prie kameros</string>
     <string name="sitePermissionsTieredMicDeniedSnackBarMessage">„DuckDuckGo“ nepavyko suteikti šiai svetainei prieigos prie mikrofono</string>
     <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">„DuckDuckGo“ nepavyko suteikti šiai svetainei prieigos prie kameros ir mikrofono</string>
+
+    <!-- Permission settings redesign -->
+    <string name="permissionSettingsAlwaysAllow" instruction="Permission setting option: the site gets the permission without asking">Visada leisti</string>
+    <string name="permissionSettingsAskEachTime" instruction="Permission setting option: the site has to ask for the permission every time">Visada klausti</string>
+    <string name="permissionSettingsLocationDialogTitle">Leisti svetainėms prašyti vietos leidimo</string>
+    <string name="permissionSettingsLocationDialogMessage">Jei pasirinksite „Niekada neleisti“, svetainėse negalėsite naudotis kai kuriomis funkcijomis, pvz., maršrutais žemėlapiuose ar netoliese esančių parduotuvių paieška.</string>
+    <string name="permissionSettingsCameraDialogTitle">Leisti svetainėms prašyti kameros leidimo</string>
+    <string name="permissionSettingsCameraDialogMessage">Jei pasirinksite „Niekada neleisti“, svetainėse negalėsite naudotis tokiomis funkcijomis kaip vaizdo pokalbiai.</string>
+    <string name="permissionSettingsMicrophoneDialogTitle">Leisti svetainėms prašyti mikrofono leidimo</string>
+    <string name="permissionSettingsMicrophoneDialogMessage">Jei pasirinksite „Niekada neleisti“, svetainėse negalėsite naudotis tokiomis funkcijomis kaip balso pokalbiai.</string>
+    <string name="permissionSettingsDrmDialogTitle">Leisti svetainėms prašyti skaitmeninių teisių valdymo (DRM) leidimo</string>
+    <string name="permissionSettingsDrmTitle" instruction="Name of a permission setting for playing protected video content">Skaitmeninių teisių valdymas (DRM)</string>
+    <string name="permissionsPerWebsiteRedesignHeader" instruction="Placeholder is the name of a website">Svetainės %1$s leidimai</string>
+    <string name="permissionsPerWebsiteRemovePermissions" instruction="Button that removes all saved permissions for the website shown on the screen">Šalinti leidimus</string>
+    <string name="permissionsRemovedForSiteSnackbar" instruction="Placeholder is the name of a website">Svetainės &lt;b&gt;%1$s&lt;/b&gt;leidimai pašalinti</string>
+    <string name="permissionsRemovedForAllSitesSnackbar">Pašalinti visų svetainių leidimai</string>
+    <string name="permissionSettingsDrmDialogMessage">Jei pasirinksi „Niekada neleisti“, vaizdo įrašai svetainėje gali nebeveikti.</string>
 
 </resources>

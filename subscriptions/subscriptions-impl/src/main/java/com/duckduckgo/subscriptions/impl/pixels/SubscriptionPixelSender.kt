@@ -17,6 +17,7 @@
 package com.duckduckgo.subscriptions.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.extensions.toSanitizedLanguageTag
 import com.duckduckgo.di.scopes.AppScope
@@ -144,6 +145,9 @@ interface SubscriptionPixelSender {
     fun reportFreeTrialStart()
     fun reportFreeTrialVpnActivation(activationDay: String, platform: String)
     fun reportFreeTrialDuckAiPaidUsed(activationDay: String, platform: String)
+    fun reportOnboardingStepShown(step: SubscriptionOnboardingStepPixels.Step, isFreeTrial: Boolean)
+    fun reportOnboardingStepCompleted(step: SubscriptionOnboardingStepPixels.Step, isFreeTrial: Boolean)
+    fun reportOnboardingStepSkipped(step: SubscriptionOnboardingStepPixels.Step, isFreeTrial: Boolean)
     fun reportPaywallNotSeen(dayBucket: String, returningUser: Boolean, privacyDashboardEverOpened: Boolean, subscriptionPromoShown: Boolean)
     fun reportExpirationReminderScheduled()
     fun reportExpirationReminderSchedulingError()
@@ -399,6 +403,15 @@ class SubscriptionPixelSenderImpl @Inject constructor(
     override fun reportExpirationReminderNotFiredPermissionsRejected() =
         fire(SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_PERMISSIONS_REJECTED)
 
+    override fun reportOnboardingStepShown(step: SubscriptionOnboardingStepPixels.Step, isFreeTrial: Boolean) =
+        fireOnboardingStep(SubscriptionOnboardingStepPixels.Action.SHOWN, step, isFreeTrial)
+
+    override fun reportOnboardingStepCompleted(step: SubscriptionOnboardingStepPixels.Step, isFreeTrial: Boolean) =
+        fireOnboardingStep(SubscriptionOnboardingStepPixels.Action.COMPLETED, step, isFreeTrial)
+
+    override fun reportOnboardingStepSkipped(step: SubscriptionOnboardingStepPixels.Step, isFreeTrial: Boolean) =
+        fireOnboardingStep(SubscriptionOnboardingStepPixels.Action.SKIPPED, step, isFreeTrial)
+
     private fun fire(
         pixel: SubscriptionPixel,
         params: Map<String, String> = emptyMap(),
@@ -410,5 +423,18 @@ class SubscriptionPixelSenderImpl @Inject constructor(
                 pixelSender.fire(pixelName = pixelName, type = pixelType, parameters = params)
             }
         }
+    }
+
+    private fun fireOnboardingStep(
+        action: SubscriptionOnboardingStepPixels.Action,
+        step: SubscriptionOnboardingStepPixels.Step,
+        isFreeTrial: Boolean,
+    ) {
+        val baseName = SubscriptionOnboardingStepPixels.baseName(action, step)
+        pixelSender.fire(
+            pixelName = "${baseName}_c",
+            type = Count,
+            parameters = mapOf(SubscriptionPixelParameter.FREE_TRIAL to isFreeTrial.toString()),
+        )
     }
 }

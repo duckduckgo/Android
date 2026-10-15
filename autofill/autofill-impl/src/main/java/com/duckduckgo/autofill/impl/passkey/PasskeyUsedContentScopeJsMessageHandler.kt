@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.passkey
 
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.passkey.PasskeyUsageResult.CreateFailed
 import com.duckduckgo.autofill.impl.passkey.PasskeyUsageResult.Created
 import com.duckduckgo.autofill.impl.passkey.PasskeyUsageResult.UseFailed
@@ -36,6 +37,7 @@ import javax.inject.Inject
 class PasskeyUsedContentScopeJsMessageHandler @Inject constructor(
     private val parser: PasskeyUsedMessageParser,
     private val pixelSender: PasskeyUsagePixelSender,
+    private val autofillFeature: AutofillFeature,
 ) : ContentScopeJsMessageHandlersPlugin {
 
     override fun getJsMessageHandler(): JsMessageHandler = object : JsMessageHandler {
@@ -44,6 +46,9 @@ class PasskeyUsedContentScopeJsMessageHandler @Inject constructor(
             jsMessaging: JsMessaging,
             jsMessageCallback: JsMessageCallback?,
         ) {
+            // With the flag off, WebView WebAuthn support is never enabled, so every page that
+            // probes navigator.credentials reports NotSupportedError. Those are not real attempts.
+            if (!autofillFeature.passkeySupport().isEnabled()) return
             processResult(parser.parse(jsMessage))
         }
 

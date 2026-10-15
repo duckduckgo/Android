@@ -21,8 +21,6 @@ import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.LinearLayout
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
 import androidx.test.core.app.ApplicationProvider
@@ -34,7 +32,6 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
 import com.google.android.material.card.MaterialCardView
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -46,31 +43,6 @@ class ContextualNativeInputHostLayoutTest {
         ApplicationProvider.getApplicationContext(),
         com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Light,
     )
-
-    @Test
-    fun whenContextualNativeLayoutInflatesThenCardAndFooterStructureIsPreserved() {
-        assertInputLayout(
-            layoutId = R.layout.fragment_contextual_duck_ai_native,
-            cardId = R.id.contextualNativeInputCard,
-            footerId = R.id.contextualNativeInputFooter,
-        )
-    }
-
-    @Test
-    fun whenContextualNativeLayoutInflatesThenLegacyComposerRemainsAStackedSibling() {
-        val root = LayoutInflater.from(context).inflate(R.layout.fragment_contextual_duck_ai_native, null)
-
-        val inputContainer = root.findViewById<FrameLayout>(R.id.contextualInputContainer)
-        val nativeCard = root.findViewById<MaterialCardView>(R.id.contextualNativeInputCard)
-        val nativeFooter = root.findViewById<NativeInputFooterView>(R.id.contextualNativeInputFooter)
-        val nativeDock = nativeCard.parent as LinearLayout
-        val legacyComposer = root.findViewById<View>(R.id.contextualModeNativeContent)
-
-        assertTrue(nativeDock is NativeInputFooterDockLayout)
-        assertSame(nativeDock, nativeFooter.parent)
-        assertSame(inputContainer, nativeDock.parent)
-        assertSame(inputContainer, legacyComposer.parent)
-    }
 
     @Test
     fun whenContextualWebViewLayoutInflatesThenCardAndFooterStructureIsPreserved() {
@@ -101,16 +73,18 @@ class ContextualNativeInputHostLayoutTest {
 
         val card = root.findViewById<MaterialCardView>(cardId)
         val footer = root.findViewById<NativeInputFooterView>(footerId)
-        val cardMargins = card.layoutParams as ViewGroup.MarginLayoutParams
+        // The card can sit in a row with other controls; the dock-level spacing lives on that row.
+        val cardRow = card.ancestorsAndSelf().first { it.parent == footer.parent }
+        val cardRowMargins = cardRow.layoutParams as ViewGroup.MarginLayoutParams
         val footerMargins = footer.layoutParams as ViewGroup.MarginLayoutParams
 
         assertEquals(1, root.descendants().count { it is NativeInputFooterView })
         assertFalse(footer.isDescendantOf(card))
-        assertSame(card.parent, footer.parent)
-        assertTrue(card.parent is NativeInputFooterDockLayout)
+        assertTrue(footer.parent is NativeInputFooterDockLayout)
+        assertTrue(card.isDescendantOf(footer.parent as ViewGroup))
         assertEquals(1, card.childCount)
         assertTrue(card.getChildAt(0) is NativeInputModeWidget)
-        assertEquals(cardMargins.bottomMargin, footerMargins.bottomMargin)
+        assertEquals(cardRowMargins.bottomMargin, footerMargins.bottomMargin)
     }
 
     private fun View.measureAndLayout() {
@@ -132,6 +106,8 @@ class ContextualNativeInputHostLayoutTest {
             currentParent = parentView.parent
         }
     }
+
+    private fun View.ancestorsAndSelf(): Sequence<View> = generateSequence(this) { it.parent as? View }
 
     private fun View.descendants(): Sequence<View> = sequence {
         yield(this@descendants)

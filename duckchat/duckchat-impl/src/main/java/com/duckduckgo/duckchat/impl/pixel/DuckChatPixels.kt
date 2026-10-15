@@ -29,6 +29,7 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelPa
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
 import com.duckduckgo.duckchat.impl.ModelTier
@@ -188,6 +189,8 @@ interface DuckChatPixels {
     fun reportContextualRecentChatsPopupDisplayed()
     fun reportContextualRecentChatSelected()
     fun reportContextualViewAllChatsTapped()
+    fun reportChatHistoryScreenShown(source: DuckChatHistorySource)
+    fun reportChatHistoryScreenShownFromDeeplink()
     fun reportContextualOpenDuckAiMenuTapped()
     fun reportContextualPageContextInvalidEmpty()
     fun reportContextualPageContextInvalidNoTitle()
@@ -243,6 +246,14 @@ interface DuckChatPixels {
 
     /** Prompt submitted while the unified input is in a Duck.ai chat context. Fires alongside [firePromptSubmitted]. */
     fun fireSentPromptInChat(surface: DuckChatPixelSurface)
+
+    /** How one Duck.ai input session ended. [submitMethod] is only set for outcomes that send something. */
+    fun fireInputOutcome(
+        surface: DuckChatPixelSurface,
+        outcome: InputOutcome,
+        submitMethod: InputSubmitMethod?,
+        tosDisclaimerShown: Boolean,
+    )
     fun fireModelSelected(modelId: String, surface: DuckChatPixelSurface)
     fun fireReasoningEffortSelected(effortLevel: String, surface: DuckChatPixelSurface)
 
@@ -732,6 +743,30 @@ class RealDuckChatPixels @Inject constructor(
         }
     }
 
+    override fun reportChatHistoryScreenShown(source: DuckChatHistorySource) {
+        fireChatHistoryScreenShown(source.pixelValue())
+    }
+
+    override fun reportChatHistoryScreenShownFromDeeplink() {
+        fireChatHistoryScreenShown("deeplink")
+    }
+
+    private fun fireChatHistoryScreenShown(source: String) {
+        fireCountAndDaily(
+            count = DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_COUNT,
+            daily = DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_DAILY,
+            parameters = mapOf(DuckChatPixelParameters.ENTRY_SOURCE to source),
+        )
+    }
+
+    private fun DuckChatHistorySource.pixelValue(): String = when (this) {
+        DuckChatHistorySource.BROWSER_MENU -> "browser_menu"
+        DuckChatHistorySource.ADDRESS_BAR -> "address_bar"
+        DuckChatHistorySource.CONTEXTUAL_CHAT -> "contextual_chat"
+        DuckChatHistorySource.SIDEBAR -> "sidebar"
+        DuckChatHistorySource.TAB_SWITCHER -> "tab_switcher"
+    }
+
     override fun reportContextualOpenDuckAiMenuTapped() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_OPEN_DUCKAI_MENU_TAPPED_COUNT)
@@ -1186,6 +1221,22 @@ class RealDuckChatPixels @Inject constructor(
         ),
     )
 
+    override fun fireInputOutcome(
+        surface: DuckChatPixelSurface,
+        outcome: InputOutcome,
+        submitMethod: InputSubmitMethod?,
+        tosDisclaimerShown: Boolean,
+    ) = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_INPUT_OUTCOME_COUNT,
+        DuckChatPixelName.DUCK_CHAT_INPUT_OUTCOME_DAILY,
+        buildMap {
+            put(DuckChatPixelParameters.SURFACE, surface.value)
+            put(DuckChatPixelParameters.OUTCOME, outcome.value)
+            put(DuckChatPixelParameters.TOS_DISCLAIMER_SHOWN, tosDisclaimerShown.toString())
+            submitMethod?.let { put(DuckChatPixelParameters.SUBMIT_METHOD, it.value) }
+        },
+    )
+
     override fun fireVoiceTapped(surface: DuckChatPixelSurface) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_VOICE_TAPPED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_VOICE_TAPPED_DAILY,
@@ -1575,6 +1626,8 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_HISTORY_NEW_CHAT_TAPPED_DAILY("m_aichat_history_new_chat_tapped_daily"),
     DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_COUNT("m_aichat_history_download_selected_count"),
     DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_DAILY("m_aichat_history_download_selected_daily"),
+    DUCK_CHAT_HISTORY_SCREEN_SHOWN_COUNT("m_aichat_history_screen_shown_count"),
+    DUCK_CHAT_HISTORY_SCREEN_SHOWN_DAILY("m_aichat_history_screen_shown_daily"),
     DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SELECTED_COUNT("m_aichat_unified_input_image_generation_selected_count"),
     DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SELECTED_DAILY("m_aichat_unified_input_image_generation_selected_daily"),
     DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_DESELECTED_COUNT("m_aichat_unified_input_image_generation_deselected_count"),
@@ -1589,6 +1642,8 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SUBMITTED_DAILY("m_aichat_unified_input_web_search_submitted_daily"),
     DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT("m_aichat_unified_input_prompt_submitted_count"),
     DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_DAILY("m_aichat_unified_input_prompt_submitted_daily"),
+    DUCK_CHAT_INPUT_OUTCOME_COUNT("m_aichat_input_outcome_count"),
+    DUCK_CHAT_INPUT_OUTCOME_DAILY("m_aichat_input_outcome_daily"),
     DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_COUNT("m_aichat_unified_input_sent_prompt_in_chat_count"),
     DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_DAILY("m_aichat_unified_input_sent_prompt_in_chat_daily"),
     DUCK_CHAT_UNIFIED_INPUT_MODEL_SELECTED("m_aichat_unified_input_model_selected"),
@@ -1648,6 +1703,11 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_OMNIBAR_MENU_NEW_TAB_TAPPED_DAILY("m_aichat_omnibar_menu_new_tab_tapped_daily"),
     DUCK_CHAT_OMNIBAR_MENU_NEW_FIRE_TAB_TAPPED_COUNT("m_aichat_omnibar_menu_new_fire_tab_tapped_count"),
     DUCK_CHAT_OMNIBAR_MENU_NEW_FIRE_TAB_TAPPED_DAILY("m_aichat_omnibar_menu_new_fire_tab_tapped_daily"),
+
+    DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_COUNT("m_tab_manager_switch_to_ai_tab_count"),
+    DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_DAILY("m_tab_manager_switch_to_ai_tab_daily"),
+    DUCK_CHAT_TAB_SWITCHER_CLOSE_AI_TAB_COUNT("m_tab_manager_close_ai_tab_count"),
+    DUCK_CHAT_TAB_SWITCHER_CLOSE_AI_TAB_DAILY("m_tab_manager_close_ai_tab_daily"),
 }
 
 object DuckChatPixelParameters {
@@ -1685,6 +1745,9 @@ object DuckChatPixelParameters {
     const val ATTACHMENT_SOURCE = "source"
     const val FILE_VALIDATION_REASON = "reason"
     const val SURFACE = "surface"
+    const val OUTCOME = "outcome"
+    const val SUBMIT_METHOD = "submit_method"
+    const val TOS_DISCLAIMER_SHOWN = "tos_disclaimer_shown"
     const val UPSELL_SOURCE = "source"
     const val UPSELL_CURRENT_TIER = "current_tier"
     const val UPSELL_REQUIRED_TIER = "required_tier"
@@ -1939,6 +2002,8 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_HISTORY_NEW_CHAT_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
@@ -1947,7 +2012,13 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_TAB_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_FIRE_TAB_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_FIRE_TAB_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_CLOSE_AI_TAB_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_CLOSE_AI_TAB_DAILY.pixelName to PixelParameter.removeAtb(),
             "m_duck-ai_native-storage_" to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_INPUT_OUTCOME_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_INPUT_OUTCOME_DAILY.pixelName to PixelParameter.removeAtb(),
             // Prefix: covers every m_aichat_unified_input_* pixel (tools, submit, model/reasoning,
             // upsell, attachments, voice, stop) AND the app-side chat_header_upgrade_tapped, which
             // shares the prefix — the interceptor matches outgoing pixel names with startsWith.

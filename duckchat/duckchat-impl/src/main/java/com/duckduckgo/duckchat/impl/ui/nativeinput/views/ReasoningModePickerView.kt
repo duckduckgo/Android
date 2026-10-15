@@ -56,7 +56,7 @@ class ReasoningModePickerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : FrameLayout(context, attrs, defStyle) {
+) : FrameLayout(context, attrs, defStyle), CompactableControl {
 
     @Inject lateinit var viewModelFactory: ViewViewModelFactory
 
@@ -84,6 +84,11 @@ class ReasoningModePickerView @JvmOverloads constructor(
     init {
         inflate(context, R.layout.view_reasoning_mode_picker, this)
     }
+
+    override fun setCompactLevel(level: Int) = Unit
+
+    // A fixed-size button that only comes and goes with the selected model.
+    override fun worstCaseWidth(level: Int): Int = resources.getDimensionPixelSize(R.dimen.nativeInputButtonSize)
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)

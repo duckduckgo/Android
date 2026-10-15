@@ -29,6 +29,12 @@ android {
     }
     sourceSets {
         androidTest.assets.srcDirs += files("$projectDir/schemas")
+        test.assets.srcDirs += files("$projectDir/schemas")
+    }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
     }
     room {
         schemaDirectory("$projectDir/schemas")
@@ -48,6 +54,9 @@ dependencies {
 
     testImplementation project(path: ':common-test')
     testImplementation Testing.junit4
+    testImplementation Testing.robolectric
+    testImplementation AndroidX.test.ext.junit
+    testImplementation AndroidX.room.testing
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

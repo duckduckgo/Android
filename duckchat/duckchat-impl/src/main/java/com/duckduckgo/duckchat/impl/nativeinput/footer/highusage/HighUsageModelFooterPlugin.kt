@@ -23,12 +23,12 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.nativeinput.footer.FooterCategory
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooter
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterState
-import com.duckduckgo.duckchat.impl.nativeinput.footer.USAGE_NOTICE_FOOTER_CATEGORY
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningExposure
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningMeasurements
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
@@ -62,7 +62,7 @@ class HighUsageModelFooterPlugin @Inject constructor(
 ) : NativeInputFooterPlugin {
 
     override val priority: Int = 100
-    override val category: String = USAGE_NOTICE_FOOTER_CATEGORY
+    override val category: FooterCategory = FooterCategory.USAGE_NOTICE
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun createFooter(

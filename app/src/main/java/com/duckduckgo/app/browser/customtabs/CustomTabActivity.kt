@@ -38,9 +38,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.isFullScreen
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
@@ -56,9 +54,6 @@ class CustomTabActivity : DuckDuckGoActivity() {
     private val binding: ActivityCustomTabBinding by viewBinding()
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,20 +63,18 @@ class CustomTabActivity : DuckDuckGoActivity() {
         val toolbarColor =
             intent.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, getColorFromAttr(com.duckduckgo.mobile.android.R.attr.preferredStatusBarColor))
 
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
-            val barStyle = if (isDarkThemeEnabled()) {
-                SystemBarStyle.dark(toolbarColor)
-            } else {
-                SystemBarStyle.light(toolbarColor, toolbarColor)
-            }
-            enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(
-                binding.root,
-                installScrim = false,
-                isFullScreen = { isFullScreen() },
-            )
-            applyDisplayCutoutMode(resources.configuration.orientation)
+        val barStyle = if (isDarkThemeEnabled()) {
+            SystemBarStyle.dark(toolbarColor)
+        } else {
+            SystemBarStyle.light(toolbarColor, toolbarColor)
         }
+        enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
+        edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(
+            binding.root,
+            installScrim = false,
+            isFullScreen = { isFullScreen() },
+        )
+        applyDisplayCutoutMode(resources.configuration.orientation)
 
         setContentView(binding.root)
 

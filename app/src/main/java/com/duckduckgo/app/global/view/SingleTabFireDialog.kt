@@ -113,7 +113,6 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     private var animationEnabled = false
     private var canFinish = false
     private var pendingFragmentResultEvent: String? = null
-    private var isFireAnimationUpdateEnabled = false
 
     override fun show(fragmentManager: FragmentManager, tag: String?) {
         // FragmentManager.commit() inside DialogFragment.show() throws after onSaveInstanceState.
@@ -275,15 +274,8 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     private fun render(state: SingleTabFireDialogViewModel.ViewState.Loaded) {
-        isFireAnimationUpdateEnabled = state.stateData.isFireAnimationUpdateEnabled
-
         if (state.stateData.isFirePictogramVisible) {
-            val animationRes = if (isFireAnimationUpdateEnabled) {
-                R.raw.fire_dialog_animation_brand_design
-            } else {
-                R.raw.fire_dialog_animation
-            }
-            binding.fireIcon.setAnimation(animationRes)
+            binding.fireIcon.setAnimation(R.raw.fire_dialog_animation_brand_design)
             binding.fireIcon.playAnimation()
         } else {
             binding.fireIcon.gone()
@@ -386,6 +378,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
                 isAppearanceLightStatusBars = false
                 isAppearanceLightNavigationBars = false
             }
+            setDimAmount(0f)
         }
         isCancelable = false
         binding.fireAnimationView.show()

@@ -154,6 +154,15 @@ class ModelPickerViewModel @Inject constructor(
         initialValue = modelManager.modelState.value.selectedModelShortName,
     )
 
+    /** Provider icon of the model shown on the chip, used when the chip collapses to an icon. */
+    val chipIconRes: StateFlow<Int> = combine(modelManager.modelState, effectiveModelId) { modelState, id ->
+        modelState.models.firstOrNull { it.id == id }?.let(::getIconResForModel) ?: R.drawable.ic_ai_model_oss_16
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = R.drawable.ic_ai_model_oss_16,
+    )
+
     /** True once a model was picked during the current recovery window (set synchronously in onModelTapped). */
     fun hasPendingRecoverySelection(): Boolean = recoverySelectedModelId.value != null
 

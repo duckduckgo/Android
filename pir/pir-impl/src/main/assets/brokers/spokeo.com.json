@@ -1,7 +1,7 @@
 {
   "name": "Spokeo",
   "url": "spokeo.com",
-  "version": "0.10.0",
+  "version": "0.11.1",
   "addedDatetime": 1692572400000,
   "optOutUrl": "https://spokeo.com/optout",
   "mirrorSites": [
@@ -32,6 +32,41 @@
       "addedAt": 1705599286529,
       "removedAt": null,
       "optOutUrl": "https://www.spokeo.com/optout"
+    },
+    {
+      "name": "Profile Systems",
+      "url": "profile.systems",
+      "addedAt": 1790968980203,
+      "removedAt": null,
+      "optOutUrl": "https://spokeo.com/optout"
+    },
+    {
+      "name": "Discover Background Data",
+      "url": "background-check.website",
+      "addedAt": 1790968980203,
+      "removedAt": null,
+      "optOutUrl": "https://spokeo.com/optout"
+    },
+    {
+      "name": "Profile Data Club",
+      "url": "profile-data.club",
+      "addedAt": 1790968980203,
+      "removedAt": null,
+      "optOutUrl": "https://spokeo.com/optout"
+    },
+    {
+      "name": "Public Data Exposed",
+      "url": "public-data.exposed",
+      "addedAt": 1790968980203,
+      "removedAt": null,
+      "optOutUrl": "https://spokeo.com/optout"
+    },
+    {
+      "name": "Profiles Exposed",
+      "url": "profiles.exposed",
+      "addedAt": 1790968980203,
+      "removedAt": null,
+      "optOutUrl": "https://spokeo.com/optout"
     }
   ],
   "steps": [

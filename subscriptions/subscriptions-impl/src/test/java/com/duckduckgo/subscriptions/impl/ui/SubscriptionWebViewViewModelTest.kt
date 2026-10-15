@@ -5,6 +5,7 @@ import android.app.Activity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -40,8 +41,10 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.internal.PaywallUrlResolver
 import com.duckduckgo.subscriptions.impl.notification.SubscriptionExpirationReminderScheduler
+import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboardingExperiments
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Subscription
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.Reload
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Companion
@@ -88,9 +91,11 @@ class SubscriptionWebViewViewModelTest {
     private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
     private val subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java, FakeToggleStore())
+    private val subscriptionOnboardingExperiments: SubscriptionOnboardingExperiments = mock()
     private val pirFeature: PirFeature = mock()
     private val subscriptionExpirationReminderScheduler: SubscriptionExpirationReminderScheduler = mock()
     private val paywallUrlResolver: PaywallUrlResolver = mock()
+    private val subscriptionOnboardingStore = SubscriptionOnboardingStore(FakeSharedPreferencesProvider())
 
     private lateinit var viewModel: SubscriptionWebViewViewModel
 
@@ -98,6 +103,7 @@ class SubscriptionWebViewViewModelTest {
     fun setup() = runTest {
         whenever(networkProtectionAccessState.getScreenForCurrentState()).thenReturn(NetworkProtectionManagementScreenNoParams)
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
+        runBlocking { whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(false) }
         viewModel = SubscriptionWebViewViewModel(
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             subscriptionsManager = subscriptionsManager,
@@ -105,9 +111,11 @@ class SubscriptionWebViewViewModelTest {
             networkProtectionAccessState = networkProtectionAccessState,
             pixelSender = pixelSender,
             subscriptionsFeature = subscriptionsFeature,
+            subscriptionOnboardingExperiments = subscriptionOnboardingExperiments,
             pirFeature = pirFeature,
             subscriptionExpirationReminderScheduler = subscriptionExpirationReminderScheduler,
             paywallUrlResolver = paywallUrlResolver,
+            subscriptionOnboardingStore = subscriptionOnboardingStore,
         )
         givenSubscriptionStatus(UNKNOWN)
     }
@@ -184,31 +192,47 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
-    fun whenFreeTrialPurchaseAndFreeTrialOnboardingEnabledThenLaunchOnboarding() = runTest {
-        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
-        subscriptionsFeature.onboardingSubscriptionExperimentMonthly().setRawStoredState(Toggle.State(enable = false))
+    fun whenPurchaseInTreatmentThenLaunchOnboarding() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
         assertLaunchOnboarding(isFreeTrial = true, expected = true)
     }
 
     @Test
-    fun whenFreeTrialPurchaseAndFreeTrialOnboardingDisabledThenDoNotLaunchOnboarding() = runTest {
-        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = false))
-        subscriptionsFeature.onboardingSubscriptionExperimentMonthly().setRawStoredState(Toggle.State(enable = true))
+    fun whenPurchaseInControlThenDoNotLaunchOnboarding() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(false)
         assertLaunchOnboarding(isFreeTrial = true, expected = false)
     }
 
     @Test
-    fun whenNonFreeTrialPurchaseAndMonthlyOnboardingEnabledThenLaunchOnboarding() = runTest {
-        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = false))
-        subscriptionsFeature.onboardingSubscriptionExperimentMonthly().setRawStoredState(Toggle.State(enable = true))
+    fun whenPaidPurchaseInTreatmentThenLaunchOnboarding() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
         assertLaunchOnboarding(isFreeTrial = false, expected = true)
     }
 
     @Test
-    fun whenNonFreeTrialPurchaseAndMonthlyOnboardingDisabledThenDoNotLaunchOnboarding() = runTest {
-        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
-        subscriptionsFeature.onboardingSubscriptionExperimentMonthly().setRawStoredState(Toggle.State(enable = false))
+    fun whenPaidPurchaseInControlThenDoNotLaunchOnboarding() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(false)
         assertLaunchOnboarding(isFreeTrial = false, expected = false)
+    }
+
+    @Test
+    fun whenPurchaseInTreatmentThenOnboardingProgressIsReset() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
+        subscriptionOnboardingStore.setStepCompleted("welcome")
+
+        assertLaunchOnboarding(isFreeTrial = false, expected = true)
+
+        assertTrue(subscriptionOnboardingStore.completedSteps().isEmpty())
+    }
+
+    @Test
+    fun whenPurchaseInControlThenOnboardingProgressIsKept() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(false)
+        subscriptionOnboardingStore.setStepCompleted("welcome")
+
+        assertLaunchOnboarding(isFreeTrial = false, expected = false)
+
+        assertEquals(setOf("welcome"), subscriptionOnboardingStore.completedSteps())
     }
 
     private suspend fun assertLaunchOnboarding(

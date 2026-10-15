@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.util.Base64
@@ -252,12 +253,19 @@ class RealDuckAiChatStore(
         for (i in 0 until messages.length()) {
             val message = messages.optJSONObject(i) ?: continue
             if (message.optString("role") != ASSISTANT_ROLE) continue
-            val parts = message.optJSONArray("parts") ?: continue
-            for (j in 0 until parts.length()) {
-                val part = parts.optJSONObject(j) ?: continue
-                if (part.optString("type") == UI_COMPONENT_TYPE && part.optString("name") == GENERATE_IMAGE_NAME) {
-                    return true
-                }
+            if (message.optJSONArray("parts").hasGenerateImagePart() || message.optJSONArray("content").hasGenerateImagePart()) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun JSONArray?.hasGenerateImagePart(): Boolean {
+        if (this == null) return false
+        for (i in 0 until length()) {
+            val part = optJSONObject(i) ?: continue
+            if (part.optString("type") == UI_COMPONENT_TYPE && part.optString("name") == GENERATE_IMAGE_NAME) {
+                return true
             }
         }
         return false

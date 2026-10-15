@@ -1566,9 +1566,8 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun `when contextual mode, redesign and text selection action enabled, then showTextSelectionAction emits true`() = runTest {
+    fun `when contextual mode and text selection action enabled, then showTextSelectionAction emits true`() = runTest {
         duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
-        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = true))
         duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
         duckChatFeature.nativeChatInput().setRawStoredState(State(enable = true))
@@ -1581,18 +1580,7 @@ class RealDuckChatTest {
     @Test
     fun `when text selection action disabled, then showTextSelectionAction emits false`() = runTest {
         duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
-        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = false))
-        testee.onPrivacyConfigDownloaded()
-
-        assertFalse(testee.showTextSelectionAction.value)
-    }
-
-    @Test
-    fun `when contextual sheet redesign disabled, then showTextSelectionAction emits false`() = runTest {
-        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
-        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = false))
-        duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = true))
         testee.onPrivacyConfigDownloaded()
 
         assertFalse(testee.showTextSelectionAction.value)
@@ -1601,7 +1589,6 @@ class RealDuckChatTest {
     @Test
     fun `when contextual native input disabled, then showTextSelectionAction emits false`() = runTest {
         duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
-        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = true))
         duckChatFeature.contextualNativeInput().setRawStoredState(State(enable = false))
         testee.onPrivacyConfigDownloaded()
@@ -1612,7 +1599,6 @@ class RealDuckChatTest {
     @Test
     fun `when contextual mode disabled, then showTextSelectionAction emits false`() = runTest {
         duckChatFeature.contextualMode().setRawStoredState(State(enable = false))
-        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = true))
         testee.onPrivacyConfigDownloaded()
 
@@ -1665,9 +1651,8 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun `when all chats menu item enabled and sheet redesign enabled, isContextualMenuAllChatsEnabled returns true`() = runTest {
+    fun `when all chats menu item enabled and contextual mode enabled, isContextualMenuAllChatsEnabled returns true`() = runTest {
         duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
-        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
         duckChatFeature.contextualMenuAllChats().setRawStoredState(State(enable = true))
         testee.onPrivacyConfigDownloaded()
 
@@ -1677,7 +1662,6 @@ class RealDuckChatTest {
     @Test
     fun `when all chats menu item disabled, isContextualMenuAllChatsEnabled returns false`() = runTest {
         duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
-        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
         duckChatFeature.contextualMenuAllChats().setRawStoredState(State(enable = false))
         testee.onPrivacyConfigDownloaded()
 
@@ -1685,9 +1669,8 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun `when all chats menu item enabled and sheet redesign disabled, isContextualMenuAllChatsEnabled returns false`() = runTest {
-        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
-        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = false))
+    fun `when all chats menu item enabled and contextual mode disabled, isContextualMenuAllChatsEnabled returns false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = false))
         duckChatFeature.contextualMenuAllChats().setRawStoredState(State(enable = true))
         testee.onPrivacyConfigDownloaded()
 

@@ -29,9 +29,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.pir.api.PirScreens.PirOnboardingStepScreen
 import com.duckduckgo.pir.impl.R
@@ -45,9 +43,6 @@ import javax.inject.Inject
 class SubscriptionOnboardingPirStepActivity : DuckDuckGoActivity() {
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val binding: ActivitySubscriptionOnboardingPirStepBinding by viewBinding()
@@ -59,10 +54,7 @@ class SubscriptionOnboardingPirStepActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
@@ -88,11 +80,9 @@ class SubscriptionOnboardingPirStepActivity : DuckDuckGoActivity() {
 
         setupScrollFade(surfaceColor)
 
-        if (edgeToEdgeEnabled) {
-            edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
-            edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout, installScrim = false)
-            edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.pirOnboardingStepScrollView)
-        }
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout, installScrim = false)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.pirOnboardingStepScrollView)
     }
 
     override fun onResume() {
