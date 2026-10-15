@@ -133,15 +133,9 @@ subprojects {
                 }
 
                 for (dependency in dependencies) {
-                    // API modules cannot depend on dagger/anvil
-                    if (projectPath.endsWith("api")
-                            && projectPath != ":feature-toggles-api"
-                            && projectPath != ":settings-api") {
-                        def notAllowedDeps = ["anvil", "dagger"]
-                        if (notAllowedDeps.contains(dependency.name)) {
-                            throw new GradleException("Invalid dependency $projectPath -> " +
-                                    "'api' modules can't depend on dagger/anvil")
-                        }
+                    if (dependency.group == "com.google.dagger" || dependency.group == "com.squareup.anvil") {
+                        throw new GradleException("Invalid dependency $projectPath -> ${dependency.group}:${dependency.name}. " +
+                                "Dagger and Anvil were replaced by Metro")
                     }
 
                     if (dependency instanceof ProjectDependency) {
@@ -248,17 +242,12 @@ subprojects {
 subprojects {
     plugins.withId('dev.zacsweers.metro') {
         metro {
-            enableKClassToClassMapKeyInterop.set(true)
             interop {
-                includeDaggerAnnotations.set(true)
-                includeJavaxAnnotations.set(true)
-                includeAnvilAnnotations.set(true)
-                enableDaggerRuntimeInterop.set(true)
-                enableDaggerAnvilInterop.set(true)
+                includeJavax()
             }
         }
         dependencies {
-            implementation "com.squareup.anvil:annotations:2.7.0"
+            implementation "javax.inject:javax.inject:_"
         }
     }
 }

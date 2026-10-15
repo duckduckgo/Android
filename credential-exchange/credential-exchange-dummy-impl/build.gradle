@@ -33,6 +33,5 @@ dependencies {
     implementation project(path: ':di')
     implementation project(path: ':anvil-annotations')
 
-    implementation Google.dagger
     implementation Square.logcat
 }

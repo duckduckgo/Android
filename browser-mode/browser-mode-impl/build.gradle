@@ -40,7 +40,6 @@ dependencies {
     implementation project(path: ':common-utils')
     implementation project(path: ':di')
 
-    implementation Google.dagger
     implementation KotlinX.coroutines.core
     implementation AndroidX.webkit
     implementation AndroidX.lifecycle.common

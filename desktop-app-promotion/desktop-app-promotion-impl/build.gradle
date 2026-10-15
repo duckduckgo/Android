@@ -49,9 +49,6 @@ dependencies {
     implementation Google.android.material
     implementation KotlinX.coroutines.android
 
-    // Dagger
-    implementation Google.dagger
-
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')

@@ -65,7 +65,6 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation AndroidX.fragment.ktx
     implementation Google.android.material
-    implementation Google.dagger
     implementation AndroidX.work.runtimeKtx
     implementation AndroidX.viewPager2
 

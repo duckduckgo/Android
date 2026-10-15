@@ -57,7 +57,6 @@ dependencies {
 
     implementation KotlinX.coroutines.android
     implementation AndroidX.core.ktx
-    implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
 
     testImplementation Testing.junit4

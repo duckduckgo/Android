@@ -56,15 +56,6 @@ class ContributesViewModelProcessorTest {
         """.trimIndent(),
     )
 
-    private val singleInstanceInStub = SourceFile.kotlin(
-        "SingleInstanceIn.kt",
-        """
-        package dagger
-        import kotlin.reflect.KClass
-        annotation class SingleInstanceIn(val scope: KClass<*>)
-        """.trimIndent(),
-    )
-
     @Test
     fun `basic ViewModel with Inject constructor generates correct factory`() {
         val source = SourceFile.kotlin(
@@ -107,29 +98,6 @@ class ContributesViewModelProcessorTest {
         val result = compile(source, activityScopeStub, viewModelStub, viewModelFactoryPluginStub)
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("must have an @Inject constructor"))
-    }
-
-    @Test
-    fun `error when annotated with SingleInstanceIn`() {
-        val source = SourceFile.kotlin(
-            "SingletonViewModel.kt",
-            """
-            package com.test
-            import androidx.lifecycle.ViewModel
-            import com.duckduckgo.anvil.annotations.ContributesViewModel
-            import com.duckduckgo.di.scopes.ActivityScope
-            import dagger.SingleInstanceIn
-            import javax.inject.Inject
-
-            @SingleInstanceIn(ActivityScope::class)
-            @ContributesViewModel(ActivityScope::class)
-            class SingletonViewModel @Inject constructor() : ViewModel()
-            """.trimIndent(),
-        )
-
-        val result = compile(source, activityScopeStub, viewModelStub, viewModelFactoryPluginStub, singleInstanceInStub)
-        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("cannot be annotated with @SingleIn"))
     }
 
     @Test

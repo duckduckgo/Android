@@ -22,7 +22,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 
 /**
  * Declares the plugin point that collects every [SubscriptionOnboardingStepPlugin] contributed across
- * feature modules. Feature modules contribute their step with `@ContributesMultibinding(AppScope::class)`
+ * feature modules. Feature modules contribute their step with `@ContributesIntoMap(AppScope::class)`
  * and order it with `@PriorityKey(n)` (lower first).
  */
 @ContributesPluginPoint(

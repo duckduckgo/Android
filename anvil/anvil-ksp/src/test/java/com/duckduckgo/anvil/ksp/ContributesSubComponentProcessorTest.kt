@@ -113,7 +113,7 @@ class ContributesSubComponentProcessorTest {
     }
 
     @Test
-    fun `ServiceScope generates SubComponent with ContributesSubcomponent`() {
+    fun `ServiceScope generates SubComponent with GraphExtension`() {
         val source = SourceFile.kotlin(
             "MyService.kt",
             """

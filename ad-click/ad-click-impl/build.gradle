@@ -68,9 +68,6 @@ dependencies {
     ksp AndroidX.room.compiler
     testImplementation AndroidX.room.testing
 
-    // Dagger
-    implementation Google.dagger
-
     implementation KotlinX.coroutines.core
 
     testImplementation(KotlinX.coroutines.test) {
