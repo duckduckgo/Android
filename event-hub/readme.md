@@ -23,3 +23,11 @@ Handles web events from Content Scope Scripts (C-S-S) via the eventHub feature, 
 - Events without a tab (empty `webViewId`) are never de-duplicated.
 - The decision is made as each event reaches the hub, against the page its tab is on at that moment.
 - Known limitation: events reach the hub through an asynchronous JS messaging queue, while navigation comes from the UI thread. An event still queued when its tab navigates can be checked against the next page, and use up that page's key.
+
+## Experiment metrics
+- An experiment can declare metrics on Event Hub events in its own `settings.metrics`. Each metric names an `event` and its `conversions` (`windows` × `thresholds`). Experiments are read from every subfeature of `contentScopeExperiments` and `blockList`, not just the active TDS experiment. Disabled experiments are skipped on each event, and the framework skips experiments the user isn't enrolled in.
+- Every event that passes de-duplication is handed to `ExperimentMetricsHandler`, which sends one `MetricsPixel` of type `COUNT_WHEN_IN_WINDOW` per threshold. The experiments framework decides enrolment, conversion windows, counting and firing, under its existing `experiment_metrics_<experiment>_<cohort>` pixel.
+- Metric definitions are cached in memory and rebuilt after each config change. Invalid metrics are skipped and logged.
+- Metric names used by Android's built-in metrics on the same experiments (`search`, `app_use`, `duck_ai_prompt_sent`, `duck_ai_new_chat`, `privacyToggleUsed`) are rejected, because a config metric with the same name would share the framework's counter. If a new built-in metric is attached to every active experiment, add its name to `ExperimentMetricsConfigParser.RESERVED_NAMES`.
+- A failing send is logged and skipped; it doesn't stop the other sends.
+- Metrics only flow while both `eventHub` (the hub) and `webEvents` (the producer of web events) are enabled.
