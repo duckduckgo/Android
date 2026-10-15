@@ -50,13 +50,6 @@ class FakePirDataStore : PirDataStore {
         return wasPending
     }
 
-    override fun reset() {
-        mainConfigEtag = null
-        hasBrokerConfigBeenManuallyUpdated = false
-        featureReceivedMs = 0L
-        resetUserData()
-    }
-
     override fun resetUserData() {
         customStatsPixelsLastSentMs = 0L
         dauLastSentMs = 0L

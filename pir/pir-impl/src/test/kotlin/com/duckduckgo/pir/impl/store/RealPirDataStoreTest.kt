@@ -74,15 +74,6 @@ class RealPirDataStoreTest {
     }
 
     @Test
-    fun whenResetThenPendingScanCompleteNotificationIsCleared() {
-        testee.markScanCompleteNotificationPending()
-
-        testee.reset()
-
-        assertFalse(testee.takePendingScanCompleteNotification())
-    }
-
-    @Test
     fun whenMarkedPendingThenItIsStoredUnderItsKey() {
         testee.markScanCompleteNotificationPending()
 

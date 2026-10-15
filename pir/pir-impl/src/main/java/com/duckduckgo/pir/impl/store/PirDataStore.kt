@@ -58,7 +58,6 @@ interface PirDataStore {
     /** Returns whether a scan-complete notification was pending, and clears it. */
     fun takePendingScanCompleteNotification(): Boolean
 
-    fun reset()
     fun resetUserData()
 }
 
@@ -216,13 +215,6 @@ internal class RealPirDataStore(
             remove(KEY_SCAN_COMPLETE_NOTIFICATION_PENDING)
         }
         return true
-    }
-
-    override fun reset() {
-        mainConfigEtag = null
-        hasBrokerConfigBeenManuallyUpdated = false
-        featureReceivedMs = 0L
-        resetUserData()
     }
 
     override fun resetUserData() {

@@ -1008,17 +1008,6 @@ class RealPirRepositoryTest {
     }
 
     @Test
-    fun whenClearAllDataThenDeleteAllTables() = runTest {
-        testee.clearAllData()
-
-        verify(mockBrokerDao).deleteAll()
-        verify(mockBrokerJsonDao).deleteAll()
-        verify(mockExtractedProfileDao).deleteAllExtractedProfiles()
-        verify(mockUserProfileDao).deleteAllProfiles()
-        verify(mockPirDataStore).reset()
-    }
-
-    @Test
     fun whenClearAllUserDataOnlyThenDeleteAllUserTables() = runTest {
         testee.clearUserData()
 
@@ -1027,7 +1016,6 @@ class RealPirRepositoryTest {
         verify(mockPirDataStore).resetUserData()
         verify(mockBrokerDao, never()).deleteAll()
         verify(mockBrokerJsonDao, never()).deleteAll()
-        verify(mockPirDataStore, never()).reset()
     }
 
     @Test
@@ -1041,7 +1029,6 @@ class RealPirRepositoryTest {
         // User/profile data must be preserved (this is a broker-config reset, not a full wipe).
         verify(mockExtractedProfileDao, never()).deleteAllExtractedProfiles()
         verify(mockUserProfileDao, never()).deleteAllProfiles()
-        verify(mockPirDataStore, never()).reset()
     }
 
     @Test
