@@ -69,6 +69,7 @@ import com.duckduckgo.duckchat.impl.terms.DuckAiTermsRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiResponseWaitWideEvent
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -106,6 +107,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 
@@ -147,6 +149,7 @@ class NativeInputModeWidgetViewModelTest {
         whenever(it.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
     }
     private val chatStateStore = ChatStateStore()
+    private val responseWaitWideEvent: DuckAiResponseWaitWideEvent = mock()
     private val realNativeInputStateStore = RealNativeInputStateStore(
         dagger.Lazy { tabRepositoryProvider },
         browserModeStateHolder,
@@ -258,6 +261,7 @@ class NativeInputModeWidgetViewModelTest {
             duckChatFeature = duckChatFeature,
             appCoroutineScope = TestScope(coroutineRule.testDispatcher),
             chatStateStore = chatStateStore,
+            responseWaitWideEvent = responseWaitWideEvent,
         )
     }
 
@@ -1919,6 +1923,51 @@ class NativeInputModeWidgetViewModelTest {
         )
         verify(duckChatPixels).fireImageGenerationSubmitted(any())
         verify(duckChatPixels, never()).fireWebSearchSubmitted(any())
+    }
+
+    @Test
+    fun whenPromptSubmittedInDuckAiTabThenResponseWaitGetsTabEffortAndTool() = runTest {
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("medium")
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        viewModel.setSelectedTool(Tool.IMAGE_GENERATION.rawValue)
+
+        viewModel.fireSubmissionPixels(
+            hasText = true,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+        )
+
+        verify(responseWaitWideEvent).onNativePromptSubmitted("tab-A", "medium", Tool.IMAGE_GENERATION.rawValue)
+    }
+
+    @Test
+    fun whenPromptSubmittedFromAddressBarThenResponseWaitIsNotCalled() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.fireSubmissionPixels(
+            hasText = true,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+        )
+
+        verifyNoInteractions(responseWaitWideEvent)
+    }
+
+    @Test
+    fun whenStopTappedInDuckAiTabThenResponseWaitGetsOnStopTapped() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.fireStopGenerationTapped()
+
+        verify(responseWaitWideEvent).onStopTapped("tab-A")
     }
 
     @Test

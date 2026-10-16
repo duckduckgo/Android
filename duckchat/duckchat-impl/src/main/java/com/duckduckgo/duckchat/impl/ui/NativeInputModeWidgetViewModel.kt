@@ -67,6 +67,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.terms.DuckAiTermsRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.ChatSuggestionsReader
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiResponseWaitWideEvent
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.history.api.NavigationHistory
@@ -127,6 +128,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val duckChatFeature: DuckChatFeature,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     chatStateStore: ChatStateStore,
+    private val responseWaitWideEvent: DuckAiResponseWaitWideEvent,
 ) : ViewModel() {
 
     // The first prompt is the one that accepts the terms, so while they are pending the keyboard must not submit:
@@ -301,7 +303,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         hasFileAttachment: Boolean,
         addressBarEntryPoint: DuckChatEntryPoint,
     ) {
-        val tool = getSelectedTool()?.let { Tool.from(it) }
+        val rawTool = getSelectedTool()
+        val tool = rawTool?.let { Tool.from(it) }
         val selectedToolParam = when (tool) {
             Tool.IMAGE_GENERATION -> "image_generation"
             Tool.WEB_SEARCH -> "web_search"
@@ -309,10 +312,11 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
         val inputState = currentInputState()
         val surface = currentSurface(inputState)
+        val reasoningEffort = getResolvedReasoningEffort()
         duckChatPixels.firePromptSubmitted(
             selectedTool = selectedToolParam,
             modelId = getSelectedModelId(),
-            reasoningEffort = getResolvedReasoningEffort(),
+            reasoningEffort = reasoningEffort,
             hasImageAttachment = hasImageAttachment,
             hasFileAttachment = hasFileAttachment,
             hasText = hasText,
@@ -327,6 +331,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             Tool.WEB_SEARCH -> duckChatPixels.fireWebSearchSubmitted(surface)
             null -> {}
         }
+        activeDuckAiTabId(surface)?.let { responseWaitWideEvent.onNativePromptSubmitted(it, reasoningEffort, rawTool) }
     }
 
     fun fireSentPromptInChat() = duckChatPixels.fireSentPromptInChat(currentSurface())
@@ -335,7 +340,14 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     fun fireVoiceSearchTapped() = duckChatPixels.fireVoiceSearchTapped(currentSurface())
 
-    fun fireStopGenerationTapped() = duckChatPixels.fireStopGenerationTapped(currentSurface())
+    fun fireStopGenerationTapped() {
+        val surface = currentSurface()
+        duckChatPixels.fireStopGenerationTapped(surface)
+        activeDuckAiTabId(surface)?.let { responseWaitWideEvent.onStopTapped(it) }
+    }
+
+    private fun activeDuckAiTabId(surface: DuckChatPixelSurface): String? =
+        activeTabId.value?.takeIf { surface == DuckChatPixelSurface.DUCK_AI && it.isNotEmpty() }
 
     fun fireClearPressed(isSearchMode: Boolean) = duckChatPixels.fireOmnibarClearButtonPressed(isSearchMode)
     fun fireKeyboardGoPressed(isSearchMode: Boolean) = duckChatPixels.fireOmnibarKeyboardGoPressed(isSearchMode)
