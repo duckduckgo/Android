@@ -165,6 +165,60 @@
                     app:layout_constraintStart_toStartOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/tabChatItemVoice"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/background_duck_ai_tab_card_voice"
+                android:padding="@dimen/keyline_2"
+                android:theme="@style/Theme.DuckDuckGo.Dark"
+                android:visibility="gone">
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/tabChatItemVoiceTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_1"
+                    android:drawablePadding="@dimen/keyline_1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="@string/duckAiTabCardListeningTitle"
+                    app:drawableStartCompat="@drawable/ic_microphone_16"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:textType="primary"
+                    app:typography="h3" />
+
+                <ImageView
+                    android:id="@+id/tabChatItemVoiceFace"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginVertical="@dimen/keyline_1"
+                    android:importantForAccessibility="no"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/duck_ai_voice_face"
+                    app:layout_constraintBottom_toTopOf="@id/tabChatItemVoiceType"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tabChatItemVoiceTitle" />
+
+                <com.duckduckgo.common.ui.view.Chip
+                    android:id="@+id/tabChatItemVoiceType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_duck_ai_tab_card_chat_type"
+                    android:drawablePadding="@dimen/keyline_2"
+                    android:paddingHorizontal="@dimen/keyline_3"
+                    android:paddingVertical="@dimen/keyline_2"
+                    android:text="@string/duckAiTabCardVoiceChatTypeLabel"
+                    android:textAppearance="@style/Typography.DuckDuckGo.Caption"
+                    android:textColor="?attr/daxColorPrimaryText"
+                    app:drawableStartCompat="@drawable/ic_chat_16"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
             <ImageView
                 android:id="@+id/tabChatItemEmptyLogo"
                 android:layout_width="wrap_content"
@@ -173,16 +227,6 @@
                 android:importantForAccessibility="no"
                 android:src="@drawable/duckduckgo_duckai_96"
                 android:visibility="gone" />
-
-            <ImageView
-                android:id="@+id/voiceActive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:importantForAccessibility="no"
-                android:src="@drawable/ic_ai_chat_voice_24"
-                android:visibility="gone"
-                app:tint="?attr/daxColorAccentBlue" />
         </FrameLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
