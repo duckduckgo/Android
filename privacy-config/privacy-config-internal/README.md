@@ -58,7 +58,7 @@ command retry, polling, or new periodic work; the existing hourly worker is unch
 The override is persistent: it remains until a RESET or a manual Developer Settings
 change, including across app restarts.
 
-Serve `generated/v5/android-config.json` from `duckduckgo/privacy-configuration`
+Serve `generated/v6/android-config.json` from `duckduckgo/privacy-configuration`
 (after running `node index.js`) with `Cache-Control: no-store` so subsequent commands
 fetch your latest file.
 
