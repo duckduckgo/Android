@@ -24,6 +24,7 @@ import android.view.LayoutInflater
 import android.view.TouchDelegate
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.ImageView
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -162,7 +163,7 @@ class DuckAiTabGridCardView(
         }
     }
 
-    // A missing or undecodable image falls back to the empty look.
+    // A missing or undecodable image shows the Duck.ai logo in its place, keeping the title and label.
     private fun loadThumbnail(content: RealDuckAiTabGridItemContent.ImageChat) {
         if (binding.thumbnail.drawable != null) return
         thumbnailJob += coroutineScope.launch(dispatchers.main()) {
@@ -170,11 +171,14 @@ class DuckAiTabGridCardView(
                 thumbnailLoader(content.fileRef, content.mode)?.let { decodeSampled(it) }
             }
             if (boundContent != content) return@launch
-            if (bitmap != null) {
-                binding.thumbnail.setImageBitmap(bitmap)
-            } else {
-                binding.tabChatItemDetails.gone()
-                binding.tabChatItemEmptyLogo.show()
+            with(binding.thumbnail) {
+                if (bitmap != null) {
+                    scaleType = ImageView.ScaleType.CENTER_CROP
+                    setImageBitmap(bitmap)
+                } else {
+                    scaleType = ImageView.ScaleType.CENTER_INSIDE
+                    setImageResource(CommonR.drawable.duckduckgo_duckai_96)
+                }
             }
         }
     }
