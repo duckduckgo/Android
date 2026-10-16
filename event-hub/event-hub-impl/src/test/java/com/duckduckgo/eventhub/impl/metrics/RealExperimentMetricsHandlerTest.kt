@@ -209,6 +209,19 @@ class RealExperimentMetricsHandlerTest {
     }
 
     @Test
+    fun `a failure reading one experiment's settings skips only that experiment`() = runTest {
+        val unreadable = object : Toggle by cssExperiments.contentScopeExperiment1().withSettings(captchaMetric()) {
+            override fun getSettings(): String = throw IllegalStateException("store unavailable")
+        }
+        contentScopeExperiments.active += unreadable
+        activate(cssExperiments.contentScopeExperiment2(), captchaMetric())
+
+        handler.onEvent("captchaDetected")
+
+        assertEquals(listOf("contentScopeExperiment2"), metricsExtension.sentMetrics.map { it.toggle.featureName().name })
+    }
+
+    @Test
     fun `an experiment without settings sends nothing`() = runTest {
         activate(cssExperiments.contentScopeExperiment1(), settings = null)
 

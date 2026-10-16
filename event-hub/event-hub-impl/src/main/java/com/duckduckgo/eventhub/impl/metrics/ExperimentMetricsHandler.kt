@@ -23,6 +23,7 @@ import com.duckduckgo.feature.toggles.api.ConversionWindow
 import com.duckduckgo.feature.toggles.api.MetricType
 import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.send
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
@@ -53,6 +54,9 @@ class RealExperimentMetricsHandler @Inject constructor(
     // metric can lose a count or fire twice
     private val mutex = Mutex()
 
+    // Only used under [mutex]
+    private val definitions = MetricDefinitionsCache()
+
     override suspend fun onEvent(eventType: String) {
         mutex.withLock {
             val experiments = try {
@@ -64,7 +68,14 @@ class RealExperimentMetricsHandler @Inject constructor(
                 return
             }
             for (experiment in experiments) {
-                val metrics = experiment.getSettings()?.let(ExperimentMetricsConfigParser::parse).orEmpty()
+                val metrics = try {
+                    definitions.of(experiment.featureName(), experiment.getSettings())
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    logcat(WARN) { "EventHub: failed to read metrics of ${experiment.featureName().name}: ${e.message}" }
+                    continue
+                }
                 for (metric in metrics.filter { it.event == eventType }) {
                     for ((threshold, windows) in metric.windowsByThreshold) {
                         logcat(VERBOSE) { "EventHub: metric ${metric.name} on ${experiment.featureName().name}, threshold $threshold" }
@@ -98,5 +109,27 @@ class RealExperimentMetricsHandler @Inject constructor(
             toggle = experiment,
             type = MetricType.COUNT_WHEN_IN_WINDOW,
         ).send()
+    }
+}
+
+/**
+ * Parsed metric definitions per experiment, reused while its settings are unchanged. Settings can be large and are read on
+ * every event, and the store hands back the same string until a new config is saved, so the comparison is usually by
+ * reference. A new config is picked up on the next read, with nothing to invalidate. Not thread-safe.
+ */
+internal class MetricDefinitionsCache(
+    private val parse: (String) -> List<MetricDefinition> = ExperimentMetricsConfigParser::parse,
+) {
+    private class Entry(val settings: String, val definitions: List<MetricDefinition>)
+
+    private val entries = mutableMapOf<FeatureName, Entry>()
+
+    fun of(experiment: FeatureName, settings: String?): List<MetricDefinition> {
+        if (settings == null) {
+            entries.remove(experiment)
+            return emptyList()
+        }
+        entries[experiment]?.takeIf { it.settings == settings }?.let { return it.definitions }
+        return parse(settings).also { entries[experiment] = Entry(settings, it) }
     }
 }
