@@ -492,4 +492,31 @@ class RealBrokerStepsParserTest {
 
         assertTrue(testee.parseStep(testBroker, json, null).isEmpty())
     }
+
+    @Test
+    fun whenParseStepWithClickChoicesAndNoElementsThenReturnScanStepWithClick() = runTest {
+        val json = """
+            {
+                "stepType": "scan", "scanType": "automated",
+                "actions": [
+                    {
+                        "actionType": "click",
+                        "id": "click-1",
+                        "choices": [
+                            {
+                                "condition": {"operation": "==", "left": "${'$'}{state}", "right": "al"},
+                                "elements": [{"type": "button", "selector": "//a[contains(@href, '/al/')]"}]
+                            }
+                        ]
+                    }
+                ]
+            }
+        """.trimIndent()
+
+        val result = testee.parseStep(testBroker, json, null)
+
+        val click = result.filterIsInstance<ScanStep>().single().step.actions.single()
+        assertTrue(click is BrokerAction.Click)
+        assertEquals("click-1", click.id)
+    }
 }
