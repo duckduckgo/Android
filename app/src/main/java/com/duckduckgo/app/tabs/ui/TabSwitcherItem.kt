@@ -17,10 +17,12 @@
 package com.duckduckgo.app.tabs.ui
 
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemContent
 
 sealed class TabSwitcherItem(val id: String) {
     sealed class Tab(val tabEntity: TabEntity) : TabSwitcherItem(tabEntity.tabId) {
         abstract val title: String
+        open val duckAiGridItemContent: DuckAiTabGridItemContent? = null
 
         data class NormalTab(
             private val entity: TabEntity,
@@ -33,12 +35,14 @@ sealed class TabSwitcherItem(val id: String) {
             val isSelected: Boolean,
             val isDuckAi: Boolean = false,
             override val title: String = "",
+            override val duckAiGridItemContent: DuckAiTabGridItemContent? = null,
         ) : Tab(entity)
 
         data class DuckAiTab(
             private val entity: TabEntity,
             val isActive: Boolean,
             override val title: String = "",
+            override val duckAiGridItemContent: DuckAiTabGridItemContent? = null,
         ) : Tab(entity)
 
         val isNewTabPage: Boolean

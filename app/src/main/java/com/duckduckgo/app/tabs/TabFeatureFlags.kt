@@ -52,4 +52,10 @@ interface TabManagerFeatureFlags {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun duckAiChatsMenu(): Toggle
+
+    /**
+     * Shows Duck.ai tabs in the tab switcher grid as a rich card instead of the tab preview.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun richDuckAiGridTabItem(): Toggle
 }

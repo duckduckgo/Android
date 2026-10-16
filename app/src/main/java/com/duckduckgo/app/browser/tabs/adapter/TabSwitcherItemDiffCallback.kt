@@ -46,7 +46,8 @@ class TabSwitcherItemDiffCallback(
                     oldItem.tabEntity.title == newItem.tabEntity.title &&
                     oldItem.tabEntity.url == newItem.tabEntity.url &&
                     (oldItem as? SelectableTab)?.isSelected == (newItem as? SelectableTab)?.isSelected &&
-                    (oldItem as? SelectableTab)?.isDuckAi == (newItem as? SelectableTab)?.isDuckAi
+                    (oldItem as? SelectableTab)?.isDuckAi == (newItem as? SelectableTab)?.isDuckAi &&
+                    oldItem.duckAiGridItemContent == newItem.duckAiGridItemContent
             }
             else -> false
         }
@@ -61,6 +62,12 @@ class TabSwitcherItemDiffCallback(
         }
 
         if ((oldItem as? SelectableTab)?.isDuckAi != (newItem as? SelectableTab)?.isDuckAi) {
+            return null
+        }
+
+        val oldHasDuckAiGridItemContent = (oldItem as? TabSwitcherItem.Tab)?.duckAiGridItemContent != null
+        val newHasDuckAiGridItemContent = (newItem as? TabSwitcherItem.Tab)?.duckAiGridItemContent != null
+        if (oldHasDuckAiGridItemContent != newHasDuckAiGridItemContent) {
             return null
         }
 
@@ -87,6 +94,10 @@ class TabSwitcherItemDiffCallback(
                 if ((oldItem as? SelectableTab)?.isSelected != (newItem as? SelectableTab)?.isSelected) {
                     diffBundle.putString(DIFF_KEY_SELECTION, null)
                 }
+
+                if (oldItem.duckAiGridItemContent != newItem.duckAiGridItemContent) {
+                    diffBundle.putString(DIFF_KEY_DUCK_AI_GRID_ITEM_CONTENT, null)
+                }
             }
             oldItem is TabSwitcherItem.TrackersAnimationInfoPanel && newItem is TabSwitcherItem.TrackersAnimationInfoPanel -> {
                 diffBundle.putFloat(
@@ -106,5 +117,6 @@ class TabSwitcherItemDiffCallback(
         const val DIFF_KEY_VIEWED = "viewed"
         const val DIFF_ALPHA = "alpha"
         const val DIFF_KEY_SELECTION = "selection"
+        const val DIFF_KEY_DUCK_AI_GRID_ITEM_CONTENT = "duckAiGridItemContent"
     }
 }
