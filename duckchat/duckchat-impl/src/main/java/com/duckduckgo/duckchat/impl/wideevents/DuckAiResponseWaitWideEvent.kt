@@ -152,6 +152,10 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
                 else -> reconcileOnScreen(appClosed = action is Action.AppClosed)
             }
         }
+        if (action is Action.AppClosed) {
+            pendingExit = null
+            newChatTabId = null
+        }
         val previousTabId = previousTab?.tabId
         if (previousTabId != null && previousTab != selectedTab) clearIntents(previousTabId)
     }
@@ -162,8 +166,6 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
             Action.AppClosed -> {
                 appOpen = false
                 launchResolved = false
-                pendingExit = null
-                newChatTabId = null
             }
             is Action.LaunchLandingResolved -> if (appOpen) {
                 launchResolved = true
@@ -214,12 +216,12 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
     private fun resolveLeftVia(flow: ResponseWait, appClosed: Boolean): String {
         val current = selectedTab
         val sameTab = current?.tabId == flow.tabId
+        val pendingTrigger = pendingExit?.takeIf { it.tabId == flow.tabId }?.trigger
         return when {
-            appClosed -> LEFT_VIA_APP_BACKGROUNDED
-            sameTab && current?.chatId != null && current.chatId != flow.chatId -> LEFT_VIA_CHAT_SWITCHED
-            newChatTabId == flow.tabId -> LEFT_VIA_CHAT_SWITCHED
-            else -> pendingExit?.takeIf { it.tabId == flow.tabId }?.trigger?.name?.lowercase()
-                ?: if (sameTab) LEFT_VIA_OTHER_NAVIGATION else LEFT_VIA_TAB_SWITCHED
+            appClosed -> if (pendingTrigger == DuckAiSessionExitTrigger.BACK_OR_CLOSE) LEFT_VIA_BACK_OR_CLOSE else LEFT_VIA_APP_BACKGROUNDED
+            // The flow only leaves when it no longer matches, so the same tab still on Duck.ai shows another or a new chat.
+            sameTab && (current?.isDuckAi == true || newChatTabId == flow.tabId) -> LEFT_VIA_CHAT_SWITCHED
+            else -> pendingTrigger?.name?.lowercase() ?: if (sameTab) LEFT_VIA_OTHER_NAVIGATION else LEFT_VIA_TAB_SWITCHED
         }
     }
 
@@ -431,6 +433,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         const val STATE_LOADING = "loading"
 
         const val LEFT_VIA_APP_BACKGROUNDED = "app_backgrounded"
+        const val LEFT_VIA_BACK_OR_CLOSE = "back_or_close"
         const val LEFT_VIA_CHAT_SWITCHED = "chat_switched"
         const val LEFT_VIA_TAB_SWITCHED = "tab_switched"
         const val LEFT_VIA_OTHER_NAVIGATION = "other_navigation"
