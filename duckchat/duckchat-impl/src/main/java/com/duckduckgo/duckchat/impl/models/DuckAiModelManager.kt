@@ -26,11 +26,9 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.store.SelectedModel
-import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -90,8 +88,7 @@ interface DuckAiModelManager {
 }
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = DuckAiModelManager::class)
-@ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
+@ContributesBinding(AppScope::class)
 class RealDuckAiModelManager @Inject constructor(
     private val modelsService: DuckAiModelsService,
     private val dataStore: DuckChatDataStore,
@@ -102,7 +99,7 @@ class RealDuckAiModelManager @Inject constructor(
     private val cookiesManager: CookieManagerProvider,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-) : DuckAiModelManager, PrivacyConfigCallbackPlugin {
+) : DuckAiModelManager {
 
     private val _modelState = MutableStateFlow(ModelState())
     override val modelState: StateFlow<ModelState> = _modelState.asStateFlow()
@@ -129,22 +126,21 @@ class RealDuckAiModelManager @Inject constructor(
             }
             // Status as well as entitlements: signing in or out changes whether the response carries
             // model labels, and entitlements stay empty either way when there is no subscription.
+            val duckAiEnabled = combine(
+                duckChatFeature.get().self().enabled(),
+                dataStore.observeDuckChatUserEnabled(),
+            ) { featureEnabled, userEnabled -> featureEnabled && userEnabled }
             combine(
                 subscriptions.getEntitlements(),
                 subscriptions.getSubscriptionStatusFlow(),
-                dataStore.observeDuckChatUserEnabled(),
-            ) { entitlements, status, userEnabled -> Triple(entitlements, status, userEnabled) }
+                duckAiEnabled,
+            ) { entitlements, status, enabled -> Triple(entitlements, status, enabled) }
                 .distinctUntilChanged()
                 .collect {
                     logcat { "Duck.ai Model Manager: subscription or Duck.ai state changed, re-fetching models" }
                     fetchModels()
                 }
         }
-    }
-
-    override fun onPrivacyConfigDownloaded() {
-        if (_modelState.value.models.isNotEmpty()) return
-        appCoroutineScope.launch(dispatcherProvider.io()) { fetchModels() }
     }
 
     /**

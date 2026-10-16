@@ -26,7 +26,9 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.store.SelectedModel
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.internal.CachedToggleStore
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.model.Entitlement
@@ -34,7 +36,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -70,7 +71,11 @@ class RealDuckAiModelManagerTest {
     private val entitlementFlow = MutableSharedFlow<Set<Entitlement>>()
     private val subscriptionStatusFlow = MutableStateFlow(SubscriptionStatus.UNKNOWN)
     private val duckChatUserEnabledFlow = MutableStateFlow(true)
-    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
+    private val duckChatFeature = FakeFeatureToggleFactory.create(
+        DuckChatFeature::class.java,
+        store = CachedToggleStore(FakeToggleStore()),
+        ioDispatcher = coroutineRule.testDispatcher,
+    )
     private val duckChatPixels: DuckChatPixels = mock()
 
     private lateinit var testee: RealDuckAiModelManager
@@ -175,37 +180,6 @@ class RealDuckAiModelManagerTest {
         testee.fetchModels()
 
         verify(modelsService, never()).getModels(any(), anyOrNull(), anyOrNull())
-    }
-
-    @Test
-    fun whenPrivacyConfigDownloadedWithNoModelsThenModelsFetched() = runTest {
-        whenever(dataStore.getSelectedModel()).thenReturn(null)
-        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
-            AIChatModelsResponse(listOf(remoteModel("id1", accessTier = listOf("free"), entityHasAccess = true))),
-        )
-
-        testee = createManager()
-        testee.onPrivacyConfigDownloaded()
-        coroutineRule.testScope.advanceUntilIdle()
-
-        assertEquals(1, testee.modelState.value.models.size)
-    }
-
-    @Test
-    fun whenPrivacyConfigDownloadedWithModelsLoadedThenModelsNotRefetched() = runTest {
-        whenever(dataStore.getSelectedModel()).thenReturn(null)
-        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
-            AIChatModelsResponse(listOf(remoteModel("id1", accessTier = listOf("free"), entityHasAccess = true))),
-        )
-
-        testee = createManager()
-        testee.fetchModels()
-        testee.onPrivacyConfigDownloaded()
-        coroutineRule.testScope.advanceUntilIdle()
-
-        verify(modelsService, times(1)).getModels(any(), anyOrNull(), anyOrNull())
     }
 
     @Test
@@ -836,6 +810,44 @@ class RealDuckAiModelManagerTest {
         subscriptionStatusFlow.value = SubscriptionStatus.AUTO_RENEWABLE
 
         verify(modelsService, times(2)).getModels(any(), anyOrNull(), anyOrNull())
+    }
+
+    @Test
+    fun whenDuckAiFeatureTurnsOnThenModelsFetched() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(listOf(remoteModel("id", accessTier = listOf("free"), entityHasAccess = true))),
+        )
+        duckChatFeature.self().setRawStoredState(Toggle.State(enable = false))
+
+        testee = createManager()
+        entitlementFlow.emit(emptySet())
+        verify(modelsService, never()).getModels(any(), anyOrNull(), anyOrNull())
+
+        duckChatFeature.self().setRawStoredState(Toggle.State(enable = true))
+
+        verify(modelsService).getModels(any(), anyOrNull(), anyOrNull())
+    }
+
+    @Test
+    fun whenUserEnablesDuckAiThenModelsFetched() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(listOf(remoteModel("id", accessTier = listOf("free"), entityHasAccess = true))),
+        )
+        dataStore.stub { onBlocking { isDuckChatUserEnabled() }.thenReturn(false) }
+        duckChatUserEnabledFlow.value = false
+
+        testee = createManager()
+        entitlementFlow.emit(emptySet())
+        verify(modelsService, never()).getModels(any(), anyOrNull(), anyOrNull())
+
+        dataStore.stub { onBlocking { isDuckChatUserEnabled() }.thenReturn(true) }
+        duckChatUserEnabledFlow.value = true
+
+        verify(modelsService).getModels(any(), anyOrNull(), anyOrNull())
     }
 
     @Test
