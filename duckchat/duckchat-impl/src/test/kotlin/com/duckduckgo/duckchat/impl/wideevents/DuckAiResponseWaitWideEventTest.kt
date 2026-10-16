@@ -277,6 +277,50 @@ class DuckAiResponseWaitWideEventTest {
     }
 
     @Test
+    fun `when new chat opened in a new tab then left_via new_tab_opened`() = runTest {
+        promptInChat(tabId = "t1", chatId = "A")
+
+        testee.onNewChatCreated("t1")
+        testee.onExitIntent("t1", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+        onChat("t2", null)
+        idle()
+
+        verify(wideEventClient).flowStep(eq(1L), eq("left"), eq(true), eq(mapOf("left_via" to "new_tab_opened")))
+    }
+
+    @Test
+    fun `when same tab shows Duck ai without a chat id then left_via chat_switched`() = runTest {
+        promptInChat(tabId = "t1", chatId = "A")
+
+        testee.onSelectedTabChanged("t1", DUCK_AI_URL)
+        idle()
+
+        verify(wideEventClient).flowStep(eq(1L), eq("left"), eq(true), eq(mapOf("left_via" to "chat_switched")))
+    }
+
+    @Test
+    fun `when back exits the app then left_via back_or_close`() = runTest {
+        promptInChat()
+
+        testee.onExitIntent("t1", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
+        testee.onClose()
+        idle()
+
+        verify(wideEventClient).flowStep(eq(1L), eq("left"), eq(true), eq(mapOf("left_via" to "back_or_close")))
+    }
+
+    @Test
+    fun `when app closes with a non-back exit intent pending then left_via app_backgrounded`() = runTest {
+        promptInChat()
+
+        testee.onExitIntent("t1", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+        testee.onClose()
+        idle()
+
+        verify(wideEventClient).flowStep(eq(1L), eq("left"), eq(true), eq(mapOf("left_via" to "app_backgrounded")))
+    }
+
+    @Test
     fun `when chat switched while loading then ready from that tab does not touch the old flow`() = runTest {
         promptInChat(chatId = "A")
         onChat("t1", "B")
