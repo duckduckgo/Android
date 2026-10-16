@@ -56,15 +56,16 @@ import com.duckduckgo.app.onboarding.ui.page.welcome.engine.CardAnchorResolver
 import com.duckduckgo.app.onboarding.ui.page.welcome.engine.ContentControllerImpl
 import com.duckduckgo.app.onboarding.ui.page.welcome.engine.EmbellishmentControllerImpl
 import com.duckduckgo.app.onboarding.ui.page.welcome.engine.SettledDecoration
-import com.duckduckgo.app.onboarding.ui.page.welcome.engine.StepIndicatorControllerImpl
 import com.duckduckgo.common.ui.compose.onboarding.DaxOnboardingDialog
 import com.duckduckgo.common.ui.compose.onboarding.DaxOnboardingDialogCta
 import com.duckduckgo.common.ui.compose.onboarding.DaxOnboardingDialogDefaults
 import com.duckduckgo.common.ui.compose.onboarding.DaxOnboardingDialogState
+import com.duckduckgo.common.ui.compose.onboarding.DaxOnboardingDialogStep
 import com.duckduckgo.common.ui.compose.onboarding.DaxOnboardingDialogTail
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.theme.OnboardingTheme
 import com.duckduckgo.onboarding.api.LinearOnboardingStepId
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -112,7 +113,7 @@ class ComposeOnboardingDialogRenderer(
     private val background = BackgroundControllerImpl(
         OnboardingBackgroundAnimator(binding.backgroundPrimary, binding.backgroundSecondary),
     )
-    private val stepIndicator = StepIndicatorControllerImpl(binding.daxDialogCta.stepIndicator)
+
     // Detach callbacks still have a WindowId; Fragment.onDestroyView runs after it is cleared.
     private val boundsDetachListener = object : View.OnAttachStateChangeListener {
         override fun onViewAttachedToWindow(view: View) = Unit
@@ -128,6 +129,7 @@ class ComposeOnboardingDialogRenderer(
 
     init {
         binding.daxDialogCta.cardView.isVisible = false
+        binding.daxDialogCta.stepIndicator.isVisible = false
         binding.daxDialogCta.root.addView(composeView)
         embellishments.resetStage()
         composeView.setContent {
@@ -139,6 +141,14 @@ class ComposeOnboardingDialogRenderer(
                         title = bound.title,
                         state = dialogState,
                         animate = bound.animate,
+                        step = bound.config.stepIndicator?.let { progress ->
+                            val total = progress.total.coerceAtLeast(1)
+                            val current = progress.current.coerceIn(1, total)
+                            val labels = (1..total).map {
+                                composeView.context.getString(R.string.onboardingStepIndicatorText, it, total)
+                            }.toImmutableList()
+                            DaxOnboardingDialogStep(current, labels)
+                        },
                         entryDelay = if (bound.config.cardEntry == CardEntry.AfterBackgroundTransition) {
                             OnboardingBackgroundAnimator.EXIT_DURATION.milliseconds
                         } else {
@@ -191,7 +201,6 @@ class ComposeOnboardingDialogRenderer(
         endBoundsTransition()
 
         background.apply(previous?.config?.background, config.background, animate)
-        stepIndicator.apply(previous?.config?.stepIndicator, config.stepIndicator, animate)
         if (previous?.stepId == stepId && previous.config.content == config.content) {
             previous.config = config
             previous.animate = animate
@@ -209,7 +218,6 @@ class ComposeOnboardingDialogRenderer(
         dialogState.skip()
         background.skipRunning()
         embellishments.skipRunning()
-        stepIndicator.skipRunning()
         current?.afterFade?.end()
     }
 
@@ -224,7 +232,6 @@ class ComposeOnboardingDialogRenderer(
         binding.daxDialogCta.root.removeView(composeView)
         background.release()
         embellishments.release()
-        stepIndicator.release()
     }
 
     private fun endBoundsTransition() {
@@ -363,7 +370,6 @@ class ComposeOnboardingDialogRenderer(
             if (!animated) {
                 background.skipRunning()
                 embellishments.skipRunning()
-                stepIndicator.skipRunning()
             }
             gate.setReady(true)
             val animator = handle.afterFade?.invoke()
