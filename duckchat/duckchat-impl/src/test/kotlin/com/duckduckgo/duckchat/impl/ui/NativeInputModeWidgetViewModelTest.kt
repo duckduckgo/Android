@@ -1966,6 +1966,23 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenEditedPromptSubmittedThenResponseWaitIsNotCalled() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configureForEdit(sessionId = "session-1")
+        advanceUntilIdle()
+
+        viewModel.fireSubmissionPixels(
+            hasText = true,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+        )
+        viewModel.fireStopGenerationTapped()
+
+        verifyNoInteractions(responseWaitWideEvent)
+    }
+
+    @Test
     fun whenStopTappedInDuckAiTabThenResponseWaitGetsOnStopTapped() = runTest {
         val viewModel = createViewModel()
         viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
