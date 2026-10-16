@@ -78,6 +78,8 @@ interface ContextualNativeInputManager {
         onPageContextRemoved: () -> Unit = {},
         onVoiceChatRequested: () -> Unit = {},
         onVoiceSearchRequested: () -> Unit = {},
+        onInputFocusChanged: (Boolean) -> Unit = {},
+        onInputVisibilityChanged: (Boolean) -> Unit = {},
     )
 
     fun onWebViewMode()
@@ -115,6 +117,7 @@ class RealContextualNativeInputManager @Inject constructor(
     private var jsMessaging: JsMessaging? = null
     private var widget: NativeInputModeWidget? = null
     private var lastMode: Mode? = null
+    private var onInputVisibilityChanged: (Boolean) -> Unit = {}
     private val modelPickerEnabled = MutableStateFlow(true)
 
     private enum class Mode { WEBVIEW, INPUT }
@@ -135,18 +138,21 @@ class RealContextualNativeInputManager @Inject constructor(
         onPageContextRemoved: () -> Unit,
         onVoiceChatRequested: () -> Unit,
         onVoiceSearchRequested: () -> Unit,
+        onInputFocusChanged: (Boolean) -> Unit,
+        onInputVisibilityChanged: (Boolean) -> Unit,
     ) {
         this.card = card
         this.footer = footer
         this.jsMessaging = jsMessaging
         this.widget = widget
+        this.onInputVisibilityChanged = onInputVisibilityChanged
 
         applyCardShape(card)
         setupWidget(
             tabId, widget, chatIdFlow, onSearchSubmitted,
             onCameraCaptureRequested, onFilePickerRequested,
             onPromptSubmitted, onAskAboutPage, onPageContextRemoved,
-            onVoiceChatRequested, onVoiceSearchRequested,
+            onVoiceChatRequested, onVoiceSearchRequested, onInputFocusChanged,
         )
         observeNativeInputSetting(lifecycleOwner)
         observeVoiceChatEntry(widget, lifecycleOwner)
@@ -207,6 +213,7 @@ class RealContextualNativeInputManager @Inject constructor(
             card?.gone()
         }
         footer?.setSurfaceVisible(visible)
+        onInputVisibilityChanged(visible)
     }
 
     private fun applyCardShape(card: MaterialCardView) {
@@ -232,6 +239,7 @@ class RealContextualNativeInputManager @Inject constructor(
         onPageContextRemoved: () -> Unit,
         onVoiceChatRequested: () -> Unit,
         onVoiceSearchRequested: () -> Unit,
+        onInputFocusChanged: (Boolean) -> Unit,
     ) {
         widget.configureContextual(tabId)
         widget.bindTextSelections(tabId, textSelection = null)
@@ -239,6 +247,10 @@ class RealContextualNativeInputManager @Inject constructor(
         widget.bindModelPickerEnabledSource(modelPickerEnabled)
         widget.hideMainButtons()
         widget.onStopTapped = ::sendStopEvent
+        widget.onInputFocusChanged = { focused ->
+            sendInputFocusedEvent(focused)
+            onInputFocusChanged(focused)
+        }
         widget.onVoiceChatClick = onVoiceChatRequested
         widget.onVoiceSearchClick = onVoiceSearchRequested
         widget.bindAttachmentCallbacks(
@@ -321,6 +333,16 @@ class RealContextualNativeInputManager @Inject constructor(
                 featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
                 subscriptionName = "submitStartUsingWeeklyLimitAction",
                 params = JSONObject().put("platform", "android"),
+            ),
+        )
+    }
+
+    private fun sendInputFocusedEvent(focused: Boolean) {
+        jsMessaging?.sendSubscriptionEvent(
+            SubscriptionEventData(
+                featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
+                subscriptionName = "submitNativeInputFocused",
+                params = JSONObject().put("focused", focused),
             ),
         )
     }

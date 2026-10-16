@@ -35,4 +35,5 @@ enum class DuckChatHistorySource {
     ADDRESS_BAR,
     CONTEXTUAL_CHAT,
     SIDEBAR,
+    TAB_SWITCHER,
 }

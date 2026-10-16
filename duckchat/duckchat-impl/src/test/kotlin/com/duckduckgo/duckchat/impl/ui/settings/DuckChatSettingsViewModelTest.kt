@@ -395,35 +395,10 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun whenDuckChatSearchAISettingsClickedAndEmbeddedEnabledAndHideAiGeneratedImagesDisabledThenOpenSettingsLinkWithLegacyLink() =
+    fun whenDuckChatSearchAISettingsClickedAndEmbeddedEnabledThenOpenSettingsLinkWithNewLink() =
         runTest {
             @Suppress("DenyListedApi")
             settingsPageFeature.embeddedSettingsWebView().setRawStoredState(State(enable = true))
-            @Suppress("DenyListedApi")
-            duckChatFeature.showHideAiGeneratedImages().setRawStoredState(State(enable = false))
-
-            testee.duckChatSearchAISettingsClicked()
-
-            testee.commands.test {
-                val command = awaitItem()
-                assertTrue(command is OpenLink)
-                command as OpenLink
-                assertEquals(
-                    DuckChatSettingsViewModel.LEGACY_DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED,
-                    command.link,
-                )
-                assertEquals(R.string.duck_chat_assist_settings_title, command.titleRes)
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
-    @Test
-    fun whenDuckChatSearchAISettingsClickedAndEmbeddedEnabledAndHideAiGeneratedImagesEnabledThenOpenSettingsLinkWithNewLink() =
-        runTest {
-            @Suppress("DenyListedApi")
-            settingsPageFeature.embeddedSettingsWebView().setRawStoredState(State(enable = true))
-            @Suppress("DenyListedApi")
-            duckChatFeature.showHideAiGeneratedImages().setRawStoredState(State(enable = true))
 
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
@@ -516,54 +491,6 @@ class DuckChatSettingsViewModelTest {
                 val command = awaitItem()
                 assertTrue(command is LaunchFeedback)
                 cancelAndIgnoreRemainingEvents()
-            }
-        }
-
-    @Test
-    fun `when hideAiGeneratedImagesOption is enabled then viewState shows option visible`() =
-        runTest {
-            @Suppress("DenyListedApi")
-            duckChatFeature.showHideAiGeneratedImages().setRawStoredState(State(enable = true))
-            testee = DuckChatSettingsViewModel(
-                duckChatActivityParams = DuckChatSettingsNoParams,
-                duckChat = duckChat,
-                pixel = mockPixel,
-                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
-                settingsPageFeature = settingsPageFeature,
-                duckChatPixels = mockDuckChatPixels,
-                dispatcherProvider = coroutineRule.testDispatcherProvider,
-                duckChatFeature = duckChatFeature,
-                serpSettingsDataProvider = serpSettingsDataProvider,
-                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
-            )
-
-            testee.viewState.test {
-                val state = awaitItem()
-                assertTrue(state.isHideGeneratedImagesOptionVisible)
-            }
-        }
-
-    @Test
-    fun `when hideAiGeneratedImagesOption is disabled then viewState shows option not visible`() =
-        runTest {
-            @Suppress("DenyListedApi")
-            duckChatFeature.showHideAiGeneratedImages().setRawStoredState(State(enable = false))
-            testee = DuckChatSettingsViewModel(
-                duckChatActivityParams = DuckChatSettingsNoParams,
-                duckChat = duckChat,
-                pixel = mockPixel,
-                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
-                settingsPageFeature = settingsPageFeature,
-                duckChatPixels = mockDuckChatPixels,
-                dispatcherProvider = coroutineRule.testDispatcherProvider,
-                duckChatFeature = duckChatFeature,
-                serpSettingsDataProvider = serpSettingsDataProvider,
-                subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
-            )
-
-            testee.viewState.test {
-                val state = awaitItem()
-                assertFalse(state.isHideGeneratedImagesOptionVisible)
             }
         }
 

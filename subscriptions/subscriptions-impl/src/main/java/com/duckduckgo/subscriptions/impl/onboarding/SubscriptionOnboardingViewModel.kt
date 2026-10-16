@@ -70,7 +70,6 @@ class SubscriptionOnboardingViewModel @Inject constructor(
         data class ShowStep(val stepPlugin: SubscriptionOnboardingStepPlugin) : Command
         data class RunHandoff(val action: () -> Unit) : Command
         data object FinishToSettings : Command
-        data object Finish : Command
     }
 
     data class ToolbarState(
@@ -152,7 +151,7 @@ class SubscriptionOnboardingViewModel @Inject constructor(
             }
             SubscriptionOnboardingController.Event.Exit -> {
                 cancelHandoff()
-                _commands.send(Command.Finish)
+                _commands.send(Command.FinishToSettings)
             }
         }
     }

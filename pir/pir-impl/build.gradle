@@ -37,6 +37,7 @@ dependencies {
     implementation project(':navigation-api')
     implementation project(':network-protection-api')
     implementation project(':remote-messaging-api')
+    implementation project(':settings-api')
     implementation project(':subscriptions-api')
     implementation project(':statistics-api')
     implementation project(':tracker-detection-api')

@@ -19,23 +19,15 @@ package com.duckduckgo.app.onboarding.ui
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint
-import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.BrandDesignUpdateDefaultBrowserPageBlueprint
-import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.BrandDesignUpdateWelcomePageBlueprint
-import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.ConfigDrivenWelcomePageBlueprint
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.DefaultBrowserBlueprint
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.WelcomePageBlueprint
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdateDefaultBrowserPage
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdateWelcomePage
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
-import com.duckduckgo.app.onboarding.ui.page.WelcomePage
-import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenWelcomePageFragment
+import com.duckduckgo.app.onboarding.ui.page.welcome.WelcomePageFragment
 
 interface OnboardingPageManager {
     fun pageCount(): Int
     fun buildPageBlueprints()
-    fun buildBrandDesignUpdatePageBlueprints()
-    fun buildConfigDrivenPageBlueprints()
     fun buildPage(position: Int): OnboardingPageFragment?
 }
 
@@ -51,27 +43,9 @@ class OnboardingPageManagerWithTrackerBlocking(
 
     override fun buildPageBlueprints() {
         pages.clear()
-
-        pages.add(WelcomePageBlueprint)
-
+        pages += WelcomePageBlueprint
         if (shouldShowDefaultBrowserPage()) {
-            pages.add((DefaultBrowserBlueprint))
-        }
-    }
-
-    override fun buildBrandDesignUpdatePageBlueprints() {
-        pages.clear()
-        pages += BrandDesignUpdateWelcomePageBlueprint
-        if (shouldShowDefaultBrowserPage()) {
-            pages += BrandDesignUpdateDefaultBrowserPageBlueprint
-        }
-    }
-
-    override fun buildConfigDrivenPageBlueprints() {
-        pages.clear()
-        pages += ConfigDrivenWelcomePageBlueprint
-        if (shouldShowDefaultBrowserPage()) {
-            pages += BrandDesignUpdateDefaultBrowserPageBlueprint
+            pages += DefaultBrowserBlueprint
         }
     }
 
@@ -79,9 +53,6 @@ class OnboardingPageManagerWithTrackerBlocking(
         return when (pages.getOrNull(position)) {
             is WelcomePageBlueprint -> buildWelcomePage()
             is DefaultBrowserBlueprint -> buildDefaultBrowserPage()
-            is BrandDesignUpdateWelcomePageBlueprint -> buildBrandDesignUpdateWelcomePage()
-            is ConfigDrivenWelcomePageBlueprint -> buildConfigDrivenWelcomePage()
-            is BrandDesignUpdateDefaultBrowserPageBlueprint -> buildBrandDesignUpdateDefaultBrowserPage()
             else -> null
         }
     }
@@ -92,23 +63,11 @@ class OnboardingPageManagerWithTrackerBlocking(
             !defaultRoleBrowserDialog.shouldShowDialog()
     }
 
-    private fun buildDefaultBrowserPage(): DefaultBrowserPage {
-        return onboardingPageBuilder.buildDefaultBrowserPage()
-    }
-
-    private fun buildWelcomePage(): WelcomePage {
+    private fun buildWelcomePage(): WelcomePageFragment {
         return onboardingPageBuilder.buildWelcomePage()
     }
 
-    private fun buildBrandDesignUpdateWelcomePage(): BrandDesignUpdateWelcomePage {
-        return onboardingPageBuilder.buildBrandDesignUpdateWelcomePage()
-    }
-
-    private fun buildConfigDrivenWelcomePage(): ConfigDrivenWelcomePageFragment {
-        return onboardingPageBuilder.buildConfigDrivenWelcomePage()
-    }
-
-    private fun buildBrandDesignUpdateDefaultBrowserPage(): BrandDesignUpdateDefaultBrowserPage {
-        return onboardingPageBuilder.buildBrandDesignUpdateDefaultBrowserPage()
+    private fun buildDefaultBrowserPage(): DefaultBrowserPage {
+        return onboardingPageBuilder.buildDefaultBrowserPage()
     }
 }

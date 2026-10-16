@@ -46,10 +46,11 @@ class CustomAiOnboardingPixels @Inject constructor(
     appUserStageStore: AppUserStageStore,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
     private val pixel: Pixel,
+    private val contextualOnboardingTimeLimit: ContextualOnboardingTimeLimit,
 ) : MainProcessLifecycleObserver {
     init {
         appUserStageStore.userAppStageFlow().onEach {
-            if (it == AppStage.ESTABLISHED && customAiOnboardingStore.isEnabled()) {
+            if (it == AppStage.ESTABLISHED && customAiOnboardingStore.isEnabled() && !contextualOnboardingTimeLimit.wasOnboardingEndedByTimeLimit()) {
                 pixel.fire(CustomAiOnboardingPixelName.PLAN_FINISHED, type = Pixel.PixelType.Unique())
             }
         }.launchIn(coroutineScope)

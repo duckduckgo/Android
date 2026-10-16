@@ -91,9 +91,8 @@ class OnboardingDevSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun createCtaRow(ctaId: CtaId): OneLineListItem {
-        val primaryText = if (viewModel.isIndependentCta(ctaId)) "${ctaId.name} (manual only)" else ctaId.name
         val row = OneLineListItem(this).apply {
-            setPrimaryText(primaryText)
+            setPrimaryText(ctaId.name)
             showSwitch()
         }
         val listener = OnCheckedChangeListener { _, isChecked ->

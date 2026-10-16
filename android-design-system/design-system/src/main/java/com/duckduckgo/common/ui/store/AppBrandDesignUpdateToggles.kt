@@ -22,8 +22,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 /**
- * App-wide, theme-related design changes feature flag, excluding onboarding which is gated via
- * `OnboardingBrandDesignUpdateToggles`.
+ * App-wide, theme-related design changes feature flag.
  */
 @ContributesRemoteFeature(
     scope = AppScope::class,

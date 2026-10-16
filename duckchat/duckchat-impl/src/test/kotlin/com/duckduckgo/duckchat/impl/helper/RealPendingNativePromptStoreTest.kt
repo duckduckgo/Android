@@ -17,7 +17,9 @@
 package com.duckduckgo.duckchat.impl.helper
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class RealPendingNativePromptStoreTest {
@@ -49,6 +51,20 @@ class RealPendingNativePromptStoreTest {
         assertEquals("hello", result?.prompt)
         assertNull(result?.modelId)
         assertNull(result?.reasoningEffort)
+    }
+
+    @Test
+    fun whenPromptStoredWithoutTermsFlagThenItCarriesTermsConsent() {
+        testee.store("hello", "model", null)
+
+        assertTrue(testee.consume()!!.carriesTermsConsent)
+    }
+
+    @Test
+    fun whenPromptStoredWithoutTermsConsentThenConsumeReturnsItNotCarrying() {
+        testee.store("hello", "model", null, carriesTermsConsent = false)
+
+        assertFalse(testee.consume()!!.carriesTermsConsent)
     }
 
     @Test

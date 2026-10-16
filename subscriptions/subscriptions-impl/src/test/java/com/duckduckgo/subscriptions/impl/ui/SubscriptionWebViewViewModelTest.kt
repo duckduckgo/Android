@@ -5,6 +5,7 @@ import android.app.Activity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -43,6 +44,7 @@ import com.duckduckgo.subscriptions.impl.notification.SubscriptionExpirationRemi
 import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboardingExperiments
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Subscription
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.Reload
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Companion
@@ -93,6 +95,7 @@ class SubscriptionWebViewViewModelTest {
     private val pirFeature: PirFeature = mock()
     private val subscriptionExpirationReminderScheduler: SubscriptionExpirationReminderScheduler = mock()
     private val paywallUrlResolver: PaywallUrlResolver = mock()
+    private val subscriptionOnboardingStore = SubscriptionOnboardingStore(FakeSharedPreferencesProvider())
 
     private lateinit var viewModel: SubscriptionWebViewViewModel
 
@@ -112,6 +115,7 @@ class SubscriptionWebViewViewModelTest {
             pirFeature = pirFeature,
             subscriptionExpirationReminderScheduler = subscriptionExpirationReminderScheduler,
             paywallUrlResolver = paywallUrlResolver,
+            subscriptionOnboardingStore = subscriptionOnboardingStore,
         )
         givenSubscriptionStatus(UNKNOWN)
     }
@@ -209,6 +213,26 @@ class SubscriptionWebViewViewModelTest {
     fun whenPaidPurchaseInControlThenDoNotLaunchOnboarding() = runTest {
         whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(false)
         assertLaunchOnboarding(isFreeTrial = false, expected = false)
+    }
+
+    @Test
+    fun whenPurchaseInTreatmentThenOnboardingProgressIsReset() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
+        subscriptionOnboardingStore.setStepCompleted("welcome")
+
+        assertLaunchOnboarding(isFreeTrial = false, expected = true)
+
+        assertTrue(subscriptionOnboardingStore.completedSteps().isEmpty())
+    }
+
+    @Test
+    fun whenPurchaseInControlThenOnboardingProgressIsKept() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(false)
+        subscriptionOnboardingStore.setStepCompleted("welcome")
+
+        assertLaunchOnboarding(isFreeTrial = false, expected = false)
+
+        assertEquals(setOf("welcome"), subscriptionOnboardingStore.completedSteps())
     }
 
     private suspend fun assertLaunchOnboarding(

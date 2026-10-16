@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.ui
 import android.content.Context
 import android.view.View
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.cash.turbine.test
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -47,6 +48,7 @@ import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.EditPromptRequest
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
@@ -62,11 +64,16 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.pixel.InputOutcomeTracker
+import com.duckduckgo.duckchat.impl.pixel.InputSubmitMethod
+import com.duckduckgo.duckchat.impl.terms.DuckAiTermsRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -126,6 +133,10 @@ class NativeInputModeWidgetViewModelTest {
     private val modelManager: DuckAiModelManager = mock()
     private val duckAiChatStore: DuckAiChatStore = mock()
     private val history: NavigationHistory = mock()
+    private val termsRepository: DuckAiTermsRepository = mock()
+    private val inputOutcomeTracker: InputOutcomeTracker = mock()
+    private val termsAccepted = MutableStateFlow(true)
+    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java, ioDispatcher = coroutineRule.testDispatcher)
 
     private val selectedTabFlow = MutableStateFlow<TabEntity?>(null)
     private val tabRepository: TabRepository = mock<TabRepository>().also {
@@ -164,6 +175,8 @@ class NativeInputModeWidgetViewModelTest {
 
     @Before
     fun setUp() {
+        whenever(termsRepository.observeTermsAccepted(BrowserMode.REGULAR)).thenReturn(termsAccepted)
+        duckChatFeature.nativeToSConsent().setRawStoredState(Toggle.State(enable = true))
         whenever(duckAiFeatureState.showSettings).thenReturn(showSettingsFlow)
         whenever(duckChatInternal.observeEnableDuckChatUserSetting()).thenReturn(duckChatUserEnabledFlow)
         whenever(duckChatInternal.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenUserSettingFlow)
@@ -178,6 +191,44 @@ class NativeInputModeWidgetViewModelTest {
 
         testee = createViewModel()
         testee.configure(tabId = "test-tab", isDuckAiMode = false, isBottom = false)
+    }
+
+    @Test
+    fun whenTermsAreNotAcceptedThenTermsAreRequired() = runTest {
+        termsAccepted.value = false
+        testee = createViewModel()
+
+        testee.termsRequired.test {
+            assertTrue(awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTermsGetAcceptedThenTermsAreNoLongerRequired() = runTest {
+        termsAccepted.value = false
+        testee = createViewModel()
+
+        testee.termsRequired.test {
+            assertTrue(awaitItem())
+
+            termsAccepted.value = true
+
+            assertFalse(awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenConsentFlagIsOffThenTermsAreNeverRequired() = runTest {
+        termsAccepted.value = false
+        duckChatFeature.nativeToSConsent().setRawStoredState(Toggle.State(enable = false))
+        testee = createViewModel()
+
+        testee.termsRequired.test {
+            assertFalse(awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private fun createViewModel(
@@ -205,6 +256,9 @@ class NativeInputModeWidgetViewModelTest {
             modelManager = modelManager,
             duckAiChatStore = duckAiChatStore,
             history = history,
+            termsRepository = termsRepository,
+            duckChatFeature = duckChatFeature,
+            inputOutcomeTracker = inputOutcomeTracker,
             appCoroutineScope = TestScope(coroutineRule.testDispatcher),
         )
     }
@@ -605,6 +659,15 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenStorePendingPromptWithoutTermsConsentThenTheStoreIsToldNotToCarryIt() = runTest {
+        val viewModel = createViewModel(plugins = emptyList())
+
+        viewModel.storePendingPrompt("hello", null, null, carriesTermsConsent = false)
+
+        verify(pendingNativePromptStore).store("hello", null, null, null, emptyList(), emptyList(), false)
+    }
+
+    @Test
     fun whenStorePendingPromptWithReasoningEffortThenForwardsEffort() = runTest {
         val viewModel = createViewModel(plugins = emptyList())
 
@@ -776,6 +839,7 @@ class NativeInputModeWidgetViewModelTest {
 
     @Test
     fun whenBrowserModeIsFireThenFooterContextReportsFireMode() = runTest {
+        whenever(termsRepository.observeTermsAccepted(BrowserMode.FIRE)).thenReturn(termsAccepted)
         val viewModel = createViewModel(browserMode = BrowserMode.FIRE)
 
         assertEquals(BrowserMode.FIRE, viewModel.footerContext.value.browserMode)
@@ -1836,6 +1900,7 @@ class NativeInputModeWidgetViewModelTest {
             hasImageAttachment = true,
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
         )
 
         verify(duckChatPixels).firePromptSubmitted(
@@ -1869,6 +1934,7 @@ class NativeInputModeWidgetViewModelTest {
             hasImageAttachment = false,
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
         )
 
         verify(duckChatPixels).firePromptSubmitted(
@@ -1902,6 +1968,7 @@ class NativeInputModeWidgetViewModelTest {
             hasImageAttachment = false,
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
         )
 
         verify(duckChatPixels).firePromptSubmitted(
@@ -1929,6 +1996,7 @@ class NativeInputModeWidgetViewModelTest {
             hasImageAttachment = false,
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
         )
 
         verify(duckChatPixels).firePromptSubmitted(
@@ -1961,6 +2029,7 @@ class NativeInputModeWidgetViewModelTest {
             hasImageAttachment = false,
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
         )
 
         verify(duckChatPixels).firePromptSubmitted(

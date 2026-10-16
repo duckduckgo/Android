@@ -206,6 +206,11 @@ enum class PirPixel(
         type = Unique(),
     ),
 
+    PIR_FREEMIUM_UPSELL(
+        baseName = "m_dbp_freemium_upsell",
+        type = Unique(),
+    ),
+
     PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS(
         baseName = "m_dbp_weekly_child-broker_orphaned-optouts",
         type = Count,
@@ -349,6 +354,14 @@ enum class PirPixel(
     PIR_SCAN_RENDERER_GONE(
         baseName = "m_dbp_scan_renderer-gone",
         types = setOf(Count, Daily()),
+    ),
+    PIR_FREEMIUM_SETTINGS_ENTRY_POINT_IMPRESSION(
+        baseName = "m_dbp_freemium_settings_entry_point_impression",
+        type = Count,
+    ),
+    PIR_FREEMIUM_SETTINGS_ENTRY_POINT_CLICKED(
+        baseName = "m_dbp_freemium_settings_entry_point_clicked",
+        type = Count,
     ),
     ;
 

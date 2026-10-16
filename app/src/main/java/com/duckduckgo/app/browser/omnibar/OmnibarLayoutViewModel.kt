@@ -79,7 +79,6 @@ import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
-import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -93,7 +92,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -123,7 +121,6 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val settingsDataStore: SettingsDataStore,
     private val urlDisplayRepository: UrlDisplayRepository,
-    private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     private val standardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle,
     private val omnibarPreFillKillSwitch: OmnibarPreFillKillSwitch,
@@ -135,12 +132,9 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
     private val isProgressBarUpgradeEnabled = progressBarUpgradeFeature.behaviourUpdate().isEnabled()
-    private val isProgressBarIndeterminateEnabled =
-        isProgressBarUpgradeEnabled && progressBarUpgradeFeature.indeterminateFallback().isEnabled()
     private val isAnimationUpdateEnabled =
         isProgressBarUpgradeEnabled && progressBarUpgradeFeature.animationConfigUpdate().isEnabled()
     private val addressBarRebrandToggle = appBrandDesignUpdateToggles.addressBar()
-    private var isSetFavouriteEasterEggLogoFeatureEnabled: Boolean = false
 
     // Tracked separately from ViewState so the derived enabledState can be recomputed
     // whenever either the lock or the fire-button highlight changes.
@@ -153,7 +147,6 @@ class OmnibarLayoutViewModel @Inject constructor(
             showTabsMenu = !isSplitOmnibarEnabled,
             showBrowserMenu = !isSplitOmnibarEnabled,
             isProgressBarUpgradeEnabled = isProgressBarUpgradeEnabled,
-            isProgressBarIndeterminateEnabled = isProgressBarIndeterminateEnabled,
             isAddressBarRebrandEnabled = addressBarRebrandToggle.isEnabled(),
             isAnimationUpdateEnabled = isAnimationUpdateEnabled,
         ),
@@ -163,17 +156,15 @@ class OmnibarLayoutViewModel @Inject constructor(
         combine(
             _viewState,
             tabRepository.flowTabs,
-            flow { emit(addressBarTrackersAnimationManager.isFeatureEnabled()) },
             addressBarTrackersAnimationManager.softwareRenderingModeEnabled,
             browserMenuHighlight.shouldShowHighlightForMode(mode),
-        ) { state, tabs, isAddressBarTrackersAnimationEnabled, useSoftwareRenderingMode, showHighlight ->
+        ) { state, tabs, useSoftwareRenderingMode, showHighlight ->
             state.copy(
                 shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
                 tabCount = tabs.size,
                 hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
                 showBrowserMenuHighlight = showHighlight,
                 viewMode = getViewMode(state),
-                isAddressBarTrackersAnimationEnabled = isAddressBarTrackersAnimationEnabled,
                 useSoftwareRenderingMode = useSoftwareRenderingMode,
             )
         }
@@ -272,10 +263,8 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showDuckAISidebar: Boolean = false,
         val isNativeInputEnabled: Boolean = false,
         val isNativeChatInputEnabled: Boolean = false,
-        val isAddressBarTrackersAnimationEnabled: Boolean = false,
         val useSoftwareRenderingMode: Boolean = false,
         val isProgressBarUpgradeEnabled: Boolean = false,
-        val isProgressBarIndeterminateEnabled: Boolean = false,
         val enabledState: EnabledState = EnabledState.ALL,
         val isAddressBarRebrandEnabled: Boolean = false,
         val isAnimationUpdateEnabled: Boolean = false,
@@ -326,7 +315,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         data class StartTrackersAnimation(
             val entities: List<Entity>?,
             val isCustomTab: Boolean,
-            val isAddressBarTrackersAnimationEnabled: Boolean,
             val useSoftwareRenderingMode: Boolean,
         ) : Command()
 
@@ -429,11 +417,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                 pixel.fire(pixel = AppPixelName.ADDRESS_BAR_NTP_FOCUSED, parameters = params)
             }.launchIn(viewModelScope)
 
-        serpEasterEggLogosToggles.setFavourite().enabled().onEach { isSetFavouriteEasterEggLogoFeatureEnabled ->
-            this.isSetFavouriteEasterEggLogoFeatureEnabled = isSetFavouriteEasterEggLogoFeatureEnabled
-        }.flowOn(dispatcherProvider.io())
-            .launchIn(viewModelScope)
-
         addressBarRebrandToggle.enabled().onEach { isAddressBarRebrandEnabled ->
             _viewState.update {
                 it.copy(
@@ -528,17 +511,10 @@ class OmnibarLayoutViewModel @Inject constructor(
                     it.omnibarText
                 }
 
-                val currentLogoUrl = if (isSetFavouriteEasterEggLogoFeatureEnabled) {
-                    getCurrentSerpLogoUrl(
-                        currentUrl = it.url,
-                        leadingIconState = it.previousLeadingIconState,
-                    )
-                } else {
-                    when (val previousState = it.previousLeadingIconState) {
-                        is EasterEggLogo -> previousState.logoUrl
-                        else -> null
-                    }
-                }
+                val currentLogoUrl = getCurrentSerpLogoUrl(
+                    currentUrl = it.url,
+                    leadingIconState = it.previousLeadingIconState,
+                )
 
                 val isFavouriteEasterEggLogo = it.previousLeadingIconState is EasterEggLogo && it.previousLeadingIconState.isFavourite
 
@@ -728,17 +704,10 @@ class OmnibarLayoutViewModel @Inject constructor(
                 else -> {
                     val scrollingEnabled = viewMode != NewTab
                     val hasFocus = _viewState.value.hasFocus
-                    val currentLogoUrl = if (isSetFavouriteEasterEggLogoFeatureEnabled) {
-                        getCurrentSerpLogoUrl(
-                            currentUrl = _viewState.value.url,
-                            leadingIconState = _viewState.value.leadingIconState,
-                        )
-                    } else {
-                        when (val leadingIconState = _viewState.value.leadingIconState) {
-                            is EasterEggLogo -> leadingIconState.logoUrl
-                            else -> null
-                        }
-                    }
+                    val currentLogoUrl = getCurrentSerpLogoUrl(
+                        currentUrl = _viewState.value.url,
+                        leadingIconState = _viewState.value.leadingIconState,
+                    )
                     _viewState.update {
                         it.copy(
                             viewMode = viewMode,
@@ -1011,29 +980,18 @@ class OmnibarLayoutViewModel @Inject constructor(
                         )
 
                         null -> {
-                            if (isSetFavouriteEasterEggLogoFeatureEnabled) {
-                                // serpLogo is null - preserve existing Easter Egg if present
-                                val currentLogoUrl = getCurrentSerpLogoUrl(
-                                    currentUrl = _viewState.value.url,
-                                    leadingIconState = _viewState.value.leadingIconState,
-                                )
-                                getLeadingIconState(
-                                    viewMode = _viewState.value.viewMode,
-                                    hasFocus = omnibarViewState.isEditing,
-                                    url = _viewState.value.url,
-                                    serpLogoUrl = currentLogoUrl,
-                                    isFavouriteSerpLogo = it.leadingIconState is EasterEggLogo && it.leadingIconState.isFavourite,
-                                )
-                            } else {
-                                // previous behaviour for null
-                                getLeadingIconState(
-                                    viewMode = _viewState.value.viewMode,
-                                    hasFocus = omnibarViewState.isEditing,
-                                    url = _viewState.value.url,
-                                    serpLogoUrl = null,
-                                    isFavouriteSerpLogo = false,
-                                )
-                            }
+                            // A null logo means extraction is pending, so preserve an existing SERP logo.
+                            val currentLogoUrl = getCurrentSerpLogoUrl(
+                                currentUrl = _viewState.value.url,
+                                leadingIconState = _viewState.value.leadingIconState,
+                            )
+                            getLeadingIconState(
+                                viewMode = _viewState.value.viewMode,
+                                hasFocus = omnibarViewState.isEditing,
+                                url = _viewState.value.url,
+                                serpLogoUrl = currentLogoUrl,
+                                isFavouriteSerpLogo = it.leadingIconState is EasterEggLogo && it.leadingIconState.isFavourite,
+                            )
                         }
                     },
                 )
@@ -1043,17 +1001,10 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     private fun onExternalLoadingStateChanged(loadingState: LoadingViewState) {
         logcat { "Omnibar: onExternalLoadingStateChanged $loadingState" }
-        val currentLogoUrl = if (isSetFavouriteEasterEggLogoFeatureEnabled) {
-            getCurrentSerpLogoUrl(
-                currentUrl = loadingState.url,
-                leadingIconState = _viewState.value.leadingIconState,
-            )
-        } else {
-            when (val leadingIconState = _viewState.value.leadingIconState) {
-                is EasterEggLogo -> leadingIconState.logoUrl
-                else -> null
-            }
-        }
+        val currentLogoUrl = getCurrentSerpLogoUrl(
+            currentUrl = loadingState.url,
+            leadingIconState = _viewState.value.leadingIconState,
+        )
         _viewState.update {
             it.copy(
                 url = loadingState.url,
@@ -1152,7 +1103,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 Command.StartTrackersAnimation(
                                     entities = decoration.entities,
                                     isCustomTab = viewState.value.viewMode is CustomTab,
-                                    isAddressBarTrackersAnimationEnabled = viewState.value.isAddressBarTrackersAnimationEnabled,
                                     useSoftwareRenderingMode = viewState.value.useSoftwareRenderingMode,
                                 ),
                             )

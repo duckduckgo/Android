@@ -73,7 +73,36 @@ class SubmitButtonViewModelTest {
     }
 
     @Test
-    fun whenInputIsEmptyThenNoSubmitButtonAndNoAskLabel() = runTest {
+    fun whenTermsNotAcceptedAndInputIsEmptyThenAskLabelIsShownDisabled() = runTest {
+        inputState.value = duckAiState(hasText = false)
+
+        testee.viewState(editTabId = null).test {
+            val state = awaitItem()
+
+            assertTrue(state.visible)
+            assertTrue(state.askLabel)
+            assertFalse(state.enabled)
+            assertTrue(state.askPossible)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTermsNotAcceptedOnTheSearchTabThenNoAskLabel() = runTest {
+        inputState.value = duckAiState(hasText = true).copy(toggleSelection = ToggleSelection.SEARCH)
+
+        testee.viewState(editTabId = null).test {
+            val state = awaitItem()
+
+            assertFalse(state.visible)
+            assertFalse(state.askLabel)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTermsAcceptedAndInputIsEmptyThenNoSubmitButton() = runTest {
+        accepted.value = true
         inputState.value = duckAiState(hasText = false)
 
         testee.viewState(editTabId = null).test {
@@ -81,7 +110,6 @@ class SubmitButtonViewModelTest {
 
             assertFalse(state.visible)
             assertFalse(state.askLabel)
-            assertTrue(state.askPossible)
             cancelAndIgnoreRemainingEvents()
         }
     }

@@ -20,8 +20,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.db.DismissedCtaDao
-import com.duckduckgo.app.cta.model.CtaId
-import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
 import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
@@ -43,9 +41,9 @@ import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.PasswordImportErrorAction
-import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig
-import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
-import com.duckduckgo.app.onboarding.ui.page.configdriven.TextConfig
+import com.duckduckgo.app.onboarding.ui.page.welcome.ContentConfig
+import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
+import com.duckduckgo.app.onboarding.ui.page.welcome.TextConfig
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
@@ -83,6 +81,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.nextsteps.api.NextSteps
+import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Completed
 import com.duckduckgo.onboarding.api.LinearOnboardingState.InProgress
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Skipped
@@ -211,8 +210,11 @@ class NewUserOnboardingPlanProviderTest {
         )
     }
 
-    private suspend fun start() {
-        orchestrator.startPlan(provider.buildRootPlan(onCompleted = {}, onSkipped = {}))
+    private suspend fun start(
+        onCompleted: suspend () -> Unit = {},
+        onSkipped: suspend () -> Unit = {},
+    ) {
+        orchestrator.startPlan(provider.buildRootPlan(onCompleted = onCompleted, onSkipped = onSkipped))
     }
 
     private fun assertStep(id: String) {
@@ -230,7 +232,8 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when initial user then walks full happy path to completed`() = runTest {
-        start()
+        var callbackState: LinearOnboardingState? = null
+        start(onCompleted = { callbackState = orchestrator.state.value })
         assertStep(NewUserOnboardingStepIds.INTRO_ANIMATION)
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         assertStep(NewUserOnboardingStepIds.NOTIFICATION_PERMISSION)
@@ -249,7 +252,19 @@ class NewUserOnboardingPlanProviderTest {
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN)
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = false))
         // input_screen_preview precondition is false (not AI) -> plan exhausts.
+        assertTrue(callbackState is InProgress)
         assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+    }
+
+    @Test
+    fun `when dev skip aborts real root plan then supplied callback runs while orchestrator is in progress`() = runTest {
+        var callbackState: LinearOnboardingState? = null
+        start(onSkipped = { callbackState = orchestrator.state.value })
+
+        orchestrator.onEvent(NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked)
+
+        assertTrue(callbackState is InProgress)
+        assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
     }
 
     @Test
@@ -673,6 +688,7 @@ class NewUserOnboardingPlanProviderTest {
             Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, result = NewUserOnboardingResult.LaunchSearch(query = "weather")),
             orchestrator.state.value,
         )
+        verify(onboardingStore, never()).setTriedDuckAi()
     }
 
     @Test
@@ -707,6 +723,7 @@ class NewUserOnboardingPlanProviderTest {
             ),
             orchestrator.state.value,
         )
+        verify(onboardingStore).setTriedDuckAi()
     }
 
     @Test
@@ -1052,6 +1069,7 @@ class NewUserOnboardingPlanProviderTest {
             Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, result = NewUserOnboardingResult.LaunchSearch(query = "weather")),
             orchestrator.state.value,
         )
+        verify(onboardingStore, never()).setTriedDuckAi()
     }
 
     @Test
@@ -1075,6 +1093,7 @@ class NewUserOnboardingPlanProviderTest {
             ),
             orchestrator.state.value,
         )
+        verify(onboardingStore).setTriedDuckAi()
     }
 
     @Test
@@ -1636,6 +1655,20 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
+    fun `when custom ai input screen preview demo submitted then marks duck ai as tried`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // ai_comparison_chart
+
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "hello", isChat = true, fromSuggestion = false))
+
+        verify(onboardingStore).setTriedDuckAi()
+    }
+
+    @Test
     fun `when duck ai demo fire completed then fires AiChatClicked`() = runTest {
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()
@@ -1670,24 +1703,6 @@ class NewUserOnboardingPlanProviderTest {
             ids.indexOf(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT) + 1,
             ids.indexOf(NewUserOnboardingStepIds.WIDGET_PROMPT),
         )
-    }
-
-    @Test
-    fun whenWidgetPromptStepPresentedThenLinearPlanWidgetPromptShownStored() = runTest {
-        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(false)
-        start()
-        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
-        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
-        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
-        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
-        assertStep(NewUserOnboardingStepIds.WIDGET_PROMPT)
-
-        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
-
-        verify(onboardingStore).linearPlanWidgetPromptShown = true
-        verify(dismissedCtaDao, never()).insert(DismissedCta(CtaId.ADD_WIDGET))
-        assertStep(NewUserOnboardingStepIds.WIDGET_PROMPT)
     }
 
     @Test

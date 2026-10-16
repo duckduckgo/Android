@@ -47,7 +47,7 @@ class PixelWideEventSender @Inject constructor(
 
         val parameters =
             mutableMapOf<String, String>().apply {
-                putAll(getCommonPixelParameters())
+                putAll(getCommonPixelParameters(event))
                 put(PARAM_META_TYPE, event.metaType)
                 put(PARAM_META_VERSION, event.metaVersion)
                 put(PARAM_SAMPLE_RATE, event.samplingProbability.toString())
@@ -103,12 +103,12 @@ class PixelWideEventSender @Inject constructor(
         }
     }
 
-    private fun getCommonPixelParameters(): Map<String, String> {
+    private fun getCommonPixelParameters(event: WideEventRepository.WideEvent): Map<String, String> {
         return mapOf(
             PARAM_PLATFORM to "Android",
             PARAM_TYPE to "app",
             PARAM_APP_NAME to "DuckDuckGo Android",
-            PARAM_APP_VERSION to appBuildConfig.versionName,
+            PARAM_APP_VERSION to event.appVersion,
             PARAM_FORM_FACTOR to deviceInfo.formFactor().description,
             PARAM_DEV_MODE to appBuildConfig.isDebug.toString(),
         )

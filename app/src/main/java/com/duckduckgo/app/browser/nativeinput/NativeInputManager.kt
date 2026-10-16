@@ -111,6 +111,8 @@ class NativeInputCallbacks(
     val onChatSuggestionDelete: (chatUrl: String) -> Unit = {},
     val onClearAutocomplete: () -> Unit,
     val onStopTapped: () -> Unit,
+    /** Input gained or lost focus (→ submitNativeInputFocused). */
+    val onInputFocusChanged: (focused: Boolean) -> Unit = {},
     val onFireButtonPressed: () -> Unit = {},
     val onTabSwitcherPressed: () -> Unit = {},
     val onBrowserMenuPressed: () -> Unit = {},
@@ -165,6 +167,7 @@ interface NativeInputManager {
     fun handleDuckAiVoiceResult(query: String)
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
     fun setPickingImage(picking: Boolean)
+    fun isPickingAttachment(): Boolean
     fun setText(text: String)
 
     /**
@@ -347,6 +350,8 @@ class RealNativeInputManager @Inject constructor(
     override fun setPickingImage(picking: Boolean) {
         isPickingImage = picking
     }
+
+    override fun isPickingAttachment(): Boolean = isPickingImage
 
     override fun setText(text: String) {
         if (!::rootView.isInitialized) return
@@ -972,6 +977,7 @@ class RealNativeInputManager @Inject constructor(
     ) {
         widgetFrom(widgetView)?.apply {
             onStopTapped = callbacks.onStopTapped
+            onInputFocusChanged = callbacks.onInputFocusChanged
             onFireButtonTapped = callbacks.onFireButtonPressed
             onCustomizeResponsesClicked = callbacks.onCustomizeResponsesClicked
             bindTabCount(lifecycleOwner, tabs.map { it.size })

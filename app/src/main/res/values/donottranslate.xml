@@ -130,6 +130,9 @@
     <string name="defaultBrowserChangedSurveyNotificationTitle">We noticed a change</string>
     <string name="defaultBrowserChangedSurveyNotificationDescription">DuckDuckGo is no longer your default browser. Mind telling us why?</string>
 
+    <!-- Page load timeout error page: copy not final yet -->
+    <string name="webViewErrorTimeout">This page is taking too long to load.</string>
+
     <!-- Fire animation rollout: relabel HeroFire to "Inferno Classic" when fireAnimationUpdate is on — pending translation -->
     <plurals name="fireDialogDeleteCountTitle">
         <item quantity="one" instruction="%1$d is the number of chats the user is about to delete.">Delete %1$d chat?</item>

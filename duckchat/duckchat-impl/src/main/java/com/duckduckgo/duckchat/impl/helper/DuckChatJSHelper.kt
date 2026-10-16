@@ -22,6 +22,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.FireMode
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.ui.view.encodeBitmapToBase64
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -29,6 +31,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
+import com.duckduckgo.duckchat.api.DuckAiTermsConsent
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
@@ -41,17 +44,21 @@ import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
+import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.feature.maxHistoryCount
+import com.duckduckgo.duckchat.impl.feature.recentDaysCutoff
 import com.duckduckgo.duckchat.impl.messaging.sync.isSyncable
 import com.duckduckgo.duckchat.impl.models.AIChatAttachmentUsage
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
-import com.duckduckgo.duckchat.impl.terms.DuckAiTermsConsent
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
+import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.selectChatSuggestions
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -135,6 +142,9 @@ class RealDuckChatJSHelper @Inject constructor(
     private val editPromptSessionStore: EditPromptSessionStore,
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
     private val duckAiSessionCallback: DuckAiSessionCallback,
+    @RegularMode private val regularChatStore: DuckAiChatStore,
+    @FireMode private val fireChatStore: DuckAiChatStore,
+    private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature,
     private val termsConsent: DuckAiTermsConsent,
 ) : DuckChatJSHelper {
 
@@ -175,6 +185,11 @@ class RealDuckChatJSHelper @Inject constructor(
             METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES ->
                 id?.let {
                     getAIChatNativeConfigValues(featureName, method, it, mode, browserMode)
+                }
+
+            METHOD_GET_AI_CHATS ->
+                id?.let {
+                    getAIChats(featureName, method, it, data, browserMode)
                 }
 
             METHOD_GET_AI_CHAT_NATIVE_PROMPT ->
@@ -462,17 +477,13 @@ class RealDuckChatJSHelper @Inject constructor(
                 false
             }
         }
-        val supportsSuggestions = withContext(dispatcherProvider.io()) {
-            duckChat.isDuckChatContextualModeEnabled() &&
-                mode == Mode.CONTEXTUAL &&
-                duckChatFeature.contextualSuggestedPrompts().isEnabled()
-        }
         val supportsNativeUsageWarnings = withContext(dispatcherProvider.io()) {
             browserMode != BrowserMode.FIRE &&
                 duckChat.isNativeChatInputEnabled() &&
                 duckChat.isNativeStorageEnabled() &&
                 duckChatFeature.duckAiUsageWarnings().isEnabled()
         }
+        val supportsHomePageChatSuggestions = supportsHomePageChatSuggestions(browserMode)
         val jsonPayload =
             JSONObject().apply {
                 put(PLATFORM, ANDROID)
@@ -485,6 +496,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_CHAT_ID_RESTORATION, duckChat.isDuckChatFullScreenModeEnabled())
                 put(SUPPORTS_IMAGE_UPLOAD, duckChat.isImageUploadEnabled())
                 put(SUPPORTS_STANDALONE_MIGRATION, duckChat.isStandaloneMigrationEnabled())
+                put(SUPPORTS_CANONICAL_CHAT_FORMAT, true)
                 put(SUPPORTS_CHAT_FULLSCREEN_MODE, duckChat.isDuckChatFullScreenModeEnabled() && mode == Mode.FULL)
                 put(SUPPORTS_CHAT_CONTEXTUAL_MODE, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
                 put(SUPPORTS_CHAT_SYNC, duckChat.isChatSyncFeatureEnabled() && browserMode.isSyncable)
@@ -496,12 +508,68 @@ class RealDuckChatJSHelper @Inject constructor(
                     duckChat.isDuckChatContextualModeEnabled() &&
                         duckChat.areMultipleContentAttachmentsEnabled(),
                 )
-                put(SUPPORTS_SUGGESTIONS, supportsSuggestions)
+                put(SUPPORTS_SUGGESTIONS, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
                 put(SUPPORTS_SUBSCRIPTION, supportsSubscription)
+                put(SUPPORTS_HOMEPAGE_CHAT_SUGGESTIONS, supportsHomePageChatSuggestions)
+                put(SUPPORTS_BONUS_OFFER, duckChatFeature.duckAiPromoCampaigns().isEnabled())
                 put(INSTALL_TYPE, if (appBuildConfig.isAppReinstall()) INSTALL_TYPE_RETURNING else INSTALL_TYPE_NEW)
                 getInstallAgeBucket()?.let { put(INSTALL_AGE, it) }
             }.also { logcat { "DuckChat-Sync: getAIChatNativeConfigValues $it" } }
         return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
+    private fun chatStoreFor(browserMode: BrowserMode): DuckAiChatStore = when (browserMode) {
+        BrowserMode.REGULAR -> regularChatStore
+        BrowserMode.FIRE -> fireChatStore
+    }
+
+    private suspend fun supportsHomePageChatSuggestions(browserMode: BrowserMode): Boolean = withContext(dispatcherProvider.io()) {
+        duckChatFeature.homepageChatSuggestions().isEnabled() &&
+            duckChat.isNativeStorageEnabled() &&
+            duckChatFeature.useNativeStorageChatData().isEnabled() &&
+            chatStoreFor(browserMode).hasMigrated()
+    }
+
+    /**
+     * Applies the same selection as the omnibar chat suggestions ([selectChatSuggestions]), capped at the homepage's
+     * `maxChats` or the remote `maxHistoryCount` when it doesn't send one. Never returns message content.
+     */
+    private suspend fun getAIChats(
+        featureName: String,
+        method: String,
+        id: String,
+        data: JSONObject?,
+        browserMode: BrowserMode,
+    ): JsCallbackData {
+        val chats = JSONArray()
+        if (supportsHomePageChatSuggestions(browserMode)) {
+            val query = data?.optString(GET_AI_CHATS_QUERY).orEmpty().trim()
+            val maxChats = if (data?.has(GET_AI_CHATS_MAX_CHATS) == true) {
+                data.optInt(GET_AI_CHATS_MAX_CHATS).coerceIn(1, MAX_CHATS_LIMIT)
+            } else {
+                duckAiChatHistoryFeature.maxHistoryCount()
+            }
+            withContext(dispatcherProvider.io()) {
+                runCatching { chatStoreFor(browserMode).getChats() }
+                    .onFailure { logcat { "Duck.ai: getAIChats failed to read chats: ${it.message}" } }
+                    .getOrDefault(emptyList())
+            }.selectChatSuggestions(
+                query = query,
+                maxSuggestions = maxChats,
+                recentDaysCutoff = duckAiChatHistoryFeature.recentDaysCutoff(),
+            ).forEach { chat ->
+                chats.put(
+                    JSONObject().apply {
+                        put("chatId", chat.chatId)
+                        put("title", chat.title)
+                        put("pinned", chat.pinned)
+                        put("lastEdit", chat.lastEdit.ifEmpty { null } ?: JSONObject.NULL)
+                        put("model", chat.model.ifEmpty { null } ?: JSONObject.NULL)
+                    },
+                )
+            }
+        }
+        return JsCallbackData(JSONObject().put(GET_AI_CHATS_CHATS, chats), featureName, method, id)
     }
 
     // Bucketed install age for the Duck.ai prompt pixel; null when there's no valid age (timestamp
@@ -528,7 +596,7 @@ class RealDuckChatJSHelper @Inject constructor(
         val jsonPayload = JSONObject().apply {
             put(PLATFORM, ANDROID)
             if (pending != null) {
-                termsConsent.carry(this, browserMode)
+                if (pending.carriesTermsConsent) termsConsent.carry(this, browserMode)
                 put("tool", "query")
                 put(
                     "query",
@@ -754,6 +822,11 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val METHOD_SHOW_MODEL_PICKER = "showModelPicker"
         const val METHOD_GET_PAGE_CONTEXT = "getAIChatPageContext"
         const val METHOD_OPEN_KEYBOARD = "openKeyboard"
+        private const val METHOD_GET_AI_CHATS = "getAIChats"
+        private const val GET_AI_CHATS_QUERY = "query"
+        private const val GET_AI_CHATS_MAX_CHATS = "maxChats"
+        private const val GET_AI_CHATS_CHATS = "chats"
+        private const val MAX_CHATS_LIMIT = 20
         private const val METHOD_EDIT_PROMPT = "editPrompt"
         private const val METHOD_CANCEL_EDIT = "cancelEdit"
 
@@ -780,6 +853,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_IMAGE_UPLOAD = "supportsImageUpload"
         private const val SUPPORTS_CHAT_ID_RESTORATION = "supportsURLChatIDRestoration"
         private const val SUPPORTS_STANDALONE_MIGRATION = "supportsStandaloneMigration"
+        private const val SUPPORTS_CANONICAL_CHAT_FORMAT = "supportsCanonicalChatFormat"
         private const val SUPPORTS_CHAT_FULLSCREEN_MODE = "supportsAIChatFullMode"
         private const val SUPPORTS_CHAT_CONTEXTUAL_MODE = "supportsAIChatContextualMode"
         private const val SUPPORTS_CHAT_SYNC = "supportsAIChatSync"
@@ -789,6 +863,8 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_NATIVE_STORAGE = "supportsNativeStorage"
         private const val SUPPORTS_NATIVE_USAGE_WARNINGS = "supportsNativeUsageWarnings"
         private const val SUPPORTS_SUBSCRIPTION = "supportsSubscription"
+        private const val SUPPORTS_HOMEPAGE_CHAT_SUGGESTIONS = "supportsHomePageChatSuggestions"
+        private const val SUPPORTS_BONUS_OFFER = "supportsBonusOffer"
         private const val INSTALL_TYPE = "installType"
         private const val INSTALL_TYPE_NEW = "new"
         private const val INSTALL_TYPE_RETURNING = "returning"

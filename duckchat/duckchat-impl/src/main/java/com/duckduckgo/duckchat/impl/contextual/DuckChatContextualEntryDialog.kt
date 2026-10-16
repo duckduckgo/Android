@@ -20,7 +20,6 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -257,7 +256,6 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
                     }
                 }
                 pendingUploadTask = null
-                restoreInputFocusAfterPicker()
             }
         }
     }
@@ -302,19 +300,6 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
             binding.entryNativeInputWidget.focusInput(activity)
         }
     }
-
-    private fun restoreInputFocusAfterPicker() {
-        binding.entryNativeInputWidget.doOnLayout {
-            if (isExternalKeyboardConnected()) {
-                binding.entryNativeInputWidget.requestInputFocus()
-            } else {
-                binding.entryNativeInputWidget.focusInput(activity)
-            }
-        }
-    }
-
-    private fun isExternalKeyboardConnected(): Boolean =
-        resources.configuration.keyboard != Configuration.KEYBOARD_NOKEYS
 
     private fun configureSuggestions() {
         binding.entrySuggestionsView.onSuggestionSelected = { suggestion ->
@@ -431,11 +416,9 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
         pendingUploadTask = null
         if (resultCode != Activity.RESULT_OK || data == null) {
             uploadTask?.onReceiveValue(null)
-            restoreInputFocusAfterPicker()
             return
         }
         uploadTask?.onReceiveValue(fileChooserIntentBuilder.extractSelectedFileUris(data))
-        restoreInputFocusAfterPicker()
     }
 
     override fun onDismiss(dialog: DialogInterface) {

@@ -21,5 +21,19 @@
             }
         ],
         "expires": "2027-03-31"
+    },
+    "m_tab_manager_switch_to_ai_tab": {
+        "description": "User taps an existing Duck.ai tab in the tab switcher, including the currently active one; measures how often users return to AI conversations via the switcher. Mirrors the iOS pixel of the same name",
+        "owners": ["karlenDimla"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_tab_manager_close_ai_tab": {
+        "description": "User closes a single Duck.ai tab from the tab switcher via the close button or swipe; tracks AI tab lifecycle. Mirrors the iOS pixel of the same name",
+        "owners": ["karlenDimla"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
     }
 }

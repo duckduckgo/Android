@@ -39,6 +39,17 @@ class SubscriptionPixelSenderImplTest {
     }
 
     @Test
+    fun whenReportOfferSubscribeClickWithPirFreeScanOriginThenOriginIsAttached() {
+        testee.reportOfferSubscribeClick(origin = "funnel_freescan_android")
+
+        verify(pixel).fire(
+            pixelName = "m_privacy-pro_terms-conditions_subscribe_click_c",
+            type = Count,
+            parameters = mapOf("origin" to "funnel_freescan_android"),
+        )
+    }
+
+    @Test
     fun whenReportExpirationReminderScheduledThenFiresScheduledPixel() {
         testee.reportExpirationReminderScheduled()
 

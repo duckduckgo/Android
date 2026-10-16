@@ -52,6 +52,12 @@
             android:paddingBottom="@dimen/keyline_4">
 
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/pirOpenDashboard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pirDevOpenDashboard" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                 android:id="@+id/pirDebugScan"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -81,6 +87,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/pirDevBrokerConfig" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/pirResetFreemiumState"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pirDevResetFreemiumState" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="wrap_content"

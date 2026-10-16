@@ -383,14 +383,14 @@ class SubscriptionOnboardingViewModelTest {
     }
 
     @Test
-    fun whenExitThenFinishes() = runTest {
+    fun whenExitThenFinishesToSettings() = runTest {
         val testee = createViewModel()
         testee.start()
         advanceUntilIdle()
 
         testee.commands.test {
             controller.exitOnboarding()
-            assertEquals(SubscriptionOnboardingViewModel.Command.Finish, awaitItem())
+            assertEquals(SubscriptionOnboardingViewModel.Command.FinishToSettings, awaitItem())
         }
     }
 

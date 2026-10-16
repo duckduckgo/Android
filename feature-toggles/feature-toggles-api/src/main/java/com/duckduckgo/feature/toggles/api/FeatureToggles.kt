@@ -228,7 +228,7 @@ interface Toggle {
      * This method
      *    - Returns whether the feature flag state is enabled or disabled.
      *    - It is not affected by experiment cohort assignment. It just checks whether the feature is enabled or not.
-     *    - It considers all other constraints like targets, minSupportedVersion, etc.
+     *    - It considers all other constraints like targets, minSupportedVersion, maxSupportedVersion, etc.
      *
      * @return `true` if the feature should be enabled, `false` otherwise
      */
@@ -246,7 +246,7 @@ interface Toggle {
      * The usage of this API is only useful for internal/dev settings/features
      * If you find yourself having to call this method in production code, then YOU'RE DOING SOMETHING WRONG
      * The raw state is the stored state. [isEnabled] method takes the raw state and computes whether the feature should be enabled or disabled.
-     * eg. by factoring in [State.minSupportedVersion] amongst others.
+     * eg. by factoring in [State.minSupportedVersion] and [State.maxSupportedVersion] amongst others.
      *
      * You should never use individual properties on that raw state, eg. [State.enable] to decide whether the feature is enabled/disabled.
      *
@@ -287,6 +287,7 @@ interface Toggle {
      * @param remoteEnableState is the enabled/disabled state in the remote config
      * @param enable is the ultimate (computed) enabled state
      * @param minSupportedVersion is the lowest Android version for which this toggle can be enabled
+     * @param maxSupportedVersion is the highest Android version for which this toggle can be enabled
      * @param rollout is the rollout specified in remote config
      * @param rolloutThreshold is the percentile for which this flag will be enabled. It's a value between 0-1
      *  Example: If [rolloutThreshold] = 0.3, if [rollout] is  <0.3 then the toggle will be disabled
@@ -297,6 +298,7 @@ interface Toggle {
         val remoteEnableState: Boolean? = null,
         val enable: Boolean = false,
         val minSupportedVersion: Int? = null,
+        val maxSupportedVersion: Int? = null,
         val rollout: List<Double>? = null,
         val rolloutThreshold: Double? = null,
         val targets: List<Target> = emptyList(),
@@ -532,9 +534,12 @@ internal class ToggleImpl constructor(
             // variants are only considered for Experiment feature flags
             val doTargetsMatch = state.evaluateTargetMatching(isExperiment)
 
+            val appVersion = appVersionProvider.invoke()
+
             return state.enable &&
                 doTargetsMatch &&
-                appVersionProvider.invoke() >= (state.minSupportedVersion ?: 0)
+                appVersion >= (state.minSupportedVersion ?: 0) &&
+                appVersion <= (state.maxSupportedVersion ?: Int.MAX_VALUE)
         }
         // check if it should always be enabled for internal builds
         if (isInternalAlwaysEnabled && flavorNameProvider.invoke().lowercase() == "internal") {

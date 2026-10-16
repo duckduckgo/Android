@@ -19,16 +19,26 @@ package com.duckduckgo.sync.impl.ui.pairing.recover
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.auth.AuthPromptRenderer
 import com.duckduckgo.sync.impl.databinding.ActivityRecoverSyncedDataBinding
-import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeContract
+import com.duckduckgo.sync.impl.ui.pairing.recover.RecoverSyncedDataViewModel.Command
+import com.duckduckgo.sync.impl.ui.pairing.recover.RecoverSyncedDataViewModel.Factory.Provider
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -39,9 +49,18 @@ class RecoverSyncedDataActivity : DuckDuckGoActivity() {
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     @Inject
-    lateinit var syncPixels: SyncPixels
+    lateinit var authPromptRenderer: AuthPromptRenderer
+
+    @Inject
+    lateinit var vmFactory: RecoverSyncedDataViewModel.Factory
 
     private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
+
+    private val isAuthRequired get() = intent.getBooleanExtra(IS_AUTH_REQUIRED_EXTRA_KEY, true)
+
+    private val viewModel by viewModels<RecoverSyncedDataViewModel> {
+        Provider(vmFactory, isAuthRequired)
+    }
 
     private val readSyncCodeLauncher = registerForActivityResult(
         ReadSyncCodeContract(),
@@ -65,6 +84,9 @@ class RecoverSyncedDataActivity : DuckDuckGoActivity() {
 
         configureToolbar()
         configureRecoverDataCta()
+
+        observeViewModel()
+        authPromptRenderer.bind(viewModel.authPrompts)
     }
 
     private fun configureEdgeToEdgeInsets() {
@@ -80,26 +102,46 @@ class RecoverSyncedDataActivity : DuckDuckGoActivity() {
     }
 
     private fun configureRecoverDataCta() {
-        binding.recoverDataButton.setOnClickListener {
-            syncPixels.fireRecoverSyncDataConfirmed()
-            readSyncCodeLauncher.launch(
-                ReadSyncCodeContract.Input(
-                    syncEntryPoint = SyncEntryPoint.RECOVER_SYNCED_DATA,
-                    launchSource = launchSource,
-                ),
-            )
+        binding.recoverDataButton.setOnClickListener { viewModel.onRecoverDataClicked() }
+    }
+
+    private fun observeViewModel() {
+        viewModel
+            .commands
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            is Command.ReadSyncCode -> {
+                readSyncCodeLauncher.launch(
+                    ReadSyncCodeContract.Input(
+                        syncEntryPoint = SyncEntryPoint.RECOVER_SYNCED_DATA,
+                        launchSource = launchSource,
+                    ),
+                )
+            }
+
+            is Command.ShowAuthError -> {
+                Snackbar.make(binding.root, R.string.sync_simplified_error_dialog_generic_body, Snackbar.LENGTH_LONG).show()
+            }
         }
     }
 
     companion object {
         private const val LAUNCH_SOURCE_EXTRA_KEY = "launch_source"
+        private const val IS_AUTH_REQUIRED_EXTRA_KEY = "is_auth_required"
 
         fun intent(
             context: Context,
             launchSource: String?,
+            isAuthRequired: Boolean,
         ): Intent {
             return Intent(context, RecoverSyncedDataActivity::class.java).apply {
                 putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
+                putExtra(IS_AUTH_REQUIRED_EXTRA_KEY, isAuthRequired)
             }
         }
     }

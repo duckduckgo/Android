@@ -27,6 +27,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
+import com.duckduckgo.duckchat.api.DuckAiTermsConsent
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
@@ -40,16 +41,18 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_I
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
+import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_GET_PAGE_CONTEXT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
-import com.duckduckgo.duckchat.impl.terms.DuckAiTermsConsent
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
+import com.duckduckgo.duckchat.store.impl.DuckAiChat
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -85,6 +88,8 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
@@ -122,6 +127,10 @@ class RealDuckChatJSHelperTest {
     private val mockBrowserInteractionsPlugin: BrowserInteractionsPlugin = mock()
     private val mockBrowserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
     private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
+    private val mockRegularChatStore: DuckAiChatStore = mock()
+    private val mockFireChatStore: DuckAiChatStore = mock()
+    private val fakeChatHistoryFeature: DuckAiChatHistoryFeature =
+        FakeFeatureToggleFactory.create(DuckAiChatHistoryFeature::class.java)
     private val mockTermsConsent: DuckAiTermsConsent = mock()
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
@@ -143,6 +152,9 @@ class RealDuckChatJSHelperTest {
         editPromptSessionStore = mockEditPromptSessionStore,
         browserInteractionsPlugins = mockBrowserInteractionsPlugins,
         duckAiSessionCallback = mockDuckAiSessionCallback,
+        regularChatStore = mockRegularChatStore,
+        fireChatStore = mockFireChatStore,
+        duckAiChatHistoryFeature = fakeChatHistoryFeature,
         termsConsent = mockTermsConsent,
     )
 
@@ -337,6 +349,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
@@ -346,6 +359,8 @@ class RealDuckChatJSHelperTest {
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -356,6 +371,36 @@ class RealDuckChatJSHelperTest {
         assertEquals(expected.method, result.method)
         assertEquals(expected.featureName, result.featureName)
         assertEquals(expected.params.toString(), result.params.toString())
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndPromoCampaignsEnabledThenSupportsBonusOfferIsTrue() = runTest {
+        mockDuckChatFeature.duckAiPromoCampaigns().setRawStoredState(Toggle.State(enable = true))
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertTrue(result!!.params.getBoolean("supportsBonusOffer"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndPromoCampaignsDisabledThenSupportsBonusOfferIsFalse() = runTest {
+        mockDuckChatFeature.duckAiPromoCampaigns().setRawStoredState(Toggle.State(enable = false))
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsBonusOffer"))
     }
 
     @Test
@@ -780,6 +825,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
@@ -789,6 +835,8 @@ class RealDuckChatJSHelperTest {
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -880,6 +928,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", true)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", true)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
@@ -889,6 +938,8 @@ class RealDuckChatJSHelperTest {
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1042,6 +1093,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", true)
             put("supportsAIChatSync", false)
@@ -1049,8 +1101,10 @@ class RealDuckChatJSHelperTest {
             put("supportsNativeStorage", false)
             put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
-            put("supportsSuggestions", false)
+            put("supportsSuggestions", true)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1064,10 +1118,9 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeConfigValuesAndSuggestedPromptsEnabledInContextualModeThenSupportsSuggestionsTrue() = runTest {
+    fun whenGetAIChatNativeConfigValuesAndContextualModeThenSupportsSuggestionsTrue() = runTest {
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(true)
-        mockDuckChatFeature.contextualSuggestedPrompts().setRawStoredState(Toggle.State(enable = true))
 
         val result = testee.processJsCallbackMessage(
             "aiChat",
@@ -1082,10 +1135,9 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeConfigValuesAndSuggestedPromptsEnabledButModeFullThenSupportsSuggestionsFalse() = runTest {
+    fun whenGetAIChatNativeConfigValuesAndModeFullThenSupportsSuggestionsFalse() = runTest {
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(true)
-        mockDuckChatFeature.contextualSuggestedPrompts().setRawStoredState(Toggle.State(enable = true))
 
         val result = testee.processJsCallbackMessage(
             "aiChat",
@@ -1100,10 +1152,9 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeConfigValuesAndSuggestedPromptsEnabledButContextualModeDisabledThenSupportsSuggestionsFalse() = runTest {
+    fun whenGetAIChatNativeConfigValuesAndContextualModeDisabledThenSupportsSuggestionsFalse() = runTest {
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(false)
-        mockDuckChatFeature.contextualSuggestedPrompts().setRawStoredState(Toggle.State(enable = true))
 
         val result = testee.processJsCallbackMessage(
             "aiChat",
@@ -1147,6 +1198,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", true)
             put("supportsAIChatSync", false)
@@ -1154,8 +1206,10 @@ class RealDuckChatJSHelperTest {
             put("supportsNativeStorage", false)
             put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", true)
-            put("supportsSuggestions", false)
+            put("supportsSuggestions", true)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1195,6 +1249,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", true)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
@@ -1204,6 +1259,8 @@ class RealDuckChatJSHelperTest {
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1243,6 +1300,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
@@ -1252,6 +1310,8 @@ class RealDuckChatJSHelperTest {
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1785,6 +1845,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", true)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
@@ -1794,6 +1855,8 @@ class RealDuckChatJSHelperTest {
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1830,6 +1893,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
@@ -1839,6 +1903,8 @@ class RealDuckChatJSHelperTest {
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1875,6 +1941,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", true)
@@ -1884,6 +1951,8 @@ class RealDuckChatJSHelperTest {
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1921,6 +1990,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
@@ -1930,6 +2000,8 @@ class RealDuckChatJSHelperTest {
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -2505,6 +2577,17 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenGetAIChatNativePromptWithPendingPromptThatDoesNotCarryTermsThenTheConsentIsNotCarried() = runTest {
+        whenever(mockPendingNativePromptStore.consume())
+            .thenReturn(PendingNativePrompt("test prompt", null, null, carriesTermsConsent = false))
+
+        val result = testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext)
+
+        assertEquals("test prompt", result!!.params.getJSONObject("query").getString("prompt"))
+        verify(mockTermsConsent, never()).carry(any(), any())
+    }
+
+    @Test
     fun whenGetAIChatNativePromptWithPendingPromptThenTheTermsConsentIsCarriedOnThePayload() = runTest {
         whenever(mockPendingNativePromptStore.consume()).thenReturn(PendingNativePrompt("test prompt", null, null))
 
@@ -2817,4 +2900,168 @@ class RealDuckChatJSHelperTest {
 
         verify(mockVoiceSessionStateManager, never()).onVoiceSessionEnded(any())
     }
+
+    @Test
+    fun whenGetAIChatsAndHomepageFlagDisabledThenReturnsNoChatsWithoutReadingStore() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        mockDuckChatFeature.homepageChatSuggestions().setRawStoredState(Toggle.State(enable = false))
+        whenever(mockRegularChatStore.getChats()).thenReturn(listOf(chat("a", "A", daysAgo = 0)))
+
+        val result = getAIChats()
+
+        assertEquals(0, result.getJSONArray("chats").length())
+        verify(mockRegularChatStore, never()).getChats()
+    }
+
+    @Test
+    fun whenGetAIChatsAndNotMigratedThenReturnsNoChats() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        whenever(mockRegularChatStore.hasMigrated()).thenReturn(false)
+        whenever(mockRegularChatStore.getChats()).thenReturn(listOf(chat("a", "A", daysAgo = 0)))
+
+        assertEquals(0, getAIChats().getJSONArray("chats").length())
+    }
+
+    @Test
+    fun whenGetAIChatsThenPinnedFirstThenRecentNewestFirstWithinLastWeek() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        whenever(mockRegularChatStore.getChats()).thenReturn(
+            listOf(
+                chat("recent-old", "Older", daysAgo = 2),
+                chat("pinned", "Pinned", daysAgo = 30, pinned = true),
+                chat("recent-new", "Newer", daysAgo = 0, model = "voice-mode"),
+                chat("stale", "Stale", daysAgo = 10),
+            ),
+        )
+
+        val chats = getAIChats().getJSONArray("chats")
+
+        assertEquals(listOf("pinned", "recent-new", "recent-old"), chats.chatIds())
+        assertTrue(chats.getJSONObject(0).getBoolean("pinned"))
+        assertEquals("voice-mode", chats.getJSONObject(1).getString("model"))
+        assertEquals(setOf("chatId", "title", "pinned", "lastEdit", "model"), chats.getJSONObject(1).keys().asSequence().toSet())
+    }
+
+    @Test
+    fun whenGetAIChatsWithMaxChatsThenChatsAreCappedAndClamped() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        whenever(mockRegularChatStore.getChats()).thenReturn((0 until 30).map { chat("c$it", "Chat $it", minutesAgo = it.toLong()) })
+
+        assertEquals(listOf("c0", "c1"), getAIChats(JSONObject().put("maxChats", 2)).getJSONArray("chats").chatIds())
+        assertEquals(20, getAIChats(JSONObject().put("maxChats", 1000)).getJSONArray("chats").length())
+    }
+
+    @Test
+    fun whenGetAIChatsWithoutMaxChatsThenCapIsRemoteMaxHistoryCount() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        fakeChatHistoryFeature.self().setRawStoredState(Toggle.State(enable = true, settings = """{"maxHistoryCount":3}"""))
+        whenever(mockRegularChatStore.getChats()).thenReturn((0 until 30).map { chat("c$it", "Chat $it", minutesAgo = it.toLong()) })
+
+        assertEquals(listOf("c0", "c1", "c2"), getAIChats().getJSONArray("chats").chatIds())
+    }
+
+    @Test
+    fun whenGetAIChatsThenPinnedChatsCountTowardMaxChats() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        whenever(mockRegularChatStore.getChats()).thenReturn(
+            listOf(
+                chat("recent", "Recent", daysAgo = 0),
+                chat("pinned", "Pinned", daysAgo = 30, pinned = true),
+                chat("recent-older", "Older", daysAgo = 1),
+            ),
+        )
+
+        val chats = getAIChats(JSONObject().put("maxChats", 2)).getJSONArray("chats")
+
+        assertEquals(listOf("pinned", "recent"), chats.chatIds())
+    }
+
+    @Test
+    fun whenGetAIChatsThenRecentWindowFollowsRemoteRecentDaysCutoff() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        fakeChatHistoryFeature.self().setRawStoredState(Toggle.State(enable = true, settings = """{"recentDaysCutoff":30}"""))
+        whenever(mockRegularChatStore.getChats()).thenReturn(
+            listOf(
+                chat("ten-days", "Ten days", daysAgo = 10),
+                chat("sixty-days", "Sixty days", daysAgo = 60),
+            ),
+        )
+
+        assertEquals(listOf("ten-days"), getAIChats().getJSONArray("chats").chatIds())
+    }
+
+    @Test
+    fun whenGetAIChatsWithQueryThenFiltersByTitleIncludingOlderChats() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        whenever(mockRegularChatStore.getChats()).thenReturn(
+            listOf(
+                chat("a", "Sourdough recipe", daysAgo = 30),
+                chat("b", "Trip ideas", daysAgo = 0),
+                chat("pinned-match", "Pinned bread recipe", daysAgo = 60, pinned = true),
+                chat("pinned-miss", "Pinned trip", daysAgo = 0, pinned = true),
+            ),
+        )
+
+        val chats = getAIChats(JSONObject().put("query", "  RECIPE ")).getJSONArray("chats")
+
+        assertEquals(listOf("pinned-match", "a"), chats.chatIds())
+    }
+
+    @Test
+    fun whenGetAIChatsAndStoreThrowsThenReturnsNoChats() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        whenever(mockRegularChatStore.getChats()).thenThrow(RuntimeException("boom"))
+
+        assertEquals(0, getAIChats().getJSONArray("chats").length())
+    }
+
+    @Test
+    fun whenGetAIChatsInFireModeThenReadsFireStoreOnly() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        whenever(mockFireChatStore.hasMigrated()).thenReturn(true)
+        whenever(mockFireChatStore.getChats()).thenReturn(listOf(chat("fire", "Fire", daysAgo = 0)))
+
+        val chats = getAIChats(browserMode = BrowserMode.FIRE).getJSONArray("chats")
+
+        assertEquals(listOf("fire"), chats.chatIds())
+        verify(mockRegularChatStore, never()).getChats()
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndHomepageChatSuggestionsSupportedThenFlagIsTrue() = runTest {
+        givenHomepageChatSuggestionsSupported()
+
+        val result = testee.processJsCallbackMessage("aiChat", "getAIChatNativeConfigValues", "123", null)
+
+        assertTrue(result!!.params.getBoolean("supportsHomePageChatSuggestions"))
+    }
+
+    private suspend fun givenHomepageChatSuggestionsSupported() {
+        mockDuckChatFeature.homepageChatSuggestions().setRawStoredState(Toggle.State(enable = true))
+        mockDuckChatFeature.useNativeStorageChatData().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockDuckChat.isNativeStorageEnabled()).thenReturn(true)
+        whenever(mockRegularChatStore.hasMigrated()).thenReturn(true)
+    }
+
+    private suspend fun getAIChats(
+        params: JSONObject? = null,
+        browserMode: BrowserMode = BrowserMode.REGULAR,
+    ): JSONObject = testee.processJsCallbackMessage("aiChat", "getAIChats", "123", params, browserMode = browserMode)!!.params
+
+    private fun chat(
+        chatId: String,
+        title: String,
+        daysAgo: Long = 0,
+        minutesAgo: Long = 0,
+        pinned: Boolean = false,
+        model: String = "gpt-4o-mini",
+    ) = DuckAiChat(
+        chatId = chatId,
+        title = title,
+        model = model,
+        lastEdit = Instant.now().minus(daysAgo, ChronoUnit.DAYS).minus(minutesAgo, ChronoUnit.MINUTES).toString(),
+        pinned = pinned,
+    )
+
+    private fun org.json.JSONArray.chatIds(): List<String> = (0 until length()).map { getJSONObject(it).getString("chatId") }
 }

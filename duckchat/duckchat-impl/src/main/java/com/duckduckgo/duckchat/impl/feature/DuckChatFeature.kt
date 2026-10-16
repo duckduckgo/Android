@@ -83,12 +83,6 @@ interface DuckChatFeature {
     fun standaloneMigration(): Toggle
 
     /**
-     * @return `true` when the "Hide AI Generated Images" option should be visible in AI Features Settings.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun showHideAiGeneratedImages(): Toggle
-
-    /**
      * @return `true` when the Native Input Field should be used instead of the web-based input.
      * If the remote feature is not present defaults to `true`.
      */
@@ -231,13 +225,6 @@ interface DuckChatFeature {
     fun duckAiVoiceChatService(): Toggle
 
     /**
-     * @return `true` when context-aware suggested prompts are shown on the contextual Duck.ai start surface.
-     * If the remote feature is not present defaults to `internal`.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun contextualSuggestedPrompts(): Toggle
-
-    /**
      * @return `true` when the native controls for AI Features are enabled in the app.
      * If the remote feature is not present defaults to `internal`
      */
@@ -315,4 +302,18 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun nativeToSConsent(): Toggle
+
+    /**
+     * @return `true` when the duckduckgo.com homepage may list the user's Duck.ai chats via `getAIChats`.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun homepageChatSuggestions(): Toggle
+
+    /**
+     * @return `true` when Duck.ai promo campaigns are supported. Exposed to Duck.ai as `supportsBonusOffer`.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiPromoCampaigns(): Toggle
 }

@@ -85,6 +85,16 @@
             android:text="Brand DuckSans"
             app:daxButtonBrandTypography="duckSans" />
 
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:platformType="compose" />
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_button_brand"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
         <Space
             android:layout_width="match_parent"
             android:layout_height="32dp" />

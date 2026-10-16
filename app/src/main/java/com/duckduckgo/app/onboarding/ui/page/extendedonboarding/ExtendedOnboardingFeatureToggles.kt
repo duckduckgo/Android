@@ -46,4 +46,7 @@ interface ExtendedOnboardingFeatureToggles {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     @Experiment
     fun freeTrialCopy(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun contextualOnboardingTimeLimit(): Toggle
 }

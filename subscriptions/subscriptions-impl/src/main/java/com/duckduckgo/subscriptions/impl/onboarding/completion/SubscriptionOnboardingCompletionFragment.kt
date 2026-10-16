@@ -44,10 +44,10 @@ import com.duckduckgo.subscriptions.impl.databinding.FragmentSubscriptionOnboard
 import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.Command
 import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.SummaryRow
 import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.ViewState
-import com.duckduckgo.subscriptions.impl.onboarding.welcome.launchOnboardingConfetti
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fragment_subscription_onboarding_completion) {
@@ -137,6 +137,7 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
                 rowView.setLeadingIconResource(row.pendingIconResId)
             }
             if (row.clickable) {
+                rowView.setTrailingIconResource(CommonR.drawable.ic_chevron_right_24)
                 rowView.setClickListener { viewModel.onPirRowClicked() }
             }
             container.addView(rowView)
@@ -169,7 +170,11 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
                 addUpdateListener { animator ->
                     fill.updateLayoutParams { width = animator.animatedValue as Int }
                 }
-                if (celebrate) doOnEnd { binding.subscriptionOnboardingCompletionKonfetti.launchOnboardingConfetti() }
+                if (celebrate) {
+                    doOnEnd {
+                        binding.subscriptionOnboardingCompletionConfetti.fire()
+                    }
+                }
                 start()
             }
         }

@@ -205,6 +205,7 @@
         <item name="daxColorBackground">@color/background_background_dark</item>
         <item name="daxColorBackgroundInverted">@color/gray0</item>
         <item name="daxColorSurface">@color/background_surface_dark</item>
+        <item name="daxColorSurfaceSecondary">@color/background_surface_secondary_dark</item>
         <item name="daxColorSurfaceTertiary">@color/background_surface_tertiary_dark</item>
         <item name="daxColorContainer">@color/white12</item>
         <item name="daxColorWindow">@color/background_window_dark</item>
@@ -328,12 +329,6 @@
         <item name="daxInfoPanelAlertBackgroundColor">@color/daxInfoPanelAlertBackgroundColorDark</item>
 
         <!-- Temp daxColors -->
-        <item name="daxColorPreonboardingOptionBackgroundStroke">@color/white12</item>
-        <item name="daxColorPreonboardingOptionSelectedBackground">@color/gray80</item>
-        <item name="daxColorPreonboardingOptionSelectedBackgroundStroke">@color/gray80</item>
-        <item name="daxColorPreonboardingProgressBarStart">@color/blue20</item>
-        <item name="daxColorPreonboardingProgressBarCenter">@color/purple20</item>
-        <item name="daxColorPreonboardingProgressBarEnd">@color/red10</item>
         <item name="daxColorOnboardingDialogBackground">@color/daxOnboardingDialogBackgroundColorDark</item>
 
         <!-- Input Screen -->
@@ -386,6 +381,7 @@
         <item name="daxColorBackground">@color/background_background_light</item>
         <item name="daxColorBackgroundInverted">@color/gray100</item>
         <item name="daxColorSurface">@color/background_surface_light</item>
+        <item name="daxColorSurfaceSecondary">@color/background_surface_secondary_light</item>
         <item name="daxColorSurfaceTertiary">@color/background_surface_tertiary_light</item>
         <item name="daxColorContainer">@color/black6</item>
         <item name="daxColorWindow">@color/background_window_light</item>
@@ -510,12 +506,6 @@
         <item name="daxInfoPanelAlertBackgroundColor">@color/daxInfoPanelAlertBackgroundColorLight</item>
 
         <!-- Temp daxColors -->
-        <item name="daxColorPreonboardingOptionBackgroundStroke">@color/gray15</item>
-        <item name="daxColorPreonboardingOptionSelectedBackground">@color/gray0</item>
-        <item name="daxColorPreonboardingOptionSelectedBackgroundStroke">@color/blue10</item>
-        <item name="daxColorPreonboardingProgressBarStart">@color/blue50</item>
-        <item name="daxColorPreonboardingProgressBarCenter">@color/purple100</item>
-        <item name="daxColorPreonboardingProgressBarEnd">@color/red50</item>
         <item name="daxColorOnboardingDialogBackground">@color/daxOnboardingDialogBackgroundColorLight</item>
 
         <!-- Input Screen -->

@@ -46,6 +46,10 @@ class SubscriptionOnboardingStore @Inject constructor(
         preferences.edit { putInt(KEY_COMPLETED_ENTRY_POINT_VIEWS, completedEntryPointViews() + 1) }
     }
 
+    fun reset() {
+        preferences.edit { clear() }
+    }
+
     companion object {
         const val FILENAME = "com.duckduckgo.subscriptions.onboarding.steps"
         const val KEY_COMPLETED_STEPS = "KEY_COMPLETED_STEPS"

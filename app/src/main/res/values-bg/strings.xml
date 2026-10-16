@@ -328,11 +328,6 @@
     <string name="surveyLoadingErrorText">В момента анкетата ни не се зарежда.\n Моля, опитайте отново по-късно.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Изпробвайте нашето приспособление за търсене!</string>
-    <string name="addWidgetCtaDescription">Добавете нашето приспособление за търсене към началния си екран за бърз и лесен достъп.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Добави приспособлението</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Показване</string>
-    <string name="addWidgetCtaDismissButton">Отказване</string>
     <string name="addWidgetInstructionsActivityTitle">Добави приспособлението</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Натиснете продължително началния екран и след това отворете менюто с приспособления.</string>
@@ -715,10 +710,6 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Операционната система на Вашето устройство не се доверява на сертификата за сигурност за %1$s. Възможно е уебсайтът да е конфигуриран грешно, хакер да е компрометирал връзката Ви или системният Ви часовник да е неправилно настроен.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Здравейте.<br/><br/>Готови ли сте за по-бърз браузър, който ви осигурява защита?]]></string>
-    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Да го направим!</string>
-    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1ButtonBrandDesign">Да започваме!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Вече знам за това</string>
     <string name="preOnboardingDaxDialog2Title">Защитите са активирани!</string>
@@ -746,8 +737,6 @@
     <string name="highlightsPreOnboardingAddressBarOption2Description">По-лесен достъп</string>
     <string name="onboardingSearchDaxDialogTitle">Опитайте търсене!</string>
     <string name="onboardingSearchDaxDialogDescription">Търсенето в DuckDuckGo винаги е поверително.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"как се нарича патицата на английски"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"как се казва „патица“ на испански"</string>
     <string name="onboardingSearchQueryOption1">как се нарича патицата на английски</string>
     <string name="onboardingSearchQueryOption1English">как се казва „патица“ на испански</string>
     <string name="onboardingSearchDaxDialogOption2">актьори в аватар</string>
@@ -825,8 +814,8 @@
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Показване при стартиране на приложението</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab">Последно отворен раздел</string>
-    <string name="showOnAppLaunchOptionNewTabPage">Страница с нов раздел</string>
+    <string name="showOnAppLaunchOptionLastUsedTab">Последно използван раздел</string>
+    <string name="showOnAppLaunchOptionOpenNewTab">Страница с нов раздел</string>
     <string name="showOnAppLaunchOptionSpecificPage">Конкретна страница</string>
 
     <!-- Privacy Dashboard -->
@@ -868,9 +857,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Опитайте нашия уиджет на началния екран!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Добавете нашето приспособление за търсене към началния си екран за бърз и лесен достъп.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Добави приспособлението</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Не сега</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Търсене с DuckDuckGo</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Уиджет на началния екран</string>

@@ -28,13 +28,20 @@ import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.pir.impl.dashboard.purchase.PirPurchaseRoute.NativePurchaseFlow
 import com.duckduckgo.pir.impl.pixels.PirInteractionReporter
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.store.PirRepository
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
+import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -47,11 +54,24 @@ class PirDashboardWebViewViewModel @Inject constructor(
     private val pirInteractionReporter: PirInteractionReporter,
     private val appBuildConfig: AppBuildConfig,
     private val pirRepository: PirRepository,
+    private val subscriptions: Subscriptions,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ViewModel(), DefaultLifecycleObserver {
 
-    private val command = Channel<Command>(1, DROP_OLDEST)
+    private var purchaseFlowOutstanding = false
+
+    private val command = Channel<Command>(Channel.BUFFERED)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
+
+    init {
+        // The dashboard needs to be reloaded on purchase
+        subscriptions.getSubscriptionStatusFlow()
+            .map { it != UNKNOWN }
+            .distinctUntilChanged()
+            .drop(1)
+            .onEach { command.send(Command.ReloadWebView) }
+            .launchIn(viewModelScope)
+    }
 
     fun handleJsMessage(
         featureName: String,
@@ -62,8 +82,26 @@ class PirDashboardWebViewViewModel @Inject constructor(
         // TODO Handle any JS messages that requires UI updates or other user actions
     }
 
+    fun onSubscriptionPurchaseRequested(route: NativePurchaseFlow) {
+        // Prevent duplicate taps on the CTA and navigation
+        if (purchaseFlowOutstanding) {
+            return
+        }
+        purchaseFlowOutstanding = true
+
+        viewModelScope.launch {
+            command.send(
+                Command.LaunchSubscriptionPurchase(
+                    origin = route.origin,
+                    featurePage = route.featurePage,
+                ),
+            )
+        }
+    }
+
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
+        purchaseFlowOutstanding = false
         pirPixelSender.reportDashboardOpened()
         appCoroutineScope.launch {
             pirInteractionReporter.attemptFirePixel()
@@ -82,5 +120,11 @@ class PirDashboardWebViewViewModel @Inject constructor(
         data class SendJsEvent(val event: SubscriptionEventData) : Command()
         data class SendResponseToJs(val data: JsCallbackData) : Command()
         data class ShowManualConfigWarning(val show: Boolean) : Command()
+        data class LaunchSubscriptionPurchase(
+            val origin: String,
+            val featurePage: String,
+        ) : Command()
+
+        data object ReloadWebView : Command()
     }
 }
