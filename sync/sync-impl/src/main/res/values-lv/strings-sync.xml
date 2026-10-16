@@ -306,6 +306,7 @@
     <string name="sync_simplified_settings_download_recovery_code_item_hint">Izmanto šo kodu, lai atgūtu datus, ja zaudēsi piekļuvi šai ierīcei — glabā to drošībā.</string>
     <string name="sync_simplified_settings_data_expiration_notice">Sync &amp; Backup datus nevar atgūt pēc 18 mēnešu neaktivitātes. <annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
     <string name="sync_simplified_settings_delete_account_item">Izslēgt un dzēst servera datus</string>
+    <string name="sync_simplified_settings_turn_off_item">Izslēgt Sync &amp; Backup</string>
     <string name="sync_simplified_settings_storage_permission_message">Lai saglabātu atkopšanas PDF failu, ir nepieciešama krātuves atļauja</string>
     <string name="sync_simplified_settings_learn_more_screen_title">Sync &amp; Backup</string>
 
@@ -320,6 +321,26 @@
     <string name="sync_simplified_settings_delete_server_data_dialog_body">Visas ierīces, kas izmanto Sync &amp; Backup, tiks atvienotas, un tavi sinhronizētie dati tiks dzēsti no servera.</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Dzēst servera datus</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">Atcelt</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_title_v2">Šo darbību nevar atsaukt.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body_v2">Visas ierīces, kas izmanto Sync &amp; Backup, tiks atvienotas, un tavi sinhronizētie dati tiks izdzēsti no servera.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button_v2">Neatgriezeniski dzēst</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button_v2">Atcelt</string>
+
+    <!-- Sync settings screen: turn off sheet -->
+    <string name="sync_simplified_settings_turn_off_sheet_remove_title" instruction="Placeholder is a device name. e.g., Samsung S23">Vai noņemt %1$s no Sync &amp; Backup?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_body" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s” vairs nevarēs piekļūt taviem sinhronizētajiem datiem citās ierīcēs.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item">Vai dzēst arī servera datus?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Izslēdz Sync &amp; Backup, izdzēs visus sinhronizētos datus no servera un deaktivizē savu atkopšanas kodu.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Noņemt ierīci</string>
+    <string name="sync_simplified_settings_turn_off_sheet_title">Vai izslēgt Sync &amp; Backup?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_body">Visas ierīces, kas izmanto Sync &amp; Backup, tiks atvienotas, un tavi sinhronizētie dati tiks izdzēsti no servera.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Izslēgt un dzēst servera datus</string>
+
+    <!-- Sync settings screen: turn off this device dialog -->
+    <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">Vai noņemt %1$s no Sync &amp; Backup?</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s” vairs nevarēs piekļūt taviem sinhronizētajiem datiem. Grāmatzīmes, automātiskās aizpildīšanas dati un Duck.ai sarunas paliks tavās ierīcēs.</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_primary_button">Noņemt</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_secondary_button">Atcelt</string>
 
     <!-- Sync settings screen: require device passcode dialog -->
     <string name="sync_simplified_settings_require_passcode_dialog_title">Aizsargā savu ierīci, lai izmantotu Sync &amp; Backup</string>
@@ -329,6 +350,8 @@
     <!-- Sync This Device screen -->
     <string name="sync_simplified_setup_header_headline">Sinhronizē šo ierīci ar tuvumā esošu datoru.</string>
     <string name="sync_simplified_setup_header_body">Palīdzēsim sinhronizēt tavas ierīces.</string>
+    <string name="sync_simplified_setup_header_headline_v2">Vai tev tuvumā ir kāda cita ierīce? Sinhronizē savas ierīces.</string>
+    <string name="sync_simplified_setup_header_body_v2">Pašlaik nav citas ierīces? Sinhronizē tikai šo ierīci un vēlāk sinhronizē ar citu.</string>
     <string name="sync_simplified_setup_primary_button">Sinhronizēt ar citu ierīci</string>
     <string name="sync_simplified_setup_secondary_button">Sinhronizēt tikai šo ierīci</string>
     <string name="sync_simplified_setup_secondary_button_syncing">Notiek savienojuma izveide…</string>
@@ -353,10 +376,14 @@
     <string name="sync_simplified_scanner_camera_header_headline">Skenē kvadrātkodu, lai sinhronizētu</string>
     <string name="sync_simplified_scanner_camera_header_body">Atver <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo for Desktop</annotation></b>\n<annotation type="gap">\n</annotation>un dodies uz <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sinhronizēt ar citu ierīci</annotation></string>
     <string name="sync_simplified_scanner_camera_primary_button">Esmu gatavs skenēt</string>
+    <string name="sync_simplified_scanner_camera_primary_button_v2">Sapratu</string>
     <string name="sync_simplified_scanner_camera_invalid_code_message">Atvaino, skenētais kods nav derīgs.</string>
     <string name="sync_simplified_scanner_no_permission_headline">Nepieciešama kameras atļauja</string>
     <string name="sync_simplified_scanner_no_permission_body">Lūdzu, dodies uz ierīces iestatījumiem un piešķir atļauju šai lietotnei piekļūt kamerai.</string>
     <string name="sync_simplified_scanner_no_permission_primary_button">Doties uz sadaļu Iestatījumi</string>
+    <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo ir nepieciešama piekļuve tavai kamerai.</string>
+    <string name="sync_simplified_scanner_no_permission_body_v2">Lai skenētu kvadrātkodu, nepieciešama atļauja piekļūt kamerai.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button_v2">Mainīt atļaujas</string>
     <string name="sync_simplified_scanner_no_hardware_headline">Kamera nav pieejama</string>
 
     <!-- Scanner screen: manual entry tab -->
@@ -411,6 +438,8 @@
     <string name="sync_simplified_edit_device_sync_this_device_item">Sinhronizēt šo ierīci</string>
     <string name="sync_simplified_edit_device_remove_notice_this_device">Ja noņemsi šo ierīci, tā vairs nevarēs piekļūt taviem sinhronizētajiem datiem.</string>
     <string name="sync_simplified_edit_device_remove_notice_another_device">Ja šī opcija tiks izslēgta, šī ierīce vairs nevarēs piekļūt taviem sinhronizētajiem datiem.</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” vairs nevarēs piekļūt taviem sinhronizētajiem datiem citās ierīcēs.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” vairs nevarēs piekļūt taviem sinhronizētajiem datiem citās ierīcēs.</string>
 
     <!-- Edit Device screen: edit name dialog -->
     <string name="sync_simplified_edit_device_edit_name_dialog_title">Rediģēt vārdu</string>
@@ -422,6 +451,8 @@
     <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” vairs nevarēs piekļūt taviem sinhronizētajiem datiem.</string>
     <string name="sync_simplified_edit_device_remove_dialog_primary_button">Noņemt</string>
     <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Atcelt</string>
+    <string name="sync_simplified_edit_device_remove_dialog_title_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Vai noņemt %1$s no Sync &amp; Backup?</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body_v2" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s” vairs nevarēs piekļūt taviem sinhronizētajiem datiem. Grāmatzīmes, automātiskās aizpildīšanas dati un Duck.ai sarunas paliks tavās ierīcēs.</string>
 
     <!-- Edit Device screen: turn off sync dialog -->
     <string name="sync_simplified_edit_device_turn_off_dialog_title">Vai izslēgt Sync &amp; Backup?</string>
