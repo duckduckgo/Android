@@ -25,6 +25,8 @@ import android.view.TouchDelegate
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -102,6 +104,7 @@ class DuckAiTabGridCardView(
                     tabChatItemTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
                     snippet.text = content.snippet
                     snippet.show()
+                    bindChatType(R.string.duckAiTabCardChatTypeLabel, R.drawable.ic_chat_16)
                     tabChatItemDetails.show()
                 }
                 is RealDuckAiTabGridItemContent.Thinking -> {
@@ -109,6 +112,7 @@ class DuckAiTabGridCardView(
                     tabChatItemTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_thinking_16, 0, 0, 0)
                     snippet.text = content.title
                     snippet.show()
+                    bindChatType(R.string.duckAiTabCardChatTypeLabel, R.drawable.ic_chat_16)
                     tabChatItemDetails.show()
                 }
                 is RealDuckAiTabGridItemContent.ImageChat -> {
@@ -116,8 +120,17 @@ class DuckAiTabGridCardView(
                     tabChatItemTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
                     snippet.gone()
                     thumbnail.show()
+                    bindChatType(R.string.duckAiTabCardChatTypeLabel, R.drawable.ic_chat_16)
                     tabChatItemDetails.show()
                     loadThumbnail(content)
+                }
+                is RealDuckAiTabGridItemContent.VoiceTranscript -> {
+                    tabChatItemTitle.text = content.title
+                    tabChatItemTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
+                    snippet.text = content.transcript
+                    snippet.show()
+                    bindChatType(R.string.duckAiTabCardTranscriptTypeLabel, R.drawable.ic_ai_chat_voice_16)
+                    tabChatItemDetails.show()
                 }
                 RealDuckAiTabGridItemContent.Empty -> {
                     tabChatItemEmptyLogo.show()
@@ -127,6 +140,11 @@ class DuckAiTabGridCardView(
                 }
             }
         }
+    }
+
+    private fun bindChatType(@StringRes label: Int, @DrawableRes icon: Int) = with(binding.tabChatItemType) {
+        setChipText(label)
+        setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0)
     }
 
     private fun bindState(state: DuckAiTabGridItemState) = with(binding) {

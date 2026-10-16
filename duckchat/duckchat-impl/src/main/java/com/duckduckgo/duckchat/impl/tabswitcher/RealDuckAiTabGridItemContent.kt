@@ -24,6 +24,9 @@ sealed class RealDuckAiTabGridItemContent : DuckAiTabGridItemContent {
 
     data class Chat(val title: String, val snippet: String) : RealDuckAiTabGridItemContent()
 
+    /** A voice chat that is no longer active, previewed by its [transcript]. */
+    data class VoiceTranscript(val title: String, val transcript: String) : RealDuckAiTabGridItemContent()
+
     /** A question has been sent and no reply text exists yet. */
     data class Thinking(val title: String) : RealDuckAiTabGridItemContent()
 

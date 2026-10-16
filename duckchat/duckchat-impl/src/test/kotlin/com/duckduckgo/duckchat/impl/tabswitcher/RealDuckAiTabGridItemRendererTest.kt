@@ -121,6 +121,20 @@ class RealDuckAiTabGridItemRendererTest {
     }
 
     @Test
+    fun whenVoiceChatWithLastMessageThenTranscriptContent() = runTest {
+        whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(isVoice = true, lastMessageText = "Said"))
+
+        assertEquals(RealDuckAiTabGridItemContent.VoiceTranscript("Title", "Said"), testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+    }
+
+    @Test
+    fun whenVoiceChatWithoutTextThenEmptyContent() = runTest {
+        whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(isVoice = true, lastMessageText = null, isAwaitingReply = true))
+
+        assertEquals(RealDuckAiTabGridItemContent.Empty, testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+    }
+
+    @Test
     fun whenAwaitingReplyThenThinkingContent() = runTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(lastMessageText = "Question", isAwaitingReply = true))
 
@@ -203,6 +217,7 @@ class RealDuckAiTabGridItemRendererTest {
 
     private fun preview(
         isImageGeneration: Boolean = false,
+        isVoice: Boolean = false,
         fileRefs: List<String> = emptyList(),
         lastMessageText: String? = null,
         isAwaitingReply: Boolean = false,
@@ -215,6 +230,7 @@ class RealDuckAiTabGridItemRendererTest {
             pinned = false,
             fileRefs = fileRefs,
             isImageGeneration = isImageGeneration,
+            isVoice = isVoice,
         ),
         lastMessageText = lastMessageText,
         isAwaitingReply = isAwaitingReply,
