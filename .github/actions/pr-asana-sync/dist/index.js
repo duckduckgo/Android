@@ -102666,8 +102666,6 @@ const RANDOMIZED_REVIEWERS_LIST = RANDOMIZED_REVIEWERS.split(',');
 // Tolerance for clock skew between GitHub and Asana when scanning the project
 // for tasks modified since the PR was opened
 const CLOCK_SKEW_TOLERANCE_MS = 60 * 60 * 1000;
-// Asana truncates paginated queries at about 1,000 objects, so we stop well
-// before that
 const MAX_SCANNED_TASKS = 500;
 function getUserIdFromLogin(login) {
     const userId = USER_MAP[login];
@@ -102711,11 +102709,8 @@ function findPRTask(customFields) {
             (0, core_1.info)(`Found PR task using searchInWorkspace: ${prTasks.data[0].gid}`);
             return prTasks.data[0];
         }
-        // Search results lag writes by up to a minute, so the task created by the
-        // previous run is often not indexed yet when the next event arrives.
-        // GET /tasks is read-your-writes, and any task for this PR was created or
-        // had its PR fields written after the PR was opened, so filtering on
-        // modified_since keeps the scan small whatever section the task sits in.
+        // Asana recommends using GET /tasks for consistent lookup as search infrastructure
+        // can have delays of up to 60 seconds due to indexing.
         // https://developers.asana.com/reference/searchtasksforworkspace#eventual-consistency
         const modifiedSince = new Date(Date.parse(payload.pull_request.created_at) - CLOCK_SKEW_TOLERANCE_MS).toISOString();
         let page = yield client.tasks.findAll({
@@ -102730,12 +102725,9 @@ function findPRTask(customFields) {
         while (page && scanned < MAX_SCANNED_TASKS) {
             for (const task of page.data) {
                 (0, core_1.info)(`Checking task ${task.gid} for PR link`);
-                for (const field of task.custom_fields) {
-                    if (field.gid === customFields.url.gid &&
-                        field.display_value === prURL) {
-                        (0, core_1.info)(`Found existing task ID ${task.gid} for PR ${prURL}`);
-                        return task;
-                    }
+                if (linksPR(task, customFields, prURL)) {
+                    (0, core_1.info)(`Found existing task ID ${task.gid} for PR ${prURL}`);
+                    return task;
                 }
             }
             scanned += page.data.length;
@@ -102837,6 +102829,8 @@ function createOrFindPRTask(payload, title, prStatus, customFields) {
         const body = payload.pull_request.body || '';
         const asanaTaskMatch = body.match(/Task\/Issue URL:.*https:\/\/app.asana.*\/([0-9]+).*/);
         let parentTaskId = asanaTaskMatch && asanaTaskMatch[1];
+        const prURL = payload.pull_request.html_url;
+        let linkedPRTask;
         let openShipReviewTask;
         let shipReviewPRTask;
         if (parentTaskId) {
@@ -102844,9 +102838,10 @@ function createOrFindPRTask(payload, title, prStatus, customFields) {
             try {
                 let subTasks = yield client.tasks.subtasks(parentTaskId, {
                     // eslint-disable-next-line camelcase
-                    opt_fields: 'name,completed',
+                    opt_fields: 'name,completed,custom_fields,permalink_url',
                     limit: 100
                 });
+                linkedPRTask = subTasks.data.find(t => linksPR(t, customFields, prURL));
                 openShipReviewTask = subTasks.data.find(t => t.name.startsWith('Ship Review') && !t.completed);
                 if (openShipReviewTask) {
                     subTasks = yield client.tasks.subtasks(openShipReviewTask.gid, {
@@ -102854,11 +102849,10 @@ function createOrFindPRTask(payload, title, prStatus, customFields) {
                         opt_fields: 'name,completed,assignee,custom_fields,permalink_url',
                         limit: 100
                     });
+                    linkedPRTask !== null && linkedPRTask !== void 0 ? linkedPRTask : (linkedPRTask = subTasks.data.find(t => linksPR(t, customFields, prURL)));
                     shipReviewPRTask = subTasks.data.find(t => t.name.includes('Pull Request') &&
-                        ((t.custom_fields.every(customField => customField.gid !== customFields.url.gid) &&
-                            !t.completed) ||
-                            t.custom_fields.some(customField => customField.gid === customFields.url.gid &&
-                                customField.display_value === payload.pull_request.html_url)));
+                        !t.completed &&
+                        t.custom_fields.every(customField => customField.gid !== customFields.url.gid));
                 }
             }
             catch (e) {
@@ -102875,8 +102869,9 @@ function createOrFindPRTask(payload, title, prStatus, customFields) {
             return;
         }
         // The workflow's concurrency group serializes runs per PR, so whichever
-        // event reaches here first creates the task and every later one finds it.
-        const existingTask = yield findPRTask(customFields);
+        // event reaches here first creates the task and every later one finds it,
+        // under the linked task when there is one and by lookup otherwise.
+        const existingTask = linkedPRTask !== null && linkedPRTask !== void 0 ? linkedPRTask : (yield findPRTask(customFields));
         if (existingTask) {
             (0, core_1.setOutput)('result', 'updated');
             return existingTask;
@@ -102914,6 +102909,9 @@ function createOrFindPRTask(payload, title, prStatus, customFields) {
         (0, core_1.setOutput)('result', 'created');
         return task;
     });
+}
+function linksPR(task, customFields, prURL) {
+    return task.custom_fields.some(field => field.gid === customFields.url.gid && field.display_value === prURL);
 }
 function run() {
     var _a, _b, _c;
