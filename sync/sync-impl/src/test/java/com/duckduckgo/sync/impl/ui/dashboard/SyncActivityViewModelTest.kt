@@ -287,6 +287,7 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenSyncThisDeviceWithoutDeviceAuthenticationThenNoCommandSent() = runTest {
+        givenImprovedSyncFlowDisabled()
         givenUserHasDeviceAuthentication(false)
 
         testee.commands().test {
@@ -298,6 +299,7 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenSyncThisDeviceThenIntroCreateAccountDoesNotRequireAuth() = runTest {
+        givenImprovedSyncFlowDisabled()
         givenUserHasDeviceAuthentication(true)
         testee.commands().test {
             testee.onSyncThisDevice()
@@ -375,6 +377,7 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenSyncThisDeviceWithoutDeviceAuthThenOnDeviceAuthNotEnrolledCalled() = runTest {
+        givenImprovedSyncFlowDisabled()
         givenUserHasDeviceAuthentication(false)
 
         testee.onSyncThisDevice()
@@ -403,6 +406,7 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenSyncThisDeviceWithoutDeviceAuthThenThisDeviceSyncIdle() = runTest {
+        givenImprovedSyncFlowDisabled()
         givenUserHasDeviceAuthentication(false)
 
         testee.viewState().test {
@@ -414,6 +418,7 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenSyncThisDeviceAuthenticatedThenOnUserAuthSuccessCalled() = runTest {
+        givenImprovedSyncFlowDisabled()
         givenUserHasDeviceAuthentication(true)
 
         testee.onSyncThisDevice()
@@ -423,6 +428,7 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenSyncThisDeviceWithinGracePeriodThenOnUserAuthSuccessCalled() = runTest {
+        givenImprovedSyncFlowDisabled()
         deviceAuthenticator.response = Response.Allowed.WithinGracePeriod
 
         testee.onSyncThisDevice()
@@ -432,6 +438,7 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenSyncThisDeviceAndAuthNotRequiredForBuildThenOnUserAuthSuccessCalled() = runTest {
+        givenImprovedSyncFlowDisabled()
         deviceAuthenticator.response = Response.Allowed.NotRequiredForBuild
 
         testee.commands().test {
@@ -454,6 +461,7 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenSyncThisDeviceVerificationDismissedThenNoCommandSentAndFlowCancelled() = runTest {
+        givenImprovedSyncFlowDisabled()
         deviceAuthenticator.response = Response.Cancelled.VerificationDismissed
 
         testee.viewState().test {
@@ -470,6 +478,7 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenSyncThisDeviceVerificationFailsThenShowErrorAndFlowCancelled() = runTest {
+        givenImprovedSyncFlowDisabled()
         deviceAuthenticator.response = Response.Failed("reason")
 
         testee.commands().test {
@@ -576,6 +585,7 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenRecoverDataWithoutDeviceAuthenticationThenNoCommandSent() = runTest {
+        givenImprovedSyncFlowDisabled()
         givenUserHasDeviceAuthentication(false)
 
         testee.commands().test {
@@ -587,6 +597,7 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenRecoverDataThenIntroRecoverSyncDataDoesNotRequireAuth() = runTest {
+        givenImprovedSyncFlowDisabled()
         givenUserHasDeviceAuthentication(true)
         testee.commands().test {
             testee.onRecoverYourSyncedData()
@@ -729,6 +740,7 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenDeleteAccountClickedWithDeviceAuthenticationThenAskDeleteAccount() = runTest {
+        givenImprovedSyncFlowDisabled()
         givenUserHasDeviceAuthentication(true)
 
         testee.onDeleteAccountClicked()
@@ -804,6 +816,7 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenImprovedSyncFlowDisabledAndSignedInThenViewStateReflectsLegacyFlow() = runTest {
+        givenImprovedSyncFlowDisabled()
         givenAuthenticatedUser()
 
         testee.viewState().test {
@@ -1725,6 +1738,10 @@ class SyncActivityViewModelTest {
 
     private fun givenImprovedSyncFlowEnabled() {
         fakeSyncFeature.canUseImprovedSyncFlow().setRawStoredState(State(true))
+    }
+
+    private fun givenImprovedSyncFlowDisabled() {
+        fakeSyncFeature.canUseImprovedSyncFlow().setRawStoredState(State(false))
     }
 
     private fun givenUserHasDeviceAuthentication(hasDeviceAuthentication: Boolean) {
