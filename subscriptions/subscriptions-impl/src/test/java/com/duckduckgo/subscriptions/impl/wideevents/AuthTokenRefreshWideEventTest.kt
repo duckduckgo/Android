@@ -28,17 +28,38 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.ClaimsParseError
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Expired
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.InvalidAudience
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.InvalidClaim
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.InvalidIssuer
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.InvalidScope
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.InvalidSignature
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.JwksParseError
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.KeyNotFound
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Malformed
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.MissingClaim
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.NotYetValid
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Other
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Unsupported
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
 import java.io.Closeable
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class AuthTokenRefreshWideEventTest {
@@ -87,7 +108,7 @@ class AuthTokenRefreshWideEventTest {
                 "process_name" to "main",
             ),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
-            definition = WideEventDefinition(version = Version(minor = 1, patch = 1)),
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 2)),
         )
 
         verify(wideEventClient).intervalStart(123L, "total_duration_ms_bucketed", null)
@@ -195,6 +216,172 @@ class AuthTokenRefreshWideEventTest {
         authWideEvent.onTokensValidated()
 
         verify(wideEventClient).flowStep(13L, "token_validation", true, emptyMap())
+    }
+
+    @Test
+    fun `onAccessTokenValidationFailed sends failed validation step for access token`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(25L))
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+
+        authWideEvent.onAccessTokenValidationFailed(InvalidSignature)
+
+        verify(wideEventClient).flowStep(
+            wideEventId = 25L,
+            stepName = "token_validation",
+            success = false,
+            metadata = mapOf(
+                "token_validation_failed_token" to "access",
+                "token_validation_failure_reason" to "invalid_signature",
+            ),
+        )
+    }
+
+    @Test
+    fun `onRefreshTokenValidationFailed sends failed validation step for refresh token`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(26L))
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+
+        authWideEvent.onRefreshTokenValidationFailed(KeyNotFound)
+
+        verify(wideEventClient).flowStep(
+            wideEventId = 26L,
+            stepName = "token_validation",
+            success = false,
+            metadata = mapOf(
+                "token_validation_failed_token" to "refresh",
+                "token_validation_failure_reason" to "key_not_found",
+            ),
+        )
+    }
+
+    @Test
+    fun `token validation failure reasons are mapped to param values`() = runTest {
+        val expectedValues = mapOf(
+            Expired(clockSkew = null) to "expired",
+            NotYetValid(clockSkew = null) to "not_yet_valid",
+            InvalidSignature to "invalid_signature",
+            KeyNotFound to "key_not_found",
+            JwksParseError to "jwks_parse_error",
+            Malformed to "malformed",
+            Unsupported to "unsupported",
+            MissingClaim to "missing_claim",
+            InvalidIssuer to "invalid_issuer",
+            InvalidAudience to "invalid_audience",
+            InvalidScope to "invalid_scope",
+            InvalidClaim to "invalid_claim",
+            ClaimsParseError to "claims_parse_error",
+            Other to "other",
+        )
+
+        expectedValues.forEach { (reason, expectedValue) ->
+            assertEquals(expectedValue, accessTokenValidationFailureMetadata(reason)["token_validation_failure_reason"])
+            assertEquals(expectedValue, refreshTokenValidationFailureMetadata(reason)["token_validation_failure_reason"])
+        }
+    }
+
+    @Test
+    fun `Expired with clock skew sends bucketed clock skew`() = runTest {
+        val metadata = accessTokenValidationFailureMetadata(Expired(clockSkew = 2.hours + 10.minutes))
+
+        assertEquals(
+            mapOf(
+                "token_validation_failed_token" to "access",
+                "token_validation_failure_reason" to "expired",
+                "token_validation_clock_skew_s_bucketed" to "7200",
+            ),
+            metadata,
+        )
+    }
+
+    @Test
+    fun `NotYetValid with clock skew sends bucketed clock skew`() = runTest {
+        val metadata = refreshTokenValidationFailureMetadata(NotYetValid(clockSkew = (-90).seconds))
+
+        assertEquals(
+            mapOf(
+                "token_validation_failed_token" to "refresh",
+                "token_validation_failure_reason" to "not_yet_valid",
+                "token_validation_clock_skew_s_bucketed" to "-60",
+            ),
+            metadata,
+        )
+    }
+
+    @Test
+    fun `Expired and NotYetValid without clock skew do not send clock skew`() = runTest {
+        assertFalse("token_validation_clock_skew_s_bucketed" in accessTokenValidationFailureMetadata(Expired(clockSkew = null)))
+        assertFalse("token_validation_clock_skew_s_bucketed" in accessTokenValidationFailureMetadata(NotYetValid(clockSkew = null)))
+    }
+
+    @Test
+    fun `clock skew is rounded toward zero to bucket boundaries and clamped`() = runTest {
+        val expectedBuckets = listOf(
+            Duration.ZERO to "0",
+            999.milliseconds to "0",
+            (-999).milliseconds to "0",
+            1.seconds to "1",
+            (-1).seconds to "-1",
+            1999.milliseconds to "1",
+            2.seconds to "2",
+            (-2).seconds to "-2",
+            4.seconds to "2",
+            (-4).seconds to "-2",
+            5.seconds to "5",
+            (-5).seconds to "-5",
+            14.seconds to "5",
+            15.seconds to "15",
+            29.seconds to "15",
+            30.seconds to "30",
+            60.seconds to "60",
+            119.seconds to "60",
+            120.seconds to "120",
+            300.seconds to "300",
+            600.seconds to "600",
+            1800.seconds to "1800",
+            3600.seconds to "3600",
+            7200.seconds to "7200",
+            10800.seconds to "7200",
+            14399.seconds to "7200",
+            14400.seconds to "14400",
+            28799.seconds to "14400",
+            28800.seconds to "28800",
+            (-28800).seconds to "-28800",
+            43200.seconds to "28800",
+            86399.seconds to "28800",
+            86400.seconds to "86400",
+            (-86400).seconds to "-86400",
+            30.days to "86400",
+            (-30).days to "-86400",
+        )
+
+        expectedBuckets.forEach { (clockSkew, expectedBucket) ->
+            assertEquals(
+                "clock skew $clockSkew",
+                expectedBucket,
+                accessTokenValidationFailureMetadata(Expired(clockSkew = clockSkew))["token_validation_clock_skew_s_bucketed"],
+            )
+        }
+    }
+
+    private suspend fun accessTokenValidationFailureMetadata(reason: TokenValidationFailureReason): Map<String, String> =
+        captureTokenValidationFailureMetadata { authWideEvent.onAccessTokenValidationFailed(reason) }
+
+    private suspend fun refreshTokenValidationFailureMetadata(reason: TokenValidationFailureReason): Map<String, String> =
+        captureTokenValidationFailureMetadata { authWideEvent.onRefreshTokenValidationFailed(reason) }
+
+    private suspend fun captureTokenValidationFailureMetadata(block: suspend () -> Unit): Map<String, String> {
+        reset(wideEventClient)
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(27L))
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+
+        block()
+
+        val metadataCaptor = argumentCaptor<Map<String, String>>()
+        verify(wideEventClient).flowStep(eq(27L), eq("token_validation"), eq(false), metadataCaptor.capture())
+        return metadataCaptor.firstValue
     }
 
     @Test
