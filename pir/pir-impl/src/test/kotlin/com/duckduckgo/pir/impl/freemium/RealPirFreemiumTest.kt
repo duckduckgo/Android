@@ -26,6 +26,7 @@ import com.duckduckgo.pir.impl.freemium.PirFreemiumState.USED
 import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirFreemiumFirstScanResult.MATCHES_FOUND
 import com.duckduckgo.pir.impl.store.PirFreemiumFirstScanResult.NO_MATCHES
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -50,6 +51,7 @@ class RealPirFreemiumTest {
     fun setUp() = runTest {
         pirRemoteFeatures.freemium().setRawStoredState(State(enable = true))
         whenever(subscriptions.isSignedIn()).thenReturn(false)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
         whenever(dataStore.firstScanResult).thenReturn(null)
 
         testee = RealPirFreemium(
@@ -75,8 +77,41 @@ class RealPirFreemiumTest {
     @Test
     fun whenUserIsSignedInThenNotEligible() = runTest {
         whenever(subscriptions.isSignedIn()).thenReturn(true)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
 
         assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
+    }
+
+    @Test
+    fun whenSignedInWithNoSubscriptionThenStillEligible() = runTest {
+        // A failed purchase leaves an account behind: SubscriptionsManager.purchase() creates one
+        // before launching the Play billing flow and nothing removes it when that flow fails. The
+        // user is signed in with no subscription, so the paid PIR row is hidden too — without this,
+        // they lose every PIR entry point until app data is cleared.
+        whenever(subscriptions.isSignedIn()).thenReturn(true)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
+
+        assertEquals(ELIGIBLE, testee.getPirFreemiumState())
+    }
+
+    @Test
+    fun whenSignedInWithNoSubscriptionAfterAFreeScanThenResultsStillReachable() = runTest {
+        whenever(subscriptions.isSignedIn()).thenReturn(true)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
+        whenever(dataStore.firstScanResult).thenReturn(NO_MATCHES)
+
+        assertEquals(USED, testee.getPirFreemiumState())
+    }
+
+    @Test
+    fun whenSubscriptionIsLapsedThenNotEligible() = runTest {
+        // Deliberate: freemium is not re-offered to someone who already had a subscription.
+        listOf(SubscriptionStatus.EXPIRED, SubscriptionStatus.INACTIVE, SubscriptionStatus.WAITING).forEach { status ->
+            whenever(subscriptions.isSignedIn()).thenReturn(true)
+            whenever(subscriptions.getSubscriptionStatus()).thenReturn(status)
+
+            assertEquals("expected NOT_ELIGIBLE for $status", NOT_ELIGIBLE, testee.getPirFreemiumState())
+        }
     }
 
     @Test
@@ -94,16 +129,17 @@ class RealPirFreemiumTest {
     }
 
     @Test
-    fun whenScanCompletedButUserSignedInSinceThenNotEligible() = runTest {
+    fun whenScanCompletedButUserSubscribedSinceThenNotEligible() = runTest {
         whenever(dataStore.firstScanResult).thenReturn(MATCHES_FOUND)
         whenever(subscriptions.isSignedIn()).thenReturn(true)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
 
         assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
     }
 
     @Test
-    fun whenSignedInCheckThrowsThenNotEligible() = runTest {
-        whenever(subscriptions.isSignedIn()).thenThrow(RuntimeException("backend unavailable"))
+    fun whenSubscriptionStatusCheckThrowsThenNotEligible() = runTest {
+        whenever(subscriptions.getSubscriptionStatus()).thenThrow(RuntimeException("backend unavailable"))
 
         assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
     }
