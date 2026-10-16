@@ -308,7 +308,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
             metadata = startMetadata(reasoningEffort, selectedTool),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 24.hours, flowStatus = FlowStatus.Failure(reason = REASON_NOT_RETURNED)),
         ).onSuccess { flowId ->
-            val flow = ResponseWait(flowId = flowId, tabId = tabId, chatId = chatId)
+            val flow = ResponseWait(flowId = flowId, tabId = tabId, chatId = chatId, awaitingFirstStream = true)
             flow.onScreen = onScreen()?.let(flow::matches) ?: false
             flows += flow
             wideEventClient.intervalStart(flowId, INTERVAL_PROMPT_TO_LEAVE, buckets = PROMPT_BUCKETS)
@@ -342,10 +342,12 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
             status in LOADING_STATUSES || status.startsWith(START_STREAM_PREFIX) -> {
                 flow.lastState = STATE_LOADING
                 flow.awaitingReloadedStream = false
+                flow.awaitingFirstStream = false
                 if (flow.result != RESULT_STOPPED) flow.done = false
                 return
             }
             status == STATUS_READY || status == STATUS_ERROR -> {
+                if (flow.awaitingFirstStream) return
                 flow.lastState = status
                 // The reloaded page reports ready even for a response that failed before the process died.
                 val keepsError = flow.awaitingReloadedStream && flow.result == RESULT_ERROR && status == STATUS_READY
@@ -430,6 +432,8 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         val flowId: Long,
         var tabId: String,
         var chatId: String?,
+        // A page loading for an outside-chat prompt reports an idle ready before the prompt's stream starts.
+        var awaitingFirstStream: Boolean = false,
     ) {
         var onScreen = false
         var left = false
