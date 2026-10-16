@@ -100,16 +100,22 @@ class DuckAiTabGridCardView(
                     tabChatItemTitle.text = content.title
                     tabChatItemTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
                     snippet.text = content.snippet
+                    snippet.show()
                     tabChatItemDetails.show()
                 }
                 is RealDuckAiTabGridItemContent.Thinking -> {
                     tabChatItemTitle.setText(R.string.duckAiTabCardThinkingTitle)
                     tabChatItemTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_thinking_16, 0, 0, 0)
                     snippet.text = content.title
+                    snippet.show()
                     tabChatItemDetails.show()
                 }
                 is RealDuckAiTabGridItemContent.ImageChat -> {
+                    tabChatItemTitle.text = content.title
+                    tabChatItemTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
+                    snippet.gone()
                     thumbnail.show()
+                    tabChatItemDetails.show()
                     loadThumbnail(content)
                 }
                 RealDuckAiTabGridItemContent.Empty -> {
@@ -167,7 +173,7 @@ class DuckAiTabGridCardView(
             if (bitmap != null) {
                 binding.thumbnail.setImageBitmap(bitmap)
             } else {
-                binding.thumbnail.gone()
+                binding.tabChatItemDetails.gone()
                 binding.tabChatItemEmptyLogo.show()
             }
         }
