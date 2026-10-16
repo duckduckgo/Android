@@ -204,7 +204,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/duckAiTabCardVoiceChatTypeLabel"
-                    app:drawableStartCompat="@drawable/ic_chat_16"
+                    app:drawableStartCompat="@drawable/ic_ai_chat_voice_16"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
