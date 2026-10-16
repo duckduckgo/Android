@@ -304,6 +304,13 @@ interface DuckChatFeature {
     fun nativeToSConsent(): Toggle
 
     /**
+     * @return `true` when the duckduckgo.com homepage may list the user's Duck.ai chats via `getAIChats`.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun homepageChatSuggestions(): Toggle
+
+    /**
      * @return `true` when Duck.ai promo campaigns are supported. Exposed to Duck.ai as `supportsBonusOffer`.
      * If the remote feature is not present defaults to `internal`.
      */

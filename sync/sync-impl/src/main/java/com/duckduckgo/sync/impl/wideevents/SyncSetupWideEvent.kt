@@ -112,6 +112,10 @@ class SyncSetupWideEventImpl @Inject constructor(
      * If the dialog prompting user to enroll in device auth is shown, abort the flow, see [onEnrollDeviceAuthDialogShown].
      * If the dialog is never shown, the flow will become stale and be reported as [FlowStatus.Unknown] with last step being [STEP_DEVICE_AUTH_NOT_ENROLLED]
      * which indicates an issue.
+     *
+     * When we authenticate on the intro screen, the enroll dialog does not abort the flow, because the user can enroll and retry
+     * without leaving the screen. There, [STEP_DEVICE_AUTH_NOT_ENROLLED] can be followed by [STEP_USER_AUTH] and a successful finish,
+     * and leaving the screen finishes the flow as [FlowStatus.Cancelled].
      */
     override suspend fun onDeviceAuthNotEnrolled() {
         if (!isFeatureEnabled()) return

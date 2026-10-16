@@ -476,6 +476,28 @@
             { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
     },
+    "onboarding_time-limit": {
+        "description": "Contextual onboarding ended by the time limit (days since install or app opens) before the user completed or skipped it. reached once per user; value is the limit that ended it.",
+        "owners": ["aibrahim-"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "event",
+                "type": "string",
+                "description": "Event type for the onboarding instrumentation standard",
+                "enum": ["reached"]
+            },
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingDownloadReasonVariant",
+            "inputPreviewAction",
+            { "key": "value", "type": "string", "description": "The limit that ended onboarding.", "enum": ["days", "app-opens"] }
+        ]
+    },
     "onboarding_download-choice": {
         "description": "Download-reason step of the segmented onboarding flow. shown when the download-reason screen is displayed; clicked when the user confirms a reason, which is also the point the reason starts being reported as variant_download_reason. Unique once per user per (event, value).",
         "owners": ["LukasPaczos"],

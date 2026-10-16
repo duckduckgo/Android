@@ -94,5 +94,48 @@
                 "enum": ["v1", "v2"]
             }
         ]
+    },
+    "sync_turn_off_sheet_shown": {
+        "description": "The turn off sync bottom sheet was shown after the user tapped Turn Off Sync on the Sync settings screen",
+        "owners": ["MiSikora"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync_turn_off_option_selected": {
+        "description": "User chose an option on the turn off sync bottom sheet",
+        "owners": ["MiSikora"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "option",
+                "type": "string",
+                "description": "Which option the user chose on the sheet: this_device turns off sync on this device only, all_devices_and_server_data turns off sync on all devices and deletes the server data",
+                "enum": ["this_device", "all_devices_and_server_data"]
+            }
+        ]
+    },
+    "sync_delete_server_data_confirmation_shown": {
+        "description": "The confirmation dialog for turning off sync on all devices and deleting server data was shown",
+        "owners": ["MiSikora"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync_delete_server_data_confirmation_confirmed": {
+        "description": "User confirmed turning off sync on all devices and deleting server data",
+        "owners": ["MiSikora"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync_delete_server_data_confirmation_dismissed": {
+        "description": "User dismissed the confirmation dialog for turning off sync on all devices and deleting server data, either with the cancel button or by dismissing the dialog",
+        "owners": ["MiSikora"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }

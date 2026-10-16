@@ -32,7 +32,7 @@ import com.duckduckgo.sync.impl.ui.dashboard.SyncDeviceListItem.SyncedDevice
 import com.duckduckgo.sync.impl.ui.dashboard.SyncedDeviceAdapter.Listener
 
 class SyncedDeviceAdapter(
-    private val listener: Listener,
+    private val listener: Listener? = null,
 ) : ListAdapter<SyncDeviceListItem, ViewHolder>(ItemCallback) {
     override fun getItemViewType(position: Int): Int = when (val item = getItem(position)) {
         is LoadingItem -> R.layout.item_sync_device_loading
@@ -108,14 +108,16 @@ private object ItemCallback : DiffUtil.ItemCallback<SyncDeviceListItem>() {
 
 private class LocalDeviceViewHolder(
     private val binding: ItemSyncDeviceLocalBinding,
-    private val listener: Listener,
+    private val listener: Listener?,
 ) : ViewHolder(binding.root) {
     private var device: ConnectedDevice? = null
 
     init {
         binding.root.setSecondaryText(itemView.context.getString(R.string.sync_simplified_settings_local_device_item_hint))
-        binding.root.setOnClickListener {
-            device?.let(listener::onDeviceClicked)
+        if (listener != null) {
+            binding.root.setOnClickListener {
+                device?.let(listener::onDeviceClicked)
+            }
         }
     }
 
@@ -128,13 +130,15 @@ private class LocalDeviceViewHolder(
 
 private class RemoteDeviceViewHolder(
     private val binding: ItemSyncDeviceRemoteBinding,
-    private val listener: Listener,
+    private val listener: Listener?,
 ) : ViewHolder(binding.root) {
     private var device: ConnectedDevice? = null
 
     init {
-        binding.root.setOnClickListener {
-            device?.let(listener::onDeviceClicked)
+        if (listener != null) {
+            binding.root.setOnClickListener {
+                device?.let(listener::onDeviceClicked)
+            }
         }
     }
 

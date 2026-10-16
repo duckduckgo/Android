@@ -63,6 +63,8 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.pixel.InputOutcomeTracker
+import com.duckduckgo.duckchat.impl.pixel.InputSubmitMethod
 import com.duckduckgo.duckchat.impl.terms.DuckAiTermsRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.ChatSuggestionsReader
@@ -124,6 +126,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val history: NavigationHistory,
     private val termsRepository: DuckAiTermsRepository,
     private val duckChatFeature: DuckChatFeature,
+    private val inputOutcomeTracker: InputOutcomeTracker,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -298,6 +301,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         hasImageAttachment: Boolean,
         hasFileAttachment: Boolean,
         addressBarEntryPoint: DuckChatEntryPoint,
+        submitMethod: InputSubmitMethod,
     ) {
         val tool = getSelectedTool()?.let { Tool.from(it) }
         val selectedToolParam = when (tool) {
@@ -325,11 +329,15 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             Tool.WEB_SEARCH -> duckChatPixels.fireWebSearchSubmitted(surface)
             null -> {}
         }
+        inputOutcomeTracker.promptSubmitted(submitMethod)
     }
 
     fun fireSentPromptInChat() = duckChatPixels.fireSentPromptInChat(currentSurface())
 
-    fun fireVoiceTapped() = duckChatPixels.fireVoiceTapped(currentSurface())
+    fun fireVoiceTapped() {
+        duckChatPixels.fireVoiceTapped(currentSurface())
+        inputOutcomeTracker.voiceStarted()
+    }
 
     fun fireVoiceSearchTapped() = duckChatPixels.fireVoiceSearchTapped(currentSurface())
 
@@ -385,6 +393,52 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     fun setFooterInputFocused(focused: Boolean) {
         footerInputFocused.value = focused
+    }
+
+    private data class InputSessionState(
+        val active: Boolean,
+        val surface: DuckChatPixelSurface,
+        val tosDisclaimerShown: Boolean,
+    )
+
+    // A Duck.ai input session is the input focused with Duck.ai selected, outside the edit surface. That is when
+    // the ToS footer can show, so the disclaimer was shown exactly when the terms were pending during the session.
+    private var observedInputSession: InputSessionState? = null
+    private var inputWindowVisible = true
+
+    init {
+        viewModelScope.launch {
+            combine(footerContext, termsRequired) { context, termsRequired ->
+                val active = context.isDuckAiSelected && context.isInputFocused && !context.isEditing
+                InputSessionState(active, DuckChatPixelSurface.from(context.inputContext), tosDisclaimerShown = active && termsRequired)
+            }
+                .distinctUntilChanged()
+                .collect { state ->
+                    val previous = observedInputSession
+                    observedInputSession = state
+                    if (!inputWindowVisible) return@collect
+                    if (state.active) {
+                        if (previous?.active != true) inputOutcomeTracker.sessionStarted(state.surface)
+                        if (state.tosDisclaimerShown) inputOutcomeTracker.tosDisclaimerDisplayed()
+                    } else if (previous?.active == true) {
+                        inputOutcomeTracker.sessionEnded()
+                    }
+                }
+        }
+    }
+
+    /** The app went to the background or the surface was dismissed: whatever the user was going to send, they have not. */
+    fun onInputWindowHidden() {
+        inputWindowVisible = false
+        inputOutcomeTracker.sessionEnded()
+    }
+
+    fun onInputWindowShown() {
+        inputWindowVisible = true
+        observedInputSession?.takeIf { it.active }?.let {
+            inputOutcomeTracker.sessionStarted(it.surface)
+            if (it.tosDisclaimerShown) inputOutcomeTracker.tosDisclaimerDisplayed()
+        }
     }
 
     fun selectModelById(modelId: String) {

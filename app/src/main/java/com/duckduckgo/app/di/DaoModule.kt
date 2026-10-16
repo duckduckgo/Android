@@ -36,11 +36,6 @@ import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.tabs.db.DuckAiTabSessionDao
 import com.duckduckgo.app.tabs.db.TabPageContextDao
 import com.duckduckgo.app.tabs.db.TabsDao
-import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
-import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
-import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
-import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
-import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.search.SearchCountDao
@@ -56,18 +51,6 @@ import dagger.Provides
 @Module
 @ContributesTo(AppScope::class)
 object DaoModule {
-
-    @Provides
-    fun providesTdsTrackDao(database: AppDatabase): TdsTrackerDao = database.tdsTrackerDao()
-
-    @Provides
-    fun providesTdsEntityDao(database: AppDatabase): TdsEntityDao = database.tdsEntityDao()
-
-    @Provides
-    fun providesTdsDomainEntityDao(database: AppDatabase): TdsDomainEntityDao = database.tdsDomainEntityDao()
-
-    @Provides
-    fun providesTdsCnameEntityDao(database: AppDatabase): TdsCnameEntityDao = database.tdsCnameEntityDao()
 
     @Provides
     fun providesUserAllowList(database: AppDatabase): UserAllowListDao = database.userAllowListDao()
@@ -115,9 +98,6 @@ object DaoModule {
 
     @Provides
     fun privacyProtectionCounts(database: AppDatabase): PrivacyProtectionCountDao = database.privacyProtectionCountsDao()
-
-    @Provides
-    fun tdsDao(database: AppDatabase): TdsMetadataDao = database.tdsDao()
 
     @Provides
     fun userStageDao(database: AppDatabase): UserStageDao = database.userStageDao()

@@ -32,6 +32,27 @@
             }
         ]
     },
+    "sync_setup_authentication_result": {
+        "description": "The user answered a device authentication prompt during sync setup. Not fired when a recent authentication is reused and no prompt is shown",
+        "owners": ["MiSikora"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "result",
+                "type": "string",
+                "description": "How the prompt ended: succeeded when the user authenticated, cancelled when the user dismissed the prompt, failed when authentication ended with an error, unconfigured when the device has no screen lock and the user closed the prompt asking to set one up",
+                "enum": ["succeeded", "cancelled", "failed", "unconfigured"]
+            },
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Which entry point asked for authentication",
+                "enum": ["settings_not_synced", "settings_synced", "this_device", "recover", "deep_link"]
+            }
+        ]
+    },
     "sync_scanner_camera_permission_state": {
         "description": "Reports the camera permission state observed on the sync scanner screen: whether it was already granted before and after asking for it, via the permission dialog or the system settings",
         "owners": ["MiSikora"],
