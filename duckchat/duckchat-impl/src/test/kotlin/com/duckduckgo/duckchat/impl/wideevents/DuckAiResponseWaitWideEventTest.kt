@@ -358,6 +358,42 @@ class DuckAiResponseWaitWideEventTest {
     }
 
     @Test
+    fun `when history is off and a new chat is created in the same tab then the old flow leaves and the next prompt starts a new flow`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(1L), Result.success(2L))
+        promptInChat(chatId = null)
+
+        testee.onNewChatCreated("t1")
+        testee.onResponseState("t1", "ready")
+        idle()
+
+        verify(wideEventClient).flowStep(eq(1L), eq("left"), eq(true), eq(mapOf("left_via" to "chat_switched")))
+        verify(wideEventClient, never()).flowFinish(any(), any(), any())
+        verify(wideEventClient, never()).flowStep(any(), eq("response_ready_while_away"), any(), any())
+
+        promptInChat(chatId = null)
+
+        verify(wideEventClient, times(2)).flowStart(any(), anyOrNull(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun `when history is off and a new chat opens in a new tab then the old flow leaves via new_tab_opened and can return`() = runTest {
+        promptInChat(chatId = null)
+
+        testee.onExitIntent("t1", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+        testee.onNewChatCreated("t1")
+        onChat("t2", null)
+        idle()
+
+        verify(wideEventClient).flowStep(eq(1L), eq("left"), eq(true), eq(mapOf("left_via" to "new_tab_opened")))
+
+        onChat("t1", null)
+        idle()
+
+        verify(wideEventClient).flowStep(eq(1L), eq("returned"), eq(true), eq(mapOf("response_state_on_return" to "loading")))
+    }
+
+    @Test
     fun `when new chat opened in a new tab then left_via new_tab_opened`() = runTest {
         promptInChat(tabId = "t1", chatId = "A")
 
