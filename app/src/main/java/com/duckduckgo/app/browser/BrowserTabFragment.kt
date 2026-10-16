@@ -2027,6 +2027,11 @@ class BrowserTabFragment :
         tabSwitcherActivityResult.launch(intent)
     }
 
+    override fun onStart() {
+        super.onStart()
+        if (fragmentIsVisible()) webViewClient.onTabForegrounded()
+    }
+
     override fun onResume() {
         super.onResume()
 
@@ -2065,6 +2070,7 @@ class BrowserTabFragment :
     }
 
     override fun onStop() {
+        webViewClient.onTabBackgrounded()
         alertDialog?.dismiss()
         super.onStop()
     }
@@ -2483,6 +2489,7 @@ class BrowserTabFragment :
         if (currentIndex >= 0) {
             viewModel.recoverFromWarningPage(true)
             if (webView?.canGoBack() == true && canGoBack) {
+                webViewClient.onUserInitiatedLoad()
                 webView?.goBack()
             } else {
                 refresh()
@@ -2586,6 +2593,7 @@ class BrowserTabFragment :
         clientBrandHintProvider.setOn(webView?.safeSettings, url)
         hideKeyboard()
         omnibar.hideFindInPage()
+        webViewClient.onUserInitiatedLoad()
         webView?.loadUrl(url, headers)
     }
 
@@ -2649,6 +2657,7 @@ class BrowserTabFragment :
     }
 
     fun refresh() {
+        webViewClient.onUserInitiatedLoad()
         webView?.reload()
         viewModel.onWebViewRefreshed()
         viewModel.resetErrors()
@@ -2790,6 +2799,7 @@ class BrowserTabFragment :
                 val currentIndex = navList?.currentIndex ?: 0
                 clientBrandHintProvider.setOn(webView?.safeSettings, navList?.getItemAtIndex(currentIndex - 1)?.url.toString())
                 viewModel.refreshBrowserError()
+                webViewClient.onUserInitiatedLoad()
                 webView?.goBackOrForward(-it.steps)
             }
 
@@ -2799,6 +2809,7 @@ class BrowserTabFragment :
                 val currentIndex = navList?.currentIndex ?: 0
                 clientBrandHintProvider.setOn(webView?.safeSettings, navList?.getItemAtIndex(currentIndex + 1)?.url.toString())
                 viewModel.refreshBrowserError()
+                webViewClient.onUserInitiatedLoad()
                 webView?.goForward()
             }
 
@@ -5218,12 +5229,14 @@ class BrowserTabFragment :
     private fun onTabHidden() {
         if (!isAdded) return
         viewModel.onViewHidden()
+        webViewClient.onTabBackgrounded()
         downloadMessagesJob.cancel()
         webView?.onPause()
     }
 
     private fun onTabVisible() {
         if (!isAdded) return
+        webViewClient.onTabForegrounded()
         webView?.onResume()
         // ViewPager2 can keep neighbors STARTED/RESUMED; expand so a bottom omnibar that was scrolled
         // away on a previous visit isn't left as an icons-only strip.
@@ -5531,6 +5544,7 @@ class BrowserTabFragment :
         val currentIndex = navList?.currentIndex ?: 0
 
         clientBrandHintProvider.setOn(webView?.safeSettings, navList?.getItemAtIndex(currentIndex + stepsToMove)?.url.toString())
+        webViewClient.onUserInitiatedLoad()
         webView?.goBackOrForward(stepsToMove)
     }
 
