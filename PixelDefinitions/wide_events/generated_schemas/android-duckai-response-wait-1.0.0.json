@@ -93,22 +93,27 @@
                                 },
                                 "status_reason": {
                                     "type": "string",
-                                    "description": "Reason the flow ended: watched when the user stayed on the tab until the response finished, returned when the user came back to the tab after leaving, not_returned when the user never came back before the flow expired",
+                                    "description": "Reason the flow ended. The flow follows the chat, not the tab it was sent from. watched when the user stayed on the chat until the response finished, returned when the user came back to the chat after leaving, not_returned when the user never came back before the flow expired. Present on every event",
                                     "enum": ["watched", "returned", "not_returned"]
+                                },
+                                "failure_reason": {
+                                    "type": "string",
+                                    "description": "Reason the flow failed. not_returned when the user never came back to the chat before the flow expired. Only present on FAILURE events",
+                                    "enum": ["not_returned"]
                                 },
                                 "response_result": {
                                     "type": "string",
-                                    "description": "Outcome of the response as last observed. unknown until the page reports a terminal state. Present on every event",
+                                    "description": "Outcome of the response as last observed. unknown until the page reports a terminal state. Unreliable when response_state_on_return is page_reloaded, because a reloaded page can report a truncated reply as ready. Present on every event",
                                     "enum": ["ready", "error", "stopped", "unknown"]
                                 },
                                 "step.left": {
                                     "type": "string",
-                                    "description": "Parameter present when the user left the Duck.ai tab while the response was still pending or ready",
+                                    "description": "Parameter present when the user left the chat while the response was still loading",
                                     "enum": ["true"]
                                 },
                                 "left_via": {
                                     "type": "string",
-                                    "description": "How the user left the Duck.ai tab. Present only when step.left is present",
+                                    "description": "How the user left the chat. Present only when step.left is present",
                                     "enum": [
                                         "app_backgrounded",
                                         "chat_switched",
@@ -126,7 +131,7 @@
                                 },
                                 "step.returned": {
                                     "type": "string",
-                                    "description": "Parameter present when the user came back to the Duck.ai tab after leaving",
+                                    "description": "Parameter present when the user came back to the chat after leaving, in the same tab or another one",
                                     "enum": ["true"]
                                 },
                                 "response_state_on_return": {
@@ -136,7 +141,7 @@
                                 },
                                 "step.prompt_after_return": {
                                     "type": "string",
-                                    "description": "Parameter present when the user submitted another prompt in the same tab after returning",
+                                    "description": "Parameter present when the user submitted another prompt in the same chat after returning",
                                     "enum": ["true"]
                                 },
                                 "prompt_to_leave_ms_bucketed": {
