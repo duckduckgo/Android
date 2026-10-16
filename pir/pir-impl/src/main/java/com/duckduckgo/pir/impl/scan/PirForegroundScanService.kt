@@ -129,13 +129,7 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
                 stopSelf()
                 return@launch
             }
-            val result = pirJobsRunner.runEligibleJobs(this@PirForegroundScanService, executionType, runMode)
-            if (result.isSuccess) {
-                pirNotificationManager.showScanStatusNotification(
-                    title = getString(R.string.pirNotificationTitleComplete),
-                    message = getString(R.string.pirNotificationMessageComplete),
-                )
-            }
+            pirJobsRunner.runEligibleJobs(this@PirForegroundScanService, executionType, runMode)
             stopSelf()
         }
 

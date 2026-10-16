@@ -30,6 +30,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner
+import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.checker.isEnabled
 import com.duckduckgo.pir.impl.dashboard.PirDashboardUrlProvider
@@ -154,6 +155,12 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
 
         binding.pirSimulateFreeScanMatches.setOnClickListener { simulateFreeScanResult(PirFreemiumFirstScanResult.MATCHES_FOUND) }
         binding.pirSimulateFreeScanNoMatches.setOnClickListener { simulateFreeScanResult(PirFreemiumFirstScanResult.NO_MATCHES) }
+
+        binding.pirShowFreemiumScanCompleteNotification.setOnClickListener {
+            if (!pirNotificationManager.showScanCompleteNotification(PirRunMode.SCAN_ONLY)) {
+                Toast.makeText(this, getString(R.string.pirDevShowFreemiumScanCompleteNotificationDenied), Toast.LENGTH_SHORT).show()
+            }
+        }
 
         binding.pirForceFreemiumEligibility.setIsChecked(pirInternalSettingsDataStore.isFreemiumEligibilityForced)
         binding.pirForceFreemiumEligibility.setOnCheckedChangeListener { _, isChecked ->

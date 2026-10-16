@@ -36,6 +36,7 @@ import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import com.duckduckgo.pir.impl.models.Address
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
+import com.duckduckgo.pir.impl.notifications.PirScanCompleteNotifier
 import com.duckduckgo.pir.impl.onboarding.experiment.SubscriptionOnboardingExperimentMetrics
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
@@ -82,6 +83,7 @@ class PirWebSaveProfileMessageHandlerTest {
     private val mockPirRemoteFeatures: PirRemoteFeatures = mock()
     private val mockFreemiumToggle: Toggle = mock()
     private val mockPirFreemiumDataStore: PirFreemiumDataStore = mock()
+    private val mockPirScanCompleteNotifier: PirScanCompleteNotifier = mock()
     private val testScope = TestScope()
 
     @Before
@@ -105,6 +107,7 @@ class PirWebSaveProfileMessageHandlerTest {
             pirWorkHandler = mockPirWorkHandler,
             pirRemoteFeatures = mockPirRemoteFeatures,
             pirFreemiumDataStore = mockPirFreemiumDataStore,
+            pirScanCompleteNotifier = mockPirScanCompleteNotifier,
         )
     }
 
@@ -879,6 +882,95 @@ class PirWebSaveProfileMessageHandlerTest {
 
         // Then
         verify(mockPirFreemiumDataStore, never()).activate(any())
+    }
+
+    @Test
+    fun whenSavingProfileAsFreeUserThenScanCompleteNotificationIsMarkedPendingBeforeStartingScan() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(
+            flowOf(PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED)),
+            flowOf(PirEligibility.Enabled(PirRunMode.SCAN_ONLY)),
+        )
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, null)
+
+        // Then the run that finishes this scan takes the flag, so it has to be marked before the scan starts
+        inOrder(mockPirScanCompleteNotifier, mockContext) {
+            verify(mockPirScanCompleteNotifier).onInitialScanStarted()
+            verify(mockContext).startForegroundService(any())
+        }
+    }
+
+    @Test
+    fun whenSavingProfileAsSubscriberThenScanCompleteNotificationIsMarkedPendingBeforeStartingScan() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)))
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, null)
+
+        // Then
+        inOrder(mockPirScanCompleteNotifier, mockContext) {
+            verify(mockPirScanCompleteNotifier).onInitialScanStarted()
+            verify(mockContext).startForegroundService(any())
+        }
+    }
+
+    @Test
+    fun whenFreeUserEditsProfileThenScanCompleteNotificationIsMarkedPending() = runTest {
+        // Given an already activated free user with a saved profile
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(listOf(createProfileQuery(id = 1)))
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_ONLY)))
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, null)
+
+        // Then
+        verify(mockPirScanCompleteNotifier).onInitialScanStarted()
+        val intentCaptor = argumentCaptor<Intent>()
+        verify(mockContext).startForegroundService(intentCaptor.capture())
+        assertEquals(PirExecutionType.MANUAL_EDIT_PROFILE.name, intentCaptor.firstValue.getStringExtra("extra_execution_type"))
+    }
+
+    @Test
+    fun whenSavingProfileAndRunModeCannotBeResolvedThenScanCompleteNotificationIsNotMarkedPending() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(
+            flowOf(PirEligibility.Disabled(DisabledReason.REPOSITORY_UNAVAILABLE)),
+        )
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, null)
+
+        // Then
+        verify(mockPirScanCompleteNotifier, never()).onInitialScanStarted()
+    }
+
+    @Test
+    fun whenSaveFailsThenScanCompleteNotificationIsNotMarkedPending() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(false)
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)))
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, null)
+
+        // Then
+        verify(mockPirScanCompleteNotifier, never()).onInitialScanStarted()
     }
 
     private suspend fun givenSuccessfulProfileSave() {

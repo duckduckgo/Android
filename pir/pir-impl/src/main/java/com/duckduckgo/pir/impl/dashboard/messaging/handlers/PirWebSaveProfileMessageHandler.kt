@@ -34,6 +34,7 @@ import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import com.duckduckgo.pir.impl.models.ProfileQuery
+import com.duckduckgo.pir.impl.notifications.PirScanCompleteNotifier
 import com.duckduckgo.pir.impl.onboarding.experiment.SubscriptionOnboardingExperimentMetrics
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
@@ -68,6 +69,7 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
     private val pirWorkHandler: PirWorkHandler,
     private val pirRemoteFeatures: PirRemoteFeatures,
     private val pirFreemiumDataStore: PirFreemiumDataStore,
+    private val pirScanCompleteNotifier: PirScanCompleteNotifier,
 ) : PirWebJsMessageHandler() {
 
     override val message = PirDashboardWebMessages.SAVE_PROFILE
@@ -121,6 +123,11 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
 
             // re-resolved after activation, which is what turns a non-subscriber into a scan-only user
             val runMode = pirWorkHandler.canRunPir().firstOrNull().runModeOrNull
+
+            // marked before the scan starts, as the run that finishes this scan is the one that takes it
+            if (runMode != null) {
+                pirScanCompleteNotifier.onInitialScanStarted()
+            }
 
             // start the initial scan at this point as startScanAndOptOut message is not reliable
             startAndScheduleInitialScan(executionType, runMode)

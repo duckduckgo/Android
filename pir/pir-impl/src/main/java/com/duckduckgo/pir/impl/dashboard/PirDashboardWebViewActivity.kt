@@ -17,6 +17,7 @@
 package com.duckduckgo.pir.impl.dashboard
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
@@ -92,6 +93,13 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
 
         pirNotificationManager.createNotificationChannel()
         lifecycle.addObserver(viewModel)
+
+        // avoid counting relaunch from Recents as fresh launch
+        val launchedFromRecents = (intent.flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0
+        viewModel.onLaunched(
+            isRestored = savedInstanceState != null || launchedFromRecents,
+            fromFreemiumScanCompleteNotification = intent.getBooleanExtra(EXTRA_FROM_FREEMIUM_SCAN_COMPLETE_NOTIFICATION, false),
+        )
     }
 
     override fun onDestroy() {
@@ -218,5 +226,6 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
 
     companion object {
         const val EXTRA_SHOW_CLOSE_BUTTON = "extra_show_close_button"
+        const val EXTRA_FROM_FREEMIUM_SCAN_COMPLETE_NOTIFICATION = "extra_from_freemium_scan_complete_notification"
     }
 }

@@ -35,6 +35,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class PirDashboardWebViewViewModelTest {
@@ -147,5 +149,26 @@ class PirDashboardWebViewViewModelTest {
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun `test reports the notification opened pixel when launched from the freemium scan complete notification`() {
+        testee.onLaunched(isRestored = false, fromFreemiumScanCompleteNotification = true)
+
+        verify(pirPixelSender).reportFreemiumScanCompleteNotificationOpened()
+    }
+
+    @Test
+    fun `test does not report the notification opened pixel for a normal launch`() {
+        testee.onLaunched(isRestored = false, fromFreemiumScanCompleteNotification = false)
+
+        verify(pirPixelSender, never()).reportFreemiumScanCompleteNotificationOpened()
+    }
+
+    @Test
+    fun `test does not report the notification opened pixel again when the dashboard is restored`() {
+        testee.onLaunched(isRestored = true, fromFreemiumScanCompleteNotification = true)
+
+        verify(pirPixelSender, never()).reportFreemiumScanCompleteNotificationOpened()
     }
 }
