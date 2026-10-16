@@ -21,6 +21,13 @@
     android:background="@drawable/popup_menu_bg"
     android:orientation="vertical">
 
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+        android:id="@+id/chatMenuPopupHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:primaryText="@string/chatMenuPopupNewTab" />
+
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/chatMenuPopupNewChat"
         android:layout_width="match_parent"

@@ -52,4 +52,10 @@ interface TabManagerFeatureFlags {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun duckAiChatsMenu(): Toggle
+
+    /**
+     * The Duck.ai "+" menu item labels update
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiPlusMenuUpdate(): Toggle
 }
