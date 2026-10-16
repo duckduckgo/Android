@@ -75,12 +75,20 @@ sealed class BrokerAction(
         val parent: ParentElement? = null,
     ) : BrokerAction(id)
 
+    /**
+     * A click either targets [elements] directly, or branches on [choices] with an optional [default].
+     */
     data class Click(
         override val id: String,
-        val elements: List<ElementSelector>,
+        val elements: List<ElementSelector>? = null,
         val selector: String?,
-        val choice: List<Choice> = emptyList(),
+        val choices: List<Choice>? = null,
+        val default: Default? = null,
     ) : BrokerAction(id) {
+        data class Default(
+            val elements: List<ElementSelector>,
+        )
+
         data class Choice(
             val condition: Condition,
             val elements: List<ElementSelector>,

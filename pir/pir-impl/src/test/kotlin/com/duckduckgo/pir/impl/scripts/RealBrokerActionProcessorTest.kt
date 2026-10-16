@@ -32,6 +32,7 @@ import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -158,6 +159,47 @@ class RealBrokerActionProcessorTest {
             assertEquals(".city", it.getJSONObject("city").getString("selector"))
             assertEquals(".state", it.getJSONObject("state").getString("selector"))
         }
+    }
+
+    @Test
+    fun whenPushClickWithChoicesThenChoicesAndDefaultAreForwardedWithoutElements() = runTest {
+        val actionJson = """
+            {
+                "actionType": "click",
+                "id": "click-1",
+                "choices": [
+                    {
+                        "condition": {"operation": ">=", "left": "${'$'}{age}", "right": "45"},
+                        "elements": [{"type": "button", "selector": "//button[contains(text(), 'Yes')]"}]
+                    }
+                ],
+                "default": {
+                    "elements": [{"type": "button", "selector": "//button[contains(text(), 'No')]"}]
+                }
+            }
+        """.trimIndent()
+        val action = moshi.adapter(BrokerAction::class.java).fromJson(actionJson)!!
+
+        testee.pushAction(action, UserProfile())
+
+        val eventCaptor = argumentCaptor<SubscriptionEventData>()
+        verify(mockJsMessaging).sendSubscriptionEvent(eventCaptor.capture())
+
+        val pushedAction = eventCaptor.firstValue.params
+            .getJSONObject("state")
+            .getJSONObject("action")
+        // C-S-S rejects a choices click if the elements key is present at all, even when empty.
+        assertFalse(pushedAction.has("elements"))
+        pushedAction.getJSONArray("choices").getJSONObject(0).also {
+            assertEquals(">=", it.getJSONObject("condition").getString("operation"))
+            assertEquals("${'$'}{age}", it.getJSONObject("condition").getString("left"))
+            assertEquals("45", it.getJSONObject("condition").getString("right"))
+            assertEquals("//button[contains(text(), 'Yes')]", it.getJSONArray("elements").getJSONObject(0).getString("selector"))
+        }
+        assertEquals(
+            "//button[contains(text(), 'No')]",
+            pushedAction.getJSONObject("default").getJSONArray("elements").getJSONObject(0).getString("selector"),
+        )
     }
 
     @Test
