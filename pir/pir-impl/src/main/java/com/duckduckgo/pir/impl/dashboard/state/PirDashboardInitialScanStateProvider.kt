@@ -28,9 +28,11 @@ import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvi
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status.IN_PROGRESS
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status.NOT_STARTED
 import com.duckduckgo.pir.impl.freemium.PirFreeScanBrokerFilter
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
 import com.duckduckgo.pir.impl.scan.PirForegroundScanServiceMonitor
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
+import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -108,6 +110,7 @@ class RealPirDashboardInitialScanStateProvider @Inject constructor(
     private val pirScanScheduler: PirScanScheduler,
     private val pirWorkHandler: PirWorkHandler,
     private val pirFreeScanBrokerFilter: PirFreeScanBrokerFilter,
+    private val pirFreemiumDataStore: PirFreemiumDataStore,
 ) : PirDashboardStateProvider(currentTimeProvider, pirRepository, pirSchedulingRepository),
     PirDashboardInitialScanStateProvider {
     override suspend fun getActiveBrokersAndMirrorSitesTotal(): Int = withContext(dispatcherProvider.io()) {
@@ -169,19 +172,50 @@ class RealPirDashboardInitialScanStateProvider @Inject constructor(
         // A NOT_EXECUTED record for a broker that can't be scanned (gated for a scan-only user, inactive, or with an
         // unparseable scan step) never runs, so it must not count here or every dashboard open would resume a scan.
         val scannableBrokerNames = getScannableActiveBrokerNames()
+        val scanJobs = pirSchedulingRepository.getAllValidScanJobRecords()
 
-        val notExecutedJobs = pirSchedulingRepository.getAllValidScanJobRecords().filter { record ->
+        val notExecutedJobs = scanJobs.filter { record ->
             record.status == ScanJobStatus.NOT_EXECUTED &&
                 record.lastScanDateInMillis == 0L &&
                 record.brokerName in scannableBrokerNames
         }
 
-        if (notExecutedJobs.isEmpty()) {
-            logcat { "PIR-WEB: No NOT_EXECUTED jobs found, initial scan is complete" }
+        if (notExecutedJobs.isNotEmpty()) {
+            logcat { "PIR-WEB: Found ${notExecutedJobs.size} NOT_EXECUTED jobs, should resume initial scan" }
+            return true
+        }
+
+        if (hasScannableBrokersWithoutScanJobs(scanJobs, scannableBrokerNames)) {
+            logcat { "PIR-WEB: Scannable brokers have no scan jobs, should resume initial scan" }
+            return true
+        }
+
+        logcat { "PIR-WEB: No NOT_EXECUTED jobs found, initial scan is complete" }
+        return false
+    }
+
+    /**
+     * Brokers can count toward the dashboard total with no scan job to resume: a free scan creates none for
+     * subscription-gated brokers, which a free user who subscribes can then scan, and a broker data update can add brokers
+     * after the scan created its jobs. A free user's scan worker is retired once their initial scan finishes, so nothing
+     * else ever scans those brokers. A paid user who never ran a free scan is skipped, as their scheduled scan picks up
+     * added brokers. A profile with no jobs at all is skipped, as the scan that creates its jobs creates them all at once
+     * and is about to run.
+     */
+    private suspend fun hasScannableBrokersWithoutScanJobs(
+        scanJobs: List<ScanJobRecord>,
+        scannableBrokerNames: Set<String>,
+    ): Boolean {
+        if (!pirFreemiumDataStore.didActivate) {
             return false
         }
 
-        logcat { "PIR-WEB: Found ${notExecutedJobs.size} NOT_EXECUTED jobs, should resume initial scan" }
-        return true
+        if (pirWorkHandler.canRunPir().firstOrNull().runModeOrNull == null) {
+            return false
+        }
+
+        return scanJobs.groupBy { it.userProfileId }.values.any { jobsForProfile ->
+            !jobsForProfile.mapTo(hashSetOf()) { it.brokerName }.containsAll(scannableBrokerNames)
+        }
     }
 }
