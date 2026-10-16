@@ -32,6 +32,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.espresso.PrivacyTest
+import com.duckduckgo.espresso.WaitForRemotePrivacyConfigRule
 import com.duckduckgo.espresso.WebViewIdlingResource
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
@@ -43,7 +44,10 @@ import org.junit.Test
 
 class CookiesTest {
 
-    @get:Rule
+    @get:Rule(order = 0)
+    val waitForRemotePrivacyConfig = WaitForRemotePrivacyConfigRule()
+
+    @get:Rule(order = 1)
     var activityScenarioRule = activityScenarioRule<BrowserActivity>(
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,
