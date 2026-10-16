@@ -29,7 +29,6 @@ import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
@@ -53,7 +52,6 @@ import javax.inject.Inject
  * [WideEventClient.flowFinish].
  */
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = DuckAiSessionCallback::class)
 @ContributesMultibinding(AppScope::class, boundType = BrowserLifecycleObserver::class)
 class RealDuckAiSessionWideEvent @Inject constructor(
     private val wideEventClient: WideEventClient,
