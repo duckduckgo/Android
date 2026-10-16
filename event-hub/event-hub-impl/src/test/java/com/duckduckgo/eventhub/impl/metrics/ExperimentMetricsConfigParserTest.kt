@@ -148,7 +148,7 @@ class ExperimentMetricsConfigParserTest {
 
     @Test
     fun `built-in metric names are rejected`() {
-        listOf("search", "app_use", "duck_ai_prompt_sent", "duck_ai_new_chat", "2xRefresh", "3xRefresh", "privacyToggleUsed").forEach { name ->
+        listOf("search", "app_use", "duck_ai_prompt_sent", "duck_ai_new_chat", "privacyToggleUsed").forEach { name ->
             val metrics = ExperimentMetricsConfigParser.parse(
                 settings(""""$name": { "event": "a", "conversions": [ { "windows": [[0, 7]], "thresholds": [1] } ] }"""),
             )

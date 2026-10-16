@@ -132,7 +132,9 @@ class RealEventHubPixelManager @Inject constructor(
         // Sampled on arrival: an event that arrives just before a period ends belongs to that period, even if it's processed after
         val nowMillis = timeProvider.currentTimeMillis()
 
+        // Checked again once the work runs: switching the hub off may be handled first
         appCoroutineScope.launch(pixelDispatcher) {
+            if (!isEnabled()) return@launch
             metricsHandler.onEvent(eventType)
         }
 
