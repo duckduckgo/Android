@@ -135,9 +135,16 @@ class DuckAiResponseWaitWideEventTest {
         testee.onSelectedTabChanged(tabId, if (chatId == null) DUCK_AI_URL else "$DUCK_AI_URL?chatID=$chatId")
     }
 
-    private fun promptInChat(tabId: String = "t1", chatId: String? = "A", effort: String? = "low", tool: String? = null) {
+    private fun promptInChat(
+        tabId: String = "t1",
+        chatId: String? = "A",
+        effort: String? = "low",
+        tool: String? = null,
+        streamStarted: Boolean = true,
+    ) {
         onChat(tabId, chatId)
         testee.onNativePromptSubmitted(tabId, effort, tool)
+        if (streamStarted) testee.onResponseState(tabId, "start_stream:new_prompt")
         idle()
     }
 
@@ -236,6 +243,38 @@ class DuckAiResponseWaitWideEventTest {
             eq(FlowStatus.Success),
             eq(mapOf("status_reason" to "watched", "response_result" to "ready")),
         )
+    }
+
+    @Test
+    fun `when idle ready arrives before the new prompt's stream then flow finishes watched only after the stream's ready`() = runTest {
+        promptInChat(streamStarted = false)
+
+        testee.onResponseState("t1", "ready")
+        idle()
+
+        verify(wideEventClient, never()).flowFinish(any(), any(), any())
+
+        testee.onResponseState("t1", "start_stream:new_prompt")
+        testee.onResponseState("t1", "loading")
+        testee.onResponseState("t1", "ready")
+        idle()
+
+        verify(wideEventClient, times(1)).flowFinish(
+            eq(1L),
+            eq(FlowStatus.Success),
+            eq(mapOf("status_reason" to "watched", "response_result" to "ready")),
+        )
+    }
+
+    @Test
+    fun `when only an idle ready arrives before leaving then the flow records left`() = runTest {
+        promptInChat(streamStarted = false)
+
+        testee.onResponseState("t1", "ready")
+        switchToOtherSite()
+
+        verify(wideEventClient).flowStep(eq(1L), eq("left"), eq(true), eq(mapOf("left_via" to "tab_switched")))
+        verify(wideEventClient, never()).flowFinish(any(), any(), any())
     }
 
     @Test
@@ -547,7 +586,7 @@ class DuckAiResponseWaitWideEventTest {
 
     @Test
     fun `when native prompt submitted twice for the same tab before any response state then only one flow starts`() = runTest {
-        promptInChat()
+        promptInChat(streamStarted = false)
 
         testee.onNativePromptSubmitted("t1", "low", null)
         idle()
@@ -825,7 +864,7 @@ class DuckAiResponseWaitWideEventTest {
     @Test
     fun `when saving fails then it is retried after the next action`() = runTest {
         flowStore.failNextSave = true
-        promptInChat()
+        promptInChat(streamStarted = false)
         assertEquals(emptyList<PersistedResponseWaitFlow>(), flowStore.flows)
 
         testee.onSelectedTabChanged("t1", "$DUCK_AI_URL?chatID=A")
