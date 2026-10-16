@@ -36,6 +36,7 @@ enum class OnboardingPixelName(override val pixelName: String) : Pixel.PixelName
     ONBOARDING_END("onboarding_end"),
     ONBOARDING_END_TRY_DUCK_AI("onboarding_end-try-duckai"),
     ONBOARDING_SUBSCRIPTION_PROMO("onboarding_subscription-promo"),
+    ONBOARDING_TIME_LIMIT("onboarding_time-limit"),
     ONBOARDING_PASSWORD_IMPORT("onboarding_password-import"),
     ONBOARDING_PASSWORD_IMPORT_COMPLETE("onboarding_password-import-complete"),
     ONBOARDING_PASSWORD_IMPORT_ERROR("onboarding_password-import-error"),

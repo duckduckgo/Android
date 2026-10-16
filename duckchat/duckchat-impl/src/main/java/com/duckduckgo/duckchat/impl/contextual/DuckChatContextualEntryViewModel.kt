@@ -23,6 +23,7 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.pixel.InputOutcomeTracker
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
@@ -49,6 +50,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     private val textSelectionRepository: TextSelectionRepository,
     private val selectionPayloadBuilder: TextSelectionPayloadBuilder,
     private val selectionJourney: DuckAiSelectionJourneyWideEvent,
+    private val inputOutcomeTracker: InputOutcomeTracker,
 ) : ViewModel() {
 
     data class ViewState(
@@ -113,11 +115,13 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     fun onSuggestionSubmitted(prompt: NativeInputPrompt) {
         if (_viewState.value.attachedContext == null && !hasTextSelections()) latestValidPageContext?.let { attach(it) }
         fireUnifiedInputPromptSubmitted()
+        inputOutcomeTracker.suggestedPrompt()
         submit(prompt, carriesTermsConsent = false)
     }
 
     fun onSummarizeSubmitted(prompt: NativeInputPrompt) {
         fireUnifiedInputPromptSubmitted()
+        inputOutcomeTracker.suggestedPrompt()
         submit(prompt, carriesTermsConsent = false)
     }
 

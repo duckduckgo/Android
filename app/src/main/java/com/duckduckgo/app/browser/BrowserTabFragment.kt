@@ -122,8 +122,10 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
+import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
 import com.duckduckgo.app.browser.applinks.AppLinksSnackBarConfigurator
+import com.duckduckgo.app.browser.applinks.planExternalAppLaunch
 import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.OpenBrokenSiteLearnMore
@@ -627,6 +629,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var appLinksLauncher: AppLinksLauncher
+
+    @Inject
+    lateinit var appLinksHandler: AppLinksHandler
 
     @Inject
     lateinit var clientBrandHintProvider: ClientBrandHintProvider
@@ -2920,6 +2925,8 @@ class BrowserTabFragment :
                     useFirstActivityFound = false,
                     headers = it.headers,
                     showConfirmation = it.showConfirmation,
+                    trustedCallerPackage = it.trustedCallerPackage,
+                    finishCustomTabOnTrustedCallerLaunch = it.finishCustomTabOnTrustedCallerLaunch,
                 )
             }
 
@@ -3479,6 +3486,8 @@ class BrowserTabFragment :
         useFirstActivityFound: Boolean = true,
         headers: Map<String, String> = emptyMap(),
         showConfirmation: Boolean = true,
+        trustedCallerPackage: String? = null,
+        finishCustomTabOnTrustedCallerLaunch: Boolean = false,
     ) {
         context?.let {
             val pm = it.packageManager
@@ -3539,7 +3548,17 @@ class BrowserTabFragment :
                     }
                 }
             } else {
-                launchExternalIntent(it, pm, intent, activities, useFirstActivityFound, viewModel.linkOpenedInNewTab(), showConfirmation)
+                launchExternalIntent(
+                    it,
+                    pm,
+                    intent,
+                    activities,
+                    useFirstActivityFound,
+                    viewModel.linkOpenedInNewTab(),
+                    showConfirmation,
+                    trustedCallerPackage,
+                    finishCustomTabOnTrustedCallerLaunch,
+                )
             }
         }
     }
@@ -3552,6 +3571,8 @@ class BrowserTabFragment :
         useFirstActivityFound: Boolean,
         isOpenedInNewTab: Boolean,
         showConfirmation: Boolean = true,
+        trustedCallerPackage: String? = null,
+        finishCustomTabOnTrustedCallerLaunch: Boolean = false,
     ) {
         if (!isActiveCustomTab() && !isActiveTab && !isOpenedInNewTab) {
             logcat(VERBOSE) { "Will not launch an intent for an inactive tab" }
@@ -3559,18 +3580,33 @@ class BrowserTabFragment :
         }
 
         runCatching {
-            val resolvedIntent = if (activities.size == 1 || useFirstActivityFound) {
-                val appTitle = activities.first().loadLabel(pm)
-                logcat(INFO) { "Exactly one app available for intent: $appTitle" }
-                intent
+            val trustedCallerIntent = appLinksHandler.trustedCallerIntent(intent, trustedCallerPackage) {
+                pm.queryIntentActivities(it, PackageManager.MATCH_DEFAULT_ONLY)
+            }
+            val launch = planExternalAppLaunch(
+                intent = intent,
+                activities = activities,
+                useFirstActivityFound = useFirstActivityFound,
+                showConfirmation = showConfirmation,
+                trustedCallerIntent = trustedCallerIntent,
+                finishCustomTabOnTrustedCallerLaunch = finishCustomTabOnTrustedCallerLaunch,
+            )
+
+            val resolvedIntent = if (launch.useChooser) {
+                Intent.createChooser(launch.intent, getString(R.string.openExternalApp))
             } else {
-                Intent.createChooser(intent, getString(R.string.openExternalApp))
+                val appTitle = launch.activities.first().loadLabel(pm)
+                logcat(INFO) { "Exactly one app available for intent: $appTitle" }
+                launch.intent
             }
 
-            if (showConfirmation) {
+            if (launch.showConfirmation) {
                 launchExternalAppDialog(context) { context.startActivity(resolvedIntent) }
             } else {
                 context.startActivity(resolvedIntent)
+                if (launch.finishCustomTab) {
+                    finishCustomTab()
+                }
             }
         }.onFailure { exception ->
             logcat(ERROR) { "Failed to launch external app: ${exception.asLog()}" }
@@ -6450,6 +6486,7 @@ class BrowserTabFragment :
 
         fun reapplyBubbleForOrientation() {
             (lastSeenCtaViewState?.cta as? DaxBubbleCta)?.onOrientationChanged()
+            (lastSeenCtaViewState?.cta as? BrokenSitePromptDialogCta)?.onOrientationChanged(binding)
         }
 
         private fun showPrivacyProSkippedOnboardingBottomSheet(configuration: SubscriptionPromoModalCta) {

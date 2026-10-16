@@ -1,8 +1,6 @@
 appId: com.duckduckgo.mobile.android
 androidWebViewHierarchy: devtools
 name: "Autofill: Prompted to save and update credentials on web form"
-tags:
-    - autofillNoAuthTests
 ---
 # Pre-requisite: on an autofill-eligible device, including having a modern WebView
 - retry:

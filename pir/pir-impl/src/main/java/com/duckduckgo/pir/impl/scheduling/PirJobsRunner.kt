@@ -26,15 +26,21 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
+import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRendererGoneException
 import com.duckduckgo.pir.impl.common.PirWebViewCountProvider
+import com.duckduckgo.pir.impl.freemium.PirFreeScanBrokerFilter
+import com.duckduckgo.pir.impl.freemium.PirFreeScanWorkWindow
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.impl.optout.PirOptOut
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scan.PirScan
+import com.duckduckgo.pir.impl.scan.PirScanScheduler
+import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
+import com.duckduckgo.pir.impl.store.PirFreemiumFirstScanResult
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEvent
@@ -45,6 +51,7 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.ERROR
 import logcat.logcat
 import javax.inject.Inject
 
@@ -54,10 +61,13 @@ interface PirJobsRunner {
      * eligible to be run at the current time.
      *
      * Note that any new [ScanJobRecord] and [OptOutJobRecord] are also created as part of the execution path.
+     *
+     * [PirRunMode.SCAN_ONLY] restricts the run to brokers whose scan is not subscription-gated.
      */
     suspend fun runEligibleJobs(
         context: Context,
         executionType: PirExecutionType,
+        runMode: PirRunMode,
     ): Result<Unit>
 
     /**
@@ -84,10 +94,15 @@ class RealPirJobsRunner @Inject constructor(
     private val pirInitialScanCompletionWideEvent: PirInitialScanCompletionWideEvent,
     private val networkProtectionState: NetworkProtectionState,
     private val pirWebViewCountProvider: PirWebViewCountProvider,
+    private val pirFreeScanBrokerFilter: PirFreeScanBrokerFilter,
+    private val pirFreeScanWorkWindow: PirFreeScanWorkWindow,
+    private val pirScanScheduler: PirScanScheduler,
+    private val pirFreemiumDataStore: PirFreemiumDataStore,
 ) : PirJobsRunner {
     override suspend fun runEligibleJobs(
         context: Context,
         executionType: PirExecutionType,
+        runMode: PirRunMode,
     ): Result<Unit> = withContext(dispatcherProvider.io()) {
         val startTimeInMillis = currentTimeProvider.currentTimeMillis()
 
@@ -136,6 +151,16 @@ class RealPirJobsRunner @Inject constructor(
             }
         }
 
+        var allActiveBrokersAreGated = false
+        if (runMode == PirRunMode.SCAN_ONLY) {
+            val ungatedBrokerNames = pirFreeScanBrokerFilter
+                .excludingGatedBrokers(pirRepository.getAllActiveBrokerObjects())
+                .mapTo(hashSetOf()) { it.name }
+            val ungatedActiveBrokers = activeBrokers.intersect(ungatedBrokerNames).toHashSet()
+            allActiveBrokersAreGated = activeBrokers.isNotEmpty() && ungatedActiveBrokers.isEmpty()
+            activeBrokers = ungatedActiveBrokers
+        }
+
         emitStartPixel(context, executionType, profileQueries.size, activeBrokers.size)
 
         // Pre-create scan jobs and resolve eligible jobs up front so the wide event has the accurate
@@ -144,6 +169,8 @@ class RealPirJobsRunner @Inject constructor(
             attemptCreateScanJobs(activeBrokers, profileQueries)
             eligibleScanJobProvider.getAllEligibleScanJobs(currentTimeProvider.currentTimeMillis())
                 .filter { it.brokerName in activeBrokers }
+                // Repeat scans only serve removals, so a scan-only user gets one successful scan per broker.
+                .filter { runMode == PirRunMode.SCAN_AND_OPT_OUT || !it.hasTerminalResult }
         } else {
             emptyList()
         }
@@ -187,8 +214,17 @@ class RealPirJobsRunner @Inject constructor(
         )
 
         if (activeBrokers.isEmpty()) {
-            logcat { "PIR-JOB-RUNNER: No active brokers available. Completing run." }
-            pirScanWideEvent.onRunFailed(executionType = executionType, reason = FailureReason.NO_ACTIVE_BROKERS)
+            if (allActiveBrokersAreGated) {
+                // Every broker this user has is behind the subscription: a product exclusion, not a failed run.
+                // onScanCompleted closes the scan interval that onRunStarted opened; onOptOutSkipped only closes the flow interval.
+                logcat { "PIR-JOB-RUNNER: All active brokers are subscription-gated. Completing run." }
+                pirScanWideEvent.onScanCompleted(executionType)
+                pirScanWideEvent.onOptOutSkipped(executionType)
+                recordFreemiumFirstScanResultIfNeeded(runMode)
+            } else {
+                logcat { "PIR-JOB-RUNNER: No active brokers available. Completing run." }
+                pirScanWideEvent.onRunFailed(executionType = executionType, reason = FailureReason.NO_ACTIVE_BROKERS)
+            }
             emitCompletedPixel(
                 context = context,
                 executionType = executionType,
@@ -220,6 +256,12 @@ class RealPirJobsRunner @Inject constructor(
 
             pirScanWideEvent.onScanCompleted(executionType)
             pirInitialScanCompletionWideEvent.onScanCompleted()
+            recordFreemiumFirstScanResultIfNeeded(runMode)
+
+            // A scheduled run IS the scheduled scan worker; cancelling its own unique work here would cancel this coroutine.
+            if (runMode == PirRunMode.SCAN_ONLY && executionType != PirExecutionType.SCHEDULED) {
+                retireScanWorkerIfInitialScanIsDone()
+            }
 
             if (executionType.isManual) {
                 val batteryOptimizationsEnabled = !context.isIgnoringBatteryOptimizations()
@@ -232,6 +274,23 @@ class RealPirJobsRunner @Inject constructor(
                     executionType = executionType,
                     notificationsPermissionGranted = context.areNotificationsPermissionGranted(),
                 )
+            }
+
+            // Removing data requires a subscription, so a scan-only run ends here. Opt-out jobs are never
+            // created, leaving nothing for a later run to pick up.
+            if (runMode == PirRunMode.SCAN_ONLY) {
+                logcat { "PIR-JOB-RUNNER: Scan-only run. Skipping the opt-out phase." }
+                pirScanWideEvent.onOptOutSkipped(executionType)
+                emitCompletedPixel(
+                    context = context,
+                    executionType = executionType,
+                    startTimeInMillis = startTimeInMillis,
+                    totalScanJobs = totalScanJobs,
+                    totalOptOutJobs = 0,
+                    profileQueryCount = profileQueries.size,
+                    brokerCount = activeBrokers.size,
+                )
+                return@withContext Result.success(Unit)
             }
 
             val formOptOutBrokers = pirRepository.getBrokersForOptOut(true).toSet()
@@ -363,6 +422,35 @@ class RealPirJobsRunner @Inject constructor(
 
     private suspend fun obtainProfiles(): List<ProfileQuery> {
         return pirRepository.getAllUserProfileQueries()
+    }
+
+    private suspend fun recordFreemiumFirstScanResultIfNeeded(runMode: PirRunMode) {
+        if (runMode != PirRunMode.SCAN_ONLY) return
+        val storedResult = pirFreemiumDataStore.firstScanResult
+        if (storedResult == PirFreemiumFirstScanResult.MATCHES_FOUND) return
+
+        runCatching {
+            val result = if (pirRepository.getAllExtractedProfiles().isEmpty()) {
+                PirFreemiumFirstScanResult.NO_MATCHES
+            } else {
+                PirFreemiumFirstScanResult.MATCHES_FOUND
+            }
+            if (result != storedResult) {
+                pirFreemiumDataStore.recordFirstScanResult(result)
+                logcat { "PIR-JOB-RUNNER: Recorded freemium first scan result: $result" }
+            }
+        }.onFailure {
+            if (it is CancellationException) throw it
+            logcat(ERROR) { "PIR-JOB-RUNNER: Failed to record freemium first scan result: $it" }
+        }
+    }
+
+    /** The worker exists only to resume an interrupted initial scan, so it goes once there is nothing left to resume. */
+    private suspend fun retireScanWorkerIfInitialScanIsDone() {
+        if (!pirFreeScanWorkWindow.isOpen()) {
+            logcat { "PIR-JOB-RUNNER: Free scan window closed. Retiring the scheduled scan worker." }
+            pirScanScheduler.cancelScheduledScanWorker()
+        }
     }
 
     private suspend fun attemptCreateScanJobs(
