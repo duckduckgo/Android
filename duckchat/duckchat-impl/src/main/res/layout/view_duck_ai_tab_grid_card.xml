@@ -134,6 +134,21 @@
                     app:typography="body2"
                     tools:text="I just heard the fantastic news about your new job, and I couldn't be happier for you." />
 
+                <ImageView
+                    android:id="@+id/thumbnail"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginVertical="@dimen/keyline_1"
+                    android:background="@drawable/background_duck_ai_tab_card_image"
+                    android:clipToOutline="true"
+                    android:importantForAccessibility="no"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toTopOf="@id/tabChatItemType"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tabChatItemTitle" />
+
                 <com.duckduckgo.common.ui.view.Chip
                     android:id="@+id/tabChatItemType"
                     android:layout_width="wrap_content"
@@ -149,14 +164,6 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <ImageView
-                android:id="@+id/thumbnail"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:importantForAccessibility="no"
-                android:scaleType="centerCrop"
-                android:visibility="gone" />
 
             <ImageView
                 android:id="@+id/tabChatItemEmptyLogo"
