@@ -36,7 +36,6 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.launch
@@ -52,7 +51,6 @@ private const val JS_OBJECT_NAME = "contentScopeAdsjs"
 @Named("contentScopeScripts")
 @SingleInstanceIn(FragmentScope::class)
 @ContributesBinding(FragmentScope::class)
-@ContributesMultibinding(scope = FragmentScope::class, ignoreQualifier = true)
 class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
     private val handlers: PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin>,
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin>,

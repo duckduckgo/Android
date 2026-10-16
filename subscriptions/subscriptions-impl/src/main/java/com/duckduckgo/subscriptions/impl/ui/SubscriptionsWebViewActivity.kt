@@ -149,7 +149,6 @@ data class SubscriptionsWebViewActivityWithParams(
 
 @InjectWith(
     scope = ActivityScope::class,
-    delayGeneration = true, // Delayed because it has a dependency on DownloadConfirmationFragment from another module
 )
 @ContributeToActivityStarter(SubscriptionPurchase::class, screenName = "subscriptions.purchase")
 @ContributeToActivityStarter(SubscriptionUpgrade::class, screenName = "subscriptions.upgrade")

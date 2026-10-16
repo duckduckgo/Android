@@ -33,4 +33,5 @@ dependencies {
     testImplementation "dev.zacsweers.kctfork:ksp:0.11.1"
     testImplementation "com.google.devtools.ksp:symbol-processing-api:_"
     testImplementation "com.squareup.anvil:annotations:2.7.0"
+    testImplementation "dev.zacsweers.metro:runtime:_"
 }
