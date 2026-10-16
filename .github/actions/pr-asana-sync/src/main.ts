@@ -38,6 +38,10 @@ const PROJECT_ID = getInput('ASANA_PROJECT_ID', {required: true})
 // Users which will not receive PRs/reviews tasks
 const RANDOMIZED_REVIEWERS = getInput('RANDOMIZED_REVIEWERS')
 const RANDOMIZED_REVIEWERS_LIST = RANDOMIZED_REVIEWERS.split(',')
+// Tolerance for clock skew between GitHub and Asana when scanning the project
+// for tasks modified since the PR was opened
+const CLOCK_SKEW_TOLERANCE_MS = 60 * 60 * 1000
+const MAX_SCANNED_TASKS = 500
 
 function getUserIdFromLogin(login: string): string | undefined {
   const userId = USER_MAP[login]
@@ -96,17 +100,26 @@ async function findPRTask(
   if (prTasks.data.length > 0) {
     info(`Found PR task using searchInWorkspace: ${prTasks.data[0].gid}`)
     return prTasks.data[0]
-  } else {
-    // searchInWorkspace can fail for recently created Asana tasks. Let's look
-    // at 100 most recent tasks in destination project
-    // https://developers.asana.com/reference/searchtasksforworkspace#eventual-consistency
-    const projectTasks = await client.tasks.findByProject(PROJECT_ID, {
+  }
+
+  // Asana recommends using GET /tasks for consistent lookup as search infrastructure
+  // can have delays of up to 60 seconds due to indexing.
+  // https://developers.asana.com/reference/searchtasksforworkspace#eventual-consistency
+  const modifiedSince = new Date(
+    Date.parse(payload.pull_request.created_at) - CLOCK_SKEW_TOLERANCE_MS
+  ).toISOString()
+  let page: asana.resources.ResourceList<asana.resources.Tasks.Type> | null =
+    await client.tasks.findAll({
+      project: PROJECT_ID,
       // eslint-disable-next-line camelcase
-      opt_fields: 'custom_fields,permalink_url',
+      modified_since: modifiedSince,
+      // eslint-disable-next-line camelcase
+      opt_fields: 'name,completed,custom_fields,permalink_url',
       limit: 100
     })
-
-    for (const task of projectTasks.data) {
+  let scanned = 0
+  while (page && scanned < MAX_SCANNED_TASKS) {
+    for (const task of page.data) {
       info(`Checking task ${task.gid} for PR link`)
       for (const field of task.custom_fields) {
         if (
@@ -118,6 +131,8 @@ async function findPRTask(
         }
       }
     }
+    scanned += page.data.length
+    page = await page.nextPage()
   }
   info(`No matching Asana task found for PR ${prURL}`)
   return null

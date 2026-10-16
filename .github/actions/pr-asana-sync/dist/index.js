@@ -102663,6 +102663,12 @@ const PROJECT_ID = (0, core_1.getInput)('ASANA_PROJECT_ID', { required: true });
 // Users which will not receive PRs/reviews tasks
 const RANDOMIZED_REVIEWERS = (0, core_1.getInput)('RANDOMIZED_REVIEWERS');
 const RANDOMIZED_REVIEWERS_LIST = RANDOMIZED_REVIEWERS.split(',');
+// Tolerance for clock skew between GitHub and Asana when scanning the project
+// for tasks modified since the PR was opened
+const CLOCK_SKEW_TOLERANCE_MS = 60 * 60 * 1000;
+// Asana truncates paginated queries at about 1,000 objects, so we stop well
+// before that
+const MAX_SCANNED_TASKS = 500;
 function getUserIdFromLogin(login) {
     const userId = USER_MAP[login];
     return userId;
@@ -102705,16 +102711,24 @@ function findPRTask(customFields) {
             (0, core_1.info)(`Found PR task using searchInWorkspace: ${prTasks.data[0].gid}`);
             return prTasks.data[0];
         }
-        else {
-            // searchInWorkspace can fail for recently created Asana tasks. Let's look
-            // at 100 most recent tasks in destination project
-            // https://developers.asana.com/reference/searchtasksforworkspace#eventual-consistency
-            const projectTasks = yield client.tasks.findByProject(PROJECT_ID, {
-                // eslint-disable-next-line camelcase
-                opt_fields: 'custom_fields,permalink_url',
-                limit: 100
-            });
-            for (const task of projectTasks.data) {
+        // Search results lag writes by up to a minute, so the task created by the
+        // previous run is often not indexed yet when the next event arrives.
+        // GET /tasks is read-your-writes, and any task for this PR was created or
+        // had its PR fields written after the PR was opened, so filtering on
+        // modified_since keeps the scan small whatever section the task sits in.
+        // https://developers.asana.com/reference/searchtasksforworkspace#eventual-consistency
+        const modifiedSince = new Date(Date.parse(payload.pull_request.created_at) - CLOCK_SKEW_TOLERANCE_MS).toISOString();
+        let page = yield client.tasks.findAll({
+            project: PROJECT_ID,
+            // eslint-disable-next-line camelcase
+            modified_since: modifiedSince,
+            // eslint-disable-next-line camelcase
+            opt_fields: 'name,completed,custom_fields,permalink_url',
+            limit: 100
+        });
+        let scanned = 0;
+        while (page && scanned < MAX_SCANNED_TASKS) {
+            for (const task of page.data) {
                 (0, core_1.info)(`Checking task ${task.gid} for PR link`);
                 for (const field of task.custom_fields) {
                     if (field.gid === customFields.url.gid &&
@@ -102724,6 +102738,8 @@ function findPRTask(customFields) {
                     }
                 }
             }
+            scanned += page.data.length;
+            page = yield page.nextPage();
         }
         (0, core_1.info)(`No matching Asana task found for PR ${prURL}`);
         return null;
