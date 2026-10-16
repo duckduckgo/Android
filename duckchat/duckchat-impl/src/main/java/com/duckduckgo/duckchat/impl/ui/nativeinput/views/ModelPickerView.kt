@@ -147,7 +147,6 @@ class ModelPickerView @JvmOverloads constructor(
         chip.setOnClickListener { showMenu() }
         chip.setOnCloseIconClickListener { showMenu() }
 
-        viewModel.fetchModels()
         observeState()
         observeInputContext()
     }
@@ -157,6 +156,7 @@ class ModelPickerView @JvmOverloads constructor(
         inputContextJob?.cancel()
         inputContextJob = nativeInputStateProvider.state
             .onEach { state ->
+                if (shouldFetchModels(previous = lastNativeInputState, current = state)) viewModel.fetchModels()
                 lastInputContext = state.inputContext
                 lastNativeInputState = state
                 updateVisibility()
@@ -481,3 +481,9 @@ internal fun shouldShowModelPicker(
     hasModels: Boolean,
     isEditMode: Boolean,
 ): Boolean = pickerEnabled && hasModels && nativeInputState?.shouldShowPluginControls(isEditing = isEditMode) == true
+
+internal fun shouldFetchModels(
+    previous: NativeInputState?,
+    current: NativeInputState,
+): Boolean = current.toggleSelection == NativeInputState.ToggleSelection.DUCK_AI &&
+    previous?.toggleSelection != NativeInputState.ToggleSelection.DUCK_AI

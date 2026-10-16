@@ -26,9 +26,11 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.store.SelectedModel
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -88,7 +90,8 @@ interface DuckAiModelManager {
 }
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+@ContributesBinding(AppScope::class, boundType = DuckAiModelManager::class)
+@ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
 class RealDuckAiModelManager @Inject constructor(
     private val modelsService: DuckAiModelsService,
     private val dataStore: DuckChatDataStore,
@@ -99,7 +102,7 @@ class RealDuckAiModelManager @Inject constructor(
     private val cookiesManager: CookieManagerProvider,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-) : DuckAiModelManager {
+) : DuckAiModelManager, PrivacyConfigCallbackPlugin {
 
     private val _modelState = MutableStateFlow(ModelState())
     override val modelState: StateFlow<ModelState> = _modelState.asStateFlow()
@@ -129,13 +132,19 @@ class RealDuckAiModelManager @Inject constructor(
             combine(
                 subscriptions.getEntitlements(),
                 subscriptions.getSubscriptionStatusFlow(),
-            ) { entitlements, status -> entitlements to status }
+                dataStore.observeDuckChatUserEnabled(),
+            ) { entitlements, status, userEnabled -> Triple(entitlements, status, userEnabled) }
                 .distinctUntilChanged()
                 .collect {
-                    logcat { "Duck.ai Model Manager: subscription state changed, re-fetching models" }
+                    logcat { "Duck.ai Model Manager: subscription or Duck.ai state changed, re-fetching models" }
                     fetchModels()
                 }
         }
+    }
+
+    override fun onPrivacyConfigDownloaded() {
+        if (_modelState.value.models.isNotEmpty()) return
+        appCoroutineScope.launch(dispatcherProvider.io()) { fetchModels() }
     }
 
     /**
@@ -176,6 +185,7 @@ class RealDuckAiModelManager @Inject constructor(
     override suspend fun fetchModels() {
         withContext(dispatcherProvider.io()) {
             try {
+                if (!duckChatFeature.get().self().isEnabled() || !dataStore.isDuckChatUserEnabled()) return@withContext
                 val userTier = resolveUserTier()
                 val response = fetchModelsResponse()
                 val isSubscriptionEligible = runCatching {

@@ -34,6 +34,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -68,6 +69,7 @@ class RealDuckAiModelManagerTest {
 
     private val entitlementFlow = MutableSharedFlow<Set<Entitlement>>()
     private val subscriptionStatusFlow = MutableStateFlow(SubscriptionStatus.UNKNOWN)
+    private val duckChatUserEnabledFlow = MutableStateFlow(true)
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val duckChatPixels: DuckChatPixels = mock()
 
@@ -80,6 +82,9 @@ class RealDuckAiModelManagerTest {
         whenever(duckAiHostProvider.getHost()).thenReturn("duck.ai")
         subscriptions.stub { onBlocking { isEligible() }.thenReturn(true) }
         dataStore.stub { onBlocking { hasClearedPinnedDefaultModel() }.thenReturn(true) }
+        dataStore.stub { onBlocking { isDuckChatUserEnabled() }.thenReturn(true) }
+        whenever(dataStore.observeDuckChatUserEnabled()).thenReturn(duckChatUserEnabledFlow)
+        duckChatFeature.self().setRawStoredState(Toggle.State(enable = true))
     }
 
     private fun createManager(): RealDuckAiModelManager {
@@ -150,6 +155,57 @@ class RealDuckAiModelManagerTest {
 
         verify(dataStore, never()).setSelectedModel(any())
         assertEquals("gpt-5.4-mini", testee.modelState.value.selectedModelId)
+    }
+
+    @Test
+    fun whenDuckAiFeatureDisabledThenModelsNotFetched() = runTest {
+        duckChatFeature.self().setRawStoredState(Toggle.State(enable = false))
+
+        testee = createManager()
+        testee.fetchModels()
+
+        verify(modelsService, never()).getModels(any(), anyOrNull(), anyOrNull())
+    }
+
+    @Test
+    fun whenDuckAiUserDisabledThenModelsNotFetched() = runTest {
+        dataStore.stub { onBlocking { isDuckChatUserEnabled() }.thenReturn(false) }
+
+        testee = createManager()
+        testee.fetchModels()
+
+        verify(modelsService, never()).getModels(any(), anyOrNull(), anyOrNull())
+    }
+
+    @Test
+    fun whenPrivacyConfigDownloadedWithNoModelsThenModelsFetched() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(listOf(remoteModel("id1", accessTier = listOf("free"), entityHasAccess = true))),
+        )
+
+        testee = createManager()
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        assertEquals(1, testee.modelState.value.models.size)
+    }
+
+    @Test
+    fun whenPrivacyConfigDownloadedWithModelsLoadedThenModelsNotRefetched() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(listOf(remoteModel("id1", accessTier = listOf("free"), entityHasAccess = true))),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(modelsService, times(1)).getModels(any(), anyOrNull(), anyOrNull())
     }
 
     @Test
