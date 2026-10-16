@@ -262,7 +262,6 @@
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
             android:exported="false"
             android:persistableMode="persistNever"
-            android:excludeFromRecents="true"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
             android:resizeableActivity="true" />
 

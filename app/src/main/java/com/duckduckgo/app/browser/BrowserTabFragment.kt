@@ -2507,7 +2507,7 @@ class BrowserTabFragment :
     }
 
     private fun closeCustomTab() {
-        (activity as? CustomTabActivity)?.finishAndRemoveTask()
+        (activity as? CustomTabActivity)?.finishAndRemoveOwnTask()
     }
 
     private fun finishCustomTab() {
