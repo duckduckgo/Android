@@ -24,8 +24,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.di.DuckChat
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.first
-import logcat.LogPriority.WARN
-import logcat.logcat
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -42,6 +40,7 @@ data class PersistedResponseWaitFlow(
     val result: String,
     val readyWhileAwayRecorded: Boolean,
     val readyToReturnRunning: Boolean,
+    val chatSwitchedAway: Boolean,
 )
 
 /** Keeps open response-wait flows on the device so they can be picked up again after the process restarts. */
@@ -67,13 +66,10 @@ class DuckAiResponseWaitFlowStoreImpl @Inject constructor(
         }
     }
 
+    // Write failures propagate so the caller can retry the save after its next change.
     override suspend fun save(flows: List<PersistedResponseWaitFlow>) {
         val json = JSONArray(flows.map { it.toJson() }).toString()
-        try {
-            store.edit { it[OPEN_FLOWS] = json }
-        } catch (e: IOException) {
-            logcat(WARN) { "Duck.ai response wait: saving open flows failed: ${e.message}" }
-        }
+        store.edit { it[OPEN_FLOWS] = json }
     }
 
     private fun PersistedResponseWaitFlow.toJson() = JSONObject()
@@ -86,6 +82,7 @@ class DuckAiResponseWaitFlowStoreImpl @Inject constructor(
         .put(RESULT, result)
         .put(READY_WHILE_AWAY_RECORDED, readyWhileAwayRecorded)
         .put(READY_TO_RETURN_RUNNING, readyToReturnRunning)
+        .put(CHAT_SWITCHED_AWAY, chatSwitchedAway)
 
     private fun JSONObject.toFlow() = PersistedResponseWaitFlow(
         flowId = getLong(FLOW_ID),
@@ -97,6 +94,7 @@ class DuckAiResponseWaitFlowStoreImpl @Inject constructor(
         result = getString(RESULT),
         readyWhileAwayRecorded = getBoolean(READY_WHILE_AWAY_RECORDED),
         readyToReturnRunning = getBoolean(READY_TO_RETURN_RUNNING),
+        chatSwitchedAway = optBoolean(CHAT_SWITCHED_AWAY, false),
     )
 
     private companion object {
@@ -111,5 +109,6 @@ class DuckAiResponseWaitFlowStoreImpl @Inject constructor(
         const val RESULT = "result"
         const val READY_WHILE_AWAY_RECORDED = "readyWhileAwayRecorded"
         const val READY_TO_RETURN_RUNNING = "readyToReturnRunning"
+        const val CHAT_SWITCHED_AWAY = "chatSwitchedAway"
     }
 }
