@@ -1,0 +1,117 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.pir.impl.freemium
+
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.freemium.PirFreemiumState.ELIGIBLE
+import com.duckduckgo.pir.impl.freemium.PirFreemiumState.NOT_ELIGIBLE
+import com.duckduckgo.pir.impl.freemium.PirFreemiumState.USED
+import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
+import com.duckduckgo.pir.impl.store.PirFreemiumFirstScanResult.MATCHES_FOUND
+import com.duckduckgo.pir.impl.store.PirFreemiumFirstScanResult.NO_MATCHES
+import com.duckduckgo.subscriptions.api.Subscriptions
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
+
+class RealPirFreemiumTest {
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
+    private val pirRemoteFeatures = FakeFeatureToggleFactory.create(PirRemoteFeatures::class.java)
+    private val subscriptions: Subscriptions = mock()
+    private val dataStore: PirFreemiumDataStore = mock()
+
+    private lateinit var testee: RealPirFreemium
+
+    @Before
+    fun setUp() = runTest {
+        pirRemoteFeatures.freemium().setRawStoredState(State(enable = true))
+        whenever(subscriptions.isSignedIn()).thenReturn(false)
+        whenever(dataStore.firstScanResult).thenReturn(null)
+
+        testee = RealPirFreemium(
+            pirRemoteFeatures = pirRemoteFeatures,
+            subscriptions = subscriptions,
+            pirFreemiumDataStore = dataStore,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+        )
+    }
+
+    @Test
+    fun whenAllGatesPassAndNoScanCompletedThenEligible() = runTest {
+        assertEquals(ELIGIBLE, testee.getPirFreemiumState())
+    }
+
+    @Test
+    fun whenFreemiumFlagIsOffThenNotEligible() = runTest {
+        pirRemoteFeatures.freemium().setRawStoredState(State(enable = false))
+
+        assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
+    }
+
+    @Test
+    fun whenUserIsSignedInThenNotEligible() = runTest {
+        whenever(subscriptions.isSignedIn()).thenReturn(true)
+
+        assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
+    }
+
+    @Test
+    fun whenScanFoundMatchesThenUsed() = runTest {
+        whenever(dataStore.firstScanResult).thenReturn(MATCHES_FOUND)
+
+        assertEquals(USED, testee.getPirFreemiumState())
+    }
+
+    @Test
+    fun whenScanFoundNothingThenStillUsed() = runTest {
+        whenever(dataStore.firstScanResult).thenReturn(NO_MATCHES)
+
+        assertEquals(USED, testee.getPirFreemiumState())
+    }
+
+    @Test
+    fun whenScanCompletedButUserSignedInSinceThenNotEligible() = runTest {
+        whenever(dataStore.firstScanResult).thenReturn(MATCHES_FOUND)
+        whenever(subscriptions.isSignedIn()).thenReturn(true)
+
+        assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
+    }
+
+    @Test
+    fun whenSignedInCheckThrowsThenNotEligible() = runTest {
+        whenever(subscriptions.isSignedIn()).thenThrow(RuntimeException("backend unavailable"))
+
+        assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
+    }
+
+    @Test
+    fun whenFirstScanResultReadThrowsThenNotEligible() = runTest {
+        whenever(dataStore.firstScanResult).thenThrow(RuntimeException("corrupted preferences"))
+
+        assertEquals(NOT_ELIGIBLE, testee.getPirFreemiumState())
+    }
+}

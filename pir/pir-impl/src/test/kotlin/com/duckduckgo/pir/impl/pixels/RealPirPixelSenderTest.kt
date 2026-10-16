@@ -17,6 +17,7 @@
 package com.duckduckgo.pir.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
@@ -1275,5 +1276,37 @@ class RealPirPixelSenderTest {
         assertTrue(nameCaptor.allValues.contains("m_dbp_scan_renderer-gone_d"))
         assertEquals("false", paramsCaptor.firstValue["did_crash"])
         assertEquals("scheduled", paramsCaptor.firstValue["scan_trigger"])
+    }
+
+    @Test
+    fun whenReportFreemiumSettingsEntryPointImpressionThenFiresImpressionPixel() {
+        testee.reportFreemiumSettingsEntryPointImpression()
+
+        verify(mockPixelSender).fire(
+            pixelName = "m_dbp_freemium_settings_entry_point_impression_c",
+            type = Count,
+        )
+    }
+
+    @Test
+    fun whenReportFreemiumSettingsEntryPointClickedBeforeFirstScanThenCtaStateIsStartFreeScan() {
+        testee.reportFreemiumSettingsEntryPointClicked(PirFreemiumCtaState.START_FREE_SCAN)
+
+        verify(mockPixelSender).fire(
+            pixelName = "m_dbp_freemium_settings_entry_point_clicked_c",
+            type = Count,
+            parameters = mapOf("cta_state" to "start_free_scan"),
+        )
+    }
+
+    @Test
+    fun whenReportFreemiumSettingsEntryPointClickedAfterFirstScanThenCtaStateIsViewScanResults() {
+        testee.reportFreemiumSettingsEntryPointClicked(PirFreemiumCtaState.VIEW_SCAN_RESULTS)
+
+        verify(mockPixelSender).fire(
+            pixelName = "m_dbp_freemium_settings_entry_point_clicked_c",
+            type = Count,
+            parameters = mapOf("cta_state" to "view_scan_results"),
+        )
     }
 }
