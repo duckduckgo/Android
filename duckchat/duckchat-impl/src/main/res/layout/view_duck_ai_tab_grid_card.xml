@@ -151,15 +151,10 @@
 
                 <com.duckduckgo.common.ui.view.Chip
                     android:id="@+id/tabChatItemType"
+                    style="@style/Widget.DuckDuckGo.DuckAiTabCardChatType"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/background_duck_ai_tab_card_chat_type"
-                    android:drawablePadding="@dimen/keyline_2"
-                    android:paddingHorizontal="@dimen/keyline_3"
-                    android:paddingVertical="@dimen/keyline_2"
                     android:text="@string/duckAiTabCardChatTypeLabel"
-                    android:textAppearance="@style/Typography.DuckDuckGo.Caption"
-                    android:textColor="?attr/daxColorPrimaryText"
                     app:drawableStartCompat="@drawable/ic_chat_16"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
@@ -205,15 +200,10 @@
 
                 <com.duckduckgo.common.ui.view.Chip
                     android:id="@+id/tabChatItemVoiceType"
+                    style="@style/Widget.DuckDuckGo.DuckAiTabCardChatType"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/background_duck_ai_tab_card_chat_type"
-                    android:drawablePadding="@dimen/keyline_2"
-                    android:paddingHorizontal="@dimen/keyline_3"
-                    android:paddingVertical="@dimen/keyline_2"
                     android:text="@string/duckAiTabCardVoiceChatTypeLabel"
-                    android:textAppearance="@style/Typography.DuckDuckGo.Caption"
-                    android:textColor="?attr/daxColorPrimaryText"
                     app:drawableStartCompat="@drawable/ic_chat_16"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />

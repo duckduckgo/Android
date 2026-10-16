@@ -144,7 +144,7 @@ class DuckAiTabGridCardView(
 
     private fun bindChatType(@StringRes label: Int, @DrawableRes icon: Int) = with(binding.tabChatItemType) {
         setChipText(label)
-        setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0)
+        setChipIcon(icon)
     }
 
     private fun bindState(state: DuckAiTabGridItemState) = with(binding) {
