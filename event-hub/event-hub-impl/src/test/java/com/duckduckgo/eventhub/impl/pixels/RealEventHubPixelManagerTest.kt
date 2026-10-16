@@ -540,15 +540,6 @@ class RealEventHubPixelManagerTest {
     }
 
     @Test
-    fun `onConfigChanged invalidates metric definitions even when feature disabled`() {
-        configureFeature(enabled = false)
-
-        manager.onConfigChanged()
-
-        verify(metricsHandler).onConfigChanged()
-    }
-
-    @Test
     fun `empty webViewId disables dedup`() {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
         stubPixelStates(state)

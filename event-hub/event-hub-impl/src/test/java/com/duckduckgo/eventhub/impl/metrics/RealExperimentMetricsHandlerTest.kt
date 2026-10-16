@@ -17,12 +17,14 @@
 package com.duckduckgo.eventhub.impl.metrics
 
 import android.annotation.SuppressLint
+import com.duckduckgo.app.trackerdetection.blocklist.BlockListExperiment
+import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.feature.toggles.api.ConversionWindow
 import com.duckduckgo.feature.toggles.api.FakeMetricsPixelExtension
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
-import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.MetricType
+import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import kotlinx.coroutines.CompletableDeferred
@@ -46,26 +48,10 @@ class RealExperimentMetricsHandlerTest {
         .featureName("blockList")
         .build()
         .create(TestBlockList::class.java)
-    private val otherFeature = FeatureToggles.Builder()
-        .store(FakeToggleStore())
-        .featureName("otherFeature")
-        .build()
-        .create(TestOtherFeature::class.java)
 
-    private val inventory = FakeInventory(
-        listOf(
-            cssExperiments.self(),
-            cssExperiments.contentScopeExperiment1(),
-            cssExperiments.contentScopeExperiment2(),
-            blockList.self(),
-            blockList.notAnExperiment(),
-            blockList.tdsNextExperiment001(),
-            blockList.tdsNextExperiment002(),
-            otherFeature.self(),
-            otherFeature.experimentLike(),
-        ),
-    )
-    private val handler = RealExperimentMetricsHandler(inventory)
+    private val contentScopeExperiments = FakeContentScopeExperiments()
+    private val blockListExperiment = FakeBlockListExperiment()
+    private val handler = RealExperimentMetricsHandler(contentScopeExperiments, blockListExperiment)
 
     @Before
     fun setup() {
@@ -74,7 +60,8 @@ class RealExperimentMetricsHandlerTest {
 
     @Test
     fun `one metrics pixel is sent per threshold with that threshold's windows`() = runTest {
-        cssExperiments.contentScopeExperiment1().enable(
+        activate(
+            cssExperiments.contentScopeExperiment1(),
             metrics(
                 """
                 "searchLike": {
@@ -109,7 +96,7 @@ class RealExperimentMetricsHandlerTest {
 
     @Test
     fun `an event no metric listens for sends nothing`() = runTest {
-        cssExperiments.contentScopeExperiment1().enable(captchaMetric())
+        activate(cssExperiments.contentScopeExperiment1(), captchaMetric())
 
         handler.onEvent("somethingElse")
 
@@ -117,57 +104,38 @@ class RealExperimentMetricsHandlerTest {
     }
 
     @Test
-    fun `every experiment declaring a metric on the event is sent`() = runTest {
-        cssExperiments.contentScopeExperiment1().enable(captchaMetric())
-        cssExperiments.contentScopeExperiment2().enable(captchaMetric())
+    fun `every active experiment declaring a metric on the event is sent`() = runTest {
+        activate(cssExperiments.contentScopeExperiment1(), captchaMetric())
+        activate(cssExperiments.contentScopeExperiment2(), captchaMetric())
+        blockListExperiment.active = blockList.tdsNextExperiment001().withSettings(captchaMetric())
 
         handler.onEvent("captchaDetected")
 
         assertEquals(
-            setOf("contentScopeExperiment1", "contentScopeExperiment2"),
+            setOf("contentScopeExperiment1", "contentScopeExperiment2", "tdsNextExperiment001"),
             metricsExtension.sentMetrics.map { it.toggle.featureName().name }.toSet(),
         )
     }
 
     @Test
-    fun `experiments under other parents are ignored`() = runTest {
-        otherFeature.experimentLike().enable(captchaMetric())
+    fun `an experiment its feature doesn't report as active sends nothing`() = runTest {
+        cssExperiments.contentScopeExperiment1().withSettings(captchaMetric())
+        blockList.tdsNextExperiment001().withSettings(captchaMetric())
+        blockListExperiment.active = blockList.tdsNextExperiment002().withSettings(captchaMetric())
 
         handler.onEvent("captchaDetected")
 
-        assertTrue(metricsExtension.sentMetrics.isEmpty())
+        assertEquals(listOf("tdsNextExperiment002"), metricsExtension.sentMetrics.map { it.toggle.featureName().name })
     }
 
     @Test
-    fun `only the active tds experiment sends blockList metrics`() = runTest {
-        blockList.tdsNextExperiment001().enable(captchaMetric())
-        blockList.tdsNextExperiment002().enable(captchaMetric())
-
+    fun `a change of active experiment applies to the next event`() = runTest {
+        blockListExperiment.active = blockList.tdsNextExperiment001().withSettings(captchaMetric())
         handler.onEvent("captchaDetected")
 
-        assertEquals(listOf("tdsNextExperiment001"), metricsExtension.sentMetrics.map { it.toggle.featureName().name })
-    }
-
-    @Test
-    fun `a tds experiment behind an active one without metrics sends nothing`() = runTest {
-        blockList.tdsNextExperiment001().enable(settings = null)
-        blockList.tdsNextExperiment002().enable(captchaMetric())
-
+        blockListExperiment.active = blockList.tdsNextExperiment002().withSettings(captchaMetric())
         handler.onEvent("captchaDetected")
 
-        assertTrue(metricsExtension.sentMetrics.isEmpty())
-    }
-
-    @Test
-    fun `the next tds experiment sends once the active one is disabled, without a config change`() = runTest {
-        blockList.tdsNextExperiment001().enable(captchaMetric())
-        blockList.tdsNextExperiment002().enable(captchaMetric())
-        handler.onEvent("captchaDetected")
-
-        blockList.tdsNextExperiment001().disable(captchaMetric())
-        handler.onEvent("captchaDetected")
-
-        assertEquals(1, inventory.getAllCalls)
         assertEquals(
             listOf("tdsNextExperiment001", "tdsNextExperiment002"),
             metricsExtension.sentMetrics.map { it.toggle.featureName().name },
@@ -175,103 +143,43 @@ class RealExperimentMetricsHandlerTest {
     }
 
     @Test
-    fun `a blockList subfeature that isn't a tds experiment sends nothing`() = runTest {
-        blockList.notAnExperiment().enable(captchaMetric())
-
+    fun `changed metric definitions apply to the next event`() = runTest {
+        activate(cssExperiments.contentScopeExperiment1(), captchaMetric())
         handler.onEvent("captchaDetected")
 
-        assertTrue(metricsExtension.sentMetrics.isEmpty())
-    }
-
-    @Test
-    fun `a disabled experiment sends nothing`() = runTest {
-        cssExperiments.contentScopeExperiment1().disable(captchaMetric())
-
-        handler.onEvent("captchaDetected")
-
-        assertTrue(metricsExtension.sentMetrics.isEmpty())
-    }
-
-    @Test
-    fun `an experiment enabled after the definitions are cached is sent without a config change`() = runTest {
-        cssExperiments.contentScopeExperiment1().disable(captchaMetric())
-        handler.onEvent("captchaDetected")
-
-        cssExperiments.contentScopeExperiment1().enable(captchaMetric())
-        handler.onEvent("captchaDetected")
-
-        assertEquals(1, inventory.getAllCalls)
-        assertEquals(listOf("captchaSeen"), metricsExtension.sentMetrics.map { it.metric })
-    }
-
-    @Test
-    fun `definitions are cached across events`() = runTest {
-        cssExperiments.contentScopeExperiment1().enable(captchaMetric())
-
-        handler.onEvent("captchaDetected")
-        handler.onEvent("captchaDetected")
-        handler.onEvent("otherEvent")
-
-        assertEquals(1, inventory.getAllCalls)
-        assertEquals(2, metricsExtension.sentMetrics.size)
-    }
-
-    @Test
-    fun `config change rebuilds definitions from the current settings`() = runTest {
-        cssExperiments.contentScopeExperiment1().enable(captchaMetric())
-        handler.onEvent("captchaDetected")
-
-        cssExperiments.contentScopeExperiment1().enable(
+        cssExperiments.contentScopeExperiment1().withSettings(
             metrics(""""reload": { "event": "reloadLoop", "conversions": [ { "windows": [[0, 7]], "thresholds": [1] } ] }"""),
         )
-        handler.onConfigChanged()
         handler.onEvent("captchaDetected")
         handler.onEvent("reloadLoop")
 
-        assertEquals(2, inventory.getAllCalls)
         assertEquals(listOf("captchaSeen", "reload"), metricsExtension.sentMetrics.map { it.metric })
     }
 
     @Test
-    fun `definitions built before a config change are not reused after it`() = runTest {
-        cssExperiments.contentScopeExperiment1().enable(captchaMetric())
-        inventory.gate = CompletableDeferred()
-
-        val firstEvent = launch { handler.onEvent("captchaDetected") }
-        testScheduler.runCurrent()
-        handler.onConfigChanged()
-        inventory.gate!!.complete(Unit)
-        firstEvent.join()
-
-        inventory.gate = null
-        handler.onEvent("captchaDetected")
-
-        assertEquals(2, inventory.getAllCalls)
-    }
-
-    @Test
     fun `a second event waits for the first instead of handling it concurrently`() = runTest {
-        cssExperiments.contentScopeExperiment1().enable(captchaMetric())
-        inventory.gate = CompletableDeferred()
+        activate(cssExperiments.contentScopeExperiment1(), captchaMetric())
+        contentScopeExperiments.gate = CompletableDeferred()
 
         val firstEvent = launch { handler.onEvent("captchaDetected") }
         val secondEvent = launch { handler.onEvent("captchaDetected") }
         testScheduler.runCurrent()
 
-        assertEquals(1, inventory.getAllCalls)
+        assertEquals(1, contentScopeExperiments.calls)
         assertTrue(metricsExtension.sentMetrics.isEmpty())
 
-        inventory.gate!!.complete(Unit)
+        contentScopeExperiments.gate!!.complete(Unit)
         firstEvent.join()
         secondEvent.join()
 
-        assertEquals(1, inventory.getAllCalls)
+        assertEquals(2, contentScopeExperiments.calls)
         assertEquals(2, metricsExtension.sentMetrics.size)
     }
 
     @Test
     fun `a failing send doesn't escape or stop the other sends`() = runTest {
-        cssExperiments.contentScopeExperiment1().enable(
+        activate(
+            cssExperiments.contentScopeExperiment1(),
             metrics(
                 """
                 "failing": { "event": "captchaDetected", "conversions": [ { "windows": [[0, 7]], "thresholds": [1, 2] } ] },
@@ -287,27 +195,30 @@ class RealExperimentMetricsHandlerTest {
     }
 
     @Test
-    fun `a failure reading the experiments sends nothing and is retried on the next event`() = runTest {
-        cssExperiments.contentScopeExperiment1().enable(captchaMetric())
-        inventory.failure = IllegalStateException("inventory unavailable")
+    fun `a failure reading the active experiments sends nothing and is retried on the next event`() = runTest {
+        activate(cssExperiments.contentScopeExperiment1(), captchaMetric())
+        contentScopeExperiments.failure = IllegalStateException("experiments unavailable")
 
         handler.onEvent("captchaDetected")
         assertTrue(metricsExtension.sentMetrics.isEmpty())
 
-        inventory.failure = null
+        contentScopeExperiments.failure = null
         handler.onEvent("captchaDetected")
 
-        assertEquals(2, inventory.getAllCalls)
         assertEquals(listOf("captchaSeen"), metricsExtension.sentMetrics.map { it.metric })
     }
 
     @Test
     fun `an experiment without settings sends nothing`() = runTest {
-        cssExperiments.contentScopeExperiment1().enable(settings = null)
+        activate(cssExperiments.contentScopeExperiment1(), settings = null)
 
         handler.onEvent("captchaDetected")
 
         assertTrue(metricsExtension.sentMetrics.isEmpty())
+    }
+
+    private fun activate(experiment: Toggle, settings: String?) {
+        contentScopeExperiments.active += experiment.withSettings(settings)
     }
 
     private fun captchaMetric() =
@@ -316,22 +227,30 @@ class RealExperimentMetricsHandlerTest {
     private fun metrics(entries: String) = """{ "metrics": { ${entries.trimIndent()} } }"""
 
     @SuppressLint("DenyListedApi")
-    private fun Toggle.enable(settings: String?) = setRawStoredState(Toggle.State(remoteEnableState = true, enable = true, settings = settings))
+    private fun Toggle.withSettings(settings: String?): Toggle = apply {
+        setRawStoredState(Toggle.State(remoteEnableState = true, enable = true, settings = settings))
+    }
 
-    @SuppressLint("DenyListedApi")
-    private fun Toggle.disable(settings: String?) = setRawStoredState(Toggle.State(remoteEnableState = false, enable = false, settings = settings))
-
-    private class FakeInventory(private val toggles: List<Toggle>) : FeatureTogglesInventory {
-        var getAllCalls = 0
+    private class FakeContentScopeExperiments : ContentScopeExperiments {
+        val active = mutableListOf<Toggle>()
+        var calls = 0
         var gate: CompletableDeferred<Unit>? = null
         var failure: Exception? = null
 
-        override suspend fun getAll(): List<Toggle> {
-            getAllCalls++
+        override suspend fun getActiveExperiments(): List<Toggle> {
+            calls++
             gate?.await()
             failure?.let { throw it }
-            return toggles
+            return active.toList()
         }
+    }
+
+    private class FakeBlockListExperiment : BlockListExperiment {
+        var active: Toggle? = null
+
+        override suspend fun activeExperimentCohort(): String? = null
+        override suspend fun metric(metric: BlockListExperiment.Metric): MetricsPixel? = null
+        override suspend fun activeExperiment(): Toggle? = active
     }
 
     interface TestContentScopeExperiments {
@@ -350,20 +269,9 @@ class RealExperimentMetricsHandlerTest {
         fun self(): Toggle
 
         @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-        fun notAnExperiment(): Toggle
-
-        @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
         fun tdsNextExperiment001(): Toggle
 
         @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
         fun tdsNextExperiment002(): Toggle
-    }
-
-    interface TestOtherFeature {
-        @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-        fun self(): Toggle
-
-        @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-        fun experimentLike(): Toggle
     }
 }
