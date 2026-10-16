@@ -16,6 +16,7 @@
 
 package com.duckduckgo.privacy.config.internal
 
+import com.duckduckgo.privacy.config.api.PRIVACY_REMOTE_CONFIG_URL
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader.ConfigDownloadResult
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader.ConfigDownloadResult.Success
@@ -129,8 +130,7 @@ class PrivacyConfigInternalLoaderTest {
         assertEquals(
             listOf(
                 "CONFIG_OVERRIDE_FAILED action=set_url reason=download_failed source=https://example.com/config.json",
-                "CONFIG_OVERRIDE_FAILED action=reset reason=download_failed " +
-                    "source=https://staticcdn.duckduckgo.com/trackerblocking/config/v5/android-config.json",
+                "CONFIG_OVERRIDE_FAILED action=reset reason=download_failed source=$PRIVACY_REMOTE_CONFIG_URL",
             ),
             lines,
         )
