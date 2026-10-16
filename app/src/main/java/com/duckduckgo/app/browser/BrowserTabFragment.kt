@@ -73,6 +73,7 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.annotation.AnyThread
 import androidx.annotation.AttrRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
@@ -236,6 +237,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -673,6 +675,9 @@ class BrowserTabFragment :
     lateinit var fireModeAvailability: FireModeAvailability
 
     @Inject
+    lateinit var tabManagerFeatureFlags: TabManagerFeatureFlags
+
+    @Inject
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
 
     @Inject
@@ -830,14 +835,22 @@ class BrowserTabFragment :
                 viewModel.openNewImageDuckChatFromChatMenu()
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)) {
-                // With the native sidebar this entry opens the new tab with its input screen surfaced on
-                // the Search tab. The target is threaded to the new tab itself rather than armed globally,
-                // so it can't be consumed by another tab.
+                // With the native sidebar this entry opens the new tab with its
+                // input screen surfaced on the Search tab. The target is threaded to the new tab itself rather than
+                // armed globally, so it can't be consumed by another tab. The
+                // entry stays in the current mode (Regular vs Fire tab).
+                val plusMenuUpdateEnabled = tabManagerFeatureFlags.duckAiPlusMenuUpdate().isEnabled()
                 viewModel.onNewTabFromChatMenuSelected()
-                browserActivity?.launchNewTab(
-                    browserMode = BrowserMode.REGULAR,
-                    inputModeTarget = if (duckAiFeatureState.nativeDuckAiSidebar.value) InputMode.SEARCH else null,
-                )
+                browserActivity?.let { activity ->
+                    activity.launchNewTab(
+                        browserMode = if (plusMenuUpdateEnabled) activity.currentBrowserMode else BrowserMode.REGULAR,
+                        inputModeTarget = if (plusMenuUpdateEnabled || duckAiFeatureState.nativeDuckAiSidebar.value) {
+                            InputMode.SEARCH
+                        } else {
+                            null
+                        },
+                    )
+                }
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)) {
                 viewModel.onNewFireTabFromChatMenuSelected()
@@ -3993,6 +4006,10 @@ class BrowserTabFragment :
         )
     }
 
+    private fun setChatMenuItemText(@IdRes itemId: Int, @StringRes textRes: Int) {
+        chatMenuPopup.contentView.findViewById<PopupMenuItemView>(itemId).setPrimaryText(getString(textRes))
+    }
+
     private fun configureItemPressedListener() {
         omnibar.configureItemPressedListeners(
             object : ItemPressedListener {
@@ -4010,18 +4027,45 @@ class BrowserTabFragment :
 
                 override fun onPlusButtonPressed(anchor: View) {
                     val activity = activity ?: return
+                    val plusMenuUpdateEnabled = tabManagerFeatureFlags.duckAiPlusMenuUpdate().isEnabled()
+                    chatMenuPopup.contentView
+                        .findViewById<View>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupHeader)
+                        .isVisible = plusMenuUpdateEnabled
                     chatMenuPopup.contentView
                         .findViewById<View>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)
-                        .isVisible = fireModeAvailability.isAvailable()
+                        .isVisible = !plusMenuUpdateEnabled && fireModeAvailability.isAvailable()
                     val nativeSidebarEnabled = duckAiFeatureState.nativeDuckAiSidebar.value
                     chatMenuPopup.contentView
                         .findViewById<View>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewImage)
                         .isVisible = nativeSidebarEnabled
-                    chatMenuPopup.contentView
-                        .findViewById<PopupMenuItemView>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)
-                        .setPrimaryText(
-                            getString(com.duckduckgo.browser.ui.R.string.chatMenuPopupNewTab),
-                        )
+                    setChatMenuItemText(
+                        com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewChat,
+                        if (plusMenuUpdateEnabled) {
+                            com.duckduckgo.browser.ui.R.string.chatMenuPopupChat
+                        } else {
+                            com.duckduckgo.browser.ui.R.string.browserMenuNewChat
+                        },
+                    )
+                    setChatMenuItemText(
+                        com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewVoiceChat,
+                        if (plusMenuUpdateEnabled) {
+                            com.duckduckgo.duckchat.impl.R.string.duckAiVoiceChatVisibilitySetting
+                        } else {
+                            com.duckduckgo.browser.ui.R.string.chatMenuPopupNewVoiceChat
+                        },
+                    )
+                    setChatMenuItemText(
+                        com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewImage,
+                        if (plusMenuUpdateEnabled) {
+                            com.duckduckgo.browser.ui.R.string.chatMenuPopupImage
+                        } else {
+                            com.duckduckgo.browser.ui.R.string.chatMenuPopupNewImage
+                        },
+                    )
+                    setChatMenuItemText(
+                        com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab,
+                        if (plusMenuUpdateEnabled) R.string.search else com.duckduckgo.browser.ui.R.string.chatMenuPopupNewTab,
+                    )
                     chatMenuPopup.showAnchoredView(activity, binding.rootView, anchor)
                 }
 

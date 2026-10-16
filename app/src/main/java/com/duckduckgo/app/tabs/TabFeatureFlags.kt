@@ -52,4 +52,11 @@ interface TabManagerFeatureFlags {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun duckAiChatsMenu(): Toggle
+
+    /**
+     * The Duck.ai "+" menu shows a "New Tab" header, drops the "New" prefix from its items, renames New Tab to Search
+     * (opening on the Search input in the current browser mode) and removes New Fire Tab.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiPlusMenuUpdate(): Toggle
 }
