@@ -53,6 +53,13 @@ interface CustomTabsFeature {
     fun handleTrustedCallersNonHttpLinks(): Toggle
 
     /**
+     * When enabled together with [handleTrustedCallers] (and [handleTrustedCallersNonHttpLinks] for non-HTTP links),
+     * links that return to the verified custom tab caller can open even when "Open Links in Apps" is set to "Never".
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun handleTrustedCallersWhenAppLinksDisabled(): Toggle
+
+    /**
      * When enabled, a custom tab survives the user switching to another app (e.g. to fetch a 2FA code) and coming
      * back: the tab is kept with the app that opened it instead of in a hidden DDG task that the system discards.
      * When disabled, custom tabs launch as before.

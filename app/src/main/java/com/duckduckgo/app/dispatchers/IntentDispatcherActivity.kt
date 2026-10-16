@@ -102,7 +102,8 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
             ?.let { customTabsSessionRegistry.lookupClientPackage(it) }
         // Best-effort caller identity from the android-app:// referrer, available even when the launcher never
         // bound the service (e.g. apps that open a login Custom Tab without a session). The launcher can set the
-        // referrer, so this is used only to skip confirmation prompts for links back to the caller, never the launch carve-out.
+        // referrer, so it only decides how links back to the caller are handled (skipping confirmation prompts, or
+        // overriding "Never" in Open Links in Apps), never the no-gesture launch carve-out.
         val referrerPackage = referrer?.takeIf { it.scheme == "android-app" }?.host
 
         // As customizations we only support the toolbar color at the moment.

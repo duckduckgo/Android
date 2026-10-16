@@ -27,6 +27,11 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface AppLinksHandler {
+    /**
+     * @param trustedCallerOverridesDisabledAppLinks true when [appLink] goes back to the app that opened the custom tab
+     * and may be handled even though [appLinksEnabled] is false. That app may only be known from its referrer, so the
+     * no-gesture launch carve-out still requires [clientPackage].
+     */
     fun handleAppLink(
         isForMainFrame: Boolean,
         appLink: AppLink,
@@ -34,6 +39,7 @@ interface AppLinksHandler {
         clientPackage: String?,
         appLinksEnabled: Boolean,
         shouldHaltWebNavigation: Boolean,
+        trustedCallerOverridesDisabledAppLinks: Boolean = false,
         launchAppLink: () -> Unit,
     ): Boolean
 
@@ -95,9 +101,15 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
         clientPackage: String?,
         appLinksEnabled: Boolean,
         shouldHaltWebNavigation: Boolean,
+        trustedCallerOverridesDisabledAppLinks: Boolean,
         launchAppLink: () -> Unit,
     ): Boolean {
-        if (!appLinksEnabled || !isForMainFrame) {
+        if (!isForMainFrame) {
+            return false
+        }
+
+        val isTrustedCaller = isTrustedCaller(appLink, clientPackage)
+        if (!appLinksEnabled && !trustedCallerOverridesDisabledAppLinks) {
             return false
         }
 
@@ -108,7 +120,7 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
         // the "trusted-caller" carve-out applies - if an app opens a Custom Tab, App Links that
         // point back to that same app should be allowed even without user interaction.
         if (!isAlwaysTriggerDomain && androidBrowserConfigFeature.customTabEndlessLoopFix().isEnabled()) {
-            if (!hasGesture && !isTrustedCaller(appLink, clientPackage)) {
+            if (!hasGesture && !isTrustedCaller) {
                 return false
             }
         }

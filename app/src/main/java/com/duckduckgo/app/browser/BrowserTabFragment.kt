@@ -2938,6 +2938,7 @@ class BrowserTabFragment :
                     showConfirmation = it.showConfirmation,
                     trustedCallerPackage = it.trustedCallerPackage,
                     finishCustomTabOnTrustedCallerLaunch = it.finishCustomTabOnTrustedCallerLaunch,
+                    trustedCallerOnly = it.trustedCallerOnly,
                 )
             }
 
@@ -3499,12 +3500,17 @@ class BrowserTabFragment :
         showConfirmation: Boolean = true,
         trustedCallerPackage: String? = null,
         finishCustomTabOnTrustedCallerLaunch: Boolean = false,
+        trustedCallerOnly: Boolean = false,
     ) {
         context?.let {
             val pm = it.packageManager
             val activities = pm.queryIntentActivities(intent, 0)
 
             if (activities.isEmpty()) {
+                if (trustedCallerOnly) {
+                    viewModel.onTrustedCallerLaunchUnavailable(fallbackUrl)
+                    return
+                }
                 when {
                     fallbackIntent == null && fallbackUrl == null && androidBrowserConfigFeature.handleIntentScheme().isEnabled() -> {
                         intent.`package`?.let { pkg ->
@@ -3569,6 +3575,8 @@ class BrowserTabFragment :
                     showConfirmation,
                     trustedCallerPackage,
                     finishCustomTabOnTrustedCallerLaunch,
+                    trustedCallerOnly,
+                    fallbackUrl,
                 )
             }
         }
@@ -3584,6 +3592,8 @@ class BrowserTabFragment :
         showConfirmation: Boolean = true,
         trustedCallerPackage: String? = null,
         finishCustomTabOnTrustedCallerLaunch: Boolean = false,
+        trustedCallerOnly: Boolean = false,
+        fallbackUrl: String? = null,
     ) {
         if (!isActiveCustomTab() && !isActiveTab && !isOpenedInNewTab) {
             logcat(VERBOSE) { "Will not launch an intent for an inactive tab" }
@@ -3593,6 +3603,10 @@ class BrowserTabFragment :
         runCatching {
             val trustedCallerIntent = appLinksHandler.trustedCallerIntent(intent, trustedCallerPackage) {
                 pm.queryIntentActivities(it, PackageManager.MATCH_DEFAULT_ONLY)
+            }
+            if (trustedCallerOnly && trustedCallerIntent == null) {
+                viewModel.onTrustedCallerLaunchUnavailable(fallbackUrl)
+                return
             }
             val launch = planExternalAppLaunch(
                 intent = intent,
