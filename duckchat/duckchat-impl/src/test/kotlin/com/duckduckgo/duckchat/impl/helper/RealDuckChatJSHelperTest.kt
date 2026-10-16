@@ -54,6 +54,7 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiResponseWaitWideEvent
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -134,6 +135,7 @@ class RealDuckChatJSHelperTest {
         FakeFeatureToggleFactory.create(DuckAiChatHistoryFeature::class.java)
     private val mockTermsConsent: DuckAiTermsConsent = mock()
     private val chatStateStore = ChatStateStore()
+    private val mockResponseWaitWideEvent: DuckAiResponseWaitWideEvent = mock()
 
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
@@ -160,6 +162,7 @@ class RealDuckChatJSHelperTest {
         duckAiChatHistoryFeature = fakeChatHistoryFeature,
         termsConsent = mockTermsConsent,
         chatStateStore = chatStateStore,
+        responseWaitWideEvent = mockResponseWaitWideEvent,
     )
 
     init {
@@ -2584,6 +2587,54 @@ class RealDuckChatJSHelperTest {
     }
 
     // endregion
+
+    @Test
+    fun whenResponseStateInFullModeThenResponseWaitGetsRawStatus() = runTest {
+        testee.processJsCallbackMessage(
+            "aiChat",
+            "responseState",
+            "123",
+            JSONObject(mapOf("status" to "start_stream:restart_stream")),
+            pageContext = viewModel.updatedPageContext,
+            tabId = "tab-1",
+        )
+
+        verify(mockResponseWaitWideEvent).onResponseState("tab-1", "start_stream:restart_stream")
+    }
+
+    @Test
+    fun whenResponseStateInContextualModeThenResponseWaitIsNotCalled() = runTest {
+        testee.processJsCallbackMessage(
+            "aiChat",
+            "responseState",
+            "123",
+            JSONObject(mapOf("status" to "ready")),
+            mode = Mode.CONTEXTUAL,
+            pageContext = viewModel.updatedPageContext,
+            tabId = "tab-1",
+        )
+
+        verifyNoInteractions(mockResponseWaitWideEvent)
+    }
+
+    @Test
+    fun whenNativePromptConsumedInFullModeThenResponseWaitGetsPendingEffortAndTool() = runTest {
+        whenever(mockPendingNativePromptStore.consume())
+            .thenReturn(PendingNativePrompt("test prompt", "model", "high", selectedTool = "WebSearch"))
+
+        testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext, tabId = "tab-1")
+
+        verify(mockResponseWaitWideEvent).onNativePromptSubmitted("tab-1", "high", "WebSearch")
+    }
+
+    @Test
+    fun whenNoPendingNativePromptThenResponseWaitIsNotCalled() = runTest {
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(null)
+
+        testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext, tabId = "tab-1")
+
+        verifyNoInteractions(mockResponseWaitWideEvent)
+    }
 
     @Test
     fun whenGetAIChatNativePromptWithPendingPromptThenReturnsPromptData() = runTest {
