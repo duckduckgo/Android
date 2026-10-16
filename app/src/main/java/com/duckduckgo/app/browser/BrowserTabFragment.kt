@@ -835,14 +835,22 @@ class BrowserTabFragment :
                 viewModel.openNewImageDuckChatFromChatMenu()
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)) {
-                // With the native sidebar this entry opens the new tab with its input screen surfaced on
-                // the Search tab. The target is threaded to the new tab itself rather than armed globally,
-                // so it can't be consumed by another tab.
+                // With the native sidebar this entry opens the new tab with its
+                // input screen surfaced on the Search tab. The target is threaded to the new tab itself rather than
+                // armed globally, so it can't be consumed by another tab. The
+                // entry stays in the current mode (Regular vs Fire tab).
+                val plusMenuUpdateEnabled = tabManagerFeatureFlags.duckAiPlusMenuUpdate().isEnabled()
                 viewModel.onNewTabFromChatMenuSelected()
-                browserActivity?.launchNewTab(
-                    browserMode = BrowserMode.REGULAR,
-                    inputModeTarget = if (duckAiFeatureState.nativeDuckAiSidebar.value) InputMode.SEARCH else null,
-                )
+                browserActivity?.let { activity ->
+                    activity.launchNewTab(
+                        browserMode = if (plusMenuUpdateEnabled) activity.currentBrowserMode else BrowserMode.REGULAR,
+                        inputModeTarget = if (plusMenuUpdateEnabled || duckAiFeatureState.nativeDuckAiSidebar.value) {
+                            InputMode.SEARCH
+                        } else {
+                            null
+                        },
+                    )
+                }
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)) {
                 viewModel.onNewFireTabFromChatMenuSelected()
