@@ -29,7 +29,9 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.subscriptions.api.Product.DuckAiPlus
+import com.duckduckgo.subscriptions.api.Product.ITR
 import com.duckduckgo.subscriptions.api.Product.NetP
+import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
@@ -196,6 +198,38 @@ class RealSubscriptionsTest {
         val products = subscriptions.getAvailableProducts()
         assertTrue(products.contains(DuckAiPlus))
         assertTrue(products.size == 2)
+    }
+
+    @Test
+    fun whenGetPurchasableProductsThenReturnKnownProductsAcrossAllOffers() = runTest {
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
+            listOf(
+                subscriptionOfferWith("Network Protection", "Data Broker Protection"),
+                subscriptionOfferWith("Identity Theft Restoration", "Some Future Product"),
+            ),
+        )
+
+        assertEquals(setOf(NetP, PIR, ITR), subscriptions.getPurchasableProducts())
+    }
+
+    @Test
+    fun whenGetPurchasableProductsHasDuckAiButFFDisabledThenRemoveFromList() = runTest {
+        subscriptionFeature.duckAiPlus().setRawStoredState(State(false))
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
+            listOf(subscriptionOfferWith("Network Protection", "Duck.ai")),
+        )
+
+        assertEquals(setOf(NetP), subscriptions.getPurchasableProducts())
+    }
+
+    @Test
+    fun whenGetPurchasableProductsHasDuckAiAndFFEnabledThenKeepInList() = runTest {
+        subscriptionFeature.duckAiPlus().setRawStoredState(State(true))
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
+            listOf(subscriptionOfferWith("Network Protection", "Duck.ai")),
+        )
+
+        assertEquals(setOf(NetP, DuckAiPlus), subscriptions.getPurchasableProducts())
     }
 
     @Test
@@ -592,6 +626,14 @@ class RealSubscriptionsTest {
         val separator = if (this.contains("?")) "&" else "?"
         return this + separator + queryParams
     }
+
+    private fun subscriptionOfferWith(vararg products: String) = SubscriptionOffer(
+        planId = "test",
+        offerId = null,
+        tier = "plus",
+        pricingPhases = emptyList(),
+        entitlements = products.map { Entitlement("plus", it) }.toSet(),
+    )
 
     private companion object {
         val ENTRY_POINTS_SETTINGS = """
