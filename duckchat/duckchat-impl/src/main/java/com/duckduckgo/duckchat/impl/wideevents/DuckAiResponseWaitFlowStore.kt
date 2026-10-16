@@ -23,7 +23,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.di.DuckChat
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -56,7 +56,7 @@ class DuckAiResponseWaitFlowStoreImpl @Inject constructor(
 
     override suspend fun load(): List<PersistedResponseWaitFlow> {
         return try {
-            val json = store.data.first()[OPEN_FLOWS] ?: return emptyList()
+            val json = store.data.firstOrNull()?.get(OPEN_FLOWS) ?: return emptyList()
             val array = JSONArray(json)
             List(array.length()) { array.getJSONObject(it).toFlow() }
         } catch (e: JSONException) {
