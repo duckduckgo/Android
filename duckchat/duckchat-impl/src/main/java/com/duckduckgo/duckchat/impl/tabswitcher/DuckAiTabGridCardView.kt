@@ -86,7 +86,7 @@ class DuckAiTabGridCardView(
         thumbnailJob.cancel()
 
         with(binding) {
-            snippet.gone()
+            tabChatItemDetails.gone()
             thumbnail.gone()
             thumbnail.setImageDrawable(null)
             tabChatItemEmptyLogo.gone()
@@ -97,8 +97,16 @@ class DuckAiTabGridCardView(
 
             when (content) {
                 is RealDuckAiTabGridItemContent.Chat -> {
+                    tabChatItemTitle.text = content.title
+                    tabChatItemTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
                     snippet.text = content.snippet
-                    snippet.show()
+                    tabChatItemDetails.show()
+                }
+                is RealDuckAiTabGridItemContent.Thinking -> {
+                    tabChatItemTitle.setText(R.string.duckAiTabCardThinkingTitle)
+                    tabChatItemTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_thinking_16, 0, 0, 0)
+                    snippet.text = content.title
+                    tabChatItemDetails.show()
                 }
                 is RealDuckAiTabGridItemContent.ImageChat -> {
                     thumbnail.show()
