@@ -103,6 +103,8 @@ import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.GetCaptchaInfoR
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.NavigateResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.SolveCaptchaResponse
 import com.duckduckgo.pir.impl.store.PirEventsRepository
+import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
+import com.duckduckgo.pir.impl.store.PirFreemiumFirstScanResult
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.store.RealPirEventsRepository
@@ -399,6 +401,7 @@ class PirEndToEndTest {
             ),
             pirFreeScanWorkWindow = NoOpPirFreeScanWorkWindow,
             pirScanScheduler = NoOpPirScanScheduler,
+            pirFreemiumDataStore = NoOpPirFreemiumDataStore,
         )
 
         pirEmailConfirmation = RealPirEmailConfirmation(
@@ -1075,6 +1078,15 @@ class PirEndToEndTest {
      */
     private object NoOpPirFreeScanWorkWindow : PirFreeScanWorkWindow {
         override suspend fun isOpen(): Boolean = true
+    }
+
+    private object NoOpPirFreemiumDataStore : PirFreemiumDataStore {
+        override val didActivate: Boolean = false
+        override val firstProfileSavedTimestamp: Long = 0L
+        override val firstScanResult: PirFreemiumFirstScanResult? = null
+        override fun activate(timestampMillis: Long) = Unit
+        override fun recordFirstScanResult(result: PirFreemiumFirstScanResult) = Unit
+        override fun reset() = Unit
     }
 
     private object NoOpPirScanScheduler : PirScanScheduler {
