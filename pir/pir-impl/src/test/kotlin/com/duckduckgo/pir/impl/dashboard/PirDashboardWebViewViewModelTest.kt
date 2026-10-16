@@ -19,6 +19,7 @@ package com.duckduckgo.pir.impl.dashboard
 import app.cash.turbine.test
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.pir.impl.PirUserUtils
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command.LaunchSubscriptionPurchase
 import com.duckduckgo.pir.impl.dashboard.purchase.PirPurchaseRoute
@@ -46,6 +47,7 @@ class PirDashboardWebViewViewModelTest {
 
     private val pirPixelSender: PirPixelSender = mock()
     private val pirInteractionReporter: PirInteractionReporter = mock()
+    private val pirUserUtils: PirUserUtils = mock()
     private val appBuildConfig: AppBuildConfig = mock()
     private val pirRepository: PirRepository = mock()
     private val subscriptions: Subscriptions = mock()
@@ -61,6 +63,7 @@ class PirDashboardWebViewViewModelTest {
         testee = PirDashboardWebViewViewModel(
             pirPixelSender = pirPixelSender,
             pirInteractionReporter = pirInteractionReporter,
+            pirUserUtils = pirUserUtils,
             appBuildConfig = appBuildConfig,
             pirRepository = pirRepository,
             subscriptions = subscriptions,
@@ -170,5 +173,25 @@ class PirDashboardWebViewViewModelTest {
         testee.onLaunched(isRestored = true, fromFreemiumScanCompleteNotification = true)
 
         verify(pirPixelSender, never()).reportFreemiumScanCompleteNotificationOpened()
+    }
+
+    @Test
+    fun `test reports dashboard opened and interaction as free for a user without a PIR subscription`() = runTest {
+        whenever(pirUserUtils.hasPirSubscription()).thenReturn(false)
+
+        testee.onStart(mock())
+
+        verify(pirPixelSender).reportDashboardOpened(isAuthenticated = false)
+        verify(pirInteractionReporter).attemptFirePixel(isAuthenticated = false)
+    }
+
+    @Test
+    fun `test reports dashboard opened and interaction as paid for a user with a PIR subscription`() = runTest {
+        whenever(pirUserUtils.hasPirSubscription()).thenReturn(true)
+
+        testee.onStart(mock())
+
+        verify(pirPixelSender).reportDashboardOpened(isAuthenticated = true)
+        verify(pirInteractionReporter).attemptFirePixel(isAuthenticated = true)
     }
 }

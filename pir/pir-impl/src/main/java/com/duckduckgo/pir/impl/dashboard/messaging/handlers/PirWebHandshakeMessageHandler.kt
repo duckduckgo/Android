@@ -22,10 +22,9 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.pir.impl.PirUserUtils
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
-import com.duckduckgo.subscriptions.api.Product.PIR
-import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
@@ -42,6 +41,7 @@ import javax.inject.Inject
 )
 class PirWebHandshakeMessageHandler @Inject constructor(
     private val subscriptions: Subscriptions,
+    private val pirUserUtils: PirUserUtils,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : PirWebJsMessageHandler() {
@@ -72,31 +72,8 @@ class PirWebHandshakeMessageHandler @Inject constructor(
 
     private suspend fun getHandshakeUserData(): PirWebMessageResponse.HandshakeResponse.UserData {
         return PirWebMessageResponse.HandshakeResponse.UserData(
-            isAuthenticatedUser = hasPirSubscription(),
+            isAuthenticatedUser = pirUserUtils.hasPirSubscription(),
             isUserEligibleForFreeTrial = subscriptions.isFreeTrialEligible(),
         )
-    }
-
-    /**
-     * Mirrors the condition [com.duckduckgo.pir.impl.checker.PirWorkHandler] resolves the run mode
-     * from, so the dashboard renders the mode that will actually be honoured. An access token is not
-     * enough: a purchase that fails after account creation leaves one behind with no subscription, and
-     * reporting that user as authenticated offers them removals the scan-only run mode never performs.
-     */
-    private suspend fun hasPirSubscription(): Boolean {
-        val subscriptionActive = when (subscriptions.getSubscriptionStatus()) {
-            SubscriptionStatus.UNKNOWN,
-            SubscriptionStatus.INACTIVE,
-            SubscriptionStatus.EXPIRED,
-            SubscriptionStatus.WAITING,
-            -> false
-
-            SubscriptionStatus.AUTO_RENEWABLE,
-            SubscriptionStatus.NOT_AUTO_RENEWABLE,
-            SubscriptionStatus.GRACE_PERIOD,
-            -> true
-        }
-
-        return subscriptionActive && subscriptions.getCurrentEntitlements().any { it.product == PIR.value }
     }
 }

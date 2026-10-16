@@ -28,6 +28,7 @@ import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.pir.impl.PirUserUtils
 import com.duckduckgo.pir.impl.dashboard.purchase.PirPurchaseRoute.NativePurchaseFlow
 import com.duckduckgo.pir.impl.pixels.PirInteractionReporter
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
@@ -52,6 +53,7 @@ import javax.inject.Inject
 class PirDashboardWebViewViewModel @Inject constructor(
     private val pirPixelSender: PirPixelSender,
     private val pirInteractionReporter: PirInteractionReporter,
+    private val pirUserUtils: PirUserUtils,
     private val appBuildConfig: AppBuildConfig,
     private val pirRepository: PirRepository,
     private val subscriptions: Subscriptions,
@@ -114,9 +116,11 @@ class PirDashboardWebViewViewModel @Inject constructor(
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
         purchaseFlowOutstanding = false
-        pirPixelSender.reportDashboardOpened()
         appCoroutineScope.launch {
-            pirInteractionReporter.attemptFirePixel()
+            // read once so the open count and the interaction pixels never disagree on the user's tier
+            val isAuthenticated = pirUserUtils.hasPirSubscription()
+            pirPixelSender.reportDashboardOpened(isAuthenticated)
+            pirInteractionReporter.attemptFirePixel(isAuthenticated)
         }
 
         if (appBuildConfig.isInternalBuild()) {

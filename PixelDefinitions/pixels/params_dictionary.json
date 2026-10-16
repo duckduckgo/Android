@@ -320,6 +320,16 @@
             "work_stopped"
         ]
     },
+    "pirIsAuthenticated": {
+        "key": "is_authenticated",
+        "type": "boolean",
+        "description": "Whether the user has an active subscription that includes PIR."
+    },
+    "pirIsFreeScan": {
+        "key": "free_scan",
+        "type": "boolean",
+        "description": "Whether the user is a free (freemium) PIR user."
+    },
     "duckAiSubscriptionFunnelOrigin": {
         "key": "origin",
         "type": "string",

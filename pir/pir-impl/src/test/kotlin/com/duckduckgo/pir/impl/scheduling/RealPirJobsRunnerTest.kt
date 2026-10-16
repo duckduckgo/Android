@@ -70,6 +70,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
@@ -275,7 +276,7 @@ class RealPirJobsRunnerTest {
         verify(mockPirRepository, never()).setLatestBackgroundScanRunInMs(any())
         verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
         // No eligible scan jobs (no active brokers) -> first-scan activation pixel does not fire
-        verify(mockPixelSender, never()).reportFirstScanStarted()
+        verify(mockPixelSender, never()).reportFirstScanStarted(any())
         verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         verify(mockPirScan).stop()
         verifyNoMoreInteractions(mockPixelSender)
@@ -317,6 +318,7 @@ class RealPirJobsRunnerTest {
                 eq(listOf(testScanJobRecord)),
                 eq(mockContext),
                 eq(RunType.MANUAL),
+                any(),
                 anyOrNull(),
                 anyOrNull(),
             ),
@@ -328,14 +330,15 @@ class RealPirJobsRunnerTest {
 
         // Then
         verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
-        verify(mockPixelSender).reportFirstScanStarted()
+        verify(mockPixelSender).reportFirstScanStarted(isAuthenticated = true)
         // we just dont attempt what the mock for time provider is giving us
-        verify(mockPixelSender).reportInitialScanDuration(eq(0L), eq(2), eq(false), eq(false), eq(1), eq(MANUAL_INITIAL), any())
+        verify(mockPixelSender).reportInitialScanDuration(eq(0L), eq(2), eq(false), eq(false), eq(1), eq(MANUAL_INITIAL), any(), any())
         verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         verify(mockPirScan).executeScanForJobs(
             eq(listOf(testScanJobRecord)),
             eq(mockContext),
             eq(RunType.MANUAL),
+            any(),
             anyOrNull(),
             anyOrNull(),
         )
@@ -373,6 +376,7 @@ class RealPirJobsRunnerTest {
                 eq(listOf(testScanJobRecord)),
                 eq(mockContext),
                 eq(RunType.MANUAL),
+                any(),
                 anyOrNull(),
                 anyOrNull(),
             ),
@@ -384,14 +388,15 @@ class RealPirJobsRunnerTest {
 
         // Then
         verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
-        verify(mockPixelSender).reportFirstScanStarted()
+        verify(mockPixelSender).reportFirstScanStarted(isAuthenticated = true)
         verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         // we just dont attempt what the mock for time provider is giving us
-        verify(mockPixelSender).reportInitialScanDuration(eq(0L), eq(2), eq(false), eq(false), eq(2), eq(MANUAL_INITIAL), any())
+        verify(mockPixelSender).reportInitialScanDuration(eq(0L), eq(2), eq(false), eq(false), eq(2), eq(MANUAL_INITIAL), any(), any())
         verify(mockPirScan).executeScanForJobs(
             eq(listOf(testScanJobRecord)),
             eq(mockContext),
             eq(RunType.MANUAL),
+            any(),
             anyOrNull(),
             anyOrNull(),
         )
@@ -425,9 +430,9 @@ class RealPirJobsRunnerTest {
 
         // Then
         verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_EDIT_PROFILE), any())
-        verify(mockPixelSender).reportInitialScanDuration(any(), any(), any(), any(), any(), eq(MANUAL_EDIT_PROFILE), any())
+        verify(mockPixelSender).reportInitialScanDuration(any(), any(), any(), any(), any(), eq(MANUAL_EDIT_PROFILE), any(), any())
         verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_EDIT_PROFILE), any())
-        verify(mockPixelSender, never()).reportFirstScanStarted()
+        verify(mockPixelSender, never()).reportFirstScanStarted(any())
     }
 
     @Test
@@ -458,9 +463,9 @@ class RealPirJobsRunnerTest {
         // Then - a resume is a manual run (forwards the resume trigger to pixels and both wide events)
         // but must NOT re-fire the once-per-install first-scan pixel.
         verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL_RESUME), any())
-        verify(mockPixelSender).reportInitialScanDuration(any(), any(), any(), any(), any(), eq(MANUAL_INITIAL_RESUME), any())
+        verify(mockPixelSender).reportInitialScanDuration(any(), any(), any(), any(), any(), eq(MANUAL_INITIAL_RESUME), any(), any())
         verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL_RESUME), any())
-        verify(mockPixelSender, never()).reportFirstScanStarted()
+        verify(mockPixelSender, never()).reportFirstScanStarted(any())
         verify(mockPirScanWideEvent).onRunStarted(
             executionType = eq(MANUAL_INITIAL_RESUME),
             profileQueriesCount = any(),
@@ -472,6 +477,7 @@ class RealPirJobsRunnerTest {
             batteryOptimizationsEnabled = any(),
             notificationsPermissionGranted = any(),
             isTrackerBlockingEnabled = any(),
+            isFreeScan = any(),
         )
         verify(mockPirInitialScanCompletionWideEvent).onRunStarted(
             executionType = eq(MANUAL_INITIAL_RESUME),
@@ -518,6 +524,7 @@ class RealPirJobsRunnerTest {
                 eq(listOf(testScanJobRecord)),
                 eq(mockContext),
                 eq(RunType.SCHEDULED),
+                any(),
                 anyOrNull(),
                 anyOrNull(),
             ),
@@ -530,11 +537,12 @@ class RealPirJobsRunnerTest {
         // Then
         verify(mockPixelSender).reportScheduledScanStarted(any(), any())
         verify(mockPixelSender).reportScheduledScanCompleted(any(), any(), any(), any(), any())
-        verify(mockPixelSender, never()).reportFirstScanStarted()
+        verify(mockPixelSender, never()).reportFirstScanStarted(any())
         verify(mockPirScan).executeScanForJobs(
             eq(listOf(testScanJobRecord)),
             eq(mockContext),
             eq(RunType.SCHEDULED),
+            any(),
             anyOrNull(),
             anyOrNull(),
         )
@@ -912,6 +920,7 @@ class RealPirJobsRunnerTest {
                 eq(listOf(testScanJobRecord)),
                 eq(mockContext),
                 eq(RunType.MANUAL),
+                any(),
                 anyOrNull(),
                 anyOrNull(),
             ),
@@ -944,6 +953,7 @@ class RealPirJobsRunnerTest {
             eq(listOf(testScanJobRecord)),
             eq(mockContext),
             eq(RunType.MANUAL),
+            any(),
             anyOrNull(),
             anyOrNull(),
         )
@@ -1314,7 +1324,7 @@ class RealPirJobsRunnerTest {
         verify(mockBrokerJsonUpdater).update()
         verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
         // No eligible scan jobs (broker data still empty) -> first-scan activation pixel does not fire
-        verify(mockPixelSender, never()).reportFirstScanStarted()
+        verify(mockPixelSender, never()).reportFirstScanStarted(any())
         verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         verifyNoMoreInteractions(mockPixelSender)
         verifyNoInteractions(mockEligibleScanJobProvider)
@@ -1369,7 +1379,7 @@ class RealPirJobsRunnerTest {
         verifyNoInteractions(mockBrokerJsonUpdater)
         verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
         // No eligible scan jobs (no active brokers) -> first-scan activation pixel does not fire
-        verify(mockPixelSender, never()).reportFirstScanStarted()
+        verify(mockPixelSender, never()).reportFirstScanStarted(any())
         verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         verifyNoMoreInteractions(mockPixelSender)
     }
@@ -1393,6 +1403,7 @@ class RealPirJobsRunnerTest {
                 eq(listOf(testScanJobRecord)),
                 eq(mockContext),
                 eq(RunType.MANUAL),
+                any(),
                 anyOrNull(),
                 anyOrNull(),
             ),
@@ -1416,6 +1427,7 @@ class RealPirJobsRunnerTest {
             batteryOptimizationsEnabled = false,
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
+            isFreeScan = false,
         )
         verify(mockPirScanWideEvent).onScanCompleted(any())
         verify(mockPirScanWideEvent).onOptOutStarted(any())
@@ -1456,6 +1468,7 @@ class RealPirJobsRunnerTest {
             batteryOptimizationsEnabled = false,
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
+            isFreeScan = false,
         )
         verify(mockPirScanWideEvent).onScanCompleted(any())
         verify(mockPirScanWideEvent).onOptOutSkipped(any())
@@ -1482,6 +1495,7 @@ class RealPirJobsRunnerTest {
                 eq(listOf(testScanJobRecord)),
                 eq(mockContext),
                 eq(RunType.SCHEDULED),
+                any(),
                 anyOrNull(),
                 anyOrNull(),
             ),
@@ -1504,6 +1518,7 @@ class RealPirJobsRunnerTest {
             batteryOptimizationsEnabled = false,
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
+            isFreeScan = false,
         )
         verify(mockPirScanWideEvent).onScanCompleted(SCHEDULED)
         verify(mockPirScanWideEvent).onOptOutSkipped(SCHEDULED)
@@ -1534,6 +1549,7 @@ class RealPirJobsRunnerTest {
             batteryOptimizationsEnabled = false,
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
+            isFreeScan = false,
         )
         verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.NO_ACTIVE_BROKERS), anyOrNull())
         verify(mockPirScanWideEvent, never()).onScanCompleted(any())
@@ -1558,6 +1574,7 @@ class RealPirJobsRunnerTest {
                 eq(listOf(testScanJobRecord)),
                 eq(mockContext),
                 eq(RunType.MANUAL),
+                any(),
                 anyOrNull(),
                 anyOrNull(),
             ),
@@ -1583,6 +1600,7 @@ class RealPirJobsRunnerTest {
             batteryOptimizationsEnabled = false,
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
+            isFreeScan = false,
         )
         verify(mockPirScanWideEvent).onRunCancelled(any(), any())
         verify(mockPirScanWideEvent, never()).onScanCompleted(any())
@@ -1606,6 +1624,7 @@ class RealPirJobsRunnerTest {
                 eq(listOf(testScanJobRecord)),
                 eq(mockContext),
                 eq(RunType.MANUAL),
+                any(),
                 anyOrNull(),
                 anyOrNull(),
             ),
@@ -1631,6 +1650,7 @@ class RealPirJobsRunnerTest {
             batteryOptimizationsEnabled = false,
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
+            isFreeScan = false,
         )
         verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.ILLEGAL_STATE_EXCEPTION), anyOrNull())
         verify(mockPirScanWideEvent, never()).onScanCompleted(any())
@@ -1652,7 +1672,7 @@ class RealPirJobsRunnerTest {
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
         whenever(
-            mockPirScan.executeScanForJobs(any(), eq(mockContext), eq(RunType.MANUAL), anyOrNull(), anyOrNull()),
+            mockPirScan.executeScanForJobs(any(), eq(mockContext), eq(RunType.MANUAL), any(), anyOrNull(), anyOrNull()),
         ).thenAnswer { throw PirRendererGoneException(didCrash = true) }
 
         // When - runEligibleJobs must NOT rethrow; it must convert renderer-gone into a failure Result
@@ -1696,6 +1716,7 @@ class RealPirJobsRunnerTest {
                 eq(listOf(testScanJobRecord)),
                 eq(mockContext),
                 eq(RunType.MANUAL),
+                any(),
                 anyOrNull(),
                 anyOrNull(),
             ),
@@ -1772,7 +1793,7 @@ class RealPirJobsRunnerTest {
         testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
 
         argumentCaptor<List<ScanJobRecord>>().apply {
-            verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any())
+            verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any(), any())
             assertEquals(listOf("Ungated"), firstValue.map { it.brokerName })
         }
     }
@@ -1797,7 +1818,7 @@ class RealPirJobsRunnerTest {
 
         verifyNoInteractions(mockPirFreeScanBrokerFilter)
         argumentCaptor<List<ScanJobRecord>>().apply {
-            verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any())
+            verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any(), any())
             assertEquals(setOf("Ungated", "Gated"), firstValue.map { it.brokerName }.toSet())
         }
     }
@@ -1916,7 +1937,7 @@ class RealPirJobsRunnerTest {
 
         testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
 
-        verify(mockPixelSender).reportInitialScanDuration(any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
+        verify(mockPixelSender).reportInitialScanDuration(any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any(), any())
     }
 
     @Test
@@ -1937,7 +1958,7 @@ class RealPirJobsRunnerTest {
         testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
 
         argumentCaptor<List<ScanJobRecord>>().apply {
-            verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any())
+            verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any(), any())
             assertEquals(listOf("Fresh"), firstValue.map { it.brokerName })
         }
     }
@@ -1960,7 +1981,7 @@ class RealPirJobsRunnerTest {
         testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
 
         argumentCaptor<List<ScanJobRecord>>().apply {
-            verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any())
+            verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any(), any())
             assertEquals(listOf("Fresh"), firstValue.map { it.brokerName })
         }
     }
@@ -1982,7 +2003,7 @@ class RealPirJobsRunnerTest {
         testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
 
         argumentCaptor<List<ScanJobRecord>>().apply {
-            verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any())
+            verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any(), any())
             assertEquals(listOf("Errored"), firstValue.map { it.brokerName })
         }
     }
@@ -2010,9 +2031,163 @@ class RealPirJobsRunnerTest {
         testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         argumentCaptor<List<ScanJobRecord>>().apply {
-            verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any())
+            verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any(), any())
             assertEquals(setOf("Matched", "NoMatch"), firstValue.map { it.brokerName }.toSet())
         }
+    }
+
+    @Test
+    fun whenScanOnlySkipsMaintenanceJobsThenReportsItOncePerRun() = runTest {
+        givenAScanRunWithUngatedBrokers("Matched", "NoMatch", "Fresh")
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(
+                ScanJobRecord(
+                    brokerName = "Matched",
+                    userProfileId = testProfileQuery.id,
+                    status = ScanJobStatus.MATCHES_FOUND,
+                    lastScanDateInMillis = 500L,
+                ),
+                ScanJobRecord(
+                    brokerName = "NoMatch",
+                    userProfileId = testProfileQuery.id,
+                    status = ScanJobStatus.NO_MATCH_FOUND,
+                    lastScanDateInMillis = 500L,
+                ),
+                ScanJobRecord(brokerName = "Fresh", userProfileId = testProfileQuery.id),
+            ),
+        )
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPixelSender, times(1)).reportFreemiumMaintenanceScanSkipped()
+        argumentCaptor<List<ScanJobRecord>>().apply {
+            verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any(), any())
+            assertEquals(listOf("Fresh"), firstValue.map { it.brokerName })
+        }
+    }
+
+    @Test
+    fun whenScanOnlyAndEveryEligibleJobIsMaintenanceThenReportsSkipAndRunsNoScan() = runTest {
+        givenAScanRunWithUngatedBrokers("Scanned")
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(
+                ScanJobRecord(
+                    brokerName = "Scanned",
+                    userProfileId = testProfileQuery.id,
+                    status = ScanJobStatus.MATCHES_FOUND,
+                    lastScanDateInMillis = 500L,
+                ),
+            ),
+        )
+
+        val result = testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        assertTrue(result.isSuccess)
+        verify(mockPixelSender).reportFreemiumMaintenanceScanSkipped()
+        verify(mockPirScan, never()).executeScanForJobs(any(), any(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenScanOnlyHasNoMaintenanceJobsThenDoesNotReportSkip() = runTest {
+        givenAScanRunWithUngatedBrokers("Fresh")
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(ScanJobRecord(brokerName = "Fresh", userProfileId = testProfileQuery.id)),
+        )
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPixelSender, never()).reportFreemiumMaintenanceScanSkipped()
+    }
+
+    @Test
+    fun whenScanAndOptOutHasMaintenanceJobsThenDoesNotReportSkip() = runTest {
+        givenAScanRunWithUngatedBrokers("Matched")
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(
+                ScanJobRecord(
+                    brokerName = "Matched",
+                    userProfileId = testProfileQuery.id,
+                    status = ScanJobStatus.MATCHES_FOUND,
+                    lastScanDateInMillis = 500L,
+                ),
+            ),
+        )
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
+
+        verify(mockPixelSender, never()).reportFreemiumMaintenanceScanSkipped()
+    }
+
+    @Test
+    fun whenScanOnlyRunStartsThenWideEventIsFreeScan() = runTest {
+        givenAScanRunWithUngatedBrokers("Fresh")
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(ScanJobRecord(brokerName = "Fresh", userProfileId = testProfileQuery.id)),
+        )
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPirScanWideEvent).onRunStarted(
+            executionType = any(),
+            profileQueriesCount = any(),
+            brokerCount = any(),
+            totalScanJobs = any(),
+            webViewCount = any(),
+            isPowerSavingEnabled = any(),
+            isVpnConnected = any(),
+            batteryOptimizationsEnabled = any(),
+            notificationsPermissionGranted = any(),
+            isTrackerBlockingEnabled = any(),
+            isFreeScan = eq(true),
+        )
+    }
+
+    @Test
+    fun whenScanOnlyInitialScanCompletesThenDurationPixelReportsFreeScan() = runTest {
+        givenAScanRunWithUngatedBrokers("Fresh")
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(ScanJobRecord(brokerName = "Fresh", userProfileId = testProfileQuery.id)),
+        )
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPixelSender).reportInitialScanDuration(any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any(), eq(true))
+    }
+
+    @Test
+    fun whenScanOnlyThenScanJobsRunAsFreeScan() = runTest {
+        givenAScanRunWithUngatedBrokers("Fresh")
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(ScanJobRecord(brokerName = "Fresh", userProfileId = testProfileQuery.id)),
+        )
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPirScan).executeScanForJobs(any(), any(), any(), eq(true), any(), any())
+    }
+
+    @Test
+    fun whenScheduledScanOnlyThenScanJobsRunAsFreeScan() = runTest {
+        givenAScanRunWithUngatedBrokers("Fresh")
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(ScanJobRecord(brokerName = "Fresh", userProfileId = testProfileQuery.id)),
+        )
+
+        testee.runEligibleJobs(mockContext, SCHEDULED, PirRunMode.SCAN_ONLY)
+
+        verify(mockPirScan).executeScanForJobs(any(), any(), eq(RunType.SCHEDULED), eq(true), any(), any())
+    }
+
+    @Test
+    fun whenScanAndOptOutThenScanJobsRunAsPaidScan() = runTest {
+        givenAScanRunWithUngatedBrokers("Fresh")
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(ScanJobRecord(brokerName = "Fresh", userProfileId = testProfileQuery.id)),
+        )
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
+
+        verify(mockPirScan).executeScanForJobs(any(), any(), any(), eq(false), any(), any())
     }
 
     @Test
@@ -2032,7 +2207,7 @@ class RealPirJobsRunnerTest {
         val result = testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
 
         assertTrue(result.isSuccess)
-        verify(mockPirScan, never()).executeScanForJobs(any(), any(), any(), any(), any())
+        verify(mockPirScan, never()).executeScanForJobs(any(), any(), any(), any(), any(), any())
         verify(mockPirScanWideEvent).onRunStarted(
             executionType = eq(MANUAL_INITIAL),
             profileQueriesCount = any(),
@@ -2044,8 +2219,18 @@ class RealPirJobsRunnerTest {
             batteryOptimizationsEnabled = any(),
             notificationsPermissionGranted = any(),
             isTrackerBlockingEnabled = any(),
+            isFreeScan = any(),
         )
         verify(mockPirScanWideEvent).onOptOutSkipped(MANUAL_INITIAL)
+    }
+
+    @Test
+    fun whenScanOnlyInitialRunStartsThenReportsFirstScanAsFree() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPixelSender).reportFirstScanStarted(isAuthenticated = false)
     }
 
     @Test
@@ -2108,7 +2293,7 @@ class RealPirJobsRunnerTest {
 
         testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
 
-        verify(mockPirScan, never()).executeScanForJobs(any(), any(), any(), any(), any())
+        verify(mockPirScan, never()).executeScanForJobs(any(), any(), any(), any(), any(), any())
         verify(mockPirFreemiumDataStore).recordFirstScanResult(MATCHES_FOUND)
     }
 
@@ -2193,7 +2378,7 @@ class RealPirJobsRunnerTest {
     @Test
     fun whenScanOnlyRunThrowsThenFirstScanResultIsNotRecorded() = runTest {
         givenAScanOnlyRunWithOneUngatedBroker()
-        whenever(mockPirScan.executeScanForJobs(any(), any(), any(), anyOrNull(), anyOrNull()))
+        whenever(mockPirScan.executeScanForJobs(any(), any(), any(), any(), anyOrNull(), anyOrNull()))
             .thenAnswer { throw IllegalStateException("boom") }
 
         try {
@@ -2209,7 +2394,7 @@ class RealPirJobsRunnerTest {
     @Test
     fun whenScanOnlyRunIsCancelledThenFirstScanResultIsNotRecorded() = runTest {
         givenAScanOnlyRunWithOneUngatedBroker()
-        whenever(mockPirScan.executeScanForJobs(any(), any(), any(), anyOrNull(), anyOrNull()))
+        whenever(mockPirScan.executeScanForJobs(any(), any(), any(), any(), anyOrNull(), anyOrNull()))
             .thenAnswer { throw CancellationException("cancelled") }
 
         try {
@@ -2225,7 +2410,7 @@ class RealPirJobsRunnerTest {
     @Test
     fun whenScanOnlyRunLosesItsRendererThenFirstScanResultIsNotRecorded() = runTest {
         givenAScanOnlyRunWithOneUngatedBroker()
-        whenever(mockPirScan.executeScanForJobs(any(), any(), any(), anyOrNull(), anyOrNull()))
+        whenever(mockPirScan.executeScanForJobs(any(), any(), any(), any(), anyOrNull(), anyOrNull()))
             .thenAnswer { throw PirRendererGoneException(didCrash = true) }
 
         val result = testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
@@ -2433,7 +2618,7 @@ class RealPirJobsRunnerTest {
     @Test
     fun whenScanOnlyRunThrowsThenNotifierIsNotTold() = runTest {
         givenAScanOnlyRunWithOneUngatedBroker()
-        whenever(mockPirScan.executeScanForJobs(any(), any(), any(), anyOrNull(), anyOrNull()))
+        whenever(mockPirScan.executeScanForJobs(any(), any(), any(), any(), anyOrNull(), anyOrNull()))
             .thenAnswer { throw IllegalStateException("boom") }
 
         try {
@@ -2449,7 +2634,7 @@ class RealPirJobsRunnerTest {
     @Test
     fun whenScanOnlyRunIsCancelledThenNotifierIsNotTold() = runTest {
         givenAScanOnlyRunWithOneUngatedBroker()
-        whenever(mockPirScan.executeScanForJobs(any(), any(), any(), anyOrNull(), anyOrNull()))
+        whenever(mockPirScan.executeScanForJobs(any(), any(), any(), any(), anyOrNull(), anyOrNull()))
             .thenAnswer { throw CancellationException("cancelled") }
 
         try {
@@ -2465,7 +2650,7 @@ class RealPirJobsRunnerTest {
     @Test
     fun whenScanOnlyRunLosesItsRendererThenNotifierIsNotTold() = runTest {
         givenAScanOnlyRunWithOneUngatedBroker()
-        whenever(mockPirScan.executeScanForJobs(any(), any(), any(), anyOrNull(), anyOrNull()))
+        whenever(mockPirScan.executeScanForJobs(any(), any(), any(), any(), anyOrNull(), anyOrNull()))
             .thenAnswer { throw PirRendererGoneException(didCrash = true) }
 
         testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
