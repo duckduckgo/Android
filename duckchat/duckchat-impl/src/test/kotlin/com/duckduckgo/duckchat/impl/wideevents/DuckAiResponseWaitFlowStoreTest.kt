@@ -36,13 +36,17 @@ class DuckAiResponseWaitFlowStoreTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private val temporaryFolder = TemporaryFolder.builder().assureDeletion().build().also { it.create() }
-    private val dataStore: DataStore<Preferences> = PreferenceDataStoreFactory.create(
-        scope = coroutineRule.testScope,
-        produceFile = { temporaryFolder.newFile("temp.preferences_pb") },
-    )
+    @get:Rule
+    val temporaryFolder = TemporaryFolder()
 
-    private val testee = DuckAiResponseWaitFlowStoreImpl(dataStore)
+    private val dataStore: DataStore<Preferences> by lazy {
+        PreferenceDataStoreFactory.create(
+            scope = coroutineRule.testScope,
+            produceFile = { temporaryFolder.newFile("temp.preferences_pb") },
+        )
+    }
+
+    private val testee by lazy { DuckAiResponseWaitFlowStoreImpl(dataStore) }
 
     @Test
     fun `save then load round-trips every field`() = runTest {
@@ -57,6 +61,7 @@ class DuckAiResponseWaitFlowStoreTest {
                 result = "ready",
                 readyWhileAwayRecorded = true,
                 readyToReturnRunning = true,
+                chatSwitchedAway = false,
             ),
             PersistedResponseWaitFlow(
                 flowId = 2L,
@@ -68,6 +73,7 @@ class DuckAiResponseWaitFlowStoreTest {
                 result = "unknown",
                 readyWhileAwayRecorded = false,
                 readyToReturnRunning = false,
+                chatSwitchedAway = true,
             ),
         )
 
@@ -86,5 +92,17 @@ class DuckAiResponseWaitFlowStoreTest {
         dataStore.edit { it[stringPreferencesKey("duckai_response_wait_open_flows")] = "not json" }
 
         assertEquals(emptyList<PersistedResponseWaitFlow>(), testee.load())
+    }
+
+    @Test
+    fun `load without chatSwitchedAway defaults it to false`() = runTest {
+        val json = """[{"flowId":1,"tabId":"t1","left":true,"returned":false,"done":false,"result":"unknown",""" +
+            """"readyWhileAwayRecorded":false,"readyToReturnRunning":false}]"""
+        dataStore.edit { it[stringPreferencesKey("duckai_response_wait_open_flows")] = json }
+
+        val loaded = testee.load().single()
+
+        assertEquals(null, loaded.chatId)
+        assertEquals(false, loaded.chatSwitchedAway)
     }
 }

@@ -115,6 +115,7 @@ class DuckAiResponseWaitWideEventTest {
         returned: Boolean = false,
         done: Boolean = false,
         result: String = "unknown",
+        chatSwitchedAway: Boolean = false,
     ) = PersistedResponseWaitFlow(
         flowId = flowId,
         tabId = tabId,
@@ -125,6 +126,7 @@ class DuckAiResponseWaitWideEventTest {
         result = result,
         readyWhileAwayRecorded = false,
         readyToReturnRunning = false,
+        chatSwitchedAway = chatSwitchedAway,
     )
 
     private fun idle() = coroutineRule.testScope.testScheduler.advanceUntilIdle()
@@ -719,12 +721,130 @@ class DuckAiResponseWaitWideEventTest {
         assertEquals(emptyList<PersistedResponseWaitFlow>(), flowStore.flows)
     }
 
+    @Test
+    fun `when restored flow had an error and reloaded page sends ready then it finishes with response_result error`() = runTest {
+        restart(
+            stored = listOf(stored(done = true, result = "error")),
+            openIds = listOf(7L),
+            landingTabId = "t1",
+            landingUrl = "$DUCK_AI_URL?chatID=A",
+        )
+
+        testee.onResponseState("t1", "ready")
+        testee.onClose()
+        idle()
+
+        verify(wideEventClient).flowFinish(
+            eq(7L),
+            eq(FlowStatus.Success),
+            eq(mapOf("status_reason" to "returned", "response_result" to "error")),
+        )
+    }
+
+    @Test
+    fun `when restored flow had an error and the stream resumes then ready replaces the error`() = runTest {
+        restart(
+            stored = listOf(stored(done = true, result = "error")),
+            openIds = listOf(7L),
+            landingTabId = "t1",
+            landingUrl = "$DUCK_AI_URL?chatID=A",
+        )
+
+        testee.onResponseState("t1", "ready")
+        testee.onResponseState("t1", "start_stream:restart_stream")
+        testee.onResponseState("t1", "loading")
+        testee.onResponseState("t1", "ready")
+        testee.onClose()
+        idle()
+
+        verify(wideEventClient).flowFinish(
+            eq(7L),
+            eq(FlowStatus.Success),
+            eq(mapOf("status_reason" to "returned", "response_result" to "ready")),
+        )
+    }
+
+    @Test
+    fun `when restored tab-keyed flow was chat switched away then its tab showing Duck ai is not a return`() = runTest {
+        restart(
+            stored = listOf(stored(chatId = null, chatSwitchedAway = true)),
+            openIds = listOf(7L),
+            landingTabId = "t1",
+            landingUrl = DUCK_AI_URL,
+        )
+
+        verify(wideEventClient, never()).flowStep(any(), eq("returned"), any(), any())
+        assertEquals(listOf(stored(chatId = null, chatSwitchedAway = true)), flowStore.flows)
+    }
+
+    @Test
+    fun `when restored flow never left then it is aborted and does not block a new flow on its tab`() = runTest {
+        restart(stored = listOf(stored(left = false)), openIds = listOf(7L), landingTabId = "t1", landingUrl = "$DUCK_AI_URL?chatID=A")
+
+        verify(wideEventClient).flowAbort(7L)
+        assertEquals(emptyList<PersistedResponseWaitFlow>(), flowStore.flows)
+
+        testee.onResponseState("t1", "ready")
+        testee.onNativePromptSubmitted("t1", "low", null)
+        idle()
+
+        verify(wideEventClient, never()).flowFinish(eq(7L), any(), any())
+        verify(wideEventClient).flowStart(any(), anyOrNull(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun `when restarted with the feature off then restored flows are aborted and store is cleared`() = runTest {
+        duckChatFeature.sendDuckAiResponseWaitWideEvent().setRawStoredState(Toggle.State(enable = false))
+
+        restart(
+            stored = listOf(stored(), stored(flowId = 8L, tabId = "t2", chatId = "B", returned = true, done = true, result = "ready")),
+            openIds = listOf(7L, 8L),
+            landingTabId = null,
+            landingUrl = null,
+        )
+
+        verify(wideEventClient).flowAbort(7L)
+        verify(wideEventClient).flowAbort(8L)
+        verify(wideEventClient, never()).flowFinish(any(), any(), any())
+        assertEquals(emptyList<PersistedResponseWaitFlow>(), flowStore.flows)
+    }
+
+    @Test
+    fun `when getFlowIds fails at recovery then restored flows are kept`() = runTest {
+        flowStore.flows = listOf(stored())
+        whenever(wideEventClient.getFlowIds(any())).thenReturn(Result.failure(Exception("unavailable")))
+        testee = createTestee()
+        testee.onOpen(isFreshLaunch = true)
+        testee.onLaunchLandingResolved("t1", "$DUCK_AI_URL?chatID=A")
+        idle()
+
+        verify(wideEventClient).flowStep(eq(7L), eq("returned"), eq(true), eq(mapOf("response_state_on_return" to "page_reloaded")))
+        assertEquals(listOf(7L), flowStore.flows.map { it.flowId })
+    }
+
+    @Test
+    fun `when saving fails then it is retried after the next action`() = runTest {
+        flowStore.failNextSave = true
+        promptInChat()
+        assertEquals(emptyList<PersistedResponseWaitFlow>(), flowStore.flows)
+
+        testee.onSelectedTabChanged("t1", "$DUCK_AI_URL?chatID=A")
+        idle()
+
+        assertEquals(listOf(1L), flowStore.flows.map { it.flowId })
+    }
+
     private class FakeFlowStore : DuckAiResponseWaitFlowStore {
         var flows: List<PersistedResponseWaitFlow> = emptyList()
+        var failNextSave = false
 
         override suspend fun load(): List<PersistedResponseWaitFlow> = flows
 
         override suspend fun save(flows: List<PersistedResponseWaitFlow>) {
+            if (failNextSave) {
+                failNextSave = false
+                throw java.io.IOException("disk full")
+            }
             this.flows = flows
         }
     }

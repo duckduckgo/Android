@@ -91,15 +91,19 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         channel.trySend(Action.Recover)
         coroutineScope.launch {
             for (action in channel) {
-                try {
-                    processAction(action)
-                    persist()
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    logcat(tag = TAG) { "Error processing ${action::class.simpleName}: ${e.message}" }
-                }
+                logFailure("processing ${action::class.simpleName}") { processAction(action) }
+                logFailure("saving open flows") { persist() }
             }
+        }
+    }
+
+    private suspend fun logFailure(what: String, block: suspend () -> Unit) {
+        try {
+            block()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            logcat(tag = TAG) { "Error $what: ${e.message}" }
         }
     }
 
@@ -177,6 +181,8 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         if (isFeatureDisabled()) {
             abortAllFlows()
         } else {
+            // A flow that never left died on screen; the reloaded page's first ready would wrongly finish it as watched.
+            flows.filter { !it.left }.forEach { abort(it) }
             flows.filter { it.returned && it.done }.forEach { finish(it, REASON_RETURNED) }
         }
     }
@@ -184,6 +190,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
     // The 24h cleanup closes flows on its own; a flow it closed must not receive more steps.
     private suspend fun dropFlowsClosedByCleanup() {
         if (flows.isEmpty()) return
+        // Kept on failure: a transient error or the wide-events kill switch must not drop flows that are still open.
         val openIds = wideEventClient.getFlowIds(FEATURE_NAME).getOrNull() ?: return
         flows.removeAll { it.flowId !in openIds }
     }
@@ -191,8 +198,9 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
     private suspend fun persist() {
         val snapshot = flows.map { it.toPersisted() }
         if (snapshot == persisted) return
-        persisted = snapshot
         flowStore.save(snapshot)
+        // Only after a successful save, so a failed write is retried after the next action.
+        persisted = snapshot
     }
 
     private fun updatePresence(action: Action) {
@@ -333,12 +341,15 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
             }
             status in LOADING_STATUSES || status.startsWith(START_STREAM_PREFIX) -> {
                 flow.lastState = STATE_LOADING
+                flow.awaitingReloadedStream = false
                 if (flow.result != RESULT_STOPPED) flow.done = false
                 return
             }
             status == STATUS_READY || status == STATUS_ERROR -> {
                 flow.lastState = status
-                if (flow.result != RESULT_STOPPED) flow.result = status
+                // The reloaded page reports ready even for a response that failed before the process died.
+                val keepsError = flow.awaitingReloadedStream && flow.result == RESULT_ERROR && status == STATUS_READY
+                if (flow.result != RESULT_STOPPED && !keepsError) flow.result = status
                 flow.done = true
             }
             else -> return
@@ -435,6 +446,9 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         // Restored after process death: the reloaded page starts from scratch, so its state on return says nothing yet.
         var pageReloaded = false
 
+        // Restored and no stream seen since, so a ready from the reloaded page can't be trusted to replace an error.
+        var awaitingReloadedStream = false
+
         fun toPersisted() = PersistedResponseWaitFlow(
             flowId = flowId,
             tabId = tabId,
@@ -445,6 +459,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
             result = result,
             readyWhileAwayRecorded = readyWhileAwayRecorded,
             readyToReturnRunning = readyToReturnRunning,
+            chatSwitchedAway = chatSwitchedAway,
         )
 
         fun matches(screen: OnScreen): Boolean =
@@ -458,7 +473,9 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         it.result = result
         it.readyWhileAwayRecorded = readyWhileAwayRecorded
         it.readyToReturnRunning = readyToReturnRunning
+        it.chatSwitchedAway = chatSwitchedAway
         it.pageReloaded = true
+        it.awaitingReloadedStream = true
     }
 
     private companion object {
@@ -489,6 +506,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         const val REASON_NOT_RETURNED = "not_returned"
 
         const val RESULT_READY = "ready"
+        const val RESULT_ERROR = "error"
         const val RESULT_STOPPED = "stopped"
         const val RESULT_UNKNOWN = "unknown"
 
