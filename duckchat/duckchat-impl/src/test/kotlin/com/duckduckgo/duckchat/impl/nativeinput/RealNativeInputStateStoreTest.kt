@@ -26,6 +26,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputMode
+import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -65,11 +66,13 @@ class RealNativeInputStateStoreTest {
     }
 
     private val textSelectionRepository = RealTextSelectionRepository(dagger.Lazy { mock() }, mock())
+    private val chatStateStore = ChatStateStore()
 
     private val testee = RealNativeInputStateStore(
         dagger.Lazy { tabRepositoryProvider },
         browserModeStateHolder,
         textSelectionRepository,
+        chatStateStore,
     )
 
     @Test
@@ -331,6 +334,26 @@ class RealNativeInputStateStoreTest {
             assertEquals(fireState, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenClearTabThenChatStateForThatTabIsReset() {
+        chatStateStore.update("tab-a", ChatState.STREAMING)
+        chatStateStore.update("tab-b", ChatState.STREAMING)
+
+        testee.clearTab("tab-a")
+
+        assertEquals(ChatState.HIDE, chatStateStore.stateFor("tab-a").value)
+        assertEquals(ChatState.STREAMING, chatStateStore.stateFor("tab-b").value)
+    }
+
+    @Test
+    fun whenClearAllThenChatStateForEveryTabIsReset() {
+        chatStateStore.update("tab-a", ChatState.STREAMING)
+
+        testee.clearAll()
+
+        assertEquals(ChatState.HIDE, chatStateStore.stateFor("tab-a").value)
     }
 
     private fun tabEntity(tabId: String): TabEntity = TabEntity(tabId = tabId, position = 0)

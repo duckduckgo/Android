@@ -56,6 +56,7 @@ import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ReasoningResolver
 import com.duckduckgo.duckchat.impl.models.Tool
+import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -128,6 +129,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val duckChatFeature: DuckChatFeature,
     private val inputOutcomeTracker: InputOutcomeTracker,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    chatStateStore: ChatStateStore,
 ) : ViewModel() {
 
     // The first prompt is the one that accepts the terms, so while they are pending the keyboard must not submit:
@@ -493,21 +495,19 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         .map { it.duckAiFireButtonHighlighted }
         .distinctUntilChanged()
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val chatState: Flow<ChatState> = activeTabId.filterNotNull()
+        .flatMapLatest { tabId -> chatStateStore.stateFor(tabId) }
+
     val state: SharedFlow<NativeInputState> = combine(
         baseState,
-        duckChatInternal.chatState,
+        chatState,
         activeChatId,
         interactionLock,
         duckAiFireButtonHighlighted,
     ) { state, chatState, chatId, lock, fireHighlighted ->
-        // chatState is a global signal, not scoped to any one tab — the edit widget has no chat of
-        // its own streaming, so it must never inherit whatever the real tab is doing. Read
-        // synchronously rather than folded into the combine's inputs, so this Flow's shape is
-        // otherwise identical to the pre-edit-mode code (a prior version spliced a derived Flow in
-        // here instead and shipped a regression in the real, non-edit composer's toggle state).
-        val isEditWidget = activeTabId.value?.startsWith(EDIT_STATE_KEY_PREFIX) == true
         state.copy(
-            isChatStreaming = !isEditWidget && (chatState == ChatState.STREAMING || chatState == ChatState.LOADING),
+            isChatStreaming = chatState == ChatState.STREAMING || chatState == ChatState.LOADING,
             chatId = chatId,
             interactionLock = lock,
             duckAiFireButtonHighlighted = fireHighlighted,
@@ -542,9 +542,6 @@ class NativeInputModeWidgetViewModel @Inject constructor(
                 }
         }
     }
-
-    // Kept for the widget's observeChatState() which handles HIDE/SHOW/READY root-visibility transitions.
-    val chatState: Flow<ChatState> = duckChatInternal.chatState
 
     val isPaidTier: Flow<Boolean> = subscriptions.getEntitlementStatus()
         .map { entitlements -> entitlements.any { it == Product.DuckAiPlus } }

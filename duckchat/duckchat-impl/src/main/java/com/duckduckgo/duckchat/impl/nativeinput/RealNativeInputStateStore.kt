@@ -51,6 +51,7 @@ class RealNativeInputStateStore @Inject constructor(
     private val tabRepositoryProvider: Lazy<BrowserModeDataProvider<TabRepository>>,
     private val browserModeStateHolder: BrowserModeStateHolder,
     private val textSelectionRepository: TextSelectionRepository,
+    private val chatStateStore: ChatStateStore,
 ) :
     NativeInputStateProvider,
     NativeInputStatePublisher {
@@ -81,11 +82,13 @@ class RealNativeInputStateStore @Inject constructor(
     override fun clearTab(tabId: String) {
         flows.remove(tabId)
         textSelectionRepository.clear(tabId)
+        chatStateStore.clear(tabId)
     }
 
     override fun clearAll() {
         flows.clear()
         textSelectionRepository.clearAll()
+        chatStateStore.clearAll()
     }
 
     // Seed unpublished tabs with [NativeInputState.zero] only because StateFlow requires an initial
