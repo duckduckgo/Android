@@ -17,8 +17,10 @@
 package com.duckduckgo.eventhub.impl.metrics
 
 import android.annotation.SuppressLint
+import com.duckduckgo.app.trackerdetection.blocklist.BlockListExperiment
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.eventhub.impl.EventHubFeature
 import com.duckduckgo.eventhub.impl.pixels.EventHubRepository
 import com.duckduckgo.eventhub.impl.pixels.RealEventHubPixelManager
@@ -26,7 +28,6 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeMetricsPixelExtension
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
-import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
@@ -49,7 +50,7 @@ import java.time.ZonedDateTime
  * [RealExperimentMetricsHandler], and each [MetricsPixel] handed to the experiments framework is flattened into the
  * spec's `(experiment, metric, conversionWindowDays, threshold)` requests.
  *
- * Only requests for enrolled experiments are asserted. Android hands over requests for every enabled experiment that
+ * Only requests for enrolled experiments are asserted. Android hands over requests for every active experiment that
  * declares the metric and leaves enrolment to the framework, which the spec allows.
  *
  * M-SEL-10 is not applicable: Android has no native (tab-less) event stream.
@@ -63,20 +64,22 @@ class EventHubMetricsSpecTest {
     private val metricsExtension = FakeMetricsPixelExtension()
     private val eventHubFeature: EventHubFeature = FakeFeatureToggleFactory.create(EventHubFeature::class.java)
     private val css = FeatureToggles.Builder().store(FakeToggleStore()).featureName("contentScopeExperiments").build()
-        .create(ContentScopeExperiments::class.java)
+        .create(CssExperiments::class.java)
     private val blockList = FeatureToggles.Builder().store(FakeToggleStore()).featureName("blockList").build()
         .create(BlockList::class.java)
-    private val inventory = object : FeatureTogglesInventory {
-        override suspend fun getAll(): List<Toggle> = listOf(
-            css.self(),
+    private val contentScopeExperiments = object : ContentScopeExperiments {
+        override suspend fun getActiveExperiments(): List<Toggle> = listOf(
             css.contentScopeExperiment1(),
             css.contentScopeExperiment3(),
             css.contentScopeExperiment10(),
             css.contentScopeExperiment19(),
             css.contentScopeExperiment21(),
-            blockList.self(),
-            blockList.tdsNextExperiment007(),
-        )
+        ).filter { it.isEnabled() }
+    }
+    private val blockListExperiment = object : BlockListExperiment {
+        override suspend fun activeExperimentCohort(): String? = null
+        override suspend fun metric(metric: BlockListExperiment.Metric): MetricsPixel? = null
+        override suspend fun activeExperiment(): Toggle? = blockList.tdsNextExperiment007().takeIf { it.isEnabled() }
     }
 
     private lateinit var manager: RealEventHubPixelManager
@@ -100,7 +103,7 @@ class EventHubMetricsSpecTest {
             appCoroutineScope = coroutineTestRule.testScope,
             pixelDispatcher = UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler),
             eventHubFeature = eventHubFeature,
-            metricsHandler = RealExperimentMetricsHandler(inventory),
+            metricsHandler = RealExperimentMetricsHandler(contentScopeExperiments, blockListExperiment),
         )
     }
 
@@ -425,7 +428,7 @@ class EventHubMetricsSpecTest {
         override fun localDateTimeNow(): java.time.LocalDateTime = java.time.LocalDateTime.now()
     }
 
-    interface ContentScopeExperiments {
+    interface CssExperiments {
         @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
         fun self(): Toggle
 

@@ -202,8 +202,6 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     override fun onConfigChanged() {
-        // Before the disabled check below, so turning the hub back on can't serve metric definitions from an old config
-        metricsHandler.onConfigChanged()
         appCoroutineScope.launch(pixelDispatcher) {
             cachedTelemetryConfigs = null
             if (!isEnabled()) {
