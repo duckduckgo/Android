@@ -27,7 +27,6 @@ interface DevPrivacyConfigSettingsDataStore {
     var remotePrivacyConfigUrl: String?
     var useCustomPrivacyConfigUrl: Boolean
     var canUrlBeChanged: Boolean
-    var lastSeenConfig: String?
 }
 
 @ContributesBinding(AppScope::class)
@@ -45,10 +44,6 @@ class DevPrivacyConfigSettingsDataStoreImpl @Inject constructor(private val cont
         get() = preferences.getBoolean(KEY_URL_CHANGED, false)
         set(enabled) = preferences.edit { putBoolean(KEY_URL_CHANGED, enabled) }
 
-    override var lastSeenConfig: String?
-        get() = preferences.getString(KEY_LAST_SEEN_CONFIG, null)
-        set(value) = preferences.edit { putString(KEY_LAST_SEEN_CONFIG, value) }
-
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     private fun selectedRemotePrivacyConfigUrlSavedValue(): String? {
@@ -60,6 +55,5 @@ class DevPrivacyConfigSettingsDataStoreImpl @Inject constructor(private val cont
         private const val KEY_SELECTED_REMOTE_PRIVACY_CONFIG = "KEY_SELECTED_REMOTE_PRIVACY_CONFIG"
         private const val KEY_CUSTOM_REMOTE_PRIVACY_CONFIG_ENABLED = "KEY_CUSTOM_REMOTE_PRIVACY_CONFIG_ENABLED"
         private const val KEY_URL_CHANGED = "KEY_URL_CHANGED"
-        private const val KEY_LAST_SEEN_CONFIG = "KEY_LAST_SEEN_CONFIG"
     }
 }

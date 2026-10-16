@@ -38,7 +38,7 @@ been launched.
 
 ### URL validation
 
-`PrivacyConfigInternalLoader.isValidUrl` accepts a URL only if all of these hold:
+A URL is accepted only if all of these hold:
 
 - the scheme is `http` or `https`, lower-case only (`HTTP://` is rejected);
 - it has a host;
@@ -50,13 +50,12 @@ leaves settings unchanged.
 
 ### Processing
 
-The broadcast does not load anything itself. It queues a `PrivacyConfigOverrideWorker`
-as unique work (`APPEND_OR_REPLACE`, not expedited), so commands run in order but start
-only when WorkManager schedules them. A valid SET_URL enables the developer override,
-and the worker then resets the stored version and ETag before downloading. There is no
-command retry, polling, or new periodic work; the existing hourly worker is unchanged.
-The override is persistent: it remains until a RESET or a manual Developer Settings
-change, including across app restarts.
+The receiver handles the command itself, in the background (`goAsync`), so the process
+stays alive until the command finishes. Commands run one at a time, in order. A valid
+SET_URL enables the developer override, then resets the stored version and ETag before
+downloading. There is no command retry, polling, or new periodic work; the existing
+hourly worker is unchanged. The override is persistent: it remains until a RESET or a
+manual Developer Settings change, including across app restarts.
 
 Serve `generated/v6/android-config.json` from `duckduckgo/privacy-configuration`
 (after running `node index.js`) with `Cache-Control: no-store` so subsequent commands
@@ -70,12 +69,10 @@ adb shell am broadcast --include-stopped-packages \
   -p com.duckduckgo.mobile.android.debug
 ```
 
-RESET is queued like SET_URL; it is finished when its result line appears.
-
 ### Result lines
 
-Result lines are logged under the tag
-`PrivacyConfigOverride`, on both `internalDebug` and `internalRelease`:
+Each command logs exactly one result line under the tag `PrivacyConfigOverride`, on both
+`internalDebug` and `internalRelease`:
 
 ```bash
 adb logcat -s PrivacyConfigOverride:I
@@ -87,20 +84,16 @@ CONFIG_OVERRIDE_RESET stage=config version=<version> etag=<etag>
 CONFIG_OVERRIDE_FAILED action=set_url|reset reason=invalid_url|download_failed source=<failing URL>
 ```
 
-`source` is the last field of a FAILED line. For `set_url` it is the URL as passed, or,
-for `invalid_url`, the raw `url` extra with all whitespace removed (empty if missing). For
-`reset` it is the production config URL the RESET download used.
+- `APPLIED`: a SET_URL whose download succeeded, with the version and ETag now stored.
+- `RESET`: a RESET whose production download succeeded.
+- `FAILED`: either command failed. `source` is its last field. For `set_url` it is the URL
+  as passed, or, for `invalid_url`, the raw `url` extra with all whitespace removed (empty
+  if missing). For `reset` it is the production config URL the RESET download used.
 
-`CONFIG_OVERRIDE_APPLIED` is logged once per persisted config while an override is
-active, not once per command. That includes the hourly background refresh and loads
-started from Developer Settings, so a newer build taken in the background logs a new
-line. Downloads that persist nothing (version not newer, failure) log no APPLIED line,
-and background refreshes never log `CONFIG_OVERRIDE_FAILED`. `RESET` logs only
-`CONFIG_OVERRIDE_RESET`. `FAILED` and `RESET` are logged once per command.
-
-Broadcast completion means the command was queued; the result line means it
-finished. The ETag is empty if the server omits it. A failed SET_URL download
-keeps the selected override for the next command or manual load.
+The broadcast returns before the command finishes; the result line means it finished.
+Loads from the hourly refresh or from Developer Settings log no line. The ETag is empty
+if the server omits it. A failed SET_URL download keeps the selected override for the
+next command or manual load.
 
 ### Known issue: DNS after a cold start
 
