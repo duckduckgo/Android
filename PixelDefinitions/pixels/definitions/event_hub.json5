@@ -41,7 +41,7 @@
         "triggers": ["scheduled"],
         "parameters": [
             {
-                "keyPattern": "^(pagesMeasured|(adwalls|captcha|commentsDisabled|other)(Ran|Failed|Over(8|16|50|150)|TotalOver(50|100|250|500))|combinedOver(100|250|500))$",
+                "keyPattern": "^(pagesMeasured|(adwalls|captcha|commentsDisabled|other)(Ran|Failed|Over[0-9]+|TotalOver[0-9]+)|combinedOver[0-9]+)$",
                 "type": "string",
                 "description": "Bucketed count for the period",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
@@ -59,7 +59,7 @@
         "triggers": ["scheduled"],
         "parameters": [
             {
-                "keyPattern": "^(pagesMeasured|(adwalls|captcha|commentsDisabled|other)(Ran|Failed|Over(8|16|50|150)|TotalOver(50|100|250|500))|combinedOver(100|250|500))$",
+                "keyPattern": "^(pagesMeasured|(adwalls|captcha|commentsDisabled|other)(Ran|Failed|Over[0-9]+|TotalOver[0-9]+)|combinedOver[0-9]+)$",
                 "type": "string",
                 "description": "Bucketed count for the period",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
