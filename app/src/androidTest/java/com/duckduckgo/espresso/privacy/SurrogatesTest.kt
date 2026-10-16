@@ -42,7 +42,10 @@ import org.junit.Test
 
 class SurrogatesTest {
 
-    @get:Rule
+    @get:Rule(order = 0)
+    val waitForRemotePrivacyConfig = WaitForRemotePrivacyConfigRule()
+
+    @get:Rule(order = 1)
     var activityScenarioRule = activityScenarioRule<BrowserActivity>(
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,

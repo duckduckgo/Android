@@ -36,6 +36,7 @@ import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.espresso.JsObjectIdlingResource
 import com.duckduckgo.espresso.PrivacyTest
+import com.duckduckgo.espresso.WaitForRemotePrivacyConfigRule
 import com.duckduckgo.espresso.WebViewIdlingResource
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
@@ -48,7 +49,10 @@ import org.junit.Test
 
 class HttpsUpgradesTest {
 
-    @get:Rule
+    @get:Rule(order = 0)
+    val waitForRemotePrivacyConfig = WaitForRemotePrivacyConfigRule()
+
+    @get:Rule(order = 1)
     var activityScenarioRule = activityScenarioRule<BrowserActivity>(
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,
