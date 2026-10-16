@@ -20,8 +20,6 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.PirJobConstants.FREE_SCAN_BACKGROUND_WINDOW_DAYS
-import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
-import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
 import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -60,7 +58,7 @@ class RealPirFreeScanWorkWindow @Inject constructor(
             .filter { !it.deprecated && it.brokerName in scannableBrokers }
 
         // No records yet means the first run has not created them, so the worker is still needed.
-        outstanding.isEmpty() || outstanding.any { !it.hasTerminalResult() }
+        outstanding.isEmpty() || outstanding.any { !it.hasTerminalResult }
     }
 
     private fun hasTimeBoundExpired(): Boolean {
@@ -68,9 +66,6 @@ class RealPirFreeScanWorkWindow @Inject constructor(
         if (firstProfileSavedAt == 0L) return false
         return currentTimeProvider.currentTimeMillis() - firstProfileSavedAt >= WINDOW_DURATION_MS
     }
-
-    private fun ScanJobRecord.hasTerminalResult(): Boolean =
-        status == ScanJobStatus.NO_MATCH_FOUND || status == ScanJobStatus.MATCHES_FOUND
 
     private companion object {
         val WINDOW_DURATION_MS = TimeUnit.DAYS.toMillis(FREE_SCAN_BACKGROUND_WINDOW_DAYS)

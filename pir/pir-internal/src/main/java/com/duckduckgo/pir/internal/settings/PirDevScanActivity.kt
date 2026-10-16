@@ -55,7 +55,9 @@ import com.duckduckgo.pir.internal.settings.store.secure.PirDatabaseExporter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.logcat
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -237,6 +239,22 @@ class PirDevScanActivity : DuckDuckGoActivity() {
             globalActivityStarter.start(this, PirResultsScreenParams.PirExtractedProfilesResultsScreen)
         }
 
+        binding.debugMakeScansDue.setOnClickListener {
+            lifecycleScope.launch(dispatcherProvider.io()) {
+                val aged = pirSchedulingRepository.getAllValidScanJobRecords()
+                    .filter { it.lastScanDateInMillis != 0L }
+                    .map { it.copy(lastScanDateInMillis = it.lastScanDateInMillis - SCAN_JOB_AGE_OFFSET_MS) }
+                pirSchedulingRepository.saveScanJobRecords(aged)
+                withContext(dispatcherProvider.main()) {
+                    Toast.makeText(
+                        this@PirDevScanActivity,
+                        getString(R.string.pirMessageScansDue, aged.size),
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                }
+            }
+        }
+
         binding.scheduleScan.setOnClickListener {
             pirScanScheduler.cancelScheduledScans(this)
             pirScanScheduler.scheduleScans()
@@ -295,6 +313,10 @@ class PirDevScanActivity : DuckDuckGoActivity() {
                 deprecated = false,
             ),
         )
+    }
+
+    private companion object {
+        val SCAN_JOB_AGE_OFFSET_MS = TimeUnit.DAYS.toMillis(11)
     }
 }
 
