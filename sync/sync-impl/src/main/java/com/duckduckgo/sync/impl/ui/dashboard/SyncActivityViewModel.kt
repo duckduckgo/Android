@@ -284,7 +284,10 @@ class SyncActivityViewModel @Inject constructor(
         data object ShowDeviceUnsupported : Command()
         data class LaunchSyncGetOnOtherPlatforms(val source: SyncGetOnOtherPlatformsLaunchSource) : Command()
         data class LaunchLearnMore(val url: String) : Command()
-        data class ShowPreviousSessionReady(val syncEntryPoint: SyncEntryPoint) : Command()
+        data class ShowPreviousSessionReady(
+            val syncEntryPoint: SyncEntryPoint,
+            val isAuthRequired: Boolean,
+        ) : Command()
         data class LaunchOriginalFlow(
             val syncEntryPoint: SyncEntryPoint,
             val isImprovedSyncFlow: Boolean,
@@ -294,8 +297,12 @@ class SyncActivityViewModel @Inject constructor(
     fun onSyncWithAnotherDevice() {
         viewModelScope.launch(dispatchers.io()) {
             if (syncAutoRestore.canRestore()) {
-                withAuthentication(AuthenticationSource.SETTINGS_NOT_SYNCED, flow = AuthFlow.SyncSetup) {
-                    command.send(ShowPreviousSessionReady(SyncEntryPoint.ADD_DEVICE))
+                if (isImprovedSyncFlow()) {
+                    command.send(ShowPreviousSessionReady(SyncEntryPoint.ADD_DEVICE, isAuthRequired = true))
+                } else {
+                    withAuthentication(AuthenticationSource.SETTINGS_NOT_SYNCED, flow = AuthFlow.SyncSetup) {
+                        command.send(ShowPreviousSessionReady(SyncEntryPoint.ADD_DEVICE, isAuthRequired = false))
+                    }
                 }
             } else {
                 withAuthentication(AuthenticationSource.SETTINGS_NOT_SYNCED) {
@@ -319,8 +326,12 @@ class SyncActivityViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             syncSetupWideEvent.onFlowStarted(source)
             if (syncAutoRestore.canRestore()) {
-                withAuthentication(AuthenticationSource.SETTINGS_NOT_SYNCED, flow = AuthFlow.SyncThisDevice) {
-                    command.send(ShowPreviousSessionReady(SyncEntryPoint.SYNC_NEW_ACCOUNT))
+                if (isImprovedSyncFlow()) {
+                    command.send(ShowPreviousSessionReady(SyncEntryPoint.SYNC_NEW_ACCOUNT, isAuthRequired = true))
+                } else {
+                    withAuthentication(AuthenticationSource.SETTINGS_NOT_SYNCED, flow = AuthFlow.SyncThisDevice) {
+                        command.send(ShowPreviousSessionReady(SyncEntryPoint.SYNC_NEW_ACCOUNT, isAuthRequired = false))
+                    }
                 }
             } else {
                 if (isImprovedSyncFlow()) {
@@ -338,8 +349,12 @@ class SyncActivityViewModel @Inject constructor(
         syncPixels.fireRecoverSyncDataTapped()
         viewModelScope.launch(dispatchers.io()) {
             if (syncAutoRestore.canRestore()) {
-                withAuthentication(AuthenticationSource.SETTINGS_NOT_SYNCED, flow = AuthFlow.SyncSetup) {
-                    command.send(ShowPreviousSessionReady(SyncEntryPoint.RECOVER_SYNCED_DATA))
+                if (isImprovedSyncFlow()) {
+                    command.send(ShowPreviousSessionReady(SyncEntryPoint.RECOVER_SYNCED_DATA, isAuthRequired = true))
+                } else {
+                    withAuthentication(AuthenticationSource.SETTINGS_NOT_SYNCED, flow = AuthFlow.SyncSetup) {
+                        command.send(ShowPreviousSessionReady(SyncEntryPoint.RECOVER_SYNCED_DATA, isAuthRequired = false))
+                    }
                 }
             } else {
                 if (isImprovedSyncFlow()) {

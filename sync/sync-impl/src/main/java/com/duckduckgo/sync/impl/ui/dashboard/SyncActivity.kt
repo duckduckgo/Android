@@ -537,6 +537,7 @@ class SyncActivity : DuckDuckGoActivity() {
                 restoreSavedAccountLauncher.launch(
                     PreviousSessionReadyContract.Input(
                         syncEntryPoint = command.syncEntryPoint,
+                        isAuthRequired = command.isAuthRequired,
                     ),
                 )
             }
