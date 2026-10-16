@@ -163,6 +163,28 @@ class RealEventHubPixelManagerTest {
     }
 
     @Test
+    fun `handleWebEvent uses the arrival time, not the time the event is processed`() {
+        val queuedDispatcher = StandardTestDispatcher(coroutineTestRule.testScope.testScheduler)
+        val queuedManager = RealEventHubPixelManager(
+            repository,
+            pixel,
+            timeProvider,
+            coroutineTestRule.testScope,
+            queuedDispatcher,
+            eventHubFeature,
+        )
+        val periodEnd = 100_000L
+        stubPixelStates(pixelState("webTelemetry_testPixel1", mapOf("count" to 0), periodEnd = periodEnd))
+
+        timeProvider.time = periodEnd - 1
+        queuedManager.handleWebEvent(webEventData("test"), "")
+        timeProvider.time = periodEnd + 1
+        coroutineTestRule.testScope.testScheduler.runCurrent()
+
+        verify(repository).savePixelState(any())
+    }
+
+    @Test
     fun `handleWebEvent can increment multiple times below max bucket`() {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
         stubPixelStates(state)
@@ -284,7 +306,7 @@ class RealEventHubPixelManagerTest {
         verify(repository, never()).savePixelState(any())
     }
 
-    // --- deduplication: multiple events on same page should count as one ---
+    // --- deduplication (spec cases are in EventHubDeduplicationSpecTest) ---
 
     @Test
     fun `same page same source - second event is deduplicated`() {
@@ -306,66 +328,28 @@ class RealEventHubPixelManagerTest {
     }
 
     @Test
-    fun `same page multiple events - all after first are deduplicated`() {
-        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 5))
-        stubPixelStates(state)
+    fun `a delivered event is counted once by every pixel watching it`() {
+        val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
+        configureFeature(settings = twoPixelConf)
+        createManager()
 
-        manager.handleWebEvent(webEventData("test"), "tab1")
+        val stateA = pixelState("pixel_a", mapOf("count" to 0))
+        val stateB = pixelState("pixel_b", mapOf("count" to 0))
+        stubPixelStates(stateA, stateB)
 
-        val captor = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(captor.capture())
-        assertEquals(6, captor.firstValue.params.mapValues { it.value.value }["count"])
-
-        for (i in 1..5) {
-            org.mockito.Mockito.reset(repository)
-            stubPixelStates(captor.firstValue)
-
-            manager.handleWebEvent(webEventData("test"), "tab1")
-
-            verify(repository, never()).savePixelState(any())
-        }
-    }
-
-    @Test
-    fun `navigation to new page resets dedup - event on new page increments`() {
-        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
-        stubPixelStates(state)
-
-        manager.onNavigationStarted("tab1", "https://example.com/page1")
-        manager.handleWebEvent(webEventData("test"), "tab1")
-
-        val firstCaptor = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(firstCaptor.capture())
-        assertEquals(1, firstCaptor.firstValue.params.mapValues { it.value.value }["count"])
-
-        // Navigate — same tab, different URL
-        org.mockito.Mockito.reset(repository)
-        stubPixelStates(firstCaptor.firstValue)
-
-        manager.onNavigationStarted("tab1", "https://example.com/page2")
-        manager.handleWebEvent(webEventData("test"), "tab1")
-
-        val secondCaptor = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(secondCaptor.capture())
-        assertEquals(2, secondCaptor.firstValue.params.mapValues { it.value.value }["count"])
-    }
-
-    @Test
-    fun `subframe event on same page is deduplicated`() {
-        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
-        stubPixelStates(state)
-
-        manager.handleWebEvent(webEventData("test"), "tab1")
+        manager.handleWebEvent(webEventData("evt"), "tab1")
 
         val captor = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(captor.capture())
-        assertEquals(1, captor.firstValue.params.mapValues { it.value.value }["count"])
+        verify(repository, org.mockito.kotlin.times(2)).savePixelState(captor.capture())
+        val savedA = captor.allValues.find { it.pixelName == "pixel_a" }!!
+        val savedB = captor.allValues.find { it.pixelName == "pixel_b" }!!
+        assertEquals(1, savedA.params.mapValues { it.value.value }["count"])
+        assertEquals(1, savedB.params.mapValues { it.value.value }["count"])
 
-        // Subframe event — same tab + same URL = deduped
         org.mockito.Mockito.reset(repository)
-        stubPixelStates(captor.firstValue)
+        stubPixelStates(savedA, savedB)
 
-        manager.handleWebEvent(webEventData("test"), "tab1")
+        manager.handleWebEvent(webEventData("evt"), "tab1")
 
         verify(repository, never()).savePixelState(any())
     }
@@ -421,28 +405,93 @@ class RealEventHubPixelManagerTest {
     }
 
     @Test
-    fun `dedup is per-pixel - same source and page deduped independently across pixels`() {
-        val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
-        configureFeature(settings = twoPixelConf)
-        createManager()
+    fun `event uses up its de-duplication key even when no pixel is counting it`() {
+        timeProvider.time = 5000L
+        val expired = pixelState("webTelemetry_testPixel1", mapOf("count" to 0), periodStart = 1000L, periodEnd = 5000L)
+        stubPixelStates(expired)
 
-        val stateA = pixelState("pixel_a", mapOf("count" to 0))
-        val stateB = pixelState("pixel_b", mapOf("count" to 0))
-        stubPixelStates(stateA, stateB)
+        manager.handleWebEvent(webEventData("test"), "tab1")
+        verify(repository, never()).savePixelState(any())
 
-        manager.handleWebEvent(webEventData("evt"), "tab1")
+        stubPixelStates(pixelState("webTelemetry_testPixel1", mapOf("count" to 0)))
 
-        val captor = argumentCaptor<PixelState>()
-        verify(repository, org.mockito.kotlin.times(2)).savePixelState(captor.capture())
-        val savedA = captor.allValues.find { it.pixelName == "pixel_a" }!!
-        val savedB = captor.allValues.find { it.pixelName == "pixel_b" }!!
-        assertEquals(1, savedA.params.mapValues { it.value.value }["count"])
-        assertEquals(1, savedB.params.mapValues { it.value.value }["count"])
+        manager.handleWebEvent(webEventData("test"), "tab1")
+        verify(repository, never()).savePixelState(any())
+    }
+
+    @Test
+    fun `dedup survives a period boundary`() {
+        manager.onNavigationStarted("tab1", "https://example.com/page1")
+        stubPixelStates(pixelState("webTelemetry_testPixel1", mapOf("count" to 0), periodStart = 0L, periodEnd = 1000L))
+        timeProvider.time = 500L
+        manager.handleWebEvent(webEventData("test"), "tab1")
+        verify(repository).savePixelState(any())
 
         org.mockito.Mockito.reset(repository)
-        stubPixelStates(savedA, savedB)
+        stubPixelStates(pixelState("webTelemetry_testPixel1", mapOf("count" to 0), periodStart = 1000L, periodEnd = 2000L))
+        timeProvider.time = 1500L
+        manager.handleWebEvent(webEventData("test"), "tab1")
 
-        manager.handleWebEvent(webEventData("evt"), "tab1")
+        verify(repository, never()).savePixelState(any())
+    }
+
+    @Test
+    fun `dedup still resets on navigation after a period boundary`() {
+        manager.onNavigationStarted("tab1", "https://example.com/page1")
+        stubPixelStates(pixelState("webTelemetry_testPixel1", mapOf("count" to 0), periodStart = 0L, periodEnd = 1000L))
+        timeProvider.time = 500L
+        manager.handleWebEvent(webEventData("test"), "tab1")
+        verify(repository).savePixelState(any())
+
+        org.mockito.Mockito.reset(repository)
+        stubPixelStates(pixelState("webTelemetry_testPixel1", mapOf("count" to 0), periodStart = 1000L, periodEnd = 2000L))
+        timeProvider.time = 1500L
+        manager.onNavigationStarted("tab1", "https://example.com/page2")
+        manager.handleWebEvent(webEventData("test"), "tab1")
+
+        val captor = argumentCaptor<PixelState>()
+        verify(repository).savePixelState(captor.capture())
+        assertEquals(1, captor.firstValue.params.getValue("count").value)
+    }
+
+    @Test
+    fun `navigation while the feature is disabled is recorded, so the next page counts again`() {
+        configureFeature(enabled = false)
+        manager.onNavigationStarted("tab1", "https://example.com/page1")
+        configureFeature()
+
+        stubPixelStates(pixelState("webTelemetry_testPixel1", mapOf("count" to 0)))
+        manager.handleWebEvent(webEventData("test"), "tab1")
+        verify(repository).savePixelState(any())
+
+        org.mockito.Mockito.reset(repository)
+        stubPixelStates(pixelState("webTelemetry_testPixel1", mapOf("count" to 1)))
+        manager.onNavigationStarted("tab1", "https://example.com/page2")
+        manager.handleWebEvent(webEventData("test"), "tab1")
+
+        verify(repository).savePixelState(any())
+    }
+
+    @Test
+    fun `dedup survives a period that fires while backgrounded`() {
+        manager.onNavigationStarted("tab1", "https://example.com/page1")
+        val firstPeriod = pixelState("webTelemetry_testPixel1", mapOf("count" to 0), periodStart = 0L, periodEnd = 1000L)
+        stubPixelStates(firstPeriod)
+        timeProvider.time = 500L
+        manager.handleWebEvent(webEventData("test"), "tab1")
+        verify(repository).savePixelState(any())
+
+        // The period fires from its timer while backgrounded, which starts no new period
+        manager.onAppBackgrounded()
+        timeProvider.time = 1500L
+        manager.onConfigChanged()
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+        verify(pixel).enqueueFire(eq("webTelemetry_testPixel1"), any(), any(), any())
+
+        org.mockito.Mockito.reset(repository)
+        stubPixelStates(pixelState("webTelemetry_testPixel1", mapOf("count" to 0), periodStart = 1500L, periodEnd = 2500L))
+        manager.onAppForegrounded()
+        manager.handleWebEvent(webEventData("test"), "tab1")
 
         verify(repository, never()).savePixelState(any())
     }
@@ -466,223 +515,6 @@ class RealEventHubPixelManagerTest {
         val secondCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(secondCaptor.capture())
         assertEquals(2, secondCaptor.firstValue.params.mapValues { it.value.value }["count"])
-    }
-
-    @Test
-    fun `returning to same URL after navigating away counts as new visit`() {
-        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
-        stubPixelStates(state)
-
-        manager.onNavigationStarted("tab1", "https://example.com/page1")
-        manager.handleWebEvent(webEventData("test"), "tab1")
-        val first = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(first.capture())
-        assertEquals(1, first.firstValue.params.mapValues { it.value.value }["count"])
-
-        // Navigate to page2
-        org.mockito.Mockito.reset(repository)
-        stubPixelStates(first.firstValue)
-
-        manager.onNavigationStarted("tab1", "https://example.com/page2")
-        manager.handleWebEvent(webEventData("test"), "tab1")
-        val second = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(second.capture())
-        assertEquals(2, second.firstValue.params.mapValues { it.value.value }["count"])
-
-        // Navigate back to page1
-        org.mockito.Mockito.reset(repository)
-        stubPixelStates(second.firstValue)
-
-        manager.onNavigationStarted("tab1", "https://example.com/page1")
-        manager.handleWebEvent(webEventData("test"), "tab1")
-        val third = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(third.capture())
-        assertEquals(3, third.firstValue.params.mapValues { it.value.value }["count"])
-    }
-
-    // --- onNavigationStarted: proactive dedup clearing ---
-
-    @Test
-    fun `onNavigationStarted clears dedup so returning to same URL is not deduplicated`() {
-        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
-        stubPixelStates(state)
-
-        // Event on page A
-        manager.handleWebEvent(webEventData("test"), "tab1")
-        val first = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(first.capture())
-        assertEquals(1, first.firstValue.params.mapValues { it.value.value }["count"])
-
-        // Navigate to page B (no event fires) — onNavigationStarted called by JsInjectorPlugin
-        manager.onNavigationStarted("tab1", "https://example.com/pageB")
-
-        // Navigate back to page A (no event fires) — onNavigationStarted called again
-        manager.onNavigationStarted("tab1", "https://example.com/pageA")
-
-        // Event on page A again — must NOT be deduplicated
-        org.mockito.Mockito.reset(repository)
-        stubPixelStates(first.firstValue)
-
-        manager.handleWebEvent(webEventData("test"), "tab1")
-
-        val second = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(second.capture())
-        assertEquals(2, second.firstValue.params.mapValues { it.value.value }["count"])
-    }
-
-    @Test
-    fun `onNavigationStarted with same URL does not clear dedup`() {
-        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
-        stubPixelStates(state)
-
-        manager.handleWebEvent(webEventData("test"), "tab1")
-        val first = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(first.capture())
-
-        // onNavigationStarted with same URL (e.g. reload) — should not clear dedup
-        manager.onNavigationStarted("tab1", "https://example.com/page1")
-
-        org.mockito.Mockito.reset(repository)
-        stubPixelStates(first.firstValue)
-
-        manager.handleWebEvent(webEventData("test"), "tab1")
-
-        verify(repository, never()).savePixelState(any())
-    }
-
-    @Test
-    fun `onNavigationStarted with empty webViewId is a no-op`() {
-        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
-        stubPixelStates(state)
-
-        manager.handleWebEvent(webEventData("test"), "tab1")
-        val first = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(first.capture())
-
-        // onNavigationStarted with empty webViewId — should not affect state
-        manager.onNavigationStarted("", "https://example.com/page2")
-
-        org.mockito.Mockito.reset(repository)
-        stubPixelStates(first.firstValue)
-
-        // Same tab, same URL — still deduped because onNavigationStarted was a no-op
-        manager.handleWebEvent(webEventData("test"), "tab1")
-
-        verify(repository, never()).savePixelState(any())
-    }
-
-    @Test
-    fun `onNavigationStarted only clears dedup for navigated tab`() {
-        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
-        stubPixelStates(state)
-
-        // Events on tab1 and tab2
-        manager.handleWebEvent(webEventData("test"), "tab1")
-        val first = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(first.capture())
-
-        org.mockito.Mockito.reset(repository)
-        stubPixelStates(first.firstValue)
-
-        manager.handleWebEvent(webEventData("test"), "tab2")
-        val second = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(second.capture())
-
-        // Navigate tab1 to a different URL
-        manager.onNavigationStarted("tab1", "https://example.com/page2")
-
-        // Tab2 should still be deduped (onNavigationStarted only cleared tab1)
-        org.mockito.Mockito.reset(repository)
-        stubPixelStates(second.firstValue)
-
-        manager.handleWebEvent(webEventData("test"), "tab2")
-        verify(repository, never()).savePixelState(any())
-    }
-
-    @Test
-    fun `returning to same URL is not deduplicated when intermediate page had different event type`() {
-        val twoSourceConfig = """
-            {
-                "telemetry": {
-                    "test": {
-                        "state": "enabled",
-                        "trigger": { "period": { "days": 1 } },
-                        "parameters": {
-                            "testCount": {
-                                "template": "counter",
-                                "source": "test",
-                                "buckets": {"0+": {"gte": 0, "lt": 5}, "5+": {"gte": 5}}
-                            },
-                            "trackerCount": {
-                                "template": "counter",
-                                "source": "trackerBlocked",
-                                "buckets": {"0+": {"gte": 0, "lt": 5}, "5+": {"gte": 5}}
-                            }
-                        }
-                    }
-                }
-            }
-        """.trimIndent()
-        configureFeature(settings = twoSourceConfig)
-        createManager()
-
-        val state = pixelState("test", mapOf("testCount" to 0, "trackerCount" to 0))
-        stubPixelStates(state)
-
-        // "test" event on page1
-        manager.onNavigationStarted("tab1", "https://example.com/page1")
-        manager.handleWebEvent(webEventData("test"), "tab1")
-        val first = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(first.capture())
-        assertEquals(1, first.firstValue.params.mapValues { it.value.value }["testCount"])
-
-        // Navigate to page2 — only "trackerBlocked" fires (not "test")
-        org.mockito.Mockito.reset(repository)
-        stubPixelStates(first.firstValue)
-
-        manager.onNavigationStarted("tab1", "https://example.com/page2")
-        manager.handleWebEvent(webEventData("trackerBlocked"), "tab1")
-        val second = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(second.capture())
-        assertEquals(1, second.firstValue.params.mapValues { it.value.value }["trackerCount"])
-
-        // Navigate back to page1 — "test" fires again; must NOT be deduplicated
-        org.mockito.Mockito.reset(repository)
-        stubPixelStates(second.firstValue)
-
-        manager.onNavigationStarted("tab1", "https://example.com/page1")
-        manager.handleWebEvent(webEventData("test"), "tab1")
-        val third = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(third.capture())
-        assertEquals(2, third.firstValue.params.mapValues { it.value.value }["testCount"])
-    }
-
-    @Test
-    fun `different tabs count independently`() {
-        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
-        stubPixelStates(state)
-
-        // Tab 1 fires event
-        manager.handleWebEvent(webEventData("test"), "tab1")
-        val firstCaptor = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(firstCaptor.capture())
-        assertEquals(1, firstCaptor.firstValue.params.mapValues { it.value.value }["count"])
-
-        // Tab 2 fires same source — different tab, should count
-        org.mockito.Mockito.reset(repository)
-        stubPixelStates(firstCaptor.firstValue)
-
-        manager.handleWebEvent(webEventData("test"), "tab2")
-        val secondCaptor = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(secondCaptor.capture())
-        assertEquals(2, secondCaptor.firstValue.params.mapValues { it.value.value }["count"])
-
-        // Tab 1 fires again — same tab, should dedup
-        org.mockito.Mockito.reset(repository)
-        stubPixelStates(secondCaptor.firstValue)
-
-        manager.handleWebEvent(webEventData("test"), "tab1")
-        verify(repository, never()).savePixelState(any())
     }
 
     // --- checkPixels ---

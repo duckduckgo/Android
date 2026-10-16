@@ -38,7 +38,6 @@ class EventHubJsInjectorPlugin @Inject constructor(
         isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
     ) {
-        if (!pixelManager.isEnabled()) return
         val webViewId = System.identityHashCode(webView).toString()
         pixelManager.onNavigationStarted(webViewId, url ?: "")
     }
