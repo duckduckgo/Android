@@ -43,7 +43,6 @@ import com.squareup.kotlinpoet.ksp.writeTo
 class ContributesSubComponentProcessor(
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
-    private val isMetro: Boolean,
 ) : SymbolProcessor {
 
     companion object {
@@ -53,7 +52,6 @@ class ContributesSubComponentProcessor(
         private val MERGE_SUBCOMPONENT_CLASS = ClassName("com.squareup.anvil.annotations", "MergeSubcomponent")
         private val CONTRIBUTES_SUBCOMPONENT_CLASS = ClassName("com.squareup.anvil.annotations", "ContributesSubcomponent")
         private val CONTRIBUTES_SUBCOMPONENT_FACTORY_CLASS = ClassName("com.squareup.anvil.annotations", "ContributesSubcomponent", "Factory")
-        private val SINGLE_INSTANCE_IN_CLASS = ClassName("dagger", "SingleInstanceIn")
         private val SUBCOMPONENT_FACTORY_CLASS = ClassName("dagger", "Subcomponent", "Factory")
         private val BINDS_INSTANCE_CLASS = ClassName("dagger", "BindsInstance")
         private val BINDS_CLASS = ClassName("dagger", "Binds")
@@ -203,21 +201,7 @@ class ContributesSubComponentProcessor(
             )
             .build()
 
-        // Main SubComponent interface
-        // In Metro mode, @SingleInstanceIn is omitted — Metro derives the scope from
-        // @ContributesSubcomponent(scope = ...) and adding @SingleInstanceIn would cause
-        // a "multiple scope annotations" error. In AnvilDagger mode, Dagger requires the
-        // explicit scope annotation on the generated subcomponent.
         val typeSpec = TypeSpec.interfaceBuilder(subComponentName)
-            .apply {
-                if (!isMetro) {
-                    addAnnotation(
-                        AnnotationSpec.builder(SINGLE_INSTANCE_IN_CLASS)
-                            .addMember("scope = %T::class", scopeClassName)
-                            .build(),
-                    )
-                }
-            }
             .addAnnotation(subComponentAnnotation)
             .addSuperinterface(ANDROID_INJECTOR_CLASS.parameterizedBy(classType))
             .addType(factoryType)
