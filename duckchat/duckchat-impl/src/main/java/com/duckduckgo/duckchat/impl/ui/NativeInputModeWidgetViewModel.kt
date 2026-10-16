@@ -346,8 +346,9 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         activeDuckAiTabId(surface)?.let { responseWaitWideEvent.onStopTapped(it) }
     }
 
+    // The edit screen's synthetic key never matches a tab, so a flow started under it could only expire unwatched.
     private fun activeDuckAiTabId(surface: DuckChatPixelSurface): String? =
-        activeTabId.value?.takeIf { surface == DuckChatPixelSurface.DUCK_AI && it.isNotEmpty() }
+        activeTabId.value?.takeIf { surface == DuckChatPixelSurface.DUCK_AI && it.isNotEmpty() && !it.startsWith(EDIT_STATE_KEY_PREFIX) }
 
     fun fireClearPressed(isSearchMode: Boolean) = duckChatPixels.fireOmnibarClearButtonPressed(isSearchMode)
     fun fireKeyboardGoPressed(isSearchMode: Boolean) = duckChatPixels.fireOmnibarKeyboardGoPressed(isSearchMode)
