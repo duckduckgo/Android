@@ -28,6 +28,11 @@ import kotlinx.coroutines.sync.withLock
 import java.net.URI
 import javax.inject.Inject
 
+sealed interface OverrideCommand {
+    data class SetUrl(val url: String?) : OverrideCommand
+    data object Reset : OverrideCommand
+}
+
 /** Shared forced-load path for Developer Settings and adb commands. */
 @SingleInstanceIn(AppScope::class)
 class PrivacyConfigInternalLoader @Inject constructor(
@@ -36,57 +41,60 @@ class PrivacyConfigInternalLoader @Inject constructor(
     private val repository: PrivacyConfigRepository,
     private val marker: PrivacyConfigOverrideMarker,
 ) {
+    // Keeps a command's settings change and its download together when Developer Settings loads at the same time.
     private val mutex = Mutex()
 
     suspend fun load(): ConfigDownloadResult = mutex.withLock { forceLoad() }
 
-    suspend fun handleCommand(action: String?, url: String?): Boolean = mutex.withLock {
-        when (action) {
-            ACTION_SET_URL -> {
-                if (!isValidUrl(url)) {
-                    marker.emit("$FAILED action=set_url reason=invalid_url source=${url.orEmpty().filterNot { it.isWhitespace() }}")
-                    return@withLock false
-                }
-                store.remotePrivacyConfigUrl = url
-                store.useCustomPrivacyConfigUrl = true
-                store.canUrlBeChanged = true
-            }
-            ACTION_RESET -> {
-                store.useCustomPrivacyConfigUrl = false
-                store.remotePrivacyConfigUrl = null
-                store.canUrlBeChanged = false
-            }
-            else -> return@withLock false
+    suspend fun handleCommand(command: OverrideCommand) = mutex.withLock {
+        when (command) {
+            is OverrideCommand.SetUrl -> setUrl(command.url)
+            OverrideCommand.Reset -> reset()
         }
-        val result = forceLoad()
-        if (result is ConfigDownloadResult.Error) {
-            val (command, source) = if (action == ACTION_SET_URL) "set_url" to url else "reset" to PRIVACY_REMOTE_CONFIG_URL
-            marker.emit("$FAILED action=$command reason=download_failed source=$source")
-        } else if (action == ACTION_RESET) {
-            val stored = repository.get()
-            marker.emit("$RESET stage=config version=${stored?.version} etag=${stored?.eTag.orEmpty()}")
-        }
-        result is ConfigDownloadResult.Success
     }
 
-    private suspend fun forceLoad(): ConfigDownloadResult {
-        // A forced download always persists, so make the next persisted config count as new even if it matches the last one.
-        store.lastSeenConfig = ""
-        // The downloader resets version and ETag under its shared download lock.
-        return downloader.download(force = true)
+    private suspend fun setUrl(url: String?) {
+        if (!isValidUrl(url)) {
+            marker.emit("$FAILED action=set_url reason=invalid_url source=${url.orEmpty().filterNot { it.isWhitespace() }}")
+            return
+        }
+        store.remotePrivacyConfigUrl = url
+        store.useCustomPrivacyConfigUrl = true
+        if (forceLoad() is ConfigDownloadResult.Error) {
+            marker.emit("$FAILED action=set_url reason=download_failed source=$url")
+            return
+        }
+        // A forced download that succeeds has always persisted, because the stored version was reset first.
+        marker.emit("$APPLIED stage=config ${storedConfig()} source=$url")
+    }
+
+    private suspend fun reset() {
+        store.useCustomPrivacyConfigUrl = false
+        store.remotePrivacyConfigUrl = null
+        if (forceLoad() is ConfigDownloadResult.Error) {
+            marker.emit("$FAILED action=reset reason=download_failed source=$PRIVACY_REMOTE_CONFIG_URL")
+            return
+        }
+        marker.emit("$RESET stage=config ${storedConfig()}")
+    }
+
+    // The downloader resets version and ETag under its shared download lock.
+    private suspend fun forceLoad(): ConfigDownloadResult = downloader.download(force = true)
+
+    private fun storedConfig(): String {
+        val stored = repository.get()
+        return "version=${stored?.version} etag=${stored?.eTag.orEmpty()}"
     }
 
     companion object {
-        const val ACTION_SET_URL = "com.duckduckgo.privacy.config.internal.SET_URL"
-        const val ACTION_RESET = "com.duckduckgo.privacy.config.internal.RESET"
-        const val EXTRA_URL = "url"
+        private const val APPLIED = "CONFIG_OVERRIDE_APPLIED"
         private const val RESET = "CONFIG_OVERRIDE_RESET"
         private const val FAILED = "CONFIG_OVERRIDE_FAILED"
 
-        fun isValidUrl(url: String?): Boolean = runCatching {
+        private fun isValidUrl(url: String?): Boolean = runCatching {
+            // URI rejects whitespace anywhere in the string.
             val uri = URI(url ?: return false)
-            (uri.scheme == "http" || uri.scheme == "https") && !uri.host.isNullOrEmpty() &&
-                uri.port in -1..65535 && url.none { it.isWhitespace() }
+            (uri.scheme == "http" || uri.scheme == "https") && !uri.host.isNullOrEmpty() && uri.port in -1..65535
         }.getOrDefault(false)
     }
 }

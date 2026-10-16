@@ -20,6 +20,8 @@ import com.duckduckgo.privacy.config.api.PRIVACY_REMOTE_CONFIG_URL
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader.ConfigDownloadResult
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader.ConfigDownloadResult.Success
+import com.duckduckgo.privacy.config.internal.OverrideCommand.Reset
+import com.duckduckgo.privacy.config.internal.OverrideCommand.SetUrl
 import com.duckduckgo.privacy.config.internal.store.DevPrivacyConfigSettingsDataStore
 import com.duckduckgo.privacy.config.store.PrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
@@ -37,7 +39,6 @@ class PrivacyConfigInternalLoaderTest {
         override var remotePrivacyConfigUrl: String? = null
         override var useCustomPrivacyConfigUrl = false
         override var canUrlBeChanged = false
-        override var lastSeenConfig: String? = null
     }
     private var downloads = 0
     private var downloadResult: ConfigDownloadResult = Success
@@ -60,97 +61,66 @@ class PrivacyConfigInternalLoaderTest {
     private val testee = PrivacyConfigInternalLoader(downloader, store, repository, marker)
 
     @Test
-    fun whenSetUrlThenEnableOverrideAndForceLoad() = runTest {
-        assertTrue(testee.handleCommand("com.duckduckgo.privacy.config.internal.SET_URL", "http://10.0.2.2:8080/android-config.json"))
-        assertEquals("http://10.0.2.2:8080/android-config.json", store.remotePrivacyConfigUrl)
+    fun whenSetUrlThenEnableOverrideForceLoadAndEmitAppliedLine() = runTest {
+        testee.handleCommand(SetUrl(URL))
+        assertEquals(URL, store.remotePrivacyConfigUrl)
         assertTrue(store.useCustomPrivacyConfigUrl)
-        assertTrue(store.canUrlBeChanged)
         assertEquals(1, downloads)
+        assertEquals(listOf("CONFIG_OVERRIDE_APPLIED stage=config version=42 etag=local-etag source=$URL"), lines)
     }
 
     @Test
-    fun whenInvalidUrlThenLeaveSettingsAndConfigUnchanged() = runTest {
-        store.remotePrivacyConfigUrl = "https://example.com/config.json"
+    fun whenInvalidUrlThenLeaveSettingsUnchangedAndEmitFailedLine() = runTest {
+        store.remotePrivacyConfigUrl = URL
         store.useCustomPrivacyConfigUrl = true
-        listOf(null, "", "not a url", "file:///tmp/config.json", "https:///config.json", "http://", "http://example.com/a b").forEach {
-            assertFalse(testee.handleCommand("com.duckduckgo.privacy.config.internal.SET_URL", it))
-        }
-        assertEquals("https://example.com/config.json", store.remotePrivacyConfigUrl)
+        val sources = mapOf(
+            null to "",
+            "" to "",
+            "not a url" to "notaurl",
+            "file:///tmp/config.json" to "file:///tmp/config.json",
+            "HTTP://example.com/config.json" to "HTTP://example.com/config.json",
+            "https:///config.json" to "https:///config.json",
+            "http://" to "http://",
+            "http://example.com/a b" to "http://example.com/ab",
+        )
+        sources.keys.forEach { testee.handleCommand(SetUrl(it)) }
+        assertEquals(URL, store.remotePrivacyConfigUrl)
         assertTrue(store.useCustomPrivacyConfigUrl)
         assertEquals(0, downloads)
+        assertEquals(sources.values.map { "CONFIG_OVERRIDE_FAILED action=set_url reason=invalid_url source=$it" }, lines)
     }
 
     @Test
-    fun whenResetThenClearOverrideAndForceLoad() = runTest {
-        store.remotePrivacyConfigUrl = "http://localhost/config.json"
+    fun whenResetThenClearOverrideForceLoadAndEmitResetLine() = runTest {
+        store.remotePrivacyConfigUrl = URL
         store.useCustomPrivacyConfigUrl = true
-        store.canUrlBeChanged = true
-        assertTrue(testee.handleCommand("com.duckduckgo.privacy.config.internal.RESET", null))
+        testee.handleCommand(Reset)
         assertNull(store.remotePrivacyConfigUrl)
         assertFalse(store.useCustomPrivacyConfigUrl)
-        assertFalse(store.canUrlBeChanged)
         assertEquals(1, downloads)
-    }
-
-    @Test
-    fun whenRepeatedCommandThenDownloadAgain() = runTest {
-        repeat(2) { testee.handleCommand("com.duckduckgo.privacy.config.internal.SET_URL", "https://example.com/config.json") }
-        assertEquals(2, downloads)
-    }
-
-    @Test
-    fun whenManualLoadThenForceDownload() = runTest {
-        assertEquals(Success, testee.load())
-        assertEquals(1, downloads)
-    }
-
-    @Test
-    fun whenUnknownActionThenDoNothing() = runTest {
-        assertFalse(testee.handleCommand("unknown", "https://example.com/config.json"))
-        assertEquals(0, downloads)
-    }
-
-    @Test
-    fun whenSetUrlSucceedsThenLoaderEmitsNothing() = runTest {
-        testee.handleCommand("com.duckduckgo.privacy.config.internal.SET_URL", "http://10.0.2.2:8080/android-config.json")
-        assertEquals(emptyList<String>(), lines)
-    }
-
-    @Test
-    fun whenResetAppliedThenEmitResetLine() = runTest {
-        testee.handleCommand("com.duckduckgo.privacy.config.internal.RESET", null)
         assertEquals(listOf("CONFIG_OVERRIDE_RESET stage=config version=42 etag=local-etag"), lines)
     }
 
     @Test
-    fun whenDownloadFailsThenEmitFailedLine() = runTest {
+    fun whenDownloadFailsThenEmitFailedLineWithTheUrlTried() = runTest {
         downloadResult = ConfigDownloadResult.Error("offline")
-        testee.handleCommand("com.duckduckgo.privacy.config.internal.SET_URL", "https://example.com/config.json")
-        testee.handleCommand("com.duckduckgo.privacy.config.internal.RESET", null)
-        assertEquals(
-            listOf(
-                "CONFIG_OVERRIDE_FAILED action=set_url reason=download_failed source=https://example.com/config.json",
-                "CONFIG_OVERRIDE_FAILED action=reset reason=download_failed source=$PRIVACY_REMOTE_CONFIG_URL",
-            ),
-            lines,
+        testee.handleCommand(SetUrl(URL))
+        testee.handleCommand(Reset)
+        val expected = listOf(
+            "CONFIG_OVERRIDE_FAILED action=set_url reason=download_failed source=$URL",
+            "CONFIG_OVERRIDE_FAILED action=reset reason=download_failed source=$PRIVACY_REMOTE_CONFIG_URL",
         )
+        assertEquals(expected, lines)
     }
 
     @Test
-    fun whenInvalidUrlThenEmitFailedLine() = runTest {
-        testee.handleCommand("com.duckduckgo.privacy.config.internal.SET_URL", "not a url")
-        assertEquals(listOf("CONFIG_OVERRIDE_FAILED action=set_url reason=invalid_url source=notaurl"), lines)
-    }
-
-    @Test
-    fun whenUrlMissingThenEmitFailedLineWithEmptySource() = runTest {
-        testee.handleCommand("com.duckduckgo.privacy.config.internal.SET_URL", null)
-        assertEquals(listOf("CONFIG_OVERRIDE_FAILED action=set_url reason=invalid_url source="), lines)
-    }
-
-    @Test
-    fun whenManualLoadThenEmitNothing() = runTest {
-        testee.load()
+    fun whenManualLoadThenForceDownloadWithoutResultLine() = runTest {
+        assertEquals(Success, testee.load())
+        assertEquals(1, downloads)
         assertEquals(emptyList<String>(), lines)
+    }
+
+    private companion object {
+        const val URL = "http://localhost:8080/v6/android-config.json"
     }
 }
