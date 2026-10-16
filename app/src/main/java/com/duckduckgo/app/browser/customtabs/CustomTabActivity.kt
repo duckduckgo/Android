@@ -128,6 +128,14 @@ class CustomTabActivity : DuckDuckGoActivity() {
         viewModel.onCloseCustomTab()
     }
 
+    private val launchMode: CustomTabLaunchMode
+        get() = CustomTabLaunchMode.fromName(intent.getStringExtra(LAUNCH_MODE_EXTRA))
+
+    fun finishAndRemoveOwnTask() {
+        // Only the legacy task belongs to the tab. Removing any other would also kill the caller or whatever joined it.
+        if (launchMode == CustomTabLaunchMode.LEGACY) finishAndRemoveTask() else finish()
+    }
+
     private fun renderView(viewState: ViewState) {
         val fragment = BrowserTabFragment.newInstanceForCustomTab(
             tabId = viewState.tabId,
@@ -146,15 +154,15 @@ class CustomTabActivity : DuckDuckGoActivity() {
     companion object {
         fun intent(
             context: Context,
-            flags: Int,
             text: String?,
             toolbarColor: Int?,
             isExternal: Boolean,
             clientPackage: String? = null,
             referrerPackage: String? = null,
+            launchMode: CustomTabLaunchMode = CustomTabLaunchMode.LEGACY,
         ): Intent {
             return Intent(context, CustomTabActivity::class.java).apply {
-                addFlags(flags)
+                addFlags(launchMode.intentFlags)
                 putExtra(Intent.EXTRA_TEXT, text)
                 putExtra(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
                 if (toolbarColor != null) {
@@ -166,11 +174,13 @@ class CustomTabActivity : DuckDuckGoActivity() {
                 if (referrerPackage != null) {
                     putExtra(REFERRER_PACKAGE_EXTRA, referrerPackage)
                 }
+                putExtra(LAUNCH_MODE_EXTRA, launchMode.name)
             }
         }
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
         private const val CLIENT_PACKAGE_EXTRA = "CLIENT_PACKAGE_EXTRA"
         private const val REFERRER_PACKAGE_EXTRA = "REFERRER_PACKAGE_EXTRA"
+        private const val LAUNCH_MODE_EXTRA = "LAUNCH_MODE_EXTRA"
     }
 
     private fun configureOnBackPressedListener() {

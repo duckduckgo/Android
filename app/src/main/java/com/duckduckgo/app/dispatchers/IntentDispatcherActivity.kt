@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.dispatchers
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsSessionToken
@@ -26,6 +25,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
+import com.duckduckgo.app.browser.customtabs.CustomTabLaunchMode
 import com.duckduckgo.app.browser.mode.ExternalUrl
 import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.dispatchers.IntentDispatcherViewModel.ViewState
@@ -72,7 +72,7 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
             }
         }
 
-        viewModel.onIntentReceived(intent, isExternal = true)
+        viewModel.onIntentReceived(intent, isExternal = true, isTaskRoot = isTaskRoot)
     }
 
     private fun dispatch(viewState: ViewState) {
@@ -88,13 +88,18 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
             globalActivityStarter.start(this, viewState.activityParams)
             finish()
         } else if (viewState.customTabRequested) {
-            showCustomTab(viewState.intentText, viewState.toolbarColor, viewState.isExternal)
+            showCustomTab(viewState.intentText, viewState.toolbarColor, viewState.isExternal, viewState.customTabLaunchMode)
         } else {
             showBrowserActivity(viewState.intentText, viewState.isExternal)
         }
     }
 
-    private fun showCustomTab(intentText: String?, toolbarColor: Int?, isExternal: Boolean) {
+    private fun showCustomTab(
+        intentText: String?,
+        toolbarColor: Int?,
+        isExternal: Boolean,
+        launchMode: CustomTabLaunchMode,
+    ) {
         // The verified calling package (non-null only when the launcher bound the
         // CustomTabsService). Carried forward as an intent extra so BrowserTabViewModel can
         // apply the trusted-caller carve-out in handleAppLink.
@@ -110,7 +115,7 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
         startActivity(
             CustomTabActivity.intent(
                 context = this,
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS,
+                launchMode = launchMode,
                 text = intentText,
                 toolbarColor = toolbarColor,
                 isExternal = isExternal,
@@ -119,7 +124,13 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
             ),
         )
 
-        finish()
+        if (launchMode == CustomTabLaunchMode.DOCUMENT_TASK_HIDE_BROWSER_TASK) {
+            // After startActivity, because launching from the background is restricted.
+            moveTaskToBack(true)
+        }
+
+        // Otherwise the dispatcher's own task stays in Recents as an empty card.
+        if (launchMode == CustomTabLaunchMode.DOCUMENT_TASK) finishAndRemoveTask() else finish()
     }
 
     private fun showBrowserActivity(intentText: String?, isExternal: Boolean) {

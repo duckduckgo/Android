@@ -24,6 +24,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayerSettingsNoParams
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.customtabs.CustomTabLaunchMode
+import com.duckduckgo.app.browser.customtabs.CustomTabsFeature
 import com.duckduckgo.app.browser.pdf.InlinePdfHandler
 import com.duckduckgo.app.browser.pdf.LocalPdfResult
 import com.duckduckgo.app.global.intentText
@@ -56,6 +58,7 @@ class IntentDispatcherViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val inlinePdfHandler: InlinePdfHandler,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val customTabsFeature: CustomTabsFeature,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -72,9 +75,14 @@ class IntentDispatcherViewModel @Inject constructor(
         val toolbarColor: Int? = null,
         val isExternal: Boolean = false,
         val localPdfError: Boolean = false,
+        val customTabLaunchMode: CustomTabLaunchMode = CustomTabLaunchMode.LEGACY,
     )
 
-    fun onIntentReceived(intent: Intent?, isExternal: Boolean) {
+    fun onIntentReceived(
+        intent: Intent?,
+        isExternal: Boolean,
+        isTaskRoot: Boolean = false,
+    ) {
         viewModelScope.launch(dispatcherProvider.io()) {
             runCatching {
                 val localPdfUri = localPdfUriOrNull(intent)
@@ -125,7 +133,20 @@ class IntentDispatcherViewModel @Inject constructor(
                 val isSyncPairingUrl = syncUrlIdentifier.shouldDelegateToSyncSetup(intentText)
                 val customTabRequested = hasSession && !isEmailProtectionLink && !isDuckDuckGoUrl && !isSyncPairingUrl && !isDuckAiUrl
 
-                logcat { "Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor" }
+                val customTabLaunchMode = if (customTabRequested) {
+                    CustomTabLaunchMode.resolve(
+                        keepOnAppSwitchEnabled = customTabsFeature.keepCustomTabOnAppSwitch().isEnabled(),
+                        launchedWithNewTask = (intent?.flags ?: 0) and Intent.FLAG_ACTIVITY_NEW_TASK != 0,
+                        isTaskRoot = isTaskRoot,
+                    )
+                } else {
+                    CustomTabLaunchMode.LEGACY
+                }
+
+                logcat {
+                    "Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor. " +
+                        "Is task root=$isTaskRoot. Custom tab launch mode=$customTabLaunchMode"
+                }
 
                 _viewState.emit(
                     viewState.value.copy(
@@ -135,6 +156,7 @@ class IntentDispatcherViewModel @Inject constructor(
                         activityParams = activityParams,
                         toolbarColor = toolbarColor,
                         isExternal = isExternal,
+                        customTabLaunchMode = customTabLaunchMode,
                     ),
                 )
             }.onFailure {
