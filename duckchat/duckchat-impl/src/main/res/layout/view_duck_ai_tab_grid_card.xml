@@ -134,29 +134,80 @@
                     app:typography="body2"
                     tools:text="I just heard the fantastic news about your new job, and I couldn't be happier for you." />
 
+                <ImageView
+                    android:id="@+id/thumbnail"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginVertical="@dimen/keyline_1"
+                    android:background="@drawable/background_duck_ai_tab_card_image"
+                    android:clipToOutline="true"
+                    android:importantForAccessibility="no"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toTopOf="@id/tabChatItemType"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tabChatItemTitle" />
+
                 <com.duckduckgo.common.ui.view.Chip
                     android:id="@+id/tabChatItemType"
+                    style="@style/Widget.DuckDuckGo.DuckAiTabCardChatType"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/background_duck_ai_tab_card_chat_type"
-                    android:drawablePadding="@dimen/keyline_2"
-                    android:paddingHorizontal="@dimen/keyline_3"
-                    android:paddingVertical="@dimen/keyline_2"
                     android:text="@string/duckAiTabCardChatTypeLabel"
-                    android:textAppearance="@style/Typography.DuckDuckGo.Caption"
-                    android:textColor="?attr/daxColorPrimaryText"
                     app:drawableStartCompat="@drawable/ic_chat_16"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <ImageView
-                android:id="@+id/thumbnail"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/tabChatItemVoice"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:importantForAccessibility="no"
-                android:scaleType="centerCrop"
-                android:visibility="gone" />
+                android:background="@drawable/background_duck_ai_tab_card_voice"
+                android:padding="@dimen/keyline_2"
+                android:theme="@style/Theme.DuckDuckGo.Dark"
+                android:visibility="gone">
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/tabChatItemVoiceTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_1"
+                    android:drawablePadding="@dimen/keyline_1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="@string/duckAiTabCardListeningTitle"
+                    app:drawableStartCompat="@drawable/ic_microphone_16"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:textType="primary"
+                    app:typography="h3" />
+
+                <ImageView
+                    android:id="@+id/tabChatItemVoiceFace"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginVertical="@dimen/keyline_1"
+                    android:importantForAccessibility="no"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/duck_ai_voice_face"
+                    app:layout_constraintBottom_toTopOf="@id/tabChatItemVoiceType"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tabChatItemVoiceTitle" />
+
+                <com.duckduckgo.common.ui.view.Chip
+                    android:id="@+id/tabChatItemVoiceType"
+                    style="@style/Widget.DuckDuckGo.DuckAiTabCardChatType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/duckAiTabCardVoiceChatTypeLabel"
+                    app:drawableStartCompat="@drawable/ic_ai_chat_voice_16"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <ImageView
                 android:id="@+id/tabChatItemEmptyLogo"
@@ -166,16 +217,6 @@
                 android:importantForAccessibility="no"
                 android:src="@drawable/duckduckgo_duckai_96"
                 android:visibility="gone" />
-
-            <ImageView
-                android:id="@+id/voiceActive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:importantForAccessibility="no"
-                android:src="@drawable/ic_ai_chat_voice_24"
-                android:visibility="gone"
-                app:tint="?attr/daxColorAccentBlue" />
         </FrameLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

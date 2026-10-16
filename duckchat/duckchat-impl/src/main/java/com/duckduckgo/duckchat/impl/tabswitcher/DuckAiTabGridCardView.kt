@@ -24,6 +24,9 @@ import android.view.LayoutInflater
 import android.view.TouchDelegate
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.ImageView
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -89,8 +92,8 @@ class DuckAiTabGridCardView(
             tabChatItemDetails.gone()
             thumbnail.gone()
             thumbnail.setImageDrawable(null)
+            tabChatItemVoice.gone()
             tabChatItemEmptyLogo.gone()
-            voiceActive.gone()
             tabChatItemBranding.setText(
                 if (content is RealDuckAiTabGridItemContent.Empty) BrowserUiR.string.browserMenuNewChat else R.string.duck_chat_title,
             )
@@ -100,26 +103,48 @@ class DuckAiTabGridCardView(
                     tabChatItemTitle.text = content.title
                     tabChatItemTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
                     snippet.text = content.snippet
+                    snippet.show()
+                    bindChatType(R.string.duckAiTabCardChatTypeLabel, R.drawable.ic_chat_16)
                     tabChatItemDetails.show()
                 }
                 is RealDuckAiTabGridItemContent.Thinking -> {
                     tabChatItemTitle.setText(R.string.duckAiTabCardThinkingTitle)
                     tabChatItemTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_thinking_16, 0, 0, 0)
                     snippet.text = content.title
+                    snippet.show()
+                    bindChatType(R.string.duckAiTabCardChatTypeLabel, R.drawable.ic_chat_16)
                     tabChatItemDetails.show()
                 }
                 is RealDuckAiTabGridItemContent.ImageChat -> {
+                    tabChatItemTitle.text = content.title
+                    tabChatItemTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
+                    snippet.gone()
                     thumbnail.show()
+                    bindChatType(R.string.duckAiTabCardChatTypeLabel, R.drawable.ic_chat_16)
+                    tabChatItemDetails.show()
                     loadThumbnail(content)
+                }
+                is RealDuckAiTabGridItemContent.VoiceTranscript -> {
+                    tabChatItemTitle.text = content.title
+                    tabChatItemTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
+                    snippet.text = content.transcript
+                    snippet.show()
+                    bindChatType(R.string.duckAiTabCardTranscriptTypeLabel, R.drawable.ic_ai_chat_voice_16)
+                    tabChatItemDetails.show()
                 }
                 is RealDuckAiTabGridItemContent.Empty -> {
                     tabChatItemEmptyLogo.show()
                 }
                 RealDuckAiTabGridItemContent.ActiveVoice -> {
-                    voiceActive.show()
+                    tabChatItemVoice.show()
                 }
             }
         }
+    }
+
+    private fun bindChatType(@StringRes label: Int, @DrawableRes icon: Int) = with(binding.tabChatItemType) {
+        setChipText(label)
+        setChipIcon(icon)
     }
 
     private fun bindState(state: DuckAiTabGridItemState) = with(binding) {
@@ -156,7 +181,7 @@ class DuckAiTabGridCardView(
         }
     }
 
-    // A missing or undecodable image falls back to the empty look.
+    // A missing or undecodable image shows the Duck.ai logo in its place, keeping the title and label.
     private fun loadThumbnail(content: RealDuckAiTabGridItemContent.ImageChat) {
         if (binding.thumbnail.drawable != null) return
         thumbnailJob += coroutineScope.launch(dispatchers.main()) {
@@ -164,11 +189,14 @@ class DuckAiTabGridCardView(
                 thumbnailLoader(content.fileRef, content.mode)?.let { decodeSampled(it) }
             }
             if (boundContent != content) return@launch
-            if (bitmap != null) {
-                binding.thumbnail.setImageBitmap(bitmap)
-            } else {
-                binding.thumbnail.gone()
-                binding.tabChatItemEmptyLogo.show()
+            with(binding.thumbnail) {
+                if (bitmap != null) {
+                    scaleType = ImageView.ScaleType.CENTER_CROP
+                    setImageBitmap(bitmap)
+                } else {
+                    scaleType = ImageView.ScaleType.CENTER_INSIDE
+                    setImageResource(CommonR.drawable.duckduckgo_duckai_96)
+                }
             }
         }
     }

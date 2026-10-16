@@ -105,10 +105,13 @@ class RealDuckAiTabGridItemRenderer @Inject constructor(
             val fileRef = chat.fileRefs.lastOrNull() ?: return RealDuckAiTabGridItemContent.Empty(title)
             return RealDuckAiTabGridItemContent.ImageChat(title, fileRef, mode)
         }
-        if (isAwaitingReply) return RealDuckAiTabGridItemContent.Thinking(title)
         // Long chats would otherwise copy their whole last reply into every card.
-        val snippet = lastMessageText?.take(SNIPPET_CHARACTER_CAP) ?: return RealDuckAiTabGridItemContent.Empty(title)
-        return RealDuckAiTabGridItemContent.Chat(title, snippet)
+        val snippet = lastMessageText?.take(SNIPPET_CHARACTER_CAP)
+        if (chat.isVoice) {
+            return snippet?.let { RealDuckAiTabGridItemContent.VoiceTranscript(title, it) } ?: RealDuckAiTabGridItemContent.Empty(title)
+        }
+        if (isAwaitingReply) return RealDuckAiTabGridItemContent.Thinking(title)
+        return snippet?.let { RealDuckAiTabGridItemContent.Chat(title, it) } ?: RealDuckAiTabGridItemContent.Empty(title)
     }
 
     private companion object {
