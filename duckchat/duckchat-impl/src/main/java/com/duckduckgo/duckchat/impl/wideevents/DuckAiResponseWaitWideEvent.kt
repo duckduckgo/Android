@@ -163,6 +163,10 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
                 is Action.NativePromptSubmitted -> startFlow(action.tabId, action.reasoningEffort, action.selectedTool)
                 is Action.ResponseState -> applyResponseState(action.tabId, action.status)
                 is Action.StopTapped -> applyStop(action.tabId)
+                is Action.NewChatCreated -> {
+                    leaveForNewChat(action.tabId)
+                    reconcileOnScreen(appClosed = false)
+                }
                 else -> reconcileOnScreen(appClosed = action is Action.AppClosed)
             }
         }
@@ -254,6 +258,17 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
                 if (screen?.tabId == flow.tabId) flow.chatSwitchedAway = true
             }
         }
+    }
+
+    // With history off the URL never carries a chat ID, so a new chat in the same tab looks unchanged to reconcileOnScreen.
+    // A pending exit means the new chat opens in another tab, and the tab switch records that leave instead.
+    private suspend fun leaveForNewChat(tabId: String) {
+        if (pendingExit?.tabId == tabId) return
+        val flow = flows.firstOrNull { it.onScreen && it.chatId == null && it.tabId == tabId } ?: return
+        newChatTabId = null
+        flow.onScreen = false
+        flow.chatSwitchedAway = true
+        recordLeave(flow, LEFT_VIA_CHAT_SWITCHED)
     }
 
     private fun resolveLeftVia(flow: ResponseWait, appClosed: Boolean): String {
