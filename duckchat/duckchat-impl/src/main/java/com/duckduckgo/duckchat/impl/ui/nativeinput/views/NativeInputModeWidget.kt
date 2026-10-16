@@ -982,14 +982,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun applyVerticalPaddingForFocus() {
-        // 4dp when minimized, 8dp when expanded. The browser omnibar with the toggle disabled stays
-        // minimized regardless of focus; the duck.ai omnibar and browser omnibar with toggle enabled
-        // expand on focus; the duck.ai contextual sheet is always expanded.
-        val isBrowserOmnibarMinimized = nativeInputState?.let {
-            it.inputContext == NativeInputState.InputContext.BROWSER && !it.toggleVisible
-        } ?: true
-        val expanded = isContextualWidget ||
-            (!isBrowserOmnibarMinimized && (inputField.hasFocus() || previewEnterFocus))
+        val expanded = usesExpandedVerticalPadding(
+            state = nativeInputState,
+            isFocused = inputField.hasFocus() || previewEnterFocus,
+        )
         val verticalPadAttr = if (expanded) {
             com.duckduckgo.mobile.android.R.dimen.keyline_2
         } else {
@@ -2211,6 +2207,17 @@ internal fun NativeInputState.shouldShowToggleRowBack(
 
 internal fun NativeInputState.shouldShowCardRowBack(isEditing: Boolean = false): Boolean =
     !isEditing && !toggleVisible && inputContext == NativeInputState.InputContext.BROWSER
+
+internal fun usesExpandedVerticalPadding(
+    state: NativeInputState?,
+    isFocused: Boolean,
+): Boolean = when (state?.inputContext) {
+    null -> false
+    NativeInputState.InputContext.BROWSER -> state.toggleVisible
+    NativeInputState.InputContext.DUCK_AI,
+    NativeInputState.InputContext.DUCK_AI_CONTEXTUAL,
+    -> isFocused
+}
 
 /**
  * Whether to synchronously show the chat-suggestions list (an opaque overlay) when the Duck.ai tab is
