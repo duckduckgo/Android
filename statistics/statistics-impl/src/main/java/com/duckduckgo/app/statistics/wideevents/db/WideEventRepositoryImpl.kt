@@ -18,6 +18,7 @@ package com.duckduckgo.app.statistics.wideevents.db
 
 import androidx.room.withTransaction
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.CleanupPolicy
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -33,6 +34,7 @@ class WideEventRepositoryImpl @Inject constructor(
     private val database: WideEventDatabase,
     private val wideEventDao: WideEventDao,
     private val timeProvider: CurrentTimeProvider,
+    private val appBuildConfig: AppBuildConfig,
 ) : WideEventRepository {
     override suspend fun insertWideEvent(
         name: String,
@@ -56,6 +58,7 @@ class WideEventRepositoryImpl @Inject constructor(
                 samplingProbability = samplingProbability,
                 metaType = metaType,
                 metaVersion = metaVersion,
+                appVersion = appBuildConfig.versionName,
             )
 
         return wideEventDao.insertWideEvent(entity)
