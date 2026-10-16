@@ -25,6 +25,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
 import com.duckduckgo.pir.impl.checker.DisabledReason
 import com.duckduckgo.pir.impl.checker.PirEligibility
 import com.duckduckgo.pir.impl.checker.PirRunMode
@@ -84,12 +85,17 @@ class PirWebSaveProfileMessageHandlerTest {
     private val mockFreemiumToggle: Toggle = mock()
     private val mockPirFreemiumDataStore: PirFreemiumDataStore = mock()
     private val mockPirScanCompleteNotifier: PirScanCompleteNotifier = mock()
+    private val mockBrokerJsonUpdater: BrokerJsonUpdater = mock()
+    private val mockUseBundledBrokerJsonsToggle: Toggle = mock()
     private val testScope = TestScope()
 
     @Before
     fun setUp() = runTest {
         whenever(mockRepository.getAllUserProfileQueries()).thenReturn(emptyList())
         whenever(mockPirRemoteFeatures.freemium()).thenReturn(mockFreemiumToggle)
+        whenever(mockPirRemoteFeatures.useBundledBrokerJsons()).thenReturn(mockUseBundledBrokerJsonsToggle)
+        whenever(mockUseBundledBrokerJsonsToggle.isEnabled()).thenReturn(true)
+        whenever(mockRepository.getAllActiveBrokers()).thenReturn(listOf("broker"))
         whenever(mockPirWorkHandler.canRunPir()).thenReturn(
             flowOf(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)),
         )
@@ -108,6 +114,7 @@ class PirWebSaveProfileMessageHandlerTest {
             pirRemoteFeatures = mockPirRemoteFeatures,
             pirFreemiumDataStore = mockPirFreemiumDataStore,
             pirScanCompleteNotifier = mockPirScanCompleteNotifier,
+            brokerJsonUpdater = mockBrokerJsonUpdater,
         )
     }
 
@@ -971,6 +978,70 @@ class PirWebSaveProfileMessageHandlerTest {
 
         // Then
         verify(mockPirScanCompleteNotifier, never()).onInitialScanStarted()
+    }
+
+    @Test
+    fun whenSavingProfileWithNoBrokersStoredThenBrokerDataIsUpdatedBeforeRespondingSuccess() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockRepository.getAllActiveBrokers()).thenReturn(emptyList())
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then the dashboard reads the scan total from stored brokers as soon as the save succeeds
+        val inOrder = inOrder(mockBrokerJsonUpdater, mockJsMessaging)
+        inOrder.verify(mockBrokerJsonUpdater).update()
+        inOrder.verify(mockJsMessaging).onResponse(any())
+        verifyResponse(jsMessage, true, mockJsMessaging)
+    }
+
+    @Test
+    fun whenSavingProfileWithBrokersAlreadyStoredThenBrokerDataIsNotUpdated() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockRepository.getAllActiveBrokers()).thenReturn(listOf("broker"))
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockBrokerJsonUpdater, never()).update()
+        verifyResponse(jsMessage, true, mockJsMessaging)
+    }
+
+    @Test
+    fun whenSavingProfileWithNoBrokersStoredAndBundledBrokersDisabledThenBrokerDataIsStillUpdated() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockRepository.getAllActiveBrokers()).thenReturn(emptyList())
+        whenever(mockUseBundledBrokerJsonsToggle.isEnabled()).thenReturn(false)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then the toggle only governs the bundled fallback, never the network fetch
+        verify(mockBrokerJsonUpdater).update()
+        verifyResponse(jsMessage, true, mockJsMessaging)
+    }
+
+    @Test
+    fun whenSaveFailsThenBrokerDataIsNotUpdated() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(false)
+        whenever(mockRepository.getAllActiveBrokers()).thenReturn(emptyList())
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockBrokerJsonUpdater, never()).update()
+        verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
     private suspend fun givenSuccessfulProfileSave() {
