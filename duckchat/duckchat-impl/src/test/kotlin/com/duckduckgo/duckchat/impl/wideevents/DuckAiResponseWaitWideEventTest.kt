@@ -508,6 +508,42 @@ class DuckAiResponseWaitWideEventTest {
     }
 
     @Test
+    fun `when error while away then return records response_state_on_return error`() = runTest {
+        promptInChat()
+        switchToOtherSite()
+        testee.onResponseState("t1", "error")
+        idle()
+
+        onChat("t1", "A")
+        idle()
+
+        verify(wideEventClient, never()).flowStep(any(), eq("response_ready_while_away"), any(), any())
+        verify(wideEventClient).flowStep(eq(1L), eq("returned"), eq(true), eq(mapOf("response_state_on_return" to "error")))
+    }
+
+    @Test
+    fun `when stop tapped after returning then flow finishes returned with response_result stopped`() = runTest {
+        promptInChat()
+        switchToOtherSite()
+        onChat("t1", "A")
+        idle()
+
+        testee.onStopTapped("t1")
+        testee.onResponseState("t1", "ready")
+        idle()
+
+        verify(wideEventClient, never()).flowFinish(any(), any(), any())
+
+        switchToOtherSite()
+
+        verify(wideEventClient, times(1)).flowFinish(
+            eq(1L),
+            eq(FlowStatus.Success),
+            eq(mapOf("status_reason" to "returned", "response_result" to "stopped")),
+        )
+    }
+
+    @Test
     fun `appendix timeline`() = runTest {
         promptInChat()
         switchToOtherSite()
@@ -705,6 +741,13 @@ class DuckAiResponseWaitWideEventTest {
         verify(wideEventClient, never()).flowStart(any(), anyOrNull(), any(), any(), any(), any())
         verify(wideEventClient).flowStep(eq(7L), eq("returned"), eq(true), eq(mapOf("response_state_on_return" to "page_reloaded")))
         verify(wideEventClient).intervalEnd(eq(7L), eq("leave_to_return_ms_bucketed"))
+    }
+
+    @Test
+    fun `when restored flow's chat opens in a different tab then returned step has page_reloaded`() = runTest {
+        restart(stored = listOf(stored(tabId = "t1")), openIds = listOf(7L), landingTabId = "t2", landingUrl = "$DUCK_AI_URL?chatID=A")
+
+        verify(wideEventClient).flowStep(eq(7L), eq("returned"), eq(true), eq(mapOf("response_state_on_return" to "page_reloaded")))
     }
 
     @Test
