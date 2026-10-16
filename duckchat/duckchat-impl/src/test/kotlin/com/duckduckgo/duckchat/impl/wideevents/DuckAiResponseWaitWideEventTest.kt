@@ -29,6 +29,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -59,6 +60,7 @@ class DuckAiResponseWaitWideEventTest {
     private val wideEventClient: WideEventClient = mock()
     private val duckChat: DuckChat = mock()
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
+    private val flowStore = FakeFlowStore()
 
     private lateinit var testee: DuckAiResponseWaitWideEventImpl
 
@@ -74,18 +76,56 @@ class DuckAiResponseWaitWideEventTest {
         whenever(wideEventClient.flowAbort(any())).thenReturn(Result.success(Unit))
         whenever(wideEventClient.intervalStart(any(), any(), anyOrNull(), anyOrNull())).thenReturn(Result.success(Unit))
         whenever(wideEventClient.intervalEnd(any(), any())).thenReturn(Result.success(Duration.ZERO))
+        whenever(wideEventClient.getFlowIds(any())).thenReturn(Result.success(emptyList()))
 
-        testee = DuckAiResponseWaitWideEventImpl(
-            wideEventClient = wideEventClient,
-            duckChat = duckChat,
-            duckChatFeature = { duckChatFeature },
-            dispatchers = coroutineRule.testDispatcherProvider,
-            appCoroutineScope = coroutineRule.testScope,
-        )
+        testee = createTestee()
         testee.onOpen(isFreshLaunch = true)
         testee.onLaunchLandingResolved(null, null)
         idle()
     }
+
+    private fun createTestee() = DuckAiResponseWaitWideEventImpl(
+        wideEventClient = wideEventClient,
+        duckChat = duckChat,
+        duckChatFeature = { duckChatFeature },
+        flowStore = flowStore,
+        dispatchers = coroutineRule.testDispatcherProvider,
+        appCoroutineScope = coroutineRule.testScope,
+    )
+
+    private suspend fun stubOpenFlowIds(vararg ids: Long) {
+        whenever(wideEventClient.getFlowIds("duckai-response-wait")).thenReturn(Result.success(ids.toList()))
+    }
+
+    // Callbacks are sent before the consumer runs, so recovery must still be applied before them.
+    private suspend fun restart(stored: List<PersistedResponseWaitFlow>, openIds: List<Long>, landingTabId: String?, landingUrl: String?) {
+        flowStore.flows = stored
+        stubOpenFlowIds(*openIds.toLongArray())
+        testee = createTestee()
+        testee.onOpen(isFreshLaunch = true)
+        testee.onLaunchLandingResolved(landingTabId, landingUrl)
+        idle()
+    }
+
+    private fun stored(
+        flowId: Long = 7L,
+        tabId: String = "t1",
+        chatId: String? = "A",
+        left: Boolean = true,
+        returned: Boolean = false,
+        done: Boolean = false,
+        result: String = "unknown",
+    ) = PersistedResponseWaitFlow(
+        flowId = flowId,
+        tabId = tabId,
+        chatId = chatId,
+        left = left,
+        returned = returned,
+        done = done,
+        result = result,
+        readyWhileAwayRecorded = false,
+        readyToReturnRunning = false,
+    )
 
     private fun idle() = coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
@@ -553,6 +593,140 @@ class DuckAiResponseWaitWideEventTest {
         idle()
 
         verify(wideEventClient, never()).flowStart(any(), anyOrNull(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun `when restarted with a stored flow that is no longer open then it is dropped`() = runTest {
+        restart(stored = listOf(stored()), openIds = emptyList(), landingTabId = "t1", landingUrl = "$DUCK_AI_URL?chatID=A")
+
+        assertEquals(emptyList<PersistedResponseWaitFlow>(), flowStore.flows)
+        verify(wideEventClient, never()).flowFinish(any(), any(), any())
+        verify(wideEventClient, never()).flowStep(eq(7L), any(), any(), any())
+    }
+
+    @Test
+    fun `when restarted with a returned and done flow then it finishes SUCCESS returned`() = runTest {
+        restart(
+            stored = listOf(stored(returned = true, done = true, result = "ready")),
+            openIds = listOf(7L),
+            landingTabId = null,
+            landingUrl = null,
+        )
+
+        verify(wideEventClient).flowFinish(
+            eq(7L),
+            eq(FlowStatus.Success),
+            eq(mapOf("status_reason" to "returned", "response_result" to "ready")),
+        )
+        assertEquals(emptyList<PersistedResponseWaitFlow>(), flowStore.flows)
+    }
+
+    @Test
+    fun `when restored flow returns then returned step has page_reloaded`() = runTest {
+        restart(stored = listOf(stored()), openIds = listOf(7L), landingTabId = "t1", landingUrl = "$DUCK_AI_URL?chatID=A")
+
+        verify(wideEventClient, never()).flowStart(any(), anyOrNull(), any(), any(), any(), any())
+        verify(wideEventClient).flowStep(eq(7L), eq("returned"), eq(true), eq(mapOf("response_state_on_return" to "page_reloaded")))
+        verify(wideEventClient).intervalEnd(eq(7L), eq("leave_to_return_ms_bucketed"))
+    }
+
+    @Test
+    fun `when callback is sent right after restart then it is processed after recovery`() = runTest {
+        flowStore.flows = listOf(stored())
+        stubOpenFlowIds(7L)
+
+        testee = createTestee()
+        testee.onOpen(isFreshLaunch = true)
+        testee.onLaunchLandingResolved("t1", "$DUCK_AI_URL?chatID=A")
+        testee.onResponseState("t1", "ready")
+        testee.onClose()
+        idle()
+
+        verify(wideEventClient).flowStep(eq(7L), eq("returned"), eq(true), any())
+        verify(wideEventClient).flowFinish(
+            eq(7L),
+            eq(FlowStatus.Success),
+            eq(mapOf("status_reason" to "returned", "response_result" to "ready")),
+        )
+    }
+
+    @Test
+    fun `when restored flow returns and page sends ready then restart_stream then user leaves then flow stays open`() = runTest {
+        restart(stored = listOf(stored()), openIds = listOf(7L), landingTabId = "t1", landingUrl = "$DUCK_AI_URL?chatID=A")
+
+        testee.onResponseState("t1", "ready")
+        testee.onResponseState("t1", "start_stream:restart_stream")
+        testee.onResponseState("t1", "loading")
+        testee.onClose()
+        idle()
+
+        verify(wideEventClient, never()).flowFinish(any(), any(), any())
+        assertEquals(listOf(7L), flowStore.flows.map { it.flowId })
+    }
+
+    @Test
+    fun `when flow starts then store contains it`() = runTest {
+        promptInChat(tabId = "t1", chatId = "A")
+
+        assertEquals(listOf(stored(flowId = 1L, left = false)), flowStore.flows)
+    }
+
+    @Test
+    fun `when flow finishes then store no longer contains it`() = runTest {
+        promptInChat()
+
+        testee.onResponseState("t1", "ready")
+        idle()
+
+        assertEquals(emptyList<PersistedResponseWaitFlow>(), flowStore.flows)
+    }
+
+    @Test
+    fun `when flow is closed by cleanup then it is dropped on next open and gets no further steps`() = runTest {
+        promptInChat()
+        testee.onClose()
+        idle()
+        stubOpenFlowIds()
+
+        testee.onOpen(isFreshLaunch = false)
+        testee.onLaunchLandingResolved("t1", "$DUCK_AI_URL?chatID=A")
+        testee.onResponseState("t1", "ready")
+        testee.onClose()
+        idle()
+
+        verify(wideEventClient, never()).flowStep(any(), eq("returned"), any(), any())
+        verify(wideEventClient, never()).flowFinish(any(), any(), any())
+        assertEquals(emptyList<PersistedResponseWaitFlow>(), flowStore.flows)
+    }
+
+    @Test
+    fun `when feature disabled with open flows then all are aborted and store is cleared`() = runTest {
+        restart(
+            stored = listOf(stored(tabId = "t9", chatId = "Z")),
+            openIds = listOf(7L),
+            landingTabId = null,
+            landingUrl = null,
+        )
+        promptInChat(tabId = "t1", chatId = "A")
+        assertEquals(listOf(7L, 1L), flowStore.flows.map { it.flowId })
+
+        duckChatFeature.sendDuckAiResponseWaitWideEvent().setRawStoredState(Toggle.State(enable = false))
+        testee.onClose()
+        idle()
+
+        verify(wideEventClient).flowAbort(7L)
+        verify(wideEventClient).flowAbort(1L)
+        assertEquals(emptyList<PersistedResponseWaitFlow>(), flowStore.flows)
+    }
+
+    private class FakeFlowStore : DuckAiResponseWaitFlowStore {
+        var flows: List<PersistedResponseWaitFlow> = emptyList()
+
+        override suspend fun load(): List<PersistedResponseWaitFlow> = flows
+
+        override suspend fun save(flows: List<PersistedResponseWaitFlow>) {
+            this.flows = flows
+        }
     }
 
     private companion object {

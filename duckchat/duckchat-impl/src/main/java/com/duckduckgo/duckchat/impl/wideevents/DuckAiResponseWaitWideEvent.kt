@@ -57,6 +57,9 @@ interface DuckAiResponseWaitWideEvent {
  *
  * A flow is identified by its chat ID; until the page reports one it is identified by its tab. Which chat
  * is on screen comes from this class's own tracking of the selected tab, so callers pass only a tab ID.
+ *
+ * Open flows are saved to [DuckAiResponseWaitFlowStore] after every change and restored as the consumer's first
+ * action, so a wait that outlives the process can still record the user's return.
  */
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class, boundType = DuckAiResponseWaitWideEvent::class)
@@ -65,6 +68,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
     private val duckChat: DuckChat,
     private val duckChatFeature: Lazy<DuckChatFeature>,
+    private val flowStore: DuckAiResponseWaitFlowStore,
     dispatchers: DispatcherProvider,
     @AppCoroutineScope appCoroutineScope: CoroutineScope,
 ) : DuckAiResponseWaitWideEvent, DuckAiSessionCallback, BrowserLifecycleObserver {
@@ -73,6 +77,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
     private val channel = Channel<Action>(capacity = Channel.UNLIMITED)
 
     private val flows = mutableListOf<ResponseWait>()
+    private var persisted = emptyList<PersistedResponseWaitFlow>()
     private var selectedTab: TabState? = null
     private var pendingExit: PendingExit? = null
     private var newChatTabId: String? = null
@@ -82,10 +87,13 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
     private var launchResolved = false
 
     init {
+        // Queued before anything else can reach the channel, so restored flows exist before any callback is applied.
+        channel.trySend(Action.Recover)
         coroutineScope.launch {
             for (action in channel) {
                 try {
                     processAction(action)
+                    persist()
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
@@ -139,12 +147,14 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
     }
 
     private suspend fun processAction(action: Action) {
+        if (action is Action.Recover) return recover()
         val previousTab = selectedTab
         // Presence is tracked even while the feature is off, so re-enabling it starts from the real screen state.
         updatePresence(action)
         if (isFeatureDisabled()) {
             abortAllFlows()
         } else {
+            if (action is Action.AppOpened) dropFlowsClosedByCleanup()
             when (action) {
                 is Action.NativePromptSubmitted -> startFlow(action.tabId, action.reasoningEffort, action.selectedTool)
                 is Action.ResponseState -> applyResponseState(action.tabId, action.status)
@@ -158,6 +168,31 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         }
         val previousTabId = previousTab?.tabId
         if (previousTabId != null && previousTab != selectedTab) clearIntents(previousTabId)
+    }
+
+    private suspend fun recover() {
+        persisted = flowStore.load()
+        flows += persisted.map { it.restore() }
+        dropFlowsClosedByCleanup()
+        if (isFeatureDisabled()) {
+            abortAllFlows()
+        } else {
+            flows.filter { it.returned && it.done }.forEach { finish(it, REASON_RETURNED) }
+        }
+    }
+
+    // The 24h cleanup closes flows on its own; a flow it closed must not receive more steps.
+    private suspend fun dropFlowsClosedByCleanup() {
+        if (flows.isEmpty()) return
+        val openIds = wideEventClient.getFlowIds(FEATURE_NAME).getOrNull() ?: return
+        flows.removeAll { it.flowId !in openIds }
+    }
+
+    private suspend fun persist() {
+        val snapshot = flows.map { it.toPersisted() }
+        if (snapshot == persisted) return
+        persisted = snapshot
+        flowStore.save(snapshot)
     }
 
     private fun updatePresence(action: Action) {
@@ -241,7 +276,8 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         flow.chatSwitchedAway = false
         if (!flow.returned) {
             flow.returned = true
-            wideEventClient.flowStep(flow.flowId, STEP_RETURNED, metadata = mapOf(KEY_RESPONSE_STATE_ON_RETURN to flow.lastState))
+            val stateOnReturn = if (flow.pageReloaded) STATE_PAGE_RELOADED else flow.lastState
+            wideEventClient.flowStep(flow.flowId, STEP_RETURNED, metadata = mapOf(KEY_RESPONSE_STATE_ON_RETURN to stateOnReturn))
             wideEventClient.intervalEnd(flow.flowId, INTERVAL_LEAVE_TO_RETURN)
         }
         if (flow.readyToReturnRunning) {
@@ -365,6 +401,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         data class NewChatCreated(val tabId: String) : Action()
         data object AppOpened : Action()
         data object AppClosed : Action()
+        data object Recover : Action()
     }
 
     private data class TabState(
@@ -395,8 +432,33 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         // Set once the flow's tab shows a different chat, so tab-keyed matching and response states stop applying to it.
         var chatSwitchedAway = false
 
+        // Restored after process death: the reloaded page starts from scratch, so its state on return says nothing yet.
+        var pageReloaded = false
+
+        fun toPersisted() = PersistedResponseWaitFlow(
+            flowId = flowId,
+            tabId = tabId,
+            chatId = chatId,
+            left = left,
+            returned = returned,
+            done = done,
+            result = result,
+            readyWhileAwayRecorded = readyWhileAwayRecorded,
+            readyToReturnRunning = readyToReturnRunning,
+        )
+
         fun matches(screen: OnScreen): Boolean =
             if (chatId != null) chatId == screen.chatId else tabId == screen.tabId && !chatSwitchedAway
+    }
+
+    private fun PersistedResponseWaitFlow.restore() = ResponseWait(flowId = flowId, tabId = tabId, chatId = chatId).also {
+        it.left = left
+        it.returned = returned
+        it.done = done
+        it.result = result
+        it.readyWhileAwayRecorded = readyWhileAwayRecorded
+        it.readyToReturnRunning = readyToReturnRunning
+        it.pageReloaded = true
     }
 
     private companion object {
@@ -431,6 +493,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         const val RESULT_UNKNOWN = "unknown"
 
         const val STATE_LOADING = "loading"
+        const val STATE_PAGE_RELOADED = "page_reloaded"
 
         const val LEFT_VIA_APP_BACKGROUNDED = "app_backgrounded"
         const val LEFT_VIA_BACK_OR_CLOSE = "back_or_close"
