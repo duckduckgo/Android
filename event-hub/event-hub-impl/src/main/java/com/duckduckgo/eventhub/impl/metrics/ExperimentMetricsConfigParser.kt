@@ -53,7 +53,7 @@ internal object ExperimentMetricsConfigParser {
 
     // search and app_use are reserved by the spec. The others are built-in metrics Android attaches to the same CSS and TDS
     // experiments, so a config metric with one of these names would share, and corrupt, the framework's counter for it.
-    private val RESERVED_NAMES = setOf("search", "app_use", "duck_ai_prompt_sent", "duck_ai_new_chat", "privacyToggleUsed")
+    private val RESERVED_NAMES = setOf("search", "app_use", "duck_ai_prompt_sent", "duck_ai_new_chat", "2xRefresh", "3xRefresh", "privacyToggleUsed")
 
     private val moshi: Moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
     private val settingsAdapter = moshi.adapter(ExperimentSettingsJson::class.java).lenient()

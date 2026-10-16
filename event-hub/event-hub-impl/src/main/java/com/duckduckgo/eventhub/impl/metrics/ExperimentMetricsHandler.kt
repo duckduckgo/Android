@@ -48,7 +48,11 @@ interface ExperimentMetricsHandler {
 
 internal data class MetricBinding(val experiment: Toggle, val metric: MetricDefinition)
 
-private class CachedBindings(val version: Int, val bindingsByEvent: Map<String, List<MetricBinding>>)
+private class CachedBindings(
+    val version: Int,
+    val bindingsByEvent: Map<String, List<MetricBinding>>,
+    val tdsExperiments: List<Toggle>,
+)
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
@@ -67,11 +71,16 @@ class RealExperimentMetricsHandler @Inject constructor(
 
     override suspend fun onEvent(eventType: String) {
         mutex.withLock {
-            val bindings = bindings()[eventType] ?: return
+            val cached = bindings() ?: return
+            val bindings = cached.bindingsByEvent[eventType] ?: return
+            val activeTds by lazy { cached.tdsExperiments.firstOrNull { it.isEnabled() }?.featureName() }
             for ((experiment, metric) in bindings) {
                 // Checked per event rather than when building the cache, so the cache depends only on config. The framework
                 // checks this too; skipping here just avoids its dispatcher hop for every disabled experiment
                 if (!experiment.isEnabled()) continue
+                // Only one blocklist experiment is in effect at a time: the one the blocklist is downloaded, enrolled and
+                // measured for. An older TDS experiment left enabled would otherwise convert for users on another blocklist
+                if (experiment.featureName().parentName == BLOCK_LIST && experiment.featureName() != activeTds) continue
                 for ((threshold, windows) in metric.windowsByThreshold) {
                     logcat(VERBOSE) { "EventHub: metric ${metric.name} on ${experiment.featureName().name}, threshold $threshold" }
                     // The framework runs on the app scope, where an uncaught exception crashes the app; one failed send
@@ -92,28 +101,26 @@ class RealExperimentMetricsHandler @Inject constructor(
         configVersion.incrementAndGet()
     }
 
-    private suspend fun bindings(): Map<String, List<MetricBinding>> {
+    private suspend fun bindings(): CachedBindings? {
         val version = configVersion.get()
-        cache.get()?.takeIf { it.version == version }?.let { return it.bindingsByEvent }
+        cache.get()?.takeIf { it.version == version }?.let { return it }
         val built = try {
-            buildBindings()
+            buildBindings(version)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             // Not cached, so the next event tries again
             logcat(WARN) { "EventHub: failed to read experiment metrics: ${e.message}" }
-            return emptyMap()
+            return null
         }
-        cache.set(CachedBindings(version, built))
+        cache.set(built)
         return built
     }
 
     // Walking every toggle is expensive, so it runs once per config change rather than once per event
-    private suspend fun buildBindings(): Map<String, List<MetricBinding>> {
-        // Every subfeature of both parents is read, not just the active TDS experiment: an older TDS experiment that is
-        // still enabled, and that the user is still enrolled in, keeps converting
-        return inventory.getAll()
-            .filter { it.featureName().parentName in EXPERIMENT_PARENTS }
+    private suspend fun buildBindings(version: Int): CachedBindings {
+        val experiments = inventory.getAll().filter { it.featureName().parentName in EXPERIMENT_PARENTS }
+        val bindingsByEvent = experiments
             .flatMap { experiment ->
                 experiment.getSettings()
                     ?.let(ExperimentMetricsConfigParser::parse)
@@ -121,6 +128,11 @@ class RealExperimentMetricsHandler @Inject constructor(
                     .map { metric -> MetricBinding(experiment, metric) }
             }
             .groupBy { it.metric.event }
+        // Matches the blocklist's activeTdsFlag(): the first enabled blockList subfeature whose name starts with "tds"
+        val tdsExperiments = experiments.filter {
+            it.featureName().parentName == BLOCK_LIST && it.featureName().name.startsWith(TDS_PREFIX)
+        }
+        return CachedBindings(version, bindingsByEvent, tdsExperiments)
     }
 
     // value comes from remote config, already validated by the parser as a whole number of at least 1
@@ -136,6 +148,8 @@ class RealExperimentMetricsHandler @Inject constructor(
     }
 
     private companion object {
-        val EXPERIMENT_PARENTS = setOf("contentScopeExperiments", "blockList")
+        const val BLOCK_LIST = "blockList"
+        const val TDS_PREFIX = "tds"
+        val EXPERIMENT_PARENTS = setOf("contentScopeExperiments", BLOCK_LIST)
     }
 }
