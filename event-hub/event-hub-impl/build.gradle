@@ -43,6 +43,7 @@ dependencies {
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':content-scope-scripts-api')
+    implementation project(path: ':tracker-detection-api')
     implementation project(path: ':statistics-api')
     implementation project(path: ':js-messaging-api')
     implementation project(path: ':browser-api')
