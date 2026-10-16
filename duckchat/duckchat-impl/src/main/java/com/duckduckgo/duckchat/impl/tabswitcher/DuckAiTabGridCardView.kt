@@ -90,8 +90,8 @@ class DuckAiTabGridCardView(
             tabChatItemDetails.gone()
             thumbnail.gone()
             thumbnail.setImageDrawable(null)
+            tabChatItemVoice.gone()
             tabChatItemEmptyLogo.gone()
-            voiceActive.gone()
             tabChatItemBranding.setText(
                 if (content == RealDuckAiTabGridItemContent.Empty) BrowserUiR.string.browserMenuNewChat else R.string.duck_chat_title,
             )
@@ -123,7 +123,7 @@ class DuckAiTabGridCardView(
                     tabChatItemEmptyLogo.show()
                 }
                 RealDuckAiTabGridItemContent.ActiveVoice -> {
-                    voiceActive.show()
+                    tabChatItemVoice.show()
                 }
             }
         }
