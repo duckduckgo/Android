@@ -139,17 +139,48 @@ class RealExperimentMetricsHandlerTest {
     }
 
     @Test
-    fun `every enabled blockList subfeature declaring the metric is sent`() = runTest {
-        blockList.notAnExperiment().enable(captchaMetric())
+    fun `only the active tds experiment sends blockList metrics`() = runTest {
         blockList.tdsNextExperiment001().enable(captchaMetric())
-        blockList.tdsNextExperiment002().disable(captchaMetric())
+        blockList.tdsNextExperiment002().enable(captchaMetric())
 
         handler.onEvent("captchaDetected")
 
+        assertEquals(listOf("tdsNextExperiment001"), metricsExtension.sentMetrics.map { it.toggle.featureName().name })
+    }
+
+    @Test
+    fun `a tds experiment behind an active one without metrics sends nothing`() = runTest {
+        blockList.tdsNextExperiment001().enable(settings = null)
+        blockList.tdsNextExperiment002().enable(captchaMetric())
+
+        handler.onEvent("captchaDetected")
+
+        assertTrue(metricsExtension.sentMetrics.isEmpty())
+    }
+
+    @Test
+    fun `the next tds experiment sends once the active one is disabled, without a config change`() = runTest {
+        blockList.tdsNextExperiment001().enable(captchaMetric())
+        blockList.tdsNextExperiment002().enable(captchaMetric())
+        handler.onEvent("captchaDetected")
+
+        blockList.tdsNextExperiment001().disable(captchaMetric())
+        handler.onEvent("captchaDetected")
+
+        assertEquals(1, inventory.getAllCalls)
         assertEquals(
-            setOf("notAnExperiment", "tdsNextExperiment001"),
-            metricsExtension.sentMetrics.map { it.toggle.featureName().name }.toSet(),
+            listOf("tdsNextExperiment001", "tdsNextExperiment002"),
+            metricsExtension.sentMetrics.map { it.toggle.featureName().name },
         )
+    }
+
+    @Test
+    fun `a blockList subfeature that isn't a tds experiment sends nothing`() = runTest {
+        blockList.notAnExperiment().enable(captchaMetric())
+
+        handler.onEvent("captchaDetected")
+
+        assertTrue(metricsExtension.sentMetrics.isEmpty())
     }
 
     @Test
@@ -171,19 +202,6 @@ class RealExperimentMetricsHandlerTest {
 
         assertEquals(1, inventory.getAllCalls)
         assertEquals(listOf("captchaSeen"), metricsExtension.sentMetrics.map { it.metric })
-    }
-
-    @Test
-    fun `an older tds experiment that is still enabled keeps sending alongside the newer one`() = runTest {
-        blockList.tdsNextExperiment001().enable(captchaMetric())
-        blockList.tdsNextExperiment002().enable(captchaMetric())
-
-        handler.onEvent("captchaDetected")
-
-        assertEquals(
-            listOf("tdsNextExperiment001", "tdsNextExperiment002"),
-            metricsExtension.sentMetrics.map { it.toggle.featureName().name }.sorted(),
-        )
     }
 
     @Test
