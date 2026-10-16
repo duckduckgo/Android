@@ -519,6 +519,27 @@ class RealEventHubPixelManagerTest {
     }
 
     @Test
+    fun `an event still queued when the hub is switched off sends no metrics`() = runTest {
+        val testScheduler = coroutineTestRule.testScope.testScheduler
+        val queuedManager = RealEventHubPixelManager(
+            repository,
+            pixel,
+            timeProvider,
+            coroutineTestRule.testScope,
+            StandardTestDispatcher(testScheduler),
+            eventHubFeature,
+            metricsHandler = metricsHandler,
+        )
+
+        queuedManager.handleWebEvent(webEventData("test"), "tab1")
+        configureFeature(enabled = false)
+        queuedManager.onConfigChanged()
+        testScheduler.runCurrent()
+
+        verify(metricsHandler, never()).onEvent(any())
+    }
+
+    @Test
     fun `onConfigChanged invalidates metric definitions even when feature disabled`() {
         configureFeature(enabled = false)
 
