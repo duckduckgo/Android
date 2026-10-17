@@ -58,6 +58,9 @@ interface VpnRemoteFeatures {
 
     @DefaultValue(DefaultFeatureValue.TRUE)
     fun sendVpnEnableWideEvent(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun endpointPortFallback(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

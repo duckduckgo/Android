@@ -31,6 +31,9 @@ import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.computeBlockMalwareDnsOrSame
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.portprobing.PortProbingCoordinator
+import com.duckduckgo.networkprotection.impl.portprobing.currentEndpointPort
+import com.duckduckgo.networkprotection.impl.portprobing.replacingEndpointPort
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -59,6 +62,7 @@ class WgVpnNetworkStack @Inject constructor(
     private val crashLogger: CrashLogger,
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
     private val vpnRemoteFeatures: VpnRemoteFeatures,
+    private val portProbingCoordinator: Lazy<PortProbingCoordinator>,
 ) : VpnNetworkStack {
     private var wgConfig: Config? = null
 
@@ -74,6 +78,13 @@ class WgVpnNetworkStack @Inject constructor(
                 .onFailure { netpPixels.get().reportErrorInRegistration() }
                 .getOrThrow()
             logcat { "Wireguard configuration:\n$wgConfig" }
+
+            wgConfig = if (vpnRemoteFeatures.endpointPortFallback().isEnabled()) {
+                probeAndSelectPort(wgConfig!!)
+            } else {
+                withServerDefaultPort(wgConfig!!)
+            }
+            wgTunnelConfigLazy.get().setActivePort(wgConfig!!.currentEndpointPort())
 
             val privateDns = dnsProvider.getPrivateDns()
             val dns = if (netPSettingsLocalConfig.blockMalware().isEnabled() && vpnRemoteFeatures.allowDnsBlockMalware().isEnabled()) {
@@ -101,6 +112,29 @@ class WgVpnNetworkStack @Inject constructor(
             Result.failure(e)
         }.onFailure {
             netpPixels.get().reportEnableAttemptFailure()
+        }
+    }
+
+    private suspend fun probeAndSelectPort(config: Config): Config {
+        val result = portProbingCoordinator.get().probeAndSelect()
+            ?: return config.also { logcat { "Port probing: skipping (not enough ports)" } }
+
+        return if (result.selectedPort != config.currentEndpointPort()) {
+            logcat { "Port probing: switching to ${result.selectedPort}" }
+            config.replacingEndpointPort(result.selectedPort)
+        } else {
+            logcat { "Port probing: keeping port ${result.selectedPort}" }
+            config
+        }
+    }
+
+    private fun withServerDefaultPort(config: Config): Config {
+        val defaultPort = wgTunnelConfigLazy.get().getServerDefaultPort()
+        return if (defaultPort > 0 && defaultPort != config.currentEndpointPort()) {
+            logcat { "Port probing disabled: switching to server default port $defaultPort" }
+            config.replacingEndpointPort(defaultPort)
+        } else {
+            config
         }
     }
 
