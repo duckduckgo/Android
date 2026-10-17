@@ -20,6 +20,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.model.TdsMetadata
 import org.junit.After
 import org.junit.Assert.*
@@ -34,15 +35,15 @@ class TdsMetadataDaoTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private lateinit var db: TrackerDetectionDatabase
+    private lateinit var db: AppDatabase
     private lateinit var tdsMetadataDao: TdsMetadataDao
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, TrackerDetectionDatabase::class.java)
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        tdsMetadataDao = db.tdsMetadataDao()
+        tdsMetadataDao = db.tdsDao()
     }
 
     @After
