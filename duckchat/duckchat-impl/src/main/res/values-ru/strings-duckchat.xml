@@ -402,4 +402,9 @@
         <item quantity="many">%1$d часов</item>
         <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d ч.</item>
     </plurals>
+
+    <!-- Duck.ai ToS consent submit button -->
+    <string name="duckChatSubmitAskLabel" instruction="Label of the submit button while the Duck.ai terms are not yet accepted. Required wording from legal, tapping it is how the user accepts.">Спросить</string>
+    <!-- Duck.ai ToS consent footer -->
+    <string name="duckChatTermsFooterMessage" instruction="Disclaimer under the Duck.ai input. ^1 is the label of the submit button, so the sentence always names the button the user taps. The two annotated phrases are tappable links to the Privacy Policy and the Terms of Service.">DuckDuckGo обеспечивает анонимность твоих чатов. Нажимая «^1», ты принимаешь нашу <annotation type="privacy_link">Политику конфиденциальности</annotation> и <annotation type="terms_link">Условия предоставления услуг</annotation>.</string>
 </resources>
