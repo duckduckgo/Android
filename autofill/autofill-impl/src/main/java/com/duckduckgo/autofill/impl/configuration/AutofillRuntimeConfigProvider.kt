@@ -29,6 +29,14 @@ import logcat.logcat
 import javax.inject.Inject
 
 interface AutofillRuntimeConfigProvider {
+    /**
+     * Populates [rawJs] with the runtime configuration the autofill script needs for [url].
+     *
+     * The returned string is already prefixed with the `javascript:` scheme, so it can be handed straight to
+     * `WebView.evaluateJavascript`. The prefix is applied while the script is assembled rather than by the caller
+     * because [rawJs] is close to a megabyte: prepending it afterwards would copy the whole script a second time,
+     * on every page load. Callers must not add the prefix again.
+     */
     suspend fun getRuntimeConfiguration(
         rawJs: String,
         url: String?,
@@ -71,20 +79,38 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         }
         val availableInputTypes = generateAvailableInputTypes(url, reAuthenticationDetails, browserMode)
 
-        return StringBuilder(rawJs).apply {
-            replacePlaceholder(this, TAG_INJECT_CONTENT_SCOPE, contentScope)
-            replacePlaceholder(this, TAG_INJECT_USER_UNPROTECTED_DOMAINS, userUnprotectedDomains)
-            replacePlaceholder(this, TAG_INJECT_USER_PREFERENCES, userPreferences)
-            replacePlaceholder(this, TAG_INJECT_AVAILABLE_INPUT_TYPES, availableInputTypes)
-        }.toString()
+        return rawJs.replacePlaceholders(
+            prefix = JAVASCRIPT_SCHEME_PREFIX,
+            TAG_INJECT_CONTENT_SCOPE to contentScope,
+            TAG_INJECT_USER_UNPROTECTED_DOMAINS to userUnprotectedDomains,
+            TAG_INJECT_USER_PREFERENCES to userPreferences,
+            TAG_INJECT_AVAILABLE_INPUT_TYPES to availableInputTypes,
+        )
     }
 
-    private fun replacePlaceholder(builder: StringBuilder, placeholder: String, replacement: String) {
-        val index = builder.indexOf(placeholder)
-        if (index != -1) {
-            builder.replace(index, index + placeholder.length, replacement)
+    private fun String.replacePlaceholders(prefix: String, vararg replacements: Pair<String, String>): String {
+        val matches = replacements
+            .mapNotNull { (placeholder, replacement) ->
+                val index = indexOf(placeholder)
+                if (index == -1) null else PlaceholderMatch(index, placeholder.length, replacement)
+            }
+            .sortedBy { it.index }
+
+        val capacity = prefix.length + length + matches.sumOf { it.replacement.length - it.placeholderLength }
+        val builder = StringBuilder(capacity).append(prefix)
+        var cursor = 0
+        matches.forEach { match ->
+            builder.append(this, cursor, match.index).append(match.replacement)
+            cursor = match.index + match.placeholderLength
         }
+        return builder.append(this, cursor, length).toString()
     }
+
+    private class PlaceholderMatch(
+        val index: Int,
+        val placeholderLength: Int,
+        val replacement: String,
+    )
 
     private suspend fun generateAvailableInputTypes(
         url: String?,
@@ -146,6 +172,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     }
 
     companion object {
+        private const val JAVASCRIPT_SCHEME_PREFIX = "javascript:"
         private const val TAG_INJECT_CONTENT_SCOPE = "// INJECT contentScope HERE"
         private const val TAG_INJECT_USER_UNPROTECTED_DOMAINS = "// INJECT userUnprotectedDomains HERE"
         private const val TAG_INJECT_USER_PREFERENCES = "// INJECT userPreferences HERE"
