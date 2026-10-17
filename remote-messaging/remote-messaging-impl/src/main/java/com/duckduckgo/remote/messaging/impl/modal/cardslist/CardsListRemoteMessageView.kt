@@ -17,9 +17,11 @@
 package com.duckduckgo.remote.messaging.impl.modal.cardslist
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -34,6 +36,7 @@ import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -49,6 +52,7 @@ import com.duckduckgo.remote.messaging.impl.R
 import com.duckduckgo.remote.messaging.impl.databinding.ViewCardsListRemoteMessageBinding
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.DismissMessage
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.LaunchAddWidget
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.LaunchAppTPOnboarding
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.LaunchDefaultBrowser
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command.LaunchDefaultCredentialProvider
@@ -87,6 +91,9 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var addWidgetLauncher: AddWidgetLauncher
 
     @Inject
     lateinit var browserNav: BrowserNav
@@ -172,6 +179,7 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
             is SubmitUrlInContext -> submitUrlInContext(command.url)
             is DismissMessage -> dismiss()
             is LaunchDefaultCredentialProvider -> launchDefaultCredentialProvider()
+            is LaunchAddWidget -> addWidgetLauncher.launchAddWidget(context.findActivity(), simpleWidgetPrompt = true)
             is LaunchAppTPOnboarding -> launchAppTPOnboarding()
             is LaunchDefaultBrowser -> launchDefaultBrowser()
             is LaunchPlayStore -> openPlayStore(command.appPackage)
@@ -272,4 +280,10 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
     interface CardsListRemoteMessageListener {
         fun onDismiss()
     }
+}
+
+private tailrec fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
 }

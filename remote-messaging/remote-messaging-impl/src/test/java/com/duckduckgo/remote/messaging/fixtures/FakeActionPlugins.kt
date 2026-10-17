@@ -16,6 +16,7 @@
 
 package com.duckduckgo.remote.messaging.fixtures
 
+import com.duckduckgo.remote.messaging.impl.mappers.AddWidgetActionMapper
 import com.duckduckgo.remote.messaging.impl.mappers.DefaultBrowserActionMapper
 import com.duckduckgo.remote.messaging.impl.mappers.DefaultCredentialProviderActionMapper
 import com.duckduckgo.remote.messaging.impl.mappers.DismissActionMapper
@@ -32,4 +33,5 @@ val messageActionPlugins = listOf(
     DefaultBrowserActionMapper(),
     ShareActionMapper(),
     DefaultCredentialProviderActionMapper(),
+    AddWidgetActionMapper(),
 ).toSet()

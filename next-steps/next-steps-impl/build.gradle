@@ -25,6 +25,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
     ksp project(':anvil-ksp')
     implementation project(':next-steps-api')
+    implementation project(':browser-api')
     implementation project(':anvil-annotations')
     implementation project(':di')
     implementation project(':common-utils')
@@ -32,6 +33,7 @@ dependencies {
     implementation project(':app-build-config-api')
     implementation project(':feature-toggles-api')
     implementation project(':remote-messaging-api')
+    implementation project(':navigation-api')
     implementation project(':design-system')
 
     // Dagger
@@ -41,12 +43,14 @@ dependencies {
     implementation KotlinX.coroutines.core
 
     implementation AndroidX.core.ktx
+    implementation AndroidX.activity
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation "com.github.bumptech.glide:glide:_"
+    implementation "com.squareup.logcat:logcat:_"
 
     // Testing dependencies
     testImplementation project(path: ':common-test')

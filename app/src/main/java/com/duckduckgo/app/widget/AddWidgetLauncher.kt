@@ -37,15 +37,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import javax.inject.Named
 
-interface AddWidgetLauncher {
-    fun launchAddWidget(
-        activity: Activity?,
-        simpleWidgetPrompt: Boolean = false,
-        searchOnlyWidgetPrompt: Boolean = false,
-        duckAiOnlyWidgetPrompt: Boolean = false,
-    )
-}
-
 @ContributesBinding(AppScope::class)
 class AddWidgetCompatLauncher @Inject constructor(
     @Named("appWidgetManagerAddWidgetLauncher") private val defaultAddWidgetLauncher: AddWidgetLauncher,

@@ -27,6 +27,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.remote.messaging.api.Action
+import com.duckduckgo.remote.messaging.api.Action.AddWidget
 import com.duckduckgo.remote.messaging.api.Action.AppTpOnboarding
 import com.duckduckgo.remote.messaging.api.Action.DefaultBrowser
 import com.duckduckgo.remote.messaging.api.Action.DefaultCredentialProvider
@@ -89,6 +90,7 @@ class RemoteMessageViewModel @Inject constructor(
         ) : Command()
 
         data object LaunchDefaultCredentialProvider : Command()
+        data object LaunchAddWidget : Command()
     }
 
     private var lastRemoteMessageSeen: RemoteMessage? = null
@@ -209,6 +211,7 @@ class RemoteMessageViewModel @Inject constructor(
                 Command.LaunchScreen(this.value, this.additionalParameters?.get("payload").orEmpty())
             }
             is DefaultCredentialProvider -> Command.LaunchDefaultCredentialProvider
+            is AddWidget -> Command.LaunchAddWidget
 
             is Survey -> {
                 val queryParams = additionalParameters?.get("queryParams")?.split(";") ?: emptyList()

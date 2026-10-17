@@ -186,4 +186,13 @@ class RealCommandActionMapperTest {
 
         assertTrue(result is Command.LaunchDefaultCredentialProvider)
     }
+
+    @Test
+    fun whenAddWidgetActionThenReturnsLaunchAddWidgetCommand() = runTest {
+        val action = Action.AddWidget
+
+        val result = mapper.asCommand(action)
+
+        assertTrue(result is Command.LaunchAddWidget)
+    }
 }
