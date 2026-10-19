@@ -28,10 +28,10 @@ interface AdBlockingExtensionFeature {
     /**
      * Kill-switch. When false, the feature is completely inaccessible.
      */
-    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.TRUE)
     fun enabledByDefault(): Toggle
 
     /**
@@ -46,12 +46,12 @@ interface AdBlockingExtensionFeature {
      * To be removed after phase 2 initial rollout
      *
      */
-    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.TRUE)
     fun adBlockingUXImprovements(): Toggle
 
     /**
      * When enabled, ad blocking animation will show on the omnibar if all other conditions met
      */
-    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.TRUE)
     fun showAdBlockingOmnibarAnimation(): Toggle
 }
