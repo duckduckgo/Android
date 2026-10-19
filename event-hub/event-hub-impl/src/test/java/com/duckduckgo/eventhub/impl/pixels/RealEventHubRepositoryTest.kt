@@ -36,12 +36,9 @@ class RealEventHubRepositoryTest {
     private val sampleConfig = TelemetryPixelConfig(
         name = "testPixel",
         state = "enabled",
-        trigger = TelemetryTriggerConfig(
-            period = TelemetryPeriodConfig(days = 1),
-        ),
+        trigger = TelemetryTriggerConfig.Period(TelemetryPeriodConfig(days = 1)),
         parameters = mapOf(
-            "count" to TelemetryParameterConfig(
-                template = "counter",
+            "count" to TelemetryParameterConfig.Counter(
                 source = "adwall.detected",
                 buckets = linkedMapOf(
                     "0" to BucketConfig(gte = 0, lt = 1),
@@ -87,7 +84,7 @@ class RealEventHubRepositoryTest {
         assertEquals(original.params["count"]?.value, restored.params["count"]?.value)
         assertEquals(original.params["count"]?.stopCounting, restored.params["count"]?.stopCounting)
         assertEquals(original.config.name, restored.config.name)
-        assertEquals(original.config.trigger.period.days, restored.config.trigger.period.days)
+        assertEquals(original.config.period.days, restored.config.period.days)
         assertEquals(original.config.parameters.size, restored.config.parameters.size)
     }
 
@@ -196,6 +193,25 @@ class RealEventHubRepositoryTest {
         assertEquals(false, parsed["count"]?.stopCounting)
         assertEquals(0, parsed["other"]?.value)
         assertEquals(true, parsed["other"]?.stopCounting)
+    }
+
+    @Test
+    fun `params serialization keeps a data value and its absence`() {
+        val original = mapOf(
+            "reason" to ParamState(value = 0, lastDataValue = "{\"a\":true}"),
+            "noValue" to ParamState(value = 0),
+        )
+
+        val parsed = RealEventHubRepository.parseParamsJson(RealEventHubRepository.serializeParams(original))
+
+        assertEquals(original, parsed)
+    }
+
+    @Test
+    fun `params saved before data values existed parse with no data value`() {
+        val parsed = RealEventHubRepository.parseParamsJson("""{"count":{"value":3,"stopCounting":false}}""")
+
+        assertEquals(mapOf("count" to ParamState(value = 3)), parsed)
     }
 
     @Test
