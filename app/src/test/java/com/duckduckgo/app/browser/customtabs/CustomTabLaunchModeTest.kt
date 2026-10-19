@@ -67,6 +67,11 @@ class CustomTabLaunchModeTest {
     }
 
     @Test
+    fun whenLegacyThenTabIsInBrowserTask() {
+        assertEquals(listOf(LEGACY), CustomTabLaunchMode.entries.filter { it.isInBrowserTask })
+    }
+
+    @Test
     fun whenNameIsKnownThenFromNameReturnsMode() {
         CustomTabLaunchMode.entries.forEach { assertEquals(it, CustomTabLaunchMode.fromName(it.name)) }
     }

@@ -1926,10 +1926,12 @@ class BrowserTabFragment :
         val intent =
             Intent(Intent.ACTION_VIEW).apply {
                 data = Uri.parse(url)
+                setPackage(requireContext().packageName)
             }
 
         if (requireActivity().packageManager.resolveActivity(intent, 0) != null) {
             startActivity(intent)
+            (activity as? CustomTabActivity)?.finishIfOutsideBrowserTask()
         } else {
             showToast(R.string.unableToOpenLink)
         }
