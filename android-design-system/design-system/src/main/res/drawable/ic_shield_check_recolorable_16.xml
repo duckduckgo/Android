@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+    <path
+        android:fillColor="@color/rb_green40"
+        android:pathData="M7.99983 0.000244141C8.8649 0.000296645 9.75645 0.288289 10.5096 1.01685C10.9909 1.48242 11.798 1.96967 12.9246 2.32935H12.9256C13.6569 2.56294 14.4144 2.80087 14.9744 3.3186C15.5743 3.8734 15.8734 4.66321 15.9578 5.80493C16.0791 7.44105 16.0184 9.44712 14.6317 11.6829C13.7812 13.0545 12.5225 14.1252 11.3045 14.8508C10.1055 15.565 8.85333 15.9992 7.98421 15.9993C7.11424 15.9993 5.86988 15.5643 4.67854 14.8499C3.46792 14.1237 2.21775 13.0536 1.368 11.6838H1.36702C-0.0189245 9.44804 -0.0794767 7.4405 0.0418244 5.80493C0.126285 4.66347 0.425281 3.87347 1.02522 3.3186C1.58528 2.80087 2.34259 2.56298 3.07405 2.32935C4.19994 1.9696 5.00884 1.48233 5.49007 1.01685C6.24323 0.288397 7.13478 0.000244141 7.99983 0.000244141Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M10.7475 5.51977C10.9884 5.27247 11.384 5.26724 11.6313 5.50805C11.8786 5.74886 11.8839 6.14454 11.6431 6.39184L7.54906 10.5962C7.31151 10.8401 6.92238 10.849 6.67394 10.6162L4.37731 8.46398C4.12545 8.22796 4.11262 7.83243 4.34862 7.58056C4.58465 7.32869 4.98017 7.31584 5.23204 7.55187L7.08129 9.28478L10.7475 5.51977Z" />
+</vector>

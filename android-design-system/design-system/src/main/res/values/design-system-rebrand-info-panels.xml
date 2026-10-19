@@ -20,6 +20,16 @@
     <!-- True when the InfoPanel brand design update is on. Absent from the base themes, so it resolves to false. -->
     <attr name="daxRebrandInfoPanels" format="boolean" />
 
+    <dimen name="rebrandInfoPanelIconTextGap">12dp</dimen>
+    <dimen name="rebrandTabSwitcherInfoPanelHorizontalMargin">6dp</dimen>
+    <!-- The shield animation's pop and ripple need the room around the 16dp shield, so its frame is 32dp. -->
+    <dimen name="rebrandTabSwitcherInfoPanelAnimationSize">32dp</dimen>
+
+    <!-- Override AppCompat's popup panelBackground for panels created without XML attributes. -->
+    <style name="Widget.DuckDuckGo.InfoPanel.Rebrand" parent="Widget.DuckDuckGo.InfoPanel">
+        <item name="panelBackground">@drawable/info_panel_tooltip_background</item>
+    </style>
+
     <style name="ThemeOverlay.Rebrand.InfoPanels" parent="">
         <item name="daxRebrandInfoPanels">true</item>
     </style>
