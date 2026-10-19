@@ -29,6 +29,7 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobR
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.LinkFetchData
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.ElementSelector
+import com.duckduckgo.pir.impl.scripts.models.asActionType
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.runTest
@@ -566,5 +567,76 @@ class RealBrokerStepsParserTest {
         assertNull(condition.comment)
         assertNull(condition.expectations.single().selector)
         assertTrue(condition.actions.single() is BrokerAction.Navigate)
+    }
+
+    @Test
+    fun whenParseStepWithConditionWithoutActionsThenReturnScanStepWithCondition() = runTest {
+        val json = """
+            {
+                "stepType": "scan", "scanType": "automated",
+                "actions": [
+                    {
+                        "actionType": "condition",
+                        "id": "condition-1",
+                        "expectations": [{"type": "url", "expect": "/optout/results/"}]
+                    }
+                ]
+            }
+        """.trimIndent()
+
+        val result = testee.parseStep(testBroker, json, null)
+
+        val condition = result.filterIsInstance<ScanStep>().single().step.actions.single() as BrokerAction.Condition
+        assertTrue(condition.actions.isEmpty())
+    }
+
+    @Test
+    fun whenParseStepWithExpectationWithNestedActionsThenReturnScanStepWithNestedActions() = runTest {
+        val json = """
+            {
+                "stepType": "scan", "scanType": "automated",
+                "actions": [
+                    {
+                        "actionType": "expectation",
+                        "id": "expectation-1",
+                        "expectations": [{"type": "element", "selector": ".results"}],
+                        "actions": [
+                            {
+                                "actionType": "click",
+                                "id": "click-1",
+                                "elements": [{"type": "button", "selector": ".consent", "failSilently": true}]
+                            }
+                        ]
+                    }
+                ]
+            }
+        """.trimIndent()
+
+        val result = testee.parseStep(testBroker, json, null)
+
+        val expectation = result.filterIsInstance<ScanStep>().single().step.actions.single() as BrokerAction.Expectation
+        assertEquals(listOf("click-1"), expectation.actions.map { it.id })
+    }
+
+    @Test
+    fun whenParseStepWithScrollActionThenReturnScanStepWithScroll() = runTest {
+        val json = """
+            {
+                "stepType": "scan", "scanType": "automated",
+                "actions": [
+                    {
+                        "actionType": "scroll",
+                        "id": "scroll-1",
+                        "selector": ".results"
+                    }
+                ]
+            }
+        """.trimIndent()
+
+        val result = testee.parseStep(testBroker, json, null)
+
+        val scroll = result.filterIsInstance<ScanStep>().single().step.actions.single()
+        assertEquals("scroll-1", scroll.id)
+        assertEquals("scroll", scroll.asActionType())
     }
 }

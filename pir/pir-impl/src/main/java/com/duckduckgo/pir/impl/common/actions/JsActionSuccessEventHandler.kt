@@ -49,6 +49,7 @@ import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedRespon
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.FillFormResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.GetCaptchaInfoResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.NavigateResponse
+import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ScrollResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.SolveCaptchaResponse
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.binding
@@ -139,7 +140,7 @@ class JsActionSuccessEventHandler @Inject constructor(
                 )
             }
 
-            is FillFormResponse, is ClickResponse, is ExpectationResponse, is ExtractedResponse, is ExecuteScriptResponse -> {
+            is FillFormResponse, is ClickResponse, is ExpectationResponse, is ExtractedResponse, is ExecuteScriptResponse, is ScrollResponse -> {
                 Next(
                     nextState = baseSuccessState.copy(
                         currentActionIndex = baseSuccessState.currentActionIndex + 1,
