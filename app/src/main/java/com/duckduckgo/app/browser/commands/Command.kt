@@ -271,6 +271,7 @@ sealed class Command {
     ) : Command()
 
     data object GenerateWebViewPreviewImage : Command()
+    data class CurrentTabClosing(val tabId: String) : Command()
 
     data object LaunchTabSwitcher : Command()
 

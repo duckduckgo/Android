@@ -139,4 +139,31 @@
     <string name="modalCoordinatorDevSettingsResetCooldownDescription">Once a prompt is shown, further modals are blocked: by the prompts coordinator quiet gap, or by the internal 24-hour window when the coordinator is off. This clears both, so modals are evaluated again on the next app resume.</string>
     <string name="modalCoordinatorDevSettingsResetCooldown">Reset modal cooldown</string>
     <string name="modalCoordinatorDevSettingsResetCooldownDone">Modal cooldown reset</string>
+
+    <!-- New Tab Transition Dev Settings -->
+    <string name="devSettingsScreenNewTabTransitions">New Tab Transitions</string>
+    <string name="devSettingsScreenNewTabTransitionsSubtitle">Animate opening a new tab</string>
+    <string name="newTabTransitionDevSettingsEnabled">Use new tab transitions</string>
+    <string name="newTabTransitionDevSettingsSwipingTabsNote">Requires the swipingTabs feature flag to be off. Kill and restart the app after changing that flag.</string>
+    <string name="newTabTransitionDevSettingsBrowserOrigin">Browser</string>
+    <string name="newTabTransitionDevSettingsTabManagerOrigin">Tab manager</string>
+    <string name="newTabTransitionDevSettingsBelowCenter">Below center animation</string>
+    <string name="newTabTransitionDevSettingsRightOfCenter">Right of center animation</string>
+    <string name="newTabTransitionDevSettingsOriginSubtitle">Start size, offset, scale back, dim, slide left and duration</string>
+    <string name="newTabTransitionDevSettingsStartSize">New page start size</string>
+    <string name="newTabTransitionDevSettingsOffset">Offset</string>
+    <string name="newTabTransitionDevSettingsScaleBack">Current page scales back to</string>
+    <string name="newTabTransitionDevSettingsDim">Current page dims by</string>
+    <string name="newTabTransitionDevSettingsDuration">Duration</string>
+    <string name="newTabTransitionDevSettingsSlideLeft">Current page slides left by</string>
+    <string name="newTabTransitionDevSettingsAnimateClose">Animate tab close</string>
+    <string name="newTabTransitionDevSettingsAnimateTabManagerOut">Keep tab manager (Screenshot)</string>
+    <string name="newTabTransitionDevSettingsSlowMotion">Slow motion</string>
+    <string name="newTabTransitionDevSettingsReset">Reset</string>
+    <string name="newTabTransitionDevSettingsPercent">%1$d%%</string>
+    <string name="newTabTransitionDevSettingsMilliseconds">%1$d ms</string>
+    <string name="newTabTransitionDevSettingsOffsetBelow">%1$d%% below</string>
+    <string name="newTabTransitionDevSettingsOffsetAbove">%1$d%% above</string>
+    <string name="newTabTransitionDevSettingsOffsetRight">%1$d%% right</string>
+    <string name="newTabTransitionDevSettingsOffsetCentered">Centered</string>
 </resources>

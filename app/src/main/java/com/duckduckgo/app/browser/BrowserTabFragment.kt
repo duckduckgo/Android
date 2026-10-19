@@ -2972,6 +2972,7 @@ class BrowserTabFragment :
             is Command.SaveCredentials -> saveBasicAuthCredentials(it.request, it.credentials)
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
+            is Command.CurrentTabClosing -> browserActivity?.onCurrentTabClosing(it.tabId)
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()

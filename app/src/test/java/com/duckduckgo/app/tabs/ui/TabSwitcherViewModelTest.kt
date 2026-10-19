@@ -27,6 +27,8 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.browser.tabs.NewTabTransitionConfig
+import com.duckduckgo.app.browser.tabs.NewTabTransitionSettings
 import com.duckduckgo.app.fire.promo.FireTabsPromos
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
@@ -182,6 +184,7 @@ class TabSwitcherViewModelTest {
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
 
     private val tabManagerFeatureFlags = FakeFeatureToggleFactory.create(TabManagerFeatureFlags::class.java)
+    private val newTabTransitionSettings: NewTabTransitionSettings = mock(NewTabTransitionSettings::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
 
     private lateinit var testee: TabSwitcherViewModel
@@ -264,6 +267,7 @@ class TabSwitcherViewModelTest {
             fireTabsPromos,
             remoteMessageModel,
             tabManagerFeatureFlags,
+            newTabTransitionSettings,
         )
     }
 
@@ -286,6 +290,52 @@ class TabSwitcherViewModelTest {
     @After
     fun after() {
         repoDeletableTabs.close()
+    }
+
+    @Test
+    fun whenNewTabRequestedAndNewTabTransitionsOffThenCloseWithoutMarkingTabManagerOrigin() = runTest {
+        whenever(newTabTransitionSettings.enabledConfig()).thenReturn(null)
+
+        testee.onNewTabRequested(fromOverflowMenu = false)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.Close, commandCaptor.lastValue)
+        verify(newTabTransitionSettings, never()).markNewTabFromTabManager()
+    }
+
+    @Test
+    fun whenNewTabRequestedAndNewTabTransitionsOnThenCloseToNewTabFromTabManager() = runTest {
+        whenever(newTabTransitionSettings.enabledConfig()).thenReturn(NewTabTransitionConfig.DEFAULT)
+
+        testee.onNewTabRequested(fromOverflowMenu = false)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.CloseToNewTab(captureSnapshot = false), commandCaptor.lastValue)
+        verify(newTabTransitionSettings).markNewTabFromTabManager()
+    }
+
+    @Test
+    fun whenNewTabRequestedAndTabManagerAnimatesOutThenCloseToNewTabCapturingSnapshot() = runTest {
+        whenever(newTabTransitionSettings.enabledConfig()).thenReturn(NewTabTransitionConfig.DEFAULT.copy(animateTabManagerOut = true))
+
+        testee.onNewTabRequested(fromOverflowMenu = false)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.CloseToNewTab(captureSnapshot = true), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenNewTabRequestedAndSwipingTabsEnabledThenCloseEvenWithNewTabTransitionsOn() = runTest {
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+        swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+        whenever(newTabTransitionSettings.enabledConfig()).thenReturn(NewTabTransitionConfig.DEFAULT)
+        initializeViewModel()
+
+        testee.onNewTabRequested(fromOverflowMenu = false)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.Close, commandCaptor.lastValue)
+        verify(newTabTransitionSettings, never()).markNewTabFromTabManager()
     }
 
     @Test
@@ -1017,6 +1067,29 @@ class TabSwitcherViewModelTest {
         testee.onDuckAIButtonClicked()
 
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, mapOf("was_used_before" to "1"))
+    }
+
+    @Test
+    fun `when Duck Chat menu new chat selected and new tab transitions on then close to new tab from tab manager`() = runTest {
+        whenever(newTabTransitionSettings.enabledConfig()).thenReturn(NewTabTransitionConfig.DEFAULT)
+        whenever(duckChatMock.getDuckChatUrl(any(), any(), any())).thenReturn("https://duck.ai")
+
+        testee.onDuckAiNewChatSelected()
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.CloseToNewTab(captureSnapshot = false), commandCaptor.lastValue)
+        verify(newTabTransitionSettings).markNewTabFromTabManager()
+    }
+
+    @Test
+    fun `when Duck Chat menu chat selected and new tab transitions on then close to new tab from tab manager`() = runTest {
+        whenever(newTabTransitionSettings.enabledConfig()).thenReturn(NewTabTransitionConfig.DEFAULT)
+
+        testee.onDuckAiChatSelected("https://duck.ai/?chatID=chat-1")
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.CloseToNewTab(captureSnapshot = false), commandCaptor.lastValue)
+        verify(newTabTransitionSettings).markNewTabFromTabManager()
     }
 
     @Test
@@ -2368,6 +2441,7 @@ class TabSwitcherViewModelTest {
             fireTabsPromos,
             remoteMessageModel,
             tabManagerFeatureFlags,
+            newTabTransitionSettings,
         )
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             isolatedViewModel.viewState.collect()
@@ -2415,6 +2489,7 @@ class TabSwitcherViewModelTest {
             fireTabsPromos,
             remoteMessageModel,
             tabManagerFeatureFlags,
+            newTabTransitionSettings,
         )
 
         assertFalse(isolatedViewModel.viewState.value.isBrowserModeToggleVisible)
@@ -2491,6 +2566,7 @@ class TabSwitcherViewModelTest {
             fireTabsPromos,
             remoteMessageModel,
             tabManagerFeatureFlags,
+            newTabTransitionSettings,
         )
 
         isolatedViewModel.onBrowserModeToggled(BrowserMode.FIRE, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)

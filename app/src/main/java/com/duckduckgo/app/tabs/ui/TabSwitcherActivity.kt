@@ -19,13 +19,18 @@ package com.duckduckgo.app.tabs.ui
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
+import android.view.PixelCopy
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
@@ -61,6 +66,7 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserv
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.browser.tabs.NewTabTransitionSettings
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -75,6 +81,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAndShowUndoMessage
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseTabsRequest
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseToNewTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DismissAnimatedTileDismissalDialog
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLink
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLinks
@@ -115,6 +122,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
@@ -135,6 +143,9 @@ class TabSwitcherActivity :
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
+
+    @Inject
+    lateinit var newTabTransitionSettings: NewTabTransitionSettings
 
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
@@ -247,6 +258,12 @@ class TabSwitcherActivity :
     private var isOnScrolledListenerAttached = false
 
     private var skipTabPurge: Boolean = false
+
+    private var animateTabManagerOut = false
+    private var snapshotInFlight = false
+    private var pendingSnapshot: Bitmap? = null
+    private var keepSnapshot = false
+    private var finishWhenSnapshotReady = false
 
     private lateinit var tabTouchHelper: TabTouchHelper
     private lateinit var tabsRecycler: RecyclerView
@@ -384,6 +401,9 @@ class TabSwitcherActivity :
 
     override fun onResume() {
         super.onResume()
+        launch {
+            animateTabManagerOut = withContext(dispatchers.io()) { newTabTransitionSettings.enabledConfig()?.animateTabManagerOut == true }
+        }
 
         // Bail when onCreate aborted before wiring up views to recreate into the launch-requested mode.
         if (!::tabsRecycler.isInitialized) return
@@ -433,6 +453,7 @@ class TabSwitcherActivity :
                     }
 
                     override fun onNewTabButtonClicked() {
+                        captureSnapshotForNewTab()
                         viewModel.onNewTabRequested()
                     }
 
@@ -906,6 +927,10 @@ class TabSwitcherActivity :
             Close -> {
                 finishAfterTransition()
             }
+            is CloseToNewTab -> {
+                keepSnapshot = command.captureSnapshot
+                if (snapshotInFlight) finishWhenSnapshotReady = true else finishToNewTab()
+            }
             is CloseAndShowUndoMessage -> {
                 skipTabPurge = true
                 setResult(
@@ -945,8 +970,15 @@ class TabSwitcherActivity :
                     menuStyle = DuckAiChatsMenu.ChatsMenuStyle.COMPACT,
                 ),
                 listener = object : DuckAiChatsMenu.Listener {
-                    override fun onNewChatSelected() = viewModel.onDuckAiNewChatSelected()
-                    override fun onChatSelected(chatUrl: String) = viewModel.onDuckAiChatSelected(chatUrl)
+                    override fun onNewChatSelected() {
+                        captureSnapshotForNewTab()
+                        viewModel.onDuckAiNewChatSelected()
+                    }
+
+                    override fun onChatSelected(chatUrl: String) {
+                        captureSnapshotForNewTab()
+                        viewModel.onDuckAiChatSelected(chatUrl)
+                    }
                 },
             )
         }
@@ -1053,6 +1085,7 @@ class TabSwitcherActivity :
     }
 
     override fun onNewTabRequested(fromOverflowMenu: Boolean) {
+        captureSnapshotForNewTab()
         // clear observers early to stop view updates
         removeObservers()
 
@@ -1171,6 +1204,44 @@ class TabSwitcherActivity :
     private fun showSettings() {
         startActivity(SettingsActivity.intent(this))
         viewModel.onSettingsMenuPressed()
+    }
+
+    // Taken at the tap, before the new tab is added: the grid then animates the new card in and removes blank tabs,
+    // which would show while waiting for the copy and end up in it. PixelCopy reads what's on screen, so it also gets
+    // the hardware bitmaps of the tab previews a software draw can't.
+    private fun captureSnapshotForNewTab() {
+        val screen = window.decorView
+        if (!animateTabManagerOut || snapshotInFlight || screen.width == 0 || screen.height == 0) return
+        snapshotInFlight = true
+        val snapshot = Bitmap.createBitmap(screen.width, screen.height, Bitmap.Config.ARGB_8888)
+        PixelCopy.request(
+            window,
+            snapshot,
+            { result ->
+                snapshotInFlight = false
+                pendingSnapshot = snapshot.takeIf { result == PixelCopy.SUCCESS }
+                if (finishWhenSnapshotReady) finishToNewTab()
+            },
+            Handler(Looper.getMainLooper()),
+        )
+    }
+
+    private fun finishToNewTab() {
+        pendingSnapshot?.takeIf { keepSnapshot }?.let { newTabTransitionSettings.putTabManagerSnapshot(it) }
+        pendingSnapshot = null
+        finishWithoutAnimation()
+    }
+
+    // Gets out of the way so the browser's new-tab transition is what the user sees.
+    private fun finishWithoutAnimation() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, 0)
+            finish()
+        } else {
+            finish()
+            @Suppress("DEPRECATION")
+            overridePendingTransition(0, 0)
+        }
     }
 
     override fun finish() {
