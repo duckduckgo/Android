@@ -493,7 +493,7 @@ class TabDataRepository(
         nativeInputStatePublisher.clearTab(tabId)
     }
 
-    override suspend fun deleteAll() {
+    override suspend fun deleteAll() = withContext(dispatchers.io()) {
         when (browserMode) {
             BrowserMode.REGULAR -> deleteAllTabsAndSharedData()
             BrowserMode.FIRE -> deleteAllTabsAndTheirData()
