@@ -25,9 +25,13 @@ data class TelemetryPixelConfig(
     val isEnabled: Boolean get() = state == "enabled"
 }
 
-data class TelemetryTriggerConfig(
-    val period: TelemetryPeriodConfig,
-)
+sealed class TelemetryTriggerConfig {
+    /** Counts delivered events over [period] and fires once at its end. */
+    data class Period(val period: TelemetryPeriodConfig) : TelemetryTriggerConfig()
+
+    /** Fires one pixel for each delivered [source] event. It has no period and no persisted state, and isn't gated on foreground. */
+    data class Immediate(val source: String) : TelemetryTriggerConfig()
+}
 
 data class TelemetryPeriodConfig(
     val seconds: Int = 0,
@@ -39,12 +43,21 @@ data class TelemetryPeriodConfig(
         get() = seconds.toLong() + minutes.toLong() * 60 + hours.toLong() * 3600 + days.toLong() * 86400
 }
 
-data class TelemetryParameterConfig(
-    val template: String,
-    val source: String,
-    val buckets: Map<String, BucketConfig>,
-) {
-    val isCounter: Boolean get() = template == "counter"
+sealed class TelemetryParameterConfig {
+    /** Counts delivered [source] events and reports the bucket the total falls in. */
+    data class Counter(
+        val source: String,
+        val buckets: Map<String, BucketConfig>,
+    ) : TelemetryParameterConfig()
+
+    /**
+     * Reports `data[dataKey]` from an event's payload. On a period pixel the value comes from the latest delivered [source]
+     * event; on an immediate pixel it comes from the event that fired it, and [source] is unused.
+     */
+    data class Data(
+        val dataKey: String,
+        val source: String? = null,
+    ) : TelemetryParameterConfig()
 }
 
 data class BucketConfig(
@@ -52,7 +65,12 @@ data class BucketConfig(
     val lt: Int?,
 )
 
-data class ParamState(val value: Int, val stopCounting: Boolean = false)
+/** [lastDataValue] is a data parameter's value as compact JSON, or null when it has none. */
+data class ParamState(
+    val value: Int,
+    val stopCounting: Boolean = false,
+    val lastDataValue: String? = null,
+)
 
 data class PixelState(
     val pixelName: String,

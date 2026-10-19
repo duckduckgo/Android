@@ -61,6 +61,24 @@ class CanonicalJsonTest {
     }
 
     @Test
+    fun `strings are escaped as JSON stringify escapes them`() {
+        assertEquals("\"a/b\"", canonicalJson("a/b"))
+        assertEquals("\"\\\\ \\b\\f\\n\\r\\t\"", canonicalJson("\\ \b\u000C\n\r\t"))
+        assertEquals("\"\\u0000\\u001f\"", canonicalJson("\u0000\u001F"))
+        assertEquals("\"\u0085 \u2014 \u2028 é 😀\"", canonicalJson("\u0085 \u2014 \u2028 é 😀"))
+    }
+
+    @Test
+    fun `lone surrogates are escaped`() {
+        assertEquals("\"\\ud800a\\udc00\"", canonicalJson("\uD800a\uDC00"))
+    }
+
+    @Test
+    fun `object keys are escaped like strings`() {
+        assertEquals("""{"a/\"b":1}""", canonicalJson(JSONObject().put("a/\"b", 1)))
+    }
+
+    @Test
     fun `numbers booleans and null are written as JSON literals`() {
         assertEquals("1", canonicalJson(1))
         assertEquals("1.5", canonicalJson(1.5))

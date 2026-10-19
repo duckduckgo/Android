@@ -17,10 +17,7 @@
 package com.duckduckgo.eventhub.impl.pixels
 
 import android.annotation.SuppressLint
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.eventhub.impl.EventHubFeature
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -28,20 +25,18 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.json.JSONObject
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoMoreInteractions
 import java.util.concurrent.TimeUnit
 
 /**
  * Android's coverage of the cross-platform de-duplication specification
  * (`docs/event-hub/tests/deduplication.md` in `duckduckgo/ddg-workflow`). Each case ID from that document leads the test
  * name so coverage is greppable and a failure names the spec case. Events go through [RealEventHubPixelManager] and are
- * observed through the spec's counter pixel, fired when its period ends.
+ * observed through the spec's immediate pixels, one per delivered event, and its counter pixel, fired when its period ends.
  *
  * D-NAT-1 is not applicable: Android has no native (tab-less) event stream.
  */
@@ -52,7 +47,7 @@ class EventHubDeduplicationSpecTest {
     val coroutineTestRule = CoroutineTestRule(StandardTestDispatcher())
 
     private val repository = InMemoryEventHubRepository()
-    private val pixel: Pixel = mock()
+    private val pixel = RecordingPixel()
     private val timeProvider = FakeCurrentTimeProvider()
     private val eventHubFeature: EventHubFeature = FakeFeatureToggleFactory.create(EventHubFeature::class.java)
 
@@ -80,7 +75,7 @@ class EventHubDeduplicationSpecTest {
         manager.onNavigationStarted(TAB_1, URL_A)
         repeat(3) { probe(TAB_1, reason("overlay")) }
 
-        assertCounterReports("1")
+        assertDelivered(count = "1", probeImmediate("overlay"))
     }
 
     @Test
@@ -89,11 +84,9 @@ class EventHubDeduplicationSpecTest {
         probe(TAB_1, reason("overlay"))
         probe(TAB_1, reason("redirect"))
 
-        assertCounterReports("2")
+        assertDelivered(count = "2", probeImmediate("overlay"), probeImmediate("redirect"))
     }
 
-    // The spec fixture only counts probeDetected, so this can't tell whether the type is part of the key. That is covered by
-    // WebEventDeduplicatorTest and RealEventHubPixelManagerTest.
     @Test
     fun `D-DEL-3 event types de-duplicate independently`() {
         manager.onNavigationStarted(TAB_1, URL_A)
@@ -101,7 +94,7 @@ class EventHubDeduplicationSpecTest {
         event("otherDetected", TAB_1, reason("overlay"))
         probe(TAB_1, reason("overlay"))
 
-        assertCounterReports("1")
+        assertDelivered(count = "1", probeImmediate("overlay"), RecordedPixel("dedupOther_immediate", mapOf("reason" to "\"overlay\"")))
     }
 
     @Test
@@ -110,7 +103,7 @@ class EventHubDeduplicationSpecTest {
         probe(TAB_1, reason("overlay"))
         probe(TAB_1, reason("overlay"))
 
-        assertCounterReports("1")
+        assertDelivered(count = "1", probeImmediate("overlay"))
     }
 
     // The JVM org.json keeps members in a HashMap, so both payloads iterate in the same order here. Android's keeps insertion
@@ -121,7 +114,7 @@ class EventHubDeduplicationSpecTest {
         probe(TAB_1, JSONObject("""{"reason": "overlay", "stage": 1}"""))
         probe(TAB_1, JSONObject("""{"stage": 1, "reason": "overlay"}"""))
 
-        assertCounterReports("1")
+        assertDelivered(count = "1", probeImmediate("overlay"))
     }
 
     @Test
@@ -130,7 +123,7 @@ class EventHubDeduplicationSpecTest {
         probe(TAB_1, data = null)
         probe(TAB_1, JSONObject())
 
-        assertCounterReports("1")
+        assertDelivered(count = "1", probeImmediate(reason = null))
     }
 
     @Test
@@ -142,7 +135,7 @@ class EventHubDeduplicationSpecTest {
         manager.onNavigationStarted(TAB_1, URL_C)
         probe(TAB_1, reason("overlay"))
 
-        assertCounterReports("3+")
+        assertDelivered(count = "3+", probeImmediate("overlay"), probeImmediate("overlay"), probeImmediate("overlay"))
     }
 
     @Test
@@ -152,7 +145,7 @@ class EventHubDeduplicationSpecTest {
         manager.onNavigationStarted(TAB_1, URL_A)
         probe(TAB_1, reason("overlay"))
 
-        assertCounterReports("1")
+        assertDelivered(count = "1", probeImmediate("overlay"))
     }
 
     @Test
@@ -163,7 +156,7 @@ class EventHubDeduplicationSpecTest {
         manager.onNavigationStarted(TAB_1, URL_A)
         probe(TAB_1, reason("overlay"))
 
-        assertCounterReports("2")
+        assertDelivered(count = "2", probeImmediate("overlay"), probeImmediate("overlay"))
     }
 
     @Test
@@ -173,7 +166,7 @@ class EventHubDeduplicationSpecTest {
             probe(tab, reason("overlay"))
         }
 
-        assertCounterReports("3+")
+        assertDelivered(count = "3+", probeImmediate("overlay"), probeImmediate("overlay"), probeImmediate("overlay"))
     }
 
     private fun probe(webViewId: String, data: Any?) = event("probeDetected", webViewId, data)
@@ -186,39 +179,20 @@ class EventHubDeduplicationSpecTest {
 
     private fun reason(value: String) = JSONObject().put("reason", value)
 
-    private fun assertCounterReports(bucket: String) {
+    private fun probeImmediate(reason: String?) =
+        RecordedPixel("dedupProbe_immediate", listOfNotNull(reason?.let { "reason" to "\"$it\"" }).toMap())
+
+    /** Ends the counter's period and checks the complete set of requested pixels: [immediates] and the counter's [count]. */
+    private fun assertDelivered(count: String, vararg immediates: RecordedPixel) {
         timeProvider.time = PERIOD_START + TimeUnit.DAYS.toMillis(1)
         manager.onAppForegrounded()
 
-        val attributionPeriod = RealEventHubPixelManager.calculateAttributionPeriod(PERIOD_START, TelemetryPeriodConfig(days = 1))
-        verify(pixel).enqueueFire(
-            pixelName = eq("dedupProbe_day"),
-            parameters = eq(mapOf("count" to bucket, "attributionPeriod" to attributionPeriod.toString())),
-            encodedParameters = eq(emptyMap()),
-            type = eq(Count),
-        )
-        verifyNoMoreInteractions(pixel)
+        val expected = immediates.toList() + RecordedPixel("dedupProbe_day", mapOf("count" to count))
+        val requested = pixel.requests.map { RecordedPixel(it.name, it.values) }
+        assertEquals(expected.sortedBy { it.toString() }, requested.sortedBy { it.toString() })
     }
 
-    private class InMemoryEventHubRepository : EventHubRepository {
-        private val states = linkedMapOf<String, PixelState>()
-        override fun getPixelState(name: String): PixelState? = states[name]
-        override fun getAllPixelStates(): List<PixelState> = states.values.toList()
-        override fun savePixelState(state: PixelState) {
-            states[state.pixelName] = state
-        }
-        override fun deletePixelState(name: String) {
-            states.remove(name)
-        }
-        override fun deleteAllPixelStates() = states.clear()
-    }
-
-    private class FakeCurrentTimeProvider : CurrentTimeProvider {
-        var time: Long = 0L
-        override fun currentTimeMillis(): Long = time
-        override fun elapsedRealtime(): Long = time
-        override fun localDateTimeNow(): java.time.LocalDateTime = java.time.LocalDateTime.now()
-    }
+    private data class RecordedPixel(val name: String, val values: Map<String, String>)
 
     private companion object {
         const val PERIOD_START = 1769385600000L // 2026-01-26T00:00:00Z
@@ -232,6 +206,16 @@ class EventHubDeduplicationSpecTest {
         val FIXTURE = """
             {
                 "telemetry": {
+                    "dedupProbe_immediate": {
+                        "state": "enabled",
+                        "trigger": { "type": "immediate_v2", "source": "probeDetected" },
+                        "parameters": { "reason": { "template": "data", "dataKey": "reason" } }
+                    },
+                    "dedupOther_immediate": {
+                        "state": "enabled",
+                        "trigger": { "type": "immediate_v2", "source": "otherDetected" },
+                        "parameters": { "reason": { "template": "data", "dataKey": "reason" } }
+                    },
                     "dedupProbe_day": {
                         "state": "enabled",
                         "trigger": { "period": { "days": 1 } },
