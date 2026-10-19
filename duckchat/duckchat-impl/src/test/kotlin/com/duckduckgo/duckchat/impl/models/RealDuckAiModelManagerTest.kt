@@ -197,6 +197,25 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
+    fun whenDuckAiUserDisabledWithModelsLoadedThenSubscriptionChangeRefetches() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(listOf(remoteModel("id", accessTier = listOf("free"), entityHasAccess = true))),
+        )
+        duckChatUserEnabledFlow.value = false
+
+        testee = createManager()
+        entitlementFlow.emit(emptySet())
+        testee.fetchModels()
+        verify(modelsService, times(1)).getModels(any(), anyOrNull(), anyOrNull())
+
+        subscriptionStatusFlow.value = SubscriptionStatus.AUTO_RENEWABLE
+
+        verify(modelsService, times(2)).getModels(any(), anyOrNull(), anyOrNull())
+    }
+
+    @Test
     fun whenFetchModelsThenModelsResolvedAndStateUpdated() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)

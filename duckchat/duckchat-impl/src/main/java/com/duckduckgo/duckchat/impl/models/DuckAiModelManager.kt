@@ -137,7 +137,7 @@ class RealDuckAiModelManager @Inject constructor(
             ) { entitlements, status, enabled -> Triple(entitlements, status, enabled) }
                 .distinctUntilChanged()
                 .collect { (_, _, enabled) ->
-                    if (!enabled) return@collect
+                    if (!enabled && _modelState.value.models.isEmpty()) return@collect
                     logcat { "Duck.ai Model Manager: subscription or Duck.ai state changed, re-fetching models" }
                     fetchModels()
                 }
