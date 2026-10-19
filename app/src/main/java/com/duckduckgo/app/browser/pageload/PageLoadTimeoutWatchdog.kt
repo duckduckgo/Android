@@ -137,6 +137,8 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
     private var committed = false
     private var pendingRedirectUrl: String? = null
     private var loadedUrl: String? = null
+    private var pageDisplayed = false
+    private var userInitiatedArm = false
     private var userInitiatedLoadPending = false
     private var timedOutAt = 0L
     private var backgrounded = false
@@ -146,7 +148,7 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
         when {
             !url.isWeb() -> disarm()
             !userInitiated && isLoaded(url) -> Unit
-            else -> arm(url, committed = false)
+            else -> arm(url, committed = false, userInitiated = userInitiated)
         }
     }
 
@@ -161,7 +163,7 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
                 this.url = url
                 pendingRedirectUrl = url
             }
-            state == State.IDLE -> arm(url, committed = false)
+            state == State.IDLE -> arm(url, committed = false, userInitiated = false)
             else -> Unit
         }
     }
@@ -175,7 +177,7 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
         when (state) {
             State.IDLE -> {
                 val userInitiated = consumeUserInitiatedLoad()
-                if (url.isWeb() && (userInitiated || !isLoaded(url))) arm(url, committed = true)
+                if (url.isWeb() && (userInitiated || !isLoaded(url))) arm(url, committed = true, userInitiated = userInitiated)
             }
             State.ARMED -> if (isCurrent(url)) {
                 this.url = url
@@ -204,8 +206,9 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
         if (state == State.ARMED) startWatching()
     }
 
-    private fun arm(url: String, committed: Boolean) {
+    private fun arm(url: String, committed: Boolean, userInitiated: Boolean) {
         loadedUrl = null
+        userInitiatedArm = userInitiated
         state = State.ARMED
         this.url = url
         this.committed = committed
@@ -232,6 +235,7 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
         }
         disarm()
         loadedUrl = url
+        pageDisplayed = true
     }
 
     private fun consumeUserInitiatedLoad(): Boolean = userInitiatedLoadPending.also { userInitiatedLoadPending = false }
@@ -258,6 +262,10 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
     }
 
     private fun timeOut() {
+        if (pageDisplayed && !committed && !userInitiatedArm) {
+            disarm()
+            return
+        }
         state = State.TIMED_OUT
         val phase = if (committed) Phase.COMMITTED_NO_CONTENT else Phase.NOT_COMMITTED
         timedOutAt = currentTimeProvider.elapsedRealtime()
