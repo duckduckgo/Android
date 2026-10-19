@@ -1218,6 +1218,12 @@ class BrowserTabFragment :
         }
 
         webViewContainer = binding.webViewContainer
+
+        // ViewPager2 throws an IllegalStateException when switching tabs if a page contains a ViewGroup
+        // whose LayoutTransition animates the parent hierarchy. Keep the layout animations but disable
+        // parent hierarchy animations. See https://github.com/duckduckgo/Android/issues/8144
+        binding.webViewAndOverlaysContainer.layoutTransition?.setAnimateParentHierarchy(false)
+
         configureObservers()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureWebView()
