@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+  <group>
+    <clip-path
+        android:pathData="M0,0h16v16h-16z"/>
+    <path
+        android:pathData="M8,0C8.865,0 9.756,0.288 10.51,1.017C10.991,1.482 11.798,1.969 12.925,2.329H12.926C13.657,2.563 14.414,2.801 14.974,3.318C15.574,3.873 15.873,4.663 15.958,5.805C16.079,7.441 16.018,9.447 14.632,11.683C13.781,13.054 12.523,14.125 11.304,14.851C10.106,15.565 8.853,15.999 7.984,15.999C7.114,15.999 5.87,15.564 4.679,14.85C3.468,14.123 2.218,13.053 1.368,11.684H1.367C-0.019,9.448 -0.079,7.44 0.042,5.805C0.126,4.663 0.425,3.873 1.025,3.318C1.585,2.801 2.343,2.563 3.074,2.329C4.2,1.969 5.009,1.482 5.49,1.017C6.243,0.288 7.135,0 8,0Z"
+        android:fillColor="@color/rb_green40"/>
+    <path
+        android:pathData="M10.748,5.52C10.988,5.273 11.384,5.267 11.631,5.508C11.879,5.749 11.884,6.145 11.643,6.392L7.549,10.596C7.312,10.84 6.922,10.849 6.674,10.616L4.377,8.464C4.125,8.228 4.113,7.833 4.349,7.581C4.585,7.329 4.98,7.316 5.232,7.552L7.081,9.285L10.748,5.52Z"
+        android:fillColor="#ffffff"/>
+  </group>
+</vector>

@@ -21,10 +21,15 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import androidx.core.text.HtmlCompat
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.*
 import com.duckduckgo.codegen.annotations.ContributesActivePlugin
 import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.common.ui.isRebrandAreaEnabled
+import com.duckduckgo.common.ui.view.InfoPanel
 import com.duckduckgo.common.ui.view.addBottomShadow
+import com.duckduckgo.common.ui.view.defaultSelectableItemBackground
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -59,6 +64,8 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : FrameLayout(context, attrs, defStyle) {
+    private val isRebrandEnabled = context.isRebrandAreaEnabled(CommonR.attr.daxRebrandInfoPanels)
+
     override fun getTag(): String = "AppTP"
 
     @Inject
@@ -77,6 +84,19 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
     private val conflatedJob = ConflatedJob()
 
     private val binding: FragmentDeviceShieldCtaBinding by viewBinding()
+
+    private val infoPanel by lazy {
+        InfoPanel(context).apply {
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
+                val margin = resources.getDimensionPixelSize(CommonR.dimen.keyline_4)
+                setMargins(margin, margin, margin, margin)
+            }
+            foreground = context.getDrawable(context.defaultSelectableItemBackground())
+            clipToOutline = true
+            setOnClickListener { binding.deviceShieldCtaLayout.performClick() }
+            this@AppTrackingProtectionStateView.addView(this)
+        }
+    }
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
@@ -107,15 +127,35 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
     }
 
     private fun renderViewState(viewState: ViewState) {
-        if (viewState.isFeatureEnabled) {
-            binding.root.show()
+        val showInfoPanel = isRebrandEnabled && (viewState.vpnState.state == ENABLED || viewState.vpnState.stopReason != REVOKED)
+        if (showInfoPanel) {
+            binding.root.isGone = true
+            infoPanel.isVisible = viewState.isFeatureEnabled
+            if (viewState.vpnState.state == ENABLED) {
+                renderStateEnabled(viewState)
+            } else {
+                renderStateDisabled()
+            }
+            infoPanel.setText(binding.deviceShieldCtaHeader.text)
+            infoPanel.setImageResource(
+                if (viewState.vpnState.state == ENABLED) {
+                    CommonR.drawable.shield_check_recolorable_16
+                } else {
+                    CommonR.drawable.exclamation_recolorable_invert_16
+                },
+            )
         } else {
-            binding.root.gone()
-        }
-        when {
-            viewState.vpnState.state == ENABLED -> renderStateEnabled(viewState)
-            viewState.vpnState.stopReason == REVOKED -> renderStateRevoked()
-            else -> renderStateDisabled()
+            if (isRebrandEnabled) infoPanel.isGone = true
+            if (viewState.isFeatureEnabled) {
+                binding.root.show()
+            } else {
+                binding.root.gone()
+            }
+            when {
+                viewState.vpnState.state == ENABLED -> renderStateEnabled(viewState)
+                viewState.vpnState.stopReason == REVOKED -> renderStateRevoked()
+                else -> renderStateDisabled()
+            }
         }
     }
 
