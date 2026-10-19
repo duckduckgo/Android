@@ -33,6 +33,7 @@ import com.duckduckgo.app.tabs.model.TabAtomicOperations
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.FireMode
 import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.CurrentTimeProvider
@@ -101,6 +102,7 @@ abstract class TabRepositoryModule {
             nativeInputStatePublisher = nativeInputStatePublisher,
             duckAiTabSessionRepository = duckAiTabSessionRepository,
             pageTitleFetcher = pageTitleFetcher,
+            browserMode = BrowserMode.REGULAR,
         )
 
         @Provides
@@ -140,6 +142,7 @@ abstract class TabRepositoryModule {
             nativeInputStatePublisher = nativeInputStatePublisher,
             duckAiTabSessionRepository = duckAiTabSessionRepository,
             pageTitleFetcher = pageTitleFetcher,
+            browserMode = BrowserMode.FIRE,
         )
     }
 }
