@@ -2460,6 +2460,44 @@ class BrowserWebViewClientTest {
     }
 
     @Test
+    fun whenMainFrameRequestIsSecPurposePrefetchThenWatchdogIsNotTold() {
+        assertSpeculativeMainFrameRequestIsIgnored("Sec-Purpose" to "prefetch")
+    }
+
+    @Test
+    fun whenMainFrameRequestIsSecPurposePrefetchPrerenderThenWatchdogIsNotTold() {
+        assertSpeculativeMainFrameRequestIsIgnored("sec-purpose" to "Prefetch;prerender")
+    }
+
+    @Test
+    fun whenMainFrameRequestIsLegacyPurposePrefetchThenWatchdogIsNotTold() {
+        assertSpeculativeMainFrameRequestIsIgnored("Purpose" to "prefetch")
+    }
+
+    @Test
+    fun whenMainFrameRequestHasUnrelatedHeadersThenWatchdogIsToldTheRequestedUrl() {
+        whenever(webResourceRequest.method).thenReturn("GET")
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.requestHeaders).thenReturn(mapOf("Accept" to "text/html"))
+
+        testee.shouldInterceptRequest(webView, webResourceRequest)
+
+        verify(mockPageLoadTimeoutWatchdog).onMainFrameRequest(EXAMPLE_URL)
+    }
+
+    private fun assertSpeculativeMainFrameRequestIsIgnored(header: Pair<String, String>) {
+        whenever(webResourceRequest.method).thenReturn("GET")
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.requestHeaders).thenReturn(mapOf(header))
+
+        testee.shouldInterceptRequest(webView, webResourceRequest)
+
+        verify(mockPageLoadTimeoutWatchdog, never()).onMainFrameRequest(any())
+    }
+
+    @Test
     fun whenSubFrameRequestIsInterceptedThenWatchdogIsNotTold() {
         whenever(webResourceRequest.method).thenReturn("GET")
         whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())

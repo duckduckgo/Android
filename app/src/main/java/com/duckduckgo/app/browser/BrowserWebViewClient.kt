@@ -909,7 +909,7 @@ class BrowserWebViewClient @Inject constructor(
                     loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
                 }
                 // The request waits here, so this always runs before the load can commit.
-                if (request.isForMainFrame && pageLoadFeature.pageLoadTimeoutWatchdog().isEnabled()) {
+                if (request.isForMainFrame && !request.isSpeculativeLoad() && pageLoadFeature.pageLoadTimeoutWatchdog().isEnabled()) {
                     pageLoadTimeoutWatchdog.onMainFrameRequest(request.url.toString())
                 }
                 webView.url
@@ -922,6 +922,20 @@ class BrowserWebViewClient @Inject constructor(
                 webViewClientListener,
             )
         }
+
+    // Speculative loads (prefetch/prerender) never commit, so they must not arm the page-load watchdog.
+    private fun WebResourceRequest.isSpeculativeLoad(): Boolean {
+        val headers = requestHeaders ?: return false
+        return headers.any { (name, value) ->
+            val purpose = value.trim()
+            when {
+                name.equals("Sec-Purpose", ignoreCase = true) ->
+                    purpose.startsWith("prefetch", ignoreCase = true) || purpose.startsWith("prerender", ignoreCase = true)
+                name.equals("Purpose", ignoreCase = true) -> purpose.equals("prefetch", ignoreCase = true)
+                else -> false
+            }
+        }
+    }
 
     override fun onRenderProcessGone(
         view: WebView?,
