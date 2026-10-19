@@ -467,7 +467,10 @@ class TabDataRepositoryTest {
 
     @Test
     fun whenTabDeletedThenTabAndDataCleared() = runTest {
-        val testee = tabDataRepository()
+        val testee = tabDataRepository(
+            webViewPreviewPersister = mockWebViewPreviewPersister,
+            faviconManager = mockFaviconManager,
+        )
         val addedTabId = testee.add()
         val siteData = testee.retrieveSiteData(addedTabId)
 
@@ -475,7 +478,7 @@ class TabDataRepositoryTest {
 
         verify(mockDao).deleteTabAndUpdateSelection(any())
         assertNotSame(siteData, testee.retrieveSiteData(addedTabId))
-        verify(mockTabVisitedSitesRepository).clearTab(addedTabId)
+        verifyDeletedTabCleanup(addedTabId)
     }
 
     @Test
@@ -741,6 +744,45 @@ class TabDataRepositoryTest {
         currentSelectedTabId = testee.liveSelectedTab.blockingObserve()?.tabId
         assertEquals(currentSelectedTabId, sourceTab.tabId)
         verify(mockTabVisitedSitesRepository).clearTab("tabToDeleteId")
+    }
+
+    @Test
+    fun whenDeleteTabAndSelectSourceThenDeletedTabDataClearedAndSourceUntouched() = runTest {
+        val db = createDatabase()
+        val dao = db.tabsDao()
+        dao.addAndSelectTab(TabEntity(tabId = "sourceId", url = "https://example.com", position = 0))
+        dao.addAndSelectTab(TabEntity(tabId = "tabToDeleteId", url = "https://example.com", position = 1, sourceTabId = "sourceId"))
+        val testee = tabDataRepository(
+            dao = dao,
+            webViewPreviewPersister = mockWebViewPreviewPersister,
+            faviconManager = mockFaviconManager,
+        )
+
+        testee.deleteTabAndSelectSource("tabToDeleteId")
+
+        assertEquals("sourceId", testee.liveSelectedTab.blockingObserve()?.tabId)
+        verifyDeletedTabCleanup("tabToDeleteId")
+        verifyNoDeletedTabCleanup("sourceId")
+        db.close()
+    }
+
+    @Test
+    fun whenDeleteTabAndSelectSourceWithUnknownTabThenNoTabDataCleared() = runTest {
+        val db = createDatabase()
+        val testee = tabDataRepository(
+            dao = db.tabsDao(),
+            webViewPreviewPersister = mockWebViewPreviewPersister,
+            faviconManager = mockFaviconManager,
+        )
+
+        testee.deleteTabAndSelectSource("unknown")
+
+        verify(mockWebViewSessionStorage, never()).deleteSession(any())
+        verify(mockAdClickManager, never()).clearTabId(any())
+        verify(mockWebViewPreviewPersister, never()).deletePreviewsForTab(any(), anyOrNull())
+        verify(mockFaviconManager, never()).deleteOldTempFavicon(any(), anyOrNull())
+        verify(mockDuckChatContextualDataStore, never()).clearTab(any())
+        db.close()
     }
 
     @Test
@@ -1209,6 +1251,16 @@ class TabDataRepositoryTest {
             .thenReturn(MutableLiveData())
 
         return mockDao
+    }
+
+    private suspend fun verifyDeletedTabCleanup(tabId: String) {
+        verify(mockWebViewSessionStorage).deleteSession(tabId)
+        verify(mockAdClickManager).clearTabId(tabId)
+        verify(mockWebViewPreviewPersister).deletePreviewsForTab(tabId, null)
+        verify(mockFaviconManager).deleteOldTempFavicon(tabId, null)
+        verify(mockDuckChatContextualDataStore).clearTab(tabId)
+        verify(mockTabVisitedSitesRepository).clearTab(tabId)
+        verify(mockNativeInputStatePublisher).clearTab(tabId)
     }
 
     private suspend fun verifyNoDeletedTabCleanup(tabId: String) {

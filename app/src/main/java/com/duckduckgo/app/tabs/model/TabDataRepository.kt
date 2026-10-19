@@ -370,12 +370,9 @@ class TabDataRepository(
 
     override suspend fun delete(tab: TabEntity) {
         databaseExecutor().scheduleDirect {
-            deleteOldPreviewImages(tab.tabId)
-            deleteOldFavicon(tab.tabId)
             tabsDao.deleteTabAndUpdateSelection(tab)
-            lastUpdatedTabState.remove(tab.tabId)
+            clearAllSiteData(listOf(tab.tabId))
         }
-        siteData.remove(tab.tabId)
         tabVisitedSitesRepository.clearTab(tab.tabId)
         nativeInputStatePublisher.clearTab(tab.tabId)
     }
@@ -478,15 +475,13 @@ class TabDataRepository(
         databaseExecutor().scheduleDirect {
             val tabToDelete = tabsDao.tab(tabId) ?: return@scheduleDirect
 
-            deleteOldPreviewImages(tabToDelete.tabId)
             val tabToSelect = tabToDelete.sourceTabId
                 .takeUnless { it.isNullOrBlank() }
                 ?.let {
                     tabsDao.tab(it)
                 }
             tabsDao.deleteTabAndUpdateSelection(tabToDelete, tabToSelect)
-            siteData.remove(tabToDelete.tabId)
-            lastUpdatedTabState.remove(tabToDelete.tabId)
+            clearAllSiteData(listOf(tabToDelete.tabId))
 
             tabToSelect?.let {
                 appCoroutineScope.launch(dispatchers.io()) {
