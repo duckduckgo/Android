@@ -267,6 +267,40 @@ class DuckAiResponseWaitWideEventTest {
     }
 
     @Test
+    fun `when error arrives before the new prompt's stream then flow finishes watched with response_result error`() = runTest {
+        promptInChat(streamStarted = false)
+
+        testee.onResponseState("t1", "error")
+        idle()
+
+        verify(wideEventClient).flowFinish(
+            eq(1L),
+            eq(FlowStatus.Success),
+            eq(mapOf("status_reason" to "watched", "response_result" to "error")),
+        )
+    }
+
+    @Test
+    fun `when outside-chat prompt streams before its page is visible then ready finishes watched`() = runTest {
+        testee.onSelectedTabChanged("t1", OTHER_URL)
+        testee.onNativePromptSubmitted("t1", "low", null)
+        idle()
+
+        testee.onResponseState("t1", "start_stream:new_prompt")
+        testee.onResponseState("t1", "streaming")
+        idle()
+        onChat("t1", "A")
+        testee.onResponseState("t1", "ready")
+        idle()
+
+        verify(wideEventClient).flowFinish(
+            eq(1L),
+            eq(FlowStatus.Success),
+            eq(mapOf("status_reason" to "watched", "response_result" to "ready")),
+        )
+    }
+
+    @Test
     fun `when only an idle ready arrives before leaving then the flow records left`() = runTest {
         promptInChat(streamStarted = false)
 

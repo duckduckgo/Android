@@ -345,8 +345,9 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
     }
 
     private suspend fun applyResponseState(tabId: String, status: String) {
+        // The off-screen match also covers an outside-chat prompt whose page streams before the tab reports it as visible.
         val flow = flows.firstOrNull { it.onScreen && it.tabId == tabId }
-            ?: flows.firstOrNull { it.tabId == tabId && it.left && !it.onScreen && !it.chatSwitchedAway }
+            ?: flows.firstOrNull { it.tabId == tabId && !it.onScreen && !it.chatSwitchedAway }
             ?: return
 
         when {
@@ -362,7 +363,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
                 return
             }
             status == STATUS_READY || status == STATUS_ERROR -> {
-                if (flow.awaitingFirstStream) return
+                if (flow.awaitingFirstStream && status == STATUS_READY) return
                 flow.lastState = status
                 // The reloaded page reports ready even for a response that failed before the process died.
                 val keepsError = flow.awaitingReloadedStream && flow.result == RESULT_ERROR && status == STATUS_READY
@@ -448,6 +449,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         var tabId: String,
         var chatId: String?,
         // A page loading for an outside-chat prompt reports an idle ready before the prompt's stream starts.
+        // An error is still accepted, since a request can fail before any stream starts.
         var awaitingFirstStream: Boolean = false,
     ) {
         var onScreen = false
