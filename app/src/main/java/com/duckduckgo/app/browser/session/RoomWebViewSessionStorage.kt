@@ -20,12 +20,9 @@ import android.os.Bundle
 import android.os.Parcel
 import android.webkit.WebView
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -33,12 +30,10 @@ import logcat.LogPriority.INFO
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
-import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
-class RoomWebViewSessionStorage @Inject constructor(
+class RoomWebViewSessionStorage(
     private val dao: WebViewSessionDao,
-    @AppCoroutineScope private val appScope: CoroutineScope,
+    private val appScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
 ) : WebViewSessionStorage {

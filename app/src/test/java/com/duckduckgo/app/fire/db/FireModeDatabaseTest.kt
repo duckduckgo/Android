@@ -16,13 +16,18 @@
 
 package com.duckduckgo.app.fire.db
 
+import android.database.sqlite.SQLiteConstraintException
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.browser.session.WebViewSessionEntity
 import com.duckduckgo.app.tabs.model.TabEntity
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -58,5 +63,33 @@ class FireModeDatabaseTest {
         assertEquals("tab-1", result!!.tabId)
         assertEquals("https://duckduckgo.com", result.url)
         assertEquals("DuckDuckGo", result.title)
+    }
+
+    @Test
+    fun whenSessionUpsertedForFireTabThenItCanBeReadBack() = runTest {
+        database.tabsDao().insertTab(TabEntity(tabId = "fire-tab", position = 0))
+
+        database.webViewSessionDao().upsert(WebViewSessionEntity("fire-tab", byteArrayOf(1, 2), savedAt = 1000L))
+
+        assertNotNull(database.webViewSessionDao().get("fire-tab"))
+    }
+
+    @Test
+    fun whenAllTabsDeletedThenSessionsAreCascadeDeleted() = runTest {
+        database.tabsDao().insertTab(TabEntity(tabId = "fire-tab", position = 0))
+        database.webViewSessionDao().upsert(WebViewSessionEntity("fire-tab", byteArrayOf(1), savedAt = 1000L))
+
+        database.tabsDao().deleteAllTabs()
+
+        assertNull(database.webViewSessionDao().get("fire-tab"))
+    }
+
+    @Test
+    fun whenSessionUpsertedForTabNotInFireDatabaseThenForeignKeyFails() = runTest {
+        val result = runCatching {
+            database.webViewSessionDao().upsert(WebViewSessionEntity("unknown-tab", byteArrayOf(1), savedAt = 1000L))
+        }
+
+        assertTrue(result.exceptionOrNull() is SQLiteConstraintException)
     }
 }
