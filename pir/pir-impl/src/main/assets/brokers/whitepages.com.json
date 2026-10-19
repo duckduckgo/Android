@@ -1,0 +1,118 @@
+{
+  "name": "Whitepages",
+  "url": "whitepages.com",
+  "version": "0.3.0",
+  "parent": "411.com",
+  "addedDatetime": 1791577487114,
+  "optOutUrl": "https://whitepagesprivacy.zendesk.com/hc/en-us/requests/new?ticket_form_id=360002296993",
+  "_comment": "The scan uses the homepage form because direct /name/ URLs are blocked.",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "526550b3-4b60-495b-8297-f69fa6fe7949",
+          "url": "https://www.whitepages.com/"
+        },
+        {
+          "actionType": "expectation",
+          "id": "ab1ba18e-337a-4a8c-a6cd-60d5cea2198a",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#search-name"
+            }
+          ]
+        },
+        {
+          "actionType": "executeScript",
+          "id": "5b0b51ea-c6ca-44e6-a74e-6361ab5b3b88",
+          "_comment": "The form has a single name field.",
+          "script": "var el = root.querySelector('#search-name'); if (el) { el.value = userProfile.firstName + ' ' + userProfile.lastName; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); }"
+        },
+        {
+          "actionType": "fillForm",
+          "id": "2f9c83d9-4bbc-4d2c-9d43-23fce0bce21f",
+          "dataSource": "userProfile",
+          "selector": "//form[.//input[@id='search-name']]",
+          "elements": [
+            {
+              "type": "state",
+              "selector": "#search-location"
+            }
+          ]
+        },
+        {
+          "actionType": "click",
+          "id": "99e178d3-7c3b-4ab8-a14b-369821c96488",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#wp-search"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "243eb710-e9e9-4efc-9c33-4facc12de78f",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//li[@data-qa-selector='organic-card'] | //div[@class='title-no-results']"
+            }
+          ]
+        },
+        {
+          "actionType": "executeScript",
+          "id": "5a6c2b9b-5f22-46e9-b63f-fad1f3fe11d3",
+          "_comment": "Age bands such as '50s' only match within a year of their start, so a band that fits the user's age is replaced with it.",
+          "script": "var a = parseInt(userProfile.age, 10); function fit(t) { var m = /^(\\d+)(s|\\+)$/.exec((t || '').trim()); if (!m || isNaN(a)) return null; var lo = +m[1], hi = m[2] === '+' ? 1e9 : lo + 9; return a >= lo - 1 && a <= hi + 1 ? String(a) : null; } root.querySelectorAll(\"li.serp-card dd.person-age\").forEach(function (e) { var v = fit(e.textContent); if (v) e.textContent = v; });"
+        },
+        {
+          "actionType": "extract",
+          "id": "19816805-e6e1-47c7-aae2-cbd619177735",
+          "_comment": "Promoted 'speedbump' cards are skipped.",
+          "selector": "li.serp-card[data-qa-selector='organic-card']",
+          "noResultsSelector": "//div[@class='title-no-results']",
+          "profile": {
+            "name": {
+              "selector": "[data-qa-selector='organic-card-person-name']"
+            },
+            "age": {
+              "selector": "dd.person-age"
+            },
+            "addressCityState": {
+              "selector": "[data-qa-selector='serp-city-label']"
+            },
+            "addressCityStateList": {
+              "selector": "dd.locations-list li",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": "dd.family-list li",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": "[data-qa-selector='organic-card-person-name']"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "_comment": "Opt-out removal is manual and takes about three days.",
+    "retryError": 48,
+    "confirmOptOutScan": 168,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}
