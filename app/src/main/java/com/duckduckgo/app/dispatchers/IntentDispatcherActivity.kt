@@ -124,13 +124,16 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
             ),
         )
 
-        if (launchMode == CustomTabLaunchMode.DOCUMENT_TASK_HIDE_BROWSER_TASK) {
-            // After startActivity, because launching from the background is restricted.
-            moveTaskToBack(true)
+        when (launchMode) {
+            // Otherwise the dispatcher's own task stays in Recents as an empty card.
+            CustomTabLaunchMode.DOCUMENT_TASK -> finishAndRemoveTask()
+            CustomTabLaunchMode.DOCUMENT_TASK_HIDE_BROWSER_TASK -> {
+                // After startActivity, because launching from the background is restricted.
+                moveTaskToBack(true)
+                finish()
+            }
+            else -> finish()
         }
-
-        // Otherwise the dispatcher's own task stays in Recents as an empty card.
-        if (launchMode == CustomTabLaunchMode.DOCUMENT_TASK) finishAndRemoveTask() else finish()
     }
 
     private fun showBrowserActivity(intentText: String?, isExternal: Boolean) {
