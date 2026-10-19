@@ -53,7 +53,7 @@ class UrlFileDownloaderTest {
     @Before
     fun setup() {
         realFileDownloadManager = RealUrlFileDownloadCallManager()
-        whenever(downloadFileService.downloadFile(anyOrNull(), anyString())).thenReturn(call)
+        whenever(downloadFileService.downloadFile(anyOrNull(), anyOrNull(), anyString())).thenReturn(call)
 
         urlFileDownloader = UrlFileDownloader(
             downloadFileService,
@@ -187,7 +187,7 @@ class UrlFileDownloaderTest {
         val pendingFileDownload = buildPendingDownload("https://example.com/file.txt")
         urlFileDownloader.downloadFile(pendingFileDownload, "file.txt", mock<DownloadCallback>())
 
-        verify(downloadFileService).downloadFile(cookie = eq(null), urlString = any())
+        verify(downloadFileService).downloadFile(cookie = eq(null), referer = anyOrNull(), urlString = any())
     }
 
     @Test
@@ -197,7 +197,7 @@ class UrlFileDownloaderTest {
         val pendingFileDownload = buildPendingDownload("https://example.com/file.txt")
         urlFileDownloader.downloadFile(pendingFileDownload, "file.txt", mock<DownloadCallback>())
 
-        verify(downloadFileService).downloadFile(cookie = eq(""), urlString = any())
+        verify(downloadFileService).downloadFile(cookie = eq(""), referer = anyOrNull(), urlString = any())
     }
 
     @Test
@@ -214,7 +214,7 @@ class UrlFileDownloaderTest {
         val pendingFileDownload = buildPendingDownload("https://example.com/file.txt")
         urlFileDownloader.downloadFile(pendingFileDownload, "file.txt", mock<DownloadCallback>())
 
-        verify(downloadFileService).downloadFile(cookie = eq("session=abc123; token=xyz"), urlString = any())
+        verify(downloadFileService).downloadFile(cookie = eq("session=abc123; token=xyz"), referer = anyOrNull(), urlString = any())
     }
 
     @Test
@@ -231,13 +231,44 @@ class UrlFileDownloaderTest {
         val pendingFileDownload = buildPendingDownload("https://example.com/file.txt")
         urlFileDownloader.downloadFile(pendingFileDownload, "file.txt", mock<DownloadCallback>())
 
-        verify(downloadFileService).downloadFile(cookie = eq("session=abc123; token=xyz"), urlString = any())
+        verify(downloadFileService).downloadFile(cookie = eq("session=abc123; token=xyz"), referer = anyOrNull(), urlString = any())
+    }
+
+    @Test
+    fun whenSameOriginRefererProvidedThenFullPageUrlSentAsRefererHeader() = runTest {
+        val pendingFileDownload = buildPendingDownload(
+            url = "https://example.com/files/image.jpg",
+            referer = "https://example.com/gallery/page#section",
+        )
+        urlFileDownloader.downloadFile(pendingFileDownload, "image.jpg", mock<DownloadCallback>())
+
+        verify(downloadFileService).downloadFile(anyOrNull(), referer = eq("https://example.com/gallery/page"), urlString = any())
+    }
+
+    @Test
+    fun whenCrossOriginRefererProvidedThenOnlyOriginSentAsRefererHeader() = runTest {
+        val pendingFileDownload = buildPendingDownload(
+            url = "https://cdn.other.com/image.jpg",
+            referer = "https://example.com/gallery/private-page",
+        )
+        urlFileDownloader.downloadFile(pendingFileDownload, "image.jpg", mock<DownloadCallback>())
+
+        verify(downloadFileService).downloadFile(anyOrNull(), referer = eq("https://example.com/"), urlString = any())
+    }
+
+    @Test
+    fun whenNoRefererProvidedThenRefererHeaderOmitted() = runTest {
+        val pendingFileDownload = buildPendingDownload("https://example.com/file.txt")
+        urlFileDownloader.downloadFile(pendingFileDownload, "file.txt", mock<DownloadCallback>())
+
+        verify(downloadFileService).downloadFile(anyOrNull(), referer = eq(null), urlString = any())
     }
 
     private fun buildPendingDownload(
         url: String,
         contentDisposition: String? = null,
         mimeType: String? = null,
+        referer: String? = null,
     ): FileDownloader.PendingFileDownload {
         return FileDownloader.PendingFileDownload(
             url = url,
@@ -246,6 +277,7 @@ class UrlFileDownloaderTest {
             subfolder = "folder",
             directory = File("directory"),
             browserMode = BrowserMode.REGULAR,
+            referer = referer,
         )
     }
 
