@@ -16,13 +16,16 @@
 
 package com.duckduckgo.app.global.view
 
+import android.app.ActivityManager
 import android.content.Context
 import android.webkit.WebStorage
 import android.webkit.WebView
+import androidx.core.content.getSystemService
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DeleteBrowsingData
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
+import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.SiteDataCleaner
@@ -138,8 +141,16 @@ class ClearPersonalDataAction(
     override suspend fun clearTabsOnly() {
         withContext(dispatchers.io()) {
             tabRepository.deleteAll()
+            closeCustomTabTasks()
             logcat { "Finished clearing tabs" }
         }
+    }
+
+    // Custom tabs in their own Recents card live outside the browser task, so clearing tabs doesn't reach them.
+    private fun closeCustomTabTasks() {
+        context.getSystemService<ActivityManager>()?.appTasks
+            ?.filter { it.taskInfo.baseIntent.component?.className == CustomTabActivity::class.java.name }
+            ?.forEach { it.finishAndRemoveTask() }
     }
 
     override suspend fun clearBrowserDataOnly(shouldFireDataClearPixel: Boolean) {
