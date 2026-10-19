@@ -1,0 +1,170 @@
+{
+  "name": "FloridaParcels",
+  "url": "floridaparcels.com",
+  "version": "0.1.0",
+  "addedDatetime": 1791331200000,
+  "optOutUrl": "https://floridaparcels.com/redaction/",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "_comment": "Florida voter registration search. Names are indexed last name first. The page lists at most 100 rows, the rest are paginated and not scanned.",
+          "actionType": "navigate",
+          "url": "https://floridaparcels.com/search/voter/name/?n=${lastName|upcase}+${firstName|upcase}",
+          "id": "efd9f6cd-61a7-44be-8f68-33892dd44756"
+        },
+        {
+          "_comment": "The results table renders on a hit and on a miss; a miss has no data rows.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//table[@id='voter_results']"
+            }
+          ],
+          "id": "af224065-160c-4cfa-a67c-3c5f455a1433"
+        },
+        {
+          "_comment": "Rows read 'LAST FIRST MIDDLE' and 'STREET CITY ZIP' with no comma or state, which C-S-S cannot match. Reorder the name to first-last using the user's last name, and add the comma and FL before the zip using the user's own cities so multi-word cities split correctly.",
+          "actionType": "executeScript",
+          "script": "var last=((userProfile&&userProfile.lastName)||'').toUpperCase().trim();var cities=[];((userProfile&&userProfile.addresses)||[]).forEach(function(a){if(a&&a.city)cities.push(a.city.toUpperCase().trim());});if(userProfile&&userProfile.city)cities.push(userProfile.city.toUpperCase().trim());root.querySelectorAll('#voter_results tr[data-county]').forEach(function(tr){var n=tr.cells[1]&&(tr.cells[1].querySelector('a')||tr.cells[1]);var a=tr.cells[2];if(!n||!a)return;var t=n.textContent.trim().replace(/\\s+/g,' ');var sfx='';var sm=t.match(/ (JR|SR|II|III|IV|V)$/);if(sm){sfx=sm[0];t=t.slice(0,-sfx.length);}if(last&&t.toUpperCase().indexOf(last+' ')===0){n.textContent=t.slice(last.length+1)+' '+t.slice(0,last.length)+sfx;}else{var i=t.indexOf(' ');if(i>0)n.textContent=t.slice(i+1)+' '+t.slice(0,i)+sfx;}var s=a.textContent.trim().replace(/\\s+/g,' ');var m=s.match(/^(.*?)\\s+(\\d{5})(\\d{4})?$/);if(!m)return;var body=m[1],up=body.toUpperCase();for(var k=0;k<cities.length;k++){var c=cities[k];if(c&&up.length>c.length+1&&up.slice(-c.length-1)===' '+c){a.textContent=body.slice(0,body.length-c.length-1)+', '+body.slice(-c.length)+', FL '+m[2];return;}}a.textContent=body+', FL '+m[2];});",
+          "id": "ec08570b-ac0a-42e0-93b5-0af6ca2de7f8"
+        },
+        {
+          "actionType": "extract",
+          "selector": "//table[@id='voter_results']//tr[@data-county]",
+          "noResultsSelector": "//table[@id='voter_results'][not(.//tr[@data-county])]",
+          "profile": {
+            "name": {
+              "selector": ".//td[2]"
+            },
+            "age": {
+              "selector": ".//td[5]"
+            },
+            "addressFull": {
+              "selector": ".//td[3]"
+            },
+            "profileUrl": {
+              "selector": ".//td[2]//a",
+              "identifierType": "path",
+              "identifier": "https://floridaparcels.com/search/voter/id/${county}/${id}"
+            }
+          },
+          "id": "6b26b2dd-73de-4a2e-b6b8-f77734d80e8d"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://floridaparcels.com/redaction/",
+          "id": "ad377858-d95d-4fac-8bae-9220151001a0"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//form[@name='redaction']//input[@id='request_page']"
+            }
+          ],
+          "id": "993dfd2e-0387-4b5a-9c37-97081bb47862"
+        },
+        {
+          "_comment": "Redaction is per page and needs a valid email address.",
+          "actionType": "generateEmail",
+          "id": "35b0b8ef-0251-49ba-a454-f9e32502d780"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": "//form[@name='redaction']",
+          "dataSource": "fetchedEmail",
+          "elements": [
+            {
+              "type": "email",
+              "selector": ".//input[@id='request_email']"
+            }
+          ],
+          "id": "26c229bd-bcab-4c59-8b75-5b7f778b6252"
+        },
+        {
+          "_comment": "The page URL must be the voter page itself. Its change handler fetches it and only then can the submit button enable.",
+          "actionType": "fillForm",
+          "selector": "//form[@name='redaction']",
+          "dataSource": "extractedProfile",
+          "elements": [
+            {
+              "type": "profileUrl",
+              "selector": ".//input[@id='request_page']"
+            },
+            {
+              "type": "fullName",
+              "selector": ".//input[@id='request_name']"
+            }
+          ],
+          "id": "ac0308e3-56e5-4cde-980b-92c4ec5dcc74"
+        },
+        {
+          "_comment": "No fillForm type carries free text, so set the reason directly.",
+          "actionType": "executeScript",
+          "script": "var r=root.getElementById('request_reason');if(r){r.value='Personal privacy. Please remove my name and address from this page.';r.dispatchEvent(new Event('input',{bubbles:true}));r.dispatchEvent(new Event('change',{bubbles:true}));}",
+          "id": "e5fce39f-5d21-47d6-9807-5b2ad0dc30ff"
+        },
+        {
+          "_comment": "Ticking the box re-runs validation, which enables submit once the page URL has resolved.",
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "checkbox",
+              "selector": "//input[@id='request_confirm']"
+            }
+          ],
+          "id": "84311585-980c-43c7-af36-0438c8f6a35a"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//button[@id='form_submit_btn' and not(@disabled)]"
+            }
+          ],
+          "id": "5cbaa910-31ae-45c2-b897-73130686a2e8"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//button[@id='form_submit_btn']"
+            }
+          ],
+          "id": "29a5936f-73d1-4846-af2c-621b95e5452d"
+        },
+        {
+          "_comment": "Shown after a successful submission, with the request summary. Approval is manual and takes up to 72 hours.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h1[contains(., 'Redaction Submission')]"
+            }
+          ],
+          "id": "9bfe4c9d-ecef-4b52-a76f-66570191a5bc"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

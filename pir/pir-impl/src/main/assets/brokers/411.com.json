@@ -1,0 +1,161 @@
+{
+  "name": "411",
+  "url": "411.com",
+  "version": "0.4.0",
+  "addedDatetime": 1790716560795,
+  "optOutUrl": "https://whitepagesprivacy.zendesk.com/hc/en-us/requests/new?ticket_form_id=360002296993",
+  "_comment": "The opt-out also removes the record from peoplesearch.com and whitepages.com.",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "e1d21ece-6be2-4249-a985-3044010f462b",
+          "url": "https://www.411.com/person-search/${firstName}-${lastName}/${state|upcase}"
+        },
+        {
+          "actionType": "expectation",
+          "id": "5c69005b-a725-4559-8571-ae4ca0feb177",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h2[contains(concat(' ', normalize-space(@class), ' '), ' font-semibold ') and contains(@class, 'md:text-xl')] | //h1[normalize-space(.)='Sorry!'] | //p[normalize-space(.)='Page not found.']"
+            }
+          ]
+        },
+        {
+          "actionType": "executeScript",
+          "id": "be8dbab3-31c4-4c94-82a6-2f7e39571539",
+          "_comment": "Age bands such as '50s' only match within a year of their start, so a band that fits the user's age is replaced with it.",
+          "script": "var a = parseInt(userProfile.age, 10); function fit(t) { var m = /^(\\d+)(s|\\+)$/.exec((t || '').trim()); if (!m || isNaN(a)) return null; var lo = +m[1], hi = m[2] === '+' ? 1e9 : lo + 9; return a >= lo - 1 && a <= hi + 1 ? String(a) : null; } root.querySelectorAll('span.text-center').forEach(function (e) { if (e.className !== 'text-center') return; var v = fit(e.textContent); if (v) e.textContent = v; });"
+        },
+        {
+          "actionType": "extract",
+          "id": "94583cae-1d4d-4040-8fe0-25a56a99defb",
+          "selector": ".shadow-md.hover\\:shadow-lg.rounded.bg-white.mb-3",
+          "noResultsSelector": "//h1[normalize-space(.)='Sorry!'] | //p[normalize-space(.)='Page not found.']",
+          "_comment": "Selectors use classes shared by both card layouts. Only the first cards carry data-name.",
+          "profile": {
+            "name": {
+              "selector": ".//h2[contains(concat(' ', normalize-space(@class), ' '), ' font-semibold ') and contains(@class, 'md:text-xl')]"
+            },
+            "age": {
+              "selector": ".//span[@class='text-center']"
+            },
+            "addressCityState": {
+              "selector": ".//h3[contains(concat(' ', normalize-space(@class), ' '), ' font-medium ') and contains(@class, 'text-ellipsis')]"
+            },
+            "addressCityStateList": {
+              "selector": ".//*[@data-name='historicallocations'] | .//span[normalize-space(text())='Other addresses']/following-sibling::div[1]"
+            },
+            "relativesList": {
+              "selector": ".//*[@data-name='relatives'] | .//span[normalize-space(text())='Family']/following-sibling::div[1]"
+            },
+            "profileUrl": {
+              "selector": ".//a[contains(@href, '/person/')] | .//a[contains(@href, 'wpId=')]",
+              "identifierType": "param",
+              "identifier": "wpId"
+            },
+            "_comment_profileUrl": "Detailed cards are identified by wpId. Compact cards have no wpId, so their /person/ link is the identifier."
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "fa43a975-48db-4bff-9d41-4bb8813be21a",
+          "url": "https://whitepagesprivacy.zendesk.com/hc/en-us/requests/new?ticket_form_id=360002296993"
+        },
+        {
+          "actionType": "expectation",
+          "id": "29b5d289-3a15-4c27-a427-639c63cb931c",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#request_subject"
+            }
+          ]
+        },
+        {
+          "actionType": "generateEmail",
+          "id": "739c6034-4f3e-4060-97b7-eeb0942c6ac6"
+        },
+        {
+          "actionType": "fillForm",
+          "id": "6d394a80-16b3-44de-9821-93f2ffdcb10e",
+          "dataSource": "fetchedEmail",
+          "selector": "#new_request",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "#request_anonymous_requester_email"
+            }
+          ]
+        },
+        {
+          "actionType": "executeScript",
+          "id": "86d47f6f-d4af-4ce3-bc70-69c40212046e",
+          "_comment": "The state field is a hidden input behind a custom dropdown. Unlisted states use wpp_other.",
+          "script": "var stateMap = {CA:'wpp_ca',CO:'wpp_co',CT:'wpp_ct',DE:'wpp_de',IA:'wpp_ia',IN:'wpp_in',KY:'wpp_ky',MD:'wpp_md',MN:'wpp_mn',MO:'wpp_mo',MT:'wpp_mt',NE:'wpp_ne',NH:'wpp_nh',NJ:'wpp_nj',OR:'wpp_or',RI:'wpp_ri',TN:'wpp_tn',TX:'wpp_tx',UT:'wpp_ut',VA:'wpp_va',WV:'wpp_wv'}; var value = stateMap[(userProfile.state||'').toUpperCase()] || 'wpp_other'; var el = root.querySelector('#request_custom_fields_16751491592475'); if (el) { el.value = value; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); }"
+        },
+        {
+          "actionType": "executeScript",
+          "id": "4c22b87f-3a82-4577-a3c3-300d2ef3c941",
+          "script": "var el = root.querySelector('#request_subject'); if (el) { el.value = 'Consumer privacy request: remove my personal information'; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); }"
+        },
+        {
+          "actionType": "executeScript",
+          "id": "82928f51-2f00-49a4-8abb-c2b23e973b29",
+          "_comment": "Support finds the listing from these details. If removal rates are low, fill the optional listing URL field from the matched card's record link.",
+          "script": "var el = root.querySelector('#request_description'); if (el) { el.value = 'Please remove all personal information associated with ' + userProfile.firstName + ' ' + userProfile.lastName + ' in ' + userProfile.city + ', ' + userProfile.state + ' from Whitepages, 411.com, and PeopleSearch.'; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); }"
+        },
+        {
+          "actionType": "expectation",
+          "id": "94de8d5e-d70e-4371-937e-d01b3a313f8b",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@id='request_custom_fields_16751491592475' and @value and @value != '']"
+            }
+          ]
+        },
+        {
+          "actionType": "click",
+          "id": "410d3f74-f413-42f4-81df-b1fad8b97a2d",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#new_request input[type='submit']"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "4470ed62-531f-4d5e-bcb8-1074cbcb3233",
+          "_comment": "A successful submission redirects here. There is no confirmation page.",
+          "expectations": [
+            {
+              "type": "url",
+              "selector": "body",
+              "expect": "/privacy/consumer-rights"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "_comment": "Opt-out removal is manual and takes about three days.",
+    "retryError": 48,
+    "confirmOptOutScan": 168,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}
