@@ -126,19 +126,15 @@ class RealDuckAiModelManager @Inject constructor(
             }
             // Status as well as entitlements: signing in or out changes whether the response carries
             // model labels, and entitlements stay empty either way when there is no subscription.
-            val duckAiEnabled = combine(
-                duckChatFeature.get().self().enabled(),
-                dataStore.observeDuckChatUserEnabled(),
-            ) { featureEnabled, userEnabled -> featureEnabled && userEnabled }
             combine(
                 subscriptions.getEntitlements(),
                 subscriptions.getSubscriptionStatusFlow(),
-                duckAiEnabled,
-            ) { entitlements, status, enabled -> Triple(entitlements, status, enabled) }
+            ) { entitlements, status -> entitlements to status }
                 .distinctUntilChanged()
-                .collect { (_, _, enabled) ->
-                    if (!enabled && _modelState.value.models.isEmpty()) return@collect
-                    logcat { "Duck.ai Model Manager: subscription or Duck.ai state changed, re-fetching models" }
+                .collect {
+                    val duckAiEnabled = duckChatFeature.get().self().isEnabled() && dataStore.isDuckChatUserEnabled()
+                    if (_modelState.value.models.isEmpty() && !duckAiEnabled) return@collect
+                    logcat { "Duck.ai Model Manager: subscription state changed, re-fetching models" }
                     fetchModels()
                 }
         }
@@ -182,7 +178,6 @@ class RealDuckAiModelManager @Inject constructor(
     override suspend fun fetchModels() {
         withContext(dispatcherProvider.io()) {
             try {
-                if (!duckChatFeature.get().self().isEnabled()) return@withContext
                 val userTier = resolveUserTier()
                 val response = fetchModelsResponse()
                 val isSubscriptionEligible = runCatching {
