@@ -423,7 +423,7 @@ class TabDataRepository(
             deleteOldFavicon(tabId)
             siteData.remove(tabId)
             lastUpdatedTabState.remove(tabId)
-            duckChatContextualDataStore.clearTabChatUrl(tabId)
+            duckChatContextualDataStore.clearTab(tabId)
         }
     }
 

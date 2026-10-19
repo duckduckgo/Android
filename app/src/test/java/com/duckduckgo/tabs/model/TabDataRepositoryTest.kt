@@ -491,7 +491,7 @@ class TabDataRepositoryTest {
         verify(mockAdClickManager).clearTabId("current")
         verify(mockWebViewPreviewPersister).deletePreviewsForTab("current", null)
         verify(mockFaviconManager).deleteOldTempFavicon("current", null)
-        verify(mockDuckChatContextualDataStore).clearTabChatUrl("current")
+        verify(mockDuckChatContextualDataStore).clearTab("current")
         verify(mockTabVisitedSitesRepository).clearTab("current")
         verify(mockNativeInputStatePublisher).clearTab("current")
         assertNotSame(siteData, testee.retrieveSiteData("current"))
@@ -972,7 +972,7 @@ class TabDataRepositoryTest {
             assertNull(testee.retrieveSiteData(tabId).value)
             verify(mockWebViewSessionStorage).deleteSession(tabId)
             verify(mockAdClickManager).clearTabId(tabId)
-            verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
+            verify(mockDuckChatContextualDataStore).clearTab(tabId)
             verify(mockTabVisitedSitesRepository).clearTab(tabId)
             verify(mockNativeInputStatePublisher).clearTab(tabId)
         }
@@ -991,7 +991,7 @@ class TabDataRepositoryTest {
             assertNull(testee.retrieveSiteData(tabId).value)
             verify(mockWebViewSessionStorage).deleteSession(tabId)
             verify(mockAdClickManager).clearTabId(tabId)
-            verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
+            verify(mockDuckChatContextualDataStore).clearTab(tabId)
             verify(mockTabVisitedSitesRepository).clearTab(tabId)
             verify(mockNativeInputStatePublisher).clearTab(tabId)
         }
@@ -1157,7 +1157,7 @@ class TabDataRepositoryTest {
         verify(mockAdClickManager, never()).clearTabId(tabId)
         verify(mockWebViewPreviewPersister, never()).deletePreviewsForTab(tabId, null)
         verify(mockFaviconManager, never()).deleteOldTempFavicon(tabId, null)
-        verify(mockDuckChatContextualDataStore, never()).clearTabChatUrl(tabId)
+        verify(mockDuckChatContextualDataStore, never()).clearTab(tabId)
         verify(mockTabVisitedSitesRepository, never()).clearTab(tabId)
         verify(mockNativeInputStatePublisher, never()).clearTab(tabId)
     }
