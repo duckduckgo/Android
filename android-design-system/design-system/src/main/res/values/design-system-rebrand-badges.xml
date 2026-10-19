@@ -24,4 +24,15 @@
         <item name="daxRebrandBadges">true</item>
     </style>
 
+    <dimen name="rebrandPillTextSize">10sp</dimen>
+    <dimen name="rebrandPillMinHeight">20dp</dimen>
+
+    <style name="Typography.DuckDuckGo.Pill.Rebrand" parent="Typography.DuckDuckGo">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textFontWeight">600</item>
+        <item name="android:textSize">@dimen/rebrandPillTextSize</item>
+        <item name="android:lineHeight">@dimen/rebrandPillTextSize</item>
+        <item name="android:letterSpacing">0.08</item>
+    </style>
+
 </resources>
