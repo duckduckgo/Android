@@ -17,11 +17,9 @@
 package com.duckduckgo.remote.messaging.impl.modal.cardslist
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Context
-import android.content.ContextWrapper
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -179,7 +177,7 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
             is SubmitUrlInContext -> submitUrlInContext(command.url)
             is DismissMessage -> dismiss()
             is LaunchDefaultCredentialProvider -> launchDefaultCredentialProvider()
-            is LaunchAddWidget -> addWidgetLauncher.launchAddWidget(context.findActivity(), simpleWidgetPrompt = true)
+            is LaunchAddWidget -> addWidgetLauncher.launchAddWidget(context, simpleWidgetPrompt = true)
             is LaunchAppTPOnboarding -> launchAppTPOnboarding()
             is LaunchDefaultBrowser -> launchDefaultBrowser()
             is LaunchPlayStore -> openPlayStore(command.appPackage)
@@ -280,10 +278,4 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
     interface CardsListRemoteMessageListener {
         fun onDismiss()
     }
-}
-
-private tailrec fun Context.findActivity(): Activity? = when (this) {
-    is Activity -> this
-    is ContextWrapper -> baseContext.findActivity()
-    else -> null
 }

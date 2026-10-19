@@ -16,16 +16,17 @@
 
 package com.duckduckgo.app.widget
 
-import android.app.Activity
+import android.content.Context
 
 /**
  * Launches the system pin-widget prompt where supported, otherwise manual add-widget instructions.
  * Pin prompts default to Search & Favorites; the simple and search-only flags select alternatives, with simple taking precedence.
- * The Duck.ai-only flag is currently ignored. A null activity does nothing.
+ * The Duck.ai-only flag is currently ignored.
+ * [activityContext] must be an Activity or backed by one, such as a View's context, so the instructions screen can be started.
  */
 interface AddWidgetLauncher {
     fun launchAddWidget(
-        activity: Activity?,
+        activityContext: Context,
         simpleWidgetPrompt: Boolean = false,
         searchOnlyWidgetPrompt: Boolean = false,
         duckAiOnlyWidgetPrompt: Boolean = false,

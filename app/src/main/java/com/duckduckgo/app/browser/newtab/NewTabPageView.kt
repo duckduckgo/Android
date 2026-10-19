@@ -18,10 +18,8 @@ package com.duckduckgo.app.browser.newtab
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
-import android.content.ContextWrapper
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
@@ -358,7 +356,7 @@ class NewTabPageView @JvmOverloads constructor(
             is SharePromoLinkRMF -> launchSharePromoRMFPageChooser(command.url, command.shareTitle)
             is SubmitUrl -> submitUrl(command.url)
             is LaunchDefaultCredentialProvider -> launchDefaultCredentialProvider()
-            is LaunchAddWidget -> addWidgetLauncher.launchAddWidget(context.findActivity(), simpleWidgetPrompt = true)
+            is LaunchAddWidget -> addWidgetLauncher.launchAddWidget(context, simpleWidgetPrompt = true)
         }
     }
 
@@ -490,10 +488,4 @@ class NewTabPageView @JvmOverloads constructor(
     private fun removeLowPriorityMessage() {
         binding.messageCta.gone()
     }
-}
-
-private tailrec fun Context.findActivity(): Activity? = when (this) {
-    is Activity -> this
-    is ContextWrapper -> baseContext.findActivity()
-    else -> null
 }
