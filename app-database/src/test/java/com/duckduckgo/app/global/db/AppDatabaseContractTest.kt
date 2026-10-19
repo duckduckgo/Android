@@ -29,7 +29,7 @@ import java.io.File
 class AppDatabaseContractTest {
 
     @Test
-    fun whenEntityCountChangesThenThisTestMustBeUpdatedDeliberately() {
+    fun whenEntitiesChangeThenThisTestMustBeUpdatedDeliberately() {
         val schemaFile = File("schemas/com.duckduckgo.app.global.db.AppDatabase")
             .listFiles { file -> file.extension == "json" }!!
             .maxBy { it.nameWithoutExtension.toInt() }
@@ -37,14 +37,49 @@ class AppDatabaseContractTest {
         val type = Types.newParameterizedType(Map::class.java, String::class.java, Any::class.java)
         val schema = moshi.adapter<Map<String, Any>>(type).fromJson(schemaFile.readText())!!
         val database = schema["database"] as Map<*, *>
-        val entities = database["entities"] as List<*>
+        val tableNames = (database["entities"] as List<*>).map { (it as Map<*, *>)["tableName"] as String }.toSet()
 
         assertEquals(
             "app.db is legacy and must only ever shrink. Adding a table here is not allowed — " +
                 "new storage belongs in the owning feature's -impl module. If you removed a table, " +
-                "lower this number.",
-            30,
-            entities.size,
+                "remove it from this set.",
+            EXPECTED_TABLES,
+            tableNames,
+        )
+    }
+
+    private companion object {
+        val EXPECTED_TABLES = setOf(
+            "app_days_used",
+            "app_enjoyment",
+            "auth_cookies_allowed_domains",
+            "bookmark_folders",
+            "bookmarks",
+            "default_browser_prompts_app_usage",
+            "dismissed_cta",
+            "duck_ai_tab_session",
+            "entities",
+            "favorites",
+            "fireproofWebsites",
+            "locationPermissions",
+            "network_leaderboard",
+            "notification",
+            "page_loaded_pixel_entity",
+            "page_painted_pixel_entity",
+            "pixel_store",
+            "privacy_protection_count",
+            "relations",
+            "search_count",
+            "sites_visited",
+            "survey",
+            "tab_page_context",
+            "tab_selection",
+            "tabs",
+            "userStage",
+            "user_events",
+            "user_whitelist",
+            "web_trackers_blocked",
+            "webview_sessions",
         )
     }
 }
