@@ -36,12 +36,15 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Compa
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.DUCK_AI_LIST
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.GRID_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TAB
+import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.RICH_DUCK_AI_GRID
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.SELECTABLE_DUCK_AI_GRID
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.SELECTABLE_DUCK_AI_LIST
+import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.SELECTABLE_RICH_DUCK_AI_GRID
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemContent
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -58,6 +61,8 @@ class TabSwitcherAdapterTest {
     private val dispatchers: DispatcherProvider = mock()
     private val trackerCountAnimator: TrackerCountAnimator = mock()
     private val addressDisplayFormatter: AddressDisplayFormatter = mock()
+
+    private val duckAiGridItemContent: DuckAiTabGridItemContent = mock()
 
     private lateinit var adapter: TabSwitcherAdapter
 
@@ -125,6 +130,44 @@ class TabSwitcherAdapterTest {
         adapter.updateData(listOf(SelectableTab(entity, isSelected = false, isDuckAi = false)))
         adapter.onLayoutTypeChanged(LIST)
         assertEquals(LIST_TAB, adapter.getItemViewType(0))
+    }
+
+    // --- Rich Duck.ai grid card routing ---
+
+    @Test
+    fun `DuckAiTab with grid item content in grid mode returns RICH_DUCK_AI_GRID`() {
+        val entity = TabEntity("1", url = "https://duck.ai/chat", position = 0)
+        adapter.updateData(listOf(DuckAiTab(entity, isActive = false, duckAiGridItemContent = duckAiGridItemContent)))
+        adapter.onLayoutTypeChanged(GRID)
+        assertEquals(RICH_DUCK_AI_GRID, adapter.getItemViewType(0))
+    }
+
+    @Test
+    fun `DuckAiTab with grid item content in list mode ignores content and returns DUCK_AI_LIST`() {
+        val entity = TabEntity("1", url = "https://duck.ai/chat", position = 0)
+        adapter.updateData(listOf(DuckAiTab(entity, isActive = false, duckAiGridItemContent = duckAiGridItemContent)))
+        adapter.onLayoutTypeChanged(LIST)
+        assertEquals(DUCK_AI_LIST, adapter.getItemViewType(0))
+    }
+
+    @Test
+    fun `SelectableTab with duck ai flag and grid item content in grid mode returns SELECTABLE_RICH_DUCK_AI_GRID`() {
+        val entity = TabEntity("1", url = "https://duck.ai/chat", position = 0)
+        adapter.updateData(
+            listOf(SelectableTab(entity, isSelected = false, isDuckAi = true, duckAiGridItemContent = duckAiGridItemContent)),
+        )
+        adapter.onLayoutTypeChanged(GRID)
+        assertEquals(SELECTABLE_RICH_DUCK_AI_GRID, adapter.getItemViewType(0))
+    }
+
+    @Test
+    fun `SelectableTab with duck ai flag and grid item content in list mode ignores content and returns SELECTABLE_DUCK_AI_LIST`() {
+        val entity = TabEntity("1", url = "https://duck.ai/chat", position = 0)
+        adapter.updateData(
+            listOf(SelectableTab(entity, isSelected = false, isDuckAi = true, duckAiGridItemContent = duckAiGridItemContent)),
+        )
+        adapter.onLayoutTypeChanged(LIST)
+        assertEquals(SELECTABLE_DUCK_AI_LIST, adapter.getItemViewType(0))
     }
 
     // --- NormalTab routing unchanged ---

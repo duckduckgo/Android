@@ -89,6 +89,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -193,8 +194,9 @@ class TabSwitcherViewModel @Inject constructor(
             _viewState,
             tabSwitcherDataStore.isTrackersAnimationInfoTileHidden(),
             currentMode,
-        ) { tabEntities, activeTab, viewState, isAnimationTileDismissed, browserMode ->
-            getTabItems(tabEntities, activeTab, isAnimationTileDismissed, viewState.mode, browserMode)
+            repo.tabSwitcherData.map { it.layoutType }.distinctUntilChanged(),
+        ) { tabEntities, activeTab, viewState, isAnimationTileDismissed, browserMode, layoutType ->
+            getTabItems(tabEntities, activeTab, isAnimationTileDismissed, viewState.mode, browserMode, layoutType)
         }
             .map<List<TabSwitcherItem>, TabItems> { TabItems.Loaded(it) }
             .onStart { emit(TabItems.NotInitialized) }
@@ -749,10 +751,11 @@ class TabSwitcherViewModel @Inject constructor(
         isTrackersAnimationInfoPanelHidden: Boolean,
         mode: Mode,
         browserMode: BrowserMode,
+        layoutType: LayoutType,
     ): List<TabSwitcherItem> {
         val duckAiTabs = tabEntities.filter { it.isDuckAi() }
         val duckAiTabIds = duckAiTabs.map { it.tabId }.toSet()
-        val duckAiGridItemContents = resolveDuckAiGridItemContents(duckAiTabs, browserMode)
+        val duckAiGridItemContents = if (layoutType == GRID) resolveDuckAiGridItemContents(duckAiTabs, browserMode) else emptyMap()
 
         if (mode is Selection) {
             return tabEntities.map { entity ->

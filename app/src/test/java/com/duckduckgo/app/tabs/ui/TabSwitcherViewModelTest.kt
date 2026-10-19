@@ -2698,7 +2698,42 @@ class TabSwitcherViewModelTest {
         verify(mockDuckAiTabGridItemRenderer, never()).resolve(eq("web"), anyOrNull(), any())
     }
 
-    private suspend fun TestScope.loadItemsWithDuckAiTab(): List<TabSwitcherItem> {
+    @Test
+    fun whenRichDuckAiCardFlagEnabledInSelectionModeThenSelectableDuckAiTabCarriesContent() = runTest {
+        tabManagerFeatureFlags.richDuckAiGridTabItem().setRawStoredState(State(enable = true))
+        val content = TestDuckAiTabGridItemContent("content")
+        whenever(mockDuckAiTabGridItemRenderer.resolve(DUCK_AI_TAB_ID, DUCK_AI_URL, BrowserMode.REGULAR)).thenReturn(content)
+
+        val items = loadItemsWithDuckAiTab(selectionMode = true).filterIsInstance<SelectableTab>()
+
+        val duckAiTab = items.single { it.id == DUCK_AI_TAB_ID }
+        assertTrue(duckAiTab.isDuckAi)
+        assertEquals(content, duckAiTab.duckAiGridItemContent)
+        assertNull(items.single { it.id == "web" }.duckAiGridItemContent)
+    }
+
+    @Test
+    fun whenRichDuckAiCardFlagDisabledInSelectionModeThenSelectableDuckAiTabHasNoContent() = runTest {
+        val items = loadItemsWithDuckAiTab(selectionMode = true).filterIsInstance<SelectableTab>()
+
+        val duckAiTab = items.single { it.id == DUCK_AI_TAB_ID }
+        assertTrue(duckAiTab.isDuckAi)
+        assertNull(duckAiTab.duckAiGridItemContent)
+        verify(mockDuckAiTabGridItemRenderer, never()).resolve(any(), anyOrNull(), any())
+    }
+
+    @Test
+    fun whenRichDuckAiCardFlagEnabledInListLayoutThenRendererNotCalled() = runTest {
+        tabManagerFeatureFlags.richDuckAiGridTabItem().setRawStoredState(State(enable = true))
+        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(TabSwitcherData(NEW, LIST)))
+
+        val items = loadItemsWithDuckAiTab()
+
+        assertNull(items.filterIsInstance<DuckAiTab>().single().duckAiGridItemContent)
+        verify(mockDuckAiTabGridItemRenderer, never()).resolve(any(), anyOrNull(), any())
+    }
+
+    private suspend fun TestScope.loadItemsWithDuckAiTab(selectionMode: Boolean = false): List<TabSwitcherItem> {
         tabList = listOf(
             TabEntity("web", url = "https://example.com", position = 0),
             TabEntity(DUCK_AI_TAB_ID, url = DUCK_AI_URL, position = 1),
@@ -2710,6 +2745,7 @@ class TabSwitcherViewModelTest {
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             testee.viewState.collect()
         }
+        if (selectionMode) testee.onSelectionModeRequested()
         advanceUntilIdle()
         return testee.viewState.value.tabSwitcherItems
     }
