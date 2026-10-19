@@ -262,9 +262,10 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
 
     // With history off the URL never carries a chat ID, so a new chat in the same tab looks unchanged to reconcileOnScreen.
     // A pending exit means the new chat opens in another tab, and the tab switch records that leave instead.
+    // A flow still waiting for its stream is the prompt that created the chat, so it hasn't left.
     private suspend fun leaveForNewChat(tabId: String) {
         if (pendingExit?.tabId == tabId) return
-        val flow = flows.firstOrNull { it.onScreen && it.chatId == null && it.tabId == tabId } ?: return
+        val flow = flows.firstOrNull { it.onScreen && it.chatId == null && it.tabId == tabId && !it.awaitingFirstStream } ?: return
         newChatTabId = null
         flow.onScreen = false
         flow.chatSwitchedAway = true

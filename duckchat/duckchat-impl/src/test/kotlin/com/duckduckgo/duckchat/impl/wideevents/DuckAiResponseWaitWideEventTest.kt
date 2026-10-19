@@ -411,6 +411,25 @@ class DuckAiResponseWaitWideEventTest {
     }
 
     @Test
+    fun `when the prompt's own chat is created before its stream then the flow stays and finishes watched`() = runTest {
+        promptInChat(chatId = null, streamStarted = false)
+
+        testee.onResponseState("t1", "ready")
+        testee.onNewChatCreated("t1")
+        testee.onResponseState("t1", "start_stream:new_prompt")
+        testee.onResponseState("t1", "loading")
+        testee.onResponseState("t1", "ready")
+        idle()
+
+        verify(wideEventClient, never()).flowStep(any(), eq("left"), any(), any())
+        verify(wideEventClient).flowFinish(
+            eq(1L),
+            eq(FlowStatus.Success),
+            eq(mapOf("status_reason" to "watched", "response_result" to "ready")),
+        )
+    }
+
+    @Test
     fun `when history is off and a new chat opens in a new tab then the old flow leaves via new_tab_opened and can return`() = runTest {
         promptInChat(chatId = null)
 
