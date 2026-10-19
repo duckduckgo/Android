@@ -53,6 +53,8 @@ import com.duckduckgo.subscriptions.impl.auth.RefreshTokenClaims
 import com.duckduckgo.subscriptions.impl.auth.ResponseError
 import com.duckduckgo.subscriptions.impl.auth.ResponseErrorCode
 import com.duckduckgo.subscriptions.impl.auth.TokenPair
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationException
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason
 import com.duckduckgo.subscriptions.impl.billing.LatestPurchaseResult
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
@@ -773,8 +775,12 @@ class RealSubscriptionsManager @Inject constructor(
         val newTokens = try {
             val tokens = authClient.getTokens(refreshToken.jwt)
             tokenRefreshWideEvent.onTokensFetched()
-            validateTokens(tokens, jwks)
-                .also { tokenRefreshWideEvent.onTokensValidated() }
+            validateTokens(
+                tokens = tokens,
+                jwks = jwks,
+                onAccessTokenInvalid = tokenRefreshWideEvent::onAccessTokenValidationFailed,
+                onRefreshTokenInvalid = tokenRefreshWideEvent::onRefreshTokenValidationFailed,
+            ).also { tokenRefreshWideEvent.onTokensValidated() }
         } catch (e: HttpException) {
             val parsedError = parseError(e)
                 ?.also { tokenRefreshWideEvent.onBackendErrorResponse(backendErrorResponse = it.error, backendErrorCode = it.errorCode) }
@@ -896,18 +902,34 @@ class RealSubscriptionsManager @Inject constructor(
         _subscriptionStatus.emit(newStatus)
     }
 
-    private fun validateTokens(tokens: TokenPair, jwks: String): ValidatedTokenPair {
-        return try {
-            ValidatedTokenPair(
-                accessToken = tokens.accessToken,
-                accessTokenClaims = authJwtValidator.validateAccessToken(tokens.accessToken, jwks),
-                refreshToken = tokens.refreshToken,
-                refreshTokenClaims = authJwtValidator.validateRefreshToken(tokens.refreshToken, jwks),
-            )
+    private suspend fun validateTokens(
+        tokens: TokenPair,
+        jwks: String,
+        onAccessTokenInvalid: suspend (TokenValidationFailureReason) -> Unit = {},
+        onRefreshTokenInvalid: suspend (TokenValidationFailureReason) -> Unit = {},
+    ): ValidatedTokenPair {
+        val accessTokenClaims = try {
+            authJwtValidator.validateAccessToken(tokens.accessToken, jwks)
         } catch (e: Exception) {
             pixelSender.reportAuthV2TokenValidationError()
+            if (e is TokenValidationException) onAccessTokenInvalid(e.reason)
             throw e
         }
+
+        val refreshTokenClaims = try {
+            authJwtValidator.validateRefreshToken(tokens.refreshToken, jwks)
+        } catch (e: Exception) {
+            pixelSender.reportAuthV2TokenValidationError()
+            if (e is TokenValidationException) onRefreshTokenInvalid(e.reason)
+            throw e
+        }
+
+        return ValidatedTokenPair(
+            accessToken = tokens.accessToken,
+            accessTokenClaims = accessTokenClaims,
+            refreshToken = tokens.refreshToken,
+            refreshTokenClaims = refreshTokenClaims,
+        )
     }
 
     private suspend fun saveTokens(tokens: ValidatedTokenPair) = with(tokens) {
