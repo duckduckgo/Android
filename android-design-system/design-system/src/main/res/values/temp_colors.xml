@@ -16,21 +16,9 @@
 
 <resources>
     <!-- Dax Colors -->
-    <attr name="daxColorPreonboardingOptionBackground" format="color" />
-    <attr name="daxColorPreonboardingOptionBackgroundStroke" format="color" />
-    <attr name="daxColorPreonboardingOptionSelectedBackground" format="color" />
-    <attr name="daxColorPreonboardingOptionSelectedBackgroundStroke" format="color" />
-    <attr name="daxColorPreonboardingProgressBarStart" format="color" />
-    <attr name="daxColorPreonboardingProgressBarCenter" format="color" />
-    <attr name="daxColorPreonboardingProgressBarEnd" format="color" />
-
     <attr name="daxColorOnboardingDialogBackground" format="color" />
 
     <!-- Design System Raw Colors -->
-    <color name="purple20">#A591DC</color>
-    <color name="purple100">#6B4EBA</color>
-    <color name="red10">#F8BBAA</color>
-
     <!-- Should be moved to theme if experiment is successful -->
 
     <color name="daxOnboardingDialogBackgroundColorLight">#FEFEFE</color>

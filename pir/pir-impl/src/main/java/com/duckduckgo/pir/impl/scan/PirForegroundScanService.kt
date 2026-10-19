@@ -32,6 +32,7 @@ import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.R
 import com.duckduckgo.pir.impl.checker.PirEligibility
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
+import com.duckduckgo.pir.impl.checker.runModeOrNull
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
@@ -123,13 +124,12 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
                 return@launch
             }
 
-            val result = pirJobsRunner.runEligibleJobs(this@PirForegroundScanService, executionType)
-            if (result.isSuccess) {
-                pirNotificationManager.showScanStatusNotification(
-                    title = getString(R.string.pirNotificationTitleComplete),
-                    message = getString(R.string.pirNotificationMessageComplete),
-                )
+            val runMode = eligibility.runModeOrNull ?: run {
+                logcat { "PIR-SCAN: No eligibility emission, cannot resolve run mode!" }
+                stopSelf()
+                return@launch
             }
+            pirJobsRunner.runEligibleJobs(this@PirForegroundScanService, executionType, runMode)
             stopSelf()
         }
 

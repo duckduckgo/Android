@@ -21,6 +21,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessaging
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -42,6 +43,7 @@ class InternalFeedbackContentScopeJsMessageHandlerTest {
     val coroutineTestRule = CoroutineTestRule()
 
     private val mockDeviceInfoProvider: InternalFeedbackDeviceInfoProvider = mock()
+    private val mockScreenshotStore: InternalFeedbackScreenshotStore = mock()
     private val mockJsMessaging: JsMessaging = mock()
     private val deviceInfo = JSONObject().put("platform", "android")
 
@@ -53,6 +55,7 @@ class InternalFeedbackContentScopeJsMessageHandlerTest {
 
         handler = InternalFeedbackContentScopeJsMessageHandler(
             deviceInfoProvider = mockDeviceInfoProvider,
+            screenshotStore = mockScreenshotStore,
             appCoroutineScope = coroutineTestRule.testScope,
         )
     }
@@ -68,13 +71,13 @@ class InternalFeedbackContentScopeJsMessageHandlerTest {
     }
 
     @Test
-    fun whenCheckingMethodsThenReturnsGetDeviceInfo() {
-        assertEquals(listOf("getDeviceInfo"), handler.getJsMessageHandler().methods)
+    fun whenCheckingMethodsThenReturnsGetDeviceInfoAndGetAttachments() {
+        assertEquals(listOf("getDeviceInfo", "getAttachments"), handler.getJsMessageHandler().methods)
     }
 
     @Test
     fun whenGetDeviceInfoRequestedThenRespondsWithDeviceInfo() {
-        with(processGetDeviceInfo()) {
+        with(process("getDeviceInfo")) {
             assertSame(deviceInfo, params)
             assertEquals("internalFeedback", featureName)
             assertEquals("getDeviceInfo", method)
@@ -86,19 +89,53 @@ class InternalFeedbackContentScopeJsMessageHandlerTest {
     fun whenGettingDeviceInfoFailsThenRespondsWithEmptyObject() = runTest {
         whenever(mockDeviceInfoProvider.getDeviceInfo()).thenReturn(Result.failure(IllegalStateException()))
 
-        assertEquals(0, processGetDeviceInfo().params.length())
+        assertEquals(0, process("getDeviceInfo").params.length())
     }
 
     @Test
     fun whenGetDeviceInfoRequestedWithoutIdThenDoesNotRespond() {
-        handler.getJsMessageHandler().process(getDeviceInfoMessage(id = null), mockJsMessaging, null)
+        handler.getJsMessageHandler().process(message("getDeviceInfo", id = null), mockJsMessaging, null)
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         verifyNoInteractions(mockJsMessaging)
     }
 
-    private fun processGetDeviceInfo(): JsCallbackData {
-        handler.getJsMessageHandler().process(getDeviceInfoMessage(id = "123"), mockJsMessaging, null)
+    @Test
+    fun whenGetAttachmentsRequestedWithScreenshotThenRespondsWithScreenshot() = runTest {
+        whenever(mockScreenshotStore.takeEncodedScreenshot()).thenReturn(SCREENSHOT)
+
+        with(process("getAttachments")) {
+            val screenshot = params.getJSONObject("screenshot")
+            assertEquals(SCREENSHOT, screenshot.getString("base64"))
+            assertEquals("image/png", screenshot.getString("mimeType"))
+            assertEquals("getAttachments", method)
+            assertEquals("123", id)
+        }
+    }
+
+    @Test
+    fun whenGetAttachmentsRequestedWithoutScreenshotThenRespondsWithEmptyObject() = runTest {
+        whenever(mockScreenshotStore.takeEncodedScreenshot()).thenReturn(null)
+
+        assertEquals(0, process("getAttachments").params.length())
+    }
+
+    @Test
+    fun whenGettingScreenshotFailsThenRespondsWithEmptyObject() = runTest {
+        whenever(mockScreenshotStore.takeEncodedScreenshot()).thenThrow(IllegalStateException())
+
+        assertEquals(0, process("getAttachments").params.length())
+    }
+
+    @Test
+    fun whenGettingScreenshotIsCancelledWhileHandlerIsActiveThenRespondsWithEmptyObject() = runTest {
+        whenever(mockScreenshotStore.takeEncodedScreenshot()).thenThrow(CancellationException())
+
+        assertEquals(0, process("getAttachments").params.length())
+    }
+
+    private fun process(method: String): JsCallbackData {
+        handler.getJsMessageHandler().process(message(method, id = "123"), mockJsMessaging, null)
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         val captor = argumentCaptor<JsCallbackData>()
@@ -106,11 +143,15 @@ class InternalFeedbackContentScopeJsMessageHandlerTest {
         return captor.firstValue
     }
 
-    private fun getDeviceInfoMessage(id: String?) = JsMessage(
+    private fun message(method: String, id: String?) = JsMessage(
         context = "contentScopeScripts",
         featureName = "internalFeedback",
-        method = "getDeviceInfo",
+        method = method,
         params = JSONObject(),
         id = id,
     )
+
+    private companion object {
+        const val SCREENSHOT = "AQID"
+    }
 }

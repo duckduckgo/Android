@@ -963,4 +963,34 @@ class RealDuckChatPixelsTest {
             parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__unknown"),
         )
     }
+
+    @Test
+    fun whenFireInputOutcomeThenFiresCountAndDailyWithParams() = runTest {
+        testee.fireInputOutcome(DuckChatPixelSurface.DUCK_AI, InputOutcome.PROMPT_SUBMITTED, InputSubmitMethod.ENTER, true)
+
+        advanceUntilIdle()
+
+        val params = mapOf(
+            DuckChatPixelParameters.SURFACE to "duck_ai",
+            DuckChatPixelParameters.OUTCOME to "prompt_submitted",
+            DuckChatPixelParameters.TOS_DISCLAIMER_SHOWN to "true",
+            DuckChatPixelParameters.SUBMIT_METHOD to "enter",
+        )
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_INPUT_OUTCOME_COUNT, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_INPUT_OUTCOME_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenFireInputOutcomeWithoutMethodThenOmitsSubmitMethod() = runTest {
+        testee.fireInputOutcome(DuckChatPixelSurface.ADDRESS_BAR, InputOutcome.ABANDONED, null, false)
+
+        advanceUntilIdle()
+
+        val params = mapOf(
+            DuckChatPixelParameters.SURFACE to "address_bar",
+            DuckChatPixelParameters.OUTCOME to "abandoned",
+            DuckChatPixelParameters.TOS_DISCLAIMER_SHOWN to "false",
+        )
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_INPUT_OUTCOME_COUNT, params)
+    }
 }

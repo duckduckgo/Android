@@ -50,7 +50,9 @@ class SubmitButtonViewModel @Inject constructor(
     private val browserMode: BrowserMode,
 ) : ViewModel() {
 
-    // The labelled button replaces the arrow while the terms are unaccepted. The edit surface never shows it.
+    // The labelled button replaces the arrow while the terms are unaccepted, and shows even with an empty
+    // field (disabled until there is something to send) so it takes the voice button's place. The edit
+    // surface never shows it.
     private val termsRequired: Flow<Boolean> = combine(
         duckChatFeature.nativeToSConsent().enabled(),
         termsRepository.observeTermsAccepted(browserMode),
@@ -63,7 +65,14 @@ class SubmitButtonViewModel @Inject constructor(
         val state = if (editTabId != null) nativeInputStateProvider.stateForTab(editTabId) else nativeInputStateProvider.state
         val terms = if (editTabId != null) flowOf(false) else termsRequired
         return combine(state, terms) { inputState, termsRequired ->
-            inputState.toSubmitButtonState().let { it.copy(askLabel = termsRequired && it.visible, askPossible = termsRequired) }
+            inputState.toSubmitButtonState().let {
+                if (termsRequired) {
+                    val onDuckAi = inputState.toggleSelection == ToggleSelection.DUCK_AI
+                    it.copy(visible = onDuckAi, askLabel = onDuckAi, askPossible = true)
+                } else {
+                    it
+                }
+            }
         }.distinctUntilChanged()
     }
 }

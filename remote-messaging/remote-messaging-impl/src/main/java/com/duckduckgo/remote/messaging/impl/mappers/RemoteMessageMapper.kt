@@ -35,6 +35,7 @@ import com.duckduckgo.remote.messaging.api.Content.Placeholder.KEY_IMPORT
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS_NEW
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.NEW_TAB_OPTIONS
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.PIR
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.PRIVACY_SHIELD
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.RADAR
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.SPLIT_BAR_SETTINGS
@@ -121,5 +122,6 @@ fun Placeholder.drawable(isLightModeEnabled: Boolean): Int {
         SPLIT_BAR_SETTINGS -> R.drawable.mobile_split_bar_settings_96
         BOOKMARKS_IMPORT -> R.drawable.bookmarks_import_96
         NEW_TAB_OPTIONS -> R.drawable.newtab_options_96
+        PIR -> R.drawable.personal_information_remover_96
     }
 }

@@ -197,6 +197,9 @@ class BrowserMenuBottomSheet(
     val fireMenuItem: MenuItemView
         get() = binding.fireMenuItem
 
+    val internalFeedbackMenuItem: MenuItemView
+        get() = binding.internalFeedbackMenuItem
+
     fun render(viewState: BrowserMenuViewState) {
         hideAllMenuItems()
         showCommonItems()
@@ -350,6 +353,7 @@ class BrowserMenuBottomSheet(
         renderVpnMenu(viewState.vpnMenuState)
         fireMenuItem.isVisible = viewState.showFireMenuItem
         downloadsMenuItem.showDotIndicator = viewState.showDownloadDot
+        renderInternalFeedbackSection(viewState.showInternalFeedback)
 
         binding.urlPageActionsSectionDivider.isVisible = true
         binding.librarySectionDivider.isVisible = true
@@ -382,6 +386,7 @@ class BrowserMenuBottomSheet(
         )
         renderVpnMenu(viewState.vpnMenuState)
         createAliasMenuItem.isVisible = viewState.isEmailSignedIn
+        renderInternalFeedbackSection(viewState.showInternalFeedback)
 
         binding.urlPageActionsSectionDivider.isVisible = false
         binding.librarySectionDivider.isVisible = true
@@ -483,6 +488,11 @@ class BrowserMenuBottomSheet(
         duckAiNewVoiceChatMenuItem.isVisible = showShortcuts && showVoiceChat
         duckChatHistoryMenuItem.isVisible = showShortcuts && showChatHistory
         duckChatSettingsMenuItem.isVisible = showChatSettings
+    }
+
+    private fun renderInternalFeedbackSection(showInternalFeedback: Boolean) {
+        binding.internalFeedbackSectionDivider.isVisible = showInternalFeedback
+        internalFeedbackMenuItem.isVisible = showInternalFeedback
     }
 
     private fun renderPageContextHeader(pageContextHeaderState: PageContextHeaderState) {

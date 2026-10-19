@@ -1,7 +1,7 @@
 {
   "name": "Spokeo",
   "url": "spokeo.com",
-  "version": "0.11.1",
+  "version": "0.11.5",
   "addedDatetime": 1692572400000,
   "optOutUrl": "https://spokeo.com/optout",
   "mirrorSites": [
@@ -98,15 +98,15 @@
               "afterText": " IN "
             },
             "addressCityStateList": {
-              "selector": ".//span[contains(text(), 'Lived')]/following-sibling::text()[1]",
+              "selector": ".//span[starts-with(normalize-space(.), 'Location')]/following-sibling::text()[normalize-space()][1]",
               "separator": ","
             },
             "relativesList": {
-              "selector": ".//span[contains(text(), 'Related To')]/following-sibling::a",
+              "selector": ".//a[preceding-sibling::span[1][starts-with(normalize-space(.), 'Relatives')]]",
               "findElements": true
             },
             "alternativeNamesList": {
-              "selector": ".//span[contains(text(), 'Also known')]/following-sibling::text()[1]",
+              "selector": ".//span[starts-with(normalize-space(.), 'Alias')]/following-sibling::span[1]",
               "separator": ","
             },
             "profileUrl": {
@@ -129,11 +129,32 @@
         },
         {
           "actionType": "expectation",
+          "id": "e3aa454e-9c45-460c-ae02-6b1702030645",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "input[name='email']",
+              "parent": ".optout_container"
+            }
+          ]
+        },
+        {
+          "actionType": "click",
+          "id": "2248e37e-5634-4513-bf87-b188936a0ef5",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".optout_container input[name='email']"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
           "id": "9e58d407-0291-499f-8003-4a78c17773f1",
           "expectations": [
             {
               "type": "element",
-              "selector": "#g-recaptcha",
+              "selector": "#g-recaptcha iframe",
               "parent": ".optout_container"
             }
           ]
@@ -178,8 +199,12 @@
           "id": "cfd69cf0-1995-4df9-a957-3a230c0a21f5",
           "expectations": [
             {
+              "type": "element",
+              "selector": "#notices"
+            },
+            {
               "type": "text",
-              "selector": "body",
+              "selector": "#notices",
               "expect": "Please check your inbox for a confirmation email"
             }
           ]
@@ -194,8 +219,12 @@
           "id": "7a5f4deb-6c15-4a6f-831c-49617721b465",
           "expectations": [
             {
+              "type": "element",
+              "selector": "#notices"
+            },
+            {
               "type": "text",
-              "selector": "body",
+              "selector": "#notices",
               "expect": "We've received your request to remove"
             }
           ]

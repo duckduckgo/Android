@@ -45,6 +45,8 @@ class SubscriptionsDummy @Inject constructor() : Subscriptions {
 
     override suspend fun getAvailableProducts(): Set<Product> = emptySet()
 
+    override suspend fun getPurchasableProducts(): Set<Product> = emptySet()
+
     override fun shouldLaunchSubscriptionForUrl(url: String): Boolean = false
 
     override fun launchSubscription(
@@ -59,4 +61,6 @@ class SubscriptionsDummy @Inject constructor() : Subscriptions {
     override suspend fun isFreeTrialEligible(): Boolean = false
 
     override fun getEntitlements(): Flow<Set<Entitlement>> = flowOf(emptySet())
+
+    override suspend fun getCurrentEntitlements(): Set<Entitlement> = emptySet()
 }

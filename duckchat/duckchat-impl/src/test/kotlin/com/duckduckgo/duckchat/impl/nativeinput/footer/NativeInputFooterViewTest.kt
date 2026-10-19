@@ -54,12 +54,28 @@ class NativeInputFooterViewTest {
     private val rowsContainer get() = card.getChildAt(0) as ViewGroup
 
     @Test
-    fun whenCreatedThenCardUsesSurfaceColourAndElevation() {
+    fun whenCreatedThenCardUsesSecondarySurfaceColourAndElevation() {
         assertEquals(
-            context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface),
+            context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurfaceSecondary),
             card.cardBackgroundColor.defaultColor,
         )
         assertTrue(card.cardElevation > 0f)
+    }
+
+    @Test
+    fun whenThemeIsLightThenCardIsFCFCFC() {
+        assertEquals(0xFFFCFCFC.toInt(), card.cardBackgroundColor.defaultColor)
+    }
+
+    @Test
+    fun whenThemeIsDarkThenCardIs2F2F2F() {
+        val dark = ContextThemeWrapper(
+            ApplicationProvider.getApplicationContext(),
+            com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Dark,
+        )
+        val darkCard = NativeInputFooterView(dark).getChildAt(0) as MaterialCardView
+
+        assertEquals(0xFF2F2F2F.toInt(), darkCard.cardBackgroundColor.defaultColor)
     }
 
     @Test

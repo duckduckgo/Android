@@ -22,8 +22,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 /**
- * App-wide, theme-related design changes feature flag, excluding onboarding which is gated via
- * `OnboardingBrandDesignUpdateToggles`.
+ * App-wide, theme-related design changes feature flag.
  */
 @ContributesRemoteFeature(
     scope = AppScope::class,
@@ -48,7 +47,7 @@ interface AppBrandDesignUpdateToggles {
     fun theme(): Toggle
 
     /** Gates the radius changes separately so the rest of the brand design update can roll out independently. */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun radius(): Toggle
 
     /**

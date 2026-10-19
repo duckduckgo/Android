@@ -22,6 +22,8 @@ import com.duckduckgo.app.statistics.wideevents.db.migration.WideEventsMigration
 import com.duckduckgo.app.statistics.wideevents.db.migration.WideEventsMigration2To3
 import com.duckduckgo.app.statistics.wideevents.db.migration.WideEventsMigration3To4
 import com.duckduckgo.app.statistics.wideevents.db.migration.WideEventsMigration4To5
+import com.duckduckgo.app.statistics.wideevents.db.migration.WideEventsMigration5To6
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -36,6 +38,7 @@ class WideEventDatabaseModule {
     fun provideWideEventDatabase(
         context: Context,
         wideEventEntityTypeConverters: WideEventEntityTypeConverters,
+        appBuildConfig: AppBuildConfig,
     ): WideEventDatabase =
         Room
             .databaseBuilder(
@@ -43,7 +46,13 @@ class WideEventDatabaseModule {
                 klass = WideEventDatabase::class.java,
                 name = "wide_events.db",
             )
-            .addMigrations(WideEventsMigration1To2, WideEventsMigration2To3, WideEventsMigration3To4, WideEventsMigration4To5)
+            .addMigrations(
+                WideEventsMigration1To2,
+                WideEventsMigration2To3,
+                WideEventsMigration3To4,
+                WideEventsMigration4To5,
+                WideEventsMigration5To6(appBuildConfig.versionName),
+            )
             .fallbackToDestructiveMigration()
             .enableMultiInstanceInvalidation()
             .addTypeConverter(wideEventEntityTypeConverters)

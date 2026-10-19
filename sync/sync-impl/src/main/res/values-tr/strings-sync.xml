@@ -306,6 +306,7 @@
     <string name="sync_simplified_settings_download_recovery_code_item_hint">Bu kodu kaydedin ve güvenli bir yerde tutun. Böylece bu cihaza erişiminizi kaybederseniz verilerinizi kurtarabilirsiniz.</string>
     <string name="sync_simplified_settings_data_expiration_notice">Sync &amp; Backup verileri 18 ay kullanılmadıktan sonra kurtarılamaz. <annotation type="learn_more_link">Daha fazla bilgi</annotation></string>
     <string name="sync_simplified_settings_delete_account_item">Sunucu Verilerini Kapat ve Sil</string>
+    <string name="sync_simplified_settings_turn_off_item">Sync &amp; Backup\'ı Kapat</string>
     <string name="sync_simplified_settings_storage_permission_message">Kurtarma PDF\'ini kaydetmek için depolama izni gereklidir</string>
     <string name="sync_simplified_settings_learn_more_screen_title">Sync &amp; Backup</string>
 
@@ -320,6 +321,26 @@
     <string name="sync_simplified_settings_delete_server_data_dialog_body">Sync &amp; Backup kullanan tüm cihazların bağlantısı kesilecek ve senkronize edilen verileriniz sunucudan silinecektir.</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Sunucu Verilerini Sil</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">İptal</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_title_v2">Bu İşlemi Geri Alamazsın.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body_v2">Sync &amp; Backup kullanan tüm cihazların bağlantısı kesilecek ve senkronize edilen verilerin sunucudan silinecektir.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button_v2">Kalıcı Olarak Sil</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button_v2">İptal</string>
+
+    <!-- Sync settings screen: turn off sheet -->
+    <string name="sync_simplified_settings_turn_off_sheet_remove_title" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s, Sync &amp; Backup\'tan kaldırılsın mı?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_body" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” artık diğer cihazlarındaki senkronize edilen verilerine erişemeyecek.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item">Sunucu verileri de silinsin mi?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Sync &amp; Backup\'ı kapat, sunucudaki tüm senkronize edilmiş verileri sil ve kurtarma kodunu devre dışı bırak.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Cihazı Kaldır</string>
+    <string name="sync_simplified_settings_turn_off_sheet_title">Sync &amp; Backup kapatılsın mı?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_body">Sync &amp; Backup kullanan tüm cihazların bağlantısı kesilecek ve senkronize edilen verilerin sunucudan silinecektir.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Sunucu Verilerini Kapat ve Sil</string>
+
+    <!-- Sync settings screen: turn off this device dialog -->
+    <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s, Sync &amp; Backup\'tan kaldırılsın mı?</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” artık senkronize edilmiş verilerine erişemeyecek. Yer işaretleri, otomatik doldurma verileri ve Duck.ai sohbetleri cihazlarında kalacak.</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_primary_button">Kaldır</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_secondary_button">İptal</string>
 
     <!-- Sync settings screen: require device passcode dialog -->
     <string name="sync_simplified_settings_require_passcode_dialog_title">Sync &amp; Backup\'ı kullanmak için cihazınızı güvenli hale getirin</string>
@@ -329,6 +350,8 @@
     <!-- Sync This Device screen -->
     <string name="sync_simplified_setup_header_headline">Bu cihazı yakındaki bir bilgisayarla senkronize edin.</string>
     <string name="sync_simplified_setup_header_body">Cihazlarınızı senkronize etmenize yardımcı olacağız.</string>
+    <string name="sync_simplified_setup_header_headline_v2">Yakınında başka bir cihaz var mı? Cihazlarını senkronize et.</string>
+    <string name="sync_simplified_setup_header_body_v2">Şu anda başka bir cihazın yok mu? Yalnızca bu cihazı senkronize et, daha sonra başka bir cihazla senkronize ol.</string>
     <string name="sync_simplified_setup_primary_button">Başka Bir Cihazla Senkronize Et</string>
     <string name="sync_simplified_setup_secondary_button">Sadece Bu Cihazı Senkronize Et</string>
     <string name="sync_simplified_setup_secondary_button_syncing">Bağlantı kuruluyor...</string>
@@ -353,10 +376,14 @@
     <string name="sync_simplified_scanner_camera_header_headline">Senkronize etmek için QR kodunu tara</string>
     <string name="sync_simplified_scanner_camera_header_body"><annotation type="icon">￼</annotation> <b><annotation type="highlight">Masaüstü için DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>uygulamasını açın ve <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Başka Bir Cihazla Senkronize Et</annotation>bölümüne gidin</string>
     <string name="sync_simplified_scanner_camera_primary_button">Taramaya Hazırım</string>
+    <string name="sync_simplified_scanner_camera_primary_button_v2">Anladım</string>
     <string name="sync_simplified_scanner_camera_invalid_code_message">Üzgünüz, taranan kod geçersiz.</string>
     <string name="sync_simplified_scanner_no_permission_headline">Kamera İzni Gereklidir</string>
     <string name="sync_simplified_scanner_no_permission_body">Lütfen cihazınızın ayarlarına gidin ve bu uygulamanın kameranıza erişmesine izin verin.</string>
     <string name="sync_simplified_scanner_no_permission_primary_button">Ayarlar\'a gidin</string>
+    <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo\'nun kamerana erişmesi gerekiyor.</string>
+    <string name="sync_simplified_scanner_no_permission_body_v2">QR kodunu taramak için kamera izinleri gerekiyor.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button_v2">İzinleri Değiştir</string>
     <string name="sync_simplified_scanner_no_hardware_headline">Kamera Kullanılamıyor</string>
 
     <!-- Scanner screen: manual entry tab -->
@@ -411,6 +438,8 @@
     <string name="sync_simplified_edit_device_sync_this_device_item">Bu Cihazı Senkronize Et</string>
     <string name="sync_simplified_edit_device_remove_notice_this_device">Bu cihazı kaldırırsanız, artık senkronize edilen verilerinize erişemeyecektir.</string>
     <string name="sync_simplified_edit_device_remove_notice_another_device">Bu özellik kapatılırsa, bu cihaz artık senkronize edilen verilerinize erişemeyecektir.</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Bu özellik kapatılırsa “%1$s” artık diğer cihazlarındaki senkronize verilerine erişemeyecek.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” artık diğer cihazlarındaki senkronize edilen verilerine erişemeyecek.</string>
 
     <!-- Edit Device screen: edit name dialog -->
     <string name="sync_simplified_edit_device_edit_name_dialog_title">Adı Düzenle</string>
@@ -422,6 +451,8 @@
     <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” artık senkronize edilmiş verilerinize erişemeyecek.</string>
     <string name="sync_simplified_edit_device_remove_dialog_primary_button">Kaldır</string>
     <string name="sync_simplified_edit_device_remove_dialog_secondary_button">İptal</string>
+    <string name="sync_simplified_edit_device_remove_dialog_title_v2" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s, Sync &amp; Backup\'tan kaldırılsın mı?</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body_v2" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” artık senkronize edilmiş verilerine erişemeyecek. Yer işaretleri, otomatik doldurma verileri ve Duck.ai sohbetleri cihazlarında kalacak.</string>
 
     <!-- Edit Device screen: turn off sync dialog -->
     <string name="sync_simplified_edit_device_turn_off_dialog_title">Sync &amp; Backup kapatılsın mı?</string>

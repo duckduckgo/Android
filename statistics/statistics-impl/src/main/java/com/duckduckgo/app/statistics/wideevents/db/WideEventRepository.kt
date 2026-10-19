@@ -81,6 +81,7 @@ interface WideEventRepository {
         val metaType: String,
         val metaVersion: String,
         val isFirstDailyOccurrence: Boolean = false,
+        val appVersion: String,
     )
 
     data class WideEventStep(

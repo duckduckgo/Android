@@ -19,12 +19,22 @@ package com.duckduckgo.subscriptions.impl.auth
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.subscriptions.api.model.Entitlement
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Expired
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.InvalidAudience
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.InvalidIssuer
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.InvalidScope
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.InvalidSignature
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.JwksParseError
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.KeyNotFound
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Malformed
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.time.Instant
 import java.time.LocalDateTime
+import kotlin.time.Duration.Companion.seconds
 
 @RunWith(AndroidJUnit4::class)
 class AuthJwtValidatorImplTest {
@@ -158,6 +168,95 @@ class AuthJwtValidatorImplTest {
         )
     }
 
+    @Test
+    fun `when access token is expired then reason is Expired with clock skew relative to iat`() {
+        timeProvider.currentTime = Instant.parse("2024-11-16T00:00:00.00Z")
+
+        val exception = assertValidationFails { authJwtValidator.validateAccessToken(ACCESS_TOKEN, JWK_SET) }
+
+        val expectedClockSkew = (timeProvider.currentTime.epochSecond - TOKENS_ISSUED_AT_EPOCH_SECONDS).seconds
+        assertEquals(Expired(clockSkew = expectedClockSkew), exception.reason)
+    }
+
+    @Test
+    fun `when refresh token is expired then reason is Expired with clock skew relative to iat`() {
+        timeProvider.currentTime = Instant.parse("2024-12-01T00:00:00.00Z")
+
+        val exception = assertValidationFails { authJwtValidator.validateRefreshToken(REFRESH_TOKEN, JWK_SET) }
+
+        val expectedClockSkew = (timeProvider.currentTime.epochSecond - TOKENS_ISSUED_AT_EPOCH_SECONDS).seconds
+        assertEquals(Expired(clockSkew = expectedClockSkew), exception.reason)
+    }
+
+    @Test
+    fun `when JWK set does not contain key with matching id then reason is KeyNotFound`() {
+        val exception = assertValidationFails { authJwtValidator.validateAccessToken(ACCESS_TOKEN, JWK_SET_WITH_UNKNOWN_KEY_ID) }
+
+        assertEquals(KeyNotFound, exception.reason)
+    }
+
+    @Test
+    fun `when token has incorrect issuer then reason is InvalidIssuer`() {
+        val exception = assertValidationFails {
+            authJwtValidator.validateAccessToken(
+                jwt = FakeCredentialsWithIncorrectIssuer.ACCESS_TOKEN,
+                jwkSet = FakeCredentialsWithIncorrectIssuer.JWK_SET,
+            )
+        }
+
+        assertEquals(InvalidIssuer, exception.reason)
+    }
+
+    @Test
+    fun `when token has incorrect audience then reason is InvalidAudience`() {
+        val exception = assertValidationFails {
+            authJwtValidator.validateRefreshToken(
+                jwt = FakeCredentialsWithIncorrectAudience.REFRESH_TOKEN,
+                jwkSet = FakeCredentialsWithIncorrectAudience.JWK_SET,
+            )
+        }
+
+        assertEquals(InvalidAudience, exception.reason)
+    }
+
+    @Test
+    fun `when token has incorrect scope then reason is InvalidScope`() {
+        val exception = assertValidationFails {
+            authJwtValidator.validateAccessToken(
+                jwt = FakeCredentialsWithIncorrectScope.ACCESS_TOKEN,
+                jwkSet = FakeCredentialsWithIncorrectScope.JWK_SET,
+            )
+        }
+
+        assertEquals(InvalidScope, exception.reason)
+    }
+
+    @Test
+    fun `when token signature does not match then reason is InvalidSignature`() {
+        val tokenWithForeignSignature = ACCESS_TOKEN.substringBeforeLast('.') + "." + REFRESH_TOKEN.substringAfterLast('.')
+
+        val exception = assertValidationFails { authJwtValidator.validateAccessToken(tokenWithForeignSignature, JWK_SET) }
+
+        assertEquals(InvalidSignature, exception.reason)
+    }
+
+    @Test
+    fun `when JWK set cannot be parsed then reason is JwksParseError`() {
+        val exception = assertValidationFails { authJwtValidator.validateAccessToken(ACCESS_TOKEN, "not a jwk set") }
+
+        assertEquals(JwksParseError, exception.reason)
+    }
+
+    @Test
+    fun `when token is malformed then reason is Malformed`() {
+        val exception = assertValidationFails { authJwtValidator.validateRefreshToken("not.a.jwt", JWK_SET) }
+
+        assertEquals(Malformed, exception.reason)
+    }
+
+    private fun assertValidationFails(block: () -> Unit): TokenValidationException =
+        assertThrows(TokenValidationException::class.java) { block() }
+
     private class FakeTimeProvider : CurrentTimeProvider {
         var currentTime: Instant = Instant.parse("2024-10-16T00:00:00.00Z")
 
@@ -167,6 +266,24 @@ class AuthJwtValidatorImplTest {
     }
 
     companion object {
+        const val TOKENS_ISSUED_AT_EPOCH_SECONDS = 1730391032L
+
+        // kid of the single key does not match kid in token header
+        const val JWK_SET_WITH_UNKNOWN_KEY_ID = """
+            {
+                "keys": [
+                    {
+                        "crv": "P-256",
+                        "kid": "aa4c0019-9da9-4143-9866-3f7b54224a46",
+                        "kty": "EC",
+                        "ts": 1722282670,
+                        "x": "kN2BXRyRbylNSaw3CrZKiKdATXjF1RIp2FpOxYMeuWg",
+                        "y": "wovX-ifQuoKKAi-ZPYFcZ9YBhCxN_Fng3qKSW2wKpdg"
+                    }
+                ]
+            }
+        """
+
         const val ACCESS_TOKEN = "eyJhbGciOiJFUzI1NiIsImtpZCI6IjhmNzI2MzZkLTc4OGMtNGU5Ny1hYTZiLTEzZGU0YzNmYmU4MyIsInR5cCI6IkpXVCJ9.eyJhcGkiOiJ2MiIs" +
             "Imp0aSI6IlI0RjhHN3R4Tk1rNVNHUmx2Q2t6cmtFOHpna29iaHJ4TmpNcldtcElhWmRxa05EeUw0N01ET1FKSDVoV0hBSjR3NFUwREpxWHl1RHhleDA1cnI3cXVVOmMzYTVjMT" +
             "EzLTg3N2YtNDZkNC1hYzYzLWYyN2RiZWVjY2RhNCIsInNjb3BlIjoicHJpdmFjeXBybyIsImF1ZCI6IlByaXZhY3lQcm8iLCJpYXQiOjE3MzAzOTEwMzIsImlzcyI6Imh0dHBz" +
@@ -221,8 +338,19 @@ class AuthJwtValidatorImplTest {
             "aZHFrTkR5TDQ3TURPUUpINWhXSEFKNHc0VTBESnFYeXVEeGV4MDVycjdxdVU6ODMyM2RhNzItY2ZjZS00MjhlLTlkMDUtYWYxNDg3NTM2YzgxIn0.3rA2bAC-Rh-vwe9bSQTEj" +
             "-jgHM1Dtx9PE7Cv8GellHw1wqIrLpRifRDJVYiDZ1XuHzdPfxpedCh9AOAN-mcL3w"
 
-        const val JWK_SET = """{keys=[{kty=EC, crv=P-256, kid=d3278574-6492-46ff-8d65-da95bb291cc4, x=AM2J0W8piRoFBj17tvHcVtusFs6QQze9N_hGzBnpWZiv, y=
-            |AJTXf8ndxPVg7vocTIPI3i23LeRCpvr5UhYOD86FOD86}]}"""
+        const val JWK_SET = """
+            {
+                "keys": [
+                    {
+                        "crv": "P-256",
+                        "kid": "d3278574-6492-46ff-8d65-da95bb291cc4",
+                        "kty": "EC",
+                        "x": "AM2J0W8piRoFBj17tvHcVtusFs6QQze9N_hGzBnpWZiv",
+                        "y": "AJTXf8ndxPVg7vocTIPI3i23LeRCpvr5UhYOD86FOD86"
+                    }
+                ]
+            }
+        """
     }
 
     private object FakeCredentialsWithIncorrectAudience {
@@ -240,8 +368,19 @@ class AuthJwtValidatorImplTest {
             "XbXBJYVpkcWtORHlMNDdNRE9RSkg1aFdIQUo0dzRVMERKcVh5dUR4ZXgwNXJyN3F1VTo4MzIzZGE3Mi1jZmNlLTQyOGUtOWQwNS1hZjE0ODc1MzZjODEifQ.A1EP6hwV8Xusdf" +
             "d8hWKTADcurX3Y5SON5J98t4x9FyGDzu_fawoZLq9jmqXy0EDDP27iXtLt919QpPzFwCRo0w"
 
-        const val JWK_SET = """{keys=[{kty=EC, crv=P-256, kid=342a1b99-b551-4ec0-975c-984c40ad3073, x=a0csfZFP45WHyCRW8IhNkmbtvgT4I5afXFuuAtnV75M, y=A
-            |OMBpLXT0WIPmq1zME1NFONefBtwtXNJzM4mQaZDNXrO}]}"""
+        const val JWK_SET = """
+            {
+                "keys": [
+                    {
+                        "crv": "P-256",
+                        "kid": "342a1b99-b551-4ec0-975c-984c40ad3073",
+                        "kty": "EC",
+                        "x": "a0csfZFP45WHyCRW8IhNkmbtvgT4I5afXFuuAtnV75M",
+                        "y": "AOMBpLXT0WIPmq1zME1NFONefBtwtXNJzM4mQaZDNXrO"
+                    }
+                ]
+            }
+        """
     }
 
     private object FakeCredentialsWithIncorrectScope {
@@ -259,7 +398,18 @@ class AuthJwtValidatorImplTest {
             "xa05EeUw0N01ET1FKSDVoV0hBSjR3NFUwREpxWHl1RHhleDA1cnI3cXVVOjgzMjNkYTcyLWNmY2UtNDI4ZS05ZDA1LWFmMTQ4NzUzNmM4MSJ9.OEKrHqpgc6PVujwIHoj9OoDF" +
             "H-kRT79e0NE5eTmDwvnoHglweJigsKuWFxN6FoTfAKvC7tMPjy3EM3peYIRHXg"
 
-        const val JWK_SET = """{keys=[{kty=EC, crv=P-256, kid=3716729c-3135-4c92-88c4-fb13b9a0929c, x=HFzQVBbfBdeOYsMdRSx_3MxbZowmDG1OwyiFBYRubgE, y=e
-            |LlCqUJEVGgc0K7mjUo3Wk52C9mgRllnOfG_S6KSEck}]}"""
+        const val JWK_SET = """
+            {
+                "keys": [
+                    {
+                        "crv": "P-256",
+                        "kid": "3716729c-3135-4c92-88c4-fb13b9a0929c",
+                        "kty": "EC",
+                        "x": "HFzQVBbfBdeOYsMdRSx_3MxbZowmDG1OwyiFBYRubgE",
+                        "y": "eLlCqUJEVGgc0K7mjUo3Wk52C9mgRllnOfG_S6KSEck"
+                    }
+                ]
+            }
+        """
     }
 }

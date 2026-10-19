@@ -21,14 +21,14 @@
 
     <!-- Inactivity timeout -->
     <string name="afterInactivityOptionTitle">Nakon neaktivnosti</string>
-    <string name="afterInactivityTimeoutRowTitle">Odaberi mjerač vremena neaktivnosti</string>
-    <string name="afterInactivityScreenSectionHeader">Odaberi što ćeš vidjeti kada se vratiš nakon neaktivnosti</string>
+    <string name="afterInactivityTimeoutTitle">Mjerač vremena neaktivnosti</string>
+    <string name="afterInactivityScreenDescription">Odaberi što ćeš vidjeti kada se vratiš na DuckDuckGo nakon neaktivnosti</string>
     <string name="afterInactivityOptionMessage" instruction="&apos;%1$s&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;after 5 minutes of inactivity&apos;">Odaberi što ćeš vidjeti kada se vratiš nakon %1$s minuta neaktivnosti.</string>
     <string name="afterInactivityTimeoutAlways">Uvijek</string>
     <string name="afterInactivityTimeout1Minute">1 minutu</string>
     <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d minuta</string>
     <string name="afterInactivityTimeout1Hour">1 sat</string>
     <string name="afterInactivityTimeoutXHours" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of hours, e.g. &apos;2 hours&apos;">%1$d sati</string>
-    <string name="returnToLastTabSettingTitle">Povratak na posljednju karticu</string>
-    <string name="returnToLastTabSettingSubtitle">Prikaži poveznicu na svoju posljednju karticu na stranici nove kartice kada ponovno otvoriš aplikaciju</string>
+    <string name="returnToLastTabShortcutSettingTitle">Prečac „Povratak na”</string>
+    <string name="returnToLastTabShortcutSettingSubtitle">Prikazuje poveznicu za povratak na posljednju korištenu karticu kada pokreneš aplikaciju nakon neaktivnosti.</string>
 </resources>

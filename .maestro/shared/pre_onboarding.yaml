@@ -3,9 +3,9 @@ appId: com.duckduckgo.mobile.android
 # Consumers need to know whether the segmented onboarding is shown
 - evalScript: ${output.segmentedOnboardingShown = false}
 - assertVisible:
-    text: ".*(Ready for a faster browser that protects you and lets you decide when and how to use.AI|Ready for a faster browser that puts you in.control).*"
+    text: ".*Ready for a faster browser that puts you in.control.*"
 - tapOn:
-    text: "(let's get started!|Let's do it!)"
+    text: "let's get started!"
 # Cohorts of the segmented onboarding experiment see a "Set things up your way" download-reason screen
 # instead of the classic path (see NewUserOnboardingPlanProvider). The check is optional so this flow
 # stays deterministic regardless of which cohort a run gets enrolled into.

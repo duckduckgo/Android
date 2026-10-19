@@ -23,6 +23,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEventStatus.FAILURE
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEventStatus.SUCCESS
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEventStep
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.squareup.moshi.Moshi
@@ -37,6 +38,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
@@ -66,11 +69,16 @@ class WideEventRepositoryTest {
             override fun localDateTimeNow(): LocalDateTime = throw UnsupportedOperationException()
         }
 
+    private val appBuildConfig: AppBuildConfig = mock { appBuildConfig ->
+        whenever(appBuildConfig.versionName).thenReturn("5.123.0")
+    }
+
     private val wideEventRepository: WideEventRepository =
         WideEventRepositoryImpl(
             database = database,
             wideEventDao = database.wideEventDao(),
             timeProvider = timeProvider,
+            appBuildConfig = appBuildConfig,
         )
 
     @After
@@ -293,6 +301,23 @@ class WideEventRepositoryTest {
                 assertTrue(metaType == "android-test-event")
                 assertTrue(metaVersion == "2.1.3")
             }
+        }
+
+    @Test
+    fun `when app version changes after event is inserted, then event keeps the app version from insertion`() =
+        runTest {
+            whenever(appBuildConfig.versionName).thenReturn("5.1.0")
+            val eventId = insertEvent(name = "test_event")
+
+            whenever(appBuildConfig.versionName).thenReturn("5.2.0")
+            wideEventRepository.addWideEventStep(
+                eventId = eventId,
+                step = WideEventStep(name = "step_A", success = true),
+                metadata = emptyMap(),
+            )
+            wideEventRepository.setWideEventStatus(eventId = eventId, status = SUCCESS, metadata = emptyMap())
+
+            assertEquals("5.1.0", wideEventRepository.getWideEvents(setOf(eventId)).single().appVersion)
         }
 
     @Test

@@ -28,17 +28,23 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
+import com.duckduckgo.pir.impl.PirFeatureDataCleaner
+import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.checker.isEnabled
 import com.duckduckgo.pir.impl.dashboard.PirDashboardUrlProvider
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
+import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
+import com.duckduckgo.pir.impl.store.PirFreemiumFirstScanResult
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.internal.R
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalSettingsBinding
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEventsResultsScreen
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -68,6 +74,12 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
+    @Inject
+    lateinit var pirFeatureDataCleaner: PirFeatureDataCleaner
+
+    @Inject
+    lateinit var pirFreemiumDataStore: PirFreemiumDataStore
+
     private val binding: ActivityPirInternalSettingsBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,6 +100,12 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupViews() {
+        // intentionally not gated on canRunPir(): this exists so a non-subscriber can reach the
+        // dashboard while the subscription-gated entry point is hidden for them
+        binding.pirOpenDashboard.setOnClickListener {
+            globalActivityStarter.start(this, PirDashboardWebViewScreen)
+        }
+
         binding.pirDebugScan.setOnClickListener {
             globalActivityStarter.start(this, PirDevScanScreenNoParams)
         }
@@ -124,6 +142,39 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
             pirInternalSettingsDataStore.customDashboardUrl = null
             binding.pirCustomUrlInput.text = PirDashboardWebConstants.DEFAULT_WEB_UI_URL
             Toast.makeText(this, getString(R.string.pirDevCustomUrlReset), Toast.LENGTH_SHORT).show()
+        }
+
+        binding.pirResetFreemiumState.setOnClickListener {
+            lifecycleScope.launch(dispatcherProvider.io()) {
+                pirFeatureDataCleaner.removeUserData()
+                withContext(dispatcherProvider.main()) {
+                    Toast.makeText(this@PirDevSettingsActivity, getString(R.string.pirDevResetFreemiumStateDone), Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        binding.pirSimulateFreeScanMatches.setOnClickListener { simulateFreeScanResult(PirFreemiumFirstScanResult.MATCHES_FOUND) }
+        binding.pirSimulateFreeScanNoMatches.setOnClickListener { simulateFreeScanResult(PirFreemiumFirstScanResult.NO_MATCHES) }
+
+        binding.pirShowFreemiumScanCompleteNotification.setOnClickListener {
+            if (!pirNotificationManager.showScanCompleteNotification(PirRunMode.SCAN_ONLY)) {
+                Toast.makeText(this, getString(R.string.pirDevShowFreemiumScanCompleteNotificationDenied), Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        binding.pirForceFreemiumEligibility.setIsChecked(pirInternalSettingsDataStore.isFreemiumEligibilityForced)
+        binding.pirForceFreemiumEligibility.setOnCheckedChangeListener { _, isChecked ->
+            pirInternalSettingsDataStore.isFreemiumEligibilityForced = isChecked
+        }
+    }
+
+    private fun simulateFreeScanResult(result: PirFreemiumFirstScanResult) {
+        lifecycleScope.launch(dispatcherProvider.io()) {
+            pirFreemiumDataStore.clearFirstScanResult()
+            pirFreemiumDataStore.recordFirstScanResult(result)
+            withContext(dispatcherProvider.main()) {
+                Toast.makeText(this@PirDevSettingsActivity, getString(R.string.pirDevSimulateFreeScanDone), Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

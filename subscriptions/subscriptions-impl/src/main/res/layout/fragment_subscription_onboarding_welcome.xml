@@ -21,36 +21,22 @@
     android:layout_height="match_parent"
     android:background="?attr/daxColorSurface">
 
-    <ImageView
-        android:id="@+id/subscriptionOnboardingWelcomeBackground"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_5"
-        android:layout_marginBottom="@dimen/keyline_5"
-        android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
-        android:src="@drawable/onboarding_welcome_background"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <androidx.core.widget.NestedScrollView
         android:id="@+id/subscriptionOnboardingWelcomeContent"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constrainedHeight="true"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/keyline_5"
+        android:fillViewport="true"
         app:layout_constraintBottom_toTopOf="@id/subscriptionOnboardingWelcomePrimaryButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0">
+        app:layout_constraintWidth_max="400dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingHorizontal="@dimen/keyline_5"
-            android:paddingBottom="@dimen/keyline_5">
+            android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/subscriptionOnboardingWelcomeIcon"
@@ -210,36 +196,41 @@
 
             </LinearLayout>
 
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:paddingVertical="@dimen/keyline_5">
+
+                <ImageView
+                    android:id="@+id/subscriptionOnboardingWelcomeDax"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/subscription_onboarding_dax_light" />
+
+            </FrameLayout>
+
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
 
-    <ImageView
-        android:id="@+id/subscriptionOnboardingWelcomeDax"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginBottom="@dimen/keyline_2"
-        android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
-        android:src="@drawable/onboarding_dax_thumbs_up"
-        app:layout_constraintBottom_toTopOf="@id/subscriptionOnboardingWelcomePrimaryButton"
-        app:layout_constraintHeight_max="wrap"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/subscriptionOnboardingWelcomeContent"
-        app:layout_constraintVertical_bias="1" />
-
     <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/subscriptionOnboardingWelcomePrimaryButton"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_5"
         android:layout_marginBottom="@dimen/keyline_4"
         android:text="@string/subscriptionOnboardingWelcomePrimaryButton"
         app:daxButtonSize="large"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_max="400dp" />
 
-    <nl.dionsegijn.konfetti.KonfettiView
-        android:id="@+id/subscriptionOnboardingWelcomeKonfetti"
+    <com.duckduckgo.subscriptions.impl.onboarding.confetti.ConfettiView
+        android:id="@+id/subscriptionOnboardingWelcomeConfetti"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clickable="false"

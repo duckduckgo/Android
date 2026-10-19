@@ -88,7 +88,6 @@ class OnboardingActivity : DuckDuckGoActivity() {
     }
 
     fun onSkipClicked() {
-        viewModel.onOnboardingSkipped()
         startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding, newSearch = true))
         finish()
     }
@@ -161,11 +160,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
 
         binding.skipOnboardingButton.setOnClickListener {
             lifecycleScope.launch {
-                val shouldNavigate = viewModel.devOnlyFullyCompleteAllOnboarding()
-                if (shouldNavigate) {
-                    startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding))
-                    finish()
-                }
+                viewModel.devOnlyFullyCompleteAllOnboarding()
             }
         }
         viewModel.initializeOnboardingSkipper()

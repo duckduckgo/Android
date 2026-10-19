@@ -23,7 +23,6 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -58,10 +57,10 @@ class EventHubJsInjectorPluginTest {
     }
 
     @Test
-    fun `onPageStarted does nothing when feature disabled`() {
+    fun `onPageStarted reports navigation even when feature disabled`() {
         whenever(pixelManager.isEnabled()).thenReturn(false)
         plugin.onPageStarted(webView, "https://example.com", null, emptyList())
 
-        verify(pixelManager, never()).onNavigationStarted(any(), any())
+        verify(pixelManager).onNavigationStarted(System.identityHashCode(webView).toString(), "https://example.com")
     }
 }

@@ -74,6 +74,7 @@ interface BrokerStepsParser {
         data class ScanStep(
             override val broker: Broker,
             override val step: ScanStepActions,
+            val isFreeScan: Boolean = false,
         ) : BrokerStep(broker, step)
 
         data class OptOutStep(

@@ -76,7 +76,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create Asana task when any orchestrator step failed
-        uses: duckduckgo/native-github-asana-sync@v2.6.0
+        uses: duckduckgo/native-github-asana-sync@v2.7.1
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}

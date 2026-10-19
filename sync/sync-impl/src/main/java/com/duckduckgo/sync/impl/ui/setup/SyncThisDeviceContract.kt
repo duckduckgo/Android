@@ -34,7 +34,12 @@ class SyncThisDeviceContract : ActivityResultContract<Input, Output>() {
         context: Context,
         input: Input,
     ): Intent {
-        return SyncThisDeviceActivity.intent(context, input.launchSource)
+        return SyncThisDeviceActivity.intent(
+            context = context,
+            launchSource = input.launchSource,
+            isAuthRequired = input.isAuthRequired,
+            isImprovedSyncFlow = input.isImprovedSyncFlow,
+        )
     }
 
     override fun parseResult(
@@ -58,6 +63,8 @@ class SyncThisDeviceContract : ActivityResultContract<Input, Output>() {
 
     data class Input(
         val launchSource: String?,
+        val isAuthRequired: Boolean,
+        val isImprovedSyncFlow: Boolean,
     )
 
     sealed interface Output {

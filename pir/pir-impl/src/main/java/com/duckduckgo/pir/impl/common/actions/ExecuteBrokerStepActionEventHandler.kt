@@ -233,6 +233,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                                 profileQueryId = state.profileQuery.id,
                                 currentActionAttemptCount = state.actionRetryCount + 1, // actionRetryCount starts at 0
                                 currentAction = actionToExecute,
+                                isFreeScan = currentBrokerStep.isFreeScan,
                             ),
                         )
                     } else if (currentBrokerStep is OptOutStep && actionToExecute is SolveCaptcha) {

@@ -44,8 +44,8 @@ import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.PasswordImportErrorAction
-import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
-import com.duckduckgo.app.onboarding.ui.page.configdriven.Embellishment
+import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
+import com.duckduckgo.app.onboarding.ui.page.welcome.Embellishment
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
@@ -878,11 +878,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             resolveDialog = { NewUserOnboardingActivityDialog.WidgetPrompt },
             transition = { event ->
                 when (event) {
-                    is NewUserOnboardingEvent.Presented -> {
-                        onboardingStore.linearPlanWidgetPromptShown = true
-                        Stay
-                    }
-
                     is NewUserOnboardingEvent.AddWidgetRequested -> {
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
                         Advance
@@ -1164,9 +1159,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                             OnboardingPixelAction.TryInputClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
                         )
                         if (handsPromptToDemoStep) {
+                            onboardingStore.setTriedDuckAi()
                             ctx.pendingDuckAiPrompt = event.query
                         } else {
                             ctx.completionResult = if (event.isChat) {
+                                onboardingStore.setTriedDuckAi()
                                 NewUserOnboardingResult.LaunchChat(prompt = event.query)
                             } else {
                                 NewUserOnboardingResult.LaunchSearch(query = event.query)

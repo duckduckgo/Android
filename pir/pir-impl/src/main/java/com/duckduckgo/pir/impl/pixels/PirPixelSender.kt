@@ -57,6 +57,12 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_LOW_MEMORY
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_START_FAILED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FREEMIUM_MAINTENANCE_SCAN_SKIPPED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FREEMIUM_NOTIFICATION_OPENED_FIRST_SCAN_COMPLETE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FREEMIUM_NOTIFICATION_SENT_FIRST_SCAN_COMPLETE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FREEMIUM_SETTINGS_ENTRY_POINT_CLICKED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FREEMIUM_SETTINGS_ENTRY_POINT_IMPRESSION
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FREEMIUM_UPSELL
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_DURATION
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_INCOMPLETE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERACTION_DAU
@@ -64,6 +70,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERACTION_MAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERACTION_WAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_MANUAL_RESET
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_NOTIFICATION_SENT_FIRST_SCAN_COMPLETE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_INVALID_EVENT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_PARSE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_SEND
@@ -433,38 +440,52 @@ interface PirPixelSender {
 
     /**
      * Emits a pixel to report Daily Active Users for PIR.
+     *
+     * @param isAuthenticated whether the user holds an active subscription that includes PIR, see [com.duckduckgo.pir.impl.PirUserUtils.hasPirSubscription]
      */
-    fun reportDAU()
+    fun reportDAU(isAuthenticated: Boolean)
 
     /**
      * Emits a pixel to report Weekly Active Users for PIR.
+     *
+     * @param isAuthenticated whether the user holds an active subscription that includes PIR, see [com.duckduckgo.pir.impl.PirUserUtils.hasPirSubscription]
      */
-    fun reportWAU()
+    fun reportWAU(isAuthenticated: Boolean)
 
     /**
      * Emits a pixel to report Monthly Active Users for PIR.
+     *
+     * @param isAuthenticated whether the user holds an active subscription that includes PIR, see [com.duckduckgo.pir.impl.PirUserUtils.hasPirSubscription]
      */
-    fun reportMAU()
+    fun reportMAU(isAuthenticated: Boolean)
 
     /**
      * Emits a pixel to report user-interacted Daily Active Users for PIR (the PIR dashboard was presented).
+     *
+     * @param isAuthenticated whether the user holds an active subscription that includes PIR, see [com.duckduckgo.pir.impl.PirUserUtils.hasPirSubscription]
      */
-    fun reportInteractionDAU()
+    fun reportInteractionDAU(isAuthenticated: Boolean)
 
     /**
      * Emits a pixel to report user-interacted Weekly Active Users for PIR (the PIR dashboard was presented).
+     *
+     * @param isAuthenticated whether the user holds an active subscription that includes PIR, see [com.duckduckgo.pir.impl.PirUserUtils.hasPirSubscription]
      */
-    fun reportInteractionWAU()
+    fun reportInteractionWAU(isAuthenticated: Boolean)
 
     /**
      * Emits a pixel to report user-interacted Monthly Active Users for PIR (the PIR dashboard was presented).
+     *
+     * @param isAuthenticated whether the user holds an active subscription that includes PIR, see [com.duckduckgo.pir.impl.PirUserUtils.hasPirSubscription]
      */
-    fun reportInteractionMAU()
+    fun reportInteractionMAU(isAuthenticated: Boolean)
 
     /**
      * Emits a unique pixel (once per install) when the user starts their first PIR scan.
+     *
+     * @param isAuthenticated whether the scan runs under a subscription that includes PIR rather than as a free scan
      */
-    fun reportFirstScanStarted()
+    fun reportFirstScanStarted(isAuthenticated: Boolean)
 
     /**
      * Emits a pixel to report weekly data on orphaned opt-out records on child data brokers that don't have matching profiles on their parent broker.
@@ -490,6 +511,7 @@ interface PirPixelSender {
         parentUrl: String,
         actionId: String,
         actionType: String,
+        isFreeScan: Boolean,
     )
 
     fun reportScanStageEmailGetData(
@@ -507,6 +529,7 @@ interface PirPixelSender {
         durationMs: Long,
         inManualStarted: Boolean,
         parentUrl: String,
+        isFreeScan: Boolean,
     )
 
     suspend fun reportScanNoMatch(
@@ -517,6 +540,7 @@ interface PirPixelSender {
         parentUrl: String,
         actionId: String,
         actionType: String,
+        isFreeScan: Boolean,
     )
 
     suspend fun reportScanError(
@@ -529,6 +553,7 @@ interface PirPixelSender {
         parentUrl: String,
         actionId: String,
         actionType: String,
+        isFreeScan: Boolean,
     )
 
     fun reportOptOutStageStart(
@@ -632,14 +657,22 @@ interface PirPixelSender {
         durationMs: Long,
     )
 
+    /**
+     * @param isFreeScan whether the user has no PIR subscription
+     */
     fun reportUpdateBrokerJsonSuccess(
         brokerJsonFileName: String,
         removedAtMs: Long,
+        isFreeScan: Boolean?,
     )
 
+    /**
+     * @param isFreeScan whether the user has no PIR subscription
+     */
     fun reportUpdateBrokerJsonFailure(
         brokerJsonFileName: String,
         removedAtMs: Long,
+        isFreeScan: Boolean?,
     )
 
     suspend fun reportDownloadMainConfigBEFailure(
@@ -667,9 +700,19 @@ interface PirPixelSender {
         actionId: String,
         errorMessage: String,
         stepType: String,
+        isFreeScan: Boolean,
     )
 
-    fun reportDashboardOpened()
+    fun reportFreemiumUpsell()
+
+    fun reportFreemiumMaintenanceScanSkipped()
+
+    /**
+     * Emits a count and a daily pixel every time the PIR dashboard is presented.
+     *
+     * @param isAuthenticated whether the user holds an active subscription that includes PIR, see [com.duckduckgo.pir.impl.PirUserUtils.hasPirSubscription]
+     */
+    fun reportDashboardOpened(isAuthenticated: Boolean)
 
     fun reportInitialScanIncomplete()
 
@@ -681,6 +724,7 @@ interface PirPixelSender {
         brokerCount: Int,
         executionType: PirExecutionType,
         notificationsPermissionGranted: Boolean,
+        isFreeScan: Boolean,
     )
 
     fun reportBackgroundScanStats(
@@ -703,6 +747,16 @@ interface PirPixelSender {
         executionType: PirExecutionType,
         didCrash: Boolean,
     )
+
+    fun reportFreemiumSettingsEntryPointImpression()
+
+    fun reportFreemiumSettingsEntryPointClicked(ctaState: PirFreemiumCtaState)
+
+    fun reportFreemiumScanCompleteNotificationSent()
+
+    fun reportFreemiumScanCompleteNotificationOpened()
+
+    fun reportScanCompleteNotificationSent()
 }
 
 @ContributesBinding(AppScope::class)
@@ -1080,32 +1134,32 @@ class RealPirPixelSender @Inject constructor(
         enqueueFire(PIR_CAN_RUN_PIR)
     }
 
-    override fun reportDAU() {
-        enqueueFire(PIR_ENGAGEMENT_DAU)
+    override fun reportDAU(isAuthenticated: Boolean) {
+        enqueueFire(PIR_ENGAGEMENT_DAU, usageParams(isAuthenticated))
     }
 
-    override fun reportWAU() {
-        enqueueFire(PIR_ENGAGEMENT_WAU)
+    override fun reportWAU(isAuthenticated: Boolean) {
+        enqueueFire(PIR_ENGAGEMENT_WAU, usageParams(isAuthenticated))
     }
 
-    override fun reportMAU() {
-        enqueueFire(PIR_ENGAGEMENT_MAU)
+    override fun reportMAU(isAuthenticated: Boolean) {
+        enqueueFire(PIR_ENGAGEMENT_MAU, usageParams(isAuthenticated))
     }
 
-    override fun reportInteractionDAU() {
-        enqueueFire(PIR_INTERACTION_DAU, usageParams())
+    override fun reportInteractionDAU(isAuthenticated: Boolean) {
+        enqueueFire(PIR_INTERACTION_DAU, usageParams(isAuthenticated))
     }
 
-    override fun reportInteractionWAU() {
-        enqueueFire(PIR_INTERACTION_WAU, usageParams())
+    override fun reportInteractionWAU(isAuthenticated: Boolean) {
+        enqueueFire(PIR_INTERACTION_WAU, usageParams(isAuthenticated))
     }
 
-    override fun reportInteractionMAU() {
-        enqueueFire(PIR_INTERACTION_MAU, usageParams())
+    override fun reportInteractionMAU(isAuthenticated: Boolean) {
+        enqueueFire(PIR_INTERACTION_MAU, usageParams(isAuthenticated))
     }
 
-    override fun reportFirstScanStarted() {
-        enqueueFire(PIR_FIRST_SCAN_STARTED, usageParams())
+    override fun reportFirstScanStarted(isAuthenticated: Boolean) {
+        enqueueFire(PIR_FIRST_SCAN_STARTED, usageParams(isAuthenticated))
     }
 
     override fun reportWeeklyChildOrphanedOptOuts(
@@ -1137,6 +1191,7 @@ class RealPirPixelSender @Inject constructor(
         parentUrl: String,
         actionId: String,
         actionType: String,
+        isFreeScan: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -1145,6 +1200,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_PARENT to parentUrl,
             PARAM_ACTION_ID to actionId,
             PARAM_KEY_ACTION_TYPE to actionType,
+            PARAM_KEY_FREE_SCAN to isFreeScan.toString(),
         )
 
         fire(PIR_SCAN_STAGE, params)
@@ -1177,6 +1233,7 @@ class RealPirPixelSender @Inject constructor(
         durationMs: Long,
         inManualStarted: Boolean,
         parentUrl: String,
+        isFreeScan: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -1187,7 +1244,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_PARENT to parentUrl,
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
             PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
-        )
+        ) + usageParams(isAuthenticated = !isFreeScan)
 
         fire(PIR_SCAN_STAGE_RESULT_MATCHES, params)
     }
@@ -1200,6 +1257,7 @@ class RealPirPixelSender @Inject constructor(
         parentUrl: String,
         actionId: String,
         actionType: String,
+        isFreeScan: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -1211,7 +1269,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_ACTION_TYPE to actionType,
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
             PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
-        )
+        ) + usageParams(isAuthenticated = !isFreeScan)
 
         fire(PIR_SCAN_STAGE_RESULT_NO_MATCH, params)
     }
@@ -1226,6 +1284,7 @@ class RealPirPixelSender @Inject constructor(
         parentUrl: String,
         actionId: String,
         actionType: String,
+        isFreeScan: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -1239,7 +1298,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_ACTION_TYPE to actionType,
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
             PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
-        )
+        ) + usageParams(isAuthenticated = !isFreeScan)
 
         fire(PIR_SCAN_STAGE_RESULT_ERROR, params)
     }
@@ -1501,25 +1560,17 @@ class RealPirPixelSender @Inject constructor(
     override fun reportUpdateBrokerJsonSuccess(
         brokerJsonFileName: String,
         removedAtMs: Long,
+        isFreeScan: Boolean?,
     ) {
-        val params = mapOf(
-            PARAM_KEY_BROKER_JSON_FILE to brokerJsonFileName,
-            PARAM_KEY_REMOVED_AT to removedAtMs.toString(),
-        )
-
-        fire(PIR_UPDATE_BROKER_SUCCESS, params)
+        fire(PIR_UPDATE_BROKER_SUCCESS, brokerUpdateParams(brokerJsonFileName, removedAtMs, isFreeScan))
     }
 
     override fun reportUpdateBrokerJsonFailure(
         brokerJsonFileName: String,
         removedAtMs: Long,
+        isFreeScan: Boolean?,
     ) {
-        val params = mapOf(
-            PARAM_KEY_BROKER_JSON_FILE to brokerJsonFileName,
-            PARAM_KEY_REMOVED_AT to removedAtMs.toString(),
-        )
-
-        fire(PIR_UPDATE_BROKER_FAILURE, params)
+        fire(PIR_UPDATE_BROKER_FAILURE, brokerUpdateParams(brokerJsonFileName, removedAtMs, isFreeScan))
     }
 
     override suspend fun reportDownloadMainConfigBEFailure(errorCode: String) {
@@ -1568,6 +1619,7 @@ class RealPirPixelSender @Inject constructor(
         actionId: String,
         errorMessage: String,
         stepType: String,
+        isFreeScan: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -1576,13 +1628,22 @@ class RealPirPixelSender @Inject constructor(
             PARAM_ACTION_ID to actionId,
             PARAM_KEY_MSG to errorMessage,
             PARAM_KEY_STEP to stepType,
+            PARAM_KEY_FREE_SCAN to isFreeScan.toString(),
         )
 
         fire(PIR_BROKER_ACTION_FAILED, params)
     }
 
-    override fun reportDashboardOpened() {
-        fire(PIR_DASHBOARD_OPENED)
+    override fun reportFreemiumUpsell() {
+        fire(PIR_FREEMIUM_UPSELL)
+    }
+
+    override fun reportFreemiumMaintenanceScanSkipped() {
+        fire(PIR_FREEMIUM_MAINTENANCE_SCAN_SKIPPED)
+    }
+
+    override fun reportDashboardOpened(isAuthenticated: Boolean) {
+        fire(PIR_DASHBOARD_OPENED, usageParams(isAuthenticated))
     }
 
     override fun reportInitialScanIncomplete() {
@@ -1597,6 +1658,7 @@ class RealPirPixelSender @Inject constructor(
         brokerCount: Int,
         executionType: PirExecutionType,
         notificationsPermissionGranted: Boolean,
+        isFreeScan: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_DURATION_MS to durationMs.toString(),
@@ -1608,6 +1670,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_SCAN_TRIGGER to executionType.toScanTriggerParam(),
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
             PARAM_KEY_NOTIFICATIONS_PERMISSION to notificationsPermissionGranted.toString(),
+            PARAM_KEY_FREE_SCAN to isFreeScan.toString(),
         )
 
         fire(PIR_INITIAL_SCAN_DURATION, params)
@@ -1657,11 +1720,40 @@ class RealPirPixelSender @Inject constructor(
         enqueueFire(PIR_SCAN_RENDERER_GONE, params)
     }
 
-    private fun usageParams(): Map<String, String> = mapOf(
-        // hardcoded values for now until we support freemium
-        PARAM_KEY_IS_AUTHENTICATED to "true",
-        PARAM_KEY_FREE_SCAN to "false",
+    override fun reportFreemiumSettingsEntryPointImpression() {
+        fire(PIR_FREEMIUM_SETTINGS_ENTRY_POINT_IMPRESSION)
+    }
+
+    override fun reportFreemiumSettingsEntryPointClicked(ctaState: PirFreemiumCtaState) {
+        fire(PIR_FREEMIUM_SETTINGS_ENTRY_POINT_CLICKED, mapOf(PARAM_KEY_CTA_STATE to ctaState.paramValue))
+    }
+
+    override fun reportFreemiumScanCompleteNotificationSent() {
+        fire(PIR_FREEMIUM_NOTIFICATION_SENT_FIRST_SCAN_COMPLETE)
+    }
+
+    override fun reportFreemiumScanCompleteNotificationOpened() {
+        fire(PIR_FREEMIUM_NOTIFICATION_OPENED_FIRST_SCAN_COMPLETE)
+    }
+
+    override fun reportScanCompleteNotificationSent() {
+        fire(PIR_NOTIFICATION_SENT_FIRST_SCAN_COMPLETE)
+    }
+
+    private fun usageParams(isAuthenticated: Boolean): Map<String, String> = mapOf(
+        PARAM_KEY_IS_AUTHENTICATED to isAuthenticated.toString(),
+        PARAM_KEY_FREE_SCAN to (!isAuthenticated).toString(),
     )
+
+    private fun brokerUpdateParams(
+        brokerJsonFileName: String,
+        removedAtMs: Long,
+        isFreeScan: Boolean?,
+    ): Map<String, String> = buildMap {
+        put(PARAM_KEY_BROKER_JSON_FILE, brokerJsonFileName)
+        put(PARAM_KEY_REMOVED_AT, removedAtMs.toString())
+        isFreeScan?.let { put(PARAM_KEY_FREE_SCAN, it.toString()) }
+    }
 
     private fun fire(
         pixel: PirPixel,
@@ -1757,5 +1849,6 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_SCAN_TRIGGER = "scan_trigger"
         private const val PARAM_KEY_NOTIFICATIONS_PERMISSION = "notifications_permission_granted"
         private const val PARAM_KEY_DID_CRASH = "did_crash"
+        private const val PARAM_KEY_CTA_STATE = "cta_state"
     }
 }

@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutConditionNotFound
@@ -214,6 +215,7 @@ class BrokerActionFailedEventHandler @Inject constructor(
                 stepType = currentBrokerStep.step.stepType,
                 completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
                 actionType = currentAction.asActionType(),
+                isFreeScan = (currentBrokerStep as? ScanStep)?.isFreeScan == true,
             ),
         )
     }

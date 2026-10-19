@@ -21,8 +21,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
-import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
+import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.R.drawable
@@ -33,7 +32,6 @@ import javax.inject.Inject
 @SingleInstanceIn(scope = AppScope::class)
 class OnboardingStoreImpl @Inject constructor(
     private val context: Context,
-    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : OnboardingStore {
 
@@ -43,28 +41,16 @@ class OnboardingStoreImpl @Inject constructor(
         get() = preferences.getString(ONBOARDING_JOURNEY, null)
         set(dialogJourney) = preferences.edit { putString(ONBOARDING_JOURNEY, dialogJourney) }
 
-    override var linearPlanWidgetPromptShown: Boolean
-        get() = preferences.getBoolean(KEY_LINEAR_PLAN_WIDGET_PROMPT_SHOWN, false)
-        set(shown) = preferences.edit { putBoolean(KEY_LINEAR_PLAN_WIDGET_PROMPT_SHOWN, shown) }
-
     override fun getSearchOptions(): List<DaxDialogIntroOption> {
         val country = Locale.getDefault().country
         val language = Locale.getDefault().language
 
         return listOf(
             DaxDialogIntroOption(
-                optionText = if (onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
-                    if (language == "en") {
-                        context.getString(R.string.onboardingSearchDaxDialogOption1EnglishQuoted)
-                    } else {
-                        context.getString(R.string.onboardingSearchDaxDialogOption1Quoted)
-                    }
+                optionText = if (language == "en") {
+                    context.getString(R.string.onboardingSearchDaxDialogOption1EnglishQuoted)
                 } else {
-                    if (language == "en") {
-                        context.getString(R.string.onboardingSearchDaxDialogOption1English)
-                    } else {
-                        context.getString(R.string.onboardingSearchDaxDialogOption1)
-                    }
+                    context.getString(R.string.onboardingSearchDaxDialogOption1Quoted)
                 },
                 iconRes = drawable.ic_find_search_16,
                 link = if (language == "en") "how to say duck in spanish" else context.getString(R.string.onboardingSearchQueryOption1),
@@ -245,13 +231,21 @@ class OnboardingStoreImpl @Inject constructor(
         return getDownloadReason()?.takeIf { it == DownloadReasonSelection.SEARCH || it == DownloadReasonSelection.AI_CHAT }
     }
 
+    override fun setTriedDuckAi() {
+        preferences.edit { putBoolean(KEY_TRIED_DUCK_AI, true) }
+    }
+
+    override fun getTriedDuckAi(): Boolean {
+        return preferences.getBoolean(KEY_TRIED_DUCK_AI, false)
+    }
+
     companion object {
         const val FILENAME = "com.duckduckgo.app.onboarding.settings"
         const val ONBOARDING_JOURNEY = "onboardingJourney"
         private const val KEY_INPUT_SCREEN_SELECTION = "inputScreenSelection"
         private const val KEY_INPUT_SCREEN_SELECTION_OVERRIDDEN_BY_USER = "inputScreenSelectionOverriddenByUser"
         private const val KEY_DUCK_AI_ONBOARDING_FLOW = "duckAiOnboardingFlow"
-        private const val KEY_LINEAR_PLAN_WIDGET_PROMPT_SHOWN = "linearPlanWidgetPromptShown"
         private const val KEY_DOWNLOAD_REASON = "downloadReason"
+        private const val KEY_TRIED_DUCK_AI = "triedDuckAi"
     }
 }

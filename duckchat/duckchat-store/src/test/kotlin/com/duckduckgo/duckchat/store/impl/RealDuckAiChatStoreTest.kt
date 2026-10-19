@@ -228,6 +228,31 @@ class RealDuckAiChatStoreTest {
     }
 
     @Test
+    fun `getChats sets isImageGeneration when canonical assistant content has generate-image ui-component`() = runTest {
+        val json = """
+            {
+              "chatId": "abc",
+              "title": "Image",
+              "model": "gpt-5-mini",
+              "lastEdit": "2026-05-15T14:23:16.313Z",
+              "pinned": false,
+              "messages": [
+                { "role": "user", "content": [{ "type": "text", "text": "draw a cat" }] },
+                {
+                  "role": "assistant",
+                  "content": [
+                    { "type": "ui-component", "name": "generate-image" }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertTrue(store.getChats()[0].isImageGeneration)
+    }
+
+    @Test
     fun `getChats does not set isImageGeneration when generate-image part is on a non-assistant message`() = runTest {
         val json = """
             {

@@ -129,7 +129,10 @@
             "tab_switcher_existing_chat",
             "subscription_onboarding",
             "browsing_menu_duckai",
-            "duck_ai_new_chat"
+            "duck_ai_new_chat",
+            "recent_chat_tab_switcher",
+            "recent_chat_contextual",
+            "chat_suggestion_input"
         ]
     },
     "osVersion": {
@@ -164,7 +167,7 @@
     "widePixelAppVersion": {
         "key": "app.version",
         "type": "string",
-        "description": "The version of the app sending the pixel"
+        "description": "The version of the app when the wide event's flow started"
     },
     "widePixelDevMode": {
         "key": "app.dev_mode",
@@ -316,6 +319,16 @@
             "foreground_start_failed",
             "work_stopped"
         ]
+    },
+    "pirIsAuthenticated": {
+        "key": "is_authenticated",
+        "type": "boolean",
+        "description": "Whether the user has an active subscription that includes PIR."
+    },
+    "pirIsFreeScan": {
+        "key": "free_scan",
+        "type": "boolean",
+        "description": "Whether the user is a free (freemium) PIR user."
     },
     "duckAiSubscriptionFunnelOrigin": {
         "key": "origin",

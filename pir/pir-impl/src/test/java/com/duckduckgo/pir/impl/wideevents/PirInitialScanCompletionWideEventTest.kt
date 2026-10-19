@@ -509,6 +509,17 @@ private class FakePirDataStore : PirDataStore {
     override var initialScanCompletionFlowId: Long = 0L
     override var initialScanCompletionForegroundRunCount: Int = 0
     override var initialScanCompletionScheduledRunCount: Int = 0
+    private var isScanCompleteNotificationPending = false
+
+    override fun markScanCompleteNotificationPending() {
+        isScanCompleteNotificationPending = true
+    }
+
+    override fun takePendingScanCompleteNotification(): Boolean {
+        val wasPending = isScanCompleteNotificationPending
+        isScanCompleteNotificationPending = false
+        return wasPending
+    }
 
     override fun reset() {
         mainConfigEtag = null
@@ -531,5 +542,6 @@ private class FakePirDataStore : PirDataStore {
         initialScanCompletionFlowId = 0L
         initialScanCompletionForegroundRunCount = 0
         initialScanCompletionScheduledRunCount = 0
+        isScanCompleteNotificationPending = false
     }
 }

@@ -17,11 +17,10 @@
 package com.duckduckgo.app.onboarding.store
 
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
-import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
+import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
 
 interface OnboardingStore {
     var onboardingDialogJourney: String?
-    var linearPlanWidgetPromptShown: Boolean
 
     fun getSearchOptions(): List<DaxDialogIntroOption>
     fun getChatSuggestions(): List<DaxDialogIntroOption>
@@ -42,4 +41,15 @@ interface OnboardingStore {
      * screen.
      */
     fun getSegmentedPathWithAiInput(): DownloadReasonSelection?
+
+    /**
+     * Should be called when the user submits a Duck.ai prompt during the onboarding.
+     */
+    fun setTriedDuckAi()
+
+    /**
+     * @return whether the user submitted a Duck.ai prompt during the onboarding. Note that installations
+     * that have completed the onboarding prior to this flag being introduced will return false.
+     */
+    fun getTriedDuckAi(): Boolean
 }
