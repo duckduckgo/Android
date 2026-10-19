@@ -36,11 +36,6 @@ import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionOnboardingFeatureInfoBinding
 import javax.inject.Inject
 
-/**
- * Full-screen detail for a single subscription feature, opened from the features-summary step. Toolbar
- * shows a close (X) and no title; closing returns to the features step. Per-feature copy and highlights
- * come from [OnboardingFeature], whose content layout is inflated into the screen.
- */
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SubscriptionOnboardingFeatureInfoScreen::class)
 class SubscriptionOnboardingFeatureInfoActivity : DuckDuckGoActivity() {

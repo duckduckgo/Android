@@ -119,7 +119,6 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
                     }
                     DISCONNECTED -> if (!hasConnected) {
                         viewState.update {
-                            // Falling back to disconnected while activation was in progress means the VPN failed to start.
                             it.copy(
                                 vpnEnabled = false,
                                 activating = false,
@@ -157,7 +156,7 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
     fun onPrimaryCtaClicked() {
         val state = viewState.value
         when {
-            state.activating -> {} // ignore taps while the VPN is being activated
+            state.activating -> {}
             state.showingVPNInfoBanners -> controller.onStepFinished(VPN_STEP_ID, COMPLETED)
             state.vpnEnabled == true -> viewState.update { it.copy(showingVPNInfoBanners = true) }
             else -> viewModelScope.launch { _commands.send(Command.RequestVpnPermission) }

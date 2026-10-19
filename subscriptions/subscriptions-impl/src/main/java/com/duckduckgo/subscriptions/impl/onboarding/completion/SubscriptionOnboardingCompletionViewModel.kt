@@ -140,7 +140,6 @@ class SubscriptionOnboardingCompletionViewModel @Inject constructor(
         )
     }
 
-    // PIR is set up from this screen, not in the linear onboarding.
     private fun pirRow(): SummaryRow {
         val completed = pirCompleted || onboardingStore.isStepCompleted(PIR_ROW_ID)
         return SummaryRow(

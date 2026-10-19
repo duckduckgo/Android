@@ -77,7 +77,6 @@ class SubscriptionOnboardingFeaturesSummaryFragment :
         subscriptionOnboardingFeaturesAi.isVisible = viewState.aiVisible
         subscriptionOnboardingFeaturesPIR.isVisible = viewState.pirVisible
 
-        // A divider shows only when a visible row precedes another visible row below it.
         onboardingSubscriptionFeaturesDivider1.isVisible =
             viewState.vpnVisible && (viewState.itrVisible || viewState.aiVisible || viewState.pirVisible)
         onboardingSubscriptionFeaturesDivider2.isVisible =

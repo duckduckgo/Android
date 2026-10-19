@@ -49,12 +49,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
-/**
- * Drives the native subscription onboarding: starts the plugin-built plan on the shared
- * [LinearOnboardingOrchestrator] and translates its state (scoped to [SUBSCRIPTION_ONBOARDING_PLAN_ID]) into
- * [Command]s the activity renders. Steps report back through [SubscriptionOnboardingController], whose events
- * this ViewModel observes and turns into orchestrator events / store writes.
- */
 @ContributesViewModel(ActivityScope::class)
 class SubscriptionOnboardingViewModel @Inject constructor(
     private val orchestrator: LinearOnboardingOrchestrator,

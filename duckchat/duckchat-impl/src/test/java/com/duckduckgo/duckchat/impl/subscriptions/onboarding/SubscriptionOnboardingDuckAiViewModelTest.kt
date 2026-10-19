@@ -180,7 +180,6 @@ class SubscriptionOnboardingDuckAiViewModelTest {
 
         verify(modelManager).selectModel(plus)
         verify(controller).onStepFinished(eq(DUCK_AI_STEP_ID), eq(COMPLETED), any())
-        // Duck.ai only opens once the host runs the hand-off, after the completion summary has been shown.
         verifyNoInteractions(duckChat)
     }
 

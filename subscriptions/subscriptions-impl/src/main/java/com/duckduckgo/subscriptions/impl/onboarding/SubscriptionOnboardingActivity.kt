@@ -74,7 +74,6 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout, installScrim = false)
         edgeToEdgeHandler.applyNavigationBarInsets(binding.subscriptionOnboardingContainer, drawBehindGestureNav = false)
 
-        // System back and the toolbar up arrow both go through the controller.
         onBackPressedDispatcher.addCallback(
             this,
             object : OnBackPressedCallback(true) {
