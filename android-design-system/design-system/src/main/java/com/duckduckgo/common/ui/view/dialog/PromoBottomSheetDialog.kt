@@ -19,15 +19,19 @@ package com.duckduckgo.common.ui.view.dialog
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.annotation.DrawableRes
+import androidx.core.view.updateLayoutParams
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.ui.isRebrandAreaEnabled
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.mobile.android.databinding.BottomSheetPromoBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.duckduckgo.mobile.android.R as CommonR
 
 @SuppressLint("NoBottomSheetDialog")
 class PromoBottomSheetDialog(builder: Builder) :
-    BottomSheetDialog(builder.context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge) {
+    BottomSheetDialog(builder.context, CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge) {
 
     abstract class EventListener {
         /** Sets a listener to be invoked when the bottom sheet is shown */
@@ -48,6 +52,7 @@ class PromoBottomSheetDialog(builder: Builder) :
     private val binding: BottomSheetPromoBinding = BottomSheetPromoBinding.inflate(LayoutInflater.from(context))
 
     init {
+        applySpacing()
         setContentView(binding.root)
         binding.root.applyBottomSystemBarInsetPadding()
 
@@ -77,6 +82,25 @@ class PromoBottomSheetDialog(builder: Builder) :
         binding.bottomSheetPromoContent.text = builder.contentText
         binding.bottomSheetPromoPrimaryButton.text = builder.primaryButtonText
         binding.bottomSheetPromoSecondaryButton.text = builder.secondaryButtonText
+    }
+
+    private fun applySpacing() {
+        if (!context.isRebrandAreaEnabled(CommonR.attr.daxRebrandSpacing)) return
+        val side = context.resources.getDimensionPixelSize(CommonR.dimen.keyline_6)
+        // Figma measures to the visible button edge, but a MaterialButton draws inside its vertical insets, so the insets come off the gaps.
+        val button = binding.bottomSheetPromoPrimaryButton
+        binding.root.setPadding(
+            side,
+            context.resources.getDimensionPixelSize(CommonR.dimen.keyline_7),
+            side,
+            (context.resources.getDimensionPixelSize(CommonR.dimen.rebrandPromoBottomPadding) - button.insetBottom).coerceAtLeast(0),
+        )
+        binding.bottomSheetPromoTitle.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            bottomMargin = context.resources.getDimensionPixelSize(CommonR.dimen.keyline_3)
+        }
+        button.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            topMargin = (context.resources.getDimensionPixelSize(CommonR.dimen.keyline_5) - button.insetTop).coerceAtLeast(0)
+        }
     }
 
     /**

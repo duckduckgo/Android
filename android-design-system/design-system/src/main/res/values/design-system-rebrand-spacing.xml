@@ -24,4 +24,9 @@
         <item name="daxRebrandSpacing">true</item>
     </style>
 
+    <dimen name="rebrandPromoBottomPadding">40dp</dimen>
+
+    <!-- Blank margin the Material radio drawable (a 32dp box around a 20dp circle) keeps on each side of its circle. -->
+    <dimen name="rebrandRadioIconInset">6dp</dimen>
+
 </resources>
