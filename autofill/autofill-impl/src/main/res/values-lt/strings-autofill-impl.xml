@@ -261,6 +261,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importuok slaptažodžius iš „Google“</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">„Google“ gali paprašyti tavęs prisijungti arba įvesti slaptažodį patvirtinimui.</string>
+    <string name="importPasswordsChooseMethodDialogSubtitleDeviceAuth">Jūsų įrenginys gali paprašyti įvesti PIN kodą, slaptažodį arba šabloną, kad patvirtintumėte.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Importuok iš „Google“</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Pasirink CSV failą</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importuoti iš darbalaukio naršyklės</string>
@@ -292,8 +293,10 @@
 
     <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Perkelk savo slaptažodžius iš&lt;br /&gt;Google“ į „DuckDuckGo“</string>
     <string name="passwords_import_promo_subtitle">Greitai ir saugiai importuok savo slaptažodžius į „DuckDuckGo“. „Google“ gali paprašyti tavęs įvesti slaptažodį.</string>
+    <string name="passwords_import_promo_subtitle_device_auth">Greitai ir saugiai importuokite slaptažodžius į „DuckDuckGo“. Jūsų įrenginys gali paprašyti įvesti PIN kodą, slaptažodį arba šabloną, kad patvirtintumėte.</string>
     <string name="passwords_import_promo_action">Importuok iš „Google“</string>
     <string name="passwords_import_promo_in_browser_title">Perkelk savo slaptažodžius iš „Google“ į „DuckDuckGo“</string>
+    <string name="passwords_import_promo_in_browser_title_device_auth">Importuokite slaptažodžius iš „Google“ į „DuckDuckGo“</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Neklausk dar kartą</string>
     <string name="passwords_import_promo_in_settings_title">Importuok slaptažodžius iš „Google“</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Slėpti</string>
