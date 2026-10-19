@@ -87,7 +87,6 @@ class RealDuckAiModelManagerTest {
         whenever(duckAiHostProvider.getHost()).thenReturn("duck.ai")
         subscriptions.stub { onBlocking { isEligible() }.thenReturn(true) }
         dataStore.stub { onBlocking { hasClearedPinnedDefaultModel() }.thenReturn(true) }
-        dataStore.stub { onBlocking { isDuckChatUserEnabled() }.thenReturn(true) }
         whenever(dataStore.observeDuckChatUserEnabled()).thenReturn(duckChatUserEnabledFlow)
         duckChatFeature.self().setRawStoredState(Toggle.State(enable = true))
     }
@@ -173,13 +172,28 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
-    fun whenDuckAiUserDisabledThenModelsNotFetched() = runTest {
-        dataStore.stub { onBlocking { isDuckChatUserEnabled() }.thenReturn(false) }
+    fun whenDuckAiUserDisabledThenModelsNotFetchedInBackground() = runTest {
+        duckChatUserEnabledFlow.value = false
+
+        testee = createManager()
+        entitlementFlow.emit(emptySet())
+
+        verify(modelsService, never()).getModels(any(), anyOrNull(), anyOrNull())
+    }
+
+    @Test
+    fun whenDuckAiUserDisabledThenExplicitFetchStillFetches() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(listOf(remoteModel("id", accessTier = listOf("free"), entityHasAccess = true))),
+        )
+        duckChatUserEnabledFlow.value = false
 
         testee = createManager()
         testee.fetchModels()
 
-        verify(modelsService, never()).getModels(any(), anyOrNull(), anyOrNull())
+        assertEquals(1, testee.modelState.value.models.size)
     }
 
     @Test
@@ -837,14 +851,12 @@ class RealDuckAiModelManagerTest {
         whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
             AIChatModelsResponse(listOf(remoteModel("id", accessTier = listOf("free"), entityHasAccess = true))),
         )
-        dataStore.stub { onBlocking { isDuckChatUserEnabled() }.thenReturn(false) }
         duckChatUserEnabledFlow.value = false
 
         testee = createManager()
         entitlementFlow.emit(emptySet())
         verify(modelsService, never()).getModels(any(), anyOrNull(), anyOrNull())
 
-        dataStore.stub { onBlocking { isDuckChatUserEnabled() }.thenReturn(true) }
         duckChatUserEnabledFlow.value = true
 
         verify(modelsService).getModels(any(), anyOrNull(), anyOrNull())

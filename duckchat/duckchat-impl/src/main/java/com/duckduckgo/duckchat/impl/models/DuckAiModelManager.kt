@@ -136,7 +136,8 @@ class RealDuckAiModelManager @Inject constructor(
                 duckAiEnabled,
             ) { entitlements, status, enabled -> Triple(entitlements, status, enabled) }
                 .distinctUntilChanged()
-                .collect {
+                .collect { (_, _, enabled) ->
+                    if (!enabled) return@collect
                     logcat { "Duck.ai Model Manager: subscription or Duck.ai state changed, re-fetching models" }
                     fetchModels()
                 }
@@ -181,7 +182,7 @@ class RealDuckAiModelManager @Inject constructor(
     override suspend fun fetchModels() {
         withContext(dispatcherProvider.io()) {
             try {
-                if (!duckChatFeature.get().self().isEnabled() || !dataStore.isDuckChatUserEnabled()) return@withContext
+                if (!duckChatFeature.get().self().isEnabled()) return@withContext
                 val userTier = resolveUserTier()
                 val response = fetchModelsResponse()
                 val isSubscriptionEligible = runCatching {
