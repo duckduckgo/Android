@@ -43,6 +43,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.trackerdetection.EntityLookup
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.test.blockingObserve
@@ -52,6 +53,9 @@ import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacy.config.api.ContentBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.first
@@ -72,6 +76,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -462,7 +467,10 @@ class TabDataRepositoryTest {
 
     @Test
     fun whenTabDeletedThenTabAndDataCleared() = runTest {
-        val testee = tabDataRepository()
+        val testee = tabDataRepository(
+            webViewPreviewPersister = mockWebViewPreviewPersister,
+            faviconManager = mockFaviconManager,
+        )
         val addedTabId = testee.add()
         val siteData = testee.retrieveSiteData(addedTabId)
 
@@ -470,7 +478,7 @@ class TabDataRepositoryTest {
 
         verify(mockDao).deleteTabAndUpdateSelection(any())
         assertNotSame(siteData, testee.retrieveSiteData(addedTabId))
-        verify(mockTabVisitedSitesRepository).clearTab(addedTabId)
+        verifyDeletedTabCleanup(addedTabId)
     }
 
     @Test
@@ -491,7 +499,7 @@ class TabDataRepositoryTest {
         verify(mockAdClickManager).clearTabId("current")
         verify(mockWebViewPreviewPersister).deletePreviewsForTab("current", null)
         verify(mockFaviconManager).deleteOldTempFavicon("current", null)
-        verify(mockDuckChatContextualDataStore).clearTabChatUrl("current")
+        verify(mockDuckChatContextualDataStore).clearTab("current")
         verify(mockTabVisitedSitesRepository).clearTab("current")
         verify(mockNativeInputStatePublisher).clearTab("current")
         assertNotSame(siteData, testee.retrieveSiteData("current"))
@@ -551,6 +559,57 @@ class TabDataRepositoryTest {
         verify(mockTabVisitedSitesRepository).clearAll()
         verify(mockNativeInputStatePublisher).clearAll()
         assertNotSame(siteData, testee.retrieveSiteData(addedTabId))
+    }
+
+    @Test
+    fun whenFireAllDeletedThenOnlyFireTabsDataClearedWithoutAppScopeWork() = runTest {
+        whenever(mockDao.tabs()).thenReturn(listOf(TabEntity(tabId = "live", position = 0)))
+        whenever(mockDao.getDeletableTabIds()).thenReturn(listOf("deletable"))
+        val testee = tabDataRepository(
+            webViewPreviewPersister = mockWebViewPreviewPersister,
+            faviconManager = mockFaviconManager,
+            browserMode = BrowserMode.FIRE,
+            appCoroutineScope = CoroutineScope(Job().apply { cancel() }),
+        )
+
+        testee.deleteAll()
+
+        val inOrder = inOrder(mockDao)
+        inOrder.verify(mockDao).tabs()
+        inOrder.verify(mockDao).getDeletableTabIds()
+        inOrder.verify(mockDao).deleteAllTabs()
+        listOf("live", "deletable").forEach { tabId ->
+            verify(mockWebViewPreviewPersister).deletePreviewsForTab(tabId, null)
+            verify(mockFaviconManager).deleteOldTempFavicon(tabId, null)
+            verify(mockAdClickManager).clearTabId(tabId)
+            verify(mockDuckChatContextualDataStore).clearTab(tabId)
+            verify(mockTabVisitedSitesRepository).clearTab(tabId)
+            verify(mockNativeInputStatePublisher).clearTab(tabId)
+        }
+        verify(mockWebViewSessionStorage).deleteAllSessions()
+        verifyNoGlobalSharedStoreClears()
+    }
+
+    @Test
+    fun whenFireAllDeletedWithNoTabsThenNoPerTabOrGlobalClears() = runTest {
+        whenever(mockDao.tabs()).thenReturn(emptyList())
+        whenever(mockDao.getDeletableTabIds()).thenReturn(emptyList())
+        val testee = tabDataRepository(
+            webViewPreviewPersister = mockWebViewPreviewPersister,
+            faviconManager = mockFaviconManager,
+            browserMode = BrowserMode.FIRE,
+        )
+
+        testee.deleteAll()
+
+        verify(mockDao).deleteAllTabs()
+        verify(mockWebViewPreviewPersister, never()).deletePreviewsForTab(any(), anyOrNull())
+        verify(mockFaviconManager, never()).deleteOldTempFavicon(any(), anyOrNull())
+        verify(mockAdClickManager, never()).clearTabId(any())
+        verify(mockDuckChatContextualDataStore, never()).clearTab(any())
+        verify(mockTabVisitedSitesRepository, never()).clearTab(any())
+        verify(mockNativeInputStatePublisher, never()).clearTab(any())
+        verifyNoGlobalSharedStoreClears()
     }
 
     @Test
@@ -685,6 +744,45 @@ class TabDataRepositoryTest {
         currentSelectedTabId = testee.liveSelectedTab.blockingObserve()?.tabId
         assertEquals(currentSelectedTabId, sourceTab.tabId)
         verify(mockTabVisitedSitesRepository).clearTab("tabToDeleteId")
+    }
+
+    @Test
+    fun whenDeleteTabAndSelectSourceThenDeletedTabDataClearedAndSourceUntouched() = runTest {
+        val db = createDatabase()
+        val dao = db.tabsDao()
+        dao.addAndSelectTab(TabEntity(tabId = "sourceId", url = "https://example.com", position = 0))
+        dao.addAndSelectTab(TabEntity(tabId = "tabToDeleteId", url = "https://example.com", position = 1, sourceTabId = "sourceId"))
+        val testee = tabDataRepository(
+            dao = dao,
+            webViewPreviewPersister = mockWebViewPreviewPersister,
+            faviconManager = mockFaviconManager,
+        )
+
+        testee.deleteTabAndSelectSource("tabToDeleteId")
+
+        assertEquals("sourceId", testee.liveSelectedTab.blockingObserve()?.tabId)
+        verifyDeletedTabCleanup("tabToDeleteId")
+        verifyNoDeletedTabCleanup("sourceId")
+        db.close()
+    }
+
+    @Test
+    fun whenDeleteTabAndSelectSourceWithUnknownTabThenNoTabDataCleared() = runTest {
+        val db = createDatabase()
+        val testee = tabDataRepository(
+            dao = db.tabsDao(),
+            webViewPreviewPersister = mockWebViewPreviewPersister,
+            faviconManager = mockFaviconManager,
+        )
+
+        testee.deleteTabAndSelectSource("unknown")
+
+        verify(mockWebViewSessionStorage, never()).deleteSession(any())
+        verify(mockAdClickManager, never()).clearTabId(any())
+        verify(mockWebViewPreviewPersister, never()).deletePreviewsForTab(any(), anyOrNull())
+        verify(mockFaviconManager, never()).deleteOldTempFavicon(any(), anyOrNull())
+        verify(mockDuckChatContextualDataStore, never()).clearTab(any())
+        db.close()
     }
 
     @Test
@@ -972,7 +1070,7 @@ class TabDataRepositoryTest {
             assertNull(testee.retrieveSiteData(tabId).value)
             verify(mockWebViewSessionStorage).deleteSession(tabId)
             verify(mockAdClickManager).clearTabId(tabId)
-            verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
+            verify(mockDuckChatContextualDataStore).clearTab(tabId)
             verify(mockTabVisitedSitesRepository).clearTab(tabId)
             verify(mockNativeInputStatePublisher).clearTab(tabId)
         }
@@ -991,7 +1089,7 @@ class TabDataRepositoryTest {
             assertNull(testee.retrieveSiteData(tabId).value)
             verify(mockWebViewSessionStorage).deleteSession(tabId)
             verify(mockAdClickManager).clearTabId(tabId)
-            verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
+            verify(mockDuckChatContextualDataStore).clearTab(tabId)
             verify(mockTabVisitedSitesRepository).clearTab(tabId)
             verify(mockNativeInputStatePublisher).clearTab(tabId)
         }
@@ -1104,6 +1202,8 @@ class TabDataRepositoryTest {
         nativeInputStatePublisher: NativeInputStatePublisher = mockNativeInputStatePublisher,
         duckAiTabSessionRepository: DuckAiTabSessionRepository = mock(),
         pageTitleFetcher: PageTitleFetcher = mock(),
+        browserMode: BrowserMode = BrowserMode.REGULAR,
+        appCoroutineScope: CoroutineScope = coroutinesTestRule.testScope,
     ): TabDataRepository {
         return TabDataRepository(
             dao,
@@ -1122,7 +1222,7 @@ class TabDataRepositoryTest {
             faviconManager,
             tabSwitcherDataStore,
             timeProvider,
-            coroutinesTestRule.testScope,
+            appCoroutineScope,
             coroutinesTestRule.testDispatcherProvider,
             mockAdClickManager,
             mockWebViewSessionStorage,
@@ -1132,6 +1232,7 @@ class TabDataRepositoryTest {
             nativeInputStatePublisher,
             duckAiTabSessionRepository,
             pageTitleFetcher,
+            browserMode,
         )
     }
 
@@ -1152,14 +1253,33 @@ class TabDataRepositoryTest {
         return mockDao
     }
 
+    private suspend fun verifyDeletedTabCleanup(tabId: String) {
+        verify(mockWebViewSessionStorage).deleteSession(tabId)
+        verify(mockAdClickManager).clearTabId(tabId)
+        verify(mockWebViewPreviewPersister).deletePreviewsForTab(tabId, null)
+        verify(mockFaviconManager).deleteOldTempFavicon(tabId, null)
+        verify(mockDuckChatContextualDataStore).clearTab(tabId)
+        verify(mockTabVisitedSitesRepository).clearTab(tabId)
+        verify(mockNativeInputStatePublisher).clearTab(tabId)
+    }
+
     private suspend fun verifyNoDeletedTabCleanup(tabId: String) {
         verify(mockWebViewSessionStorage, never()).deleteSession(tabId)
         verify(mockAdClickManager, never()).clearTabId(tabId)
         verify(mockWebViewPreviewPersister, never()).deletePreviewsForTab(tabId, null)
         verify(mockFaviconManager, never()).deleteOldTempFavicon(tabId, null)
-        verify(mockDuckChatContextualDataStore, never()).clearTabChatUrl(tabId)
+        verify(mockDuckChatContextualDataStore, never()).clearTab(tabId)
         verify(mockTabVisitedSitesRepository, never()).clearTab(tabId)
         verify(mockNativeInputStatePublisher, never()).clearTab(tabId)
+    }
+
+    private suspend fun verifyNoGlobalSharedStoreClears() {
+        verify(mockWebViewPreviewPersister, never()).deleteAll()
+        verify(mockFaviconManager, never()).deleteAllTemp()
+        verify(mockAdClickManager, never()).clearAll()
+        verify(mockDuckChatContextualDataStore, never()).clearAll()
+        verify(mockTabVisitedSitesRepository, never()).clearAll()
+        verify(mockNativeInputStatePublisher, never()).clearAll()
     }
 
     private fun now(): LocalDateTime {

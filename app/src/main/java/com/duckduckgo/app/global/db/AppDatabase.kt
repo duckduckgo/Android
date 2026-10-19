@@ -80,7 +80,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 /**
  * Main application database.
  *
- * [TabEntity] and [TabSelectionEntity] are also used by
+ * [TabEntity], [TabSelectionEntity] and [com.duckduckgo.app.browser.session.WebViewSessionEntity] are also used by
  * [com.duckduckgo.app.fire.db.FireModeDatabase]. Any schema change to these entities must be
  * accompanied by a migration in BOTH databases — forgetting one will result in a runtime crash
  * for the affected users.

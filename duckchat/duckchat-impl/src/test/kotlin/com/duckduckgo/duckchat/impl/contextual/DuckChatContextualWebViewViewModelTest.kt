@@ -896,6 +896,11 @@ class DuckChatContextualWebViewViewModelTest {
             closeTimestamps.remove(tabId)
         }
 
+        override fun clearTab(tabId: String) {
+            urls.remove(tabId)
+            closeTimestamps.remove(tabId)
+        }
+
         override fun clearAll() {
             urls.clear()
             closeTimestamps.clear()
