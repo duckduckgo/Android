@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+    <path
+        android:fillColor="@color/pollen50"
+        android:pathData="M8 16C12.4183 16 16 12.4183 16 8C16 3.58172 12.4183 0 8 0C3.58172 0 0 3.58172 0 8C0 12.4183 3.58172 16 8 16Z" />
+    <path
+        android:fillColor="#FF000000"
+        android:fillAlpha="0.84"
+        android:pathData="M8.00009 9.5C7.64876 9.5 7.35801 9.22679 7.33617 8.87614L7.02809 3.92939C6.99673 3.42572 7.39676 3 7.9014 3H8.09991C8.60463 3 9.00469 3.42585 8.97321 3.92959L8.66401 8.87629C8.64209 9.22688 8.35136 9.5 8.00009 9.5Z" />
+    <path
+        android:fillColor="#FF000000"
+        android:fillAlpha="0.84"
+        android:pathData="M8 13C8.55228 13 9 12.5523 9 12C9 11.4477 8.55228 11 8 11C7.44772 11 7 11.4477 7 12C7 12.5523 7.44772 13 8 13Z" />
+</vector>

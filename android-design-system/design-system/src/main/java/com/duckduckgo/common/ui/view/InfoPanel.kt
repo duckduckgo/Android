@@ -29,11 +29,16 @@ import android.text.style.UnderlineSpan
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
+import androidx.core.view.updateLayoutParams
+import com.duckduckgo.common.ui.isRebrandAreaEnabled
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewInfoPanelBinding
 
 class InfoPanel : FrameLayout {
+
+    private val isRebrandEnabled = context.isRebrandAreaEnabled(R.attr.daxRebrandInfoPanels)
+    private var panelBackground = R.drawable.info_panel_tooltip_background
 
     private val binding: ViewInfoPanelBinding by viewBinding()
 
@@ -52,7 +57,19 @@ class InfoPanel : FrameLayout {
         attrs: AttributeSet?,
         defStyle: Int,
     ) : super(context, attrs, defStyle) {
-        val attributes = context.obtainStyledAttributes(attrs, R.styleable.InfoPanel)
+        val attributes = context.obtainStyledAttributes(
+            attrs,
+            R.styleable.InfoPanel,
+            0,
+            if (isRebrandEnabled) R.style.Widget_DuckDuckGo_InfoPanel_Rebrand else 0,
+        )
+        panelBackground = attributes.getResourceId(
+            R.styleable.InfoPanel_panelBackground,
+            R.drawable.info_panel_tooltip_background,
+        )
+        if (isRebrandEnabled) {
+            binding.infoPanelImage.updateLayoutParams<MarginLayoutParams> { topMargin = 0 }
+        }
         setText(attributes.getString(R.styleable.InfoPanel_panelText) ?: "")
         setImageResource(
             attributes.getResourceId(
@@ -61,10 +78,11 @@ class InfoPanel : FrameLayout {
             ),
         )
         setBackgroundResource(
-            attributes.getResourceId(
-                R.styleable.InfoPanel_panelBackground,
-                R.drawable.info_panel_tooltip_background,
-            ),
+            if (isRebrandEnabled && panelBackground in listOf(R.drawable.info_panel_tooltip_background, R.drawable.info_panel_alert_background)) {
+                R.drawable.info_panel_rebrand_background
+            } else {
+                panelBackground
+            },
         )
         attributes.recycle()
     }
@@ -72,7 +90,7 @@ class InfoPanel : FrameLayout {
     /**
      * Sets the panel text
      */
-    fun setText(text: String) {
+    fun setText(text: CharSequence) {
         binding.infoPanelText.text = text
     }
 
@@ -132,7 +150,20 @@ class InfoPanel : FrameLayout {
      * Sets the panel image resource
      */
     fun setImageResource(idRes: Int) {
-        binding.infoPanelImage.setImageResource(idRes)
+        val icon = if (isRebrandEnabled) {
+            when (idRes) {
+                R.drawable.ic_info_panel_info -> if (panelBackground == R.drawable.info_panel_alert_background) {
+                    R.drawable.ic_exclamation_recolorable_invert_16
+                } else {
+                    R.drawable.ic_info_recolorable_16
+                }
+                R.drawable.ic_exclamation_yellow_16 -> R.drawable.ic_exclamation_recolorable_invert_16
+                else -> idRes
+            }
+        } else {
+            idRes
+        }
+        binding.infoPanelImage.setImageResource(icon)
     }
 
     companion object {

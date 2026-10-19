@@ -20,11 +20,15 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
+import androidx.annotation.VisibleForTesting
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.*
 import com.duckduckgo.codegen.annotations.ContributesActivePlugin
 import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.common.ui.isRebrandAreaEnabled
+import com.duckduckgo.common.ui.view.InfoPanel
 import com.duckduckgo.common.ui.view.addBottomShadow
+import com.duckduckgo.common.ui.view.defaultSelectableItemBackground
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -59,6 +63,8 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : FrameLayout(context, attrs, defStyle) {
+    private val isRebrandEnabled = context.isRebrandAreaEnabled(CommonR.attr.daxRebrandInfoPanels)
+
     override fun getTag(): String = "AppTP"
 
     @Inject
@@ -77,6 +83,21 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
     private val conflatedJob = ConflatedJob()
 
     private val binding: FragmentDeviceShieldCtaBinding by viewBinding()
+
+    private val disabledInfoPanel by lazy {
+        InfoPanel(context).apply {
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
+                val margin = resources.getDimensionPixelSize(CommonR.dimen.keyline_4)
+                setMargins(margin, margin, margin, margin)
+            }
+            setText(context.getText(R.string.atp_NewTabDisabled))
+            setImageResource(CommonR.drawable.ic_exclamation_recolorable_invert_16)
+            foreground = context.getDrawable(context.defaultSelectableItemBackground())
+            clipToOutline = true
+            setOnClickListener { binding.deviceShieldCtaLayout.performClick() }
+            this@AppTrackingProtectionStateView.addView(this)
+        }
+    }
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
@@ -106,8 +127,13 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
         }
     }
 
-    private fun renderViewState(viewState: ViewState) {
-        if (viewState.isFeatureEnabled) {
+    @VisibleForTesting
+    internal fun renderViewState(viewState: ViewState) {
+        val showDisabledPanel = isRebrandEnabled && viewState.vpnState.state != ENABLED && viewState.vpnState.stopReason != REVOKED
+        if (isRebrandEnabled) {
+            disabledInfoPanel.visibility = if (viewState.isFeatureEnabled && showDisabledPanel) View.VISIBLE else View.GONE
+        }
+        if (viewState.isFeatureEnabled && !showDisabledPanel) {
             binding.root.show()
         } else {
             binding.root.gone()
