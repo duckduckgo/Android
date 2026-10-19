@@ -21,6 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
@@ -38,12 +39,15 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.JsRequestResponse
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -54,12 +58,21 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.LocalDateTime
+import java.util.Collections
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.atomic.AtomicInteger
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -72,6 +85,7 @@ class ContentScopeScriptsJsMessagingTest {
     private val handlers: PluginPoint<ContentScopeJsMessageHandlersPlugin> = FakePluginPoint()
     private val contentScopeScriptsFeature = FakeFeatureToggleFactory.create(ContentScopeScriptsFeature::class.java)
     private val pixel: Pixel = mock()
+    private val timeProvider = FakeTimeProvider()
     private lateinit var contentScopeScriptsJsMessaging: ContentScopeScriptsJsMessaging
 
     private class FakePluginPoint : PluginPoint<ContentScopeJsMessageHandlersPlugin> {
@@ -113,6 +127,7 @@ class ContentScopeScriptsJsMessagingTest {
             contentScopeScriptsFeature,
             pixel,
             coroutineRule.testScope,
+            timeProvider,
         )
 
     @Test
@@ -671,7 +686,7 @@ class ContentScopeScriptsJsMessagingTest {
 
             repeat(MAX_QUEUED_MESSAGES + 8) { messaging.process(webEventMessage("e$it"), messaging.secret) }
 
-            verify(pixel, times(1)).fire(INBOUND_QUEUE_FULL, type = Daily())
+            verify(pixel, times(1)).fire(eq(INBOUND_QUEUE_FULL), any(), any(), eq(Daily()))
         }
 
     @Test
@@ -684,7 +699,7 @@ class ContentScopeScriptsJsMessagingTest {
             advanceUntilIdle()
             repeat(MAX_QUEUED_MESSAGES + 1) { messaging.process(webEventMessage("second$it"), messaging.secret) }
 
-            verify(pixel, times(2)).fire(INBOUND_QUEUE_FULL, type = Daily())
+            verify(pixel, times(2)).fire(eq(INBOUND_QUEUE_FULL), any(), any(), eq(Daily()))
         }
 
     @Test
@@ -696,7 +711,7 @@ class ContentScopeScriptsJsMessagingTest {
             repeat(MAX_QUEUED_MESSAGES) { messaging.process(webEventMessage("e$it"), messaging.secret) }
             advanceUntilIdle()
 
-            verify(pixel, never()).fire(INBOUND_QUEUE_FULL, type = Daily())
+            verify(pixel, never()).fire(eq(INBOUND_QUEUE_FULL), any(), any(), eq(Daily()))
         }
 
     @Test
@@ -728,6 +743,228 @@ class ContentScopeScriptsJsMessagingTest {
             assertEquals(listOf("after"), callback.ids)
         }
 
+    @Test
+    fun `when the queue overflows before the consumer starts then it is reported as a flood of that feature`() =
+        runTest {
+            val messaging = givenQueuedMessaging(WebEventsPluginPoint())
+            messaging.register(mockWebView, webEventsCallback)
+
+            repeat(MAX_QUEUED_MESSAGES + 1) { messaging.process(webEventMessage("e$it"), messaging.secret) }
+
+            assertEquals(
+                mapOf(
+                    "feature" to "webEvents",
+                    "handling_stage" to "none",
+                    "handling_time" to "none",
+                ),
+                firedOverflowParameters(),
+            )
+        }
+
+    @Test
+    fun `when the queue overflows while a handler is running then the handler's stage and time are reported`() =
+        runTest {
+            lateinit var messaging: ContentScopeScriptsJsMessaging
+            var flooded = false
+            val slowHandler =
+                SlowHandlerPluginPoint {
+                    if (!flooded) {
+                        flooded = true
+                        timeProvider.elapsed += 15_000
+                        repeat(MAX_QUEUED_MESSAGES + 1) { messaging.process(subscriptionsMessage(), messaging.secret) }
+                    }
+                }
+            messaging = givenQueuedMessaging(slowHandler)
+            messaging.register(mockWebView, callback)
+
+            messaging.process(subscriptionsMessage(), messaging.secret)
+            advanceUntilIdle()
+
+            assertEquals(
+                mapOf(
+                    "feature" to "subscriptions",
+                    "handling_stage" to "handler",
+                    "handling_time" to "10s_to_60s",
+                ),
+                firedOverflowParameters(),
+            )
+        }
+
+    @Test
+    fun `when the queue overflows while the url read is waiting on the main thread then the url stage is reported`() =
+        runTest {
+            val stalledMain = StandardTestDispatcher(TestCoroutineScheduler())
+            val messaging = givenQueuedMessaging(handlers, main = stalledMain)
+            messaging.register(mockWebView, callback)
+
+            messaging.process(webShareMessage("first"), messaging.secret)
+            advanceUntilIdle()
+            repeat(MAX_QUEUED_MESSAGES + 1) { messaging.process(webShareMessage("e$it"), messaging.secret) }
+
+            assertEquals(
+                mapOf(
+                    "feature" to "webCompat",
+                    "handling_stage" to "url",
+                    "handling_time" to "under_1s",
+                ),
+                firedOverflowParameters(),
+            )
+        }
+
+    @Test
+    fun `when the queue overflows with a feature that is not reported by name then it is reported as other`() =
+        runTest {
+            val messaging = givenQueuedMessaging(WebEventsPluginPoint())
+            messaging.register(mockWebView, webEventsCallback)
+
+            repeat(MAX_QUEUED_MESSAGES + 1) { messaging.process(unknownFeatureMessage("e$it"), messaging.secret) }
+
+            assertEquals("other", firedOverflowParameters()["feature"])
+        }
+
+    @Test
+    fun `when a feature's url read is waiting on the main thread then another feature's messages are still handled`() =
+        runTest {
+            val stalledMain = StandardTestDispatcher(TestCoroutineScheduler())
+            val messaging = givenQueuedMessaging(MixedPluginPoint(), main = stalledMain)
+            messaging.register(mockWebView, callback)
+            whenever(mockWebView.url).thenReturn("https://example.com")
+
+            messaging.process(webShareMessage("waitsForUrl"), messaging.secret)
+            messaging.process(webEventMessage("independent"), messaging.secret)
+            advanceUntilIdle()
+
+            assertEquals(listOf("independent"), callback.ids)
+
+            stalledMain.scheduler.advanceUntilIdle()
+            advanceUntilIdle()
+
+            assertEquals(listOf("independent", "waitsForUrl"), callback.ids)
+        }
+
+    @Test
+    fun `when one feature's queue is full then other features' messages are still handled`() =
+        runTest {
+            val messaging = givenQueuedMessaging(MixedPluginPoint())
+            messaging.register(mockWebView, callback)
+            whenever(mockWebView.url).thenReturn("https://example.com")
+
+            repeat(MAX_QUEUED_MESSAGES + 8) { messaging.process(webEventMessage("e$it"), messaging.secret) }
+            messaging.process(webShareMessage("other"), messaging.secret)
+            advanceUntilIdle()
+
+            assertEquals(MAX_QUEUED_MESSAGES, callback.handledBy.count { it == "webEvents" })
+            assertEquals(listOf("webCompat"), callback.handledBy.filter { it == "webCompat" })
+        }
+
+    @Test
+    fun `when a message with an id is dropped because its queue is full then a queue full error is sent`() =
+        runTest {
+            val messaging = givenQueuedMessaging(WebEventsPluginPoint())
+            messaging.register(mockWebView, webEventsCallback)
+
+            repeat(MAX_QUEUED_MESSAGES + 1) { messaging.process(webEventMessage("e$it"), messaging.secret) }
+
+            val captor = argumentCaptor<JsRequestResponse>()
+            verify(jsMessageHelper).sendJsResponse(captor.capture(), any(), any(), any())
+            val error = captor.firstValue as JsRequestResponse.Error
+            assertEquals("e$MAX_QUEUED_MESSAGES", error.id)
+            assertEquals(ContentScopeScriptsJsMessaging.QUEUE_FULL_ERROR_CODE, error.error.code)
+        }
+
+    @Test
+    fun `when a handler blocks its thread then another feature's messages are still handled`() =
+        withThreadPool { pool ->
+            val otherFeatureHandled = CountDownLatch(1)
+            val blockedHandlerSawOtherFeature = CountDownLatch(1)
+            val handlers =
+                object : PluginPoint<ContentScopeJsMessageHandlersPlugin> {
+                    override fun getPlugins(): Collection<ContentScopeJsMessageHandlersPlugin> =
+                        listOf(
+                            SlowHandlerPluginPoint {
+                                if (otherFeatureHandled.await(5, SECONDS)) blockedHandlerSawOtherFeature.countDown()
+                            }.Plugin(),
+                            WebEventsPluginPoint().WebEventsPlugin(),
+                        )
+                }
+            val messaging = givenThreadedMessaging(handlers, pool)
+            messaging.register(
+                mockWebView,
+                object : JsMessageCallback() {
+                    override fun process(
+                        featureName: String,
+                        method: String,
+                        id: String?,
+                        data: JSONObject?,
+                    ) {
+                        if (featureName == "webEvents") otherFeatureHandled.countDown()
+                    }
+                },
+            )
+
+            messaging.process(subscriptionsMessage(), messaging.secret)
+            messaging.process(webEventMessage("independent"), messaging.secret)
+
+            assertTrue(blockedHandlerSawOtherFeature.await(5, SECONDS))
+        }
+
+    @Test
+    fun `when features in different lanes add debug flags then the flags are still handled one at a time`() =
+        withThreadPool { pool ->
+            val features = listOf("webCompat", "webEvents", "someUnknownFeature")
+            val perFeature = 20
+            val active = AtomicInteger()
+            val maxActive = AtomicInteger()
+            val handled = CountDownLatch(features.size * perFeature)
+            val flags = Collections.synchronizedList(mutableListOf<String>())
+            val messaging = givenThreadedMessaging(MixedPluginPoint(), pool)
+            messaging.register(
+                mockWebView,
+                object : JsMessageCallback() {
+                    override fun process(
+                        featureName: String,
+                        method: String,
+                        id: String?,
+                        data: JSONObject?,
+                    ) {
+                        maxActive.accumulateAndGet(active.incrementAndGet(), ::maxOf)
+                        // Holds the call open long enough that two lanes running it at once would overlap.
+                        Thread.sleep(2)
+                        flags.add(featureName)
+                        active.decrementAndGet()
+                        handled.countDown()
+                    }
+                },
+            )
+
+            repeat(perFeature) { features.forEach { messaging.process(addDebugFlagMessage(it), messaging.secret) } }
+
+            assertTrue(handled.await(10, SECONDS))
+            assertEquals(1, maxActive.get())
+            features.forEach { feature -> assertEquals(perFeature, flags.count { it == feature }) }
+        }
+
+    private fun firedOverflowParameters(): Map<String, String> {
+        val captor = argumentCaptor<Map<String, String>>()
+        verify(pixel).fire(eq(INBOUND_QUEUE_FULL), captor.capture(), any(), eq(Daily()))
+        return captor.firstValue
+    }
+
+    private fun subscriptionsMessage() =
+        """
+        {"context":"contentScopeScripts","featureName":"subscriptions","id":"sub","method":"handshake","params":{}}
+        """.trimIndent()
+
+    private fun addDebugFlagMessage(featureName: String) =
+        """
+        {"context":"contentScopeScripts","featureName":"$featureName","method":"addDebugFlag","params":{}}
+        """.trimIndent()
+
+    private fun unknownFeatureMessage(id: String) =
+        """
+        {"context":"contentScopeScripts","featureName":"someUnknownFeature","id":"$id","method":"anything","params":{}}
+        """.trimIndent()
+
     private fun webShareMessage(id: String) =
         """
         {"context":"contentScopeScripts","featureName":"webCompat","id":"$id","method":"webShare","params":{}}
@@ -740,13 +977,14 @@ class ContentScopeScriptsJsMessagingTest {
 
     private fun TestScope.givenQueuedMessaging(
         handlers: PluginPoint<ContentScopeJsMessageHandlersPlugin>,
+        main: CoroutineDispatcher? = null,
     ): ContentScopeScriptsJsMessaging {
         val dispatcher = StandardTestDispatcher(testScheduler)
         val dispatcherProvider =
             object : DispatcherProvider {
                 override fun io(): CoroutineDispatcher = dispatcher
 
-                override fun main(): CoroutineDispatcher = dispatcher
+                override fun main(): CoroutineDispatcher = main ?: dispatcher
 
                 override fun computation(): CoroutineDispatcher = dispatcher
 
@@ -763,7 +1001,78 @@ class ContentScopeScriptsJsMessagingTest {
             contentScopeScriptsFeature,
             pixel,
             scope,
+            timeProvider,
         )
+    }
+
+    // Real threads, unlike the test dispatchers above, so that lanes run in parallel and a blocking handler holds a thread.
+    private fun withThreadPool(block: (ExecutorService) -> Unit) {
+        val pool = Executors.newFixedThreadPool(4)
+        try {
+            block(pool)
+        } finally {
+            pool.shutdownNow()
+        }
+    }
+
+    private fun givenThreadedMessaging(
+        handlers: PluginPoint<ContentScopeJsMessageHandlersPlugin>,
+        pool: ExecutorService,
+    ): ContentScopeScriptsJsMessaging {
+        val dispatcher = pool.asCoroutineDispatcher()
+        val dispatcherProvider =
+            object : DispatcherProvider {
+                override fun io(): CoroutineDispatcher = dispatcher
+
+                override fun main(): CoroutineDispatcher = dispatcher
+
+                override fun computation(): CoroutineDispatcher = dispatcher
+
+                override fun unconfined(): CoroutineDispatcher = dispatcher
+            }
+        return ContentScopeScriptsJsMessaging(
+            jsMessageHelper,
+            dispatcherProvider,
+            coreContentScopeScripts,
+            handlers,
+            contentScopeScriptsFeature,
+            pixel,
+            CoroutineScope(SupervisorJob() + dispatcher),
+            timeProvider,
+        )
+    }
+
+    private class FakeTimeProvider : CurrentTimeProvider {
+        var elapsed = 0L
+
+        override fun elapsedRealtime(): Long = elapsed
+
+        override fun currentTimeMillis(): Long = elapsed
+
+        override fun localDateTimeNow(): LocalDateTime = LocalDateTime.MIN
+    }
+
+    private class SlowHandlerPluginPoint(
+        private val whileHandling: () -> Unit,
+    ) : PluginPoint<ContentScopeJsMessageHandlersPlugin> {
+        override fun getPlugins(): Collection<ContentScopeJsMessageHandlersPlugin> = listOf(Plugin())
+
+        inner class Plugin : ContentScopeJsMessageHandlersPlugin {
+            override fun getJsMessageHandler(): JsMessageHandler =
+                object : JsMessageHandler {
+                    override fun process(
+                        jsMessage: JsMessage,
+                        jsMessaging: JsMessaging,
+                        jsMessageCallback: JsMessageCallback?,
+                    ) {
+                        whileHandling()
+                    }
+
+                    override val allowedDomains: List<String> = emptyList()
+                    override val featureName: String = "subscriptions"
+                    override val methods: List<String> = listOf("handshake")
+                }
+        }
     }
 
     private class ThrowingPluginPoint : PluginPoint<ContentScopeJsMessageHandlersPlugin> {
@@ -847,6 +1156,11 @@ class ContentScopeScriptsJsMessagingTest {
                     override val methods: List<String> = listOf("webShare")
                 }
         }
+    }
+
+    private class MixedPluginPoint : PluginPoint<ContentScopeJsMessageHandlersPlugin> {
+        override fun getPlugins(): Collection<ContentScopeJsMessageHandlersPlugin> =
+            listOf(FakePluginPoint().FakePlugin(), WebEventsPluginPoint().WebEventsPlugin())
     }
 
     private class WebEventsPluginPoint : PluginPoint<ContentScopeJsMessageHandlersPlugin> {

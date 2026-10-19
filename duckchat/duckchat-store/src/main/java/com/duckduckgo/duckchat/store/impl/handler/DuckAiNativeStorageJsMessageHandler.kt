@@ -63,7 +63,8 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                 "getFile", "putFile", "deleteFile", "deleteFiles", "deleteAllFiles", "listFiles",
             )
 
-            // Runs on the JavaBridge thread — DAO/file I/O are safe here.
+            // Runs off the main thread: on the JavaBridge thread, or on a background consumer when optimizeContentScopeMessaging
+            // is on. Either way, DAO/file I/O are safe here.
             override fun process(jsMessage: JsMessage, jsMessaging: JsMessaging, jsMessageCallback: JsMessageCallback?) {
                 // The activity's browsing mode (injected, frozen for the activity's lifetime) selects which per-mode
                 // storage backend this message reads from / writes to.
