@@ -66,7 +66,7 @@ class PrivacyConfigInternalLoaderTest {
         assertEquals(URL, store.remotePrivacyConfigUrl)
         assertTrue(store.useCustomPrivacyConfigUrl)
         assertEquals(1, downloads)
-        assertEquals(listOf("CONFIG_OVERRIDE_APPLIED stage=config version=42 etag=local-etag source=$URL"), lines)
+        assertEquals(listOf("CONFIG_OVERRIDE_APPLIED version=42 etag=local-etag source=$URL"), lines)
     }
 
     @Test
@@ -98,7 +98,7 @@ class PrivacyConfigInternalLoaderTest {
         assertNull(store.remotePrivacyConfigUrl)
         assertFalse(store.useCustomPrivacyConfigUrl)
         assertEquals(1, downloads)
-        assertEquals(listOf("CONFIG_OVERRIDE_RESET stage=config version=42 etag=local-etag"), lines)
+        assertEquals(listOf("CONFIG_OVERRIDE_RESET version=42 etag=local-etag"), lines)
     }
 
     @Test

@@ -79,8 +79,8 @@ adb logcat -s PrivacyConfigOverride:I
 ```
 
 ```text
-CONFIG_OVERRIDE_APPLIED stage=config version=<version> etag=<etag> source=<override URL>
-CONFIG_OVERRIDE_RESET stage=config version=<version> etag=<etag>
+CONFIG_OVERRIDE_APPLIED version=<version> etag=<etag> source=<override URL>
+CONFIG_OVERRIDE_RESET version=<version> etag=<etag>
 CONFIG_OVERRIDE_FAILED action=set_url|reset reason=invalid_url|download_failed source=<failing URL>
 ```
 

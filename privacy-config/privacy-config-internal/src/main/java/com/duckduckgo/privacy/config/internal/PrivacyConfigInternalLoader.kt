@@ -65,7 +65,7 @@ class PrivacyConfigInternalLoader @Inject constructor(
             return
         }
         // A forced download that succeeds has always persisted, because the stored version was reset first.
-        marker.emit("$APPLIED stage=config ${storedConfig()} source=$url")
+        marker.emit("$APPLIED ${storedConfig()} source=$url")
     }
 
     private suspend fun reset() {
@@ -75,7 +75,7 @@ class PrivacyConfigInternalLoader @Inject constructor(
             marker.emit("$FAILED action=reset reason=download_failed source=$PRIVACY_REMOTE_CONFIG_URL")
             return
         }
-        marker.emit("$RESET stage=config ${storedConfig()}")
+        marker.emit("$RESET ${storedConfig()}")
     }
 
     // The downloader resets version and ETag under its shared download lock.
