@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.customtabs
 
+import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -24,6 +25,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.content.getSystemService
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -59,6 +61,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.onShowCustomTab()
+        if (launchMode != CustomTabLaunchMode.LEGACY && isTaskRoot) showInRecents()
 
         val toolbarColor =
             intent.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, getColorFromAttr(com.duckduckgo.mobile.android.R.attr.preferredStatusBarColor))
@@ -130,6 +133,13 @@ class CustomTabActivity : DuckDuckGoActivity() {
 
     private val launchMode: CustomTabLaunchMode
         get() = CustomTabLaunchMode.fromName(intent.getStringExtra(LAUNCH_MODE_EXTRA))
+
+    // The manifest hides legacy tabs from Recents, but a tab in its own task needs its card to be reachable.
+    private fun showInRecents() {
+        getSystemService<ActivityManager>()?.appTasks
+            ?.firstOrNull { it.taskInfo.persistentId == taskId }
+            ?.setExcludeFromRecents(false)
+    }
 
     fun finishAndRemoveOwnTask() {
         // Only the legacy task belongs to the tab. Removing any other would also kill the caller or whatever joined it.
