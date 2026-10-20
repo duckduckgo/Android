@@ -170,6 +170,7 @@ internal fun DaxOnboardingDialogCore(
     modifier: Modifier = Modifier,
     body: (@Composable () -> Unit)? = null,
     landscapeLayout: Boolean = false,
+    step: DaxOnboardingDialogStep? = null,
 ) {
     val titleLineHeightPx = with(LocalDensity.current) { titleStyle.asTextStyle.lineHeight.toPx() }
     val titleLineSpacingExtraPx = with(LocalDensity.current) {
@@ -571,6 +572,18 @@ internal fun DaxOnboardingDialogCore(
                 )
             }
         }
+        AnimatedDaxOnboardingStepIndicator(
+            step = step,
+            animate = animate && motionScale != 0f && !inInspectionMode,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(end = DaxOnboardingDialogDefaults.StepIndicatorEndInset)
+                .layout { measurable, constraints ->
+                    val placeable = measurable.measure(constraints)
+                    layout(placeable.width, 0) { placeable.place(0, -placeable.height / 2) }
+                }
+                .graphicsLayer { alpha = shellAlpha() },
+        )
     }
 }
 

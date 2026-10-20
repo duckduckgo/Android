@@ -67,6 +67,7 @@ object DaxOnboardingDialogDefaults {
     val DismissOffset: Dp = 4.dp
     val TailBandHeight: Dp = DaxSpeechBubbleShape.TailHeight + StrokeWidth
 
+    val StepIndicatorEndInset: Dp = 38.dp
     val StepIndicatorActiveDot: Dp = 12.dp
     val StepIndicatorInactiveDot: Dp = 6.dp
     val StepIndicatorDotGap: Dp = 4.dp
