@@ -16,6 +16,10 @@
 
 package com.duckduckgo.common.ui.compose.onboarding
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,12 +30,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -54,7 +62,9 @@ import com.duckduckgo.common.ui.compose.theme.DuckSansProduct
 import com.duckduckgo.common.ui.compose.theme.LocalOnboardingColors
 import com.duckduckgo.common.ui.compose.theme.OnboardingTheme
 import kotlinx.collections.immutable.toImmutableList
+import kotlin.math.PI
 import kotlin.math.ceil
+import kotlin.math.cos
 
 private val StepIndicatorShape = RoundedCornerShape(64.dp)
 
@@ -66,6 +76,55 @@ private val StepIndicatorLabelStyle = DuckDuckGoTextStyle(
         platformStyle = PlatformTextStyle(includeFontPadding = false),
     ),
 )
+
+@Composable
+internal fun AnimatedDaxOnboardingStepIndicator(
+    step: DaxOnboardingDialogStep?,
+    animate: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val previous = remember {
+        object {
+            var step: DaxOnboardingDialogStep? = null
+        }
+    }
+    val decision = remember(step, animate) {
+        val lastStep = previous.step
+        object {
+            val fadeOut = step == null && lastStep != null && animate
+            val displayedStep = step ?: lastStep.takeIf { fadeOut }
+            val animateDots = step != null && animate && lastStep != null && lastStep != step && step.current != 1
+            val transition = Animatable(if (animateDots) 0f else 1f)
+            val alpha = Animatable(1f)
+        }
+    }
+    var exited by remember(decision) { mutableStateOf(false) }
+
+    SideEffect { previous.step = step }
+
+    LaunchedEffect(decision) {
+        val duration = DaxOnboardingDialogDefaults.StepIndicatorTransitionDuration.inWholeMilliseconds.toInt()
+        if (decision.fadeOut) {
+            decision.alpha.animateTo(
+                0f,
+                tween(duration, easing = Easing { x -> ((cos((x + 1) * PI) / 2.0) + 0.5).toFloat() }),
+            )
+            exited = true
+        } else if (decision.animateDots) {
+            decision.transition.animateTo(1f, tween(duration, easing = FastOutSlowInEasing))
+        }
+    }
+
+    if (!exited) {
+        decision.displayedStep?.let {
+            DaxOnboardingStepIndicator(
+                step = it,
+                modifier = modifier.graphicsLayer { alpha = decision.alpha.value },
+                transition = { decision.transition.value },
+            )
+        }
+    }
+}
 
 @Composable
 internal fun DaxOnboardingStepIndicator(
