@@ -6,8 +6,8 @@ providing built-in search, tracker blocking, HTTPS enforcement and other privacy
 **Versions** (SDK levels, Kotlin, Gradle, libraries) live in the build files — don't restate them here:
 `min_sdk` / `target_sdk` / `compile_sdk` in `build.gradle`, `version.kotlin` in `versions.properties`,
 and the Gradle version in `gradle/wrapper/gradle-wrapper.properties`.
-**Build:** AGP via refreshVersions. DI is Anvil/Dagger2 today, with a migration to **Metro** in flight
-(dual-build selected by the `ddg.di` Gradle property; see `build.gradle`).
+**Build:** AGP via refreshVersions. DI is **Metro** (Anvil/Dagger annotations are still
+read through Metro interop while they are migrated; see `build.gradle`).
 **Toolchain:** Kotlin JVM target 17; building requires **JDK 21** (Metro compiler plugin).
 
 Notable libraries: Room, Retrofit/OkHttp/Moshi, Coroutines, Jetpack Compose (selective), WorkManager,
