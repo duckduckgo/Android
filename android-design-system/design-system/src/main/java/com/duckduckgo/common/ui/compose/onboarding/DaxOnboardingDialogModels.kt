@@ -18,6 +18,7 @@ package com.duckduckgo.common.ui.compose.onboarding
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import kotlinx.collections.immutable.ImmutableList
 
 /** Horizontal alignment options supported by the onboarding dialog variants. */
 @Stable
@@ -57,4 +58,19 @@ enum class DaxOnboardingDialogTail {
     BottomStart,
     BottomStartWide,
     BottomEnd,
+}
+
+/**
+ * [labels] are the caller's localized copy, one per step; [current] is one-based.
+ * Pass `null` as the dialog's step to hide the indicator. Equal values across content keys do not animate.
+ */
+@Immutable
+data class DaxOnboardingDialogStep(
+    val current: Int,
+    val labels: ImmutableList<String>,
+) {
+    init {
+        require(labels.isNotEmpty())
+        require(current in 1..labels.size)
+    }
 }
