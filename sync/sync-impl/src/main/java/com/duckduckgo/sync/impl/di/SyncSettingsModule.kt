@@ -19,9 +19,9 @@ package com.duckduckgo.sync.impl.di
 import com.duckduckgo.di.*
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.sync.api.*
-import com.squareup.anvil.annotations.*
-import dagger.*
-import dagger.multibindings.*
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.multibindings.Multibinds
 
 @Module
 @ContributesTo(ActivityScope::class)

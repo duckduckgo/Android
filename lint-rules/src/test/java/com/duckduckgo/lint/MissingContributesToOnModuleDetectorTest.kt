@@ -18,6 +18,7 @@ package com.duckduckgo.lint
 
 import com.android.tools.lint.checks.infrastructure.TestFiles.kt
 import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
+import com.duckduckgo.lint.utils.METRO_DI_API
 import org.junit.Test
 
 @Suppress("UnstableApiUsage")
@@ -152,6 +153,50 @@ class MissingContributesToOnModuleDetectorTest {
 
                     @Module
                     @ContributesTo(ActivityScope::class)
+                    object FooModule
+                    """,
+                ).indented(),
+            )
+            .issues(MissingContributesToOnModuleDetector.MISSING_CONTRIBUTES_TO_ON_MODULE)
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun whenBindingContainerHasNoContributesToThenFailWithError() {
+        lint()
+            .files(
+                METRO_DI_API,
+                kt(
+                    """
+                    package com.duckduckgo.example
+                    import dev.zacsweers.metro.BindingContainer
+
+                    @BindingContainer
+                    object FooModule
+                    """,
+                ).indented(),
+            )
+            .issues(MissingContributesToOnModuleDetector.MISSING_CONTRIBUTES_TO_ON_MODULE)
+            .run()
+            .expectErrorCount(1)
+    }
+
+    @Test
+    fun whenBindingContainerHasContributesToThenSucceed() {
+        lint()
+            .files(
+                METRO_DI_API,
+                scopeStubs,
+                kt(
+                    """
+                    package com.duckduckgo.example
+                    import com.duckduckgo.di.scopes.AppScope
+                    import dev.zacsweers.metro.BindingContainer
+                    import dev.zacsweers.metro.ContributesTo
+
+                    @BindingContainer
+                    @ContributesTo(AppScope::class)
                     object FooModule
                     """,
                 ).indented(),

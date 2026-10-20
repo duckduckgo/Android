@@ -43,7 +43,6 @@ import javax.inject.Inject
 
 @InjectWith(
     scope = ActivityScope::class,
-    delayGeneration = true,
 )
 @ContributeToActivityStarter(OpenVpnBreakageCategoryWithBrokenApp::class)
 class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {

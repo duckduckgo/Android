@@ -129,7 +129,29 @@ class ContributesViewModelProcessorTest {
 
         val result = compile(source, activityScopeStub, viewModelStub, viewModelFactoryPluginStub, singleInstanceInStub)
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("cannot be annotated with @SingleInstanceIn"))
+        assertTrue(result.messages.contains("cannot be annotated with @SingleIn"))
+    }
+
+    @Test
+    fun `error when annotated with SingleIn`() {
+        val source = SourceFile.kotlin(
+            "MyViewModel.kt",
+            """
+            package com.test
+            import androidx.lifecycle.ViewModel
+            import com.duckduckgo.anvil.annotations.ContributesViewModel
+            import com.duckduckgo.di.scopes.ActivityScope
+            import dev.zacsweers.metro.SingleIn
+            import javax.inject.Inject
+
+            @SingleIn(ActivityScope::class)
+            @ContributesViewModel(ActivityScope::class)
+            class MyViewModel @Inject constructor() : ViewModel()
+            """.trimIndent(),
+        )
+        val result = compile(source, activityScopeStub, viewModelStub, viewModelFactoryPluginStub)
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("cannot be annotated with @SingleIn"))
     }
 
     @Test

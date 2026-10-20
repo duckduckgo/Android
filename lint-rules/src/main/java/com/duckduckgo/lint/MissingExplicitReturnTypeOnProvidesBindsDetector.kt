@@ -58,7 +58,12 @@ class MissingExplicitReturnTypeOnProvidesBindsDetector : Detector(), SourceCodeS
     }
 
     companion object {
-        private val DAGGER_BINDING_ANNOTATIONS = setOf("dagger.Provides", "dagger.Binds")
+        private val DAGGER_BINDING_ANNOTATIONS = setOf(
+            "dagger.Provides",
+            "dagger.Binds",
+            "dev.zacsweers.metro.Provides",
+            "dev.zacsweers.metro.Binds",
+        )
 
         val MISSING_EXPLICIT_RETURN_TYPE = Issue.create(
             "MissingExplicitReturnTypeOnProvidesBinds",
