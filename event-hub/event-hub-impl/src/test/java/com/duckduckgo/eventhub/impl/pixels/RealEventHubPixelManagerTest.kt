@@ -22,11 +22,13 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.eventhub.impl.EventHubFeature
+import com.duckduckgo.eventhub.impl.metrics.ExperimentMetricsHandler
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -54,6 +56,7 @@ class RealEventHubPixelManagerTest {
     private val pixel: Pixel = mock()
     private val timeProvider = FakeCurrentTimeProvider()
     private val eventHubFeature: EventHubFeature = FakeFeatureToggleFactory.create(EventHubFeature::class.java)
+    private val metricsHandler: ExperimentMetricsHandler = mock()
 
     private fun webEventData(type: String) = JSONObject().put("type", type)
 
@@ -71,6 +74,7 @@ class RealEventHubPixelManagerTest {
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
             UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), eventHubFeature,
+            metricsHandler = metricsHandler,
         )
         manager.onAppForegrounded()
         eventHubFeature.self().setRawStoredState(savedState ?: Toggle.State(enable = false))
@@ -172,6 +176,7 @@ class RealEventHubPixelManagerTest {
             coroutineTestRule.testScope,
             queuedDispatcher,
             eventHubFeature,
+            metricsHandler = metricsHandler,
         )
         val periodEnd = 100_000L
         stubPixelStates(pixelState("webTelemetry_testPixel1", mapOf("count" to 0), periodEnd = periodEnd))
@@ -494,6 +499,44 @@ class RealEventHubPixelManagerTest {
         manager.handleWebEvent(webEventData("test"), "tab1")
 
         verify(repository, never()).savePixelState(any())
+    }
+
+    @Test
+    fun `a delivered event reaches the metrics handler and a duplicate does not`() = runTest {
+        manager.handleWebEvent(webEventData("test"), "tab1")
+        manager.handleWebEvent(webEventData("test"), "tab1")
+
+        verify(metricsHandler, times(1)).onEvent("test")
+    }
+
+    @Test
+    fun `events don't reach the metrics handler when feature disabled`() = runTest {
+        configureFeature(enabled = false)
+
+        manager.handleWebEvent(webEventData("test"), "tab1")
+
+        verify(metricsHandler, never()).onEvent(any())
+    }
+
+    @Test
+    fun `an event still queued when the hub is switched off sends no metrics`() = runTest {
+        val testScheduler = coroutineTestRule.testScope.testScheduler
+        val queuedManager = RealEventHubPixelManager(
+            repository,
+            pixel,
+            timeProvider,
+            coroutineTestRule.testScope,
+            StandardTestDispatcher(testScheduler),
+            eventHubFeature,
+            metricsHandler = metricsHandler,
+        )
+
+        queuedManager.handleWebEvent(webEventData("test"), "tab1")
+        configureFeature(enabled = false)
+        queuedManager.onConfigChanged()
+        testScheduler.runCurrent()
+
+        verify(metricsHandler, never()).onEvent(any())
     }
 
     @Test
