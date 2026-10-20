@@ -245,7 +245,6 @@ class RealContextualNativeInputManager @Inject constructor(
         widget.bindTextSelections(tabId, textSelection = null)
         widget.bindChatIdSource(chatIdFlow)
         widget.bindModelPickerEnabledSource(modelPickerEnabled)
-        widget.hideMainButtons()
         widget.onStopTapped = ::sendStopEvent
         widget.onInputFocusChanged = { focused ->
             sendInputFocusedEvent(focused)
