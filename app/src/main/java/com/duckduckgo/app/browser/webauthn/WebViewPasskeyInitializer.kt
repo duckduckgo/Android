@@ -22,6 +22,8 @@ import androidx.webkit.WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_BROWSER
 import androidx.webkit.WebViewFeature
 import androidx.webkit.WebViewFeature.WEB_AUTHENTICATION
 import com.duckduckgo.app.browser.DuckDuckGoWebView
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor.FDROID
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -38,10 +40,11 @@ interface WebViewPasskeyInitializer {
 class RealWebViewPasskeyInitializer @Inject constructor(
     private val autofillFeature: AutofillFeature,
     private val dispatchers: DispatcherProvider,
+    private val appBuildConfig: AppBuildConfig,
 ) : WebViewPasskeyInitializer {
 
     override suspend fun configurePasskeySupport(webView: DuckDuckGoWebView) {
-        if (featureFlagEnabled() && webViewCapable()) {
+        if (featureFlagEnabled() && isAllowlistedBuild() && webViewCapable()) {
             enablePasskeySupport(webView)
         }
     }
@@ -61,6 +64,9 @@ class RealWebViewPasskeyInitializer @Inject constructor(
             autofillFeature.passkeySupport().isEnabled()
         }
     }
+
+    // Google only returns the page origin to allowlisted package + signing cert pairs, and F-Droid signs with its own key
+    private fun isAllowlistedBuild(): Boolean = appBuildConfig.flavor != FDROID
 
     private suspend fun webViewCapable(): Boolean {
         return withContext(dispatchers.main()) {
