@@ -21,7 +21,7 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class SwitchedAccountPixelTracker @Inject constructor(
+class SwitchedAccountDetector @Inject constructor(
     private val accountRepository: SyncAccountRepository,
     private val syncPixels: SyncPixels,
     private val dispatchers: DispatcherProvider,

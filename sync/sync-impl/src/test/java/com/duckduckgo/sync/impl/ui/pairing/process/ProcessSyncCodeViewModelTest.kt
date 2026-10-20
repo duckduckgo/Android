@@ -41,7 +41,7 @@ import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.autorestore.RestorePayload
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
-import com.duckduckgo.sync.impl.pixels.SwitchedAccountPixelTracker
+import com.duckduckgo.sync.impl.pixels.SwitchedAccountDetector
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
@@ -98,7 +98,7 @@ class ProcessSyncCodeViewModelTest {
     private val codeDispatcher = mock<SyncCodeDispatcher>()
     private val syncPixels = mock<SyncPixels>()
     private val syncAutoRestoreManager = mock<SyncAutoRestoreManager>()
-    private val switchedAccountPixelTracker = mock<SwitchedAccountPixelTracker>()
+    private val switchedAccountDetector = mock<SwitchedAccountDetector>()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
     private var accountInfo = AccountInfo()
@@ -114,7 +114,7 @@ class ProcessSyncCodeViewModelTest {
             syncFeature = syncFeature,
             syncPixels = syncPixels,
             syncAutoRestoreManager = syncAutoRestoreManager,
-            switchedAccountPixelTracker = switchedAccountPixelTracker,
+            switchedAccountDetector = switchedAccountDetector,
             dispatchers = coroutineTestRule.testDispatcherProvider,
         )
     }
@@ -861,7 +861,7 @@ class ProcessSyncCodeViewModelTest {
 
         createTestee()
 
-        verify(switchedAccountPixelTracker).onPairingStarted()
+        verify(switchedAccountDetector).onPairingStarted()
     }
 
     @Test
@@ -879,7 +879,7 @@ class ProcessSyncCodeViewModelTest {
             awaitItem()
             cancel()
         }
-        verify(switchedAccountPixelTracker).onPaired()
+        verify(switchedAccountDetector).onPaired()
     }
 
     @Test
@@ -898,7 +898,7 @@ class ProcessSyncCodeViewModelTest {
             awaitItem()
             cancel()
         }
-        verify(switchedAccountPixelTracker).onPaired()
+        verify(switchedAccountDetector).onPaired()
     }
 
     @Test
@@ -915,7 +915,7 @@ class ProcessSyncCodeViewModelTest {
             awaitItem()
             cancel()
         }
-        verify(switchedAccountPixelTracker).onPaired()
+        verify(switchedAccountDetector).onPaired()
     }
 
     @Test
@@ -925,7 +925,7 @@ class ProcessSyncCodeViewModelTest {
 
         createTestee()
 
-        verify(switchedAccountPixelTracker, never()).onPaired()
+        verify(switchedAccountDetector, never()).onPaired()
     }
 
     @Test
@@ -1054,7 +1054,7 @@ class ProcessSyncCodeViewModelTest {
         }
         verify(syncPixels).fireUserAcceptedSwitchingAccount()
         verify(syncPixels).fireUserSwitchedAccount()
-        verify(switchedAccountPixelTracker, never()).onPaired()
+        verify(switchedAccountDetector, never()).onPaired()
     }
 
     @Test

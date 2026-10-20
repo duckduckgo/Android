@@ -38,7 +38,7 @@ import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
-import com.duckduckgo.sync.impl.pixels.SwitchedAccountPixelTracker
+import com.duckduckgo.sync.impl.pixels.SwitchedAccountDetector
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
@@ -109,7 +109,7 @@ class DisplayQrCodeViewModelTest {
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
     private val qrEncoder = mock<QREncoder>()
     private val clipboard = mock<ClipboardInteractor>()
-    private val switchedAccountPixelTracker = mock<SwitchedAccountPixelTracker>()
+    private val switchedAccountDetector = mock<SwitchedAccountDetector>()
 
     @Before
     fun setup() {
@@ -128,7 +128,7 @@ class DisplayQrCodeViewModelTest {
         syncFeature = syncFeature,
         qrEncoder = qrEncoder,
         clipboard = clipboard,
-        switchedAccountPixelTracker = switchedAccountPixelTracker,
+        switchedAccountDetector = switchedAccountDetector,
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
 
@@ -580,7 +580,7 @@ class DisplayQrCodeViewModelTest {
 
         createTestee()
 
-        verify(switchedAccountPixelTracker).onPairingStarted()
+        verify(switchedAccountDetector).onPairingStarted()
     }
 
     @Test
@@ -591,7 +591,7 @@ class DisplayQrCodeViewModelTest {
 
         createTestee()
 
-        verify(switchedAccountPixelTracker).onPaired()
+        verify(switchedAccountDetector).onPaired()
     }
 
     @Test
@@ -601,7 +601,7 @@ class DisplayQrCodeViewModelTest {
 
         createTestee()
 
-        verify(switchedAccountPixelTracker, never()).onPaired()
+        verify(switchedAccountDetector, never()).onPaired()
     }
 
     @Test

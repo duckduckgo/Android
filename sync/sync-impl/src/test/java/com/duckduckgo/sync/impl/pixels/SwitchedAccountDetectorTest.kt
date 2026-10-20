@@ -27,7 +27,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class SwitchedAccountPixelTrackerTest {
+class SwitchedAccountDetectorTest {
 
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
@@ -35,7 +35,7 @@ class SwitchedAccountPixelTrackerTest {
     private val accountRepository = mock<SyncAccountRepository>()
     private val syncPixels = mock<SyncPixels>()
 
-    private val testee = SwitchedAccountPixelTracker(
+    private val testee = SwitchedAccountDetector(
         accountRepository = accountRepository,
         syncPixels = syncPixels,
         dispatchers = coroutineTestRule.testDispatcherProvider,
