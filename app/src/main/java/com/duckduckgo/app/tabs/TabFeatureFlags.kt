@@ -51,6 +51,7 @@ interface TabManagerFeatureFlags {
      * The Duck.ai button opens the chats menu (New Chat, recent chats, View all) instead of opening a new Duck.ai tab.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.InternalAlwaysEnabled
     fun duckAiChatsMenu(): Toggle
 
     /**
@@ -58,5 +59,6 @@ interface TabManagerFeatureFlags {
      * (opening on the Search input in the current browser mode) and removes New Fire Tab.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.InternalAlwaysEnabled
     fun duckAiPlusMenuUpdate(): Toggle
 }
