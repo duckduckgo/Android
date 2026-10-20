@@ -43,7 +43,7 @@ private val DuckSansDisplay = FontFamily(
     Font(FontsR.font.ducksansdisplay_bold, FontWeight.Bold),
 )
 
-private val DuckSansProduct = FontFamily(
+internal val DuckSansProduct = FontFamily(
     Font(FontsR.font.ducksansproduct_regular, FontWeight.Normal),
     Font(FontsR.font.ducksansproduct_medium, FontWeight.Medium),
     Font(FontsR.font.ducksansproduct_bold, FontWeight.Bold),
