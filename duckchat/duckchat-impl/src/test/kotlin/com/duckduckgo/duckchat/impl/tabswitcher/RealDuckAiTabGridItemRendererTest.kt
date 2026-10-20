@@ -136,7 +136,10 @@ class RealDuckAiTabGridItemRendererTest {
 
     @Test
     fun whenImageChatThenImageContentWithLastFileRef() = runTest {
-        whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(isImageGeneration = true, fileRefs = listOf("first", "last")))
+        // The store reports a finished image chat as awaiting a reply, since its last assistant message has no text.
+        whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(
+            preview(isImageGeneration = true, fileRefs = listOf("first", "last"), isAwaitingReply = true),
+        )
 
         assertEquals(
             RealDuckAiTabGridItemContent.ImageChat("Title", "last", BrowserMode.REGULAR),
