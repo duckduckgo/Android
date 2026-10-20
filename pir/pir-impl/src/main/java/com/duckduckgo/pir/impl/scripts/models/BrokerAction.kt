@@ -110,6 +110,7 @@ sealed class BrokerAction(
     data class Expectation(
         override val id: String,
         val expectations: List<ExpectationSelector>,
+        val actions: List<BrokerAction> = emptyList(),
     ) : BrokerAction(id) {
         data class ExpectationSelector(
             val type: String,
@@ -130,7 +131,12 @@ sealed class BrokerAction(
         @Json(name = "_comment")
         val comment: String?,
         val expectations: List<ExpectationSelector>,
-        val actions: List<BrokerAction>,
+        val actions: List<BrokerAction> = emptyList(),
+    ) : BrokerAction(id)
+
+    data class Scroll(
+        override val id: String,
+        val selector: String,
     ) : BrokerAction(id)
 
     data class GenerateEmail(
@@ -201,6 +207,7 @@ fun BrokerAction.asActionType(): String {
         is SolveCaptcha -> "solveCaptcha"
         is EmailConfirmation -> "emailConfirmation"
         is Condition -> "condition"
+        is BrokerAction.Scroll -> "scroll"
         is BrokerAction.GenerateEmail -> "generateEmail"
         is BrokerAction.GetEmailData -> "getEmailData"
     }

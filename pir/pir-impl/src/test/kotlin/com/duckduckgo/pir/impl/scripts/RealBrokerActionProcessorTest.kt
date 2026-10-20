@@ -229,6 +229,68 @@ class RealBrokerActionProcessorTest {
     }
 
     @Test
+    fun whenPushExpectationWithNestedActionsThenNestedActionsAreForwarded() = runTest {
+        val actionJson = """
+            {
+                "actionType": "expectation",
+                "id": "expectation-1",
+                "expectations": [{"type": "element", "selector": ".results"}],
+                "actions": [
+                    {
+                        "actionType": "click",
+                        "id": "click-1",
+                        "elements": [{"type": "button", "selector": ".consent", "failSilently": true}]
+                    }
+                ]
+            }
+        """.trimIndent()
+        val action = moshi.adapter(BrokerAction::class.java).fromJson(actionJson)!!
+
+        testee.pushAction(action, UserProfile())
+
+        val eventCaptor = argumentCaptor<SubscriptionEventData>()
+        verify(mockJsMessaging).sendSubscriptionEvent(eventCaptor.capture())
+
+        val pushedNestedAction = eventCaptor.firstValue.params
+            .getJSONObject("state")
+            .getJSONObject("action")
+            .getJSONArray("actions")
+            .getJSONObject(0)
+        assertEquals("click", pushedNestedAction.getString("actionType"))
+        assertEquals("click-1", pushedNestedAction.getString("id"))
+        assertEquals(".consent", pushedNestedAction.getJSONArray("elements").getJSONObject(0).getString("selector"))
+    }
+
+    @Test
+    fun whenProcessJsCallbackWithScrollSuccessThenCallsOnSuccess() = runTest {
+        val callback = registerAndGetCallback()
+
+        val successJson = """
+            {
+                "result": {
+                    "success": {
+                        "actionID": "scroll-1",
+                        "actionType": "scroll",
+                        "response": null
+                    }
+                }
+            }
+        """.trimIndent()
+
+        callback.process(
+            featureName = PIRScriptConstants.SCRIPT_FEATURE_NAME,
+            method = PIRScriptConstants.RECEIVED_METHOD_NAME_COMPLETED,
+            id = null,
+            data = JSONObject(successJson),
+        )
+
+        val successCaptor = argumentCaptor<PirSuccessResponse>()
+        verify(mockActionResultListener).onSuccess(successCaptor.capture())
+        assertEquals("scroll-1", successCaptor.firstValue.actionID)
+        assertEquals("scroll", successCaptor.firstValue.actionType)
+    }
+
+    @Test
     fun whenPushCaptchaActionsThenProfileMatchParentIsForwarded() = runTest {
         val actions = listOf("getCaptchaInfo", "solveCaptcha")
 

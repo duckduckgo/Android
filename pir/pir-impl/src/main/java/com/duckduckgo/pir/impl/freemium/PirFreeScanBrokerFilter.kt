@@ -96,12 +96,13 @@ private fun BrokerAction.isTokenGated(): Boolean = when (this) {
     -> true
 
     is BrokerAction.Condition -> actions.any { it.isTokenGated() }
+    is BrokerAction.Expectation -> actions.any { it.isTokenGated() }
 
     is BrokerAction.Navigate,
     is BrokerAction.Extract,
     is BrokerAction.FillForm,
     is BrokerAction.Click,
     is BrokerAction.ExecuteScript,
-    is BrokerAction.Expectation,
+    is BrokerAction.Scroll,
     -> false
 }
