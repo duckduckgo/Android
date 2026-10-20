@@ -19,7 +19,7 @@ package com.duckduckgo.app.anr.ndk
 import com.duckduckgo.android_crashkit.Crashpad
 import com.duckduckgo.anrs.api.CrashAnnotations
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
