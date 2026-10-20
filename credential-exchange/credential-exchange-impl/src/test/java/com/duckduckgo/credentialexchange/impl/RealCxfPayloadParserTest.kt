@@ -119,6 +119,50 @@ class RealCxfPayloadParserTest {
     }
 
     @Test
+    fun whenItemHoldsCredentialTypesWithPlainStringFieldsThenOnlyLoginParsed() = runTest {
+        val json = payloadWithCredentials(
+            """{"type":"basic-auth","username":{"value":"login-user"},"password":{"value":"login-pass"}},
+            {"type":"passkey","credentialId":"abc","rpId":"example.com","username":"passkey-user","userDisplayName":"d",
+            "userHandle":"h","key":"k"},
+            {"type":"totp","secret":"s","period":30,"digits":6,"username":"totp-user","algorithm":"sha1"},
+            {"type":"generated-password","password":"generated-pass"}""",
+        )
+
+        val result = testee.parse(json) as CxfParseResult.Parsed
+
+        with(result.credentials.single()) {
+            assertEquals("login-user", username)
+            assertEquals("login-pass", password)
+        }
+    }
+
+    @Test
+    fun whenOneItemHasUnexpectedShapeThenOtherItemsStillParsed() = runTest {
+        val json = """
+            {"accounts":[{"items":[
+            {"title":{"unexpected":true},"credentials":[{"type":"basic-auth","username":{"value":"bad"}}]},
+            "not an item",
+            {"title":"t","credentials":[{"type":"basic-auth","username":{"value":"good"},"password":{"value":"p"}}]}]}]}
+        """.trimIndent()
+
+        val result = testee.parse(json) as CxfParseResult.Parsed
+
+        assertEquals("good", result.credentials.single().username)
+    }
+
+    @Test
+    fun whenLoginFieldIsNotAnObjectThenFieldIsNull() = runTest {
+        val json = payloadWithCredentials("""{"type":"basic-auth","username":"plain","password":{"value":"p"}}""")
+
+        val result = testee.parse(json) as CxfParseResult.Parsed
+
+        with(result.credentials.single()) {
+            assertNull(username)
+            assertEquals("p", password)
+        }
+    }
+
+    @Test
     fun whenAccountsMissingThenMalformed() = runTest {
         assertTrue(testee.parse("""{"version":{"major":1,"minor":0}}""") is CxfParseResult.Malformed)
     }
