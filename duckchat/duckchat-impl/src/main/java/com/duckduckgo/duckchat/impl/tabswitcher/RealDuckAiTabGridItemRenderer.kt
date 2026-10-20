@@ -74,7 +74,7 @@ class RealDuckAiTabGridItemRenderer @Inject constructor(
     private suspend fun resolveContent(tabId: String, url: String?, mode: BrowserMode): DuckAiTabGridItemContent? {
         if (voiceSessionStateManager.isVoiceSessionActive(tabId)) return RealDuckAiTabGridItemContent.ActiveVoice
 
-        val chatId = url?.toUri()?.toChatIdOrNull(duckChat) ?: return RealDuckAiTabGridItemContent.Empty(title = null)
+        val chatId = url?.toUri()?.toChatIdOrNull(duckChat) ?: return RealDuckAiTabGridItemContent.Empty
 
         val store = storeFor(mode)
         if (!store.hasMigrated() || !duckChatFeature.useNativeStorageChatData().isEnabled()) return null
@@ -98,15 +98,15 @@ class RealDuckAiTabGridItemRenderer @Inject constructor(
         BrowserMode.FIRE -> fireChatStore
     }
 
-    // A chat with nothing to preview keeps its title on an empty card rather than falling back to the host's card.
+    // A chat with nothing to preview shows the empty card rather than falling back to the host's card.
     private fun DuckAiChatPreview.toContent(mode: BrowserMode): RealDuckAiTabGridItemContent {
         val title = chat.title
         if (chat.isImageGeneration) {
-            val fileRef = chat.fileRefs.lastOrNull() ?: return RealDuckAiTabGridItemContent.Empty(title)
+            val fileRef = chat.fileRefs.lastOrNull() ?: return RealDuckAiTabGridItemContent.Empty
             return RealDuckAiTabGridItemContent.ImageChat(title, fileRef, mode)
         }
         // Long chats would otherwise copy their whole last reply into every card.
-        val snippet = lastMessageText?.take(SNIPPET_CHARACTER_CAP) ?: return RealDuckAiTabGridItemContent.Empty(title)
+        val snippet = lastMessageText?.take(SNIPPET_CHARACTER_CAP) ?: return RealDuckAiTabGridItemContent.Empty
         return RealDuckAiTabGridItemContent.Chat(title, snippet)
     }
 
