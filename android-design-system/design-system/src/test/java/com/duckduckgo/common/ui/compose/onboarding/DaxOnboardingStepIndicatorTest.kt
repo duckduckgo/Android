@@ -19,15 +19,18 @@ package com.duckduckgo.common.ui.compose.onboarding
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.view.View
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
@@ -60,7 +63,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
+import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.cos
 
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [28], qualifiers = "xxhdpi")
@@ -70,6 +75,9 @@ class DaxOnboardingStepIndicatorTest {
     val compose = createComposeRule()
 
     private val step = mutableStateOf(DaxOnboardingDialogStep(2, (1..5).map { "$it of 5" }.toImmutableList()))
+    private val animatedStep = mutableStateOf<DaxOnboardingDialogStep?>(progress(1), neverEqualPolicy())
+    private val animate = mutableStateOf(true)
+    private var usesAnimation = false
     private lateinit var drawingView: View
     private lateinit var colors: OnboardingColors
 
@@ -146,9 +154,189 @@ class DaxOnboardingStepIndicatorTest {
         assertColor(colors.surfaceTertiary, pixels[bounds.left.toInt() + 15, bounds.center.y.toInt()])
     }
 
+    @Test
+    fun plusOneAnimatesWithFastOutSlowInOverThreeHundredMillis() {
+        showIndicator(animated = true)
+        val start = change(progress(2))
+        pill().assertTextEquals("2 of 5")
+        assertSpan(1, 18f)
+        val elapsed = sample(start, 160)
+        assertSpan(1, 18f + 18f * FastOutSlowInEasing.transform(elapsed / 300f))
+        assertTrue(abs(dotSpans()[1].count() - (18f + 18f * elapsed / 300f)) > 3f)
+        val later = sample(start, 240)
+        assertSpan(1, 18f + 18f * FastOutSlowInEasing.transform(later / 300f))
+        sample(start, 316)
+        assertSpan(1, 36f)
+        assertSpan(0, 18f)
+    }
+
+    @Test
+    fun jumpAnimatesFromThePreviousStepLikeTheView() {
+        showIndicator(animated = true)
+        val start = change(progress(3))
+        assertSpan(1, 36f)
+        assertSpan(2, 18f)
+        sample(start, 316)
+        assertSpan(2, 36f)
+    }
+
+    @Test
+    fun totalChangeAnimatesFromCurrentMinusOneWithTheNewLabels() {
+        showIndicator(animated = true)
+        change(progress(2, 6))
+        assertEquals(6, dotSpans().size)
+        assertSpan(0, 36f)
+        pill().assertTextEquals("2 of 6")
+    }
+
+    @Test
+    fun firstStepSnaps() {
+        animatedStep.value = progress(2)
+        showIndicator(animated = true)
+        val start = change(progress(1))
+        assertSpan(0, 36f)
+        val spans = dotSpans()
+        sample(start, 316)
+        assertEquals(spans, dotSpans())
+    }
+
+    @Test
+    fun firstCompositionAndEqualValuesSnap() {
+        animatedStep.value = progress(3)
+        showIndicator(animated = true)
+        val start = compose.mainClock.currentTime
+        assertSpan(2, 36f)
+        val spans = dotSpans()
+        sample(start, 150)
+        assertEquals(spans, dotSpans())
+        sample(start, 316)
+        assertEquals(spans, dotSpans())
+        val equalStart = change(progress(3))
+        sample(equalStart, 150)
+        assertEquals(spans, dotSpans())
+    }
+
+    @Test
+    fun animateFalseSnaps() {
+        animate.value = false
+        showIndicator(animated = true)
+        change(progress(2))
+        assertSpan(1, 36f)
+    }
+
+    @Test
+    fun exitFadesWithAccelerateDecelerateThenRemoves() {
+        animatedStep.value = progress(5)
+        showIndicator(animated = true)
+        val start = change(null)
+        val elapsed = sample(start, 150)
+        val alpha = 1f - ((cos((elapsed / 300f + 1) * PI) / 2.0) + 0.5).toFloat()
+        val actual = fillPixel()
+        assertTrue(actual.green > 0f && actual.green < 1f)
+        assertTrue(distance(colors.surfaceTertiary.copy(alpha = alpha).compositeOver(Color.Magenta), actual) <= 0.03f)
+        sample(start, 316)
+        pill().assertDoesNotExist()
+    }
+
+    @Test
+    fun exitWithoutAnimationRemovesImmediately() {
+        animatedStep.value = progress(5)
+        animate.value = false
+        showIndicator(animated = true)
+        change(null)
+        pill().assertDoesNotExist()
+    }
+
+    @Test
+    fun newStepMidAnimationSnapsThenAppliesTheTable() {
+        showIndicator(animated = true)
+        sample(change(progress(2)), 100)
+        val start = change(progress(3))
+        assertSpan(1, 36f)
+        assertSpan(2, 18f)
+        sample(start, 316)
+        assertSpan(2, 36f)
+    }
+
+    @Test
+    fun nonNullMidExitCancelsTheFadeAndSnaps() {
+        animatedStep.value = progress(5)
+        showIndicator(animated = true)
+        sample(change(null), 100)
+        change(progress(2))
+        assertColor(colors.surfaceTertiary, fillPixel())
+        assertSpan(1, 36f)
+    }
+
+    @Test
+    fun animateTurningFalseMidRunSnaps() {
+        showIndicator(animated = true)
+        sample(change(progress(2)), 100)
+        compose.runOnIdle { animate.value = false }
+        settleChange()
+        assertSpan(1, 36f)
+    }
+
+    @Test
+    fun animateTurningFalseMidExitRemoves() {
+        showIndicator(animated = true)
+        sample(change(null), 100)
+        compose.runOnIdle { animate.value = false }
+        settleChange()
+        pill().assertDoesNotExist()
+    }
+
+    @Test
+    fun backwardsMoveAnimatesFromCurrentMinusOne() {
+        animatedStep.value = progress(5)
+        showIndicator(animated = true)
+        val start = change(progress(3))
+        assertSpan(1, 36f)
+        assertSpan(2, 18f)
+        sample(start, 316)
+        assertSpan(2, 36f)
+    }
+
+    private fun progress(current: Int, total: Int = 5) =
+        DaxOnboardingDialogStep(current, (1..total).map { "$it of $total" }.toImmutableList())
+
+    private fun change(value: DaxOnboardingDialogStep?): Long {
+        compose.runOnIdle { animatedStep.value = value }
+        settleChange()
+        return compose.mainClock.currentTime
+    }
+
+    private fun settleChange() {
+        repeat(3) {
+            compose.mainClock.advanceTimeByFrame()
+            compose.waitForIdle()
+        }
+    }
+
+    private fun sample(start: Long, target: Long): Float {
+        val before = compose.mainClock.currentTime
+        compose.mainClock.advanceTimeByFrame()
+        compose.waitForIdle()
+        val frame = compose.mainClock.currentTime - before
+        while (compose.mainClock.currentTime - start + frame / 2 < target) {
+            compose.mainClock.advanceTimeByFrame()
+            compose.waitForIdle()
+        }
+        return (compose.mainClock.currentTime - start).toFloat()
+    }
+
+    private fun assertSpan(index: Int, expected: Float) = assertEquals(expected, dotSpans()[index].count().toFloat(), 1.5f)
+
+    private fun fillPixel(): Color {
+        val bounds = bounds()
+        return capturePixels()[bounds.left.toInt() + 5, bounds.center.y.toInt()]
+    }
+
     private fun model(current: Int, vararg labels: String) = DaxOnboardingDialogStep(current, labels.toList().toImmutableList())
 
-    private fun showIndicator(fontScale: Float = 1f) {
+    private fun showIndicator(fontScale: Float = 1f, animated: Boolean = false) {
+        usesAnimation = animated
+        if (animated) compose.mainClock.autoAdvance = false
         compose.setContent {
             DuckDuckGoTheme(isDarkTheme = false) {
                 OnboardingTheme {
@@ -156,12 +344,17 @@ class DaxOnboardingStepIndicatorTest {
                     drawingView = LocalView.current
                     CompositionLocalProvider(LocalDensity provides Density(3f, fontScale)) {
                         Box(Modifier.fillMaxSize().background(Color.Magenta).padding(40.dp)) {
-                            DaxOnboardingStepIndicator(step.value)
+                            if (animated) {
+                                AnimatedDaxOnboardingStepIndicator(animatedStep.value, animate.value)
+                            } else {
+                                DaxOnboardingStepIndicator(step.value)
+                            }
                         }
                     }
                 }
             }
         }
+        if (animated) settleChange()
     }
 
     private fun update(value: DaxOnboardingDialogStep) {
@@ -182,7 +375,7 @@ class DaxOnboardingStepIndicatorTest {
         val bounds = bounds()
         val pixels = capturePixels()
         val start = bounds.left.toInt() + 24
-        val total = step.value.labels.size
+        val total = if (usesAnimation) animatedStep.value?.labels?.size ?: 5 else step.value.labels.size
         val end = start + 36 + (total - 1) * 30
         val ink = (start until end).filter { x -> distance(pixels[x, bounds.center.y.toInt()], colors.surfaceTertiary) > 0.02f }
         return ink.fold(mutableListOf()) { spans, x ->
