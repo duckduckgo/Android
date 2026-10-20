@@ -18,8 +18,8 @@ package com.duckduckgo.duckchat.impl.promo
 
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -127,7 +127,7 @@ interface PromoCampaignRepository {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealPromoCampaignRepository @Inject constructor(
     private val dataStore: PromoCampaignDataStore,
     private val currentTimeProvider: CurrentTimeProvider,
