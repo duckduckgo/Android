@@ -107,6 +107,34 @@ class RealDuckAiTabGridItemRendererTest {
     }
 
     @Test
+    fun whenResolvingSeveralTabsThenMigrationCheckedOnce() = runTest {
+        whenever(regularStore.getChatPreview(any())).thenReturn(preview(lastMessageText = "Answer"))
+
+        testee.resolve("tab-1", CHAT_URL, BrowserMode.REGULAR)
+        testee.resolve("tab-2", "https://duck.ai/?chatID=chat-2", BrowserMode.REGULAR)
+
+        verify(regularStore, times(1)).hasMigrated()
+    }
+
+    @Test
+    fun whenNotMigratedThenNotCheckedAgainForTheOpening() = runTest {
+        whenever(regularStore.hasMigrated()).thenReturn(false, true)
+
+        assertNull(testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertNull(testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        verify(regularStore, times(1)).hasMigrated()
+    }
+
+    @Test
+    fun whenStorageCheckedForOneModeThenOtherModeCheckedSeparately() = runTest {
+        whenever(regularStore.hasMigrated()).thenReturn(false)
+        whenever(fireStore.getChatPreview(CHAT_ID)).thenReturn(preview(lastMessageText = "Fire"))
+
+        assertNull(testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertEquals(RealDuckAiTabGridItemContent.Chat("Title", "Fire"), testee.resolve(TAB_ID, CHAT_URL, BrowserMode.FIRE))
+    }
+
+    @Test
     fun whenChatNotFoundThenNull() = runTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(null)
 

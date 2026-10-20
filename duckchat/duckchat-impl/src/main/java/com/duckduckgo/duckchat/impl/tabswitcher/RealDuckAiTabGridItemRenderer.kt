@@ -66,6 +66,9 @@ class RealDuckAiTabGridItemRenderer @Inject constructor(
     // A read that throws would throw again, and every list emission (each selection tap included) would otherwise retry and log it.
     private val unreadableChats = ConcurrentHashMap.newKeySet<Pair<BrowserMode, String>>()
 
+    // Checked once per opening rather than for every Duck.ai tab on every list emission.
+    private val nativeStorageReady = ConcurrentHashMap<BrowserMode, Boolean>()
+
     // Holders are recreated whenever the view type changes, such as entering selection mode, so each would otherwise re-read and re-decode.
     private val thumbnails = object : LruCache<Pair<BrowserMode, String>, Bitmap>(THUMBNAIL_CACHE_BYTES) {
         override fun sizeOf(key: Pair<BrowserMode, String>, value: Bitmap): Int = value.byteCount
@@ -89,7 +92,7 @@ class RealDuckAiTabGridItemRenderer @Inject constructor(
         val chatId = url?.toUri()?.toChatIdOrNull(duckChat) ?: return RealDuckAiTabGridItemContent.Empty
 
         val store = storeFor(mode)
-        if (!store.hasMigrated() || !duckChatFeature.useNativeStorageChatData().isEnabled()) return null
+        if (!isNativeStorageReady(store, mode)) return null
         return chatPreview(store, mode, chatId)?.toContent(mode)
     }
 
@@ -152,6 +155,9 @@ class RealDuckAiTabGridItemRenderer @Inject constructor(
             null
         }
     }
+
+    private suspend fun isNativeStorageReady(store: DuckAiChatStore, mode: BrowserMode): Boolean =
+        nativeStorageReady.getOrPut(mode) { store.hasMigrated() && duckChatFeature.useNativeStorageChatData().isEnabled() }
 
     private fun storeFor(mode: BrowserMode): DuckAiChatStore = when (mode) {
         BrowserMode.REGULAR -> regularChatStore
