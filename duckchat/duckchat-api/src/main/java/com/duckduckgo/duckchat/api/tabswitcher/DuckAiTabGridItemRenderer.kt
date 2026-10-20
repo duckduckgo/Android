@@ -19,13 +19,15 @@ package com.duckduckgo.duckchat.api.tabswitcher
 import android.content.Context
 import android.view.View
 import com.duckduckgo.browsermode.api.BrowserMode
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * Rich Duck.ai card for the tab switcher grid. Each card resolves and owns what it shows, so hosts only
  * decide that a Duck.ai tab uses this card and delegate rendering to it.
  */
 interface DuckAiTabGridItemRenderer {
-    fun create(context: Context): DuckAiTabGridItemView
+    /** The card loads its content in [coroutineScope], which must end before the host's views are destroyed. */
+    fun create(context: Context, coroutineScope: CoroutineScope): DuckAiTabGridItemView
 }
 
 /** Identifies the Duck.ai tab a card shows. A different key means the card resolves its content again. */

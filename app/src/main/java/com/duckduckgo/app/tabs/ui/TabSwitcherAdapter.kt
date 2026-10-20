@@ -158,7 +158,7 @@ class TabSwitcherAdapter(
                 TabSwitcherViewHolder.DuckAiTabListViewHolder(binding)
             }
             RICH_DUCK_AI_GRID, SELECTABLE_RICH_DUCK_AI_GRID -> {
-                TabSwitcherViewHolder.RichDuckAiGridViewHolder(duckAiTabGridItemRenderer.create(parent.context))
+                TabSwitcherViewHolder.RichDuckAiGridViewHolder(duckAiTabGridItemRenderer.create(parent.context, lifecycleOwner.lifecycleScope))
             }
             TRACKER_ANIMATION_TILE_INFO_PANEL -> {
                 val binding = ItemTabSwitcherAnimationInfoPanelBinding.inflate(inflater, parent, false)

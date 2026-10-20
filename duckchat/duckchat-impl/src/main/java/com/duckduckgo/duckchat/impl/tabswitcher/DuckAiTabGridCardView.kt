@@ -258,6 +258,8 @@ class DuckAiTabGridCardView(
         glide.load(File(path))
             .transition(DrawableTransitionOptions.withCrossFade())
             .transform(FitAndClipBottom, RoundedCorners(cornerRadius))
+            // The view centres it at its own size, matching the empty logo, since error drawables aren't transformed.
+            .error(CommonR.drawable.duckduckgo_duckai_96)
             .into(tabChatItemScreenshot)
     }
 

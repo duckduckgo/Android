@@ -68,7 +68,6 @@ class RealDuckAiTabGridItemRendererTest {
         voiceSessionStateManager = voiceSessionStateManager,
         duckChat = duckChat,
         dispatchers = coroutineTestRule.testDispatcherProvider,
-        appCoroutineScope = coroutineTestRule.testScope,
     )
 
     @Before

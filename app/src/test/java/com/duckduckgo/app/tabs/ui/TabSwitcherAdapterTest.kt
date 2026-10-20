@@ -22,6 +22,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -183,7 +184,8 @@ class TabSwitcherAdapterTest {
     fun `rich card is bound with its tab key and the host title and screenshot`() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         whenever(duckAiTabGridItemView.view).thenReturn(FrameLayout(context))
-        whenever(duckAiTabGridItemRenderer.create(any())).thenReturn(duckAiTabGridItemView)
+        whenever(lifecycleOwner.lifecycle).thenReturn(LifecycleRegistry(lifecycleOwner))
+        whenever(duckAiTabGridItemRenderer.create(any(), any())).thenReturn(duckAiTabGridItemView)
         whenever(webViewPreviewPersister.fullPathForFile("1", "preview.jpg")).thenReturn("/previews/1/preview.jpg")
         val entity = TabEntity("1", url = "https://duck.ai/?chatID=abc", position = 0, tabPreviewFile = "preview.jpg", viewed = false)
         adapter.updateData(listOf(DuckAiTab(entity, isActive = false, title = "Host title", isRichDuckAiCard = true)))

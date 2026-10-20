@@ -21,7 +21,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.LruCache
 import androidx.core.net.toUri
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.FireMode
 import com.duckduckgo.browsermode.api.RegularMode
@@ -57,7 +56,6 @@ class RealDuckAiTabGridItemRenderer @Inject constructor(
     private val voiceSessionStateManager: VoiceSessionStateManager,
     private val duckChat: DuckChat,
     private val dispatchers: DispatcherProvider,
-    @param:AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : DuckAiTabGridItemRenderer, DuckAiTabGridContentSource {
 
     // Lives as long as the tab switcher, so each chat is read and parsed once per opening and shows its state at that point.
@@ -72,11 +70,11 @@ class RealDuckAiTabGridItemRenderer @Inject constructor(
         override fun sizeOf(key: Pair<BrowserMode, String>, value: Bitmap): Int = value.byteCount
     }
 
-    override fun create(context: Context): DuckAiTabGridItemView = DuckAiTabGridCardView(
+    override fun create(context: Context, coroutineScope: CoroutineScope): DuckAiTabGridItemView = DuckAiTabGridCardView(
         context = context,
         contentSource = this,
         dispatchers = dispatchers,
-        coroutineScope = appCoroutineScope,
+        coroutineScope = coroutineScope,
     )
 
     override fun peek(key: DuckAiTabGridItemKey): RealDuckAiTabGridItemContent? {
