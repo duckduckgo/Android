@@ -336,5 +336,695 @@
             "eventHubYoutubeBufferingCount",
             "eventHubAttributionPeriod"
         ]
+    },
+    "webTelemetry_pageLoadTime_day": {
+        "description": "Daily bucketed counts of page loads where a load ended 8 s or more after navigation start, or was still loading at 15 s, on a page visible through the load that painted no content under 3 s, one parameter per load time bucket, and one for reloaded pages. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "loadLoading",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the page was still loading at 15 s. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "load8to15s",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the load ended 8 to 15 s after navigation start. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "load15sPlus",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the load ended 15 s or more after navigation start. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "slowReload",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the slow page was one the user reloaded. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_errorPhraseCount_day": {
+        "description": "Daily bucketed counts of page loads where \"access denied\", \"page not found\" or \"404 not found\" was found in rendered text, one parameter per occurrence count bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count1",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the phrases occurred once. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "count2to4",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the phrases occurred 2 to 4 times. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "count5Plus",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the phrases occurred 5 or more times. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_soft404Features_day": {
+        "description": "Daily bucketed counts of page loads where five or more error terms were found on a page with little rendered text for its size, fewer than two images or a short title, and under 2000 characters of rendered text, one parameter per error term count bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "keywords5to9",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the page had 5 to 9 error terms. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "keywords10to24",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the page had 10 to 24 error terms. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "keywords25Plus",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the page had 25 or more error terms. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_failurePhrasesSmallPage_day": {
+        "description": "Daily bucketed counts of page loads where \"something went wrong\", \"temporary error\" or \"this is taking longer than\" was found on a page with under 2000 characters of rendered text, one parameter per rendered text length bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "text0to499",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the page had under 500 characters of rendered text. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "text500to999",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the page had 500 to 999 characters of rendered text. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "text1000to1999",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the page had 1000 to 1999 characters of rendered text. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_stylesMissing_day": {
+        "description": "Daily bucketed counts of page loads where stylesheet links had no stylesheet once the load event had ended, one parameter per missing stylesheet count bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "sheets1",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where one stylesheet was missing. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "sheets2to4",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where 2 to 4 stylesheets were missing. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "sheets5Plus",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where 5 or more stylesheets were missing. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_brokenImages_day": {
+        "description": "Daily bucketed counts of page loads where two or more broken images rendered at 16 × 16 px or more, or one when one in ten or more of the page's images broke, excluding declared tracking pixels, one parameter per broken image count bucket and per broken image share bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count1",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where one image broke. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "count2to4",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where 2 to 4 images broke. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "count5to9",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where 5 to 9 images broke. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "count10Plus",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where 10 or more images broke. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "share10to25",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where 10 to 25% of the page's images broke. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "share25to50",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where 25 to 50% of the page's images broke. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "share50to90",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where 50 to 90% of the page's images broke. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "share90Plus",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where 90% or more of the page's images broke. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_forbiddenPage_day": {
+        "description": "Daily bucketed counts of page loads where 403 wording appeared in the title or a heading, one parameter per matched wording and response status bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "wording_status2xx",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where 403 wording, or \"access is denied\", was served with a 2xx status. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "wording_status4xx",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where 403 wording, or \"access is denied\", was served with a 4xx status. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "wording_status5xx",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where 403 wording, or \"access is denied\", was served with a 5xx status. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "bareForbidden_status4xx",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where a title or heading starting \"Forbidden\" was served with a 4xx status. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "bareForbidden_status5xx",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where a title or heading starting \"Forbidden\" was served with a 5xx status. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_rateLimitedPage_day": {
+        "description": "Daily bucketed counts of page loads where 429 wording appeared in the title or a heading, one parameter per matched wording and response status bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "wording_status2xx",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where 429 wording was served with a 2xx status. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "wording_status4xx",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where 429 wording was served with a 4xx status. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "wording_status5xx",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where 429 wording was served with a 5xx status. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "bareTooManyRequests_status4xx",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where \"Too many requests\" in the title or a heading was served with a 4xx status. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "bareTooManyRequests_status5xx",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where \"Too many requests\" in the title or a heading was served with a 5xx status. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_wafAssetsPage_day": {
+        "description": "Daily bucketed counts of page loads where a web application firewall vendor's asset was found on a page served with an error status, or with under 500 characters of rendered text, one parameter per route and rendered text length bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "littleText_text0to499",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the page had under 500 characters of rendered text and no error status. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "errorStatus_text0to499",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the page had an error status and under 500 characters of rendered text. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "errorStatus_text500to999",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the page had an error status and 500 to 999 characters of rendered text. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "errorStatus_text1000to1999",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the page had an error status and 1000 to 1999 characters of rendered text. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "errorStatus_text2000Plus",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the page had an error status and 2000 or more characters of rendered text. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_appRootEmpty_day": {
+        "description": "Daily bucketed counts of page loads where an app mount container was still empty 3 s after the load event, on a page with under 500 characters of rendered text, one parameter per load time bucket and per failed script count bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "load0to3s",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the load event ended under 3 s after navigation start. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "load3to8s",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the load event ended 3 to 8 s after navigation start. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "load8sPlus",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the load event ended 8 s or more after navigation start. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "scripts0",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where no scripts failed. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "scripts1",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where one script failed. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "scripts2Plus",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where two or more scripts failed. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_noTextOrTitle_day": {
+        "description": "Daily bucketed counts of page loads where a page had no rendered text, no title and no media, one parameter per response size bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "size0",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the response was empty. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "sizeUnder1KB",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the response was under 1 KB. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "size1to100KB",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the response was 1 to 100 KB. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "size100KBPlus",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the response was 100 KB or more. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_noContentfulPaint_day": {
+        "description": "Daily bucketed counts of page loads where there was no contentful paint 3 s after the load event, on a page visible since navigation start with no visible iframe, one parameter per load time bucket and per first paint state. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "load0to3s",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the load event ended under 3 s after navigation start. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "load3to8s",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the load event ended 3 to 8 s after navigation start. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "load8sPlus",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the load event ended 8 s or more after navigation start. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "firstPaintNone",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the page painted nothing. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "firstPaintPainted",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the page painted a background. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_viewportEmpty_day": {
+        "description": "Daily bucketed counts of page loads where at least 8 of 9 viewport points were empty on two reads in a row, in an empty app mount container, on a page with under 500 characters of rendered text, one parameter per detection. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "empty",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the viewport sampled empty. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_slowFirstInput_day": {
+        "description": "Daily bucketed counts of page loads where the page's first click, tap or key press waited 300 ms or more for its handlers, one parameter per input delay bucket and per input-to-paint duration bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "delay300to999",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the input waited 300 to 999 ms for its handlers. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "delay1to3s",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the input waited 1 to 3 s for its handlers. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "delay3sPlus",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the input waited 3 s or more for its handlers. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "durationUnder500",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the input took under 500 ms to the next paint. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "duration500to999",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the input took 500 to 999 ms to the next paint. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "duration1to3s",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the input took 1 to 3 s to the next paint. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "duration3sPlus",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the input took 3 s or more to the next paint. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_failedSubresources_day": {
+        "description": "Daily bucketed counts of page loads where two or more scripts, or two or more stylesheets and loads from CSS, failed with a 4xx or 5xx status, same-origin or CORS, one parameter per failed script, stylesheet and image count bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "scripts1",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where one script failed. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "scripts2to4",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where 2 to 4 scripts failed. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "scripts5Plus",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where 5 or more scripts failed. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "styles1",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where one stylesheet or load from CSS failed. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "styles2to4",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where 2 to 4 stylesheets and loads from CSS failed. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "styles5Plus",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where 5 or more stylesheets and loads from CSS failed. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "images1",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where one image failed. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "images2to4",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where 2 to 4 images failed. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "images5Plus",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where 5 or more images failed. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_vercelCheckpoint_day": {
+        "description": "Daily bucketed counts of page loads where a Vercel bot checkpoint showed for 8 s or more, one parameter per outcome. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "cleared_shown8sPlus",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the checkpoint cleared after showing for 8 s or more. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "held",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the checkpoint was still showing 8 s after a read first found it. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_challenge_day": {
+        "description": "Daily bucketed counts of page loads where a Cloudflare challenge interstitial or a page titled as a verification check was detected, one parameter per response status bucket and per rendered text length bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "status2xx",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the challenge was served with a 2xx status. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "status4xx",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the challenge was served with a 4xx status. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "status5xx",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the challenge was served with a 5xx status. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "text0to499",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the challenge page had under 500 characters of rendered text. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "text500to1999",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the challenge page had 500 to 1999 characters of rendered text. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "text2000Plus",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the challenge page had 2000 or more characters of rendered text. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_blockPage_day": {
+        "description": "Daily bucketed counts of page loads where a Cloudflare access denied page was detected, one parameter per response status bucket and per rendered text length bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "status2xx",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the block page was served with a 2xx status. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "status4xx",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the block page was served with a 4xx status. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "status5xx",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the block page was served with a 5xx status. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "text0to499",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the block page had under 500 characters of rendered text. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "text500to1999",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the block page had 500 to 1999 characters of rendered text. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "text2000Plus",
+                "type": "string",
+                "description": "Bucketed count of detected page loads in the period where the block page had 2000 or more characters of rendered text. Bucket boundaries are set by the eventHub remote config",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
     }
 }
