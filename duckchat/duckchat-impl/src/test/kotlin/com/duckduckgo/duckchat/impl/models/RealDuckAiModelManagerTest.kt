@@ -80,8 +80,6 @@ class RealDuckAiModelManagerTest {
         whenever(duckAiHostProvider.getHost()).thenReturn("duck.ai")
         subscriptions.stub { onBlocking { isEligible() }.thenReturn(true) }
         dataStore.stub { onBlocking { hasClearedPinnedDefaultModel() }.thenReturn(true) }
-        dataStore.stub { onBlocking { isDuckChatUserEnabled() }.thenReturn(true) }
-        duckChatFeature.self().setRawStoredState(Toggle.State(enable = true))
     }
 
     private fun createManager(): RealDuckAiModelManager {
@@ -155,57 +153,13 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
-    fun whenDuckAiFeatureDisabledThenModelsNotFetchedInBackground() = runTest {
-        duckChatFeature.self().setRawStoredState(Toggle.State(enable = false))
+    fun whenManagerCreatedWithoutConsumersThenModelsNotFetched() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
 
         testee = createManager()
         entitlementFlow.emit(emptySet())
 
         verify(modelsService, never()).getModels(any(), anyOrNull(), anyOrNull())
-    }
-
-    @Test
-    fun whenDuckAiUserDisabledThenModelsNotFetchedInBackground() = runTest {
-        dataStore.stub { onBlocking { isDuckChatUserEnabled() }.thenReturn(false) }
-
-        testee = createManager()
-        entitlementFlow.emit(emptySet())
-
-        verify(modelsService, never()).getModels(any(), anyOrNull(), anyOrNull())
-    }
-
-    @Test
-    fun whenDuckAiUserDisabledThenExplicitFetchStillFetches() = runTest {
-        whenever(dataStore.getSelectedModel()).thenReturn(null)
-        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
-            AIChatModelsResponse(listOf(remoteModel("id", accessTier = listOf("free"), entityHasAccess = true))),
-        )
-        dataStore.stub { onBlocking { isDuckChatUserEnabled() }.thenReturn(false) }
-
-        testee = createManager()
-        testee.fetchModels()
-
-        assertEquals(1, testee.modelState.value.models.size)
-    }
-
-    @Test
-    fun whenDuckAiUserDisabledWithModelsLoadedThenSubscriptionChangeRefetches() = runTest {
-        whenever(dataStore.getSelectedModel()).thenReturn(null)
-        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
-            AIChatModelsResponse(listOf(remoteModel("id", accessTier = listOf("free"), entityHasAccess = true))),
-        )
-        dataStore.stub { onBlocking { isDuckChatUserEnabled() }.thenReturn(false) }
-
-        testee = createManager()
-        entitlementFlow.emit(emptySet())
-        testee.fetchModels()
-        verify(modelsService, times(1)).getModels(any(), anyOrNull(), anyOrNull())
-
-        subscriptionStatusFlow.value = SubscriptionStatus.AUTO_RENEWABLE
-
-        verify(modelsService, times(2)).getModels(any(), anyOrNull(), anyOrNull())
     }
 
     @Test
@@ -831,6 +785,7 @@ class RealDuckAiModelManagerTest {
         )
 
         testee = createManager()
+        testee.fetchModels()
         entitlementFlow.emit(emptySet())
 
         subscriptionStatusFlow.value = SubscriptionStatus.AUTO_RENEWABLE
@@ -1010,9 +965,12 @@ class RealDuckAiModelManagerTest {
         )
 
         testee = createManager()
+        testee.fetchModels()
+        entitlementFlow.emit(emptySet())
 
         entitlementFlow.emit(setOf(Entitlement(name = "plus", product = "Duck.ai")))
 
+        verify(modelsService, times(2)).getModels(any(), anyOrNull(), anyOrNull())
         assertEquals(1, testee.modelState.value.models.size)
     }
 
@@ -1369,13 +1327,13 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
-    fun whenRestoreCachedSelectionThrowsThenEntitlementCollectorStillStarts() = runTest {
+    fun whenRestoreCachedSelectionThrowsThenModelsStillFetched() = runTest {
         whenever(dataStore.getSelectedModel()).thenThrow(RuntimeException("disk error"))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
         whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(AIChatModelsResponse(emptyList()))
 
         testee = createManager()
-        entitlementFlow.emit(emptySet())
+        testee.fetchModels()
 
         verify(modelsService).getModels(any(), anyOrNull(), anyOrNull())
     }

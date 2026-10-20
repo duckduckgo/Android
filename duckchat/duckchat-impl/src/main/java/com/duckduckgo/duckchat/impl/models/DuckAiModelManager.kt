@@ -32,11 +32,13 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -124,20 +126,22 @@ class RealDuckAiModelManager @Inject constructor(
             } catch (e: Exception) {
                 logcat { "Duck.ai Model Manager: failed to restore cached selection: ${e.message}" }
             }
-            // Status as well as entitlements: signing in or out changes whether the response carries
-            // model labels, and entitlements stay empty either way when there is no subscription.
-            combine(
-                subscriptions.getEntitlements(),
-                subscriptions.getSubscriptionStatusFlow(),
-            ) { entitlements, status -> entitlements to status }
-                .distinctUntilChanged()
-                .collect {
-                    val duckAiEnabled = duckChatFeature.get().self().isEnabled() && dataStore.isDuckChatUserEnabled()
-                    if (_modelState.value.models.isEmpty() && !duckAiEnabled) return@collect
-                    logcat { "Duck.ai Model Manager: subscription state changed, re-fetching models" }
-                    fetchModels()
-                }
         }
+    }
+
+    // Status as well as entitlements: signing in or out changes whether the response carries
+    // model labels, and entitlements stay empty either way when there is no subscription.
+    private val subscriptionChangeObserver = appCoroutineScope.launch(dispatcherProvider.io(), start = CoroutineStart.LAZY) {
+        combine(
+            subscriptions.getEntitlements(),
+            subscriptions.getSubscriptionStatusFlow(),
+        ) { entitlements, status -> entitlements to status }
+            .distinctUntilChanged()
+            .drop(1)
+            .collect {
+                logcat { "Duck.ai Model Manager: subscription state changed, re-fetching models" }
+                fetchModels()
+            }
     }
 
     /**
@@ -176,6 +180,7 @@ class RealDuckAiModelManager @Inject constructor(
     }
 
     override suspend fun fetchModels() {
+        subscriptionChangeObserver.start()
         withContext(dispatcherProvider.io()) {
             try {
                 val userTier = resolveUserTier()
