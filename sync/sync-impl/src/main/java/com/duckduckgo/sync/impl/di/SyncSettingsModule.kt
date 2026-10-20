@@ -28,5 +28,5 @@ import dev.zacsweers.metro.Multibinds
 abstract class SyncSettingsModule {
     // we use multibinds as the list of plugins can be empty
     @Multibinds(allowEmpty = true)
-    abstract fun provideSyncSettingsPlugins(): DaggerMap<Int, SyncSettingsPlugin>
+    abstract fun provideSyncSettingsPlugins(): Map<Int, SyncSettingsPlugin>
 }

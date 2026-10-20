@@ -26,8 +26,8 @@ dependencies {
 	implementation project(":data-store-api")
 	implementation project(":anrs-api")
 
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(':codegen-annotations')
     implementation project(':common-utils')
     implementation project(':di')
     implementation project(':feature-toggles-api')

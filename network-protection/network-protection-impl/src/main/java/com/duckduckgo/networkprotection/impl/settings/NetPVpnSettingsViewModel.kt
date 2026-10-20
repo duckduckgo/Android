@@ -23,7 +23,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.isIgnoringBatteryOptimizations
 import com.duckduckgo.di.scopes.ActivityScope

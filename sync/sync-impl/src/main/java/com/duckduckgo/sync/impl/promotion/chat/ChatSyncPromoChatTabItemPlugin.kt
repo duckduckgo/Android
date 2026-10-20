@@ -19,8 +19,8 @@ package com.duckduckgo.sync.impl.promotion.chat
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.ContributesActivePlugin
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.di.scopes.AppScope

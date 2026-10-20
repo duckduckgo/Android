@@ -25,8 +25,8 @@ import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Disabled
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
 import com.duckduckgo.adblocking.impl.R
 import com.duckduckgo.adblocking.impl.databinding.ActivityAdBlockingSettingsV2Binding
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.view.StatusIndicatorView
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.DaxListItem

@@ -44,9 +44,9 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class, binding = binding<NativeInputStateProvider>())
 @ContributesBinding(AppScope::class, binding = binding<NativeInputStatePublisher>())
 class RealNativeInputStateStore @Inject constructor(
-    // Lazy avoids a Dagger cycle: TabRepository's impl (TabDataRepository) injects
+    // Lazy avoids a dependency cycle: TabRepository's impl (TabDataRepository) injects
     // NativeInputStatePublisher to clearTab on tab eviction. Resolving the per-mode
-    // repository provider lazily lets Dagger construct both without circularity. The
+    // repository provider lazily lets Metro construct both without circularity. The
     // lazy is only dereferenced when `state` is collected for the first time.
     private val tabRepositoryProvider: Lazy<BrowserModeDataProvider<TabRepository>>,
     private val browserModeStateHolder: BrowserModeStateHolder,

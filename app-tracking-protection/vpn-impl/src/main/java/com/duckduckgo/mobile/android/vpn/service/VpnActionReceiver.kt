@@ -22,14 +22,14 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.android.AndroidInjection
 import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.Vpn
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import dagger.android.AndroidInjection
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.logcat

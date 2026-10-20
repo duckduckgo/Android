@@ -24,9 +24,9 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding

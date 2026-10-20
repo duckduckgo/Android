@@ -21,8 +21,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.ProcessName
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks

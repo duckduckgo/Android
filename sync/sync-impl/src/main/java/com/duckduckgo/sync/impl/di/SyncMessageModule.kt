@@ -28,5 +28,5 @@ import dev.zacsweers.metro.Multibinds
 abstract class SyncMessageModule {
     // we use multibinds as the list of plugins can be empty
     @Multibinds(allowEmpty = true)
-    abstract fun provideSyncMessagePlugins(): DaggerSet<SyncMessagePlugin>
+    abstract fun provideSyncMessagePlugins(): Set<SyncMessagePlugin>
 }

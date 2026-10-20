@@ -17,8 +17,8 @@
 package com.duckduckgo.app.dev.settings
 
 import android.content.Context
-import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import dev.zacsweers.metro.ContributesIntoMap

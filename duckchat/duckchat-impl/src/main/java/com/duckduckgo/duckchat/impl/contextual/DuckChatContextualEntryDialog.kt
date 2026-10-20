@@ -38,9 +38,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoBottomSheetDialogFragment
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard

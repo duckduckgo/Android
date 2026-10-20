@@ -16,7 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.bugreport
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope

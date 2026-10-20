@@ -22,8 +22,8 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestPermissi
 import androidx.annotation.DrawableRes
 import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding

@@ -18,7 +18,6 @@ package com.duckduckgo.app.generalsettings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
@@ -36,6 +35,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat

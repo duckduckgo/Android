@@ -16,9 +16,9 @@
 
 package com.duckduckgo.autofill.impl.engagement
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.impl.engagement.store.AutofillEngagementRepository
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesIntoSet

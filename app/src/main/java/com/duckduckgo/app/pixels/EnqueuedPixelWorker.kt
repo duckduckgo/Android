@@ -19,7 +19,6 @@ package com.duckduckgo.app.pixels
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
-import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
@@ -33,6 +32,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope

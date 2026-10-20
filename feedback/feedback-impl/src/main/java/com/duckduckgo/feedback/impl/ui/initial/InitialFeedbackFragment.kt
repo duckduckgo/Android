@@ -19,7 +19,7 @@ package com.duckduckgo.feedback.impl.ui.initial
 import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
 import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT

@@ -18,7 +18,7 @@ package com.duckduckgo.duckchat.internal
 
 import android.content.Context
 import android.content.Intent
-import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import dev.zacsweers.metro.ContributesIntoMap

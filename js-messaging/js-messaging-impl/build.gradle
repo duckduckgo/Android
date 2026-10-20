@@ -27,7 +27,7 @@ dependencies {
     implementation project(':browser-api')
     implementation project(':js-messaging-api')
 
-    implementation project(':anvil-annotations')
+    implementation project(':codegen-annotations')
 
     implementation "com.squareup.logcat:logcat:_"
     implementation KotlinX.coroutines.core

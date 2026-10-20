@@ -26,7 +26,8 @@ import android.os.Build
 import android.os.IBinder
 import android.os.Process
 import androidx.core.app.ServiceCompat
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.di.android.AndroidInjection
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.R
@@ -39,7 +40,6 @@ import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import com.duckduckgo.pir.impl.scheduling.PirJobsRunner
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
-import dagger.android.AndroidInjection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.firstOrNull

@@ -19,10 +19,10 @@ package com.duckduckgo.voice.impl.language
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.di.android.AndroidInjection
 import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.voice.impl.VoiceSearchAvailabilityConfigProvider
-import dagger.android.AndroidInjection
 import javax.inject.Inject
 
 @InjectWith(ReceiverScope::class)

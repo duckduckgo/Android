@@ -18,8 +18,8 @@ package com.duckduckgo.app.anr.ndk
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope

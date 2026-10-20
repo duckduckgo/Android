@@ -17,12 +17,12 @@
 package com.duckduckgo.app.trackerdetection.blocklist
 
 import android.annotation.SuppressLint
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.trackerdetection.api.TDS_BASE_URL
 import com.duckduckgo.app.trackerdetection.api.TDS_PATH
 import com.duckduckgo.app.trackerdetection.api.TdsRequired
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.CONTROL
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.FakeChain
 import com.duckduckgo.fakes.FakePixel

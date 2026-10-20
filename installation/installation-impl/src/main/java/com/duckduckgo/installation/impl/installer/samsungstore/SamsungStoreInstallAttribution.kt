@@ -16,9 +16,9 @@
 
 package com.duckduckgo.installation.impl.installer.samsungstore
 
-import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager

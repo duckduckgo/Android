@@ -118,7 +118,7 @@ class ThemingRebrandOverlayTest {
                 DuckDuckGoTheme.valueOf(intent.getStringExtra(EXTRA_THEME) ?: DuckDuckGoTheme.LIGHT.name),
             )
             appBrandDesignUpdateToggles = configuredToggles(setOfNotNull(intent.getStringExtra(EXTRA_ENABLED_TOGGLE)))
-            onCreate(savedInstanceState, daggerInject = false)
+            onCreate(savedInstanceState, injectDependencies = false)
         }
     }
 

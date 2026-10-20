@@ -6,7 +6,7 @@ providing built-in search, tracker blocking, HTTPS enforcement and other privacy
 **Versions** (SDK levels, Kotlin, Gradle, libraries) live in the build files — don't restate them here:
 `min_sdk` / `target_sdk` / `compile_sdk` in `build.gradle`, `version.kotlin` in `versions.properties`,
 and the Gradle version in `gradle/wrapper/gradle-wrapper.properties`.
-**Build:** AGP via refreshVersions. DI is **Metro** (KSP generators in `:anvil-ksp`; see `.claude/docs/architecture.md`).
+**Build:** AGP via refreshVersions. DI is **Metro** (KSP generators in `:codegen-ksp`; see `.claude/docs/architecture.md`).
 **Toolchain:** Kotlin JVM target 17; building requires **JDK 21** (Metro compiler plugin).
 
 Notable libraries: Room, Retrofit/OkHttp/Moshi, Coroutines, Jetpack Compose (selective), WorkManager,
@@ -48,7 +48,7 @@ what you remember of it.
 | `.claude/docs/plugin-system.md` | declaring a plugin point or contributing a plugin (`PluginPoint` / `ActivePluginPoint`) |
 | `.claude/docs/native-input.md` | **changing** the native input (`NativeInputModeWidget`, its plugins and footers, `NativeInputManager`, the contextual sheet or the edit screen) — adding a control, state-store rules, host gotchas, and the refactor still in flight |
 | `.claude/docs/pixels.md` | adding or changing pixel telemetry — including whether a pixel or a wide event is the right instrument |
-| `.claude/docs/dagger-scopes.md` | an injection fails at runtime ("could not find dagger component"), or you're deciding which scope to pass to `@InjectWith` — has the component/subcomponent diagram and the `injectorFactoryMap` lookups |
+| `.claude/docs/di-scopes.md` | an injection fails at runtime ("Could not find the injector"), or you're deciding which scope to pass to `@InjectWith` — has the component/subcomponent diagram and the `injectorFactoryMap` lookups |
 | `.claude/docs/navigation.md` | adding a screen or navigating to one — `ActivityParams`, `@ContributeToActivityStarter`, deeplinks, and which `GlobalActivityStarter` overload to use |
 | `.claude/docs/url-classification.md` | routing typed input to navigation vs search — use `QueryUrlPredictor`, not `UriString.isWebUrl()` |
 | `.claude/docs/icons.md` | the change needs an icon the project doesn't have yet — it must be fetched from the internal Icons repository, never invented |

@@ -16,8 +16,8 @@
 
 package com.duckduckgo.brokensite.impl
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed

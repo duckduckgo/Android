@@ -23,7 +23,6 @@ import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
 import com.duckduckgo.remote.messaging.api.JsonToMatchingAttributeMapper
@@ -127,8 +126,8 @@ object DataSourceModule {
     @Provides
     @SingleIn(AppScope::class)
     fun providesRemoteMessagingConfigJsonMapper(
-        matchingAttributeMappers: DaggerSet<JsonToMatchingAttributeMapper>,
-        actionMappers: DaggerSet<MessageActionMapperPlugin>,
+        matchingAttributeMappers: Set<JsonToMatchingAttributeMapper>,
+        actionMappers: Set<MessageActionMapperPlugin>,
         appBuildConfig: AppBuildConfig,
         remoteMessagingFeatureToggles: RemoteMessagingFeatureToggles,
     ): RemoteMessagingConfigJsonMapper {
@@ -138,7 +137,7 @@ object DataSourceModule {
     @Provides
     @SingleIn(AppScope::class)
     fun providesRemoteMessagingConfigMatcher(
-        matchers: DaggerSet<AttributeMatcherPlugin>,
+        matchers: Set<AttributeMatcherPlugin>,
         remoteMessagingRepository: RemoteMessagingRepository,
         remoteMessagingCohortStore: RemoteMessagingCohortStore,
     ): RemoteMessagingConfigMatcher {

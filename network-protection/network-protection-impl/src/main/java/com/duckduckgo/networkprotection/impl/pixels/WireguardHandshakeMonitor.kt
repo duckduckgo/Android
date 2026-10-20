@@ -22,7 +22,7 @@ import android.net.ConnectivityManager.NetworkCallback
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint

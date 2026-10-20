@@ -20,7 +20,7 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.feature.toggles.api.Toggle.State

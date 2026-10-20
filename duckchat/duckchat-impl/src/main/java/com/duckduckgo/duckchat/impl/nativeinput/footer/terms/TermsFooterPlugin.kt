@@ -16,8 +16,8 @@
 package com.duckduckgo.duckchat.impl.nativeinput.footer.terms
 
 import android.content.Context
-import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.codegen.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooter

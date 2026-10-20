@@ -16,7 +16,7 @@
 
 package com.duckduckgo.feature.toggles.impl
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle

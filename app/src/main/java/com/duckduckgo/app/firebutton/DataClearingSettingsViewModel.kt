@@ -19,7 +19,6 @@ package com.duckduckgo.app.firebutton
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.store.FireDataStore
@@ -30,6 +29,7 @@ import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState

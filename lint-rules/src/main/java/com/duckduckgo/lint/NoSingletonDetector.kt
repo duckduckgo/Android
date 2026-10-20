@@ -50,7 +50,7 @@ class NoSingletonDetector : Detector(), SourceCodeScanner {
             "The Singleton annotation must not be used",
             """
                 The @Singleton annotation must not be used to contribute dependencies
-                to the App dagger component.
+                to the App DI graph.
                 Use @SingleIn(SomeScope::class) instead.
             """.trimIndent(),
             Category.CORRECTNESS, 10, ERROR,
