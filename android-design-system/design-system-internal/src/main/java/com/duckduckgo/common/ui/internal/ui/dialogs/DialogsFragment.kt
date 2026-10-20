@@ -107,6 +107,16 @@ class DialogsFragment : Fragment() {
         val optionText = getString(CommonR.string.text_dialog_option)
         val checkboxText = getString(CommonR.string.text_dialog_checkbox)
 
+        view.findViewById<View>(R.id.onboardingViewDismissButton)?.let {
+            it.setOnClickListener {
+                showToast("View onboarding dialog dismissed")
+            }
+        }
+
+        view.setupThemedComposeView(R.id.composeOnboardingDialog, isDarkTheme) {
+            DaxOnboardingDialogDemo()
+        }
+
         view.findViewById<Button>(R.id.textAlertDialogWithImageButton)?.let {
             it.setOnClickListener {
                 TextAlertDialogBuilder(requireContext())
