@@ -19,15 +19,15 @@ package com.duckduckgo.app.anr.ndk
 import com.duckduckgo.android_crashkit.Crashpad
 import com.duckduckgo.anrs.api.CrashBreadcrumbs
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealCrashBreadcrumbs @Inject constructor() : CrashBreadcrumbs {
 
     private val index = AtomicInteger(0)
