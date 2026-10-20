@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -54,6 +55,7 @@ fun DaxText(
     textAlign: TextAlign? = null,
     overflow: TextOverflow = TextOverflow.Ellipsis,
     maxLines: Int = Int.MAX_VALUE,
+    onTextLayout: (TextLayoutResult) -> Unit = {},
 ) {
     Text(
         text = text,
@@ -62,6 +64,7 @@ fun DaxText(
         textAlign = textAlign,
         overflow = overflow,
         maxLines = maxLines,
+        onTextLayout = onTextLayout,
         modifier = modifier,
     )
 }
@@ -85,6 +88,7 @@ fun DaxText(
     textAlign: TextAlign? = null,
     overflow: TextOverflow = TextOverflow.Ellipsis,
     maxLines: Int = Int.MAX_VALUE,
+    onTextLayout: (TextLayoutResult) -> Unit = {},
 ) {
     Text(
         text = text,
@@ -93,6 +97,7 @@ fun DaxText(
         textAlign = textAlign,
         overflow = overflow,
         maxLines = maxLines,
+        onTextLayout = onTextLayout,
         modifier = modifier,
     )
 }
