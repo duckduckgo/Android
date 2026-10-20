@@ -36,6 +36,7 @@ import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
+import com.duckduckgo.sync.impl.pixels.SwitchedAccountDetector
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
@@ -78,6 +79,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
     private val syncFeature: SyncFeature,
     private val syncPixels: SyncPixels,
     private val syncAutoRestoreManager: SyncAutoRestoreManager,
+    private val switchedAccountDetector: SwitchedAccountDetector,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
     private val _commands = Channel<Command>(Channel.BUFFERED)
@@ -103,6 +105,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
         }
 
         viewModelScope.launch(dispatchers.io()) {
+            switchedAccountDetector.onPairingStarted()
             val decision = codeDispatcher.route(syncCode)
             fireCodeParsedPixel(decision)
             when (decision) {
@@ -205,6 +208,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
                         }
 
                         else -> {
+                            switchedAccountDetector.onPaired()
                             animationCompletionSignal.await()
                             sendSuccess()
                         }
@@ -230,6 +234,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
                         }
 
                         is LoggedIn -> {
+                            switchedAccountDetector.onPaired()
                             animationCompletionSignal.await()
                             sendSuccess()
                             isPolling = false
@@ -301,6 +306,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
                 if (startAnimation) {
                     _commands.send(Command.RunAcknowledgmentAnimation)
                 }
+                switchedAccountDetector.onPaired()
                 animationCompletionSignal.await()
 
                 sendSuccess(outcome.path, outcome.myRole, outcome.peerKind)
