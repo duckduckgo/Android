@@ -519,4 +519,52 @@ class RealBrokerStepsParserTest {
         assertTrue(click is BrokerAction.Click)
         assertEquals("click-1", click.id)
     }
+
+    @Test
+    fun whenParseStepWithUrlExpectationWithoutSelectorThenReturnScanStepWithExpectation() = runTest {
+        val json = """
+            {
+                "stepType": "scan", "scanType": "automated",
+                "actions": [
+                    {
+                        "actionType": "expectation",
+                        "id": "expectation-1",
+                        "expectations": [{"type": "url", "expect": "/optout/process"}]
+                    }
+                ]
+            }
+        """.trimIndent()
+
+        val result = testee.parseStep(testBroker, json, null)
+
+        val expectation = result.filterIsInstance<ScanStep>().single().step.actions.single() as BrokerAction.Expectation
+        val selector = expectation.expectations.single()
+        assertEquals("url", selector.type)
+        assertEquals("/optout/process", selector.expect)
+        assertNull(selector.selector)
+    }
+
+    @Test
+    fun whenParseStepWithConditionWithoutCommentAndSelectorThenReturnScanStepWithCondition() = runTest {
+        val json = """
+            {
+                "stepType": "scan", "scanType": "automated",
+                "actions": [
+                    {
+                        "actionType": "condition",
+                        "id": "condition-1",
+                        "expectations": [{"type": "url", "expect": "/optout/results/"}],
+                        "actions": [{"actionType": "navigate", "id": "nav-1", "url": "https://testbroker.com/search"}]
+                    }
+                ]
+            }
+        """.trimIndent()
+
+        val result = testee.parseStep(testBroker, json, null)
+
+        val condition = result.filterIsInstance<ScanStep>().single().step.actions.single() as BrokerAction.Condition
+        assertNull(condition.comment)
+        assertNull(condition.expectations.single().selector)
+        assertTrue(condition.actions.single() is BrokerAction.Navigate)
+    }
 }

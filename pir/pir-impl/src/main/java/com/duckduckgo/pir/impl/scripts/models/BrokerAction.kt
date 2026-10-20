@@ -113,7 +113,7 @@ sealed class BrokerAction(
     ) : BrokerAction(id) {
         data class ExpectationSelector(
             val type: String,
-            val selector: String,
+            val selector: String?,
             val expect: String?,
             val parent: String?,
             val failSilently: Boolean?,
@@ -128,7 +128,7 @@ sealed class BrokerAction(
     data class Condition(
         override val id: String,
         @Json(name = "_comment")
-        val comment: String,
+        val comment: String?,
         val expectations: List<ExpectationSelector>,
         val actions: List<BrokerAction>,
     ) : BrokerAction(id)

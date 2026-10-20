@@ -203,6 +203,32 @@ class RealBrokerActionProcessorTest {
     }
 
     @Test
+    fun whenPushUrlExpectationWithoutSelectorThenSelectorIsOmitted() = runTest {
+        val actionJson = """
+            {
+                "actionType": "expectation",
+                "id": "expectation-1",
+                "expectations": [{"type": "url", "expect": "/optout/process"}]
+            }
+        """.trimIndent()
+        val action = moshi.adapter(BrokerAction::class.java).fromJson(actionJson)!!
+
+        testee.pushAction(action, UserProfile())
+
+        val eventCaptor = argumentCaptor<SubscriptionEventData>()
+        verify(mockJsMessaging).sendSubscriptionEvent(eventCaptor.capture())
+
+        val pushedExpectation = eventCaptor.firstValue.params
+            .getJSONObject("state")
+            .getJSONObject("action")
+            .getJSONArray("expectations")
+            .getJSONObject(0)
+        assertEquals("url", pushedExpectation.getString("type"))
+        assertEquals("/optout/process", pushedExpectation.getString("expect"))
+        assertFalse(pushedExpectation.has("selector"))
+    }
+
+    @Test
     fun whenPushCaptchaActionsThenProfileMatchParentIsForwarded() = runTest {
         val actions = listOf("getCaptchaInfo", "solveCaptcha")
 
