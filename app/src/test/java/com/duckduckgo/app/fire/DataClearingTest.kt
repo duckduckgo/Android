@@ -186,6 +186,33 @@ class DataClearingTest {
     }
 
     @Test
+    fun whenManualClearWithTabs_thenCloseCustomTabs() = runTest {
+        configureManualOptions(setOf(FireClearOption.TABS))
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true, browserMode = BrowserMode.REGULAR)
+
+        verify(mockClearDataAction).closeCustomTabs()
+    }
+
+    @Test
+    fun whenManualClearWithoutTabs_thenDoNotCloseCustomTabs() = runTest {
+        configureManualOptions(setOf(FireClearOption.DATA))
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true, browserMode = BrowserMode.REGULAR)
+
+        verify(mockClearDataAction, never()).closeCustomTabs()
+    }
+
+    @Test
+    fun whenAutomaticClearWithTabs_thenDoNotCloseCustomTabs() = runTest {
+        configureAutomaticOptions(setOf(FireClearOption.TABS))
+
+        testee.clearDataUsingAutomaticFireOptions(killProcessIfNeeded = false)
+
+        verify(mockClearDataAction, never()).closeCustomTabs()
+    }
+
+    @Test
     fun whenManualClearWithDataOnly_thenClearDataAndSetFlag() = runTest {
         configureManualOptions(setOf(FireClearOption.DATA))
 

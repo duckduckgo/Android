@@ -66,6 +66,11 @@ interface ClearDataAction {
     suspend fun clearTabsOnly()
 
     /**
+     * Closes the custom tabs that are open now, including those in other apps' tasks.
+     */
+    suspend fun closeCustomTabs()
+
+    /**
      * Clears browser data except tabs and chats.
      * @param shouldFireDataClearPixel whether to fire the data clear pixel
      */
@@ -140,19 +145,20 @@ class ClearPersonalDataAction(
 
     override suspend fun clearTabsOnly() {
         withContext(dispatchers.io()) {
-            logcat { "Finished clearing tabs" }
             tabRepository.deleteAll()
-            closeCustomTabTasks()
-
-            settingsDataStore.tabsClearedTimestamp = System.currentTimeMillis()
+            logcat { "Finished clearing tabs" }
         }
     }
 
-    // Custom tabs in their own Recents card live outside the browser task, so clearing tabs doesn't reach them.
-    private fun closeCustomTabTasks() {
-        context.getSystemService<ActivityManager>()?.appTasks
-            ?.filter { it.taskInfo.baseIntent.component?.className == CustomTabActivity::class.java.name }
-            ?.forEach { it.finishAndRemoveTask() }
+    override suspend fun closeCustomTabs() {
+        withContext(dispatchers.io()) {
+            settingsDataStore.tabsClearedTimestamp = System.currentTimeMillis()
+
+            // Custom tabs in their own Recents card live outside the browser task, so clearing tabs doesn't reach them.
+            context.getSystemService<ActivityManager>()?.appTasks
+                ?.filter { it.taskInfo.baseIntent.component?.className == CustomTabActivity::class.java.name }
+                ?.forEach { it.finishAndRemoveTask() }
+        }
     }
 
     override suspend fun clearBrowserDataOnly(shouldFireDataClearPixel: Boolean) {

@@ -194,6 +194,10 @@ class DataClearing @Inject constructor(
             shouldFireDataClearPixel = true,
         )
 
+        if (FireClearOption.TABS in options) {
+            clearDataAction.closeCustomTabs()
+        }
+
         val wasDuckAiChatsCleared = options.contains(FireClearOption.DUCKAI_CHATS) &&
             duckAiFeatureState.showClearDuckAIChatHistory.value
         val wasDataCleared = options.contains(FireClearOption.DATA) || wasDuckAiChatsCleared
