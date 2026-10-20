@@ -73,6 +73,10 @@ object DaxOnboardingDialogDefaults {
     internal val TypingCadence: Duration = 20.milliseconds
     internal val TypingSettle: Duration = 20.milliseconds
 
+    internal val LandscapeCtaWidth = 200.dp
+    internal val LandscapeTextCtaSpacing = 8.dp
+    internal val LandscapeTitleBodySpacing = 8.dp
+
     /** Colours for the current [com.duckduckgo.common.ui.compose.theme.OnboardingTheme]. */
     internal val colors: DaxOnboardingDialogColors
         @Composable
