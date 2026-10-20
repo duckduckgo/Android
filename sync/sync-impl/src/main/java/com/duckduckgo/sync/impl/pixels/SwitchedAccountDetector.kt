@@ -34,7 +34,8 @@ class SwitchedAccountDetector @Inject constructor(
     }
 
     suspend fun onPaired() {
-        if (primaryKeyBeforePairing.isNotBlank() && primaryKeyBeforePairing != currentPrimaryKey()) {
+        val primaryKeyAfterPairing = currentPrimaryKey()
+        if (primaryKeyBeforePairing.isNotBlank() && primaryKeyAfterPairing.isNotBlank() && primaryKeyBeforePairing != primaryKeyAfterPairing) {
             syncPixels.fireUserSwitchedAccount()
         }
     }

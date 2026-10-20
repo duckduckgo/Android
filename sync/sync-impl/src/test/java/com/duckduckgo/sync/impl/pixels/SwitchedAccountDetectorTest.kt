@@ -74,6 +74,17 @@ class SwitchedAccountDetectorTest {
     }
 
     @Test
+    fun `when the device is signed out after pairing then the switched account pixel is not fired`() = runTest {
+        givenPrimaryKey("old-primary-key")
+        testee.onPairingStarted()
+        givenPrimaryKey("")
+
+        testee.onPaired()
+
+        verify(syncPixels, never()).fireUserSwitchedAccount()
+    }
+
+    @Test
     fun `when the pairing start was never recorded then the switched account pixel is not fired`() = runTest {
         givenPrimaryKey("new-primary-key")
 
