@@ -163,6 +163,22 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
+    fun whenFetchModelsCalledRepeatedlyThenSubscriptionChangeRefetchesOnce() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(AIChatModelsResponse(emptyList()))
+
+        testee = createManager()
+        testee.fetchModels()
+        testee.fetchModels()
+        entitlementFlow.emit(emptySet())
+
+        entitlementFlow.emit(setOf(Entitlement(name = "plus", product = "Duck.ai")))
+
+        verify(modelsService, times(3)).getModels(any(), anyOrNull(), anyOrNull())
+    }
+
+    @Test
     fun whenFetchModelsThenModelsResolvedAndStateUpdated() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
