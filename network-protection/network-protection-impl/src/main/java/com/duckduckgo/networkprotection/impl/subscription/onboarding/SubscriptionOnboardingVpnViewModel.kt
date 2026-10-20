@@ -156,7 +156,7 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
     fun onPrimaryCtaClicked() {
         val state = viewState.value
         when {
-            state.activating -> {}
+            state.activating -> {} // ignore taps while the VPN is being activated
             state.showingVPNInfoBanners -> controller.onStepFinished(VPN_STEP_ID, COMPLETED)
             state.vpnEnabled == true -> viewState.update { it.copy(showingVPNInfoBanners = true) }
             else -> viewModelScope.launch { _commands.send(Command.RequestVpnPermission) }

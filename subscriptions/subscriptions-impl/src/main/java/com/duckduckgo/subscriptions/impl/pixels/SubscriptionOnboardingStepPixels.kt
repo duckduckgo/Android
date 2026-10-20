@@ -36,6 +36,7 @@ object SubscriptionOnboardingStepPixels {
         COMPLETION(stepId = "completion", wireName = "completion"),
         ;
 
+        // Whether users can complete or skip this step, not just see it.
         val supportsOutcome: Boolean get() = this != COMPLETION
 
         companion object {
@@ -45,6 +46,7 @@ object SubscriptionOnboardingStepPixels {
 
     fun baseName(action: Action, step: Step): String = "${PREFIX}_${action.wireName}_${step.wireName}"
 
+    // Every pixel name this class can send.
     fun allBaseNames(): List<String> = buildList {
         Step.entries.forEach { step ->
             add(baseName(Action.SHOWN, step))
