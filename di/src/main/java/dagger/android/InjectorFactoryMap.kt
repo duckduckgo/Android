@@ -3,7 +3,7 @@ package dagger.android
 import kotlin.reflect.KClass
 
 /**
- * Type alias for the injector factory map used in Metro mode.
+ * Type alias for the injector factory map.
  * Uses KClass<*> keys, which is what Metro's @ClassKey interop produces.
  */
 typealias InjectorFactoryMap = Map<@JvmSuppressWildcards KClass<*>, @JvmSuppressWildcards AndroidInjector.Factory<*, *>>
