@@ -28,7 +28,7 @@ import com.duckduckgo.duckchat.internal.DuckAiDevCapabilityPlugin
 import com.duckduckgo.duckchat.store.impl.DuckAiMigrationPrefs
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatsDao
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -42,7 +42,7 @@ import javax.inject.Inject
  * Seeds Regular-mode native storage with long chats, each assistant reply split into many parts, and opens each in a
  * new tab. Every run adds a new batch.
  */
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class DuckAiLongChatsSeederCapabilityPlugin @Inject constructor(
     @param:RegularMode private val chatsDao: DuckAiBridgeChatsDao,
     @param:RegularMode private val tabRepository: TabRepository,

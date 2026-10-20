@@ -33,8 +33,8 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.duckchat.store.impl.DuckAiChatPreview
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
@@ -45,7 +45,7 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 @ContributesBinding(ActivityScope::class)
-@SingleInstanceIn(ActivityScope::class)
+@SingleIn(ActivityScope::class)
 class RealDuckAiTabGridItemRenderer @Inject constructor(
     @param:RegularMode private val regularChatStore: DuckAiChatStore,
     @param:FireMode private val fireChatStore: DuckAiChatStore,
