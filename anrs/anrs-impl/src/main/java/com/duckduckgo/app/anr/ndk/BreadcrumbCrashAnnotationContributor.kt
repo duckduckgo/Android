@@ -18,11 +18,11 @@ package com.duckduckgo.app.anr.ndk
 
 import com.duckduckgo.anrs.api.CrashAnnotationContributor
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
 /** Registers the breadcrumb ring-buffer slots so they survive the Crashpad annotation allowlist. */
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class BreadcrumbCrashAnnotationContributor @Inject constructor() : CrashAnnotationContributor {
     override val keys: Set<String> = BreadcrumbKeys.ALL
 }
