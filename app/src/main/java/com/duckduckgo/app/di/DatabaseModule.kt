@@ -17,23 +17,15 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import com.duckduckgo.app.bookmarks.migration.AppDatabaseBookmarksMigrationCallbackProvider
 import com.duckduckgo.app.browser.DefaultWebViewDatabaseProvider
 import com.duckduckgo.app.browser.WebViewDatabaseProvider
-import com.duckduckgo.app.fire.db.FireModeDatabase
-import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.db.MigrationsProvider
-import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.appbuildconfig.api.*
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 
-@BindingContainer(includes = [DaoModule::class])
+@BindingContainer
 @ContributesTo(AppScope::class)
 object DatabaseModule {
 
@@ -41,46 +33,5 @@ object DatabaseModule {
     @SingleIn(AppScope::class)
     fun provideWebViewDatabaseProvider(context: Context): WebViewDatabaseProvider {
         return DefaultWebViewDatabaseProvider(context)
-    }
-
-    @Provides
-    fun provideAppDatabaseBookmarksMigrationCallbackProvider(
-        appDatabase: Lazy<AppDatabase>,
-        appBuildConfig: AppBuildConfig,
-    ): AppDatabaseBookmarksMigrationCallbackProvider {
-        return AppDatabaseBookmarksMigrationCallbackProvider(appDatabase, appBuildConfig)
-    }
-
-    @Provides
-    @SingleIn(AppScope::class)
-    fun provideAppDatabase(
-        context: Context,
-        migrationsProvider: MigrationsProvider,
-        databaseBookmarksMigrationCallbackProvider: AppDatabaseBookmarksMigrationCallbackProvider,
-    ): AppDatabase {
-        return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
-            .addMigrations(*migrationsProvider.ALL_MIGRATIONS.toTypedArray())
-            .addCallback(migrationsProvider.BOOKMARKS_DB_ON_CREATE)
-            .addCallback(databaseBookmarksMigrationCallbackProvider.provideCallbacks())
-            .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
-            .enableMultiInstanceInvalidation()
-            .build()
-    }
-
-    @Provides
-    fun provideDatabaseMigrations(
-        context: Context,
-        settingsDataStore: SettingsDataStore,
-    ): MigrationsProvider {
-        return MigrationsProvider(context, settingsDataStore)
-    }
-
-    @Provides
-    @SingleIn(AppScope::class)
-    fun provideFireModeDatabase(context: Context): FireModeDatabase {
-        return Room.databaseBuilder(context, FireModeDatabase::class.java, "fire_mode.db")
-            .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
-            .fallbackToDestructiveMigration(true)
-            .build()
     }
 }

@@ -37,7 +37,7 @@ import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 
-@BindingContainer(includes = [DaoModule::class])
+@BindingContainer
 @ContributesTo(AppScope::class)
 object NotificationModule {
 
