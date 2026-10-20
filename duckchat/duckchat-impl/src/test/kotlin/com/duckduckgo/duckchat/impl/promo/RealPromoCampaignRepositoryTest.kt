@@ -475,20 +475,6 @@ class RealPromoCampaignRepositoryTest {
     }
     //endregion
 
-    private class FakePromoCampaignDataStore : PromoCampaignDataStore {
-        val record = MutableStateFlow<PromoRecord?>(null)
-
-        override val promoRecord: Flow<PromoRecord?> = record
-
-        override suspend fun getPromoRecord(): PromoRecord? = record.value
-
-        override suspend fun updatePromoRecord(transform: (PromoRecord?) -> PromoRecord?): PromoRecord? = record.updateAndGet(transform)
-
-        override suspend fun clear() {
-            record.value = null
-        }
-    }
-
     private companion object {
         const val NOW = 10_000L
         const val CAMPAIGN_ID = "campaign"
