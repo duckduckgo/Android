@@ -24,6 +24,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.autofill.api.ImportFromGoogle
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
@@ -32,6 +33,7 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.models.SavedSites
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
@@ -67,9 +69,12 @@ import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -132,6 +137,7 @@ class BookmarksViewModel @Inject constructor(
 
     private val _itemsToDisplay = MutableStateFlow<List<BookmarksItemTypes>>(emptyList())
     val itemsToDisplay = _itemsToDisplay.asStateFlow()
+    private val displayedItemsJob = ConflatedJob()
 
     init {
         viewState.value = ViewState()
@@ -255,40 +261,57 @@ class BookmarksViewModel @Inject constructor(
     }
 
     fun fetchBookmarksAndFolders(parentId: String) {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            if (faviconsFetchingPrompt.shouldShow()) {
-                withContext(dispatcherProvider.main()) {
-                    command.value = ShowFaviconsPrompt
-                }
-            }
-
+        displayItemsFrom(
             savedSitesRepository.getSavedSites(parentId)
-                .combine(hiddenIds) { savedSites, hiddenIds ->
-                    val filteredBookmarks = savedSites.bookmarks.filter {
-                        when (it) {
-                            is Bookmark -> it.id !in hiddenIds.items
-                            is BookmarkFolder -> it.id !in hiddenIds.items
-                            else -> false
-                        }
-                    }
-                    savedSites.copy(
-                        bookmarks = filteredBookmarks,
-                        favorites = savedSites.favorites.filter { it.id !in hiddenIds.items },
-                    )
-                }.collect {
-                    onSavedSitesItemsChanged(it.favorites, it.bookmarks)
-                }
-        }
+                .onStart { showFaviconsPromptIfNeeded() },
+        )
     }
 
     fun fetchAllBookmarksAndFolders() {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            val favorites = savedSitesRepository.getFavoritesSync()
-            val folders = savedSitesRepository.getFolderTree(SavedSitesNames.BOOKMARKS_ROOT, null)
-                .map { it.bookmarkFolder }
-                .filter { it.id != SavedSitesNames.BOOKMARKS_ROOT }
-            val bookmarks = savedSitesRepository.getBookmarksTree()
-            onSavedSitesItemsChanged(favorites, bookmarks + folders)
+        displayItemsFrom(
+            flow {
+                val folders = savedSitesRepository.getFolderTree(SavedSitesNames.BOOKMARKS_ROOT, null)
+                    .map { it.bookmarkFolder }
+                    .filter { it.id != SavedSitesNames.BOOKMARKS_ROOT }
+                emit(
+                    SavedSites(
+                        favorites = savedSitesRepository.getFavoritesSync(),
+                        bookmarks = savedSitesRepository.getBookmarksTree() + folders,
+                    ),
+                )
+            },
+        )
+    }
+
+    /**
+     * Only one source may own the displayed list at a time. The folder scoped Flow keeps emitting on
+     * every database change, so leaving it collecting would overwrite the whole tree the user searches through.
+     */
+    private fun displayItemsFrom(source: Flow<SavedSites>) {
+        displayedItemsJob += viewModelScope.launch(dispatcherProvider.io()) {
+            source.combine(hiddenIds) { savedSites, hiddenIds ->
+                val filteredBookmarks = savedSites.bookmarks.filter {
+                    when (it) {
+                        is Bookmark -> it.id !in hiddenIds.items
+                        is BookmarkFolder -> it.id !in hiddenIds.items
+                        else -> false
+                    }
+                }
+                savedSites.copy(
+                    bookmarks = filteredBookmarks,
+                    favorites = savedSites.favorites.filter { it.id !in hiddenIds.items },
+                )
+            }.collect {
+                onSavedSitesItemsChanged(it.favorites, it.bookmarks)
+            }
+        }
+    }
+
+    private suspend fun showFaviconsPromptIfNeeded() {
+        if (faviconsFetchingPrompt.shouldShow()) {
+            withContext(dispatcherProvider.main()) {
+                command.value = ShowFaviconsPrompt
+            }
         }
     }
 
