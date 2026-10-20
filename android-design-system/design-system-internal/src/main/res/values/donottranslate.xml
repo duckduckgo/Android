@@ -5,4 +5,21 @@
     <string name="dsShowcaseCaptionComposeOnly">Compose-only</string>
     <string name="dsShowcaseCaptionNoComposeSmallIcon">View only (16dp leading icon is no longer in the design system and nothing in the app uses it, so Compose stops at 24dp)</string>
     <string name="dsShowcaseCaptionNoComposeExtraLargeIcon">View only (40dp leading icon is no longer in the design system and nothing in the app uses it, Compose covers the intent with a full-bleed Image instead)</string>
+    <string name="dsOnboardingDemoReady">Intro complete. The enabled primary action can advance.</string>
+    <string name="dsOnboardingDemoIntro">Tap the dialog to finish its intro, then tap Continue to advance.</string>
+    <string name="dsOnboardingDemoSkip">Skip intro</string>
+    <string name="dsOnboardingDemoDisable">Disable primary</string>
+    <string name="dsOnboardingDemoEnable">Enable primary</string>
+    <string name="dsOnboardingDemoTail">Change tail</string>
+    <string name="dsOnboardingDemoRetract">Retract tail</string>
+    <string name="dsOnboardingDemoExtend">Extend tail</string>
+    <string name="dsOnboardingDemoLess">Show less content</string>
+    <string name="dsOnboardingDemoMore">Show more content</string>
+    <string name="dsOnboardingDemoTitleFirst">A private browser with Dax</string>
+    <string name="dsOnboardingDemoTitleSecond">Your next step stays private</string>
+    <string name="dsOnboardingDemoBodyFirst">This Compose dialog reveals its title before enabling the content and Continue action.</string>
+    <string name="dsOnboardingDemoBodySecond">The new content key starts another intro. Return becomes available after it finishes.</string>
+    <string name="dsOnboardingDemoContinue">Continue</string>
+    <string name="dsOnboardingDemoReturn">Return to first content</string>
+    <string name="dsOnboardingDemoDetails">Extra content changes the settled card height without replaying the intro. Tail controls keep the same shell while their position and depth change. Disable the primary action to check that a settled dialog still respects caller-owned eligibility.</string>
 </resources>
