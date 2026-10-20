@@ -65,8 +65,6 @@ class NativeCrashInitTest {
         whenever(mockCrashpadInitializer.initialize(any(), any(), anyOrNull())).thenReturn(true)
         whenever(mockNativeCrashFeature.nativeCrashHandling()).thenReturn(mockEnabledToggle)
         whenever(mockNativeCrashFeature.nativeCrashHandlingSecondaryProcess()).thenReturn(mockEnabledToggle)
-        whenever(mockNativeCrashFeature.useCrashpad()).thenReturn(mockEnabledToggle)
-        whenever(mockCrashpadInitializer.initialize(any(), anyOrNull())).thenReturn(true)
     }
 
     // ── Process routing ────────────────────────────────────────────────────────
