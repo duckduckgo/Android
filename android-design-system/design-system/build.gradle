@@ -104,5 +104,7 @@ dependencies {
     testImplementation AndroidX.archCore.testing
     testImplementation 'app.cash.turbine:turbine:_'
     testImplementation Testing.robolectric
+    testImplementation AndroidX.compose.ui.testJunit4
+    testImplementation AndroidX.compose.ui.testManifest
     testImplementation project(path: ':common-test')
 }
