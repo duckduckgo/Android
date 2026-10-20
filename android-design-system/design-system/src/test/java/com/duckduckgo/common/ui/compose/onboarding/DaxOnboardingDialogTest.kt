@@ -16,6 +16,7 @@
 
 package com.duckduckgo.common.ui.compose.onboarding
 
+import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.focusable
@@ -27,8 +28,10 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.MotionDurationScale
@@ -42,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.semantics.SemanticsActions
@@ -549,6 +553,40 @@ class DaxOnboardingDialogTest {
     }
 
     @Test
+    fun orientationChangeKeepsSlotStateSetFromContentReady() {
+        val landscape = mutableStateOf(false)
+        var slotReady = false
+        compose.setContent {
+            val base = LocalConfiguration.current
+            val configuration = remember(landscape.value) {
+                Configuration(base).apply {
+                    orientation = if (landscape.value) Configuration.ORIENTATION_LANDSCAPE else Configuration.ORIENTATION_PORTRAIT
+                }
+            }
+            DuckDuckGoTheme {
+                OnboardingTheme {
+                    CompositionLocalProvider(LocalConfiguration provides configuration) {
+                        DaxContextualOnboardingDialog(contentKey = "first", title = title.value, state = state) {
+                            var ready by remember { mutableStateOf(false) }
+                            onContentReady { ready = true }
+                            slotReady = ready
+                        }
+                    }
+                }
+            }
+        }
+        advanceRecompositionFrames()
+        compose.runOnIdle { state.skip() }
+        advanceRecompositionFrames()
+        assertTrue(slotReady)
+
+        compose.runOnIdle { landscape.value = true }
+        advanceRecompositionFrames()
+
+        assertTrue(slotReady)
+    }
+
+    @Test
     fun replacingDialogContentPreservesFocusOwnedByHost() {
         val hostRequester = FocusRequester()
         val slotRequester = FocusRequester()
@@ -576,6 +614,131 @@ class DaxOnboardingDialogTest {
 
         assertTrue(hostFocused)
         assertTrue(state.isAnimating)
+    }
+
+    @Test
+    fun removingSlotBeforeIntroCompletesDropsItsContentReadyCallback() {
+        val showSlot = mutableStateOf(true)
+        val slotReady = mutableListOf<Boolean>()
+        showSlotDialog(showSlot) { onContentReady { slotReady.add(it) } }
+        advance(1_000)
+        assertTrue(state.isAnimating)
+
+        compose.runOnIdle { showSlot.value = false }
+        advanceRecompositionFrames()
+        finishAnimation()
+
+        assertEquals(listOf("first"), finished)
+        assertTrue(slotReady.isEmpty())
+    }
+
+    @Test
+    fun reAddingSlotBeforeIntroCompletesDeliversOnce() {
+        val showSlot = mutableStateOf(true)
+        val slotReady = mutableListOf<Boolean>()
+        showSlotDialog(showSlot) { onContentReady { slotReady.add(it) } }
+        advance(1_000)
+
+        compose.runOnIdle { showSlot.value = false }
+        advanceRecompositionFrames()
+        compose.runOnIdle { showSlot.value = true }
+        advanceRecompositionFrames()
+        finishAnimation()
+
+        assertEquals(listOf(true), slotReady)
+    }
+
+    @Test
+    fun slotReAddedAfterIntroCompletedWhileAbsentReceivesPendingReadyOnce() {
+        val showSlot = mutableStateOf(true)
+        val slotReady = mutableListOf<Pair<Int, Boolean>>()
+        var instances = 0
+        showSlotDialog(showSlot) {
+            val instance = remember { ++instances }
+            onContentReady { slotReady.add(instance to it) }
+        }
+        advance(1_000)
+
+        compose.runOnIdle { showSlot.value = false }
+        advanceRecompositionFrames()
+        finishAnimation()
+        assertEquals(listOf("first"), finished)
+        assertTrue(slotReady.isEmpty())
+
+        compose.runOnIdle { showSlot.value = true }
+        advanceRecompositionFrames()
+        assertEquals(listOf(2 to true), slotReady)
+
+        finishAnimation()
+        assertEquals(1, slotReady.size)
+    }
+
+    @Test
+    fun rotationDuringTypingKeepsTypingProgressAndBodyState() {
+        val landscape = mutableStateOf(false)
+        val bodyInstances = mutableSetOf<Any>()
+        val slotReady = mutableListOf<Boolean>()
+        val slotInstances = mutableSetOf<Any>()
+        var slotDisposals = 0
+        compose.setContent {
+            val base = LocalConfiguration.current
+            val configuration = remember(landscape.value) {
+                Configuration(base).apply {
+                    orientation = if (landscape.value) Configuration.ORIENTATION_LANDSCAPE else Configuration.ORIENTATION_PORTRAIT
+                }
+            }
+            DuckDuckGoTheme {
+                OnboardingTheme {
+                    CompositionLocalProvider(LocalConfiguration provides configuration) {
+                        DaxContextualOnboardingDialog(
+                            contentKey = "first",
+                            title = title.value,
+                            body = { bodyInstances.add(remember { Any() }) },
+                            state = state,
+                            onIntroFinished = { finished.add(it) },
+                        ) {
+                            slotInstances.add(remember { Any() })
+                            DisposableEffect(Unit) { onDispose { slotDisposals++ } }
+                            onContentReady { slotReady.add(it) }
+                        }
+                    }
+                }
+            }
+        }
+        advanceRecompositionFrames()
+        advance(1_200)
+        assertTrue(state.isAnimating)
+
+        compose.runOnIdle { landscape.value = true }
+        advanceRecompositionFrames()
+        advance(1_300)
+
+        assertFalse(state.isAnimating)
+        assertEquals(listOf("first"), finished)
+        assertEquals(listOf(true), slotReady)
+        assertEquals(1, bodyInstances.size)
+        assertEquals(1, slotInstances.size)
+        assertEquals(0, slotDisposals)
+    }
+
+    private fun showSlotDialog(
+        showSlot: State<Boolean>,
+        slot: @Composable DaxOnboardingDialogContentScope.() -> Unit,
+    ) {
+        compose.setContent {
+            DuckDuckGoTheme {
+                OnboardingTheme {
+                    DaxContextualOnboardingDialog(
+                        contentKey = "first",
+                        title = title.value,
+                        state = state,
+                        onIntroFinished = { finished.add(it) },
+                        content = if (showSlot.value) slot else null,
+                    )
+                }
+            }
+        }
+        advanceRecompositionFrames()
     }
 
     private fun installClickableSlot() {

@@ -33,6 +33,7 @@ import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -168,6 +169,7 @@ internal fun DaxOnboardingDialogCore(
     content: (@Composable DaxOnboardingDialogContentScope.() -> Unit)?,
     modifier: Modifier = Modifier,
     body: (@Composable () -> Unit)? = null,
+    landscapeLayout: Boolean = false,
 ) {
     val titleLineHeightPx = with(LocalDensity.current) { titleStyle.asTextStyle.lineHeight.toPx() }
     val titleLineSpacingExtraPx = with(LocalDensity.current) {
@@ -267,6 +269,7 @@ internal fun DaxOnboardingDialogCore(
     }
     LaunchedEffect(contentScope, contentScope.readyVersion) { contentScope.deliverContentReady() }
 
+    // Orientation changes move the slot between layouts; it must keep state while contentScope stays delivered.
     val contentSlot = remember(contentScope) {
         movableContentOf<@Composable DaxOnboardingDialogContentScope.() -> Unit> { slot ->
             DisposableEffect(Unit) { onDispose { contentScope.clearReadyCallback() } }
@@ -276,6 +279,8 @@ internal fun DaxOnboardingDialogCore(
             }
         }
     }
+    // Title and body are called from different layout branches by orientation; a stable identity keeps typing progress.
+    val dialogTextSlot = remember(contentKey) { movableContentOf<@Composable () -> Unit> { it() } }
     val scrollState = remember(contentKey) { ScrollState(0) }
     val tailAtRest = { !sampledAnimate && !intro.finished }
     val renderedTailPlacement = { if (tailAtRest()) tailPlacementFor(tail).toOffset() else shell.tailPlacement.value }
@@ -430,7 +435,15 @@ internal fun DaxOnboardingDialogCore(
                                     }
 
                                     if (body != null) {
-                                        Spacer(Modifier.size(DaxOnboardingDialogDefaults.TitleBodySpacing))
+                                        Spacer(
+                                            Modifier.size(
+                                                if (landscapeLayout) {
+                                                    DaxOnboardingDialogDefaults.LandscapeTitleBodySpacing
+                                                } else {
+                                                    DaxOnboardingDialogDefaults.TitleBodySpacing
+                                                },
+                                            ),
+                                        )
                                         Box(contentGate.drawAlpha { intro.contentAlpha.value }) { body.invoke() }
                                     }
                                 }
@@ -448,7 +461,7 @@ internal fun DaxOnboardingDialogCore(
                         }
 
                         @Composable
-                        fun DialogActions() {
+                        fun DialogActions(landscape: Boolean) {
                             val hasActions = content != null ||
                                 primaryCta != null ||
                                 secondaryCta != null
@@ -457,7 +470,7 @@ internal fun DaxOnboardingDialogCore(
                                 hasPrimaryCta = primaryCta != null,
                                 hasSecondaryCta = secondaryCta != null,
                             )
-                            if (hasActions) {
+                            if (!landscape && hasActions) {
                                 Spacer(Modifier.size(actionLayout.headerToActions))
                             }
 
@@ -509,8 +522,23 @@ internal fun DaxOnboardingDialogCore(
                             }
                         }
 
-                        DialogText()
-                        DialogActions()
+                        val dialogText: @Composable () -> Unit = { DialogText() }
+
+                        if (landscapeLayout) {
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Column(Modifier.weight(1f)) { dialogTextSlot(dialogText) }
+                                Spacer(Modifier.width(DaxOnboardingDialogDefaults.LandscapeTextCtaSpacing))
+                                Column(Modifier.width(DaxOnboardingDialogDefaults.LandscapeCtaWidth)) {
+                                    DialogActions(landscape = true)
+                                }
+                            }
+                        } else {
+                            dialogTextSlot(dialogText)
+                            DialogActions(landscape = false)
+                        }
 
                         if (tail != DaxOnboardingDialogTail.None) {
                             Spacer(Modifier.height(DaxOnboardingDialogDefaults.TailBandHeight))
