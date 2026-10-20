@@ -95,6 +95,7 @@ import kotlin.time.Duration
  * @param primaryCta Optional primary CTA.
  * @param onIntroFinished Called after composition with the completed run’s content key; canceled runs do not call it.
  * @param dismiss Optional dismiss action and accessible content description.
+ * @param step Optional step indicator centred on the painted top edge; `null` hides it.
  * @param content Optional content-keyed arbitrary content slot.
  */
 @Composable
@@ -114,6 +115,7 @@ fun DaxOnboardingDialog(
     primaryCta: DaxOnboardingDialogCta? = null,
     onIntroFinished: (contentKey: String) -> Unit = {},
     dismiss: DaxOnboardingDialogDismiss? = null,
+    step: DaxOnboardingDialogStep? = null,
     content: (@Composable DaxOnboardingDialogContentScope.() -> Unit)? = null,
 ) {
     DaxOnboardingDialogCore(
@@ -133,6 +135,7 @@ fun DaxOnboardingDialog(
         primaryCta = primaryCta,
         onIntroFinished = onIntroFinished,
         dismiss = dismiss,
+        step = step,
         content = content,
     )
 }
@@ -171,6 +174,7 @@ fun DaxOnboardingDialog(
  * @param primaryCta Optional primary CTA.
  * @param onIntroFinished Called after composition with the completed run’s content key; canceled runs do not call it.
  * @param dismiss Optional dismiss action and accessible content description.
+ * @param step Optional step indicator centred on the painted top edge; `null` hides it.
  * @param content Optional content-keyed arbitrary content slot.
  */
 @Composable
@@ -190,6 +194,7 @@ fun DaxOnboardingDialog(
     primaryCta: DaxOnboardingDialogCta? = null,
     onIntroFinished: (contentKey: String) -> Unit = {},
     dismiss: DaxOnboardingDialogDismiss? = null,
+    step: DaxOnboardingDialogStep? = null,
     content: (@Composable DaxOnboardingDialogContentScope.() -> Unit)? = null,
 ) {
     DaxOnboardingDialogCore(
@@ -209,6 +214,7 @@ fun DaxOnboardingDialog(
         primaryCta = primaryCta,
         onIntroFinished = onIntroFinished,
         dismiss = dismiss,
+        step = step,
         content = content,
     )
 }
@@ -247,6 +253,7 @@ fun DaxOnboardingDialog(
  * @param primaryCta Optional primary CTA.
  * @param onIntroFinished Called after composition with the completed run’s content key; canceled runs do not call it.
  * @param dismiss Optional dismiss action and accessible content description.
+ * @param step Optional step indicator centred on the painted top edge; `null` hides it.
  * @param content Optional content-keyed arbitrary content slot.
  */
 @Composable
@@ -266,6 +273,7 @@ fun DaxOnboardingDialog(
     primaryCta: DaxOnboardingDialogCta? = null,
     onIntroFinished: (contentKey: String) -> Unit = {},
     dismiss: DaxOnboardingDialogDismiss? = null,
+    step: DaxOnboardingDialogStep? = null,
     content: (@Composable DaxOnboardingDialogContentScope.() -> Unit)? = null,
 ) {
     DaxOnboardingDialogCore(
@@ -285,6 +293,7 @@ fun DaxOnboardingDialog(
         primaryCta = primaryCta,
         onIntroFinished = onIntroFinished,
         dismiss = dismiss,
+        step = step,
         content = content,
     )
 }
