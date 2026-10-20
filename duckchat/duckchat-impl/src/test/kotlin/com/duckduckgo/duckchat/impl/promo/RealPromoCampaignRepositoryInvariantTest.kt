@@ -16,14 +16,11 @@
 
 package com.duckduckgo.duckchat.impl.promo
 
-import com.duckduckgo.common.utils.CurrentTimeProvider
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
 import java.util.UUID
 
 /**
@@ -33,7 +30,7 @@ import java.util.UUID
 @RunWith(Parameterized::class)
 class RealPromoCampaignRepositoryInvariantTest(private val testCase: TestCase) {
     private val dataStore = FakePromoCampaignDataStore()
-    private val currentTimeProvider: CurrentTimeProvider = mock { on { currentTimeMillis() } doReturn NOW }
+    private val currentTimeProvider = FakeCurrentTimeProvider(NOW)
     private val testee = RealPromoCampaignRepository(dataStore, currentTimeProvider)
 
     @Test

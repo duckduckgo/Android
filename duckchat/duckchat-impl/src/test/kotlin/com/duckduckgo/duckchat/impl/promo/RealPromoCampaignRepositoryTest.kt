@@ -17,7 +17,6 @@
 package com.duckduckgo.duckchat.impl.promo
 
 import app.cash.turbine.test
-import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.squareup.moshi.JsonDataException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceTimeBy
@@ -27,15 +26,13 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
 import java.io.IOException
 import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
 
 class RealPromoCampaignRepositoryTest {
     private val dataStore = FakePromoCampaignDataStore()
-    private val currentTimeProvider: CurrentTimeProvider = mock { on { currentTimeMillis() } doReturn NOW }
+    private val currentTimeProvider = FakeCurrentTimeProvider(NOW)
     private val testee = RealPromoCampaignRepository(dataStore, currentTimeProvider)
 
     //region Get Promo Record
