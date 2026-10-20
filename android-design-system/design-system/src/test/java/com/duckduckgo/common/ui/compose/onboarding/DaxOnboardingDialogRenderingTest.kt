@@ -19,10 +19,12 @@ package com.duckduckgo.common.ui.compose.onboarding
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.view.View
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -51,6 +53,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.theme.LocalOnboardingColors
 import com.duckduckgo.common.ui.compose.theme.OnboardingTheme
+import kotlinx.collections.immutable.toImmutableList
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -76,6 +79,8 @@ class DaxOnboardingDialogRenderingTest {
     @get:Rule
     val compose = createComposeRule(effectContext = motionScale)
 
+    private val step = mutableStateOf<DaxOnboardingDialogStep?>(null)
+    private var topSpace = 0.dp
     private val state = DaxOnboardingDialogState()
     private val contentKey = mutableStateOf("first")
     private val animate = mutableStateOf(false)
@@ -529,6 +534,122 @@ class DaxOnboardingDialogRenderingTest {
         assertTrue(state.isAnimating)
     }
 
+    @Test
+    fun stepIndicatorIsCentredOnThePaintedCardTop() {
+        topSpace = 40.dp
+        showDialog()
+        val root = cardBounds()
+        val pixels = capturePixels()
+        val paintedTop = (root.top.toInt() + 10 downTo root.top.toInt()).first { y ->
+            !matchesSurface(pixels[root.center.x.toInt(), y])
+        }
+        assertEquals(root.top + 4f, paintedTop.toFloat(), 1f)
+        compose.runOnIdle { step.value = progress(2) }
+        frames()
+        val pill = pillBounds()
+        assertEquals(paintedTop.toFloat(), pill.center.y, 1f)
+        assertEquals(38f, root.right - 4f - pill.right, 1f)
+        assertTrue(pill.height > 0f)
+    }
+
+    @Test
+    fun stepIndicatorDoesNotMoveTheCard() {
+        topSpace = 40.dp
+        showDialog()
+        val before = cardBounds()
+        compose.runOnIdle { step.value = progress(2) }
+        frames()
+        assertEquals(before, cardBounds())
+        compose.runOnIdle { step.value = null }
+        frames()
+        assertEquals(before, cardBounds())
+    }
+
+    @Test
+    fun stepIndicatorPaintsAboveTheDialogBounds() {
+        topSpace = 40.dp
+        step.value = progress(2)
+        showDialog()
+        val x = pillBounds().left.toInt() + 5
+        val y = cardBounds().top.toInt() - 2
+        assertTrue(matchesSurface(capturePixels()[x, y]))
+        compose.runOnIdle { step.value = null }
+        frames()
+        assertTrue(matchesColor(capturePixels()[x, y], Color.Magenta))
+    }
+
+    @Test
+    fun stepIndicatorFadesInWithTheCardShell() {
+        topSpace = 40.dp
+        animate.value = true
+        step.value = progress(2)
+        showDialog()
+        advance(350)
+        val pill = pillBounds()
+        val x = pill.left.toInt() + 5
+        val y = pill.center.y.toInt()
+        val mid = capturePixels()[x, y]
+        assertTrue(mid.green > Color.Magenta.green && mid.green < surface.green)
+        advance(1_000)
+        assertTrue(matchesSurface(capturePixels()[x, y]))
+    }
+
+    @Test
+    @Config(sdk = [28], qualifiers = "xxhdpi")
+    fun sameKeyAnimateChangesReachTheIndicator() {
+        topSpace = 40.dp
+        step.value = progress(1)
+        showDialog()
+        compose.runOnIdle { animate.value = true }
+        frames()
+        compose.runOnIdle { step.value = progress(2) }
+        frames(count = 2)
+        val start = compose.mainClock.currentTime
+        advance(100)
+        val elapsed = (compose.mainClock.currentTime - start).toFloat()
+        assertEquals(18f + 18f * FastOutSlowInEasing.transform(elapsed / 300f), secondDotSpan(), 1.5f)
+        compose.runOnIdle { animate.value = false }
+        frames()
+        assertEquals(36f, secondDotSpan(), 1.5f)
+    }
+
+    @Test
+    @Config(sdk = [28], qualifiers = "xxhdpi")
+    fun sameKeyDisablingAnimationSnapsTheIndicatorAfterAnAnimatedIntro() {
+        topSpace = 40.dp
+        animate.value = true
+        step.value = progress(1)
+        showDialog()
+        advance(2_000)
+        compose.runOnIdle { step.value = progress(2) }
+        frames()
+        advance(100)
+        assertTrue(secondDotSpan() < 34f)
+        compose.runOnIdle { animate.value = false }
+        frames()
+        assertEquals(36f, secondDotSpan(), 1.5f)
+    }
+
+    private fun progress(current: Int) = DaxOnboardingDialogStep(current, (1..5).map { "$it of 5" }.toImmutableList())
+
+    private fun pillBounds() = compose.onNodeWithTag("daxOnboardingStepIndicator").fetchSemanticsNode().boundsInRoot
+
+    private fun secondDotSpan(): Float {
+        val pill = pillBounds()
+        val pixels = capturePixels()
+        val start = pill.left.toInt() + 24
+        val ink = (start until start + 156).filter { x -> !matchesSurface(pixels[x, pill.center.y.toInt()]) }
+        val spans = ink.fold(mutableListOf<IntRange>()) { spans, x ->
+            if (spans.isNotEmpty() && spans.last().last == x - 1) {
+                spans[spans.lastIndex] = spans.last().first..x
+            } else {
+                spans.add(x..x)
+            }
+            spans
+        }
+        return spans[1].count().toFloat()
+    }
+
     private fun showDialog() {
         compose.setContent {
             DuckDuckGoTheme(isDarkTheme = false) {
@@ -543,25 +664,28 @@ class DaxOnboardingDialogRenderingTest {
                             Modifier.fillMaxSize().background(Color.Magenta).testTag("canvas")
                                 .then(if (unboundedParent) Modifier.verticalScroll(rememberScrollState()) else Modifier),
                         ) {
-                            DaxOnboardingDialog(
-                                contentKey = contentKey.value,
-                                title = title.value,
-                                modifier = Modifier.width(280.dp).testTag("dialog"),
-                                state = state,
-                                animate = animate.value,
-                                tail = tail.value,
-                                tailExtended = tailExtended.value,
-                                onIntroFinished = onFinished,
-                                dismiss = dismiss,
-                            ) {
-                                Box(
-                                    Modifier
-                                        .width(48.dp)
-                                        .height(contentHeight.value)
-                                        .background(contentColor.value)
-                                        .onGloballyPositioned { contentCentre = it.boundsInRoot().center },
+                            Box(Modifier.padding(top = topSpace)) {
+                                DaxOnboardingDialog(
+                                    contentKey = contentKey.value,
+                                    title = title.value,
+                                    modifier = Modifier.width(280.dp).testTag("dialog"),
+                                    state = state,
+                                    animate = animate.value,
+                                    tail = tail.value,
+                                    tailExtended = tailExtended.value,
+                                    onIntroFinished = onFinished,
+                                    dismiss = dismiss,
+                                    step = step.value,
                                 ) {
-                                    Box(Modifier.align(Alignment.BottomCenter).size(8.dp).testTag("bottom-marker"))
+                                    Box(
+                                        Modifier
+                                            .width(48.dp)
+                                            .height(contentHeight.value)
+                                            .background(contentColor.value)
+                                            .onGloballyPositioned { contentCentre = it.boundsInRoot().center },
+                                    ) {
+                                        Box(Modifier.align(Alignment.BottomCenter).size(8.dp).testTag("bottom-marker"))
+                                    }
                                 }
                             }
                         }
