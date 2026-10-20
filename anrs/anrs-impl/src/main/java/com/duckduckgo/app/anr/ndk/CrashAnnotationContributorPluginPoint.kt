@@ -17,7 +17,7 @@
 package com.duckduckgo.app.anr.ndk
 
 import com.duckduckgo.anrs.api.CrashAnnotationContributor
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
 
 @ContributesPluginPoint(
