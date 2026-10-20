@@ -59,16 +59,15 @@ class EventHubConfigParserTest {
 
         val pixel = telemetry[0]
         assertTrue(pixel.isEnabled)
-        assertEquals(1, pixel.trigger.period.days)
-        assertEquals(86400L, pixel.trigger.period.periodSeconds)
+        assertEquals(1, pixel.period.days)
+        assertEquals(86400L, pixel.period.periodSeconds)
     }
 
     @Test
     fun `counter parameter with map buckets parsed correctly`() {
         val telemetry = EventHubConfigParser.parseTelemetry(settingsJson)
-        val param = telemetry[0].parameters["count"]!!
+        val param = telemetry[0].counter("count")
 
-        assertTrue(param.isCounter)
         assertEquals("test", param.source)
         assertEquals(7, param.buckets.size)
 
@@ -106,7 +105,7 @@ class EventHubConfigParserTest {
             }
         """.trimIndent()
 
-        val buckets = EventHubConfigParser.parseTelemetry(json).single().parameters["c"]!!.buckets
+        val buckets = EventHubConfigParser.parseTelemetry(json).single().counter("c").buckets
 
         assertEquals(listOf("40+", "0", "3-5", "1-2", "6-39"), buckets.keys.toList())
     }
@@ -131,7 +130,7 @@ class EventHubConfigParserTest {
             }
         """.trimIndent()
         val telemetry = EventHubConfigParser.parseTelemetry(json)
-        assertEquals(30L, telemetry[0].trigger.period.periodSeconds)
+        assertEquals(30L, telemetry[0].period.periodSeconds)
     }
 
     @Test
@@ -303,10 +302,10 @@ class EventHubConfigParserTest {
         assertNotNull(restored)
         assertEquals(original.name, restored!!.name)
         assertEquals(original.state, restored.state)
-        assertEquals(original.trigger.period.periodSeconds, restored.trigger.period.periodSeconds)
+        assertEquals(original.period.periodSeconds, restored.period.periodSeconds)
         assertEquals(original.parameters.size, restored.parameters.size)
-        assertEquals(original.parameters["count"]!!.source, restored.parameters["count"]!!.source)
-        assertEquals(original.parameters["count"]!!.buckets.size, restored.parameters["count"]!!.buckets.size)
+        assertEquals(original.counter("count").source, restored.counter("count").source)
+        assertEquals(original.counter("count").buckets.size, restored.counter("count").buckets.size)
     }
 
     @Test
@@ -314,10 +313,9 @@ class EventHubConfigParserTest {
         val config = TelemetryPixelConfig(
             name = "test",
             state = "enabled",
-            trigger = TelemetryTriggerConfig(period = TelemetryPeriodConfig(days = 1)),
+            trigger = TelemetryTriggerConfig.Period(TelemetryPeriodConfig(days = 1)),
             parameters = mapOf(
-                "c" to TelemetryParameterConfig(
-                    template = "counter",
+                "c" to TelemetryParameterConfig.Counter(
                     source = "e",
                     buckets = linkedMapOf("0+" to BucketConfig(gte = 0, lt = null)),
                 ),
@@ -347,11 +345,11 @@ class EventHubConfigParserTest {
         """.trimIndent()
         val telemetry = EventHubConfigParser.parseTelemetry(json)
         assertEquals(1, telemetry.size)
-        assertEquals(5400L, telemetry[0].trigger.period.periodSeconds) // 1h30m = 5400s
+        assertEquals(5400L, telemetry[0].period.periodSeconds) // 1h30m = 5400s
     }
 
     @Test
-    fun `immediate_v2 entry does not prevent sibling period entry from parsing`() {
+    fun `immediate_v2 entry is parsed alongside a period entry`() {
         val json = """
             {
                 "telemetry": {
@@ -367,7 +365,125 @@ class EventHubConfigParserTest {
 
         val telemetry = EventHubConfigParser.parseTelemetry(json)
 
+        assertEquals(listOf("webTelemetry_immediate", "webTelemetry_period"), telemetry.map { it.name })
+        assertEquals(TelemetryTriggerConfig.Immediate("captcha"), telemetry[0].trigger)
+        assertTrue(telemetry[0].parameters.isEmpty())
+    }
+
+    @Test
+    fun `immediate_v2 entry without a source is skipped`() {
+        val json = """
+            {
+                "telemetry": {
+                    "webTelemetry_noSource": {
+                        "state": "enabled",
+                        "trigger": { "type": "immediate_v2" },
+                        "parameters": {}
+                    },
+                    "webTelemetry_emptySource": {
+                        "state": "enabled",
+                        "trigger": { "type": "immediate_v2", "source": "" },
+                        "parameters": {}
+                    },
+                    "webTelemetry_period": $periodPixelJson
+                }
+            }
+        """.trimIndent()
+
+        val telemetry = EventHubConfigParser.parseTelemetry(json)
+
         assertEquals(listOf("webTelemetry_period"), telemetry.map { it.name })
+    }
+
+    @Test
+    fun `data parameters are parsed with their key and optional source`() {
+        val json = """
+            {
+                "telemetry": {
+                    "webTelemetry_immediate": {
+                        "state": "enabled",
+                        "trigger": { "type": "immediate_v2", "source": "adwall" },
+                        "parameters": { "reason": { "template": "data", "dataKey": "reason" } }
+                    },
+                    "webTelemetry_period": {
+                        "state": "enabled",
+                        "trigger": { "period": { "days": 1 } },
+                        "parameters": {
+                            "c": { "template": "counter", "source": "adwall", "buckets": {"0+": {"gte": 0}} },
+                            "reason": { "template": "data", "source": "adwall", "dataKey": "reason" }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+
+        val telemetry = EventHubConfigParser.parseTelemetry(json).associateBy { it.name }
+
+        assertEquals(TelemetryParameterConfig.Data(dataKey = "reason"), telemetry.getValue("webTelemetry_immediate").parameters["reason"])
+        assertEquals(
+            TelemetryParameterConfig.Data(dataKey = "reason", source = "adwall"),
+            telemetry.getValue("webTelemetry_period").parameters["reason"],
+        )
+    }
+
+    @Test
+    fun `data parameter without a dataKey is dropped`() {
+        val json = """
+            {
+                "telemetry": {
+                    "webTelemetry_immediate": {
+                        "state": "enabled",
+                        "trigger": { "type": "immediate_v2", "source": "adwall" },
+                        "parameters": {
+                            "missing": { "template": "data" },
+                            "empty": { "template": "data", "dataKey": "" },
+                            "reason": { "template": "data", "dataKey": "reason" }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+
+        val telemetry = EventHubConfigParser.parseTelemetry(json)
+
+        assertEquals(setOf("reason"), telemetry.single().parameters.keys)
+    }
+
+    @Test
+    fun `period entry whose only parameter is data is skipped`() {
+        val json = """
+            {
+                "telemetry": {
+                    "webTelemetry_dataOnly": {
+                        "state": "enabled",
+                        "trigger": { "period": { "days": 1 } },
+                        "parameters": { "reason": { "template": "data", "source": "adwall", "dataKey": "reason" } }
+                    },
+                    "webTelemetry_period": $periodPixelJson
+                }
+            }
+        """.trimIndent()
+
+        val telemetry = EventHubConfigParser.parseTelemetry(json)
+
+        assertEquals(listOf("webTelemetry_period"), telemetry.map { it.name })
+    }
+
+    @Test
+    fun `period config with a data parameter round-trips through serialization`() {
+        val config = TelemetryPixelConfig(
+            name = "test",
+            state = "enabled",
+            trigger = TelemetryTriggerConfig.Period(TelemetryPeriodConfig(days = 1)),
+            parameters = mapOf(
+                "c" to TelemetryParameterConfig.Counter(source = "e", buckets = linkedMapOf("0+" to BucketConfig(gte = 0, lt = null))),
+                "reason" to TelemetryParameterConfig.Data(dataKey = "reason", source = "e"),
+            ),
+        )
+
+        val restored = EventHubConfigParser.parseSinglePixelConfig("test", EventHubConfigParser.serializePixelConfig(config)!!)
+
+        assertEquals(config, restored)
     }
 
     @Test
@@ -417,7 +533,7 @@ class EventHubConfigParserTest {
         val telemetry = EventHubConfigParser.parseTelemetry(json)
 
         assertEquals(1, telemetry.size)
-        assertEquals(86400L, telemetry[0].trigger.period.periodSeconds)
+        assertEquals(86400L, telemetry[0].period.periodSeconds)
     }
 
     @Test

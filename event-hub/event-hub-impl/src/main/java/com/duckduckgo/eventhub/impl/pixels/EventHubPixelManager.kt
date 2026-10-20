@@ -131,14 +131,20 @@ class RealEventHubPixelManager @Inject constructor(
 
         // Sampled on arrival: an event that arrives just before a period ends belongs to that period, even if it's processed after
         val nowMillis = timeProvider.currentTimeMillis()
+        // A payload that isn't an object has no keys, so every data parameter reading it has no value
+        val eventData = data.optJSONObject("data")
 
-        // Checked again once the work runs: switching the hub off may be handled first
+        // Both checked again once the work runs: switching the hub off may be handled first, and an immediate pixel has no state
+        // that switching off could clear
         appCoroutineScope.launch(pixelDispatcher) {
             if (!isEnabled()) return@launch
             metricsHandler.onEvent(eventType)
         }
 
         appCoroutineScope.launch(pixelDispatcher) {
+            if (!isEnabled()) return@launch
+            fireImmediatePixels(eventType, eventData)
+
             for (pixelState in repository.getAllPixelStates()) {
                 if (nowMillis >= pixelState.periodEndMillis) continue
 
@@ -146,7 +152,7 @@ class RealEventHubPixelManager @Inject constructor(
                 var changed = false
 
                 for ((paramName, paramConfig) in pixelState.config.parameters) {
-                    if (paramConfig.isCounter && paramConfig.source == eventType) {
+                    if (paramConfig is TelemetryParameterConfig.Counter && paramConfig.source == eventType) {
                         val paramState = updatedParams[paramName] ?: ParamState(0)
                         if (paramState.stopCounting) continue
 
@@ -160,6 +166,14 @@ class RealEventHubPixelManager @Inject constructor(
                         val newValue = paramState.value + 1
                         updatedParams[paramName] = paramState.copy(value = newValue)
                         logcat(VERBOSE) { "EventHub: ${pixelState.pixelName}.$paramName incremented to $newValue" }
+                    } else if (paramConfig is TelemetryParameterConfig.Data && paramConfig.source == eventType) {
+                        // Every matching event assigns, so one without the key leaves no value rather than an earlier event's
+                        val paramState = updatedParams[paramName] ?: ParamState(0)
+                        val newValue = dataParameterValue(eventData, paramConfig.dataKey)
+                        if (newValue != paramState.lastDataValue) {
+                            changed = true
+                            updatedParams[paramName] = paramState.copy(lastDataValue = newValue)
+                        }
                     }
                 }
 
@@ -167,6 +181,20 @@ class RealEventHubPixelManager @Inject constructor(
                     repository.savePixelState(pixelState.copy(params = updatedParams))
                 }
             }
+        }
+    }
+
+    private fun fireImmediatePixels(eventType: String, eventData: JSONObject?) {
+        for (config in getTelemetryConfigs()) {
+            val trigger = config.trigger
+            if (!config.isEnabled || trigger !is TelemetryTriggerConfig.Immediate || trigger.source != eventType) continue
+
+            val encodedParams = config.parameters.mapNotNull { (paramName, paramConfig) ->
+                if (paramConfig !is TelemetryParameterConfig.Data) return@mapNotNull null
+                dataParameterValue(eventData, paramConfig.dataKey)?.let { paramName to percentEncode(it) }
+            }.toMap()
+            logcat(DEBUG) { "EventHub: firing immediate pixel ${config.name} encoded=$encodedParams" }
+            pixel.enqueueFire(pixelName = config.name, parameters = emptyMap(), encodedParameters = encodedParams)
         }
     }
 
@@ -252,20 +280,21 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     private fun fireTelemetry(pixelState: PixelState): Long? {
-        val pixelData = buildPixel(pixelState)
+        val counterParams = buildCounterParams(pixelState)
+        val trigger = pixelState.config.trigger
 
-        if (pixelData.isNotEmpty()) {
+        // Only a counter landing in a bucket fires a period pixel: data parameters are carried along but never fire it
+        if (counterParams.isNotEmpty() && trigger is TelemetryTriggerConfig.Period) {
             val additionalParams = mapOf(
-                PARAM_ATTRIBUTION_PERIOD to calculateAttributionPeriod(
-                    pixelState.periodStartMillis,
-                    pixelState.config.trigger.period,
-                ).toString(),
+                PARAM_ATTRIBUTION_PERIOD to calculateAttributionPeriod(pixelState.periodStartMillis, trigger.period).toString(),
             )
-            val allParams = pixelData + additionalParams
-            logcat(DEBUG) { "EventHub: firing pixel ${pixelState.pixelName} params=$allParams" }
+            val allParams = counterParams + additionalParams
+            val encodedParams = buildDataParams(pixelState)
+            logcat(DEBUG) { "EventHub: firing pixel ${pixelState.pixelName} params=$allParams encoded=$encodedParams" }
             pixel.enqueueFire(
                 pixelName = pixelState.pixelName,
                 parameters = allParams,
+                encodedParameters = encodedParams,
             )
         } else {
             logcat(VERBOSE) { "EventHub: skipping pixel ${pixelState.pixelName}, no params" }
@@ -278,12 +307,13 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     private fun startNewPeriod(pixelConfig: TelemetryPixelConfig): Long? {
+        val trigger = pixelConfig.trigger as? TelemetryTriggerConfig.Period ?: return null
         if (!isInForeground || !isEnabled() || !pixelConfig.isEnabled) {
             logcat(VERBOSE) { "EventHub: skipping startNewPeriod for ${pixelConfig.name}" }
             return null
         }
         val nowMillis = timeProvider.currentTimeMillis()
-        val periodMillis = pixelConfig.trigger.period.periodSeconds * 1000
+        val periodMillis = trigger.period.periodSeconds * 1000
         val periodEndMillis = nowMillis + periodMillis
 
         logcat(VERBOSE) { "EventHub: startNewPeriod ${pixelConfig.name} start=$nowMillis end=$periodEndMillis" }
@@ -300,11 +330,11 @@ class RealEventHubPixelManager @Inject constructor(
         return periodEndMillis
     }
 
-    private fun buildPixel(pixelState: PixelState): Map<String, String> {
+    private fun buildCounterParams(pixelState: PixelState): Map<String, String> {
         val pixelData = mutableMapOf<String, String>()
 
         for ((paramName, paramConfig) in pixelState.config.parameters) {
-            if (paramConfig.isCounter) {
+            if (paramConfig is TelemetryParameterConfig.Counter) {
                 val value = (pixelState.params[paramName] ?: ParamState(0)).value
                 val bucketName = BucketCounter.bucketCount(value, paramConfig.buckets)
                 if (bucketName != null) {
@@ -314,6 +344,13 @@ class RealEventHubPixelManager @Inject constructor(
         }
 
         return pixelData
+    }
+
+    private fun buildDataParams(pixelState: PixelState): Map<String, String> {
+        return pixelState.config.parameters.mapNotNull { (paramName, paramConfig) ->
+            if (paramConfig !is TelemetryParameterConfig.Data) return@mapNotNull null
+            pixelState.params[paramName]?.lastDataValue?.let { paramName to percentEncode(it) }
+        }.toMap()
     }
 
     companion object {
