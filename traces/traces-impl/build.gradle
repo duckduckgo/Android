@@ -36,6 +36,5 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
 
-    implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
 }

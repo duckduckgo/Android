@@ -61,9 +61,6 @@ dependencies {
 
     implementation Square.retrofit2.converter.moshi
 
-    // Dagger
-    implementation Google.dagger
-
     implementation KotlinX.coroutines.core
 
     implementation "com.squareup.logcat:logcat:_"

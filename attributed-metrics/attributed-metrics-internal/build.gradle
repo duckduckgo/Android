@@ -29,7 +29,6 @@ dependencies {
     implementation AndroidX.appCompat
     implementation AndroidX.constraintLayout
     implementation Google.android.material
-    implementation Google.dagger
 
     testImplementation project(path: ':common-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

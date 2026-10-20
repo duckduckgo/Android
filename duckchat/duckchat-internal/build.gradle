@@ -52,7 +52,6 @@ dependencies {
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.runtime.ktx
     implementation Google.android.material
-    implementation Google.dagger
     implementation "org.nanohttpd:nanohttpd:2.3.1"
     implementation "com.squareup.logcat:logcat:_"
 

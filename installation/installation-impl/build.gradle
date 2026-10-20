@@ -34,7 +34,6 @@ dependencies {
     implementation project(path: ':experiments-api')
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
-    implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.commonJava8

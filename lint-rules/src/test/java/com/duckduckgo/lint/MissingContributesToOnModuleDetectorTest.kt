@@ -24,23 +24,6 @@ import org.junit.Test
 @Suppress("UnstableApiUsage")
 class MissingContributesToOnModuleDetectorTest {
 
-    private val daggerStubs = kt(
-        """
-        package dagger
-        annotation class Module
-        annotation class Provides
-        annotation class Binds
-        """,
-    ).indented()
-
-    private val anvilStubs = kt(
-        """
-        package com.squareup.anvil.annotations
-        import kotlin.reflect.KClass
-        annotation class ContributesTo(val scope: KClass<*>)
-        """,
-    ).indented()
-
     private val scopeStubs = kt(
         """
         package com.duckduckgo.di.scopes
@@ -50,38 +33,16 @@ class MissingContributesToOnModuleDetectorTest {
     ).indented()
 
     @Test
-    fun whenObjectModuleHasNoContributesToThenFailWithError() {
+    fun whenAbstractClassBindingContainerHasNoContributesToThenFailWithError() {
         lint()
             .files(
-                daggerStubs,
-                anvilStubs,
+                METRO_DI_API,
                 kt(
                     """
                     package com.duckduckgo.example
-                    import dagger.Module
+                    import dev.zacsweers.metro.BindingContainer
 
-                    @Module
-                    object FooModule
-                    """,
-                ).indented(),
-            )
-            .issues(MissingContributesToOnModuleDetector.MISSING_CONTRIBUTES_TO_ON_MODULE)
-            .run()
-            .expectErrorCount(1)
-    }
-
-    @Test
-    fun whenAbstractClassModuleHasNoContributesToThenFailWithError() {
-        lint()
-            .files(
-                daggerStubs,
-                anvilStubs,
-                kt(
-                    """
-                    package com.duckduckgo.example
-                    import dagger.Module
-
-                    @Module
+                    @BindingContainer
                     abstract class FooModule
                     """,
                 ).indented(),
@@ -92,17 +53,16 @@ class MissingContributesToOnModuleDetectorTest {
     }
 
     @Test
-    fun whenInterfaceModuleHasNoContributesToThenFailWithError() {
+    fun whenInterfaceBindingContainerHasNoContributesToThenFailWithError() {
         lint()
             .files(
-                daggerStubs,
-                anvilStubs,
+                METRO_DI_API,
                 kt(
                     """
                     package com.duckduckgo.example
-                    import dagger.Module
+                    import dev.zacsweers.metro.BindingContainer
 
-                    @Module
+                    @BindingContainer
                     interface FooModule
                     """,
                 ).indented(),
@@ -113,45 +73,19 @@ class MissingContributesToOnModuleDetectorTest {
     }
 
     @Test
-    fun whenModuleHasContributesToAppScopeThenSucceed() {
+    fun whenBindingContainerHasContributesToActivityScopeThenSucceed() {
         lint()
             .files(
-                daggerStubs,
-                anvilStubs,
-                scopeStubs,
-                kt(
-                    """
-                    package com.duckduckgo.example
-                    import com.duckduckgo.di.scopes.AppScope
-                    import com.squareup.anvil.annotations.ContributesTo
-                    import dagger.Module
-
-                    @Module
-                    @ContributesTo(AppScope::class)
-                    object FooModule
-                    """,
-                ).indented(),
-            )
-            .issues(MissingContributesToOnModuleDetector.MISSING_CONTRIBUTES_TO_ON_MODULE)
-            .run()
-            .expectClean()
-    }
-
-    @Test
-    fun whenModuleHasContributesToActivityScopeThenSucceed() {
-        lint()
-            .files(
-                daggerStubs,
-                anvilStubs,
+                METRO_DI_API,
                 scopeStubs,
                 kt(
                     """
                     package com.duckduckgo.example
                     import com.duckduckgo.di.scopes.ActivityScope
-                    import com.squareup.anvil.annotations.ContributesTo
-                    import dagger.Module
+                    import dev.zacsweers.metro.BindingContainer
+                    import dev.zacsweers.metro.ContributesTo
 
-                    @Module
+                    @BindingContainer
                     @ContributesTo(ActivityScope::class)
                     object FooModule
                     """,
@@ -210,8 +144,7 @@ class MissingContributesToOnModuleDetectorTest {
     fun whenClassIsNotAModuleThenSucceed() {
         lint()
             .files(
-                daggerStubs,
-                anvilStubs,
+                METRO_DI_API,
                 kt(
                     """
                     package com.duckduckgo.example
@@ -226,5 +159,4 @@ class MissingContributesToOnModuleDetectorTest {
             .run()
             .expectClean()
     }
-
 }

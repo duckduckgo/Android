@@ -47,7 +47,6 @@ dependencies {
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.process
-    implementation Google.dagger
     implementation AndroidX.fragment.ktx
 
     implementation "com.squareup.logcat:logcat:_"

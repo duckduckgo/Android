@@ -213,7 +213,7 @@ after the final design.
 ## Step 6 — Evaluate module placement
 
 - New interfaces and data classes → `-api` module
-- No Anvil, no Dagger in `-api` (except `:feature-toggles-api`, `:settings-api`)
+- `-api` modules do not apply the Metro plugin, and no module depends on Dagger or Anvil
 - `-api` must not depend on other `-api` modules (except the three in H13)
 - Implementation classes and repositories → `-impl` only
 - No `-impl` depending on another `-impl`

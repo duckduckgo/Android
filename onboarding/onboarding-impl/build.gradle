@@ -33,7 +33,6 @@ dependencies {
     implementation project(':di')
 
     implementation KotlinX.coroutines.core
-    implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
 
     testImplementation Testing.junit4

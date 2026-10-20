@@ -37,7 +37,6 @@ dependencies {
     implementation project(path: ':data-store-api')
 
     implementation AndroidX.room.runtime
-    implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
     implementation "io.reactivex.rxjava2:rxjava:_"
     implementation KotlinX.coroutines.core

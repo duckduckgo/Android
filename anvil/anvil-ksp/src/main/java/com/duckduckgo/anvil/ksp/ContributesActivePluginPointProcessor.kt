@@ -51,7 +51,7 @@ import com.squareup.kotlinpoet.ksp.writeTo
  * - A remote feature flag interface with @ContributesRemoteFeature
  * - A multi-process SharedPreferences store for the feature flag
  * - An active wrapper class implementing ActivePluginPoint<T> that filters by isActive() + feature flag
- * - A Dagger binding module for the wrapper
+ * - A Metro binding container for the wrapper
  * - A sentinel object in a fixed package for cross-module validation
  *
  * **@ContributesActivePlugin** generates:
@@ -108,7 +108,7 @@ class ContributesActivePluginPointProcessor(
         private val JSON_ADAPTER = ClassName("com.squareup.moshi", "JsonAdapter")
 
         // Metro
-        private val MODULE = ClassName("dev.zacsweers.metro", "BindingContainer")
+        private val BINDING_CONTAINER = ClassName("dev.zacsweers.metro", "BindingContainer")
         private val BINDS = ClassName("dev.zacsweers.metro", "Binds")
         private val INJECT = ClassName("javax.inject", "Inject")
         private val SUPPRESS = ClassName("kotlin", "Suppress")
@@ -468,7 +468,7 @@ class ContributesActivePluginPointProcessor(
             // Binding module
             .addType(
                 TypeSpec.classBuilder(wrapperBindingModuleClassName)
-                    .addAnnotation(AnnotationSpec.builder(MODULE).build())
+                    .addAnnotation(AnnotationSpec.builder(BINDING_CONTAINER).build())
                     .addAnnotation(
                         AnnotationSpec.builder(CONTRIBUTES_TO)
                             .addMember("scope = %T::class", scopeClassName)

@@ -50,7 +50,7 @@ dependencies {
     implementation project(path: ':feature-toggles-api')
     implementation AndroidX.room.runtime
     ksp AndroidX.room.compiler
-    implementation Google.dagger
+    compileOnly "javax.inject:javax.inject:_"
 
     testImplementation project(path: ':common-test')
     testImplementation Testing.junit4

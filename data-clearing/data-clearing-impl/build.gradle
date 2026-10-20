@@ -31,7 +31,6 @@ dependencies {
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
 
-    implementation Google.dagger
     implementation KotlinX.coroutines.core
     implementation "com.squareup.logcat:logcat:_"
 

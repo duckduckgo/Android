@@ -37,8 +37,6 @@ dependencies {
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android
 
-    implementation Google.dagger
-
     // DataStore
     api AndroidX.dataStore.preferences
 

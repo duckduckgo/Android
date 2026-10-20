@@ -27,7 +27,6 @@ android {
 
 dependencies {
     implementation AndroidX.fragment.ktx
-    implementation Google.dagger
     implementation AndroidX.appCompat
     api "dev.zacsweers.metro:runtime:_"
 }

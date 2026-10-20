@@ -46,28 +46,25 @@ class MissingContributesToOnModuleDetector : Detector(), SourceCodeScanner {
                     MISSING_CONTRIBUTES_TO_ON_MODULE,
                     moduleAnnotation,
                     context.getNameLocation(moduleAnnotation),
-                    "@Module/@BindingContainer must be annotated with @ContributesTo to be discovered by Dagger/Anvil or Metro. " +
+                    "@BindingContainer must be annotated with @ContributesTo to be discovered by Metro. " +
                         "Add @ContributesTo(AppScope::class) — or the appropriate scope (ActivityScope, FragmentScope, " +
-                        "VpnScope, etc.) — alongside @Module/@BindingContainer.",
+                        "VpnScope, etc.) — alongside @BindingContainer.",
                 )
             }
         }
     }
 
     companion object {
-        private val MODULE_ANNOTATIONS = setOf("dagger.Module", "dev.zacsweers.metro.BindingContainer")
-        private val CONTRIBUTES_TO = setOf("com.squareup.anvil.annotations.ContributesTo", "dev.zacsweers.metro.ContributesTo")
+        private val MODULE_ANNOTATIONS = setOf("dev.zacsweers.metro.BindingContainer")
+        private val CONTRIBUTES_TO = setOf("dev.zacsweers.metro.ContributesTo")
 
         val MISSING_CONTRIBUTES_TO_ON_MODULE = Issue.create(
             "MissingContributesToOnModule",
-            "@Module/@BindingContainer is missing @ContributesTo",
+            "@BindingContainer is missing @ContributesTo",
             """
-                Every Dagger @Module or Metro @BindingContainer must also be annotated with @ContributesTo
-                so that Anvil/Metro can auto-discover it. Add @ContributesTo(AppScope::class), or the
-                appropriate scope (ActivityScope, FragmentScope, VpnScope, etc.), alongside @Module/@BindingContainer.
-
-                This is required for the Anvil → Metro migration: both DI frameworks rely on @ContributesTo
-                to merge modules into the dependency graph.
+                Every Metro @BindingContainer must also be annotated with @ContributesTo, otherwise Metro
+                does not discover it and merge it into the dependency graph. Add @ContributesTo(AppScope::class),
+                or the appropriate scope (ActivityScope, FragmentScope, VpnScope, etc.), alongside @BindingContainer.
             """.trimIndent(),
             Category.CORRECTNESS,
             10,

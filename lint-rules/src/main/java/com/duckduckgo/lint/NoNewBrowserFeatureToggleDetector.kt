@@ -147,7 +147,7 @@ class NoNewBrowserFeatureToggleDetector : Detector(), SourceCodeScanner {
                 * If only one `-impl` module reads the toggle, put the `@ContributesRemoteFeature` \
                 interface in that `-impl` module.
                 * If several modules read it, put the interface in its own small standalone module. \
-                It cannot live in an `-api` module (Anvil is banned there) and `:app` cannot import \
+                It cannot live in an `-api` module (the Metro plugin is banned there) and `:app` cannot import \
                 from an `-impl` module.
 
                 Do not add an entry to the grandfathered list to silence this check.
