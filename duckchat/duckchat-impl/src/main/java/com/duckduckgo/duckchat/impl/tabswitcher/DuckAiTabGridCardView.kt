@@ -18,7 +18,6 @@ package com.duckduckgo.duckchat.impl.tabswitcher
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.TouchDelegate
@@ -48,7 +47,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 
 class DuckAiTabGridCardView(
     context: Context,
-    private val thumbnailLoader: suspend (fileRef: String, mode: BrowserMode) -> ByteArray?,
+    private val thumbnailLoader: suspend (fileRef: String, mode: BrowserMode) -> Bitmap?,
     private val dispatchers: DispatcherProvider,
     private val coroutineScope: CoroutineScope,
 ) : DuckAiTabGridItemView {
@@ -186,7 +185,7 @@ class DuckAiTabGridCardView(
         if (binding.thumbnail.drawable != null) return
         thumbnailJob += coroutineScope.launch(dispatchers.main()) {
             val bitmap = withContext(dispatchers.io()) {
-                thumbnailLoader(content.fileRef, content.mode)?.let { decodeSampled(it) }
+                thumbnailLoader(content.fileRef, content.mode)
             }
             if (boundContent != content) return@launch
             with(binding.thumbnail) {
@@ -201,21 +200,7 @@ class DuckAiTabGridCardView(
         }
     }
 
-    private fun decodeSampled(bytes: ByteArray): Bitmap? {
-        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
-        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
-
-        var sampleSize = 1
-        while (bounds.outWidth / (sampleSize * 2) >= THUMBNAIL_MAX_PX && bounds.outHeight / (sampleSize * 2) >= THUMBNAIL_MAX_PX) {
-            sampleSize *= 2
-        }
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size, BitmapFactory.Options().apply { inSampleSize = sampleSize })
-    }
-
     private companion object {
-        // Covers the card's preview slot at high densities with room for the centerCrop.
-        const val THUMBNAIL_MAX_PX = 512
         const val EXTRA_CLOSE_BUTTON_TOUCH_AREA_DP = 6
     }
 }
