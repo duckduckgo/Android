@@ -140,9 +140,11 @@ class ClearPersonalDataAction(
 
     override suspend fun clearTabsOnly() {
         withContext(dispatchers.io()) {
+            logcat { "Finished clearing tabs" }
             tabRepository.deleteAll()
             closeCustomTabTasks()
-            logcat { "Finished clearing tabs" }
+
+            settingsDataStore.tabsClearedTimestamp = System.currentTimeMillis()
         }
     }
 

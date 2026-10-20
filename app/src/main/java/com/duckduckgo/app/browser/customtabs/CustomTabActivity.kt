@@ -35,6 +35,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.ViewState
 import com.duckduckgo.app.browser.databinding.ActivityCustomTabBinding
 import com.duckduckgo.app.global.intentText
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
@@ -58,8 +59,17 @@ class CustomTabActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (wereTabsClearedSinceLaunch()) {
+            finish()
+            return
+        }
+
         viewModel.onShowCustomTab()
         if (launchMode != CustomTabLaunchMode.LEGACY && isTaskRoot) showInRecents()
 
@@ -71,6 +81,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
         } else {
             SystemBarStyle.light(toolbarColor, toolbarColor)
         }
+
         enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
         edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(
             binding.root,
@@ -126,6 +137,11 @@ class CustomTabActivity : DuckDuckGoActivity() {
         viewModel.onShowCustomTab()
     }
 
+    override fun onRestart() {
+        super.onRestart()
+        if (wereTabsClearedSinceLaunch()) finish()
+    }
+
     override fun onStop() {
         super.onStop()
         viewModel.onCloseCustomTab()
@@ -133,6 +149,9 @@ class CustomTabActivity : DuckDuckGoActivity() {
 
     private val launchMode: CustomTabLaunchMode
         get() = CustomTabLaunchMode.fromName(intent.getStringExtra(LAUNCH_MODE_EXTRA))
+
+    private fun wereTabsClearedSinceLaunch(): Boolean =
+        settingsDataStore.tabsClearedTimestamp > intent.getLongExtra(LAUNCHED_AT_EXTRA, 0L)
 
     // The manifest hides legacy tabs from Recents, but a tab in its own task needs its card to be reachable.
     private fun showInRecents() {
@@ -175,6 +194,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
                 addFlags(launchMode.intentFlags)
                 putExtra(Intent.EXTRA_TEXT, text)
                 putExtra(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
+                putExtra(LAUNCHED_AT_EXTRA, System.currentTimeMillis())
                 if (toolbarColor != null) {
                     putExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, toolbarColor)
                 }
@@ -191,6 +211,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
         private const val CLIENT_PACKAGE_EXTRA = "CLIENT_PACKAGE_EXTRA"
         private const val REFERRER_PACKAGE_EXTRA = "REFERRER_PACKAGE_EXTRA"
         private const val LAUNCH_MODE_EXTRA = "LAUNCH_MODE_EXTRA"
+        private const val LAUNCHED_AT_EXTRA = "LAUNCHED_AT_EXTRA"
     }
 
     private fun configureOnBackPressedListener() {
