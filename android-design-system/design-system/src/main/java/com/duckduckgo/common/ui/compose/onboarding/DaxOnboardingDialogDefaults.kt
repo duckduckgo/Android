@@ -67,6 +67,12 @@ object DaxOnboardingDialogDefaults {
     val DismissOffset: Dp = 4.dp
     val TailBandHeight: Dp = DaxSpeechBubbleShape.TailHeight + StrokeWidth
 
+    val StepIndicatorActiveDot: Dp = 12.dp
+    val StepIndicatorInactiveDot: Dp = 6.dp
+    val StepIndicatorDotGap: Dp = 4.dp
+    val StepIndicatorLabelGap: Dp = 20.dp
+    val StepIndicatorTransitionDuration: Duration = 300.milliseconds
+
     internal val ContainerFadeDuration: Duration = 400.milliseconds
     internal val ContentFadeDuration: Duration = 200.milliseconds
     internal val HeaderFadeDuration: Duration = 300.milliseconds
