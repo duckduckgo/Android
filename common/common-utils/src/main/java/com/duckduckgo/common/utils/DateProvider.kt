@@ -17,7 +17,7 @@
 package com.duckduckgo.common.utils
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter

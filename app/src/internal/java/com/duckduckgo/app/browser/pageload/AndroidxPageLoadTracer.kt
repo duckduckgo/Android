@@ -18,8 +18,8 @@ package com.duckduckgo.app.browser.pageload
 
 import androidx.tracing.Trace
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
@@ -27,7 +27,7 @@ import javax.inject.Inject
  * Internal-flavor implementation of [PageLoadTracer]. Single app-scoped instance so its cookie
  * counter is shared across all [PageLoadTraceMarker]s (one per tab) and stays process-unique.
  */
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class AndroidxPageLoadTracer @Inject constructor() : PageLoadTracer {
 

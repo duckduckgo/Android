@@ -21,12 +21,12 @@ import android.webkit.WebViewDatabase
 import androidx.room.Room
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 
-@Module(includes = [DaoModule::class])
+@BindingContainer(includes = [DaoModule::class])
 @ContributesTo(
     scope = AppScope::class,
     replaces = [DatabaseModule::class],
@@ -34,13 +34,13 @@ import dagger.SingleInstanceIn
 class StubDatabaseModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideWebviewDatabase(context: Context): WebViewDatabase {
         return WebViewDatabase.getInstance(context)
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideDatabase(context: Context): AppDatabase {
         return Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()

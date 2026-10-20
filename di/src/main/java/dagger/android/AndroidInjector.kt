@@ -25,7 +25,7 @@ import android.content.ContextWrapper
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.findFragment
-import dagger.BindsInstance
+import dev.zacsweers.metro.Provides
 import java.lang.RuntimeException
 
 interface HasDaggerInjector {
@@ -53,7 +53,7 @@ interface AndroidInjector<T> {
          * Creates an {@link AndroidInjector} for {@code instance}. This should be the same instance
          * that will be passed to {@link #inject(Object)}.
          */
-        fun create(@BindsInstance instance: T): SubComponentType
+        fun create(@Provides instance: T): SubComponentType
     }
 
     companion object {

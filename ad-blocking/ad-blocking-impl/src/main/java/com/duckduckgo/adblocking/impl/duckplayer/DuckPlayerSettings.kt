@@ -21,10 +21,10 @@ import android.view.View
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.settings.api.OtherSettingsPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoMap(ActivityScope::class)
 @PriorityKey(200)
 class DuckPlayerSettingsEntry @Inject constructor() : OtherSettingsPlugin {
 

@@ -20,7 +20,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FAQS_URL
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackVpnSubCategory.OTHER
 import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface FeedbackHelpUrlProvider {

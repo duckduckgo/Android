@@ -3,20 +3,19 @@ package com.test
 import androidx.work.ListenableWorker
 import com.duckduckgo.common.utils.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
-import javax.inject.Provider
 import kotlin.Boolean
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 public class TestWorker_WorkerInjectorPlugin @Inject constructor(
-  private val settingsDataStore: Provider<SettingsDataStore>,
-  private val clearDataAction: Provider<ClearDataAction>,
+  private val settingsDataStore: () -> SettingsDataStore,
+  private val clearDataAction: () -> ClearDataAction,
 ) : WorkerInjectorPlugin {
   public override fun inject(worker: ListenableWorker): Boolean {
     if (worker is TestWorker) {
-        worker.settingsDataStore = settingsDataStore.get()
-        worker.clearDataAction = clearDataAction.get()
+        worker.settingsDataStore = settingsDataStore()
+        worker.clearDataAction = clearDataAction()
         return true
     }
     return false

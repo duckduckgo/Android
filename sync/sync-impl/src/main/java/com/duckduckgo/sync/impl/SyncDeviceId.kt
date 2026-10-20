@@ -25,7 +25,7 @@ import com.duckduckgo.sync.api.DeviceSyncState.Type.DESKTOP
 import com.duckduckgo.sync.api.DeviceSyncState.Type.MOBILE
 import com.duckduckgo.sync.api.DeviceSyncState.Type.UNKNOWN
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.util.*
 import javax.inject.Inject
 

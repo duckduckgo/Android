@@ -21,15 +21,16 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.SyncService
 import com.duckduckgo.sync.impl.error.SyncUnavailableRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Response
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = ApiInterceptorPlugin::class,
+    binding = binding<ApiInterceptorPlugin>(),
 )
 class SyncServerUnavailableInterceptor @Inject constructor(
     private val syncUnavailableRepository: SyncUnavailableRepository,

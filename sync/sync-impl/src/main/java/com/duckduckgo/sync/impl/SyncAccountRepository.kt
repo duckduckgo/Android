@@ -49,9 +49,9 @@ import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.duckduckgo.sync.store.*
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.*
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -157,7 +157,7 @@ interface SyncAccountRepository {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @WorkerThread
 class AppSyncAccountRepository @Inject constructor(
     private val connectedDevicesObserver: ConnectedDevicesObserver,

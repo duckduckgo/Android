@@ -40,8 +40,8 @@ import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
 import com.duckduckgo.saved.sites.impl.databinding.ViewFavouritesSettingsItemBinding
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSettingsViewModel.ViewState
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -91,7 +91,7 @@ class FavouritesNewTabSettingView @JvmOverloads constructor(
     }
 }
 
-@ContributesMultibinding(scope = ActivityScope::class)
+@ContributesIntoMap(scope = ActivityScope::class)
 @PriorityKey(NewTabPageSectionSettingsPlugin.FAVOURITES)
 class FavouritesNewTabSectionSettingsPlugin @Inject constructor() : NewTabPageSectionSettingsPlugin {
     override val name = NewTabPageSection.FAVOURITES.name

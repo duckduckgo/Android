@@ -47,7 +47,7 @@ class AuthClientImplTest {
         authService = authService,
         appBuildConfig = appBuildConfig,
         timeProvider = timeProvider,
-        subscriptionsFeature = { subscriptionsFeature },
+        subscriptionsFeature = lazy { subscriptionsFeature },
         dispatchers = coroutinesTestRule.testDispatcherProvider,
     )
 

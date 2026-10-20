@@ -26,11 +26,11 @@ import com.duckduckgo.desktopapppromotion.api.DesktopAppPromotionInteractionHand
 import com.duckduckgo.desktopapppromotion.api.DesktopAppPromotionParams
 import com.duckduckgo.desktopapppromotion.api.DownloadLinkConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SettingsDesktopBrowserPromotionHandler @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val dispatchers: DispatcherProvider,

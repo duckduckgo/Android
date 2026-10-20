@@ -28,9 +28,8 @@ import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.store.SelectedModel
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -87,7 +86,7 @@ interface DuckAiModelManager {
     fun getResolvedReasoningEffort(): String?
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDuckAiModelManager @Inject constructor(
     private val modelsService: DuckAiModelsService,
@@ -243,7 +242,7 @@ class RealDuckAiModelManager @Inject constructor(
     // The picker sublines (model `label`) are only returned on an authenticated request, so the
     // token rides along only while the updated pickers are the ones consuming it.
     private suspend fun authorizationHeader(): String? {
-        if (!duckChatFeature.get().updatedPickers().isEnabled()) return null
+        if (!duckChatFeature.value.updatedPickers().isEnabled()) return null
         return runCatching {
             subscriptions.getAccessToken()?.takeUnless { it.isBlank() }?.let { "Bearer $it" }
         }.getOrElse {
@@ -417,7 +416,7 @@ class RealDuckAiModelManager @Inject constructor(
             .filter { ModelLabel.from(it) == ModelLabel.UNKNOWN }
             .map { it.sanitisedLabel() }
             .distinct()
-            .forEach { duckChatPixels.get().fireUnknownModelLabel(it) }
+            .forEach { duckChatPixels.value.fireUnknownModelLabel(it) }
     }
 
     // The label is a backend-authored id, so keep the pixel to that shape rather than passing
@@ -429,7 +428,7 @@ class RealDuckAiModelManager @Inject constructor(
 
     /** Labelled models lead the list, as the backend marks them as the ones to recommend. */
     private suspend fun List<AIChatModel>.sortLabelledFirst(): List<AIChatModel> {
-        if (!duckChatFeature.get().updatedPickers().isEnabled()) return this
+        if (!duckChatFeature.value.updatedPickers().isEnabled()) return this
         return sortedBy { if (it.label != null) 0 else 1 }
     }
 

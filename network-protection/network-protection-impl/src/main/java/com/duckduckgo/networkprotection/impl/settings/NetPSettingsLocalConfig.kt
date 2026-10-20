@@ -26,8 +26,8 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.networkprotection.impl.di.ProdNetPConfigTogglesDao
 import com.duckduckgo.networkprotection.store.remote_config.NetPConfigToggle
 import com.duckduckgo.networkprotection.store.remote_config.NetPConfigTogglesDao
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -84,7 +84,7 @@ interface NetPSettingsLocalConfig {
 
 @ContributesBinding(AppScope::class)
 @RemoteFeatureStoreNamed(NetPSettingsLocalConfig::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class NetPSettingsLocalConfigStore @Inject constructor(
     @ProdNetPConfigTogglesDao private val togglesDao: NetPConfigTogglesDao,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,

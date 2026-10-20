@@ -1,6 +1,6 @@
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -21,8 +21,5 @@ dependencies {
 }
 
 android {
-    anvil {
-        generateDaggerFactories = true
-    }
     namespace 'com.duckduckgo.contentscopeprivacyfeatures.impl'
 }

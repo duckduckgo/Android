@@ -23,13 +23,13 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.nextsteps.api.NextSteps
 import com.duckduckgo.nextsteps.impl.NextStepsItemsExperimentToggles.Cohorts
 import com.duckduckgo.nextsteps.impl.ui.NextStepsStackedCardsView
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealNextSteps @Inject constructor(
     private val nextStepsItemsFeatureToggles: NextStepsItemsExperimentToggles,
     private val appBuildConfig: AppBuildConfig,

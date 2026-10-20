@@ -19,11 +19,10 @@ package com.duckduckgo.subscriptions.impl.services
 import android.annotation.SuppressLint
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Lazy
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -31,7 +30,7 @@ import java.io.File
 import javax.inject.Named
 import javax.inject.Qualifier
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class SubscriptionNetworkModule {
 
@@ -41,7 +40,7 @@ class SubscriptionNetworkModule {
 
     @Provides
     @SubscriptionCachedClient
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideSubscriptionsCustomCacheHttpClient(
         context: Context,
         @Named("api") okHttpClient: OkHttpClient,
@@ -55,14 +54,14 @@ class SubscriptionNetworkModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @SuppressLint("NoRetrofitCreateMethodCallDetector")
     fun providesSubscriptionsCachedService(
         @Named(value = "api") retrofit: Retrofit,
         @SubscriptionCachedClient customClient: Lazy<OkHttpClient>,
     ): SubscriptionsCachedService {
         val customRetrofit = retrofit.newBuilder()
-            .callFactory { customClient.get().newCall(it) }
+            .callFactory { customClient.value.newCall(it) }
             .build()
 
         return customRetrofit.create(SubscriptionsCachedService::class.java)

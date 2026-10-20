@@ -21,10 +21,10 @@ import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin.Companion.SAVED_SITES_SETTINGS_PRIO_KEY
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoMap(AppScope::class)
 @PriorityKey(SAVED_SITES_SETTINGS_PRIO_KEY)
 class InternalSavedSitesFeature @Inject constructor(private val context: Context) : InternalFeaturePlugin {
     override fun internalFeatureTitle(): String {

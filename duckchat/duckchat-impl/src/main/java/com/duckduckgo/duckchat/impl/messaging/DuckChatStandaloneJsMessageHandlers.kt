@@ -30,9 +30,9 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -44,7 +44,7 @@ interface StandaloneDuckChatStore {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class InMemoryStandaloneStore @Inject constructor() : StandaloneDuckChatStore {
     private val migrationItems = mutableListOf<String>()
 
@@ -63,7 +63,7 @@ class InMemoryStandaloneStore @Inject constructor() : StandaloneDuckChatStore {
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class StoreMigrationDataHandler @Inject constructor(
     private val standaloneDuckChatStore: StandaloneDuckChatStore,
     private val duckAiHostProvider: DuckAiHostProvider,
@@ -104,7 +104,7 @@ class StoreMigrationDataHandler @Inject constructor(
         }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class GetMigrationInfoHandler @Inject constructor(
     private val standaloneDuckChatStore: StandaloneDuckChatStore,
     private val duckAiHostProvider: DuckAiHostProvider,
@@ -138,7 +138,7 @@ class GetMigrationInfoHandler @Inject constructor(
         }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class GetMigrationDataByIndexHandler @Inject constructor(
     private val standaloneDuckChatStore: StandaloneDuckChatStore,
     private val duckAiHostProvider: DuckAiHostProvider,
@@ -177,7 +177,7 @@ class GetMigrationDataByIndexHandler @Inject constructor(
         }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class ClearMigrationDataHandler @Inject constructor(
     private val standaloneDuckChatStore: StandaloneDuckChatStore,
     private val duckAiHostProvider: DuckAiHostProvider,

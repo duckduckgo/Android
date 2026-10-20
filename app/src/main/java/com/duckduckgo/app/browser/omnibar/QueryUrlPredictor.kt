@@ -23,8 +23,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.urlpredictor.Decision
 import com.duckduckgo.urlpredictor.UrlPredictor
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -34,7 +34,7 @@ import javax.inject.Inject
  * Wrapper around the native implementation of [UrlPredictor] to allow unit testing.
  */
 @ContributesBinding(scope = AppScope::class)
-@SingleInstanceIn(scope = AppScope::class)
+@SingleIn(scope = AppScope::class)
 class QueryUrlPredictorImpl @Inject constructor(
     @AppCoroutineScope coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,

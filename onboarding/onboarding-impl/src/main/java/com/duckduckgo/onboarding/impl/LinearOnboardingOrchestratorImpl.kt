@@ -23,8 +23,8 @@ import com.duckduckgo.onboarding.api.LinearOnboardingPlan
 import com.duckduckgo.onboarding.api.LinearOnboardingResult
 import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,7 +49,7 @@ import javax.inject.Inject
  * instead of deadlocking). Root-plan terminal callbacks run before the terminal state is emitted, so anything
  * they write (e.g. AppStage) is visible to listeners routing off Completed / Skipped.
  */
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class LinearOnboardingOrchestratorImpl @Inject constructor() : LinearOnboardingOrchestrator {
 

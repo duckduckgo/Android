@@ -23,10 +23,10 @@ import com.duckduckgo.app.trackerdetection.db.TrackerDetectionDatabase
 import com.duckduckgo.common.utils.extensions.extractETag
 import com.duckduckgo.common.utils.store.BinaryDataStore
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesBinding
 import io.reactivex.Completable
 import logcat.logcat
 import okhttp3.Headers

@@ -34,8 +34,8 @@ import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType
 import com.duckduckgo.pir.impl.store.db.EventType.EMAIL_CONFIRMATION_COMPLETED
 import com.duckduckgo.pir.impl.store.db.EventType.EMAIL_CONFIRMATION_STARTED
 import com.duckduckgo.pir.impl.store.db.PirEventLog
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
@@ -61,7 +61,7 @@ interface PirEmailConfirmationJobsRunner {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealPirEmailConfirmationJobsRunner @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val pirSchedulingRepository: PirSchedulingRepository,

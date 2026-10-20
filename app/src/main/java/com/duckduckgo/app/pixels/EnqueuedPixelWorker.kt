@@ -37,8 +37,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.verifiedinstallation.IsVerifiedPlayStoreInstall
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -47,16 +48,15 @@ import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import javax.inject.Provider
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class EnqueuedPixelWorker @Inject constructor(
     private val workManager: WorkManager,
-    private val pixel: Provider<Pixel>,
+    private val pixel: () -> Pixel,
     private val unsentForgetAllPixelStore: UnsentForgetAllPixelStore,
     private val appReturnPixelSender: AppReturnPixelSender,
     private val webViewVersionProvider: WebViewVersionProvider,
@@ -106,21 +106,21 @@ class EnqueuedPixelWorker @Inject constructor(
         }.toMap()
 
         // app launch pixel
-        pixel.get().fire(
+        pixel().fire(
             pixel = AppPixelName.APP_LAUNCH,
             parameters = paramsMap,
         )
-        pixel.get().fire(
+        pixel().fire(
             pixel = AppPixelName.PRODUCT_TELEMETRY_SURFACE_DAU,
         )
-        pixel.get().fire(
+        pixel().fire(
             pixel = AppPixelName.PRODUCT_TELEMETRY_SURFACE_DAU_DAILY,
             type = Pixel.PixelType.Daily(),
         )
 
         // verified app launch pixel
         if (isVerifiedPlayStoreInstall() && !customTabDetector.isCustomTab()) {
-            pixel.get().fire(
+            pixel().fire(
                 pixel = AppPixelName.APP_LAUNCH_VERIFIED_INSTALL,
                 parameters = paramsMap,
             )
@@ -136,7 +136,7 @@ class EnqueuedPixelWorker @Inject constructor(
             val pendingPixelCounts = unsentForgetAllPixelStore.pendingPixelCountsClearData
             logcat(INFO) { "Found ${pendingPixelCounts.values.sum()} unsent clear data pixels" }
             if (pendingPixelCounts.values.any { it > 0 }) {
-                pixel.get().fire(
+                pixel().fire(
                     AppPixelName.FORGET_ALL_EXECUTED_DAILY,
                     type = Pixel.PixelType.Daily(),
                 )
@@ -145,13 +145,13 @@ class EnqueuedPixelWorker @Inject constructor(
                 if (count <= 0) return@forEach
                 val params = mapOf(Pixel.PixelParameter.BROWSER_MODE to mode.name.lowercase())
                 for (i in 1..count) {
-                    pixel.get().fire(AppPixelName.FORGET_ALL_EXECUTED, params)
+                    pixel().fire(AppPixelName.FORGET_ALL_EXECUTED, params)
                 }
                 val dailyPixel = when (mode) {
                     BrowserMode.REGULAR -> AppPixelName.FORGET_ALL_EXECUTED_REGULAR_DAILY
                     BrowserMode.FIRE -> AppPixelName.FORGET_ALL_EXECUTED_FIRE_DAILY
                 }
-                pixel.get().fire(dailyPixel, type = Pixel.PixelType.Daily())
+                pixel().fire(dailyPixel, type = Pixel.PixelType.Daily())
                 unsentForgetAllPixelStore.resetCount(mode)
             }
         }

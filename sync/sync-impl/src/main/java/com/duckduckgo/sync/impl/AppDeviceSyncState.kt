@@ -20,12 +20,13 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.api.DeviceSyncState.ConnectedDevice
 import com.duckduckgo.sync.api.DeviceSyncState.SyncAccountState
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.binding
 import javax.inject.*
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = DeviceSyncState::class,
+    binding = binding<DeviceSyncState>(),
 )
 class AppDeviceSyncState @Inject constructor(
     private val syncFeatureToggle: SyncFeatureToggle,

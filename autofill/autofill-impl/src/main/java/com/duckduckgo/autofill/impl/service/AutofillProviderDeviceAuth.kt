@@ -23,8 +23,8 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import com.duckduckgo.autofill.impl.deviceauth.AutofillDeviceAuthStore
 import com.duckduckgo.autofill.impl.time.TimeProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.firstOrNull
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
@@ -35,7 +35,7 @@ interface AutofillProviderDeviceAuth {
     suspend fun recordSuccessfulAuthorization()
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAutofillProviderDeviceAuth @Inject constructor(
     private val timeProvider: TimeProvider,

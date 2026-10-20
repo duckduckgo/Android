@@ -14,29 +14,24 @@ import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 import kotlin.Boolean
+import kotlin.Lazy
 import kotlin.String
 import kotlin.Unit
 import kotlin.collections.List
 import okio.Buffer
 
-@ContributesMultibinding(
-  scope = AppScope::class,
-  boundType = PrivacyFeaturePlugin::class,
-  ignoreQualifier = true,
-)
 @ContributesBinding(
   scope = AppScope::class,
-  boundType = Toggle.Store::class,
+  binding = binding<Toggle.Store>(),
 )
 @RemoteFeatureStoreNamed(value = TestFeature::class)
-@SingleInstanceIn(scope = AppScope::class)
+@SingleIn(scope = AppScope::class)
 public class TestFeature_RemoteFeature @Inject constructor(
   @RemoteFeatureStoreNamed(value = TestFeature::class)
   private val settingsStore: FeatureSettings.Store,
@@ -56,7 +51,7 @@ public class TestFeature_RemoteFeature @Inject constructor(
   public override fun hash(): String? {
     try {
         // try to hash with all sub-features
-        val concatMethodNames = this.feature.get().javaClass
+        val concatMethodNames = this.feature.value.javaClass
             .declaredMethods
             .map { it.name }
             .sorted()
@@ -85,7 +80,7 @@ public class TestFeature_RemoteFeature @Inject constructor(
 
         val isEnabled = (feature.state == "enabled") || (appBuildConfig.flavor ==
         BuildFlavor.INTERNAL && feature.state == "internal")
-        this.feature.get().invokeMethod("self").setRawStoredState(
+        this.feature.value.invokeMethod("self").setRawStoredState(
             Toggle.State(
                 remoteEnableState = isEnabled,
                 enable = isEnabled,
@@ -105,11 +100,11 @@ public class TestFeature_RemoteFeature @Inject constructor(
                 // sub-feature and continue with the rest of them
                 try {
                     val previousState =
-        this.feature.get().invokeMethod(subfeature.key).getRawStoredState()
+        this.feature.value.invokeMethod(subfeature.key).getRawStoredState()
                     // we try to honour the previous state
                     // else we resort to compute it using isEnabled()
                     val previousStateValue = previousState?.enable ?:
-        this.feature.get().invokeMethod(subfeature.key).isEnabled()
+        this.feature.value.invokeMethod(subfeature.key).isEnabled()
 
                     val previousRolloutThreshold = previousState?.rolloutThreshold
                     val previousAssignedCohort = previousState?.assignedCohort
@@ -134,7 +129,7 @@ public class TestFeature_RemoteFeature @Inject constructor(
                     } ?: emptyList()
                     val settings = jsonToggle?.settings?.toString()
                     val subFeatureExceptions = parseExceptions(jsonToggle.exceptions)
-                    this.feature.get().invokeMethod(subfeature.key).setRawStoredState(
+                    this.feature.value.invokeMethod(subfeature.key).setRawStoredState(
                         Toggle.State(
                             remoteEnableState = newStateValue,
                             enable = previousStateValue,

@@ -19,7 +19,7 @@ package com.duckduckgo.sync.impl
 import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority
 import logcat.LogPriority.WARN
 import logcat.logcat

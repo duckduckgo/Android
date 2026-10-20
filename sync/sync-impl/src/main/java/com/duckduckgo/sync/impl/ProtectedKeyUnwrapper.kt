@@ -24,8 +24,8 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 /**
@@ -41,7 +41,7 @@ interface ProtectedKeyUnwrapper {
     fun unwrap(entry: ProtectedKeyEntry): Result<ByteArray>
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealProtectedKeyUnwrapper @Inject constructor(
     private val syncStore: SyncStore,

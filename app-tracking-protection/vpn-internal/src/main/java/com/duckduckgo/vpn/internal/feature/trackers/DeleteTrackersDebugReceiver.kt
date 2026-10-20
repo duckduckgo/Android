@@ -25,7 +25,7 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.vpn.internal.feature.InternalFeatureReceiver
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -51,7 +51,7 @@ class DeleteTrackersDebugReceiver(
     }
 }
 
-@ContributesMultibinding(VpnScope::class)
+@ContributesIntoSet(VpnScope::class)
 class DeleteTrackersDebugReceiverRegister @Inject constructor(
     private val context: Context,
     private val appTrackerBlockingRepository: AppTrackerBlockingStatsRepository,

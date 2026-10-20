@@ -43,7 +43,7 @@ class RealDuckChatContextualTest {
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val contextualEntryPromptStore = RealContextualEntryPromptStore()
     private val globalActivityStarter: GlobalActivityStarter = mock()
-    private val textSelectionRepository = RealTextSelectionRepository(dagger.Lazy { duckChatPixels }, mock())
+    private val textSelectionRepository = RealTextSelectionRepository(lazy { duckChatPixels }, mock())
     private val anchor: View = mock()
 
     private val testee = RealDuckChatContextual(

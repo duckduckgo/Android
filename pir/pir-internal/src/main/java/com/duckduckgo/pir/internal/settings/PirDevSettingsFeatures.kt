@@ -25,12 +25,12 @@ import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.internal.R
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoMap(AppScope::class)
 @PriorityKey(InternalFeaturePlugin.PIR_SETTINGS_PRIO_KEY)
 class PirDevSettingsFeatures @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,

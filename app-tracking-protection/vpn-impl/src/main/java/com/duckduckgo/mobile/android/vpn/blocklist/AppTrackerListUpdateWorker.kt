@@ -32,7 +32,8 @@ import com.duckduckgo.mobile.android.vpn.di.AppTpBlocklistUpdateMutex
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -122,9 +123,9 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
     }
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class AppTrackerListUpdateWorkerScheduler @Inject constructor(
     private val workManager: WorkManager,

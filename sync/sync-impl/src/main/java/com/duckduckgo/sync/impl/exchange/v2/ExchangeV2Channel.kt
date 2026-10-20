@@ -21,7 +21,7 @@ import com.duckduckgo.sync.impl.ExchangeEnvelope
 import com.duckduckgo.sync.impl.ExchangeMessageEntry
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

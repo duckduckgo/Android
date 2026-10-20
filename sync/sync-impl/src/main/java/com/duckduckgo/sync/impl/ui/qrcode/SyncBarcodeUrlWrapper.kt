@@ -19,7 +19,7 @@ package com.duckduckgo.sync.impl.ui.qrcode
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.SyncDeviceIds
 import com.duckduckgo.sync.impl.applyUrlSafetyFromB64
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.logcat

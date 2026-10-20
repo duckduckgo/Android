@@ -18,7 +18,8 @@ package com.duckduckgo.sync.impl
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
 interface SyncBuildConfig : AppBuildConfig {
@@ -28,7 +29,7 @@ interface SyncBuildConfig : AppBuildConfig {
     val isAuthRequired: Boolean
 }
 
-@ContributesBinding(AppScope::class, boundType = SyncBuildConfig::class)
+@ContributesBinding(AppScope::class, binding = binding<SyncBuildConfig>())
 class RealSyncBuildConfig @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
 ) : SyncBuildConfig, AppBuildConfig by appBuildConfig {

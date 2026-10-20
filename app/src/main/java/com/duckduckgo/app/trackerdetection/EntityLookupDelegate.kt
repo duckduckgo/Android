@@ -20,22 +20,22 @@ import android.net.Uri
 import com.duckduckgo.app.trackerdetection.flags.CachedEntityLookupRCWrapper
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
-import javax.inject.Provider
 
-@ContributesBinding(AppScope::class, boundType = EntityLookup::class)
-@ContributesBinding(AppScope::class, boundType = EntityLookupRefresher::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<EntityLookup>())
+@ContributesBinding(AppScope::class, binding = binding<EntityLookupRefresher>())
+@SingleIn(AppScope::class)
 class EntityLookupDelegate @Inject constructor(
-    private val legacy: Provider<TdsEntityLookup>,
-    private val cached: Provider<CachedTdsEntityLookup>,
+    private val legacy: () -> TdsEntityLookup,
+    private val cached: () -> CachedTdsEntityLookup,
     private val flag: CachedEntityLookupRCWrapper,
 ) : EntityLookup, EntityLookupRefresher {
 
     private val active: EntityLookupWithRefresh by lazy {
-        if (flag.enabled) cached.get() else legacy.get()
+        if (flag.enabled) cached() else legacy()
     }
 
     override fun entityForUrl(url: String): Entity? = active.entityForUrl(url)

@@ -31,10 +31,10 @@ import com.duckduckgo.remote.messaging.api.JsonActionType.SHARE
 import com.duckduckgo.remote.messaging.api.JsonActionType.URL
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
 import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.*
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     AppScope::class,
 )
 class UrlActionMapper @Inject constructor() : MessageActionMapperPlugin {
@@ -47,7 +47,7 @@ class UrlActionMapper @Inject constructor() : MessageActionMapperPlugin {
     }
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     AppScope::class,
 )
 class UrlInContextActionMapper @Inject constructor() : MessageActionMapperPlugin {
@@ -60,7 +60,7 @@ class UrlInContextActionMapper @Inject constructor() : MessageActionMapperPlugin
     }
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     AppScope::class,
 )
 class DismissActionMapper @Inject constructor() : MessageActionMapperPlugin {
@@ -73,7 +73,7 @@ class DismissActionMapper @Inject constructor() : MessageActionMapperPlugin {
     }
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     AppScope::class,
 )
 class PlayStoreActionMapper @Inject constructor() : MessageActionMapperPlugin {
@@ -86,7 +86,7 @@ class PlayStoreActionMapper @Inject constructor() : MessageActionMapperPlugin {
     }
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     AppScope::class,
 )
 class DefaultBrowserActionMapper @Inject constructor() : MessageActionMapperPlugin {
@@ -99,7 +99,7 @@ class DefaultBrowserActionMapper @Inject constructor() : MessageActionMapperPlug
     }
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     AppScope::class,
 )
 class ShareActionMapper @Inject constructor() : MessageActionMapperPlugin {
@@ -112,7 +112,7 @@ class ShareActionMapper @Inject constructor() : MessageActionMapperPlugin {
     }
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     AppScope::class,
 )
 class NavigationActionMapper @Inject constructor(
@@ -130,7 +130,7 @@ class NavigationActionMapper @Inject constructor(
     }
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     AppScope::class,
 )
 class DefaultCredentialProviderActionMapper @Inject constructor() : MessageActionMapperPlugin {

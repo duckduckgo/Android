@@ -4,8 +4,8 @@ import com.duckduckgo.data.store.api.DatabaseExecutor
 import com.duckduckgo.data.store.api.DatabaseExecutor.Custom
 import com.duckduckgo.data.store.api.DatabaseExecutor.Default
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -18,7 +18,7 @@ interface DatabaseExecutorProvider {
     fun createTransactionExecutor(executor: DatabaseExecutor): Executor?
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDatabaseExecutorProvider @Inject constructor(
     databaseProviderFeature: DatabaseProviderFeature,

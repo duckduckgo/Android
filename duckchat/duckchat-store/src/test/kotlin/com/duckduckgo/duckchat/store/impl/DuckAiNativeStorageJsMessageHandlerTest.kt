@@ -32,7 +32,6 @@ import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingsDao
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
-import dagger.Lazy
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -67,7 +66,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
         whenever(it.getHost()).thenReturn("duck.ai")
     }
     private fun storageProviderFor(filesDir: java.io.File): BrowserModeDataProvider<DuckAiBridgeStorage> {
-        val storage = RealDuckAiBridgeStorage(settings = settingsDao, chats = chatsDao, fileMeta = fileMetaDao, filesDirLazy = Lazy { filesDir })
+        val storage = RealDuckAiBridgeStorage(settings = settingsDao, chats = chatsDao, fileMeta = fileMetaDao, filesDirLazy = lazy { filesDir })
         return mock<BrowserModeDataProvider<DuckAiBridgeStorage>>().also { whenever(it.forMode(any())).thenReturn(storage) }
     }
     private val handlerPlugin by lazy {

@@ -26,10 +26,10 @@ import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.BackPressed
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.StepFinished
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class SubscriptionOnboardingPlanProvider @Inject constructor(
     private val stepPlugins: PluginPoint<SubscriptionOnboardingStepPlugin>,
     private val onboardingStore: SubscriptionOnboardingStore,

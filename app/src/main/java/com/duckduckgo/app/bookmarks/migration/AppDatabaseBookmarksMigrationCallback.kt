@@ -27,7 +27,6 @@ import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import com.duckduckgo.savedsites.store.EntityType.FOLDER
 import com.duckduckgo.savedsites.store.Relation
-import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asExecutor
 import java.util.UUID
@@ -77,7 +76,7 @@ class AppDatabaseBookmarksMigrationCallback(
     private fun detachRootFoldersFromBookmarksRoot() {
         // users that received a payload from a FFS version could have attached root folders to bookmarks_root
         // this fixes that state if it happened
-        with(appDatabase.get()) {
+        with(appDatabase.value) {
             syncRelationsDao().deleteRelationByEntity(SavedSitesNames.FAVORITES_ROOT)
             syncRelationsDao().deleteRelationByEntity(SavedSitesNames.FAVORITES_MOBILE_ROOT)
             syncRelationsDao().deleteRelationByEntity(SavedSitesNames.FAVORITES_DESKTOP_ROOT)
@@ -85,7 +84,7 @@ class AppDatabaseBookmarksMigrationCallback(
     }
 
     private fun addRootFolders() {
-        with(appDatabase.get()) {
+        with(appDatabase.value) {
             if (syncEntitiesDao().entityById(SavedSitesNames.BOOKMARKS_ROOT) == null) {
                 syncEntitiesDao().insert(Entity(SavedSitesNames.BOOKMARKS_ROOT, SavedSitesNames.BOOKMARKS_NAME, "", FOLDER, lastModified = null))
             }
@@ -97,7 +96,7 @@ class AppDatabaseBookmarksMigrationCallback(
 
     private fun createFavoritesFormFactorFolders(): Boolean {
         var foldersAdded = false
-        with(appDatabase.get()) {
+        with(appDatabase.value) {
             if (syncEntitiesDao().entityById(SavedSitesNames.FAVORITES_MOBILE_ROOT) == null) {
                 syncEntitiesDao().insert(
                     Entity(SavedSitesNames.FAVORITES_MOBILE_ROOT, SavedSitesNames.FAVORITES_MOBILE_NAME, "", FOLDER, lastModified = null),
@@ -115,13 +114,13 @@ class AppDatabaseBookmarksMigrationCallback(
     }
 
     private fun needsMigration(): Boolean {
-        with(appDatabase.get()) {
+        with(appDatabase.value) {
             return (favoritesDao().userHasFavorites() || bookmarksDao().bookmarksCount() > 0)
         }
     }
 
     private fun needsFormFactorFavoritesMigration(): Boolean {
-        with(appDatabase.get()) {
+        with(appDatabase.value) {
             return syncEntitiesDao().allEntitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT) != syncEntitiesDao().allEntitiesInFolderSync(
                 SavedSitesNames.FAVORITES_MOBILE_ROOT,
             )
@@ -129,7 +128,7 @@ class AppDatabaseBookmarksMigrationCallback(
     }
 
     private fun migrateFavorites() {
-        with(appDatabase.get()) {
+        with(appDatabase.value) {
             val favouriteMigration = mutableListOf<Relation>()
             val entitiesMigration = mutableListOf<Entity>()
 
@@ -153,7 +152,7 @@ class AppDatabaseBookmarksMigrationCallback(
     }
 
     private fun migrateFavoritesToFormFactorFolders() {
-        with(appDatabase.get()) {
+        with(appDatabase.value) {
             val favouriteMigration = mutableListOf<Relation>()
             val entitiesMigration = mutableListOf<Entity>()
             val rootFavorites = syncEntitiesDao().allEntitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT)
@@ -175,7 +174,7 @@ class AppDatabaseBookmarksMigrationCallback(
     }
 
     private fun migrateBookmarks() {
-        with(appDatabase.get()) {
+        with(appDatabase.value) {
             if (bookmarksDao().bookmarksCount() > 0) {
                 // generate Ids for all folders
                 val bookmarkFolders = bookmarkFoldersDao().getBookmarkFoldersSync()
@@ -199,7 +198,7 @@ class AppDatabaseBookmarksMigrationCallback(
         // https://app.asana.com/0/0/1204697337057464/f
         // during the initial migration of favourites we didn't properly add them to bookmarks
         // users might have fixed this, so we only do something if there is a favourite that is not in the bookmarks folder
-        with(appDatabase.get()) {
+        with(appDatabase.value) {
             val favourites = syncEntitiesDao().allEntitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT)
             val bookmarks = syncEntitiesDao().allBookmarks()
             return favourites.filterNot { rootFavorite ->
@@ -209,7 +208,7 @@ class AppDatabaseBookmarksMigrationCallback(
     }
 
     private fun runOldFavouritesMigration(favourites: List<Entity>) {
-        with(appDatabase.get()) {
+        with(appDatabase.value) {
             val favouriteMigration = mutableListOf<Relation>()
             favourites.forEach {
                 favouriteMigration.add(Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = it.entityId))
@@ -222,7 +221,7 @@ class AppDatabaseBookmarksMigrationCallback(
         parentId: Long,
         folderMap: MutableMap<Long, String>,
     ) {
-        with(appDatabase.get()) {
+        with(appDatabase.value) {
             val entities = mutableListOf<Entity>()
             val relations = mutableListOf<Relation>()
             val foldersInFolder = bookmarkFoldersDao().getBookmarkFoldersByParentIdSync(parentId)
@@ -261,7 +260,7 @@ class AppDatabaseBookmarksMigrationCallback(
     }
 
     private fun cleanUpTables() {
-        with(appDatabase.get()) {
+        with(appDatabase.value) {
             favoritesDao().deleteAll()
             bookmarksDao().deleteAll()
             bookmarkFoldersDao().deleteAll()

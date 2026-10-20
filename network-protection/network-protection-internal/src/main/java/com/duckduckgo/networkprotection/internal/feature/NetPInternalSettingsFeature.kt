@@ -20,10 +20,10 @@ import android.content.Context
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoMap(AppScope::class)
 @PriorityKey(InternalFeaturePlugin.VPN_SETTINGS_PRIO_KEY)
 class NetPInternalSettingsFeature @Inject constructor() : InternalFeaturePlugin {
     override fun internalFeatureTitle(): String {

@@ -18,7 +18,7 @@ package com.duckduckgo.savedsites.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface RelationsReconciler {

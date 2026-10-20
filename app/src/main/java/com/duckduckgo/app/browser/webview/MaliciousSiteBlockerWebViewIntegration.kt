@@ -40,8 +40,9 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Malici
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Malicious
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Safe
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -92,8 +93,8 @@ class RealExemptedUrlsHolder @Inject constructor() : ExemptedUrlsHolder {
     }
 }
 
-@ContributesMultibinding(AppScope::class, PrivacyConfigCallbackPlugin::class)
-@ContributesBinding(AppScope::class, MaliciousSiteBlockerWebViewIntegration::class)
+@ContributesIntoSet(AppScope::class, binding = binding<PrivacyConfigCallbackPlugin>())
+@ContributesBinding(AppScope::class, binding = binding<MaliciousSiteBlockerWebViewIntegration>())
 class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     private val maliciousSiteProtection: MaliciousSiteProtection,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,

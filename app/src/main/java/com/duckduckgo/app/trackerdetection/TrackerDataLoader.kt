@@ -34,8 +34,9 @@ import com.duckduckgo.app.trackerdetection.db.TrackerDetectionDatabase
 import com.duckduckgo.app.trackerdetection.model.TdsMetadata
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -44,13 +45,13 @@ import okio.source
 import javax.inject.Inject
 
 @WorkerThread
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = PirProcessLifecycleObserver::class,
+    binding = binding<PirProcessLifecycleObserver>(),
 )
 class TrackerDataLoader @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,

@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -44,9 +44,6 @@ dependencies {
 }
 
 android {
-    anvil {
-        generateDaggerFactories = true
-    }
     testOptions {
         unitTests {
             includeAndroidResources = true

@@ -17,7 +17,7 @@
 plugins {
     id 'com.android.library'
     id 'com.google.devtools.ksp'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'androidx.room'
 }
 
@@ -94,9 +94,6 @@ dependencies {
 android {
     sourceSets {
         test.assets.srcDirs += files("$projectDir/schemas")
-    }
-    anvil {
-        generateDaggerFactories = true // default is false
     }
     lintOptions {
         baseline file("lint-baseline.xml")

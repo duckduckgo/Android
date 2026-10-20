@@ -33,7 +33,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.R
 import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewActivity
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface PirNotificationManager {

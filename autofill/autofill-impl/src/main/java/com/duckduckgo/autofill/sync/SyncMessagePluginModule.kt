@@ -18,16 +18,16 @@ package com.duckduckgo.autofill.sync
 
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.api.SyncMessagePlugin
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Binds
-import dagger.Module
-import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.Binds
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.IntoSet
 
 /**
  * This module provides the [SyncMessagePlugin]s that are used by the Sync feature.
  * Anvil produces a runtime error, so we have to use a workaround to make it work.
  */
-@Module
+@BindingContainer
 @ContributesTo(ActivityScope::class)
 abstract class SyncMessagePluginModule {
     @Binds @IntoSet

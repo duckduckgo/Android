@@ -25,7 +25,7 @@ import com.duckduckgo.sync.store.model.SyncApiErrorType.OBJECT_LIMIT_EXCEEDED
 import com.duckduckgo.sync.store.model.SyncApiErrorType.REQUEST_SIZE_LIMIT_EXCEEDED
 import com.duckduckgo.sync.store.model.SyncApiErrorType.TOO_MANY_REQUESTS
 import com.duckduckgo.sync.store.model.SyncApiErrorType.VALIDATION_ERROR
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
 

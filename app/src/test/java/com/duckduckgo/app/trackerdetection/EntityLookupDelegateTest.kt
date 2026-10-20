@@ -27,7 +27,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import javax.inject.Provider
 
 @RunWith(AndroidJUnit4::class)
 class EntityLookupDelegateTest {
@@ -36,8 +35,8 @@ class EntityLookupDelegateTest {
     private val mockCached: CachedTdsEntityLookup = mock()
 
     private fun delegateWithFlag(enabled: Boolean) = EntityLookupDelegate(
-        legacy = Provider { mockLegacy },
-        cached = Provider { mockCached },
+        legacy = { mockLegacy },
+        cached = { mockCached },
         flag = object : CachedEntityLookupRCWrapper {
             override val enabled: Boolean = enabled
         },
@@ -70,8 +69,8 @@ class EntityLookupDelegateTest {
             override val enabled: Boolean get() = enabled
         }
         val testee = EntityLookupDelegate(
-            legacy = Provider { mockLegacy },
-            cached = Provider { mockCached },
+            legacy = { mockLegacy },
+            cached = { mockCached },
             flag = flag,
         )
 

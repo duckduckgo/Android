@@ -29,7 +29,8 @@ import com.duckduckgo.daxprompts.impl.pixels.DaxPromptBrowserComparisonPixelName
 import com.duckduckgo.daxprompts.impl.pixels.DaxPromptBrowserComparisonPixelName.WIN_BACK_PROMPT_PRIMARY_BUTTON_CLICKED
 import com.duckduckgo.daxprompts.impl.pixels.DaxPromptBrowserComparisonPixelName.WIN_BACK_PROMPT_SHOWN
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 
 enum class DaxPromptBrowserComparisonPixelName(override val pixelName: String) : Pixel.PixelName {
     REACTIVATE_USERS_BROWSER_COMPARISON_PROMPT_SHOWN("m_reactivate_users_browser_comparison_prompt_shown"),
@@ -52,9 +53,9 @@ object DaxPromptBrowserComparisonPixelParameter {
     const val PARAM_VALUE_SYSTEM_DIALOG_DISMISSED = "system_dialog_dismissed"
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = PixelParamRemovalPlugin::class,
+    binding = binding<PixelParamRemovalPlugin>(),
 )
 object DaxPromptBrowserComparisonPixelParamRemoval : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {

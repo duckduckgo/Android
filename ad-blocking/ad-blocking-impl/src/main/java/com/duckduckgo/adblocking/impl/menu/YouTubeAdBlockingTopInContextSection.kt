@@ -22,10 +22,10 @@ import android.view.View
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.browser.menu.TopInContextSection
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoMap(AppScope::class)
 @PriorityKey(100)
 class YouTubeAdBlockingTopInContextSection @Inject constructor() : TopInContextSection {
     override fun getView(url: Uri, context: Context, onClick: () -> Unit): View =

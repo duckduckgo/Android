@@ -45,13 +45,13 @@ import com.duckduckgo.remote.messaging.store.RemoteMessagingCohortStoreImpl
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import com.duckduckgo.remote.messaging.store.RemoteMessagingDatabase
 import com.duckduckgo.remote.messaging.store.RemoteMessagingDatabase.Companion.ALL_MIGRATIONS
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
-import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.IntoSet
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object DomainModule {
 
@@ -64,7 +64,7 @@ object DomainModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideImagePrefetcher(
         context: Context,
         dispatcherProvider: DispatcherProvider,
@@ -73,12 +73,12 @@ object DomainModule {
     }
 }
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object DataSourceModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providesRemoteMessagingConfigProcessor(
         remoteMessagingConfigJsonMapper: RemoteMessagingConfigJsonMapper,
         remoteMessagingConfigRepository: RemoteMessagingConfigRepository,
@@ -117,7 +117,7 @@ object DataSourceModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providesRemoteMessagesDao(
         remoteMessagingDatabase: RemoteMessagingDatabase,
     ): RemoteMessagesDao {
@@ -125,7 +125,7 @@ object DataSourceModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providesRemoteMessagingConfigJsonMapper(
         matchingAttributeMappers: DaggerSet<JsonToMatchingAttributeMapper>,
         actionMappers: DaggerSet<MessageActionMapperPlugin>,
@@ -136,7 +136,7 @@ object DataSourceModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providesRemoteMessagingConfigMatcher(
         matchers: DaggerSet<AttributeMatcherPlugin>,
         remoteMessagingRepository: RemoteMessagingRepository,
@@ -177,7 +177,7 @@ object DataSourceModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providesRemoteMessagingDatabase(context: Context): RemoteMessagingDatabase {
         return Room.databaseBuilder(context, RemoteMessagingDatabase::class.java, "remote_messaging.db")
             .fallbackToDestructiveMigration()
@@ -186,7 +186,7 @@ object DataSourceModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providesRemoteMessagingUserDataStore(database: RemoteMessagingDatabase, dispatchers: DispatcherProvider): RemoteMessagingCohortStore {
         return RemoteMessagingCohortStoreImpl(database, dispatchers)
     }

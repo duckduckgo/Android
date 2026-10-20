@@ -24,12 +24,12 @@ import com.duckduckgo.common.utils.device.ContextDeviceInfo
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object StatisticsModule {
 
@@ -41,7 +41,7 @@ object StatisticsModule {
     @Provides
     fun deviceInfo(context: Context): DeviceInfo = ContextDeviceInfo(context)
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun pixelDao(database: AppDatabase): PendingPixelDao {
         return database.pixelDao()

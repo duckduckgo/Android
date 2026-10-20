@@ -20,11 +20,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.common.utils.plugins.view_model.FragmentViewModelFactoryPluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
-@SingleInstanceIn(FragmentScope::class)
+@SingleIn(FragmentScope::class)
 @ContributesBinding(FragmentScope::class)
 class FragmentViewModelFactory @Inject constructor(
     private val viewModelFactoryPluginPoint: FragmentViewModelFactoryPluginPoint,
