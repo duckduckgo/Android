@@ -18,8 +18,13 @@ package com.duckduckgo.common.ui.compose.onboarding
 
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 object DaxOnboardingDialogDefaults {
     val StrokeWidth: Dp = 1.5.dp
     val TailBandHeight: Dp = DaxSpeechBubbleShape.TailHeight + StrokeWidth
+
+    internal val TypingCadence: Duration = 20.milliseconds
+    internal val TypingSettle: Duration = 20.milliseconds
 }
