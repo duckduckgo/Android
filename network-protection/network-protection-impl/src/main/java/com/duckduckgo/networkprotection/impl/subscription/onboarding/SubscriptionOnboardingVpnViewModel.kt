@@ -119,7 +119,6 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
                     }
                     DISCONNECTED -> if (!hasConnected) {
                         viewState.update {
-                            // Falling back to disconnected while activation was in progress means the VPN failed to start.
                             it.copy(
                                 vpnEnabled = false,
                                 activating = false,

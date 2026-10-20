@@ -25,7 +25,6 @@ import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-/** VPN step of the subscription onboarding, contributed from `network-protection-impl`. */
 @ContributesMultibinding(AppScope::class)
 @PriorityKey(200)
 class SubscriptionOnboardingVpnStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {

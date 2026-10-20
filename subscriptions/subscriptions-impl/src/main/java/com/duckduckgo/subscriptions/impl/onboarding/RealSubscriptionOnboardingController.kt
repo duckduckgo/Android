@@ -27,10 +27,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import javax.inject.Inject
 
-/**
- * Relays step events to the host. AppScope so steps and the retained host ViewModel share one instance across
- * configuration changes. SharedFlow with no replay: buffered, not delivered to later runs.
- */
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealSubscriptionOnboardingController @Inject constructor() : SubscriptionOnboardingController {

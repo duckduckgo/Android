@@ -26,7 +26,6 @@ import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-/** Duck.ai step of the subscription onboarding, contributed from `duckchat-impl`. */
 @ContributesMultibinding(AppScope::class)
 @PriorityKey(300)
 class SubscriptionOnboardingDuckAiStepPlugin @Inject constructor(
