@@ -72,8 +72,6 @@ import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
-import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemContent
-import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemRenderer
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -100,7 +98,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -109,7 +106,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doSuspendableAnswer
@@ -184,7 +180,6 @@ class TabSwitcherViewModelTest {
 
     private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
     private val tabManagerFeatureFlags = FakeFeatureToggleFactory.create(TabManagerFeatureFlags::class.java)
-    private val mockDuckAiTabGridItemRenderer: DuckAiTabGridItemRenderer = mock()
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
 
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
@@ -269,7 +264,6 @@ class TabSwitcherViewModelTest {
             fireTabsPromos,
             remoteMessageModel,
             tabManagerFeatureFlags,
-            mockDuckAiTabGridItemRenderer,
         )
     }
 
@@ -2374,7 +2368,6 @@ class TabSwitcherViewModelTest {
             fireTabsPromos,
             remoteMessageModel,
             tabManagerFeatureFlags,
-            mockDuckAiTabGridItemRenderer,
         )
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             isolatedViewModel.viewState.collect()
@@ -2422,7 +2415,6 @@ class TabSwitcherViewModelTest {
             fireTabsPromos,
             remoteMessageModel,
             tabManagerFeatureFlags,
-            mockDuckAiTabGridItemRenderer,
         )
 
         assertFalse(isolatedViewModel.viewState.value.isBrowserModeToggleVisible)
@@ -2499,7 +2491,6 @@ class TabSwitcherViewModelTest {
             fireTabsPromos,
             remoteMessageModel,
             tabManagerFeatureFlags,
-            mockDuckAiTabGridItemRenderer,
         )
 
         isolatedViewModel.onBrowserModeToggled(BrowserMode.FIRE, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)
@@ -2660,77 +2651,51 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenRichDuckAiCardFlagDisabledThenDuckAiTabHasNoContentAndRendererNotCalled() = runTest {
+    fun whenRichDuckAiCardFlagDisabledThenDuckAiTabIsNotRichCard() = runTest {
         val items = loadItemsWithDuckAiTab()
 
-        assertNull(items.filterIsInstance<DuckAiTab>().single().duckAiGridItemContent)
-        verify(mockDuckAiTabGridItemRenderer, never()).resolve(any(), anyOrNull(), any())
+        assertFalse(items.filterIsInstance<DuckAiTab>().single().isRichDuckAiCard)
     }
 
     @Test
-    fun whenRichDuckAiCardFlagEnabledAndContentResolvedThenDuckAiTabCarriesContent() = runTest {
+    fun whenRichDuckAiCardFlagEnabledInGridThenDuckAiTabIsRichCard() = runTest {
         tabManagerFeatureFlags.richDuckAiGridTabItem().setRawStoredState(State(enable = true))
-        val content = TestDuckAiTabGridItemContent("content")
-        whenever(mockDuckAiTabGridItemRenderer.resolve(DUCK_AI_TAB_ID, DUCK_AI_URL, BrowserMode.REGULAR)).thenReturn(content)
 
         val items = loadItemsWithDuckAiTab()
 
-        assertEquals(content, items.filterIsInstance<DuckAiTab>().single().duckAiGridItemContent)
+        assertTrue(items.filterIsInstance<DuckAiTab>().single().isRichDuckAiCard)
+        assertFalse(items.filterIsInstance<NormalTab>().single().isRichDuckAiCard)
     }
 
     @Test
-    fun whenRichDuckAiCardFlagEnabledAndNoContentResolvedThenDuckAiTabFallsBackToExistingCard() = runTest {
+    fun whenRichDuckAiCardFlagEnabledInSelectionModeThenOnlySelectableDuckAiTabIsRichCard() = runTest {
         tabManagerFeatureFlags.richDuckAiGridTabItem().setRawStoredState(State(enable = true))
-        whenever(mockDuckAiTabGridItemRenderer.resolve(any(), anyOrNull(), any())).thenReturn(null)
-
-        val items = loadItemsWithDuckAiTab()
-
-        assertNull(items.filterIsInstance<DuckAiTab>().single().duckAiGridItemContent)
-    }
-
-    @Test
-    fun whenRichDuckAiCardFlagEnabledThenOnlyDuckAiTabsAreResolved() = runTest {
-        tabManagerFeatureFlags.richDuckAiGridTabItem().setRawStoredState(State(enable = true))
-
-        loadItemsWithDuckAiTab()
-
-        verify(mockDuckAiTabGridItemRenderer).resolve(DUCK_AI_TAB_ID, DUCK_AI_URL, BrowserMode.REGULAR)
-        verify(mockDuckAiTabGridItemRenderer, never()).resolve(eq("web"), anyOrNull(), any())
-    }
-
-    @Test
-    fun whenRichDuckAiCardFlagEnabledInSelectionModeThenSelectableDuckAiTabCarriesContent() = runTest {
-        tabManagerFeatureFlags.richDuckAiGridTabItem().setRawStoredState(State(enable = true))
-        val content = TestDuckAiTabGridItemContent("content")
-        whenever(mockDuckAiTabGridItemRenderer.resolve(DUCK_AI_TAB_ID, DUCK_AI_URL, BrowserMode.REGULAR)).thenReturn(content)
 
         val items = loadItemsWithDuckAiTab(selectionMode = true).filterIsInstance<SelectableTab>()
 
         val duckAiTab = items.single { it.id == DUCK_AI_TAB_ID }
         assertTrue(duckAiTab.isDuckAi)
-        assertEquals(content, duckAiTab.duckAiGridItemContent)
-        assertNull(items.single { it.id == "web" }.duckAiGridItemContent)
+        assertTrue(duckAiTab.isRichDuckAiCard)
+        assertFalse(items.single { it.id == "web" }.isRichDuckAiCard)
     }
 
     @Test
-    fun whenRichDuckAiCardFlagDisabledInSelectionModeThenSelectableDuckAiTabHasNoContent() = runTest {
+    fun whenRichDuckAiCardFlagDisabledInSelectionModeThenSelectableDuckAiTabIsNotRichCard() = runTest {
         val items = loadItemsWithDuckAiTab(selectionMode = true).filterIsInstance<SelectableTab>()
 
         val duckAiTab = items.single { it.id == DUCK_AI_TAB_ID }
         assertTrue(duckAiTab.isDuckAi)
-        assertNull(duckAiTab.duckAiGridItemContent)
-        verify(mockDuckAiTabGridItemRenderer, never()).resolve(any(), anyOrNull(), any())
+        assertFalse(duckAiTab.isRichDuckAiCard)
     }
 
     @Test
-    fun whenRichDuckAiCardFlagEnabledInListLayoutThenRendererNotCalled() = runTest {
+    fun whenRichDuckAiCardFlagEnabledInListLayoutThenDuckAiTabIsNotRichCard() = runTest {
         tabManagerFeatureFlags.richDuckAiGridTabItem().setRawStoredState(State(enable = true))
         whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(TabSwitcherData(NEW, LIST)))
 
         val items = loadItemsWithDuckAiTab()
 
-        assertNull(items.filterIsInstance<DuckAiTab>().single().duckAiGridItemContent)
-        verify(mockDuckAiTabGridItemRenderer, never()).resolve(any(), anyOrNull(), any())
+        assertFalse(items.filterIsInstance<DuckAiTab>().single().isRichDuckAiCard)
     }
 
     private suspend fun TestScope.loadItemsWithDuckAiTab(selectionMode: Boolean = false): List<TabSwitcherItem> {
@@ -2824,5 +2789,3 @@ class TabSwitcherViewModelTest {
 
 private const val DUCK_AI_TAB_ID = "duckai"
 private const val DUCK_AI_URL = "https://duck.ai/chat?chatID=abc"
-
-private data class TestDuckAiTabGridItemContent(val content: String) : DuckAiTabGridItemContent

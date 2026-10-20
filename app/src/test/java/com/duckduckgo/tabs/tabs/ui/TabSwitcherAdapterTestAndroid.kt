@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter
 import com.duckduckgo.app.tabs.ui.TabSwitcherListener
 import com.duckduckgo.app.tabs.ui.TrackerCountAnimator
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -65,6 +66,7 @@ class TabSwitcherAdapterTestAndroid {
             trackerCountAnimator = mock<TrackerCountAnimator>(),
             addressDisplayFormatter = mock<AddressDisplayFormatter>(),
             duckAiTabGridItemRenderer = mock(),
+            browserMode = BrowserMode.REGULAR,
         )
     }
 }

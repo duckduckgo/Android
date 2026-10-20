@@ -17,13 +17,11 @@
 package com.duckduckgo.app.browser.tabs.adapter
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_DUCK_AI_GRID_ITEM_CONTENT
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_TITLE
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_URL
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
-import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemContent
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -73,34 +71,24 @@ class TabSwitcherItemDiffCallbackTest {
     }
 
     @Test
-    fun `when duck ai content changes then contents differ and payload marks the content`() {
-        val oldTab = duckAiTab(content = TestContent("old"))
-        val newTab = duckAiTab(content = TestContent("new"))
-
-        assertFalse(callback.areContentsTheSame(oldTab, newTab))
-        assertTrue(callback.getChangePayload(oldTab, newTab)!!.containsKey(DIFF_KEY_DUCK_AI_GRID_ITEM_CONTENT))
+    fun `when rich duck ai card is unchanged then contents are the same`() {
+        assertTrue(callback.areContentsTheSame(duckAiTab(isRichDuckAiCard = true), duckAiTab(isRichDuckAiCard = true)))
     }
 
     @Test
-    fun `when duck ai content is unchanged then contents are the same`() {
-        assertTrue(callback.areContentsTheSame(duckAiTab(content = TestContent("same")), duckAiTab(content = TestContent("same"))))
+    fun `when rich duck ai card turns on then no payload so the view type can change`() {
+        assertFalse(callback.areContentsTheSame(duckAiTab(isRichDuckAiCard = false), duckAiTab(isRichDuckAiCard = true)))
+        assertNull(callback.getChangePayload(duckAiTab(isRichDuckAiCard = false), duckAiTab(isRichDuckAiCard = true)))
     }
 
     @Test
-    fun `when duck ai content appears then no payload so the view type can change`() {
-        assertNull(callback.getChangePayload(duckAiTab(content = null), duckAiTab(content = TestContent("new"))))
+    fun `when rich duck ai card turns off then no payload so the view type can change`() {
+        assertNull(callback.getChangePayload(duckAiTab(isRichDuckAiCard = true), duckAiTab(isRichDuckAiCard = false)))
     }
 
-    @Test
-    fun `when duck ai content disappears then no payload so the view type can change`() {
-        assertNull(callback.getChangePayload(duckAiTab(content = TestContent("old")), duckAiTab(content = null)))
-    }
-
-    private fun duckAiTab(content: DuckAiTabGridItemContent?) = DuckAiTab(
+    private fun duckAiTab(isRichDuckAiCard: Boolean) = DuckAiTab(
         entity = TabEntity(tabId = "1", url = "https://duck.ai/chat", position = 0),
         isActive = false,
-        duckAiGridItemContent = content,
+        isRichDuckAiCard = isRichDuckAiCard,
     )
-
-    private data class TestContent(val content: String) : DuckAiTabGridItemContent
 }

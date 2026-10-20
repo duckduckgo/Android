@@ -77,6 +77,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel.Companion.ANIMATED_TILE_DEFAULT_ALPHA
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
@@ -84,6 +85,7 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
 import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemCallbacks
+import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemKey
 import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemRenderer
 import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemState
 import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemState.Selection
@@ -110,6 +112,7 @@ class TabSwitcherAdapter(
     private val trackerCountAnimator: TrackerCountAnimator,
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val duckAiTabGridItemRenderer: DuckAiTabGridItemRenderer,
+    private val browserMode: BrowserMode,
 ) : Adapter<ViewHolder>() {
 
     @Volatile
@@ -168,12 +171,12 @@ class TabSwitcherAdapter(
     override fun getItemViewType(position: Int): Int =
         when (val item = differ.currentList[position]) {
             is DuckAiTab -> when {
-                layoutType == GRID && item.duckAiGridItemContent != null -> RICH_DUCK_AI_GRID
+                layoutType == GRID && item.isRichDuckAiCard -> RICH_DUCK_AI_GRID
                 layoutType == GRID -> DUCK_AI_GRID
                 else -> DUCK_AI_LIST
             }
             is SelectableTab -> when {
-                item.isDuckAi && layoutType == GRID && item.duckAiGridItemContent != null -> SELECTABLE_RICH_DUCK_AI_GRID
+                item.isDuckAi && layoutType == GRID && item.isRichDuckAiCard -> SELECTABLE_RICH_DUCK_AI_GRID
                 item.isDuckAi && layoutType == GRID -> SELECTABLE_DUCK_AI_GRID
                 item.isDuckAi && layoutType == LIST -> SELECTABLE_DUCK_AI_LIST
                 layoutType == GRID -> GRID_TAB
@@ -307,13 +310,13 @@ class TabSwitcherAdapter(
     }
 
     private fun bindRichDuckAiGridTab(holder: TabSwitcherViewHolder.RichDuckAiGridViewHolder, tab: Tab) {
-        val content = tab.duckAiGridItemContent ?: return
-
         holder.item.bind(
-            content = content,
+            key = DuckAiTabGridItemKey(tabId = tab.id, url = tab.tabEntity.url, mode = browserMode),
             state = DuckAiTabGridItemState(
                 isUnread = !tab.tabEntity.viewed,
                 selection = if (tab is SelectableTab) Selectable(tab.isSelected) else Selection.None,
+                title = tab.title,
+                screenshotPath = tab.tabEntity.tabPreviewFile?.let { webViewPreviewPersister.fullPathForFile(tab.id, it) },
             ),
             callbacks = object : DuckAiTabGridItemCallbacks {
                 override fun onClick() {

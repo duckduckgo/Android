@@ -210,6 +210,14 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <ImageView
+                android:id="@+id/tabChatItemScreenshot"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:importantForAccessibility="no"
+                android:scaleType="center"
+                android:visibility="gone" />
+
+            <ImageView
                 android:id="@+id/tabChatItemEmptyLogo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

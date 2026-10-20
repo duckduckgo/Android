@@ -21,6 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemKey
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
@@ -83,35 +84,35 @@ class RealDuckAiTabGridItemRendererTest {
         whenever(voiceSessionStateManager.isVoiceSessionActive(TAB_ID)).thenReturn(true)
         duckChatFeature.useNativeStorageChatData().setRawStoredState(State(enable = false))
 
-        assertEquals(RealDuckAiTabGridItemContent.ActiveVoice, testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertEquals(RealDuckAiTabGridItemContent.ActiveVoice, testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
     }
 
     @Test
     fun whenUrlHasNoChatIdThenEmptyContent() = runTest {
-        assertEquals(RealDuckAiTabGridItemContent.Empty, testee.resolve(TAB_ID, "https://duck.ai/", BrowserMode.REGULAR))
-        assertEquals(RealDuckAiTabGridItemContent.Empty, testee.resolve(TAB_ID, null, BrowserMode.REGULAR))
+        assertEquals(RealDuckAiTabGridItemContent.Empty, testee.load(DuckAiTabGridItemKey(TAB_ID, "https://duck.ai/", BrowserMode.REGULAR)))
+        assertEquals(RealDuckAiTabGridItemContent.Empty, testee.load(DuckAiTabGridItemKey(TAB_ID, null, BrowserMode.REGULAR)))
     }
 
     @Test
-    fun whenNativeStorageDisabledThenNull() = runTest {
+    fun whenNativeStorageDisabledThenFallback() = runTest {
         duckChatFeature.useNativeStorageChatData().setRawStoredState(State(enable = false))
 
-        assertNull(testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertEquals(RealDuckAiTabGridItemContent.Fallback, testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
     }
 
     @Test
-    fun whenNotMigratedThenNull() = runTest {
+    fun whenNotMigratedThenFallback() = runTest {
         whenever(regularStore.hasMigrated()).thenReturn(false)
 
-        assertNull(testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertEquals(RealDuckAiTabGridItemContent.Fallback, testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
     }
 
     @Test
     fun whenResolvingSeveralTabsThenMigrationCheckedOnce() = runTest {
         whenever(regularStore.getChatPreview(any())).thenReturn(preview(lastMessageText = "Answer"))
 
-        testee.resolve("tab-1", CHAT_URL, BrowserMode.REGULAR)
-        testee.resolve("tab-2", "https://duck.ai/?chatID=chat-2", BrowserMode.REGULAR)
+        testee.load(DuckAiTabGridItemKey("tab-1", CHAT_URL, BrowserMode.REGULAR))
+        testee.load(DuckAiTabGridItemKey("tab-2", "https://duck.ai/?chatID=chat-2", BrowserMode.REGULAR))
 
         verify(regularStore, times(1)).hasMigrated()
     }
@@ -120,8 +121,8 @@ class RealDuckAiTabGridItemRendererTest {
     fun whenNotMigratedThenNotCheckedAgainForTheOpening() = runTest {
         whenever(regularStore.hasMigrated()).thenReturn(false, true)
 
-        assertNull(testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
-        assertNull(testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertEquals(RealDuckAiTabGridItemContent.Fallback, testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
+        assertEquals(RealDuckAiTabGridItemContent.Fallback, testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
         verify(regularStore, times(1)).hasMigrated()
     }
 
@@ -130,57 +131,63 @@ class RealDuckAiTabGridItemRendererTest {
         whenever(regularStore.hasMigrated()).thenReturn(false)
         whenever(fireStore.getChatPreview(CHAT_ID)).thenReturn(preview(lastMessageText = "Fire"))
 
-        assertNull(testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
-        assertEquals(RealDuckAiTabGridItemContent.Chat("Title", "Fire"), testee.resolve(TAB_ID, CHAT_URL, BrowserMode.FIRE))
+        assertEquals(RealDuckAiTabGridItemContent.Fallback, testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
+        assertEquals(RealDuckAiTabGridItemContent.Chat("Title", "Fire"), testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.FIRE)))
     }
 
     @Test
-    fun whenChatNotFoundThenNull() = runTest {
+    fun whenChatNotFoundThenFallback() = runTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(null)
 
-        assertNull(testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertEquals(RealDuckAiTabGridItemContent.Fallback, testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
     }
 
     @Test
     fun whenTextChatWithLastMessageThenChatContent() = runTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(lastMessageText = "Answer"))
 
-        assertEquals(RealDuckAiTabGridItemContent.Chat("Title", "Answer"), testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertEquals(RealDuckAiTabGridItemContent.Chat("Title", "Answer"), testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
     }
 
     @Test
     fun whenLastMessageIsLongThenSnippetCappedAt500Characters() = runTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(lastMessageText = "a".repeat(600)))
 
-        assertEquals(RealDuckAiTabGridItemContent.Chat("Title", "a".repeat(500)), testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertEquals(
+            RealDuckAiTabGridItemContent.Chat("Title", "a".repeat(500)),
+            testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)),
+        )
     }
 
     @Test
     fun whenVoiceChatWithLastMessageThenTranscriptContent() = runTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(isVoice = true, lastMessageText = "Said"))
 
-        assertEquals(RealDuckAiTabGridItemContent.VoiceTranscript("Title", "Said"), testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertEquals(
+            RealDuckAiTabGridItemContent.VoiceTranscript("Title", "Said"),
+            testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)),
+        )
     }
 
     @Test
     fun whenVoiceChatWithoutTextThenEmptyContent() = runTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(isVoice = true, lastMessageText = null, isAwaitingReply = true))
 
-        assertEquals(RealDuckAiTabGridItemContent.Empty, testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertEquals(RealDuckAiTabGridItemContent.Empty, testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
     }
 
     @Test
     fun whenAwaitingReplyThenThinkingContent() = runTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(lastMessageText = "Question", isAwaitingReply = true))
 
-        assertEquals(RealDuckAiTabGridItemContent.Thinking("Title"), testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertEquals(RealDuckAiTabGridItemContent.Thinking("Title"), testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
     }
 
     @Test
     fun whenTextChatWithoutContentThenEmptyContent() = runTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(lastMessageText = null))
 
-        assertEquals(RealDuckAiTabGridItemContent.Empty, testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertEquals(RealDuckAiTabGridItemContent.Empty, testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
     }
 
     @Test
@@ -191,8 +198,8 @@ class RealDuckAiTabGridItemRendererTest {
         )
 
         assertEquals(
-            RealDuckAiTabGridItemContent.ImageChat("Title", "last", BrowserMode.REGULAR),
-            testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR),
+            RealDuckAiTabGridItemContent.ImageChat("Title", "last", thumbnail = null),
+            testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)),
         )
     }
 
@@ -200,7 +207,7 @@ class RealDuckAiTabGridItemRendererTest {
     fun whenImageChatWithoutFileRefsThenEmptyContent() = runTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(isImageGeneration = true))
 
-        assertEquals(RealDuckAiTabGridItemContent.Empty, testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertEquals(RealDuckAiTabGridItemContent.Empty, testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
     }
 
     @Test
@@ -208,26 +215,26 @@ class RealDuckAiTabGridItemRendererTest {
         whenever(fireStore.getChatPreview(CHAT_ID)).thenReturn(preview(isImageGeneration = true, fileRefs = listOf("ref")))
 
         assertEquals(
-            RealDuckAiTabGridItemContent.ImageChat("Title", "ref", BrowserMode.FIRE),
-            testee.resolve(TAB_ID, CHAT_URL, BrowserMode.FIRE),
+            RealDuckAiTabGridItemContent.ImageChat("Title", "ref", thumbnail = null),
+            testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.FIRE)),
         )
         verify(regularStore, never()).getChatPreview(any())
     }
 
     @Test
-    fun whenChatReadFailsThenNull() = runTest {
+    fun whenChatReadFailsThenFallback() = runTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenThrow(IllegalStateException("Row too big to fit into CursorWindow"))
 
-        assertNull(testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertEquals(RealDuckAiTabGridItemContent.Fallback, testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
     }
 
     @Test
     fun whenChatReadFailsThenNotReadAgainOnNextResolve() = runTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenThrow(IllegalStateException("Row too big to fit into CursorWindow"))
 
-        testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR)
+        testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
 
-        assertNull(testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertEquals(RealDuckAiTabGridItemContent.Fallback, testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
         verify(regularStore, times(1)).getChatPreview(CHAT_ID)
     }
 
@@ -236,27 +243,72 @@ class RealDuckAiTabGridItemRendererTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenThrow(IllegalStateException("Row too big to fit into CursorWindow"))
         whenever(fireStore.getChatPreview(CHAT_ID)).thenReturn(preview(lastMessageText = "Fire"))
 
-        testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR)
+        testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
 
-        assertEquals(RealDuckAiTabGridItemContent.Chat("Title", "Fire"), testee.resolve(TAB_ID, CHAT_URL, BrowserMode.FIRE))
+        assertEquals(RealDuckAiTabGridItemContent.Chat("Title", "Fire"), testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.FIRE)))
     }
 
     @Test
     fun whenChatReadFailsThenVoiceSessionStillShown() = runTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenThrow(IllegalStateException("Row too big to fit into CursorWindow"))
-        testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR)
+        testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
         whenever(voiceSessionStateManager.isVoiceSessionActive(TAB_ID)).thenReturn(true)
 
-        assertEquals(RealDuckAiTabGridItemContent.ActiveVoice, testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertEquals(RealDuckAiTabGridItemContent.ActiveVoice, testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
+    }
+
+    @Test
+    fun whenNothingLoadedYetThenPeekNeedsALoad() {
+        assertNull(testee.peek(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
+    }
+
+    @Test
+    fun whenChatLoadedThenPeekReturnsItWithoutReading() = runTest {
+        whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(lastMessageText = "Answer"))
+        testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+
+        assertEquals(RealDuckAiTabGridItemContent.Chat("Title", "Answer"), testee.peek(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
+        verify(regularStore, times(1)).getChatPreview(CHAT_ID)
+    }
+
+    @Test
+    fun whenChatIsThinkingThenPeekNeedsALoadAgain() = runTest {
+        whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(lastMessageText = "Question", isAwaitingReply = true))
+        testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+
+        assertNull(testee.peek(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
+    }
+
+    @Test
+    fun whenStorageKnownNotReadyThenPeekReturnsFallback() = runTest {
+        whenever(regularStore.hasMigrated()).thenReturn(false)
+        testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+
+        assertEquals(RealDuckAiTabGridItemContent.Fallback, testee.peek(DuckAiTabGridItemKey("other", CHAT_URL, BrowserMode.REGULAR)))
+    }
+
+    @Test
+    fun whenChatUnreadableThenPeekReturnsFallback() = runTest {
+        whenever(regularStore.getChatPreview(CHAT_ID)).thenThrow(IllegalStateException("Row too big to fit into CursorWindow"))
+        testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+
+        assertEquals(RealDuckAiTabGridItemContent.Fallback, testee.peek(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
+    }
+
+    @Test
+    fun whenVoiceSessionActiveThenPeekReturnsActiveVoiceWithoutLoading() {
+        whenever(voiceSessionStateManager.isVoiceSessionActive(TAB_ID)).thenReturn(true)
+
+        assertEquals(RealDuckAiTabGridItemContent.ActiveVoice, testee.peek(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
     }
 
     @Test
     fun whenChatResolvedAgainThenPreviewReadOnce() = runTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(lastMessageText = "Answer"), preview(lastMessageText = "Newer"))
 
-        testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR)
+        testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
 
-        assertEquals(RealDuckAiTabGridItemContent.Chat("Title", "Answer"), testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertEquals(RealDuckAiTabGridItemContent.Chat("Title", "Answer"), testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
         verify(regularStore, times(1)).getChatPreview(CHAT_ID)
     }
 
@@ -264,9 +316,9 @@ class RealDuckAiTabGridItemRendererTest {
     fun whenChatNotFoundThenReadAgainOnNextResolve() = runTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(null, preview(lastMessageText = "Answer"))
 
-        testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR)
+        testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
 
-        assertEquals(RealDuckAiTabGridItemContent.Chat("Title", "Answer"), testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertEquals(RealDuckAiTabGridItemContent.Chat("Title", "Answer"), testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
     }
 
     @Test
@@ -274,69 +326,86 @@ class RealDuckAiTabGridItemRendererTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(lastMessageText = "Regular"))
         whenever(fireStore.getChatPreview(CHAT_ID)).thenReturn(preview(lastMessageText = "Fire"))
 
-        testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR)
+        testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
 
-        assertEquals(RealDuckAiTabGridItemContent.Chat("Title", "Fire"), testee.resolve(TAB_ID, CHAT_URL, BrowserMode.FIRE))
+        assertEquals(RealDuckAiTabGridItemContent.Chat("Title", "Fire"), testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.FIRE)))
     }
 
     @Test
     @GraphicsMode(GraphicsMode.Mode.NATIVE)
-    fun whenThumbnailLoadedAgainThenCachedBitmapReturnedWithoutRereading() = runTest {
+    fun whenImageChatLoadedAgainThenCachedThumbnailReturnedWithoutRereading() = runTest {
+        givenImageChat(regularStore)
         whenever(regularStore.readFileRef(FILE_REF)).thenReturn(pngFileRef())
 
-        val first = testee.loadThumbnail(FILE_REF, BrowserMode.REGULAR)
-        val second = testee.loadThumbnail(FILE_REF, BrowserMode.REGULAR)
+        val first = loadImageChat(BrowserMode.REGULAR)
+        val second = loadImageChat(BrowserMode.REGULAR)
 
-        assertNotNull(first)
-        assertSame(first, second)
+        assertNotNull(first.thumbnail)
+        assertSame(first.thumbnail, second.thumbnail)
+        verify(regularStore, times(1)).getChatPreview(CHAT_ID)
         verify(regularStore, times(1)).readFileRef(FILE_REF)
     }
 
     @Test
     @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    fun whenImageChatLoadedThenPeekReturnsItWithThumbnail() = runTest {
+        givenImageChat(regularStore)
+        whenever(regularStore.readFileRef(FILE_REF)).thenReturn(pngFileRef())
+        val loaded = loadImageChat(BrowserMode.REGULAR)
+
+        assertEquals(loaded, testee.peek(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
+    }
+
+    @Test
+    @GraphicsMode(GraphicsMode.Mode.NATIVE)
     fun whenSameFileRefInOtherModeThenThumbnailNotShared() = runTest {
+        givenImageChat(regularStore)
+        givenImageChat(fireStore)
         whenever(regularStore.readFileRef(FILE_REF)).thenReturn(pngFileRef())
         whenever(fireStore.readFileRef(FILE_REF)).thenReturn(pngFileRef())
 
-        testee.loadThumbnail(FILE_REF, BrowserMode.REGULAR)
-        testee.loadThumbnail(FILE_REF, BrowserMode.FIRE)
+        loadImageChat(BrowserMode.REGULAR)
+        loadImageChat(BrowserMode.FIRE)
 
         verify(fireStore).readFileRef(FILE_REF)
     }
 
     @Test
-    fun whenThumbnailMissingThenNullAndReadAgainOnNextLoad() = runTest {
+    fun whenThumbnailMissingThenNullAndOnlyThumbnailReadAgainOnNextLoad() = runTest {
+        givenImageChat(regularStore)
         whenever(regularStore.readFileRef(FILE_REF)).thenReturn(null)
 
-        assertNull(testee.loadThumbnail(FILE_REF, BrowserMode.REGULAR))
-        testee.loadThumbnail(FILE_REF, BrowserMode.REGULAR)
+        assertNull(loadImageChat(BrowserMode.REGULAR).thumbnail)
+        assertNull(testee.peek(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, BrowserMode.REGULAR)))
+        loadImageChat(BrowserMode.REGULAR)
 
+        verify(regularStore, times(1)).getChatPreview(CHAT_ID)
         verify(regularStore, times(2)).readFileRef(FILE_REF)
     }
 
     @Test
-    fun whenThumbnailReadThrowsThenNullAndReadAgainOnNextLoad() = runTest {
+    fun whenThumbnailReadThrowsThenImageChatWithoutThumbnail() = runTest {
+        givenImageChat(regularStore)
         whenever(regularStore.readFileRef(FILE_REF)).thenThrow(IllegalStateException("read failed"))
 
-        assertNull(testee.loadThumbnail(FILE_REF, BrowserMode.REGULAR))
-        testee.loadThumbnail(FILE_REF, BrowserMode.REGULAR)
-
-        verify(regularStore, times(2)).readFileRef(FILE_REF)
+        assertNull(loadImageChat(BrowserMode.REGULAR).thumbnail)
     }
 
     @Test
-    fun whenThumbnailDecodeRunsOutOfMemoryThenNull() = runTest {
+    fun whenThumbnailDecodeRunsOutOfMemoryThenImageChatWithoutThumbnail() = runTest {
+        givenImageChat(regularStore)
         whenever(regularStore.readFileRef(FILE_REF)).thenAnswer { throw OutOfMemoryError() }
 
-        assertNull(testee.loadThumbnail(FILE_REF, BrowserMode.REGULAR))
+        assertNull(loadImageChat(BrowserMode.REGULAR).thumbnail)
     }
 
     @Test
     @GraphicsMode(GraphicsMode.Mode.NATIVE)
     fun whenImageIsLargeThenShortSideSampledDownToTarget() = runTest {
+        givenImageChat(regularStore)
         whenever(regularStore.readFileRef(FILE_REF)).thenReturn(pngFileRef(width = 2048, height = 2048))
 
-        val bitmap = testee.loadThumbnail(FILE_REF, BrowserMode.REGULAR)!!
+        val bitmap = loadImageChat(BrowserMode.REGULAR).thumbnail!!
 
         assertEquals(512, bitmap.width)
         assertEquals(512, bitmap.height)
@@ -345,12 +414,20 @@ class RealDuckAiTabGridItemRendererTest {
     @Test
     @GraphicsMode(GraphicsMode.Mode.NATIVE)
     fun whenImageIsVeryTallThenSampledUnderPixelCap() = runTest {
+        givenImageChat(regularStore)
         whenever(regularStore.readFileRef(FILE_REF)).thenReturn(pngFileRef(width = 512, height = 8192))
 
-        val bitmap = testee.loadThumbnail(FILE_REF, BrowserMode.REGULAR)!!
+        val bitmap = loadImageChat(BrowserMode.REGULAR).thumbnail!!
 
         assertTrue(bitmap.width.toLong() * bitmap.height <= 1024 * 1024)
     }
+
+    private suspend fun givenImageChat(store: DuckAiChatStore) {
+        whenever(store.getChatPreview(CHAT_ID)).thenReturn(preview(isImageGeneration = true, fileRefs = listOf(FILE_REF)))
+    }
+
+    private suspend fun loadImageChat(mode: BrowserMode): RealDuckAiTabGridItemContent.ImageChat =
+        testee.load(DuckAiTabGridItemKey(TAB_ID, CHAT_URL, mode)) as RealDuckAiTabGridItemContent.ImageChat
 
     private fun pngFileRef(width: Int = 4, height: Int = 4): FileRefContent {
         val output = ByteArrayOutputStream()
