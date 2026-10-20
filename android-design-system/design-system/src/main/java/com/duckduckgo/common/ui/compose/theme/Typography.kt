@@ -183,6 +183,18 @@ data class DuckDuckGoTypography(
             fontWeight = FontWeight.Normal,
         ),
     ),
+
+    val onboardingTitleInContext: DuckDuckGoTextStyle = DuckDuckGoTextStyle(
+        onboardingTitle.textStyle.copy(
+            fontSize = 20.sp,
+        ),
+    ),
+
+    val onboardingBodyInContext: DuckDuckGoTextStyle = DuckDuckGoTextStyle(
+        onboardingBody.textStyle.copy(
+            fontSize = 16.sp,
+        ),
+    ),
 )
 
 val Typography = DuckDuckGoTypography()
