@@ -167,6 +167,118 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
     },
+    "webTelemetry_challenge_cloudflare_day": {
+        "description": "Daily bucketed count of page loads where a Cloudflare or DDoS-Guard \"Just a moment\" challenge interstitial was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_challenge_generic_day": {
+        "description": "Daily bucketed count of page loads where a page titled as a human or security verification check was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_blockPage_cloudflare_day": {
+        "description": "Daily bucketed count of page loads where a Cloudflare access denied or error page was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_blockPage_generic_day": {
+        "description": "Daily bucketed count of page loads where web application firewall block wording was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_blockPage_vendor_day": {
+        "description": "Daily bucketed count of page loads where an Incapsula, Sucuri, Distil, CloudFront or Cloudflare block page was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_blockPage_verificationfailed_day": {
+        "description": "Daily bucketed count of page loads where a message that browser or device verification failed was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_blockPage_vercel_day": {
+        "description": "Daily bucketed count of page loads where a Vercel Security Checkpoint page was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_blockPage_toomanyrequests_day": {
+        "description": "Daily bucketed count of page loads where an HTTP 429 or \"too many requests\" page was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_blockPage_networksecurity_day": {
+        "description": "Daily bucketed count of page loads where a \"blocked by network security\" page was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_blockPage_title_day": {
+        "description": "Daily bucketed count of page loads where a page titled as a blocked URL or a seized domain was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_blockPage_forbidden_day": {
+        "description": "Daily bucketed count of page loads where an HTTP 403 forbidden or \"access is denied\" page was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_errorPage_unavailable_day": {
+        "description": "Daily bucketed count of page loads where a page titled \"Website temporarily unavailable\" was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_errorPage_soft404_day": {
+        "description": "Daily bucketed count of page loads where a \"page not found\", \"404 not found\" or \"access denied\" page was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_geoblock_day": {
+        "description": "Daily bucketed count of page loads where a message that content is not available in the user's region or country was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_blankPage_empty_day": {
+        "description": "Daily bucketed count of page loads where the page showed no title and no visible text. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_adwall_vendor_day": {
+        "description": "Daily bucketed count of page loads where PageFair or FuckAdBlock anti-adblock text was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
     "eventHub_baseline_day": {
         "description": "Daily bucketed count of periods in which EventHub ran at all. Serves as the denominator for the other eventHub telemetry — it counts nothing beyond the period itself. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
