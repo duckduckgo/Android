@@ -180,7 +180,7 @@ class RealNativeInputManagerTest {
     @Test
     fun whenKeyboardAppearsDuringDismissalFadeThenToolbarIsNotHidden() {
         givenDismissibleWidget()
-        assertTrue(rootView.findViewById<View>(R.id.inputModeWidget) is NativeInputWidget)
+        assertTrue(rootView.findViewById<View>(com.duckduckgo.duckchat.impl.R.id.inputModeWidget) is NativeInputWidget)
         testee.onKeyboardVisibilityChanged(true)
         verify(omnibar).hide()
         testee.hideNativeInput(isNavigation = true)
@@ -230,7 +230,7 @@ class RealNativeInputManagerTest {
         val card = object : FrameLayout(context) {
             override fun animate(): ViewPropertyAnimator = fade
         }.apply { id = R.id.inputModeWidgetCard }
-        card.addView(TestNativeInputWidget(context).apply { id = R.id.inputModeWidget })
+        card.addView(TestNativeInputWidget(context).apply { id = com.duckduckgo.duckchat.impl.R.id.inputModeWidget })
         rootView.addView(
             FrameLayout(context).apply {
                 id = R.id.inputModeRoot
@@ -262,7 +262,7 @@ class RealNativeInputManagerTest {
         val endAction = argumentCaptor<Runnable>()
         verify(fade).withEndAction(endAction.capture())
         endAction.firstValue.run()
-        rootView.addView(TestNativeInputWidget(context).apply { id = R.id.inputModeWidget })
+        rootView.addView(TestNativeInputWidget(context).apply { id = com.duckduckgo.duckchat.impl.R.id.inputModeWidget })
         clearInvocations(omnibar)
 
         testee.onKeyboardVisibilityChanged(true)
@@ -452,7 +452,7 @@ class RealNativeInputManagerTest {
         testee.init(omnibar, rootView, lifecycleOwner)
 
         val input = FakeInput(context).apply {
-            id = R.id.inputModeWidget
+            id = com.duckduckgo.duckchat.impl.R.id.inputModeWidget
             this.text = text
             existingListeners()
         }
@@ -582,7 +582,7 @@ class RealNativeInputManagerTest {
             rootView.addView(FrameLayout(context).apply { id = R.id.includeNewBrowserTab })
         }
 
-        val widget = TestNativeInputWidget(context).apply { id = R.id.inputModeWidget }
+        val widget = TestNativeInputWidget(context).apply { id = com.duckduckgo.duckchat.impl.R.id.inputModeWidget }
         val widgetView = FrameLayout(context).apply { addView(widget) }
         val layoutInflater: LayoutInflater = mock()
         whenever(layoutInflater.inflate(any<Int>(), any<ViewGroup>(), any<Boolean>())).thenReturn(widgetView)

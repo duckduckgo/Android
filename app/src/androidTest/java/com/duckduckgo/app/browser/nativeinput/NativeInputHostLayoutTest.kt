@@ -25,6 +25,7 @@ import android.widget.LinearLayout
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputLayout
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
@@ -60,8 +61,9 @@ class NativeInputHostLayoutTest {
         assertFalse(footer.isDescendantOf(card))
         assertSame(stack, (card.parent as View).parent)
         assertEquals(LinearLayout.VERTICAL, stack.orientation)
+        assertTrue(card is NativeInputLayout)
         assertEquals(1, card.childCount)
-        assertEquals(R.id.inputModeWidget, card.getChildAt(0).id)
+        assertEquals(com.duckduckgo.duckchat.impl.R.id.inputModeWidget, card.getChildAt(0).id)
         assertFalse(stack.clipChildren)
         assertFalse(stack.clipToPadding)
     }

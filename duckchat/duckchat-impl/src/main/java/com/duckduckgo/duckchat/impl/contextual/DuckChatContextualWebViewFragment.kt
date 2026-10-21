@@ -451,8 +451,7 @@ class DuckChatContextualWebViewFragment :
         }
         contextualNativeInputManager.init(
             tabId = tabId,
-            card = binding.contextualNativeInputCard,
-            widget = binding.contextualNativeInputWidget,
+            inputLayout = binding.contextualNativeInputCard,
             footer = binding.contextualNativeInputFooter,
             jsMessaging = contentScopeScripts,
             lifecycleOwner = viewLifecycleOwner,
@@ -566,7 +565,7 @@ class DuckChatContextualWebViewFragment :
                     }
 
                     is DuckChatContextualWebViewViewModel.Command.ChangeSheetState -> {
-                        command.prefillNativeInput?.let { binding.contextualNativeInputWidget.text = it }
+                        command.prefillNativeInput?.let { binding.contextualNativeInputCard.widget.text = it }
                         if (command.hideKeyboard) activity?.hideKeyboard()
                         bottomSheetBehavior.state = command.newState
                     }
@@ -605,7 +604,7 @@ class DuckChatContextualWebViewFragment :
                     }
 
                     is DuckChatContextualWebViewViewModel.Command.FocusInput -> {
-                        binding.contextualNativeInputWidget.focusInput(activity)
+                        binding.contextualNativeInputCard.widget.focusInput(activity)
                     }
 
                     is DuckChatContextualWebViewViewModel.Command.ApplyContextualReopened -> {
@@ -658,12 +657,12 @@ class DuckChatContextualWebViewFragment :
         contextualNativeInputManager.onWebViewMode()
 
         if (viewState.showContext && viewState.contextTitle.isNotEmpty()) {
-            binding.contextualNativeInputWidget.setPageContext(
+            binding.contextualNativeInputCard.widget.setPageContext(
                 title = viewState.contextTitle,
                 url = viewState.contextUrl,
             )
         } else {
-            binding.contextualNativeInputWidget.clearPageContext()
+            binding.contextualNativeInputCard.widget.clearPageContext()
         }
     }
 
@@ -672,7 +671,7 @@ class DuckChatContextualWebViewFragment :
     private fun renderFireButton() {
         val isFireButtonEnabled = viewModel.viewState.value.isFireButtonEnabled
         val isNativeInputVisible = binding.contextualNativeInputCard.isVisible
-        val isNativeInputFocused = binding.contextualNativeInputWidget.hasInputFocus()
+        val isNativeInputFocused = binding.contextualNativeInputCard.widget.hasInputFocus()
         if (isFireButtonEnabled && !isNativeInputVisible) binding.contextualFire.show() else binding.contextualFire.gone()
         if (isFireButtonEnabled && isNativeInputVisible && !isNativeInputFocused) {
             binding.contextualInputFire.show()
