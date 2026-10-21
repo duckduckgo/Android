@@ -19,6 +19,8 @@ package com.duckduckgo.app.install
 import android.content.SharedPreferences
 import android.os.Environment
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
@@ -47,7 +49,11 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
 import java.io.File
@@ -62,6 +68,7 @@ class RealReinstallDetectorTest {
 
     private val dispatcherProvider = DefaultDispatcherProvider()
     private val persistentStorage = FakePersistentStorage()
+    private val pixel: Pixel = mock()
     private val ddgDownloadsDirectory = File(
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
         "DuckDuckGo",
@@ -391,6 +398,101 @@ class RealReinstallDetectorTest {
         assertTrue(coroutineTestRule.testScope.isActive)
     }
 
+    @Test
+    @Config(sdk = [29])
+    fun whenBelowAndroid11AndFlagExistsThenCheckResultPixelSaysFound() = runTest {
+        persistentStorage.values[InstallSeenPersistentStorageKey.key] = byteArrayOf(1)
+
+        reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall()
+
+        verifyCheckResultPixel("found")
+    }
+
+    @Test
+    @Config(sdk = [29])
+    fun whenBelowAndroid11AndFlagIsMissingThenCheckResultPixelSaysNotFound() = runTest {
+        reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall()
+
+        verifyCheckResultPixel("not_found")
+    }
+
+    @Test
+    @Config(sdk = [29])
+    fun whenBelowAndroid11AndBlockStoreIsUnavailableThenCheckResultPixelSaysUnavailable() = runTest {
+        persistentStorage.available = false
+
+        reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall()
+
+        verifyCheckResultPixel("unavailable")
+    }
+
+    @Test
+    @Config(sdk = [29])
+    fun whenBelowAndroid11AndBlockStoreNeverAnswersThenCheckResultPixelSaysTimeout() = runTest {
+        persistentStorage.neverAnswer = true
+        val reinstallDetector = reinstallDetectorWith(
+            InMemorySharedPreferences(),
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            appCoroutineScope = coroutineTestRule.testScope,
+        )
+
+        coroutineTestRule.testScope.async { reinstallDetector.isAppReinstall() }
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verifyCheckResultPixel("timeout")
+    }
+
+    @Test
+    @Config(sdk = [29])
+    fun whenBelowAndroid11AndBlockStoreThrowsThenCheckResultPixelSaysError() = runTest {
+        persistentStorage.throwOnCall = true
+        val reinstallDetector = reinstallDetectorWith(
+            InMemorySharedPreferences(),
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            appCoroutineScope = coroutineTestRule.testScope,
+        )
+
+        reinstallDetector.isAppReinstall()
+
+        verifyCheckResultPixel("error")
+    }
+
+    @Test
+    @Config(sdk = [29])
+    fun whenBelowAndroid11AndTwoCallersCheckAtTheSameTimeThenCheckResultPixelIsFiredOnce() = runTest {
+        val blockStoreAnswer = CompletableDeferred<Unit>()
+        persistentStorage.retrieveGate = blockStoreAnswer
+        val reinstallDetector = reinstallDetectorWith(
+            InMemorySharedPreferences(),
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            appCoroutineScope = coroutineTestRule.testScope,
+        )
+
+        coroutineTestRule.testScope.async { reinstallDetector.isAppReinstall() }
+        coroutineTestRule.testScope.async { reinstallDetector.isAppReinstall() }
+        blockStoreAnswer.complete(Unit)
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(pixel, times(1)).fire(eq(ReinstallDetectorPixelName.BLOCK_STORE_CHECK_RESULT), any(), any(), any())
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenAndroidVersionIs11OrAboveThenCheckResultPixelIsNotFired() = runTest {
+        reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall()
+
+        verify(pixel, never()).fire(eq(ReinstallDetectorPixelName.BLOCK_STORE_CHECK_RESULT), any(), any(), any())
+    }
+
+    private fun verifyCheckResultPixel(result: String) {
+        verify(pixel).fire(
+            eq(ReinstallDetectorPixelName.BLOCK_STORE_CHECK_RESULT),
+            eq(mapOf("result" to result)),
+            any(),
+            eq(Unique()),
+        )
+    }
+
     private fun reinstallDetectorWith(
         preferences: SharedPreferences,
         dispatcherProvider: DispatcherProvider = this.dispatcherProvider,
@@ -403,6 +505,7 @@ class RealReinstallDetectorTest {
             sharedPreferencesProvider = sharedPreferencesProvider,
             persistentStorage = persistentStorage,
             appCoroutineScope = appCoroutineScope,
+            pixel = pixel,
         )
     }
 
