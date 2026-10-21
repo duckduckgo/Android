@@ -20,8 +20,6 @@ import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.Toast
 import androidx.lifecycle.Lifecycle
@@ -105,11 +103,6 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     private fun configureUiEventHandlers() {
         binding.enableWebContentDebugging.quietlySetIsChecked(webContentDebuggingFeature.webContentDebugging().isEnabled()) { _, isChecked ->
             webContentDebuggingFeature.webContentDebugging().setRawStoredState(Toggle.State(enable = isChecked))
-        }
-        binding.triggerAnr.setOnClickListener {
-            Handler(Looper.getMainLooper()).post {
-                Thread.sleep(10000)
-            }
         }
         binding.overrideUserAgentSelector.setOnClickListener { viewModel.onUserAgentSelectorClicked() }
         binding.overridePrivacyRemoteConfigUrl.setOnClickListener { viewModel.onRemotePrivacyUrlClicked() }
