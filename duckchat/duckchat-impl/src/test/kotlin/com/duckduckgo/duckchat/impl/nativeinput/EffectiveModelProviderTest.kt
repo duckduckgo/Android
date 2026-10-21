@@ -63,6 +63,7 @@ class EffectiveModelProviderTest {
         lazy { tabRepositoryProvider },
         browserModeStateHolder,
         RealTextSelectionRepository(lazy { mock() }, mock()),
+        ChatStateStore(),
     )
     private val modelStateFlow = MutableStateFlow(
         ModelState(

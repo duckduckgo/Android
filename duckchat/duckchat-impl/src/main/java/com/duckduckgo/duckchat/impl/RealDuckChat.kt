@@ -214,16 +214,6 @@ interface DuckChatInternal : DuckChat {
     fun isDuckChatUserEnabled(): Boolean
 
     /**
-     * Updates the current chat state.
-     */
-    fun updateChatState(state: ChatState)
-
-    /**
-     * Returns the current chat state.
-     */
-    val chatState: StateFlow<ChatState>
-
-    /**
      * Requests the native model picker to open for [tabId].
      */
     fun requestShowModelPicker(tabId: String)
@@ -488,7 +478,6 @@ class RealDuckChat @Inject constructor(
     private val _showOmnibarShortcutInAllStates = MutableStateFlow(false)
     private val _showClearDuckAIChatHistory = MutableStateFlow(true)
 
-    private val _chatState = MutableStateFlow(ChatState.HIDE)
     private val _showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
     private val _editPromptRequests = MutableSharedFlow<EditPromptRequest>(extraBufferCapacity = 1)
     private val _nativeInputFieldEnabled = MutableStateFlow(false)
@@ -677,10 +666,6 @@ class RealDuckChat @Inject constructor(
 
     override fun isDuckChatUserEnabled(): Boolean = isDuckChatUserEnabled
 
-    override fun updateChatState(state: ChatState) {
-        _chatState.value = state
-    }
-
     override fun requestShowModelPicker(tabId: String) {
         _showModelPickerEvents.tryEmit(tabId)
     }
@@ -718,8 +703,6 @@ class RealDuckChat @Inject constructor(
     override val nativeInputFieldEnabled: StateFlow<Boolean> = _nativeInputFieldEnabled.asStateFlow()
 
     override val nativeDuckAiSidebar: StateFlow<Boolean> = _nativeDuckAiSidebar.asStateFlow()
-
-    override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
     override fun isImageUploadEnabled(): Boolean = isImageUploadEnabled
 

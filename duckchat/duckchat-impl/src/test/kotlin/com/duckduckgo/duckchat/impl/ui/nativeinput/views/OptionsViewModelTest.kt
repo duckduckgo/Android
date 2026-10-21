@@ -27,6 +27,7 @@ import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.Tool
+import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModel
 import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModelProvider
 import com.duckduckgo.duckchat.impl.nativeinput.RealEffectiveModelProvider
@@ -77,6 +78,7 @@ class OptionsViewModelTest {
         lazy { tabRepositoryProvider },
         browserModeStateHolder,
         RealTextSelectionRepository(lazy { mock() }, mock()),
+        ChatStateStore(),
     )
     private val duckChatPixels: DuckChatPixels = mock()
     private val modelStateFlow = MutableStateFlow(ModelState())
