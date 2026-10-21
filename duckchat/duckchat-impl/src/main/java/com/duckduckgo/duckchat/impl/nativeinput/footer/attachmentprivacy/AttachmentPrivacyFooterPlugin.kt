@@ -29,6 +29,8 @@ import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterState
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -48,6 +50,7 @@ class AttachmentPrivacyFooterPlugin @Inject constructor(
     private val duckChatFeature: DuckChatFeature,
     private val stateProvider: NativeInputStateProvider,
     private val store: AttachmentPrivacyDisclaimerStore,
+    private val pixels: DuckChatPixels,
     private val browserNav: BrowserNav,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : NativeInputFooterPlugin {
@@ -64,7 +67,11 @@ class AttachmentPrivacyFooterPlugin @Inject constructor(
         var shownThisPrompt = false
         var promptSubmissions = hostContext.value.promptSubmissions
 
+        fun getSurface() = DuckChatPixelSurface.from(hostContext.value.inputContext)
+        fun hasImages() = host.draft().hasImages
+
         footerView.render {
+            pixels.fireAttachmentPrivacyLearnMoreTapped(hasImages(), getSurface())
             context.startActivity(browserNav.openInNewTab(context, LEARN_MORE_URL))
         }
 
@@ -91,6 +98,7 @@ class AttachmentPrivacyFooterPlugin @Inject constructor(
             override fun onDisplayed(displayed: Boolean) {
                 if (!displayed || shownThisPrompt) return
                 shownThisPrompt = true
+                pixels.fireAttachmentPrivacyShown(hasImages(), getSurface())
                 appCoroutineScope.launch { store.markShown() }
             }
         }

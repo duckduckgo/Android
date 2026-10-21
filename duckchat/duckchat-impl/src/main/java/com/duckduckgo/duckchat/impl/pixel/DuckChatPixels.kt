@@ -230,6 +230,8 @@ interface DuckChatPixels {
     fun fireWebSearchSelected(surface: DuckChatPixelSurface)
     fun fireWebSearchDeselected(surface: DuckChatPixelSurface)
     fun fireWebSearchSubmitted(surface: DuckChatPixelSurface)
+    fun fireAttachmentPrivacyShown(hasImages: Boolean, surface: DuckChatPixelSurface)
+    fun fireAttachmentPrivacyLearnMoreTapped(hasImages: Boolean, surface: DuckChatPixelSurface)
     fun firePromptSubmitted(
         selectedTool: String,
         modelId: String?,
@@ -983,6 +985,34 @@ class RealDuckChatPixels @Inject constructor(
         surfaceParams(surface),
     )
 
+    override fun fireAttachmentPrivacyShown(hasImages: Boolean, surface: DuckChatPixelSurface) = if (hasImages) {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_IMAGE_SHOWN_COUNT,
+            DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_IMAGE_SHOWN_DAILY,
+            surfaceParams(surface),
+        )
+    } else {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_FILE_SHOWN_COUNT,
+            DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_FILE_SHOWN_DAILY,
+            surfaceParams(surface),
+        )
+    }
+
+    override fun fireAttachmentPrivacyLearnMoreTapped(hasImages: Boolean, surface: DuckChatPixelSurface) = if (hasImages) {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_IMAGE_LEARN_MORE_TAPPED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_IMAGE_LEARN_MORE_TAPPED_DAILY,
+            surfaceParams(surface),
+        )
+    } else {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_FILE_LEARN_MORE_TAPPED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_FILE_LEARN_MORE_TAPPED_DAILY,
+            surfaceParams(surface),
+        )
+    }
+
     override fun firePromptSubmitted(
         selectedTool: String,
         modelId: String?,
@@ -1638,6 +1668,14 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SELECTED_DAILY("m_aichat_unified_input_web_search_selected_daily"),
     DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_DESELECTED_COUNT("m_aichat_unified_input_web_search_deselected_count"),
     DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_DESELECTED_DAILY("m_aichat_unified_input_web_search_deselected_daily"),
+    DUCK_CHAT_ATTACHMENT_PRIVACY_IMAGE_SHOWN_COUNT("m_aichat_attachment_privacy_image_shown_count"),
+    DUCK_CHAT_ATTACHMENT_PRIVACY_IMAGE_SHOWN_DAILY("m_aichat_attachment_privacy_image_shown_daily"),
+    DUCK_CHAT_ATTACHMENT_PRIVACY_FILE_SHOWN_COUNT("m_aichat_attachment_privacy_file_shown_count"),
+    DUCK_CHAT_ATTACHMENT_PRIVACY_FILE_SHOWN_DAILY("m_aichat_attachment_privacy_file_shown_daily"),
+    DUCK_CHAT_ATTACHMENT_PRIVACY_IMAGE_LEARN_MORE_TAPPED_COUNT("m_aichat_attachment_privacy_image_learn_more_tapped_count"),
+    DUCK_CHAT_ATTACHMENT_PRIVACY_IMAGE_LEARN_MORE_TAPPED_DAILY("m_aichat_attachment_privacy_image_learn_more_tapped_daily"),
+    DUCK_CHAT_ATTACHMENT_PRIVACY_FILE_LEARN_MORE_TAPPED_COUNT("m_aichat_attachment_privacy_file_learn_more_tapped_count"),
+    DUCK_CHAT_ATTACHMENT_PRIVACY_FILE_LEARN_MORE_TAPPED_DAILY("m_aichat_attachment_privacy_file_learn_more_tapped_daily"),
     DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SUBMITTED_COUNT("m_aichat_unified_input_web_search_submitted_count"),
     DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SUBMITTED_DAILY("m_aichat_unified_input_web_search_submitted_daily"),
     DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT("m_aichat_unified_input_prompt_submitted_count"),
@@ -2023,6 +2061,7 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             // upsell, attachments, voice, stop) AND the app-side chat_header_upgrade_tapped, which
             // shares the prefix — the interceptor matches outgoing pixel names with startsWith.
             "m_aichat_unified_input_" to PixelParameter.removeAtb(),
+            "m_aichat_attachment_privacy_" to PixelParameter.removeAtb(),
             // Same coverage for unified_input pixels added without the legacy m_ prefix.
             "aichat_unified_input_" to PixelParameter.removeAtb(),
         )

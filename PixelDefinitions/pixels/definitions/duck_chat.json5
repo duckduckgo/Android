@@ -1803,6 +1803,34 @@
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_aichat_attachment_privacy_image_shown": {
+        "description": "Fires when the attachment privacy disclaimer appears under the native Duck.ai input with an image staged. Once per prompt, and the disclaimer is shown for one prompt per install.",
+        "owners": ["joshliebe"],
+        "triggers": ["impression"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
+    "m_aichat_attachment_privacy_file_shown": {
+        "description": "Fires when the attachment privacy disclaimer appears under the native Duck.ai input with a file (no image) staged. Once per prompt, and the disclaimer is shown for one prompt per install.",
+        "owners": ["joshliebe"],
+        "triggers": ["impression"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
+    "m_aichat_attachment_privacy_image_learn_more_tapped": {
+        "description": "Fires when the user taps the Learn more link on the attachment privacy disclaimer while an image is staged.",
+        "owners": ["joshliebe"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
+    "m_aichat_attachment_privacy_file_learn_more_tapped": {
+        "description": "Fires when the user taps the Learn more link on the attachment privacy disclaimer while a file (no image) is staged.",
+        "owners": ["joshliebe"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
     "m_aichat_contextual_quick_action_ask_about_page_shown": {
         "description": "The Ask About Page quick action pill was shown in the Contextual sheet",
         "owners": ["karlenDimla"],
