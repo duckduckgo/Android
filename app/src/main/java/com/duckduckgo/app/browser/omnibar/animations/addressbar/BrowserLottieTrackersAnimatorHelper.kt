@@ -490,12 +490,3 @@ internal fun addressBarAnimationContext(
 } else {
     context
 }
-
-sealed class TrackerLogo() {
-    class ImageLogo(val resId: Int) : TrackerLogo()
-    class LetterLogo(
-        val trackerLetter: String = "",
-    ) : TrackerLogo()
-
-    class StackedLogo(val resId: Int = R.drawable.network_logo_more) : TrackerLogo()
-}
