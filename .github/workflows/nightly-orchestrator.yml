@@ -20,7 +20,7 @@ jobs:
         id: resolve
         run: |
           echo "Using commit: ${{ github.sha }}"
-          echo "commit_sha=${{ github.sha }}" >> $GITHUB_OUTPUT
+          echo "commit_sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
 
   call-release-blocking-checks:
     needs: resolve-commit
@@ -154,11 +154,11 @@ jobs:
           yesterday=$(date -u -d yesterday +%F)
           echo "Last LGC: ${last_lgc:-none}, yesterday: $yesterday"
 
-          echo "last_lgc=${last_lgc:-none}" >> $GITHUB_OUTPUT
+          echo "last_lgc=${last_lgc:-none}" >> "$GITHUB_OUTPUT"
           if [ -z "$last_lgc" ] || [[ "$lgc_date" < "$yesterday" ]]; then
-            echo "is_stale=true" >> $GITHUB_OUTPUT
+            echo "is_stale=true" >> "$GITHUB_OUTPUT"
           else
-            echo "is_stale=false" >> $GITHUB_OUTPUT
+            echo "is_stale=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Create Asana task in Android Releases AOR
@@ -206,7 +206,7 @@ jobs:
           --android-repo-path . \
           --end-commit '${{ needs.resolve-commit.outputs.commit_sha }}' \
           --trigger-phrase 'Task/Issue URL:')
-          echo "task_ids=$TASK_IDS" >> $GITHUB_OUTPUT
+          echo "task_ids=$TASK_IDS" >> "$GITHUB_OUTPUT"
 
   move_tasks_in_lgc:
     name: Tag tasks as LGC
