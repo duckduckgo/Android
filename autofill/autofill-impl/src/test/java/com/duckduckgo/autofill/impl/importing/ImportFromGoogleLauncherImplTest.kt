@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-
-
 package com.duckduckgo.autofill.impl.importing
 
 import android.app.Activity

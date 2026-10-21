@@ -51,7 +51,7 @@ private class ImportBookmarksFromGoogleContract(
 ) : ActivityResultContract<BookmarksImportRequest, PublicResult>() {
     override fun getSynchronousResult(
         context: Context,
-        input: BookmarksImportRequest
+        input: BookmarksImportRequest,
     ): SynchronousResult<PublicResult>? {
         val isAvailable = (input as? AvailabilityCheckedRequest)?.isAvailable == true
         return when {
@@ -63,7 +63,7 @@ private class ImportBookmarksFromGoogleContract(
 
     override fun createIntent(
         context: Context,
-        input: BookmarksImportRequest
+        input: BookmarksImportRequest,
     ): Intent {
         return checkNotNull(buildIntent(context)) {
             "getSynchronousResult should return a result when there is no intent"
@@ -72,7 +72,7 @@ private class ImportBookmarksFromGoogleContract(
 
     override fun parseResult(
         resultCode: Int,
-        intent: Intent?
+        intent: Intent?,
     ): PublicResult {
         val data = intent?.extras ?: return PublicResult.UserCancelled
 
