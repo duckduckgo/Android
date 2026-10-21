@@ -154,7 +154,12 @@ jobs:
           yesterday=$(date -u -d yesterday +%F)
           echo "Last LGC: ${last_lgc:-none}, yesterday: $yesterday"
 
-          echo "last_lgc=${last_lgc:-none}" >> "$GITHUB_OUTPUT"
+          if [ -n "$last_lgc" ]; then
+            days_ago=$(( ($(date -u -d "$(date -u +%F)" +%s) - $(date -u -d "$lgc_date" +%s)) / 86400 ))
+            echo "last_lgc_age=$days_ago days ago" >> "$GITHUB_OUTPUT"
+          else
+            echo "last_lgc_age=none" >> "$GITHUB_OUTPUT"
+          fi
           if [ -z "$last_lgc" ] || [[ "$lgc_date" < "$yesterday" ]]; then
             echo "is_stale=true" >> "$GITHUB_OUTPUT"
           else
@@ -171,7 +176,7 @@ jobs:
           asana-task-name: No LGC tagged since before yesterday
           asana-task-description: |
             The nightly orchestrator failed to tag a new LGC and no LGC has been tagged since before yesterday.
-            Last LGC: ${{ steps.check_lgc_date.outputs.last_lgc }}
+            Last LGC: ${{ steps.check_lgc_date.outputs.last_lgc_age }}
             Failed run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'
 
