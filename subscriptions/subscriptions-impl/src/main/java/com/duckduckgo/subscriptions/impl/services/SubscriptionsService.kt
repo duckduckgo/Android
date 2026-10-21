@@ -42,6 +42,10 @@ interface SubscriptionsService {
 
     @GET("https://subscriptions.duckduckgo.com/api/products/{sku}/features")
     suspend fun features(@Path("sku") sku: String): FeaturesResponse
+
+    @AuthRequired
+    @GET("https://subscriptions.duckduckgo.com/api/subscription/withdraw")
+    suspend fun withdrawalEligibility(): WithdrawalEligibilityResponse
 }
 
 data class PortalResponse(val customerPortalUrl: String)
@@ -95,4 +99,12 @@ data class ConfirmationEntitlement(
 
 data class FeaturesResponse(
     val features: List<String>,
+)
+
+data class WithdrawalEligibilityResponse(
+    val eligible: Boolean,
+    val eligibleUntil: Long?,
+    val refundAmount: String?,
+    val refundCurrency: String?,
+    val reason: String?,
 )

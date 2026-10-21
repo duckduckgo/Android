@@ -31,6 +31,9 @@ import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
+import com.duckduckgo.common.ui.view.button.ButtonType.SECONDARY
+import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
+import com.duckduckgo.common.ui.view.dialog.StackedButton
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
@@ -65,6 +68,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.LaunchOnboarding
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.OnboardingEntryPoint
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
@@ -160,6 +164,10 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
         binding.onboardingProgressButton.setOnClickListener {
             viewModel.onContinueSetupClicked()
+        }
+
+        binding.withdraw.setClickListener {
+            viewModel.onWithdrawClicked()
         }
 
         if (savedInstanceState == null) {
@@ -304,6 +312,12 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
+        val withdrawal = viewState.withdrawal
+        binding.withdraw.isVisible = withdrawal != null
+        if (withdrawal != null) {
+            binding.withdraw.setSecondaryText(getString(string.subscriptionSettingWithdrawDeadline, withdrawal.deadline))
+        }
+
         if (viewState.email == null) {
             binding.manageEmail.gone()
             binding.addToDevice.setSecondaryText(resources.getString(string.addToDeviceSecondaryTextWithoutEmail))
@@ -371,7 +385,32 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             }
 
             LaunchOnboarding -> globalActivityStarter.start(this, SubscriptionOnboardingScreenWithEmptyParams)
+            is ShowWithdrawalDialog -> showWithdrawalDialog(command)
         }
+    }
+
+    private fun showWithdrawalDialog(command: ShowWithdrawalDialog) {
+        StackedAlertDialogBuilder(this)
+            .setTitle(string.subscriptionWithdrawDialogTitle)
+            .setMessage(getString(string.subscriptionWithdrawDialogMessage, getString(command.tierNameResId), command.refundAmount))
+            .setStackedButtons(
+                listOf(
+                    StackedButton(string.subscriptionWithdrawDialogConfirm, DESTRUCTIVE),
+                    StackedButton(string.subscriptionWithdrawDialogKeep, SECONDARY),
+                ),
+            )
+            .setRebrandUpdate(true)
+            .setCancellable(true)
+            .addEventListener(
+                object : StackedAlertDialogBuilder.EventListener() {
+                    override fun onButtonClicked(position: Int) {
+                        if (position == WITHDRAWAL_DIALOG_CONFIRM_POSITION) {
+                            viewModel.onWithdrawalConfirmed()
+                        }
+                    }
+                },
+            )
+            .show()
     }
 
     private fun goToFaqs() {
@@ -489,6 +528,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         const val LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email"
         const val PRIVACY_POLICY_URL = "https://duckduckgo.com/pro/privacy-terms"
 
+        private const val WITHDRAWAL_DIALOG_CONFIRM_POSITION = 0
         private const val PURCHASE_VIEW_PLANS_ORIGIN = "funnel_subscriptionsettings_android__viewplans"
     }
 }

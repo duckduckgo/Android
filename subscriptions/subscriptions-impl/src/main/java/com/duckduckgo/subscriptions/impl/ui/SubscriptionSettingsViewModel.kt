@@ -47,9 +47,12 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.LaunchOnboarding
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
+import com.duckduckgo.subscriptions.impl.withdrawal.SubscriptionWithdrawal
+import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalEligibility
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -59,8 +62,11 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.logcat
+import java.text.NumberFormat
+import java.util.Currency
 import java.util.Date
 import javax.inject.Inject
 
@@ -75,6 +81,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
     private val onboardingStore: SubscriptionOnboardingStore,
     private val subscriptionOnboardingExperiments: SubscriptionOnboardingExperiments,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val subscriptionWithdrawal: SubscriptionWithdrawal,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -82,6 +89,9 @@ class SubscriptionSettingsViewModel @Inject constructor(
 
     private val _viewState = MutableStateFlow<ViewState>(ViewState.Loading)
     val viewState = _viewState.asStateFlow()
+
+    private var withdrawalOption: WithdrawalOption? = null
+    private var withdrawalEligibilityRequested = false
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
@@ -165,8 +175,54 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 pendingTierNameResId = pendingTierNameResId,
                 effectiveTier = effectiveTier,
                 onboardingEntryPoint = onboardingEntryPoint(subscription),
+                withdrawal = withdrawalOption.takeIf { canWithdraw(subscription) },
             ),
         )
+
+        loadWithdrawalOptionIfNeeded(subscription)
+    }
+
+    private fun canWithdraw(subscription: Subscription): Boolean {
+        return subscriptionsFeature.subscriptionWithdrawal().isEnabled() &&
+            subscription.platform.equals(STRIPE_PLATFORM, ignoreCase = true) &&
+            subscription.isActive() &&
+            ActiveOfferType.TRIAL !in subscription.activeOffers
+    }
+
+    // Eligibility needs a Stripe lookup on the backend, so it is requested once per screen rather than on every resume
+    private suspend fun loadWithdrawalOptionIfNeeded(subscription: Subscription) {
+        if (!canWithdraw(subscription) || withdrawalEligibilityRequested) return
+        withdrawalEligibilityRequested = true
+
+        val eligibility = subscriptionWithdrawal.getEligibility() ?: return
+        val option = eligibility.toWithdrawalOption(subscription)
+        withdrawalOption = option
+        _viewState.update { state -> if (state is Ready) state.copy(withdrawal = option) else state }
+    }
+
+    private fun WithdrawalEligibility.toWithdrawalOption(subscription: Subscription): WithdrawalOption {
+        return WithdrawalOption(
+            deadline = DateFormat.getInstanceForSkeleton("ddMMMMyyyy").format(Date(eligibleUntil)),
+            refundAmount = formatRefundAmount(this),
+            tierNameResId = getPendingTierNameResId(subscription.tier),
+        )
+    }
+
+    private fun formatRefundAmount(eligibility: WithdrawalEligibility): String {
+        val currencyCode = eligibility.refundCurrency.uppercase()
+        return runCatching {
+            NumberFormat.getCurrencyInstance().apply { currency = Currency.getInstance(currencyCode) }.format(eligibility.refundAmount)
+        }.getOrElse { "${eligibility.refundAmount.toPlainString()} $currencyCode" }
+    }
+
+    fun onWithdrawClicked() {
+        val option = (_viewState.value as? Ready)?.withdrawal ?: return
+        viewModelScope.launch {
+            command.send(ShowWithdrawalDialog(tierNameResId = option.tierNameResId, refundAmount = option.refundAmount))
+        }
+    }
+
+    fun onWithdrawalConfirmed() {
     }
 
     private val completedEntryPointAllowed: Boolean by lazy {
@@ -278,9 +334,16 @@ class SubscriptionSettingsViewModel @Inject constructor(
         data object GoToActivationScreen : Command()
         data class GoToPortal(val url: String) : Command()
         data object LaunchOnboarding : Command()
+        data class ShowWithdrawalDialog(val tierNameResId: Int, val refundAmount: String) : Command()
     }
 
     data class OnboardingEntryPoint(val percentage: Int)
+
+    data class WithdrawalOption(
+        val deadline: String,
+        val refundAmount: String,
+        val tierNameResId: Int,
+    )
 
     sealed class ViewState {
         data object Loading : ViewState()
@@ -303,11 +366,13 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val pendingTierNameResId: Int? = null,
             val effectiveTier: SubscriptionTier,
             val onboardingEntryPoint: OnboardingEntryPoint? = null,
+            val withdrawal: WithdrawalOption? = null,
         ) : ViewState()
     }
 
     companion object {
         private const val COMPLETE_PERCENTAGE = 100
+        private const val STRIPE_PLATFORM = "stripe"
         private const val INCOMPLETE_CARD_WINDOW_MILLIS = 14L * 24 * 60 * 60 * 1000
     }
 }

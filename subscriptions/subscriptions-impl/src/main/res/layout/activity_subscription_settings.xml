@@ -296,6 +296,15 @@
                 android:layout_height="wrap_content"
                 app:primaryText="@string/subscriptionSettingRemoveFromDevice" />
 
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/withdraw"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/subscriptionSettingWithdraw"
+                tools:secondaryText="You can withdraw and get a full refund until October 15, 2026"
+                tools:visibility="visible" />
+
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
