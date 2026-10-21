@@ -86,7 +86,6 @@ class AppWidgetManagerAddWidgetLauncher @Inject constructor(
                 widgetLabel = context.getString(R.string.searchOnlyWidgetLabel)
                 ComponentName(context, SearchOnlyWidget::class.java)
             }
-            // There is no Duck.ai widget provider yet; the previous duckAiOnly flag also fell through to the favorites widget.
             WidgetType.SEARCH_AND_FAVORITES, WidgetType.DUCK_AI -> {
                 widgetLabel = context.getString(R.string.favoritesWidgetLabel)
                 ComponentName(context, SearchAndFavoritesWidget::class.java)
