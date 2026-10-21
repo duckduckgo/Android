@@ -62,6 +62,7 @@ class NetworkModule {
         val cache = Cache(cacheLocation, CACHE_SIZE)
         return OkHttpClient.Builder()
             .addInterceptor(apiRequestInterceptor)
+            .hostnameVerifier(ForbiddenCertificatesHostnameVerifier())
             .cache(cache).apply {
                 apiInterceptorPlugins.getPlugins().forEach {
                     addInterceptor(it.getInterceptor())
@@ -98,6 +99,7 @@ class NetworkModule {
         return OkHttpClient.Builder()
             .addInterceptor(apiRequestInterceptor)
             .addInterceptor(pixelReQueryInterceptor)
+            .hostnameVerifier(ForbiddenCertificatesHostnameVerifier())
             .apply {
                 pixelInterceptorPlugins.getPlugins().forEach { addInterceptor(it.getInterceptor()) }
             }

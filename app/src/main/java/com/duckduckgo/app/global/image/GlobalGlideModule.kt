@@ -25,6 +25,7 @@ import com.bumptech.glide.integration.okhttp3.OkHttpUrlLoader
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.module.AppGlideModule
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.global.api.ForbiddenCertificatesHostnameVerifier
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import java.io.InputStream
@@ -37,6 +38,7 @@ class GlobalGlideModule : AppGlideModule() {
         registry: Registry,
     ) {
         val okHttpClientBuilder = OkHttpClient.Builder()
+            .hostnameVerifier(ForbiddenCertificatesHostnameVerifier())
             .addInterceptor { chain: Interceptor.Chain ->
                 val request = chain.request()
 

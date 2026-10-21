@@ -17,6 +17,7 @@
 package com.duckduckgo.app.tabs.model
 
 import androidx.core.text.HtmlCompat
+import com.duckduckgo.app.global.api.ForbiddenCertificatesHostnameVerifier
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.Gpc
@@ -41,7 +42,10 @@ class RealPageTitleFetcher @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : PageTitleFetcher {
     private val client by lazy {
-        OkHttpClient.Builder().callTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS).build()
+        OkHttpClient.Builder()
+            .callTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .hostnameVerifier(ForbiddenCertificatesHostnameVerifier())
+            .build()
     }
 
     override suspend fun fetchTitle(url: String): String? = withContext(dispatchers.io()) {

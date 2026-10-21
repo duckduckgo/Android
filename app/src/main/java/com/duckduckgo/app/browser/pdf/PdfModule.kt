@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.pdf
 
+import com.duckduckgo.app.global.api.ForbiddenCertificatesHostnameVerifier
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
@@ -36,6 +37,8 @@ object PdfModule {
     @SingleIn(AppScope::class)
     @PdfOkHttpClient
     fun providePdfOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder().build()
+        return OkHttpClient.Builder()
+            .hostnameVerifier(ForbiddenCertificatesHostnameVerifier())
+            .build()
     }
 }
