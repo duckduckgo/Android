@@ -16,6 +16,7 @@
 
 package com.duckduckgo.remote.messaging.impl.modal.cardslist
 
+import com.duckduckgo.app.widget.WidgetType
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Action.AddWidget
@@ -61,7 +62,7 @@ class RealCommandActionMapper @Inject constructor(
                 Command.SubmitUrl(surveyParameterManager.buildSurveyUrl(action.value, queryParams))
             }
             is DefaultCredentialProvider -> Command.LaunchDefaultCredentialProvider
-            is AddWidget -> Command.LaunchAddWidget
+            is AddWidget -> Command.LaunchAddWidget(WidgetType.fromValue(action.value))
         }
     }
 }

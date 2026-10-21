@@ -36,7 +36,7 @@
             "primaryActionText": "Add widget",
             "primaryAction": {
               "type": "addWidget",
-              "value": ""
+              "value": "search"
             }
           }
         ]

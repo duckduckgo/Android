@@ -16,6 +16,7 @@
 package com.duckduckgo.nextsteps.impl.ui
 
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
+import com.duckduckgo.app.widget.WidgetType
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
@@ -595,7 +596,7 @@ class NextStepsItemsViewModelTest {
         activeMessage.value = message
         advanceUntilIdle()
         testee.onPrimaryActionClicked()
-        assertEquals(Command.LaunchAddWidget, testee.commands().first())
+        assertEquals(Command.LaunchAddWidget(WidgetType.SEARCH), testee.commands().first())
         addWidgetCheck.completed = true
 
         testee.onResume(mock())
@@ -836,13 +837,13 @@ class NextStepsItemsViewModelTest {
 
     @Test
     fun `when add widget primary action is clicked then widget command is emitted`() = runTest {
-        val item = syncItem.copy(primaryAction = Action.AddWidget)
+        val item = syncItem.copy(primaryAction = Action.AddWidget("searchOnly"))
         activeMessage.value = aMessage(content = Content.ActionableItems(titleText = "Complete your setup", listItems = listOf(item)))
         advanceUntilIdle()
 
         testee.onPrimaryActionClicked()
 
-        assertEquals(Command.LaunchAddWidget, testee.commands().first())
+        assertEquals(Command.LaunchAddWidget(WidgetType.SEARCH_ONLY), testee.commands().first())
         assertEquals(listOf(item), testee.viewState.value.items)
         assertEquals(emptySet<String>(), itemsStore.dismissedItemIds().first())
         verify(remoteMessageModel, never()).onMessageDismissed(any())
@@ -971,7 +972,7 @@ class NextStepsItemsViewModelTest {
     private val addWidgetItem = defaultBrowserItem.copy(
         id = "setup_add_widget",
         titleText = "Try our Home screen widget",
-        primaryAction = Action.AddWidget,
+        primaryAction = Action.AddWidget(""),
     )
 
     private val syncItem = defaultBrowserItem.copy(id = "setup_sync", titleText = "Sync your data")

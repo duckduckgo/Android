@@ -193,7 +193,7 @@ sealed class Action(
     ) : Action(JsonActionType.SURVEY.jsonValue, value, additionalParameters)
 
     data object DefaultCredentialProvider : Action(DEFAULT_CREDENTIAL_PROVIDER.jsonValue, "", null)
-    data object AddWidget : Action(ADD_WIDGET.jsonValue, "", null)
+    data class AddWidget(override val value: String) : Action(ADD_WIDGET.jsonValue, value, null)
 }
 
 sealed class CardItem {

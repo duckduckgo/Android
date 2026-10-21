@@ -141,7 +141,7 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
 
     private fun processCommand(command: Command) {
         when (command) {
-            is Command.LaunchAddWidget -> addWidgetLauncher.launchAddWidget(context, simpleWidgetPrompt = true)
+            is Command.LaunchAddWidget -> addWidgetLauncher.launchAddWidget(context, command.widgetType)
             is Command.LaunchDefaultBrowserDialog -> launchDefaultBrowserDialog()
             is Command.LaunchDefaultBrowserSettings -> launchDefaultBrowserSettings()
             is Command.LaunchScreen -> {

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.remote.messaging.impl.modal.cardslist
 
+import com.duckduckgo.app.widget.WidgetType
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageViewModel.Command
 import com.duckduckgo.survey.api.SurveyParameterManager
@@ -188,11 +189,20 @@ class RealCommandActionMapperTest {
     }
 
     @Test
-    fun whenAddWidgetActionThenReturnsLaunchAddWidgetCommand() = runTest {
-        val action = Action.AddWidget
+    fun whenAddWidgetActionThenReturnsLaunchAddWidgetCommandWithWidgetType() = runTest {
+        val action = Action.AddWidget("searchAndFavorites")
 
         val result = mapper.asCommand(action)
 
-        assertTrue(result is Command.LaunchAddWidget)
+        assertEquals(Command.LaunchAddWidget(WidgetType.SEARCH_AND_FAVORITES), result)
+    }
+
+    @Test
+    fun whenAddWidgetActionHasUnknownValueThenFallsBackToSearchWidget() = runTest {
+        val action = Action.AddWidget("vpn")
+
+        val result = mapper.asCommand(action)
+
+        assertEquals(Command.LaunchAddWidget(WidgetType.SEARCH), result)
     }
 }

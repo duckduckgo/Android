@@ -20,15 +20,28 @@ import android.content.Context
 
 /**
  * Launches the system pin-widget prompt where supported, otherwise manual add-widget instructions.
- * Pin prompts default to Search & Favorites; the simple and search-only flags select alternatives, with simple taking precedence.
- * The Duck.ai-only flag is currently ignored.
- * [activityContext] must be an Activity or backed by one, such as a View's context, so the instructions screen can be started.
+ * The manual instructions need an Activity behind [context] (an Activity or a View's context); without one they are not shown
+ * in release builds and crash internal/debug builds.
  */
 interface AddWidgetLauncher {
     fun launchAddWidget(
-        activityContext: Context,
-        simpleWidgetPrompt: Boolean = false,
-        searchOnlyWidgetPrompt: Boolean = false,
-        duckAiOnlyWidgetPrompt: Boolean = false,
+        context: Context,
+        widgetType: WidgetType = WidgetType.SEARCH,
     )
+}
+
+/**
+ * Home screen widgets the pin prompt can offer. [value] is the identifier used in remote config (e.g. the RMF `addWidget` action);
+ * [fromValue] falls back to [SEARCH] for empty or unknown values, so new types can be added without breaking older clients.
+ */
+enum class WidgetType(val value: String) {
+    SEARCH("search"),
+    SEARCH_ONLY("searchOnly"),
+    SEARCH_AND_FAVORITES("searchAndFavorites"),
+    DUCK_AI("duckAi"),
+    ;
+
+    companion object {
+        fun fromValue(value: String?): WidgetType = entries.firstOrNull { it.value == value } ?: SEARCH
+    }
 }

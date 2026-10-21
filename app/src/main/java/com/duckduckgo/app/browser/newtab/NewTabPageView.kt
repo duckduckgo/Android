@@ -356,7 +356,7 @@ class NewTabPageView @JvmOverloads constructor(
             is SharePromoLinkRMF -> launchSharePromoRMFPageChooser(command.url, command.shareTitle)
             is SubmitUrl -> submitUrl(command.url)
             is LaunchDefaultCredentialProvider -> launchDefaultCredentialProvider()
-            is LaunchAddWidget -> addWidgetLauncher.launchAddWidget(context, simpleWidgetPrompt = true)
+            is LaunchAddWidget -> addWidgetLauncher.launchAddWidget(context, command.widgetType)
         }
     }
 

@@ -177,7 +177,7 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
             is SubmitUrlInContext -> submitUrlInContext(command.url)
             is DismissMessage -> dismiss()
             is LaunchDefaultCredentialProvider -> launchDefaultCredentialProvider()
-            is LaunchAddWidget -> addWidgetLauncher.launchAddWidget(context, simpleWidgetPrompt = true)
+            is LaunchAddWidget -> addWidgetLauncher.launchAddWidget(context, command.widgetType)
             is LaunchAppTPOnboarding -> launchAppTPOnboarding()
             is LaunchDefaultBrowser -> launchDefaultBrowser()
             is LaunchPlayStore -> openPlayStore(command.appPackage)

@@ -150,7 +150,7 @@ class DefaultCredentialProviderActionMapper @Inject constructor() : MessageActio
 class AddWidgetActionMapper @Inject constructor() : MessageActionMapperPlugin {
     override fun evaluate(jsonMessageAction: JsonMessageAction): Action? {
         return if (jsonMessageAction.type == ADD_WIDGET.jsonValue) {
-            Action.AddWidget
+            Action.AddWidget(jsonMessageAction.value)
         } else {
             null
         }

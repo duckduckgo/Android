@@ -41,17 +41,17 @@ class AddWidgetCompatLauncherTest {
     fun whenAutomaticWidgetAddIsNotSupportedThenDelegateToLegacyAddWidgetLauncher() {
         whenever(widgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
 
-        testee.launchAddWidget(context)
+        testee.launchAddWidget(context, WidgetType.SEARCH_ONLY)
 
-        verify(legacyAddWidgetLauncher).launchAddWidget(context)
+        verify(legacyAddWidgetLauncher).launchAddWidget(context, WidgetType.SEARCH_ONLY)
     }
 
     @Test
     fun whenAutomaticWidgetAddIsSupportedThenDelegateToAppWidgetManagerAddWidgetLauncher() {
         whenever(widgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
 
-        testee.launchAddWidget(context)
+        testee.launchAddWidget(context, WidgetType.SEARCH_ONLY)
 
-        verify(defaultAddWidgetLauncher).launchAddWidget(context)
+        verify(defaultAddWidgetLauncher).launchAddWidget(context, WidgetType.SEARCH_ONLY)
     }
 }

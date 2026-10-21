@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
+import com.duckduckgo.app.widget.WidgetType
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ViewScope
@@ -67,7 +68,7 @@ class NextStepsItemsViewModel @Inject constructor(
     )
 
     sealed class Command {
-        data object LaunchAddWidget : Command()
+        data class LaunchAddWidget(val widgetType: WidgetType) : Command()
         data object LaunchDefaultBrowserDialog : Command()
         data object LaunchDefaultBrowserSettings : Command()
         data class LaunchScreen(
@@ -142,7 +143,7 @@ class NextStepsItemsViewModel @Inject constructor(
                 }
             }
 
-            is Action.AddWidget -> Command.LaunchAddWidget
+            is Action.AddWidget -> Command.LaunchAddWidget(WidgetType.fromValue(action.value))
             is Action.Navigation -> Command.LaunchScreen(action.value, action.additionalParameters?.get("payload").orEmpty())
             else -> null
         } ?: return

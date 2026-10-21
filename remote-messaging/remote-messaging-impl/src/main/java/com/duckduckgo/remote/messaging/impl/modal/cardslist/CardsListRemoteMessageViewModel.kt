@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.widget.WidgetType
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.remote.messaging.api.Action
@@ -225,6 +226,6 @@ class CardsListRemoteMessageViewModel @Inject constructor(
         ) : Command()
 
         data object LaunchDefaultCredentialProvider : Command()
-        data object LaunchAddWidget : Command()
+        data class LaunchAddWidget(val widgetType: WidgetType) : Command()
     }
 }
