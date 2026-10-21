@@ -19,14 +19,14 @@ package com.duckduckgo.adblocking.impl
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.browser.api.BrowserRefreshTriggerPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class AdBlockingRefreshTriggerPlugin @Inject constructor(
     private val statusChecker: AdBlockingStatusChecker,
 ) : BrowserRefreshTriggerPlugin {

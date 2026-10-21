@@ -26,12 +26,12 @@ import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionManager
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Moshi.Builder
 import com.squareup.moshi.Types
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.runBlocking
 import java.util.Locale
 import java.util.UUID
@@ -51,7 +51,7 @@ interface CoreContentScopeScripts {
     val callbackName: String
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealContentScopeScripts @Inject constructor(
     private val pluginPoint: PluginPoint<ContentScopeConfigPlugin>,

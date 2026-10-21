@@ -17,7 +17,7 @@
 package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import androidx.lifecycle.ViewModel
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputMode

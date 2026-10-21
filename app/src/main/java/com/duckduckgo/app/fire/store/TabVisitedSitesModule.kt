@@ -20,16 +20,16 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class TabVisitedSitesModule {
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideDatabase(context: Context): TabVisitedSitesDatabase {
         return Room.databaseBuilder(context, TabVisitedSitesDatabase::class.java, "tab_visited_sites.db")
@@ -38,7 +38,7 @@ class TabVisitedSitesModule {
             .build()
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideDao(db: TabVisitedSitesDatabase): TabVisitedSitesDao = db.dao()
 }

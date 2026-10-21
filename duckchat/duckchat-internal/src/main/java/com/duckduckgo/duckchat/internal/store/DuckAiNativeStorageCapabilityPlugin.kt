@@ -22,11 +22,11 @@ import android.os.Build
 import android.widget.Toast
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.internal.DuckAiDevCapabilityPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import java.net.NetworkInterface
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class DuckAiNativeStorageCapabilityPlugin @Inject constructor(
     private val server: DuckAiDebugServer,
 ) : DuckAiDevCapabilityPlugin {

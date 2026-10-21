@@ -25,7 +25,6 @@ import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import dagger.Lazy
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -132,13 +131,13 @@ class ContributesRemoteFeatureCodeGeneratorBucketAssignmentTest(private val test
             .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
             .getConstructor(
                 FeatureSettings.Store::class.java,
-                dagger.Lazy::class.java as Class<*>,
+                kotlin.Lazy::class.java as Class<*>,
                 AppBuildConfig::class.java,
                 VariantManager::class.java,
                 Context::class.java,
             ).newInstance(
                 FeatureSettings.EMPTY_STORE,
-                Lazy { testFeature },
+                lazyOf(testFeature),
                 appBuildConfig,
                 variantManager,
                 context,

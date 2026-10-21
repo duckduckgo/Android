@@ -18,7 +18,7 @@ package com.duckduckgo.autofill.impl.importing
 
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface DomainNameNormalizer {

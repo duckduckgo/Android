@@ -20,18 +20,27 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.checker.isEnabled
 import com.duckduckgo.pir.impl.store.PirRepository
-import com.squareup.anvil.annotations.ContributesBinding
+import com.duckduckgo.subscriptions.api.Product.PIR
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
+import com.duckduckgo.subscriptions.api.Subscriptions
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
 interface PirUserUtils {
     suspend fun isActiveUser(): Boolean
+
+    /**
+     * Whether the user holds an active subscription that includes PIR.
+     */
+    suspend fun hasPirSubscription(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
 class RealPirUserUtils @Inject constructor(
     private val pirWorkHandler: PirWorkHandler,
     private val pirRepository: PirRepository,
+    private val subscriptions: Subscriptions,
 ) : PirUserUtils {
 
     /**
@@ -42,5 +51,22 @@ class RealPirUserUtils @Inject constructor(
      */
     override suspend fun isActiveUser(): Boolean {
         return pirWorkHandler.canRunPir().firstOrNull()?.isEnabled == true && pirRepository.getValidUserProfileQueries().isNotEmpty()
+    }
+
+    override suspend fun hasPirSubscription(): Boolean {
+        val subscriptionActive = when (subscriptions.getSubscriptionStatus()) {
+            SubscriptionStatus.UNKNOWN,
+            SubscriptionStatus.INACTIVE,
+            SubscriptionStatus.EXPIRED,
+            SubscriptionStatus.WAITING,
+            -> false
+
+            SubscriptionStatus.AUTO_RENEWABLE,
+            SubscriptionStatus.NOT_AUTO_RENEWABLE,
+            SubscriptionStatus.GRACE_PERIOD,
+            -> true
+        }
+
+        return subscriptionActive && subscriptions.getCurrentEntitlements().any { it.product == PIR.value }
     }
 }

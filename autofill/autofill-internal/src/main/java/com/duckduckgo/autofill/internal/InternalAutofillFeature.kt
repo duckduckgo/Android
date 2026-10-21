@@ -17,14 +17,14 @@
 package com.duckduckgo.autofill.internal
 
 import android.content.Context
-import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin.Companion.AUTOFILL_SETTINGS_PRIO_KEY
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoMap(AppScope::class)
 @PriorityKey(AUTOFILL_SETTINGS_PRIO_KEY)
 class InternalAutofillFeature @Inject constructor(private val context: Context) : InternalFeaturePlugin {
     override fun internalFeatureTitle(): String {

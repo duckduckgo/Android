@@ -26,14 +26,14 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.promptscoordinator.impl.di.PromptsCoordinatorStore
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 /**
  * Owns the per-install-week state behind the prompt exposure pixels. Nothing is scheduled: every operation
  * first rolls the week over if needed, inside the same [DataStore.edit] transaction, so callers never race.
  */
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class PromptExposureWeekTracker @Inject constructor(
     @PromptsCoordinatorStore private val store: DataStore<Preferences>,
     private val appInstall: AppInstall,

@@ -18,10 +18,10 @@ package com.duckduckgo.installation.impl.installer.fullpackage.feature
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.installation.impl.installer.fullpackage.InstallSourceFullPackageStore.IncludedPackages
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface InstallSourceFullPackageListJsonParser {

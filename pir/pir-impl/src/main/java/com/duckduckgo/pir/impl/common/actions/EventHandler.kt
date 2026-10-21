@@ -16,7 +16,7 @@
 
 package com.duckduckgo.pir.impl.common.actions
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect

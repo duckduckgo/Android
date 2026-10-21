@@ -29,10 +29,10 @@ import com.duckduckgo.savedsites.impl.SavedSitesPixelName.EDIT_BOOKMARK_DELETE_B
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CONFIRMED
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SavedSitesPixelsParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
 
     override fun names(): List<Pair<String, Set<PixelParameter>>> {

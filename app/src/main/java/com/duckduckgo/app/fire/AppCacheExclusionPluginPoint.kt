@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.fire
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.fire.model.AppCacheExclusionPlugin
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
 
 @ContributesPluginPoint(

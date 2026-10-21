@@ -22,7 +22,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.experiments.impl.reinstalls.REINSTALL_VARIANT
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.logcat

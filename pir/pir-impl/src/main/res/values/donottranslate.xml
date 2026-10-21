@@ -24,22 +24,31 @@
     <string name="pirOptOutNotificationMessageComplete">Opt out is complete! View your results.</string>
     <string name="pirDashboardManualConfigWarning">Warning: Broker config has been manually modified. Results may differ from production.</string>
 
+    <!-- Freemium PIR settings entry point -->
+    <string name="pirFreemiumSettingSubtitle">Find your personal info on sites that sell it.</string>
+    <string name="pirFreemiumSettingStartScan">Start Free Scan</string>
+    <string name="pirFreemiumSettingViewResults">View Scan Results</string>
+
+    <!-- Freemium PIR scan complete notification -->
+    <string name="pirFreemiumNotificationTitleComplete">Free Personal Information Scan</string>
+    <string name="pirFreemiumNotificationMessageComplete">Your free personal info scan is now complete. Check out the results…</string>
+
     <!-- PIR subscription onboarding step -->
     <string name="pirOnboardingStepTitle">Personal Information Removal</string>
-    <string name="pirOnboardingStepDescription">DuckDuckGo helps find and remove your personal info from data broker sites, fighting identity theft and spam.</string>
+    <string name="pirOnboardingStepDescription">DuckDuckGo finds and removes your personal info from data broker sites, helping to combat identity theft and spam.</string>
     <string name="pirOnboardingStepActivate">Activate</string>
     <string name="pirOnboardingStepPlatformIos">iOS</string>
     <string name="pirOnboardingStepPlatformAndroid">Android</string>
     <string name="pirOnboardingStepPlatformMac">Mac</string>
     <string name="pirOnboardingStepPlatformWindows">Windows</string>
     <string name="pirOnboardingStepItem1Title">Platforms</string>
-    <string name="pirOnboardingStepItem1Description">Personal Information Removal is only available on Mac and Windows</string>
-    <string name="pirOnboardingStepItem2Title">Repeatedly scans many data broker sites that sell your information</string>
+    <string name="pirOnboardingStepItem1Description">Personal Information Removal is only available on iOS, Mac and Windows.</string>
+    <string name="pirOnboardingStepItem2Title">Repeatedly scans data broker sites that sell your information</string>
     <string name="pirOnboardingStepItem2Description">Find and remove your personal information from data broker sites around the web. DuckDuckGo re-scans regularly to minimize the risk of your info reappearing.</string>
     <string name="pirOnboardingStepItem3Title">Your info stays on your device, not our servers</string>
-    <string name="pirOnboardingStepItem3Description">Unlike other services, the removal process happens entirely on your device, not remote servers — your device stores the personal information you provide during setup and initiates removal requests.</string>
-    <string name="pirOnboardingStepItem4Title">We automate many removals &amp; help you manually remove the rest</string>
-    <string name="pirOnboardingStepItem4Description">Let us help handle the time, effort, and complexity typically required to get your details removed. We scan for your info, request its removal where possible, then receive and handle confirmation emails for you.</string>
-    <string name="pirOnboardingStepItem5Title">Monitor removal progress in real time</string>
-    <string name="pirOnboardingStepItem5Description">It can take a while for sites to update, so we made it easy to keep tabs on progress of ongoing removals and see the personal info we\'ve removed in real time on your personal dashboard.</string>
+    <string name="pirOnboardingStepItem3Description">Unlike other services, the automated removal process happens entirely on your device, not remote servers — your device stores the personal information you provide during setup and initiates removal requests.</string>
+    <string name="pirOnboardingStepItem4Title">Automated removals save you time and effort</string>
+    <string name="pirOnboardingStepItem4Description">We hunt down your personal info on data broker sites that are trying to sell it, and we work to get your details removed by submitting removal requests for you.</string>
+    <string name="pirOnboardingStepItem5Title">You monitor removal progress in real time</string>
+    <string name="pirOnboardingStepItem5Description">It can take a while for sites to update, but your personal dashboard makes it easy to keep tabs on progress of ongoing automated removals in real time and see where any manual follow ups may be needed.</string>
 </resources>

@@ -16,7 +16,7 @@
 
 package com.duckduckgo.common.ui.store
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
@@ -47,7 +47,7 @@ interface AppBrandDesignUpdateToggles {
     fun theme(): Toggle
 
     /** Gates the radius changes separately so the rest of the brand design update can roll out independently. */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun radius(): Toggle
 
     /**

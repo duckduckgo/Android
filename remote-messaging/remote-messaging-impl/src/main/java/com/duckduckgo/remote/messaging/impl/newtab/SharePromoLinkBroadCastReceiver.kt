@@ -19,14 +19,14 @@ package com.duckduckgo.remote.messaging.impl.newtab
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.android.AndroidInjection
 import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.remote.messaging.impl.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixels
-import dagger.android.AndroidInjection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take

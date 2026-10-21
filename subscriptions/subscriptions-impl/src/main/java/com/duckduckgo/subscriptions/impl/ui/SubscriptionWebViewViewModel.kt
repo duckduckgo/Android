@@ -19,7 +19,7 @@ package com.duckduckgo.subscriptions.impl.ui
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -75,6 +75,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.duckduckgo.subscriptions.impl.repository.isExpired
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.*
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Failure
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.InProgress
@@ -110,6 +111,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val pirFeature: PirFeature,
     private val subscriptionExpirationReminderScheduler: SubscriptionExpirationReminderScheduler,
     private val paywallUrlResolver: PaywallUrlResolver,
+    private val subscriptionOnboardingStore: SubscriptionOnboardingStore,
 ) : ViewModel() {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -158,6 +160,9 @@ class SubscriptionWebViewViewModel @Inject constructor(
                         }
                         pendingScheduleNotificationDaysBeforeCancel = null
                     }
+                    val launchOnboarding = subscriptionOnboardingExperiments.isTreatment()
+                    // A resubscription must not carry over the previous subscription's onboarding progress.
+                    if (launchOnboarding) subscriptionOnboardingStore.reset()
                     Success(
                         SubscriptionEventData(
                             PURCHASE_COMPLETED_FEATURE_NAME,
@@ -165,7 +170,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                             JSONObject(PURCHASE_COMPLETED_JSON),
                         ),
                         isFreeTrial = it.isFreeTrial,
-                        launchOnboarding = subscriptionOnboardingExperiments.isTreatment(),
+                        launchOnboarding = launchOnboarding,
                     )
                 }
                 is CurrentPurchase.InProgress, CurrentPurchase.PreFlowInProgress -> InProgress

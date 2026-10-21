@@ -24,20 +24,21 @@ import com.duckduckgo.remote.messaging.api.JsonToMatchingAttributeMapper
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.repository.isExpired
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = JsonToMatchingAttributeMapper::class,
+    binding = binding<JsonToMatchingAttributeMapper>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = AttributeMatcherPlugin::class,
+    binding = binding<AttributeMatcherPlugin>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RMFSubscriptionDaysUntilExpiryRenewalMatchingAttribute @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val currentTimeProvider: CurrentTimeProvider,

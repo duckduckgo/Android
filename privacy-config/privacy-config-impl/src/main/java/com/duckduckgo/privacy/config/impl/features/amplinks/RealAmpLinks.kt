@@ -26,13 +26,13 @@ import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.logcat
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealAmpLinks @Inject constructor(
     private val ampLinksRepository: AmpLinksRepository,
     private val featureToggle: FeatureToggle,

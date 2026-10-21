@@ -20,8 +20,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.db.DismissedCtaDao
-import com.duckduckgo.app.cta.model.CtaId
-import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
 import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
@@ -690,6 +688,7 @@ class NewUserOnboardingPlanProviderTest {
             Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, result = NewUserOnboardingResult.LaunchSearch(query = "weather")),
             orchestrator.state.value,
         )
+        verify(onboardingStore, never()).setTriedDuckAi()
     }
 
     @Test
@@ -724,6 +723,7 @@ class NewUserOnboardingPlanProviderTest {
             ),
             orchestrator.state.value,
         )
+        verify(onboardingStore).setTriedDuckAi()
     }
 
     @Test
@@ -1069,6 +1069,7 @@ class NewUserOnboardingPlanProviderTest {
             Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, result = NewUserOnboardingResult.LaunchSearch(query = "weather")),
             orchestrator.state.value,
         )
+        verify(onboardingStore, never()).setTriedDuckAi()
     }
 
     @Test
@@ -1092,6 +1093,7 @@ class NewUserOnboardingPlanProviderTest {
             ),
             orchestrator.state.value,
         )
+        verify(onboardingStore).setTriedDuckAi()
     }
 
     @Test
@@ -1653,6 +1655,20 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
+    fun `when custom ai input screen preview demo submitted then marks duck ai as tried`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // ai_comparison_chart
+
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "hello", isChat = true, fromSuggestion = false))
+
+        verify(onboardingStore).setTriedDuckAi()
+    }
+
+    @Test
     fun `when duck ai demo fire completed then fires AiChatClicked`() = runTest {
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()
@@ -1687,24 +1703,6 @@ class NewUserOnboardingPlanProviderTest {
             ids.indexOf(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT) + 1,
             ids.indexOf(NewUserOnboardingStepIds.WIDGET_PROMPT),
         )
-    }
-
-    @Test
-    fun whenWidgetPromptStepPresentedThenLinearPlanWidgetPromptShownStored() = runTest {
-        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(false)
-        start()
-        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
-        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
-        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
-        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
-        assertStep(NewUserOnboardingStepIds.WIDGET_PROMPT)
-
-        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
-
-        verify(onboardingStore).linearPlanWidgetPromptShown = true
-        verify(dismissedCtaDao, never()).insert(DismissedCta(CtaId.ADD_WIDGET))
-        assertStep(NewUserOnboardingStepIds.WIDGET_PROMPT)
     }
 
     @Test

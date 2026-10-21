@@ -22,12 +22,12 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
 const val BROWSER_UI_LOCK_FEATURE_NAME = "browserUiLock"
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class UiLockContentScopeJsMessageHandler @Inject constructor() : ContentScopeJsMessageHandlersPlugin {
 
     override fun getJsMessageHandler(): JsMessageHandler = object : JsMessageHandler {

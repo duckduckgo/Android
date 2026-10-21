@@ -26,11 +26,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.BundleCompat
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.ImportFromGoogle
 import com.duckduckgo.autofill.api.ImportFromGoogle.ImportFromGoogleResult
 import com.duckduckgo.browser.api.ui.BrowserScreens
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider

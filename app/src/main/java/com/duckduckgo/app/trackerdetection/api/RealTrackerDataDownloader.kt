@@ -16,17 +16,17 @@
 
 package com.duckduckgo.app.trackerdetection.api
 
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
+import com.duckduckgo.app.trackerdetection.db.TrackerDetectionDatabase
 import com.duckduckgo.common.utils.extensions.extractETag
 import com.duckduckgo.common.utils.store.BinaryDataStore
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesBinding
 import io.reactivex.Completable
 import logcat.logcat
 import okhttp3.Headers
@@ -40,7 +40,7 @@ class RealTrackerDataDownloader @Inject constructor(
     private val trackerListService: TrackerListService,
     private val binaryDataStore: BinaryDataStore,
     private val trackerDataLoader: TrackerDataLoader,
-    private val appDatabase: AppDatabase,
+    private val trackerDetectionDatabase: TrackerDetectionDatabase,
     private val metadataDao: TdsMetadataDao,
     @TrackerDetectionMoshi moshi: Moshi,
 ) : TrackerDataDownloader {
@@ -64,7 +64,7 @@ class RealTrackerDataDownloader @Inject constructor(
             val oldEtag = metadataDao.eTag()
             if (eTag != oldEtag) {
                 logcat { "Updating tds data from server" }
-                appDatabase.runInTransaction {
+                trackerDetectionDatabase.runInTransaction {
                     trackerDataLoader.persistTds(eTag, tdsJson)
                     trackerDataLoader.loadTrackers()
                 }

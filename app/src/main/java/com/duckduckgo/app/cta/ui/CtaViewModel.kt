@@ -32,6 +32,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
+import com.duckduckgo.app.onboarding.ContextualOnboardingTimeLimit
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -64,7 +65,7 @@ import com.duckduckgo.onboarding.api.cta.ContextualCtaSuppressorPlugin
 import com.duckduckgo.onboarding.api.forPlan
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.Subscriptions
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -84,7 +85,7 @@ import logcat.logcat
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class CtaViewModel @Inject constructor(
     private val appInstallStore: AppInstallStore,
     private val pixel: Pixel,
@@ -111,6 +112,7 @@ class CtaViewModel @Inject constructor(
     linearOnboardingOrchestrator: LinearOnboardingOrchestrator,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val onboardingPixelSender: OnboardingPixelSender,
+    private val contextualOnboardingTimeLimit: ContextualOnboardingTimeLimit,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -332,6 +334,7 @@ class CtaViewModel @Inject constructor(
         brokenSitePromptUrl: String?,
     ): Cta? {
         return withContext(dispatcher) {
+            contextualOnboardingTimeLimit.endOnboardingIfTimeLimitReached()
             if (isBrowserShowing) {
                 getBrowserCta(site, detectedRefreshPatterns, suppressDuckAiOnboardingCta, brokenSitePromptUrl)
             } else {
@@ -464,7 +467,7 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowDuckAiEndCta(): Boolean =
-        onboardingStore.isDuckAiOnboardingFlow() && duckAiFireButtonShown() && !duckAiEndShown() && !hideTips()
+        onboardingStore.isDuckAiOnboardingFlow() && duckAiFireButtonShown() && !duckAiEndShown() && !hideTips() && !daxOnboardingEnded()
 
     @WorkerThread
     private suspend fun canShowSubscriptionCta(): Boolean {
@@ -493,12 +496,8 @@ class CtaViewModel @Inject constructor(
             return null
         }
 
-        if (!inContextDaxDialogsCompleted) {
-            nonNullSite.uri?.let { uri ->
-                if (contextualCtaSuppressorPlugins.getPlugins().any { !it.canShowCta(uri) }) {
-                    return null
-                }
-            }
+        if (!inContextDaxDialogsCompleted && isCtaSuppressedByPlugins(nonNullSite)) {
+            return null
         }
 
         nonNullSite.let {
@@ -508,7 +507,7 @@ class CtaViewModel @Inject constructor(
 
             // Duck.ai-focused onboarding CTAs
             if (duckChat.isDuckChatUrl(it.url.toUri())) {
-                if (onboardingStore.isDuckAiOnboardingFlow() && !suppressDuckAiOnboardingCta) {
+                if (onboardingStore.isDuckAiOnboardingFlow() && !suppressDuckAiOnboardingCta && !daxOnboardingEnded()) {
                     if (!duckAiFireButtonShown()) {
                         return DaxDuckAiFireButtonContextualCta(
                             onboardingStore = onboardingStore,
@@ -522,27 +521,12 @@ class CtaViewModel @Inject constructor(
             }
 
             if (inContextDaxDialogsCompleted) {
-                val promptUrl = brokenSitePromptUrl ?: return null
-                // Reports are built from Site, so reject stale state before showing the prompt.
-                if (nonNullSite.url != promptUrl) return null
-                return if (brokenSitePrompt.shouldShowBrokenSitePrompt(promptUrl, detectedRefreshPatterns)) {
-                    BrokenSitePromptDialogCta()
-                } else {
-                    null
-                }
+                return brokenSitePromptCta(nonNullSite, brokenSitePromptUrl, detectedRefreshPatterns)
+                    ?: trackersBlockedCtaAfterTimeLimit(nonNullSite)
             }
 
             // Trackers blocked
-            if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackerBlockedEntities().isNotEmpty()) {
-                return DaxTrackersBlockedContextualCta(
-                    onboardingStore = onboardingStore,
-                    appInstallStore = appInstallStore,
-                    trackers = it.orderedTrackerBlockedEntities(),
-                    settingsDataStore = settingsDataStore,
-                    isLightTheme = appTheme.isLightModeEnabled(),
-                    deviceInfo = deviceInfo,
-                )
-            }
+            trackersBlockedCta(it)?.let { cta -> return cta }
 
             // Is major network
             if (it.entity != null) {
@@ -594,6 +578,48 @@ class CtaViewModel @Inject constructor(
 
             return null
         }
+    }
+
+    private suspend fun brokenSitePromptCta(
+        site: Site,
+        brokenSitePromptUrl: String?,
+        detectedRefreshPatterns: Set<RefreshPattern>,
+    ): Cta? {
+        val promptUrl = brokenSitePromptUrl ?: return null
+        // Reports are built from Site, so reject stale state before showing the prompt.
+        if (site.url != promptUrl) return null
+        return if (brokenSitePrompt.shouldShowBrokenSitePrompt(promptUrl, detectedRefreshPatterns)) {
+            BrokenSitePromptDialogCta()
+        } else {
+            null
+        }
+    }
+
+    private fun trackersBlockedCta(site: Site): Cta? {
+        if (daxDialogTrackersFoundShown() || isSerpUrl(site.url)) return null
+        val trackers = site.orderedTrackerBlockedEntities()
+        if (trackers.isEmpty()) return null
+
+        return DaxTrackersBlockedContextualCta(
+            onboardingStore = onboardingStore,
+            appInstallStore = appInstallStore,
+            trackers = trackers,
+            settingsDataStore = settingsDataStore,
+            isLightTheme = appTheme.isLightModeEnabled(),
+            deviceInfo = deviceInfo,
+        )
+    }
+
+    // The only onboarding dialog still shown after the time limit.
+    private suspend fun trackersBlockedCtaAfterTimeLimit(site: Site): Cta? {
+        if (hideTips() || !contextualOnboardingTimeLimit.wasOnboardingEndedByTimeLimit()) return null
+        if (isCtaSuppressedByPlugins(site)) return null
+        return trackersBlockedCta(site)
+    }
+
+    private suspend fun isCtaSuppressedByPlugins(site: Site): Boolean {
+        val uri = site.uri ?: return false
+        return contextualCtaSuppressorPlugins.getPlugins().any { !it.canShowCta(uri) }
     }
 
     private fun isSiteNotAllowedForOnboarding(site: Site): Boolean {
@@ -662,6 +688,8 @@ class CtaViewModel @Inject constructor(
     private fun isSerpUrl(url: String): Boolean = url.contains(ContextualDaxDialogCta.SERP)
 
     private suspend fun daxOnboardingActive(): Boolean = userStageStore.daxOnboardingActive()
+
+    private suspend fun daxOnboardingEnded(): Boolean = userStageStore.getUserAppStage() == AppStage.ESTABLISHED
 
     private suspend fun pulseAnimationDisabled(): Boolean =
         !daxOnboardingActive() || pulseFireButtonShown() || daxDialogFireEducationShown() || hideTips()

@@ -22,10 +22,10 @@ import com.duckduckgo.persistentstorage.api.PersistentStorage
 import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncFeature
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import logcat.logcat
@@ -39,7 +39,7 @@ interface SyncAutoRestoreManager {
     suspend fun isRestoreOnReinstallEnabled(): Boolean
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealSyncAutoRestoreManager @Inject constructor(
     private val persistentStorage: PersistentStorage,

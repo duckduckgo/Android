@@ -17,6 +17,7 @@
 <resources>
     <string name="pirDevSettings">Pir Dev Settings</string>
     <string name="pirDevSettingsScan">PIR Scan</string>
+    <string name="pirDevOpenDashboard">Open PIR Dashboard</string>
     <string name="pirDevScanTitle">PIR Dev Scan</string>
     <string name="pirDevOptOutTitle">PIR Dev Opt-out</string>
     <string name="pirDevDebugOptOutTitle">PIR Dev Debug Opt-out</string>
@@ -34,6 +35,7 @@
     <string name="pirDevExportDb">Export database</string>
     <string name="pirDevViewEmailEvents">PIR Email</string>
     <string name="pirDevSchedule">Schedule Scan</string>
+    <string name="pirDevMakeScansDue">Make all scans due</string>
     <string name="pirDevSimpleScanHeader">Simple Scan Results</string>
     <string name="pirDevHeader">Test Actions</string>
     <string name="pirDevProfileQueryHeader">Scan (if empty uses default)</string>
@@ -44,6 +46,7 @@
     <string name="pirStatsStatusBrokerFound" instruction="Placeholder is an integer">Brokers with records: %1$d</string>
     <string name="pirStatsStatusError" instruction="Placeholder is an integer">Errors: %1$d</string>
     <string name="pirMessageSchedule">Successfully schedule background scan!</string>
+    <string name="pirMessageScansDue" instruction="Placeholder is an integer">Aged %1$d scan jobs. Maintenance and retry scans are now due.</string>
     <string name="pirDevScanLogHeader">Scan events log</string>
     <string name="pirDevDebugOptOut">Debug opt out</string>
     <string name="pirDevOptOut">Run opt out</string>
@@ -79,4 +82,13 @@
     <string name="pirDevCustomUrlSet">Custom dashboard URL set</string>
     <string name="pirDevCustomUrlReset">Dashboard URL reset to default</string>
     <string name="pirDevCustomUrlEmpty">URL cannot be empty</string>
+    <string name="pirDevResetFreemiumState">Reset Freemium PIR State</string>
+    <string name="pirDevResetFreemiumStateDone">Freemium PIR state and scan data cleared.</string>
+    <string name="pirDevForceFreemiumEligibility">Force Freemium PIR eligibility</string>
+    <string name="pirDevForceFreemiumEligibilityDescription">Offer the free scan even where Play has no plans with PIR. Still requires no subscription and the freemium flag on.</string>
+    <string name="pirDevSimulateFreeScanMatches">Simulate free scan: records found</string>
+    <string name="pirDevSimulateFreeScanNoMatches">Simulate free scan: no records</string>
+    <string name="pirDevSimulateFreeScanDone">Free scan result set. Download the RMF config to re-evaluate messages.</string>
+    <string name="pirDevShowFreemiumScanCompleteNotification">Show freemium scan complete notification</string>
+    <string name="pirDevShowFreemiumScanCompleteNotificationDenied">Not shown: notification permission is not granted.</string>
 </resources>

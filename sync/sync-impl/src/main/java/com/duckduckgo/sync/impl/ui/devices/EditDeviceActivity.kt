@@ -28,10 +28,12 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE_SECONDARY
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
+import com.duckduckgo.common.ui.view.button.ButtonType.SECONDARY
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
@@ -82,6 +84,8 @@ class EditDeviceActivity : DuckDuckGoActivity() {
     }
 
     private val currentDevice get() = viewModel.viewState.value.device
+
+    private val isImprovedSyncFlow get() = intent.getBooleanExtra(IS_IMPROVED_SYNC_FLOW_EXTRA_KEY, false)
 
     private val turnOffSyncListener = OnCheckedChangeListener { _, isChecked ->
         if (!isChecked) viewModel.onTurnOffSync()
@@ -137,13 +141,23 @@ class EditDeviceActivity : DuckDuckGoActivity() {
         binding.editThisDeviceNameDivider.isVisible = viewState.device.thisDevice
         binding.syncThisDeviceToggle.isVisible = viewState.device.thisDevice
 
-        binding.removeNoticeLabel.setText(
-            if (viewState.device.thisDevice) {
-                R.string.sync_simplified_edit_device_remove_notice_this_device
-            } else {
-                R.string.sync_simplified_edit_device_remove_notice_another_device
-            },
-        )
+        binding.removeNoticeLabel.text = when {
+            isImprovedSyncFlow && viewState.device.thisDevice -> {
+                getString(R.string.sync_simplified_edit_device_remove_notice_this_device_v2, viewState.device.deviceName)
+            }
+
+            isImprovedSyncFlow -> {
+                getString(R.string.sync_simplified_edit_device_remove_notice_another_device_v2, viewState.device.deviceName)
+            }
+
+            viewState.device.thisDevice -> {
+                getString(R.string.sync_simplified_edit_device_remove_notice_this_device)
+            }
+
+            else -> {
+                getString(R.string.sync_simplified_edit_device_remove_notice_another_device)
+            }
+        }
     }
 
     private fun processCommand(command: Command) {
@@ -206,43 +220,60 @@ class EditDeviceActivity : DuckDuckGoActivity() {
     }
 
     private fun askRemoveDevice() {
-        TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_simplified_edit_device_remove_dialog_title)
-            .setMessage(getString(R.string.sync_simplified_edit_device_remove_dialog_body, currentDevice.deviceName))
-            .setPositiveButton(R.string.sync_simplified_edit_device_remove_dialog_primary_button, DESTRUCTIVE)
-            .setNegativeButton(R.string.sync_simplified_edit_device_remove_dialog_secondary_button, GHOST_ALT)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        viewModel.onRemoveDeviceConfirmed()
-                    }
-                },
-            )
-            .setCancellable(true)
-            .show()
+        val listener = object : TextAlertDialogBuilder.EventListener() {
+            override fun onPositiveButtonClicked() {
+                viewModel.onRemoveDeviceConfirmed()
+            }
+        }
+        if (isImprovedSyncFlow) {
+            askRemoveDeviceForImprovedUi(listener)
+        } else {
+            TextAlertDialogBuilder(this)
+                .setTitle(R.string.sync_simplified_edit_device_remove_dialog_title)
+                .setMessage(getString(R.string.sync_simplified_edit_device_remove_dialog_body, currentDevice.deviceName))
+                .setPositiveButton(R.string.sync_simplified_edit_device_remove_dialog_primary_button, DESTRUCTIVE)
+                .setNegativeButton(R.string.sync_simplified_edit_device_remove_dialog_secondary_button, GHOST_ALT)
+                .addEventListener(listener)
+                .setCancellable(true)
+                .show()
+        }
     }
 
     private fun askTurnOffSync() {
+        val listener = object : TextAlertDialogBuilder.EventListener() {
+            override fun onPositiveButtonClicked() {
+                viewModel.onTurnOffSyncConfirmed()
+            }
+
+            override fun onNegativeButtonClicked() {
+                viewModel.onTurnOffSyncCanceled()
+            }
+
+            override fun onDialogCancelled() {
+                viewModel.onTurnOffSyncCanceled()
+            }
+        }
+        if (isImprovedSyncFlow) {
+            askRemoveDeviceForImprovedUi(listener)
+        } else {
+            TextAlertDialogBuilder(this)
+                .setTitle(R.string.sync_simplified_edit_device_turn_off_dialog_title)
+                .setMessage(getString(R.string.sync_simplified_edit_device_turn_off_dialog_body))
+                .setPositiveButton(R.string.sync_simplified_edit_device_turn_off_dialog_primary_button)
+                .setNegativeButton(R.string.sync_simplified_edit_device_turn_off_dialog_secondary_button)
+                .addEventListener(listener)
+                .setCancellable(true)
+                .show()
+        }
+    }
+
+    private fun askRemoveDeviceForImprovedUi(listener: TextAlertDialogBuilder.EventListener) {
         TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_simplified_edit_device_turn_off_dialog_title)
-            .setMessage(getString(R.string.sync_simplified_edit_device_turn_off_dialog_body))
-            .setPositiveButton(R.string.sync_simplified_edit_device_turn_off_dialog_primary_button)
-            .setNegativeButton(R.string.sync_simplified_edit_device_turn_off_dialog_secondary_button)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        viewModel.onTurnOffSyncConfirmed()
-                    }
-
-                    override fun onNegativeButtonClicked() {
-                        viewModel.onTurnOffSyncCanceled()
-                    }
-
-                    override fun onDialogCancelled() {
-                        viewModel.onTurnOffSyncCanceled()
-                    }
-                },
-            )
+            .setTitle(getString(R.string.sync_simplified_edit_device_remove_dialog_title_v2, currentDevice.deviceName))
+            .setMessage(getString(R.string.sync_simplified_edit_device_remove_dialog_body_v2, currentDevice.deviceName))
+            .setPositiveButton(R.string.sync_simplified_edit_device_remove_dialog_primary_button, DESTRUCTIVE_SECONDARY)
+            .setNegativeButton(R.string.sync_simplified_edit_device_remove_dialog_secondary_button, SECONDARY)
+            .addEventListener(listener)
             .setCancellable(true)
             .show()
     }
@@ -284,11 +315,17 @@ class EditDeviceActivity : DuckDuckGoActivity() {
     }
 
     companion object {
+        private const val IS_IMPROVED_SYNC_FLOW_EXTRA_KEY = "is_improved_sync_flow"
+
         fun intent(
             context: Context,
             device: ParcelableDevice,
+            isImprovedSyncFlow: Boolean,
         ): Intent {
-            return Intent(context, EditDeviceActivity::class.java).putExtra(DEVICE_EXTRA_KEY, device)
+            return Intent(context, EditDeviceActivity::class.java).apply {
+                putExtra(DEVICE_EXTRA_KEY, device)
+                putExtra(IS_IMPROVED_SYNC_FLOW_EXTRA_KEY, isImprovedSyncFlow)
+            }
         }
     }
 }

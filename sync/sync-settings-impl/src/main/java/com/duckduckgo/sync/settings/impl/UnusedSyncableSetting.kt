@@ -16,7 +16,7 @@
 
 package com.duckduckgo.sync.settings.impl
 
-import com.duckduckgo.anvil.annotations.*
+import com.duckduckgo.codegen.annotations.*
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.sync.settings.api.SyncableSetting
 

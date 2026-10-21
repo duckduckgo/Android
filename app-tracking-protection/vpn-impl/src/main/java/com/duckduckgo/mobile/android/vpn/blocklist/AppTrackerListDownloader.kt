@@ -24,7 +24,7 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerJsonParser
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerPackage
 import com.duckduckgo.mobile.android.vpn.trackers.JsonAppBlockingList
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat

@@ -27,9 +27,10 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -65,15 +66,15 @@ interface WebViewHttpAuthStore {
     suspend fun cleanHttpAuthDatabase()
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = WebViewHttpAuthStore::class,
+    binding = binding<WebViewHttpAuthStore>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealWebViewHttpAuthStore @Inject constructor(
     private val webViewDatabaseProvider: WebViewDatabaseProvider,
     private val databaseCleaner: DatabaseCleaner,

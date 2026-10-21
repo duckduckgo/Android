@@ -132,6 +132,11 @@ sealed class PirSuccessResponse(
         val meta: AdditionalData? = null,
     ) : PirSuccessResponse(actionID, actionType)
 
+    data class ScrollResponse(
+        override val actionID: String,
+        override val actionType: String,
+    ) : PirSuccessResponse(actionID, actionType)
+
     data class AdditionalData(
         val additionalData: String,
     )

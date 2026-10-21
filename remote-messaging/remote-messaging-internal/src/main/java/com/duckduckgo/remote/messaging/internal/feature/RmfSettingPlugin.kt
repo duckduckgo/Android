@@ -18,7 +18,7 @@ package com.duckduckgo.remote.messaging.internal.feature
 
 import android.content.*
 import android.view.*
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 
 /**

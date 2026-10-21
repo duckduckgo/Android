@@ -18,14 +18,15 @@ package com.duckduckgo.app.dev.settings.onboarding
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.onboarding.ContextualOnboardingTimeLimit
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,6 +42,7 @@ class OnboardingDevSettingsViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val dismissedCtaDao: DismissedCtaDao,
     private val ctaViewModel: CtaViewModel,
+    private val contextualOnboardingTimeLimit: ContextualOnboardingTimeLimit,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
@@ -60,7 +62,6 @@ class OnboardingDevSettingsViewModel @Inject constructor(
             CtaId.DAX_INTRO_VISIT_SITE,
             CtaId.DAX_DIALOG_NETWORK,
             CtaId.DAX_DIALOG_OTHER,
-            CtaId.ADD_WIDGET,
         ).filterNot { it in requiredDialogs }
         return requiredDialogs + extraDialogs
     }
@@ -98,6 +99,7 @@ class OnboardingDevSettingsViewModel @Inject constructor(
                         dismissedCtaDao.insert(DismissedCta(ctaId))
                     }
                 } else {
+                    contextualOnboardingTimeLimit.restartTimeLimit()
                     userStageStore.moveToStage(AppStage.NEW)
                     settingsDataStore.hideTips = false
                     _viewState.value.visibleCtaIds.forEach { ctaId ->
@@ -136,12 +138,12 @@ class OnboardingDevSettingsViewModel @Inject constructor(
                 val wasCompletedByCtas = _viewState.value.onboardingCompleted && !settingsDataStore.hideTips
 
                 when {
-                    ctaId == CtaId.ADD_WIDGET -> { /* noop */ }
                     isDismissed && allRequiredDismissed -> {
                         userStageStore.moveToStage(AppStage.ESTABLISHED)
                         settingsDataStore.hideTips = false
                     }
                     !isDismissed && wasCompletedByCtas && required.contains(ctaId) -> {
+                        contextualOnboardingTimeLimit.restartTimeLimit()
                         userStageStore.moveToStage(AppStage.DAX_ONBOARDING)
                     }
                 }
@@ -149,6 +151,4 @@ class OnboardingDevSettingsViewModel @Inject constructor(
             }
         }
     }
-
-    fun isIndependentCta(ctaId: CtaId): Boolean = ctaId == CtaId.ADD_WIDGET
 }

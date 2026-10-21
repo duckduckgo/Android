@@ -23,15 +23,16 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode.FailureRecovery
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesTo
 import com.wireguard.config.Config
 import com.wireguard.config.InetNetwork
 import com.wireguard.config.Interface
 import com.wireguard.config.Peer
 import com.wireguard.crypto.KeyPair
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.binding
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -96,7 +97,7 @@ interface WgTunnelConfig {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = WgTunnelConfig::class,
+    binding = binding<WgTunnelConfig>(),
 )
 class RealWgTunnelConfig @Inject constructor(
     @InternalApi private val wgTunnelStore: WgTunnelStore,
@@ -120,7 +121,7 @@ class RealWgTunnelConfig @Inject constructor(
 
 @ContributesBinding(
     scope = VpnScope::class,
-    boundType = WgTunnel::class,
+    binding = binding<WgTunnel>(),
 )
 class RealWgTunnel @Inject constructor(
     private val wgServerApi: WgServerApi,
@@ -290,7 +291,7 @@ class WgTunnelStore constructor(
     }
 }
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object WgTunnelStoreModule {
     @Provides

@@ -22,13 +22,14 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
@@ -59,10 +60,10 @@ interface AdBlockingExtensionConfigProvider {
     val scriptletsSettings: StateFlow<AdBlockingExtensionSettings?>
 }
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(scope = AppScope::class, boundType = AdBlockingExtensionConfigProvider::class)
-@ContributesMultibinding(scope = AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
-@ContributesMultibinding(scope = AppScope::class, boundType = MainProcessLifecycleObserver::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(scope = AppScope::class, binding = binding<AdBlockingExtensionConfigProvider>())
+@ContributesIntoSet(scope = AppScope::class, binding = binding<PrivacyConfigCallbackPlugin>())
+@ContributesIntoSet(scope = AppScope::class, binding = binding<MainProcessLifecycleObserver>())
 class RealAdBlockingExtensionConfigProvider @Inject constructor(
     private val feature: AdBlockingExtensionFeature,
     @AppCoroutineScope private val appScope: CoroutineScope,

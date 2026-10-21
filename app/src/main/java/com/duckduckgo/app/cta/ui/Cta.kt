@@ -36,6 +36,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
@@ -1304,61 +1305,6 @@ abstract class DaxBubbleCta(
     }
 }
 
-sealed class HomePanelCta(
-    override val ctaId: CtaId,
-    @DrawableRes open val image: Int,
-    @StringRes open val title: Int,
-    @StringRes open val description: Int,
-    @StringRes open val okButton: Int,
-    @StringRes open val dismissButton: Int,
-    override val shownPixel: Pixel.PixelName?,
-    override val okPixel: Pixel.PixelName?,
-    override val cancelPixel: Pixel.PixelName?,
-    override val closePixel: Pixel.PixelName? = null,
-) : Cta,
-    ViewCta {
-    override fun showCta(
-        view: View,
-        onTypingAnimationFinished: () -> Unit,
-    ) {
-        // No-op: Home Panel CTAs render through the bottom-sheet flow.
-        // Keep this type to preserve CTA identity and pixel metadata.
-    }
-
-    override fun pixelCancelParameters(): Map<String, String> = emptyMap()
-
-    override fun pixelOkParameters(): Map<String, String> = emptyMap()
-
-    override fun pixelShownParameters(): Map<String, String> = emptyMap()
-
-    override fun shouldDropAddressBarFocusWhenShown(): Boolean = true
-
-    data object AddWidgetAutoOnboarding :
-        HomePanelCta(
-            CtaId.ADD_WIDGET,
-            R.drawable.add_widget_cta_icon,
-            R.string.addWidgetCtaTitle,
-            R.string.addWidgetCtaDescription,
-            R.string.addWidgetCtaAutoLaunchButton,
-            R.string.addWidgetCtaDismissButton,
-            AppPixelName.WIDGET_CTA_SHOWN,
-            AppPixelName.WIDGET_CTA_LAUNCHED,
-            AppPixelName.WIDGET_CTA_DISMISSED,
-        )
-
-    data object AddWidgetInstructions : HomePanelCta(
-        CtaId.ADD_WIDGET,
-        R.drawable.add_widget_cta_icon,
-        R.string.addWidgetCtaTitle,
-        R.string.addWidgetCtaDescription,
-        R.string.addWidgetCtaInstructionsLaunchButton,
-        R.string.addWidgetCtaDismissButton,
-        AppPixelName.WIDGET_LEGACY_CTA_SHOWN,
-        AppPixelName.WIDGET_LEGACY_CTA_LAUNCHED,
-        AppPixelName.WIDGET_LEGACY_CTA_DISMISSED,
-    )
-}
-
 class BrokenSitePromptDialogCta : Cta {
     override val ctaId: CtaId = CtaId.BROKEN_SITE_PROMPT
     override val shownPixel: Pixel.PixelName = SITE_NOT_WORKING_SHOWN
@@ -1383,11 +1329,36 @@ class BrokenSitePromptDialogCta : Cta {
         onDismissCtaClicked: () -> Unit,
         onCtaShown: () -> Unit,
     ) {
-        val daxDialog = binding.includeBrokenSitePromptDialog
-        daxDialog.root.show()
+        binding.includeBrokenSitePromptDialog.root.show()
+        stretchButtonsWhenTheyWrap(binding)
         binding.includeBrokenSitePromptDialog.reportButton.setOnClickListener { onReportBrokenSiteClicked.invoke() }
         binding.includeBrokenSitePromptDialog.dismissButton.setOnClickListener { onDismissCtaClicked.invoke() }
         onCtaShown()
+    }
+
+    fun onOrientationChanged(binding: FragmentBrowserTabBinding) {
+        stretchButtonsWhenTheyWrap(binding)
+    }
+
+    private fun stretchButtonsWhenTheyWrap(binding: FragmentBrowserTabBinding) {
+        val daxDialog = binding.includeBrokenSitePromptDialog
+        val buttons = listOf(daxDialog.reportButton, daxDialog.dismissButton)
+        buttons.forEach { button ->
+            button.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                width = ConstraintLayout.LayoutParams.WRAP_CONTENT
+            }
+        }
+        daxDialog.root.doOnLayout {
+            if (daxDialog.dismissButton.top > daxDialog.reportButton.top) {
+                buttons.forEach { button ->
+                    button.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        width = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
+                        matchConstraintDefaultWidth = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT_PERCENT
+                        matchConstraintPercentWidth = 1f
+                    }
+                }
+            }
+        }
     }
 }
 

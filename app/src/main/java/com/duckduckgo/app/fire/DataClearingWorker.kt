@@ -21,11 +21,11 @@ import androidx.annotation.WorkerThread
 import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker.Result.success
 import androidx.work.WorkerParameters
-import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import kotlinx.coroutines.CoroutineScope

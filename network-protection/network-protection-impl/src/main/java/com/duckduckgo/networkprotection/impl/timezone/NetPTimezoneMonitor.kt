@@ -26,8 +26,9 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -36,10 +37,10 @@ import kotlinx.coroutines.runBlocking
 import logcat.logcat
 import javax.inject.Inject
 
-@SingleInstanceIn(VpnScope::class)
-@ContributesMultibinding(
+@SingleIn(VpnScope::class)
+@ContributesIntoSet(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class,
+    binding = binding<VpnServiceCallbacks>(),
 )
 class NetPTimezoneMonitor @Inject constructor(
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,

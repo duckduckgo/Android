@@ -28,8 +28,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutScreenNoParams
 import com.duckduckgo.app.accessibility.AccessibilityScreens
 import com.duckduckgo.app.appearance.AppearanceScreen
@@ -71,7 +69,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionScreenNoParams
 import com.duckduckgo.app.widget.AddWidgetLauncher
-import com.duckduckgo.app.widget.AddWidgetSource
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
@@ -79,6 +76,8 @@ import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementSc
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.gone
@@ -587,7 +586,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun launchAddHomeScreenWidget() {
         pixel.fire(AppPixelName.SETTINGS_ADD_HOME_SCREEN_WIDGET_CLICKED)
-        addWidgetLauncher.launchAddWidget(this, true, source = AddWidgetSource.SETTINGS)
+        addWidgetLauncher.launchAddWidget(this, true)
     }
 
     private fun launchFeedback() {

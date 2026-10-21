@@ -31,7 +31,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.RelativeCornerSize
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 data class Margins(val top: Int, val bottom: Int)

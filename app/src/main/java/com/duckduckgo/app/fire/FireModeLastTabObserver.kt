@@ -29,8 +29,8 @@ import com.duckduckgo.browsermode.api.FireMode
 import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -50,7 +50,7 @@ import javax.inject.Inject
  * deletes the Fire tabs itself, which would otherwise look exactly like the user closing the last tab and
  * start a second burn.
  */
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class FireModeDataClearingState @Inject constructor() {
     private val _hasUnclearedData = MutableStateFlow(false)
     val hasUnclearedData: StateFlow<Boolean> = _hasUnclearedData.asStateFlow()
@@ -67,8 +67,8 @@ class FireModeDataClearingState @Inject constructor() {
 /**
  * Burns Fire mode data once the last Fire tab is gone.
  */
-@ContributesMultibinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(AppScope::class)
+@SingleIn(AppScope::class)
 class FireModeLastTabObserver @Inject constructor(
     @param:FireMode private val fireTabsDao: TabsDao,
     @param:FireMode private val fireTabRepository: TabRepository,

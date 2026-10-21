@@ -32,9 +32,9 @@ import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
 import com.duckduckgo.adblocking.impl.R
 import com.duckduckgo.adblocking.impl.databinding.ActivityDuckPlayerSettingsBinding
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsViewModel.ViewState
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.view.addClickableSpan

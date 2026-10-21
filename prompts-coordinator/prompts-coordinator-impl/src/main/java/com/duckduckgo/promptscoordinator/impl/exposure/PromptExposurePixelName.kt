@@ -63,7 +63,6 @@ internal val KNOWN_PROMPT_IDS = setOf(
     "remote_message_modal",
     "additional_default_browser_prompts",
     "subscription_promo_modal",
-    "add_widget_modal",
     "app_rating_prompt",
     "cookie_popup_opt_in",
     "remote_message_card",

@@ -55,7 +55,7 @@ class SubscriptionRestoreWideEventTest {
         subscriptionRestoreWideEvent =
             SubscriptionRestoreWideEventImpl(
                 wideEventClient = wideEventClient,
-                subscriptionsFeature = { subscriptionsFeature },
+                subscriptionsFeature = lazy { subscriptionsFeature },
                 dispatchers = coroutineRule.testDispatcherProvider,
                 coroutineScope = coroutineRule.testScope,
             )

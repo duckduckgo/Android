@@ -32,17 +32,17 @@ import com.duckduckgo.user.agent.store.UserAgentDatabase
 import com.duckduckgo.user.agent.store.UserAgentFeatureToggleRepository
 import com.duckduckgo.user.agent.store.UserAgentFeatureToggleStore
 import com.duckduckgo.user.agent.store.UserAgentRepository
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
 
 @ContributesTo(AppScope::class)
-@Module
+@BindingContainer
 class UserAgentModule {
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     @Named("defaultUserAgent")
     fun provideDefaultUserAgent(context: Context): String {
@@ -51,7 +51,7 @@ class UserAgentModule {
         }.getOrDefault(RealUserAgentProvider.fallbackDefaultUA)
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideUserAgentRepository(
         database: UserAgentDatabase,
@@ -67,13 +67,13 @@ class UserAgentModule {
         )
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideUserAgentFeatureToggleStore(context: Context): UserAgentFeatureToggleStore {
         return RealUserAgentFeatureToggleStore(context)
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideUserAgentFeatureToggleRepository(
         userAgentFeatureToggleStore: UserAgentFeatureToggleStore,
@@ -83,7 +83,7 @@ class UserAgentModule {
         )
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideDatabase(context: Context): UserAgentDatabase {
         return Room.databaseBuilder(context, UserAgentDatabase::class.java, "user_agent.db")

@@ -19,10 +19,11 @@ package com.duckduckgo.sync.impl.ui.setup
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
@@ -31,14 +32,17 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.auth.AuthPromptRenderer
 import com.duckduckgo.sync.impl.databinding.ActivitySyncThisDeviceBinding
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeContract
 import com.duckduckgo.sync.impl.ui.setup.SyncThisDeviceContract.Companion.RESULT_DEVICE_BACKED_UP
+import com.duckduckgo.sync.impl.ui.setup.SyncThisDeviceViewModel.Factory.Provider
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
 import com.google.android.material.progressindicator.IndeterminateDrawable
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -48,15 +52,27 @@ import com.duckduckgo.mobile.android.R as CommonR
 class SyncThisDeviceActivity : DuckDuckGoActivity() {
     private val binding by viewBinding<ActivitySyncThisDeviceBinding>()
 
-    private val viewModel by bindViewModel<SyncThisDeviceViewModel>()
-
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     @Inject
     lateinit var syncSetupWideEvent: SyncSetupWideEvent
 
+    @Inject
+    lateinit var authPromptRenderer: AuthPromptRenderer
+
+    @Inject
+    lateinit var vmFactory: SyncThisDeviceViewModel.Factory
+
     private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
+
+    private val isAuthRequired get() = intent.getBooleanExtra(IS_AUTH_REQUIRED_EXTRA_KEY, true)
+
+    private val isImprovedSyncFlow get() = intent.getBooleanExtra(IS_IMPROVED_SYNC_FLOW_EXTRA_KEY, false)
+
+    private val viewModel by viewModels<SyncThisDeviceViewModel> {
+        Provider(vmFactory, isAuthRequired)
+    }
 
     private lateinit var progressDrawable: IndeterminateDrawable<CircularProgressIndicatorSpec>
 
@@ -81,10 +97,12 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
         configureEdgeToEdgeInsets()
 
         configureToolbar()
+        configureHeader()
         configureSyncWithAnotherCta()
         configureSyncWithThisCta()
 
         observeViewModel()
+        authPromptRenderer.bind(viewModel.authPrompts)
     }
 
     private fun configureEdgeToEdgeInsets() {
@@ -130,6 +148,10 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
                 showError(command)
             }
 
+            is SyncThisDeviceViewModel.Command.ShowAuthError -> {
+                Snackbar.make(binding.root, R.string.sync_simplified_error_dialog_generic_body, Snackbar.LENGTH_LONG).show()
+            }
+
             is SyncThisDeviceViewModel.Command.SyncWithAnotherDevice -> {
                 readSyncCodeLauncher.launch(
                     ReadSyncCodeContract.Input(
@@ -144,6 +166,13 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
     private fun configureToolbar() {
         binding.closeButton.setOnClickListener {
             viewModel.onCloseClicked()
+        }
+    }
+
+    private fun configureHeader() {
+        if (isImprovedSyncFlow) {
+            binding.headlineText.setText(R.string.sync_simplified_setup_header_headline_v2)
+            binding.bodyText.setText(R.string.sync_simplified_setup_header_body_v2)
         }
     }
 
@@ -163,9 +192,7 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
         progressDrawable = IndeterminateDrawable.createCircularDrawable(this, progressDrawableSpec)
 
         binding.syncThisDeviceButton.setOnClickListener {
-            if (!viewModel.viewState.value.isSyncing) {
-                viewModel.syncThisDevice(launchSource)
-            }
+            viewModel.syncThisDevice(launchSource)
         }
     }
 
@@ -186,13 +213,19 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val LAUNCH_SOURCE_EXTRA_KEY = "launch_source"
+        private const val IS_AUTH_REQUIRED_EXTRA_KEY = "is_auth_required"
+        private const val IS_IMPROVED_SYNC_FLOW_EXTRA_KEY = "is_improved_sync_flow"
 
         fun intent(
             context: Context,
             launchSource: String?,
+            isAuthRequired: Boolean,
+            isImprovedSyncFlow: Boolean,
         ): Intent {
             return Intent(context, SyncThisDeviceActivity::class.java).apply {
                 putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
+                putExtra(IS_AUTH_REQUIRED_EXTRA_KEY, isAuthRequired)
+                putExtra(IS_IMPROVED_SYNC_FLOW_EXTRA_KEY, isImprovedSyncFlow)
             }
         }
     }

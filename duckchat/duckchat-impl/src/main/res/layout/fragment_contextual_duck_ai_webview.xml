@@ -143,26 +143,47 @@
         android:background="?attr/daxColorDuckAiBackground"
         android:orientation="vertical">
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/contextualNativeInputCard"
-            android:theme="?attr/daxInputModeCardThemeOverlay"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginHorizontal="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
-            app:cardBackgroundColor="?attr/daxColorWindow"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="false">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
-                android:id="@+id/contextualNativeInputWidget"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="4dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+            <ImageView
+                android:id="@+id/contextualInputFire"
+                android:layout_width="@dimen/toolbarIcon"
+                android:layout_height="@dimen/toolbarIcon"
+                android:layout_marginStart="@dimen/keyline_2"
+                android:background="@drawable/selectable_item_rounded_corner_background"
+                android:contentDescription="@string/duckAIContextualFireButtonContentDescription"
+                android:scaleType="center"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:srcCompat="@drawable/ic_fire_24" />
 
-        </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/contextualNativeInputCard"
+                android:theme="?attr/daxInputModeCardThemeOverlay"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="bottom"
+                android:layout_marginHorizontal="@dimen/keyline_2"
+                app:cardBackgroundColor="?attr/daxColorWindow"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="false">
+
+                <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
+                    android:id="@+id/contextualNativeInputWidget"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
 
         <com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterView
             android:id="@+id/contextualNativeInputFooter"

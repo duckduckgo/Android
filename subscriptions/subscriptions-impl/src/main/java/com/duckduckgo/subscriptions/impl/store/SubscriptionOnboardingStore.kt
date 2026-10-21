@@ -20,10 +20,10 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class SubscriptionOnboardingStore @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) {
@@ -44,6 +44,10 @@ class SubscriptionOnboardingStore @Inject constructor(
 
     fun incrementCompletedEntryPointViews() {
         preferences.edit { putInt(KEY_COMPLETED_ENTRY_POINT_VIEWS, completedEntryPointViews() + 1) }
+    }
+
+    fun reset() {
+        preferences.edit { clear() }
     }
 
     companion object {

@@ -19,7 +19,6 @@ package com.duckduckgo.app.location.data
 import androidx.lifecycle.LiveData
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.utils.DispatcherProvider
-import dagger.Lazy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -70,7 +69,7 @@ class LocationPermissionsRepositoryImpl @Inject constructor(
         withContext(dispatchers.io()) {
             val entity = locationPermissionsDao.getPermission(domain)
             entity?.let {
-                faviconManager.get().deletePersistedFavicon(domain)
+                faviconManager.value.deletePersistedFavicon(domain)
                 locationPermissionsDao.delete(it)
             }
         }

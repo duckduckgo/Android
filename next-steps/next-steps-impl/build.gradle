@@ -16,16 +16,16 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
+    ksp project(':codegen-ksp')
     implementation project(':next-steps-api')
-    implementation project(':anvil-annotations')
+    implementation project(':codegen-annotations')
     implementation project(':di')
     implementation project(':common-utils')
     implementation project(':data-store-api')
@@ -33,10 +33,6 @@ dependencies {
     implementation project(':feature-toggles-api')
     implementation project(':remote-messaging-api')
     implementation project(':design-system')
-
-    // Dagger
-    compileOnly "org.glassfish:javax.annotation:10.0-b28"
-    implementation Google.dagger
 
     implementation KotlinX.coroutines.core
 
@@ -65,9 +61,6 @@ dependencies {
 
 android {
     namespace "com.duckduckgo.nextsteps.impl"
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     compileOptions {
         coreLibraryDesugaringEnabled = true
     }

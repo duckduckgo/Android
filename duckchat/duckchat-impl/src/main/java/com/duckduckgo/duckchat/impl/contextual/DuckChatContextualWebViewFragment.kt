@@ -38,16 +38,17 @@ import android.webkit.WebView
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.AnyThread
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.WebViewModeInitializer
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
@@ -487,6 +488,8 @@ class DuckChatContextualWebViewFragment :
                 activity?.hideKeyboard()
                 voiceSearchLauncher.launch(requireActivity(), VoiceSearchMode.DUCK_AI)
             },
+            onInputFocusChanged = { renderFireButton() },
+            onInputVisibilityChanged = { renderFireButton() },
         )
         observeViewModel()
 
@@ -535,6 +538,9 @@ class DuckChatContextualWebViewFragment :
             viewModel.onChatsIconClicked()
         }
         binding.contextualFire.setOnClickListener {
+            viewModel.onFireButtonClicked()
+        }
+        binding.contextualInputFire.setOnClickListener {
             viewModel.onFireButtonClicked()
         }
         binding.contextualModeButtons.setOnClickListener { }
@@ -649,7 +655,6 @@ class DuckChatContextualWebViewFragment :
         }
 
         binding.contextualNewChat.show()
-        if (viewState.isFireButtonEnabled) binding.contextualFire.show() else binding.contextualFire.gone()
         contextualNativeInputManager.onWebViewMode()
 
         if (viewState.showContext && viewState.contextTitle.isNotEmpty()) {
@@ -659,6 +664,20 @@ class DuckChatContextualWebViewFragment :
             )
         } else {
             binding.contextualNativeInputWidget.clearPageContext()
+        }
+    }
+
+    // Matches Duck.ai by sitting next to the native input and hiding while it's focused. The web input is
+    // drawn inside the WebView, so a native button can't sit beside it and falls back to the header.
+    private fun renderFireButton() {
+        val isFireButtonEnabled = viewModel.viewState.value.isFireButtonEnabled
+        val isNativeInputVisible = binding.contextualNativeInputCard.isVisible
+        val isNativeInputFocused = binding.contextualNativeInputWidget.hasInputFocus()
+        if (isFireButtonEnabled && !isNativeInputVisible) binding.contextualFire.show() else binding.contextualFire.gone()
+        if (isFireButtonEnabled && isNativeInputVisible && !isNativeInputFocused) {
+            binding.contextualInputFire.show()
+        } else {
+            binding.contextualInputFire.gone()
         }
     }
 

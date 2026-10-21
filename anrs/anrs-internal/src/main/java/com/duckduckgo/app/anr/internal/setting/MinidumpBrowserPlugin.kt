@@ -21,12 +21,12 @@ import android.content.Intent
 import com.duckduckgo.app.anr.internal.feature.CrashAnrDevCapabilityPlugin
 import com.duckduckgo.app.anr.internal.feature.MinidumpListActivity
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(AppScope::class)
+@SingleIn(AppScope::class)
 class MinidumpBrowserPlugin @Inject constructor(
     private val context: Context,
 ) : CrashAnrDevCapabilityPlugin {

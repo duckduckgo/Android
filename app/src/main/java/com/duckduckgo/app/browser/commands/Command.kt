@@ -221,6 +221,9 @@ sealed class Command {
         val nonHttpAppLink: NonHttpAppLink,
         val headers: Map<String, String>,
         val showConfirmation: Boolean = true,
+        val trustedCallerPackage: String? = null,
+        val finishCustomTabOnTrustedCallerLaunch: Boolean = false,
+        val trustedCallerOnly: Boolean = false,
     ) : Command()
 
     class ShowAppLinkPrompt(
@@ -257,8 +260,6 @@ sealed class Command {
     data object LaunchDefaultBrowser : Command()
 
     data object LaunchAppTPOnboarding : Command()
-
-    data object LaunchAddWidgetOnboarding : Command()
 
     class RequiresAuthentication(
         val request: BasicAuthenticationRequest,

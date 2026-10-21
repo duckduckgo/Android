@@ -17,10 +17,10 @@
 package com.duckduckgo.common.ui.tabs
 
 import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class SwipingTabsFeatureProvider @Inject constructor(
     private val swipingTabsFeature: SwipingTabsFeature,
 ) {

@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.core.os.BundleCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.plusAssign
@@ -29,20 +30,20 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE_SECONDARY
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
+import com.duckduckgo.common.ui.view.button.ButtonType.SECONDARY
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.di.DaggerMap
-import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
@@ -63,8 +64,11 @@ import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AddAnotherDevice
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteAccount
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteServerData
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskSetupSyncDeepLink
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskTurnOffSync
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskTurnOffThisDevice
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.DeepLinkIntoSetup
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.IntroCreateAccount
@@ -81,7 +85,9 @@ import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.SyncW
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.dashboard.TurnOffSyncBottomSheetDialog.Choice
 import com.duckduckgo.sync.impl.ui.devices.EditDeviceContract
+import com.duckduckgo.sync.impl.ui.devices.ParcelableDevice
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeContract
 import com.duckduckgo.sync.impl.ui.pairing.process.SyncCodeSource
@@ -109,13 +115,13 @@ class SyncActivity : DuckDuckGoActivity() {
     private val viewModel by bindViewModel<SyncActivityViewModel>()
 
     @Inject
-    lateinit var syncSettingsPlugin: DaggerMap<Int, SyncSettingsPlugin>
+    lateinit var syncSettingsPlugin: Map<Int, SyncSettingsPlugin>
 
     @Inject
     lateinit var syncDesktopAppPromotionLauncher: SyncDesktopAppPromotionLauncher
 
     @Inject
-    lateinit var syncMessagesPlugin: DaggerSet<SyncMessagePlugin>
+    lateinit var syncMessagesPlugin: Set<SyncMessagePlugin>
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -301,6 +307,7 @@ class SyncActivity : DuckDuckGoActivity() {
         configureGetOnOtherPlatformsItem()
         configureDataExpirationNotice()
         configureDataDeletionItem()
+        configureTurnOffSyncResultListener()
 
         observeViewModel()
         authPromptRenderer.bind(viewModel.authPrompts)
@@ -348,6 +355,13 @@ class SyncActivity : DuckDuckGoActivity() {
             getOnOtherPlatformsItem.setState(
                 isNewDesktopBrowserAvailable = viewState.newDesktopBrowserSettingEnabled,
             )
+            deleteAccountItem.setPrimaryTextResource(
+                if (viewState.isImprovedSyncFlow) {
+                    R.string.sync_simplified_settings_turn_off_item
+                } else {
+                    R.string.sync_simplified_settings_delete_account_item
+                },
+            )
             restoreOnReinstallItem.isVisible = viewState.showAutoRestoreToggle
             if (viewState.showAutoRestoreToggle) {
                 restoreOnReinstallItem.quietlySetIsChecked(viewState.autoRestoreEnabled, autoRestoreListener)
@@ -386,16 +400,29 @@ class SyncActivity : DuckDuckGoActivity() {
                 showDeleteAccountDialog()
             }
 
+            is AskDeleteServerData -> {
+                askDeleteServerData()
+            }
+
             is AskEditDevice -> {
                 editDeviceLauncher.launch(
                     EditDeviceContract.Input(
                         device = command.device,
+                        isImprovedSyncFlow = command.isImprovedSyncFlow,
                     ),
                 )
             }
 
             is AskSetupSyncDeepLink -> {
                 askSetupSyncDeepLink(command.syncBarcodeUrl)
+            }
+
+            is AskTurnOffSync -> {
+                askTurnOffSync(command)
+            }
+
+            is AskTurnOffThisDevice -> {
+                askTurnOffThisDevice(command.device)
             }
 
             is CheckIfUserHasStoragePermission -> {
@@ -423,6 +450,8 @@ class SyncActivity : DuckDuckGoActivity() {
                 backUpNewAccountLauncher.launch(
                     SyncThisDeviceContract.Input(
                         launchSource = launchSource,
+                        isAuthRequired = command.isAuthRequired,
+                        isImprovedSyncFlow = command.isImprovedSyncFlow,
                     ),
                 )
             }
@@ -431,6 +460,7 @@ class SyncActivity : DuckDuckGoActivity() {
                 recoverSyncedDataLauncher.launch(
                     RecoverSyncedDataContract.Input(
                         launchSource = launchSource,
+                        isAuthRequired = command.isAuthRequired,
                     ),
                 )
             }
@@ -451,6 +481,8 @@ class SyncActivity : DuckDuckGoActivity() {
                         backUpNewAccountLauncher.launch(
                             SyncThisDeviceContract.Input(
                                 launchSource = launchSource,
+                                isAuthRequired = false,
+                                isImprovedSyncFlow = command.isImprovedSyncFlow,
                             ),
                         )
                     }
@@ -471,6 +503,7 @@ class SyncActivity : DuckDuckGoActivity() {
                         recoverSyncedDataLauncher.launch(
                             RecoverSyncedDataContract.Input(
                                 launchSource = launchSource,
+                                isAuthRequired = false,
                             ),
                         )
                     }
@@ -502,6 +535,7 @@ class SyncActivity : DuckDuckGoActivity() {
                 restoreSavedAccountLauncher.launch(
                     PreviousSessionReadyContract.Input(
                         syncEntryPoint = command.syncEntryPoint,
+                        isAuthRequired = command.isAuthRequired,
                     ),
                 )
             }
@@ -657,6 +691,21 @@ class SyncActivity : DuckDuckGoActivity() {
         )
     }
 
+    private fun configureTurnOffSyncResultListener() {
+        supportFragmentManager.setFragmentResultListener(TurnOffSyncBottomSheetDialog.REQUEST_KEY, this) { _, bundle ->
+            BundleCompat.getParcelable(bundle, TurnOffSyncBottomSheetDialog.RESULT_KEY_CHOICE, Choice::class.java)?.let { choice ->
+                when (choice) {
+                    is Choice.TurnOffThisDevice -> {
+                        viewModel.onTurnOffThisDeviceClicked(choice.device.toConnectedDevice())
+                    }
+                    is Choice.TurnOffAndDeleteServerData -> {
+                        viewModel.onTurnOffAndDeleteServerDataClicked()
+                    }
+                }
+            }
+        }
+    }
+
     private fun configureDataDeletionItem() {
         val color = ColorStateList.valueOf(getColorFromAttr(CommonR.attr.daxColorDestructive))
         binding.includeEnabledView.deleteAccountItem.apply {
@@ -689,6 +738,64 @@ class SyncActivity : DuckDuckGoActivity() {
             )
             .setCancellable(true)
             .show()
+    }
+
+    private fun askDeleteServerData() {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_simplified_settings_delete_server_data_dialog_title_v2)
+            .setMessage(getString(R.string.sync_simplified_settings_delete_server_data_dialog_body_v2))
+            .setPositiveButton(R.string.sync_simplified_settings_delete_server_data_dialog_primary_button_v2, DESTRUCTIVE)
+            .setNegativeButton(R.string.sync_simplified_settings_delete_server_data_dialog_secondary_button_v2, SECONDARY)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onDialogShown() {
+                        viewModel.onDeleteServerDataConfirmationShown()
+                    }
+
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onDeleteServerDataConfirmed()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onDeleteServerDataCancelled()
+                    }
+
+                    override fun onDialogCancelled() {
+                        viewModel.onDeleteServerDataCancelled()
+                    }
+                },
+            )
+            .setCancellable(true)
+            .show()
+    }
+
+    private fun askTurnOffThisDevice(device: ConnectedDevice) {
+        val deviceName = device.deviceName
+        TextAlertDialogBuilder(this)
+            .setTitle(getString(R.string.sync_simplified_settings_turn_off_device_dialog_title, deviceName))
+            .setMessage(getString(R.string.sync_simplified_settings_turn_off_device_dialog_body, deviceName))
+            .setPositiveButton(R.string.sync_simplified_settings_turn_off_device_dialog_primary_button, DESTRUCTIVE_SECONDARY)
+            .setNegativeButton(R.string.sync_simplified_settings_turn_off_device_dialog_secondary_button, SECONDARY)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onTurnOffSyncConfirmed(device)
+                    }
+                },
+            )
+            .setCancellable(true)
+            .show()
+    }
+
+    private fun askTurnOffSync(command: AskTurnOffSync) {
+        if (supportFragmentManager.findFragmentByTag(TurnOffSyncBottomSheetDialog.TAG) != null) return
+
+        TurnOffSyncBottomSheetDialog
+            .newInstance(
+                thisDevice = ParcelableDevice.fromConnectedDevice(command.thisDevice),
+                allDevices = command.allDevices.map(ParcelableDevice::fromConnectedDevice),
+            )
+            .show(supportFragmentManager, TurnOffSyncBottomSheetDialog.TAG)
     }
 
     private fun askSetupSyncDeepLink(barcodeSyncUrl: SyncBarcodeUrl) {

@@ -20,6 +20,7 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Request
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 
 class FakeDeviceAuthenticator : DeviceAuthenticator {
     var response: Response = Response.Allowed.UserAuthenticated
@@ -30,11 +31,22 @@ class FakeDeviceAuthenticator : DeviceAuthenticator {
 
     override val currentPrompt = MutableStateFlow<AuthPrompt?>(null)
 
+    private val isResponseSuspended = MutableStateFlow(false)
+
+    fun suspendResponse() {
+        isResponseSuspended.value = true
+    }
+
+    fun resumeResponse() {
+        isResponseSuspended.value = false
+    }
+
     override suspend fun authenticate(
         request: Request,
         onEvent: (Event) -> Unit,
     ): Response {
         _requests += request
+        isResponseSuspended.first { !it }
         events.forEach(onEvent)
         return response
     }

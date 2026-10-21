@@ -73,6 +73,7 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.annotation.AnyThread
 import androidx.annotation.AttrRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
@@ -109,7 +110,6 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayerSettingsNoParams
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.bookmarks.dialog.BookmarkAddedConfirmationDialog
 import com.duckduckgo.app.bookmarks.dialog.BookmarkAddedConfirmationDialogFactory
@@ -122,8 +122,10 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
+import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
 import com.duckduckgo.app.browser.applinks.AppLinksSnackBarConfigurator
+import com.duckduckgo.app.browser.applinks.planExternalAppLaunch
 import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.OpenBrokenSiteLearnMore
@@ -187,7 +189,6 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.dialogs.AutomaticFireproofDialogOptions
 import com.duckduckgo.app.browser.ui.dialogs.LaunchInExternalAppOptions
-import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.HomeScreenWidgetBottomSheetDialog
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
@@ -215,8 +216,6 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonContextualCta
-import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboarding
 import com.duckduckgo.app.cta.ui.KeyboardFollowingCallback
 import com.duckduckgo.app.cta.ui.PrivacyProSkippedOnboardingBottomSheetDialog
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
@@ -237,10 +236,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
-import com.duckduckgo.app.widget.AddWidgetLauncher
-import com.duckduckgo.app.widget.AddWidgetSource
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
@@ -291,10 +289,10 @@ import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.browsermode.api.WebViewModeInitializer
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.menu.PopupMenu
-import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.DaxDialog
@@ -303,7 +301,6 @@ import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
-import com.duckduckgo.common.ui.view.dialog.PromoBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.fadeTransitionConfig
@@ -419,7 +416,6 @@ import java.io.File
 import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Named
-import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
 import kotlin.getValue
 
@@ -561,9 +557,6 @@ class BrowserTabFragment :
     lateinit var appTheme: BrowserAppTheme
 
     @Inject
-    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
-
-    @Inject
     lateinit var accessibilitySettingsDataStore: AccessibilitySettingsDataStore
 
     @Inject
@@ -577,19 +570,16 @@ class BrowserTabFragment :
     lateinit var appBuildConfig: AppBuildConfig
 
     @Inject
-    lateinit var addWidgetLauncher: AddWidgetLauncher
-
-    @Inject
     lateinit var downloadsFileActions: DownloadsFileActions
 
     @Inject
-    lateinit var urlExtractingWebViewClient: Provider<UrlExtractingWebViewClient>
+    lateinit var urlExtractingWebViewClient: () -> UrlExtractingWebViewClient
 
     @Inject
-    lateinit var urlExtractor: Provider<DOMUrlExtractor>
+    lateinit var urlExtractor: () -> DOMUrlExtractor
 
     @Inject
-    lateinit var urlExtractorUserAgent: Provider<UserAgentProvider>
+    lateinit var urlExtractorUserAgent: () -> UserAgentProvider
 
     @Inject
     lateinit var voiceSearchLauncher: VoiceSearchLauncher
@@ -642,6 +632,9 @@ class BrowserTabFragment :
     lateinit var appLinksLauncher: AppLinksLauncher
 
     @Inject
+    lateinit var appLinksHandler: AppLinksHandler
+
+    @Inject
     lateinit var clientBrandHintProvider: ClientBrandHintProvider
 
     @Inject
@@ -679,6 +672,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var fireModeAvailability: FireModeAvailability
+
+    @Inject
+    lateinit var tabManagerFeatureFlags: TabManagerFeatureFlags
 
     @Inject
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
@@ -735,9 +731,6 @@ class BrowserTabFragment :
 
     private var bottomSheetMenu: BrowserMenuBottomSheet? = null
     private var pdfDownloadTooltipPopup: PdfDownloadTooltipPopup? = null
-    private lateinit var ctaBottomSheet: PromoBottomSheetDialog
-    private lateinit var widgetBottomSheetDialog: HomeScreenWidgetBottomSheetDialog
-    private val widgetBottomSheetDialogJob: ConflatedJob = ConflatedJob()
     private var privacyProSkippedOnboardingBottomSheet: PrivacyProSkippedOnboardingBottomSheetDialog? = null
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
@@ -841,14 +834,22 @@ class BrowserTabFragment :
                 viewModel.openNewImageDuckChatFromChatMenu()
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)) {
-                // With the native sidebar this entry opens the new tab with its input screen surfaced on
-                // the Search tab. The target is threaded to the new tab itself rather than armed globally,
-                // so it can't be consumed by another tab.
+                // With the native sidebar this entry opens the new tab with its
+                // input screen surfaced on the Search tab. The target is threaded to the new tab itself rather than
+                // armed globally, so it can't be consumed by another tab. The
+                // entry stays in the current mode (Regular vs Fire tab).
+                val plusMenuUpdateEnabled = tabManagerFeatureFlags.duckAiPlusMenuUpdate().isEnabled()
                 viewModel.onNewTabFromChatMenuSelected()
-                browserActivity?.launchNewTab(
-                    browserMode = BrowserMode.REGULAR,
-                    inputModeTarget = if (duckAiFeatureState.nativeDuckAiSidebar.value) InputMode.SEARCH else null,
-                )
+                browserActivity?.let { activity ->
+                    activity.launchNewTab(
+                        browserMode = if (plusMenuUpdateEnabled) activity.currentBrowserMode else BrowserMode.REGULAR,
+                        inputModeTarget = if (plusMenuUpdateEnabled || duckAiFeatureState.nativeDuckAiSidebar.value) {
+                            InputMode.SEARCH
+                        } else {
+                            null
+                        },
+                    )
+                }
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)) {
                 viewModel.onNewFireTabFromChatMenuSelected()
@@ -1160,11 +1161,13 @@ class BrowserTabFragment :
         logcat { "Resuming webview: $tabId" }
 
         if (omnibar.viewMode == ViewMode.DuckAI) {
+            val returningFromAttachmentPicker = nativeInputManager.isPickingAttachment()
             logcat { "Duck.ai: resume in Duck.ai mode" }
             appCoroutineScope.launch(dispatchers.main()) {
                 delay(100)
                 webView?.onResume()
-                webView?.requestFocus()
+                // The native input restores its own focus after the attachment picker; taking it here would close the keyboard.
+                if (!returningFromAttachmentPicker) webView?.requestFocus()
             }
         }
 
@@ -2036,6 +2039,11 @@ class BrowserTabFragment :
         tabSwitcherActivityResult.launch(intent)
     }
 
+    override fun onStart() {
+        super.onStart()
+        if (fragmentIsVisible()) webViewClient.onTabForegrounded()
+    }
+
     override fun onResume() {
         super.onResume()
 
@@ -2074,6 +2082,7 @@ class BrowserTabFragment :
     }
 
     override fun onStop() {
+        webViewClient.onTabBackgrounded()
         alertDialog?.dismiss()
         super.onStop()
     }
@@ -2492,6 +2501,7 @@ class BrowserTabFragment :
         if (currentIndex >= 0) {
             viewModel.recoverFromWarningPage(true)
             if (webView?.canGoBack() == true && canGoBack) {
+                webViewClient.onUserInitiatedLoad()
                 webView?.goBack()
             } else {
                 refresh()
@@ -2595,6 +2605,7 @@ class BrowserTabFragment :
         clientBrandHintProvider.setOn(webView?.safeSettings, url)
         hideKeyboard()
         omnibar.hideFindInPage()
+        webViewClient.onUserInitiatedLoad()
         webView?.loadUrl(url, headers)
     }
 
@@ -2658,6 +2669,7 @@ class BrowserTabFragment :
     }
 
     fun refresh() {
+        webViewClient.onUserInitiatedLoad()
         webView?.reload()
         viewModel.onWebViewRefreshed()
         viewModel.resetErrors()
@@ -2799,6 +2811,7 @@ class BrowserTabFragment :
                 val currentIndex = navList?.currentIndex ?: 0
                 clientBrandHintProvider.setOn(webView?.safeSettings, navList?.getItemAtIndex(currentIndex - 1)?.url.toString())
                 viewModel.refreshBrowserError()
+                webViewClient.onUserInitiatedLoad()
                 webView?.goBackOrForward(-it.steps)
             }
 
@@ -2808,6 +2821,7 @@ class BrowserTabFragment :
                 val currentIndex = navList?.currentIndex ?: 0
                 clientBrandHintProvider.setOn(webView?.safeSettings, navList?.getItemAtIndex(currentIndex + 1)?.url.toString())
                 viewModel.refreshBrowserError()
+                webViewClient.onUserInitiatedLoad()
                 webView?.goForward()
             }
 
@@ -2934,6 +2948,9 @@ class BrowserTabFragment :
                     useFirstActivityFound = false,
                     headers = it.headers,
                     showConfirmation = it.showConfirmation,
+                    trustedCallerPackage = it.trustedCallerPackage,
+                    finishCustomTabOnTrustedCallerLaunch = it.finishCustomTabOnTrustedCallerLaunch,
+                    trustedCallerOnly = it.trustedCallerOnly,
                 )
             }
 
@@ -2948,8 +2965,6 @@ class BrowserTabFragment :
 
             is Command.LaunchPlayStore -> launchPlayStore(it.appPackage)
             is Command.SubmitUrl -> submitQuery(it.url)
-            is Command.LaunchAddWidgetOnboarding ->
-                addWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt = true, source = AddWidgetSource.HOME_SCREEN_PROMPT)
             is Command.LaunchDefaultBrowser -> launchDefaultBrowser()
             is Command.LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()
             is Command.RequiresAuthentication -> showAuthenticationDialog(it.request)
@@ -3319,12 +3334,12 @@ class BrowserTabFragment :
 
     private fun extractUrlFromAmpLink(initialUrl: String) {
         context?.let {
-            val client = urlExtractingWebViewClient.get()
+            val client = urlExtractingWebViewClient()
             client.urlExtractionListener = viewModel
 
             logcat { "AMP link detection: Creating WebView for URL extraction" }
             urlExtractingWebView =
-                UrlExtractingWebView(requireContext(), client, urlExtractorUserAgent.get(), urlExtractor.get(), webViewModeInitializer, browserMode)
+                UrlExtractingWebView(requireContext(), client, urlExtractorUserAgent(), urlExtractor(), webViewModeInitializer, browserMode)
 
             urlExtractingWebView?.urlExtractionListener = viewModel
 
@@ -3495,12 +3510,19 @@ class BrowserTabFragment :
         useFirstActivityFound: Boolean = true,
         headers: Map<String, String> = emptyMap(),
         showConfirmation: Boolean = true,
+        trustedCallerPackage: String? = null,
+        finishCustomTabOnTrustedCallerLaunch: Boolean = false,
+        trustedCallerOnly: Boolean = false,
     ) {
         context?.let {
             val pm = it.packageManager
             val activities = pm.queryIntentActivities(intent, 0)
 
             if (activities.isEmpty()) {
+                if (trustedCallerOnly) {
+                    viewModel.onTrustedCallerLaunchUnavailable(fallbackUrl)
+                    return
+                }
                 when {
                     fallbackIntent == null && fallbackUrl == null && androidBrowserConfigFeature.handleIntentScheme().isEnabled() -> {
                         intent.`package`?.let { pkg ->
@@ -3555,7 +3577,19 @@ class BrowserTabFragment :
                     }
                 }
             } else {
-                launchExternalIntent(it, pm, intent, activities, useFirstActivityFound, viewModel.linkOpenedInNewTab(), showConfirmation)
+                launchExternalIntent(
+                    it,
+                    pm,
+                    intent,
+                    activities,
+                    useFirstActivityFound,
+                    viewModel.linkOpenedInNewTab(),
+                    showConfirmation,
+                    trustedCallerPackage,
+                    finishCustomTabOnTrustedCallerLaunch,
+                    trustedCallerOnly,
+                    fallbackUrl,
+                )
             }
         }
     }
@@ -3568,6 +3602,10 @@ class BrowserTabFragment :
         useFirstActivityFound: Boolean,
         isOpenedInNewTab: Boolean,
         showConfirmation: Boolean = true,
+        trustedCallerPackage: String? = null,
+        finishCustomTabOnTrustedCallerLaunch: Boolean = false,
+        trustedCallerOnly: Boolean = false,
+        fallbackUrl: String? = null,
     ) {
         if (!isActiveCustomTab() && !isActiveTab && !isOpenedInNewTab) {
             logcat(VERBOSE) { "Will not launch an intent for an inactive tab" }
@@ -3575,18 +3613,37 @@ class BrowserTabFragment :
         }
 
         runCatching {
-            val resolvedIntent = if (activities.size == 1 || useFirstActivityFound) {
-                val appTitle = activities.first().loadLabel(pm)
-                logcat(INFO) { "Exactly one app available for intent: $appTitle" }
-                intent
+            val trustedCallerIntent = appLinksHandler.trustedCallerIntent(intent, trustedCallerPackage) {
+                pm.queryIntentActivities(it, PackageManager.MATCH_DEFAULT_ONLY)
+            }
+            if (trustedCallerOnly && trustedCallerIntent == null) {
+                viewModel.onTrustedCallerLaunchUnavailable(fallbackUrl)
+                return
+            }
+            val launch = planExternalAppLaunch(
+                intent = intent,
+                activities = activities,
+                useFirstActivityFound = useFirstActivityFound,
+                showConfirmation = showConfirmation,
+                trustedCallerIntent = trustedCallerIntent,
+                finishCustomTabOnTrustedCallerLaunch = finishCustomTabOnTrustedCallerLaunch,
+            )
+
+            val resolvedIntent = if (launch.useChooser) {
+                Intent.createChooser(launch.intent, getString(R.string.openExternalApp))
             } else {
-                Intent.createChooser(intent, getString(R.string.openExternalApp))
+                val appTitle = launch.activities.first().loadLabel(pm)
+                logcat(INFO) { "Exactly one app available for intent: $appTitle" }
+                launch.intent
             }
 
-            if (showConfirmation) {
+            if (launch.showConfirmation) {
                 launchExternalAppDialog(context) { context.startActivity(resolvedIntent) }
             } else {
                 context.startActivity(resolvedIntent)
+                if (launch.finishCustomTab) {
+                    finishCustomTab()
+                }
             }
         }.onFailure { exception ->
             logcat(ERROR) { "Failed to launch external app: ${exception.asLog()}" }
@@ -3948,6 +4005,10 @@ class BrowserTabFragment :
         )
     }
 
+    private fun setChatMenuItemText(@IdRes itemId: Int, @StringRes textRes: Int) {
+        chatMenuPopup.contentView.findViewById<PopupMenuItemView>(itemId).setPrimaryText(getString(textRes))
+    }
+
     private fun configureItemPressedListener() {
         omnibar.configureItemPressedListeners(
             object : ItemPressedListener {
@@ -3965,18 +4026,45 @@ class BrowserTabFragment :
 
                 override fun onPlusButtonPressed(anchor: View) {
                     val activity = activity ?: return
+                    val plusMenuUpdateEnabled = tabManagerFeatureFlags.duckAiPlusMenuUpdate().isEnabled()
+                    chatMenuPopup.contentView
+                        .findViewById<View>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupHeader)
+                        .isVisible = plusMenuUpdateEnabled
                     chatMenuPopup.contentView
                         .findViewById<View>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)
-                        .isVisible = fireModeAvailability.isAvailable()
+                        .isVisible = !plusMenuUpdateEnabled && fireModeAvailability.isAvailable()
                     val nativeSidebarEnabled = duckAiFeatureState.nativeDuckAiSidebar.value
                     chatMenuPopup.contentView
                         .findViewById<View>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewImage)
                         .isVisible = nativeSidebarEnabled
-                    chatMenuPopup.contentView
-                        .findViewById<PopupMenuItemView>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)
-                        .setPrimaryText(
-                            getString(com.duckduckgo.browser.ui.R.string.chatMenuPopupNewTab),
-                        )
+                    setChatMenuItemText(
+                        com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewChat,
+                        if (plusMenuUpdateEnabled) {
+                            com.duckduckgo.browser.ui.R.string.chatMenuPopupChat
+                        } else {
+                            com.duckduckgo.browser.ui.R.string.browserMenuNewChat
+                        },
+                    )
+                    setChatMenuItemText(
+                        com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewVoiceChat,
+                        if (plusMenuUpdateEnabled) {
+                            com.duckduckgo.duckchat.impl.R.string.duckAiVoiceChatVisibilitySetting
+                        } else {
+                            com.duckduckgo.browser.ui.R.string.chatMenuPopupNewVoiceChat
+                        },
+                    )
+                    setChatMenuItemText(
+                        com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewImage,
+                        if (plusMenuUpdateEnabled) {
+                            com.duckduckgo.browser.ui.R.string.chatMenuPopupImage
+                        } else {
+                            com.duckduckgo.browser.ui.R.string.chatMenuPopupNewImage
+                        },
+                    )
+                    setChatMenuItemText(
+                        com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab,
+                        if (plusMenuUpdateEnabled) R.string.search else com.duckduckgo.browser.ui.R.string.chatMenuPopupNewTab,
+                    )
                     chatMenuPopup.showAnchoredView(activity, binding.rootView, anchor)
                 }
 
@@ -5198,12 +5286,14 @@ class BrowserTabFragment :
     private fun onTabHidden() {
         if (!isAdded) return
         viewModel.onViewHidden()
+        webViewClient.onTabBackgrounded()
         downloadMessagesJob.cancel()
         webView?.onPause()
     }
 
     private fun onTabVisible() {
         if (!isAdded) return
+        webViewClient.onTabForegrounded()
         webView?.onResume()
         // ViewPager2 can keep neighbors STARTED/RESUMED; expand so a bottom omnibar that was scrolled
         // away on a previous visit isn't left as an icons-only strip.
@@ -5233,7 +5323,6 @@ class BrowserTabFragment :
         val orientationChanged = lastOrientation != newConfig.orientation
         lastOrientation = newConfig.orientation
 
-        renderer.renderHomeCta()
         recreateBrowserMenu()
         viewModel.onConfigurationChanged(orientationChanged)
         if (orientationChanged) {
@@ -5283,7 +5372,6 @@ class BrowserTabFragment :
         dismissAppLinkSnackBar()
         supervisorJob.cancel()
         dismissBrowserMenu()
-        widgetBottomSheetDialogJob?.cancel()
         loginDetectionDialog?.dismiss()
         automaticFireproofDialog?.dismiss()
         privacyProSkippedOnboardingBottomSheet?.dismiss()
@@ -5513,6 +5601,7 @@ class BrowserTabFragment :
         val currentIndex = navList?.currentIndex ?: 0
 
         clientBrandHintProvider.setOn(webView?.safeSettings, navList?.getItemAtIndex(currentIndex + stepsToMove)?.url.toString())
+        webViewClient.onUserInitiatedLoad()
         webView?.goBackOrForward(stepsToMove)
     }
 
@@ -5585,7 +5674,6 @@ class BrowserTabFragment :
         const val KEYBOARD_DELAY = 200L
         private const val NAVIGATION_DELAY = 100L
         private const val BOTTOM_SHEET_MENU_DELAY = 300L
-        private const val WIDGET_PROMPT_DELAY = 200L
         private const val CHECK_IF_ABOUT_BLANK_DELAY = 200L
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
@@ -6345,7 +6433,6 @@ class BrowserTabFragment :
             instantShow: Boolean = false,
         ) {
             when (configuration) {
-                is HomePanelCta -> showBottomSheetCta(configuration)
                 is SubscriptionPromoModalCta -> showPrivacyProSkippedOnboardingBottomSheet(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is ContextualDaxDialogCta ->
@@ -6470,6 +6557,7 @@ class BrowserTabFragment :
 
         fun reapplyBubbleForOrientation() {
             (lastSeenCtaViewState?.cta as? DaxBubbleCta)?.onOrientationChanged()
+            (lastSeenCtaViewState?.cta as? BrokenSitePromptDialogCta)?.onOrientationChanged(binding)
         }
 
         private fun showPrivacyProSkippedOnboardingBottomSheet(configuration: SubscriptionPromoModalCta) {
@@ -6544,93 +6632,6 @@ class BrowserTabFragment :
             )
         }
 
-        private fun showBottomSheetCta(configuration: HomePanelCta) {
-            widgetBottomSheetDialogJob += viewLifecycleOwner.lifecycleScope.launch {
-                delay(WIDGET_PROMPT_DELAY)
-                if (configuration is AddWidgetAutoOnboarding) {
-                    showHomeWidgetPrompt(configuration)
-                } else {
-                    showHomeCta(configuration)
-                }
-            }
-        }
-
-        private fun showHomeWidgetPrompt(configuration: HomePanelCta) {
-            hideDaxCta()
-            val isAddressBarRebrandEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled()
-
-            if (!::widgetBottomSheetDialog.isInitialized) {
-                widgetBottomSheetDialog =
-                    HomeScreenWidgetBottomSheetDialog(
-                        context = requireContext(),
-                        isLightModeEnabled = appTheme.isLightModeEnabled(),
-                        isAddressBarRebrandEnabled = isAddressBarRebrandEnabled,
-                    )
-                widgetBottomSheetDialog.eventListener =
-                    object : HomeScreenWidgetBottomSheetDialog.EventListener {
-                        override fun onShown() {
-                            viewModel.onCtaShown()
-                        }
-
-                        override fun onCanceled() {
-                            viewModel.onUserClickCtaSecondaryButton(configuration)
-                        }
-
-                        override fun onAddWidgetButtonClicked() {
-                            viewModel.onUserClickCtaOkButton(configuration)
-                        }
-
-                        override fun onNotNowButtonClicked() {
-                            viewModel.onUserClickCtaSecondaryButton(configuration)
-                        }
-                    }
-                widgetBottomSheetDialog.show()
-            } else {
-                if (!widgetBottomSheetDialog.isShowing) {
-                    widgetBottomSheetDialog.show()
-                }
-            }
-        }
-
-        private fun showHomeCta(configuration: HomePanelCta) {
-            hideDaxCta()
-
-            if (!::ctaBottomSheet.isInitialized) {
-                ctaBottomSheet =
-                    PromoBottomSheetDialog
-                        .Builder(requireContext())
-                        .setIcon(configuration.image)
-                        .setTitle(getString(configuration.title))
-                        .setContent(getString(configuration.description))
-                        .setPrimaryButton(getString(configuration.okButton))
-                        .setSecondaryButton(getString(configuration.dismissButton))
-                        .addEventListener(
-                            object : PromoBottomSheetDialog.EventListener() {
-                                override fun onPrimaryButtonClicked() {
-                                    super.onPrimaryButtonClicked()
-                                    viewModel.onUserClickCtaOkButton(configuration)
-                                }
-
-                                override fun onSecondaryButtonClicked() {
-                                    super.onSecondaryButtonClicked()
-                                    viewModel.onUserClickCtaSecondaryButton(configuration)
-                                }
-
-                                override fun onBottomSheetDismissed() {
-                                    super.onBottomSheetDismissed()
-                                    viewModel.onUserClickCtaSecondaryButton(configuration)
-                                }
-                            },
-                        ).build()
-                ctaBottomSheet.show()
-            } else {
-                if (!ctaBottomSheet.isShowing) {
-                    ctaBottomSheet.show()
-                }
-            }
-            viewModel.onCtaShown()
-        }
-
         fun recreateNewTabPageContent() {
             newBrowserTab.newTabContainerLayout.removeAllViews()
             addNewTabPageContent()
@@ -6678,19 +6679,6 @@ class BrowserTabFragment :
                 cta.hideOnboardingCta(binding)
             } else {
                 ContextualDaxDialogCta.hideContainer(binding)
-            }
-        }
-
-        fun renderHomeCta() {
-            if (::ctaBottomSheet.isInitialized) {
-                if (ctaBottomSheet.isShowing) {
-                    // the bottom sheet might be visible but not fully expanded
-                    val bottomSheet = ctaBottomSheet.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-                    if (bottomSheet != null) {
-                        val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
-                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                    }
-                }
             }
         }
 

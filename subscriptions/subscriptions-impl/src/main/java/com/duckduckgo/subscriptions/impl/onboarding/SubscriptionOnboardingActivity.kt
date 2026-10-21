@@ -24,9 +24,9 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -74,7 +74,6 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout, installScrim = false)
         edgeToEdgeHandler.applyNavigationBarInsets(binding.subscriptionOnboardingContainer, drawBehindGestureNav = false)
 
-        // System back and the toolbar up arrow both go through the controller.
         onBackPressedDispatcher.addCallback(
             this,
             object : OnBackPressedCallback(true) {
@@ -113,7 +112,6 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
                 finish()
             }
             is Command.FinishToSettings -> finishToSettings()
-            is Command.Finish -> finish()
         }
     }
 

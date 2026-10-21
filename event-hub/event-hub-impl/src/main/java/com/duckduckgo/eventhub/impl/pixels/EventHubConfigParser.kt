@@ -22,7 +22,7 @@ import logcat.LogPriority.WARN
 import logcat.logcat
 
 private data class EventHubSettingsJson(
-    val telemetry: Map<String, TelemetryPixelJson>? = null,
+    val telemetry: Map<String, Any?>? = null,
 )
 
 private data class TelemetryPixelJson(
@@ -32,7 +32,8 @@ private data class TelemetryPixelJson(
 )
 
 private data class TelemetryTriggerJson(
-    val period: TelemetryPeriodJson,
+    val type: String? = null,
+    val period: TelemetryPeriodJson? = null,
 )
 
 private data class TelemetryPeriodJson(
@@ -55,20 +56,31 @@ private data class BucketJson(
 
 object EventHubConfigParser {
 
+    private const val PERIOD_TRIGGER_TYPE = "period"
+
     private val moshi: Moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
     private val settingsAdapter = moshi.adapter(EventHubSettingsJson::class.java).lenient()
     private val pixelAdapter = moshi.adapter(TelemetryPixelJson::class.java).lenient()
 
     fun parseTelemetry(settingsJson: String): List<TelemetryPixelConfig> {
-        return try {
-            val settings = settingsAdapter.fromJson(settingsJson) ?: return emptyList()
-            val telemetryMap = settings.telemetry ?: return emptyList()
-            telemetryMap.mapNotNull { (name, pixelJson) ->
-                toTelemetryPixelConfig(name, pixelJson)
-            }
+        val settings = try {
+            settingsAdapter.fromJson(settingsJson)
         } catch (e: Exception) {
             logcat(WARN) { "Failed to parse eventHub settings: ${e.message}" }
-            emptyList()
+            null
+        }
+        // Each entry is decoded on its own so that one entry this client can't parse (e.g. a newer trigger type)
+        // doesn't discard every other pixel
+        return settings?.telemetry.orEmpty().mapNotNull { (name, pixelValue) -> parseTelemetryEntry(name, pixelValue) }
+    }
+
+    private fun parseTelemetryEntry(name: String, pixelValue: Any?): TelemetryPixelConfig? {
+        return try {
+            val pixelJson = pixelAdapter.fromJsonValue(pixelValue) ?: return skipEntry(name, "null entry")
+            toTelemetryPixelConfig(name, pixelJson)
+        } catch (e: Exception) {
+            logcat(WARN) { "Skipping eventHub telemetry entry $name: ${e.message}" }
+            null
         }
     }
 
@@ -108,8 +120,14 @@ object EventHubConfigParser {
     }
 
     private fun toTelemetryPixelConfig(name: String, json: TelemetryPixelJson): TelemetryPixelConfig? {
-        val periodJson = json.trigger.period
-        if (periodJson.seconds == 0 && periodJson.minutes == 0 && periodJson.hours == 0 && periodJson.days == 0) return null
+        val triggerType = json.trigger.type
+        if (triggerType != null && triggerType != PERIOD_TRIGGER_TYPE) {
+            return skipEntry(name, "unsupported trigger type $triggerType")
+        }
+        val periodJson = json.trigger.period ?: return skipEntry(name, "missing period")
+        if (periodJson.seconds == 0 && periodJson.minutes == 0 && periodJson.hours == 0 && periodJson.days == 0) {
+            return skipEntry(name, "zero period")
+        }
 
         val period = TelemetryPeriodConfig(
             seconds = periodJson.seconds,
@@ -117,13 +135,13 @@ object EventHubConfigParser {
             hours = periodJson.hours,
             days = periodJson.days,
         )
-        if (period.periodSeconds <= 0) return null
+        if (period.periodSeconds <= 0) return skipEntry(name, "non-positive period")
 
         val parameters = mutableMapOf<String, TelemetryParameterConfig>()
         for ((paramName, paramJson) in json.parameters) {
             toParameterConfig(paramJson)?.let { parameters[paramName] = it }
         }
-        if (parameters.isEmpty()) return null
+        if (parameters.isEmpty()) return skipEntry(name, "no valid counter parameters")
 
         return TelemetryPixelConfig(
             name = name,
@@ -131,6 +149,11 @@ object EventHubConfigParser {
             trigger = TelemetryTriggerConfig(period = period),
             parameters = parameters,
         )
+    }
+
+    private fun skipEntry(name: String, reason: String): TelemetryPixelConfig? {
+        logcat(WARN) { "Skipping eventHub telemetry entry $name: $reason" }
+        return null
     }
 
     private fun toParameterConfig(json: TelemetryParameterJson): TelemetryParameterConfig? {

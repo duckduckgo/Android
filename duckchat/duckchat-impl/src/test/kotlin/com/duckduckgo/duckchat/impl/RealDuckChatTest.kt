@@ -56,7 +56,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.squareup.moshi.Moshi
-import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -147,7 +146,7 @@ class RealDuckChatTest {
                 mockContext,
                 true,
                 coroutineRule.testScope,
-                Lazy { mockDuckChatPixels },
+                lazy { mockDuckChatPixels },
                 imageUploadFeature,
                 mockBrowserNav,
                 mockDeviceSyncState,

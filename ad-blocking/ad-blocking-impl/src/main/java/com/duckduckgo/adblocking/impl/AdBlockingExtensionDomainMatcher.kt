@@ -21,8 +21,8 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 /**
@@ -37,7 +37,7 @@ interface AdBlockingExtensionDomainMatcher {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealAdBlockingExtensionDomainMatcher @Inject constructor() : AdBlockingExtensionDomainMatcher {
 
     override fun matches(url: String?): Boolean {

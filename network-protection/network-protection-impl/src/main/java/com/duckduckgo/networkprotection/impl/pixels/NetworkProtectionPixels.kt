@@ -23,8 +23,8 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.*
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -309,7 +309,7 @@ interface NetworkProtectionPixels {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealNetworkProtectionPixel @Inject constructor(
     private val pixel: Pixel,
     private val sharedPreferencesProvider: SharedPreferencesProvider,

@@ -23,7 +23,6 @@ import androidx.browser.customtabs.CustomTabsSessionToken
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
@@ -33,6 +32,7 @@ import com.duckduckgo.app.dispatchers.IntentDispatcherViewModel.ViewState
 import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.pixels.AppReturnPixelSender
 import com.duckduckgo.app.pixels.toPixelLaunchSourceValue
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.customtabs.api.CustomTabsSessionRegistry
 import com.duckduckgo.di.scopes.ActivityScope
@@ -102,7 +102,8 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
             ?.let { customTabsSessionRegistry.lookupClientPackage(it) }
         // Best-effort caller identity from the android-app:// referrer, available even when the launcher never
         // bound the service (e.g. apps that open a login Custom Tab without a session). The launcher can set the
-        // referrer, so this is used only for the low-stakes prompt-skip decision, never the launch carve-out.
+        // referrer, so it only decides how links back to the caller are handled (skipping confirmation prompts, or
+        // overriding "Never" in Open Links in Apps), never the no-gesture launch carve-out.
         val referrerPackage = referrer?.takeIf { it.scheme == "android-app" }?.host
 
         // As customizations we only support the toolbar color at the moment.

@@ -20,8 +20,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementDeviceUnsupportedBinding
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.FragmentScope

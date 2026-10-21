@@ -28,12 +28,12 @@ import androidx.core.view.ViewCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.ViewState
 import com.duckduckgo.app.browser.databinding.ActivityCustomTabBinding
 import com.duckduckgo.app.global.intentText
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.isFullScreen

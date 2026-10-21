@@ -18,14 +18,14 @@ package com.duckduckgo.adblocking.impl.ui
 
 import android.content.Context
 import android.view.View
-import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.settings.api.ProtectionsSettingsPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
 
 @PriorityKey(100)
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoMap(ActivityScope::class)
 class AdBlockingProtectionsSettingsEntry @Inject constructor() : ProtectionsSettingsPlugin {
     override fun getView(context: Context): View = AdBlockingProtectionsSettingsEntryView(context)
 }

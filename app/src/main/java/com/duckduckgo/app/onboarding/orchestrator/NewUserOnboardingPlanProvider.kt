@@ -80,7 +80,7 @@ import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Stay
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.SwitchTo
 import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin
 import com.duckduckgo.sync.api.SyncAutoRestore
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
@@ -96,7 +96,7 @@ import javax.inject.Inject
  * Each call to [buildRootPlan] creates a fresh [NewUserOnboardingPlanContext] and per-run [SuspendMemo]s, so
  * a new onboarding run never reads stale state.
  */
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class NewUserOnboardingPlanProvider @Inject constructor(
     private val syncAutoRestore: SyncAutoRestore,
     private val appBuildConfig: AppBuildConfig,
@@ -878,11 +878,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             resolveDialog = { NewUserOnboardingActivityDialog.WidgetPrompt },
             transition = { event ->
                 when (event) {
-                    is NewUserOnboardingEvent.Presented -> {
-                        onboardingStore.linearPlanWidgetPromptShown = true
-                        Stay
-                    }
-
                     is NewUserOnboardingEvent.AddWidgetRequested -> {
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
                         Advance
@@ -1164,9 +1159,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                             OnboardingPixelAction.TryInputClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
                         )
                         if (handsPromptToDemoStep) {
+                            onboardingStore.setTriedDuckAi()
                             ctx.pendingDuckAiPrompt = event.query
                         } else {
                             ctx.completionResult = if (event.isChat) {
+                                onboardingStore.setTriedDuckAi()
                                 NewUserOnboardingResult.LaunchChat(prompt = event.query)
                             } else {
                                 NewUserOnboardingResult.LaunchSearch(query = event.query)

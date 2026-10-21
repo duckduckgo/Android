@@ -21,12 +21,12 @@ import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class NetworkProtectionRetentionPixelSender @Inject constructor(
     private val networkProtectionState: NetworkProtectionState,
     private val networkProtectionPixels: NetworkProtectionPixels,

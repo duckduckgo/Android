@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.feature.removal
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
 import logcat.logcat
 import javax.inject.Inject

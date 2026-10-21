@@ -25,11 +25,11 @@ import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.Companion.PIR_ROW_ID
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class SubscriptionOnboardingProgress @Inject constructor(
     private val stepPlugins: PluginPoint<SubscriptionOnboardingStepPlugin>,
     private val onboardingStore: SubscriptionOnboardingStore,

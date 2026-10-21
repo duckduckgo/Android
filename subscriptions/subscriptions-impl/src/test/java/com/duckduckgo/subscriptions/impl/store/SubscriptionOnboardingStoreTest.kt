@@ -50,6 +50,17 @@ class SubscriptionOnboardingStoreTest {
     }
 
     @Test
+    fun whenResetThenCompletedStepsAndEntryPointViewsAreCleared() {
+        store.setStepCompleted("welcome")
+        store.incrementCompletedEntryPointViews()
+
+        store.reset()
+
+        assertTrue(store.completedSteps().isEmpty())
+        assertEquals(0, store.completedEntryPointViews())
+    }
+
+    @Test
     fun whenCompletedEntryPointViewsIncrementedThenCountPersists() {
         assertEquals(0, store.completedEntryPointViews())
 

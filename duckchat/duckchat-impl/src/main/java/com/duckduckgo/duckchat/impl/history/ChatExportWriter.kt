@@ -23,8 +23,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.FileDownloadCallbackPlugin
 import com.duckduckgo.downloads.api.model.DownloadItem
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import java.io.File
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -55,7 +55,7 @@ sealed interface ExportPayload {
     }
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealChatExportWriter @Inject constructor(
     private val downloadsRepository: DownloadsRepository,

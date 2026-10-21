@@ -16,11 +16,12 @@
 
 package com.duckduckgo.duckchat.impl.nativeinput
 
+import android.app.Activity
 import android.content.Context
 import android.net.Uri
 import android.view.View
 import android.webkit.ValueCallback
-import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
+import com.duckduckgo.codegen.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
@@ -46,6 +47,9 @@ interface NativeInputHost {
     fun showAttachmentChooser(showing: Boolean)
     fun showModelPicker(showing: Boolean)
     fun showReasoningPicker(showing: Boolean)
+
+    /** Focus the input field and show the keyboard; without an [activity] the widget's own window is used. */
+    fun focusInput(activity: Activity? = null)
 
     /** Focus the input field, expanding the bottom row so a plugin popup (e.g. the model picker) can anchor to it. */
     fun requestInputFocus()

@@ -22,13 +22,13 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.testseeder.api.TestSeederKey
 import com.duckduckgo.testseeder.api.TestSeederPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
 // Ships in every internal build, but RealTestScenarioSeeder only invokes plugins when the launch
 // intent carries isMaestro/isMacrobenchmark=true, a normal launch never sets that, so apply() is inert.
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class UserAllowListSeederPlugin @Inject constructor(
     private val userAllowListRepository: UserAllowListRepository,
     private val userAllowListDao: UserAllowListDao,

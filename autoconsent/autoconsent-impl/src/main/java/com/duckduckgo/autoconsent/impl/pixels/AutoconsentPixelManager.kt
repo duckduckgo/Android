@@ -23,7 +23,7 @@ import com.duckduckgo.autoconsent.impl.AutoconsentHeuristicModeProvider
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -43,7 +43,7 @@ interface AutoconsentPixelManager {
     suspend fun markDetectedOnlyRulesProcessed(instanceId: String)
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealAutoconsentPixelManager @Inject constructor(
     private val pixel: Pixel,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,

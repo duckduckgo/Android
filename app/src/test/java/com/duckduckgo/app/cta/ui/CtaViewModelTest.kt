@@ -38,6 +38,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.FakeContextualOnboardingTimeLimit
 import com.duckduckgo.app.onboarding.RealDuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -67,7 +68,6 @@ import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -118,8 +118,6 @@ class CtaViewModelTest {
 
     private lateinit var db: AppDatabase
 
-    private val mockWidgetCapabilities: WidgetCapabilities = mock()
-
     private lateinit var subscriptionPromoModalDecider: SubscriptionPromoModalDecider
 
     private val mockDismissedCtaDao: DismissedCtaDao = mock()
@@ -166,6 +164,8 @@ class CtaViewModelTest {
     private val mockDuckChat: DuckChat = mock()
 
     private val mockOnboardingPixelSender: OnboardingPixelSender = mock()
+
+    private val fakeContextualOnboardingTimeLimit = FakeContextualOnboardingTimeLimit()
 
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
 
@@ -250,6 +250,7 @@ class CtaViewModelTest {
             },
             duckAiFeatureState = mockDuckAiFeatureState,
             onboardingPixelSender = mockOnboardingPixelSender,
+            contextualOnboardingTimeLimit = fakeContextualOnboardingTimeLimit,
         )
     }
 
@@ -293,24 +294,6 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenCtaShownAndCtaIsNotDaxThenPixelIsFired() = runTest {
-        testee.onCtaShown(HomePanelCta.AddWidgetAutoOnboarding)
-        verify(mockPixel).fire(eq(WIDGET_CTA_SHOWN), any(), any(), eq(Count))
-    }
-
-    @Test
-    fun whenCtaLaunchedPixelIsFired() = runTest {
-        testee.onUserClickCtaOkButton(HomePanelCta.AddWidgetAutoOnboarding)
-        verify(mockPixel).fire(eq(WIDGET_CTA_LAUNCHED), any(), any(), eq(Count))
-    }
-
-    @Test
-    fun whenCtaDismissedThenCancelPixelIsFired() = runTest {
-        testee.onUserDismissedCta(HomePanelCta.AddWidgetAutoOnboarding)
-        verify(mockPixel).fire(eq(WIDGET_CTA_DISMISSED), any(), any(), eq(Count))
-    }
-
-    @Test
     fun whenOnboardingCtaDismissedViaCloseBtnThenPixelIsFired() = runTest {
         val testCta = DaxTryASearchBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
 
@@ -326,12 +309,6 @@ class CtaViewModelTest {
         testee.onUserDismissedCta(testCta)
 
         verify(mockPixel, never()).fire(eq(ONBOARDING_DAX_CTA_DISMISS_BUTTON), any(), any(), eq(Count))
-    }
-
-    @Test
-    fun whenNonSurveyCtaDismissedCtaThenDatabaseNotified() = runTest {
-        testee.onUserDismissedCta(HomePanelCta.AddWidgetAutoOnboarding)
-        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.ADD_WIDGET))
     }
 
     @Test
@@ -1075,7 +1052,6 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1097,7 +1073,6 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1237,7 +1212,6 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1333,6 +1307,198 @@ class CtaViewModelTest {
             brokenSitePromptUrl = null,
         )
         assertNull(value)
+    }
+
+    @Test
+    fun whenRefreshCtaThenContextualOnboardingTimeLimitIsChecked() = runTest {
+        givenDaxOnboardingActive()
+
+        testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertEquals(1, fakeContextualOnboardingTimeLimit.timeLimitChecks)
+    }
+
+    @Test
+    fun whenOnboardingEndedByTimeLimitAndTrackersBlockedNotShownThenReturnTrackersBlockedCta() = runTest {
+        givenOnboardingEndedByTimeLimit()
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = siteWithBlockedTrackers(),
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertTrue(value is DaxTrackersBlockedContextualCta)
+    }
+
+    @Test
+    fun whenOnboardingEndedByTimeLimitAndTrackersBlockedAlreadyShownThenReturnNull() = runTest {
+        givenOnboardingEndedByTimeLimit()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)).thenReturn(true)
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = siteWithBlockedTrackers(),
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertNull(value)
+    }
+
+    @Test
+    fun whenOnboardingEndedByTimeLimitAndNoTrackersBlockedThenReturnNull() = runTest {
+        givenOnboardingEndedByTimeLimit()
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site(url = "http://www.wikipedia.com"),
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertNull(value)
+    }
+
+    @Test
+    fun whenOnboardingEndedByTimeLimitAndTipsHiddenThenTrackersBlockedCtaNotReturned() = runTest {
+        givenOnboardingEndedByTimeLimit()
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = siteWithBlockedTrackers(),
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertNull(value)
+    }
+
+    @Test
+    fun whenOnboardingEndedByTimeLimitAndContextualCtaSuppressedThenTrackersBlockedCtaNotReturned() = runTest {
+        givenOnboardingEndedByTimeLimit()
+        canShowContextualCta = false
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = siteWithBlockedTrackers(),
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertNull(value)
+    }
+
+    @Test
+    fun whenOnboardingEndedByTimeLimitAndBrokenSitePromptDueThenReturnBrokenSitePrompt() = runTest {
+        givenOnboardingEndedByTimeLimit()
+        whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt(any(), any())).thenReturn(true)
+        val site = siteWithBlockedTrackers()
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site,
+            detectedRefreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS),
+            brokenSitePromptUrl = site.url,
+        )
+
+        assertTrue(value is BrokenSitePromptDialogCta)
+    }
+
+    @Test
+    fun whenOnboardingCompletedByUserAndTrackersBlockedNotShownThenReturnNull() = runTest {
+        givenDaxOnboardingCompleted()
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = siteWithBlockedTrackers(),
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertNull(value)
+    }
+
+    @Test
+    fun whenDuckAiOnboardingFlowActiveOnDuckAiSiteThenReturnDuckAiFireButtonCta() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockOnboardingStore.isDuckAiOnboardingFlow()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site(url = "https://duck.ai"),
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertTrue(value is DaxDuckAiFireButtonContextualCta)
+    }
+
+    @Test
+    fun whenDuckAiOnboardingFlowEndedOnDuckAiSiteThenDuckAiFireButtonCtaNotReturned() = runTest {
+        givenOnboardingEndedByTimeLimit()
+        whenever(mockOnboardingStore.isDuckAiOnboardingFlow()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site(url = "https://duck.ai"),
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertNull(value)
+    }
+
+    @Test
+    fun whenDuckAiOnboardingFlowEndedThenDuckAiEndCtaNotReturnedOnHome() = runTest {
+        givenOnboardingEndedByTimeLimit()
+        givenCanShowDuckAiEndCta()
+        showInputScreenFlow.value = false
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertNull(value)
+    }
+
+    private suspend fun givenOnboardingEndedByTimeLimit() {
+        givenUserIsEstablished()
+        fakeContextualOnboardingTimeLimit.onboardingEndedByTimeLimit = true
+    }
+
+    private fun siteWithBlockedTrackers(): Site {
+        val trackingEvent = TrackingEvent(
+            documentUrl = "test.com",
+            trackerUrl = "test.com",
+            categories = null,
+            entity = TdsEntity("test", "test", 9.0),
+            surrogateId = null,
+            status = TrackerStatus.BLOCKED,
+            type = TrackerType.OTHER,
+        )
+        return site(url = "http://www.cnn.com", trackerCount = 1, events = listOf(trackingEvent))
     }
 
     private suspend fun givenDaxOnboardingActive() {
@@ -1522,7 +1688,6 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1543,7 +1708,6 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(DownloadReasonSelection.AI_CHAT)
 
         val value = testee.refreshCta(

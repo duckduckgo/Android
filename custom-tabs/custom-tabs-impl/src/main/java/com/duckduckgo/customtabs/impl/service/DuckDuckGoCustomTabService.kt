@@ -21,9 +21,9 @@ import android.os.Binder
 import android.os.Bundle
 import androidx.browser.customtabs.CustomTabsService
 import androidx.browser.customtabs.CustomTabsSessionToken
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.di.android.AndroidInjection
 import com.duckduckgo.di.scopes.ServiceScope
-import dagger.android.AndroidInjection
 import logcat.logcat
 import javax.inject.Inject
 

@@ -17,12 +17,14 @@
 package com.duckduckgo.pir.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -677,48 +679,71 @@ class RealPirPixelSenderTest {
     }
 
     @Test
-    fun whenReportDAUThenEnqueuesCorrectPixel() = runTest {
-        testee.reportDAU()
+    fun whenReportDAUForPaidUserThenEnqueuesPixelWithPaidParams() = runTest {
+        testee.reportDAU(isAuthenticated = true)
 
+        val pixelNameCaptor = argumentCaptor<String>()
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).enqueueFire(
-            pixelName = any(),
+            pixelName = pixelNameCaptor.capture(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
             type = any(),
         )
 
-        assert(paramsCaptor.firstValue.isEmpty())
+        assertEquals("m_dbp_engagement_dau_c", pixelNameCaptor.firstValue)
+        assertEquals(mapOf("is_authenticated" to "true", "free_scan" to "false"), paramsCaptor.firstValue)
     }
 
     @Test
-    fun whenReportWAUThenEnqueuesCorrectPixel() = runTest {
-        testee.reportWAU()
+    fun whenReportDAUForFreeUserThenEnqueuesPixelWithFreeParams() = runTest {
+        testee.reportDAU(isAuthenticated = false)
 
+        val pixelNameCaptor = argumentCaptor<String>()
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).enqueueFire(
-            pixelName = any(),
+            pixelName = pixelNameCaptor.capture(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
             type = any(),
         )
 
-        assert(paramsCaptor.firstValue.isEmpty())
+        assertEquals("m_dbp_engagement_dau_c", pixelNameCaptor.firstValue)
+        assertEquals(mapOf("is_authenticated" to "false", "free_scan" to "true"), paramsCaptor.firstValue)
     }
 
     @Test
-    fun whenReportMAUThenEnqueuesCorrectPixel() = runTest {
-        testee.reportMAU()
+    fun whenReportWAUForFreeUserThenEnqueuesPixelWithFreeParams() = runTest {
+        testee.reportWAU(isAuthenticated = false)
 
+        val pixelNameCaptor = argumentCaptor<String>()
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).enqueueFire(
-            pixelName = any(),
+            pixelName = pixelNameCaptor.capture(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
             type = any(),
         )
 
-        assert(paramsCaptor.firstValue.isEmpty())
+        assertEquals("m_dbp_engagement_wau_c", pixelNameCaptor.firstValue)
+        assertEquals(mapOf("is_authenticated" to "false", "free_scan" to "true"), paramsCaptor.firstValue)
+    }
+
+    @Test
+    fun whenReportMAUForFreeUserThenEnqueuesPixelWithFreeParams() = runTest {
+        testee.reportMAU(isAuthenticated = false)
+
+        val pixelNameCaptor = argumentCaptor<String>()
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).enqueueFire(
+            pixelName = pixelNameCaptor.capture(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        assertEquals("m_dbp_engagement_mau_c", pixelNameCaptor.firstValue)
+        assertEquals(mapOf("is_authenticated" to "false", "free_scan" to "true"), paramsCaptor.firstValue)
     }
 
     @Test
@@ -767,6 +792,7 @@ class RealPirPixelSenderTest {
             parentUrl = "https://parent.com",
             actionId = "action-scan-1",
             actionType = "navigate",
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -783,6 +809,7 @@ class RealPirPixelSenderTest {
         assert(params["tries"] == "2")
         assert(params["parent"] == "https://parent.com")
         assert(params["action_id"] == "action-scan-1")
+        assert(params["free_scan"] == "false")
         assert(params["action_type"] == "navigate")
     }
 
@@ -795,6 +822,7 @@ class RealPirPixelSenderTest {
             durationMs = 5000L,
             inManualStarted = true,
             parentUrl = "https://parent.com",
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -812,6 +840,8 @@ class RealPirPixelSenderTest {
         assert(params["is_manual_scan"] == "true")
         assert(params["parent"] == "https://parent.com")
         assert(params["vpn_connection_state"] == "disconnected")
+        assert(params["is_authenticated"] == "true")
+        assert(params["free_scan"] == "false")
         assert(params["tracker_blocking_state"] == "disabled")
     }
 
@@ -826,6 +856,7 @@ class RealPirPixelSenderTest {
             parentUrl = "https://parent.com",
             actionId = "action-scan-2",
             actionType = "extract",
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -845,6 +876,8 @@ class RealPirPixelSenderTest {
         assert(params["action_id"] == "action-scan-2")
         assert(params["action_type"] == "extract")
         assert(params["vpn_connection_state"] == "connected")
+        assert(params["is_authenticated"] == "true")
+        assert(params["free_scan"] == "false")
         assert(params["tracker_blocking_state"] == "disabled")
     }
 
@@ -861,6 +894,7 @@ class RealPirPixelSenderTest {
             parentUrl = "https://parent.com",
             actionId = "action-scan-3",
             actionType = "navigate",
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -882,7 +916,59 @@ class RealPirPixelSenderTest {
         assert(params["action_id"] == "action-scan-3")
         assert(params["action_type"] == "navigate")
         assert(params["vpn_connection_state"] == "disconnected")
+        assert(params["is_authenticated"] == "true")
+        assert(params["free_scan"] == "false")
         assert(params["tracker_blocking_state"] == "disabled")
+    }
+
+    @Test
+    fun whenReportScanErrorForFreeScanThenSendsFreeTier() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(false)
+        testee.reportScanError(
+            brokerUrl = "https://broker.com",
+            brokerVersion = "3.0",
+            durationMs = 2000L,
+            errorCategory = "network",
+            errorDetails = "timeout",
+            inManualStarted = true,
+            parentUrl = "https://parent.com",
+            actionId = "action-scan-3",
+            actionType = "navigate",
+            isFreeScan = true,
+        )
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).fire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+        assertEquals("false", paramsCaptor.firstValue["is_authenticated"])
+        assertEquals("true", paramsCaptor.firstValue["free_scan"])
+    }
+
+    @Test
+    fun whenReportScanStageForFreeScanThenSendsFreeScanOnly() = runTest {
+        testee.reportScanStage(
+            brokerUrl = "https://broker.com",
+            brokerVersion = "3.0",
+            tries = 2,
+            parentUrl = "https://parent.com",
+            actionId = "action-scan-1",
+            actionType = "navigate",
+            isFreeScan = true,
+        )
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).fire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+        assertEquals("true", paramsCaptor.firstValue["free_scan"])
+        assertFalse(paramsCaptor.firstValue.containsKey("is_authenticated"))
     }
 
     @Test
@@ -896,6 +982,7 @@ class RealPirPixelSenderTest {
             durationMs = 1000L,
             inManualStarted = false,
             parentUrl = "https://parent.com",
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -984,6 +1071,7 @@ class RealPirPixelSenderTest {
         testee.reportUpdateBrokerJsonSuccess(
             brokerJsonFileName = "broker.json",
             removedAtMs = 123456789L,
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -995,6 +1083,8 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
+
+        assert(params["free_scan"] == "false")
         assert(params["data_broker_json_file"] == "broker.json")
         assert(params["removed_at"] == "123456789")
     }
@@ -1004,6 +1094,7 @@ class RealPirPixelSenderTest {
         testee.reportUpdateBrokerJsonFailure(
             brokerJsonFileName = "broker.json",
             removedAtMs = 987654321L,
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -1015,8 +1106,28 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
+
+        assert(params["free_scan"] == "false")
         assert(params["data_broker_json_file"] == "broker.json")
         assert(params["removed_at"] == "987654321")
+    }
+
+    @Test
+    fun whenReportUpdateBrokerJsonSuccessWithUnknownTierThenOmitsFreeScan() = runTest {
+        testee.reportUpdateBrokerJsonSuccess(
+            brokerJsonFileName = "broker.json",
+            removedAtMs = 0L,
+            isFreeScan = null,
+        )
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).fire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+        assertFalse(paramsCaptor.firstValue.containsKey("free_scan"))
     }
 
     @Test
@@ -1064,6 +1175,7 @@ class RealPirPixelSenderTest {
             actionId = "action-fail-1",
             errorMessage = "Action failed due to error",
             stepType = "scan",
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -1080,24 +1192,43 @@ class RealPirPixelSenderTest {
         assert(params["broker_version"] == "5.0")
         assert(params["action_id"] == "action-fail-1")
         assert(params["message"] == "Action failed due to error")
+        assert(params["free_scan"] == "false")
         assert(params["stepType"] == "scan")
     }
 
     @Test
-    fun whenReportDashboardOpenedThenFiresCorrectPixel() = runTest {
-        testee.reportDashboardOpened()
+    fun whenReportFreemiumMaintenanceScanSkippedThenFiresCountAndDaily() = runTest {
+        testee.reportFreemiumMaintenanceScanSkipped()
 
+        val pixelNameCaptor = argumentCaptor<String>()
+        verify(mockPixelSender, times(2)).fire(
+            pixelName = pixelNameCaptor.capture(),
+            parameters = any(),
+            encodedParameters = any(),
+            type = any(),
+        )
+        assertEquals(
+            setOf("m_dbp_freemium_pir_maintenance_scan_skipped_c", "m_dbp_freemium_pir_maintenance_scan_skipped_d"),
+            pixelNameCaptor.allValues.toSet(),
+        )
+    }
+
+    @Test
+    fun whenReportDashboardOpenedThenFiresCountAndDailyWithTierParams() = runTest {
+        testee.reportDashboardOpened(isAuthenticated = false)
+
+        val pixelNameCaptor = argumentCaptor<String>()
         val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixelSender, org.mockito.kotlin.times(2)).fire(
-            pixelName = any(),
+        verify(mockPixelSender, times(2)).fire(
+            pixelName = pixelNameCaptor.capture(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
             type = any(),
         )
 
-        // Check both captured values are empty
+        assertEquals(setOf("pir_webui_dashboard_opened_c", "pir_webui_dashboard_opened_d"), pixelNameCaptor.allValues.toSet())
         paramsCaptor.allValues.forEach { params ->
-            assert(params.isEmpty())
+            assertEquals(mapOf("is_authenticated" to "false", "free_scan" to "true"), params)
         }
     }
 
@@ -1113,6 +1244,7 @@ class RealPirPixelSenderTest {
             brokerCount = 10,
             executionType = PirExecutionType.MANUAL_INITIAL,
             notificationsPermissionGranted = true,
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -1124,6 +1256,8 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
+
+        assert(params["free_scan"] == "false")
         assert(params["duration_in_ms"] == "45000")
         assert(params["profile_queries"] == "3")
         assert(params["tracker_blocking_state"] == "disabled")
@@ -1133,6 +1267,31 @@ class RealPirPixelSenderTest {
         assert(params["scan_trigger"] == "onboarding")
         assert(params["vpn_connection_state"] == "disconnected")
         assert(params["notifications_permission_granted"] == "true")
+    }
+
+    @Test
+    fun whenReportInitialScanDurationForFreeScanThenSendsFreeScan() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(false)
+
+        testee.reportInitialScanDuration(
+            durationMs = 45000L,
+            profileQueryCount = 1,
+            isPowerSavingEnabled = false,
+            batteryOptimizationsEnabled = false,
+            brokerCount = 10,
+            executionType = PirExecutionType.MANUAL_INITIAL,
+            notificationsPermissionGranted = true,
+            isFreeScan = true,
+        )
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).fire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+        assertEquals("true", paramsCaptor.firstValue["free_scan"])
     }
 
     @Test
@@ -1147,6 +1306,7 @@ class RealPirPixelSenderTest {
             brokerCount = 0,
             executionType = PirExecutionType.MANUAL_EDIT_PROFILE,
             notificationsPermissionGranted = false,
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -1174,6 +1334,7 @@ class RealPirPixelSenderTest {
             brokerCount = 1,
             executionType = PirExecutionType.MANUAL_INITIAL_RESUME,
             notificationsPermissionGranted = true,
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -1189,7 +1350,7 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportInteractionDAUThenEnqueuesPixelWithAuthParams() = runTest {
-        testee.reportInteractionDAU()
+        testee.reportInteractionDAU(isAuthenticated = true)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).enqueueFire(
@@ -1205,7 +1366,7 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportInteractionWAUThenEnqueuesPixelWithAuthParams() = runTest {
-        testee.reportInteractionWAU()
+        testee.reportInteractionWAU(isAuthenticated = true)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).enqueueFire(
@@ -1221,7 +1382,7 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportInteractionMAUThenEnqueuesPixelWithAuthParams() = runTest {
-        testee.reportInteractionMAU()
+        testee.reportInteractionMAU(isAuthenticated = true)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).enqueueFire(
@@ -1236,8 +1397,23 @@ class RealPirPixelSenderTest {
     }
 
     @Test
+    fun whenReportInteractionDAUForFreeUserThenEnqueuesPixelWithFreeParams() = runTest {
+        testee.reportInteractionDAU(isAuthenticated = false)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).enqueueFire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        assertEquals(mapOf("is_authenticated" to "false", "free_scan" to "true"), paramsCaptor.firstValue)
+    }
+
+    @Test
     fun whenReportFirstScanStartedThenEnqueuesUniquePixelWithAuthParams() = runTest {
-        testee.reportFirstScanStarted()
+        testee.reportFirstScanStarted(isAuthenticated = true)
 
         val pixelNameCaptor = argumentCaptor<String>()
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -1253,6 +1429,21 @@ class RealPirPixelSenderTest {
         assert(typeCaptor.firstValue is Pixel.PixelType.Unique)
         assert(paramsCaptor.firstValue["is_authenticated"] == "true")
         assert(paramsCaptor.firstValue["free_scan"] == "false")
+    }
+
+    @Test
+    fun whenReportFirstScanStartedForFreeScanThenEnqueuesPixelWithFreeParams() = runTest {
+        testee.reportFirstScanStarted(isAuthenticated = false)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).enqueueFire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        assertEquals(mapOf("is_authenticated" to "false", "free_scan" to "true"), paramsCaptor.firstValue)
     }
 
     @Test
@@ -1275,5 +1466,37 @@ class RealPirPixelSenderTest {
         assertTrue(nameCaptor.allValues.contains("m_dbp_scan_renderer-gone_d"))
         assertEquals("false", paramsCaptor.firstValue["did_crash"])
         assertEquals("scheduled", paramsCaptor.firstValue["scan_trigger"])
+    }
+
+    @Test
+    fun whenReportFreemiumSettingsEntryPointImpressionThenFiresImpressionPixel() {
+        testee.reportFreemiumSettingsEntryPointImpression()
+
+        verify(mockPixelSender).fire(
+            pixelName = "m_dbp_freemium_settings_entry_point_impression_c",
+            type = Count,
+        )
+    }
+
+    @Test
+    fun whenReportFreemiumSettingsEntryPointClickedBeforeFirstScanThenCtaStateIsStartFreeScan() {
+        testee.reportFreemiumSettingsEntryPointClicked(PirFreemiumCtaState.START_FREE_SCAN)
+
+        verify(mockPixelSender).fire(
+            pixelName = "m_dbp_freemium_settings_entry_point_clicked_c",
+            type = Count,
+            parameters = mapOf("cta_state" to "start_free_scan"),
+        )
+    }
+
+    @Test
+    fun whenReportFreemiumSettingsEntryPointClickedAfterFirstScanThenCtaStateIsViewScanResults() {
+        testee.reportFreemiumSettingsEntryPointClicked(PirFreemiumCtaState.VIEW_SCAN_RESULTS)
+
+        verify(mockPixelSender).fire(
+            pixelName = "m_dbp_freemium_settings_entry_point_clicked_c",
+            type = Count,
+            parameters = mapOf("cta_state" to "view_scan_results"),
+        )
     }
 }

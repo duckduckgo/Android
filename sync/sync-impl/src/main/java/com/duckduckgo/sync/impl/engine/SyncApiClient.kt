@@ -28,7 +28,7 @@ import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
 import com.duckduckgo.sync.impl.error.SyncApiErrorRecorder
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority
 import logcat.logcat
 import okhttp3.MediaType.Companion.toMediaType

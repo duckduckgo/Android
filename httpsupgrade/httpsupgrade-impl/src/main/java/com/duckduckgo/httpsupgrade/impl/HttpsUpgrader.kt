@@ -28,22 +28,23 @@ import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.privacy.config.api.Https
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import logcat.logcat
 import java.util.concurrent.locks.ReentrantLock
 import javax.inject.Inject
 import kotlin.concurrent.thread
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = HttpsUpgrader::class,
+    binding = binding<HttpsUpgrader>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class HttpsUpgraderImpl @Inject constructor(
     private val bloomFactory: HttpsBloomFilterFactory,

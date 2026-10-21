@@ -18,7 +18,7 @@ package com.duckduckgo.duckchat.impl.nativeinput
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.ChatState
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.concurrent.ConcurrentHashMap
@@ -28,7 +28,7 @@ import javax.inject.Inject
  * Duck.ai response state (streaming, hidden input, ...) per native input surface, keyed the same way as
  * [com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider] so each tab only reacts to its own chat.
  */
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class ChatStateStore @Inject constructor() {
 
     private val flows = ConcurrentHashMap<String, MutableStateFlow<ChatState>>()
