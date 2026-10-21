@@ -30,6 +30,7 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -39,6 +40,7 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.nativeinput.footer.FakeNativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterDraft
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,8 +55,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
@@ -75,7 +79,10 @@ class AttachmentPrivacyFooterPluginTest {
     private val inputState = MutableStateFlow(NativeInputState.zero().copy(hasAttachments = true))
     private val stateProvider: NativeInputStateProvider = mock()
     private val hostContext = MutableStateFlow(duckAiContext())
-    private val host = FakeNativeInputFooterHost()
+    private val host = FakeNativeInputFooterHost(
+        draft = NativeInputFooterDraft(hasImages = true, fileMimeTypes = emptyList(), selectedTool = null),
+    )
+    private val pixel: Pixel = mock()
     private val browserNav: BrowserNav = mock()
     private lateinit var dataStore: DataStore<Preferences>
     private lateinit var store: AttachmentPrivacyDisclaimerStore
@@ -94,6 +101,7 @@ class AttachmentPrivacyFooterPluginTest {
             duckChatFeature = feature,
             stateProvider = stateProvider,
             store = store,
+            pixels = AttachmentPrivacyPixels(pixel, coroutineRule.testDispatcherProvider, coroutineRule.testScope),
             browserNav = browserNav,
             appCoroutineScope = coroutineRule.testScope,
         )
@@ -174,6 +182,29 @@ class AttachmentPrivacyFooterPluginTest {
     }
 
     @Test
+    fun whenDisplayedWithImageThenImageShownPixelFiresOnce() = runTest {
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.onDisplayed(true)
+        footer.onDisplayed(false)
+        footer.onDisplayed(true)
+
+        verify(pixel).fire(named("m_aichat_attachment_privacy_image_shown_count"), eq(mapOf("surface" to "duck_ai")), any(), any())
+        verify(pixel).fire(named("m_aichat_attachment_privacy_image_shown_daily"), eq(mapOf("surface" to "duck_ai")), any(), any())
+        verify(pixel, never()).fire(named("m_aichat_attachment_privacy_file_shown_count"), any(), any(), any())
+    }
+
+    @Test
+    fun whenDisplayedWithFileOnlyThenFileShownPixelFires() = runTest {
+        host.draft = NativeInputFooterDraft(hasImages = false, fileMimeTypes = listOf("application/pdf"), selectedTool = null)
+        hostContext.value = duckAiContext(inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL)
+
+        testee.createFooter(context, hostContext, host).onDisplayed(true)
+
+        verify(pixel).fire(named("m_aichat_attachment_privacy_file_shown_count"), eq(mapOf("surface" to "contextual_chat")), any(), any())
+    }
+
+    @Test
     fun whenFooterIsCreatedThenItShowsTheDisclaimerWithLearnMoreLink() {
         val footer = testee.createFooter(context, hostContext, host)
         val message = footer.view.findViewById<TextView>(R.id.attachmentPrivacyFooterMessage).text as Spanned
@@ -184,7 +215,7 @@ class AttachmentPrivacyFooterPluginTest {
     }
 
     @Test
-    fun whenLearnMoreTappedThenHelpPageOpensInNewTab() = runTest {
+    fun whenLearnMoreTappedThenHelpPageOpensInNewTabAndPixelFires() = runTest {
         val activity = Robolectric.buildActivity(Activity::class.java).create().get()
         activity.setTheme(com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Light)
         whenever(browserNav.openInNewTab(any(), any(), anyOrNull())).thenReturn(Intent("open-in-new-tab"))
@@ -195,7 +226,10 @@ class AttachmentPrivacyFooterPluginTest {
 
         verify(browserNav).openInNewTab(any(), eq("https://duckduckgo.com/duckduckgo-help-pages/duckai/ai-chat-privacy"), anyOrNull())
         assertEquals("open-in-new-tab", shadowOf(activity).nextStartedActivity.action)
+        verify(pixel).fire(named("m_aichat_attachment_privacy_image_learn_more_tapped_count"), eq(mapOf("surface" to "duck_ai")), any(), any())
     }
+
+    private fun named(name: String): Pixel.PixelName = argThat<Pixel.PixelName> { pixelName == name }
 
     private fun duckAiContext(
         isDuckAiSelected: Boolean = true,

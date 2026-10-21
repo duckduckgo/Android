@@ -29,6 +29,11 @@ import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterState
+import com.duckduckgo.duckchat.impl.nativeinput.footer.attachmentprivacy.AttachmentPrivacyPixelName.FILE_LEARN_MORE_TAPPED
+import com.duckduckgo.duckchat.impl.nativeinput.footer.attachmentprivacy.AttachmentPrivacyPixelName.FILE_SHOWN
+import com.duckduckgo.duckchat.impl.nativeinput.footer.attachmentprivacy.AttachmentPrivacyPixelName.IMAGE_LEARN_MORE_TAPPED
+import com.duckduckgo.duckchat.impl.nativeinput.footer.attachmentprivacy.AttachmentPrivacyPixelName.IMAGE_SHOWN
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -48,6 +53,7 @@ class AttachmentPrivacyFooterPlugin @Inject constructor(
     private val duckChatFeature: DuckChatFeature,
     private val stateProvider: NativeInputStateProvider,
     private val store: AttachmentPrivacyDisclaimerStore,
+    private val pixels: AttachmentPrivacyPixels,
     private val browserNav: BrowserNav,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : NativeInputFooterPlugin {
@@ -64,7 +70,11 @@ class AttachmentPrivacyFooterPlugin @Inject constructor(
         var shownThisPrompt = false
         var promptSubmissions = hostContext.value.promptSubmissions
 
+        fun surface() = DuckChatPixelSurface.from(hostContext.value.inputContext)
+        fun hasImages() = host.draft().hasImages
+
         footerView.render {
+            pixels.fire(if (hasImages()) IMAGE_LEARN_MORE_TAPPED else FILE_LEARN_MORE_TAPPED, surface())
             context.startActivity(browserNav.openInNewTab(context, LEARN_MORE_URL))
         }
 
@@ -91,6 +101,7 @@ class AttachmentPrivacyFooterPlugin @Inject constructor(
             override fun onDisplayed(displayed: Boolean) {
                 if (!displayed || shownThisPrompt) return
                 shownThisPrompt = true
+                pixels.fire(if (hasImages()) IMAGE_SHOWN else FILE_SHOWN, surface())
                 appCoroutineScope.launch { store.markShown() }
             }
         }
