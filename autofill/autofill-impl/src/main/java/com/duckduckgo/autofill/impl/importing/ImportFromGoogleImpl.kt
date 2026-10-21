@@ -17,7 +17,6 @@
 package com.duckduckgo.autofill.impl.importing
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import androidx.core.os.BundleCompat
 import com.duckduckgo.autofill.api.AutofillFeature
@@ -37,7 +36,6 @@ class ImportFromGoogleImpl @Inject constructor(
     private val autofillFeature: AutofillFeature,
     private val dispatchers: DispatcherProvider,
     private val globalActivityStarter: GlobalActivityStarter,
-    private val context: Context,
     private val webViewCapabilityChecker: ImportGoogleBookmarksWebViewCapabilityChecker,
 ) : ImportFromGoogle {
 
@@ -47,10 +45,10 @@ class ImportFromGoogleImpl @Inject constructor(
         }
     }
 
-    override suspend fun getBookmarksImportLaunchIntent(activity: Activity?): Intent? {
+    override suspend fun getBookmarksImportLaunchIntent(activity: Activity): Intent? {
         return if (isBookmarksImportAvailable()) {
             val launchSource = getLaunchSource()
-            globalActivityStarter.startIntent(activity ?: context, ImportBookmarksViaGoogleTakeoutScreen(launchSource))
+            globalActivityStarter.startIntent(activity, ImportBookmarksViaGoogleTakeoutScreen(launchSource))
         } else {
             null
         }

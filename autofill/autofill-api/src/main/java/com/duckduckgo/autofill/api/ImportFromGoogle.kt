@@ -33,10 +33,8 @@ interface ImportFromGoogle {
      * It's possible the flow is unsupported, in which case null will be returned.
      *
      * @param activity The activity that will launch the returned intent for a result.
-     * If null, the intent starts in a new task, so launching it for a result
-     * immediately delivers a cancelled result.
      */
-    suspend fun getBookmarksImportLaunchIntent(activity: Activity?): Intent?
+    suspend fun getBookmarksImportLaunchIntent(activity: Activity): Intent?
 
     /**
      * Parse the result of the bookmark import flow

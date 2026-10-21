@@ -18,7 +18,6 @@ package com.duckduckgo.autofill.impl.importing
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -57,8 +56,6 @@ class ImportFromGoogleImplTest {
 
     private val webViewCapabilityChecker: ImportGoogleBookmarksWebViewCapabilityChecker = mock()
 
-    private val context: Context = mock()
-
     private val activity: Activity = mock()
 
     private lateinit var testee: ImportFromGoogleImpl
@@ -69,7 +66,6 @@ class ImportFromGoogleImplTest {
             autofillFeature = autofillFeature,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             globalActivityStarter = globalActivityStarter,
-            context = context,
             webViewCapabilityChecker = webViewCapabilityChecker,
         )
 
