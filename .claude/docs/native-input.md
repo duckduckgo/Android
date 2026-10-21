@@ -171,7 +171,6 @@ change needs them, check the linked task first.
 
 | Still hand-wired | Direction | Task |
 |---|---|---|
-| Onboarding lock rendered by the widget (`setInteractionLocked`) | Each plugin renders its own locked state from `interactionLock` | https://app.asana.com/0/0/1218750257810051/f |
 | Card chrome duplicated in every host layout, shaped by `applyOmnibarShape` and `applyPositionChrome` | One card owned and styled inside the widget | https://app.asana.com/0/0/1217275429788919/f |
 | Remote flags gating native input | Hardcode on and delete once rolled out | https://app.asana.com/0/0/1216509602671179/f |
 | Legacy focused state in `OmnibarLayout` | Omnibar becomes display-only; the widget owns all text input | https://app.asana.com/0/0/1215373984475612/f |
