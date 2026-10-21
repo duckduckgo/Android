@@ -109,7 +109,8 @@ class DuckAiTabGridCardView(
         }
     }
 
-    // Not cancelled when the card scrolls away: the read is short and its result is cached for when the card comes back.
+    // Not cancelled when the card scrolls away, since the read is short and its result is cached for when the card comes back.
+    // Rebinding the holder to another tab does cancel it, and a cancelled read isn't cached, so that chat is read again on its next bind.
     private fun loadContent(key: DuckAiTabGridItemKey) {
         contentJob += coroutineScope.launch(dispatchers.main()) {
             val content = contentSource.load(key)
