@@ -22,7 +22,7 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
-import com.duckduckgo.autofill.api.ImportFromGoogle
+import com.duckduckgo.autofill.api.ImportFromGoogleAvailability
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -69,7 +69,7 @@ class BookmarksViewModelTest {
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
-    private val importFromGoogle: ImportFromGoogle = mock()
+    private val importFromGoogleAvailability: ImportFromGoogleAvailability = mock()
 
     private val commandCaptor = argumentCaptor<BookmarksViewModel.Command>()
     private val viewStateCaptor = argumentCaptor<BookmarksViewModel.ViewState>()
@@ -116,7 +116,7 @@ class BookmarksViewModelTest {
             faviconsFetchingPrompt,
             bookmarksDataStore,
             coroutineRule.testDispatcherProvider,
-            importFromGoogle,
+            importFromGoogleAvailability,
             coroutineRule.testScope,
         )
         model.viewState.observeForever(viewStateObserver)
@@ -612,7 +612,7 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenImportBookmarksClickedThenPixelSent() = runTest {
-        whenever(importFromGoogle.isBookmarksImportAvailable()).thenReturn(false)
+        whenever(importFromGoogleAvailability.isBookmarksImportAvailable()).thenReturn(false)
         testee.onImportBookmarksClicked()
 
         verify(pixel).fire(SavedSitesPixelName.BOOKMARK_MENU_IMPORT_CLICKED)
@@ -620,7 +620,7 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenImportBookmarksClickedAndFeatureEnabledThenShowDialog() = runTest {
-        whenever(importFromGoogle.isBookmarksImportAvailable()).thenReturn(true)
+        whenever(importFromGoogleAvailability.isBookmarksImportAvailable()).thenReturn(true)
         testee.onImportBookmarksClicked()
 
         verify(commandObserver).onChanged(commandCaptor.capture())
@@ -629,7 +629,7 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenImportBookmarksClickedAndFeatureDisabledThenLaunchFileImport() = runTest {
-        whenever(importFromGoogle.isBookmarksImportAvailable()).thenReturn(false)
+        whenever(importFromGoogleAvailability.isBookmarksImportAvailable()).thenReturn(false)
         testee.onImportBookmarksClicked()
 
         verify(commandObserver).onChanged(commandCaptor.capture())

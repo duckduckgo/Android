@@ -22,13 +22,15 @@ import android.net.Uri
 import android.os.Bundle
 import android.webkit.CookieManager
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.BundleCompat
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.tabs.BrowserNav
-import com.duckduckgo.autofill.api.ImportFromGoogle
-import com.duckduckgo.autofill.api.ImportFromGoogle.ImportFromGoogleResult
+import com.duckduckgo.autofill.api.ImportFromGoogleLauncher
+import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.BookmarksImportRequest
+import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.ImportFromGoogleResult
 import com.duckduckgo.browser.api.ui.BrowserScreens
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -66,7 +68,7 @@ class SavedSitesInternalSettingsActivity : DuckDuckGoActivity() {
     lateinit var takeoutBookmarkImporter: TakeoutBookmarkImporter
 
     @Inject
-    lateinit var importFromGoogle: ImportFromGoogle
+    lateinit var importFromGoogleLauncher: ImportFromGoogleLauncher
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -82,8 +84,13 @@ class SavedSitesInternalSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
+    private lateinit var googleBookmarksImport: ActivityResultLauncher<BookmarksImportRequest>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        googleBookmarksImport = registerForActivityResult(importFromGoogleLauncher.bookmarksImportContract()) { result ->
+            onGoogleBookmarkImportResult(result)
+        }
         enableTransparentEdgeToEdge()
         setContentView(binding.root)
         configureEdgeToEdgeInsets()
@@ -178,36 +185,21 @@ class SavedSitesInternalSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    @Suppress("DEPRECATION")
     private fun launchImportBookmarksFlow() {
         lifecycleScope.launch {
-            val intent = importFromGoogle.getBookmarksImportLaunchIntent(this@SavedSitesInternalSettingsActivity)
-            if (intent != null) {
-                startActivityForResult(intent, GOOGLE_BOOKMARK_IMPORT_REQUEST_CODE)
-            } else {
-                "Import feature not available".showSnackbar()
-            }
+            importFromGoogleLauncher.launchBookmarksImport(googleBookmarksImport)
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    private fun onGoogleBookmarkImportResult(result: ImportFromGoogleResult) {
+        logcat { "Bookmark-import: result for Google Bookmark import flow. result=$result" }
 
-        when (requestCode) {
-            GOOGLE_BOOKMARK_IMPORT_REQUEST_CODE -> {
-                lifecycleScope.launch {
-                    val result = importFromGoogle.parseResult(data)
-
-                    logcat { "Bookmark-import: onActivityResult for Google Bookmark import flow. result=$result" }
-
-                    when (result) {
-                        is ImportFromGoogleResult.Success -> hidePreImportDialog()
-                        is ImportFromGoogleResult.Error -> hidePreImportDialog()
-                        is ImportFromGoogleResult.UserCancelled -> {
-                            // User cancelled, no action needed
-                        }
-                    }
-                }
+        when (result) {
+            is ImportFromGoogleResult.Success -> hidePreImportDialog()
+            is ImportFromGoogleResult.Error -> hidePreImportDialog()
+            is ImportFromGoogleResult.Unavailable -> "Import feature not available".showSnackbar()
+            is ImportFromGoogleResult.UserCancelled -> {
+                // User cancelled, no action needed
             }
         }
     }
@@ -241,6 +233,5 @@ class SavedSitesInternalSettingsActivity : DuckDuckGoActivity() {
         fun intent(context: Context): Intent = Intent(context, SavedSitesInternalSettingsActivity::class.java)
 
         private const val TAG_PRE_IMPORT_BOOKMARKS = "ImportBookmarksPreImportDialog"
-        private const val GOOGLE_BOOKMARK_IMPORT_REQUEST_CODE = 200
     }
 }

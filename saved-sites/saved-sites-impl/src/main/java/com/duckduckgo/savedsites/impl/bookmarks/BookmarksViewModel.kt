@@ -22,7 +22,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
-import com.duckduckgo.autofill.api.ImportFromGoogle
+import com.duckduckgo.autofill.api.ImportFromGoogleAvailability
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -85,7 +85,7 @@ class BookmarksViewModel @Inject constructor(
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
     private val bookmarksDataStore: BookmarksDataStore,
     private val dispatcherProvider: DispatcherProvider,
-    private val importFromGoogle: ImportFromGoogle,
+    private val importFromGoogleAvailability: ImportFromGoogleAvailability,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, DeleteBookmarkListener, ViewModel() {
 
@@ -520,7 +520,7 @@ class BookmarksViewModel @Inject constructor(
         pixel.fire(SavedSitesPixelName.BOOKMARK_MENU_IMPORT_CLICKED)
 
         viewModelScope.launch {
-            command.value = if (importFromGoogle.isBookmarksImportAvailable()) {
+            command.value = if (importFromGoogleAvailability.isBookmarksImportAvailable()) {
                 Command.ShowBookmarkImportDialog
             } else {
                 LaunchBookmarkImportFile
