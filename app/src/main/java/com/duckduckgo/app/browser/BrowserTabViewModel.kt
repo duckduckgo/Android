@@ -686,7 +686,6 @@ class BrowserTabViewModel @Inject constructor(
       Useful if user has done something that would result in a strange UX to then show the picker
       This only prevents against automatically showing; if the user taps on an autofill field directly, the dialog can still show
      */
-    private var canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
 
     val url: String?
         get() = site?.url
@@ -2120,8 +2119,6 @@ class BrowserTabViewModel @Inject constructor(
 
         if (!currentBrowserViewState().browserShowing) return
 
-        canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
-
         browserViewState.value =
             currentBrowserViewState().copy(
                 canGoBack = newWebNavigationState.canGoBack || !skipHome,
@@ -2926,7 +2923,6 @@ class BrowserTabViewModel @Inject constructor(
                             )
                         },
                         queryOrFullUrl = documentUrlString,
-                        isEditing = false,
                         navigationChange = true,
                     )
             }
@@ -4212,10 +4208,7 @@ class BrowserTabViewModel @Inject constructor(
         command.value = ShowWebContent
     }
 
-    fun userLaunchingTabSwitcher(
-        viewMode: Omnibar.ViewMode,
-        hasFocus: Boolean,
-    ) {
+    fun userLaunchingTabSwitcher(viewMode: Omnibar.ViewMode) {
         command.value = LaunchTabSwitcher
         browserInteractionsPlugins.getPlugins().forEach { it.onTabSwitcherSelected() }
 
@@ -4231,7 +4224,7 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             is Omnibar.ViewMode.NewTab -> {
-                val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to hasFocus.toString()) + browserModeParams
+                val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to "false") + browserModeParams
                 pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, parameters = params)
             }
 
@@ -4673,7 +4666,6 @@ class BrowserTabViewModel @Inject constructor(
         resetTrackersCount()
         refreshBrowserError()
         resetAutoConsent()
-        canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
     }
 
     override fun handleCloakedAmpLink(initialUrl: String) {
@@ -4828,7 +4820,6 @@ class BrowserTabViewModel @Inject constructor(
                     currentOmnibarViewState().copy(
                         omnibarText = if (isFullUrlEnabled.value) siteUrlString else addressDisplayFormatter.getShortUrl(siteUrlString),
                         queryOrFullUrl = siteUrlString,
-                        isEditing = false,
                     )
 
                 command.value =
@@ -4841,7 +4832,6 @@ class BrowserTabViewModel @Inject constructor(
                     currentOmnibarViewState().copy(
                         omnibarText = if (isFullUrlEnabled.value) siteUrlString else addressDisplayFormatter.getShortUrl(siteUrlString),
                         queryOrFullUrl = siteUrlString,
-                        isEditing = false,
                     )
                 loadingViewState.value =
                     currentLoadingViewState().copy(
@@ -4903,13 +4893,6 @@ class BrowserTabViewModel @Inject constructor(
     private fun launchAutofillSettings() {
         command.value = LaunchAutofillSettings(privacyProtectionEnabled = !currentBrowserViewState().isPrivacyProtectionDisabled)
     }
-
-    fun cancelPendingAutofillRequestToChooseCredentials() {
-        canAutofillSelectCredentialsDialogCanAutomaticallyShow = false
-    }
-
-    fun canAutofillSelectCredentialsDialogCanAutomaticallyShow(): Boolean =
-        canAutofillSelectCredentialsDialogCanAutomaticallyShow && !currentOmnibarViewState().isEditing
 
     fun onShowUserCredentialsSaved(it: LoginCredentials) {
         viewModelScope.launch(dispatchers.main()) {
@@ -5951,7 +5934,6 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onDuckChatOmnibarButtonClicked(
         query: String?,
-        hasFocus: Boolean,
         isNtp: Boolean,
     ) {
         viewModelScope.launch {
@@ -5961,17 +5943,12 @@ class BrowserTabViewModel @Inject constructor(
         pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED)
         pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED_DAILY, type = Daily())
 
-        when {
-            // Contextual chat is about the page you're viewing, so on a page it's only offered from
-            // the unfocused omnibar: once focused (composing), fall through to full-screen Duck.ai.
-            // The NTP omnibar is focused from the start, so there the menu hangs off an empty query
-            // instead, and only when it carries the Chats entry alongside New Chat.
-            duckAiFeatureState.showContextualMode.value &&
-                if (isNtp) query.isNullOrBlank() else !hasFocus -> {
-                command.value = Command.ShowDuckAIContextualMode(tabId, url)
-            }
-
-            else -> openDuckChatFromOmnibar(query, hasFocus, isNtp)
+        // On the NTP the menu hangs off an empty query, and only when it carries the Chats entry
+        // alongside New Chat.
+        if (duckAiFeatureState.showContextualMode.value && (!isNtp || query.isNullOrBlank())) {
+            command.value = Command.ShowDuckAIContextualMode(tabId, url)
+        } else {
+            openDuckChatFromOmnibar(query)
         }
     }
 
@@ -5979,33 +5956,13 @@ class BrowserTabViewModel @Inject constructor(
      * Opens Duck.ai straight from the address bar icon. Also the fallback when the NTP menu declines
      * to show, so that path keeps behaving exactly as it did before the menu existed.
      */
-    fun openDuckChatFromOmnibar(
-        query: String?,
-        hasFocus: Boolean,
-        isNtp: Boolean,
-    ) {
-        val (url, submittedAiPrompt) = when {
-            hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false) to false
-            hasFocus && queryUrlPredictor.isUrl(query ?: "") -> (query ?: "") to false
-            hasFocus -> duckChat.getDuckChatUrl(query ?: "", true) to !query.isNullOrBlank()
-            else -> duckChat.getDuckChatUrl(query ?: "", false) to false
-        }
-        if (duckChat.isDuckChatUrl(url.toUri())) {
-            if (submittedAiPrompt) {
-                browserInteractionsPlugins.getPlugins().forEach {
-                    it.onAiPromptSubmitted(source = DuckChatEntryPoint.ADDRESS_BAR_ICON.name.lowercase())
-                }
-            }
-            duckChat.reportDuckChatEntry(
-                DuckChatEntryPoint.ADDRESS_BAR_ICON,
-                opensNewTab = false,
-                hasPrompt = submittedAiPrompt,
-            )
-            submitQuery(url, QueryOrigin.FromUser, QuerySubmissionSource.INTERNAL_NAVIGATION)
-        } else {
-            // The typed-URL branch above: genuinely a URL submission, not a Duck.ai one.
-            onUserSubmittedQuery(url)
-        }
+    fun openDuckChatFromOmnibar(query: String?) {
+        duckChat.reportDuckChatEntry(
+            DuckChatEntryPoint.ADDRESS_BAR_ICON,
+            opensNewTab = false,
+            hasPrompt = false,
+        )
+        submitQuery(duckChat.getDuckChatUrl(query ?: "", false), QueryOrigin.FromUser, QuerySubmissionSource.INTERNAL_NAVIGATION)
     }
 
     fun onVpnMenuClicked() {
