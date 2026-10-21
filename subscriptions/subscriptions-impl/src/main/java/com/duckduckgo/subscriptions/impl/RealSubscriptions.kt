@@ -402,6 +402,13 @@ interface SubscriptionsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun bridgeOriginCheck(): Toggle
 
+    /**
+     * When enabled, eligible Stripe subscribers can withdraw from their subscription for a full refund
+     * from Subscription Settings.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun subscriptionWithdrawal(): Toggle
+
     enum class PerformanceOptimizedPaywallsCohorts(override val cohortName: String) : CohortName {
         CONTROL("control"),
         TREATMENT("treatment"),
