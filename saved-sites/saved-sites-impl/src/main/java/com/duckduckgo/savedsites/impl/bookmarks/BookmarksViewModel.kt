@@ -520,11 +520,7 @@ class BookmarksViewModel @Inject constructor(
         pixel.fire(SavedSitesPixelName.BOOKMARK_MENU_IMPORT_CLICKED)
 
         viewModelScope.launch {
-            val googleImportLaunchIntent = withContext(dispatcherProvider.io()) {
-                importFromGoogle.getBookmarksImportLaunchIntent()
-            }
-
-            command.value = if (googleImportLaunchIntent != null) {
+            command.value = if (importFromGoogle.isBookmarksImportAvailable()) {
                 Command.ShowBookmarkImportDialog
             } else {
                 LaunchBookmarkImportFile

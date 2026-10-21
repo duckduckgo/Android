@@ -17,7 +17,6 @@
 package com.duckduckgo.savedsites.impl.bookmarks
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -620,7 +619,7 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenImportBookmarksClickedAndFeatureEnabledThenShowDialog() = runTest {
-        whenever(importFromGoogle.getBookmarksImportLaunchIntent()).thenReturn(Intent())
+        whenever(importFromGoogle.isBookmarksImportAvailable()).thenReturn(true)
         testee.onImportBookmarksClicked()
 
         verify(commandObserver).onChanged(commandCaptor.capture())
@@ -629,7 +628,7 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenImportBookmarksClickedAndFeatureDisabledThenLaunchFileImport() = runTest {
-        whenever(importFromGoogle.getBookmarksImportLaunchIntent()).thenReturn(null)
+        whenever(importFromGoogle.isBookmarksImportAvailable()).thenReturn(false)
         testee.onImportBookmarksClicked()
 
         verify(commandObserver).onChanged(commandCaptor.capture())

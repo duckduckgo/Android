@@ -491,7 +491,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     @Suppress("DEPRECATION")
     private fun launchBookmarkImportWebFlow() {
         lifecycleScope.launch {
-            val intent = importFromGoogle.getBookmarksImportLaunchIntent()
+            val intent = importFromGoogle.getBookmarksImportLaunchIntent(this@BookmarksActivity)
             if (intent != null) {
                 startActivityForResult(intent, GOOGLE_BOOKMARK_IMPORT_REQUEST_CODE)
             } else {

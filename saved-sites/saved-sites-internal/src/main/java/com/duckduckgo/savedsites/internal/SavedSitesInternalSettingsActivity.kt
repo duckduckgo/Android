@@ -181,7 +181,7 @@ class SavedSitesInternalSettingsActivity : DuckDuckGoActivity() {
     @Suppress("DEPRECATION")
     private fun launchImportBookmarksFlow() {
         lifecycleScope.launch {
-            val intent = importFromGoogle.getBookmarksImportLaunchIntent()
+            val intent = importFromGoogle.getBookmarksImportLaunchIntent(this@SavedSitesInternalSettingsActivity)
             if (intent != null) {
                 startActivityForResult(intent, GOOGLE_BOOKMARK_IMPORT_REQUEST_CODE)
             } else {

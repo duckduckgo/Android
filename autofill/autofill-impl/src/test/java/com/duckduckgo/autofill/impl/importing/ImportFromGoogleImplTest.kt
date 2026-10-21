@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.impl.importing
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -58,6 +59,8 @@ class ImportFromGoogleImplTest {
 
     private val context: Context = mock()
 
+    private val activity: Activity = mock()
+
     private lateinit var testee: ImportFromGoogleImpl
 
     @Before
@@ -81,21 +84,21 @@ class ImportFromGoogleImplTest {
     @Test
     fun `Launch intent is null when feature is disabled`() = runTest {
         configureFeatureState(isEnabled = false)
-        assertNull(testee.getBookmarksImportLaunchIntent())
+        assertNull(testee.getBookmarksImportLaunchIntent(activity))
     }
 
     @Test
     fun `Launch intent is not null when feature is enabled and WebView is capable`() = runTest {
         configureFeatureState(isEnabled = true)
         whenever(webViewCapabilityChecker.webViewCapableOfImporting()).thenReturn(true)
-        assertNotNull(testee.getBookmarksImportLaunchIntent())
+        assertNotNull(testee.getBookmarksImportLaunchIntent(activity))
     }
 
     @Test
     fun `Launch intent is null when feature is enabled but WebView is not capable`() = runTest {
         configureFeatureState(isEnabled = true)
         whenever(webViewCapabilityChecker.webViewCapableOfImporting()).thenReturn(false)
-        assertNull(testee.getBookmarksImportLaunchIntent())
+        assertNull(testee.getBookmarksImportLaunchIntent(activity))
     }
 
     @Test

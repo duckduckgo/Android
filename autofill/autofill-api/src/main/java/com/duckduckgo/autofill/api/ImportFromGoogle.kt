@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.api
 
+import android.app.Activity
 import android.content.Intent
 
 /**
@@ -23,9 +24,19 @@ import android.content.Intent
  */
 interface ImportFromGoogle {
     /**
-     * Get the intent which will launch the bookmark import flow. It's possible the flow is unsupported, in which case null will be returned.
+     * Whether the bookmark import flow is supported on this device.
      */
-    suspend fun getBookmarksImportLaunchIntent(): Intent?
+    suspend fun isBookmarksImportAvailable(): Boolean
+
+    /**
+     * Get the intent which will launch the bookmark import flow.
+     * It's possible the flow is unsupported, in which case null will be returned.
+     *
+     * @param activity The activity that will launch the returned intent for a result.
+     * If null, the intent starts in a new task, so launching it for a result
+     * immediately delivers a cancelled result.
+     */
+    suspend fun getBookmarksImportLaunchIntent(activity: Activity?): Intent?
 
     /**
      * Parse the result of the bookmark import flow
