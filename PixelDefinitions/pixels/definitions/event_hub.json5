@@ -338,7 +338,7 @@
         ]
     },
     "webTelemetry_pageLoadTime_day": {
-        "description": "Daily bucketed counts of page loads where a load ended 8 s or more after navigation start, or was still loading at 15 s, on a page visible through the load that painted no content under 3 s, one parameter per load time bucket and per reload load time bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "description": "Daily bucketed counts of page loads detected as a slow page load, one parameter per load time bucket, for all loads and for reloads. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -347,20 +347,20 @@
             {
                 "keyPattern": "^load[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per load time bucket. The key is `load` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per load time bucket. The key is `load` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
                 "keyPattern": "^slowReload[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per reload load time bucket. The key is `slowReload` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per reload load time bucket. The key is `slowReload` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
         ]
     },
     "webTelemetry_errorPhraseCount_day": {
-        "description": "Daily bucketed counts of page loads where \"access denied\", \"page not found\" or \"404 not found\" was found in rendered text, one parameter per occurrence count bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "description": "Daily bucketed counts of page loads detected as a page showing error text, one parameter per occurrence count bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -369,14 +369,14 @@
             {
                 "keyPattern": "^count[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per occurrence count bucket. The key is `count` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per occurrence count bucket. The key is `count` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
         ]
     },
     "webTelemetry_soft404Features_day": {
-        "description": "Daily bucketed counts of page loads where five or more error terms were found on a page with little rendered text for its size, fewer than two images or a short title, and under 2000 characters of rendered text, one parameter per error term count bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "description": "Daily bucketed counts of page loads detected as an error page served as a successful response, one parameter per error term count bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -385,14 +385,14 @@
             {
                 "keyPattern": "^keywords[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per error term count bucket. The key is `keywords` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per error term count bucket. The key is `keywords` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
         ]
     },
     "webTelemetry_failurePhrasesSmallPage_day": {
-        "description": "Daily bucketed counts of page loads where \"something went wrong\", \"temporary error\" or \"this is taking longer than\" was found on a page with under 2000 characters of rendered text, one parameter per rendered text length bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "description": "Daily bucketed counts of page loads detected as a page showing a generic failure message, one parameter per rendered text length bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -401,14 +401,14 @@
             {
                 "keyPattern": "^text[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per rendered text length bucket. The key is `text` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per rendered text length bucket. The key is `text` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
         ]
     },
     "webTelemetry_stylesMissing_day": {
-        "description": "Daily bucketed counts of page loads where stylesheet links had no stylesheet once the load event had ended, one parameter per missing stylesheet count bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "description": "Daily bucketed counts of page loads detected as a page with missing stylesheets, one parameter per missing stylesheet count bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -417,14 +417,14 @@
             {
                 "keyPattern": "^sheets[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per missing stylesheet count bucket. The key is `sheets` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per missing stylesheet count bucket. The key is `sheets` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
         ]
     },
     "webTelemetry_brokenImages_day": {
-        "description": "Daily bucketed counts of page loads where two or more broken images rendered at 16 × 16 px or more, or one when one in ten or more of the page's images broke, excluding declared tracking pixels, one parameter per broken image count bucket and per broken image share bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "description": "Daily bucketed counts of page loads detected as a page with images that failed to load, one parameter per broken image count bucket and per broken image share bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -433,20 +433,20 @@
             {
                 "keyPattern": "^count[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per broken image count bucket. The key is `count` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per broken image count bucket. The key is `count` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
                 "keyPattern": "^share[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per broken image share bucket. The key is `share` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per broken image share bucket. The key is `share` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
         ]
     },
     "webTelemetry_forbiddenPage_day": {
-        "description": "Daily bucketed counts of page loads where 403 wording appeared in the title or a heading, one parameter per matched wording and response status bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "description": "Daily bucketed counts of page loads detected as an access-forbidden error page, one parameter per detection route and response status bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -455,20 +455,20 @@
             {
                 "keyPattern": "^wording_status[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per response status, for 403 wording or \"access is denied\", bucket. The key is `wording_status` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per response status, on the `wording` detection route, bucket. The key is `wording_status` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
                 "keyPattern": "^bareForbidden_status[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per response status, for a title or heading starting \"Forbidden\", bucket. The key is `bareForbidden_status` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per response status, on the `bareForbidden` detection route, bucket. The key is `bareForbidden_status` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
         ]
     },
     "webTelemetry_rateLimitedPage_day": {
-        "description": "Daily bucketed counts of page loads where 429 wording appeared in the title or a heading, one parameter per matched wording and response status bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "description": "Daily bucketed counts of page loads detected as a rate-limit error page, one parameter per detection route and response status bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -477,20 +477,20 @@
             {
                 "keyPattern": "^wording_status[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per response status, for 429 wording, bucket. The key is `wording_status` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per response status, on the `wording` detection route, bucket. The key is `wording_status` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
                 "keyPattern": "^bareTooManyRequests_status[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per response status, for \"Too many requests\" in the title or a heading, bucket. The key is `bareTooManyRequests_status` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per response status, on the `bareTooManyRequests` detection route, bucket. The key is `bareTooManyRequests_status` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
         ]
     },
     "webTelemetry_wafAssetsPage_day": {
-        "description": "Daily bucketed counts of page loads where a web application firewall vendor's asset was found on a page served with an error status, or with under 500 characters of rendered text, one parameter per route and rendered text length bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "description": "Daily bucketed counts of page loads detected as a web application firewall page, one parameter per detection route and rendered text length bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -499,20 +499,20 @@
             {
                 "keyPattern": "^littleText_text[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per rendered text length, on a page with no error status, bucket. The key is `littleText_text` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per rendered text length, on the `littleText` detection route, bucket. The key is `littleText_text` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
                 "keyPattern": "^errorStatus_text[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per rendered text length, on a page with an error status, bucket. The key is `errorStatus_text` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per rendered text length, on the `errorStatus` detection route, bucket. The key is `errorStatus_text` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
         ]
     },
     "webTelemetry_appRootEmpty_day": {
-        "description": "Daily bucketed counts of page loads where an app mount container was still empty 3 s after the load event, on a page with under 500 characters of rendered text, one parameter per load time bucket and per failed script count bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "description": "Daily bucketed counts of page loads detected as an app page that rendered no content, one parameter per load time bucket and per failed script count bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -521,20 +521,20 @@
             {
                 "keyPattern": "^load[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per load time bucket. The key is `load` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per load time bucket. The key is `load` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
                 "keyPattern": "^scripts[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per failed script count bucket. The key is `scripts` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per failed script count bucket. The key is `scripts` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
         ]
     },
     "webTelemetry_noTextOrTitle_day": {
-        "description": "Daily bucketed counts of page loads where a page had no rendered text, no title and no media, one parameter per response size bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "description": "Daily bucketed counts of page loads detected as a blank page, one parameter per response size bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -543,14 +543,14 @@
             {
                 "keyPattern": "^size[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per response size bucket. The key is `size` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per response size bucket. The key is `size` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
         ]
     },
     "webTelemetry_noContentfulPaint_day": {
-        "description": "Daily bucketed counts of page loads where there was no contentful paint 3 s after the load event, on a page visible since navigation start with no visible iframe, one parameter per load time bucket and per first paint state. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "description": "Daily bucketed counts of page loads detected as a page that painted no content, one parameter per load time bucket and per first paint state. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -559,20 +559,20 @@
             {
                 "keyPattern": "^load[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per load time bucket. The key is `load` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per load time bucket. The key is `load` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
                 "keyPattern": "^firstPaint[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per first paint state bucket. The key is `firstPaint` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per first paint state bucket. The key is `firstPaint` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
         ]
     },
     "webTelemetry_viewportEmpty_day": {
-        "description": "Daily bucketed counts of page loads where at least 8 of 9 viewport points were empty on two reads in a row, in an empty app mount container, on a page with under 500 characters of rendered text, one parameter per empty viewport sample bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "description": "Daily bucketed counts of page loads detected as a page whose viewport stayed empty, one parameter per empty viewport sample bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -581,14 +581,14 @@
             {
                 "keyPattern": "^empty[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per empty viewport sample bucket. The key is `empty` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per empty viewport sample bucket. The key is `empty` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
         ]
     },
     "webTelemetry_slowFirstInput_day": {
-        "description": "Daily bucketed counts of page loads where the page's first click, tap or key press waited 300 ms or more for its handlers, one parameter per input delay bucket and per input-to-paint duration bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "description": "Daily bucketed counts of page loads detected as a page slow to respond to its first input, one parameter per input delay bucket and per input-to-paint duration bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -597,20 +597,20 @@
             {
                 "keyPattern": "^delay[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per input delay bucket. The key is `delay` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per input delay bucket. The key is `delay` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
                 "keyPattern": "^duration[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per input-to-paint duration bucket. The key is `duration` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per input-to-paint duration bucket. The key is `duration` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
         ]
     },
     "webTelemetry_failedSubresources_day": {
-        "description": "Daily bucketed counts of page loads where two or more scripts, or two or more stylesheets and loads from CSS, failed with a 4xx or 5xx status, same-origin or CORS, one parameter per failed script, stylesheet and image count bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "description": "Daily bucketed counts of page loads detected as a page with failed subresource loads, one parameter per failed script, stylesheet and image count bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -619,26 +619,26 @@
             {
                 "keyPattern": "^scripts[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per failed script count bucket. The key is `scripts` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per failed script count bucket. The key is `scripts` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
                 "keyPattern": "^styles[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per failed stylesheet and CSS load count bucket. The key is `styles` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per failed stylesheet count bucket. The key is `styles` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
                 "keyPattern": "^images[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per failed image count bucket. The key is `images` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per failed image count bucket. The key is `images` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
         ]
     },
     "webTelemetry_vercelCheckpoint_day": {
-        "description": "Daily bucketed counts of page loads where a Vercel bot checkpoint showed for 8 s or more, one parameter per outcome and time bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "description": "Daily bucketed counts of page loads detected as a page held at a Vercel bot checkpoint, one parameter per outcome and time bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -647,20 +647,20 @@
             {
                 "keyPattern": "^cleared_shown[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per time shown before clearing bucket. The key is `cleared_shown` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per time shown, for checkpoints that cleared, bucket. The key is `cleared_shown` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
                 "keyPattern": "^held[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per hold time bucket. The key is `held` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per hold time, for checkpoints still showing, bucket. The key is `held` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
         ]
     },
     "webTelemetry_challenge_day": {
-        "description": "Daily bucketed counts of page loads where a Cloudflare challenge interstitial or a page titled as a verification check was detected, one parameter per response status bucket and per rendered text length bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "description": "Daily bucketed counts of page loads detected as a bot or human-verification challenge page, one parameter per response status bucket and per rendered text length bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -669,20 +669,20 @@
             {
                 "keyPattern": "^status[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per response status bucket. The key is `status` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per response status bucket. The key is `status` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
                 "keyPattern": "^text[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per rendered text length bucket. The key is `text` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per rendered text length bucket. The key is `text` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
         ]
     },
     "webTelemetry_blockPage_day": {
-        "description": "Daily bucketed counts of page loads where a Cloudflare access denied page was detected, one parameter per response status bucket and per rendered text length bucket. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "description": "Daily bucketed counts of page loads detected as a bot-protection block page, one parameter per response status bucket and per rendered text length bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -691,13 +691,13 @@
             {
                 "keyPattern": "^status[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per response status bucket. The key is `status` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per response status bucket. The key is `status` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
                 "keyPattern": "^text[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period, per rendered text length bucket. The key is `text` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
+                "description": "Count of detected page loads in the period, per rendered text length bucket. The key is `text` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
