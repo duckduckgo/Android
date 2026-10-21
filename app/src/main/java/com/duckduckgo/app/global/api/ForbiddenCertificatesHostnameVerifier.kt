@@ -17,7 +17,7 @@
 package com.duckduckgo.app.global.api
 
 import okhttp3.CertificatePinner.Companion.sha256Hash
-import okhttp3.internal.tls.OkHostnameVerifier
+import okhttp3.OkHttpClient
 import okio.ByteString
 import okio.ByteString.Companion.decodeHex
 import java.security.cert.X509Certificate
@@ -33,7 +33,7 @@ import javax.net.ssl.SSLSession
  */
 class ForbiddenCertificatesHostnameVerifier(
     private val forbiddenSpkiSha256s: Set<ByteString> = COMPROMISED_EMUDHRA_INTERMEDIATES,
-    private val delegate: HostnameVerifier = OkHostnameVerifier,
+    private val delegate: HostnameVerifier = okHttpDefaultHostnameVerifier,
 ) : HostnameVerifier {
 
     override fun verify(hostname: String, session: SSLSession): Boolean {
@@ -47,6 +47,8 @@ class ForbiddenCertificatesHostnameVerifier(
     }
 
     companion object {
+        private val okHttpDefaultHostnameVerifier: HostnameVerifier by lazy { OkHttpClient().hostnameVerifier }
+
         /**
          * SPKI SHA-256 of the eight eMudhra intermediates whose private keys leaked (CVE-2026-111943).
          * Matching on the key also covers the Sectigo cross-signed certificates that share it.
