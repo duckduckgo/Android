@@ -22,7 +22,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Action.*
 import com.duckduckgo.survey.api.SurveyParameterManager
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface CommandActionMapper {

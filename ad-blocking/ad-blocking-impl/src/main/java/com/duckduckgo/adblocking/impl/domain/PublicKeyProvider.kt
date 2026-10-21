@@ -17,8 +17,8 @@
 package com.duckduckgo.adblocking.impl.domain
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import java.security.KeyFactory
 import java.security.PublicKey
 import java.security.spec.X509EncodedKeySpec
@@ -32,7 +32,7 @@ interface PublicKeyProvider {
 private const val KEY = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEuqrhn2ztPnPt8QybIGsLpROYR/xcJ/uw0jN85kdMQFKdCkwxOLaU70uVQ+zZ+F0B1fgx8qfAXus7mXWsJxBXrg=="
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealPublicKeyProvider @Inject constructor() : PublicKeyProvider {
 
     override val publicKey: PublicKey by lazy {

@@ -33,20 +33,20 @@ import com.duckduckgo.networkprotection.impl.configuration.computeBlockMalwareDn
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.wireguard.config.Config
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = VpnScope::class,
-    boundType = VpnNetworkStack::class,
+    binding = binding<VpnNetworkStack>(),
 )
-@SingleInstanceIn(VpnScope::class)
+@SingleIn(VpnScope::class)
 class WgVpnNetworkStack @Inject constructor(
     private val wgProtocol: Lazy<WgProtocol>,
     private val wgTunnelLazy: Lazy<WgTunnel>,
@@ -68,10 +68,10 @@ class WgVpnNetworkStack @Inject constructor(
 
     override suspend fun onPrepareVpn(): Result<VpnTunnelConfig> {
         return try {
-            netpPixels.get().reportEnableAttempt()
+            netpPixels.value.reportEnableAttempt()
 
-            wgConfig = wgTunnelLazy.get().createAndSetWgConfig()
-                .onFailure { netpPixels.get().reportErrorInRegistration() }
+            wgConfig = wgTunnelLazy.value.createAndSetWgConfig()
+                .onFailure { netpPixels.value.reportErrorInRegistration() }
                 .getOrThrow()
             logcat { "Wireguard configuration:\n$wgConfig" }
 
@@ -100,15 +100,15 @@ class WgVpnNetworkStack @Inject constructor(
             crashLogger.logCrash(Crash("vpn_on_prepare_error", e))
             Result.failure(e)
         }.onFailure {
-            netpPixels.get().reportEnableAttemptFailure()
+            netpPixels.value.reportEnableAttemptFailure()
         }
     }
 
     override fun onStartVpn(tunfd: ParcelFileDescriptor): Result<Unit> {
         logcat { "onStartVpn called." }
         return turnOnNative(tunfd.detachFd())
-            .onSuccess { netpPixels.get().reportEnableAttemptSuccess() }
-            .onFailure { netpPixels.get().reportEnableAttemptFailure() }
+            .onSuccess { netpPixels.value.reportEnableAttemptSuccess() }
+            .onFailure { netpPixels.value.reportEnableAttemptFailure() }
     }
 
     override fun onStopVpn(reason: VpnStopReason): Result<Unit> {
@@ -123,11 +123,11 @@ class WgVpnNetworkStack @Inject constructor(
 
     private fun turnOnNative(tunfd: Int): Result<Unit> {
         if (wgConfig == null) {
-            netpPixels.get().reportErrorWgInvalidState()
+            netpPixels.value.reportErrorWgInvalidState()
             return Result.failure(java.lang.IllegalStateException("Tunnel data not available when attempting to start wg."))
         }
 
-        val result = wgProtocol.get().startWg(
+        val result = wgProtocol.value.startWg(
             tunfd,
             wgConfig!!.toWgUserspaceString().also {
                 logcat { "WgUserspace config: $it" }
@@ -137,14 +137,14 @@ class WgVpnNetworkStack @Inject constructor(
         )
         return if (result.isFailure) {
             logcat(ERROR) { "Failed to turnOnNative due to ${result.exceptionOrNull()}" }
-            netpPixels.get().reportErrorWgBackendCantStart()
+            netpPixels.value.reportErrorWgBackendCantStart()
             result
         } else {
             logcat { "Completed turnOnNative" }
 
             // Only update if enabledTimeInMillis has been reset
-            if (networkProtectionRepository.get().enabledTimeInMillis == -1L) {
-                networkProtectionRepository.get().enabledTimeInMillis = currentTimeProvider.getTimeInMillis()
+            if (networkProtectionRepository.value.enabledTimeInMillis == -1L) {
+                networkProtectionRepository.value.enabledTimeInMillis = currentTimeProvider.getTimeInMillis()
             }
             Result.success(Unit)
         }
@@ -155,7 +155,7 @@ class WgVpnNetworkStack @Inject constructor(
 
         logcat { "Started turnOffNative" }
         kotlin.runCatching {
-            wgProtocol.get().stopWg()
+            wgProtocol.value.stopWg()
         }.onFailure {
             logcat(ERROR) { "WG network: ${it.asLog()}" }
         }
@@ -163,12 +163,12 @@ class WgVpnNetworkStack @Inject constructor(
 
         if (reason != RESTART) {
             logcat { "Deleting wireguard config..." }
-            wgTunnelConfigLazy.get().clearWgConfig()
+            wgTunnelConfigLazy.value.clearWgConfig()
         }
 
         // Only update if enabledTimeInMillis stop has been initiated by the user
         if (reason is SELF_STOP && reason.snoozedTriggerAtMillis == 0L) {
-            networkProtectionRepository.get().enabledTimeInMillis = -1
+            networkProtectionRepository.value.enabledTimeInMillis = -1
         }
         return Result.success(Unit)
     }

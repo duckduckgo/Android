@@ -16,9 +16,6 @@
 
 package com.duckduckgo.app.usage.app
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -64,10 +61,3 @@ class AppDaysUsedDatabaseRepository(private val appDaysUsedDao: AppDaysUsedDao) 
         }
     }
 }
-
-@Entity(tableName = "app_days_used")
-data class AppDaysUsedEntity(
-    @PrimaryKey val date: String = formatter.format((Date())),
-    @ColumnInfo(name = "previous_date")
-    val previousDate: String? = null,
-)

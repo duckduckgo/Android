@@ -34,9 +34,10 @@ import com.duckduckgo.pir.impl.store.db.ScanCompletedBroker
 import com.duckduckgo.pir.impl.store.db.ScanLogDao
 import com.duckduckgo.pir.impl.store.db.ScanResultsDao
 import com.duckduckgo.pir.impl.store.secure.PirSecureStorageDatabaseFactory
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
@@ -117,9 +118,9 @@ interface PirEventsRepository {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = PirEventsRepository::class,
+    binding = binding<PirEventsRepository>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealPirEventsRepository @Inject constructor(
     val moshi: Moshi,
     private val dispatcherProvider: DispatcherProvider,

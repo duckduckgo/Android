@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -26,13 +26,12 @@ dependencies {
     implementation project(":verified-installation-api")
     implementation project(':app-build-config-api')
 
-    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':di')
     ksp AndroidX.room.compiler
 
     implementation KotlinX.coroutines.android
     implementation AndroidX.core.ktx
-    implementation Google.dagger
 
     implementation "com.squareup.logcat:logcat:_"
 
@@ -53,9 +52,6 @@ dependencies {
 
 android {
     namespace "com.duckduckgo.verifiedinstallation.impl"
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     lint {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"

@@ -21,8 +21,8 @@ import android.content.Context
 import android.content.Intent
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -109,7 +109,7 @@ interface DuckChatFeatureRepository {
     suspend fun checkAndMarkFirstPromptSubmission(): Boolean
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDuckChatFeatureRepository @Inject constructor(
     private val duckChatDataStore: DuckChatDataStore,

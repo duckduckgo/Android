@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
     id 'kotlin-parcelize'
 }
@@ -27,9 +27,6 @@ android {
     lintOptions {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
-    }
-    anvil {
-        generateDaggerFactories = true // default is false
     }
 
     testOptions {
@@ -44,10 +41,10 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
+    ksp project(':codegen-ksp')
     implementation project(':navigation-api')
     implementation project(':anrs-api')
-    implementation project(':anvil-annotations')
+    implementation project(':codegen-annotations')
     implementation project(':vpn-store')
     implementation project(':vpn-api')
     implementation project(':app-tracking-api')
@@ -93,10 +90,6 @@ dependencies {
 
     // Shimmer
     implementation "com.facebook.shimmer:shimmer:_"
-
-    // Dagger
-    compileOnly "org.glassfish:javax.annotation:10.0-b28"
-    implementation Google.dagger
 
     implementation KotlinX.coroutines.core
 

@@ -7,7 +7,7 @@ Pixels are lightweight telemetry events sent via HTTP with a name and optional p
 - Conversion and retention (e.g., subscription purchase, activation, onboarding completion)
 
 The privacy invariants every pixel must satisfy (no PII, no URLs, no correlation IDs, bucketed numbers,
-bounded enums) are in CLAUDE.md and apply to all outbound data — they are not repeated here.
+bounded enums) are in AGENTS.md and apply to all outbound data — they are not repeated here.
 
 ## Types of Pixels
 

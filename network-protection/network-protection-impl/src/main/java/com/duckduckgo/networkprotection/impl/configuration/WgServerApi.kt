@@ -24,7 +24,7 @@ import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode.FailureRecovery
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
 

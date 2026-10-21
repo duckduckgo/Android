@@ -38,6 +38,7 @@ import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
+import com.duckduckgo.sync.impl.pixels.SwitchedAccountDetector
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
@@ -108,6 +109,7 @@ class DisplayQrCodeViewModelTest {
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
     private val qrEncoder = mock<QREncoder>()
     private val clipboard = mock<ClipboardInteractor>()
+    private val switchedAccountDetector = mock<SwitchedAccountDetector>()
 
     @Before
     fun setup() {
@@ -126,6 +128,7 @@ class DisplayQrCodeViewModelTest {
         syncFeature = syncFeature,
         qrEncoder = qrEncoder,
         clipboard = clipboard,
+        switchedAccountDetector = switchedAccountDetector,
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
 
@@ -569,6 +572,36 @@ class DisplayQrCodeViewModelTest {
         }
         verify(pixels).fireLoginPixel()
         verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, SetupPath.PAIRING, null, null)
+    }
+
+    @Test
+    fun `when the screen opens then the account before pairing is recorded`() = runTest {
+        givenV2Enabled()
+
+        createTestee()
+
+        verify(switchedAccountDetector).onPairingStarted()
+    }
+
+    @Test
+    fun `when the v2 login completes then the switched account tracker is notified`() = runTest {
+        givenV2Enabled()
+        givenThisConnectedDevice()
+        whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LoggedIn(path = SetupPath.PAIRING)))
+
+        createTestee()
+
+        verify(switchedAccountDetector).onPaired()
+    }
+
+    @Test
+    fun `when v2 pairing fails then the switched account tracker is not notified`() = runTest {
+        givenV2Enabled()
+        whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.Failed("boom")))
+
+        createTestee()
+
+        verify(switchedAccountDetector, never()).onPaired()
     }
 
     @Test

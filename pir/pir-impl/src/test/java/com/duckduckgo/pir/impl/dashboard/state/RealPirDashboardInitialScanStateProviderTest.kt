@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.dashboard.state
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.pir.impl.checker.DisabledReason
 import com.duckduckgo.pir.impl.checker.PirEligibility
 import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
@@ -37,6 +38,7 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
 import com.duckduckgo.pir.impl.scan.PirForegroundScanServiceMonitor
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
+import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import kotlinx.coroutines.flow.flowOf
@@ -70,6 +72,7 @@ class RealPirDashboardInitialScanStateProviderTest {
     private val mockPirScanScheduler: PirScanScheduler = mock()
     private val mockPirWorkHandler: PirWorkHandler = mock()
     private val mockPirFreeScanBrokerFilter: PirFreeScanBrokerFilter = mock()
+    private val mockPirFreemiumDataStore: PirFreemiumDataStore = mock()
 
     private val currentTime = 1640995200000L
 
@@ -85,6 +88,7 @@ class RealPirDashboardInitialScanStateProviderTest {
             pirScanScheduler = mockPirScanScheduler,
             pirWorkHandler = mockPirWorkHandler,
             pirFreeScanBrokerFilter = mockPirFreeScanBrokerFilter,
+            pirFreemiumDataStore = mockPirFreemiumDataStore,
         )
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(currentTime)
         whenever(mockForegroundScanServiceMonitor.isRunning()).thenReturn(false)
@@ -883,6 +887,7 @@ class RealPirDashboardInitialScanStateProviderTest {
             createScanJobRecord("Broker3", 1L, ScanJobStatus.NO_MATCH_FOUND, 3000L),
         )
         whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(completedJobs)
+        setupBrokersWithScannableSteps((1..3).map { createBroker("Broker$it") })
 
         // When
         val result = testee.shouldRestartInitialScan()
@@ -899,6 +904,7 @@ class RealPirDashboardInitialScanStateProviderTest {
             createScanJobRecord("Broker2", 1L, ScanJobStatus.NOT_EXECUTED, 2000L),
         )
         whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(alreadyScannedJobs)
+        setupBrokersWithScannableSteps((1..2).map { createBroker("Broker$it") })
 
         // When
         val result = testee.shouldRestartInitialScan()
@@ -916,6 +922,7 @@ class RealPirDashboardInitialScanStateProviderTest {
             createScanJobRecord("Broker3", 1L, ScanJobStatus.NOT_EXECUTED, 0L),
         )
         whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(unscannedJobs)
+        setupBrokersWithScannableSteps(listOf(createBroker("Broker2"), createBroker("Broker3")))
 
         // When
         val result = testee.shouldRestartInitialScan()
@@ -937,6 +944,7 @@ class RealPirDashboardInitialScanStateProviderTest {
             createScanJobRecord("Broker5", 1L, ScanJobStatus.ERROR, 3000L),
         )
         whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(mixedJobs)
+        setupBrokersWithScannableSteps((1..5).map { createBroker("Broker$it") })
 
         // When
         val result = testee.shouldRestartInitialScan()
@@ -955,6 +963,7 @@ class RealPirDashboardInitialScanStateProviderTest {
             createScanJobRecord("Broker4", 1L, ScanJobStatus.NOT_EXECUTED, 0L), // Only this one qualifies
         )
         whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(jobsWithOneUnscanned)
+        setupBrokersWithScannableSteps((1..4).map { createBroker("Broker$it") })
 
         // When
         val result = testee.shouldRestartInitialScan()
@@ -967,6 +976,7 @@ class RealPirDashboardInitialScanStateProviderTest {
     fun whenEmptyJobListThenShouldNotRestartScan() = runTest {
         // Given - no jobs at all
         whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(emptyList())
+        setupBrokersWithScannableSteps(listOf(createBroker("Broker1")))
 
         // When
         val result = testee.shouldRestartInitialScan()
@@ -983,6 +993,7 @@ class RealPirDashboardInitialScanStateProviderTest {
             createScanJobRecord("Broker2", 1L, ScanJobStatus.ERROR, 2000L),
         )
         whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(errorJobs)
+        setupBrokersWithScannableSteps((1..2).map { createBroker("Broker$it") })
 
         // When
         val result = testee.shouldRestartInitialScan()
@@ -996,6 +1007,7 @@ class RealPirDashboardInitialScanStateProviderTest {
         // Given - unscanned jobs exist (would otherwise restart) but the foreground scan is running
         whenever(mockPirSchedulingRepository.getAllValidScanJobRecords())
             .thenReturn(listOf(createScanJobRecord("Broker1", 1L, ScanJobStatus.NOT_EXECUTED, 0L)))
+        setupBrokersWithScannableSteps(listOf(createBroker("Broker1")))
         whenever(mockForegroundScanServiceMonitor.isRunning()).thenReturn(true)
 
         // When / Then
@@ -1007,6 +1019,7 @@ class RealPirDashboardInitialScanStateProviderTest {
         // Given - unscanned jobs exist but a scheduled background scan is running
         whenever(mockPirSchedulingRepository.getAllValidScanJobRecords())
             .thenReturn(listOf(createScanJobRecord("Broker1", 1L, ScanJobStatus.NOT_EXECUTED, 0L)))
+        setupBrokersWithScannableSteps(listOf(createBroker("Broker1")))
         whenever(mockPirScanScheduler.isScheduledScanRunning()).thenReturn(true)
 
         // When / Then
@@ -1023,6 +1036,108 @@ class RealPirDashboardInitialScanStateProviderTest {
 
         // When / Then
         assertFalse(testee.shouldRestartInitialScan())
+    }
+
+    @Test
+    fun whenSubscriberHasUnexecutedJobOnlyForBrokerWithUnparseableScanStepThenShouldNotRestartScan() = runTest {
+        // Given - the broker's scan step can't be parsed, so its job is skipped at scan time and never runs
+        val unparseableBroker = createBroker("Broker1")
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(unparseableBroker))
+        whenever(mockPirRepository.getBrokerScanSteps(unparseableBroker.name)).thenReturn("{steps:Broker1}")
+        whenever(mockBrokerStepsParser.parseStep(eq(unparseableBroker), any(), anyOrNull())).thenReturn(emptyList())
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords())
+            .thenReturn(listOf(createScanJobRecord("Broker1", 1L, ScanJobStatus.NOT_EXECUTED, 0L)))
+
+        // When / Then
+        assertFalse(testee.shouldRestartInitialScan())
+    }
+
+    @Test
+    fun whenSubscriberHasUnexecutedJobOnlyForInactiveBrokerThenShouldNotRestartScan() = runTest {
+        // Given - the job's broker is no longer active, so it is never scanned
+        setupBrokersWithScannableSteps(listOf(createBroker("Broker1")))
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords())
+            .thenReturn(listOf(createScanJobRecord("RemovedBroker", 1L, ScanJobStatus.NOT_EXECUTED, 0L)))
+
+        // When / Then
+        assertFalse(testee.shouldRestartInitialScan())
+    }
+
+    @Test
+    fun whenFreeScanUserSubscribesWithNoScanJobForBrokerGatedDuringFreeScanThenShouldRestartScan() = runTest {
+        // Given - the free scan only created a job for the free broker, and after subscribing both brokers can be scanned
+        whenever(mockPirFreemiumDataStore.didActivate).thenReturn(true)
+        setupBrokersWithScannableSteps(listOf(createBroker("FreeBroker"), createBroker("GatedBroker")))
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords())
+            .thenReturn(listOf(createScanJobRecord("FreeBroker", 1L, ScanJobStatus.NO_MATCH_FOUND, 1000L)))
+
+        // When / Then
+        assertTrue(testee.shouldRestartInitialScan())
+    }
+
+    @Test
+    fun whenSubscriberWhoNeverUsedFreeScanHasNoScanJobForBrokerThenShouldNotRestartScan() = runTest {
+        // Given - e.g. a broker added after a paid user's initial scan, which the scheduled scan picks up
+        whenever(mockPirFreemiumDataStore.didActivate).thenReturn(false)
+        setupBrokersWithScannableSteps(listOf(createBroker("Broker1"), createBroker("NewBroker")))
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords())
+            .thenReturn(listOf(createScanJobRecord("Broker1", 1L, ScanJobStatus.NO_MATCH_FOUND, 1000L)))
+
+        // When / Then
+        assertFalse(testee.shouldRestartInitialScan())
+    }
+
+    @Test
+    fun whenFreeScanUserSubscribesBeforeAnyScanJobExistsThenShouldNotRestartScan() = runTest {
+        // Given - a profile was saved but the scan it started has not created its jobs yet
+        whenever(mockPirFreemiumDataStore.didActivate).thenReturn(true)
+        setupBrokersWithScannableSteps(listOf(createBroker("Broker1")))
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(listOf(createProfileQuery(1L)))
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(emptyList())
+
+        // When / Then
+        assertFalse(testee.shouldRestartInitialScan())
+    }
+
+    @Test
+    fun whenFreeScanUserIsNotEligibleWithNoScanJobForGatedBrokerThenShouldNotRestartScan() = runTest {
+        // Given - e.g. mid-upgrade, the subscription is active but its entitlements are not stored yet
+        whenever(mockPirFreemiumDataStore.didActivate).thenReturn(true)
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Disabled(DisabledReason.ENTITLEMENT_LOST)))
+        setupBrokersWithScannableSteps(listOf(createBroker("FreeBroker"), createBroker("GatedBroker")))
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords())
+            .thenReturn(listOf(createScanJobRecord("FreeBroker", 1L, ScanJobStatus.NO_MATCH_FOUND, 1000L)))
+
+        // When / Then
+        assertFalse(testee.shouldRestartInitialScan())
+    }
+
+    @Test
+    fun whenScanOnlyUserHasNoScanJobForGatedBrokerThenShouldNotRestartScan() = runTest {
+        // Given - a free user's scan never creates jobs for gated brokers
+        whenever(mockPirFreemiumDataStore.didActivate).thenReturn(true)
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_ONLY)))
+        whenever(mockPirFreeScanBrokerFilter.freeScannableBrokerNames()).thenReturn(setOf("FreeBroker"))
+        setupBrokersWithScannableSteps(listOf(createBroker("FreeBroker"), createBroker("GatedBroker")))
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords())
+            .thenReturn(listOf(createScanJobRecord("FreeBroker", 1L, ScanJobStatus.NO_MATCH_FOUND, 1000L)))
+
+        // When / Then
+        assertFalse(testee.shouldRestartInitialScan())
+    }
+
+    @Test
+    fun whenScanOnlyUserHasNoScanJobForFreeBrokerThenShouldRestartScan() = runTest {
+        // Given - a broker data update added a free broker after the free scan created its jobs
+        whenever(mockPirFreemiumDataStore.didActivate).thenReturn(true)
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_ONLY)))
+        whenever(mockPirFreeScanBrokerFilter.freeScannableBrokerNames()).thenReturn(setOf("FreeBroker", "NewFreeBroker"))
+        setupBrokersWithScannableSteps(listOf(createBroker("FreeBroker"), createBroker("NewFreeBroker")))
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords())
+            .thenReturn(listOf(createScanJobRecord("FreeBroker", 1L, ScanJobStatus.NO_MATCH_FOUND, 1000L)))
+
+        // When / Then
+        assertTrue(testee.shouldRestartInitialScan())
     }
 
     private suspend fun setupForEmptyBrokersAndJobs() {

@@ -30,9 +30,9 @@ import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.store.PirRepository
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
@@ -74,6 +74,7 @@ interface BrokerStepsParser {
         data class ScanStep(
             override val broker: Broker,
             override val step: ScanStepActions,
+            val isFreeScan: Boolean = false,
         ) : BrokerStep(broker, step)
 
         data class OptOutStep(

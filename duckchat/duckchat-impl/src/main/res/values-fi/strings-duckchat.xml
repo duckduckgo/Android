@@ -394,4 +394,9 @@
         <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d tunti</item>
         <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d tuntia</item>
     </plurals>
+
+    <!-- Duck.ai ToS consent submit button -->
+    <string name="duckChatSubmitAskLabel" instruction="Label of the submit button while the Duck.ai terms are not yet accepted. Required wording from legal, tapping it is how the user accepts.">Kysy</string>
+    <!-- Duck.ai ToS consent footer -->
+    <string name="duckChatTermsFooterMessage" instruction="Disclaimer under the Duck.ai input. ^1 is the label of the submit button, so the sentence always names the button the user taps. The two annotated phrases are tappable links to the Privacy Policy and the Terms of Service.">DuckDuckGo anonymisoi keskustelusi. Kun napsautat painiketta ^1, hyväksyt <annotation type="privacy_link">tietosuojakäytäntömme</annotation> ja <annotation type="terms_link">palveluehtomme</annotation>.</string>
 </resources>

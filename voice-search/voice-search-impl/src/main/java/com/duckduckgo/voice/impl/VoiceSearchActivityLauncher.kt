@@ -35,7 +35,7 @@ import com.duckduckgo.voice.impl.listeningmode.VoiceSearchActivity.Companion.VOI
 import com.duckduckgo.voice.impl.listeningmode.ui.VoiceSearchBackgroundBlurRenderer
 import com.duckduckgo.voice.store.VoiceSearchRepository
 import com.google.android.material.snackbar.Snackbar
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface VoiceSearchActivityLauncher {

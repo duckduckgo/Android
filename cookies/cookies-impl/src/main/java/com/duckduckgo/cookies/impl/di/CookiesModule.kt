@@ -32,17 +32,17 @@ import com.duckduckgo.cookies.store.RealCookiesFeatureToggleStore
 import com.duckduckgo.cookies.store.contentscopescripts.ContentScopeScriptsCookieRepository
 import com.duckduckgo.cookies.store.contentscopescripts.RealContentScopeScriptsCookieRepository
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object CookiesModule {
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideCookiesDatabase(context: Context): CookiesDatabase {
         return Room.databaseBuilder(context, CookiesDatabase::class.java, "cookies.db")
@@ -51,7 +51,7 @@ object CookiesModule {
             .build()
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideCookiesRepository(
         database: CookiesDatabase,
@@ -62,19 +62,19 @@ object CookiesModule {
         return RealCookieRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideCookiesFeatureToggleRepository(cookiesFeatureToggleStore: CookiesFeatureToggleStore): CookiesFeatureToggleRepository {
         return RealCookiesFeatureToggleRepository(cookiesFeatureToggleStore)
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideCookiesFeatureToggleStore(context: Context): CookiesFeatureToggleStore {
         return RealCookiesFeatureToggleStore(context)
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideContentScopeScriptsCookieRepository(
         database: CookiesDatabase,

@@ -27,22 +27,22 @@ import com.duckduckgo.app.global.job.AppConfigurationSyncWorkRequestBuilder
 import com.duckduckgo.app.global.job.AppConfigurationSyncWorkRequestBuilder.Companion.APP_CONFIG_SYNC_WORK_TAG
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
-import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.IntoSet
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
 import logcat.LogPriority.INFO
 import logcat.LogPriority.WARN
 import logcat.logcat
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class AppConfigurationSyncerModule {
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @IntoSet
     fun provideAppConfigurationSyncer(
         appConfigurationSyncWorkRequestBuilder: AppConfigurationSyncWorkRequestBuilder,

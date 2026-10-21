@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -24,9 +24,6 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
     namespace "com.duckduckgo.promptscoordinator.impl"
-    anvil {
-        generateDaggerFactories = true
-    }
     lint {
         baseline file("lint-baseline.xml")
     }
@@ -48,13 +45,10 @@ dependencies {
     implementation project(':statistics-api')
     implementation project(':browser-api')
 
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(':codegen-annotations')
     implementation project(':di')
     api AndroidX.dataStore.preferences
-
-    // Dagger
-    implementation Google.dagger
 
     implementation AndroidX.lifecycle.common
     implementation AndroidX.lifecycle.process

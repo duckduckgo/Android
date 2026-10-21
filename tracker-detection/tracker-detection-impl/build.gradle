@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
     id 'androidx.room'
 }
@@ -24,8 +24,8 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(':codegen-annotations')
     implementation project(':di')
     ksp AndroidX.room.compiler
 
@@ -35,7 +35,6 @@ dependencies {
     implementation project(':data-store-api')
 
     implementation AndroidX.room.runtime
-    implementation Google.dagger
     implementation Square.moshi
 
     testImplementation Testing.junit4
@@ -53,9 +52,6 @@ android {
         test.assets.srcDirs += files("$projectDir/schemas")
     }
     namespace 'com.duckduckgo.tracker.detection.impl'
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     testOptions {
         unitTests {
             includeAndroidResources = true

@@ -22,6 +22,10 @@ import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.store.PirRepository
+import com.duckduckgo.subscriptions.api.Product
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
+import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.api.model.Entitlement
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -38,6 +42,7 @@ class RealPirUserUtilsTest {
 
     private val mockPirWorkHandler: PirWorkHandler = mock()
     private val mockPirRepository: PirRepository = mock()
+    private val mockSubscriptions: Subscriptions = mock()
 
     private val testProfileQuery = ProfileQuery(
         id = 1L,
@@ -57,6 +62,7 @@ class RealPirUserUtilsTest {
         testee = RealPirUserUtils(
             pirWorkHandler = mockPirWorkHandler,
             pirRepository = mockPirRepository,
+            subscriptions = mockSubscriptions,
         )
     }
 
@@ -130,5 +136,34 @@ class RealPirUserUtilsTest {
         val result = testee.isActiveUser()
 
         assertTrue(result)
+    }
+
+    @Test
+    fun whenSubscriptionIsActiveWithPirEntitlementThenHasPirSubscription() = runTest {
+        listOf(SubscriptionStatus.AUTO_RENEWABLE, SubscriptionStatus.NOT_AUTO_RENEWABLE, SubscriptionStatus.GRACE_PERIOD).forEach { status ->
+            whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(status)
+            whenever(mockSubscriptions.getCurrentEntitlements()).thenReturn(setOf(Entitlement("", Product.PIR.value)))
+
+            assertTrue("expected a PIR subscription for $status", testee.hasPirSubscription())
+        }
+    }
+
+    @Test
+    fun whenSubscriptionIsActiveWithoutPirEntitlementThenHasNoPirSubscription() = runTest {
+        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+        whenever(mockSubscriptions.getCurrentEntitlements()).thenReturn(setOf(Entitlement("", Product.NetP.value)))
+
+        assertFalse(testee.hasPirSubscription())
+    }
+
+    @Test
+    fun whenSubscriptionIsNotActiveThenHasNoPirSubscriptionEvenWithACachedPirEntitlement() = runTest {
+        // UNKNOWN is also what a failed purchase leaves behind: an account and an access token, but no subscription
+        listOf(SubscriptionStatus.UNKNOWN, SubscriptionStatus.INACTIVE, SubscriptionStatus.EXPIRED, SubscriptionStatus.WAITING).forEach { status ->
+            whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(status)
+            whenever(mockSubscriptions.getCurrentEntitlements()).thenReturn(setOf(Entitlement("", Product.PIR.value)))
+
+            assertFalse("expected no PIR subscription for $status", testee.hasPirSubscription())
+        }
     }
 }

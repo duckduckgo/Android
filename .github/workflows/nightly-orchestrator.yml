@@ -78,7 +78,7 @@ jobs:
       - name: Create Asana task on failure
         id: create-failure-task
         if: ${{ failure() && github.event_name != 'workflow_dispatch' }}
-        uses: duckduckgo/native-github-asana-sync@v2.6.0
+        uses: duckduckgo/native-github-asana-sync@v2.7.1
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
@@ -89,7 +89,7 @@ jobs:
 
       - name: Adding as a release blocker
         if: ${{ failure() && steps.create-failure-task.outputs.taskId != '' }}
-        uses: duckduckgo/native-github-asana-sync@v2.6.0
+        uses: duckduckgo/native-github-asana-sync@v2.7.1
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
@@ -181,7 +181,7 @@ jobs:
       max-parallel: 1
     steps:
       - name: Add task to project (no-op if already there)
-        uses: duckduckgo/native-github-asana-sync@v2.6.0
+        uses: duckduckgo/native-github-asana-sync@v2.7.1
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
@@ -189,7 +189,7 @@ jobs:
           asana-task-id: ${{ matrix.task_id }}
           action: 'add-task-asana-project'
       - name: Tag task as LGC
-        uses: duckduckgo/native-github-asana-sync@v2.6.0
+        uses: duckduckgo/native-github-asana-sync@v2.7.1
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-task-id: ${{ matrix.task_id }}

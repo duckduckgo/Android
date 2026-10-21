@@ -49,7 +49,7 @@
                 "key": "source",
                 "type": "string",
                 "description": "Which entry point asked for authentication",
-                "enum": ["settings_not_synced", "settings_synced", "this_device", "recover", "deep_link"]
+                "enum": ["settings_not_synced", "settings_synced", "this_device", "recover", "deep_link", "session_restore"]
             }
         ]
     },

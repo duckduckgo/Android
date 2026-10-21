@@ -23,7 +23,6 @@ import com.duckduckgo.duckchat.store.impl.handler.DuckAiNativeStorageJsMessageHa
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatsDao
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageHandler
-import dagger.Lazy
 import org.json.JSONObject
 import org.junit.Before
 import org.junit.Rule
@@ -57,13 +56,13 @@ class DuckAiNativeStorageJsMessageHandlerModeTest {
             settings = mock(),
             chats = regularChats,
             fileMeta = mock(),
-            filesDirLazy = Lazy { regularDir },
+            filesDirLazy = lazy { regularDir },
         )
         val fireStorage = RealDuckAiBridgeStorage(
             settings = mock(),
             chats = fireChats,
             fileMeta = mock(),
-            filesDirLazy = Lazy { fireDir },
+            filesDirLazy = lazy { fireDir },
         )
         provider = mock<BrowserModeDataProvider<DuckAiBridgeStorage>>().also {
             whenever(it.forMode(BrowserMode.REGULAR)).thenReturn(regularStorage)

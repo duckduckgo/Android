@@ -2255,6 +2255,27 @@ class BrowserWebViewClientTest {
     }
 
     @Test
+    fun whenUserInitiatedLoadThenWatchdogIsTold() {
+        testee.onUserInitiatedLoad()
+
+        verify(mockPageLoadTimeoutWatchdog).onUserInitiatedLoad()
+    }
+
+    @Test
+    fun whenTabBackgroundedThenWatchdogIsBackgrounded() {
+        testee.onTabBackgrounded()
+
+        verify(mockPageLoadTimeoutWatchdog).onBackgrounded()
+    }
+
+    @Test
+    fun whenTabForegroundedThenWatchdogIsForegrounded() {
+        testee.onTabForegrounded()
+
+        verify(mockPageLoadTimeoutWatchdog).onForegrounded()
+    }
+
+    @Test
     fun whenOnPageStartedCalledThenWatchdogIsToldTheNavigationCommitted() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
 

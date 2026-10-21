@@ -21,7 +21,7 @@ import android.content.Context
 import androidx.annotation.RequiresApi
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface InstallSourceExtractor {

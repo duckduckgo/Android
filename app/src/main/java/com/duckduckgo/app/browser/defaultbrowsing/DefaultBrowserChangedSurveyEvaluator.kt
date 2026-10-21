@@ -26,9 +26,10 @@ import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -38,15 +39,15 @@ import javax.inject.Inject
 
 interface DefaultBrowserChangedSurveyEvaluator
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = ModalEvaluator::class,
+    binding = binding<ModalEvaluator>(),
 )
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = DefaultBrowserChangedSurveyEvaluator::class,
+    binding = binding<DefaultBrowserChangedSurveyEvaluator>(),
 )
-@SingleInstanceIn(scope = AppScope::class)
+@SingleIn(scope = AppScope::class)
 class DefaultBrowserChangedSurveyEvaluatorImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val applicationContext: Context,

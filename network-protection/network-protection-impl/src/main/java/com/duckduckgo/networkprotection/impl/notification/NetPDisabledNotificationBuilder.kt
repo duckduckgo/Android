@@ -32,7 +32,7 @@ import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager
 import com.duckduckgo.networkprotection.impl.subscription.isActive
 import com.duckduckgo.networkprotection.impl.subscription.isExpired
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date

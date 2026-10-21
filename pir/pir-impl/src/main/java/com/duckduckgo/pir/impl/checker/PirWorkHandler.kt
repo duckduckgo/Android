@@ -32,8 +32,9 @@ import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
 import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -51,7 +52,8 @@ interface PirWorkHandler {
      *
      * @return Flow that emits [PirEligibility.Enabled] (carrying the [PirRunMode] the user is
      * allowed to run) when PIR can run, or [PirEligibility.Disabled] (carrying the failing
-     * [DisabledReason]) otherwise.
+     * [DisabledReason]) otherwise. [DisabledReason.FEATURE_DISABLED] means neither paid nor free
+     * PIR is enabled remotely.
      */
     suspend fun canRunPir(): Flow<PirEligibility>
 
@@ -64,10 +66,10 @@ interface PirWorkHandler {
     suspend fun cancelWork(reason: CancellationReason)
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = PirWorkHandler::class,
+    binding = binding<PirWorkHandler>(),
 )
 class RealPirWorkHandler @Inject constructor(
     private val pirRemoteFeatures: PirRemoteFeatures,
@@ -83,7 +85,9 @@ class RealPirWorkHandler @Inject constructor(
 
     override suspend fun canRunPir(): Flow<PirEligibility> {
         return withContext(dispatcherProvider.io()) {
-            if (pirRemoteFeatures.pirBeta().isEnabled()) {
+            // pirBeta is config-targeted to the PIR entitlement, so it is never on for a free user;
+            // each run mode is still gated on its own conditions in resolveEligibility.
+            if (pirRemoteFeatures.pirBeta().isEnabled() || pirRemoteFeatures.freemium().isEnabled()) {
                 // User could have a valid subscription but is not entitled to PIR,
                 // so we have to check both
                 // The flows only signal a change: their first value is whatever this process cached earlier,

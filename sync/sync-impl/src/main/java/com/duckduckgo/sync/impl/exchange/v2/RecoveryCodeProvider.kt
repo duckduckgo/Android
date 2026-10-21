@@ -23,8 +23,8 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ThirdPartyRecoveryCode
 import com.duckduckgo.sync.impl.ThirdPartyRecoveryCodeWrapper
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesBinding
 import org.json.JSONObject
 import java.util.Base64
 import javax.inject.Inject

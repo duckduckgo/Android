@@ -19,10 +19,10 @@ package com.duckduckgo.app.widget
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.nextsteps.api.NextStepCompletionCheck
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class WidgetNextStepCompletionCheck @Inject constructor(
     private val widgetCapabilities: WidgetCapabilities,
 ) : NextStepCompletionCheck {

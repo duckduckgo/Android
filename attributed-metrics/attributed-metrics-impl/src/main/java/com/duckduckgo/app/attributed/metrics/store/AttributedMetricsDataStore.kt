@@ -24,8 +24,8 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.app.attributed.metrics.di.AttributedMetrics
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -41,7 +41,7 @@ interface AttributedMetricsDataStore {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealAttributedMetricsDataStore @Inject constructor(
     @AttributedMetrics private val store: DataStore<Preferences>,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,

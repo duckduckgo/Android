@@ -21,7 +21,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirUserUtils
 import com.duckduckgo.pir.impl.store.PirRepository
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.ZoneId
@@ -44,37 +44,47 @@ class RealPirEngagementReporter @Inject constructor(
         withContext(dispatcherProvider.io()) {
             if (!pirUserUtils.isActiveUser()) return@withContext
 
+            val isAuthenticated = pirUserUtils.hasPirSubscription()
             val nowMs = currentTimeProvider.currentTimeMillis()
-            attemptToFireDauPixel(nowMs)
-            attemptToFireWauPixel(nowMs)
-            attemptToFireMauPixel(nowMs)
+            attemptToFireDauPixel(nowMs, isAuthenticated)
+            attemptToFireWauPixel(nowMs, isAuthenticated)
+            attemptToFireMauPixel(nowMs, isAuthenticated)
         }
     }
 
-    private suspend fun attemptToFireDauPixel(nowMs: Long) {
+    private suspend fun attemptToFireDauPixel(
+        nowMs: Long,
+        isAuthenticated: Boolean,
+    ) {
         val lastPixelMs = pirRepository.getLastPirDauPixelTimeMs()
 
         if (!hasDateElapsed(DIFF_DATE_DAU, lastPixelMs, nowMs)) return
 
-        pirPixelSender.reportDAU()
+        pirPixelSender.reportDAU(isAuthenticated)
         pirRepository.setLastPirDauPixelTimeMs(nowMs)
     }
 
-    private suspend fun attemptToFireWauPixel(nowMs: Long) {
+    private suspend fun attemptToFireWauPixel(
+        nowMs: Long,
+        isAuthenticated: Boolean,
+    ) {
         val lastPixelMs = pirRepository.getLastPirWauPixelTimeMs()
 
         if (!hasDateElapsed(DIFF_DATE_WAU, lastPixelMs, nowMs)) return
 
-        pirPixelSender.reportWAU()
+        pirPixelSender.reportWAU(isAuthenticated)
         pirRepository.setLastPirWauPixelTimeMs(nowMs)
     }
 
-    private suspend fun attemptToFireMauPixel(nowMs: Long) {
+    private suspend fun attemptToFireMauPixel(
+        nowMs: Long,
+        isAuthenticated: Boolean,
+    ) {
         val lastPixelMs = pirRepository.getLastPirMauPixelTimeMs()
 
         if (!hasDateElapsed(DIFF_DATE_MAU, lastPixelMs, nowMs)) return
 
-        pirPixelSender.reportMAU()
+        pirPixelSender.reportMAU(isAuthenticated)
         pirRepository.setLastPirMauPixelTimeMs(nowMs)
     }
 

@@ -22,12 +22,12 @@ import androidx.core.net.toUri
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
 import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import logcat.logcat
 import java.util.WeakHashMap
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class AutoconsentReloadLoopDetector @Inject constructor(
     private val autoconsentPixelManager: AutoconsentPixelManager,
 ) {

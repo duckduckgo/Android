@@ -20,7 +20,7 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.impl.VariantManagerImpl.Companion.DEFAULT_VARIANT
 import com.duckduckgo.experiments.impl.reinstalls.REINSTALL_VARIANT
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.Inject

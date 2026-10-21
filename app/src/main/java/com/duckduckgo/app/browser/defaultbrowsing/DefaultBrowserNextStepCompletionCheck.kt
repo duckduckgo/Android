@@ -18,10 +18,10 @@ package com.duckduckgo.app.browser.defaultbrowsing
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.nextsteps.api.NextStepCompletionCheck
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class DefaultBrowserNextStepCompletionCheck @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
 ) : NextStepCompletionCheck {

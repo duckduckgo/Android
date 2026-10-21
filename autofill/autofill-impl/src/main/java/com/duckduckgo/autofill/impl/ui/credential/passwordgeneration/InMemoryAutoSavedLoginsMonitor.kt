@@ -18,12 +18,12 @@ package com.duckduckgo.autofill.impl.ui.credential.passwordgeneration
 
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 // singleton in app scope, as we want the same instance across multiple fragments
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class InMemoryAutoSavedLoginsMonitor @Inject constructor() : AutomaticSavedLoginsMonitor {
 

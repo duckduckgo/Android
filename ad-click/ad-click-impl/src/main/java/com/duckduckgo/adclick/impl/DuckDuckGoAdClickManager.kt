@@ -22,13 +22,13 @@ import com.duckduckgo.adclick.impl.pixels.AdClickPixelName
 import com.duckduckgo.adclick.impl.pixels.AdClickPixels
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.logcat
 import okhttp3.internal.publicsuffix.PublicSuffixDatabase
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class DuckDuckGoAdClickManager @Inject constructor(
     private val adClickData: AdClickData,

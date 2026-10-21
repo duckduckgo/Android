@@ -18,8 +18,8 @@ package com.duckduckgo.macos.impl
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.macos.impl.MacOsPixelNames.MACOS_WAITLIST_SHARE_PRESSED
 import com.duckduckgo.macos.impl.MacOsViewModel.Command.GoToWindowsClientSettings

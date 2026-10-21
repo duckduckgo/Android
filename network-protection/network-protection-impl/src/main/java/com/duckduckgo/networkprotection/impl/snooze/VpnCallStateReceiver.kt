@@ -21,17 +21,18 @@ import android.content.*
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.registerExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.mobile.android.vpn.Vpn
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.*
 import logcat.LogPriority.ERROR
 import logcat.asLog
@@ -40,9 +41,9 @@ import javax.inject.Inject
 import kotlin.properties.Delegates
 
 @InjectWith(ReceiverScope::class)
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class VpnCallStateReceiver @Inject constructor(
     private val context: Context,

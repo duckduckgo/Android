@@ -51,7 +51,6 @@ import com.duckduckgo.adblocking.api.AdBlockingOmnibarAnimationProvider
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.adclick.api.AdClickManager
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SSLErrorType.EXPIRED
@@ -357,6 +356,7 @@ import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchFeature
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
@@ -439,7 +439,6 @@ import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
-import dagger.Lazy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -822,8 +821,8 @@ class BrowserTabViewModel @Inject constructor(
 
     /** Non-null while this tab is displayed inside a Custom Tab. [clientPackage] is the verified
      * calling package (when known), used by [handleAppLink]'s trusted-caller launch carve-out.
-     * [referrerPackage] is the best-effort, non-verified android-app:// referrer, used only to skip
-     * confirmation prompts (in [appLinkClicked] and for non-HTTP app links), never the launch carve-out. */
+     * [referrerPackage] is the best-effort, non-verified android-app:// referrer, used only for links back to the
+     * caller (skipping confirmation prompts, or overriding "Never" in Open Links in Apps), never the launch carve-out. */
     private data class CustomTabContext(val clientPackage: String?, val referrerPackage: String?)
     private var customTab: CustomTabContext? = null
 
@@ -4034,13 +4033,17 @@ class BrowserTabViewModel @Inject constructor(
         isForMainFrame: Boolean,
         hasGesture: Boolean,
     ): Boolean {
+        val appLinksEnabled = appSettingsPreferencesStore.appLinksEnabled
+        val trustedCallerOverridesDisabledAppLinks = !appLinksEnabled &&
+            appLinksHandler.isTrustedCaller(appLink, trustedCallerPackage(nonHttpLink = false, overridingDisabledAppLinks = true))
         return appLinksHandler.handleAppLink(
             isForMainFrame,
             appLink,
             hasGesture,
             customTab?.clientPackage,
-            appSettingsPreferencesStore.appLinksEnabled,
+            appLinksEnabled,
             !appSettingsPreferencesStore.showAppLinksPrompt,
+            trustedCallerOverridesDisabledAppLinks,
         ) { appLinkClicked(appLink) }
     }
 
@@ -4088,10 +4091,14 @@ class BrowserTabViewModel @Inject constructor(
         appLinksHandler.setUserQueryState(false)
     }
 
-    private fun trustedCallerPackage(): String? {
-        if (!customTabsFeature.handleTrustedCallers().isEnabled() || !customTabsFeature.handleTrustedCallersNonHttpLinks().isEnabled()) {
-            return null
-        }
+    private fun trustedCallerPackage(
+        nonHttpLink: Boolean,
+        overridingDisabledAppLinks: Boolean,
+    ): String? {
+        val enabled = customTabsFeature.handleTrustedCallers().isEnabled() &&
+            (!nonHttpLink || customTabsFeature.handleTrustedCallersNonHttpLinks().isEnabled()) &&
+            (!overridingDisabledAppLinks || customTabsFeature.handleTrustedCallersWhenAppLinksDisabled().isEnabled())
+        if (!enabled) return null
         return customTab?.let { it.clientPackage ?: it.referrerPackage }
     }
 
@@ -4103,19 +4110,37 @@ class BrowserTabViewModel @Inject constructor(
     fun nonHttpAppLinkClicked(appLink: NonHttpAppLink) {
         if (nonHttpAppLinkChecker.isPermitted(appLink.intent)) {
             if (!appSettingsPreferencesStore.appLinksEnabled) {
-                appLink.fallbackUrl?.let { fallbackUrl ->
-                    command.value = NavigationCommand.Navigate(fallbackUrl, getUrlHeaders(fallbackUrl))
+                val trustedCallerPackage = trustedCallerPackage(nonHttpLink = true, overridingDisabledAppLinks = true)
+                if (trustedCallerPackage != null) {
+                    command.value = HandleNonHttpAppLink(
+                        nonHttpAppLink = appLink,
+                        headers = getUrlHeaders(appLink.fallbackUrl),
+                        showConfirmation = false,
+                        trustedCallerPackage = trustedCallerPackage,
+                        finishCustomTabOnTrustedCallerLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
+                        trustedCallerOnly = true,
+                    )
+                    return
                 }
+                navigateToFallbackUrl(appLink.fallbackUrl)
                 return
             }
             command.value = HandleNonHttpAppLink(
                 nonHttpAppLink = appLink,
                 headers = getUrlHeaders(appLink.fallbackUrl),
                 showConfirmation = appSettingsPreferencesStore.showAppLinksPrompt,
-                trustedCallerPackage = trustedCallerPackage(),
+                trustedCallerPackage = trustedCallerPackage(nonHttpLink = true, overridingDisabledAppLinks = false),
                 finishCustomTabOnTrustedCallerLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
             )
         }
+    }
+
+    fun onTrustedCallerLaunchUnavailable(fallbackUrl: String?) {
+        navigateToFallbackUrl(fallbackUrl)
+    }
+
+    private fun navigateToFallbackUrl(fallbackUrl: String?) {
+        fallbackUrl?.let { command.value = NavigationCommand.Navigate(it, getUrlHeaders(it)) }
     }
 
     fun onPrintSelected() {
@@ -4926,17 +4951,17 @@ class BrowserTabViewModel @Inject constructor(
             when {
                 // 400 errors
                 statusCode == HTTP_STATUS_CODE_BAD_REQUEST_ERROR ->
-                    httpErrorPixels.get().updateCountPixel(
+                    httpErrorPixels.value.updateCountPixel(
                         HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY,
                     )
                 // all 4xx errors apart from 400
                 statusCode / 100 == HTTP_STATUS_CODE_CLIENT_ERROR_PREFIX ->
-                    httpErrorPixels.get().updateCountPixel(
+                    httpErrorPixels.value.updateCountPixel(
                         HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_4XX_DAILY,
                     )
                 // all 5xx errors
                 statusCode / 100 == HTTP_STATUS_CODE_SERVER_ERROR_PREFIX ->
-                    httpErrorPixels.get().update5xxCountPixel(
+                    httpErrorPixels.value.update5xxCountPixel(
                         HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY,
                         statusCode,
                     )
@@ -5705,7 +5730,7 @@ class BrowserTabViewModel @Inject constructor(
         URLUtil.isNetworkUrl(text) || URLUtil.isAssetUrl(text) || URLUtil.isFileUrl(text) || URLUtil.isContentUrl(text)
 
     fun onNewTabShown() {
-        newTabPixels.get().fireNewTabDisplayed()
+        newTabPixels.value.fireNewTabDisplayed()
     }
 
     fun handleMenuRefreshAction() {

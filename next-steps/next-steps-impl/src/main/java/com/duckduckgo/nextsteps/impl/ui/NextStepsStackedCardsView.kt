@@ -35,14 +35,15 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.widget.AddWidgetLauncher
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
@@ -52,7 +53,6 @@ import com.duckduckgo.nextsteps.impl.databinding.ViewNextStepsStackedCardsBindin
 import com.duckduckgo.nextsteps.impl.ui.NextStepsItemsViewModel.Command
 import com.duckduckgo.nextsteps.impl.ui.NextStepsItemsViewModel.ViewState
 import com.duckduckgo.remote.messaging.api.CardItem
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.LogPriority.WARN

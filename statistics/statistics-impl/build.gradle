@@ -17,17 +17,18 @@
 plugins {
     id 'com.android.library'
     id 'com.google.devtools.ksp'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'androidx.room'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
+    ksp project(':codegen-ksp')
 
-    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':codegen-annotations')
 
+    implementation project(path: ':app-database')
     implementation project(path: ':statistics-api')
     implementation project(path: ':common-utils')
     implementation project(path: ':di')
@@ -48,8 +49,6 @@ dependencies {
     implementation Square.retrofit2.converter.moshi
     implementation Square.retrofit2.adapter.rxJava2
     implementation Square.retrofit2.converter.scalars
-
-    implementation Google.dagger
 
     // Room
     implementation AndroidX.room.runtime
@@ -94,9 +93,6 @@ dependencies {
 android {
     sourceSets {
         test.assets.srcDirs += files("$projectDir/schemas")
-    }
-    anvil {
-        generateDaggerFactories = true // default is false
     }
     lintOptions {
         baseline file("lint-baseline.xml")

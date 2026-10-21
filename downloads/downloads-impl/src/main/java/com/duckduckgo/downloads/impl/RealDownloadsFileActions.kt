@@ -28,7 +28,7 @@ import androidx.core.content.FileProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.DownloadsFileActions
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.ERROR
 import logcat.logcat
 import java.io.File

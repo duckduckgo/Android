@@ -23,7 +23,7 @@ import com.duckduckgo.credentialexchange.api.CredentialExchangeResult
 import com.duckduckgo.credentialexchange.api.CredentialExchangeResult.Failure
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 /**

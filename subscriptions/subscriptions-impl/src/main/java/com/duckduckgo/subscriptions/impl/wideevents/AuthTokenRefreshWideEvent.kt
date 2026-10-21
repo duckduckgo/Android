@@ -27,14 +27,31 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.ClaimsParseError
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Expired
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.InvalidAudience
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.InvalidClaim
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.InvalidIssuer
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.InvalidScope
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.InvalidSignature
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.JwksParseError
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.KeyNotFound
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Malformed
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.MissingClaim
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.NotYetValid
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Other
+import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Unsupported
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withContext
 import java.io.Closeable
 import javax.inject.Inject
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 interface AuthTokenRefreshWideEvent {
@@ -50,6 +67,8 @@ interface AuthTokenRefreshWideEvent {
     )
 
     suspend fun onTokensValidated()
+    suspend fun onAccessTokenValidationFailed(reason: TokenValidationFailureReason)
+    suspend fun onRefreshTokenValidationFailed(reason: TokenValidationFailureReason)
     suspend fun onUnknownAccountError()
     suspend fun onPlayLoginSuccess()
     suspend fun onPlayLoginFailure(
@@ -62,7 +81,7 @@ interface AuthTokenRefreshWideEvent {
     suspend fun onFailure(e: Exception)
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class AuthTokenRefreshWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
@@ -87,11 +106,11 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
                 cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
                 metadata = mapOf(
                     KEY_SUBSCRIPTION_STATUS to subscriptionStatus.statusName,
-                    KEY_NETP_IS_ENABLED to runCatching { networkProtectionState.get().isEnabled().toString() }.getOrDefault(""),
-                    KEY_NETP_IS_RUNNING to runCatching { networkProtectionState.get().isRunning().toString() }.getOrDefault(""),
+                    KEY_NETP_IS_ENABLED to runCatching { networkProtectionState.value.isEnabled().toString() }.getOrDefault(""),
+                    KEY_NETP_IS_RUNNING to runCatching { networkProtectionState.value.isRunning().toString() }.getOrDefault(""),
                     KEY_PROCESS_NAME to processName,
                 ),
-                definition = WideEventDefinition(version = Version(minor = 1, patch = 1)),
+                definition = WideEventDefinition(version = Version(minor = 1, patch = 2)),
             )
             .getOrNull()
             ?.also { wideEventId ->
@@ -148,6 +167,33 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
         if (!isFeatureEnabled()) return
         ongoingTokenRefreshWideEventId?.let { wideEventId ->
             wideEventClient.flowStep(wideEventId = wideEventId, stepName = STEP_TOKEN_VALIDATION)
+        }
+    }
+
+    override suspend fun onAccessTokenValidationFailed(reason: TokenValidationFailureReason) {
+        onTokenValidationFailed(failedToken = "access", reason = reason)
+    }
+
+    override suspend fun onRefreshTokenValidationFailed(reason: TokenValidationFailureReason) {
+        onTokenValidationFailed(failedToken = "refresh", reason = reason)
+    }
+
+    private suspend fun onTokenValidationFailed(
+        failedToken: String,
+        reason: TokenValidationFailureReason,
+    ) {
+        if (!isFeatureEnabled()) return
+        ongoingTokenRefreshWideEventId?.let { wideEventId ->
+            wideEventClient.flowStep(
+                wideEventId = wideEventId,
+                stepName = STEP_TOKEN_VALIDATION,
+                success = false,
+                metadata = buildMap {
+                    put(KEY_TOKEN_VALIDATION_FAILED_TOKEN, failedToken)
+                    put(KEY_TOKEN_VALIDATION_FAILURE_REASON, reason.toParamValue())
+                    reason.clockSkew?.let { put(KEY_TOKEN_VALIDATION_CLOCK_SKEW, it.toBucketedSeconds().toString()) }
+                },
+            )
         }
     }
 
@@ -227,7 +273,7 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        subscriptionsFeature.get().sendAuthTokenRefreshWideEvent().isEnabled()
+        subscriptionsFeature.value.sendAuthTokenRefreshWideEvent().isEnabled()
     }
 
     private companion object {
@@ -256,7 +302,61 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
         const val KEY_NETP_IS_ENABLED = "netp_is_enabled"
         const val KEY_NETP_IS_RUNNING = "netp_is_running"
         const val KEY_PROCESS_NAME = "process_name"
+        const val KEY_TOKEN_VALIDATION_FAILED_TOKEN = "token_validation_failed_token"
+        const val KEY_TOKEN_VALIDATION_FAILURE_REASON = "token_validation_failure_reason"
+        const val KEY_TOKEN_VALIDATION_CLOCK_SKEW = "token_validation_clock_skew_s_bucketed"
     }
 }
 
 private fun Exception.toErrorString(): String = javaClass.simpleName
+
+private val CLOCK_SKEW_BUCKETS = listOf(
+    Duration.ZERO,
+    1.seconds,
+    2.seconds,
+    5.seconds,
+    15.seconds,
+    30.seconds,
+    1.minutes,
+    2.minutes,
+    5.minutes,
+    10.minutes,
+    30.minutes,
+    1.hours,
+    2.hours,
+    4.hours,
+    8.hours,
+    24.hours,
+)
+
+private fun TokenValidationFailureReason.toParamValue(): String = when (this) {
+    is Expired -> "expired"
+    is NotYetValid -> "not_yet_valid"
+    InvalidSignature -> "invalid_signature"
+    KeyNotFound -> "key_not_found"
+    JwksParseError -> "jwks_parse_error"
+    Malformed -> "malformed"
+    Unsupported -> "unsupported"
+    MissingClaim -> "missing_claim"
+    InvalidIssuer -> "invalid_issuer"
+    InvalidAudience -> "invalid_audience"
+    InvalidScope -> "invalid_scope"
+    InvalidClaim -> "invalid_claim"
+    ClaimsParseError -> "claims_parse_error"
+    Other -> "other"
+}
+
+private val TokenValidationFailureReason.clockSkew: Duration?
+    get() = when (this) {
+        is Expired -> clockSkew
+        is NotYetValid -> clockSkew
+        else -> null
+    }
+
+/**
+ * Rounds the magnitude down to the nearest bucket boundary, keeping the sign.
+ */
+private fun Duration.toBucketedSeconds(): Long {
+    val bucket = CLOCK_SKEW_BUCKETS.last { it <= absoluteValue }.inWholeSeconds
+    return if (isNegative()) -bucket else bucket
+}

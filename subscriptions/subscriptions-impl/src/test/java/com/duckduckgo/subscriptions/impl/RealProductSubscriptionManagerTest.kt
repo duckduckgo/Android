@@ -270,6 +270,8 @@ private class FakeSubscriptions(
 
     override suspend fun getAvailableProducts(): Set<Product> = emptySet()
 
+    override suspend fun getPurchasableProducts(): Set<Product> = emptySet()
+
     override fun shouldLaunchSubscriptionForUrl(url: String): Boolean = false
 
     override fun launchSubscription(

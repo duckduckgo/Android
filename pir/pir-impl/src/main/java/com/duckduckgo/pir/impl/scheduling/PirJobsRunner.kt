@@ -35,6 +35,7 @@ import com.duckduckgo.pir.impl.freemium.PirFreeScanWorkWindow
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
+import com.duckduckgo.pir.impl.notifications.PirScanCompleteNotifier
 import com.duckduckgo.pir.impl.optout.PirOptOut
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scan.PirScan
@@ -46,8 +47,8 @@ import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEvent
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.FailureReason
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withContext
@@ -77,7 +78,7 @@ interface PirJobsRunner {
 }
 
 @ContributesBinding(scope = AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealPirJobsRunner @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val pirRepository: PirRepository,
@@ -98,6 +99,7 @@ class RealPirJobsRunner @Inject constructor(
     private val pirFreeScanWorkWindow: PirFreeScanWorkWindow,
     private val pirScanScheduler: PirScanScheduler,
     private val pirFreemiumDataStore: PirFreemiumDataStore,
+    private val pirScanCompleteNotifier: PirScanCompleteNotifier,
 ) : PirJobsRunner {
     override suspend fun runEligibleJobs(
         context: Context,
@@ -105,6 +107,7 @@ class RealPirJobsRunner @Inject constructor(
         runMode: PirRunMode,
     ): Result<Unit> = withContext(dispatcherProvider.io()) {
         val startTimeInMillis = currentTimeProvider.currentTimeMillis()
+        val isFreeScan = runMode == PirRunMode.SCAN_ONLY
 
         // Multiple profile support (includes deprecated profiles as we need to process opt-out for them if there are extracted profiles)
         val profileQueries = obtainProfiles()
@@ -167,17 +170,23 @@ class RealPirJobsRunner @Inject constructor(
         // total_scan_jobs count at flowStart.
         val eligibleJobs = if (activeBrokers.isNotEmpty()) {
             attemptCreateScanJobs(activeBrokers, profileQueries)
-            eligibleScanJobProvider.getAllEligibleScanJobs(currentTimeProvider.currentTimeMillis())
+            val activeBrokerJobs = eligibleScanJobProvider.getAllEligibleScanJobs(currentTimeProvider.currentTimeMillis())
                 .filter { it.brokerName in activeBrokers }
+            if (isFreeScan) {
                 // Repeat scans only serve removals, so a scan-only user gets one successful scan per broker.
-                .filter { runMode == PirRunMode.SCAN_AND_OPT_OUT || !it.hasTerminalResult }
+                val (maintenanceJobs, firstScanJobs) = activeBrokerJobs.partition { it.hasTerminalResult }
+                if (maintenanceJobs.isNotEmpty()) pixelSender.reportFreemiumMaintenanceScanSkipped()
+                firstScanJobs
+            } else {
+                activeBrokerJobs
+            }
         } else {
             emptyList()
         }
 
         // Activation pixel: once per install when the user starts their first scan.
         if (executionType == PirExecutionType.MANUAL_INITIAL && eligibleJobs.isNotEmpty()) {
-            pixelSender.reportFirstScanStarted()
+            pixelSender.reportFirstScanStarted(isAuthenticated = runMode == PirRunMode.SCAN_AND_OPT_OUT)
         }
 
         val isPowerSavingEnabled = context.isPowerSavingModeEnabled()
@@ -198,6 +207,7 @@ class RealPirJobsRunner @Inject constructor(
             batteryOptimizationsEnabled = batteryOptimizationsEnabled,
             notificationsPermissionGranted = notificationsPermissionGranted,
             isTrackerBlockingEnabled = isTrackerBlockingEnabled,
+            isFreeScan = isFreeScan,
         )
 
         pirInitialScanCompletionWideEvent.onRunStarted(
@@ -221,6 +231,7 @@ class RealPirJobsRunner @Inject constructor(
                 pirScanWideEvent.onScanCompleted(executionType)
                 pirScanWideEvent.onOptOutSkipped(executionType)
                 recordFreemiumFirstScanResultIfNeeded(runMode)
+                pirScanCompleteNotifier.onRunCompleted(runMode)
             } else {
                 logcat { "PIR-JOB-RUNNER: No active brokers available. Completing run." }
                 pirScanWideEvent.onRunFailed(executionType = executionType, reason = FailureReason.NO_ACTIVE_BROKERS)
@@ -250,6 +261,7 @@ class RealPirJobsRunner @Inject constructor(
                 context = context,
                 executionType = executionType,
                 eligibleJobs = eligibleJobs,
+                isFreeScan = isFreeScan,
                 onJobCompleted = onJobCompletedCallback,
                 onScanJobsResolved = onScanJobsResolvedCallback,
             )
@@ -273,6 +285,7 @@ class RealPirJobsRunner @Inject constructor(
                     brokerCount = activeBrokers.size,
                     executionType = executionType,
                     notificationsPermissionGranted = context.areNotificationsPermissionGranted(),
+                    isFreeScan = isFreeScan,
                 )
             }
 
@@ -290,6 +303,7 @@ class RealPirJobsRunner @Inject constructor(
                     profileQueryCount = profileQueries.size,
                     brokerCount = activeBrokers.size,
                 )
+                pirScanCompleteNotifier.onRunCompleted(runMode)
                 return@withContext Result.success(Unit)
             }
 
@@ -308,6 +322,7 @@ class RealPirJobsRunner @Inject constructor(
                     profileQueryCount = profileQueries.size,
                     brokerCount = activeBrokers.size,
                 )
+                pirScanCompleteNotifier.onRunCompleted(runMode)
                 return@withContext Result.success(Unit)
             }
 
@@ -328,6 +343,7 @@ class RealPirJobsRunner @Inject constructor(
                 profileQueryCount = profileQueries.size,
                 brokerCount = activeBrokers.size,
             )
+            pirScanCompleteNotifier.onRunCompleted(runMode)
             return@withContext Result.success(Unit)
         } catch (e: TimeoutCancellationException) {
             pirScanWideEvent.onRunFailed(executionType = executionType, reason = FailureReason.TIMEOUT_CANCELLATION_EXCEPTION)
@@ -489,6 +505,7 @@ class RealPirJobsRunner @Inject constructor(
         context: Context,
         executionType: PirExecutionType,
         eligibleJobs: List<ScanJobRecord>,
+        isFreeScan: Boolean,
         onJobCompleted: suspend () -> Unit = {},
         onScanJobsResolved: suspend (Int) -> Unit = {},
     ): Int {
@@ -499,7 +516,7 @@ class RealPirJobsRunner @Inject constructor(
         }
         if (eligibleJobs.isNotEmpty()) {
             logcat { "PIR-JOB-RUNNER: Executing scan for ${eligibleJobs.size} eligible scan jobs." }
-            pirScan.executeScanForJobs(eligibleJobs, context, runType, onJobCompleted, onScanJobsResolved)
+            pirScan.executeScanForJobs(eligibleJobs, context, runType, isFreeScan, onJobCompleted, onScanJobsResolved)
         } else {
             logcat { "PIR-JOB-RUNNER: No eligible scan jobs to execute." }
             onScanJobsResolved(0)

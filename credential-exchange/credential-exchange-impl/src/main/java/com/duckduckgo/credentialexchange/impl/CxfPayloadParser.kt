@@ -23,10 +23,10 @@ import com.duckduckgo.credentialexchange.api.ExchangedCredential
 import com.duckduckgo.credentialexchange.impl.CxfParseResult.Malformed
 import com.duckduckgo.credentialexchange.impl.CxfParseResult.Parsed
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
@@ -54,6 +54,7 @@ class RealCxfPayloadParser @Inject constructor(
 
     private val moshi by lazy { Moshi.Builder().add(KotlinJsonAdapterFactory()).build() }
     private val adapter by lazy { moshi.adapter(CxfPayload::class.java) }
+    private val itemAdapter by lazy { moshi.adapter(CxfItem::class.java) }
 
     override suspend fun parse(cxfJson: String): CxfParseResult = withContext(dispatchers.io()) {
         val payload = runCatching { adapter.fromJson(cxfJson) }
@@ -62,55 +63,56 @@ class RealCxfPayloadParser @Inject constructor(
 
         val accounts = payload?.accounts ?: return@withContext Malformed
 
-        Parsed(accounts.flatMap { account -> account.items.orEmpty().flatMap { it.toExchangedCredentials() } })
+        Parsed(
+            accounts
+                .flatMap { it.items.orEmpty() }
+                .mapNotNull { it.toCxfItem() }
+                .flatMap { it.toExchangedCredentials() },
+        )
     }
 
-    private fun CxfItem.toExchangedCredentials(): List<ExchangedCredential> {
-        val logins = credentials.orEmpty().filter { it.type == CREDENTIAL_TYPE_BASIC_AUTH }
+    private fun Any?.toCxfItem(): CxfItem? = runCatching { itemAdapter.fromJsonValue(this) }
+        .onFailure { logcat(ERROR) { "${LOG_PREFIX}skipped unreadable CXF item: ${it.message}" } }
+        .getOrNull()
 
-        val note = credentials.orEmpty()
-            .filter { it.type == CREDENTIAL_TYPE_NOTE }
-            .firstNotNullOfOrNull { it.content?.value?.takeIf(String::isNotBlank) }
+    private fun CxfItem.toExchangedCredentials(): List<ExchangedCredential> {
+        val entries = credentials.orEmpty().filterIsInstance<Map<*, *>>()
+        val logins = entries.filter { it["type"] == CREDENTIAL_TYPE_BASIC_AUTH }
+
+        val note = entries
+            .filter { it["type"] == CREDENTIAL_TYPE_NOTE }
+            .firstNotNullOfOrNull { it.editableFieldValue("content")?.takeIf(String::isNotBlank) }
 
         return logins.map {
             ExchangedCredential(
                 urls = scope?.urls.orEmpty().filter { url -> url.isNotBlank() },
                 title = title,
-                username = it.username?.value,
-                password = it.password?.value,
+                username = it.editableFieldValue("username"),
+                password = it.editableFieldValue("password"),
                 note = note,
             )
         }
     }
+
+    private fun Map<*, *>.editableFieldValue(name: String): String? = (this[name] as? Map<*, *>)?.get("value") as? String
 }
 
 @JsonClass(generateAdapter = false)
 internal data class CxfPayload(val accounts: List<CxfAccount>? = null)
 
 @JsonClass(generateAdapter = false)
-internal data class CxfAccount(val items: List<CxfItem>? = null)
+internal data class CxfAccount(val items: List<Any?>? = null)
 
+/**
+ * `credentials` stays untyped because CXF gives the same field name different shapes per credential type
+ * Only the types we read are inspected; the rest are never decoded.
+ */
 @JsonClass(generateAdapter = false)
 internal data class CxfItem(
     val title: String? = null,
     val scope: CxfScope? = null,
-    val credentials: List<CxfCredential>? = null,
+    val credentials: List<Any?>? = null,
 )
 
 @JsonClass(generateAdapter = false)
 internal data class CxfScope(val urls: List<String>? = null)
-
-/**
- * One entry of the polymorphic `credentials` array. Every field is optional because a single shape
- * has to cover all 17 CXF credential types; a type we don't read simply leaves them null.
- */
-@JsonClass(generateAdapter = false)
-internal data class CxfCredential(
-    val type: String? = null,
-    val username: CxfEditableField? = null,
-    val password: CxfEditableField? = null,
-    val content: CxfEditableField? = null,
-)
-
-@JsonClass(generateAdapter = false)
-internal data class CxfEditableField(val value: String? = null)

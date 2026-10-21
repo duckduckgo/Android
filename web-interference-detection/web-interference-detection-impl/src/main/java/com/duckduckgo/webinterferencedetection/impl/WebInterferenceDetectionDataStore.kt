@@ -23,8 +23,8 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -39,7 +39,7 @@ interface WebInterferenceDetectionDataStore {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class SharedPreferencesWebInterferenceDetectionDataStore @Inject constructor(
     @WebInterferenceDetection private val store: DataStore<Preferences>,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,

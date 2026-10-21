@@ -29,10 +29,10 @@ import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.interactions.HatchInteractionsPlugin
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.drop
@@ -53,10 +53,10 @@ import kotlin.time.Duration.Companion.seconds
  * Session start waits for [FirstScreenHandlerImpl] to finish applying the opening-screen decision.
  * This makes `after_idle` and `landed_on` authoritative at [WideEventClient.flowStart].
  */
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = ReturnSessionLandingListener::class)
-@ContributesMultibinding(AppScope::class, boundType = BrowserInteractionsPlugin::class)
-@ContributesMultibinding(AppScope::class, boundType = HatchInteractionsPlugin::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<ReturnSessionLandingListener>())
+@ContributesIntoSet(AppScope::class, binding = binding<BrowserInteractionsPlugin>())
+@ContributesIntoSet(AppScope::class, binding = binding<HatchInteractionsPlugin>())
 class RealReturnSessionWideEvent @Inject constructor(
     private val wideEventClient: WideEventClient,
     private val settingsDataStore: SettingsDataStore,
@@ -333,7 +333,7 @@ class RealReturnSessionWideEvent @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        returnSessionWideEventFeature.get().self().isEnabled()
+        returnSessionWideEventFeature.value.self().isEnabled()
     }
 
     private class SessionState(

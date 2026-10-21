@@ -306,6 +306,7 @@
     <string name="sync_simplified_settings_download_recovery_code_item_hint">Brug denne kode til at gendanne dine data, hvis du mister adgang til denne enhed – opbevar den sikkert.</string>
     <string name="sync_simplified_settings_data_expiration_notice">Sync &amp; Backup-data kan ikke gendannes efter 18 måneders inaktivitet. <annotation type="learn_more_link">Læs mere</annotation></string>
     <string name="sync_simplified_settings_delete_account_item">Slå fra, og slet serverdata</string>
+    <string name="sync_simplified_settings_turn_off_item">Slå Sync &amp; Backup fra</string>
     <string name="sync_simplified_settings_storage_permission_message">Download af gendannelses-PDF kræver lagringstilladelse</string>
     <string name="sync_simplified_settings_learn_more_screen_title">Synkronisering og sikkerhedskopiering</string>
 
@@ -320,6 +321,26 @@
     <string name="sync_simplified_settings_delete_server_data_dialog_body">Alle enheder, der bruger Sync &amp; Backup, bliver afbrudt, og dine synkroniserede data slettes fra serveren.</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Slet serverdata</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">Annuller</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_title_v2">Denne handling kan ikke fortrydes.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body_v2">Alle enheder, der bruger Sync &amp; Backup, bliver afbrudt, og dine synkroniserede data slettes fra serveren.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button_v2">Slet permanent</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button_v2">Annuller</string>
+
+    <!-- Sync settings screen: turn off sheet -->
+    <string name="sync_simplified_settings_turn_off_sheet_remove_title" instruction="Placeholder is a device name. e.g., Samsung S23">Fjern %1$s fra Sync &amp; Backup?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_body" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” vil ikke længere have adgang til dine synkroniserede data på andre enheder.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item">Slet også serverdata?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Slå Sync &amp; Backup fra, slet alle synkroniserede data fra serveren, og deaktiver din gendannelseskode.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Fjern enhed</string>
+    <string name="sync_simplified_settings_turn_off_sheet_title">Slå Sync &amp; Backup fra?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_body">Alle enheder, der bruger Sync &amp; Backup, bliver afbrudt, og dine synkroniserede data slettes fra serveren.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Slå fra, og slet serverdata</string>
+
+    <!-- Sync settings screen: turn off this device dialog -->
+    <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">Fjern %1$s fra Sync &amp; Backup?</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">\"%1$s\" kan ikke længere få adgang til dine synkroniserede data. Bogmærker, data til automatisk udfyldning og Duck.ai-chats forbliver på dine enheder.</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_primary_button">Fjern</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_secondary_button">Annuller</string>
 
     <!-- Sync settings screen: require device passcode dialog -->
     <string name="sync_simplified_settings_require_passcode_dialog_title">Beskyt din enhed for at bruge Sync &amp; Backup</string>
@@ -329,6 +350,8 @@
     <!-- Sync This Device screen -->
     <string name="sync_simplified_setup_header_headline">Synkroniser denne enhed med en computer i nærheden.</string>
     <string name="sync_simplified_setup_header_body">Vi hjælper dig med at synkronisere dine enheder.</string>
+    <string name="sync_simplified_setup_header_headline_v2">Har du en anden enhed i nærheden? Synkroniser dine enheder.</string>
+    <string name="sync_simplified_setup_header_body_v2">Ingen anden enhed lige nu? Synkroniser kun denne enhed, og synkroniser med en anden senere.</string>
     <string name="sync_simplified_setup_primary_button">Synkroniser med en anden enhed</string>
     <string name="sync_simplified_setup_secondary_button">Synkroniser kun denne enhed</string>
     <string name="sync_simplified_setup_secondary_button_syncing">Forbinder ...</string>
@@ -353,10 +376,14 @@
     <string name="sync_simplified_scanner_camera_header_headline">Scan QR- kode for at synkronisere</string>
     <string name="sync_simplified_scanner_camera_header_body">Åbn <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo til computer</annotation></b>\n<annotation type="gap">\n</annotation>og gå til <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synkroniser med  en anden enhed</annotation></string>
     <string name="sync_simplified_scanner_camera_primary_button">Jeg er klar til at scanne</string>
+    <string name="sync_simplified_scanner_camera_primary_button_v2">Forstået</string>
     <string name="sync_simplified_scanner_camera_invalid_code_message">Beklager, den scannede kode er ugyldig.</string>
     <string name="sync_simplified_scanner_no_permission_headline">Kameratilladelse er påkrævet</string>
     <string name="sync_simplified_scanner_no_permission_body">Gå til din enheds indstillinger, og giv denne app tilladelse til at få adgang til dit kamera.</string>
     <string name="sync_simplified_scanner_no_permission_primary_button">Gå til Indstillinger</string>
+    <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo skal have adgang til dit kamera.</string>
+    <string name="sync_simplified_scanner_no_permission_body_v2">Der kræves kameratilladelse for at scanne QR-koden.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button_v2">Skift tilladelser</string>
     <string name="sync_simplified_scanner_no_hardware_headline">Kameraet er ikke tilgængeligt</string>
 
     <!-- Scanner screen: manual entry tab -->
@@ -411,6 +438,8 @@
     <string name="sync_simplified_edit_device_sync_this_device_item">Synkroniser denne enhed</string>
     <string name="sync_simplified_edit_device_remove_notice_this_device">Denne enhed vil ikke længere have adgang til dine synkroniserede data, hvis du fjerner den.</string>
     <string name="sync_simplified_edit_device_remove_notice_another_device">Denne enhed vil ikke længere have adgang til dine synkroniserede data, hvis dette slås fra.</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” vil ikke længere have adgang til dine synkroniserede data på andre enheder, hvis dette slås fra.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” vil ikke længere have adgang til dine synkroniserede data på andre enheder.</string>
 
     <!-- Edit Device screen: edit name dialog -->
     <string name="sync_simplified_edit_device_edit_name_dialog_title">Rediger navn</string>
@@ -422,6 +451,8 @@
     <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">\"%1$s\" kan ikke længere få adgang til dine synkroniserede data.</string>
     <string name="sync_simplified_edit_device_remove_dialog_primary_button">Fjern</string>
     <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Annuller</string>
+    <string name="sync_simplified_edit_device_remove_dialog_title_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Fjern %1$s fra Sync &amp; Backup?</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body_v2" instruction="Placeholder is a device name. e.g., Samsung S23">\"%1$s\" kan ikke længere få adgang til dine synkroniserede data. Bogmærker, data til automatisk udfyldning og Duck.ai-chats forbliver på dine enheder.</string>
 
     <!-- Edit Device screen: turn off sync dialog -->
     <string name="sync_simplified_edit_device_turn_off_dialog_title">Slå Sync &amp; Backup fra?</string>

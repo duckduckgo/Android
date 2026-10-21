@@ -76,6 +76,7 @@ import com.duckduckgo.pir.impl.models.Address
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
+import com.duckduckgo.pir.impl.notifications.PirScanCompleteNotifier
 import com.duckduckgo.pir.impl.optout.RealPirOptOut
 import com.duckduckgo.pir.impl.pixels.PirPixel
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
@@ -402,6 +403,7 @@ class PirEndToEndTest {
             pirFreeScanWorkWindow = NoOpPirFreeScanWorkWindow,
             pirScanScheduler = NoOpPirScanScheduler,
             pirFreemiumDataStore = NoOpPirFreemiumDataStore,
+            pirScanCompleteNotifier = NoOpPirScanCompleteNotifier,
         )
 
         pirEmailConfirmation = RealPirEmailConfirmation(
@@ -1039,6 +1041,7 @@ class PirEndToEndTest {
             batteryOptimizationsEnabled: Boolean,
             notificationsPermissionGranted: Boolean,
             isTrackerBlockingEnabled: Boolean,
+            isFreeScan: Boolean,
         ) = Unit
 
         override suspend fun onScanJobsResolved(executionType: PirExecutionType, actualScanJobs: Int) = Unit
@@ -1080,12 +1083,18 @@ class PirEndToEndTest {
         override suspend fun isOpen(): Boolean = true
     }
 
+    private object NoOpPirScanCompleteNotifier : PirScanCompleteNotifier {
+        override fun onInitialScanStarted() = Unit
+        override suspend fun onRunCompleted(runMode: PirRunMode) = Unit
+    }
+
     private object NoOpPirFreemiumDataStore : PirFreemiumDataStore {
         override val didActivate: Boolean = false
         override val firstProfileSavedTimestamp: Long = 0L
         override val firstScanResult: PirFreemiumFirstScanResult? = null
         override fun activate(timestampMillis: Long) = Unit
         override fun recordFirstScanResult(result: PirFreemiumFirstScanResult) = Unit
+        override fun clearFirstScanResult() = Unit
         override fun reset() = Unit
     }
 

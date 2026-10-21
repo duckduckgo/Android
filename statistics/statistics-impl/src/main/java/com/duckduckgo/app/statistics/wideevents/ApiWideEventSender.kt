@@ -32,7 +32,7 @@ import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEvent
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.logcat
 import retrofit2.HttpException
 import javax.inject.Inject
@@ -62,7 +62,7 @@ class ApiWideEventSender @Inject constructor(
             ),
             app = AppSection(
                 name = APP_NAME,
-                version = appBuildConfig.versionName,
+                version = event.appVersion,
                 formFactor = deviceInfo.formFactor().description,
                 devMode = appBuildConfig.isDebug,
             ),

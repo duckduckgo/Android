@@ -21,7 +21,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.privacy.config.api.Gpc
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 

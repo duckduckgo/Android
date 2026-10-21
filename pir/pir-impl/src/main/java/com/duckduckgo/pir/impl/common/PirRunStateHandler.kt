@@ -66,8 +66,8 @@ import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_SUCCESS
 import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType.EMAIL_CONFIRMATION_FAILED
 import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType.EMAIL_CONFIRMATION_SUCCESS
 import com.duckduckgo.pir.impl.store.db.PirBrokerScanLog
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Named
@@ -91,6 +91,7 @@ interface PirRunStateHandler {
             val totalTimeMillis: Long,
             val isManualRun: Boolean,
             val lastAction: BrokerAction,
+            val isFreeScan: Boolean,
         ) : PirRunState(broker)
 
         data class BrokerScanFailed(
@@ -103,6 +104,7 @@ interface PirRunStateHandler {
             val errorCategory: String?,
             val errorDetails: String?,
             val failedAction: BrokerAction,
+            val isFreeScan: Boolean,
         ) : PirRunState(broker)
 
         data class BrokerScanActionStarted(
@@ -110,6 +112,7 @@ interface PirRunStateHandler {
             val profileQueryId: Long,
             val currentActionAttemptCount: Int,
             val currentAction: BrokerAction,
+            val isFreeScan: Boolean,
         ) : PirRunState(broker)
 
         data class BrokerScanActionSucceeded(
@@ -273,6 +276,7 @@ interface PirRunStateHandler {
             val actionType: String,
             val actionID: String,
             val errorMessage: String,
+            val isFreeScan: Boolean,
         ) : PirRunState(broker)
 
         data class BrokerStepInvalidEvent(
@@ -469,6 +473,7 @@ class RealPirRunStateHandler @Inject constructor(
             parentUrl = state.broker.parent.orEmpty(),
             actionId = state.currentAction.id,
             actionType = state.currentAction.asActionType(),
+            isFreeScan = state.isFreeScan,
         )
     }
 
@@ -496,6 +501,7 @@ class RealPirRunStateHandler @Inject constructor(
             parentUrl = state.broker.parent.orEmpty(),
             actionId = state.failedAction.id,
             actionType = state.failedAction.asActionType(),
+            isFreeScan = state.isFreeScan,
         )
         eventsRepository.saveBrokerScanLog(
             PirBrokerScanLog(
@@ -524,6 +530,7 @@ class RealPirRunStateHandler @Inject constructor(
                 parentUrl = state.broker.parent.orEmpty(),
                 actionId = state.lastAction.id,
                 actionType = state.lastAction.asActionType(),
+                isFreeScan = state.isFreeScan,
             )
         } else {
             pixelSender.reportScanMatches(
@@ -532,6 +539,7 @@ class RealPirRunStateHandler @Inject constructor(
                 inManualStarted = state.isManualRun,
                 parentUrl = state.broker.parent.orEmpty(),
                 totalMatches = matchCount,
+                isFreeScan = state.isFreeScan,
             )
         }
         val brokerName = state.broker.name
@@ -716,6 +724,7 @@ class RealPirRunStateHandler @Inject constructor(
             actionId = state.actionID,
             errorMessage = state.errorMessage,
             stepType = state.stepType,
+            isFreeScan = state.isFreeScan,
         )
 
         if (state.stepType == KEY_STEPTYPE_OPTOUT && state.extractedProfile != null) {

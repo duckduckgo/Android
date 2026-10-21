@@ -96,7 +96,7 @@ class RealReturnSessionWideEventTest {
         wideEventClient = wideEventClient,
         settingsDataStore = settingsDataStore,
         showOnAppLaunchOptionDataStore = showOnAppLaunchOptionDataStore,
-        returnSessionWideEventFeature = { returnSessionWideEventFeature },
+        returnSessionWideEventFeature = lazy { returnSessionWideEventFeature },
         dispatchers = coroutineRule.testDispatcherProvider,
         appCoroutineScope = coroutineRule.testScope,
     )

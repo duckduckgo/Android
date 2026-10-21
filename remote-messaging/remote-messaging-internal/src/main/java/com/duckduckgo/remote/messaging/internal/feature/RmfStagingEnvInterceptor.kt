@@ -18,16 +18,17 @@ package com.duckduckgo.remote.messaging.internal.feature
 
 import com.duckduckgo.app.global.api.ApiInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import logcat.logcat
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Response
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = ApiInterceptorPlugin::class,
+    binding = binding<ApiInterceptorPlugin>(),
 )
 class RmfStagingEnvInterceptor @Inject constructor(
     private val rmfConfigUrlResolver: RmfConfigUrlResolver,

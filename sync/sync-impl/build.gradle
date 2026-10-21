@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
     id 'kotlin-parcelize'
 }
@@ -32,7 +32,7 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
+    ksp project(':codegen-ksp')
     implementation project(path: ':di')
     implementation project(':browser-api')
     implementation project(path: ':common-utils')
@@ -60,7 +60,7 @@ dependencies {
     implementation project(':persistent-storage-api')
     implementation project(':browser-mode-api')
 
-    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':codegen-annotations')
 
     implementation AndroidX.appCompat
     implementation Google.android.material
@@ -72,7 +72,6 @@ dependencies {
 
     implementation Square.retrofit2.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
-    implementation Google.dagger
     implementation AndroidX.core.ktx
     implementation('com.journeyapps:zxing-android-embedded:_') { transitive = false }
     implementation 'com.google.zxing:core:_'
@@ -125,9 +124,6 @@ dependencies {
 }
 
 android {
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     lint {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"

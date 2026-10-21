@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -24,10 +24,6 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
     namespace 'com.duckduckgo.referral.impl'
-
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
 
     flavorDimensions "store"
     productFlavors {
@@ -49,8 +45,8 @@ tasks.named('jvm_tests').configure { setDependsOn(['testPlayDebugUnitTest']) }
 tasks.named('jvm_checks').configure { setDependsOn(['spotlessCheck', 'lint', 'testPlayDebugUnitTest']) }
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(':codegen-annotations')
 
     implementation project(':di')
     implementation project(':common-utils')
@@ -63,7 +59,6 @@ dependencies {
     implementation project(':content-scope-scripts-api')
     implementation project(':js-messaging-api')
 
-    implementation Google.dagger
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
     implementation "com.squareup.logcat:logcat:_"

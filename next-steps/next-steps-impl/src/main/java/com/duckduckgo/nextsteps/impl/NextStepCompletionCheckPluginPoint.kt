@@ -15,7 +15,7 @@
  */
 package com.duckduckgo.nextsteps.impl
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.nextsteps.api.NextStepCompletionCheck
 

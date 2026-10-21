@@ -21,7 +21,7 @@ import com.duckduckgo.feature.toggles.api.ConversionWindow
 import com.duckduckgo.feature.toggles.api.MetricType
 import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.send
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface OnboardingPasswordImportExperimentMetrics {

@@ -13,7 +13,7 @@
         },
         "version": {
             "type": "string",
-            "description": "The version of the app sending the event. Release builds are X.Y.Z; internal and nightly builds append the build number and channel suffix.",
+            "description": "The version of the app when the event's flow started. Release builds are X.Y.Z; internal and nightly builds append the build number and channel suffix.",
             "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+(-[a-z]+)?)?$"
         },
         "form_factor": {

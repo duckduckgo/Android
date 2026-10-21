@@ -18,10 +18,10 @@ package com.duckduckgo.app.attributed.metrics.impl
 
 import com.duckduckgo.app.attributed.metrics.AttributedMetricsConfigFeature
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface OriginParamManager {
@@ -34,7 +34,7 @@ interface OriginParamManager {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealOriginParamManager @Inject constructor(
     private val attributedMetricsConfigFeature: AttributedMetricsConfigFeature,
     private val moshi: Moshi,

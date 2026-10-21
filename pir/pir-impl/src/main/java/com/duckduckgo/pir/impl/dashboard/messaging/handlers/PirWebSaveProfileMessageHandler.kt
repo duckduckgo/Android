@@ -25,6 +25,7 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
 import com.duckduckgo.pir.impl.checker.DisabledReason
 import com.duckduckgo.pir.impl.checker.PirEligibility
 import com.duckduckgo.pir.impl.checker.PirRunMode
@@ -34,6 +35,7 @@ import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import com.duckduckgo.pir.impl.models.ProfileQuery
+import com.duckduckgo.pir.impl.notifications.PirScanCompleteNotifier
 import com.duckduckgo.pir.impl.onboarding.experiment.SubscriptionOnboardingExperimentMetrics
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
@@ -41,7 +43,8 @@ import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -51,9 +54,9 @@ import javax.inject.Inject
 /**
  * Handles the message from Web to store the user profile information to local storage.
  */
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = ActivityScope::class,
-    boundType = PirWebJsMessageHandler::class,
+    binding = binding<PirWebJsMessageHandler>(),
 )
 class PirWebSaveProfileMessageHandler @Inject constructor(
     private val pirWebProfileStateHolder: PirWebProfileStateHolder,
@@ -68,6 +71,8 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
     private val pirWorkHandler: PirWorkHandler,
     private val pirRemoteFeatures: PirRemoteFeatures,
     private val pirFreemiumDataStore: PirFreemiumDataStore,
+    private val pirScanCompleteNotifier: PirScanCompleteNotifier,
+    private val brokerJsonUpdater: BrokerJsonUpdater,
 ) : PirWebJsMessageHandler() {
 
     override val message = PirDashboardWebMessages.SAVE_PROFILE
@@ -104,6 +109,9 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
                 return@launch
             }
 
+            // ensure broker data is present so dashboard is displayed correctly
+            updateBrokerDataIfNoneStored()
+
             jsMessaging.sendResponse(
                 jsMessage,
                 response = PirWebMessageResponse.DefaultResponse.SUCCESS,
@@ -121,6 +129,11 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
 
             // re-resolved after activation, which is what turns a non-subscriber into a scan-only user
             val runMode = pirWorkHandler.canRunPir().firstOrNull().runModeOrNull
+
+            // marked before the scan starts, as the run that finishes this scan is the one that takes it
+            if (runMode != null) {
+                pirScanCompleteNotifier.onInitialScanStarted()
+            }
 
             // start the initial scan at this point as startScanAndOptOut message is not reliable
             startAndScheduleInitialScan(executionType, runMode)
@@ -202,6 +215,16 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
                 jobRecordUpdater.removeScanJobRecordsWithNoMatchesForProfiles(profileQueriesToUpdate.map { it.id })
             }
         }
+    }
+
+    /**
+     * Ensure broker data is present before starting scan to prevent invalid dashboard state.
+     */
+    private suspend fun updateBrokerDataIfNoneStored() {
+        if (repository.getAllActiveBrokers().isNotEmpty()) return
+
+        logcat { "PIR-WEB: PirWebSaveProfileMessageHandler: no brokers stored, updating broker data" }
+        brokerJsonUpdater.update()
     }
 
     /**

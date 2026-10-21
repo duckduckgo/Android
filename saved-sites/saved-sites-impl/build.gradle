@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'kotlin-parcelize'
     id 'com.google.devtools.ksp'
 }
@@ -24,7 +24,7 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
+    ksp project(':codegen-ksp')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':di')
@@ -41,7 +41,7 @@ dependencies {
     implementation project(path: ':autofill-api')
     implementation project(path: ':saved-sites-store')
 
-    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':codegen-annotations')
 
     implementation AndroidX.dataStore.preferences
     implementation "io.reactivex.rxjava2:rxjava:_"
@@ -50,7 +50,6 @@ dependencies {
     implementation AndroidX.fragment.ktx
     implementation Google.android.material
     implementation "com.squareup.logcat:logcat:_"
-    implementation Google.dagger
     implementation KotlinX.coroutines.core
     implementation AndroidX.core.ktx
     implementation AndroidX.lifecycle.viewModelKtx
@@ -90,9 +89,6 @@ dependencies {
 }
 
 android {
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     lint {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"

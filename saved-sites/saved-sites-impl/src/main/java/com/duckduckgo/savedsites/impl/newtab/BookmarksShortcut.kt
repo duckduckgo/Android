@@ -18,9 +18,9 @@ package com.duckduckgo.savedsites.impl.newtab
 
 import android.content.Context
 import android.content.Intent
-import com.duckduckgo.anvil.annotations.ContributesActivePlugin
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
+import com.duckduckgo.codegen.annotations.ContributesActivePlugin
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue

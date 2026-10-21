@@ -68,7 +68,7 @@ class FreeTrialConversionWideEventTest {
     fun setup() {
         freeTrialConversionWideEvent = FreeTrialConversionWideEventImpl(
             wideEventClient = wideEventClient,
-            subscriptionsFeature = { subscriptionsFeature },
+            subscriptionsFeature = lazy { subscriptionsFeature },
             authRepository = authRepository,
             timeProvider = timeProvider,
             dispatchers = coroutineRule.testDispatcherProvider,

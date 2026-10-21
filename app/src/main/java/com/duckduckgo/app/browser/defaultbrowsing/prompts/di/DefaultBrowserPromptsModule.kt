@@ -20,16 +20,14 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsAppUsageDao
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import javax.inject.Qualifier
 
 @ContributesTo(AppScope::class)
-@Module
+@BindingContainer
 object DefaultBrowserPromptsModule {
 
     private val Context.defaultBrowserPromptsDataStore: DataStore<Preferences> by preferencesDataStore(
@@ -39,11 +37,6 @@ object DefaultBrowserPromptsModule {
     @Provides
     @DefaultBrowserPrompts
     fun providesDefaultBrowserPromptsDataStore(context: Context): DataStore<Preferences> = context.defaultBrowserPromptsDataStore
-
-    @Provides
-    fun providesDefaultBrowserPromptsAppUsageDao(
-        database: AppDatabase,
-    ): DefaultBrowserPromptsAppUsageDao = database.defaultBrowserPromptsAppUsageDao()
 }
 
 @Qualifier

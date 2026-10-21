@@ -341,7 +341,6 @@ class SubscriptionOnboardingViewModelTest {
             advanceUntilIdle()
             assertFalse(handoffRan)
 
-            // Advancing re-emits InProgress for the next step, which is what arms the hand-off.
             orchestrator.stateFlow.value = inProgressState(canGoBack = true)
             assertTrue(awaitItem() is SubscriptionOnboardingViewModel.Command.ShowStep)
             assertFalse(handoffRan)
@@ -368,11 +367,9 @@ class SubscriptionOnboardingViewModelTest {
 
             controller.onStepFinished("duck_ai", COMPLETED) { handoffRan = true }
             advanceUntilIdle()
-            // Advancing re-emits InProgress for the next step, which is what arms the hand-off.
             orchestrator.stateFlow.value = inProgressState(canGoBack = true)
             assertTrue(awaitItem() is SubscriptionOnboardingViewModel.Command.ShowStep)
 
-            // Back is ignored while the hand-off is in flight, so it emits nothing and the hand-off still runs.
             controller.onBack()
             advanceUntilIdle()
             val command = awaitItem()
@@ -416,8 +413,6 @@ class SubscriptionOnboardingViewModelTest {
         )
     }
 
-    // Mockito returns false for an unstubbed Boolean, so back navigation has to be stubbed back to the
-    // interface default.
     private fun stepPluginMock(
         allowsBackNavigation: Boolean = true,
         stepId: String = "welcome",

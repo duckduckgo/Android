@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import androidx.lifecycle.*
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.TimeDiffFormatter
 import com.duckduckgo.di.scopes.FragmentScope

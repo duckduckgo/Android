@@ -30,9 +30,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.view.addClickableSpan
@@ -44,8 +44,6 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.di.DaggerMap
-import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
@@ -117,13 +115,13 @@ class SyncActivity : DuckDuckGoActivity() {
     private val viewModel by bindViewModel<SyncActivityViewModel>()
 
     @Inject
-    lateinit var syncSettingsPlugin: DaggerMap<Int, SyncSettingsPlugin>
+    lateinit var syncSettingsPlugin: Map<Int, SyncSettingsPlugin>
 
     @Inject
     lateinit var syncDesktopAppPromotionLauncher: SyncDesktopAppPromotionLauncher
 
     @Inject
-    lateinit var syncMessagesPlugin: DaggerSet<SyncMessagePlugin>
+    lateinit var syncMessagesPlugin: Set<SyncMessagePlugin>
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -537,6 +535,7 @@ class SyncActivity : DuckDuckGoActivity() {
                 restoreSavedAccountLauncher.launch(
                     PreviousSessionReadyContract.Input(
                         syncEntryPoint = command.syncEntryPoint,
+                        isAuthRequired = command.isAuthRequired,
                     ),
                 )
             }

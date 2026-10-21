@@ -20,7 +20,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
 enum class StatisticsPixelName(override val pixelName: String) : PixelName {
@@ -30,7 +30,7 @@ enum class StatisticsPixelName(override val pixelName: String) : PixelName {
     ATB_PRE_INITIALIZER_PLUGIN_TIMEOUT("timeout_atb_pre_initializer_plugin"),
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class AtbInitializerPluginPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(

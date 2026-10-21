@@ -25,17 +25,17 @@ import com.duckduckgo.history.impl.store.ALL_MIGRATIONS
 import com.duckduckgo.history.impl.store.HistoryDataStore
 import com.duckduckgo.history.impl.store.HistoryDatabase
 import com.duckduckgo.history.impl.store.SharedPreferencesHistoryDataStore
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class HistoryModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideHistoryRepository(
         historyDatabase: HistoryDatabase,
         dispatcherProvider: DispatcherProvider,
@@ -48,7 +48,7 @@ class HistoryModule {
         )
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideDatabase(context: Context): HistoryDatabase {
         return Room.databaseBuilder(context, HistoryDatabase::class.java, "history.db")
@@ -58,7 +58,7 @@ class HistoryModule {
             .build()
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideHistoryDataStore(context: Context): HistoryDataStore {
         return SharedPreferencesHistoryDataStore(context)

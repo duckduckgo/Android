@@ -43,6 +43,9 @@ interface PirFreemiumDataStore {
     /** Only moves forward: a no-op once [PirFreemiumFirstScanResult.MATCHES_FOUND] has been recorded. */
     fun recordFirstScanResult(result: PirFreemiumFirstScanResult)
 
+    /** Forgets the recorded outcome but keeps activation, so a tester can record either result. */
+    fun clearFirstScanResult()
+
     fun reset()
 }
 
@@ -84,6 +87,12 @@ internal class RealPirFreemiumDataStore(
         // committed synchronously as the scan (:pir) writes it and Settings (:main) reads it
         preferences.edit(commit = true) {
             putString(KEY_FIRST_SCAN_RESULT, result.name)
+        }
+    }
+
+    override fun clearFirstScanResult() {
+        preferences.edit(commit = true) {
+            remove(KEY_FIRST_SCAN_RESULT)
         }
     }
 

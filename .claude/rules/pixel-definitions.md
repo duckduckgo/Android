@@ -187,7 +187,7 @@ Check that:
 - `failure_reason` is defined when the flow can end in failure
 - custom `feature.data.ext.*` fields use bounded enums where possible
 - the sample rate is documented
-- the CLAUDE.md privacy invariants hold for every field
+- the AGENTS.md privacy invariants hold for every field
 
 See the existing `wide_*.json5` files for the current shape.
 
