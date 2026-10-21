@@ -193,7 +193,6 @@ class TabSwitcherActivity :
             trackerCountAnimator = trackerCountAnimator,
             addressDisplayFormatter = addressDisplayFormatter,
             duckAiTabGridItemRenderer = duckAiTabGridItemRenderer,
-            browserMode = currentBrowserMode,
         )
     }
 

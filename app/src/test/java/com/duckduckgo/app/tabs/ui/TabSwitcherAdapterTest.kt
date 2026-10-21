@@ -44,7 +44,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Compa
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
-import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemKey
 import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemRenderer
@@ -86,7 +85,6 @@ class TabSwitcherAdapterTest {
             trackerCountAnimator = trackerCountAnimator,
             addressDisplayFormatter = addressDisplayFormatter,
             duckAiTabGridItemRenderer = duckAiTabGridItemRenderer,
-            browserMode = BrowserMode.FIRE,
         )
     }
 
@@ -195,7 +193,7 @@ class TabSwitcherAdapterTest {
         adapter.onBindViewHolder(holder, 0)
 
         verify(duckAiTabGridItemView).bind(
-            key = eq(DuckAiTabGridItemKey(tabId = "1", url = "https://duck.ai/?chatID=abc", mode = BrowserMode.FIRE)),
+            key = eq(DuckAiTabGridItemKey(tabId = "1", url = "https://duck.ai/?chatID=abc")),
             state = eq(
                 DuckAiTabGridItemState(
                     isUnread = true,

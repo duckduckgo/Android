@@ -18,7 +18,6 @@ package com.duckduckgo.duckchat.api.tabswitcher
 
 import android.content.Context
 import android.view.View
-import com.duckduckgo.browsermode.api.BrowserMode
 import kotlinx.coroutines.CoroutineScope
 
 /**
@@ -34,7 +33,6 @@ interface DuckAiTabGridItemRenderer {
 data class DuckAiTabGridItemKey(
     val tabId: String,
     val url: String?,
-    val mode: BrowserMode,
 )
 
 interface DuckAiTabGridItemView {

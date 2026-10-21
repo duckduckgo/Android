@@ -77,7 +77,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel.Companion.ANIMATED_TILE_DEFAULT_ALPHA
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
-import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
@@ -112,7 +111,6 @@ class TabSwitcherAdapter(
     private val trackerCountAnimator: TrackerCountAnimator,
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val duckAiTabGridItemRenderer: DuckAiTabGridItemRenderer,
-    private val browserMode: BrowserMode,
 ) : Adapter<ViewHolder>() {
 
     @Volatile
@@ -311,7 +309,7 @@ class TabSwitcherAdapter(
 
     private fun bindRichDuckAiGridTab(holder: TabSwitcherViewHolder.RichDuckAiGridViewHolder, tab: Tab) {
         holder.item.bind(
-            key = DuckAiTabGridItemKey(tabId = tab.id, url = tab.tabEntity.url, mode = browserMode),
+            key = DuckAiTabGridItemKey(tabId = tab.id, url = tab.tabEntity.url),
             state = DuckAiTabGridItemState(
                 isUnread = !tab.tabEntity.viewed,
                 selection = if (tab is SelectableTab) Selectable(tab.isSelected) else Selection.None,

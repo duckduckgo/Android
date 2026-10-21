@@ -24,7 +24,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemCallbacks
 import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemKey
@@ -222,7 +221,7 @@ class DuckAiTabGridCardViewTest {
     }
 
     private companion object {
-        val KEY = DuckAiTabGridItemKey(tabId = "tab", url = "https://duck.ai/?chatID=chat-1", mode = BrowserMode.REGULAR)
-        val OTHER_KEY = DuckAiTabGridItemKey(tabId = "other", url = "https://duck.ai/?chatID=chat-2", mode = BrowserMode.REGULAR)
+        val KEY = DuckAiTabGridItemKey(tabId = "tab", url = "https://duck.ai/?chatID=chat-1")
+        val OTHER_KEY = DuckAiTabGridItemKey(tabId = "other", url = "https://duck.ai/?chatID=chat-2")
     }
 }

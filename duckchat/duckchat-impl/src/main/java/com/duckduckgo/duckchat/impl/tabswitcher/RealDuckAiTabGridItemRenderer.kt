@@ -21,9 +21,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.LruCache
 import androidx.core.net.toUri
-import com.duckduckgo.browsermode.api.BrowserMode
-import com.duckduckgo.browsermode.api.FireMode
-import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -50,8 +47,7 @@ import javax.inject.Inject
 @ContributesBinding(ActivityScope::class, binding = binding<DuckAiTabGridItemRenderer>())
 @SingleIn(ActivityScope::class)
 class RealDuckAiTabGridItemRenderer @Inject constructor(
-    @param:RegularMode private val regularChatStore: DuckAiChatStore,
-    @param:FireMode private val fireChatStore: DuckAiChatStore,
+    private val chatStore: DuckAiChatStore,
     private val duckChatFeature: DuckChatFeature,
     private val voiceSessionStateManager: VoiceSessionStateManager,
     private val duckChat: DuckChat,
@@ -60,14 +56,15 @@ class RealDuckAiTabGridItemRenderer @Inject constructor(
 
     // Lives as long as the tab switcher, so each chat is read and parsed once per opening and shows its state at that point.
     // A chat whose read throws is kept as Fallback, since every rebind would otherwise retry and log it.
-    private val contents = ConcurrentHashMap<Pair<BrowserMode, String>, RealDuckAiTabGridItemContent>()
+    private val contents = ConcurrentHashMap<String, RealDuckAiTabGridItemContent>()
 
     // Checked once per opening rather than for every Duck.ai tab on every list emission.
-    private val nativeStorageReady = ConcurrentHashMap<BrowserMode, Boolean>()
+    @Volatile
+    private var nativeStorageReady: Boolean? = null
 
     // Holders are recreated whenever the view type changes, such as entering selection mode, so each would otherwise re-read and re-decode.
-    private val thumbnails = object : LruCache<Pair<BrowserMode, String>, Bitmap>(THUMBNAIL_CACHE_BYTES) {
-        override fun sizeOf(key: Pair<BrowserMode, String>, value: Bitmap): Int = value.byteCount
+    private val thumbnails = object : LruCache<String, Bitmap>(THUMBNAIL_CACHE_BYTES) {
+        override fun sizeOf(key: String, value: Bitmap): Int = value.byteCount
     }
 
     override fun create(context: Context, coroutineScope: CoroutineScope): DuckAiTabGridItemView = DuckAiTabGridCardView(
@@ -80,13 +77,13 @@ class RealDuckAiTabGridItemRenderer @Inject constructor(
     override fun peek(key: DuckAiTabGridItemKey): RealDuckAiTabGridItemContent? {
         if (voiceSessionStateManager.isVoiceSessionActive(key.tabId)) return RealDuckAiTabGridItemContent.ActiveVoice
         val chatId = key.chatId() ?: return RealDuckAiTabGridItemContent.Empty
-        when (nativeStorageReady[key.mode]) {
+        when (nativeStorageReady) {
             null -> return null
             false -> return RealDuckAiTabGridItemContent.Fallback
             true -> Unit
         }
-        return when (val content = contents[key.mode to chatId]) {
-            is RealDuckAiTabGridItemContent.ImageChat -> thumbnails[key.mode to content.fileRef]?.let { content.copy(thumbnail = it) }
+        return when (val content = contents[chatId]) {
+            is RealDuckAiTabGridItemContent.ImageChat -> thumbnails[content.fileRef]?.let { content.copy(thumbnail = it) }
             else -> content
         }
     }
@@ -105,32 +102,29 @@ class RealDuckAiTabGridItemRenderer @Inject constructor(
 
     private suspend fun resolve(key: DuckAiTabGridItemKey): RealDuckAiTabGridItemContent {
         val chatId = key.chatId() ?: return RealDuckAiTabGridItemContent.Empty
-        val store = storeFor(key.mode)
-        if (!isNativeStorageReady(store, key.mode)) return RealDuckAiTabGridItemContent.Fallback
+        if (!isNativeStorageReady()) return RealDuckAiTabGridItemContent.Fallback
 
-        val contentKey = key.mode to chatId
-        val content = contents[contentKey] ?: run {
+        val content = contents[chatId] ?: run {
             // A chat that isn't stored yet may be by the next bind, so it isn't kept.
-            val read = readContent(store, chatId) ?: return RealDuckAiTabGridItemContent.Fallback
+            val read = readContent(chatId) ?: return RealDuckAiTabGridItemContent.Fallback
             // A reply still streaming would otherwise stay on Thinking for the rest of the opening.
-            if (read !is RealDuckAiTabGridItemContent.Thinking) contents[contentKey] = read
+            if (read !is RealDuckAiTabGridItemContent.Thinking) contents[chatId] = read
             read
         }
         return when (content) {
-            is RealDuckAiTabGridItemContent.ImageChat -> content.copy(thumbnail = loadThumbnail(content.fileRef, key.mode))
+            is RealDuckAiTabGridItemContent.ImageChat -> content.copy(thumbnail = loadThumbnail(content.fileRef))
             else -> content
         }
     }
 
     private fun DuckAiTabGridItemKey.chatId(): String? = url?.toUri()?.toChatIdOrNull(duckChat)
 
-    private suspend fun loadThumbnail(fileRef: String, mode: BrowserMode): Bitmap? {
-        val key = mode to fileRef
-        thumbnails[key]?.let { return it }
+    private suspend fun loadThumbnail(fileRef: String): Bitmap? {
+        thumbnails[fileRef]?.let { return it }
         // A failure leaves the logo in place rather than falling back to the screenshot, keeping the title and label.
         return try {
-            val bytes = storeFor(mode).readFileRef(fileRef)?.bytes ?: return null
-            decodeSampled(bytes)?.also { thumbnails.put(key, it) }
+            val bytes = chatStore.readFileRef(fileRef)?.bytes ?: return null
+            decodeSampled(bytes)?.also { thumbnails.put(fileRef, it) }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -161,8 +155,8 @@ class RealDuckAiTabGridItemRenderer @Inject constructor(
     }
 
     // A chat that can't be read, such as a row over the CursorWindow limit, falls back to the screenshot.
-    private suspend fun readContent(store: DuckAiChatStore, chatId: String): RealDuckAiTabGridItemContent? = try {
-        store.getChatPreview(chatId)?.toContent()
+    private suspend fun readContent(chatId: String): RealDuckAiTabGridItemContent? = try {
+        chatStore.getChatPreview(chatId)?.toContent()
     } catch (e: CancellationException) {
         throw e
     } catch (e: Exception) {
@@ -170,13 +164,8 @@ class RealDuckAiTabGridItemRenderer @Inject constructor(
         RealDuckAiTabGridItemContent.Fallback
     }
 
-    private suspend fun isNativeStorageReady(store: DuckAiChatStore, mode: BrowserMode): Boolean =
-        nativeStorageReady.getOrPut(mode) { store.hasMigrated() && duckChatFeature.useNativeStorageChatData().isEnabled() }
-
-    private fun storeFor(mode: BrowserMode): DuckAiChatStore = when (mode) {
-        BrowserMode.REGULAR -> regularChatStore
-        BrowserMode.FIRE -> fireChatStore
-    }
+    private suspend fun isNativeStorageReady(): Boolean = nativeStorageReady
+        ?: (chatStore.hasMigrated() && duckChatFeature.useNativeStorageChatData().isEnabled()).also { nativeStorageReady = it }
 
     // A chat with nothing to preview shows the empty card rather than the screenshot.
     private fun DuckAiChatPreview.toContent(): RealDuckAiTabGridItemContent {
