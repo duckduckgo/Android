@@ -121,8 +121,8 @@ class WgVpnNetworkStack @Inject constructor(
 
         if (result.selectedPort != config.currentEndpointPort()) {
             logcat { "Port probing: switching to ${result.selectedPort}" }
-            if (result.selectedPort != wgTunnelConfigLazy.get().getServerDefaultPort()) {
-                netpPixels.get().reportSwitchedToFallbackPort()
+            if (result.selectedPort != wgTunnelConfigLazy.value.getServerDefaultPort()) {
+                netpPixels.value.reportSwitchedToFallbackPort()
             }
             config.replacingEndpointPort(result.selectedPort)
         } else {
