@@ -19,7 +19,7 @@ package com.duckduckgo.networkprotection.impl.portprobing
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnSocketProtector
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
