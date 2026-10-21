@@ -26,6 +26,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.logcat
@@ -48,7 +49,9 @@ class ReinstallAtbListener @Inject constructor(
             .adapter(ReinstallerVariantProtectionSettings::class.java)
     }
 
-    override suspend fun beforeAtbInit() = withContext(dispatcherProvider.io()) {
+    // The ATB is only sent once this returns, so finishing past the time limit costs nothing. Being cancelled would drop
+    // "ru" for a returning user: the check can still be waiting on another caller, or already be done and saved.
+    override suspend fun beforeAtbInit() = withContext(dispatcherProvider.io() + NonCancellable) {
         backupDataStore.clearBackupPreferences()
 
         if (appBuildConfig.isAppReinstall()) {
