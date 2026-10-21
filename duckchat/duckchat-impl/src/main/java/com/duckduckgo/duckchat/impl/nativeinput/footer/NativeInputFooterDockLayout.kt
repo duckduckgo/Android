@@ -24,7 +24,7 @@ import android.view.ViewTreeObserver
 import android.widget.LinearLayout
 import androidx.core.view.isVisible
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputLayout
 import com.google.android.material.card.MaterialCardView
 
 /**
@@ -195,7 +195,7 @@ class NativeInputFooterDockLayout @JvmOverloads constructor(
         fun ViewGroup.findCard(): MaterialCardView? {
             for (index in 0 until childCount) {
                 val child = getChildAt(index)
-                if (child is MaterialCardView && child.childCount == 1 && child.getChildAt(0) is NativeInputModeWidget) {
+                if (child is NativeInputLayout) {
                     return child
                 }
                 if (child is ViewGroup) {
