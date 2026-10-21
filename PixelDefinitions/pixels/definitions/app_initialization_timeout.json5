@@ -17,8 +17,31 @@
                 "key": "plugin",
                 "description": "The class name of the plugin which timed out",
                 "type": "string",
-                "enum": ["AuraExperimentManager", "EmptyReferrerStateListener", "PlayStoreAppReferrerStateListener", "ReinstallAtbListener"]
+                "enum": [
+                    "AuraExperimentManager",
+                    "EmptyReferrerStateListener",
+                    "PlayStoreAppReferrerStateListener",
+                    "ReinstallAtbListener",
+                    "SamsungStoreInstallAttribution"
+                ]
             }
         ]
+    },
+    "atb_reinstall_check_slow": {
+        "description": "The reinstall check before the first ATB call took longer than its 1.5s time limit. The check still finishes and the ATB waits for it. Fires at most once per install, because the check only runs on the first ATB setup. returning_user is the check's answer, not whether the ru variant was applied: a reinstaller with a protected experiment variant keeps that variant. timeout_atb_pre_initializer_plugin with plugin=ReinstallAtbListener can fire for the same event, but only when the step had to wait for another caller's check; when the step only blocks, it is not sent",
+        "owners": ["anikiki"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "returningUser",
+            {
+                "key": "duration",
+                "description": "How long the reinstall step took, in seconds",
+                "type": "string",
+                "enum": ["1.5-3", "3-5", "5-10", "10-30", "30+"]
+            }
+        ],
+        "expires": "2027-04-30"
     }
 }
