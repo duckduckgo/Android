@@ -611,7 +611,8 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenImportBookmarksClickedThenPixelSent() {
+    fun whenImportBookmarksClickedThenPixelSent() = runTest {
+        whenever(importFromGoogle.isBookmarksImportAvailable()).thenReturn(false)
         testee.onImportBookmarksClicked()
 
         verify(pixel).fire(SavedSitesPixelName.BOOKMARK_MENU_IMPORT_CLICKED)
