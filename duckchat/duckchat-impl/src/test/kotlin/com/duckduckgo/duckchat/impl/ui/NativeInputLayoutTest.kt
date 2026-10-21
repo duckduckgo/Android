@@ -73,6 +73,18 @@ class NativeInputLayoutTest {
     }
 
     @Test
+    fun `omnibar position switches between the omnibar surfaces only`() {
+        val omnibar = NativeInputLayout(lightContext())
+        val contextual = NativeInputLayout(lightContext()).apply { surface = Surface.CONTEXTUAL }
+
+        omnibar.setOmnibarPosition(isBottom = true)
+        contextual.setOmnibarPosition(isBottom = true)
+
+        assertEquals(Surface.OMNIBAR_BOTTOM, omnibar.surface)
+        assertEquals(Surface.CONTEXTUAL, contextual.surface)
+    }
+
+    @Test
     fun `in a dark Fire Tab the card and widget take the fire card colour`() {
         val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), CommonR.style.Theme_DuckDuckGo_Dark_Fire)
         val fireCard = context.getColor(CommonR.color.omnibar_card_fire_dark)

@@ -56,6 +56,12 @@ class NativeInputLayout @JvmOverloads constructor(
         styled.recycle()
     }
 
+    /** The omnibar host only knows top or bottom at runtime; the contextual and edit surfaces never move. */
+    internal fun setOmnibarPosition(isBottom: Boolean) {
+        if (surface != Surface.OMNIBAR_TOP && surface != Surface.OMNIBAR_BOTTOM) return
+        surface = if (isBottom) Surface.OMNIBAR_BOTTOM else Surface.OMNIBAR_TOP
+    }
+
     private fun applySurfaceStyle() {
         val keyline1 = resources.getDimensionPixelSize(CommonR.dimen.keyline_1)
         val keyline2 = resources.getDimensionPixelSize(CommonR.dimen.keyline_2)

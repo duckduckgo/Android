@@ -1543,6 +1543,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, forceImageGeneration: Boolean) {
         activeTabId = tabId
+        (parent as? NativeInputLayout)?.setOmnibarPosition(isBottom)
         doOnAttach {
             viewModel.configure(tabId, isDuckAiMode, isBottom, forceImageGeneration)
             publishGatingSnapshot()
