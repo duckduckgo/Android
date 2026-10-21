@@ -17,9 +17,11 @@
 package com.duckduckgo.experiments.impl.reinstalls
 
 import com.duckduckgo.app.statistics.AtbInitializerListener
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.codegen.annotations.PriorityKey
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.moshi.Moshi
@@ -41,6 +43,8 @@ class ReinstallAtbListener @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
     private val reinstallerVariantProtectionFeature: ReinstallerVariantProtectionFeature,
+    private val pixel: Pixel,
+    private val currentTimeProvider: CurrentTimeProvider,
     moshi: Moshi,
 ) : AtbInitializerListener {
 
@@ -52,9 +56,11 @@ class ReinstallAtbListener @Inject constructor(
     // The ATB is only sent once this returns, so finishing past the time limit costs nothing. Being cancelled would drop
     // "ru" for a returning user: the check can still be waiting on another caller, or already be done and saved.
     override suspend fun beforeAtbInit() = withContext(dispatcherProvider.io() + NonCancellable) {
+        val startedAt = currentTimeProvider.elapsedRealtime()
         backupDataStore.clearBackupPreferences()
 
-        if (appBuildConfig.isAppReinstall()) {
+        val isReinstall = appBuildConfig.isAppReinstall()
+        if (isReinstall) {
             val currentVariant = statisticsDataStore.variant
             if (currentVariant == null || currentVariant !in getProtectedVariants()) {
                 statisticsDataStore.variant = REINSTALL_VARIANT
@@ -63,6 +69,25 @@ class ReinstallAtbListener @Inject constructor(
                 logcat(INFO) { "Skipping variant update for returning user: current variant '$currentVariant' is protected" }
             }
         }
+
+        val durationMillis = currentTimeProvider.elapsedRealtime() - startedAt
+        if (durationMillis > MAX_REINSTALL_WAIT_TIME_MS) {
+            pixel.fire(
+                ReinstallPixelName.REINSTALL_CHECK_SLOW,
+                parameters = mapOf(
+                    PARAM_RETURNING_USER to isReinstall.toString(),
+                    PARAM_DURATION to durationBucket(durationMillis),
+                ),
+            )
+        }
+    }
+
+    private fun durationBucket(durationMillis: Long): String = when {
+        durationMillis <= 3_000L -> "1.5-3"
+        durationMillis <= 5_000L -> "3-5"
+        durationMillis <= 10_000L -> "5-10"
+        durationMillis <= 30_000L -> "10-30"
+        else -> "30+"
     }
 
     private fun getProtectedVariants(): List<String> =
@@ -77,6 +102,8 @@ class ReinstallAtbListener @Inject constructor(
 
     companion object {
         private const val MAX_REINSTALL_WAIT_TIME_MS = 1_500L
+        private const val PARAM_RETURNING_USER = "returning_user"
+        private const val PARAM_DURATION = "duration"
     }
 }
 
