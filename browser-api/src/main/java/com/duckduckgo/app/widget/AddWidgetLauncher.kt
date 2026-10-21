@@ -38,7 +38,6 @@ enum class WidgetType(val value: String) {
     SEARCH("search"),
     SEARCH_ONLY("searchOnly"),
     SEARCH_AND_FAVORITES("searchAndFavorites"),
-    DUCK_AI("duckAi"),
     ;
 
     companion object {

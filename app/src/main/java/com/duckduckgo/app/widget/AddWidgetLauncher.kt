@@ -86,7 +86,7 @@ class AppWidgetManagerAddWidgetLauncher @Inject constructor(
                 widgetLabel = context.getString(R.string.searchOnlyWidgetLabel)
                 ComponentName(context, SearchOnlyWidget::class.java)
             }
-            WidgetType.SEARCH_AND_FAVORITES, WidgetType.DUCK_AI -> {
+            WidgetType.SEARCH_AND_FAVORITES -> {
                 widgetLabel = context.getString(R.string.favoritesWidgetLabel)
                 ComponentName(context, SearchAndFavoritesWidget::class.java)
             }
