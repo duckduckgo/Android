@@ -345,21 +345,9 @@
         "parameters": [
             "appVersion",
             {
-                "key": "loadLoading",
+                "keyPattern": "^load[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the page was still loading at 15 s. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "load8to15s",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the load ended 8 to 15 s after navigation start. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "load15sPlus",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the load ended 15 s or more after navigation start. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per load time bucket. The key is `load` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
@@ -379,21 +367,9 @@
         "parameters": [
             "appVersion",
             {
-                "key": "count1",
+                "keyPattern": "^count[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the phrases occurred once. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "count2to4",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the phrases occurred 2 to 4 times. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "count5Plus",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the phrases occurred 5 or more times. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per occurrence count bucket. The key is `count` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
@@ -407,21 +383,9 @@
         "parameters": [
             "appVersion",
             {
-                "key": "keywords5to9",
+                "keyPattern": "^keywords[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the page had 5 to 9 error terms. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "keywords10to24",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the page had 10 to 24 error terms. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "keywords25Plus",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the page had 25 or more error terms. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per error term count bucket. The key is `keywords` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
@@ -435,21 +399,9 @@
         "parameters": [
             "appVersion",
             {
-                "key": "text0to499",
+                "keyPattern": "^text[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the page had under 500 characters of rendered text. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "text500to999",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the page had 500 to 999 characters of rendered text. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "text1000to1999",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the page had 1000 to 1999 characters of rendered text. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per rendered text length bucket. The key is `text` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
@@ -463,21 +415,9 @@
         "parameters": [
             "appVersion",
             {
-                "key": "sheets1",
+                "keyPattern": "^sheets[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where one stylesheet was missing. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "sheets2to4",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where 2 to 4 stylesheets were missing. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "sheets5Plus",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where 5 or more stylesheets were missing. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per missing stylesheet count bucket. The key is `sheets` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
@@ -491,51 +431,15 @@
         "parameters": [
             "appVersion",
             {
-                "key": "count1",
+                "keyPattern": "^count[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where one image broke. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per broken image count bucket. The key is `count` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
-                "key": "count2to4",
+                "keyPattern": "^share[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where 2 to 4 images broke. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "count5to9",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where 5 to 9 images broke. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "count10Plus",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where 10 or more images broke. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "share10to25",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where 10 to 25% of the page's images broke. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "share25to50",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where 25 to 50% of the page's images broke. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "share50to90",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where 50 to 90% of the page's images broke. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "share90Plus",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where 90% or more of the page's images broke. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per broken image share bucket. The key is `share` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
@@ -549,33 +453,15 @@
         "parameters": [
             "appVersion",
             {
-                "key": "wording_status2xx",
+                "keyPattern": "^wording_status[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where 403 wording, or \"access is denied\", was served with a 2xx status. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per response status, for 403 wording or \"access is denied\", bucket. The key is `wording_status` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
-                "key": "wording_status4xx",
+                "keyPattern": "^bareForbidden_status[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where 403 wording, or \"access is denied\", was served with a 4xx status. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "wording_status5xx",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where 403 wording, or \"access is denied\", was served with a 5xx status. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "bareForbidden_status4xx",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where a title or heading starting \"Forbidden\" was served with a 4xx status. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "bareForbidden_status5xx",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where a title or heading starting \"Forbidden\" was served with a 5xx status. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per response status, for a title or heading starting \"Forbidden\", bucket. The key is `bareForbidden_status` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
@@ -589,33 +475,15 @@
         "parameters": [
             "appVersion",
             {
-                "key": "wording_status2xx",
+                "keyPattern": "^wording_status[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where 429 wording was served with a 2xx status. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per response status, for 429 wording, bucket. The key is `wording_status` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
-                "key": "wording_status4xx",
+                "keyPattern": "^bareTooManyRequests_status[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where 429 wording was served with a 4xx status. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "wording_status5xx",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where 429 wording was served with a 5xx status. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "bareTooManyRequests_status4xx",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where \"Too many requests\" in the title or a heading was served with a 4xx status. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "bareTooManyRequests_status5xx",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where \"Too many requests\" in the title or a heading was served with a 5xx status. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per response status, for \"Too many requests\" in the title or a heading, bucket. The key is `bareTooManyRequests_status` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
@@ -629,33 +497,15 @@
         "parameters": [
             "appVersion",
             {
-                "key": "littleText_text0to499",
+                "keyPattern": "^littleText_text[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the page had under 500 characters of rendered text and no error status. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per rendered text length, on a page with no error status, bucket. The key is `littleText_text` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
-                "key": "errorStatus_text0to499",
+                "keyPattern": "^errorStatus_text[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the page had an error status and under 500 characters of rendered text. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "errorStatus_text500to999",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the page had an error status and 500 to 999 characters of rendered text. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "errorStatus_text1000to1999",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the page had an error status and 1000 to 1999 characters of rendered text. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "errorStatus_text2000Plus",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the page had an error status and 2000 or more characters of rendered text. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per rendered text length, on a page with an error status, bucket. The key is `errorStatus_text` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
@@ -669,39 +519,15 @@
         "parameters": [
             "appVersion",
             {
-                "key": "load0to3s",
+                "keyPattern": "^load[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the load event ended under 3 s after navigation start. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per load time bucket. The key is `load` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
-                "key": "load3to8s",
+                "keyPattern": "^scripts[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the load event ended 3 to 8 s after navigation start. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "load8sPlus",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the load event ended 8 s or more after navigation start. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "scripts0",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where no scripts failed. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "scripts1",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where one script failed. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "scripts2Plus",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where two or more scripts failed. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per failed script count bucket. The key is `scripts` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
@@ -715,27 +541,9 @@
         "parameters": [
             "appVersion",
             {
-                "key": "size0",
+                "keyPattern": "^size[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the response was empty. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "sizeUnder1KB",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the response was under 1 KB. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "size1to100KB",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the response was 1 to 100 KB. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "size100KBPlus",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the response was 100 KB or more. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per response size bucket. The key is `size` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
@@ -749,33 +557,15 @@
         "parameters": [
             "appVersion",
             {
-                "key": "load0to3s",
+                "keyPattern": "^load[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the load event ended under 3 s after navigation start. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per load time bucket. The key is `load` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
-                "key": "load3to8s",
+                "keyPattern": "^firstPaint[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the load event ended 3 to 8 s after navigation start. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "load8sPlus",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the load event ended 8 s or more after navigation start. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "firstPaintNone",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the page painted nothing. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "firstPaintPainted",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the page painted a background. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per first paint state bucket. The key is `firstPaint` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
@@ -805,45 +595,15 @@
         "parameters": [
             "appVersion",
             {
-                "key": "delay300to999",
+                "keyPattern": "^delay[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the input waited 300 to 999 ms for its handlers. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per input delay bucket. The key is `delay` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
-                "key": "delay1to3s",
+                "keyPattern": "^duration[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the input waited 1 to 3 s for its handlers. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "delay3sPlus",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the input waited 3 s or more for its handlers. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "durationUnder500",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the input took under 500 ms to the next paint. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "duration500to999",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the input took 500 to 999 ms to the next paint. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "duration1to3s",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the input took 1 to 3 s to the next paint. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "duration3sPlus",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the input took 3 s or more to the next paint. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per input-to-paint duration bucket. The key is `duration` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
@@ -857,57 +617,21 @@
         "parameters": [
             "appVersion",
             {
-                "key": "scripts1",
+                "keyPattern": "^scripts[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where one script failed. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per failed script count bucket. The key is `scripts` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
-                "key": "scripts2to4",
+                "keyPattern": "^styles[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where 2 to 4 scripts failed. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per failed stylesheet and CSS load count bucket. The key is `styles` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
-                "key": "scripts5Plus",
+                "keyPattern": "^images[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where 5 or more scripts failed. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "styles1",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where one stylesheet or load from CSS failed. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "styles2to4",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where 2 to 4 stylesheets and loads from CSS failed. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "styles5Plus",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where 5 or more stylesheets and loads from CSS failed. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "images1",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where one image failed. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "images2to4",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where 2 to 4 images failed. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "images5Plus",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where 5 or more images failed. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per failed image count bucket. The key is `images` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
@@ -943,39 +667,15 @@
         "parameters": [
             "appVersion",
             {
-                "key": "status2xx",
+                "keyPattern": "^status[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the challenge was served with a 2xx status. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per response status bucket. The key is `status` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
-                "key": "status4xx",
+                "keyPattern": "^text[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the challenge was served with a 4xx status. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "status5xx",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the challenge was served with a 5xx status. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "text0to499",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the challenge page had under 500 characters of rendered text. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "text500to1999",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the challenge page had 500 to 1999 characters of rendered text. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "text2000Plus",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the challenge page had 2000 or more characters of rendered text. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per rendered text length bucket. The key is `text` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
@@ -989,39 +689,15 @@
         "parameters": [
             "appVersion",
             {
-                "key": "status2xx",
+                "keyPattern": "^status[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the block page was served with a 2xx status. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per response status bucket. The key is `status` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
-                "key": "status4xx",
+                "keyPattern": "^text[A-Za-z0-9]+$",
                 "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the block page was served with a 4xx status. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "status5xx",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the block page was served with a 5xx status. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "text0to499",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the block page had under 500 characters of rendered text. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "text500to1999",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the block page had 500 to 1999 characters of rendered text. Bucket boundaries are set by the eventHub remote config",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "text2000Plus",
-                "type": "string",
-                "description": "Bucketed count of detected page loads in the period where the block page had 2000 or more characters of rendered text. Bucket boundaries are set by the eventHub remote config",
+                "description": "Bucketed count of detected page loads in the period, per rendered text length bucket. The key is `text` followed by the bucket name in remote config. Bucket boundaries are set by the eventHub remote config",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             "eventHubAttributionPeriod"
