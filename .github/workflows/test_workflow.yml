@@ -15,12 +15,98 @@ env:
 jobs:
   test-workflow:
     runs-on: ubuntu-latest
-    name: Add here whatever steps you want to test
+    name: LGC check - ${{ matrix.case }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - case: pass
+            days_ahead: 0
+          - case: fail
+            days_ahead: 2
 
     steps:
+      - name: Check last LGC date
+        id: check_lgc_date
+        run: |
+          last_lgc=$(git ls-remote --tags --refs "https://github.com/${{ github.repository }}.git" 'LGC-*' \
+            | awk -F'refs/tags/' '{print $2}' \
+            | sort \
+            | tail -n 1)
+          # LGC-YYYY-MM-DDTHHMMSS
+          lgc_date=$(echo "$last_lgc" | cut -c5-14)
+          # Shift "today" forward to simulate missed nightlies
+          today=$(date -u -d "+${{ matrix.days_ahead }} days" +%F)
+          yesterday=$(date -u -d "$today -1 day" +%F)
+          echo "Case: ${{ matrix.case }} (today shifted by ${{ matrix.days_ahead }} days)"
+          echo "Last LGC: ${last_lgc:-none}"
+          echo "Simulated today: $today"
+          echo "Simulated yesterday: $yesterday"
+
+          echo "last_lgc=$last_lgc" >> "$GITHUB_OUTPUT"
+          if [ -n "$last_lgc" ]; then
+            days_ago=$(( ($(date -u -d "$today" +%s) - $(date -u -d "$lgc_date" +%s)) / 86400 ))
+            echo "Last LGC age: $days_ago days ago"
+            echo "last_lgc_age=$days_ago days ago" >> "$GITHUB_OUTPUT"
+          else
+            echo "last_lgc_age=none" >> "$GITHUB_OUTPUT"
+          fi
+          if [ -z "$last_lgc" ] || [[ "$lgc_date" < "$yesterday" ]]; then
+            echo "Result: LGC is stale, an Asana task will be created"
+            echo "is_stale=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Result: LGC is recent, no Asana task needed"
+            echo "is_stale=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout repository
+        if: ${{ steps.check_lgc_date.outputs.is_stale == 'true' && steps.check_lgc_date.outputs.last_lgc != '' }}
         uses: actions/checkout@v4
         with:
-          submodules: recursive
-          token: ${{ secrets.GT_DAXMOBILE }}
-          ref: ${{ github.event.inputs.ref }}
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        if: ${{ steps.check_lgc_date.outputs.is_stale == 'true' && steps.check_lgc_date.outputs.last_lgc != '' }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: List tasks not included since last LGC
+        id: tasks_since_lgc
+        if: ${{ steps.check_lgc_date.outputs.is_stale == 'true' && steps.check_lgc_date.outputs.last_lgc != '' }}
+        continue-on-error: true
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/release/requirements.txt
+
+          task_ids=$(python ./scripts/release/collect-lgc-asana-tasks.py \
+          --android-repo-path . \
+          --start-tag '${{ steps.check_lgc_date.outputs.last_lgc }}' \
+          --end-commit '${{ github.sha }}' \
+          --trigger-phrase 'Task/Issue URL:')
+          task_urls=$(echo "$task_ids" | jq -r 'unique | .[] | "https://app.asana.com/1/137249556945/task/\(.)"')
+          echo "$task_urls"
+
+          {
+            echo "task_urls<<EOF"
+            echo "${task_urls:-None}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create Asana task in Android Releases AOR
+        if: ${{ steps.check_lgc_date.outputs.is_stale == 'true' }}
+        uses: duckduckgo/native-github-asana-sync@v2.7.1
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ vars.GH_ANDROID_RELEASES_AOR_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_RELEASES_AOR_TRIAGE_SECTION_ID }}
+          asana-task-name: "[TEST 2] No LGC tagged since before yesterday"
+          asana-task-description: |
+            The nightly orchestrator failed to tag a new LGC and no LGC has been tagged since before yesterday.
+            Last LGC: ${{ steps.check_lgc_date.outputs.last_lgc_age }}
+            Failed run: https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+
+            Tasks not included in an LGC yet:
+            ${{ steps.tasks_since_lgc.outputs.task_urls || 'Could not collect tasks, see the failed run' }}
+          action: 'create-asana-task'
