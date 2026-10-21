@@ -17,8 +17,8 @@
 <!--
   Single wrapper for both omnibar positions. The manager (applyPositionChrome) sets the position-varying
   placement in code from isBottom: the row's side paddings, the card's resting margins, the inline nav
-  buttons' gravity and margins, and the footer's bottom margin; NativeInputLayout styles itself from the
-  surface it is given. A LinearLayout with the card at weight=1 lets the card reclaim the trailing space
+  buttons' gravity and margins, and the footer's bottom margin; NativeInputLayout styles itself for the
+  position the widget is configured with. A LinearLayout with the card at weight=1 lets the card reclaim the trailing space
   when the buttons go GONE, and honours the negative margins the card's shape logic (applyOmnibarShape)
   depends on, which a ConstraintLayout would clamp. The leading fire is present for both positions but stays
   GONE until the widget shows it, which it only does in the bottom Duck.ai layout.

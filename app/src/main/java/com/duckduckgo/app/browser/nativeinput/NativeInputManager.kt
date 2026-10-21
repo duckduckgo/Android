@@ -66,7 +66,6 @@ import com.duckduckgo.duckchat.api.NativeInputEventListener
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.toChatIdOrNull
-import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputLayout
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -868,12 +867,12 @@ class RealNativeInputManager @Inject constructor(
     /**
      * One layout serves both positions; the per-position placement that used to live in the two wrapper
      * XMLs is set here from [isBottom]: the row's side paddings, the card's resting margins, the inline nav
-     * buttons' gravity and margins, and the footer's bottom margin. The card styles itself from its surface,
-     * and its shape and horizontal insets stay state-driven (NativeInputLayout.applyOmnibarShape); the
+     * buttons' gravity and margins, and the footer's bottom margin. The card styles itself for the position the
+     * widget is configured with, and its shape and horizontal insets stay state-driven (NativeInputLayout.applyOmnibarShape); the
      * leading fire is gated on bottom by the widget itself.
      */
     private fun applyPositionChrome(view: View, isBottom: Boolean) {
-        val card = view.findViewById<NativeInputLayout>(R.id.inputModeWidgetCard) ?: return
+        val card = view.findViewById<View>(R.id.inputModeWidgetCard) ?: return
         val buttons = view.findViewById<View>(R.id.inlineNavButtonsContainer) ?: return
         // The card sits in the row LinearLayout, nested inside the footer dock, so reach it via the card
         // rather than the root's first child (which is the dock).
@@ -883,7 +882,6 @@ class RealNativeInputManager @Inject constructor(
         val keyline1 = res.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
         val keyline2 = res.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
         footer?.updateLayoutParams<MarginLayoutParams> { bottomMargin = if (isBottom) keyline2 else 0 }
-        card.surface = if (isBottom) NativeInputLayout.Surface.OMNIBAR_BOTTOM else NativeInputLayout.Surface.OMNIBAR_TOP
         if (isBottom) {
             row.setPaddingRelative(keyline2, 0, keyline1, 0)
             card.updateLayoutParams<MarginLayoutParams> {
