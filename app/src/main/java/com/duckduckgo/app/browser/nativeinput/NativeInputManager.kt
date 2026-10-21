@@ -132,17 +132,7 @@ interface NativeInputManager {
         omnibar: Omnibar,
         rootView: ViewGroup,
         lifecycleOwner: LifecycleOwner,
-        onDisabled: () -> Unit = {},
     )
-
-    fun isNativeInputEnabled(): Boolean
-
-    /**
-     * Whether the native input should actually be used for the current context, as opposed to the
-     * legacy omnibar. True when the field is enabled AND either we're in Duck.ai or the config is not
-     * search-only. In search-only mode the browser omnibar falls back to the legacy text input.
-     */
-    fun isNativeInputActive(): Boolean
 
     /** True when the native input widget is currently attached (top or bottom omnibar). */
     fun isNativeInputShown(): Boolean
@@ -208,7 +198,6 @@ class RealNativeInputManager @Inject constructor(
     private val pixel: Pixel,
     private val nativeInputStateBugKillSwitch: NativeInputStateBugKillSwitch,
     private val nativeInputUrlClearingFeature: NativeInputUrlClearingFeature,
-    private val nativeInputOmnibarFeature: NativeInputOmnibarFeature,
     private val nativeInputEventListener: NativeInputEventListener,
     private val edgeToEdgeHandler: EdgeToEdgeHandler,
     private val duckAiChatStore: DuckAiChatStore,
@@ -216,7 +205,6 @@ class RealNativeInputManager @Inject constructor(
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
     private lateinit var layoutCoordinator: NativeInputLayoutCoordinator
-    private var isNativeInputFieldEnabled: Boolean = false
     private var isNativeChatInputEnabled: Boolean = false
     private var isNavBarFeatureEnabled: Boolean = false
     private var inputModeCapability: NativeInputState.InputMode = NativeInputState.InputMode.SEARCH_ONLY
@@ -262,24 +250,10 @@ class RealNativeInputManager @Inject constructor(
         omnibar: Omnibar,
         rootView: ViewGroup,
         lifecycleOwner: LifecycleOwner,
-        onDisabled: () -> Unit,
     ) {
         this.omnibarController = RealNativeInputOmnibarController(omnibar, rootView, nativeInputStateBugKillSwitch)
         this.rootView = rootView
         this.layoutCoordinator = NativeInputLayoutCoordinator(rootView, this.omnibarController)
-        duckChat.observeNativeInputFieldUserSettingEnabled()
-            .onEach { isEnabled ->
-                if (isNativeInputFieldEnabled && !isEnabled) {
-                    // Instant teardown before clearing the flag. Settings toggles often fire while the
-                    // tab is paused, so an animated exit's waitForLayout may never run; and once the
-                    // flag is false, hideNativeInput used to no-op and leave UTI chrome / a missing
-                    // address field on return to NTP.
-                    hideNativeInput(animate = false)
-                    onDisabled()
-                }
-                isNativeInputFieldEnabled = isEnabled
-            }
-            .launchIn(lifecycleOwner.lifecycleScope)
         duckChat.observeNativeChatInputEnabled()
             .onEach { isEnabled ->
                 val wasEnabled = isNativeChatInputEnabled
@@ -296,13 +270,10 @@ class RealNativeInputManager @Inject constructor(
         duckChatInputModeState.inputModeCapability
             .onEach {
                 inputModeCapability = it
-                // Rebuild on the next focus (rather than half-update in place) when the new search mode no
-                // longer fits the open widget: native input is now inactive, or,with search-only on, it's
-                // the browser omnibar, whose two search layouts differ. An active Duck.ai input is unaffected,
-                // so just refresh its nav bar.
-                val rebuildOnRefocus = !isNativeInputActive() ||
-                    (isSearchOnlyRestoreEnabled() && !omnibarController.isDuckAiMode())
-                if (rebuildOnRefocus) {
+                // Rebuild the browser omnibar's widget on the next focus (rather than half-update in place),
+                // since its two search layouts differ. An active Duck.ai input is unaffected, so just refresh
+                // its nav bar.
+                if (!omnibarController.isDuckAiMode()) {
                     hideNativeInput(animate = false)
                 } else {
                     refreshNavBarVisibility()
@@ -319,21 +290,6 @@ class RealNativeInputManager @Inject constructor(
             .onEach { widgetFrom(rootView)?.let { widget -> updateVoiceButtons(widget) } }
             .launchIn(lifecycleOwner.lifecycleScope)
     }
-
-    override fun isNativeInputEnabled(): Boolean = isNativeInputFieldEnabled
-
-    override fun isNativeInputActive(): Boolean {
-        if (!isNativeInputFieldEnabled) return false
-        // Native input is used in Duck.ai mode, in Search & Duck.ai mode, and in search-only mode
-        // only when the search-only feature flag is on.
-        val inDuckAi = ::omnibarController.isInitialized && omnibarController.isDuckAiMode()
-        return inDuckAi ||
-            inputModeCapability == NativeInputState.InputMode.SEARCH_AND_DUCK_AI ||
-            (isSearchOnlyRestoreEnabled() && inputModeCapability == NativeInputState.InputMode.SEARCH_ONLY)
-    }
-
-    private fun isSearchOnlyRestoreEnabled(): Boolean =
-        nativeInputOmnibarFeature.self().isEnabled() && nativeInputOmnibarFeature.nativeInputSearchOnly().isEnabled()
 
     override fun isNativeInputShown(): Boolean {
         if (!::rootView.isInitialized) return false
@@ -401,9 +357,6 @@ class RealNativeInputManager @Inject constructor(
             ?: return false
         if (isExiting && animate) return !omnibarController.isDuckAiMode()
         isExiting = true
-
-        // Do not require isNativeInputFieldEnabled: teardown must still run after the setting flips
-        // off (and after a paused animated hide left the widget attached).
 
         // Clear focus before hiding the IME. In SEARCH_ONLY mode the input field still holds focus
         // when the widget is dismissed, and a focused, attached EditText remains the IME target —
@@ -533,7 +486,7 @@ class RealNativeInputManager @Inject constructor(
     }
 
     override fun onKeyboardVisibilityChanged(isVisible: Boolean) {
-        if (!isNativeInputFieldEnabled) return
+        if (!::rootView.isInitialized) return
         if (isExiting) return
         val widget = widgetFrom(rootView) ?: return
         val widgetRoot = widgetRoot
@@ -620,7 +573,7 @@ class RealNativeInputManager @Inject constructor(
         forceImageGeneration: Boolean,
         textSelection: String?,
     ) {
-        if (!isNativeInputFieldEnabled) return
+        if (!::rootView.isInitialized) return
 
         // When native chat input is disabled, Duck.ai renders its own web input — don't overlay
         // the native widget. Remove any widget left over from a previous (non-Duck.ai) state.

@@ -705,45 +705,33 @@ class BrowserTabViewModel @Inject constructor(
      * Always-on autocomplete pipeline tied to the omnibar's text. Kept in sync with the
      * omnibar via [onOmnibarTextRendered] so the native-input widget can restore the
      * omnibar's autocomplete results when it closes — even if in-widget typing temporarily
-     * overwrote [autoCompleteStateFlow]. Gated on the native-input user setting so that
-     * users without the widget don't pay for a duplicate pipeline.
+     * overwrote [autoCompleteStateFlow].
      */
     private val omnibarTextStateFlow = MutableStateFlow("")
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     internal val omnibarAutocompleteCache: StateFlow<AutoCompleteResult> =
-        duckChat.observeNativeInputFieldUserSettingEnabled()
-            .catch { t ->
-                logcat(WARN) { "Native input setting flow failed: ${t.asLog()}" }
-                emit(false)
-            }
-            .flatMapLatest { isNativeInputEnabled ->
-                if (!isNativeInputEnabled) {
-                    flowOf(AutoCompleteResult("", emptyList()))
+        omnibarTextStateFlow
+            .debounce(300)
+            .distinctUntilChanged()
+            .flatMapLatest { query ->
+                // Skip page URLs — omnibarViewState emits on every navigation, and
+                // running the fetch against full URLs would be both wasteful and
+                // wrong (the autocomplete API expects user-typed queries).
+                val isQueryLike = query.isNotBlank() &&
+                    !UriString.isWebUrl(query) &&
+                    !duckPlayer.isDuckPlayerUri(query)
+                if (!isQueryLike || !autoCompleteSettings.autoCompleteSuggestionsEnabled) {
+                    flowOf(AutoCompleteResult(query, emptyList()))
                 } else {
-                    omnibarTextStateFlow
-                        .debounce(300)
-                        .distinctUntilChanged()
-                        .flatMapLatest { query ->
-                            // Skip page URLs — omnibarViewState emits on every navigation, and
-                            // running the fetch against full URLs would be both wasteful and
-                            // wrong (the autocomplete API expects user-typed queries).
-                            val isQueryLike = query.isNotBlank() &&
-                                !UriString.isWebUrl(query) &&
-                                !duckPlayer.isDuckPlayerUri(query)
-                            if (!isQueryLike || !autoCompleteSettings.autoCompleteSuggestionsEnabled) {
-                                flowOf(AutoCompleteResult(query, emptyList()))
-                            } else {
-                                // Catch inside flatMapLatest so a failed fetch only drops this query's
-                                // result — without it, .catch + stateIn(Eagerly) would terminate the
-                                // pipeline for the ViewModel's lifetime (no equivalent of the existing
-                                // pipeline's ConflatedJob restart).
-                                autoComplete.autoComplete(query)
-                                    .catch { t ->
-                                        logcat(WARN) { "Failed to get omnibar autocomplete: ${t.asLog()}" }
-                                        emit(AutoCompleteResult(query, emptyList()))
-                                    }
-                            }
+                    // Catch inside flatMapLatest so a failed fetch only drops this query's
+                    // result — without it, .catch + stateIn(Eagerly) would terminate the
+                    // pipeline for the ViewModel's lifetime (no equivalent of the existing
+                    // pipeline's ConflatedJob restart).
+                    autoComplete.autoComplete(query)
+                        .catch { t ->
+                            logcat(WARN) { "Failed to get omnibar autocomplete: ${t.asLog()}" }
+                            emit(AutoCompleteResult(query, emptyList()))
                         }
                 }
             }
@@ -3915,7 +3903,6 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun showOrHideKeyboard(cta: Cta?, reportLandingFocus: Boolean = true) {
         val shouldHideKeyboard = cta?.shouldDropAddressBarFocusWhenShown() == true ||
-            duckAiFeatureState.showInputScreen.value ||
             currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark ||
             (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard)
 
@@ -5971,10 +5958,8 @@ class BrowserTabViewModel @Inject constructor(
             command.value = HideKeyboardForChat
         }
 
-        if (!duckAiFeatureState.showInputScreen.value) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED_DAILY, type = Daily())
-        }
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED)
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED_DAILY, type = Daily())
 
         when {
             // Contextual chat is about the page you're viewing, so on a page it's only offered from

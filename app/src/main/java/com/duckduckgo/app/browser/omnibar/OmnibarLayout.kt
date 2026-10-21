@@ -171,7 +171,6 @@ class OmnibarLayout @JvmOverloads constructor(
         val showSpacer: Boolean,
         val showDuckSidebar: Boolean,
         val isDuckAiMode: Boolean,
-        val isNativeInputEnabled: Boolean,
         val isNativeChatInputEnabled: Boolean,
     )
 
@@ -895,7 +894,6 @@ class OmnibarLayout @JvmOverloads constructor(
                 showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
                 showDuckSidebar = viewState.showDuckAISidebar,
                 isDuckAiMode = viewState.viewMode is ViewMode.DuckAI,
-                isNativeInputEnabled = viewState.isNativeInputEnabled,
                 isNativeChatInputEnabled = viewState.isNativeChatInputEnabled,
             )
 
@@ -903,7 +901,6 @@ class OmnibarLayout @JvmOverloads constructor(
             (
                 newTransitionState.showFireIcon != previousTransitionState?.showFireIcon ||
                     newTransitionState.isDuckAiMode != previousTransitionState?.isDuckAiMode ||
-                    newTransitionState.isNativeInputEnabled != previousTransitionState?.isNativeInputEnabled ||
                     newTransitionState.isNativeChatInputEnabled != previousTransitionState?.isNativeChatInputEnabled ||
                     newTransitionState.showTabsMenu != previousTransitionState?.showTabsMenu ||
                     newTransitionState.showBrowserMenu != previousTransitionState?.showBrowserMenu ||
@@ -917,8 +914,8 @@ class OmnibarLayout @JvmOverloads constructor(
         voiceSearchButton.isVisible = viewState.showVoiceSearch
         tabsMenu.isVisible = newTransitionState.showTabsMenu
         // The fire/+ slot is shared: in a Duck.ai chat the + icon takes over from fire as the
-        // leading action, but only when the native input field is enabled. Users with the
-        // nativeInputField flag off keep the fire button even in a Duck.ai view. Driven by
+        // leading action, but only when the native chat input is enabled. Users with the
+        // nativeChatInput flag off keep the fire button even in a Duck.ai view. Driven by
         // viewMode (plus the flag) rather than a separate state flag so it can't drift out of
         // sync with other state-update paths.
         fireIconMenu.isVisible = shouldShowFireIcon(
@@ -1623,13 +1620,13 @@ class OmnibarLayout @JvmOverloads constructor(
         viewModel.setDraftTextIfNtpOrSerp(query)
     }
 
-    private fun enableTextInputClickCatcher(enabled: Boolean) {
-        omnibarTextInputClickCatcher.isVisible = enabled
+    private fun enableTextInputClickCatcher() {
+        omnibarTextInputClickCatcher.isVisible = true
 
         omnibarTextInput.apply {
-            isEnabled = !enabled
-            isFocusable = !enabled
-            isFocusableInTouchMode = !enabled
+            isEnabled = false
+            isFocusable = false
+            isFocusableInTouchMode = false
         }
     }
 
@@ -1652,9 +1649,9 @@ class OmnibarLayout @JvmOverloads constructor(
         applyEnabled(fireIconMenu, fireEnabled)
         omnibarTextInput.alpha = if (nonFireEnabled) 1.0f else LOCKED_INPUT_ALPHA
 
-        // Show the click catcher whenever a click catcher is requested OR the omnibar is
-        // locked (so the locked state can intercept and ignore the click).
-        enableTextInputClickCatcher(viewState.showTextInputClickCatcher || isLocked)
+        // The click catcher always covers the text input: it routes a tap to the native input,
+        // or swallows it while the omnibar is locked.
+        enableTextInputClickCatcher()
 
         // When locked, the click catcher should not launch the input screen.
         if (isLocked) {
@@ -1800,7 +1797,7 @@ internal fun resolveRebrandPrivacyShieldLayout(
  *
  * Fire is the default leading action. The + icon only replaces it inside a Duck.ai view when the
  * native chat input is enabled; with nativeChatInput off (the web-input fallback) the user keeps
- * the fire button even in a Duck.ai view. nativeChatInput already implies nativeInputField.
+ * the fire button even in a Duck.ai view.
  */
 internal fun shouldShowFireIcon(
     showFireIcon: Boolean,

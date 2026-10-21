@@ -22,8 +22,7 @@ import com.duckduckgo.testseeder.api.TestSeederPlugin
 import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-// Native input is now controlled by the `nativeInputField` feature flag (default
-// true), not a user setting. This plugin is retained so existing Maestro flows
+// Native input is always on, so there is nothing to seed. This plugin is retained so existing Maestro flows
 // can keep passing `nativeInputToggle` without erroring; it's a no-op.
 @ContributesIntoSet(AppScope::class)
 class NativeInputToggleSeederPlugin @Inject constructor() : TestSeederPlugin {

@@ -120,7 +120,6 @@ exclusive. General plugin-point mechanics: `.claude/docs/plugin-system.md`.
 | The edit widget must not write shared browser state | No `selectedMode`/`inputQuery` pushes, ignores global `ChatState`, never launches the edit screen itself. |
 | Bottom-pinned input and insets | Use `EdgeToEdgeHandler.applyNavigationBarInsetsAsMargin` (`common/common-utils/.../EdgeToEdgeHandler.kt`); hand-rolled inset maths leaves the input behind the IME or nav bar on recent target SDKs. |
 | Removing or renaming a layout or id | Also compile instrumented tests: `./gradlew :app:compilePlayDebugAndroidTestKotlin`. Unit-test runs do not compile `androidTest`. |
-| Misleading name | `observeNativeInputFieldUserSettingEnabled()` returns the remote `nativeInputField` flag, not a user setting. |
 
 ## Talking to the Duck.ai frontend
 
@@ -137,17 +136,16 @@ change that compiles can still break or silently do nothing on the other side.
 
 ## Feature flags
 
-The master switches default on, so "it's behind a flag" is not a reason for thin coverage. Check
-`DuckChatFeature.kt` and `NativeInputOmnibarFeature.kt` for current defaults.
+Native input itself has no flag: the omnibar click catcher always routes to it, and the omnibar's leftover
+focus code is dead (see **Refactor in progress**). The flags below gate Duck.ai-side integrations and default on, so "it's behind a flag" is not a reason for thin coverage. Check
+`DuckChatFeature.kt` for current defaults.
 
 | Flag | Gates |
 |---|---|
-| `aiChat.nativeInputField` | Native input at all (master switch). |
 | `aiChat.nativeChatInput` | Native composer on Duck.ai pages (`native-input=true` param). |
 | `aiChat.contextualNativeInput` | Native input in the contextual sheet. |
 | `aiChat.nativePromptEditing` | Edit-message screen. |
 | `aiChat.nativeInputNavBar` | Persistent nav bar above the top omnibar input. |
-| `nativeInputOmnibar.nativeInputSearchOnly` | Native input for search-only users. |
 | `pluginPointNativeInput` + each plugin `featureName` | Individual controls (remote kill switches). |
 
 ## Testing
@@ -174,7 +172,6 @@ change needs them, check the linked task first.
 | Fire, tabs, menu and back: `onFireButtonTapped`, `onBackPressed`, `setNavBarVisible`, `bindTabCount`, the leading fire found by walking ancestors | Plugins contributed from `:app`, placed via host-resolved slots | https://app.asana.com/0/0/1218750568353646/f |
 | Onboarding lock rendered by the widget (`setInteractionLocked`) | Each plugin renders its own locked state from `interactionLock` | https://app.asana.com/0/0/1218750257810051/f |
 | Card chrome duplicated in every host layout, shaped by `applyOmnibarShape` and `applyPositionChrome` | One card owned and styled inside the widget | https://app.asana.com/0/0/1217275429788919/f |
-| Remote flags gating native input | Hardcode on and delete once rolled out | https://app.asana.com/0/0/1216509602671179/f |
 | Legacy focused state in `OmnibarLayout` | Omnibar becomes display-only; the widget owns all text input | https://app.asana.com/0/0/1215373984475612/f |
 | `DuckChat` god-interface in `duckchat-api` | Split into single-responsibility `DuckAi*` interfaces | https://app.asana.com/0/0/1215641620311419/f |
 

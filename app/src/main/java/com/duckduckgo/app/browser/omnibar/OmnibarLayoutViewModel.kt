@@ -30,7 +30,6 @@ import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
 import com.duckduckgo.app.browser.menu.BrowserViewMode
-import com.duckduckgo.app.browser.nativeinput.NativeInputOmnibarFeature
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
@@ -125,7 +124,6 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val standardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle,
     private val omnibarPreFillKillSwitch: OmnibarPreFillKillSwitch,
     private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
-    private val nativeInputOmnibarFeature: NativeInputOmnibarFeature,
     private val browserMode: BrowserMode,
     appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
 ) : ViewModel() {
@@ -257,11 +255,9 @@ class OmnibarLayoutViewModel @Inject constructor(
         val previouslyTrackersBlocked: Int = 0,
         val showShadows: Boolean = false,
         val isSearchOnly: Boolean = false,
-        val searchOnlyRestoreEnabled: Boolean = false,
         val showFindInPage: Boolean = false,
         val showDuckAIHeader: Boolean = false,
         val showDuckAISidebar: Boolean = false,
-        val isNativeInputEnabled: Boolean = false,
         val isNativeChatInputEnabled: Boolean = false,
         val useSoftwareRenderingMode: Boolean = false,
         val isProgressBarUpgradeEnabled: Boolean = false,
@@ -270,24 +266,14 @@ class OmnibarLayoutViewModel @Inject constructor(
         val isAnimationUpdateEnabled: Boolean = false,
     ) {
         /**
-         * The Duck.ai entry icon shows the chevron-down (contextual sheet) variant when the native
-         * input field setting is enabled, we're not on the new-tab page, and Duck.ai is available in
-         * the address bar (not search-only) — tapping it then opens the contextual sheet. In every
-         * other case (including search-only) it falls back to the standard chat icon. Derived from
-         * flags + viewMode rather than a stored flag so it can't drift out of sync.
+         * The Duck.ai entry icon shows the chevron-down (contextual sheet) variant when we're not on
+         * the new-tab page and Duck.ai is available in the address bar (not search-only) — tapping it
+         * then opens the contextual sheet. In every other case (including search-only) it falls back
+         * to the standard chat icon. Derived from viewMode rather than a stored flag so it can't drift
+         * out of sync.
          */
         val showContextualSheetIcon: Boolean
-            get() = isNativeInputEnabled && viewMode !is NewTab && !isSearchOnly
-
-        /**
-         * The click catcher routes an omnibar tap to the native input overlay. Shown when the native
-         * field is on and we should use it for the current context — i.e. we're in Duck.ai (always
-         * UTI) or not in search-only. In search-only the browser omnibar keeps the catcher hidden so
-         * its text input stays focusable and a tap focuses it directly. Derived from flags + viewMode
-         * so it can't drift out of sync.
-         */
-        val showTextInputClickCatcher: Boolean
-            get() = isNativeInputEnabled && (viewMode is ViewMode.DuckAI || !isSearchOnly || searchOnlyRestoreEnabled)
+            get() = viewMode !is NewTab && !isSearchOnly
 
         fun shouldUpdateOmnibarText(
             isFullUrlEnabled: Boolean,
@@ -349,20 +335,13 @@ class OmnibarLayoutViewModel @Inject constructor(
     init {
         logVoiceSearchAvailability()
         combine(
-            duckChat.observeNativeInputFieldUserSettingEnabled(),
             duckChat.observeNativeChatInputEnabled(),
             duckChatInputModeState.inputModeCapability,
-            combine(
-                nativeInputOmnibarFeature.self().enabled(),
-                nativeInputOmnibarFeature.nativeInputSearchOnly().enabled(),
-            ) { self, searchOnly -> self && searchOnly },
-        ) { nativeInputEnabled, nativeChatInputEnabled, inputModeCapability, searchOnlyRestoreEnabled ->
+        ) { nativeChatInputEnabled, inputModeCapability ->
             _viewState.update {
                 it.copy(
                     isSearchOnly = inputModeCapability == NativeInputState.InputMode.SEARCH_ONLY,
-                    isNativeInputEnabled = nativeInputEnabled,
                     isNativeChatInputEnabled = nativeChatInputEnabled,
-                    searchOnlyRestoreEnabled = searchOnlyRestoreEnabled,
                 )
             }
         }.launchIn(viewModelScope)
@@ -1227,18 +1206,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onDuckAiHeaderClicked() {
-        if (viewState.value.showTextInputClickCatcher) {
-            onTextInputClickCatcherClicked()
-        } else {
-            _viewState.update {
-                it.copy(
-                    showDuckAIHeader = false,
-                )
-            }
-            viewModelScope.launch {
-                command.send(Command.FocusInputField)
-            }
-        }
+        onTextInputClickCatcherClicked()
     }
 
     fun onTextInputClickCatcherClicked() {

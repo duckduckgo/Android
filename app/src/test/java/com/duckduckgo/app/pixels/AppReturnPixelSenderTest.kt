@@ -24,7 +24,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -56,7 +55,6 @@ class AppReturnPixelSenderTest {
     private val idleThresholdResolver: IdleThresholdResolver = mock()
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore = mock()
     private val duckChatInputModeState: DuckChatInputModeState = mock()
-    private val duckAiFeatureState: DuckAiFeatureState = mock()
     private val androidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val unsentForgetAllPixelStore: UnsentForgetAllPixelStore = mock()
 
@@ -67,7 +65,6 @@ class AppReturnPixelSenderTest {
         whenever(idleThresholdResolver.effectiveThresholdSeconds(anyOrNull())).thenReturn(1800L)
         whenever(showOnAppLaunchOptionDataStore.optionFlow).thenReturn(flowOf(ShowOnAppLaunchOption.NewTabPage))
         whenever(duckChatInputModeState.inputModeCapability).thenReturn(MutableStateFlow(NativeInputState.InputMode.SEARCH_ONLY))
-        whenever(duckAiFeatureState.nativeInputFieldEnabled).thenReturn(MutableStateFlow(false))
         whenever(unsentForgetAllPixelStore.lastClearTimestamp).thenReturn(0L)
         androidBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(State(enable = false))
 
@@ -77,7 +74,6 @@ class AppReturnPixelSenderTest {
             idleThresholdResolver = idleThresholdResolver,
             showOnAppLaunchOptionDataStore = showOnAppLaunchOptionDataStore,
             duckChatInputModeState = duckChatInputModeState,
-            duckAiFeatureState = duckAiFeatureState,
             androidBrowserConfigFeature = androidBrowserConfigFeature,
             unsentForgetAllPixelStore = unsentForgetAllPixelStore,
             dispatchers = coroutineRule.testDispatcherProvider,
@@ -98,7 +94,7 @@ class AppReturnPixelSenderTest {
             AppReturnPixelParameters.IDLE_THRESHOLD_SECONDS to "1800",
             AppReturnPixelParameters.AFTER_INACTIVITY_OPTION to "new_tab_page",
             AppReturnPixelParameters.FEATURE_ELIGIBLE to "false",
-            AppReturnPixelParameters.UNIFIED_INPUT_AVAILABLE to "false",
+            AppReturnPixelParameters.UNIFIED_INPUT_AVAILABLE to "true",
             AppReturnPixelParameters.TOGGLE_VISIBLE to "false",
             AppReturnPixelParameters.LAUNCH_SOURCE to "standard",
             Pixel.PixelParameter.PETAL to Pixel.PixelValues.PETAL_RANDOMIZE,
@@ -145,7 +141,6 @@ class AppReturnPixelSenderTest {
         whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(0L)
         whenever(duckChatInputModeState.inputModeCapability)
             .thenReturn(MutableStateFlow(NativeInputState.InputMode.SEARCH_AND_DUCK_AI))
-        whenever(duckAiFeatureState.nativeInputFieldEnabled).thenReturn(MutableStateFlow(true))
 
         testee.fireIfNeeded("standard")
         advanceUntilIdle()

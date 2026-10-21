@@ -11,7 +11,6 @@ import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
 import com.duckduckgo.app.browser.menu.BrowserViewMode
-import com.duckduckgo.app.browser.nativeinput.NativeInputOmnibarFeature
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchNativeInput
@@ -106,9 +105,7 @@ class OmnibarLayoutViewModelTest {
     private val inputModeCapabilityFlow = MutableStateFlow(NativeInputState.InputMode.SEARCH_AND_DUCK_AI)
     private val duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow = MutableStateFlow(true)
     private val duckAiShowOmnibarShortcutInAllStatesFlow = MutableStateFlow(true)
-    private val nativeInputFieldSettingFlow = MutableStateFlow(false)
     private val nativeChatInputEnabledFlow = MutableStateFlow(false)
-    private val fakeNativeInputOmnibarFeature = FakeFeatureToggleFactory.create(NativeInputOmnibarFeature::class.java)
     private val inputScreenUserSettingFlow = MutableStateFlow(false)
     private val activeVoiceSessionsFlow = MutableStateFlow<Set<String>>(emptySet())
     private val selectedTabFlow = MutableStateFlow<TabEntity?>(null)
@@ -152,10 +149,7 @@ class OmnibarLayoutViewModelTest {
         whenever(duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow)
         whenever(duckAiFeatureState.showOmnibarShortcutInAllStates).thenReturn(duckAiShowOmnibarShortcutInAllStatesFlow)
         whenever(urlDisplayRepository.isFullUrlEnabled).then { isFullUrlEnabledFlow }
-        whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputFieldSettingFlow)
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(nativeChatInputEnabledFlow)
-        fakeNativeInputOmnibarFeature.self().setRawStoredState(State(enable = false))
-        fakeNativeInputOmnibarFeature.nativeInputSearchOnly().setRawStoredState(State(enable = false))
         fakeAppBrandDesignUpdateToggles.addressBar().setRawStoredState(State(enable = false))
         whenever(duckChatInputModeState.inputModeCapability).thenReturn(inputModeCapabilityFlow)
         whenever(duckChat.activeVoiceChatSessions).thenReturn(activeVoiceSessionsFlow)
@@ -216,7 +210,6 @@ class OmnibarLayoutViewModelTest {
             standardizedLeadingIconToggle = fakeStandardizedLeadingIconToggle,
             omnibarPreFillKillSwitch = fakeOmnibarPreFillKillSwitch,
             progressBarUpgradeFeature = fakeProgressBarUpgradeFeature,
-            nativeInputOmnibarFeature = fakeNativeInputOmnibarFeature,
             browserMode = browserMode,
             appBrandDesignUpdateToggles = fakeAppBrandDesignUpdateToggles,
         )
@@ -1637,70 +1630,7 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenNativeInputFieldDisabledThenShowClickCatcherFalse() = runTest {
-        nativeInputFieldSettingFlow.value = false
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertFalse(viewState.showTextInputClickCatcher)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNativeInputFieldEnabledThenShowClickCatcherTrue() = runTest {
-        nativeInputFieldSettingFlow.value = true
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertTrue(viewState.showTextInputClickCatcher)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNativeInputFieldEnabledButSearchOnlyThenShowClickCatcherFalse() = runTest {
-        nativeInputFieldSettingFlow.value = true
-        inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_ONLY
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertFalse(viewState.showTextInputClickCatcher)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenSearchOnlyAndRestoreFlagEnabledThenShowClickCatcherTrue() = runTest {
-        fakeNativeInputOmnibarFeature.self().setRawStoredState(State(enable = true))
-        fakeNativeInputOmnibarFeature.nativeInputSearchOnly().setRawStoredState(State(enable = true))
-        nativeInputFieldSettingFlow.value = true
-        inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_ONLY
-        initializeViewModel()
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertTrue(viewState.showTextInputClickCatcher)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenSearchOnlyButInDuckAiViewModeThenShowClickCatcherTrue() = runTest {
-        nativeInputFieldSettingFlow.value = true
-        inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_ONLY
-        testee.onViewModeChanged(ViewMode.DuckAI)
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertTrue(viewState.showTextInputClickCatcher)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenSearchOnlyThenShowContextualSheetIconFalse() = runTest {
-        nativeInputFieldSettingFlow.value = true
         inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_ONLY
 
         testee.viewState.test {
@@ -2540,27 +2470,7 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenDuckAiHeaderPressedAndNativeInputDisabledThenFocusInputFieldCommandSent() = runTest {
-        nativeInputFieldSettingFlow.value = false
-        givenDuckAILoaded()
-        testee.onDuckAiHeaderClicked()
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertTrue(viewState.showDuckAISidebar)
-            assertFalse(viewState.showDuckAIHeader)
-        }
-
-        testee.commands().test {
-            val command = awaitItem()
-            assertTrue(command is Command.FocusInputField)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenDuckAiHeaderPressedAndNativeInputEnabledThenNativeInputShown() = runTest {
-        nativeInputFieldSettingFlow.value = true
+    fun whenDuckAiHeaderPressedThenNativeInputShown() = runTest {
         testee.onDuckAiHeaderClicked()
 
         testee.commands().test {

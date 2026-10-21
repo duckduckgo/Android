@@ -296,8 +296,7 @@ interface DuckChatInternal : DuckChat {
 
     /**
      * Returns whether the Duck.ai native chat input integration is enabled.
-     * True only when both the native input widget ([nativeInputField]) and the
-     * [nativeChatInput] toggle are enabled (and the widget is not suppressed).
+     * True only when the [nativeChatInput] toggle is enabled (and the widget is not suppressed).
      */
     fun isNativeChatInputEnabled(): Boolean
 
@@ -472,7 +471,6 @@ class RealDuckChat @Inject constructor(
     PrivacyConfigCallbackPlugin {
     private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
     private val _showSettings = MutableStateFlow(false)
-    private val _showInputScreen = MutableStateFlow(false)
     private val _showPopupMenuShortcut = MutableStateFlow(false)
     private val _showOmnibarShortcutOnNtpAndOnFocus = MutableStateFlow(false)
     private val _showOmnibarShortcutInAllStates = MutableStateFlow(false)
@@ -480,7 +478,6 @@ class RealDuckChat @Inject constructor(
 
     private val _showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
     private val _editPromptRequests = MutableSharedFlow<EditPromptRequest>(extraBufferCapacity = 1)
-    private val _nativeInputFieldEnabled = MutableStateFlow(false)
     private val _nativeDuckAiSidebar = MutableStateFlow(false)
     private val _nativeChatInputEnabled = MutableStateFlow(false)
     private val _nativeInputNavBarEnabled = MutableStateFlow(false)
@@ -515,7 +512,6 @@ class RealDuckChat @Inject constructor(
     private var isAutomaticContextAttachmentEnabled: Boolean = false
     private var duckAiNativeStorage: Boolean = false
     private var areMultipleContentAttachmentsEnabled: Boolean = false
-    private var isNativeInputFieldEnabled: Boolean = false
     private var isNativeChatInputEnabled: Boolean = false
     private var isContextualNativeInputEnabled: Boolean = false
     private var isNativePromptEditingEnabled: Boolean = false
@@ -614,8 +610,6 @@ class RealDuckChat @Inject constructor(
     override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> =
         duckChatFeatureRepository.observeAutomaticContextAttachmentUserSettingEnabled()
 
-    override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = _nativeInputFieldEnabled.asStateFlow()
-
     override fun observeNativeChatInputEnabled(): Flow<Boolean> = _nativeChatInputEnabled.asStateFlow()
 
     override fun observeNativeInputNavBarEnabled(): Flow<Boolean> = _nativeInputNavBarEnabled.asStateFlow()
@@ -680,8 +674,6 @@ class RealDuckChat @Inject constructor(
 
     override val showSettings: StateFlow<Boolean> = _showSettings.asStateFlow()
 
-    override val showInputScreen: StateFlow<Boolean> = _showInputScreen.asStateFlow()
-
     override val showPopupMenuShortcut: StateFlow<Boolean> = _showPopupMenuShortcut.asStateFlow()
 
     override val showOmnibarShortcutOnNtpAndOnFocus: StateFlow<Boolean> = _showOmnibarShortcutOnNtpAndOnFocus.asStateFlow()
@@ -699,8 +691,6 @@ class RealDuckChat @Inject constructor(
     override val showTextSelectionAction: StateFlow<Boolean> = _showTextSelectionAction.asStateFlow()
 
     override val allowDuckAiAsDigitalAssistant: StateFlow<Boolean> = _allowDuckAiAsDigitalAssistant.asStateFlow()
-
-    override val nativeInputFieldEnabled: StateFlow<Boolean> = _nativeInputFieldEnabled.asStateFlow()
 
     override val nativeDuckAiSidebar: StateFlow<Boolean> = _nativeDuckAiSidebar.asStateFlow()
 
@@ -1043,7 +1033,6 @@ class RealDuckChat @Inject constructor(
             _allowDuckAiAsDigitalAssistant.emit(featureEnabled && duckChatFeature.digitalAssistantDuckAi().isEnabled())
             isImageUploadEnabled = imageUploadFeature.self().isEnabled()
             isStandaloneMigrationEnabled = duckChatFeature.standaloneMigration().isEnabled()
-            _nativeInputFieldEnabled.value = duckChatFeature.nativeInputField().isEnabled()
             _nativeDuckAiSidebar.value = duckChatFeature.nativeDuckAiSidebar().isEnabled()
 
             keepSessionAliveInMinutes = settingsJson?.sessionTimeoutMinutes ?: DEFAULT_SESSION_ALIVE
@@ -1056,8 +1045,7 @@ class RealDuckChat @Inject constructor(
         withContext(dispatchers.io()) {
             isDuckChatUserEnabled = duckChatFeatureRepository.isDuckChatUserEnabled()
 
-            isNativeInputFieldEnabled = _nativeInputFieldEnabled.value
-            isNativeChatInputEnabled = isNativeInputFieldEnabled && duckChatFeature.nativeChatInput().isEnabled()
+            isNativeChatInputEnabled = duckChatFeature.nativeChatInput().isEnabled()
             _nativeChatInputEnabled.value = isNativeChatInputEnabled
             // Contextual native INPUT mode is gated by nativeChatInput AND the contextualNativeInput flag.
             // Read synchronously via isContextualNativeInputEnabled() — no flow needed (static per session).
@@ -1074,11 +1062,6 @@ class RealDuckChat @Inject constructor(
             } else {
                 NativeInputState.InputMode.SEARCH_ONLY
             }
-
-            val showInputScreen =
-                isInputScreenFeatureAvailable() && isDuckChatFeatureEnabled && isDuckChatUserEnabled &&
-                    inputScreenUserSettingEnabled && !isNativeInputFieldEnabled
-            _showInputScreen.emit(showInputScreen)
 
             val showInBrowserMenu =
                 duckChatFeatureRepository.shouldShowInBrowserMenu() &&

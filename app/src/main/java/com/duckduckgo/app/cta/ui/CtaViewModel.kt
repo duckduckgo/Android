@@ -56,7 +56,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.inputscreen.DuckAiOnboardingEndCtaVariant
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
@@ -110,7 +109,6 @@ class CtaViewModel @Inject constructor(
     private val deviceInfo: DeviceInfo,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     linearOnboardingOrchestrator: LinearOnboardingOrchestrator,
-    private val duckAiFeatureState: DuckAiFeatureState,
     private val onboardingPixelSender: OnboardingPixelSender,
     private val contextualOnboardingTimeLimit: ContextualOnboardingTimeLimit,
 ) {
@@ -136,12 +134,6 @@ class CtaViewModel @Inject constructor(
             .onEach { completeStageIfDaxOnboardingCompleted() }
             .launchIn(coroutineScope)
     }
-
-    /**
-     * Whether the legacy `InputScreenActivity` is in play. When false, the native input widget is shown
-     * instead (gated in `RealDuckChat.cacheUserSettings()` by `DuckChatFeature.nativeInputField()` + user settings).
-     */
-    private fun isInputScreenEnabled(): Boolean = duckAiFeatureState.showInputScreen.value
 
     private fun contextualOnboardingPixelNames(cta: Cta): List<OnboardingPixelName> = when (cta) {
         is DaxTryASearchBubbleCta -> listOf(OnboardingPixelName.ONBOARDING_SEARCH)
@@ -390,21 +382,15 @@ class CtaViewModel @Inject constructor(
         return when {
             // Duck.ai onboarding end
             canShowDuckAiEndCta() -> {
-                if (isInputScreenEnabled()) {
-                    // Legacy path: the input screen auto-launches with the end CTA. Suppress home
-                    // CTAs until that flow runs (see prepareAndMarkDuckAiEndCtaForInputScreen).
-                    null
-                } else {
-                    setInputToggleStateForDuckAiEndCta()
-                    DaxDuckAiEndBubbleCta(
-                        onboardingStore = onboardingStore,
-                        appInstallStore = appInstallStore,
-                        isLightTheme = appTheme.isLightModeEnabled(),
-                        deviceInfo = deviceInfo,
-                        isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
-                        segmentedPath = onboardingStore.getSegmentedPathWithAiInput(),
-                    )
-                }
+                setInputToggleStateForDuckAiEndCta()
+                DaxDuckAiEndBubbleCta(
+                    onboardingStore = onboardingStore,
+                    appInstallStore = appInstallStore,
+                    isLightTheme = appTheme.isLightModeEnabled(),
+                    deviceInfo = deviceInfo,
+                    isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
+                    segmentedPath = onboardingStore.getSegmentedPathWithAiInput(),
+                )
             }
 
             // Search suggestions

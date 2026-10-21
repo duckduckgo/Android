@@ -44,7 +44,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import dev.zacsweers.metro.ContributesBinding
@@ -76,7 +75,6 @@ class RealAppReturnPixelSender @Inject constructor(
     private val idleThresholdResolver: IdleThresholdResolver,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val duckChatInputModeState: DuckChatInputModeState,
-    private val duckAiFeatureState: DuckAiFeatureState,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val unsentForgetAllPixelStore: UnsentForgetAllPixelStore,
     private val dispatchers: DispatcherProvider,
@@ -116,7 +114,7 @@ class RealAppReturnPixelSender @Inject constructor(
                 put(AppReturnPixelParameters.IDLE_THRESHOLD_SECONDS, idleThresholdSeconds.toString())
                 afterInactivityOption?.let { put(AppReturnPixelParameters.AFTER_INACTIVITY_OPTION, it) }
                 put(AppReturnPixelParameters.FEATURE_ELIGIBLE, androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled().toString())
-                put(AppReturnPixelParameters.UNIFIED_INPUT_AVAILABLE, duckAiFeatureState.nativeInputFieldEnabled.value.toString())
+                put(AppReturnPixelParameters.UNIFIED_INPUT_AVAILABLE, "true")
                 put(AppReturnPixelParameters.TOGGLE_VISIBLE, toggleVisible.toString())
                 put(AppReturnPixelParameters.LAUNCH_SOURCE, launchSource)
                 put(Pixel.PixelParameter.PETAL, Pixel.PixelValues.PETAL_RANDOMIZE)

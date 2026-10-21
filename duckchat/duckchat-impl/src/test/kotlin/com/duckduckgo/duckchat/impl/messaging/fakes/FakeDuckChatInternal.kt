@@ -48,7 +48,6 @@ class FakeDuckChatInternal(
     private val showInVoiceChatUserSetting = MutableStateFlow(false)
     private val inputScreenUserSettingEnabled = MutableStateFlow(false)
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
-    private val nativeInputFieldUserSettingEnabled = MutableStateFlow(false)
     private val nativeChatInputEnabled = MutableStateFlow(false)
     private val nativeInputNavBarEnabled = MutableStateFlow(false)
     private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow<Boolean>(false)
@@ -96,7 +95,6 @@ class FakeDuckChatInternal(
 
     override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = cosmeticInputScreenUserSettingEnabled
     override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachmentUserSettingEnabled
-    override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = nativeInputFieldUserSettingEnabled
     override fun observeNativeChatInputEnabled(): Flow<Boolean> = nativeChatInputEnabled
     override fun observeNativeInputNavBarEnabled(): Flow<Boolean> = nativeInputNavBarEnabled
 
@@ -129,10 +127,6 @@ class FakeDuckChatInternal(
 
     override suspend fun setAutomaticPageContextUserSetting(isEnabled: Boolean) {
         automaticContextAttachmentUserSettingEnabled.value = isEnabled
-    }
-
-    fun setNativeInputFieldEnabled(isEnabled: Boolean) {
-        nativeInputFieldUserSettingEnabled.value = isEnabled
     }
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> = enableDuckChatUserSetting

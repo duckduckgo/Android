@@ -741,11 +741,7 @@ class BrowserTabFragment :
                 newState: Int,
             ) {
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                    if (nativeInputManager.isNativeInputActive()) {
-                        hideKeyboardImmediatelyRetainFocus()
-                    } else {
-                        hideKeyboardRetainFocus()
-                    }
+                    hideKeyboardImmediatelyRetainFocus()
                 }
             }
         }
@@ -1100,11 +1096,7 @@ class BrowserTabFragment :
                         }
 
                         is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
-                            if (nativeInputManager.isNativeInputEnabled()) {
-                                nativeInputManager.handleDuckAiVoiceResult(result.query)
-                            } else {
-                                duckChat.openDuckChatWithAutoPrompt(result.query, DuckChatEntryPoint.VOICE)
-                            }
+                            nativeInputManager.handleDuckAiVoiceResult(result.query)
                         }
                     }
                     resumeWebView()
@@ -1212,9 +1204,7 @@ class BrowserTabFragment :
             binding = binding,
         )
 
-        nativeInputManager.init(omnibar, binding.rootView, viewLifecycleOwner) {
-            nativeInputManager.hideNativeInput(animate = false)
-        }
+        nativeInputManager.init(omnibar, binding.rootView, viewLifecycleOwner)
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -2857,19 +2847,15 @@ class BrowserTabFragment :
             }
 
             is Command.ShowKeyboard -> {
-                if (nativeInputManager.isNativeInputActive()) {
-                    // Surface the native input widget so its onEnterComplete focuses the input
-                    // and brings up the keyboard via the same path as a manual omnibar tap.
-                    // Skip if the widget is already attached — Command.ShowKeyboard can fire
-                    // multiple times per session (e.g. CTA refresh / tab swipe back to NTP) and
-                    // showNativeInput() tears down and re-animates the widget on each call.
-                    // isNativeInputShown checks the single inputModeRoot across both positions; a
-                    // top-only check re-opened UTI on every swipe and stacked NTP content insets.
-                    if (!nativeInputManager.isNativeInputShown()) {
-                        showNativeInput()
-                    }
-                } else {
-                    showKeyboard()
+                // Surface the native input widget so its onEnterComplete focuses the input
+                // and brings up the keyboard via the same path as a manual omnibar tap.
+                // Skip if the widget is already attached — Command.ShowKeyboard can fire
+                // multiple times per session (e.g. CTA refresh / tab swipe back to NTP) and
+                // showNativeInput() tears down and re-animates the widget on each call.
+                // isNativeInputShown checks the single inputModeRoot across both positions; a
+                // top-only check re-opened UTI on every swipe and stacked NTP content insets.
+                if (!nativeInputManager.isNativeInputShown()) {
+                    showNativeInput()
                 }
             }
 
@@ -2878,11 +2864,7 @@ class BrowserTabFragment :
             }
 
             is Command.DropAddressBarFocus -> {
-                if (nativeInputManager.isNativeInputActive()) {
-                    nativeInputManager.hideNativeInput()
-                } else {
-                    hideKeyboard()
-                }
+                nativeInputManager.hideNativeInput()
             }
 
             is Command.ShowToast -> {
@@ -2996,12 +2978,7 @@ class BrowserTabFragment :
             is Command.CancelIncomingAutofillRequest -> injectAutofillCredentials(it.url, null)
             is Command.LaunchAutofillSettings -> launchAutofillManagementScreen(it.privacyProtectionEnabled)
             is Command.EditWithSelectedQuery -> {
-                if (nativeInputManager.isNativeInputActive()) {
-                    nativeInputManager.setText(it.query)
-                } else {
-                    omnibar.setText(it.query)
-                    omnibar.setTextSelection(it.query.length)
-                }
+                nativeInputManager.setText(it.query)
             }
 
             is ShowBackNavigationHistory -> showBackNavigationHistory(it)
@@ -4207,8 +4184,6 @@ class BrowserTabFragment :
                     hasFocus: Boolean,
                     query: String,
                 ) {
-                    if (nativeInputManager.isNativeInputActive()) return
-                    onOmnibarTextFocusChanged(hasFocus, query)
                 }
 
                 override fun onBackKeyPressed(): Boolean {
@@ -4223,17 +4198,9 @@ class BrowserTabFragment :
                 }
 
                 override fun onOmnibarTextChanged(state: OmnibarTextState) {
-                    if (nativeInputManager.isNativeInputActive()) return
-                    onUserEnteredText(state.text, state.hasFocus)
                 }
 
                 override fun onShowSuggestions(state: OmnibarTextState) {
-                    if (nativeInputManager.isNativeInputActive()) return
-                    viewModel.triggerAutocomplete(
-                        state.text,
-                        state.hasFocus,
-                        true,
-                    )
                 }
 
                 override fun onTrackersCountFinished() {
@@ -4245,26 +4212,6 @@ class BrowserTabFragment :
                 }
             },
         )
-    }
-
-    private fun onOmnibarTextFocusChanged(
-        hasFocus: Boolean,
-        query: String,
-    ) {
-        viewModel.triggerAutocomplete(query, hasFocus, false)
-        if (hasFocus) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_SHOWN_DAILY, type = Daily())
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_SHOWN_COUNT)
-            cancelPendingAutofillRequestsToChooseCredentials()
-            removeDuckChatContextualSheet()
-        } else {
-            omnibar.omnibarTextInput.hideKeyboard()
-
-            // prevent a crash when the view is not initiliazed yet
-            if (view != null) {
-                binding.focusDummy.requestFocus()
-            }
-        }
     }
 
     private fun onOmnibarBackKeyPressed(): Boolean {
@@ -4713,11 +4660,6 @@ class BrowserTabFragment :
             }
             browserAutofill.rejectGeneratedPassword()
         }
-    }
-
-    private fun cancelPendingAutofillRequestsToChooseCredentials() {
-        browserAutofill.cancelPendingAutofillRequestToChooseCredentials()
-        viewModel.cancelPendingAutofillRequestToChooseCredentials()
     }
 
     private fun showAutofillDialogSaveCredentials(
