@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.InBrowserPromo
+import com.duckduckgo.autofill.impl.importing.AutofillImportRedesignFeature
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
 import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
@@ -47,7 +48,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
@@ -62,7 +65,20 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     private val credentialExchangePasswordImporter: CredentialExchangePasswordImporter,
     private val webViewCapabilityChecker: ImportGooglePasswordsCapabilityChecker,
     private val credentialImportWideEvent: CredentialImportWideEvent,
+    private val importRedesignFeature: AutofillImportRedesignFeature,
 ) : ViewModel() {
+
+    fun determineInitialUi(launchSource: AutofillImportLaunchSource, canShowPreImportDialog: Boolean) {
+        viewModelScope.launch {
+            val isRedesignEnabled = withContext(dispatchers.io()) { importRedesignFeature.self().isEnabled() }
+            _viewState.update { it.copy(isRedesignEnabled = isRedesignEnabled) }
+            if (canShowPreImportDialog) {
+                shouldShowInitialInstructionalPrompt(launchSource)
+            } else {
+                onDirectImportRequested(launchSource)
+            }
+        }
+    }
 
     fun onImportFlowFinishedSuccessfully() {
         viewModelScope.launch(dispatchers.main()) {
@@ -205,6 +221,7 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     data class ViewState(
         val viewMode: ViewMode = DeterminingFirstView,
         val usesCredentialExchange: Boolean = false,
+        val isRedesignEnabled: Boolean = false,
     )
 
     sealed interface Command {
