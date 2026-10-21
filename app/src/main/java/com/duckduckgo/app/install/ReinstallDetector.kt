@@ -22,11 +22,14 @@ import androidx.core.content.edit
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.persistentstorage.api.PersistentStorage
 import com.duckduckgo.persistentstorage.api.PersistentStorageKey
+import com.duckduckgo.persistentstorage.api.PersistentStorageUnavailableException
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
@@ -70,6 +73,7 @@ class RealReinstallDetector @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val persistentStorage: PersistentStorage,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val pixel: Pixel,
 ) : ReinstallDetector, MainProcessLifecycleObserver {
 
     private val sdkInt: Int = Build.VERSION.SDK_INT
@@ -113,12 +117,24 @@ class RealReinstallDetector @Inject constructor(
 
     private suspend fun detectAndSaveWithBlockStore(): Boolean {
         val installSeen = callBlockStore { persistentStorage.retrieve(InstallSeenPersistentStorageKey) }
-        val isReinstall = when {
-            installSeen == null -> false.also { logcat(WARN) { "Reinstall check: Block Store read timed out" } }
-            installSeen.isFailure -> false.also { logcat(WARN) { "Reinstall check: Block Store read failed ${installSeen.exceptionOrNull()}" } }
-            else -> installSeen.getOrNull() != null
+        val checkResult = when {
+            installSeen == null -> BlockStoreCheckResult.TIMEOUT
+            installSeen.exceptionOrNull() is PersistentStorageUnavailableException -> BlockStoreCheckResult.UNAVAILABLE
+            installSeen.isFailure -> BlockStoreCheckResult.ERROR
+            installSeen.getOrNull() != null -> BlockStoreCheckResult.FOUND
+            else -> BlockStoreCheckResult.NOT_FOUND
         }
-        logcat(INFO) { "Reinstall check (Block Store): reinstall=$isReinstall" }
+        if (installSeen?.isFailure == true) {
+            logcat(WARN) { "Reinstall check: Block Store read failed ${installSeen.exceptionOrNull()}" }
+        }
+        val isReinstall = checkResult == BlockStoreCheckResult.FOUND
+        logcat(INFO) { "Reinstall check (Block Store): result=${checkResult.value}, reinstall=$isReinstall" }
+        // Without it there's no way to tell "Block Store dropped the flag" from "few reinstalls" from "Play services unavailable"
+        pixel.fire(
+            ReinstallDetectorPixelName.BLOCK_STORE_CHECK_RESULT,
+            parameters = mapOf(PARAM_RESULT to checkResult.value),
+            type = Unique(),
+        )
 
         // Saved even when Block Store failed, so every caller gets the same answer for this install instead of retrying a slow call
         runCatching { saveAppReinstallValue(isReinstall) }
@@ -208,6 +224,7 @@ class RealReinstallDetector @Inject constructor(
         private const val PREFERENCES_FILE_NAME = "com.duckduckgo.app.buildconfig.cache"
         private const val APP_REINSTALLED_KEY = "appReinstalled"
         private const val INSTALL_SEEN_FLAG_STORED_KEY = "installSeenFlagStored"
+        private const val PARAM_RESULT = "result"
         private const val DDG_DOWNLOADS_DIRECTORY = "DuckDuckGo"
 
         // Nothing else bounds this step: the pre-ATB time limit can't stop it, so a stuck Play services call would hold back the ATB

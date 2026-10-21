@@ -48,5 +48,21 @@
             }
         ],
         "expires": "2027-04-30"
+    },
+    "atb_reinstall_check_block_store": {
+        "description": "The reinstall check on Android 10 and older finished reading the Block Store \"install seen\" flag. Sent once per install, only on Android 10 and older, where reinstalls are detected with Block Store instead of the Downloads folder. Shows whether detection works there: Block Store only keeps the flag through an uninstall when the device has Android backup turned on. Any result other than found counts the install as new",
+        "owners": ["anikiki"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "result",
+                "description": "found: flag found, so the install is a reinstall. not_found: no flag, so a new install, or the flag didn't survive the uninstall. unavailable: Play services isn't available. timeout: Block Store didn't answer within the time limit. error: the read failed",
+                "type": "string",
+                "enum": ["found", "not_found", "unavailable", "timeout", "error"]
+            }
+        ],
+        "expires": "2027-04-30"
     }
 }
