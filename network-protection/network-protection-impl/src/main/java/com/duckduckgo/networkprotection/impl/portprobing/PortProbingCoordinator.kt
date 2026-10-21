@@ -18,7 +18,7 @@ package com.duckduckgo.networkprotection.impl.portprobing
 
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 /**

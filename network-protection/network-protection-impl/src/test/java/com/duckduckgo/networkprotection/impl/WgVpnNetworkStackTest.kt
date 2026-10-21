@@ -131,7 +131,7 @@ class WgVpnNetworkStackTest {
             mock(),
             netPSettingsLocalConfig,
             vpnRemoteFeatures,
-            { mock() }, // portProbingCoordinator
+            lazy { mock() }, // portProbingCoordinator
         )
     }
 
