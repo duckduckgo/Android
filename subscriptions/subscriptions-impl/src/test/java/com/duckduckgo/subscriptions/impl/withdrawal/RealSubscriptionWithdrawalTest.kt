@@ -1,5 +1,6 @@
 package com.duckduckgo.subscriptions.impl.withdrawal
 
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.duckduckgo.subscriptions.impl.services.WithdrawResponse
@@ -12,6 +13,9 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -24,7 +28,11 @@ class RealSubscriptionWithdrawalTest {
 
     private val subscriptionsService: SubscriptionsService = mock()
     private val subscriptionsManager: SubscriptionsManager = mock()
-    private val withdrawal = RealSubscriptionWithdrawal(subscriptionsService, subscriptionsManager)
+    private val withdrawalStore: WithdrawalStore = mock()
+    private val currentTimeProvider: CurrentTimeProvider = mock {
+        on { currentTimeMillis() } doReturn NOW
+    }
+    private val withdrawal = RealSubscriptionWithdrawal(subscriptionsService, subscriptionsManager, withdrawalStore, currentTimeProvider)
 
     @Test
     fun whenEligibleThenReturnEligibility() = runTest {
@@ -105,6 +113,29 @@ class RealSubscriptionWithdrawalTest {
     }
 
     @Test
+    fun whenWithdrawSucceedsThenSaveCompletedWithdrawalBeforeRefreshing() = runTest {
+        whenever(subscriptionsService.withdraw()).thenReturn(WithdrawResponse(refundedAmount = 999, currency = "gbp"))
+
+        withdrawal.withdraw()
+
+        inOrder(withdrawalStore, subscriptionsManager) {
+            verify(withdrawalStore).setCompletedWithdrawal(
+                CompletedWithdrawal(withdrawnAt = NOW, refundedAmount = BigDecimal("9.99"), currency = "GBP"),
+            )
+            verify(subscriptionsManager).refreshSubscriptionData()
+        }
+    }
+
+    @Test
+    fun whenWithdrawFailsThenDoNotSaveCompletedWithdrawal() = runTest {
+        whenever(subscriptionsService.withdraw()).thenThrow(httpException(500))
+
+        withdrawal.withdraw()
+
+        verify(withdrawalStore, never()).setCompletedWithdrawal(any())
+    }
+
+    @Test
     fun whenWithdrawReturns409ThenNotEligible() = runTest {
         whenever(subscriptionsService.withdraw()).thenThrow(httpException(409))
 
@@ -141,6 +172,10 @@ class RealSubscriptionWithdrawalTest {
     }
 
     private fun httpException(code: Int) = HttpException(Response.error<Any>(code, "".toResponseBody()))
+
+    private companion object {
+        private const val NOW = 1792065600000L
+    }
 
     private fun eligibleResponse() = WithdrawalEligibilityResponse(
         eligible = true,

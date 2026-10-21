@@ -70,6 +70,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.LaunchOnboarding
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalError
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.CompletedWithdrawalState
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.OnboardingEntryPoint
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
@@ -210,6 +211,8 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         binding.upgradeToProContainer.isVisible = false
         binding.verticalTierDivider.isVisible = false
         binding.pendingDowngradeInfoPanel.gone()
+
+        if (renderCompletedWithdrawal(viewState.completedWithdrawal)) return
 
         if (viewState.status in listOf(INACTIVE, EXPIRED)) {
             binding.viewPlans.isVisible = true
@@ -353,6 +356,20 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 )
                 .show()
         }
+    }
+
+    private fun renderCompletedWithdrawal(completedWithdrawal: CompletedWithdrawalState?): Boolean {
+        val withdrawn = completedWithdrawal != null
+        binding.settingsSections.isVisible = !withdrawn
+        binding.completedWithdrawal.isVisible = withdrawn
+        binding.subscriptionNotSubscribedStatusContainer.isVisible = withdrawn
+        if (completedWithdrawal == null) return false
+
+        binding.subscriptionActiveStatusContainer.isVisible = false
+        binding.subscriptionExpiredStatusContainer.isVisible = false
+        binding.completedWithdrawal.setPrimaryText(getString(string.subscriptionWithdrawnTitle, completedWithdrawal.date))
+        binding.completedWithdrawal.setSecondaryText(getString(string.subscriptionWithdrawnRefund, completedWithdrawal.refundAmount))
+        return true
     }
 
     private fun renderOnboardingEntryPoint(card: OnboardingEntryPoint?) {

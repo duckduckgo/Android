@@ -16,6 +16,7 @@
 
 package com.duckduckgo.subscriptions.impl.withdrawal
 
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
@@ -39,6 +40,13 @@ interface SubscriptionWithdrawal {
      * the backend finishes an interrupted withdrawal without refunding twice.
      */
     suspend fun withdraw(): WithdrawalResult
+
+    /**
+     * Returns the last withdrawal made on this device, or null if there is none.
+     */
+    fun getCompletedWithdrawal(): CompletedWithdrawal?
+
+    fun clearCompletedWithdrawal()
 }
 
 sealed class WithdrawalResult {
@@ -67,6 +75,8 @@ data class WithdrawalEligibility(
 class RealSubscriptionWithdrawal @Inject constructor(
     private val subscriptionsService: SubscriptionsService,
     private val subscriptionsManager: SubscriptionsManager,
+    private val withdrawalStore: WithdrawalStore,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : SubscriptionWithdrawal {
 
     override suspend fun getEligibility(): WithdrawalEligibility? {
@@ -93,15 +103,29 @@ class RealSubscriptionWithdrawal @Inject constructor(
             return Failure(WithdrawalResult.FailureReason.UNKNOWN)
         }
 
+        val result = Success(
+            refundedAmount = response.refundedAmount.fromMinorUnits(response.currency),
+            currency = response.currency.uppercase(),
+        )
+        // Saved before refreshing, so the expired status emitted by the refresh already renders as a withdrawal
+        withdrawalStore.setCompletedWithdrawal(
+            CompletedWithdrawal(
+                withdrawnAt = currentTimeProvider.currentTimeMillis(),
+                refundedAmount = result.refundedAmount,
+                currency = result.currency,
+            ),
+        )
+
         // The backend expires the subscription in the same request; refresh so access is revoked locally right away
         runCatching { subscriptionsManager.refreshSubscriptionData() }
         runCatching { subscriptionsManager.refreshAccessToken() }
 
-        return Success(
-            refundedAmount = response.refundedAmount.fromMinorUnits(response.currency),
-            currency = response.currency.uppercase(),
-        )
+        return result
     }
+
+    override fun getCompletedWithdrawal(): CompletedWithdrawal? = withdrawalStore.getCompletedWithdrawal()
+
+    override fun clearCompletedWithdrawal() = withdrawalStore.clear()
 
     private fun HttpException.toFailureReason(): WithdrawalResult.FailureReason = when (code()) {
         400 -> WithdrawalResult.FailureReason.NOT_STRIPE_SUBSCRIPTION

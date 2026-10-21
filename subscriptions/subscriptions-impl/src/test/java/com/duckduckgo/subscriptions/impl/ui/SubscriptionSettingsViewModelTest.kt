@@ -34,6 +34,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
+import com.duckduckgo.subscriptions.impl.withdrawal.CompletedWithdrawal
 import com.duckduckgo.subscriptions.impl.withdrawal.SubscriptionWithdrawal
 import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalEligibility
 import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult
@@ -50,6 +51,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -954,6 +956,69 @@ class SubscriptionSettingsViewModelTest {
             viewModel.onWithdrawalConfirmed()
             assertEquals(ShowWithdrawalError, awaitItem())
         }
+    }
+
+    @Test
+    fun whenExpiredAfterWithdrawalThenShowCompletedWithdrawal() = runTest {
+        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
+        whenever(subscriptionWithdrawal.getCompletedWithdrawal()).thenReturn(
+            CompletedWithdrawal(withdrawnAt = ELIGIBILITY.eligibleUntil, refundedAmount = BigDecimal("9.99"), currency = "EUR"),
+        )
+        stubReadySubscription(platform = "stripe", status = EXPIRED)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            val completedWithdrawal = (expectMostRecentItem() as Ready).completedWithdrawal
+            assertEquals("October 15, 2026", completedWithdrawal?.date)
+            assertTrue(completedWithdrawal!!.refundAmount.contains("9.99"))
+        }
+    }
+
+    @Test
+    fun whenExpiredWithoutWithdrawalThenNoCompletedWithdrawal() = runTest {
+        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
+        whenever(subscriptionWithdrawal.getCompletedWithdrawal()).thenReturn(null)
+        stubReadySubscription(platform = "stripe", status = EXPIRED)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertNull((expectMostRecentItem() as Ready).completedWithdrawal)
+        }
+    }
+
+    @Test
+    fun whenWithdrawalFlagDisabledThenNoCompletedWithdrawal() = runTest {
+        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = false))
+        whenever(subscriptionWithdrawal.getCompletedWithdrawal()).thenReturn(
+            CompletedWithdrawal(withdrawnAt = ELIGIBILITY.eligibleUntil, refundedAmount = BigDecimal("9.99"), currency = "EUR"),
+        )
+        stubReadySubscription(platform = "stripe", status = EXPIRED)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertNull((expectMostRecentItem() as Ready).completedWithdrawal)
+        }
+    }
+
+    @Test
+    fun whenSubscriptionActiveAgainThenClearCompletedWithdrawal() = runTest {
+        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
+        stubReadySubscription(platform = "stripe", status = AUTO_RENEWABLE)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertNull((expectMostRecentItem() as Ready).completedWithdrawal)
+        }
+        verify(subscriptionWithdrawal, atLeastOnce()).clearCompletedWithdrawal()
+    }
+
+    @Test
+    fun whenRemoveFromDeviceThenClearCompletedWithdrawal() = runTest {
+        viewModel.commands().test {
+            viewModel.removeFromDevice()
+            awaitItem()
+        }
+        verify(subscriptionWithdrawal).clearCompletedWithdrawal()
     }
 
     private suspend fun stubReadySubscription(

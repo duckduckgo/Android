@@ -166,6 +166,9 @@
     <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Your %1$s subscription will end right away and you\'ll be refunded %2$s to your original payment method within 14 days.\n\nVPN, Personal Information Removal and advanced Duck.ai models stop working once you confirm.</string>
     <string name="subscriptionWithdrawDialogConfirm">Confirm Withdrawal</string>
     <string name="subscriptionWithdrawDialogKeep">Keep Subscription</string>
+    <string name="subscriptionStatusNotSubscribed">Not Subscribed</string>
+    <string name="subscriptionWithdrawnTitle" instruction="Placeholder is the date the user withdrew from their subscription, e.g. October 6, 2026">You withdrew on %1$s.</string>
+    <string name="subscriptionWithdrawnRefund" instruction="Placeholder is the refund amount with currency, e.g. €9.99">Your refund of %1$s is being processed.</string>
     <string name="subscriptionWithdrawError">We couldn\'t process your withdrawal. Please try again.</string>
 
 </resources>

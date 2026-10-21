@@ -52,6 +52,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
+import com.duckduckgo.subscriptions.impl.withdrawal.CompletedWithdrawal
 import com.duckduckgo.subscriptions.impl.withdrawal.SubscriptionWithdrawal
 import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalEligibility
 import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult
@@ -67,6 +68,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.logcat
+import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.Currency
 import java.util.Date
@@ -179,10 +181,28 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 effectiveTier = effectiveTier,
                 onboardingEntryPoint = onboardingEntryPoint(subscription),
                 withdrawal = withdrawalOption.takeIf { canWithdraw(subscription) },
+                completedWithdrawal = completedWithdrawalState(subscription),
             ),
         )
 
         loadWithdrawalOptionIfNeeded(subscription)
+    }
+
+    private fun completedWithdrawalState(subscription: Subscription): CompletedWithdrawalState? {
+        if (subscription.isActive()) {
+            subscriptionWithdrawal.clearCompletedWithdrawal()
+            return null
+        }
+        if (!subscriptionsFeature.subscriptionWithdrawal().isEnabled()) return null
+
+        return subscriptionWithdrawal.getCompletedWithdrawal()?.toCompletedWithdrawalState()
+    }
+
+    private fun CompletedWithdrawal.toCompletedWithdrawalState(): CompletedWithdrawalState {
+        return CompletedWithdrawalState(
+            date = DateFormat.getInstanceForSkeleton("ddMMMMyyyy").format(Date(withdrawnAt)),
+            refundAmount = formatAmount(refundedAmount, currency),
+        )
     }
 
     private fun canWithdraw(subscription: Subscription): Boolean {
@@ -206,16 +226,16 @@ class SubscriptionSettingsViewModel @Inject constructor(
     private fun WithdrawalEligibility.toWithdrawalOption(subscription: Subscription): WithdrawalOption {
         return WithdrawalOption(
             deadline = DateFormat.getInstanceForSkeleton("ddMMMMyyyy").format(Date(eligibleUntil)),
-            refundAmount = formatRefundAmount(this),
+            refundAmount = formatAmount(refundAmount, refundCurrency),
             tierNameResId = getPendingTierNameResId(subscription.tier),
         )
     }
 
-    private fun formatRefundAmount(eligibility: WithdrawalEligibility): String {
-        val currencyCode = eligibility.refundCurrency.uppercase()
+    private fun formatAmount(amount: BigDecimal, currencyCode: String): String {
+        val code = currencyCode.uppercase()
         return runCatching {
-            NumberFormat.getCurrencyInstance().apply { currency = Currency.getInstance(currencyCode) }.format(eligibility.refundAmount)
-        }.getOrElse { "${eligibility.refundAmount.toPlainString()} $currencyCode" }
+            NumberFormat.getCurrencyInstance().apply { currency = Currency.getInstance(code) }.format(amount)
+        }.getOrElse { "${amount.toPlainString()} $code" }
     }
 
     fun onWithdrawClicked() {
@@ -289,6 +309,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
         pixelSender.reportSubscriptionSettingsRemoveFromDeviceClick()
 
         viewModelScope.launch {
+            subscriptionWithdrawal.clearCompletedWithdrawal()
             subscriptionsManager.signOut()
             command.send(FinishSignOut)
         }
@@ -357,6 +378,11 @@ class SubscriptionSettingsViewModel @Inject constructor(
 
     data class OnboardingEntryPoint(val percentage: Int)
 
+    data class CompletedWithdrawalState(
+        val date: String,
+        val refundAmount: String,
+    )
+
     data class WithdrawalOption(
         val deadline: String,
         val refundAmount: String,
@@ -385,6 +411,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val effectiveTier: SubscriptionTier,
             val onboardingEntryPoint: OnboardingEntryPoint? = null,
             val withdrawal: WithdrawalOption? = null,
+            val completedWithdrawal: CompletedWithdrawalState? = null,
         ) : ViewState()
     }
 
