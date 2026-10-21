@@ -29,13 +29,6 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_addressbar_click_aichat": {
-        "description": "Fires when the user touches the address bar while the Duck.ai chat input is showing",
-        "owners": ["0nko"],
-        "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "browserMode"]
-    },
     "m_aichat_contextual_selection_attached": {
         "description": "User attached a text selection to Duck.ai via the \"Ask Duck.ai\" text selection action. Not sent when the same text is selected again, or when the attachment is refused at the limit.",
         "owners": ["joshliebe"],
