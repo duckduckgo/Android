@@ -46,6 +46,10 @@ interface SubscriptionsService {
     @AuthRequired
     @GET("https://subscriptions.duckduckgo.com/api/subscription/withdraw")
     suspend fun withdrawalEligibility(): WithdrawalEligibilityResponse
+
+    @AuthRequired
+    @POST("https://subscriptions.duckduckgo.com/api/subscription/withdraw")
+    suspend fun withdraw(): WithdrawResponse
 }
 
 data class PortalResponse(val customerPortalUrl: String)
@@ -107,4 +111,9 @@ data class WithdrawalEligibilityResponse(
     val refundAmount: String?,
     val refundCurrency: String?,
     val reason: String?,
+)
+
+data class WithdrawResponse(
+    val refundedAmount: Long,
+    val currency: String,
 )

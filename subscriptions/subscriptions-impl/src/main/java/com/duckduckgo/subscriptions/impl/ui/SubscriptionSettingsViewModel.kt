@@ -48,11 +48,13 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.LaunchOnboarding
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialog
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalError
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
 import com.duckduckgo.subscriptions.impl.withdrawal.SubscriptionWithdrawal
 import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalEligibility
+import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -92,6 +94,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
 
     private var withdrawalOption: WithdrawalOption? = null
     private var withdrawalEligibilityRequested = false
+    private var withdrawalInProgress = false
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
@@ -223,6 +226,20 @@ class SubscriptionSettingsViewModel @Inject constructor(
     }
 
     fun onWithdrawalConfirmed() {
+        if (withdrawalInProgress) return
+        withdrawalInProgress = true
+
+        viewModelScope.launch {
+            when (subscriptionWithdrawal.withdraw()) {
+                is WithdrawalResult.Success -> {
+                    withdrawalOption = null
+                    _viewState.update { state -> if (state is Ready) state.copy(withdrawal = null) else state }
+                    emitChanges()
+                }
+                is WithdrawalResult.Failure -> command.send(ShowWithdrawalError)
+            }
+            withdrawalInProgress = false
+        }
     }
 
     private val completedEntryPointAllowed: Boolean by lazy {
@@ -335,6 +352,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
         data class GoToPortal(val url: String) : Command()
         data object LaunchOnboarding : Command()
         data class ShowWithdrawalDialog(val tierNameResId: Int, val refundAmount: String) : Command()
+        data object ShowWithdrawalError : Command()
     }
 
     data class OnboardingEntryPoint(val percentage: Int)

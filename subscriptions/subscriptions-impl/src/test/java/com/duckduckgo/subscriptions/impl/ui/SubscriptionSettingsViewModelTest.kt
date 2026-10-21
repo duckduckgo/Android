@@ -30,11 +30,13 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialog
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalError
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
 import com.duckduckgo.subscriptions.impl.withdrawal.SubscriptionWithdrawal
 import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalEligibility
+import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -925,6 +927,32 @@ class SubscriptionSettingsViewModelTest {
         viewModel.commands().test {
             viewModel.onWithdrawClicked()
             expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenWithdrawalConfirmedAndSucceedsThenHideWithdrawalOption() = runTest {
+        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
+        whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(BigDecimal("9.99"), "EUR"))
+        stubReadySubscription(platform = "stripe")
+        viewModel.onCreate(mock())
+
+        viewModel.viewState.test {
+            assertNotNull((expectMostRecentItem() as Ready).withdrawal)
+            viewModel.onWithdrawalConfirmed()
+            assertNull((expectMostRecentItem() as Ready).withdrawal)
+        }
+        verify(subscriptionWithdrawal).withdraw()
+    }
+
+    @Test
+    fun whenWithdrawalConfirmedAndFailsThenShowWithdrawalError() = runTest {
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failure(WithdrawalResult.FailureReason.UNKNOWN))
+
+        viewModel.commands().test {
+            viewModel.onWithdrawalConfirmed()
+            assertEquals(ShowWithdrawalError, awaitItem())
         }
     }
 

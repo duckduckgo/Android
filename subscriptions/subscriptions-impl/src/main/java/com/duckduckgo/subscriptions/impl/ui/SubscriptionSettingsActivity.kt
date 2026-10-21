@@ -69,6 +69,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.LaunchOnboarding
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialog
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalError
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.OnboardingEntryPoint
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
@@ -386,6 +387,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
             LaunchOnboarding -> globalActivityStarter.start(this, SubscriptionOnboardingScreenWithEmptyParams)
             is ShowWithdrawalDialog -> showWithdrawalDialog(command)
+            ShowWithdrawalError -> Toast.makeText(this, string.subscriptionWithdrawError, Toast.LENGTH_LONG).show()
         }
     }
 

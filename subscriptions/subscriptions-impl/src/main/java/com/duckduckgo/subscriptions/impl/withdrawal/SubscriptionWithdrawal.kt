@@ -17,9 +17,14 @@
 package com.duckduckgo.subscriptions.impl.withdrawal
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
+import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult.Failure
+import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult.Success
 import dev.zacsweers.metro.ContributesBinding
+import retrofit2.HttpException
 import java.math.BigDecimal
+import java.util.Currency
 import javax.inject.Inject
 
 interface SubscriptionWithdrawal {
@@ -28,6 +33,28 @@ interface SubscriptionWithdrawal {
      * or eligibility could not be determined.
      */
     suspend fun getEligibility(): WithdrawalEligibility?
+
+    /**
+     * Ends the subscription immediately and refunds the user. Safe to call again after a failure:
+     * the backend finishes an interrupted withdrawal without refunding twice.
+     */
+    suspend fun withdraw(): WithdrawalResult
+}
+
+sealed class WithdrawalResult {
+    data class Success(
+        val refundedAmount: BigDecimal,
+        val currency: String,
+    ) : WithdrawalResult()
+
+    data class Failure(val reason: FailureReason) : WithdrawalResult()
+
+    enum class FailureReason {
+        NOT_ELIGIBLE,
+        NOT_STRIPE_SUBSCRIPTION,
+        NO_SUBSCRIPTION,
+        UNKNOWN,
+    }
 }
 
 data class WithdrawalEligibility(
@@ -39,6 +66,7 @@ data class WithdrawalEligibility(
 @ContributesBinding(AppScope::class)
 class RealSubscriptionWithdrawal @Inject constructor(
     private val subscriptionsService: SubscriptionsService,
+    private val subscriptionsManager: SubscriptionsManager,
 ) : SubscriptionWithdrawal {
 
     override suspend fun getEligibility(): WithdrawalEligibility? {
@@ -54,5 +82,43 @@ class RealSubscriptionWithdrawal @Inject constructor(
             refundAmount = refundAmount,
             refundCurrency = refundCurrency,
         )
+    }
+
+    override suspend fun withdraw(): WithdrawalResult {
+        val response = try {
+            subscriptionsService.withdraw()
+        } catch (e: HttpException) {
+            return Failure(e.toFailureReason())
+        } catch (e: Exception) {
+            return Failure(WithdrawalResult.FailureReason.UNKNOWN)
+        }
+
+        // The backend expires the subscription in the same request; refresh so access is revoked locally right away
+        runCatching { subscriptionsManager.refreshSubscriptionData() }
+        runCatching { subscriptionsManager.refreshAccessToken() }
+
+        return Success(
+            refundedAmount = response.refundedAmount.fromMinorUnits(response.currency),
+            currency = response.currency.uppercase(),
+        )
+    }
+
+    private fun HttpException.toFailureReason(): WithdrawalResult.FailureReason = when (code()) {
+        400 -> WithdrawalResult.FailureReason.NOT_STRIPE_SUBSCRIPTION
+        404 -> WithdrawalResult.FailureReason.NO_SUBSCRIPTION
+        409 -> WithdrawalResult.FailureReason.NOT_ELIGIBLE
+        else -> WithdrawalResult.FailureReason.UNKNOWN
+    }
+
+    private fun Long.fromMinorUnits(currencyCode: String): BigDecimal {
+        val fractionDigits = runCatching { Currency.getInstance(currencyCode.uppercase()).defaultFractionDigits }
+            .getOrNull()
+            ?.takeIf { it >= 0 }
+            ?: DEFAULT_FRACTION_DIGITS
+        return BigDecimal.valueOf(this, fractionDigits)
+    }
+
+    private companion object {
+        private const val DEFAULT_FRACTION_DIGITS = 2
     }
 }
