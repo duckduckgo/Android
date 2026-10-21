@@ -28,6 +28,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterDockLayout
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterView
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputLayout
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
 import com.google.android.material.card.MaterialCardView
 import org.junit.Assert.assertEquals
@@ -82,6 +83,8 @@ class ContextualNativeInputHostLayoutTest {
         assertFalse(footer.isDescendantOf(card))
         assertTrue(footer.parent is NativeInputFooterDockLayout)
         assertTrue(card.isDescendantOf(footer.parent as ViewGroup))
+        assertTrue(card is NativeInputLayout)
+        assertEquals(NativeInputLayout.Surface.CONTEXTUAL, (card as NativeInputLayout).surface)
         assertEquals(1, card.childCount)
         assertTrue(card.getChildAt(0) is NativeInputModeWidget)
         assertEquals(cardRowMargins.bottomMargin, footerMargins.bottomMargin)

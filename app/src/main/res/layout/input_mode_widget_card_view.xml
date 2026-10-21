@@ -16,10 +16,10 @@
   -->
 <!--
   Single wrapper for both omnibar positions. The manager (applyPositionChrome) sets the position-varying
-  bits in code from isBottom: the row's side paddings, the card's background/elevation/compat-padding/
-  resting margins, the input field's content padding, the inline nav buttons' gravity and margins, and the
-  footer's bottom margin. A LinearLayout with the card at weight=1 lets the card reclaim the trailing space
-  when the buttons go GONE, and honours the negative margins the omnibar's shape logic (applyOmnibarShape)
+  placement in code from isBottom: the row's side paddings, the card's resting margins, the inline nav
+  buttons' gravity and margins, and the footer's bottom margin; NativeInputLayout styles itself from the
+  surface it is given. A LinearLayout with the card at weight=1 lets the card reclaim the trailing space
+  when the buttons go GONE, and honours the negative margins the card's shape logic (applyOmnibarShape)
   depends on, which a ConstraintLayout would clamp. The leading fire is present for both positions but stays
   GONE until the widget shows it, which it only does in the bottom Duck.ai layout.
 -->
@@ -65,24 +65,11 @@
                     android:src="@drawable/ic_fire_24" />
             </FrameLayout>
 
-            <com.google.android.material.card.MaterialCardView
+            <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputLayout
                 android:id="@+id/inputModeWidgetCard"
-                android:theme="?attr/daxInputModeCardThemeOverlay"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                app:cardBackgroundColor="?attr/daxColorSurface"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="6dp"
-                app:cardUseCompatPadding="true">
-
-                <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
-                    android:id="@+id/inputModeWidget"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingHorizontal="@dimen/keyline_1"
-                    android:paddingVertical="4dp" />
-            </com.google.android.material.card.MaterialCardView>
+                android:layout_weight="1" />
 
             <include
                 android:id="@+id/inlineNavButtonsContainer"

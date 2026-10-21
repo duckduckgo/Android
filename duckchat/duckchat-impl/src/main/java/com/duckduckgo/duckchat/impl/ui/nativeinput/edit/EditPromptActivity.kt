@@ -85,7 +85,7 @@ class EditPromptActivity : DuckDuckGoActivity() {
             return
         }
 
-        with(binding.editPromptInput) {
+        with(binding.editPromptInputCard.widget) {
             configureForEdit(sessionId)
             adoptEditAttachments(payload.images, payload.files)
             text = payload.prompt
@@ -121,9 +121,9 @@ class EditPromptActivity : DuckDuckGoActivity() {
         editPromptSessionStore.resolve(
             sessionId,
             EditPromptResult.Submitted(
-                prompt = binding.editPromptInput.text,
-                images = binding.editPromptInput.getImageAttachmentsJson().toSubmittedImages(),
-                files = binding.editPromptInput.getFileAttachmentsJson().toSubmittedFiles(),
+                prompt = binding.editPromptInputCard.widget.text,
+                images = binding.editPromptInputCard.widget.getImageAttachmentsJson().toSubmittedImages(),
+                files = binding.editPromptInputCard.widget.getFileAttachmentsJson().toSubmittedFiles(),
             ),
         )
         duckChatPixels.fireEditPromptSubmitted()
