@@ -29,7 +29,7 @@ jobs:
   startup-benchmark:
     name: Startup benchmark
     runs-on: android-large-runner
-    timeout-minutes: 150
+    timeout-minutes: 90
     env:
       DEFAULT_TESTS: noCompilation,partialNoProfile,baselineProfile,fullCompilation
       DEFAULT_DEVICE_MODEL: shiba
