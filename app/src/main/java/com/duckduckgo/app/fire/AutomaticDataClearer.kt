@@ -122,6 +122,7 @@ class AutomaticDataClearer @Inject constructor(
         if (isOpenPending) {
             if (isCustomTabStarted && customTabsFeature.keepCustomTabOnAppSwitch().isEnabled()) {
                 workManager.cancelAllWorkByTag(DataClearingWorker.WORK_REQUEST_TAG)
+                withContext(dispatchers.io()) { settingsDataStore.appUsedSinceLastClear = true }
             } else {
                 isOpenPending = false
                 onAppForegroundedAsync()

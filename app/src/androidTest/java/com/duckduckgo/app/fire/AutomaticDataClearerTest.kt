@@ -108,6 +108,15 @@ class AutomaticDataClearerTest {
 
     @UiThreadTest
     @Test
+    fun whenOpenedByCustomTabThenAppIsMarkedAsUsed() = runTest {
+        testee.onActivityStarted(CustomTabActivity())
+        testee.onOpen(isFreshLaunch = true)
+
+        verify(settingsDataStore).appUsedSinceLastClear = true
+    }
+
+    @UiThreadTest
+    @Test
     fun whenBrowserStartsAfterCustomTabFreshLaunchThenDataIsClearedAsFreshLaunch() = runTest {
         whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
         whenever(dataClearing.shouldClearDataAutomatically(true, true, false)).thenReturn(true)
