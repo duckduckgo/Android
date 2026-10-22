@@ -22,6 +22,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.nextsteps.api.NextStepCompletionCheck
+import com.duckduckgo.nextsteps.impl.NextStepsCompletionChecker
 import com.duckduckgo.nextsteps.impl.NextStepsItemsStore
 import com.duckduckgo.nextsteps.impl.NextStepsTelemetryStore
 import com.duckduckgo.nextsteps.impl.RealNextStepsItemsStore
@@ -94,7 +95,7 @@ class NextStepsItemsViewModelTest {
         dispatchers = coroutineRule.testDispatcherProvider,
         remoteMessageModel = remoteMessageModel,
         itemsStore = itemsStore,
-        completionChecks = completionChecks,
+        completionChecker = NextStepsCompletionChecker(itemsStore, completionChecks, coroutineRule.testDispatcherProvider),
         defaultRoleBrowserDialog = defaultRoleBrowserDialog,
         telemetry = telemetry,
     ).also { it.onViewAttached() }
