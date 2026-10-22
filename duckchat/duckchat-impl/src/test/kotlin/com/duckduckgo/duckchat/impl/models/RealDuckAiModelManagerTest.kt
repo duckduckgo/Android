@@ -153,6 +153,32 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
+    fun whenManagerCreatedWithoutConsumersThenModelsNotFetched() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+
+        testee = createManager()
+        entitlementFlow.emit(emptySet())
+
+        verify(modelsService, never()).getModels(any(), anyOrNull(), anyOrNull())
+    }
+
+    @Test
+    fun whenFetchModelsCalledRepeatedlyThenSubscriptionChangeRefetchesOnce() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(AIChatModelsResponse(emptyList()))
+
+        testee = createManager()
+        testee.fetchModels()
+        testee.fetchModels()
+        entitlementFlow.emit(emptySet())
+
+        entitlementFlow.emit(setOf(Entitlement(name = "plus", product = "Duck.ai")))
+
+        verify(modelsService, times(3)).getModels(any(), anyOrNull(), anyOrNull())
+    }
+
+    @Test
     fun whenFetchModelsThenModelsResolvedAndStateUpdated() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
@@ -775,6 +801,7 @@ class RealDuckAiModelManagerTest {
         )
 
         testee = createManager()
+        testee.fetchModels()
         entitlementFlow.emit(emptySet())
 
         subscriptionStatusFlow.value = SubscriptionStatus.AUTO_RENEWABLE
@@ -954,9 +981,12 @@ class RealDuckAiModelManagerTest {
         )
 
         testee = createManager()
+        testee.fetchModels()
+        entitlementFlow.emit(emptySet())
 
         entitlementFlow.emit(setOf(Entitlement(name = "plus", product = "Duck.ai")))
 
+        verify(modelsService, times(2)).getModels(any(), anyOrNull(), anyOrNull())
         assertEquals(1, testee.modelState.value.models.size)
     }
 
@@ -1313,13 +1343,13 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
-    fun whenRestoreCachedSelectionThrowsThenEntitlementCollectorStillStarts() = runTest {
+    fun whenRestoreCachedSelectionThrowsThenModelsStillFetched() = runTest {
         whenever(dataStore.getSelectedModel()).thenThrow(RuntimeException("disk error"))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
         whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(AIChatModelsResponse(emptyList()))
 
         testee = createManager()
-        entitlementFlow.emit(emptySet())
+        testee.fetchModels()
 
         verify(modelsService).getModels(any(), anyOrNull(), anyOrNull())
     }
