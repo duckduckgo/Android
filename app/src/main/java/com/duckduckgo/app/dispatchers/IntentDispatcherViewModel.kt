@@ -86,7 +86,6 @@ class IntentDispatcherViewModel @Inject constructor(
         // app-resume work such as modal prompts would otherwise run before CustomTabActivity marks itself.
         customTabMarkedEarly = runCatching { intent?.hasExtra(CustomTabsIntent.EXTRA_SESSION) == true }.getOrDefault(false)
         if (customTabMarkedEarly) {
-            logcat { "CTPromptDebug: CustomTabVM - Marking custom tab early" }
             customTabDetector.setCustomTab(true)
         }
 

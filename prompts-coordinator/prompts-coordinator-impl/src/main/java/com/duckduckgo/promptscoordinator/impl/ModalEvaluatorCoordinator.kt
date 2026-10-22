@@ -73,7 +73,6 @@ class ModalEvaluatorCoordinator @Inject constructor(
 
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
-        logcat { "CTPromptDebug: process ON_RESUME, scheduling APP_RESUME pass" }
         appCoroutineScope.launch(dispatchers.io()) {
             coordinateEvaluation(ModalTrigger.APP_RESUME)
         }
@@ -86,7 +85,6 @@ class ModalEvaluatorCoordinator @Inject constructor(
     }
 
     private suspend fun coordinateEvaluation(trigger: ModalTrigger) = evaluationMutex.withLock {
-        logcat { "CTPromptDebug: coordinator pass START trigger=$trigger" }
         logcat { "ModalEvaluatorCoordinator: Starting coordinated evaluation for trigger $trigger" }
 
         if (customTabDetector.isCustomTab()) {
@@ -119,11 +117,9 @@ class ModalEvaluatorCoordinator @Inject constructor(
 
             for (evaluator in evaluators) {
                 logcat { "ModalEvaluatorCoordinator: Evaluating '${evaluator.evaluatorId}' (priority ${evaluator.priority})" }
-                logcat { "CTPromptDebug: evaluating '${evaluator.evaluatorId}'" }
 
                 when (evaluator.evaluate()) {
                     is ModalEvaluator.EvaluationResult.ModalShown -> {
-                        logcat { "CTPromptDebug: '${evaluator.evaluatorId}' returned ModalShown" }
                         logcat {
                             "ModalEvaluatorCoordinator: Evaluator '${evaluator.evaluatorId}' " +
                                 "completed and modal shown, record timestamp and stop"
