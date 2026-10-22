@@ -848,7 +848,6 @@ class DuckChatContextualWebViewViewModelTest {
         override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = emptyFlow()
         override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = emptyFlow()
         override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = flowOf(true)
-        override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = emptyFlow()
         override fun observeNativeChatInputEnabled(): Flow<Boolean> = nativeChatInputEnabled
         override fun observeNativeInputNavBarEnabled(): Flow<Boolean> = emptyFlow()
         override suspend fun isStandaloneMigrationCompleted(): Boolean = true

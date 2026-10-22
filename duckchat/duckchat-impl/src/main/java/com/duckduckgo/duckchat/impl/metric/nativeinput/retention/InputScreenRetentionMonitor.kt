@@ -26,7 +26,6 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
@@ -50,7 +49,6 @@ import javax.inject.Inject
 class InputScreenRetentionMonitor @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     @InputScreenRetentionMonitorStore private val retentionMonitorDataStore: DataStore<Preferences>,
-    private val duckAiFeatureState: DuckAiFeatureState,
     private val pixel: Pixel,
     private val timeProvider: TimeProvider,
 ) : MainProcessLifecycleObserver {
@@ -74,10 +72,9 @@ class InputScreenRetentionMonitor @Inject constructor(
                         if (nowMinus24hET > lastCheckET) {
                             val wasFeatureEnabled = persistedData[Key.LAST_ENABLED_STATE]
                             if (wasFeatureEnabled == true) {
-                                val isStillEnabled = duckAiFeatureState.nativeInputFieldEnabled.value
                                 pixel.fire(
                                     pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_DAILY_RETENTION,
-                                    parameters = mapOf("still_enabled" to isStillEnabled.toString()),
+                                    parameters = mapOf("still_enabled" to "true"),
                                 )
                             }
                             persistCurrentState()
@@ -101,10 +98,9 @@ class InputScreenRetentionMonitor @Inject constructor(
 
     private suspend fun persistCurrentState() {
         val currentTimeETString = timeProvider.nowInEasternTime().toString()
-        val isFeatureEnabled = duckAiFeatureState.nativeInputFieldEnabled.value
         retentionMonitorDataStore.edit { preferences ->
             preferences[Key.LAST_CHECK_DATE_TIME_ET] = currentTimeETString
-            preferences[Key.LAST_ENABLED_STATE] = isFeatureEnabled
+            preferences[Key.LAST_ENABLED_STATE] = true
         }
     }
 }

@@ -48,7 +48,7 @@ class DuckAiFeatureStateReporterPlugin @Inject constructor(
         }
         return mapOf(
             DUCK_AI_INPUT_MODE to inputMode.pixelValue(),
-            DUCK_AI_NATIVE_INPUT to duckAiFeatureState.nativeInputFieldEnabled.value.toBinaryString(),
+            DUCK_AI_NATIVE_INPUT to true.toBinaryString(),
             DUCK_AI_CONTEXTUAL to duckAiFeatureState.showContextualMode.value.toBinaryString(),
         )
     }

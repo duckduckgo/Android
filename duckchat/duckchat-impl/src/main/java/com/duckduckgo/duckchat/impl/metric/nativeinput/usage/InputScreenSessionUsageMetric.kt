@@ -20,7 +20,6 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import dev.zacsweers.metro.ContributesBinding
@@ -47,7 +46,6 @@ interface InputScreenSessionUsageMetric {
 @SingleIn(scope = AppScope::class)
 class InputScreenSessionUsageMetricImpl @Inject constructor(
     private val pixel: Pixel,
-    private val duckAiFeatureState: DuckAiFeatureState,
     private val duckChatPixels: DuckChatPixels,
 ) : MainProcessLifecycleObserver, InputScreenSessionUsageMetric {
 
@@ -61,9 +59,6 @@ class InputScreenSessionUsageMetricImpl @Inject constructor(
     private val bothModesFired: AtomicBoolean = AtomicBoolean(false)
 
     override fun onStop(owner: LifecycleOwner) {
-        if (!duckAiFeatureState.nativeInputFieldEnabled.value) {
-            return
-        }
         val searchCount = searchCounter.getAndSet(0)
         val promptCount = promptCounter.getAndSet(0)
         bothModesFired.set(false)

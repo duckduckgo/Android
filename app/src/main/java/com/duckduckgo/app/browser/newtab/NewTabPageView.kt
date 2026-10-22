@@ -65,7 +65,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
@@ -77,8 +76,8 @@ import com.duckduckgo.nextsteps.api.NextSteps
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.SharePromoLinkIntentFactory
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -119,9 +118,6 @@ class NewTabPageView @JvmOverloads constructor(
 
     @Inject
     lateinit var androidBrowserConfig: AndroidBrowserConfigFeature
-
-    @Inject
-    lateinit var duckChat: DuckChat
 
     @Inject
     lateinit var inputModeState: DuckChatInputModeState
@@ -182,14 +178,9 @@ class NewTabPageView @JvmOverloads constructor(
             .onEach { processCommands(it) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
-        conflatedNativeInputJob += combine(
-            duckChat.observeNativeInputFieldUserSettingEnabled(),
-            inputModeState.inputModeCapability,
-        ) { enabled, capability ->
-            // Search-only still has the native-input field setting on, but the browser uses the
-            // legacy omnibar — drop the UTI chrome margin so the logo isn't left too low.
-            enabled && capability != NativeInputState.InputMode.SEARCH_ONLY
-        }
+        // Search-only drops the UTI chrome margin so the logo isn't left too low.
+        conflatedNativeInputJob += inputModeState.inputModeCapability
+            .map { capability -> capability != NativeInputState.InputMode.SEARCH_ONLY }
             .onEach { updateLogoMargin(it) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 

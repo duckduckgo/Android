@@ -22,7 +22,6 @@ import androidx.datastore.preferences.core.edit
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.metric.nativeinput.discovery.InputScreenDiscoveryFunnelStep.FeatureEnabled
 import com.duckduckgo.duckchat.impl.metric.nativeinput.discovery.InputScreenDiscoveryFunnelStep.FullyConverted
 import com.duckduckgo.duckchat.impl.metric.nativeinput.discovery.InputScreenDiscoveryFunnelStep.OmnibarInteracted
@@ -54,15 +53,12 @@ class InputScreenDiscoveryFunnelImpl @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     @InputScreenDiscoveryFunnelStore private val dataStore: DataStore<Preferences>,
     private val pixel: Pixel,
-    private val duckAiFeatureState: DuckAiFeatureState,
 ) : InputScreenDiscoveryFunnel {
 
     private val stepProcessingMutex = Mutex()
 
     override fun onDuckAiSettingsSeen() {
-        if (!duckAiFeatureState.showInputScreen.value) {
-            onStep(SettingsSeen)
-        }
+        onStep(SettingsSeen)
     }
 
     override fun onInputScreenEnabled() {

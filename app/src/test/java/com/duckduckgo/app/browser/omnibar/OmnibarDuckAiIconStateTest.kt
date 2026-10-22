@@ -25,33 +25,27 @@ import org.junit.Test
 class OmnibarDuckAiIconStateTest {
 
     @Test
-    fun whenNativeInputEnabledAndBrowserModeThenContextualSheetIconShown() {
-        val state = ViewState(isNativeInputEnabled = true, viewMode = ViewMode.Browser(null))
+    fun whenBrowserModeThenContextualSheetIconShown() {
+        val state = ViewState(viewMode = ViewMode.Browser(null))
         assertTrue(state.showContextualSheetIcon)
     }
 
     @Test
-    fun whenNativeInputEnabledAndDuckAiModeThenContextualSheetIconShown() {
-        val state = ViewState(isNativeInputEnabled = true, viewMode = ViewMode.DuckAI)
+    fun whenDuckAiModeThenContextualSheetIconShown() {
+        val state = ViewState(viewMode = ViewMode.DuckAI)
         assertTrue(state.showContextualSheetIcon)
     }
 
     @Test
-    fun whenNativeInputEnabledAndNewTabModeThenContextualSheetIconHidden() {
+    fun whenNewTabModeThenContextualSheetIconHidden() {
         // On the new-tab page we always show the full-screen Duck.ai entry point.
-        val state = ViewState(isNativeInputEnabled = true, viewMode = ViewMode.NewTab)
+        val state = ViewState(viewMode = ViewMode.NewTab)
         assertFalse(state.showContextualSheetIcon)
     }
 
     @Test
-    fun whenNativeInputDisabledThenContextualSheetIconHidden() {
-        val state = ViewState(isNativeInputEnabled = false, viewMode = ViewMode.Browser(null))
-        assertFalse(state.showContextualSheetIcon)
-    }
-
-    @Test
-    fun whenNativeInputDisabledAndNewTabModeThenContextualSheetIconHidden() {
-        val state = ViewState(isNativeInputEnabled = false, viewMode = ViewMode.NewTab)
+    fun whenSearchOnlyThenContextualSheetIconHidden() {
+        val state = ViewState(isSearchOnly = true, viewMode = ViewMode.Browser(null))
         assertFalse(state.showContextualSheetIcon)
     }
 }
