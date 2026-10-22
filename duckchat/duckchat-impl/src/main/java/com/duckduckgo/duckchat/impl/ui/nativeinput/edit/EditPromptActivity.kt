@@ -90,7 +90,6 @@ class EditPromptActivity : DuckDuckGoActivity() {
             adoptEditAttachments(payload.images, payload.files)
             text = payload.prompt
             onChatSent = { submit(sessionId) }
-            hideMainButtons()
             // configureForEdit's own widget setup runs on attach; focusing before that leaves the
             // field not yet focusable. Queuing after it (registered later, so it runs after) fixes it.
             asView().doOnAttach { focusInput(this@EditPromptActivity) }

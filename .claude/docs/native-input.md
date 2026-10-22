@@ -171,16 +171,17 @@ change needs them, check the linked task first.
 
 | Still hand-wired | Direction | Task |
 |---|---|---|
-| Fire, tabs, menu and back: `onFireButtonTapped`, `onBackPressed`, `setNavBarVisible`, `bindTabCount`, the leading fire found by walking ancestors | Plugins contributed from `:app`, placed via host-resolved slots | https://app.asana.com/0/0/1218750568353646/f |
-| Onboarding lock rendered by the widget (`setInteractionLocked`) | Each plugin renders its own locked state from `interactionLock` | https://app.asana.com/0/0/1218750257810051/f |
 | Card chrome duplicated in every host layout, shaped by `applyOmnibarShape` and `applyPositionChrome` | One card owned and styled inside the widget | https://app.asana.com/0/0/1217275429788919/f |
 | Remote flags gating native input | Hardcode on and delete once rolled out | https://app.asana.com/0/0/1216509602671179/f |
 | Legacy focused state in `OmnibarLayout` | Omnibar becomes display-only; the widget owns all text input | https://app.asana.com/0/0/1215373984475612/f |
 | `DuckChat` god-interface in `duckchat-api` | Split into single-responsibility `DuckAi*` interfaces | https://app.asana.com/0/0/1215641620311419/f |
 
-Known dead or stale code, safe to remove alongside the work above: the in-widget trailing fire, tab count and
-menu buttons (`inputModeMainButtonsContainer`) are never shown because every host calls `hideMainButtons()`;
-`setFloatingSubmitContainer` only hosts the new-line button.
+Browser controls stay with the host by design and are not becoming plugins: the leading fire (found by walking
+ancestors), both back arrows, and the fire, tabs and menu `:app` draws beside the card and in the nav bar, wired
+through `onFireButtonTapped`, `onBackPressed` and `setNavBarVisible`.
+
+Known dead or stale code, safe to remove alongside the work above: `setFloatingSubmitContainer` only hosts the
+new-line button.
 
 Older PRs, proposals and docs reference things that no longer exist. Do not build against them:
 `NativeInputHost.getInputState()` and `getPromptContribution()` (replaced by the state store),

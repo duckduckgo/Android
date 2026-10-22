@@ -30,7 +30,6 @@ import android.text.style.ImageSpan
 import android.text.style.ParagraphStyle
 import android.text.style.URLSpan
 import android.transition.AutoTransition
-import android.transition.Fade
 import android.transition.TransitionManager
 import android.util.AttributeSet
 import android.view.KeyEvent
@@ -52,8 +51,6 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -63,7 +60,6 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.ui.PulseAnimation
-import com.duckduckgo.browser.ui.tabs.TabSwitcherButton
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
@@ -167,7 +163,6 @@ interface NativeInputWidget {
     fun applyDefaultTogglePosition()
     fun saveLastUsedTogglePosition(isChat: Boolean)
     fun isChatTabSelected(): Boolean
-    fun hideMainButtons()
     fun setVoiceSearchAvailable(available: Boolean)
     fun setVoiceChatAvailable(available: Boolean)
     fun submitMessage(message: String?)
@@ -238,11 +233,6 @@ interface NativeInputWidget {
         onSearchSubmitted: (String) -> Unit,
         onChatSubmitted: (String) -> Unit,
         onInputTextEmptyChanged: (isEmpty: Boolean) -> Unit = {},
-    )
-
-    fun bindTabCount(
-        lifecycleOwner: LifecycleOwner,
-        tabCount: LiveData<Int>,
     )
 
     fun bindChatSuggestions(
@@ -318,8 +308,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private var activeTabId: String? = null
 
-    private var tabCountLiveData: LiveData<Int>? = null
-    private var tabCountObserver: Observer<Int>? = null
     private var newLineButton: NewLineButtonView? = null
     private var floatingSubmitContainer: ViewGroup? = null
     private var chatStateJob: Job? = null
@@ -442,18 +430,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private val inputModeWidgetUnifiedBack: View
     private val inputModeSwitch: TabLayout
     private val inputModeWidgetCard: MaterialCardView
-    private val inputModeMainButtonsContainer: View
     private val inputModeWidgetLayout: View
-    val tabSwitcherButton: TabSwitcherButton
-    private val fireButton: View
-
-    private val inputModeCardExtendedEndMargin: Int by lazy {
-        resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
-    }
-
-    private val inputModeCardEndMargin: Int by lazy {
-        resources.getDimensionPixelSize(R.dimen.inputScreenOmnibarCardMarginHorizontal)
-    }
 
     override var onBack: (() -> Unit)? = null
     var onSearchSent: ((String) -> Unit)? = null
@@ -506,9 +483,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         inputModeWidgetUnifiedBack = findViewById(R.id.inputModeUnifiedBack)
         inputModeSwitch = findViewById(R.id.inputModeSwitch)
         inputModeWidgetCard = findViewById(R.id.inputModeWidgetCard)
-        fireButton = findViewById(R.id.inputFieldFireButton)
-        tabSwitcherButton = findViewById(R.id.inputFieldTabsMenu)
-        inputModeMainButtonsContainer = findViewById(R.id.inputModeMainButtonsContainer)
         inputModeWidgetLayout = findViewById(R.id.inputModeWidgetLayout)
 
         configureClickListeners()
@@ -521,7 +495,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun configureClickListeners() {
         inputModeWidgetBack.setOnClickListener { onBackPressed() }
         inputModeWidgetUnifiedBack.setOnClickListener { onBackPressed() }
-        fireButton.setOnClickListener { onFireButtonTapped?.invoke() }
     }
 
     private fun configureInputBehavior() =
@@ -662,33 +635,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         inputField.setSelection(selectionStart + 1)
     }
 
-    private fun setMainButtonsVisible(mainButtonsVisible: Boolean) {
-        fade(inputModeMainButtonsContainer, mainButtonsVisible)
-
-        inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
-            marginEnd = if (mainButtonsVisible) {
-                inputModeCardEndMargin
-            } else {
-                inputModeCardExtendedEndMargin
-            }
-        }
-    }
-
-    private fun fade(
-        view: View,
-        visible: Boolean,
-        duration: Long = FADE_DURATION,
-    ) {
-        if (view.isVisible == visible) return
-        (view.parent as? ViewGroup)?.let { root ->
-            TransitionManager.beginDelayedTransition(
-                root,
-                Fade().apply { this.duration = duration },
-            )
-        }
-        view.isVisible = visible
-    }
-
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
@@ -721,8 +667,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     /**
      * The leading fire menu lives as a sibling of this widget in the bottom omnibar
-     * (see input_mode_widget_card_view.xml). Wire its click here so it shares the
-     * same [onFireButtonTapped] callback as the trailing fire that lives inside the widget.
+     * (see input_mode_widget_card_view.xml), so the widget wires its click to [onFireButtonTapped].
      */
     private fun bindLeadingFireButtonClick() {
         leadingFireButtonView()?.setOnClickListener { onFireButtonTapped?.invoke() }
@@ -1090,10 +1035,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     /**
-     * In a fullscreen Duck.ai chat the fire button moves into the bottom omnibar layout
-     * (sibling to this widget, see input_mode_widget_card_view.xml). The trailing
-     * fire that lives inside the widget hides in DUCK_AI so the user only ever sees one
-     * fire affordance; other contexts keep today's trailing placement.
+     * In a fullscreen Duck.ai chat the fire button sits in the bottom omnibar layout
+     * (sibling to this widget, see input_mode_widget_card_view.xml).
      *
      * The leading fire is additionally hidden while the input field has focus — the user is
      * typing and the chrome around the input should yield space to the keyboard / input area.
@@ -1103,8 +1046,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         // the view in both positions, so gate on position to keep it bottom-only as before.
         val showLeading = isWidgetBottom() && state.shouldShowLeadingFireButton(isEditing = isEditWidget) && !inputField.hasFocus()
         leadingFireButtonView()?.visibility = if (showLeading) VISIBLE else GONE
-        fireButton.visibility =
-            if (state.shouldShowTrailingFireButton(isEditing = isEditWidget)) VISIBLE else GONE
     }
 
     // Onboarding rendering for the leading (Duck.ai) fire button. The lock/dim comes from interactionLock; the
@@ -1413,10 +1354,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         findViewTreeLifecycleOwner()?.lifecycleScope?.launch(dispatchers.io()) {
             viewModel.saveLastUsedTogglePosition(position.name)
         }
-    }
-
-    override fun hideMainButtons() {
-        setMainButtonsVisible(false)
     }
 
     override fun setToggleVisible(visible: Boolean) {
@@ -1752,22 +1689,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         this.onInputTextEmptyChanged = onInputTextEmptyChanged
     }
 
-    override fun bindTabCount(
-        lifecycleOwner: LifecycleOwner,
-        tabCount: LiveData<Int>,
-    ) {
-        tabCountObserver?.let { existing ->
-            tabCountLiveData?.removeObserver(existing)
-        }
-        val observer = Observer<Int> { count ->
-            setTabCount(count)
-        }
-        tabCountLiveData = tabCount
-        tabCountObserver = observer
-        tabCount.observe(lifecycleOwner, observer)
-        setTabCount(tabCount.value ?: 0)
-    }
-
     override fun bindChatSuggestions(
         lifecycleOwner: LifecycleOwner,
         onChatSuggestionSelected: (String) -> Unit,
@@ -1882,10 +1803,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun asView(): View = this
-
-    fun setTabCount(count: Int) {
-        tabSwitcherButton.count = count
-    }
 
     private fun observeChatSuggestionsEnabled() {
         chatSuggestionsSettingJob?.cancel()
@@ -2174,7 +2091,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     companion object {
         private const val MAX_LINES = 5
         private const val CHAT_MIN_LINES = 2
-        private const val FADE_DURATION = 150L
         private const val FOCUS_TRANSITION_DURATION_MS = 100L
         private const val LOCKED_ALPHA = 0.4f
         private const val LOCKED_FIRE_ALPHA = 0.4f
@@ -2230,10 +2146,6 @@ internal fun shouldShowChatSuggestionsCoverOnSelect(
 /** Fire button placed inside the input field card at the leading edge — only in a fullscreen Duck.ai chat. */
 internal fun NativeInputState.shouldShowLeadingFireButton(isEditing: Boolean = false): Boolean =
     !isEditing && inputContext == NativeInputState.InputContext.DUCK_AI
-
-/** Trailing fire button (in the buttons row next to tabs/menu) — hidden in fullscreen Duck.ai chat, otherwise shown. */
-internal fun NativeInputState.shouldShowTrailingFireButton(isEditing: Boolean = false): Boolean =
-    !isEditing && inputContext != NativeInputState.InputContext.DUCK_AI
 
 /**
  * The bottom row hosts chat-mode tools (attachments, options, reasoning, model picker).

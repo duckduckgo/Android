@@ -947,9 +947,9 @@ class RealNativeInputManager @Inject constructor(
     }
 
     /**
-     * Mirrors [NativeInputWidget.bindTabCount]: the fragment's viewLifecycleOwner is reused across
-     * show/hide cycles, so the previous observer is removed before re-observing — otherwise each cycle
-     * stacks an observer that keeps updating a detached button. Shared by the nav-bar strip and the
+     * The fragment's viewLifecycleOwner is reused across show/hide cycles, so the previous observer is
+     * removed before re-observing — otherwise each cycle stacks an observer that keeps updating a
+     * detached button. Shared by the nav-bar strip and the
      * search-only inline buttons.
      */
     private fun bindNavBarTabCount(
@@ -980,8 +980,6 @@ class RealNativeInputManager @Inject constructor(
             onInputFocusChanged = callbacks.onInputFocusChanged
             onFireButtonTapped = callbacks.onFireButtonPressed
             onCustomizeResponsesClicked = callbacks.onCustomizeResponsesClicked
-            bindTabCount(lifecycleOwner, tabs.map { it.size })
-            hideMainButtons()
             onAttachmentChooserStateChanged = { showing -> isPickingImage = showing }
             bindAttachmentCallbacks(
                 onCameraCaptureRequested = callbacks.onCameraCaptureRequested,
