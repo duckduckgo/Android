@@ -29,6 +29,7 @@ class NextStepsCompletionChecker @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) {
 
+    /** [completedIds] keeps the completion order, oldest first. */
     data class Completion(
         val completedIds: Set<String>,
         val newlyCompletedIds: Set<String>,
