@@ -18,43 +18,41 @@ package com.duckduckgo.duckchat.api.tabswitcher
 
 import android.content.Context
 import android.view.View
-import com.duckduckgo.browsermode.api.BrowserMode
+import kotlinx.coroutines.CoroutineScope
 
 /**
- * Rich Duck.ai card for the tab switcher grid. Content is resolved and owned by Duck.ai;
- * the host decides layout from whether a card is available and delegates rendering.
+ * Rich Duck.ai card for the tab switcher grid. Each card resolves and owns what it shows, so hosts only
+ * decide that a Duck.ai tab uses this card and delegate rendering to it.
  */
 interface DuckAiTabGridItemRenderer {
-    /**
-     * Resolves what a Duck.ai tab's grid item shows, from native chat storage for [mode].
-     * @return the content, or null when it can't be shown and the host should use its existing card
-     */
-    suspend fun resolve(tabId: String, url: String?, mode: BrowserMode): DuckAiTabGridItemContent?
-
-    fun create(context: Context): DuckAiTabGridItemView
+    /** The card loads its content in [coroutineScope], which must end before the host's views are destroyed. */
+    fun create(context: Context, coroutineScope: CoroutineScope): DuckAiTabGridItemView
 }
 
-/**
- * What a Duck.ai tab's grid item shows, resolved by Duck.ai and opaque to hosts. Hosts only store it,
- * compare it and pass it to [DuckAiTabGridItemView.bind]. Equality reflects what is shown, so an
- * unequal value means the item needs rebinding.
- */
-interface DuckAiTabGridItemContent {
-    override fun equals(other: Any?): Boolean
-    override fun hashCode(): Int
-}
+/** Identifies the Duck.ai tab a card shows. A different key means the card resolves its content again. */
+data class DuckAiTabGridItemKey(
+    val tabId: String,
+    val url: String?,
+)
 
 interface DuckAiTabGridItemView {
     val view: View
 
-    /** Safe to call repeatedly as the host recycles the view. */
-    fun bind(content: DuckAiTabGridItemContent, state: DuckAiTabGridItemState, callbacks: DuckAiTabGridItemCallbacks)
+    /**
+     * Shows the tab identified by [key], loading its content when it isn't already known. A chat that can't be read
+     * falls back to [DuckAiTabGridItemState.screenshotPath]. Safe to call repeatedly as the host recycles the view.
+     */
+    fun bind(key: DuckAiTabGridItemKey, state: DuckAiTabGridItemState, callbacks: DuckAiTabGridItemCallbacks)
 }
 
 /** Host-owned state for the card. */
 data class DuckAiTabGridItemState(
     val isUnread: Boolean,
     val selection: Selection,
+    /** The host's title for the tab, shown while the card's own content loads. */
+    val title: String,
+    /** Absolute path of the host's screenshot of the tab, or null when it has none. */
+    val screenshotPath: String?,
 ) {
     sealed interface Selection {
         data object None : Selection

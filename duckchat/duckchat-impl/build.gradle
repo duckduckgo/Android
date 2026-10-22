@@ -69,6 +69,7 @@ dependencies {
     implementation AndroidX.viewPager2
 
     implementation "com.squareup.logcat:logcat:_"
+    implementation "com.github.bumptech.glide:glide:_"
     implementation "com.airbnb.android:lottie:_"
 
     implementation Square.retrofit2.retrofit

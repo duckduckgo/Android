@@ -16,10 +16,9 @@
 
 package com.duckduckgo.duckchat.impl.tabswitcher
 
-import com.duckduckgo.browsermode.api.BrowserMode
-import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemContent
+import android.graphics.Bitmap
 
-sealed class RealDuckAiTabGridItemContent : DuckAiTabGridItemContent {
+sealed class RealDuckAiTabGridItemContent {
     data object Empty : RealDuckAiTabGridItemContent()
 
     data class Chat(val title: String, val snippet: String) : RealDuckAiTabGridItemContent()
@@ -30,8 +29,11 @@ sealed class RealDuckAiTabGridItemContent : DuckAiTabGridItemContent {
     /** A question has been sent and no reply text exists yet. */
     data class Thinking(val title: String) : RealDuckAiTabGridItemContent()
 
-    /** [mode] selects the store [fileRef] is read from when the thumbnail loads. */
-    data class ImageChat(val title: String, val fileRef: String, val mode: BrowserMode) : RealDuckAiTabGridItemContent()
+    /** [thumbnail] is null when the image is missing or can't be decoded. */
+    data class ImageChat(val title: String, val fileRef: String, val thumbnail: Bitmap?) : RealDuckAiTabGridItemContent()
 
     data object ActiveVoice : RealDuckAiTabGridItemContent()
+
+    /** The chat can't be read, so the card shows the host's screenshot of the tab instead. */
+    data object Fallback : RealDuckAiTabGridItemContent()
 }

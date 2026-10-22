@@ -47,7 +47,7 @@ class TabSwitcherItemDiffCallback(
                     oldItem.tabEntity.url == newItem.tabEntity.url &&
                     (oldItem as? SelectableTab)?.isSelected == (newItem as? SelectableTab)?.isSelected &&
                     (oldItem as? SelectableTab)?.isDuckAi == (newItem as? SelectableTab)?.isDuckAi &&
-                    oldItem.duckAiGridItemContent == newItem.duckAiGridItemContent
+                    oldItem.isRichDuckAiCard == newItem.isRichDuckAiCard
             }
             else -> false
         }
@@ -65,9 +65,7 @@ class TabSwitcherItemDiffCallback(
             return null
         }
 
-        val oldHasDuckAiGridItemContent = (oldItem as? TabSwitcherItem.Tab)?.duckAiGridItemContent != null
-        val newHasDuckAiGridItemContent = (newItem as? TabSwitcherItem.Tab)?.duckAiGridItemContent != null
-        if (oldHasDuckAiGridItemContent != newHasDuckAiGridItemContent) {
+        if ((oldItem as? TabSwitcherItem.Tab)?.isRichDuckAiCard != (newItem as? TabSwitcherItem.Tab)?.isRichDuckAiCard) {
             return null
         }
 
@@ -94,10 +92,6 @@ class TabSwitcherItemDiffCallback(
                 if ((oldItem as? SelectableTab)?.isSelected != (newItem as? SelectableTab)?.isSelected) {
                     diffBundle.putString(DIFF_KEY_SELECTION, null)
                 }
-
-                if (oldItem.duckAiGridItemContent != newItem.duckAiGridItemContent) {
-                    diffBundle.putString(DIFF_KEY_DUCK_AI_GRID_ITEM_CONTENT, null)
-                }
             }
             oldItem is TabSwitcherItem.TrackersAnimationInfoPanel && newItem is TabSwitcherItem.TrackersAnimationInfoPanel -> {
                 diffBundle.putFloat(
@@ -117,6 +111,5 @@ class TabSwitcherItemDiffCallback(
         const val DIFF_KEY_VIEWED = "viewed"
         const val DIFF_ALPHA = "alpha"
         const val DIFF_KEY_SELECTION = "selection"
-        const val DIFF_KEY_DUCK_AI_GRID_ITEM_CONTENT = "duckAiGridItemContent"
     }
 }
