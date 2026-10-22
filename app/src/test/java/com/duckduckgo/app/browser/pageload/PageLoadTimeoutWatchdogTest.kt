@@ -412,9 +412,10 @@ class PageLoadTimeoutWatchdogTest {
         watchdog.onFinished(URL)
 
         watchdog.onMainFrameRequest("https://other.example.com/")
+        watchdog.onCommitted("https://other.example.com/")
 
         advanceToMs(45_000)
-        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+        assertEquals(listOf(TimedOut(COMMITTED_NO_CONTENT)), timeouts)
     }
 
     @Test
@@ -425,8 +426,68 @@ class PageLoadTimeoutWatchdogTest {
         watchdog.onEngineError()
 
         watchdog.onMainFrameRequest(URL)
+        watchdog.onCommitted(URL)
 
         advanceToMs(45_000)
+        assertEquals(listOf(TimedOut(COMMITTED_NO_CONTENT)), timeouts)
+    }
+
+    @Test
+    fun whenPageIsLoadedThenDifferentUrlRequestNeverCommitsThenNoTimeout() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+
+        watchdog.onMainFrameRequest("https://other.example.com/")
+
+        advanceToSeconds(120)
+        assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
+    fun whenPageIsLoadedThenUserInitiatedRequestNeverCommitsThenTimesOut() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+
+        watchdog.onUserInitiatedLoad()
+        watchdog.onMainFrameRequest("https://other.example.com/")
+
+        advanceToMs(45_000)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenPageIsLoadedThenUserInitiatedRedirectNeverCommitsThenTimesOut() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+
+        watchdog.onUserInitiatedLoad()
+        watchdog.onMainFrameRequest("https://other.example.com/")
+        watchdog.onRedirect(HOP_1)
+
+        advanceToMs(45_000)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenNoPageWasDisplayedThenRequestNeverCommitsThenTimesOut() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onMainFrameRequest(OTHER_URL)
+
+        advanceToMs(45_000)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenSuppressedRequestIsFollowedByUserInitiatedHangThenItTimesOut() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+        watchdog.onMainFrameRequest("https://other.example.com/")
+        advanceToSeconds(60)
+
+        watchdog.onUserInitiatedLoad()
+        watchdog.onMainFrameRequest(OTHER_URL)
+
+        advanceToSeconds(60 + 45)
         assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
     }
 
