@@ -395,6 +395,13 @@ interface SubscriptionsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun subscriptionConcurrentExperiments(): Toggle
 
+    /**
+     * Kill-switch for checking subscription page messages against the committed back/forward entry as well as the
+     * WebView url.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun bridgeOriginCheck(): Toggle
+
     enum class PerformanceOptimizedPaywallsCohorts(override val cohortName: String) : CohortName {
         CONTROL("control"),
         TREATMENT("treatment"),
