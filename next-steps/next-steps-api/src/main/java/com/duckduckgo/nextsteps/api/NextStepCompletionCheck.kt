@@ -19,7 +19,7 @@ package com.duckduckgo.nextsteps.api
  * Reports whether the setup step behind a next steps item is already done, so an item the user
  * has effectively completed elsewhere (e.g. set as default during onboarding) is never shown.
  *
- * Contributed by the module that owns the step, with @ContributesMultibinding(AppScope::class).
+ * Contributed by the module that owns the step, with @ContributesIntoSet(AppScope::class).
  */
 interface NextStepCompletionCheck {
     /** Matches the item's `id`, e.g. "setup_default_browser". */
