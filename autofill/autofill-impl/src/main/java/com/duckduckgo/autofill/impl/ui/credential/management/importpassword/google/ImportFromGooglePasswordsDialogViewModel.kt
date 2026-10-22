@@ -38,6 +38,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goog
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.Importing
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.PreImport
 import com.duckduckgo.codegen.annotations.ContributesViewModel
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.credentialexchange.api.CredentialExchangeResult
 import com.duckduckgo.di.scopes.FragmentScope
@@ -66,12 +67,15 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     private val webViewCapabilityChecker: ImportGooglePasswordsCapabilityChecker,
     private val credentialImportWideEvent: CredentialImportWideEvent,
     private val importRedesignFeature: AutofillImportRedesignFeature,
+    private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
 ) : ViewModel() {
 
     fun determineInitialUi(launchSource: AutofillImportLaunchSource, canShowPreImportDialog: Boolean) {
         viewModelScope.launch {
-            val isRedesignEnabled = withContext(dispatchers.io()) { importRedesignFeature.self().isEnabled() }
-            _viewState.update { it.copy(isRedesignEnabled = isRedesignEnabled) }
+            val (isRedesignEnabled, isPictogramsEnabled) = withContext(dispatchers.io()) {
+                importRedesignFeature.self().isEnabled() to appBrandDesignUpdateToggles.pictograms().isEnabled()
+            }
+            _viewState.update { it.copy(isRedesignEnabled = isRedesignEnabled, isPictogramsEnabled = isPictogramsEnabled) }
             if (canShowPreImportDialog) {
                 shouldShowInitialInstructionalPrompt(launchSource)
             } else {
@@ -222,6 +226,7 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
         val viewMode: ViewMode = DeterminingFirstView,
         val usesCredentialExchange: Boolean = false,
         val isRedesignEnabled: Boolean = false,
+        val isPictogramsEnabled: Boolean = false,
     )
 
     sealed interface Command {
