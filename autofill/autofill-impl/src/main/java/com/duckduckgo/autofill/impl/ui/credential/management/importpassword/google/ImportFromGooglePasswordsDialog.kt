@@ -287,13 +287,8 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
             }
         }
 
-        // check if we should show the initial instructional prompt, and if so, which variant of it. if not, start the import flow directly
         val launchSource = getLaunchSource()
-        if (canShowPreImportDialog(launchSource)) {
-            viewModel.shouldShowInitialInstructionalPrompt(launchSource)
-        } else {
-            viewModel.onDirectImportRequested(launchSource)
-        }
+        viewModel.determineInitialUi(launchSource, canShowPreImportDialog(launchSource))
     }
 
     private fun canShowPreImportDialog(launchSource: AutofillImportLaunchSource): Boolean {
@@ -330,6 +325,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     }
 
     private fun renderViewState(viewState: ViewState) {
+        logcat { "Autofill-import: rendering ${viewState.viewMode}, redesign enabled: ${viewState.isRedesignEnabled}" }
         when (viewState.viewMode) {
             is PreImport -> switchDialogShowPreImportView(viewState.usesCredentialExchange)
             is BrowserPromoPreImport -> switchDialogShowInBrowserPromoPreImportView(viewState.usesCredentialExchange)
