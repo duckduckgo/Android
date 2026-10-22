@@ -15,21 +15,7 @@
   -->
 
 <resources>
-    <!-- Pre-import -->
-    <string name="importPasswordsRedesignPreImportPrimaryButton">Import From Google</string>
-
-    <!-- In-browser promo pre-import -->
-    <string name="importPasswordsRedesignBrowserPromoPrimaryButton">Import From Google</string>
-    <string name="importPasswordsRedesignBrowserPromoSecondaryButton">Don\'t Ask Again</string>
-
-    <!-- Importing -->
     <string name="importPasswordsRedesignImportingPrimaryButton">Done</string>
-
-    <!-- Import success -->
-    <string name="importPasswordsRedesignSuccessTitle">Import complete!</string>
-    <string name="importPasswordsRedesignFailedToImport" instruction="Placeholder is the number of passwords that failed to import">Failed to import: <![CDATA[<b>%1$d</b>]]></string>
     <string name="importPasswordsRedesignSuccessPrimaryButton">Done</string>
-
-    <!-- Import error -->
     <string name="importPasswordsRedesignErrorPrimaryButton">Got It</string>
 </resources>

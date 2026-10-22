@@ -21,10 +21,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.transition.ChangeBounds
-import android.transition.Fade
-import android.transition.TransitionManager
-import android.transition.TransitionSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,7 +31,6 @@ import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentManager
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -285,35 +280,22 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
 
     private fun renderContentVisibility(viewState: ViewState) {
         val hasContent = viewState.viewMode !is DeterminingFirstView
-        val wasRedesignShown = binding.redesign.isVisible
         binding.legacy.root.isVisible = hasContent && !viewState.isRedesignEnabled
         binding.redesign.isVisible = hasContent && viewState.isRedesignEnabled
         if (binding.redesign.isVisible && viewState.viewMode.usesFullHeightSheet() && !isSheetExpandedToFullHeight) {
-            expandToFullHeight(animate = wasRedesignShown)
+            expandToFullHeight()
         }
     }
 
     private fun ViewMode.usesFullHeightSheet() = this is Importing || this is ImportSuccess || this is ImportError
 
-    private fun expandToFullHeight(animate: Boolean) {
-        if (animate) {
-            val sceneRoot = binding.root.rootView as? ViewGroup ?: binding.root
-            TransitionManager.beginDelayedTransition(sceneRoot, createExpandTransition())
-        }
+    private fun expandToFullHeight() {
         val bottomSheetDialog = dialog as BottomSheetDialog
         bottomSheetDialog.findViewById<View>(MaterialR.id.design_bottom_sheet)?.updateLayoutParams { height = ViewGroup.LayoutParams.MATCH_PARENT }
         bottomSheetDialog.behavior.skipCollapsed = true
         bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         isSheetExpandedToFullHeight = true
     }
-
-    private fun createExpandTransition() = TransitionSet()
-        .setOrdering(TransitionSet.ORDERING_TOGETHER)
-        .addTransition(Fade(Fade.OUT))
-        .addTransition(ChangeBounds())
-        .addTransition(Fade(Fade.IN))
-        .setDuration(EXPAND_TRANSITION_DURATION_MS)
-        .setInterpolator(FastOutSlowInInterpolator())
 
     private fun renderRedesignViewState(viewState: ViewState) {
         when (viewState.viewMode) {
@@ -365,7 +347,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         with(binding.importSuccess) {
             val imported = getString(R.string.importPasswordsProcessingResultDialogResultPasswordsImported, result.savedCredentials)
             successImportedRow.setPrimaryText(imported.html(binding.root.context))
-            val failed = getString(R.string.importPasswordsRedesignFailedToImport, result.numberSkipped)
+            val failed = getString(R.string.importPasswordsProcessingResultDialogResultDuplicatesSkipped, result.numberSkipped)
             successFailedRow.setPrimaryText(failed.html(binding.root.context))
             successFailedRow.isVisible = result.numberSkipped > 0
         }
@@ -572,7 +554,6 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     companion object {
 
         private const val KEY_LAUNCH_SOURCE = "launchSource"
-        private const val EXPAND_TRANSITION_DURATION_MS = 300L
 
         fun instance(importSource: AutofillImportLaunchSource, tabId: String? = null, originalUrl: String? = null): ImportFromGooglePasswordsDialog {
             val fragment = ImportFromGooglePasswordsDialog()
