@@ -64,7 +64,6 @@ import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goog
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewState
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
-import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.ui.view.show
@@ -100,9 +99,6 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
 
     @Inject
     lateinit var authorizationGracePeriod: AutofillAuthorizationGracePeriod
-
-    @Inject
-    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     @Inject
     lateinit var credentialExchangeLauncher: CredentialExchangeLauncher
@@ -265,7 +261,10 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     private fun renderLegacyViewState(viewState: ViewState) {
         when (viewState.viewMode) {
             is PreImport -> legacySwitchDialogShowPreImportView(viewState.usesCredentialExchange)
-            is BrowserPromoPreImport -> legacySwitchDialogShowInBrowserPromoPreImportView(viewState.usesCredentialExchange)
+            is BrowserPromoPreImport -> legacySwitchDialogShowInBrowserPromoPreImportView(
+                viewState.usesCredentialExchange,
+                viewState.isPictogramsEnabled,
+            )
             is ImportError -> legacyProcessErrorResult()
             is ImportSuccess -> legacyProcessSuccessResult(viewState.viewMode.importResult)
             is Importing -> legacySwitchDialogShowImportInProgressView()
@@ -290,7 +289,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         binding.legacy.prePostViewSwitcher.displayedChild = 0
     }
 
-    private fun legacySwitchDialogShowInBrowserPromoPreImportView(usesCredentialExchange: Boolean) {
+    private fun legacySwitchDialogShowInBrowserPromoPreImportView(usesCredentialExchange: Boolean, isPictogramsEnabled: Boolean) {
         with(binding.legacy.preflow) {
             val (title, subtitle) = if (usesCredentialExchange) {
                 R.string.passwords_import_promo_in_browser_title_device_auth to R.string.passwords_import_promo_subtitle_device_auth
@@ -300,7 +299,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
             dialogTitle.text = getString(title)
             onboardingSubtitle.text = binding.root.context.prependIconToText(subtitle, R.drawable.ic_lock_solid_12)
             declineButton.show()
-            val animationAsset = resolvePasswordsKeychainAnimationAsset(appBrandDesignUpdateToggles.pictograms().isEnabled())
+            val animationAsset = resolvePasswordsKeychainAnimationAsset(isPictogramsEnabled)
             animationAsset.staticRes?.let { staticRes ->
                 topIllustrationAnimated.cancelAnimation()
                 topIllustrationAnimated.setImageResource(staticRes)
