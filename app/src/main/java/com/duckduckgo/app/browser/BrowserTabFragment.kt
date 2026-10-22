@@ -84,6 +84,7 @@ import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnPreDraw
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -2286,6 +2287,11 @@ class BrowserTabFragment :
 
     private fun isActiveCustomTab(): Boolean = tabId.startsWith(CUSTOM_TAB_NAME_PREFIX) && fragmentIsVisible()
 
+    // The platform keeps only the first call, so later tabs and content changes are no-ops.
+    private fun reportFullyDrawnIfSelected() {
+        if (viewModel.liveSelectedTab.value?.tabId == tabId) activity?.reportFullyDrawn()
+    }
+
     private fun fragmentIsVisible(): Boolean {
         // using isHidden rather than isVisible, as isVisible will incorrectly return false when windowToken is not yet initialized.
         // changes on isHidden will be received in onHiddenChanged
@@ -2329,6 +2335,19 @@ class BrowserTabFragment :
         hidePdf()
         omnibar.setViewMode(ViewMode.Browser(viewModel.url))
         browserNavigationBarIntegration.configureBrowserViewMode()
+        val visibleWebView = webView
+        if (visibleWebView != null) {
+            visibleWebView.postVisualStateCallback(
+                0L,
+                object : WebView.VisualStateCallback() {
+                    override fun onComplete(requestId: Long) {
+                        if (webView === visibleWebView) reportFullyDrawnIfSelected()
+                    }
+                },
+            )
+        } else {
+            binding.browserLayout.doOnPreDraw { reportFullyDrawnIfSelected() }
+        }
     }
 
     private fun showPdfDownloadTooltip() {
@@ -6746,6 +6765,7 @@ class BrowserTabFragment :
                                 LayoutParams.MATCH_PARENT,
                             ),
                         )
+                        newBrowserTab.newTabContainerLayout.doOnPreDraw { reportFullyDrawnIfSelected() }
                     }
                 }.launchIn(viewLifecycleOwner.lifecycleScope)
         }

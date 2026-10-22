@@ -10,6 +10,7 @@ plugins {
     id 'com.squareup.anvil'
     id 'androidx.room'
     id 'org.jetbrains.kotlin.plugin.compose'
+    id 'androidx.baselineprofile'
 }
 apply from: '../versioning.gradle'
 apply from: "$rootDir/code-formatting.gradle"
@@ -168,6 +169,13 @@ android {
                 signingConfig = null
             }
         }
+        benchmark {
+            initWith release
+            applicationIdSuffix ".benchmark"
+            debuggable false
+            signingConfig signingConfigs.debug
+            matchingFallbacks = ["release"]
+        }
     }
     flavorDimensions "store"
     productFlavors {
@@ -237,6 +245,13 @@ if (diFramework != 'Metro') {
     configurations.matching { it.name.startsWith("kapt") && it.name != "kapt" }.configureEach {
         extendsFrom(configurations.kapt)
     }
+}
+
+baselineProfile {
+    automaticGenerationDuringBuild = false
+    saveInSrc = true
+    dexLayoutOptimization = true
+    mergeIntoMain = true
 }
 
 base {
@@ -629,6 +644,8 @@ dependencies {
     // Android KTX
     implementation AndroidX.core.ktx
     implementation AndroidX.core.splashscreen
+    implementation "androidx.profileinstaller:profileinstaller:_"
+    baselineProfile project(':macrobenchmark')
     implementation AndroidX.fragment.ktx
 
     // ViewModel and LiveData
