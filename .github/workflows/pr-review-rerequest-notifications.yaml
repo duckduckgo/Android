@@ -1,0 +1,31 @@
+name: Pull Request Review Re-requested -> Sync With Asana
+
+on:
+  pull_request:
+    types: [review_requested]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  sync:
+    name: Ping re-requested reviewer in Asana
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout native actions repo
+        uses: actions/checkout@v4
+        with:
+          ref: ms/rerequest-review-ping # switch to the release tag once it ships
+          # Do not change the below path (the composite expects it)
+          path: native-github-asana-sync
+          repository: duckduckgo/native-github-asana-sync
+
+      # Pings the reviewer on the linked Asana task when a review is re-requested
+      # from someone who has already reviewed the PR. First requests are skipped.
+      - name: Ping re-requested reviewer in Asana
+        uses: ./native-github-asana-sync/.github/actions/pr-review-rerequest-notifications
+        with:
+          trigger-phrase: "Task/Issue URL:"
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          user-map: ${{ vars.GH_ANDROID_USER_MAP }}
