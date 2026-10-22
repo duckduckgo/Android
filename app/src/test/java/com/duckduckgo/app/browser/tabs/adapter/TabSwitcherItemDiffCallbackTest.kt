@@ -17,10 +17,13 @@
 package com.duckduckgo.app.browser.tabs.adapter
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_DUCK_AI_GRID_ITEM_CONTENT
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_TITLE
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_URL
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
+import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemContent
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -68,4 +71,36 @@ class TabSwitcherItemDiffCallbackTest {
         assertTrue(bundle!!.containsKey(DIFF_KEY_TITLE))
         assertFalse(bundle.containsKey(DIFF_KEY_URL))
     }
+
+    @Test
+    fun `when duck ai content changes then contents differ and payload marks the content`() {
+        val oldTab = duckAiTab(content = TestContent("old"))
+        val newTab = duckAiTab(content = TestContent("new"))
+
+        assertFalse(callback.areContentsTheSame(oldTab, newTab))
+        assertTrue(callback.getChangePayload(oldTab, newTab)!!.containsKey(DIFF_KEY_DUCK_AI_GRID_ITEM_CONTENT))
+    }
+
+    @Test
+    fun `when duck ai content is unchanged then contents are the same`() {
+        assertTrue(callback.areContentsTheSame(duckAiTab(content = TestContent("same")), duckAiTab(content = TestContent("same"))))
+    }
+
+    @Test
+    fun `when duck ai content appears then no payload so the view type can change`() {
+        assertNull(callback.getChangePayload(duckAiTab(content = null), duckAiTab(content = TestContent("new"))))
+    }
+
+    @Test
+    fun `when duck ai content disappears then no payload so the view type can change`() {
+        assertNull(callback.getChangePayload(duckAiTab(content = TestContent("old")), duckAiTab(content = null)))
+    }
+
+    private fun duckAiTab(content: DuckAiTabGridItemContent?) = DuckAiTab(
+        entity = TabEntity(tabId = "1", url = "https://duck.ai/chat", position = 0),
+        isActive = false,
+        duckAiGridItemContent = content,
+    )
+
+    private data class TestContent(val content: String) : DuckAiTabGridItemContent
 }

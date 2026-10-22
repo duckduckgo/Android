@@ -33,6 +33,7 @@ android {
 dependencies {
     ksp project(':codegen-ksp')
     implementation project(path: ':codegen-annotations')
+    implementation project(path: ':browser-api')
     implementation project(path: ':browser-mode-api')
     implementation project(path: ':internal-features-api')
     implementation project(path: ':duckchat-api')
