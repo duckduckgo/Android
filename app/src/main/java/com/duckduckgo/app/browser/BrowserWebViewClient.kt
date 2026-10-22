@@ -910,6 +910,7 @@ class BrowserWebViewClient @Inject constructor(
                 }
                 // The request waits here, so this always runs before the load can commit.
                 if (request.isForMainFrame && !request.isSpeculativeLoad() && pageLoadFeature.pageLoadTimeoutWatchdog().isEnabled()) {
+                    if (request.hasGesture()) pageLoadTimeoutWatchdog.onUserInitiatedLoad()
                     pageLoadTimeoutWatchdog.onMainFrameRequest(request.url.toString())
                 }
                 webView.url
