@@ -55,9 +55,9 @@ interface PasswordsImportScreenPromotionPlugin {
 
     interface Callback {
         /**
-         * The card took the user somewhere else (for example Sync setup). The host closes the import sheet.
+         * The host closes the import sheet when this is called.
          */
-        fun onPromoActionClicked()
+        fun dismissHost()
     }
 
     companion object {
