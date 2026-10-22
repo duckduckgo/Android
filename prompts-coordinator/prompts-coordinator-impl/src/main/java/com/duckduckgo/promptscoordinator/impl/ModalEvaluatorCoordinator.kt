@@ -21,6 +21,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import com.duckduckgo.promptscoordinator.api.ModalTrigger
@@ -65,12 +66,14 @@ class ModalEvaluatorCoordinator @Inject constructor(
     private val promptsCoordinator: PromptsCoordinator,
     private val dispatchers: DispatcherProvider,
     private val promptExposureReporter: PromptExposureReporter,
+    private val customTabDetector: CustomTabDetector,
 ) : MainProcessLifecycleObserver, NewTabPageModalTrigger {
 
     private val evaluationMutex = Mutex()
 
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
+        logcat { "CTPromptDebug: process ON_RESUME, scheduling APP_RESUME pass" }
         appCoroutineScope.launch(dispatchers.io()) {
             coordinateEvaluation(ModalTrigger.APP_RESUME)
         }
@@ -83,7 +86,13 @@ class ModalEvaluatorCoordinator @Inject constructor(
     }
 
     private suspend fun coordinateEvaluation(trigger: ModalTrigger) = evaluationMutex.withLock {
+        logcat { "CTPromptDebug: coordinator pass START trigger=$trigger" }
         logcat { "ModalEvaluatorCoordinator: Starting coordinated evaluation for trigger $trigger" }
+
+        if (customTabDetector.isCustomTab()) {
+            logcat { "ModalEvaluatorCoordinator: Evaluation skipped, a custom tab is showing" }
+            return@withLock
+        }
 
         var claimHeld = false
         val promptsCoordinatorEnabled = promptsCoordinator.isEnabled()
@@ -110,9 +119,11 @@ class ModalEvaluatorCoordinator @Inject constructor(
 
             for (evaluator in evaluators) {
                 logcat { "ModalEvaluatorCoordinator: Evaluating '${evaluator.evaluatorId}' (priority ${evaluator.priority})" }
+                logcat { "CTPromptDebug: evaluating '${evaluator.evaluatorId}'" }
 
                 when (evaluator.evaluate()) {
                     is ModalEvaluator.EvaluationResult.ModalShown -> {
+                        logcat { "CTPromptDebug: '${evaluator.evaluatorId}' returned ModalShown" }
                         logcat {
                             "ModalEvaluatorCoordinator: Evaluator '${evaluator.evaluatorId}' " +
                                 "completed and modal shown, record timestamp and stop"
