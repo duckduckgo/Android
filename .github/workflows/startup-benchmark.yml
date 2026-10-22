@@ -1,0 +1,154 @@
+name: Startup Benchmark
+
+on:
+  push:
+    branches: [feature/gerard/startup-baseline-profile]
+  workflow_dispatch:
+    inputs:
+      tests:
+        description: 'Comma-separated StartupBenchmark methods (noCompilation, partialNoProfile, baselineProfile, fullCompilation)'
+        required: true
+        default: 'noCompilation,partialNoProfile,baselineProfile,fullCompilation'
+      device_model:
+        description: 'FTL physical device model id (instantnoodle = OnePlus 8)'
+        required: true
+        default: 'instantnoodle'
+      device_version:
+        description: 'FTL Android API level for the device'
+        required: true
+        default: '34'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  startup-benchmark:
+    name: Startup benchmark
+    runs-on: android-large-runner
+    timeout-minutes: 150
+    env:
+      DEFAULT_TESTS: noCompilation,partialNoProfile,baselineProfile,fullCompilation
+      DEFAULT_DEVICE_MODEL: instantnoodle
+      DEFAULT_DEVICE_VERSION: '34'
+
+    steps:
+      - name: Validate inputs
+        env:
+          TESTS: ${{ inputs.tests || env.DEFAULT_TESTS }}
+          DEVICE_MODEL: ${{ inputs.device_model || env.DEFAULT_DEVICE_MODEL }}
+          DEVICE_VERSION: ${{ inputs.device_version || env.DEFAULT_DEVICE_VERSION }}
+        run: |
+          [[ "$TESTS" =~ ^(noCompilation|partialNoProfile|baselineProfile|fullCompilation)(,(noCompilation|partialNoProfile|baselineProfile|fullCompilation))*$ ]] || { echo "Invalid tests: $TESTS"; exit 1; }
+          [[ "$DEVICE_MODEL" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "Invalid device_model"; exit 1; }
+          [[ "$DEVICE_VERSION" =~ ^[0-9]+$ ]] || { echo "Invalid device_version"; exit 1; }
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          submodules: recursive
+
+      - name: Set up JDK version
+        uses: actions/setup-java@v4
+        with:
+          java-version-file: .github/.java-version
+          distribution: 'adopt'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          cache-read-only: true
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Decode release properties
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+          fileName: ddg_android_build.properties
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Decode release key
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.FAKE_RELEASE_KEY }}
+          fileName: android
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Write Flank credentials
+        env:
+          FLANK: ${{ secrets.FLANK }}
+        run: echo "$FLANK" > flank.json
+
+      - name: Ensure debug keystore exists
+        run: |
+          # macrobenchmark/build.gradle signs its release build type with the AGP debug keystore.
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            mkdir -p "$HOME/.android"
+            keytool -genkeypair -v -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -keypass android -alias androiddebugkey \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
+      - name: Build APKs
+        env:
+          DUCKSANS_PACKAGE_AUTH_USER: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
+          DUCKSANS_PACKAGE_AUTH_TOKEN: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
+        run: ./gradlew -q :app:assembleInternalRelease :macrobenchmark:assembleRelease -Pforce-default-variant
+
+      - name: Run startup benchmark on FTL
+        env:
+          TESTS: ${{ inputs.tests || env.DEFAULT_TESTS }}
+          DEVICE_MODEL: ${{ inputs.device_model || env.DEFAULT_DEVICE_MODEL }}
+          DEVICE_VERSION: ${{ inputs.device_version || env.DEFAULT_DEVICE_VERSION }}
+        run: |
+          ./gradlew -q runFlankStartupTests --no-configuration-cache \
+            -PftlStartupMethods="$TESTS" -PftlDeviceModel="$DEVICE_MODEL" -PftlDeviceVersion="$DEVICE_VERSION"
+
+      - name: Authenticate to Google Cloud
+        if: always()
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FLANK }}
+
+      - name: Download benchmark artifacts from the FTL results bucket
+        if: always()
+        run: |
+          set -euo pipefail
+          GCS_PATH=$(jq -r '.[].gcsPath' build/fladle/startupResults/matrix_ids.json | head -1)
+          GCS_PATH="${GCS_PATH%/}"
+          if [ -z "$GCS_PATH" ] || [ "$GCS_PATH" = "null" ]; then
+            echo "ERROR: could not read gcsPath from matrix_ids.json" >&2
+            exit 1
+          fi
+          mkdir -p startup-artifacts
+          gcloud storage cp -r "gs://${GCS_PATH}/*" startup-artifacts/
+
+      - name: Summarize results
+        if: always()
+        run: |
+          {
+            echo "Device: \`${{ inputs.device_model || env.DEFAULT_DEVICE_MODEL }}\` API ${{ inputs.device_version || env.DEFAULT_DEVICE_VERSION }}, ref \`${{ github.ref_name }}\` @ \`${GITHUB_SHA::10}\`"
+            echo
+            echo "| Test | TTID min | TTID median | TTID max | TTFD min | TTFD median | TTFD max |"
+            echo "|---|---:|---:|---:|---:|---:|---:|"
+            find startup-artifacts -name '*benchmarkData.json' -print0 | xargs -0 -r jq -r '
+              .benchmarks[] | .name as $n | .metrics as $m
+              | "| \($n) | " + ([ "timeToInitialDisplayMs", "timeToFullDisplayMs" ]
+                  | map($m[.] | "\(.minimum) | \(.median) | \(.maximum)") | join(" | ")) + " |"'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: startup-benchmark-${{ github.run_number }}
+          path: |
+            startup-artifacts/**
+          retention-days: 30
