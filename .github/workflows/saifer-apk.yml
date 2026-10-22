@@ -1,0 +1,86 @@
+name: Build Saifer Browser APK
+
+on:
+  push:
+    branches:
+      - saifer-browser-build
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: saifer-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-apk:
+    name: Build branded Saifer Browser from source
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout source with submodules
+        uses: actions/checkout@v4
+        with:
+          ref: saifer-browser-build
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Configure Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Assemble F-Droid release variant
+        env:
+          MALICIOUS_SITE_PROTECTION_AUTH_TOKEN: ${{ secrets.MALICIOUS_SITE_PROTECTION_AUTH_TOKEN }}
+        run: |
+          chmod +x ./gradlew
+          ./gradlew --no-daemon assembleFdroidRelease
+
+      - name: Locate APK
+        id: apk
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="$(find app/build/outputs/apk -type f -name '*.apk' ! -name '*androidTest*' | head -n 1)"
+          test -n "$APK"
+          echo "path=$APK" >> "$GITHUB_OUTPUT"
+          echo "Built APK: $APK"
+
+      - name: Sign installable Saifer APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDK_ROOT="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          BUILD_TOOLS="$SDK_ROOT/build-tools/$(find "$SDK_ROOT/build-tools" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort -V | tail -n 1)"
+          mkdir -p dist
+          keytool -genkeypair -noprompt \
+            -keystore saifer-ci-signing.jks \
+            -storepass saifer-temporary-build-key \
+            -keypass saifer-temporary-build-key \
+            -alias saifer \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=Saifer Browser, OU=Build, O=Saifer, L=Dhaka, ST=Dhaka, C=BD"
+          "$BUILD_TOOLS/zipalign" -f 4 "${{ steps.apk.outputs.path }}" dist/SaiferBrowser-aligned.apk
+          "$BUILD_TOOLS/apksigner" sign \
+            --ks saifer-ci-signing.jks \
+            --ks-key-alias saifer \
+            --ks-pass pass:saifer-temporary-build-key \
+            --key-pass pass:saifer-temporary-build-key \
+            --out dist/SaiferBrowser.apk \
+            dist/SaiferBrowser-aligned.apk
+          "$BUILD_TOOLS/apksigner" verify dist/SaiferBrowser.apk
+          rm -f saifer-ci-signing.jks dist/SaiferBrowser-aligned.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SaiferBrowser-APK
+          path: dist/SaiferBrowser.apk
+          if-no-files-found: error
+          retention-days: 14
