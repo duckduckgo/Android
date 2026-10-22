@@ -63,6 +63,6 @@ interface TabManagerFeatureFlags {
     /**
      * Shows Duck.ai tabs in the tab switcher grid as a rich card instead of the tab preview.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun richDuckAiGridTabItem(): Toggle
 }

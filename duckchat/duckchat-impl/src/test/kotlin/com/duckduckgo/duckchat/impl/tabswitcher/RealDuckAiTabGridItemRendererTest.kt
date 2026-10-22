@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.tabswitcher
 
+import android.graphics.Bitmap
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -25,11 +26,15 @@ import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatPreview
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import com.duckduckgo.duckchat.store.impl.FileRefContent
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -40,6 +45,8 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.robolectric.annotation.GraphicsMode
+import java.io.ByteArrayOutputStream
 
 @RunWith(AndroidJUnit4::class)
 class RealDuckAiTabGridItemRendererTest {
@@ -100,6 +107,34 @@ class RealDuckAiTabGridItemRendererTest {
     }
 
     @Test
+    fun whenResolvingSeveralTabsThenMigrationCheckedOnce() = runTest {
+        whenever(regularStore.getChatPreview(any())).thenReturn(preview(lastMessageText = "Answer"))
+
+        testee.resolve("tab-1", CHAT_URL, BrowserMode.REGULAR)
+        testee.resolve("tab-2", "https://duck.ai/?chatID=chat-2", BrowserMode.REGULAR)
+
+        verify(regularStore, times(1)).hasMigrated()
+    }
+
+    @Test
+    fun whenNotMigratedThenNotCheckedAgainForTheOpening() = runTest {
+        whenever(regularStore.hasMigrated()).thenReturn(false, true)
+
+        assertNull(testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertNull(testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        verify(regularStore, times(1)).hasMigrated()
+    }
+
+    @Test
+    fun whenStorageCheckedForOneModeThenOtherModeCheckedSeparately() = runTest {
+        whenever(regularStore.hasMigrated()).thenReturn(false)
+        whenever(fireStore.getChatPreview(CHAT_ID)).thenReturn(preview(lastMessageText = "Fire"))
+
+        assertNull(testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertEquals(RealDuckAiTabGridItemContent.Chat("Title", "Fire"), testee.resolve(TAB_ID, CHAT_URL, BrowserMode.FIRE))
+    }
+
+    @Test
     fun whenChatNotFoundThenNull() = runTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(null)
 
@@ -118,6 +153,20 @@ class RealDuckAiTabGridItemRendererTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(lastMessageText = "a".repeat(600)))
 
         assertEquals(RealDuckAiTabGridItemContent.Chat("Title", "a".repeat(500)), testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+    }
+
+    @Test
+    fun whenVoiceChatWithLastMessageThenTranscriptContent() = runTest {
+        whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(isVoice = true, lastMessageText = "Said"))
+
+        assertEquals(RealDuckAiTabGridItemContent.VoiceTranscript("Title", "Said"), testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+    }
+
+    @Test
+    fun whenVoiceChatWithoutTextThenEmptyContent() = runTest {
+        whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(isVoice = true, lastMessageText = null, isAwaitingReply = true))
+
+        assertEquals(RealDuckAiTabGridItemContent.Empty, testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
     }
 
     @Test
@@ -173,6 +222,35 @@ class RealDuckAiTabGridItemRendererTest {
     }
 
     @Test
+    fun whenChatReadFailsThenNotReadAgainOnNextResolve() = runTest {
+        whenever(regularStore.getChatPreview(CHAT_ID)).thenThrow(IllegalStateException("Row too big to fit into CursorWindow"))
+
+        testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR)
+
+        assertNull(testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        verify(regularStore, times(1)).getChatPreview(CHAT_ID)
+    }
+
+    @Test
+    fun whenChatReadFailsInOneModeThenOtherModeStillRead() = runTest {
+        whenever(regularStore.getChatPreview(CHAT_ID)).thenThrow(IllegalStateException("Row too big to fit into CursorWindow"))
+        whenever(fireStore.getChatPreview(CHAT_ID)).thenReturn(preview(lastMessageText = "Fire"))
+
+        testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR)
+
+        assertEquals(RealDuckAiTabGridItemContent.Chat("Title", "Fire"), testee.resolve(TAB_ID, CHAT_URL, BrowserMode.FIRE))
+    }
+
+    @Test
+    fun whenChatReadFailsThenVoiceSessionStillShown() = runTest {
+        whenever(regularStore.getChatPreview(CHAT_ID)).thenThrow(IllegalStateException("Row too big to fit into CursorWindow"))
+        testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR)
+        whenever(voiceSessionStateManager.isVoiceSessionActive(TAB_ID)).thenReturn(true)
+
+        assertEquals(RealDuckAiTabGridItemContent.ActiveVoice, testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+    }
+
+    @Test
     fun whenChatResolvedAgainThenPreviewReadOnce() = runTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(lastMessageText = "Answer"), preview(lastMessageText = "Newer"))
 
@@ -201,8 +279,88 @@ class RealDuckAiTabGridItemRendererTest {
         assertEquals(RealDuckAiTabGridItemContent.Chat("Title", "Fire"), testee.resolve(TAB_ID, CHAT_URL, BrowserMode.FIRE))
     }
 
+    @Test
+    @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    fun whenThumbnailLoadedAgainThenCachedBitmapReturnedWithoutRereading() = runTest {
+        whenever(regularStore.readFileRef(FILE_REF)).thenReturn(pngFileRef())
+
+        val first = testee.loadThumbnail(FILE_REF, BrowserMode.REGULAR)
+        val second = testee.loadThumbnail(FILE_REF, BrowserMode.REGULAR)
+
+        assertNotNull(first)
+        assertSame(first, second)
+        verify(regularStore, times(1)).readFileRef(FILE_REF)
+    }
+
+    @Test
+    @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    fun whenSameFileRefInOtherModeThenThumbnailNotShared() = runTest {
+        whenever(regularStore.readFileRef(FILE_REF)).thenReturn(pngFileRef())
+        whenever(fireStore.readFileRef(FILE_REF)).thenReturn(pngFileRef())
+
+        testee.loadThumbnail(FILE_REF, BrowserMode.REGULAR)
+        testee.loadThumbnail(FILE_REF, BrowserMode.FIRE)
+
+        verify(fireStore).readFileRef(FILE_REF)
+    }
+
+    @Test
+    fun whenThumbnailMissingThenNullAndReadAgainOnNextLoad() = runTest {
+        whenever(regularStore.readFileRef(FILE_REF)).thenReturn(null)
+
+        assertNull(testee.loadThumbnail(FILE_REF, BrowserMode.REGULAR))
+        testee.loadThumbnail(FILE_REF, BrowserMode.REGULAR)
+
+        verify(regularStore, times(2)).readFileRef(FILE_REF)
+    }
+
+    @Test
+    fun whenThumbnailReadThrowsThenNullAndReadAgainOnNextLoad() = runTest {
+        whenever(regularStore.readFileRef(FILE_REF)).thenThrow(IllegalStateException("read failed"))
+
+        assertNull(testee.loadThumbnail(FILE_REF, BrowserMode.REGULAR))
+        testee.loadThumbnail(FILE_REF, BrowserMode.REGULAR)
+
+        verify(regularStore, times(2)).readFileRef(FILE_REF)
+    }
+
+    @Test
+    fun whenThumbnailDecodeRunsOutOfMemoryThenNull() = runTest {
+        whenever(regularStore.readFileRef(FILE_REF)).thenAnswer { throw OutOfMemoryError() }
+
+        assertNull(testee.loadThumbnail(FILE_REF, BrowserMode.REGULAR))
+    }
+
+    @Test
+    @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    fun whenImageIsLargeThenShortSideSampledDownToTarget() = runTest {
+        whenever(regularStore.readFileRef(FILE_REF)).thenReturn(pngFileRef(width = 2048, height = 2048))
+
+        val bitmap = testee.loadThumbnail(FILE_REF, BrowserMode.REGULAR)!!
+
+        assertEquals(512, bitmap.width)
+        assertEquals(512, bitmap.height)
+    }
+
+    @Test
+    @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    fun whenImageIsVeryTallThenSampledUnderPixelCap() = runTest {
+        whenever(regularStore.readFileRef(FILE_REF)).thenReturn(pngFileRef(width = 512, height = 8192))
+
+        val bitmap = testee.loadThumbnail(FILE_REF, BrowserMode.REGULAR)!!
+
+        assertTrue(bitmap.width.toLong() * bitmap.height <= 1024 * 1024)
+    }
+
+    private fun pngFileRef(width: Int = 4, height: Int = 4): FileRefContent {
+        val output = ByteArrayOutputStream()
+        Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888).compress(Bitmap.CompressFormat.PNG, 100, output)
+        return FileRefContent(fileName = null, mimeType = "image/png", bytes = output.toByteArray())
+    }
+
     private fun preview(
         isImageGeneration: Boolean = false,
+        isVoice: Boolean = false,
         fileRefs: List<String> = emptyList(),
         lastMessageText: String? = null,
         isAwaitingReply: Boolean = false,
@@ -215,6 +373,7 @@ class RealDuckAiTabGridItemRendererTest {
             pinned = false,
             fileRefs = fileRefs,
             isImageGeneration = isImageGeneration,
+            isVoice = isVoice,
         ),
         lastMessageText = lastMessageText,
         isAwaitingReply = isAwaitingReply,
@@ -224,5 +383,6 @@ class RealDuckAiTabGridItemRendererTest {
         const val TAB_ID = "tab"
         const val CHAT_ID = "chat-1"
         const val CHAT_URL = "https://duck.ai/?chatID=$CHAT_ID"
+        const val FILE_REF = "file-1"
     }
 }

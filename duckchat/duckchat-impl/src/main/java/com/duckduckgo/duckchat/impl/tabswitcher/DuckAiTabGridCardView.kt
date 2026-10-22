@@ -18,12 +18,14 @@ package com.duckduckgo.duckchat.impl.tabswitcher
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.TouchDelegate
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.ImageView
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -45,7 +47,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 
 class DuckAiTabGridCardView(
     context: Context,
-    private val thumbnailLoader: suspend (fileRef: String, mode: BrowserMode) -> ByteArray?,
+    private val thumbnailLoader: suspend (fileRef: String, mode: BrowserMode) -> Bitmap?,
     private val dispatchers: DispatcherProvider,
     private val coroutineScope: CoroutineScope,
 ) : DuckAiTabGridItemView {
@@ -89,8 +91,8 @@ class DuckAiTabGridCardView(
             tabChatItemDetails.gone()
             thumbnail.gone()
             thumbnail.setImageDrawable(null)
+            tabChatItemVoice.gone()
             tabChatItemEmptyLogo.gone()
-            voiceActive.gone()
             tabChatItemBranding.setText(
                 if (content == RealDuckAiTabGridItemContent.Empty) BrowserUiR.string.browserMenuNewChat else R.string.duck_chat_title,
             )
@@ -100,26 +102,48 @@ class DuckAiTabGridCardView(
                     tabChatItemTitle.text = content.title
                     tabChatItemTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
                     snippet.text = content.snippet
+                    snippet.show()
+                    bindChatType(R.string.duckAiTabCardChatTypeLabel, R.drawable.ic_chat_16)
                     tabChatItemDetails.show()
                 }
                 is RealDuckAiTabGridItemContent.Thinking -> {
                     tabChatItemTitle.setText(R.string.duckAiTabCardThinkingTitle)
                     tabChatItemTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_thinking_16, 0, 0, 0)
                     snippet.text = content.title
+                    snippet.show()
+                    bindChatType(R.string.duckAiTabCardChatTypeLabel, R.drawable.ic_chat_16)
                     tabChatItemDetails.show()
                 }
                 is RealDuckAiTabGridItemContent.ImageChat -> {
+                    tabChatItemTitle.text = content.title
+                    tabChatItemTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
+                    snippet.gone()
                     thumbnail.show()
+                    bindChatType(R.string.duckAiTabCardChatTypeLabel, R.drawable.ic_chat_16)
+                    tabChatItemDetails.show()
                     loadThumbnail(content)
+                }
+                is RealDuckAiTabGridItemContent.VoiceTranscript -> {
+                    tabChatItemTitle.text = content.title
+                    tabChatItemTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
+                    snippet.text = content.transcript
+                    snippet.show()
+                    bindChatType(R.string.duckAiTabCardTranscriptTypeLabel, R.drawable.ic_ai_chat_voice_16)
+                    tabChatItemDetails.show()
                 }
                 RealDuckAiTabGridItemContent.Empty -> {
                     tabChatItemEmptyLogo.show()
                 }
                 RealDuckAiTabGridItemContent.ActiveVoice -> {
-                    voiceActive.show()
+                    tabChatItemVoice.show()
                 }
             }
         }
+    }
+
+    private fun bindChatType(@StringRes label: Int, @DrawableRes icon: Int) = with(binding.tabChatItemType) {
+        setChipText(label)
+        setChipIcon(icon)
     }
 
     private fun bindState(state: DuckAiTabGridItemState) = with(binding) {
@@ -156,38 +180,27 @@ class DuckAiTabGridCardView(
         }
     }
 
-    // A missing or undecodable image falls back to the empty look.
+    // A missing or undecodable image shows the Duck.ai logo in its place, keeping the title and label.
     private fun loadThumbnail(content: RealDuckAiTabGridItemContent.ImageChat) {
         if (binding.thumbnail.drawable != null) return
         thumbnailJob += coroutineScope.launch(dispatchers.main()) {
             val bitmap = withContext(dispatchers.io()) {
-                thumbnailLoader(content.fileRef, content.mode)?.let { decodeSampled(it) }
+                thumbnailLoader(content.fileRef, content.mode)
             }
             if (boundContent != content) return@launch
-            if (bitmap != null) {
-                binding.thumbnail.setImageBitmap(bitmap)
-            } else {
-                binding.thumbnail.gone()
-                binding.tabChatItemEmptyLogo.show()
+            with(binding.thumbnail) {
+                if (bitmap != null) {
+                    scaleType = ImageView.ScaleType.CENTER_CROP
+                    setImageBitmap(bitmap)
+                } else {
+                    scaleType = ImageView.ScaleType.CENTER_INSIDE
+                    setImageResource(CommonR.drawable.duckduckgo_duckai_96)
+                }
             }
         }
-    }
-
-    private fun decodeSampled(bytes: ByteArray): Bitmap? {
-        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
-        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
-
-        var sampleSize = 1
-        while (bounds.outWidth / (sampleSize * 2) >= THUMBNAIL_MAX_PX && bounds.outHeight / (sampleSize * 2) >= THUMBNAIL_MAX_PX) {
-            sampleSize *= 2
-        }
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size, BitmapFactory.Options().apply { inSampleSize = sampleSize })
     }
 
     private companion object {
-        // Covers the card's preview slot at high densities with room for the centerCrop.
-        const val THUMBNAIL_MAX_PX = 512
         const val EXTRA_CLOSE_BUTTON_TOUCH_AREA_DP = 6
     }
 }
