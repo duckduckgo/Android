@@ -1351,8 +1351,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun saveLastUsedTogglePosition(isChat: Boolean) {
         val position = if (isChat) DefaultTogglePosition.DUCK_AI else DefaultTogglePosition.SEARCH
-        findViewTreeLifecycleOwner()?.lifecycleScope?.launch(dispatchers.io()) {
-            viewModel.saveLastUsedTogglePosition(position.name)
+        doOnAttach {
+            findViewTreeLifecycleOwner()?.lifecycleScope?.launch(dispatchers.io()) {
+                viewModel.saveLastUsedTogglePosition(position.name)
+            }
         }
     }
 
