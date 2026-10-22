@@ -21,7 +21,7 @@ ext {
 
 android {
     defaultConfig {
-        applicationId "com.duckduckgo.mobile.android"
+        applicationId "com.saifer.browser"
 
         minSdk min_sdk
         targetSdk target_sdk
