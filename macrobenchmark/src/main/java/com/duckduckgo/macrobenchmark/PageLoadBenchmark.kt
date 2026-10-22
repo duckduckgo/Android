@@ -35,7 +35,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 
-internal const val TARGET_PACKAGE = "com.duckduckgo.mobile.android"
+/**
+ * The Gradle build type supplies this value so the test APK and target app always use the same
+ * package.
+ */
+internal val TARGET_PACKAGE: String
+    get() = BuildConfig.TARGET_PACKAGE
 
 /**
  * Page-load benchmark: drives N sequential navigations to a deterministic test page inside a SINGLE
