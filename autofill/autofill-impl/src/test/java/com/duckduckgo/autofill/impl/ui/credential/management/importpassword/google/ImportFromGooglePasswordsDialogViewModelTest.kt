@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.InBrowserPromo
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.importing.AutofillImportRedesignFeature
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.Finished
@@ -35,7 +36,9 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -50,6 +53,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ImportFromGooglePasswordsDialogViewModelTest {
@@ -286,6 +290,71 @@ class ImportFromGooglePasswordsDialogViewModelTest {
             testee.onDirectImportRequested(TEST_SOURCE)
             assertEquals(Command.StartWebFlow, awaitItem())
         }
+    }
+
+    @Test
+    fun whenImportFinishedWithRedesignThenImportingKeptUntilPromoResolved() = runTest {
+        configureImportFinished(savedCredentials = 10, numberSkipped = 2)
+        showRedesignedPreImportPrompt()
+
+        testee.onImportFlowFinishedSuccessfully()
+        runCurrent()
+
+        val waitingState = testee.viewState.value
+        waitingState.assertIsImporting()
+        val request = requireNotNull(waitingState.promoRequest)
+        assertEquals(PasswordsImportScreenPromotionPlugin.ImportResult(successCount = 10, skippedCount = 2), request.data)
+
+        request.onPromoResolved()
+        runCurrent()
+
+        val successState = testee.viewState.value
+        assertTrue(successState.viewMode is ImportSuccess)
+        assertNull(successState.promoRequest)
+    }
+
+    @Test
+    fun whenPromoNotResolvedInTimeThenImportSuccessShown() = runTest {
+        configureImportFinished(savedCredentials = 10, numberSkipped = 0)
+        showRedesignedPreImportPrompt()
+
+        testee.onImportFlowFinishedSuccessfully()
+        runCurrent()
+        testee.viewState.value.assertIsImporting()
+
+        advanceTimeBy(ImportFromGooglePasswordsDialogViewModel.PROMO_TIMEOUT + 1.milliseconds)
+
+        val state = testee.viewState.value
+        assertTrue(state.viewMode is ImportSuccess)
+        assertNull(state.promoRequest)
+    }
+
+    @Test
+    fun whenPromoResolvedTwiceThenImportSuccessShownOnce() = runTest {
+        configureImportFinished(savedCredentials = 10, numberSkipped = 0)
+        showRedesignedPreImportPrompt()
+        testee.onImportFlowFinishedSuccessfully()
+        runCurrent()
+        val request = requireNotNull(testee.viewState.value.promoRequest)
+
+        request.onPromoResolved()
+        request.onPromoResolved()
+        runCurrent()
+
+        assertTrue(testee.viewState.value.viewMode is ImportSuccess)
+    }
+
+    @Test
+    fun whenImportFinishedWithoutRedesignThenNoPromoRequested() = runTest {
+        configureImportFinished(savedCredentials = 10, numberSkipped = 0)
+        showPreImportPrompt()
+
+        testee.onImportFlowFinishedSuccessfully()
+        runCurrent()
+
+        val state = testee.viewState.value
+        assertTrue(state.viewMode is ImportSuccess)
+        assertNull(state.promoRequest)
     }
 
     @Test
@@ -541,6 +610,12 @@ class ImportFromGooglePasswordsDialogViewModelTest {
 
     private fun TestScope.showPreImportPrompt() {
         testee.shouldShowInitialInstructionalPrompt(importSource = TEST_SOURCE)
+        advanceUntilIdle()
+    }
+
+    private fun TestScope.showRedesignedPreImportPrompt() {
+        importRedesignFeature.self().setRawStoredState(State(enable = true))
+        testee.determineInitialUi(TEST_SOURCE, canShowPreImportDialog = true)
         advanceUntilIdle()
     }
 
