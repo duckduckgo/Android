@@ -126,8 +126,6 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
 
     private var successImport = false
 
-    private var isSheetExpandedToFullHeight = false
-
     private val importGooglePasswordsFlowLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
         if (activityResult.resultCode == Activity.RESULT_OK) {
             viewLifecycleOwner.lifecycleScope.launch {
@@ -230,15 +228,13 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         binding.preImport.preImportButton.setOnClickListener { onImportGcmButtonClicked() }
         binding.browserPromoPreImport.browserPromoImportButton.setOnClickListener { onImportGcmButtonClicked() }
         binding.browserPromoPreImport.browserPromoDeclineButton.setOnClickListener { viewModel.onInBrowserPromoDismissed() }
-        binding.importing.importingDoneButton.setOnClickListener { dismiss() }
         binding.importSuccess.successDoneButton.setOnClickListener { dismiss() }
         binding.importError.errorDoneButton.setOnClickListener { dismiss() }
     }
 
     private fun configureCloseButton(binding: ContentImportFromGooglePasswordDialogBinding) {
         binding.legacy.closeButton.setOnClickListener { animateClosed() }
-        binding.preImport.preImportCloseButton.setOnClickListener { animateClosed() }
-        binding.browserPromoPreImport.browserPromoCloseButton.setOnClickListener { animateClosed() }
+        binding.redesignCloseButton.setOnClickListener { animateClosed() }
     }
 
     private fun animateClosed() {
@@ -282,7 +278,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         val hasContent = viewState.viewMode !is DeterminingFirstView
         binding.legacy.root.isVisible = hasContent && !viewState.isRedesignEnabled
         binding.redesign.isVisible = hasContent && viewState.isRedesignEnabled
-        if (binding.redesign.isVisible && viewState.viewMode.usesFullHeightSheet() && !isSheetExpandedToFullHeight) {
+        if (binding.redesign.isVisible && viewState.viewMode.usesFullHeightSheet()) {
             expandToFullHeight()
         }
     }
@@ -294,7 +290,6 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         bottomSheetDialog.findViewById<View>(MaterialR.id.design_bottom_sheet)?.updateLayoutParams { height = ViewGroup.LayoutParams.MATCH_PARENT }
         bottomSheetDialog.behavior.skipCollapsed = true
         bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        isSheetExpandedToFullHeight = true
     }
 
     private fun renderRedesignViewState(viewState: ViewState) {

@@ -15,7 +15,6 @@
   -->
 
 <resources>
-    <string name="importPasswordsRedesignImportingPrimaryButton">Done</string>
     <string name="importPasswordsRedesignSuccessPrimaryButton">Done</string>
     <string name="importPasswordsRedesignErrorPrimaryButton">Got It</string>
 </resources>
