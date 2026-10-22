@@ -10,9 +10,9 @@ on:
         required: true
         default: 'noCompilation,partialNoProfile,baselineProfile,fullCompilation'
       device_model:
-        description: 'FTL physical device model id (instantnoodle = OnePlus 8)'
+        description: 'FTL physical device model id (shiba = Pixel 8)'
         required: true
-        default: 'instantnoodle'
+        default: 'shiba'
       device_version:
         description: 'FTL Android API level for the device'
         required: true
@@ -32,7 +32,7 @@ jobs:
     timeout-minutes: 150
     env:
       DEFAULT_TESTS: noCompilation,partialNoProfile,baselineProfile,fullCompilation
-      DEFAULT_DEVICE_MODEL: instantnoodle
+      DEFAULT_DEVICE_MODEL: shiba
       DEFAULT_DEVICE_VERSION: '34'
 
     steps:
