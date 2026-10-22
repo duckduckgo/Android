@@ -1,38 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Saifer Browser launcher mark. Derived work within Apache-2.0 licensed project. -->
+<!-- Saifer Browser fox-and-globe brand mark. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Cyan globe -->
+    <!-- Globe behind the fox -->
     <path
-        android:fillColor="#00000000"
-        android:strokeColor="#42D9FF"
-        android:strokeWidth="3.2"
-        android:pathData="M54,29 C67.8,29 79,40.2 79,54 C79,67.8 67.8,79 54,79 C40.2,79 29,67.8 29,54 C29,40.2 40.2,29 54,29 Z" />
-    <path
-        android:fillColor="#00000000"
-        android:strokeColor="#42D9FF"
+        android:fillColor="#071B49"
+        android:strokeColor="#38DDFB"
         android:strokeWidth="2.2"
-        android:pathData="M30,54 C42,47.5 66,47.5 78,54 M54,30 C45.5,40 45.5,68 54,78" />
-    <!-- Saifer S -->
+        android:pathData="M54,31 A23,23 0,1 0,54 77 A23,23 0,1 0,54 31 Z" />
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="5.8"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:pathData="M64,42 C59,35 45,38 44,46 C43,52 60,52 63,59 C67,69 50,73 42,65" />
-    <!-- Orange orbital sweep -->
+        android:strokeColor="#21B9F5"
+        android:strokeWidth="1.5"
+        android:pathData="M31,54 C42,47 66,47 77,54 M54,31 C43,42 43,66 54,77 M54,31 C65,42 65,66 54,77" />
+    <path
+        android:fillColor="#27C8F7"
+        android:pathData="M37,44 L44,40 L47,47 L41,52 Z M58,38 L65,41 L63,47 L57,45 Z M59,56 L69,54 L73,60 L66,66 L60,63 Z M43,62 L50,59 L54,66 L49,72 L43,68 Z" />
+    <!-- Stylized Saifer fox silhouette -->
+    <path
+        android:fillColor="#086BFF"
+        android:pathData="M25,39 L18,17 L39,29 C48,24 61,24 70,29 L91,17 L85,41 C92,49 94,58 90,67 C84,80 69,88 54,91 C39,87 27,79 21,67 C17,57 19,47 25,39 Z" />
+    <!-- Cyan highlight sweep -->
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#FFB547"
-        android:strokeWidth="4.2"
+        android:strokeColor="#43E8FF"
+        android:strokeWidth="3.2"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M20,67 C31,29 75,22 91,43" />
+        android:pathData="M25,39 C37,30 47,29 55,31 C70,33 79,42 85,53 C76,49 66,48 57,51 C47,54 42,62 45,70 C48,78 58,82 68,79" />
+    <!-- Fox muzzle -->
     <path
-        android:fillColor="#FFB547"
-        android:pathData="M86,42 L94,44 L90,35 Z" />
+        android:fillColor="#DDFBFF"
+        android:pathData="M61,54 C72,51 80,54 86,60 C81,68 73,72 64,70 L56,64 Z" />
+    <path
+        android:fillColor="#071B49"
+        android:pathData="M80,58 L88,60 L82,64 Z" />
+    <!-- Eye -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M69,43 L80,47 L72,49 Z" />
+    <!-- Orange orbital ring -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FF9C16"
+        android:strokeWidth="5.5"
+        android:strokeLineCap="round"
+        android:pathData="M13,68 C23,88 54,94 79,79 C89,73 95,64 96,56" />
+    <path
+        android:fillColor="#FFE45C"
+        android:pathData="M90,55 L98,50 L97,61 Z" />
 </vector>
