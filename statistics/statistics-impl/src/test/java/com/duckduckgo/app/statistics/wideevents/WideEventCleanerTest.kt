@@ -278,6 +278,90 @@ class WideEventCleanerTest {
         }
 
     @Test
+    fun `Active interval started recently on an old event does not set status`() =
+        runTest {
+            val event =
+                WideEventRepository.WideEvent(
+                    id = 8L,
+                    name = "test",
+                    status = null,
+                    steps = emptyList(),
+                    metadata = emptyMap(),
+                    flowEntryPoint = null,
+                    cleanupPolicy =
+                    WideEventRepository.CleanupPolicy.OnTimeout(
+                        duration = Duration.ofDays(1),
+                        status = WideEventRepository.WideEventStatus.UNKNOWN,
+                        metadata = emptyMap(),
+                    ),
+                    activeIntervals =
+                    listOf(
+                        WideEventRepository.WideEventInterval(
+                            name = "interval",
+                            startedAt = timeProvider.currentTime.minus(Duration.ofMinutes(1)),
+                            timeout = Duration.ofMinutes(5),
+                            buckets = null,
+                        ),
+                    ),
+                    createdAt = timeProvider.currentTime.minus(Duration.ofHours(1)),
+                    metaType = "android-test",
+                    metaVersion = "1.0.0",
+                    appVersion = "5.123.0",
+                )
+            whenever(wideEventRepository.getActiveWideEventIds()).thenReturn(listOf(8L))
+            whenever(wideEventRepository.getWideEvents(setOf(8L))).thenReturn(listOf(event))
+
+            cleaner.onCreate(lifecycleOwner)
+            advanceUntilIdle()
+
+            verify(wideEventRepository, never()).setWideEventStatus(any(), any(), any())
+        }
+
+    @Test
+    fun `Active interval started longer ago than its timeout on a recent event sets UNKNOWN status`() =
+        runTest {
+            val event =
+                WideEventRepository.WideEvent(
+                    id = 9L,
+                    name = "test",
+                    status = null,
+                    steps = emptyList(),
+                    metadata = emptyMap(),
+                    flowEntryPoint = null,
+                    cleanupPolicy =
+                    WideEventRepository.CleanupPolicy.OnTimeout(
+                        duration = Duration.ofDays(1),
+                        status = WideEventRepository.WideEventStatus.FAILURE,
+                        metadata = emptyMap(),
+                    ),
+                    activeIntervals =
+                    listOf(
+                        WideEventRepository.WideEventInterval(
+                            name = "interval",
+                            startedAt = timeProvider.currentTime.minus(Duration.ofMinutes(6)),
+                            timeout = Duration.ofMinutes(5),
+                            buckets = null,
+                        ),
+                    ),
+                    createdAt = timeProvider.currentTime.minus(Duration.ofMinutes(7)),
+                    metaType = "android-test",
+                    metaVersion = "1.0.0",
+                    appVersion = "5.123.0",
+                )
+            whenever(wideEventRepository.getActiveWideEventIds()).thenReturn(listOf(9L))
+            whenever(wideEventRepository.getWideEvents(setOf(9L))).thenReturn(listOf(event))
+
+            cleaner.onCreate(lifecycleOwner)
+            advanceUntilIdle()
+
+            verify(wideEventRepository).setWideEventStatus(
+                eventId = 9L,
+                status = WideEventRepository.WideEventStatus.UNKNOWN,
+                metadata = emptyMap(),
+            )
+        }
+
+    @Test
     fun `Cleanup policy conditions are not met and no interval timeout does nothing`() =
         runTest {
             val event =

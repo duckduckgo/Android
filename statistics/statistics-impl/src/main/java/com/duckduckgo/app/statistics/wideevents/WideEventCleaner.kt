@@ -91,7 +91,7 @@ class WideEventCleaner @Inject constructor(
 
         event.activeIntervals
             .firstOrNull { interval ->
-                interval.timeout != null && isTimeoutReached(event.createdAt, interval.timeout)
+                interval.timeout != null && isTimeoutReached(interval.startedAt, interval.timeout)
             }?.let { interval ->
                 wideEventRepository.setWideEventStatus(
                     eventId = event.id,
