@@ -4208,7 +4208,10 @@ class BrowserTabViewModel @Inject constructor(
         command.value = ShowWebContent
     }
 
-    fun userLaunchingTabSwitcher(viewMode: Omnibar.ViewMode) {
+    fun userLaunchingTabSwitcher(
+        viewMode: Omnibar.ViewMode,
+        hasFocus: Boolean,
+    ) {
         command.value = LaunchTabSwitcher
         browserInteractionsPlugins.getPlugins().forEach { it.onTabSwitcherSelected() }
 
@@ -4224,7 +4227,7 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             is Omnibar.ViewMode.NewTab -> {
-                val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to "false") + browserModeParams
+                val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to hasFocus.toString()) + browserModeParams
                 pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, parameters = params)
             }
 
