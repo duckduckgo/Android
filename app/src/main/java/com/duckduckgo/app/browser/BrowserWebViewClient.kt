@@ -19,11 +19,13 @@ package com.duckduckgo.app.browser
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
+import android.net.http.SslCertificate
 import android.net.http.SslError
 import android.net.http.SslError.SSL_DATE_INVALID
 import android.net.http.SslError.SSL_EXPIRED
 import android.net.http.SslError.SSL_IDMISMATCH
 import android.net.http.SslError.SSL_UNTRUSTED
+import android.os.Build
 import android.webkit.HttpAuthHandler
 import android.webkit.RenderProcessGoneDetail
 import android.webkit.SslErrorHandler
@@ -55,8 +57,10 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_CRASH
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_KILLED
 import com.duckduckgo.app.browser.applinks.AppSchemeInterceptionFeature
+import com.duckduckgo.app.browser.certificates.blocklist.CertificateBlocklistRejections
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
+import com.duckduckgo.app.browser.certificates.toX509Certificate
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
@@ -104,6 +108,7 @@ import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.logcat
 import java.net.URI
+import java.security.cert.X509Certificate
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
@@ -117,6 +122,7 @@ private val STANDARD_WEB_SCHEMES = setOf("http", "https", "about", "data", "java
 class BrowserWebViewClient @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
     private val trustedCertificateStore: TrustedCertificateStore,
+    private val certificateBlocklistRejections: CertificateBlocklistRejections,
     private val requestRewriter: RequestRewriter,
     private val specialUrlDetector: SpecialUrlDetector,
     private val requestInterceptor: RequestInterceptor,
@@ -986,6 +992,14 @@ class BrowserWebViewClient @Inject constructor(
         handler: SslErrorHandler,
         error: SslError,
     ) {
+        // A blocklist rejection must never be re-trusted, neither by the bundled-root fallback below nor by the user.
+        if (error.isBlocklistRejection()) {
+            logcat { "The certificate chain was rejected by the certificate blocklist" }
+            pageLoadTimeoutWatchdog.onEngineError()
+            webViewClientListener?.onReceivedSslError(handler, parseSSlErrorResponse(error, blocklisted = true))
+            return
+        }
+
         var trusted: CertificateValidationState = CertificateValidationState.UntrustedChain
 
         when (error.primaryError) {
@@ -1006,7 +1020,19 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    private fun parseSSlErrorResponse(sslError: SslError): SslErrorResponse {
+    private fun SslError.isBlocklistRejection(): Boolean {
+        if (primaryError != SSL_UNTRUSTED) return false
+        val leaf = runCatching { certificate.leafX509Certificate() }.getOrNull() ?: return false
+        return certificateBlocklistRejections.contains(leaf)
+    }
+
+    private fun SslCertificate.leafX509Certificate(): X509Certificate? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) x509Certificate else toX509Certificate()
+
+    private fun parseSSlErrorResponse(
+        sslError: SslError,
+        blocklisted: Boolean = false,
+    ): SslErrorResponse {
         logcat { "SSL Certificate: parseSSlErrorResponse ${sslError.primaryError}" }
         val sslErrorType =
             when (sslError.primaryError) {
@@ -1016,7 +1042,7 @@ class BrowserWebViewClient @Inject constructor(
                 SSL_IDMISMATCH -> WRONG_HOST
                 else -> GENERIC
             }
-        return SslErrorResponse(sslError, sslErrorType, sslError.url)
+        return SslErrorResponse(sslError, sslErrorType, sslError.url, blocklisted)
     }
 
     private fun requestAuthentication(
@@ -1194,6 +1220,8 @@ data class SslErrorResponse(
     val error: SslError,
     val errorType: SSLErrorType,
     val url: String,
+    /** True when the chain was refused by the certificate blocklist rather than by the platform; such errors cannot be bypassed. */
+    val blocklisted: Boolean = false,
 )
 
 enum class SSLErrorType(

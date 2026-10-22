@@ -54,6 +54,8 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.WebViewErrorResponse.SSL_PROTOCOL_ERROR
 import com.duckduckgo.app.browser.applinks.AppSchemeInterceptionFeature
+import com.duckduckgo.app.browser.certificates.blocklist.CertificateBlocklistRejections
+import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
@@ -154,6 +156,7 @@ class BrowserWebViewClientTest {
     private val loginDetector: DOMLoginDetector = mock()
     private val dosDetector: DosDetector = DosDetector()
     private val trustedCertificateStore: TrustedCertificateStore = mock()
+    private val certificateBlocklistRejections: CertificateBlocklistRejections = mock()
     private val webViewHttpAuthStore: WebViewHttpAuthStore = mock()
     private val thirdPartyCookieManager: ThirdPartyCookieManager = mock()
     private val browserAutofillConfigurator: BrowserAutofill.Configurator = mock()
@@ -225,6 +228,7 @@ class BrowserWebViewClientTest {
                 BrowserWebViewClient(
                     webViewHttpAuthStore,
                     trustedCertificateStore,
+                    certificateBlocklistRejections,
                     requestRewriter,
                     specialUrlDetector,
                     requestInterceptor,
@@ -2446,6 +2450,36 @@ class BrowserWebViewClientTest {
         testee.onReceivedSslError(webView, aHandler(), sslError)
 
         verify(mockPageLoadTimeoutWatchdog).onEngineError()
+    }
+
+    @Test
+    fun whenUntrustedSslErrorWasRejectedByTheBlocklistThenResponseIsNotBypassableAndFallbackStoreIsSkipped() {
+        whenever(certificateBlocklistRejections.contains(any())).thenReturn(true)
+        val handler = aHandler()
+        val sslError = SslError(SslError.SSL_UNTRUSTED, aRSASslCertificate(), EXAMPLE_URL)
+
+        testee.onReceivedSslError(webView, handler, sslError)
+
+        val captor = argumentCaptor<SslErrorResponse>()
+        verify(listener).onReceivedSslError(eq(handler), captor.capture())
+        org.junit.Assert.assertTrue(captor.firstValue.blocklisted)
+        org.junit.Assert.assertEquals(SSLErrorType.UNTRUSTED_HOST, captor.firstValue.errorType)
+        verify(mockPageLoadTimeoutWatchdog).onEngineError()
+        verifyNoInteractions(trustedCertificateStore)
+    }
+
+    @Test
+    fun whenUntrustedSslErrorWasNotRejectedByTheBlocklistThenResponseStaysBypassable() {
+        whenever(certificateBlocklistRejections.contains(any())).thenReturn(false)
+        whenever(trustedCertificateStore.validateSslCertificateChain(any())).thenReturn(CertificateValidationState.UntrustedChain)
+        val handler = aHandler()
+        val sslError = SslError(SslError.SSL_UNTRUSTED, aRSASslCertificate(), EXAMPLE_URL)
+
+        testee.onReceivedSslError(webView, handler, sslError)
+
+        val captor = argumentCaptor<SslErrorResponse>()
+        verify(listener).onReceivedSslError(eq(handler), captor.capture())
+        org.junit.Assert.assertFalse(captor.firstValue.blocklisted)
     }
 
     @Test

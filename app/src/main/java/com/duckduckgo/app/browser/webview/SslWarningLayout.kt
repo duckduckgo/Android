@@ -74,6 +74,9 @@ class SslWarningLayout @JvmOverloads constructor(
         with(binding) {
             configureCopy(errorResponse)
             setListeners(handler, actionHandler)
+            if (errorResponse.blocklisted) {
+                sslErrorAdvancedCTA.gone()
+            }
         }
     }
 
