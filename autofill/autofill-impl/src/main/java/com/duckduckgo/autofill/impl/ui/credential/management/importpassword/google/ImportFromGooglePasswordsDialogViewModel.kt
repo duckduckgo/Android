@@ -294,6 +294,6 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
 
     companion object {
         private const val IMPORT_PASSWORDS_GOOGLE_PROMPT_ID = "import_passwords_google"
-        val PROMO_TIMEOUT = 5.seconds
+        val PROMO_TIMEOUT = 1.seconds
     }
 }
