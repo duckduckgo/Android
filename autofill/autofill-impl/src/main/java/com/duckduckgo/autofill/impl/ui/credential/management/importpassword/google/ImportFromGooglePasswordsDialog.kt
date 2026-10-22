@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
@@ -54,6 +55,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goog
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog.ImportPasswordsDialog.Companion.KEY_TAB_ID
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog.ImportPasswordsDialog.Companion.KEY_URL
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.Command
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.BrowserPromoPreImport
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.DeterminingFirstView
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.FlowTerminated
@@ -84,6 +86,7 @@ import logcat.LogPriority.VERBOSE
 import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
+import com.google.android.material.R as MaterialR
 
 @InjectWith(FragmentScope::class)
 class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
@@ -157,6 +160,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         _binding = ContentImportFromGooglePasswordDialogBinding.inflate(inflater, container, false)
         configureViews(binding)
         binding.legacy.legacyContent.applyBottomSystemBarInsetPadding()
+        binding.redesign.applyBottomSystemBarInsetPadding()
         observeViewModel()
         logcat { "Creating ImportFromGooglePasswordsDialog with launch source: ${getLaunchSource()}" }
         return binding.root
@@ -220,10 +224,21 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         binding.legacy.preflow.declineButton.setOnClickListener {
             viewModel.onInBrowserPromoDismissed()
         }
+
+        binding.preImport.preImportButton.setOnClickListener { onImportGcmButtonClicked() }
+        binding.browserPromoPreImport.browserPromoImportButton.setOnClickListener { onImportGcmButtonClicked() }
+        binding.browserPromoPreImport.browserPromoDeclineButton.setOnClickListener { viewModel.onInBrowserPromoDismissed() }
+        binding.importSuccess.successDoneButton.setOnClickListener { dismiss() }
+        binding.importError.errorDoneButton.setOnClickListener { dismiss() }
     }
 
     private fun configureCloseButton(binding: ContentImportFromGooglePasswordDialogBinding) {
-        binding.legacy.closeButton.setOnClickListener { (dialog as BottomSheetDialog).animateClosed() }
+        binding.legacy.closeButton.setOnClickListener { animateClosed() }
+        binding.redesignCloseButton.setOnClickListener { animateClosed() }
+    }
+
+    private fun animateClosed() {
+        (dialog as BottomSheetDialog).animateClosed()
     }
 
     private fun processCommand(command: Command) {
@@ -243,19 +258,105 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         logcat { "Autofill-import: rendering ${viewState.viewMode}, redesign enabled: ${viewState.isRedesignEnabled}" }
         handleViewStateSideEffects(viewState)
         renderContentVisibility(viewState)
-        renderLegacyViewState(viewState)
+        if (viewState.isRedesignEnabled) {
+            renderRedesignViewState(viewState)
+        } else {
+            renderLegacyViewState(viewState)
+        }
     }
 
     private fun handleViewStateSideEffects(viewState: ViewState) {
-        // a cancel event from here on is the dialog closing after import started, not the user backing out of it
-        if (viewState.viewMode is Importing) {
-            ignoreCancellationEvents = true
+        when (viewState.viewMode) {
+            // a cancel event from here on is the dialog closing after import started, not the user backing out of it
+            is Importing -> ignoreCancellationEvents = true
+            is ImportSuccess -> successImport = true
+            else -> Unit
         }
     }
 
     private fun renderContentVisibility(viewState: ViewState) {
         val hasContent = viewState.viewMode !is DeterminingFirstView
-        binding.legacy.root.isVisible = hasContent
+        binding.legacy.root.isVisible = hasContent && !viewState.isRedesignEnabled
+        binding.redesign.isVisible = hasContent && viewState.isRedesignEnabled
+        if (binding.redesign.isVisible && viewState.viewMode.usesFullHeightSheet()) {
+            expandToFullHeight()
+        }
+    }
+
+    private fun ViewMode.usesFullHeightSheet() = this is Importing || this is ImportSuccess || this is ImportError
+
+    private fun expandToFullHeight() {
+        val bottomSheetDialog = dialog as BottomSheetDialog
+        bottomSheetDialog.findViewById<View>(MaterialR.id.design_bottom_sheet)?.updateLayoutParams { height = ViewGroup.LayoutParams.MATCH_PARENT }
+        bottomSheetDialog.behavior.skipCollapsed = true
+        bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+    }
+
+    private fun renderRedesignViewState(viewState: ViewState) {
+        when (viewState.viewMode) {
+            is PreImport -> redesignShowPreImportView(viewState.usesCredentialExchange)
+            is BrowserPromoPreImport -> redesignShowInBrowserPromoPreImportView(
+                viewState.usesCredentialExchange,
+                viewState.isPictogramsEnabled,
+            )
+            is ImportError -> redesignSelectViewToShow(binding.importError.root)
+            is ImportSuccess -> redesignShowImportSuccessView(viewState.viewMode.importResult)
+            is Importing -> redesignSelectViewToShow(binding.importing.root)
+            is DeterminingFirstView -> Unit
+            is FlowTerminated -> dismiss()
+        }
+    }
+
+    private fun redesignShowPreImportView(usesCredentialExchange: Boolean) {
+        val subtitle = if (usesCredentialExchange) {
+            R.string.importPasswordsChooseMethodDialogSubtitleDeviceAuth
+        } else {
+            R.string.importPasswordsChooseMethodDialogSubtitle
+        }
+        binding.preImport.preImportSubtitle.text = getString(subtitle)
+        redesignSelectViewToShow(binding.preImport.root)
+    }
+
+    private fun redesignShowInBrowserPromoPreImportView(usesCredentialExchange: Boolean, isPictogramsEnabled: Boolean) {
+        with(binding.browserPromoPreImport) {
+            val (title, subtitle) = if (usesCredentialExchange) {
+                R.string.passwords_import_promo_in_browser_title_device_auth to R.string.passwords_import_promo_subtitle_device_auth
+            } else {
+                R.string.passwords_import_promo_in_browser_title to R.string.passwords_import_promo_subtitle
+            }
+            browserPromoTitle.text = getString(title)
+            browserPromoSubtitle.text = binding.root.context.prependIconToText(subtitle, R.drawable.ic_lock_solid_12)
+            val animationAsset = resolvePasswordsKeychainAnimationAsset(isPictogramsEnabled)
+            animationAsset.staticRes?.let { staticRes ->
+                browserPromoIllustration.cancelAnimation()
+                browserPromoIllustration.setImageResource(staticRes)
+            } ?: run {
+                browserPromoIllustration.setAnimation(animationAsset.animationRes)
+                browserPromoIllustration.playAnimation()
+            }
+        }
+        redesignSelectViewToShow(binding.browserPromoPreImport.root)
+    }
+
+    private fun redesignShowImportSuccessView(result: CredentialImporter.ImportResult.Finished) {
+        with(binding.importSuccess) {
+            val imported = getString(R.string.importPasswordsProcessingResultDialogResultPasswordsImported, result.savedCredentials)
+            successImportedRow.setPrimaryText(imported.html(binding.root.context))
+            val failed = getString(R.string.importPasswordsProcessingResultDialogResultDuplicatesSkipped, result.numberSkipped)
+            successFailedRow.setPrimaryText(failed.html(binding.root.context))
+            successFailedRow.isVisible = result.numberSkipped > 0
+        }
+        redesignSelectViewToShow(binding.importSuccess.root)
+    }
+
+    private fun redesignSelectViewToShow(toShow: View) {
+        listOf(
+            binding.preImport.root,
+            binding.browserPromoPreImport.root,
+            binding.importing.root,
+            binding.importSuccess.root,
+            binding.importError.root,
+        ).forEach { view -> view.isVisible = view == toShow }
     }
 
     private fun renderLegacyViewState(viewState: ViewState) {
@@ -326,8 +427,6 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     }
 
     private fun legacyProcessSuccessResult(result: CredentialImporter.ImportResult.Finished) {
-        successImport = true
-
         binding.legacy.postflow.importFinished.errorNotImported.visibility = View.GONE
         binding.legacy.postflow.appIcon.setImageDrawable(
             ContextCompat.getDrawable(
