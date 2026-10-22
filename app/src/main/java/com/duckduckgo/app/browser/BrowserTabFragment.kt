@@ -1538,8 +1538,11 @@ class BrowserTabFragment :
     }
 
     private fun onTabsButtonPressed() {
-        launch { viewModel.userLaunchingTabSwitcher(omnibar.viewMode) }
+        val isFocusedNtp = isFocusedNtp()
+        launch { viewModel.userLaunchingTabSwitcher(omnibar.viewMode, isFocusedNtp) }
     }
+
+    private fun isFocusedNtp(): Boolean = omnibar.viewMode == ViewMode.NewTab && nativeInputManager.hasInputFocus()
 
     private fun onTabsButtonLongPressed(): Boolean {
         return viewModel.onNewTabMenuItemClicked(longPress = true)
@@ -1590,7 +1593,7 @@ class BrowserTabFragment :
     private fun onFireButtonPressed() {
         val cta = viewModel.ctaViewState.value?.cta
         val isDuckAiOnboarding = cta is DaxDuckAiFireButtonContextualCta
-        browserActivity?.launchFire(isDuckAiOnboarding = isDuckAiOnboarding)
+        browserActivity?.launchFire(launchedFromFocusedNtp = isFocusedNtp(), isDuckAiOnboarding = isDuckAiOnboarding)
         viewModel.onFireMenuSelected(omnibar.viewMode)
     }
 
@@ -1912,6 +1915,7 @@ class BrowserTabFragment :
     }
 
     private fun launchBottomSheetMenu(addExtraDelay: Boolean) {
+        val isFocusedNtp = isFocusedNtp()
         val delay = if (addExtraDelay) BOTTOM_SHEET_MENU_DELAY * 2 else BOTTOM_SHEET_MENU_DELAY
         // small delay added to let keyboard disappear and avoid jarring transition
         binding.rootView.postDelayed(delay) {
@@ -1939,12 +1943,15 @@ class BrowserTabFragment :
                 } else {
                     pixel.fire(AppPixelName.BROWSING_MENU_DISPLAYED)
                 }
-                fireMenuOpenedPixels(viewState)
+                fireMenuOpenedPixels(isFocusedNtp, viewState)
             }
         }
     }
 
-    private fun fireMenuOpenedPixels(viewState: BrowserViewState?) {
+    private fun fireMenuOpenedPixels(
+        isFocusedNtp: Boolean,
+        viewState: BrowserViewState?,
+    ) {
         if (isActiveCustomTab()) {
             pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
         } else if (omnibar.viewMode == ViewMode.DuckAI) {
@@ -1952,7 +1959,7 @@ class BrowserTabFragment :
         } else {
             val vpnStatus = viewState?.vpnMenuState?.pixelParam.toString()
             val params = mapOf(
-                PixelParameter.FROM_FOCUSED_NTP to "false",
+                PixelParameter.FROM_FOCUSED_NTP to isFocusedNtp.toString(),
                 PixelParameter.STATUS to vpnStatus,
                 PixelParameter.BROWSER_MODE to browserMode.name.lowercase(),
             )

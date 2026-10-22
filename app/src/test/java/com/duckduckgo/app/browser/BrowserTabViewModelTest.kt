@@ -8508,7 +8508,7 @@ class BrowserTabViewModelTest {
                 )
             testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
-            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(exampleUrl))
+            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(exampleUrl), false)
 
             verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
         }
@@ -8794,7 +8794,7 @@ class BrowserTabViewModelTest {
                     PixelParameter.BROWSER_MODE to "regular",
                 )
 
-            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(exampleUrl))
+            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(exampleUrl), false)
 
             assertCommandIssued<Command.LaunchTabSwitcher>()
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED, mapOf(PixelParameter.BROWSER_MODE to "regular"))
@@ -8828,7 +8828,7 @@ class BrowserTabViewModelTest {
                     PixelParameter.BROWSER_MODE to "regular",
                 )
 
-            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.DuckAI)
+            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.DuckAI, false)
 
             assertCommandIssued<Command.LaunchTabSwitcher>()
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED, mapOf(PixelParameter.BROWSER_MODE to "regular"))
@@ -10117,7 +10117,7 @@ class BrowserTabViewModelTest {
             val domain = "https://www.example.com"
             givenCurrentSite(domain)
 
-            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(domain))
+            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(domain), false)
 
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE, mapOf(PixelParameter.BROWSER_MODE to "regular"))
         }
@@ -10128,11 +10128,25 @@ class BrowserTabViewModelTest {
             givenTabManagerData()
             setBrowserShowing(false)
 
-            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.NewTab)
+            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.NewTab, false)
 
             verify(mockPixel).fire(
                 AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB,
                 mapOf(PixelParameter.FROM_FOCUSED_NTP to "false", PixelParameter.BROWSER_MODE to "regular"),
+            )
+        }
+
+    @Test
+    fun whenTabSwitcherPressedInFocusModeAndUserOnNtpThenPixelIsSent() =
+        runTest {
+            givenTabManagerData()
+            setBrowserShowing(false)
+
+            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.NewTab, true)
+
+            verify(mockPixel).fire(
+                AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB,
+                mapOf(PixelParameter.FROM_FOCUSED_NTP to "true", PixelParameter.BROWSER_MODE to "regular"),
             )
         }
 
@@ -10145,7 +10159,7 @@ class BrowserTabViewModelTest {
             val domain = "https://duckduckgo.com/?q=test&atb=v395-1-wb&ia=web"
             givenCurrentSite(domain)
 
-            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(domain))
+            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(domain), false)
 
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP, mapOf(PixelParameter.BROWSER_MODE to "regular"))
         }
