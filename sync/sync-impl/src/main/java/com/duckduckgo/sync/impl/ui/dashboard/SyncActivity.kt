@@ -105,7 +105,7 @@ import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
+@ContributeToActivityStarter(SyncActivityWithEmptyParams::class, screenName = "sync")
 @ContributeToActivityStarter(SyncActivityWithSourceParams::class)
 @ContributeToActivityStarter(SyncActivityFromSetupUrl::class)
 @ContributeToActivityStarter(SyncActivityWithAnotherDevice::class)

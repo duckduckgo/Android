@@ -29,6 +29,7 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.generalsettings.showonapplaunch.rmf.AfterIdleMessageTriggerProvider
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.widget.WidgetType
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
@@ -136,6 +137,7 @@ class NewTabPageViewModel @AssistedInject constructor(
         ) : Command()
 
         data object LaunchDefaultCredentialProvider : Command()
+        data class LaunchAddWidget(val widgetType: WidgetType) : Command()
     }
 
     private var lastRemoteMessageSeen: RemoteMessage? = null

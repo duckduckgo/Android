@@ -22,6 +22,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.JsonActionType
+import com.duckduckgo.remote.messaging.api.JsonActionType.ADD_WIDGET
 import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_BROWSER
 import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_CREDENTIAL_PROVIDER
 import com.duckduckgo.remote.messaging.api.JsonActionType.DISMISS
@@ -137,6 +138,19 @@ class DefaultCredentialProviderActionMapper @Inject constructor() : MessageActio
     override fun evaluate(jsonMessageAction: JsonMessageAction): Action? {
         return if (jsonMessageAction.type == DEFAULT_CREDENTIAL_PROVIDER.jsonValue) {
             Action.DefaultCredentialProvider
+        } else {
+            null
+        }
+    }
+}
+
+@ContributesIntoSet(
+    AppScope::class,
+)
+class AddWidgetActionMapper @Inject constructor() : MessageActionMapperPlugin {
+    override fun evaluate(jsonMessageAction: JsonMessageAction): Action? {
+        return if (jsonMessageAction.type == ADD_WIDGET.jsonValue) {
+            Action.AddWidget(jsonMessageAction.value)
         } else {
             null
         }

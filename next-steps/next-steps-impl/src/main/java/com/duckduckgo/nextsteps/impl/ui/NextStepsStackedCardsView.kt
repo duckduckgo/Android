@@ -15,16 +15,28 @@
  */
 package com.duckduckgo.nextsteps.impl.ui
 
+import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.ContextWrapper
+import android.content.Intent
+import android.provider.Settings
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.os.bundleOf
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.duckduckgo.app.global.DefaultRoleBrowserDialog
+import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -33,13 +45,19 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.duckduckgo.nextsteps.impl.R
 import com.duckduckgo.nextsteps.impl.databinding.ViewNextStepsCardBinding
 import com.duckduckgo.nextsteps.impl.databinding.ViewNextStepsStackedCardsBinding
+import com.duckduckgo.nextsteps.impl.ui.NextStepsItemsViewModel.Command
 import com.duckduckgo.nextsteps.impl.ui.NextStepsItemsViewModel.ViewState
 import com.duckduckgo.remote.messaging.api.CardItem
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import logcat.LogPriority.WARN
+import logcat.logcat
+import java.util.UUID
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
@@ -52,6 +70,15 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
 
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var addWidgetLauncher: AddWidgetLauncher
+
+    @Inject
+    lateinit var defaultRoleBrowserDialog: DefaultRoleBrowserDialog
+
     private val binding: ViewNextStepsStackedCardsBinding by viewBinding()
 
     private val viewModel: NextStepsItemsViewModel by lazy {
@@ -59,7 +86,11 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
     }
 
     private val conflatedStateJob = ConflatedJob()
+    private val conflatedCommandJob = ConflatedJob()
+    private var lifecycleOwner: LifecycleOwner? = null
     private var dismissAnimationRunning = false
+    private val defaultBrowserDialogKey = "next_steps_default_browser_${UUID.randomUUID()}"
+    private var defaultBrowserDialogLauncher: ActivityResultLauncher<Intent>? = null
 
     private val backCardOffset = resources.getDimension(R.dimen.nextStepsBackCardOffset)
     private val frontElevation = resources.getDimension(R.dimen.nextStepsCardElevation)
@@ -67,6 +98,7 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
 
     init {
         binding.frontCard.closeButton.setOnClickListener { dismissFrontCard() }
+        binding.frontCard.primaryAction.setOnClickListener { viewModel.onPrimaryActionClicked() }
         binding.backCard.closeButton.isEnabled = false
         binding.backCard.primaryAction.isEnabled = false
         binding.backCard.root.isClickable = false
@@ -76,15 +108,94 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        val lifecycleOwner = findViewTreeLifecycleOwner()!!
+        defaultBrowserDialogLauncher = (context.getActivity() as? ComponentActivity)?.activityResultRegistry?.register(
+            defaultBrowserDialogKey,
+            ActivityResultContracts.StartActivityForResult(),
+        ) { }
+
+        val lifecycleOwner = findViewTreeLifecycleOwner()!!.also { this.lifecycleOwner = it }
+        lifecycleOwner.lifecycle.addObserver(viewModel)
+        viewModel.onViewAttached()
         conflatedStateJob += viewModel.viewState
             .onEach { render(it) }
+            .launchIn(lifecycleOwner.lifecycleScope)
+
+        conflatedCommandJob += viewModel.commands()
+            .onEach { processCommand(it) }
             .launchIn(lifecycleOwner.lifecycleScope)
     }
 
     override fun onDetachedFromWindow() {
+        binding.frontCard.root.animate().cancel()
+        binding.backCard.root.animate().cancel()
+        dismissAnimationRunning = false
         conflatedStateJob.cancel()
+        conflatedCommandJob.cancel()
+        viewModel.onViewDetached()
+        defaultBrowserDialogLauncher?.unregister()
+        defaultBrowserDialogLauncher = null
+        lifecycleOwner?.lifecycle?.removeObserver(viewModel)
+        lifecycleOwner = null
         super.onDetachedFromWindow()
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            is Command.LaunchAddWidget -> addWidgetLauncher.launchAddWidget(context, command.widgetType)
+            is Command.LaunchDefaultBrowserDialog -> launchDefaultBrowserDialog()
+            is Command.LaunchDefaultBrowserSettings -> launchDefaultBrowserSettings()
+            is Command.LaunchScreen -> {
+                globalActivityStarter.start(context, DeeplinkActivityParams(screenName = command.screen, jsonArguments = command.payload), null)
+            }
+            is Command.AnimateFrontCardCompletion -> animateFrontCardOut { viewModel.onFrontCardCompletionAnimated() }
+        }
+    }
+
+    private fun launchDefaultBrowserDialog() {
+        val launcher = defaultBrowserDialogLauncher
+        if (launcher == null) {
+            launchDefaultBrowserSettings()
+            return
+        }
+
+        val launched = try {
+            val intent = defaultRoleBrowserDialog.createIntent(context)
+            if (intent != null) {
+                launcher.launch(intent)
+                true
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            logcat(WARN) { "Can't launch default browser dialog" }
+            false
+        }
+
+        if (launched) {
+            viewModel.onDefaultBrowserDialogShown()
+        } else {
+            launchDefaultBrowserSettings()
+        }
+    }
+
+    private fun launchDefaultBrowserSettings() {
+        try {
+            val intent = Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS)
+            intent.putExtra(":settings:fragment_args_key", "default_browser")
+            intent.putExtra(":settings:show_fragment_args", bundleOf(":settings:fragment_args_key" to "default_browser"))
+            context.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            logcat(WARN) { "Can't launch default app settings screen" }
+        }
+    }
+
+    private fun Context.getActivity(): Activity? {
+        var current = this
+        while (current is ContextWrapper) {
+            if (current is Activity) return current
+            current = current.baseContext
+        }
+        return null
     }
 
     private fun render(viewState: ViewState) {
@@ -109,6 +220,10 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
     }
 
     private fun dismissFrontCard() {
+        animateFrontCardOut { viewModel.onFrontCardDismissed() }
+    }
+
+    private fun animateFrontCardOut(onEnd: () -> Unit) {
         if (dismissAnimationRunning) return
         dismissAnimationRunning = true
 
@@ -121,7 +236,7 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
             .alpha(0f)
             .setDuration(FRONT_EXIT_DURATION_MS)
             .withEndAction {
-                if (!hasBackCard) finishDismiss()
+                if (!hasBackCard) finishDismiss(onEnd)
             }
             .start()
 
@@ -131,14 +246,14 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
                 .scaleY(1f)
                 .translationY(0f)
                 .setDuration(BACK_PROMOTE_DURATION_MS)
-                .withEndAction { finishDismiss() }
+                .withEndAction { finishDismiss(onEnd) }
                 .start()
         }
     }
 
-    private fun finishDismiss() {
+    private fun finishDismiss(onEnd: () -> Unit) {
         dismissAnimationRunning = false
-        viewModel.onFrontCardDismissed()
+        onEnd()
     }
 
     private fun resetStackTransforms() {

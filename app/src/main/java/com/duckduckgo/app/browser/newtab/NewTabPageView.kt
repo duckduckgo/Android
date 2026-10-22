@@ -38,6 +38,7 @@ import com.duckduckgo.app.browser.databinding.ViewNewTabBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.DismissMessage
+import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchAddWidget
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchAppTPOnboarding
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchDefaultBrowser
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchDefaultCredentialProvider
@@ -52,6 +53,7 @@ import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.codegen.annotations.InjectWith
@@ -115,6 +117,9 @@ class NewTabPageView @JvmOverloads constructor(
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var addWidgetLauncher: AddWidgetLauncher
 
     @Inject
     lateinit var androidBrowserConfig: AndroidBrowserConfigFeature
@@ -254,16 +259,19 @@ class NewTabPageView @JvmOverloads constructor(
         }
     }
 
-    private fun showNextStepsSection(newMessage: Boolean) {
+    private fun showNextStepsSection() {
         if (binding.nextStepsContainer.childCount == 0) {
             inflateNextStepsSection()
         } else {
-            val wasHidden = binding.nextStepsContainer.isGone
             binding.nextStepsContainer.show()
-            if (newMessage || wasHidden) {
-                viewModel.onMessageShown()
-            }
         }
+    }
+
+    private fun hideNextStepsSection() {
+        nextStepsSectionJob?.cancel()
+        nextStepsSectionJob = null
+        binding.nextStepsContainer.removeAllViews()
+        binding.nextStepsContainer.gone()
     }
 
     private fun inflateNextStepsSection() {
@@ -272,7 +280,6 @@ class NewTabPageView @JvmOverloads constructor(
             val section = nextSteps.provideSectionView(context) ?: return@launch
             binding.nextStepsContainer.addView(section)
             binding.nextStepsContainer.show()
-            viewModel.onMessageShown()
         }
     }
 
@@ -296,7 +303,7 @@ class NewTabPageView @JvmOverloads constructor(
             binding.appTrackingProtectionStateView.gone()
             binding.ddgLogo.gone()
             binding.messageCta.gone()
-            binding.nextStepsContainer.gone()
+            hideNextStepsSection()
             binding.focusedFavourites.gone()
             return
         }
@@ -311,12 +318,12 @@ class NewTabPageView @JvmOverloads constructor(
         }
         if (viewState.showNextSteps) {
             binding.messageCta.gone()
-            showNextStepsSection(viewState.newMessage)
+            showNextStepsSection()
         } else if (viewState.message != null && viewState.onboardingComplete) {
-            binding.nextStepsContainer.gone()
+            hideNextStepsSection()
             showRemoteMessage(viewState.message, viewState.messageImageFilePath, viewState.newMessage)
         } else {
-            binding.nextStepsContainer.gone()
+            hideNextStepsSection()
             binding.messageCta.gone()
             if (viewState.lowPriorityMessage != null) {
                 showLowPriorityMessage(viewState.lowPriorityMessage)
@@ -340,6 +347,7 @@ class NewTabPageView @JvmOverloads constructor(
             is SharePromoLinkRMF -> launchSharePromoRMFPageChooser(command.url, command.shareTitle)
             is SubmitUrl -> submitUrl(command.url)
             is LaunchDefaultCredentialProvider -> launchDefaultCredentialProvider()
+            is LaunchAddWidget -> addWidgetLauncher.launchAddWidget(context, command.widgetType)
         }
     }
 

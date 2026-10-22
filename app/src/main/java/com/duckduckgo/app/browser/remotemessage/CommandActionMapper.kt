@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.remotemessage
 
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel
+import com.duckduckgo.app.widget.WidgetType
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Action.*
@@ -47,6 +48,7 @@ class RealCommandActionMapper @Inject constructor(
                 NewTabPageViewModel.Command.SubmitUrl(surveyParameterManager.buildSurveyUrl(action.value, queryParams))
             }
             is DefaultCredentialProvider -> NewTabPageViewModel.Command.LaunchDefaultCredentialProvider
+            is AddWidget -> NewTabPageViewModel.Command.LaunchAddWidget(WidgetType.fromValue(action.value))
         }
     }
 }

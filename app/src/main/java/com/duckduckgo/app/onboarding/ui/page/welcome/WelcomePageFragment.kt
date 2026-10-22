@@ -309,7 +309,7 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
             is WelcomePageViewModel.Command.ShowDefaultBrowserDialog ->
                 defaultBrowserRoleManagerDialog.launch(command.intent)
             WelcomePageViewModel.Command.LaunchAddWidgetPrompt ->
-                addWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt = true)
+                addWidgetLauncher.launchAddWidget(requireContext())
             WelcomePageViewModel.Command.Finish -> onContinuePressed()
             is WelcomePageViewModel.Command.FinishAndSubmitSearchQuery ->
                 (activity as? OnboardingActivity)?.finishAndSubmitSearchQuery(command.query)

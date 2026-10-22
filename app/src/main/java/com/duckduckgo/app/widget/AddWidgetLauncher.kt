@@ -23,10 +23,13 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.widget.SearchAndFavoritesWidget
@@ -37,15 +40,6 @@ import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 import javax.inject.Named
 
-interface AddWidgetLauncher {
-    fun launchAddWidget(
-        activity: Activity?,
-        simpleWidgetPrompt: Boolean = false,
-        searchOnlyWidgetPrompt: Boolean = false,
-        duckAiOnlyWidgetPrompt: Boolean = false,
-    )
-}
-
 @ContributesBinding(AppScope::class)
 class AddWidgetCompatLauncher @Inject constructor(
     @Named("appWidgetManagerAddWidgetLauncher") private val defaultAddWidgetLauncher: AddWidgetLauncher,
@@ -54,15 +48,13 @@ class AddWidgetCompatLauncher @Inject constructor(
 ) : AddWidgetLauncher {
 
     override fun launchAddWidget(
-        activity: Activity?,
-        simpleWidgetPrompt: Boolean,
-        searchOnlyWidgetPrompt: Boolean,
-        duckAiOnlyWidgetPrompt: Boolean,
+        context: Context,
+        widgetType: WidgetType,
     ) {
         if (widgetCapabilities.supportsAutomaticWidgetAdd) {
-            defaultAddWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt, searchOnlyWidgetPrompt, duckAiOnlyWidgetPrompt)
+            defaultAddWidgetLauncher.launchAddWidget(context, widgetType)
         } else {
-            legacyAddWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt, searchOnlyWidgetPrompt, duckAiOnlyWidgetPrompt)
+            legacyAddWidgetLauncher.launchAddWidget(context, widgetType)
         }
     }
 }
@@ -80,33 +72,26 @@ class AppWidgetManagerAddWidgetLauncher @Inject constructor(
 
     @SuppressLint("NewApi")
     override fun launchAddWidget(
-        activity: Activity?,
-        simpleWidgetPrompt: Boolean,
-        searchOnlyWidgetPrompt: Boolean,
-        duckAiOnlyWidgetPrompt: Boolean,
+        context: Context,
+        widgetType: WidgetType,
     ) {
-        activity?.let {
-            val widgetLabel: String
-            val provider = when {
-                simpleWidgetPrompt && appTheme.isLightModeEnabled() -> {
-                    widgetLabel = it.getString(R.string.searchWidgetLabel)
-                    ComponentName(it, SearchWidgetLight::class.java)
-                }
-                simpleWidgetPrompt -> {
-                    widgetLabel = it.getString(R.string.searchWidgetLabel)
-                    ComponentName(it, SearchWidget::class.java)
-                }
-                searchOnlyWidgetPrompt -> {
-                    widgetLabel = it.getString(R.string.searchOnlyWidgetLabel)
-                    ComponentName(it, SearchOnlyWidget::class.java)
-                }
-                else -> {
-                    widgetLabel = it.getString(R.string.favoritesWidgetLabel)
-                    ComponentName(it, SearchAndFavoritesWidget::class.java)
-                }
+        val widgetLabel: String
+        val provider = when (widgetType) {
+            WidgetType.SEARCH -> {
+                widgetLabel = context.getString(R.string.searchWidgetLabel)
+                val widgetClass = if (appTheme.isLightModeEnabled()) SearchWidgetLight::class.java else SearchWidget::class.java
+                ComponentName(context, widgetClass)
             }
-            AppWidgetManager.getInstance(it).requestPinAppWidget(provider, null, buildPendingIntent(it, widgetLabel))
+            WidgetType.SEARCH_ONLY -> {
+                widgetLabel = context.getString(R.string.searchOnlyWidgetLabel)
+                ComponentName(context, SearchOnlyWidget::class.java)
+            }
+            WidgetType.SEARCH_AND_FAVORITES -> {
+                widgetLabel = context.getString(R.string.favoritesWidgetLabel)
+                ComponentName(context, SearchAndFavoritesWidget::class.java)
+            }
         }
+        AppWidgetManager.getInstance(context).requestPinAppWidget(provider, null, buildPendingIntent(context, widgetLabel))
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
@@ -125,16 +110,25 @@ class AppWidgetManagerAddWidgetLauncher @Inject constructor(
 
 @ContributesBinding(AppScope::class)
 @Named("legacyAddWidgetLauncher")
-class LegacyAddWidgetLauncher @Inject constructor() : AddWidgetLauncher {
+class LegacyAddWidgetLauncher @Inject constructor(
+    private val appBuildConfig: AppBuildConfig,
+) : AddWidgetLauncher {
     override fun launchAddWidget(
-        activity: Activity?,
-        simpleWidgetPrompt: Boolean,
-        searchOnlyWidgetPrompt: Boolean,
-        duckAiOnlyWidgetPrompt: Boolean,
+        context: Context,
+        widgetType: WidgetType,
     ) {
-        activity?.let {
-            val options = ActivityOptions.makeSceneTransitionAnimation(it).toBundle()
-            it.startActivity(AddWidgetInstructionsActivity.intent(it), options)
+        val activity = context.findActivity()
+        if (activity == null) {
+            check(!appBuildConfig.isDebug && !appBuildConfig.isInternalBuild()) { "AddWidgetLauncher needs an Activity behind the context" }
+            return
         }
+        val options = ActivityOptions.makeSceneTransitionAnimation(activity).toBundle()
+        activity.startActivity(AddWidgetInstructionsActivity.intent(activity), options)
+    }
+
+    private tailrec fun Context.findActivity(): Activity? = when (this) {
+        is Activity -> this
+        is ContextWrapper -> baseContext.findActivity()
+        else -> null
     }
 }

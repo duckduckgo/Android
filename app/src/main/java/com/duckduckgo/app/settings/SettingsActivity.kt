@@ -586,7 +586,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun launchAddHomeScreenWidget() {
         pixel.fire(AppPixelName.SETTINGS_ADD_HOME_SCREEN_WIDGET_CLICKED)
-        addWidgetLauncher.launchAddWidget(this, true)
+        addWidgetLauncher.launchAddWidget(this)
     }
 
     private fun launchFeedback() {

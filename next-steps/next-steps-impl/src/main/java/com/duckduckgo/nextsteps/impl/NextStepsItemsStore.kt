@@ -16,21 +16,37 @@
 package com.duckduckgo.nextsteps.impl
 
 import android.content.SharedPreferences
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import androidx.core.content.edit
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
-/** Device-local state of the Next Steps section: card order, front card impressions and dismissed cards. */
+/**
+ * Device-local state of the Next Steps section. Item ids are stable across RMF messages, so dismissed and completed
+ * ids are kept for good: a card the user closed or whose step is done never comes back, not even in a later message
+ * or after the step is undone (e.g. the widget is removed).
+ */
 interface NextStepsItemsStore {
     fun itemOrder(): List<String>
 
     fun saveItemOrder(ids: List<String>)
 
-    fun dismissedItemIds(): Set<String>
+    fun dismissedItemIds(): Flow<Set<String>>
 
     fun addDismissedItemId(id: String)
+
+    fun completedItemIds(): Set<String>
+
+    fun addCompletedItemIds(ids: Set<String>)
 
     fun frontImpressions(itemId: String): Int
 
@@ -38,8 +54,10 @@ interface NextStepsItemsStore {
 }
 
 @ContributesBinding(AppScope::class)
+@SingleIn(AppScope::class)
 class RealNextStepsItemsStore @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,
+    private val dispatchers: DispatcherProvider,
 ) : NextStepsItemsStore {
 
     private val preferences: SharedPreferences by lazy {
@@ -53,10 +71,21 @@ class RealNextStepsItemsStore @Inject constructor(
         preferences.edit { putString(KEY_ORDER, ids.joinToString(ORDER_SEPARATOR)) }
     }
 
-    override fun dismissedItemIds(): Set<String> = preferences.getStringSet(KEY_DISMISSED, null)?.toSet().orEmpty()
+    override fun dismissedItemIds(): Flow<Set<String>> = callbackFlow {
+        val listener = OnSharedPreferenceChangeListener { _, key -> if (key == KEY_DISMISSED) trySend(readDismissedItemIds()) }
+        preferences.registerOnSharedPreferenceChangeListener(listener)
+        trySend(readDismissedItemIds())
+        awaitClose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
+    }.distinctUntilChanged().flowOn(dispatchers.io())
 
     override fun addDismissedItemId(id: String) {
-        preferences.edit { putStringSet(KEY_DISMISSED, dismissedItemIds() + id) }
+        preferences.edit { putStringSet(KEY_DISMISSED, readDismissedItemIds() + id) }
+    }
+
+    override fun completedItemIds(): Set<String> = preferences.getStringSet(KEY_COMPLETED, null)?.toSet().orEmpty()
+
+    override fun addCompletedItemIds(ids: Set<String>) {
+        preferences.edit { putStringSet(KEY_COMPLETED, completedItemIds() + ids) }
     }
 
     override fun frontImpressions(itemId: String): Int =
@@ -70,10 +99,13 @@ class RealNextStepsItemsStore @Inject constructor(
         }
     }
 
+    private fun readDismissedItemIds(): Set<String> = preferences.getStringSet(KEY_DISMISSED, null)?.toSet().orEmpty()
+
     private companion object {
         const val FILENAME = "com.duckduckgo.nextsteps.items"
         const val KEY_ORDER = "KEY_ORDER"
         const val KEY_DISMISSED = "KEY_DISMISSED"
+        const val KEY_COMPLETED = "KEY_COMPLETED"
         const val KEY_FRONT_ITEM_ID = "KEY_FRONT_ITEM_ID"
         const val KEY_FRONT_IMPRESSIONS = "KEY_FRONT_IMPRESSIONS"
         const val ORDER_SEPARATOR = "\n"
