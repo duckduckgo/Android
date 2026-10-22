@@ -30,8 +30,8 @@ develocity {
         }
         // Runner metadata, populated on CI by the develocity-runner-info action.
         // Captured as custom values (not tags) so each dimension stays named and
-        // independently queryable when correlating Artifact Cache overhead with the
-        // runner hardware/region. Each is guarded so local builds emit nothing and so
+        // independently queryable when comparing build performance across runner
+        // hardware and regions. Each is guarded so local builds emit nothing and so
         // a runner without Azure IMDS (self-hosted) simply omits what it can't detect.
         [
             'Runner Type'       : 'DDG_RUNNER_TYPE',        // optional human label, if the CI step set one
