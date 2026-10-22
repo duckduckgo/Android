@@ -24,6 +24,9 @@ sealed class RealDuckAiTabGridItemContent : DuckAiTabGridItemContent {
 
     data class Chat(val title: String, val snippet: String) : RealDuckAiTabGridItemContent()
 
+    /** A question has been sent and no reply text exists yet. */
+    data class Thinking(val title: String) : RealDuckAiTabGridItemContent()
+
     /** [mode] selects the store [fileRef] is read from when the thumbnail loads. */
     data class ImageChat(val title: String, val fileRef: String, val mode: BrowserMode) : RealDuckAiTabGridItemContent()
 

@@ -50,11 +50,13 @@ data class DuckAiChat(
 
 /**
  * [chat] metadata plus the trimmed text of its last message ([lastMessageText] is null when that message has no text),
- * built from a single read and parse of the FE-owned chat JSON.
+ * built from a single read and parse of the FE-owned chat JSON. [isAwaitingReply] is true when a question has been sent
+ * but no reply text exists yet: the last message is the user's, or an assistant reply without text.
  */
 data class DuckAiChatPreview(
     val chat: DuckAiChat,
     val lastMessageText: String?,
+    val isAwaitingReply: Boolean = false,
 )
 
 /**
@@ -219,7 +221,8 @@ class RealDuckAiChatStore(
             runCatching {
                 val json = JSONObject(entity.data)
                 val chat = json.toDuckAiChat() ?: return@runCatching null
-                DuckAiChatPreview(chat = chat, lastMessageText = json.lastMessageText())
+                val lastMessageText = json.lastMessageText()
+                DuckAiChatPreview(chat = chat, lastMessageText = lastMessageText, isAwaitingReply = json.isAwaitingReply(lastMessageText))
             }.getOrNull()
         }
 
@@ -282,6 +285,16 @@ class RealDuckAiChatStore(
         return text.trim().takeIf { it.isNotEmpty() }
     }
 
+    private fun JSONObject.isAwaitingReply(lastMessageText: String?): Boolean {
+        val messages = optJSONArray("messages") ?: return false
+        val lastMessage = messages.optJSONObject(messages.length() - 1) ?: return false
+        return when (lastMessage.optString("role")) {
+            USER_ROLE -> true
+            ASSISTANT_ROLE -> lastMessageText == null
+            else -> false
+        }
+    }
+
     private fun JSONObject.directContent(): String? {
         val text = when (val content = opt("content")) {
             is String -> content
@@ -327,6 +340,7 @@ class RealDuckAiChatStore(
     private companion object {
         const val VOICE_MODEL = "voice-mode"
         const val ASSISTANT_ROLE = "assistant"
+        const val USER_ROLE = "user"
         const val UI_COMPONENT_TYPE = "ui-component"
         const val TEXT_TYPE = "text"
         const val GENERATE_IMAGE_NAME = "generate-image"

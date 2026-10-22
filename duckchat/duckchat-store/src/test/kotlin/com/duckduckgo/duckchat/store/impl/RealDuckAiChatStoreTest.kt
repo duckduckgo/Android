@@ -700,6 +700,24 @@ class RealDuckAiChatStoreTest {
     }
 
     @Test
+    fun `getChatPreview is awaiting reply when last message is the user's or an assistant reply without text`() = runTest {
+        givenChat("""{"chatId":"abc","messages":[{"role":"user","content":"hi"}]}""")
+        assertTrue(store.getChatPreview("abc")!!.isAwaitingReply)
+
+        givenChat("""{"chatId":"abc","messages":[{"role":"user","content":"hi"},{"role":"assistant","content":"","parts":[]}]}""")
+        assertTrue(store.getChatPreview("abc")!!.isAwaitingReply)
+    }
+
+    @Test
+    fun `getChatPreview is not awaiting reply when there are no messages or the reply has text`() = runTest {
+        givenChat("""{"chatId":"abc","messages":[]}""")
+        assertFalse(store.getChatPreview("abc")!!.isAwaitingReply)
+
+        givenChat("""{"chatId":"abc","messages":[{"role":"user","content":"hi"},{"role":"assistant","content":"Hello"}]}""")
+        assertFalse(store.getChatPreview("abc")!!.isAwaitingReply)
+    }
+
+    @Test
     fun `getChatPreview returns null when chat not found or JSON malformed`() = runTest {
         whenever(chatsDao.getById("missing")).thenReturn(null)
         assertNull(store.getChatPreview("missing"))
