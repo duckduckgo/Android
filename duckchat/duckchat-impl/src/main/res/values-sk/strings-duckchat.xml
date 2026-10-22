@@ -407,4 +407,6 @@
     <string name="duckChatSubmitAskLabel" instruction="Label of the submit button while the Duck.ai terms are not yet accepted. Required wording from legal, tapping it is how the user accepts.">Opýtať sa</string>
     <!-- Duck.ai ToS consent footer -->
     <string name="duckChatTermsFooterMessage" instruction="Disclaimer under the Duck.ai input. ^1 is the label of the submit button, so the sentence always names the button the user taps. The two annotated phrases are tappable links to the Privacy Policy and the Terms of Service.">DuckDuckGo anonymizuje tvoje chaty. Kliknutím na tlačidlo „^1“ súhlasíš s našimi <annotation type="privacy_link">Zásadami ochrany osobných údajov</annotation> a <annotation type="terms_link">Podmienkami používania služby</annotation>.</string>
+    <!-- Duck.ai attachment privacy footer -->
+    <string name="duckChatAttachmentPrivacyFooterMessage" instruction="Disclaimer under the Duck.ai input while an image or file is attached. The annotated phrase is a tappable link to a help page.">Súbory sa automaticky kontrolujú ohľadom nelegálneho obsahu. Označené čety majú obmedzené uchovávanie údajov. <annotation type="learn_more_link">Zistiť viac</annotation></string>
 </resources>

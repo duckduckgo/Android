@@ -399,4 +399,6 @@
     <string name="duckChatSubmitAskLabel" instruction="Label of the submit button while the Duck.ai terms are not yet accepted. Required wording from legal, tapping it is how the user accepts.">Sor</string>
     <!-- Duck.ai ToS consent footer -->
     <string name="duckChatTermsFooterMessage" instruction="Disclaimer under the Duck.ai input. ^1 is the label of the submit button, so the sentence always names the button the user taps. The two annotated phrases are tappable links to the Privacy Policy and the Terms of Service.">DuckDuckGo sohbetlerinizi anonimleştirir. \'^1\' düğmesine tıklayarak <annotation type="privacy_link">Gizlilik Politikamızı</annotation> ve <annotation type="terms_link">Hizmet Şartlarımızı</annotation> kabul etmiş olursunuz.</string>
+    <!-- Duck.ai attachment privacy footer -->
+    <string name="duckChatAttachmentPrivacyFooterMessage" instruction="Disclaimer under the Duck.ai input while an image or file is attached. The annotated phrase is a tappable link to a help page.">Dosyalar, yasa dışı içerik için otomatik olarak taranır. İşaretlenen sohbetlerin veri saklama süresi sınırlıdır. <annotation type="learn_more_link">Daha fazla bilgi</annotation></string>
 </resources>
