@@ -16,7 +16,6 @@
 
 package com.duckduckgo.macrobenchmark
 
-import android.content.Intent
 import androidx.benchmark.macro.junit4.BaselineProfileRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -45,13 +44,7 @@ class StartupBaselineProfileGenerator {
     @Before
     fun completeOnboarding() {
         device.executeShellCommand("pm clear $TARGET_PACKAGE")
-        val launchIntent = checkNotNull(instrumentation.context.packageManager.getLaunchIntentForPackage(TARGET_PACKAGE))
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        instrumentation.context.startActivity(launchIntent)
-
-        val skipButton = By.res(TARGET_PACKAGE, "skipOnboardingButton")
-        check(device.wait(Until.hasObject(skipButton), SCREEN_TIMEOUT_MS)) { "Onboarding skip button was not shown" }
-        device.findObject(skipButton).click()
+        launchWithOnboardingSkipped(instrumentation)
         check(device.wait(Until.hasObject(BROWSER_TAB), SCREEN_TIMEOUT_MS)) { "Browser tab was not shown after onboarding" }
         device.pressHome()
     }

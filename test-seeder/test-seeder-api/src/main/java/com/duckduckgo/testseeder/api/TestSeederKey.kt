@@ -58,4 +58,8 @@ enum class TestSeederKey(val key: String, val description: String) {
         "Fixture server port. Pins TDS and surrogates, proxies the WebView to the fixture server on that port " +
             "and verifies readiness in the measured process. Other network calls are untouched. Absent means off.",
     ),
+    SKIP_ONBOARDING(
+        "skipOnboarding",
+        "Marks onboarding as completed before launch routing, so no skip button is needed. Value: true",
+    ),
 }
