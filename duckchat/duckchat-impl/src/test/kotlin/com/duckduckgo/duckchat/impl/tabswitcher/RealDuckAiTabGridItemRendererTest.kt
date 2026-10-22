@@ -80,9 +80,9 @@ class RealDuckAiTabGridItemRendererTest {
     }
 
     @Test
-    fun whenUrlHasNoChatIdThenEmptyContentWithoutTitle() = runTest {
-        assertEquals(RealDuckAiTabGridItemContent.Empty(title = null), testee.resolve(TAB_ID, "https://duck.ai/", BrowserMode.REGULAR))
-        assertEquals(RealDuckAiTabGridItemContent.Empty(title = null), testee.resolve(TAB_ID, null, BrowserMode.REGULAR))
+    fun whenUrlHasNoChatIdThenEmptyContent() = runTest {
+        assertEquals(RealDuckAiTabGridItemContent.Empty, testee.resolve(TAB_ID, "https://duck.ai/", BrowserMode.REGULAR))
+        assertEquals(RealDuckAiTabGridItemContent.Empty, testee.resolve(TAB_ID, null, BrowserMode.REGULAR))
     }
 
     @Test
@@ -121,10 +121,10 @@ class RealDuckAiTabGridItemRendererTest {
     }
 
     @Test
-    fun whenTextChatWithoutContentThenEmptyContentKeepsTitle() = runTest {
+    fun whenTextChatWithoutContentThenEmptyContent() = runTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(lastMessageText = null))
 
-        assertEquals(RealDuckAiTabGridItemContent.Empty("Title"), testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertEquals(RealDuckAiTabGridItemContent.Empty, testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
     }
 
     @Test
@@ -138,10 +138,10 @@ class RealDuckAiTabGridItemRendererTest {
     }
 
     @Test
-    fun whenImageChatWithoutFileRefsThenEmptyContentKeepsTitle() = runTest {
+    fun whenImageChatWithoutFileRefsThenEmptyContent() = runTest {
         whenever(regularStore.getChatPreview(CHAT_ID)).thenReturn(preview(isImageGeneration = true))
 
-        assertEquals(RealDuckAiTabGridItemContent.Empty("Title"), testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
+        assertEquals(RealDuckAiTabGridItemContent.Empty, testee.resolve(TAB_ID, CHAT_URL, BrowserMode.REGULAR))
     }
 
     @Test

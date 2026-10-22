@@ -20,8 +20,7 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemContent
 
 sealed class RealDuckAiTabGridItemContent : DuckAiTabGridItemContent {
-    /** [title] is null for a tab that has no chat yet. */
-    data class Empty(val title: String?) : RealDuckAiTabGridItemContent()
+    data object Empty : RealDuckAiTabGridItemContent()
 
     data class Chat(val title: String, val snippet: String) : RealDuckAiTabGridItemContent()
 

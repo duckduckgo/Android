@@ -65,7 +65,7 @@
             app:layout_constraintTop_toTopOf="@id/favicon" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/title"
+            android:id="@+id/tabChatItemBranding"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_2"
@@ -82,7 +82,7 @@
             app:layout_constraintStart_toEndOf="@id/favicon"
             app:layout_constraintTop_toTopOf="@id/favicon"
             app:typography="h5"
-            tools:text="Explain quantum entanglement" />
+            android:text="@string/duck_chat_title" />
 
         <!-- Same size as the host's screenshot preview, so the card lines up with other grid cells. -->
         <FrameLayout
@@ -116,7 +116,7 @@
                 android:visibility="gone" />
 
             <ImageView
-                android:id="@+id/emptyLogo"
+                android:id="@+id/tabChatItemEmptyLogo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

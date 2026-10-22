@@ -89,26 +89,25 @@ class DuckAiTabGridCardView(
             snippet.gone()
             thumbnail.gone()
             thumbnail.setImageDrawable(null)
-            emptyLogo.gone()
+            tabChatItemEmptyLogo.gone()
             voiceActive.gone()
+            tabChatItemBranding.setText(
+                if (content == RealDuckAiTabGridItemContent.Empty) BrowserUiR.string.browserMenuNewChat else R.string.duck_chat_title,
+            )
 
             when (content) {
                 is RealDuckAiTabGridItemContent.Chat -> {
-                    title.text = content.title
                     snippet.text = content.snippet
                     snippet.show()
                 }
                 is RealDuckAiTabGridItemContent.ImageChat -> {
-                    title.text = content.title
                     thumbnail.show()
                     loadThumbnail(content)
                 }
-                is RealDuckAiTabGridItemContent.Empty -> {
-                    title.text = content.title ?: root.context.getString(BrowserUiR.string.duck_ai_tab_label)
-                    emptyLogo.show()
+                RealDuckAiTabGridItemContent.Empty -> {
+                    tabChatItemEmptyLogo.show()
                 }
                 RealDuckAiTabGridItemContent.ActiveVoice -> {
-                    title.text = root.context.getString(BrowserUiR.string.duck_ai_tab_label)
                     voiceActive.show()
                 }
             }
@@ -149,7 +148,7 @@ class DuckAiTabGridCardView(
         }
     }
 
-    // A missing or undecodable image falls back to the empty look, keeping the chat title.
+    // A missing or undecodable image falls back to the empty look.
     private fun loadThumbnail(content: RealDuckAiTabGridItemContent.ImageChat) {
         if (binding.thumbnail.drawable != null) return
         thumbnailJob += coroutineScope.launch(dispatchers.main()) {
@@ -161,7 +160,7 @@ class DuckAiTabGridCardView(
                 binding.thumbnail.setImageBitmap(bitmap)
             } else {
                 binding.thumbnail.gone()
-                binding.emptyLogo.show()
+                binding.tabChatItemEmptyLogo.show()
             }
         }
     }
