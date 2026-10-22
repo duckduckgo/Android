@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.fire
 
+import android.app.Activity
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
@@ -25,6 +26,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.duckduckgo.app.browser.customtabs.CustomTabActivity
+import com.duckduckgo.app.browser.customtabs.CustomTabsFeature
+import com.duckduckgo.app.dispatchers.IntentDispatcherActivity
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.ApplicationClearDataState
@@ -33,6 +37,7 @@ import com.duckduckgo.app.global.ApplicationClearDataState.INITIALIZING
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.browser.api.ActivityLifecycleCallbacks
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -63,6 +68,10 @@ interface DataClearer {
     scope = AppScope::class,
     binding = binding<BrowserLifecycleObserver>(),
 )
+@ContributesIntoSet(
+    scope = AppScope::class,
+    binding = binding<ActivityLifecycleCallbacks>(),
+)
 @SingleIn(AppScope::class)
 class AutomaticDataClearer @Inject constructor(
     private val workManager: WorkManager,
@@ -73,7 +82,8 @@ class AutomaticDataClearer @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val fireDataStore: FireDataStore,
     private val dataClearingWideEvent: DataClearingWideEvent,
-) : DataClearer, BrowserLifecycleObserver, CoroutineScope {
+    private val customTabsFeature: CustomTabsFeature,
+) : DataClearer, BrowserLifecycleObserver, ActivityLifecycleCallbacks, CoroutineScope {
 
     private val clearJob: Job = Job()
 
@@ -86,12 +96,40 @@ class AutomaticDataClearer @Inject constructor(
 
     override var isFreshAppLaunch = true
 
+    // Opening a custom tab doesn't count as opening the app, so the clear waits until another activity starts.
+    private var isCustomTabStarted = false
+    private var isOpenPending = false
+
     override fun onOpen(isFreshLaunch: Boolean) {
-        isFreshAppLaunch = isFreshLaunch
+        isFreshAppLaunch = isFreshLaunch || (isOpenPending && isFreshAppLaunch)
+        isOpenPending = true
+
         launch {
-            onAppForegroundedAsync()
+            onOpenIfNotCustomTab()
         }
     }
+
+    override fun onActivityStarted(activity: Activity) {
+        isCustomTabStarted = activity.isCustomTabLaunch()
+        if (isOpenPending) {
+            launch {
+                onOpenIfNotCustomTab()
+            }
+        }
+    }
+
+    private suspend fun onOpenIfNotCustomTab() {
+        if (isOpenPending) {
+            if (isCustomTabStarted && customTabsFeature.keepCustomTabOnAppSwitch().isEnabled()) {
+                workManager.cancelAllWorkByTag(DataClearingWorker.WORK_REQUEST_TAG)
+            } else {
+                isOpenPending = false
+                onAppForegroundedAsync()
+            }
+        }
+    }
+
+    private fun Activity.isCustomTabLaunch() = this is CustomTabActivity || this is IntentDispatcherActivity
 
     @VisibleForTesting
     suspend fun onAppForegroundedAsync() {
@@ -135,6 +173,7 @@ class AutomaticDataClearer @Inject constructor(
     }
 
     override fun onClose() {
+        val isClearPending = isOpenPending
         launch {
             val timeNow = SystemClock.elapsedRealtime()
             logcat { "Recording when app backgrounded ($timeNow)" }
@@ -142,7 +181,8 @@ class AutomaticDataClearer @Inject constructor(
             postDataClearerState(INITIALIZING)
 
             withContext(dispatchers.io()) {
-                settingsDataStore.appBackgroundedTimestamp = timeNow
+                // Keep the time the browser was left, so the pending clear still runs when it opens.
+                if (!isClearPending) settingsDataStore.appBackgroundedTimestamp = timeNow
 
                 val clearWhenOption = fireDataStore.getAutomaticallyClearWhenOption()
                 val clearOptions = fireDataStore.getAutomaticClearOptions()

@@ -20,6 +20,7 @@ package com.duckduckgo.app.fire
 
 import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.customtabs.CustomTabsFeature
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
@@ -42,6 +43,8 @@ import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.NavigationHistory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
@@ -131,6 +134,7 @@ class DataClearingTest {
     private lateinit var mockDataClearingTrigger: DataClearingTrigger
 
     private val fireModeDataClearingState = FireModeDataClearingState()
+    private val customTabsFeature = FakeFeatureToggleFactory.create(CustomTabsFeature::class.java)
 
     private val showClearDuckAIChatHistoryFlow = MutableStateFlow(true)
     private val showOnAppLaunchOptionFlow = MutableStateFlow<ShowOnAppLaunchOption>(ShowOnAppLaunchOption.LastOpenedTab)
@@ -169,6 +173,7 @@ class DataClearingTest {
             showOnAppLaunchOptionDataStore = mockShowOnAppLaunchOptionDataStore,
             dataClearingTrigger = mockDataClearingTrigger,
             fireModeDataClearingState = fireModeDataClearingState,
+            customTabsFeature = customTabsFeature,
         )
     }
 
@@ -204,7 +209,18 @@ class DataClearingTest {
     }
 
     @Test
-    fun whenAutomaticClearWithTabs_thenDoNotCloseCustomTabs() = runTest {
+    fun whenAutomaticClearWithTabs_thenCloseCustomTabs() = runTest {
+        customTabsFeature.keepCustomTabOnAppSwitch().setRawStoredState(State(enable = true))
+        configureAutomaticOptions(setOf(FireClearOption.TABS))
+
+        testee.clearDataUsingAutomaticFireOptions(killProcessIfNeeded = false)
+
+        verify(mockClearDataAction).closeCustomTabs()
+    }
+
+    @Test
+    fun whenAutomaticClearWithTabsAndKeepCustomTabDisabled_thenDoNotCloseCustomTabs() = runTest {
+        customTabsFeature.keepCustomTabOnAppSwitch().setRawStoredState(State(enable = false))
         configureAutomaticOptions(setOf(FireClearOption.TABS))
 
         testee.clearDataUsingAutomaticFireOptions(killProcessIfNeeded = false)

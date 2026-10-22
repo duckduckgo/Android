@@ -20,6 +20,7 @@ package com.duckduckgo.app.fire
 
 import android.annotation.SuppressLint
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.customtabs.CustomTabsFeature
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
@@ -80,6 +81,7 @@ class DataClearing @Inject constructor(
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val dataClearingTrigger: DataClearingTrigger,
     private val fireModeDataClearingState: FireModeDataClearingState,
+    private val customTabsFeature: CustomTabsFeature,
 ) : ManualDataClearing, AutomaticDataClearing {
 
     override suspend fun clearSingleTabData(tabId: String, replaceCurrentTab: Boolean, browserMode: BrowserMode): ClearDataResult {
@@ -214,6 +216,11 @@ class DataClearing @Inject constructor(
             shouldFireDataClearPixel = false,
         )
         performFireModeClear()
+
+        // Without deferring the clear while a custom tab opens, this would close the tab that is opening.
+        if (FireClearOption.TABS in options && customTabsFeature.keepCustomTabOnAppSwitch().isEnabled()) {
+            clearDataAction.closeCustomTabs()
+        }
 
         clearDataAction.setAppUsedSinceLastClearFlag(!killProcessIfNeeded)
 
