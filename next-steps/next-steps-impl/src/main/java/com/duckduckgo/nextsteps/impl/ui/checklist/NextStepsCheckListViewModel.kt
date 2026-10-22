@@ -96,6 +96,7 @@ class NextStepsCheckListViewModel @Inject constructor(
     private var pendingCompletionItemId: String? = null
     private var animatingCompletionItemId: String? = null
     private var shownMessageId: String? = null
+    private var completionOrder: List<String> = emptyList()
     private var sectionJob: Job? = null
 
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -168,6 +169,7 @@ class NextStepsCheckListViewModel @Inject constructor(
         val content = this.content as Content.ActionableItems
         val supportedItems = completionChecker.supportedItems(content.listItems)
         val completedIds = completionChecker.refresh(supportedItems).completedIds
+        completionOrder = completedIds.toList()
         val settledItems = supportedItems.map { ViewState.Item(item = it, completed = it.id in completedIds) }.sortedItems()
         startCompletionAnimationIfDue(settledItems)
         val items = supportedItems
@@ -193,6 +195,8 @@ class NextStepsCheckListViewModel @Inject constructor(
         }
     }
 
-    // Completed items sink below the remaining ones; the sort is stable, so both groups keep the config order.
-    private fun List<ViewState.Item>.sortedItems(): List<ViewState.Item> = sortedBy { it.completed }
+    // Remaining items keep the config order; completed items follow, the most recently completed first, so a
+    // newly completed item lands right below the remaining ones and the older ones sink.
+    private fun List<ViewState.Item>.sortedItems(): List<ViewState.Item> =
+        filter { !it.completed } + filter { it.completed }.sortedByDescending { completionOrder.indexOf(it.item.id) }
 }

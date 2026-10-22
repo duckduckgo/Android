@@ -260,7 +260,7 @@ class NextStepsCheckListViewModelTest {
     }
 
     @Test
-    fun `when another item is already completed then the animated item lands above it in config order`() = runTest {
+    fun `when another item is already completed then the newly completed item lands right below the remaining ones`() = runTest {
         syncCheck.completed = true
         activeMessage.value = aMessage(content = nextStepsContent())
         advanceUntilIdle()
@@ -275,6 +275,53 @@ class NextStepsCheckListViewModelTest {
         assertEquals(listOf(defaultBrowserItem, addWidgetItem, syncItem), testee.viewState.value.items.map { it.item })
         testee.onItemCompletionAnimated(defaultBrowserItem.id)
         assertEquals(listOf(addWidgetItem, defaultBrowserItem, syncItem), testee.viewState.value.items.map { it.item })
+    }
+
+    @Test
+    fun `when items complete one after another then the completed ones are ordered newest first`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+
+        testee.onItemClicked(defaultBrowserItem.id)
+        advanceUntilIdle()
+        defaultBrowserCheck.completed = true
+        testee.onResume(mock())
+        advanceUntilIdle()
+        assertEquals(Command.AnimateItemCompletion(defaultBrowserItem.id, toPosition = 2), commands.last())
+        testee.onItemCompletionAnimated(defaultBrowserItem.id)
+        assertEquals(listOf(addWidgetItem, syncItem, defaultBrowserItem), testee.viewState.value.items.map { it.item })
+
+        testee.onItemClicked(addWidgetItem.id)
+        advanceUntilIdle()
+        addWidgetCheck.completed = true
+        testee.onResume(mock())
+        advanceUntilIdle()
+        assertEquals(Command.AnimateItemCompletion(addWidgetItem.id, toPosition = 1), commands.last())
+        testee.onItemCompletionAnimated(addWidgetItem.id)
+        assertEquals(listOf(syncItem, addWidgetItem, defaultBrowserItem), testee.viewState.value.items.map { it.item })
+    }
+
+    @Test
+    fun `when the item right above the completed ones completes then it keeps its position`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        testee.onItemClicked(defaultBrowserItem.id)
+        advanceUntilIdle()
+        defaultBrowserCheck.completed = true
+        testee.onResume(mock())
+        advanceUntilIdle()
+        testee.onItemCompletionAnimated(defaultBrowserItem.id)
+        assertEquals(listOf(addWidgetItem, syncItem, defaultBrowserItem), testee.viewState.value.items.map { it.item })
+
+        testee.onItemClicked(syncItem.id)
+        advanceUntilIdle()
+        syncCheck.completed = true
+        testee.onResume(mock())
+        advanceUntilIdle()
+
+        assertEquals(Command.AnimateItemCompletion(syncItem.id, toPosition = 1), commands.last())
+        testee.onItemCompletionAnimated(syncItem.id)
+        assertEquals(listOf(addWidgetItem, syncItem, defaultBrowserItem), testee.viewState.value.items.map { it.item })
     }
 
     @Test
