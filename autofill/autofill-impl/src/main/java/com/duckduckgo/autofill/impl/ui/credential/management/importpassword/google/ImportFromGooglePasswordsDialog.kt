@@ -139,7 +139,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     private var handledPromoRequest: PromoRequest? = null
 
     private val promoCallback = object : PasswordsImportScreenPromotionPlugin.Callback {
-        override fun onPromoActionClicked() {
+        override fun dismissHost() {
             dismiss()
         }
     }
