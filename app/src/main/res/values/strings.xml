@@ -17,8 +17,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="appName" translatable="false">Saifer Browser</string>
-    <string name="appDescription" translatable="false">Saifer Browser</string>
-    <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
+    <string name="appDescription" translatable="false">Saifer Browser — fast, private browsing</string>
+    <string name="duckDuckGoLogoDescription">Saifer Browser logo</string>
     <string name="duckDuckGoProtectionPrivacyPeaceTagLine">Protection. Privacy. Peace of Mind.</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
@@ -30,15 +30,15 @@
     <string name="duckAiChatDeletedSnackbar">Chat deleted</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">Visit Settings to search and browse with DuckDuckGo every time.</string>
-    <string name="onboardingDefaultBrowserTitle">Make DuckDuckGo your default</string>
+    <string name="onboardingDefaultBrowserDescription">Visit Settings to search and browse with Saifer Browser every time.</string>
+    <string name="onboardingDefaultBrowserTitle">Make Saifer Browser your default</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Can\'t launch default app settings screen</string>
     <string name="setAsDefaultBrowser">Set As Default Browser</string>
     <string name="defaultBrowserMaybeLater">Maybe Later</string>
     <string name="defaultBrowserDescriptionNoDefault">Open links with peace of mind, every time.</string>
-    <string name="defaultBrowserInstructions">Select DuckDuckGo and tap <font color='#678fff'>Always</font>.</string>
+    <string name="defaultBrowserInstructions">Select Saifer Browser and tap <font color='#678fff'>Always</font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Browser menu</string>
@@ -93,11 +93,11 @@
     <!-- Opening external apps -->
     <string name="openExternalApp">Open External App</string>
     <string name="launchingExternalApp">Open in another app</string>
-    <string name="confirmOpenExternalApp">Would you like to leave DuckDuckGo to view this content?</string>
+    <string name="confirmOpenExternalApp">Would you like to leave Saifer Browser to view this content?</string>
     <string name="unableToOpenLink">Unable to open this type of link</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="homeTab" translatable="false">Saifer Browser</string>
     <string name="tabActivityTitle">Tabs</string>
     <string name="tabsMenuItem">Tabs</string>
     <string name="newTabMenuItem">New Tab</string>
@@ -132,7 +132,7 @@
     <string name="settingsHeadingAppearance">Appearance</string>
     <string name="settingsWhatsNew">What\'s New</string>
     <string name="settingsHeadingAbout">About</string>
-    <string name="settingsAboutDuckduckgo">About DuckDuckGo</string>
+    <string name="settingsAboutDuckduckgo">About Saifer Browser</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Share Feedback</string>
     <string name="leaveFeedbackNew">Send Feedback</string>
@@ -163,12 +163,12 @@
     <string name="settingsAddWidget">Add Widget to Home Screen</string>
     <string name="settingsAddressBarPosition">Set Your Address Bar Position</string>
     <string name="settingsEnableVoiceSearch">Enable Private Voice Search</string>
-    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo on Other Platforms</string>
+    <string name="settingsDDGOnOtherPlatforms">Saifer Browser on Other Platforms</string>
     <string name="settingsDuckAi">AI Features</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Private Search</string>
-    <string name="privateSearchDescription">DuckDuckGo Private Search is your default search engine, so you can search the web without being tracked.</string>
+    <string name="privateSearchDescription">Saifer Search is your default search engine, so you can search the web without being tracked.</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">More Search Settings</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Customize your search language, region, and more</string>
     <string name="privateSearchMoreSearchSettingsTitle">More Search Settings</string>
@@ -211,7 +211,7 @@
 
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Get Desktop Browser</string>
-    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo for Mac and Windows</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">Saifer Browser for Mac and Windows</string>
     <string name="getDesktopBrowserHideItem">Hide</string>
 
     <!-- Cookie Pop-Up Protection -->
@@ -282,10 +282,10 @@
     <string name="settingsClearAiDataTitle">Delete Duck.ai Chats</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button will also delete Duck.ai history, including pinned chats.</string>
     <!-- About Activity -->
-    <string name="aboutActivityTitle">About DuckDuckGo</string>
+    <string name="aboutActivityTitle">About Saifer Browser</string>
     <string name="aboutActivityTitleNew">About</string>
     <string name="aboutHeaderNewTagLine">Protection. Privacy. Peace of mind.</string>
-    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nDuckDuckGo is the independent online protection company for anyone who wants to take back control of their personal information.\n\nWe believe the best way to protect your personal information from hackers, scammers, and privacy-invasive companies is to stop it from being collected at all. That\'s why millions of people <annotation type="chart_comparison">choose DuckDuckGo over Chrome and other browsers</annotation> to search and browse online. Our built-in search engine is like Google but never tracks your searches. And our browsing protections, such as ad tracker blocking and cookie blocking, help stop other companies from collecting your data. Oh, and our browser is free — we make money from <annotation type="privacy_respecting_ads">privacy-respecting search ads</annotation>, not by exploiting your data.\n\nIn addition, we also offer <annotation type="ppro_help_page">DuckDuckGo subscription</annotation> integrated into our browser. Subscribers get even more privacy protection with a fast and simple <annotation type="vpn_help_page">VPN</annotation> that helps secure your online activity, access to advanced AI models in our private AI chat service Duck.ai, a service that finds and removes your personal information from people-finder sites, and a service that restores your identity should it be stolen.\n\nTake back control of your personal information with the browser designed for data protection, not data collection.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nSaifer Browser is the independent online protection company for anyone who wants to take back control of their personal information.\n\nWe believe the best way to protect your personal information from hackers, scammers, and privacy-invasive companies is to stop it from being collected at all. That\'s why millions of people <annotation type="chart_comparison">choose Saifer Browser over Chrome and other browsers</annotation> to search and browse online. Our built-in search engine is like Google but never tracks your searches. And our browsing protections, such as ad tracker blocking and cookie blocking, help stop other companies from collecting your data. Oh, and our browser is free — we make money from <annotation type="privacy_respecting_ads">privacy-respecting search ads</annotation>, not by exploiting your data.\n\nIn addition, we also offer <annotation type="ppro_help_page">Saifer Browser subscription</annotation> integrated into our browser. Subscribers get even more privacy protection with a fast and simple <annotation type="vpn_help_page">VPN</annotation> that helps secure your online activity, access to advanced AI models in our private AI chat service Duck.ai, a service that finds and removes your personal information from people-finder sites, and a service that restores your identity should it be stolen.\n\nTake back control of your personal information with the browser designed for data protection, not data collection.</string>
     <string name="no_suggestions">No Suggestions</string>
 
     <!-- Broken Site Activity -->
@@ -296,7 +296,7 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Turning protections OFF might help.</string>
 
     <!-- Widget -->
-    <string name="searchWidgetTextHint">Search DuckDuckGo</string>
+    <string name="searchWidgetTextHint">Search Saifer Browser</string>
 
     <!-- Favorites widget -->
     <string name="addFavoriteMenuTitleHighlighted">👋 Add Favorite</string>
@@ -321,7 +321,7 @@
     <string name="surveyCtaLaunchButton">Take the Survey</string>
     <string name="surveyCtaDismissButton">No Thanks</string>
     <string name="surveyActivityTitle">User Survey</string>
-    <string name="surveyTitle">DuckDuckGo Survey</string>
+    <string name="surveyTitle">Saifer Browser Survey</string>
     <string name="surveyDismissContentDescription">Dismiss survey</string>
     <string name="surveyLoadingErrorTitle">Oh no!</string>
     <string name="surveyLoadingErrorText">Our survey is not currently loading.\nPlease try again later.</string>
@@ -331,14 +331,14 @@
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Long-press your home screen, then open the widgets menu.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Find the DuckDuckGo widget.</string>
+    <string name="addWidgetInstruction2">Find the Saifer Browser widget.</string>
     <string name="addWidgetInstruction3Label">3</string>
     <string name="addWidgetInstruction3">Drag the widget to your home screen.</string>
     <string name="addWidgetInstructionsButtonGoHome">Go to Home Screen</string>
     <string name="addWidgetInstructionsButtonClose">Close</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
-    <string name="appEnjoymentDialogTitle">Enjoying DuckDuckGo?</string>
+    <string name="appEnjoymentDialogTitle">Enjoying Saifer Browser?</string>
     <string name="appEnjoymentDialogMessage">We\'d love to know what you think.</string>
     <string name="appEnjoymentDialogPositiveButton">I Like It</string>
     <string name="appEnjoymentDialogNegativeButton">It Needs Work</string>
@@ -360,15 +360,15 @@
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Data clearing set to manual</string>
-    <string name="clearNotificationDescription">Customize DuckDuckGo to automatically clear browsing data after every session.</string>
+    <string name="clearNotificationDescription">Customize Saifer Browser to automatically clear browsing data after every session.</string>
 
     <!-- Privacy Protection Notification -->
     <string name="privacyProtectionNotificationDefaultTitle">We\'re protecting your privacy</string>
     <string name="privacyProtectionNotificationReportTitle">Your Privacy Report</string>
-    <string name="privacyProtectionNotificationDefaultDescription">Using the DuckDuckGo app protects your data by blocking trackers and encrypting connections.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">You protected your data by securing %1$d unencrypted connections while using DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">You protected your data by blocking %1$d trackers while using DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">You protected your data by blocking %1$d trackers and securing %2$d unencrypted connections while using DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Using the Saifer Browser app protects your data by blocking trackers and encrypting connections.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">You protected your data by securing %1$d unencrypted connections while using Saifer Browser.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">You protected your data by blocking %1$d trackers while using Saifer Browser.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">You protected your data by blocking %1$d trackers and securing %2$d unencrypted connections while using Saifer Browser.</string>
     <string name="privacyProtectionNotificationLaunchButton">Resume Browsing</string>
 
     <!-- Authentication -->
@@ -380,7 +380,7 @@
     <string name="authenticationDialogPasswordHint">Password</string>
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
-    <string name="systemTextSearchMessage">Search DuckDuckGo</string>
+    <string name="systemTextSearchMessage">Search Saifer Browser</string>
 
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"The webpage could not be displayed."</string>
@@ -388,8 +388,8 @@
 
     <!-- System Search-->
     <string name="systemSearchAppNotFound">Application could not be found</string>
-    <string name="systemSearchOnboardingThanks">Thanks for choosing DuckDuckGo!\nUsing our browser helps keep you protected from hackers, scammers, and data-hungry companies.</string>
-    <string name="systemSearchOnboardingFeaturesIntroText">The DuckDuckGo app also:</string>
+    <string name="systemSearchOnboardingThanks">Thanks for choosing Saifer Browser!\nUsing our browser helps keep you protected from hackers, scammers, and data-hungry companies.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">The Saifer Browser app also:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blocks unsafe trackers.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Forces encryption on websites.</string>
     <string name="systemSearchOnboardingFeatureThreeText">Clears data with one tap.</string>
@@ -407,7 +407,7 @@
     <string name="daxDialogAppTpRetentionSecondaryButtonText">Not Now</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Welcome to DuckDuckGo!"</string>
+    <string name="onboardingWelcomeTitle">"Welcome to Saifer Browser!"</string>
     <string name="onboardingDaxText"><![CDATA[The Internet can be kinda creepy.<br/><br/>Not to worry! Searching and browsing privately is easier than you think.]]></string>
     <string name="onboardingLetsDoItButton">Let\'s Do It!</string>
     <string name="daxNonSerpCtaText"><![CDATA[As you tap and scroll, I\'ll block pesky trackers. <br/><br/>Go ahead — keep browsing!]]></string>
@@ -497,7 +497,7 @@
     <string name="dosErrorMessage">Connection aborted. This website could be harmful to your device.</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Enable device location for DuckDuckGo Privacy Browser?</string>
+    <string name="preciseLocationSystemDialogTitle">Enable device location for Saifer Browser Privacy Browser?</string>
     <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s is requesting your device location. You\'ll first need to allow the app to send your device location, then %2$s can ask permission.</string>
     <string name="preciseLocationSystemDialogAllow">Enable</string>
     <string name="preciseLocationSystemDialogDeny">Maybe Later</string>
@@ -509,7 +509,7 @@
     <string name="preciseLocationSiteDialogAllowOnce">Only for This Session</string>
     <string name="preciseLocationSiteDialogDenyAlways">Deny Always</string>
     <string name="preciseLocationSiteDialogDenyOnce">Deny for This Session</string>
-    <string name="preciseLocationFeatureDescription">Sites you visit may ask to know your device location. They won\'t be able to access it until you explicitly grant permission. DuckDuckGo only uses your location anonymously to deliver local search results.</string>
+    <string name="preciseLocationFeatureDescription">Sites you visit may ask to know your device location. They won\'t be able to access it until you explicitly grant permission. Saifer Browser only uses your location anonymously to deliver local search results.</string>
     <string name="preciseLocationToggleText">Sites Can Ask for My Location</string>
     <string name="preciseLocationEmptyListHint">No websites granted permission to access location</string>
     <string name="preciseLocationNoSystemPermission">To manage the location access permissions you\’ve granted to individual sites, enable location for this app in Android Settings.</string>
@@ -561,11 +561,11 @@
     <string name="settingsAccessibility">Accessibility</string>
     <string name="accessibilityActivityTitle">Accessibility</string>
     <string name="accessibilityFontSizeTitle">Text size</string>
-    <string name="accessibilityFontSizeHint">Drag the slider until you can read this comfortably. Websites you view in DuckDuckGo will adjust to it.</string>
+    <string name="accessibilityFontSizeHint">Drag the slider until you can read this comfortably. Websites you view in Saifer Browser will adjust to it.</string>
     <string name="accessibilityForceZoomTitle">Enforce Manual Page Zoom</string>
     <string name="accessibilityForceZoomSubtitle">Pinch and zoom on any site, even those that would otherwise prevent it</string>
     <string name="accessibilityTextSizeOverrideTitle">Manage Text Size</string>
-    <string name="accessibilityTextSizeOverrideSubtitle">Text on websites you view in DuckDuckGo will adjust to match the setting below</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Text on websites you view in Saifer Browser will adjust to match the setting below</string>
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Privacy Policy</string>
@@ -618,7 +618,7 @@
     <string name="tabSelectedIndicator">Tab selected indicator</string>
     <string name="tabNotSelectedIndicator">Tab not selected indicator</string>
 
-    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d links from DuckDuckGo</string>
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d links from Saifer Browser</string>
     <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Share Link</item>
         <item quantity="other">Share %1$d Links</item>
@@ -679,7 +679,7 @@
     </plurals>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Add Private Voice Search option to the address bar. Audio is not stored or shared with anyone, including DuckDuckGo.</string>
+    <string name="accessibilityVoiceSearchSubtitle">Add Private Voice Search option to the address bar. Audio is not stored or shared with anyone, including Saifer Browser.</string>
     <string name="accessibilityVoiceSearchTitle">Private Voice Search</string>
 
     <!-- Uploading an image from the camera or choosing to use existing image -->
@@ -687,8 +687,8 @@
     <string name="imageCaptureCameraGalleryDisambiguationTitle">Upload an image</string>
     <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Choose File</string>
     <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Take Photo</string>
-    <string name="imageCaptureCameraPermissionDeniedTitle">Allow DuckDuckGo to ask for camera access on this device</string>
-    <string name="imageCaptureCameraPermissionDeniedMessage">Sites can only use your camera if you allow DuckDuckGo to ask for access.</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Allow Saifer Browser to ask for camera access on this device</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Sites can only use your camera if you allow Saifer Browser to ask for access.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Open Settings</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Cancel</string>
 
@@ -702,7 +702,7 @@
     <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">The certificate for this site is invalid. You might be connecting to a server that is pretending to be %1$s which could put your confidential information at risk.</string>
     <string name="sslErrorLeaveCTA">Leave This Site</string>
     <string name="sslErrorAdvancedCTA">Advanced</string>
-    <string name="sslErrorExpandedHeadline">DuckDuckGo warns you when a website has an invalid certificate.</string>
+    <string name="sslErrorExpandedHeadline">Saifer Browser warns you when a website has an invalid certificate.</string>
     <string name="sslErrorExpandedCTA"><![CDATA[<u>Accept Risk and Visit Site</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">The security certificate for %1$s is expired. It’s possible that the website is misconfigured, that an attacker has compromised your connection, or that your system clock is incorrect.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">The security certificate for %1$s does not match *.%2$s. It’s possible that the website is misconfigured or that an attacker has compromised your connection, or that your system clock is incorrect.</string>
@@ -735,7 +735,7 @@
     <string name="highlightsPreOnboardingAddressBarOption2Title">Bottom</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Easy to reach</string>
     <string name="onboardingSearchDaxDialogTitle">Try a search!</string>
-    <string name="onboardingSearchDaxDialogDescription">Your DuckDuckGo searches are always private.</string>
+    <string name="onboardingSearchDaxDialogDescription">Your Saifer Browser searches are always private.</string>
     <string name="onboardingSearchQueryOption1">how to say duck in english</string>
     <string name="onboardingSearchQueryOption1English">how to say duck in spanish</string>
     <string name="onboardingSearchDaxDialogOption2">cast of avatar</string>
@@ -749,8 +749,8 @@
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Surprise me!</string>
-    <string name="onboardingSerpDaxDialogDescription"><![CDATA[That\'s <b>DuckDuckGo Search</b>! Private. Fast. Fewer ads.]]></string>
-    <string name="onboardingSerpDaxDialogBrandDesignTitle">That\'s DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogDescription"><![CDATA[That\'s <b>Saifer Browser Search</b>! Private. Fast. Fewer ads.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">That\'s Saifer Browser Search!</string>
     <string name="onboardingSerpDaxDialogBrandDesignDescription">Private. Fast. Fewer ads.</string>
     <string name="onboardingSerpDaxDialogButton">Got it!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Next, try visiting a site!</string>
@@ -786,7 +786,7 @@
 
     <!--Onboarding Reinstall Quick Setup-->
     <string name="preOnboardingReinstallQuickSetupTitle">Welcome back!&lt;br/&gt;Want to customize anything?</string>
-    <string name="preOnboardingReinstallSetDefaultLabel">Set DuckDuckGo as default</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Set Saifer Browser as default</string>
     <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Add Home screen widget</string>
     <string name="preOnboardingReinstallAddressBarLabel">Address bar position</string>
     <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Address bar search options</string>
@@ -818,15 +818,15 @@
     <string name="showOnAppLaunchOptionSpecificPage">Specific Page</string>
 
     <!-- Privacy Dashboard -->
-    <string name="brokenSiteSubmittedReportMessage">Thank you! Your report helps make DuckDuckGo better for everyone!</string>
+    <string name="brokenSiteSubmittedReportMessage">Thank you! Your report helps make Saifer Browser better for everyone!</string>
 
     <!--    Default Browser Bottom Sheet Dialog -->
-    <string name="defaultBrowserBottomSheetDialogTitle">Let DuckDuckGo protect more of what you do online</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Switch your default browser so links open in DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogTitle">Let Saifer Browser protect more of what you do online</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Switch your default browser so links open in Saifer Browser.</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Not Now</string>
 
     <!-- Default Browser message -->
-    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo isn\'t your default browser. Get more protection.</string>
+    <string name="newTabPageDefaultBrowserMessageHeading">Saifer Browser isn\'t your default browser. Get more protection.</string>
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Set As Default</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Don\'t Ask Again</string>
 
@@ -846,7 +846,7 @@
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Learn More</annotation></string>
     <string name="maliciousSiteSettingDisabled">Disabling this feature can put your information at risk.</string>
     <string name="threatProtectionTitle">Threat Protection</string>
-    <string name="threatProtectionDescription">DuckDuckGo\'s enhanced protections stop common threats while keeping your connection secure.</string>
+    <string name="threatProtectionDescription">Saifer Browser\'s enhanced protections stop common threats while keeping your connection secure.</string>
     <string name="smarterEncryptionTitle">Smarter Encryption</string>
     <string name="smarterEncryptionDescription"><![CDATA[Automatically upgrades links to HTTPS whenever possible.<br><a href="">Learn More</a>]]></string>
     <string name="scamBlockerTitle">Scam Blocker</string>
@@ -878,19 +878,19 @@
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Search Only</string>
-    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Quickly launch a private search with DuckDuckGo.</string>
-    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Search privately with DuckDuckGo or ask Duck.ai. Voice Search and Duck.ai available if enabled.</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Quickly launch a private search with Saifer Browser.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Search privately with Saifer Browser or ask Duck.ai. Voice Search and Duck.ai available if enabled.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Search or visit your favorite sites privately with one tap. Voice Search and Duck.ai available if enabled.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 
     <!-- Sync Restore (onboarding) -->
     <string name="syncRestoreDialogTitle">Let\'s pick up where you left off</string>
-    <string name="syncRestoreDialogDescription">Want to restore your bookmarks, passwords, and more from your previous DuckDuckGo sync?</string>
+    <string name="syncRestoreDialogDescription">Want to restore your bookmarks, passwords, and more from your previous Saifer Browser sync?</string>
     <string name="syncRestoreDialogPrimaryCta">Restore My Stuff</string>
     <string name="syncRestoreDialogSecondaryCta">Skip</string>
 
     <!-- Sync Restore (brand-design onboarding) -->
-    <string name="syncRestoreDialogBrandDesignTitle">Let\'s pick up where you left off on DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignTitle">Let\'s pick up where you left off on Saifer Browser.</string>
     <string name="syncRestoreDialogBrandDesignBody1">Your saved bookmarks, passwords, and more are ready.</string>
 
     <!-- PDF download tooltip -->
@@ -939,7 +939,7 @@
     <!-- Pre-onboarding: input demo screen -->
     <string name="preOnboardingInputModeDemoTitleCustomAi">Now, try a private AI chat!</string>
     <!-- Pre-onboarding: browser comparison screen -->
-    <string name="preOnboardingDaxDialog2TitleCustomAi">Want to make DuckDuckGo your default browser?</string>
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Want to make Saifer Browser your default browser?</string>
 
     <!-- Pre-onboarding: widget prompt -->
     <string name="preOnboardingWidgetPromptTitle">Try our Home Screen widget.</string>
@@ -973,7 +973,7 @@
     <string name="input_screen_user_pref_with_ai_updated">Toggle between\nSearch and Duck.ai</string>
 
     <!-- New Address Bar Picker -->
-    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">Saifer Browser</string>
     <string name="newAddressBarPickerConfirm">Confirm</string>
 
     <!-- App feedback -->
@@ -999,7 +999,7 @@
     <string name="downloadsCannotOpenFileErrorMessage">Can\'t open file. Check for compatible app.</string>
 
     <!-- Error pages -->
-    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo can\'t load this page</string>
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">Saifer Browser can\'t load this page</string>
     <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">The internet connection appears to be offline.</string>
     <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">A server with the specified hostname could not be found.</string>
     <string name="webViewErrorSslProtocol" instruction="Message shown when the website's SSL certificate is invalid. Placeholder is the website's address"><![CDATA[The certificate for this server is invalid. You might be connecting to a server that is pretending to be <b>%1$s</b> which could put your confidential information at risk.]]></string>
