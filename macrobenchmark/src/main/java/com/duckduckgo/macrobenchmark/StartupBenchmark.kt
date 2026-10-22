@@ -16,8 +16,8 @@
 
 package com.duckduckgo.macrobenchmark
 
+import android.app.Instrumentation
 import android.content.Intent
-import android.os.SystemClock
 import androidx.benchmark.macro.BaselineProfileMode
 import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.StartupMode
@@ -29,6 +29,7 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import androidx.test.uiautomator.uiAutomator
+import com.duckduckgo.testseeder.api.TestSeederKey
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -44,20 +45,9 @@ class StartupBenchmark {
     private val device = UiDevice.getInstance(instrumentation)
 
     private fun completeOnboardingIfNeeded() {
-        val launchIntent = checkNotNull(instrumentation.context.packageManager.getLaunchIntentForPackage(TARGET_PACKAGE))
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        instrumentation.context.startActivity(launchIntent)
-
-        val skipButton = By.res(TARGET_PACKAGE, "skipOnboardingButton")
-        val deadline = SystemClock.elapsedRealtime() + SCREEN_TIMEOUT_MS
-        while (!device.hasObject(BROWSER_TAB) && !device.hasObject(skipButton)) {
-            check(SystemClock.elapsedRealtime() < deadline) { "Neither onboarding nor the browser tab was shown" }
-            SystemClock.sleep(POLL_INTERVAL_MS)
-        }
-        if (!device.hasObject(BROWSER_TAB)) {
-            device.findObject(skipButton)?.click()
-            check(device.wait(Until.hasObject(BROWSER_TAB), SCREEN_TIMEOUT_MS)) { "Browser tab was not shown after onboarding" }
-        }
+        if (device.hasObject(BROWSER_TAB)) return
+        launchWithOnboardingSkipped(instrumentation)
+        check(device.wait(Until.hasObject(BROWSER_TAB), SCREEN_TIMEOUT_MS)) { "Browser tab was not shown after onboarding" }
     }
 
     @Test
@@ -99,6 +89,14 @@ class StartupBenchmark {
         val BROWSER_TAB = By.res(TARGET_PACKAGE, "newTabRootLayout")
         const val ITERATIONS = 20
         const val SCREEN_TIMEOUT_MS = 30_000L
-        const val POLL_INTERVAL_MS = 250L
     }
+}
+
+/** Seeds onboarding as completed on a fresh launch; seeding only runs from an intent that creates the launch activity. */
+internal fun launchWithOnboardingSkipped(instrumentation: Instrumentation) {
+    val launchIntent = checkNotNull(instrumentation.context.packageManager.getLaunchIntentForPackage(TARGET_PACKAGE))
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        .putExtra(TestSeederKey.IS_MACROBENCHMARK.key, "true")
+        .putExtra(TestSeederKey.SKIP_ONBOARDING.key, "true")
+    instrumentation.context.startActivity(launchIntent)
 }
