@@ -340,7 +340,7 @@ fladle {
                             ? findProperty("ftlStartupMethods").toString().split(",").collect { "class com.duckduckgo.macrobenchmark.StartupBenchmark#${it.trim()}".toString() }
                             : ["class com.duckduckgo.macrobenchmark.StartupBenchmark"]
             )
-            devices.set([["model": findProperty("ftlDeviceModel") ?: "instantnoodle", "version": findProperty("ftlDeviceVersion") ?: "30"]])
+            devices.set([["model": findProperty("ftlDeviceModel") ?: "shiba", "version": findProperty("ftlDeviceVersion") ?: "34"]])
             environmentVariables.set([
                     "additionalTestOutputDir"        : "/sdcard/Download",
                     "no-isolated-storage"            : "true",
