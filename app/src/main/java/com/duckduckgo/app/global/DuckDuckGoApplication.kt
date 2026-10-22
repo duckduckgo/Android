@@ -21,6 +21,8 @@ import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.browser.certificates.blocklist.CertificateBlocklistFeature
+import com.duckduckgo.app.browser.certificates.blocklist.CertificateBlocklistInstaller
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.AppComponentFactory
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -55,6 +57,9 @@ open class DuckDuckGoApplication : HasInjector, MultiProcessApplication() {
     lateinit var uncaughtExceptionHandler: Thread.UncaughtExceptionHandler
 
     @Inject
+    lateinit var certificateBlocklistFeature: CertificateBlocklistFeature
+
+    @Inject
     lateinit var referralStateListener: AppInstallationReferrerStateListener
 
     @Inject
@@ -87,8 +92,10 @@ open class DuckDuckGoApplication : HasInjector, MultiProcessApplication() {
         configureLogging()
         logcat { "onMainProcessCreate $currentProcessName with pid=${android.os.Process.myPid()}" }
 
+        CertificateBlocklistInstaller.install()
         configureStrictMode()
         configureDependencyInjection()
+        CertificateBlocklistInstaller.blocklist.enabledWhen { certificateBlocklistFeature.self().isEnabled() }
         setupActivityLifecycleCallbacks()
         configureUncaughtExceptionHandler()
 
@@ -109,8 +116,10 @@ open class DuckDuckGoApplication : HasInjector, MultiProcessApplication() {
             runInSecondaryProcessNamed(shortProcessName) {
                 configureLogging()
                 logcat { "Init for secondary process $shortProcessName with pid=${android.os.Process.myPid()}" }
+                CertificateBlocklistInstaller.install()
                 configureStrictMode()
                 configureDependencyInjection()
+                CertificateBlocklistInstaller.blocklist.enabledWhen { certificateBlocklistFeature.self().isEnabled() }
                 configureUncaughtExceptionHandler()
 
                 if (shortProcessName == VPN_PROCESS_NAME) {
