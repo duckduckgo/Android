@@ -1041,4 +1041,5 @@
     <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Nie można znaleźć serwera o podanej nazwie hosta.</string>
     <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Certyfikat tego serwera jest nieprawidłowy. Być może łączysz się z serwerem podszywającym się pod <b>%1$s</b>, co może narazić poufne informacje na niebezpieczeństwo.]]></string>
     <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Czy chodziło Ci o <annotation type="redirect_link">^1</annotation>?</string>
+    <string name="webViewErrorTimeout" instruction="Message shown when a website is taking too long to load">Ta strona ładuje się zbyt długo.</string>
 </resources>
