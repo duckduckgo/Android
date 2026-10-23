@@ -149,7 +149,7 @@ class AutomaticDataClearer @Inject constructor(
         }
     }
 
-    // With no browser activity started, only a custom tab is left in front, which never opens the app.
+    // The pending clear only runs once a browser activity is open.
     private fun onOpenIfPending() {
         if (isOpenPending && startedOtherActivities > 0) onOpenIfNotCustomTab()
     }
@@ -221,7 +221,7 @@ class AutomaticDataClearer @Inject constructor(
             postDataClearerState(INITIALIZING)
 
             withContext(dispatchers.io()) {
-                // Keep the time the browser was left, so the pending clear still runs when it opens.
+                // Keep the original time so the pending clear still runs.
                 if (!isClearPending) settingsDataStore.appBackgroundedTimestamp = timeNow
 
                 val clearWhenOption = fireDataStore.getAutomaticallyClearWhenOption()

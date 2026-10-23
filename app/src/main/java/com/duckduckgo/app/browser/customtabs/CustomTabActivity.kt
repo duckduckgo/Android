@@ -153,7 +153,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
     private fun wereTabsClearedSinceLaunch(): Boolean =
         settingsDataStore.tabsClearedCount > intent.getIntExtra(TABS_CLEARED_COUNT_EXTRA, 0)
 
-    // The manifest hides legacy tabs from Recents, but a tab in its own task needs its card to be reachable.
+    // A tab in its own task needs a Recents card, or the user can't get back to it.
     private fun showInRecents() {
         getSystemService<ActivityManager>()?.appTasks
             ?.firstOrNull { it.taskInfo.persistentId == taskId }
@@ -161,7 +161,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
     }
 
     fun finishAndRemoveOwnTask() {
-        // Only the legacy task belongs to the tab. Removing any other would also kill the caller or whatever joined it.
+        // Only a legacy tab owns its task. Other tasks belong to the calling app, so just finish the tab.
         if (launchMode == CustomTabLaunchMode.LEGACY) finishAndRemoveTask() else finish()
     }
 

@@ -160,7 +160,7 @@ class ClearPersonalDataAction(
         withContext(dispatchers.io()) {
             settingsDataStore.tabsClearedCount++
 
-            // Custom tabs in their own Recents card live outside the browser task, so clearing tabs doesn't reach them.
+            // Tabs in their own task aren't closed by clearing the browser's tabs, so close them here.
             context.getSystemService<ActivityManager>()?.appTasks
                 ?.filter { it.taskInfo.baseIntent.component?.className == CustomTabActivity::class.java.name }
                 ?.forEach { it.finishAndRemoveTask() }

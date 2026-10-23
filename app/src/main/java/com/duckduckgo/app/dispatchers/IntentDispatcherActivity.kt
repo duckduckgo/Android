@@ -133,7 +133,7 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
             // Otherwise the dispatcher's own task stays in Recents as an empty card.
             CustomTabLaunchMode.DOCUMENT_TASK -> finishAndRemoveTask()
             CustomTabLaunchMode.DOCUMENT_TASK_HIDE_BROWSER_TASK -> {
-                // After startActivity, because launching from the background is restricted.
+                // After startActivity: once in the background, this activity can't start others.
                 moveTaskToBack(true)
                 finish()
             }

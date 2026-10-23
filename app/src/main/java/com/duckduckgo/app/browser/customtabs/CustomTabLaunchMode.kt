@@ -19,16 +19,16 @@ package com.duckduckgo.app.browser.customtabs
 import android.content.Intent
 
 enum class CustomTabLaunchMode {
-    /** Flag off: the tab's hidden task can be trimmed by the system once the user switches apps. */
+    /** Flag off: a hidden task the system may discard when the user switches apps. */
     LEGACY,
 
-    /** Caller launched without NEW_TASK: the tab stacks on top of the caller, like Chrome. */
+    /** Opens on top of the calling app, like Chrome. */
     CALLER_TASK,
 
-    /** Caller launched with NEW_TASK into a new task: the tab gets its own document task, away from DDG's browser. */
+    /** The calling app asked for a new task: the tab gets its own task and Recents card. */
     DOCUMENT_TASK,
 
-    /** Caller launched with NEW_TASK into DDG's task: that task moves to the back, so closing the tab returns to the caller. */
+    /** Like [DOCUMENT_TASK] while DDG's browser is open: the browser moves to the back, so closing the tab returns to the calling app. */
     DOCUMENT_TASK_HIDE_BROWSER_TASK,
     ;
 

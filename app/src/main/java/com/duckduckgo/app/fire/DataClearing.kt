@@ -217,7 +217,7 @@ class DataClearing @Inject constructor(
         )
         performFireModeClear()
 
-        // Without deferring the clear while a custom tab opens, this would close the tab that is opening.
+        // Only with the flag on: it makes the clear wait while a custom tab is opening, so this can't close that tab.
         if (FireClearOption.TABS in options && customTabsFeature.keepCustomTabOnAppSwitch().isEnabled()) {
             clearDataAction.closeCustomTabs()
         }
