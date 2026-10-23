@@ -58,6 +58,9 @@ enum class DaxOnboardingDialogTail {
     BottomStart,
     BottomStartWide,
     BottomEnd,
+
+    /** The reflected hook, 96dp from logical start, matching the pre-browser card artwork. */
+    BottomStartMirrored,
 }
 
 /**

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.common.ui.compose.onboarding
 
+import android.util.TypedValue
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -41,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
@@ -136,7 +138,9 @@ internal fun DaxOnboardingStepIndicator(
     val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
     val textMeasurer = rememberTextMeasurer()
-    val style = StepIndicatorLabelStyle.textStyle
+    val metrics = LocalContext.current.resources.displayMetrics
+    val labelSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12f, metrics)
+    val style = StepIndicatorLabelStyle.textStyle.copy(fontSize = with(density) { labelSize.toSp() })
     val labelWidth = remember(step.labels, style, density.density, density.fontScale, textMeasurer, layoutDirection) {
         with(density) {
             ceil(step.labels.maxOf { textMeasurer.measure(it, style, softWrap = false).size.width }.toFloat()).toDp()
@@ -153,11 +157,16 @@ internal fun DaxOnboardingStepIndicator(
             .clearAndSetSemantics { text = AnnotatedString(step.labels[step.current - 1]) }
             .background(colors.surfaceTertiary, StepIndicatorShape)
             .border(1.5.dp, colors.accentAltPrimary, StepIndicatorShape)
-            .padding(start = 8.dp, end = 10.dp, top = 6.dp, bottom = 6.dp),
+            .padding(
+                start = with(density) { 8.dp.toPx().toInt().toDp() },
+                end = with(density) { 10.dp.toPx().toInt().toDp() },
+                top = with(density) { 6.dp.toPx().toInt().toDp() },
+                bottom = with(density) { 6.dp.toPx().toInt().toDp() },
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(DaxOnboardingDialogDefaults.StepIndicatorLabelGap),
     ) {
-        Canvas(Modifier.size(width = dotWidth, height = activeDot)) {
+        Canvas(Modifier.size(width = with(density) { dotWidth.toPx().toInt().toDp() }, height = with(density) { activeDot.toPx().toInt().toDp() })) {
             val progress = if (step.current == 1) 1f else transition().coerceIn(0f, 1f)
             val currentIndex = step.current - 1
             val activeDiameter = activeDot.toPx()
@@ -186,7 +195,7 @@ internal fun DaxOnboardingStepIndicator(
         DaxText(
             text = step.labels[step.current - 1],
             modifier = Modifier.widthIn(min = labelWidth),
-            style = StepIndicatorLabelStyle,
+            style = DuckDuckGoTextStyle(style),
             color = colors.textPrimary,
             maxLines = 1,
         )

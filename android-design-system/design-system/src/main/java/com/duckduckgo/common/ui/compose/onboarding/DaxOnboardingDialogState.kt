@@ -24,10 +24,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
-/** Hoisted controls for the currently attached onboarding dialog introduction. */
+/** Hoisted introduction controls and measured content height for the attached onboarding dialog. */
 @Stable
 class DaxOnboardingDialogState {
+    /** Available height of the complete dialog in pixels, supplied independently by a View stage. */
+    var availableHeightPx: Int? by mutableStateOf(null)
+
     private var skipCurrent: (() -> Unit)? = null
+
+    /** Unclipped content height in pixels, before the card is bounded by its host. */
+    var contentHeightPx: Int by mutableStateOf(0)
+        private set
+
+    internal fun updateContentHeight(skip: () -> Unit, height: Int) {
+        if (skipCurrent === skip) contentHeightPx = height
+    }
 
     /** Whether the attached dialog is running its introduction. */
     var isAnimating: Boolean by mutableStateOf(false)
