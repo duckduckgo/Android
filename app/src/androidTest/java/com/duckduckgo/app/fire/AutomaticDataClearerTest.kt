@@ -317,7 +317,7 @@ class AutomaticDataClearerTest {
         whenever(dataClearing.shouldClearDataAutomatically(true, true, false)).thenReturn(false)
 
         testee.isFreshAppLaunch = true
-        testee.onAppForegroundedAsync()
+        testee.onBrowserOpenedAsync()
 
         verify(dataClearing, never()).clearDataUsingAutomaticFireOptions(any())
     }
@@ -330,7 +330,7 @@ class AutomaticDataClearerTest {
         whenever(dataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(true)
 
         testee.isFreshAppLaunch = true
-        testee.onAppForegroundedAsync()
+        testee.onBrowserOpenedAsync()
 
         verify(dataClearing).clearDataUsingAutomaticFireOptions(false)
         verify(clearDataAction, never()).killAndRestartProcess(any(), any(), any(), anyOrNull())
@@ -343,7 +343,7 @@ class AutomaticDataClearerTest {
         whenever(dataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(true)
 
         testee.isFreshAppLaunch = false
-        testee.onAppForegroundedAsync()
+        testee.onBrowserOpenedAsync()
         Thread.sleep(200)
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
 
@@ -358,7 +358,7 @@ class AutomaticDataClearerTest {
         whenever(dataClearing.shouldClearDataAutomatically(any(), any(), any())).thenReturn(false)
 
         testee.deferredQuery = "https://example.com"
-        testee.onAppForegroundedAsync()
+        testee.onBrowserOpenedAsync()
 
         assertNull(testee.deferredQuery)
     }
@@ -371,7 +371,7 @@ class AutomaticDataClearerTest {
 
         testee.isFreshAppLaunch = false
         testee.deferredQuery = "https://example.com"
-        testee.onAppForegroundedAsync()
+        testee.onBrowserOpenedAsync()
         Thread.sleep(200)
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
 

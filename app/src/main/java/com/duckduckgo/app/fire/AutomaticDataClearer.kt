@@ -108,12 +108,12 @@ class AutomaticDataClearer @Inject constructor(
     private var startedCustomTabActivities = 0
     private var startedOtherActivities = 0
     private var liveIntentDispatchers = 0
-    private var isOpenPending = false
+    private var isAppOpenPending = false
 
     override fun onOpen(isFreshLaunch: Boolean) {
-        isFreshAppLaunch = isFreshLaunch || (isOpenPending && isFreshAppLaunch)
-        isOpenPending = true
-        onOpenIfNotCustomTab()
+        isFreshAppLaunch = isFreshLaunch || (isAppOpenPending && isFreshAppLaunch)
+        isAppOpenPending = true
+        handleAppOpen()
     }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
@@ -126,7 +126,7 @@ class AutomaticDataClearer @Inject constructor(
             is IntentDispatcherActivity -> Unit
             else -> {
                 startedOtherActivities++
-                onOpenIfPending()
+                handleAppOpenIfBrowserStarted()
             }
         }
     }
@@ -135,7 +135,7 @@ class AutomaticDataClearer @Inject constructor(
         when (activity) {
             is CustomTabActivity -> {
                 startedCustomTabActivities--
-                if (!activity.isChangingConfigurations) onOpenIfPending()
+                if (!activity.isChangingConfigurations) handleAppOpenIfBrowserStarted()
             }
             is IntentDispatcherActivity -> Unit
             else -> startedOtherActivities--
@@ -145,36 +145,41 @@ class AutomaticDataClearer @Inject constructor(
     override fun onActivityDestroyed(activity: Activity) {
         if (activity is IntentDispatcherActivity) {
             liveIntentDispatchers--
-            onOpenIfPending()
+            handleAppOpenIfBrowserStarted()
         }
     }
 
     // The pending clear only runs once a browser activity is open.
-    private fun onOpenIfPending() {
-        if (isOpenPending && startedOtherActivities > 0) onOpenIfNotCustomTab()
+    private fun handleAppOpenIfBrowserStarted() {
+        if (isAppOpenPending && startedOtherActivities > 0) handleAppOpen()
     }
 
-    private fun onOpenIfNotCustomTab() {
+    private fun handleAppOpen() {
         // Launched so the counters are up to date when this runs.
         launch {
-            val isCustomTabInFront = startedCustomTabActivities > 0 || liveIntentDispatchers > 0
-            if (isOpenPending) {
-                if (isCustomTabInFront && customTabsFeature.keepCustomTabOnAppSwitch().isEnabled()) {
-                    workManager.cancelAllWorkByTag(DataClearingWorker.WORK_REQUEST_TAG)
-                    withContext(dispatchers.io()) { settingsDataStore.appUsedSinceLastClear = true }
-                } else {
-                    isOpenPending = false
-                    onAppForegroundedAsync()
-                }
+            if (!isAppOpenPending) return@launch
+            if (isCustomTabInFront()) {
+                deferClearWhileInCustomTab()
+            } else {
+                isAppOpenPending = false
+                onBrowserOpenedAsync()
             }
         }
     }
 
+    private fun isCustomTabInFront() = customTabsFeature.keepCustomTabOnAppSwitch().isEnabled() &&
+        (startedCustomTabActivities > 0 || liveIntentDispatchers > 0)
+
+    private suspend fun deferClearWhileInCustomTab() {
+        workManager.cancelAllWorkByTag(DataClearingWorker.WORK_REQUEST_TAG)
+        withContext(dispatchers.io()) { settingsDataStore.appUsedSinceLastClear = true }
+    }
+
     @VisibleForTesting
-    suspend fun onAppForegroundedAsync() {
+    suspend fun onBrowserOpenedAsync() {
         postDataClearerState(INITIALIZING)
 
-        logcat { "onAppForegrounded; is from fresh app launch? $isFreshAppLaunch" }
+        logcat { "onBrowserOpened; is from fresh app launch? $isFreshAppLaunch" }
 
         workManager.cancelAllWorkByTag(DataClearingWorker.WORK_REQUEST_TAG)
 
@@ -213,7 +218,7 @@ class AutomaticDataClearer @Inject constructor(
     }
 
     override fun onClose() {
-        val isClearPending = isOpenPending
+        val isClearPending = isAppOpenPending
         launch {
             val timeNow = SystemClock.elapsedRealtime()
             logcat { "Recording when app backgrounded ($timeNow)" }
