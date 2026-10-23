@@ -31,7 +31,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
-class NextStepsMessageObserverTest {
+class NextStepsAppObserverTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
@@ -51,7 +51,7 @@ class NextStepsMessageObserverTest {
     }
     private val telemetry: NextStepsTelemetry = mock()
 
-    private fun anObserver() = NextStepsMessageObserver(
+    private fun anObserver() = NextStepsAppObserver(
         model,
         telemetry,
         coroutineRule.testScope.backgroundScope,
@@ -126,6 +126,14 @@ class NextStepsMessageObserverTest {
 
         verify(telemetry, times(1)).onActiveMessageChanged(null)
         verifyNoMoreInteractions(telemetry)
+    }
+
+    @Test
+    fun `app resume is forwarded to telemetry`() = runTest {
+        anObserver().onResume(mock())
+        advanceUntilIdle()
+
+        verify(telemetry).onAppResumed()
     }
 
     private fun aNextStepsMessage(id: String) = RemoteMessage(

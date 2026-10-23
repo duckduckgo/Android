@@ -194,6 +194,81 @@ class RealNextStepsTelemetryTest {
     }
 
     @Test
+    fun `app resume on a later day sends the previous day counts without starting a new day`() = runTest {
+        testee.onFrontCardShown("message", A, setOf(A, B))
+        today = today.plusDays(1)
+
+        testee.onAppResumed()
+
+        verify(pixels).cardDailyImpressions(A, DAY_0, "1")
+        verify(pixels).cardDailyImpressions(B, DAY_0, "0")
+        assertEquals(null, telemetryStore.state().openDay)
+        assertEquals(1, telemetryStore.state().activeDays)
+
+        testee.onFrontCardShown("message", A, setOf(A, B))
+
+        verify(pixels).cardImpression(A, Days(activeDay = "1", calendarDay = "1"))
+        verify(pixels, times(1)).cardDailyImpressions(A, DAY_0, "1")
+        verify(pixels, times(1)).cardDailyImpressions(B, DAY_0, "0")
+        assertEquals(mapOf(A to 1, B to 0), telemetryStore.state().dayCounts)
+    }
+
+    @Test
+    fun `repeated app resumes over several days send the day counts once`() = runTest {
+        testee.onFrontCardShown("message", A, setOf(A, B))
+        today = today.plusDays(1)
+        testee.onAppResumed()
+        today = today.plusDays(1)
+        testee.onAppResumed()
+        today = today.plusDays(3)
+
+        testee.onAppResumed()
+
+        verify(pixels, times(2)).cardDailyImpressions(any(), any(), any())
+        assertEquals(1, telemetryStore.state().activeDays)
+    }
+
+    @Test
+    fun `a render before the app resume on a later day leaves nothing for the resume to send`() = runTest {
+        testee.onFrontCardShown("message", A, setOf(A, B))
+        today = today.plusDays(1)
+        testee.onFrontCardShown("message", A, setOf(A, B))
+
+        testee.onAppResumed()
+
+        verify(pixels, times(2)).cardDailyImpressions(any(), any(), any())
+        assertEquals(today.toEpochDay(), telemetryStore.state().openDay)
+        assertEquals(mapOf(A to 1, B to 0), telemetryStore.state().dayCounts)
+    }
+
+    @Test
+    fun `app resume on the open day or before any impression sends nothing`() = runTest {
+        testee.onAppResumed()
+        testee.onFrontCardShown("message", A, setOf(A, B))
+
+        testee.onAppResumed()
+
+        verify(pixels, never()).cardDailyImpressions(any(), any(), any())
+        assertEquals(firstDay.toEpochDay(), telemetryStore.state().openDay)
+    }
+
+    @Test
+    fun `cards removed after the day was closed on resume count in the summary without a second day count`() = runTest {
+        testee.onFrontCardShown("message", A, setOf(A, B))
+        today = today.plusDays(1)
+        testee.onAppResumed()
+
+        testee.onCardsCompleted(setOf(A))
+        testee.onCardDismissed(B)
+        testee.onAllCardsDone()
+
+        verify(pixels, times(1)).cardDailyImpressions(A, DAY_0, "1")
+        verify(pixels, times(1)).cardDailyImpressions(B, DAY_0, "0")
+        verify(pixels, times(2)).cardDailyImpressions(any(), any(), any())
+        verify(pixels).cardsDismissed(Days(activeDay = "0", calendarDay = "1"), "all_cards_done", completed = 1, dismissed = 1)
+    }
+
+    @Test
     fun `active day counts only days with an impression while calendar day counts every day`() = runTest {
         testee.onFrontCardShown("message", A, setOf(A))
         today = today.plusDays(3)

@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
-class NextStepsMessageObserver @Inject constructor(
+class NextStepsAppObserver @Inject constructor(
     private val remoteMessageModel: RemoteMessageModel,
     private val telemetry: NextStepsTelemetry,
     @AppCoroutineScope private val appScope: CoroutineScope,
@@ -48,6 +48,10 @@ class NextStepsMessageObserver @Inject constructor(
                     telemetry.onActiveMessageChanged(remoteMessageModel.getActiveMessage()?.nextStepsMessageId())
                 }
         }
+    }
+
+    override fun onResume(owner: LifecycleOwner) {
+        appScope.launch(dispatchers.io()) { telemetry.onAppResumed() }
     }
 
     private fun RemoteMessage.nextStepsMessageId(): String? = id.takeIf { isNextStepsForNewTabPage() }

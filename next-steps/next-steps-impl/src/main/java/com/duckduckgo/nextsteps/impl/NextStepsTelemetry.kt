@@ -43,6 +43,9 @@ interface NextStepsTelemetry {
     suspend fun onAllCardsDone()
 
     suspend fun onActiveMessageChanged(nextStepsMessageId: String?)
+
+    /** Sends the previous day's counts without waiting for the next NTP render. */
+    suspend fun onAppResumed()
 }
 
 @ContributesBinding(AppScope::class)
@@ -96,6 +99,10 @@ class RealNextStepsTelemetry @Inject constructor(
         update { state, today -> state.endCarouselIfReplaced(nextStepsMessageId, today) }
     }
 
+    override suspend fun onAppResumed() {
+        update { state, today -> state.sendCountsIfDayEnded(today) }
+    }
+
     /** Runs one state transition under the lock; [Pixel.fire][com.duckduckgo.app.statistics.pixels.Pixel.fire] only enqueues, so firing inside it is fine. */
     private suspend fun update(transition: (state: NextStepsTelemetryState, today: Long) -> NextStepsTelemetryState) {
         withContext(dispatchers.io()) {
@@ -118,10 +125,24 @@ class RealNextStepsTelemetry @Inject constructor(
 
     /** On a new calendar day: sends the previous day's counts, then starts counting again with zero for every card in the stack. */
     private fun NextStepsTelemetryState.startNewDayIfChanged(today: Long, cardIdsInStack: Set<String>): NextStepsTelemetryState {
-        val openDay = openDay
-        if (openDay != null && today <= openDay) return this
-        if (openDay != null) sendDailyImpressions(dayCounts.keys)
-        return copy(activeDays = activeDays + 1, openDay = today, dayCounts = cardIdsInStack.associateWith { 0 })
+        val state = sendCountsIfDayEnded(today)
+        if (state.openDay != null) return state
+        return state.copy(activeDays = activeDays + 1, openDay = today, dayCounts = cardIdsInStack.associateWith { 0 })
+    }
+
+    /**
+     * Sends the counts of a day that has ended, so they go out on app resume instead of waiting for the next render.
+     * The cards stay listed with zero so a removal before that render still counts in the summary, while
+     * [sendDailyImpressions] sends nothing until a day is open again.
+     */
+    private fun NextStepsTelemetryState.sendCountsIfDayEnded(today: Long): NextStepsTelemetryState {
+        val dayEnded = openDay != null && today > openDay
+        return if (dayEnded) {
+            sendDailyImpressions(dayCounts.keys)
+            copy(openDay = null, dayCounts = dayCounts.mapValues { 0 })
+        } else {
+            this
+        }
     }
 
     private fun NextStepsTelemetryState.incrementImpressions(cardId: String): NextStepsTelemetryState =
