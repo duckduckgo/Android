@@ -5,7 +5,6 @@
         "triggers": ["impression"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion", "atb"],
-        "expires": "2027-04-21"
     },
     "next_steps_card_impression": {
         "description": "Fires when a stacked setup card becomes the visible front card, on first render or promotion. Returning to an unchanged front does not count again.",
@@ -34,7 +33,6 @@
                 "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
             }
         ],
-        "expires": "2027-04-21"
     },
     "next_steps_card_cta_clicked": {
         "description": "Fires when the front setup card CTA is tapped and resolves to a launch command.",
@@ -63,7 +61,6 @@
                 "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
             }
         ],
-        "expires": "2027-04-21"
     },
     "next_steps_card_completed": {
         "description": "Fires on the first detection of completion for the setup card whose CTA was last tapped. External completions without CTA attribution do not fire this pixel.",
@@ -92,7 +89,6 @@
                 "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
             }
         ],
-        "expires": "2027-04-21"
     },
     "next_steps_card_dismissed": {
         "description": "Fires when the user dismisses the front setup card with its close button.",
@@ -121,7 +117,6 @@
                 "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
             }
         ],
-        "expires": "2027-04-21"
     },
     "next_steps_card_daily_impressions": {
         "description": "Reports bucketed impressions for one eligible setup card and local day. Finalized on card retirement, a later impression day, or carousel end; classified by the recorded impressions.",
@@ -156,7 +151,6 @@
                 "enum": ["0", "1", "2", "3-4", "5-7", "8+"]
             }
         ],
-        "expires": "2027-04-21"
     },
     "next_steps_cards_dismissed": {
         "description": "Fires when the stacked setup cards end: the user completed or dismissed every card, or RMF took the message out of the active slot (auto-dismiss, replacement by another message, config removal) while cards were still open.",
@@ -197,6 +191,5 @@
                 "enum": ["0", "1", "2", "3"]
             }
         ],
-        "expires": "2027-04-21"
     }
 }

@@ -169,7 +169,6 @@ class NextStepsItemsViewModel @Inject constructor(
         val dismissedId = _viewState.value.items.firstOrNull()?.id ?: return
         val remaining = removeFrontCard()
         viewModelScope.launch {
-            // The dismissal is reported before the carousel can end, so the end-of-carousel summary counts it.
             telemetry.onCardDismissed(dismissedId)
             withContext(dispatchers.io()) { itemsStore.addDismissedItemId(dismissedId) }
             onFrontCardRemoved(remaining)

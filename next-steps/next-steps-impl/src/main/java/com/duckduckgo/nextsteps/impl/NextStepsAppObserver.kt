@@ -43,8 +43,6 @@ class NextStepsAppObserver @Inject constructor(
                 .map { it?.nextStepsMessageId() }
                 .distinctUntilChanged()
                 .collect {
-                    // Decide on the live slot, not the emission: a delayed emission must not close a message that
-                    // has since been shown again.
                     telemetry.onActiveMessageChanged(remoteMessageModel.getActiveMessage()?.nextStepsMessageId())
                 }
         }

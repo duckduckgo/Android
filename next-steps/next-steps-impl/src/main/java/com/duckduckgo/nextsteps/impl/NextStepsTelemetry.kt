@@ -28,8 +28,7 @@ import javax.inject.Inject
 
 /**
  * Owns the Next Steps pixel state shared by every NTP tab: the day anchor, the open-day impression counters,
- * CTA attribution and which message is on screen. All transitions run under one lock so two tabs
- * reporting the same event produce one pixel.
+ * CTA attribution and which message is on screen.
  */
 interface NextStepsTelemetry {
     suspend fun onFrontCardShown(messageId: String, cardId: String, cardIdsInStack: Set<String>)
@@ -103,7 +102,6 @@ class RealNextStepsTelemetry @Inject constructor(
         update { state, today -> state.sendCountsIfDayEnded(today) }
     }
 
-    /** Runs one state transition under the lock; [Pixel.fire][com.duckduckgo.app.statistics.pixels.Pixel.fire] only enqueues, so firing inside it is fine. */
     private suspend fun update(transition: (state: NextStepsTelemetryState, today: Long) -> NextStepsTelemetryState) {
         withContext(dispatchers.io()) {
             mutex.withLock {
@@ -148,10 +146,6 @@ class RealNextStepsTelemetry @Inject constructor(
     private fun NextStepsTelemetryState.incrementImpressions(cardId: String): NextStepsTelemetryState =
         copy(dayCounts = dayCounts + (cardId to (dayCounts[cardId] ?: 0) + 1))
 
-    /**
-     * Sends the day count of each card now, before it drops out of the carousel. Only cards still counted are
-     * affected, so a repeated report, or a card completed before it was ever shown, changes nothing.
-     */
     private fun NextStepsTelemetryState.removeCards(cardIds: Set<String>, removal: Removal): NextStepsTelemetryState {
         val removed = cardIds.filter { it in dayCounts }.toSet()
         sendDailyImpressions(removed)
