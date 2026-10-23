@@ -18,8 +18,6 @@ package com.duckduckgo.duckchat.impl.promo
 
 import app.cash.turbine.test
 import com.squareup.moshi.JsonDataException
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -28,7 +26,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.IOException
 import java.util.UUID
-import kotlin.time.Duration.Companion.milliseconds
 
 class RealPromoCampaignRepositoryTest {
     private val dataStore = FakePromoCampaignDataStore()
@@ -348,104 +345,82 @@ class RealPromoCampaignRepositoryTest {
     }
     //endregion
 
-    //region IsPromoActive Flow
+    //region Is Promo Active
     @Test
     fun `when no record stored, then promo is not active`() = runTest {
-        testee.isPromoActive.test {
-            assertFalse(awaitItem())
-        }
+        assertFalse(testee.isPromoActive())
     }
 
     @Test
     fun `when promo pending, then promo is not active`() = runTest {
         dataStore.record.value = PENDING_RECORD
 
-        testee.isPromoActive.test {
-            assertFalse(awaitItem())
-        }
+        assertFalse(testee.isPromoActive())
     }
 
     @Test
     fun `when promo has ended, then promo is not active`() = runTest {
         dataStore.record.value = ENDED_RECORD
 
-        testee.isPromoActive.test {
-            assertFalse(awaitItem())
-        }
+        assertFalse(testee.isPromoActive())
     }
 
     @Test
     fun `when terms not expired, then promo is active`() = runTest {
         dataStore.record.value = ACTIVE_RECORD
 
-        testee.isPromoActive.test {
-            assertTrue(awaitItem())
-        }
+        assertTrue(testee.isPromoActive())
     }
 
     @Test
     fun `when terms expire now, then promo is not active`() = runTest {
         dataStore.record.value = ACTIVE_RECORD.copy(terms = TERMS.copy(expiresAtMillis = NOW))
 
-        testee.isPromoActive.test {
-            assertFalse(awaitItem())
-        }
+        assertFalse(testee.isPromoActive())
     }
 
     @Test
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun `when terms expire while collecting, then promo stops being active at expiry`() = runTest {
+    fun `when the clock passes the terms expiry, then promo stops being active`() = runTest {
         dataStore.record.value = ACTIVE_RECORD
+        assertTrue(testee.isPromoActive())
 
-        testee.isPromoActive.test {
-            assertTrue(awaitItem())
+        currentTimeProvider.nowMillis = TERMS.expiresAtMillis
 
-            advanceTimeBy((TERMS.expiresAtMillis - NOW - 1).milliseconds)
-            expectNoEvents()
-
-            advanceTimeBy(1.milliseconds)
-            assertFalse(awaitItem())
-            expectNoEvents()
-        }
+        assertFalse(testee.isPromoActive())
     }
 
     @Test
     fun `when pending promo started, then promo becomes active`() = runTest {
         dataStore.record.value = PENDING_RECORD
 
-        testee.isPromoActive.test {
-            assertFalse(awaitItem())
+        testee.startPromo(PROMO_ID, TERMS)
 
-            testee.startPromo(PROMO_ID, TERMS)
-
-            assertTrue(awaitItem())
-        }
+        assertTrue(testee.isPromoActive())
     }
 
     @Test
     fun `when active promo ended, then promo stops being active`() = runTest {
         dataStore.record.value = ACTIVE_RECORD
 
-        testee.isPromoActive.test {
-            assertTrue(awaitItem())
+        testee.endPromo(checkExpiry = false)
 
-            testee.endPromo(checkExpiry = false)
-
-            assertFalse(awaitItem())
-        }
+        assertFalse(testee.isPromoActive())
     }
 
     @Test
-    fun `when record changes without affecting active state, then promo active state is not emitted again`() = runTest {
-        dataStore.record.value = PENDING_RECORD
+    fun `when reading the record fails, then promo is not active`() = runTest {
+        dataStore.record.value = ACTIVE_RECORD
+        dataStore.readFailures += PromoRecordStorageException(IOException("disk"))
 
-        testee.isPromoActive.test {
-            assertFalse(awaitItem())
+        assertFalse(testee.isPromoActive())
+    }
 
-            testee.recordRedeemAttempt(PROMO_ID)
+    @Test
+    fun `when record is corrupted, then promo is not active`() = runTest {
+        dataStore.record.value = ACTIVE_RECORD
+        dataStore.readFailures += PromoRecordCorruptedException(JsonDataException("corrupted"))
 
-            expectNoEvents()
-        }
+        assertFalse(testee.isPromoActive())
     }
     //endregion
 

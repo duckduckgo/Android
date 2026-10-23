@@ -20,17 +20,13 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.retryWhen
-import kotlinx.coroutines.flow.transformLatest
 import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.pow
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -46,18 +42,18 @@ interface PromoCampaignRepository {
     val promoRecord: Flow<PromoRecord?>
 
     /**
-     * Emits whether a promo is active, meaning its terms are stored and haven't expired, each time it changes.
-     * Emits false once the terms expire. Retries I/O failures. Fails with [PromoRecordCorruptedException] if the record can't be decoded.
-     */
-    val isPromoActive: Flow<Boolean>
-
-    /**
      * @return the stored promo record, or null if none is stored.
      *
      * @throws [PromoRecordCorruptedException] if the stored record can't be decoded.
      * @throws [PromoRecordStorageException] if the stored record can't be read.
      */
     suspend fun getPromoRecord(): PromoRecord?
+
+    /**
+     * @return whether a promo is active, meaning its terms are stored and haven't expired.
+     * Returns false if the stored record can't be read or decoded.
+     */
+    suspend fun isPromoActive(): Boolean
 
     /**
      * Stores [campaignId] as the dismissed campaign.
@@ -142,17 +138,13 @@ class RealPromoCampaignRepository @Inject constructor(
             }
         }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override val isPromoActive: Flow<Boolean> = promoRecord
-        .transformLatest { record ->
-            val remainingMillis = record?.remainingActiveMillis() ?: 0
-            if (remainingMillis > 0) {
-                emit(true)
-                delay(remainingMillis.milliseconds)
-            }
-            emit(false)
-        }
-        .distinctUntilChanged()
+    override suspend fun isPromoActive(): Boolean = try {
+        dataStore.getPromoRecord()?.isActive() == true
+    } catch (_: PromoRecordStorageException) {
+        false
+    } catch (_: PromoRecordCorruptedException) {
+        false
+    }
 
     override suspend fun getPromoRecord(): PromoRecord? = dataStore.getPromoRecord()
 
@@ -249,13 +241,8 @@ class RealPromoCampaignRepository @Inject constructor(
 
     private fun retryDelay(attempt: Long): Duration = (FIRST_RETRY_DELAY * 2.0.pow(attempt.toDouble())).coerceAtMost(MAX_RETRY_DELAY)
 
-    private fun PromoRecord.remainingActiveMillis(): Long {
-        return if (campaignId != null && promoId != null && terms != null) {
-            terms.expiresAtMillis - currentTimeProvider.currentTimeMillis()
-        } else {
-            0
-        }
-    }
+    private fun PromoRecord.isActive(): Boolean =
+        campaignId != null && promoId != null && terms != null && terms.expiresAtMillis > currentTimeProvider.currentTimeMillis()
 
     private companion object {
         val FIRST_RETRY_DELAY = 1.seconds

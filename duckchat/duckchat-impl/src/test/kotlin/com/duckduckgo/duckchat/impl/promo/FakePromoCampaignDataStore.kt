@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.promo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.updateAndGet
 
@@ -34,7 +35,7 @@ class FakePromoCampaignDataStore : PromoCampaignDataStore {
         emitAll(record)
     }
 
-    override suspend fun getPromoRecord(): PromoRecord? = record.value
+    override suspend fun getPromoRecord(): PromoRecord? = promoRecord.firstOrNull()
 
     override suspend fun updatePromoRecord(transform: (PromoRecord?) -> PromoRecord?): PromoRecord? = record.updateAndGet(transform)
 
