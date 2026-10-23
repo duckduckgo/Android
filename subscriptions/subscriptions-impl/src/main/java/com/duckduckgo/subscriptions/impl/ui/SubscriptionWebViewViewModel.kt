@@ -153,6 +153,9 @@ class SubscriptionWebViewViewModel @Inject constructor(
                     Waiting
                 }
                 is CurrentPurchase.Success -> {
+                    if (!it.isPlanSwitch) {
+                        pixelSender.reportPurchaseSuccessOrigin(launchOrigin, it.isFreeTrial)
+                    }
                     subscriptionsChecker.runChecker()
                     pendingScheduleNotificationDaysBeforeCancel?.let { days ->
                         if (subscriptionsFeature.subscriptionExpirationReminderNotification().isEnabled()) {
@@ -171,7 +174,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
                         ),
                         isFreeTrial = it.isFreeTrial,
                         launchOnboarding = launchOnboarding,
-                        isPlanSwitch = it.isPlanSwitch,
                     )
                 }
                 is CurrentPurchase.InProgress, CurrentPurchase.PreFlowInProgress -> InProgress
@@ -840,7 +842,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
             val subscriptionEventData: SubscriptionEventData,
             val isFreeTrial: Boolean,
             val launchOnboarding: Boolean,
-            val isPlanSwitch: Boolean = false,
         ) : PurchaseStateView()
         data object Waiting : PurchaseStateView()
         data object Recovered : PurchaseStateView()
