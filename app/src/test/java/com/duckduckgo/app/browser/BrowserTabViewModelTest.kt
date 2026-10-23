@@ -8281,7 +8281,7 @@ class BrowserTabViewModelTest {
     fun whenSslCertificateBypassedThenUrlAddedToRepository() {
         val url = exampleUrl
 
-        testee.onSSLCertificateWarningAction(Action.Proceed, url)
+        testee.onSSLCertificateWarningAction(Action.Proceed, url, false)
 
         verify(mockBypassedSSLCertificatesRepository).add(url)
 
@@ -8292,23 +8292,23 @@ class BrowserTabViewModelTest {
     fun whenSslCertificateActionShownThenPixelsFired() {
         val url = exampleUrl
 
-        testee.onSSLCertificateWarningAction(Action.Shown(EXPIRED), url)
+        testee.onSSLCertificateWarningAction(Action.Shown(EXPIRED), url, false)
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_EXPIRED_SHOWN)
 
-        testee.onSSLCertificateWarningAction(Action.Shown(WRONG_HOST), url)
+        testee.onSSLCertificateWarningAction(Action.Shown(WRONG_HOST), url, false)
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_WRONG_HOST_SHOWN)
 
-        testee.onSSLCertificateWarningAction(Action.Shown(UNTRUSTED_HOST), url)
+        testee.onSSLCertificateWarningAction(Action.Shown(UNTRUSTED_HOST), url, false)
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_UNTRUSTED_SHOWN)
 
-        testee.onSSLCertificateWarningAction(Action.Shown(GENERIC), url)
+        testee.onSSLCertificateWarningAction(Action.Shown(GENERIC), url, false)
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_GENERIC_SHOWN)
     }
 
     @Test
     fun whenSslCertificateActionAdvanceThenPixelsFired() {
         val url = exampleUrl
-        testee.onSSLCertificateWarningAction(Action.Advance, url)
+        testee.onSSLCertificateWarningAction(Action.Advance, url, false)
 
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_ADVANCED_PRESSED)
     }
@@ -8316,7 +8316,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSslCertificateActionLeaveSiteThenPixelsFiredAndViewStatesUpdated() {
         val url = exampleUrl
-        testee.onSSLCertificateWarningAction(Action.LeaveSite, url)
+        testee.onSSLCertificateWarningAction(Action.LeaveSite, url, false)
 
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_CLOSE_PRESSED)
         assertEquals(NONE, browserViewState().sslError)
@@ -8367,7 +8367,7 @@ class BrowserTabViewModelTest {
 
         testee.onReceivedSslError(aHandler(), sslErrorResponse)
 
-        testee.onSSLCertificateWarningAction(Action.Proceed, url)
+        testee.onSSLCertificateWarningAction(Action.Proceed, url, false)
 
         assertCommandNotIssued<Command.HideSSLError>()
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_PROCEED_PRESSED)

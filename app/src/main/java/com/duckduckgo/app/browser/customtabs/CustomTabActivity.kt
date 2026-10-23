@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.customtabs
 
+import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -24,6 +25,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.content.getSystemService
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -33,6 +35,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.ViewState
 import com.duckduckgo.app.browser.databinding.ActivityCustomTabBinding
 import com.duckduckgo.app.global.intentText
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
@@ -56,9 +59,19 @@ class CustomTabActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (wereTabsClearedSinceLaunch()) {
+            finish()
+            return
+        }
+
         viewModel.onShowCustomTab()
+        if (launchMode != CustomTabLaunchMode.LEGACY && isTaskRoot) showInRecents()
 
         val toolbarColor =
             intent.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, getColorFromAttr(com.duckduckgo.mobile.android.R.attr.preferredStatusBarColor))
@@ -68,6 +81,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
         } else {
             SystemBarStyle.light(toolbarColor, toolbarColor)
         }
+
         enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
         edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(
             binding.root,
@@ -123,9 +137,32 @@ class CustomTabActivity : DuckDuckGoActivity() {
         viewModel.onShowCustomTab()
     }
 
+    override fun onRestart() {
+        super.onRestart()
+        if (wereTabsClearedSinceLaunch()) finish()
+    }
+
     override fun onStop() {
         super.onStop()
         viewModel.onCloseCustomTab()
+    }
+
+    private val launchMode: CustomTabLaunchMode
+        get() = CustomTabLaunchMode.fromName(intent.getStringExtra(LAUNCH_MODE_EXTRA))
+
+    private fun wereTabsClearedSinceLaunch(): Boolean =
+        settingsDataStore.tabsClearedCount > intent.getIntExtra(TABS_CLEARED_COUNT_EXTRA, 0)
+
+    // A tab in its own task needs a Recents card, or the user can't get back to it.
+    private fun showInRecents() {
+        getSystemService<ActivityManager>()?.appTasks
+            ?.firstOrNull { it.taskInfo.persistentId == taskId }
+            ?.setExcludeFromRecents(false)
+    }
+
+    fun finishAndRemoveOwnTask() {
+        // Only a legacy tab owns its task. Other tasks belong to the calling app, so just finish the tab.
+        if (launchMode == CustomTabLaunchMode.LEGACY) finishAndRemoveTask() else finish()
     }
 
     private fun renderView(viewState: ViewState) {
@@ -146,17 +183,19 @@ class CustomTabActivity : DuckDuckGoActivity() {
     companion object {
         fun intent(
             context: Context,
-            flags: Int,
             text: String?,
             toolbarColor: Int?,
             isExternal: Boolean,
             clientPackage: String? = null,
             referrerPackage: String? = null,
+            launchMode: CustomTabLaunchMode = CustomTabLaunchMode.LEGACY,
+            tabsClearedCount: Int = 0,
         ): Intent {
             return Intent(context, CustomTabActivity::class.java).apply {
-                addFlags(flags)
+                addFlags(launchMode.intentFlags)
                 putExtra(Intent.EXTRA_TEXT, text)
                 putExtra(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
+                putExtra(TABS_CLEARED_COUNT_EXTRA, tabsClearedCount)
                 if (toolbarColor != null) {
                     putExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, toolbarColor)
                 }
@@ -166,11 +205,14 @@ class CustomTabActivity : DuckDuckGoActivity() {
                 if (referrerPackage != null) {
                     putExtra(REFERRER_PACKAGE_EXTRA, referrerPackage)
                 }
+                putExtra(LAUNCH_MODE_EXTRA, launchMode.name)
             }
         }
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
         private const val CLIENT_PACKAGE_EXTRA = "CLIENT_PACKAGE_EXTRA"
         private const val REFERRER_PACKAGE_EXTRA = "REFERRER_PACKAGE_EXTRA"
+        private const val LAUNCH_MODE_EXTRA = "LAUNCH_MODE_EXTRA"
+        private const val TABS_CLEARED_COUNT_EXTRA = "TABS_CLEARED_COUNT_EXTRA"
     }
 
     private fun configureOnBackPressedListener() {

@@ -5418,7 +5418,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onSSLCertificateWarningAction(
         action: Action,
         url: String,
-        activeCustomTab: Boolean = false,
+        activeCustomTab: Boolean,
     ) {
         when (action) {
             is Action.Shown -> {

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.dispatchers
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsSessionToken
@@ -26,12 +25,14 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
+import com.duckduckgo.app.browser.customtabs.CustomTabLaunchMode
 import com.duckduckgo.app.browser.mode.ExternalUrl
 import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.dispatchers.IntentDispatcherViewModel.ViewState
 import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.pixels.AppReturnPixelSender
 import com.duckduckgo.app.pixels.toPixelLaunchSourceValue
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.customtabs.api.CustomTabsSessionRegistry
@@ -56,6 +57,9 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var appReturnPixelSender: AppReturnPixelSender
 
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // Sanitize before super.onCreate so lifecycle callbacks dispatched from there don't trip over
         // Parcelable extras whose classes are absent from our classpath.
@@ -72,7 +76,7 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
             }
         }
 
-        viewModel.onIntentReceived(intent, isExternal = true)
+        viewModel.onIntentReceived(intent, isExternal = true, isTaskRoot = isTaskRoot)
     }
 
     private fun dispatch(viewState: ViewState) {
@@ -88,13 +92,18 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
             globalActivityStarter.start(this, viewState.activityParams)
             finish()
         } else if (viewState.customTabRequested) {
-            showCustomTab(viewState.intentText, viewState.toolbarColor, viewState.isExternal)
+            showCustomTab(viewState.intentText, viewState.toolbarColor, viewState.isExternal, viewState.customTabLaunchMode)
         } else {
             showBrowserActivity(viewState.intentText, viewState.isExternal)
         }
     }
 
-    private fun showCustomTab(intentText: String?, toolbarColor: Int?, isExternal: Boolean) {
+    private fun showCustomTab(
+        intentText: String?,
+        toolbarColor: Int?,
+        isExternal: Boolean,
+        launchMode: CustomTabLaunchMode,
+    ) {
         // The verified calling package (non-null only when the launcher bound the
         // CustomTabsService). Carried forward as an intent extra so BrowserTabViewModel can
         // apply the trusted-caller carve-out in handleAppLink.
@@ -110,16 +119,26 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
         startActivity(
             CustomTabActivity.intent(
                 context = this,
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS,
+                launchMode = launchMode,
                 text = intentText,
                 toolbarColor = toolbarColor,
                 isExternal = isExternal,
                 clientPackage = clientPackage,
                 referrerPackage = referrerPackage,
+                tabsClearedCount = settingsDataStore.tabsClearedCount,
             ),
         )
 
-        finish()
+        when (launchMode) {
+            // Otherwise the dispatcher's own task stays in Recents as an empty card.
+            CustomTabLaunchMode.DOCUMENT_TASK -> finishAndRemoveTask()
+            CustomTabLaunchMode.DOCUMENT_TASK_HIDE_BROWSER_TASK -> {
+                // After startActivity: once in the background, this activity can't start others.
+                moveTaskToBack(true)
+                finish()
+            }
+            else -> finish()
+        }
     }
 
     private fun showBrowserActivity(intentText: String?, isExternal: Boolean) {

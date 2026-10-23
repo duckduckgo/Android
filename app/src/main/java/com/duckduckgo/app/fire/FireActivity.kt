@@ -46,7 +46,8 @@ class FireActivity : AppCompatActivity() {
         // Reconstruct the restart Intent in this process from the primitive extras passed by triggerRestart.
         val notifyDataCleared = intent.getBooleanExtra(KEY_NOTIFY_DATA_CLEARED, false)
         val deletedTabCount = intent.getIntExtra(KEY_DELETED_TAB_COUNT, 0)
-        startActivity(getRestartIntent(this, notifyDataCleared, deletedTabCount), fadeTransitionConfig())
+        val query = intent.getStringExtra(KEY_QUERY)
+        startActivity(getRestartIntent(this, notifyDataCleared, deletedTabCount, query), fadeTransitionConfig())
         overridePendingTransition(0, 0)
         finish()
         killProcess()
@@ -55,14 +56,16 @@ class FireActivity : AppCompatActivity() {
     companion object {
         private const val KEY_NOTIFY_DATA_CLEARED = "KEY_NOTIFY_DATA_CLEARED"
         private const val KEY_DELETED_TAB_COUNT = "KEY_DELETED_TAB_COUNT"
+        private const val KEY_QUERY = "KEY_QUERY"
 
         fun triggerRestart(
             context: Context,
             notifyDataCleared: Boolean,
             enableTransitionAnimation: Boolean = true,
             deletedTabCount: Int = 0,
+            query: String? = null,
         ) {
-            val intent = fireActivityIntent(context, notifyDataCleared, deletedTabCount)
+            val intent = fireActivityIntent(context, notifyDataCleared, deletedTabCount, query)
 
             val transitionAnimationConfig = if (enableTransitionAnimation) {
                 context.fadeTransitionConfig()
@@ -89,11 +92,13 @@ class FireActivity : AppCompatActivity() {
             context: Context,
             notifyDataCleared: Boolean,
             deletedTabCount: Int,
+            query: String? = null,
         ): Intent {
             return Intent(context, FireActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 putExtra(KEY_NOTIFY_DATA_CLEARED, notifyDataCleared)
                 putExtra(KEY_DELETED_TAB_COUNT, deletedTabCount)
+                putExtra(KEY_QUERY, query)
             }
         }
 
@@ -101,10 +106,12 @@ class FireActivity : AppCompatActivity() {
             context: Context,
             notifyDataCleared: Boolean = false,
             deletedTabCount: Int = 0,
+            query: String? = null,
         ): Intent {
             val intent = BrowserActivity.intent(
                 context,
                 launchSource = FireRestart,
+                queryExtra = query,
                 notifyDataCleared = notifyDataCleared,
                 deletedTabCount = deletedTabCount,
             )

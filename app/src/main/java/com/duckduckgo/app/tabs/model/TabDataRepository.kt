@@ -496,7 +496,7 @@ class TabDataRepository(
         nativeInputStatePublisher.clearTab(tabId)
     }
 
-    override suspend fun deleteAll() {
+    override suspend fun deleteAll() = withContext(dispatchers.io()) {
         logcat(INFO) { "Deleting tabs right now" }
         tabsDao.deleteAllTabs()
         webViewPreviewPersister.deleteAll()
