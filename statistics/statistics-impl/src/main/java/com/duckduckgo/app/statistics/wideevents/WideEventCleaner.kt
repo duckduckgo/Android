@@ -27,7 +27,6 @@ import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
 
@@ -35,6 +34,7 @@ import javax.inject.Inject
 class WideEventCleaner @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val wideEventRepository: WideEventRepository,
+    private val policyEvaluator: WideEventCleanupPolicyEvaluator,
     private val currentTimeProvider: CurrentTimeProvider,
     private val wideEventFeature: WideEventFeature,
     private val dispatcherProvider: DispatcherProvider,
@@ -50,63 +50,13 @@ class WideEventCleaner @Inject constructor(
     }
 
     private suspend fun performWideEventCleanup() {
-        wideEventRepository
-            .getActiveWideEventIds()
-            .chunked(100)
-            .forEach { idsChunk ->
-                wideEventRepository
-                    .getWideEvents(idsChunk.toSet())
-                    .forEach { event ->
-                        processWideEvent(event)
-                    }
-            }
-    }
+        val now = Instant.ofEpochMilli(currentTimeProvider.currentTimeMillis())
 
-    private suspend fun processWideEvent(event: WideEventRepository.WideEvent) {
-        when (val policy = event.cleanupPolicy) {
-            is WideEventRepository.CleanupPolicy.OnProcessStart -> {
-                val hasIntervalTimeouts = event.activeIntervals.any { it.timeout != null }
-
-                if (!hasIntervalTimeouts || !policy.ignoreIfIntervalTimeoutPresent) {
-                    wideEventRepository.setWideEventStatus(
-                        eventId = event.id,
-                        status = policy.status,
-                        metadata = policy.metadata,
-                    )
-                    return
-                }
-            }
-
-            is WideEventRepository.CleanupPolicy.OnTimeout -> {
-                if (isTimeoutReached(startAt = event.createdAt, timeout = policy.duration)) {
-                    wideEventRepository.setWideEventStatus(
-                        eventId = event.id,
-                        status = policy.status,
-                        metadata = policy.metadata,
-                    )
-                    return
-                }
+        wideEventRepository.getActiveWideEventIds().forEach { eventId ->
+            wideEventRepository.cleanUpWideEvent(eventId) { event ->
+                policyEvaluator.evaluate(event, now)
             }
         }
-
-        event.activeIntervals
-            .firstOrNull { interval ->
-                interval.timeout != null && isTimeoutReached(interval.startedAt, interval.timeout)
-            }?.let { interval ->
-                wideEventRepository.setWideEventStatus(
-                    eventId = event.id,
-                    status = WideEventRepository.WideEventStatus.UNKNOWN,
-                    metadata = emptyMap(),
-                )
-            }
-    }
-
-    private fun isTimeoutReached(
-        startAt: Instant,
-        timeout: Duration,
-    ): Boolean {
-        val currentTime = Instant.ofEpochMilli(currentTimeProvider.currentTimeMillis())
-        return timeout <= Duration.between(startAt, currentTime)
     }
 
     private suspend fun isFeatureEnabled(): Boolean =
