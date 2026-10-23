@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.install
 
+import android.content.Context
 import android.os.Build
 import android.os.Environment
 import androidx.core.content.edit
@@ -48,6 +49,7 @@ import logcat.LogPriority.WARN
 import logcat.logcat
 import java.io.File
 import javax.inject.Inject
+import kotlin.math.abs
 
 interface ReinstallDetector {
     /**
@@ -69,6 +71,7 @@ object InstallSeenPersistentStorageKey : PersistentStorageKey(
 @ContributesBinding(AppScope::class, binding = binding<ReinstallDetector>())
 @ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
 class RealReinstallDetector @Inject constructor(
+    private val context: Context,
     private val dispatcherProvider: DispatcherProvider,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val persistentStorage: PersistentStorage,
@@ -221,10 +224,24 @@ class RealReinstallDetector @Inject constructor(
             // this is a new install
             false
         } else {
-            true
+            !wasCreatedAroundThisInstall(File(downloadDirectory, DDG_DOWNLOADS_DIRECTORY))
         }
         saveAppReinstallValue(appReinstallValue)
         return appReinstallValue
+    }
+
+    // Some stores launch the app out of sight while installing it, then wipe its private data: Samsung's Galaxy Store does
+    // this before the install is committed. The folder created by that launch outlives the wipe, so a folder last changed
+    // this close to the install time belongs to this install, not to a previous one.
+    private fun wasCreatedAroundThisInstall(directory: File): Boolean {
+        val modifiedAt = directory.lastModified()
+        val installedAt = runCatching { context.packageManager.getPackageInfo(context.packageName, 0).firstInstallTime }.getOrNull()
+        if (modifiedAt == 0L || installedAt == null) return false
+
+        val createdAroundThisInstall = abs(modifiedAt - installedAt) <= SAME_INSTALL_WINDOW_MS
+        val secondsFromInstall = (modifiedAt - installedAt) / 1000
+        logcat(INFO) { "Reinstall check: folder changed ${secondsFromInstall}s from install time, same install=$createdAroundThisInstall" }
+        return createdAroundThisInstall
     }
 
     private fun getDownloadsDirectory(): File {
@@ -258,6 +275,9 @@ class RealReinstallDetector @Inject constructor(
         private const val INSTALL_SEEN_FLAG_STORED_KEY = "installSeenFlagStored"
         private const val PARAM_RESULT = "result"
         private const val DDG_DOWNLOADS_DIRECTORY = "DuckDuckGo"
+
+        // The out-of-sight launch happens seconds before the install is committed. A reinstall within this window counts as new.
+        private const val SAME_INSTALL_WINDOW_MS = 2 * 60 * 1000L
 
         // Nothing else bounds this step: the pre-ATB time limit can't stop it, so a stuck Play services call would hold back the ATB
         private const val BLOCK_STORE_TIME_LIMIT_MS = 10_000L
