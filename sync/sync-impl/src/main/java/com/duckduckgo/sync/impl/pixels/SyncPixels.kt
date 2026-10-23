@@ -17,7 +17,6 @@
 package com.duckduckgo.sync.impl.pixels
 
 import android.content.SharedPreferences
-import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
@@ -562,14 +561,14 @@ class RealSyncPixels @Inject constructor(
         pixel: SyncPixelName,
         payload: Map<String, String> = emptyMap(),
     ) {
-        val now = getUtcIsoLocalDate()
-        val timestamp = preferences.getString(pixel.name.appendTimestampSuffix(), null)
+        // Older app versions stored the last fire date here instead of using PixelType.Daily. We only read it, so a device
+        // that fired the pixel before updating today doesn't fire it again. We can remove this check after a few releases
+        // once enough devices update to an app version that has this check and run it.
+        // https://app.asana.com/1/137249556945/project/1215321458176118/task/1219486501578915
+        val legacyTimestamp = preferences.getString(pixel.name.appendTimestampSuffix(), null)
+        if (legacyTimestamp == getUtcIsoLocalDate()) return
 
-        // check if pixel was already sent in the current day
-        if (timestamp == null || now > timestamp) {
-            this.pixel.fire(pixel, payload)
-                .also { preferences.edit { putString(pixel.name.appendTimestampSuffix(), now) } }
-        }
+        this.pixel.fire(pixel, payload, type = PixelType.Daily())
     }
 
     private fun getUtcIsoLocalDate(): String {
