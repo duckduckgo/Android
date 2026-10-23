@@ -33,8 +33,10 @@ import com.duckduckgo.persistentstorage.api.PersistentStorageUnavailableExceptio
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -391,6 +393,50 @@ class RealReinstallDetectorTest {
 
     @Test
     @Config(sdk = [29])
+    fun whenBelowAndroid11AndSavingTheAnswerReturnsFalseThenTheFlagIsNotWrittenEvenOnAppStart() = runTest {
+        val preferences = NotReachingDiskSharedPreferences()
+        val reinstallDetector = reinstallDetectorWith(
+            preferences,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            appCoroutineScope = coroutineTestRule.testScope,
+        )
+
+        assertFalse(reinstallDetector.isAppReinstall())
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+        reinstallDetector.onCreate(mock())
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        // The answer is still readable in memory, but after a restart only the flag would be left
+        assertTrue(preferences.contains(APP_REINSTALLED_KEY))
+        assertEquals(0, persistentStorage.storeCalls)
+    }
+
+    @Test
+    @Config(sdk = [29])
+    fun whenBelowAndroid11AndTheAnswerIsStillBeingSavedThenAppStartWritesTheFlagOnlyAfterTheSave() = runBlocking {
+        val preferences = SlowToCommitAnswerSharedPreferences()
+        val appCoroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.io())
+        val reinstallDetector = reinstallDetectorWith(preferences, appCoroutineScope = appCoroutineScope)
+
+        try {
+            val first = async(dispatcherProvider.io()) { reinstallDetector.isAppReinstall() }
+            assertTrue(preferences.commitStarted.await(5, TimeUnit.SECONDS))
+            reinstallDetector.onCreate(mock())
+
+            assertFalse(persistentStorage.stored.await(SAVE_DELAY_MS, TimeUnit.MILLISECONDS))
+            preferences.releaseCommit.countDown()
+
+            assertFalse(first.await())
+            assertTrue(persistentStorage.stored.await(5, TimeUnit.SECONDS))
+            assertNotNull(persistentStorage.values[InstallSeenPersistentStorageKey.key])
+        } finally {
+            preferences.releaseCommit.countDown()
+            appCoroutineScope.cancel()
+        }
+    }
+
+    @Test
+    @Config(sdk = [29])
     fun whenBelowAndroid11AndBlockStoreThrowsThenIsNotReinstallAndNothingEscapes() = runTest {
         persistentStorage.throwOnCall = true
         val preferences = InMemorySharedPreferences()
@@ -532,6 +578,51 @@ class RealReinstallDetectorTest {
         }
     }
 
+    /**
+     * Like Android when the disk write fails: commit() returns false, but the value stays readable in memory.
+     */
+    private class NotReachingDiskSharedPreferences(
+        private val delegate: InMemorySharedPreferences = InMemorySharedPreferences(),
+    ) : SharedPreferences by delegate, SharedPreferences.Editor by delegate {
+        override fun edit(): SharedPreferences.Editor = this
+
+        override fun putBoolean(key: String, value: Boolean): SharedPreferences.Editor {
+            delegate.putBoolean(key, value)
+            return this
+        }
+
+        override fun commit(): Boolean = false
+    }
+
+    /**
+     * Holds the answer's commit open after the answer is readable in memory, like Android while the disk write is running.
+     */
+    private class SlowToCommitAnswerSharedPreferences(
+        private val delegate: InMemorySharedPreferences = InMemorySharedPreferences(),
+    ) : SharedPreferences by delegate, SharedPreferences.Editor by delegate {
+        val commitStarted = CountDownLatch(1)
+        val releaseCommit = CountDownLatch(1)
+
+        @Volatile
+        private var lastPutKey: String? = null
+
+        override fun edit(): SharedPreferences.Editor = this
+
+        override fun putBoolean(key: String, value: Boolean): SharedPreferences.Editor {
+            lastPutKey = key
+            delegate.putBoolean(key, value)
+            return this
+        }
+
+        override fun commit(): Boolean {
+            if (lastPutKey == APP_REINSTALLED_KEY) {
+                commitStarted.countDown()
+                releaseCommit.await(5, TimeUnit.SECONDS)
+            }
+            return true
+        }
+    }
+
     private class FakePersistentStorage : PersistentStorage {
         val values = mutableMapOf<String, ByteArray>()
         var available = true
@@ -542,6 +633,7 @@ class RealReinstallDetectorTest {
         var throwOnCall = false
         var retrieveCalls = 0
         var storeCalls = 0
+        val stored = CountDownLatch(1)
 
         override suspend fun checkAvailability(): PersistentStorageAvailability =
             if (available) {
@@ -559,6 +651,7 @@ class RealReinstallDetectorTest {
             if (!available) return Result.failure(PersistentStorageUnavailableException())
             if (failStore) return Result.failure(IllegalStateException("store failed"))
             values[key.key] = value
+            stored.countDown()
             return Result.success(Unit)
         }
 

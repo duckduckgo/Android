@@ -36,6 +36,7 @@ import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -85,15 +86,19 @@ class RealReinstallDetector @Inject constructor(
     // One check per process, shared by every caller. Onboarding and the pre-ATB plugins can ask at the same time on first
     // launch, and a second check could see the marker the first one just created and answer "reinstall" for a new install.
     // It runs in the app scope, so a cancelled caller only stops waiting; the check still saves its answer.
-    // Not reentrant: the check must not call isAppReinstall().
-    private val reinstallCheck: Deferred<Boolean> by lazy {
-        appCoroutineScope.async(dispatcherProvider.io()) {
-            runCatching { savedAppReinstallValue() ?: detectAndSaveAppReinstall() }.getOrDefault(false)
-        }
+    // Not reentrant: the check must not call isAppReinstall(). Started lazily rather than built in a `by lazy` block, because
+    // the flag write it launches waits on it too and could otherwise re-enter the initializer.
+    private val reinstallCheck: Deferred<Boolean> = appCoroutineScope.async(dispatcherProvider.io(), start = CoroutineStart.LAZY) {
+        runCatching { savedAppReinstallValue() ?: detectAndSaveAppReinstall() }.getOrDefault(false)
     }
 
     // Keeps the two flag writers (after a new-install check, and on app start) from calling Block Store at once
     private val installSeenFlagWriteMutex = Mutex()
+
+    // A failed save leaves the answer readable in memory, so reading preferences again can't tell it from one that reached
+    // disk. Set before the shared check completes.
+    @Volatile
+    private var answerSaveFailed = false
 
     override fun onCreate(owner: LifecycleOwner) {
         if (sdkInt >= 30) return
@@ -137,11 +142,11 @@ class RealReinstallDetector @Inject constructor(
         )
 
         // Saved even when Block Store failed, so every caller gets the same answer for this install instead of retrying a slow call
-        runCatching { saveAppReinstallValue(isReinstall) }
+        val answerSaved = runCatching { saveAppReinstallValue(isReinstall) }.getOrDefault(false)
 
         if (isReinstall) {
             runCatching { preferences.edit(commit = true) { putBoolean(INSTALL_SEEN_FLAG_STORED_KEY, true) } }
-        } else {
+        } else if (answerSaved) {
             // Written outside the check: the answer is already saved, so callers shouldn't also wait for a second Block Store call
             appCoroutineScope.launch(dispatcherProvider.io()) { storeInstallSeenFlagIfMissing() }
         }
@@ -149,12 +154,19 @@ class RealReinstallDetector @Inject constructor(
     }
 
     private suspend fun storeInstallSeenFlagIfMissing() = installSeenFlagWriteMutex.withLock {
-        // Only once this install's answer is saved, so the flag can't make this install look like a reinstall
-        val answerSaved = savedAppReinstallValueOrNull() != null
-        val flagStored = runCatching { preferences.getBoolean(INSTALL_SEEN_FLAG_STORED_KEY, false) }.getOrDefault(false)
-        if (answerSaved && !flagStored) {
+        if (canStoreInstallSeenFlag()) {
             storeInstallSeenFlag()
         }
+    }
+
+    // Only safe once this install's answer is on disk: otherwise, after a restart, the flag alone would make this install look
+    // like a reinstall. Waiting for the shared check means a check still saving its answer has finished, and recorded whether
+    // the save failed.
+    private suspend fun canStoreInstallSeenFlag(): Boolean {
+        reinstallCheck.await()
+        val answerSaved = savedAppReinstallValueOrNull() != null && !answerSaveFailed
+        val flagStored = runCatching { preferences.getBoolean(INSTALL_SEEN_FLAG_STORED_KEY, false) }.getOrDefault(false)
+        return answerSaved && !flagStored
     }
 
     private suspend fun storeInstallSeenFlag() {
@@ -183,8 +195,19 @@ class RealReinstallDetector @Inject constructor(
     private fun savedAppReinstallValue(): Boolean? =
         if (preferences.contains(APP_REINSTALLED_KEY)) preferences.getBoolean(APP_REINSTALLED_KEY, false) else null
 
-    private fun saveAppReinstallValue(isReinstall: Boolean): Boolean =
-        preferences.edit().putBoolean(APP_REINSTALLED_KEY, isReinstall).commit()
+    /**
+     * @return false if the answer may not have reached disk. Android keeps it readable in memory even then.
+     */
+    private fun saveAppReinstallValue(isReinstall: Boolean): Boolean {
+        val saved = try {
+            preferences.edit().putBoolean(APP_REINSTALLED_KEY, isReinstall).commit()
+        } catch (e: Exception) {
+            answerSaveFailed = true
+            throw e
+        }
+        if (!saved) answerSaveFailed = true
+        return saved
+    }
 
     // The answer is saved before the folder is created. If only the folder were written, the next launch would find it and
     // answer "reinstall" for a new install; if only the answer is saved, a later reinstall goes undetected, which is the lesser harm.
