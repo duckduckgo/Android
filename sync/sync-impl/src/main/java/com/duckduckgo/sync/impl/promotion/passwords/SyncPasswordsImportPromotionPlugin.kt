@@ -39,7 +39,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesIntoMap(scope = AppScope::class)
 @PriorityKey(PRIORITY_KEY_SYNC_PROMO)
-class SyncPasswordsImportPromotion @Inject constructor() : PasswordsImportScreenPromotionPlugin {
+class SyncPasswordsImportPromotionPlugin @Inject constructor() : PasswordsImportScreenPromotionPlugin {
 
     override suspend fun getView(
         context: Context,
