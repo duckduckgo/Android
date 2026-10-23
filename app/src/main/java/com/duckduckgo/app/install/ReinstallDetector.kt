@@ -250,10 +250,40 @@ class RealReinstallDetector @Inject constructor(
         val installedAt = runCatching { context.packageManager.getPackageInfo(context.packageName, 0).firstInstallTime }.getOrNull()
         if (modifiedAt == 0L || installedAt == null) return false
 
-        val createdAroundThisInstall = abs(modifiedAt - installedAt) <= SAME_INSTALL_WINDOW_MS
+        val distanceFromInstallMs = abs(modifiedAt - installedAt)
+        val createdAroundThisInstall = distanceFromInstallMs <= SAME_INSTALL_WINDOW_MS
         val secondsFromInstall = (modifiedAt - installedAt) / 1000
         logcat(INFO) { "Reinstall check: folder changed ${secondsFromInstall}s from install time, same install=$createdAroundThisInstall" }
+        fireRecentFolderPixel(distanceFromInstallMs)
         return createdAroundThisInstall
+    }
+
+    // Shows how often the rule above decides the answer, whether its window fits and which stores cause it. Reports up to
+    // 10 minutes, wider than the window, so near misses show up too.
+    private fun fireRecentFolderPixel(distanceFromInstallMs: Long) {
+        val age = when {
+            distanceFromInstallMs <= 10_000L -> RecentFolderAge.UP_TO_10_SECONDS
+            distanceFromInstallMs <= SAME_INSTALL_WINDOW_MS -> RecentFolderAge.UP_TO_2_MINUTES
+            distanceFromInstallMs <= RECENT_FOLDER_REPORT_WINDOW_MS -> RecentFolderAge.UP_TO_10_MINUTES
+            else -> return
+        }
+        pixel.fire(
+            ReinstallDetectorPixelName.RECENT_FOLDER,
+            parameters = mapOf(PARAM_AGE to age.value, PARAM_INSTALLER to installer().value),
+            type = Unique(),
+        )
+    }
+
+    private fun installer(): RecentFolderInstaller {
+        if (Build.VERSION.SDK_INT < 30) return RecentFolderInstaller.OTHER
+        val installerPackage = runCatching {
+            context.packageManager.getInstallSourceInfo(context.packageName).installingPackageName
+        }.getOrNull()
+        return when (installerPackage) {
+            GALAXY_STORE_PACKAGE -> RecentFolderInstaller.GALAXY_STORE
+            PLAY_STORE_PACKAGE -> RecentFolderInstaller.PLAY_STORE
+            else -> RecentFolderInstaller.OTHER
+        }
     }
 
     private fun getDownloadsDirectory(): File {
@@ -287,10 +317,15 @@ class RealReinstallDetector @Inject constructor(
         private const val INSTALL_SEEN_FLAG_STORED_KEY = "installSeenFlagStored"
         private const val PARAM_RESULT = "result"
         private const val PARAM_DURATION = "duration"
+        private const val PARAM_AGE = "age"
+        private const val PARAM_INSTALLER = "installer"
         private const val DDG_DOWNLOADS_DIRECTORY = "DuckDuckGo"
+        private const val GALAXY_STORE_PACKAGE = "com.sec.android.app.samsungapps"
+        private const val PLAY_STORE_PACKAGE = "com.android.vending"
 
         // The out-of-sight launch happens seconds before the install is committed. A reinstall within this window counts as new.
         private const val SAME_INSTALL_WINDOW_MS = 2 * 60 * 1000L
+        private const val RECENT_FOLDER_REPORT_WINDOW_MS = 10 * 60 * 1000L
 
         // Nothing else bounds this step: the pre-ATB time limit can't stop it, so a stuck Play services call would hold back the ATB
         private const val BLOCK_STORE_TIME_LIMIT_MS = 10_000L

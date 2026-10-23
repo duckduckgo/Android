@@ -20,6 +20,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 
 enum class ReinstallDetectorPixelName(override val pixelName: String) : PixelName {
     BLOCK_STORE_CHECK_RESULT("atb_reinstall_check_block_store"),
+    RECENT_FOLDER("atb_reinstall_check_recent_folder"),
 }
 
 enum class BlockStoreCheckResult(val value: String) {
@@ -28,4 +29,16 @@ enum class BlockStoreCheckResult(val value: String) {
     UNAVAILABLE("unavailable"),
     TIMEOUT("timeout"),
     ERROR("error"),
+}
+
+enum class RecentFolderAge(val value: String) {
+    UP_TO_10_SECONDS("0-10s"),
+    UP_TO_2_MINUTES("10s-2m"),
+    UP_TO_10_MINUTES("2-10m"),
+}
+
+enum class RecentFolderInstaller(val value: String) {
+    GALAXY_STORE("galaxy_store"),
+    PLAY_STORE("play_store"),
+    OTHER("other"),
 }

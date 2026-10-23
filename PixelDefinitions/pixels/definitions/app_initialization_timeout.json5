@@ -78,5 +78,27 @@
             }
         ],
         "expires": "2027-04-30"
+    },
+    "atb_reinstall_check_recent_folder": {
+        "description": "The reinstall check on Android 11 and later found the Downloads/DuckDuckGo folder, and the folder was last changed within 10 minutes of the app's install time. Sent at most once per install. Some stores launch the app out of sight while installing it and then wipe its data, which leaves the folder behind: a folder changed within 2 minutes of the install time counts as this install's own, so the install counts as new. Shows how often that happens, whether the 2 minute window fits, and which stores cause it",
+        "owners": ["anikiki"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "age",
+                "description": "How far the folder's last change was from the install time, before or after it. 0-10s and 10s-2m count the install as new; 2-10m counts it as a reinstall",
+                "type": "string",
+                "enum": ["0-10s", "10s-2m", "2-10m"]
+            },
+            {
+                "key": "installer",
+                "description": "The store that installed the app: galaxy_store, play_store, or other for any other installer or when it can't be read",
+                "type": "string",
+                "enum": ["galaxy_store", "play_store", "other"]
+            }
+        ],
+        "expires": "2027-04-30"
     }
 }
