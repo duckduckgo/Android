@@ -23,6 +23,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.browser.customtabs.CustomTabsFeature
 import com.duckduckgo.app.dispatchers.IntentDispatcherActivity
@@ -39,6 +40,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -87,6 +89,7 @@ class AutomaticDataClearerTest {
     @UiThreadTest
     @Before
     fun setup() {
+        runBlocking { whenever(fireDataStore.getAutomaticClearOptions()).thenReturn(setOf(FireClearOption.DATA)) }
         testee = createTestee(coroutineTestRule.testDispatcherProvider)
     }
 
@@ -131,15 +134,13 @@ class AutomaticDataClearerTest {
         whenever(dataClearing.shouldClearDataAutomatically(true, true, false)).thenReturn(true)
         whenever(dataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(false)
         whenever(fireDataStore.getAutomaticallyClearWhenOption()).thenReturn(ClearWhenOption.APP_EXIT_ONLY)
-        whenever(fireDataStore.getAutomaticClearOptions()).thenReturn(emptySet())
-
         val customTab = CustomTabActivity()
         testee.onActivityStarted(customTab)
         testee.onOpen(isFreshLaunch = true)
         testee.onActivityStopped(customTab)
         testee.onClose()
         testee.onOpen(isFreshLaunch = false)
-        testee.onActivityStarted(Activity())
+        testee.onActivityStarted(BrowserActivity())
 
         verify(dataClearing).clearDataUsingAutomaticFireOptions(false)
     }
@@ -154,7 +155,7 @@ class AutomaticDataClearerTest {
         testee.onActivityCreated(dispatcher, null)
         testee.onActivityStarted(dispatcher)
         testee.onOpen(isFreshLaunch = false)
-        testee.onActivityStarted(Activity())
+        testee.onActivityStarted(BrowserActivity())
         testee.onActivityStarted(CustomTabActivity())
         testee.onActivityStopped(dispatcher)
         testee.onActivityDestroyed(dispatcher)
@@ -173,7 +174,7 @@ class AutomaticDataClearerTest {
         testee.onActivityCreated(dispatcher, null)
         testee.onActivityStarted(dispatcher)
         testee.onOpen(isFreshLaunch = false)
-        testee.onActivityStarted(Activity())
+        testee.onActivityStarted(BrowserActivity())
         testee.onActivityStopped(dispatcher)
         verify(dataClearing, never()).clearDataUsingAutomaticFireOptions(any())
 
@@ -192,7 +193,7 @@ class AutomaticDataClearerTest {
         val customTab = CustomTabActivity()
         testee.onActivityStarted(customTab)
         testee.onOpen(isFreshLaunch = false)
-        testee.onActivityStarted(Activity())
+        testee.onActivityStarted(BrowserActivity())
         verify(dataClearing, never()).clearDataUsingAutomaticFireOptions(any())
 
         testee.onActivityStopped(customTab)
@@ -231,7 +232,7 @@ class AutomaticDataClearerTest {
 
         val dispatcher = IntentDispatcherActivity()
         testee.onActivityCreated(dispatcher, null)
-        testee.onActivityStarted(Activity())
+        testee.onActivityStarted(BrowserActivity())
         testee.onOpen(isFreshLaunch = false)
         testee.onActivityStarted(dispatcher)
         testee.onActivityStarted(CustomTabActivity())
@@ -258,7 +259,7 @@ class AutomaticDataClearerTest {
         testee.onOpen(isFreshLaunch = false)
         testee.onActivityCreated(dispatcher, null)
         testee.onActivityStarted(dispatcher)
-        InstrumentationRegistry.getInstrumentation().runOnMainSync { testee.onActivityStarted(Activity()) }
+        InstrumentationRegistry.getInstrumentation().runOnMainSync { testee.onActivityStarted(BrowserActivity()) }
         testee.deferredQuery = "https://example.com"
         testee.onActivityStopped(customTab)
         testee.onActivityStopped(dispatcher)
@@ -267,6 +268,51 @@ class AutomaticDataClearerTest {
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
 
         verify(clearDataAction).killAndRestartProcess(notifyDataCleared = true, query = "https://example.com")
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOtherScreenOpensFromCustomTabThenDataIsNotCleared() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(any(), any(), any())).thenReturn(true)
+
+        val customTab = CustomTabActivity()
+        testee.onActivityStarted(customTab)
+        testee.onOpen(isFreshLaunch = false)
+        testee.onActivityStarted(Activity())
+        testee.onActivityStopped(customTab)
+
+        verify(dataClearing, never()).clearDataUsingAutomaticFireOptions(any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenNoAutomaticClearOptionsThenOpeningCustomTabIsNotDeferred() = runTest {
+        whenever(fireDataStore.getAutomaticClearOptions()).thenReturn(emptySet())
+        whenever(dataClearing.shouldClearDataAutomatically(any(), any(), any())).thenReturn(false)
+
+        testee.onActivityStarted(CustomTabActivity())
+        testee.onOpen(isFreshLaunch = false)
+
+        verify(dataClearing).shouldClearDataAutomatically(any(), any(), any())
+    }
+
+    @Test
+    fun whenFreshLaunchClearWasDeferredForCustomTabThenProcessIsRestarted() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(true, true, false)).thenReturn(true)
+        whenever(dataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(true)
+        lateinit var customTab: CustomTabActivity
+        InstrumentationRegistry.getInstrumentation().runOnMainSync { customTab = CustomTabActivity() }
+
+        testee.onActivityStarted(customTab)
+        testee.onOpen(isFreshLaunch = true)
+        InstrumentationRegistry.getInstrumentation().runOnMainSync { testee.onActivityStarted(BrowserActivity()) }
+        testee.onActivityStopped(customTab)
+        Thread.sleep(200)
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+
+        verify(clearDataAction).killAndRestartProcess(notifyDataCleared = true)
     }
 
     @UiThreadTest
@@ -287,8 +333,6 @@ class AutomaticDataClearerTest {
     @Test
     fun whenClosedWhileClearIsPendingThenBackgroundTimestampIsKept() = runTest {
         whenever(fireDataStore.getAutomaticallyClearWhenOption()).thenReturn(ClearWhenOption.APP_EXIT_ONLY)
-        whenever(fireDataStore.getAutomaticClearOptions()).thenReturn(emptySet())
-
         testee.onActivityStarted(CustomTabActivity())
         testee.onOpen(isFreshLaunch = false)
         testee.onClose()

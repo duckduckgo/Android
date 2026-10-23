@@ -27,6 +27,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.browser.customtabs.CustomTabsFeature
 import com.duckduckgo.app.dispatchers.IntentDispatcherActivity
@@ -104,11 +105,14 @@ class AutomaticDataClearer @Inject constructor(
 
     // Opening a custom tab from another app must not run the automatic clear, because the clear would close that tab.
     // The clear waits until the user opens the browser itself. To tell the two apart, these count what is open:
-    // custom tabs, the activity that routes links into a custom tab, and everything else.
+    // custom tabs, the activity that routes links into a custom tab, and the browser.
     private var startedCustomTabActivities = 0
-    private var startedOtherActivities = 0
+    private var startedBrowserActivities = 0
     private var liveIntentDispatchers = 0
     private var isAppOpenPending = false
+
+    // A custom tab has already used WebView in this process, so clearing its data needs a restart even on a fresh launch.
+    private var wasDeferredForCustomTab = false
 
     override fun onOpen(isFreshLaunch: Boolean) {
         isFreshAppLaunch = isFreshLaunch || (isAppOpenPending && isFreshAppLaunch)
@@ -123,9 +127,8 @@ class AutomaticDataClearer @Inject constructor(
     override fun onActivityStarted(activity: Activity) {
         when (activity) {
             is CustomTabActivity -> startedCustomTabActivities++
-            is IntentDispatcherActivity -> Unit
-            else -> {
-                startedOtherActivities++
+            is BrowserActivity -> {
+                startedBrowserActivities++
                 handleAppOpenIfBrowserStarted()
             }
         }
@@ -137,8 +140,7 @@ class AutomaticDataClearer @Inject constructor(
                 startedCustomTabActivities--
                 if (!activity.isChangingConfigurations) handleAppOpenIfBrowserStarted()
             }
-            is IntentDispatcherActivity -> Unit
-            else -> startedOtherActivities--
+            is BrowserActivity -> startedBrowserActivities--
         }
     }
 
@@ -149,16 +151,16 @@ class AutomaticDataClearer @Inject constructor(
         }
     }
 
-    // The pending clear only runs once a browser activity is open.
     private fun handleAppOpenIfBrowserStarted() {
-        if (isAppOpenPending && startedOtherActivities > 0) handleAppOpen()
+        if (isAppOpenPending && startedBrowserActivities > 0) handleAppOpen()
     }
 
     private fun handleAppOpen() {
         // Launched so the counters are up to date when this runs.
         launch {
+            val hasAutomaticClearOptions = withContext(dispatchers.io()) { fireDataStore.getAutomaticClearOptions().isNotEmpty() }
             if (!isAppOpenPending) return@launch
-            if (isCustomTabInFront()) {
+            if (hasAutomaticClearOptions && isCustomTabInFront()) {
                 deferClearWhileInCustomTab()
             } else {
                 isAppOpenPending = false
@@ -171,6 +173,7 @@ class AutomaticDataClearer @Inject constructor(
         (startedCustomTabActivities > 0 || liveIntentDispatchers > 0)
 
     private suspend fun deferClearWhileInCustomTab() {
+        wasDeferredForCustomTab = true
         workManager.cancelAllWorkByTag(DataClearingWorker.WORK_REQUEST_TAG)
         withContext(dispatchers.io()) { settingsDataStore.appUsedSinceLastClear = true }
     }
@@ -284,7 +287,7 @@ class AutomaticDataClearer @Inject constructor(
                 dataClearingWideEvent.finishFailure(e)
                 throw e
             }
-            val needsRestart = !isFreshAppLaunch && shouldRestart
+            val needsRestart = (!isFreshAppLaunch || wasDeferredForCustomTab) && shouldRestart
             if (needsRestart) {
                 withContext(dispatchers.io()) {
                     clearDataAction.setAppUsedSinceLastClearFlag(false)
