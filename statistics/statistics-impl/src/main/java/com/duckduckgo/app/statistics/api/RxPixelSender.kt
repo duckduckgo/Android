@@ -31,10 +31,10 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelRequiringAtbPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -49,13 +49,13 @@ import javax.inject.Inject
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = PixelSender::class,
+    binding = binding<PixelSender>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RxPixelSender @Inject constructor(
     private val api: PixelService,
     private val pendingPixelDao: PendingPixelDao,
@@ -206,7 +206,7 @@ class RxPixelSender @Inject constructor(
     }
 
     private fun shouldSendAtb(pixelName: String): Boolean {
-        if (!pixelSenderFeature.get().self().isEnabled()) return true
+        if (!pixelSenderFeature.value.self().isEnabled()) return true
         return pixelsRequiringAtb.any { pixelName.startsWith(it) }
     }
 

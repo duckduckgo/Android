@@ -27,7 +27,7 @@ import com.duckduckgo.site.permissions.impl.drmblock.DrmBlock
 import com.duckduckgo.site.permissions.impl.hostAndParentCandidates
 import com.duckduckgo.site.permissions.impl.isSiteUnprotectedByUser
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
@@ -58,8 +58,8 @@ class RealDrmPolicyManager @Inject constructor(
         ).evaluate()
     }
 
-    // Every row carries a DRM value defaulting to ASK_EVERY_TIME, so a row saved for another permission
-    // must not stop the scan before an explicit choice on one of the other spellings.
+    // Ask decides nothing, the same as not set, so it must not stop the scan before an Always / Never
+    // stored on one of the other spellings.
     private fun String.toDrmSetting(): SitePermissionAskSettingType? =
         runCatching { SitePermissionAskSettingType.valueOf(this) }.getOrNull()
             ?.takeIf { it != SitePermissionAskSettingType.ASK_EVERY_TIME }

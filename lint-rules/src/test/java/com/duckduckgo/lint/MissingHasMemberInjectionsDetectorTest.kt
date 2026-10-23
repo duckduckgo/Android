@@ -18,6 +18,7 @@ package com.duckduckgo.lint
 
 import com.android.tools.lint.checks.infrastructure.TestFiles.kt
 import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
+import com.android.tools.lint.checks.infrastructure.TestMode
 import org.junit.Test
 
 @Suppress("UnstableApiUsage")
@@ -26,6 +27,7 @@ class MissingHasMemberInjectionsDetectorTest {
     private val injectStub = kt(
         """
         package javax.inject
+        @Target(AnnotationTarget.FIELD, AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR)
         annotation class Inject
         annotation class Qualifier
         """,
@@ -65,6 +67,7 @@ class MissingHasMemberInjectionsDetectorTest {
                 ).indented(),
             )
             .issues(MissingHasMemberInjectionsDetector.MISSING_HAS_MEMBER_INJECTIONS)
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectErrorCount(1)
     }
@@ -91,6 +94,7 @@ class MissingHasMemberInjectionsDetectorTest {
                 ).indented(),
             )
             .issues(MissingHasMemberInjectionsDetector.MISSING_HAS_MEMBER_INJECTIONS)
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectErrorCount(1)
     }
@@ -116,6 +120,7 @@ class MissingHasMemberInjectionsDetectorTest {
                 ).indented(),
             )
             .issues(MissingHasMemberInjectionsDetector.MISSING_HAS_MEMBER_INJECTIONS)
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
@@ -141,6 +146,7 @@ class MissingHasMemberInjectionsDetectorTest {
                 ).indented(),
             )
             .issues(MissingHasMemberInjectionsDetector.MISSING_HAS_MEMBER_INJECTIONS)
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
@@ -162,6 +168,7 @@ class MissingHasMemberInjectionsDetectorTest {
                 ).indented(),
             )
             .issues(MissingHasMemberInjectionsDetector.MISSING_HAS_MEMBER_INJECTIONS)
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
@@ -184,6 +191,7 @@ class MissingHasMemberInjectionsDetectorTest {
                 ).indented(),
             )
             .issues(MissingHasMemberInjectionsDetector.MISSING_HAS_MEMBER_INJECTIONS)
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
@@ -209,6 +217,7 @@ class MissingHasMemberInjectionsDetectorTest {
                 ).indented(),
             )
             .issues(MissingHasMemberInjectionsDetector.MISSING_HAS_MEMBER_INJECTIONS)
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectErrorCount(1)
     }
@@ -232,6 +241,7 @@ class MissingHasMemberInjectionsDetectorTest {
                 ).indented(),
             )
             .issues(MissingHasMemberInjectionsDetector.MISSING_HAS_MEMBER_INJECTIONS)
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectErrorCount(1)
     }

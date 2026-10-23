@@ -103,7 +103,7 @@ data class LogRow(
 
 private val logTimestampFormat = ThreadLocal.withInitial { SimpleDateFormat("HH:mm:ss.SSS", Locale.US) }
 
-private fun Long.toLogTimestamp(): String = logTimestampFormat.get()!!.format(Date(this))
+internal fun Long.toLogTimestamp(): String = logTimestampFormat.get()!!.format(Date(this))
 
 private fun ExchangeV2Event.debugSummary(): String = when (this) {
     is ExchangeV2Event.SessionStarted -> "Started as $pairingRole"

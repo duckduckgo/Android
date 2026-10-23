@@ -27,7 +27,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.setFragmentResult
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
@@ -42,16 +41,15 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillClipboardIn
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.AutofillUseGeneratedPasswordDialogFragment.DialogEvent.Dismissed
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.AutofillUseGeneratedPasswordDialogFragment.DialogEvent.GeneratedPasswordAccepted
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.AutofillUseGeneratedPasswordDialogFragment.DialogEvent.Shown
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.ui.view.toPx
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import dagger.android.support.AndroidSupportInjection
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
@@ -68,20 +66,13 @@ class AutofillUseGeneratedPasswordDialogFragment : BottomSheetDialogFragment(), 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
     /**
      * To capture all the ways the BottomSheet can be dismissed, we might end up with onCancel being called when we don't want it
      * This flag is set to true when taking an action which dismisses the dialog, but should not be treated as a cancellation.
      */
     private var ignoreCancellationEvents = false
 
-    override fun getTheme(): Int = if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-        R.style.AutofillBottomSheetDialogThemeEdgeToEdge
-    } else {
-        R.style.AutofillBottomSheetDialogTheme
-    }
+    override fun getTheme(): Int = R.style.AutofillBottomSheetDialogThemeEdgeToEdge
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -106,9 +97,7 @@ class AutofillUseGeneratedPasswordDialogFragment : BottomSheetDialogFragment(), 
 
         val binding = ContentAutofillGeneratePasswordDialogBinding.inflate(inflater, container, false)
         configureViews(binding)
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-            binding.dialogRootView.applyBottomSystemBarInsetPadding()
-        }
+        binding.dialogRootView.applyBottomSystemBarInsetPadding()
         return binding.root
     }
 

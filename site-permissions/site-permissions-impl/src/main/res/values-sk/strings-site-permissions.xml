@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Webová stránka \"%1$s\" chce získať prístup k tvojmu fotoaparátu</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Webová stránka \"%1$s\" chce získať prístup k tvojmu mikrofónu</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Webová stránka \"%1$s\" chce získať prístup k tvojmu fotoaparátu a mikrofónu</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ chce na tejto webovej stránke získať prístup k tvojej polohe</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ chce na tejto webovej stránke získať prístup k fotoaparátu</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ chce na tejto webovej stránke získať prístup k tvojmu mikrofónu</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ chce na tejto webovej stránke získať prístup k tvojmu fotoaparátu a mikrofónu</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">„%1$s“ chce na tejto webovej stránke získať prístup k tvojmu softvéru na správu digitálnych práv (DRM)</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Ak to nepovolíš, videá na stránke sa nemusia dať prehrať, ale táto stránka nebude mať prístup k identifikátorom zariadení poskytovaným softvérom DRM.</string>
 
     <!-- Reminder dialog -->
@@ -104,5 +109,22 @@
     <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">DuckDuckGo nemohol tejto lokalite udeliť prístup k fotoaparátu</string>
     <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo nemohol udeliť prístup k mikrofónu tejto lokalite</string>
     <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo nemohol udeliť prístup k fotoaparátu a mikrofónu tejto stránke</string>
+
+    <!-- Permission settings redesign -->
+    <string name="permissionSettingsAlwaysAllow" instruction="Permission setting option: the site gets the permission without asking">Vždy povoliť</string>
+    <string name="permissionSettingsAskEachTime" instruction="Permission setting option: the site has to ask for the permission every time">Vždy sa opýtať</string>
+    <string name="permissionSettingsLocationDialogTitle">Povoliť stránkam žiadať o povolenie na prístup k polohe</string>
+    <string name="permissionSettingsLocationDialogMessage">Ak vyberieš „Nikdy nepovoliť”, nebudeš môcť na stránkach používať určité funkcie, ako je navigácia na mapách alebo obchody v okolí.</string>
+    <string name="permissionSettingsCameraDialogTitle">Povoliť lokalitám žiadať o povolenie pre fotoaparát</string>
+    <string name="permissionSettingsCameraDialogMessage">Ak zvolíš „Nikdy nepovoliť“, nebudeš môcť na stránkach používať funkcie, ako je videohovor.</string>
+    <string name="permissionSettingsMicrophoneDialogTitle">Povoliť stránkam žiadať o povolenie pre mikrofón</string>
+    <string name="permissionSettingsMicrophoneDialogMessage">Ak vyberieš možnosť „Nikdy nepovoliť”, nebudeš môcť na stránkach používať funkcie, ako je hlasový čet.</string>
+    <string name="permissionSettingsDrmDialogTitle">Povoliť stránkam žiadať o povolenie na správu digitálnych práv (DRM)</string>
+    <string name="permissionSettingsDrmTitle" instruction="Name of a permission setting for playing protected video content">Správa digitálnych práv (DRM)</string>
+    <string name="permissionsPerWebsiteRedesignHeader" instruction="Placeholder is the name of a website">Povolenia pre %1$s</string>
+    <string name="permissionsPerWebsiteRemovePermissions" instruction="Button that removes all saved permissions for the website shown on the screen">Odstrániť povolenia</string>
+    <string name="permissionsRemovedForSiteSnackbar" instruction="Placeholder is the name of a website">Povolenia boli odstránené pre &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="permissionsRemovedForAllSitesSnackbar">Povolenia boli odstránené pre všetky lokality</string>
+    <string name="permissionSettingsDrmDialogMessage">Ak vyberieš „Nikdy nepovoliť“, videá na stránke sa nemusia dať prehrať.</string>
 
 </resources>

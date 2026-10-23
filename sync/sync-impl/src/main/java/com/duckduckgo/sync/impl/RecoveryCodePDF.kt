@@ -26,7 +26,7 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.databinding.ViewRecoveryCodePdfBinding
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.io.File
 import java.io.FileOutputStream
 import javax.inject.*

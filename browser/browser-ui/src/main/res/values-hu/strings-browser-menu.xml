@@ -58,4 +58,10 @@
     <string name="browserMenuForward">Előre</string>
     <string name="browserMenuRefresh">Frissítés</string>
     <string name="browserMenuFireTabsData">Lapok és adatok törlése</string>
+
+    <!-- Duck.ai tab + menu -->
+    <string name="chatMenuPopupNewVoiceChat">Új hangalapú beszélgetés</string>
+    <string name="chatMenuPopupNewImage">Új kép</string>
+    <string name="chatMenuPopupNewTab">Új lap</string>
+    <string name="chatMenuPopupNewFireTab">Új Fire-lap</string>
 </resources>

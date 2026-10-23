@@ -25,10 +25,12 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecor
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutFailed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutSubmitted
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanFailed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanSuccess
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepActionFailed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepInvalidEvent
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.Broker
@@ -226,6 +228,7 @@ class RealPirRunStateHandlerTest {
                     totalTimeMillis = testTotalTimeMillis,
                     isManualRun = true,
                     lastAction = BrokerAction.Navigate(id = "1234", url = "hello.com"),
+                    isFreeScan = false,
                 )
             whenever(mockRepository.getExtractedProfiles(any(), any())).thenReturn(emptyList())
             testee.handleState(state)
@@ -238,6 +241,7 @@ class RealPirRunStateHandlerTest {
                 parentUrl = "",
                 actionId = "1234",
                 actionType = "navigate",
+                isFreeScan = false,
             )
             verify(mockEventsRepository).saveBrokerScanLog(
                 PirBrokerScanLog(
@@ -268,6 +272,7 @@ class RealPirRunStateHandlerTest {
                     totalTimeMillis = testTotalTimeMillis,
                     isManualRun = true,
                     lastAction = BrokerAction.Navigate(id = "1234", url = "hello.com"),
+                    isFreeScan = false,
                 )
             whenever(mockRepository.getExtractedProfiles(any(), any())).thenReturn(
                 listOf(testExtractedProfile),
@@ -280,6 +285,7 @@ class RealPirRunStateHandlerTest {
                 inManualStarted = true,
                 parentUrl = "",
                 totalMatches = 1,
+                isFreeScan = false,
             )
             verify(mockEventsRepository).saveBrokerScanLog(
                 PirBrokerScanLog(
@@ -299,6 +305,87 @@ class RealPirRunStateHandlerTest {
         }
 
     @Test
+    fun whenHandleFreeScanActionStartedThenReportsScanStageAsFreeScan() =
+        runTest {
+            testee.handleState(
+                BrokerScanActionStarted(
+                    broker = testBroker,
+                    profileQueryId = testProfileQueryId,
+                    currentActionAttemptCount = 1,
+                    currentAction = BrokerAction.Navigate(id = "1234", url = "hello.com"),
+                    isFreeScan = true,
+                ),
+            )
+
+            verify(mockPixelSender).reportScanStage(
+                brokerUrl = testBroker.url,
+                brokerVersion = testBroker.version,
+                tries = 1,
+                parentUrl = "",
+                actionId = "1234",
+                actionType = "navigate",
+                isFreeScan = true,
+            )
+        }
+
+    @Test
+    fun whenHandleFreeScanCompletedWithNoMatchThenReportsNoMatchAsFreeScan() =
+        runTest {
+            whenever(mockRepository.getExtractedProfiles(any(), any())).thenReturn(emptyList())
+
+            testee.handleState(
+                BrokerScanSuccess(
+                    broker = testBroker,
+                    profileQueryId = testProfileQueryId,
+                    startTimeInMillis = testStartTimeInMillis,
+                    eventTimeInMillis = testEventTimeInMillis,
+                    totalTimeMillis = testTotalTimeMillis,
+                    isManualRun = true,
+                    lastAction = BrokerAction.Navigate(id = "1234", url = "hello.com"),
+                    isFreeScan = true,
+                ),
+            )
+
+            verify(mockPixelSender).reportScanNoMatch(
+                brokerUrl = testBroker.url,
+                brokerVersion = testBroker.version,
+                durationMs = testTotalTimeMillis,
+                inManualStarted = true,
+                parentUrl = "",
+                actionId = "1234",
+                actionType = "navigate",
+                isFreeScan = true,
+            )
+        }
+
+    @Test
+    fun whenHandleFreeScanActionFailedThenReportsActionFailureAsFreeScan() =
+        runTest {
+            testee.handleState(
+                BrokerStepActionFailed(
+                    broker = testBroker,
+                    extractedProfile = null,
+                    completionTimeInMillis = testEventTimeInMillis,
+                    stepType = "scan",
+                    actionType = "navigate",
+                    actionID = "1234",
+                    errorMessage = "boom",
+                    isFreeScan = true,
+                ),
+            )
+
+            verify(mockPixelSender).reportBrokerActionFailure(
+                brokerUrl = testBroker.url,
+                brokerVersion = testBroker.version,
+                parentUrl = "",
+                actionId = "1234",
+                errorMessage = "boom",
+                stepType = "scan",
+                isFreeScan = true,
+            )
+        }
+
+    @Test
     fun whenHandleBrokerManualScanCompletedWithFailureThenSavesErrorLogsAndReportsPixel() =
         runTest {
             val state =
@@ -312,6 +399,7 @@ class RealPirRunStateHandlerTest {
                     errorCategory = "network-error",
                     errorDetails = "Error details",
                     failedAction = BrokerAction.Navigate(id = "123243", url = "test.com"),
+                    isFreeScan = false,
                 )
 
             testee.handleState(state)
@@ -326,6 +414,7 @@ class RealPirRunStateHandlerTest {
                 parentUrl = "",
                 actionId = "123243",
                 actionType = "navigate",
+                isFreeScan = false,
             )
             verify(mockEventsRepository).saveBrokerScanLog(
                 PirBrokerScanLog(

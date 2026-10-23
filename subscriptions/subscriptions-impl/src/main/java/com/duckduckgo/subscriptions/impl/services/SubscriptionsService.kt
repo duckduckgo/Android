@@ -16,7 +16,7 @@
 
 package com.duckduckgo.subscriptions.impl.services
 
-import com.duckduckgo.anvil.annotations.ContributesNonCachingServiceApi
+import com.duckduckgo.codegen.annotations.ContributesNonCachingServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.auth.AuthRequired
 import retrofit2.http.Body

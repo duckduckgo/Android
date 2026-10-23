@@ -23,10 +23,12 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.pixel.InputOutcomeTracker
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionPayloadBuilder
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import kotlinx.coroutines.test.runTest
 import org.json.JSONArray
 import org.json.JSONObject
@@ -51,13 +53,17 @@ class DuckChatContextualEntryViewModelTest {
     private val store: ContextualEntryPromptStore = mock()
     private val duckChatPixels: DuckChatPixels = mock()
     private val modelManager: DuckAiModelManager = mock()
-    private val textSelectionRepository = RealTextSelectionRepository()
+    private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
+    private val inputOutcomeTracker: InputOutcomeTracker = mock()
+    private val textSelectionRepository = RealTextSelectionRepository(lazy { duckChatPixels }, selectionJourney)
     private val viewModel = DuckChatContextualEntryViewModel(
         store,
         duckChatPixels,
         modelManager,
         textSelectionRepository,
         RealTextSelectionPayloadBuilder(RuntimeEnvironment.getApplication(), object : DuckAiHostProvider {}),
+        selectionJourney,
+        inputOutcomeTracker,
     )
 
     private val validContext = """{"title":"Example","url":"https://example.com","content":"some page content"}"""
@@ -122,6 +128,48 @@ class DuckChatContextualEntryViewModelTest {
         val captor = argumentCaptor<ContextualEntryPrompt>()
         verify(store).store(captor.capture())
         assertEquals(validContext, captor.firstValue.serializedPageContext)
+    }
+
+    @Test
+    fun whenSuggestionSubmittedThenTermsConsentIsNotCarried() = runTest {
+        viewModel.start("tab-1")
+
+        viewModel.commands.test {
+            viewModel.onSuggestionSubmitted(samplePrompt)
+            assertEquals(DuckChatContextualEntryViewModel.Command.HandOffToSheet, awaitItem())
+        }
+
+        val captor = argumentCaptor<ContextualEntryPrompt>()
+        verify(store).store(captor.capture())
+        assertFalse(captor.firstValue.carriesTermsConsent)
+    }
+
+    @Test
+    fun whenSummarizeSubmittedThenTermsConsentIsNotCarried() = runTest {
+        viewModel.start("tab-1")
+
+        viewModel.commands.test {
+            viewModel.onSummarizeSubmitted(samplePrompt)
+            assertEquals(DuckChatContextualEntryViewModel.Command.HandOffToSheet, awaitItem())
+        }
+
+        val captor = argumentCaptor<ContextualEntryPrompt>()
+        verify(store).store(captor.capture())
+        assertFalse(captor.firstValue.carriesTermsConsent)
+    }
+
+    @Test
+    fun whenPromptTypedThenTermsConsentIsCarried() = runTest {
+        viewModel.start("tab-1")
+
+        viewModel.commands.test {
+            viewModel.onPromptSubmitted(samplePrompt)
+            assertEquals(DuckChatContextualEntryViewModel.Command.HandOffToSheet, awaitItem())
+        }
+
+        val captor = argumentCaptor<ContextualEntryPrompt>()
+        verify(store).store(captor.capture())
+        assertTrue(captor.firstValue.carriesTermsConsent)
     }
 
     @Test
@@ -271,6 +319,15 @@ class DuckChatContextualEntryViewModelTest {
     }
 
     @Test
+    fun whenDismissedThenReportsSurfaceDismissedToSelectionJourney() {
+        viewModel.start("tab-1")
+
+        viewModel.onDismiss()
+
+        verify(selectionJourney).onSurfaceDismissed("tab-1")
+    }
+
+    @Test
     fun whenContextManuallyAttachedThenReportsManualAttachPixel() {
         viewModel.onPageContextReceived(validContext)
         viewModel.onContextRemoved()
@@ -342,6 +399,8 @@ class DuckChatContextualEntryViewModelTest {
         assertEquals(15, first.getInt("fullContentLength"))
         assertFalse(first.getBoolean("truncated"))
         assertTrue(textSelectionRepository.selections("tab-1").value.isEmpty())
+        verify(duckChatPixels).reportContextualPromptSubmittedWithSelections(2)
+        verify(selectionJourney).onPromptSubmitted("tab-1")
     }
 
     @Test
@@ -358,6 +417,8 @@ class DuckChatContextualEntryViewModelTest {
         verify(store).store(captor.capture())
         assertNull(captor.firstValue.selectionsJson)
         assertEquals(validContext, captor.firstValue.serializedPageContext)
+        verify(duckChatPixels, never()).reportContextualPromptSubmittedWithSelections(any())
+        verify(selectionJourney, never()).onPromptSubmitted(any())
     }
 
     @Test
@@ -429,6 +490,59 @@ class DuckChatContextualEntryViewModelTest {
     }
 
     @Test
+    fun whenFirstSelectionAttachedThenJourneyRecordsIt() {
+        textSelectionRepository.add("tab-1", "selected words", "https://example.com")
+
+        verify(selectionJourney).onSelectionAttached("tab-1", 1)
+    }
+
+    @Test
+    fun whenLastSelectionRemovedThenJourneyRecordsEmptyState() {
+        textSelectionRepository.add("tab-1", "selected words", "https://example.com")
+        val target = textSelectionRepository.selections("tab-1").value.first()
+
+        textSelectionRepository.remove("tab-1", target.id)
+
+        verify(selectionJourney).onSelectionRemoved("tab-1", 0)
+    }
+
+    @Test
+    fun whenSelectionAttachedThenPixelSent() {
+        textSelectionRepository.add("tab-1", "selected words", "https://example.com")
+
+        verify(duckChatPixels).reportContextualSelectionAttached()
+        verify(duckChatPixels, never()).reportContextualSelectionLimitReached()
+    }
+
+    @Test
+    fun whenSameSelectionAttachedTwiceThenOnlyOneAttachedPixelSent() {
+        textSelectionRepository.add("tab-1", "selected words", "https://example.com")
+        textSelectionRepository.add("tab-1", "selected words", "https://example.com")
+
+        verify(duckChatPixels).reportContextualSelectionAttached()
+        verify(duckChatPixels, never()).reportContextualSelectionLimitReached()
+    }
+
+    @Test
+    fun whenSelectionRefusedAtLimitThenLimitReachedPixelSent() {
+        repeat(TextSelectionRepository.MAX_SELECTIONS) { textSelectionRepository.add("tab-1", "selection $it", "https://example.com") }
+
+        textSelectionRepository.add("tab-1", "one too many", "https://example.com")
+
+        verify(duckChatPixels).reportContextualSelectionLimitReached()
+    }
+
+    @Test
+    fun whenSelectionRemovedThenPixelSent() {
+        textSelectionRepository.add("tab-1", "selected words", "https://example.com")
+        val target = textSelectionRepository.selections("tab-1").value.first()
+
+        textSelectionRepository.remove("tab-1", target.id)
+
+        verify(duckChatPixels).reportContextualSelectionRemoved()
+    }
+
+    @Test
     fun whenSelectionsExceedMaxThenExtrasDropped() {
         repeat(
             TextSelectionRepository.MAX_SELECTIONS + 2,
@@ -446,5 +560,23 @@ class DuckChatContextualEntryViewModelTest {
         textSelectionRepository.remove("tab-1", target.id)
 
         assertEquals(listOf("keep me"), textSelectionRepository.consume("tab-1").map { it.text })
+    }
+
+    @Test
+    fun whenSuggestionSubmittedThenReportsSuggestedPromptOutcome() = runTest {
+        viewModel.start("tab-1")
+
+        viewModel.onSuggestionSubmitted(samplePrompt)
+
+        verify(inputOutcomeTracker).suggestedPrompt()
+    }
+
+    @Test
+    fun whenSummarizeSubmittedThenReportsSuggestedPromptOutcome() = runTest {
+        viewModel.start("tab-1")
+
+        viewModel.onSummarizeSubmitted(samplePrompt)
+
+        verify(inputOutcomeTracker).suggestedPrompt()
     }
 }

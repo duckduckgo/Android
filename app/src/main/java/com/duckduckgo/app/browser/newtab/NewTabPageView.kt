@@ -33,12 +33,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.HomeBackgroundLogo
 import com.duckduckgo.app.browser.databinding.ViewNewTabBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.DismissMessage
+import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchAddWidget
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchAppTPOnboarding
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchDefaultBrowser
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchDefaultCredentialProvider
@@ -53,8 +53,10 @@ import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -63,8 +65,8 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
@@ -72,11 +74,12 @@ import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreen
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.duckduckgo.newtabpage.api.interactions.HatchInteractionsPlugin
+import com.duckduckgo.nextsteps.api.NextSteps
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.SharePromoLinkIntentFactory
-import dagger.android.support.AndroidSupportInjection
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -116,10 +119,10 @@ class NewTabPageView @JvmOverloads constructor(
     lateinit var appBuildConfig: AppBuildConfig
 
     @Inject
-    lateinit var androidBrowserConfig: AndroidBrowserConfigFeature
+    lateinit var addWidgetLauncher: AddWidgetLauncher
 
     @Inject
-    lateinit var duckChat: DuckChat
+    lateinit var androidBrowserConfig: AndroidBrowserConfigFeature
 
     @Inject
     lateinit var inputModeState: DuckChatInputModeState
@@ -132,6 +135,9 @@ class NewTabPageView @JvmOverloads constructor(
 
     @Inject
     lateinit var ntpEngagementTracker: NtpEngagementTracker
+
+    @Inject
+    lateinit var nextSteps: NextSteps
 
     private val binding: ViewNewTabBinding by viewBinding()
 
@@ -152,6 +158,7 @@ class NewTabPageView @JvmOverloads constructor(
 
     private var lastSelectedMode: InputMode? = null
     private var logoAnimator: ValueAnimator? = null
+    private var nextStepsSectionJob: Job? = null
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         if (ev.actionMasked == MotionEvent.ACTION_DOWN && ntpEngagementTracker.shouldReportEngagement()) {
@@ -176,14 +183,9 @@ class NewTabPageView @JvmOverloads constructor(
             .onEach { processCommands(it) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
-        conflatedNativeInputJob += combine(
-            duckChat.observeNativeInputFieldUserSettingEnabled(),
-            inputModeState.inputModeCapability,
-        ) { enabled, capability ->
-            // Search-only still has the native-input field setting on, but the browser uses the
-            // legacy omnibar — drop the UTI chrome margin so the logo isn't left too low.
-            enabled && capability != NativeInputState.InputMode.SEARCH_ONLY
-        }
+        // Search-only drops the UTI chrome margin so the logo isn't left too low.
+        conflatedNativeInputJob += inputModeState.inputModeCapability
+            .map { capability -> capability != NativeInputState.InputMode.SEARCH_ONLY }
             .onEach { updateLogoMargin(it) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
@@ -202,6 +204,8 @@ class NewTabPageView @JvmOverloads constructor(
         conflatedCommandJob.cancel()
         conflatedNativeInputJob.cancel()
         conflatedChatModeJob.cancel()
+        nextStepsSectionJob?.cancel()
+        nextStepsSectionJob = null
         logoAnimator?.cancel()
         logoAnimator = null
         lastSelectedMode = null
@@ -255,6 +259,30 @@ class NewTabPageView @JvmOverloads constructor(
         }
     }
 
+    private fun showNextStepsSection() {
+        if (binding.nextStepsContainer.childCount == 0) {
+            inflateNextStepsSection()
+        } else {
+            binding.nextStepsContainer.show()
+        }
+    }
+
+    private fun hideNextStepsSection() {
+        nextStepsSectionJob?.cancel()
+        nextStepsSectionJob = null
+        binding.nextStepsContainer.removeAllViews()
+        binding.nextStepsContainer.gone()
+    }
+
+    private fun inflateNextStepsSection() {
+        if (nextStepsSectionJob?.isActive == true) return
+        nextStepsSectionJob = findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+            val section = nextSteps.provideSectionView(context) ?: return@launch
+            binding.nextStepsContainer.addView(section)
+            binding.nextStepsContainer.show()
+        }
+    }
+
     private fun updateLogoMargin(nativeInputEnabled: Boolean) {
         val baseMargin = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.homeTabDdgLogoTopMargin)
         val extraMargin = if (nativeInputEnabled) 48.toPx() else 0
@@ -275,6 +303,7 @@ class NewTabPageView @JvmOverloads constructor(
             binding.appTrackingProtectionStateView.gone()
             binding.ddgLogo.gone()
             binding.messageCta.gone()
+            hideNextStepsSection()
             binding.focusedFavourites.gone()
             return
         }
@@ -287,9 +316,14 @@ class NewTabPageView @JvmOverloads constructor(
         } else {
             homeBackgroundLogo.hideLogo()
         }
-        if (viewState.message != null && viewState.onboardingComplete) {
+        if (viewState.showNextSteps) {
+            binding.messageCta.gone()
+            showNextStepsSection()
+        } else if (viewState.message != null && viewState.onboardingComplete) {
+            hideNextStepsSection()
             showRemoteMessage(viewState.message, viewState.messageImageFilePath, viewState.newMessage)
         } else {
+            hideNextStepsSection()
             binding.messageCta.gone()
             if (viewState.lowPriorityMessage != null) {
                 showLowPriorityMessage(viewState.lowPriorityMessage)
@@ -313,6 +347,7 @@ class NewTabPageView @JvmOverloads constructor(
             is SharePromoLinkRMF -> launchSharePromoRMFPageChooser(command.url, command.shareTitle)
             is SubmitUrl -> submitUrl(command.url)
             is LaunchDefaultCredentialProvider -> launchDefaultCredentialProvider()
+            is LaunchAddWidget -> addWidgetLauncher.launchAddWidget(context, command.widgetType)
         }
     }
 

@@ -32,11 +32,11 @@ import com.duckduckgo.app.cta.model.CtaId.DAX_INTRO_PRIVACY_PRO
 import com.duckduckgo.app.cta.model.CtaId.DAX_INTRO_VISIT_SITE
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.onboarding.FakeContextualOnboardingTimeLimit
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -51,7 +51,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
@@ -102,7 +101,6 @@ class OnboardingDaxDialogTests {
     private val mockSubscriptions: Subscriptions = mock()
     private val mockDuckChat: DuckChat = mock()
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
-    private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockAppTheme: AppTheme = org.mockito.kotlin.mock { on { isLightModeEnabled() } doReturn true }
     private val mockDeviceInfo: DeviceInfo = mock()
 
@@ -123,8 +121,6 @@ class OnboardingDaxDialogTests {
         whenever(extendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
         whenever(extendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers()).thenReturn(mockDisabledToggle)
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
-        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockDisabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
 
         testee = CtaViewModel(
             appInstallStore,
@@ -155,15 +151,14 @@ class OnboardingDaxDialogTests {
                 override fun getPlugins() = emptyList<SubscriptionPromoCtaShownPlugin>()
             },
             contextualCtaSuppressorPlugins,
-            mockOnboardingBrandDesignUpdateToggles,
             mockAppTheme,
             mockDeviceInfo,
             coroutineRule.testScope,
             mock(LinearOnboardingOrchestrator::class.java).apply {
                 whenever(state).thenReturn(MutableStateFlow(LinearOnboardingState.NotStarted))
             },
-            mock(DuckAiFeatureState::class.java).also { whenever(it.showInputScreen).thenReturn(MutableStateFlow(true)) },
             mock(),
+            FakeContextualOnboardingTimeLimit(),
         )
     }
 
@@ -390,7 +385,7 @@ class OnboardingDaxDialogTests {
             brokenSitePromptUrl = null,
         )
 
-        assertTrue(result is OnboardingDaxDialogCta.DaxMainNetworkCta)
+        assertTrue(result is DaxMainNetworkContextualCta)
     }
 
     private fun site(

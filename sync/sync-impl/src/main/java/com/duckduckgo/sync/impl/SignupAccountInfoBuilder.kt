@@ -26,7 +26,7 @@ import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel.AccountInfoKeyCrea
 import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel.DeviceInfoWriteFailureReason
 import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel.OwnRowDeviceInfoFirstWriteFailed
 import com.duckduckgo.sync.store.AccountInfoPublicKey
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.ERROR
 import logcat.logcat
 import javax.inject.Inject

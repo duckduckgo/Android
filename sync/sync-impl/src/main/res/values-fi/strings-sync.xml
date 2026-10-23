@@ -306,6 +306,7 @@
     <string name="sync_simplified_settings_download_recovery_code_item_hint">Käytä koodia tietojesi palauttamiseen, jos menetät pääsyn tähän laitteeseen – pidä se turvassa.</string>
     <string name="sync_simplified_settings_data_expiration_notice">Sync &amp; Backup -tietoja ei voida palauttaa 18 kuukauden käyttämättömyyden jälkeen. <annotation type="learn_more_link">Lue lisää</annotation></string>
     <string name="sync_simplified_settings_delete_account_item">Poista palvelin käytöstä ja poista sen tiedot</string>
+    <string name="sync_simplified_settings_turn_off_item">Poista Sync &amp; Backup käytöstä</string>
     <string name="sync_simplified_settings_storage_permission_message">Palautus-PDF:n tallentaminen edellyttää tallennustilan käyttöoikeutta.</string>
     <string name="sync_simplified_settings_learn_more_screen_title">Sync &amp; Backup</string>
 
@@ -320,6 +321,26 @@
     <string name="sync_simplified_settings_delete_server_data_dialog_body">Kaikki Sync &amp; Backup -toimintoa käyttävien laitteiden yhteys katkaistaan ja synkronoidut tietosi poistetaan palvelimelta.</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Poista palvelintiedot</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">Peruuta</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_title_v2">Tätä toimintoa ei voi kumota.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body_v2">Kaikki Sync &amp; Backup -toimintoa käyttävien laitteiden yhteys katkaistaan ja synkronoidut tietosi poistetaan palvelimelta.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button_v2">Poista pysyvästi</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button_v2">Peruuta</string>
+
+    <!-- Sync settings screen: turn off sheet -->
+    <string name="sync_simplified_settings_turn_off_sheet_remove_title" instruction="Placeholder is a device name. e.g., Samsung S23">Poistetaanko %1$s Sync &amp; Backupista?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_body" instruction="Placeholder is a device name. e.g., Samsung S23">”%1$s” ei enää voi käyttää muilla laitteilla olevia synkronoituja tietojasi.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item">Poistetaanko myös palvelimen tiedot?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Poista Sync &amp; Backup käytöstä ja poista kaikki synkronoidut tiedot palvelimelta ja poista palautuskoodisi käytöstä.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Poista laite</string>
+    <string name="sync_simplified_settings_turn_off_sheet_title">Poistetaanko Sync &amp; Backup käytöstä?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_body">Kaikki Sync &amp; Backup -toimintoa käyttävien laitteiden yhteys katkaistaan ja synkronoidut tietosi poistetaan palvelimelta.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Poista palvelin käytöstä ja poista sen tiedot</string>
+
+    <!-- Sync settings screen: turn off this device dialog -->
+    <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">Poistetaanko %1$s Sync &amp; Backupista?</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” ei enää pääse käsiksi synkronoituihin tietoihisi. Kirjanmerkit, automaattisen täytön tiedot ja Duck.ai-keskustelut pysyvät laitteillasi.</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_primary_button">Poista</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_secondary_button">Peruuta</string>
 
     <!-- Sync settings screen: require device passcode dialog -->
     <string name="sync_simplified_settings_require_passcode_dialog_title">Ota laitteen suojaus käyttöön, jotta voit käyttää Sync &amp; Backup -toimintoa</string>
@@ -329,6 +350,8 @@
     <!-- Sync This Device screen -->
     <string name="sync_simplified_setup_header_headline">Synkronoi tämä laite lähellä olevan tietokoneen kanssa.</string>
     <string name="sync_simplified_setup_header_body">Autamme sinua synkronoimaan laitteesi.</string>
+    <string name="sync_simplified_setup_header_headline_v2">Onko sinulla toinen laite lähellä? Synkronoi laitteesi.</string>
+    <string name="sync_simplified_setup_header_body_v2">Eikö sinulla ole toista laitetta juuri nyt? Synkronoi vain tämä laite ja synkronoi toisen laitteen kanssa myöhemmin.</string>
     <string name="sync_simplified_setup_primary_button">Synkronoi toisen laitteen kanssa</string>
     <string name="sync_simplified_setup_secondary_button">Synkronoi vain tämä laite</string>
     <string name="sync_simplified_setup_secondary_button_syncing">Yhdistetään…</string>
@@ -353,10 +376,14 @@
     <string name="sync_simplified_scanner_camera_header_headline">Skannaa QR-koodi synkronointia varten</string>
     <string name="sync_simplified_scanner_camera_header_body">Avaa <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo-työpöytäsovellus</annotation></b>\n<annotation type="gap">\n</annotation>ja siirry kohtaan <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synkronoi toisen laitteen kanssa</annotation></string>
     <string name="sync_simplified_scanner_camera_primary_button">Olen valmis skannaamaan</string>
+    <string name="sync_simplified_scanner_camera_primary_button_v2">Selvä</string>
     <string name="sync_simplified_scanner_camera_invalid_code_message">Tämä skannattu koodi ei kelpaa.</string>
     <string name="sync_simplified_scanner_no_permission_headline">Kameran käyttölupa tarvitaan</string>
     <string name="sync_simplified_scanner_no_permission_body">Siirry laitteesi asetuksiin ja anna tälle sovellukselle kameran käyttölupa.</string>
     <string name="sync_simplified_scanner_no_permission_primary_button">Siirry asetuksiin</string>
+    <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo tarvitsee kamerasi käyttöoikeuden.</string>
+    <string name="sync_simplified_scanner_no_permission_body_v2">QR-koodin skannaamiseen tarvitaan kameran käyttöoikeudet.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button_v2">Muuta käyttöoikeuksia</string>
     <string name="sync_simplified_scanner_no_hardware_headline">Kamera ei ole käytettävissä</string>
 
     <!-- Scanner screen: manual entry tab -->
@@ -376,7 +403,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Sync &amp; Backup on päästä päähän salattu kaikilla laitteillasi.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Tarkista toinen laitteesi</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Tarkista toinen laitteesi.</string>
     <string name="sync_simplified_pairing_headline_recovery">Palautetaan tietoja</string>
     <string name="sync_simplified_pairing_body">Yhdistetään…</string>
 
@@ -411,6 +438,8 @@
     <string name="sync_simplified_edit_device_sync_this_device_item">Synkronoi tämä laite</string>
     <string name="sync_simplified_edit_device_remove_notice_this_device">Tämä laite ei enää voi käyttää synkronoituja tietojasi, jos poistat sen.</string>
     <string name="sync_simplified_edit_device_remove_notice_another_device">Tämä laite ei enää voi käyttää synkronoituja tietojasi, jos tämä ominaisuus on poistettu käytöstä.</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">”%1$s” ei enää voi käyttää muilla laitteilla olevia synkronoituja tietojasi, jos tämä poistetaan käytöstä.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">”%1$s” ei enää voi käyttää muilla laitteilla olevia synkronoituja tietojasi.</string>
 
     <!-- Edit Device screen: edit name dialog -->
     <string name="sync_simplified_edit_device_edit_name_dialog_title">Muokkaa nimeä</string>
@@ -422,6 +451,8 @@
     <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">”%1$s” ei enää voi käyttää synkronoituja tietojasi.</string>
     <string name="sync_simplified_edit_device_remove_dialog_primary_button">Poista</string>
     <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Peruuta</string>
+    <string name="sync_simplified_edit_device_remove_dialog_title_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Poistetaanko %1$s Sync &amp; Backupista?</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body_v2" instruction="Placeholder is a device name. e.g., Samsung S23">“%1$s” ei enää pääse käsiksi synkronoituihin tietoihisi. Kirjanmerkit, automaattisen täytön tiedot ja Duck.ai-keskustelut pysyvät laitteillasi.</string>
 
     <!-- Edit Device screen: turn off sync dialog -->
     <string name="sync_simplified_edit_device_turn_off_dialog_title">Poistetaanko Sync &amp; Backup käytöstä?</string>

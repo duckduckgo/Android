@@ -16,14 +16,13 @@
 
 package com.duckduckgo.common.ui.store
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 /**
- * App-wide, theme-related design changes feature flag, excluding onboarding which is gated via
- * `OnboardingBrandDesignUpdateToggles`.
+ * App-wide, theme-related design changes feature flag.
  */
 @ContributesRemoteFeature(
     scope = AppScope::class,
@@ -46,6 +45,10 @@ interface AppBrandDesignUpdateToggles {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun theme(): Toggle
+
+    /** Gates the radius changes separately so the rest of the brand design update can roll out independently. */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun radius(): Toggle
 
     /**
      * Gates the address bar radius, Lotties: shield, cookies, ad-blocking and Duck Player

@@ -26,4 +26,14 @@
         android:src="@drawable/ic_arrow_right_24"
         app:tint="?attr/daxColorButtonPrimaryText" />
 
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+        android:id="@+id/nativeInputAskButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:maxLines="1"
+        android:text="@string/duckChatSubmitAskLabel"
+        android:visibility="gone"
+        app:daxButtonSize="small" />
+
 </merge>

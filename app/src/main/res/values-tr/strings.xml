@@ -63,8 +63,8 @@
     <string name="undoSnackbarAction">Geri al</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">İzleyici Engellendi</item>
-        <item quantity="other">İzleyici Engellendi</item>
+        <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">İzleyici Engellendi</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">İzleyici Engellendi</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -223,7 +223,7 @@
     <string name="dataClearingDescription">Kişisel verilerinizi silmek, çevrimiçi gizliliğinizi korumanıza yardımcı olabilir. Verileri manuel olarak silmek için Fire Button\'ı kullanın veya otomatik silmeyi ayarlayın.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d site temizleme işleminden hariç tutuldu.</item>
-        <item quantity="other">%1$d site temizleme işleminden hariç tutuldu.</item>
+        <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d site temizleme işleminden hariç tutuldu.</item>
     </plurals>
     <string name="dataClearingAutomaticClearingOn">Açık</string>
     <string name="dataClearingAutomaticClearingOff">Kapalı</string>
@@ -250,14 +250,15 @@
     <string name="singleTabFireDialogSubtitleSiteData">Site verilerini silmek, hesaplarınızdan çıkış yapmanıza neden olabilir.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Bu işlem devam eden indirmeleri iptal edecektir.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">%1$d sekme ve verileri silindi</item>
-        <item quantity="other">%1$d sekme ve verileri silindi</item>
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">%1$d sekme ve verileri silindi</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">%1$d sekme ve verileri silindi</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Site verileri silinemedi. Lütfen WebView\'yu güncelleyin.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Bir hata nedeniyle site verileri silinemedi.</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">İzinler</string>
+    <string name="permissionsGeneralPermissionsTitle" instruction="Section header on the Permissions settings screen, above the Notifications and Open Links in Apps settings">Genel İzinler</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Görünüm</string>
@@ -327,11 +328,6 @@
     <string name="surveyLoadingErrorText">Anketimiz şu anda yüklenemiyor.\nLütfen daha sonra tekrar deneyin.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Arama Widget\'ımızı deneyin!</string>
-    <string name="addWidgetCtaDescription">Hızlı ve kolay erişim için arama widget\'ımızı ana ekranınıza ekleyin.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Widget Ekle</string>
-    <string name="addWidgetCtaInstructionsLaunchButton">Göster</string>
-    <string name="addWidgetCtaDismissButton">Reddet</string>
     <string name="addWidgetInstructionsActivityTitle">Widget ekle</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Ana ekranınıza uzun basıp widget\'lar menüsünü açın.</string>
@@ -714,10 +710,6 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Cihazınızın işletim sistemi, %1$s güvenlik sertifikasına güvenmiyor. Web sitesi yanlış yapılandırılmış, bir saldırgan bağlantınızı tehlikeye atmış veya sistem saatiniz yanlış ayarlanmış olabilir.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Merhaba.<br/><br/>Sizi koruyan daha hızlı bir tarayıcıya hazır mısınız?]]></string>
-    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Hadi başlayalım!</string>
-    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1ButtonBrandDesign">Başlayalım!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Daha önce buradaydım</string>
     <string name="preOnboardingDaxDialog2Title">Korumalar etkinleştirildi!</string>
@@ -745,8 +737,6 @@
     <string name="highlightsPreOnboardingAddressBarOption2Description">Ulaşması kolay</string>
     <string name="onboardingSearchDaxDialogTitle">Bir şeyler arayın!</string>
     <string name="onboardingSearchDaxDialogDescription">DuckDuckGo aramalarınız her zaman gizlidir.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"ingilizcede ördek nasıl denir"</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"ispanyolcada ördek nasıl denir"</string>
     <string name="onboardingSearchQueryOption1">ingilizcede ördek nasıl denir</string>
     <string name="onboardingSearchQueryOption1English">ispanyolcada ördek nasıl denir</string>
     <string name="onboardingSearchDaxDialogOption2">avatar oyuncu kadrosu</string>
@@ -766,12 +756,12 @@
     <string name="onboardingSerpDaxDialogButton">Anladım!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Sonra, bir siteyi ziyaret etmeyi deneyin!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
-        <item quantity="one"><![CDATA[ ve <b>%1$d site daha</b> sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
-        <item quantity="other"><![CDATA[ ve <b>%1$d site daha</b> sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[ ve <b>%1$d site daha</b> sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[ ve <b>%1$d site daha</b> sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
-        <item quantity="other"><![CDATA[ sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[ sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[ sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Anladım!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[<b>Fire Button</b> ile göz atma etkinliğinizi anında temizleyin.<br/><br/>Hemen deneyin!️ 🔥]]></string>
@@ -824,8 +814,8 @@
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Uygulama Başlatıldığında Göster</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab">Son Açılan Sekme</string>
-    <string name="showOnAppLaunchOptionNewTabPage">Yeni Sekme Sayfası</string>
+    <string name="showOnAppLaunchOptionLastUsedTab">Son Kullanılan Sekme</string>
+    <string name="showOnAppLaunchOptionOpenNewTab">Yeni Sekme Sayfası</string>
     <string name="showOnAppLaunchOptionSpecificPage">Belirli Bir Sayfa</string>
 
     <!-- Privacy Dashboard -->
@@ -867,9 +857,7 @@
     <!-- Experiment: Improve prompts for "homescreen widget" -->
     <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Ana ekran widget\'ımızı deneyin!</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Hızlı ve kolay erişim için arama widget\'ımızı ana ekranınıza ekleyin.</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Widget Ekle</string>
     <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Şimdi Değil</string>
-    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">DuckDuckGo\'da Ara</string>
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Ana Ekran Widget\'ı</string>
@@ -977,9 +965,6 @@
     <string name="preOnboardingImportErrorRetry">Tekrar dene</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Beni favoriler satırına ekle.</string>
-    <string name="preOnboardingAddToDockBody">Ana Ekranınızda DuckDuckGo simgesini bulun. Daha sonra simgeye basıp sürükleyerek yerine sabitleyin. Hepsi bu kadar!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Anladım!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Duck.ai ile gizli bir yapay zekâ sohbeti başlatın veya korumalı gezinme için Arama moduna geçin.<br/><br/>Sohbet simgesini gördüğünüz her yerden Duck.ai kullanabilirsiniz]]></string>
@@ -1020,4 +1005,5 @@
     <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Belirtilen ana bilgisayar adına sahip sunucu bulunamadı.</string>
     <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Bu sunucunun sertifikası geçersiz. <b>%1$s</b> gibi görünen ve gizli bilgilerinizi riske atabilecek bir sunucuya bağlanıyor olabilirsiniz.]]></string>
     <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address."><annotation type="redirect_link">^1</annotation> demek istemiş olabilir misiniz?</string>
+    <string name="webViewErrorTimeout" instruction="Message shown when a website is taking too long to load">Bu sayfanın yüklenmesi çok uzun sürüyor.</string>
 </resources>

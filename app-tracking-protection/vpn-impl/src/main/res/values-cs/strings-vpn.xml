@@ -46,10 +46,10 @@
     <string name="atp_OnInitialNotification">"App Tracking Protection je zapnutá a blokuje pokusy aplikací o sledování"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Vyhledávání sledování… pípnutí… pípnutí"</string>
     <plurals name="atp_OnNotification">
-        <item quantity="one"><![CDATA[ Zablokované pokusy o sledování <b>v %1$d aplikaci</b> (za poslední hodinu).]]></item>
+        <item quantity="one" instruction="Placeholder is a number"><![CDATA[ Zablokované pokusy o sledování <b>v %1$d aplikaci</b> (za poslední hodinu).]]></item>
         <item quantity="few"><![CDATA[ Zablokované pokusy o sledování <b>ve %1$d aplikacích</b> (za poslední hodinu).]]></item>
         <item quantity="many"><![CDATA[ Zablokované pokusy o sledování <b>v %1$d aplikacích</b> (za poslední hodinu).]]></item>
-        <item quantity="other"><![CDATA[ Zablokované pokusy o sledování <b>v %1$d aplikacích</b> (za poslední hodinu).]]></item>
+        <item quantity="other" instruction="Placeholder is a number"><![CDATA[ Zablokované pokusy o sledování <b>v %1$d aplikacích</b> (za poslední hodinu).]]></item>
     </plurals>
     <string name="atp_DisabledNotification">App Tracking Protection vypnutá. Klepnutím budeš pokračovat v blokování pokusů o sledování.</string>
     <string name="atp_RevokedNotification">VPN aplikace ve tvém zařízení vypnula App Tracking Protection. Klepnutím na položku ji znovu zapneš.</string>
@@ -61,17 +61,17 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ Počet <b>pokusů o sledování zablokovaných pomocí App Tracking Protection: %1$d, v počtu aplikací: %2$d, včetně %3$s</b> (za poslední den).]]></string>
 
     <plurals name="atp_DailyTopCompanyNotification">
-        <item quantity="one"><![CDATA[%1$s se tě pokusil sledovat <b>v %2$d aplikaci</b> (za poslední den). <b>Další informace</b>]]></item>
+        <item quantity="one" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[%1$s se tě pokusil sledovat <b>v %2$d aplikaci</b> (za poslední den). <b>Další informace</b>]]></item>
         <item quantity="few"><![CDATA[%1$s se tě pokusil sledovat <b>ve %2$d aplikacích</b> (za poslední den). <b>Další informace</b>]]></item>
         <item quantity="many"><![CDATA[%1$s se tě pokusil sledovat <b>v %2$d aplikacích</b> (za poslední den). <b>Další informace</b>]]></item>
-        <item quantity="other"><![CDATA[%1$s se tě pokusil sledovat <b>v %2$d aplikacích</b> (za poslední den). <b>Další informace</b>]]></item>
+        <item quantity="other" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[%1$s se tě pokusil sledovat <b>v %2$d aplikacích</b> (za poslední den). <b>Další informace</b>]]></item>
     </plurals>
 
     <plurals name="atp_DailyCompanyBlockedNotification">
-        <item quantity="one"><![CDATA[Funkce App Tracking Protection zablokovala nejvíce pokusů o sledování za <b>%1$s</b> (předchozí den).]]></item>
+        <item quantity="one" instruction="Placeholder is the name of an app"><![CDATA[Funkce App Tracking Protection zablokovala nejvíce pokusů o sledování za <b>%1$s</b> (předchozí den).]]></item>
         <item quantity="few"><![CDATA[Funkce App Tracking Protection zablokovala nejvíce pokusů o sledování za <b>%1$s</b> a <b>%2$s</b> (předchozí den).]]></item>
         <item quantity="many"><![CDATA[Funkce App Tracking Protection zablokovala nejvíce pokusů o sledování za <b>%1$s</b> a <b>%2$s</b> (předchozí den).]]></item>
-        <item quantity="other"><![CDATA[Funkce App Tracking Protection zablokovala nejvíce pokusů o sledování za <b>%1$s</b> a <b>%2$s</b> (předchozí den).]]></item>
+        <item quantity="other" instruction="Both placeholders are the name of an app"><![CDATA[Funkce App Tracking Protection zablokovala nejvíce pokusů o sledování za <b>%1$s</b> a <b>%2$s</b> (předchozí den).]]></item>
     </plurals>
 
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[App Tracking Protection <b> zablokovala %1$s %2$d krát v %3$s</b> (minulý den).]]></string>
@@ -91,10 +91,10 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokusů o sledování v %2$s</b> a %3$d dalších aplikacích (za poslední týden).]]></string>
 
     <plurals name="atp_WeeklyCompanyTeaserNotification">
-        <item quantity="one"><![CDATA[App Tracking Protection zablokovala <b>%1$s v %2$d aplikaci, %3$s</b> (za minulý týden).]]></item>
+        <item quantity="one" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[App Tracking Protection zablokovala <b>%1$s v %2$d aplikaci, %3$s</b> (za minulý týden).]]></item>
         <item quantity="few"><![CDATA[App Tracking Protection zablokovala <b>%1$s v %2$d aplikacích, včetně %3$s</b> (za minulý týden).]]></item>
         <item quantity="many"><![CDATA[App Tracking Protection zablokovala <b>%1$s v %2$d aplikacích, včetně %3$s</b> (za minulý týden).]]></item>
-        <item quantity="other"><![CDATA[App Tracking Protection zablokovala <b>%1$s v %2$d aplikacích, včetně %3$s</b> (za minulý týden).]]></item>
+        <item quantity="other" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of one of the apps where it happened"><![CDATA[App Tracking Protection zablokovala <b>%1$s v %2$d aplikacích, včetně %3$s</b> (za minulý týden).]]></item>
     </plurals>
 
     <string name="atp_EnableCTA">Povolit App Tracking Protection</string>
@@ -281,16 +281,16 @@
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">
-        <item quantity="one">%1$d pokus. Víme, že shromažďuje:</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d pokus. Víme, že shromažďuje:</item>
         <item quantity="few">%1$d pokusy. Víme, že shromažďuje:</item>
         <item quantity="many">%1$d pokusu. Víme, že shromažďuje:</item>
-        <item quantity="other">%1$d pokusů. Víme, že shromažďuje:</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d pokusů. Víme, že shromažďuje:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">DuckDuckGo zablokovalo %1$d pokus o sledování</item>
+        <item quantity="one" instruction="Placeholder is a number">DuckDuckGo zablokovalo %1$d pokus o sledování</item>
         <item quantity="few">DuckDuckGo zablokovalo %1$d pokusy o sledování</item>
         <item quantity="many">DuckDuckGo zablokovalo %1$d pokusu o sledování</item>
-        <item quantity="other">DuckDuckGo zablokovalo %1$d pokusů o sledování</item>
+        <item quantity="other" instruction="Placeholder is a number">DuckDuckGo zablokovalo %1$d pokusů o sledování</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Nahlásit problém s touhle aplikací</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Zobrazit další %1$d</string>

@@ -16,17 +16,13 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     namespace 'com.duckduckgo.savedsites.internal'
     lintOptions {
         baseline file("lint-baseline.xml")
@@ -43,15 +39,14 @@ dependencies {
     implementation project(':saved-sites-impl')
     implementation project(':test-seeder-api')
 
-    ksp project(path: ':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
+    ksp project(path: ':codegen-ksp')
+    implementation project(path: ':codegen-annotations')
     implementation project(':di')
     implementation project(path: ':common-utils')
 
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.process
-    implementation Google.dagger
     implementation AndroidX.fragment.ktx
 
     implementation "com.squareup.logcat:logcat:_"

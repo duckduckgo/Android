@@ -17,16 +17,16 @@
 package com.duckduckgo.duckchat.impl.subscriptiononboarding
 
 import androidx.fragment.app.Fragment
-import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingCompletionSummaryRow
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
 
-/** Duck.ai step of the subscription onboarding, contributed from `duckchat-impl`. */
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoMap(AppScope::class)
 @PriorityKey(300)
 class SubscriptionOnboardingDuckAiStepPlugin @Inject constructor(
     private val duckChat: DuckChat,
@@ -35,6 +35,11 @@ class SubscriptionOnboardingDuckAiStepPlugin @Inject constructor(
     override val stepId: String = DUCK_AI_STEP_ID
 
     override val titleResId: Int = R.string.subscriptionOnboardingDuckAiTitle
+
+    override val completionSummaryRow = SubscriptionOnboardingCompletionSummaryRow(
+        labelResId = R.string.subscriptionOnboardingCompletionDuckAiTitle,
+        pendingIconResId = R.drawable.duckduckgo_ai_grayscale_color_24,
+    )
 
     override suspend fun shouldShow(): Boolean = duckChat.isEnabled()
 

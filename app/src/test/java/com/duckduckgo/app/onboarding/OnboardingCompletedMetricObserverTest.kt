@@ -36,17 +36,17 @@ class OnboardingCompletedMetricObserverTest {
 
     private val appStageFlow = MutableSharedFlow<AppStage>(replay = 1)
     private val userStageStore: UserStageStore = mock { on { userAppStageFlow() } doReturn appStageFlow }
-    private val metrics: OnboardingPromptsExperimentMetrics = mock()
     private val segmentedMetrics: SegmentedOnboardingExperimentMetrics = mock()
     private val passwordImportMetrics: OnboardingPasswordImportExperimentMetrics = mock()
     private val lifecycleOwner: LifecycleOwner = mock()
+    private val contextualOnboardingTimeLimit = FakeContextualOnboardingTimeLimit()
 
     private val testee = OnboardingCompletedMetricObserver(
         appCoroutineScope = coroutineRule.testScope,
         userStageStore = userStageStore,
-        onboardingPromptsExperimentMetrics = metrics,
         segmentedOnboardingExperimentMetrics = segmentedMetrics,
         onboardingPasswordImportExperimentMetrics = passwordImportMetrics,
+        contextualOnboardingTimeLimit = contextualOnboardingTimeLimit,
     )
 
     @Test
@@ -55,7 +55,6 @@ class OnboardingCompletedMetricObserverTest {
 
         appStageFlow.emit(AppStage.ESTABLISHED)
 
-        verify(metrics).fireOnboardingCompletedMetric()
         verify(passwordImportMetrics).fireOnboardingCompletedMetric()
     }
 
@@ -66,7 +65,6 @@ class OnboardingCompletedMetricObserverTest {
         appStageFlow.emit(AppStage.NEW)
         appStageFlow.emit(AppStage.DAX_ONBOARDING)
 
-        verify(metrics, never()).fireOnboardingCompletedMetric()
         verify(passwordImportMetrics, never()).fireOnboardingCompletedMetric()
     }
 
@@ -86,6 +84,17 @@ class OnboardingCompletedMetricObserverTest {
         appStageFlow.emit(AppStage.NEW)
         appStageFlow.emit(AppStage.DAX_ONBOARDING)
 
+        verify(segmentedMetrics, never()).fireOnboardingCompletedMetric()
+    }
+
+    @Test
+    fun `when onboarding ended by time limit then onboarding completed metrics are not fired`() = runTest {
+        contextualOnboardingTimeLimit.onboardingEndedByTimeLimit = true
+        testee.onCreate(lifecycleOwner)
+
+        appStageFlow.emit(AppStage.ESTABLISHED)
+
+        verify(passwordImportMetrics, never()).fireOnboardingCompletedMetric()
         verify(segmentedMetrics, never()).fireOnboardingCompletedMetric()
     }
 }

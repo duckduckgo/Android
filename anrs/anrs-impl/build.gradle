@@ -16,16 +16,15 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(':codegen-annotations')
 
     implementation project(':app-build-config-api')
     implementation project(':anrs-api')
@@ -36,14 +35,12 @@ dependencies {
     implementation project(':custom-tabs-api')
     implementation project(':statistics-api')
     implementation project(':verified-installation-api')
-    implementation project(':library-loader-api')
     implementation project(':feature-toggles-api')
     implementation project(':data-store-api')
     implementation "com.duckduckgo.crashkit:android-crashkit:_"
 
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
-    implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
     implementation Square.okio
     implementation AndroidX.room.runtime
@@ -67,25 +64,15 @@ android {
         baseline = file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
 
-    ndkVersion '28.2.13676358'
     namespace 'com.duckduckgo.app.anr'
     compileOptions {
         coreLibraryDesugaringEnabled = true
     }
 
-    externalNativeBuild {
-        cmake {
-            path "CMakeLists.txt"
-        }
-    }
-
     packagingOptions {
         jniLibs {
-            // Required: crashpad_handler.so is an executable that Crashpad launches as a
+            // Required: libcrashpad_handler.so is an executable that Crashpad launches as a
             // subprocess via exec(). It must exist as a real file on disk. Without this,
             // AGP stores .so files uncompressed inside the APK (not extracted), so the
             // handler path would not resolve and StartHandler() would fail silently.

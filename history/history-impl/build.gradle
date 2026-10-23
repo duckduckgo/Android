@@ -16,8 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
     id 'androidx.room'
 }
@@ -27,8 +26,8 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
 	implementation project(":history-api")
 
-    ksp project(':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':di')
     ksp AndroidX.room.compiler
 
@@ -40,7 +39,6 @@ dependencies {
 
     implementation KotlinX.coroutines.android
     implementation AndroidX.core.ktx
-    implementation Google.dagger
 
     implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.room.runtime
@@ -74,9 +72,6 @@ android {
         test.assets.srcDirs += files("$projectDir/schemas")
     }
     namespace "com.duckduckgo.history.impl"
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     lint {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"

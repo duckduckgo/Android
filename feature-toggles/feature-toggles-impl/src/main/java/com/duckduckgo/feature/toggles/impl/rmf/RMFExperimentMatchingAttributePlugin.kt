@@ -18,23 +18,25 @@ package com.duckduckgo.feature.toggles.impl.rmf
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import com.duckduckgo.feature.toggles.impl.rmf.ExperimentMatchingAttribute.Companion.COHORT_SEPARATOR
 import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
 import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.api.JsonToMatchingAttributeMapper
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = JsonToMatchingAttributeMapper::class,
+    binding = binding<JsonToMatchingAttributeMapper>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = AttributeMatcherPlugin::class,
+    binding = binding<AttributeMatcherPlugin>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RMFExperimentMatchingAttributePlugin @Inject constructor(
     private val featureTogglesInventory: FeatureTogglesInventory,
 ) : JsonToMatchingAttributeMapper, AttributeMatcherPlugin {
@@ -55,8 +57,15 @@ class RMFExperimentMatchingAttributePlugin @Inject constructor(
         return when (matchingAttribute) {
             is ExperimentMatchingAttribute -> {
                 assert(matchingAttribute.values.isNotEmpty())
-                val activeExperimentName = featureTogglesInventory.getAllActiveExperimentToggles().map { it.featureName().name }
-                return matchingAttribute.values.any { activeExperimentName.contains(it) }
+                val activeExperiments = featureTogglesInventory.getAllActiveExperimentToggles()
+                return matchingAttribute.values.any { value ->
+                    val experimentName = value.substringBefore(COHORT_SEPARATOR)
+                    val cohortName = value.substringAfter(COHORT_SEPARATOR, missingDelimiterValue = "").ifEmpty { null }
+                    activeExperiments.any { experiment ->
+                        experiment.featureName().name == experimentName &&
+                            (cohortName == null || experiment.getCohort()?.name.equals(cohortName, ignoreCase = true))
+                    }
+                }
             }
 
             else -> null
@@ -69,5 +78,6 @@ data class ExperimentMatchingAttribute(
 ) : MatchingAttribute {
     companion object {
         const val KEY = "isUserInAnyActiveExperiment"
+        const val COHORT_SEPARATOR = ":"
     }
 }

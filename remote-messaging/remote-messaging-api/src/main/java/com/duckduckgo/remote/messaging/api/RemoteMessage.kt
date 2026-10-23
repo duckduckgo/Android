@@ -24,6 +24,7 @@ import com.duckduckgo.remote.messaging.api.Content.MessageType.MEDIUM
 import com.duckduckgo.remote.messaging.api.Content.MessageType.PROMO_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.api.Content.MessageType.SMALL
 import com.duckduckgo.remote.messaging.api.Content.Placeholder
+import com.duckduckgo.remote.messaging.api.JsonActionType.ADD_WIDGET
 import com.duckduckgo.remote.messaging.api.JsonActionType.APP_TP_ONBOARDING
 import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_BROWSER
 import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_CREDENTIAL_PROVIDER
@@ -55,6 +56,7 @@ data class DisplayConditions(
     val trigger: MessageTrigger?,
     val dismissAfterDaysShown: Int?,
     val maxImpressions: Int? = null,
+    val dismissAfterUniqueDailyImpressions: Int? = null,
 )
 
 /**
@@ -115,6 +117,11 @@ sealed class Content(val messageType: MessageType) {
         val imageUrl: String? = null,
     ) : Content(MessageType.CARDS_LIST)
 
+    data class ActionableItems(
+        val titleText: String,
+        val listItems: List<CardItem>,
+    ) : Content(MessageType.ACTIONABLE_ITEMS)
+
     enum class MessageType {
         SMALL,
         MEDIUM,
@@ -122,6 +129,7 @@ sealed class Content(val messageType: MessageType) {
         BIG_TWO_ACTION,
         PROMO_SINGLE_ACTION,
         CARDS_LIST,
+        ACTIONABLE_ITEMS,
     }
 
     enum class Placeholder(val jsonValue: String) {
@@ -141,6 +149,7 @@ sealed class Content(val messageType: MessageType) {
         SPLIT_BAR_SETTINGS("SplitBarSettings"),
         BOOKMARKS_IMPORT("BookmarksImport"),
         NEW_TAB_OPTIONS("NewTabOptions"),
+        PIR("PIR"),
         ;
 
         companion object {
@@ -185,6 +194,7 @@ sealed class Action(
     ) : Action(JsonActionType.SURVEY.jsonValue, value, additionalParameters)
 
     data object DefaultCredentialProvider : Action(DEFAULT_CREDENTIAL_PROVIDER.jsonValue, "", null)
+    data class AddWidget(override val value: String) : Action(ADD_WIDGET.jsonValue, value, null)
 }
 
 sealed class CardItem {
@@ -227,4 +237,5 @@ enum class CardItemType(val jsonValue: String) {
     TWO_LINE_LIST_ITEM("two_line_list_item"),
     LIST_SECTION_TITLE("section_title"),
     FEATURED_TWO_LINE_SINGLE_ACTION_LIST_ITEM("featured_two_line_single_action_list_item"),
+    ONE_ACTION_ITEM("one_action_item"),
 }

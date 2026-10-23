@@ -19,9 +19,11 @@ package com.duckduckgo.duckchat.impl.contextual
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.api.DuckAiTermsConsent
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.toChatIdOrNull
@@ -35,6 +37,9 @@ import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
+import com.duckduckgo.duckchat.impl.wideevents.SelectionTerminalReason
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -73,10 +78,14 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     private val sessionTimeoutProvider: DuckChatContextualSessionTimeoutProvider,
     private val timeProvider: DuckChatContextualTimeProvider,
     private val duckChatPixels: DuckChatPixels,
+    private val selectionJourney: DuckAiSelectionJourneyWideEvent,
     private val duckChatFeature: DuckChatFeature,
     private val modelManager: DuckAiModelManager,
     private val chatHistoryRepository: ChatHistoryRepository,
     private val contextualEntryPromptStore: ContextualEntryPromptStore,
+    private val textSelectionRepository: TextSelectionRepository,
+    private val termsConsent: DuckAiTermsConsent,
+    private val browserMode: BrowserMode,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -118,6 +127,8 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
 
     // The selections the entry dialog had attached at hand-off.
     private var pendingEntrySelections: JSONArray? = null
+
+    private var pendingEntryCarriesTermsConsent: Boolean = true
 
     private var hidingSheetForNewChat = false
 
@@ -209,8 +220,9 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             }
 
             val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
+            val isSessionValid = shouldReuseStoredChatUrl(tabId)
             val shouldReuseUrl = !existingChatUrl.isNullOrBlank() &&
-                shouldReuseStoredChatUrl(tabId) &&
+                isSessionValid &&
                 !isStoredChatMissingFromHistory(existingChatUrl)
             if (shouldReuseUrl) {
                 logcat { "Duck.ai: tab=$tabId has an existing url and don't need to restart the session" }
@@ -218,6 +230,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
                 loadWebViewUrl(tabId, existingChatUrl!!)
             } else {
                 logcat { "Duck.ai: tab=$tabId session expired or absent, starting a new chat" }
+                if (!isSessionValid) selectionJourney.onJourneyEnded(tabId, SelectionTerminalReason.SESSION_EXPIRED)
                 loadFreshChat(tabId)
             }
         }
@@ -253,6 +266,8 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         val shouldReuseSession = shouldReuseStoredChatUrl(tabId)
         val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
         if (!shouldReuseSession || isStoredChatMissingFromHistory(existingChatUrl)) {
+            val reason = if (shouldReuseSession) SelectionTerminalReason.NEW_CHAT else SelectionTerminalReason.SESSION_EXPIRED
+            selectionJourney.onJourneyEnded(tabId, reason)
             resetToNewChat()
             hidingSheetForNewChat = true
             withContext(dispatchers.main()) {
@@ -313,6 +328,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         pendingEntryPrompt = entry.prompt
         pendingEntryPageContext = entry.serializedPageContext
         pendingEntrySelections = entry.selectionsJson
+        pendingEntryCarriesTermsConsent = entry.carriesTermsConsent
         val handedOffWithoutContext = entry.serializedPageContext == null
         val chatUrl = duckChat.getDuckChatUrl("", false, sidebar = true)
         withContext(dispatchers.main()) {
@@ -339,6 +355,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         val entry = pendingEntryPrompt ?: return
         val entryPageContext = pendingEntryPageContext
         val entrySelections = pendingEntrySelections
+        val entryCarriesTermsConsent = pendingEntryCarriesTermsConsent
         pendingEntryPrompt = null
         pendingEntryPageContext = null
         pendingEntrySelections = null
@@ -351,6 +368,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             filesJson = entry.filesJson,
             pageContextSerialized = entryPageContext,
             selectionsJson = entrySelections,
+            carriesTermsConsent = entryCarriesTermsConsent,
         )
     }
 
@@ -365,6 +383,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         selectionsJson: JSONArray? = null,
     ) {
         val attachedContext = pageContextState.attachedPage.takeIf { _viewState.value.showContext }
+        selectionsJson?.length()?.takeIf { it > 0 }?.let { duckChatPixels.reportContextualPromptSubmittedWithSelections(it) }
         submitPrompt(prompt, followUpPrefill, modelId, reasoningEffort, selectedTool, imagesJson, filesJson, attachedContext, selectionsJson)
     }
 
@@ -378,10 +397,21 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         filesJson: JSONArray? = null,
         pageContextSerialized: String?,
         selectionsJson: JSONArray? = null,
+        carriesTermsConsent: Boolean = true,
     ) {
         viewModelScope.launch(dispatchers.io()) {
             val contextPrompt =
-                generateContextPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson, pageContextSerialized, selectionsJson)
+                generateContextPrompt(
+                    prompt,
+                    modelId,
+                    reasoningEffort,
+                    selectedTool,
+                    imagesJson,
+                    filesJson,
+                    pageContextSerialized,
+                    selectionsJson,
+                    carriesTermsConsent,
+                )
             val prefillText = followUpPrefill?.takeIf { it.isNotEmpty() }
             val prefillEvent = prefillText?.let { generatePrefillEvent(it) }
             withContext(dispatchers.main()) {
@@ -470,6 +500,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         filesJson: JSONArray? = null,
         pageContextSerialized: String?,
         selectionsJson: JSONArray? = null,
+        carriesTermsConsent: Boolean = true,
     ): SubscriptionEventData {
         val pageContext =
             pageContextSerialized
@@ -515,6 +546,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
                 pageContext?.let { put("pageContext", it) }
                 selectionsJson?.let { put("selections", it) }
             }
+        if (carriesTermsConsent) termsConsent.carry(params, browserMode)
 
         return SubscriptionEventData(
             featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
@@ -561,6 +593,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             return
         }
         duckChatPixels.reportContextualSheetDismissed()
+        selectionJourney.onSurfaceDismissed(viewState.value.tabId)
         persistTabClosed()
         commandChannel.trySend(Command.ApplyContextualClosed(_viewState.value.tabId))
     }
@@ -648,6 +681,9 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         }
         duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.CONTEXTUAL_CHAT, opensNewTab = true, hasPrompt = hasPrompt)
         duckChatPixels.reportContextualSheetExpanded()
+        val tabId = viewState.value.tabId
+        selectionJourney.onJourneyEnded(tabId, SelectionTerminalReason.MOVED_TO_TAB)
+        textSelectionRepository.consume(tabId)
     }
 
     fun onPageContextReceived(
@@ -668,10 +704,11 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
 
             val urlChanged = current.contextUrl.isNotEmpty() && url != current.contextUrl
             val remainsUserRemoved = current.userRemovedContext && !urlChanged
+            val hasTextSelections = textSelectionRepository.selections(tabId).value.isNotEmpty()
             val dropStaleAttachment = !allowsAutomaticContextAttachment && current.showContext && urlChanged
 
             val showContext = when {
-                allowsAutomaticContextAttachment -> !remainsUserRemoved
+                allowsAutomaticContextAttachment -> !remainsUserRemoved && !hasTextSelections
                 dropStaleAttachment -> false
                 else -> current.showContext
             }
@@ -717,6 +754,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         // so it isn't resumed, then let the dialog command hide the sheet. Mark the impending hide as a
         // handoff so onSheetClosed doesn't revert the tab's contextual input state.
         duckChatPixels.reportContextualSheetNewChatFromPopup()
+        selectionJourney.onJourneyEnded(viewState.value.tabId, SelectionTerminalReason.NEW_CHAT)
         hidingSheetForNewChat = true
         resetToNewChat()
         commandChannel.trySend(Command.ShowNewChatEntryDialog(_viewState.value.tabId))
@@ -747,7 +785,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         duckChatPixels.reportContextualRecentChatSelected()
         val url = duckChatInternal.buildChatUrl(chatId)
         val sourceTabId = _viewState.value.tabId
-        duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.CHAT_HISTORY_OPEN_CHAT, opensNewTab = true, hasPrompt = false)
+        duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.RECENT_CHAT_CONTEXTUAL, opensNewTab = true, hasPrompt = false)
         commandChannel.trySend(Command.OpenChatUrl(url = url, sourceTabId = sourceTabId))
     }
 
@@ -765,6 +803,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
 
     fun onContextualFireConfirmed() {
         duckChatPixels.reportContextualFireButtonConfirmed()
+        selectionJourney.onJourneyEnded(viewState.value.tabId, SelectionTerminalReason.CHAT_CLEARED)
         resetToNewChat()
         commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HIDDEN))
     }
@@ -777,6 +816,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             val currentTabId = _viewState.value.tabId
             if (currentTabId.isBlank()) return@launch
             contextualDataStore.clearTabChatUrl(currentTabId)
+            textSelectionRepository.consume(currentTabId)
             withContext(dispatchers.main()) {
                 clearSheetUrl()
                 pageContextState = pageContextState.copy(attachedPage = "")

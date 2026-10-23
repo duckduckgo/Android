@@ -30,11 +30,21 @@
         android:visibility="gone" />
 
     <include
+        android:id="@+id/includeNoPermission2"
+        layout="@layout/fragment_read_sync_code_camera_no_permission_v2"
+        android:visibility="gone" />
+
+    <include
         android:id="@+id/includeIntro"
         layout="@layout/fragment_read_sync_code_camera_intro" />
 
     <include
         android:id="@+id/includeCamera"
         layout="@layout/fragment_read_sync_code_camera_preview"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/includeIntroV2"
+        layout="@layout/fragment_read_sync_code_camera_intro_v2"
         android:visibility="gone" />
 </FrameLayout>

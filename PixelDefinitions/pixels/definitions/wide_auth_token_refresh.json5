@@ -45,11 +45,6 @@
                 "enum": ["true", "false", ""]
             },
             {
-                "key": "feature.data.ext.serialization_enabled",
-                "description": "Whether refreshes were being serialized across processes with a cross-process lock, i.e. the value of the serializeTokenRefresh flag when the refresh started.",
-                "type": "boolean"
-            },
-            {
                 "key": "feature.data.ext.lock_outcome",
                 "description": "Outcome of acquiring the cross-process refresh lock. 'timeout' means another process held it for longer than the wait limit; the refresh then proceeds unserialized.",
                 "enum": ["acquired", "timeout", "error"]
@@ -81,6 +76,11 @@
                 "examples": ["unknown_account", "invalid_token_request"]
             },
             {
+                "key": "feature.data.ext.backend_error_code",
+                "description": "Backend-supplied numeric code from the `error_code` field of the token endpoint's error body, sent alongside `error`.",
+                "enum": ["0", "1", "2", "3", "4"]
+            },
+            {
                 "key": "feature.data.ext.play_login_error",
                 "description": "Why the Play store login fallback failed. PurchaseInfoNotAvailable carries the reason Play could not be queried.",
                 "type": "string",
@@ -93,10 +93,72 @@
                 ]
             },
             {
+                "key": "feature.data.ext.token_validation_failed_token",
+                "description": "Which of the newly fetched tokens failed validation. Only present when step.token_validation is false.",
+                "enum": ["access", "refresh"]
+            },
+            {
+                "key": "feature.data.ext.token_validation_failure_reason",
+                "description": "Why the token failed validation.",
+                "enum": [
+                    "expired",
+                    "not_yet_valid",
+                    "invalid_signature",
+                    "key_not_found",
+                    "jwks_parse_error",
+                    "malformed",
+                    "unsupported",
+                    "missing_claim",
+                    "invalid_issuer",
+                    "invalid_audience",
+                    "invalid_scope",
+                    "invalid_claim",
+                    "claims_parse_error",
+                    "other"
+                ]
+            },
+            {
+                "key": "feature.data.ext.token_validation_clock_skew_s_bucketed",
+                "description": "Time between the failed token's issued-at time and the device clock in seconds, rounded toward zero to a bucket boundary and clamped at one day.",
+                "enum": [
+                    "-86400",
+                    "-28800",
+                    "-14400",
+                    "-7200",
+                    "-3600",
+                    "-1800",
+                    "-600",
+                    "-300",
+                    "-120",
+                    "-60",
+                    "-30",
+                    "-15",
+                    "-5",
+                    "-2",
+                    "-1",
+                    "0",
+                    "1",
+                    "2",
+                    "5",
+                    "15",
+                    "30",
+                    "60",
+                    "120",
+                    "300",
+                    "600",
+                    "1800",
+                    "3600",
+                    "7200",
+                    "14400",
+                    "28800",
+                    "86400"
+                ]
+            },
+            {
                 "key": "feature.data.ext.failure_reason",
-                "description": "Exception class name of the failure. Only present on FAILURE events.",
+                "description": "Exception class name of the failure. Only present on FAILURE events. TokenValidationException when the newly fetched tokens failed validation; see token_validation_failure_reason.",
                 "type": "string",
-                "examples": ["HttpException", "SocketTimeoutException", "IllegalStateException"]
+                "examples": ["HttpException", "SocketTimeoutException", "TokenValidationException"]
             },
             {
                 "key": "feature.data.ext.signed_out",
@@ -125,8 +187,8 @@
             },
             {
                 "key": "feature.data.ext.step.token_validation",
-                "description": "Parameter present if the newly fetched tokens passed validation",
-                "enum": ["true"]
+                "description": "true if the newly fetched tokens passed validation, false if either token failed it. See token_validation_failed_token and token_validation_failure_reason.",
+                "type": "boolean"
             },
             {
                 "key": "feature.data.ext.step.play_login",

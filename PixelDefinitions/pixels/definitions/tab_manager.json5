@@ -5,6 +5,7 @@
         "description": "Fires when the browser is paused, reporting the furthest a user went back in the tab activation order since this pixel was last sent. Distance is the number of distinct other tabs activated since the revisited tab was last active, bucketed. Anything that pauses the browser closes the reporting window and resets the running maximum, including opening another screen of the app such as settings or the tab switcher, so a stretch of browsing broken up by those screens reports several smaller maxima instead of one larger one and the reported distance is a lower bound on the furthest reuse within a longer user session. The activation order itself is not reset, so a distance measured after resuming can span tabs activated before the pause. Sizes the user impact of lowering the number of retained tab fragments.",
         "owners": ["catalinradoiu"],
         "triggers": ["other"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -21,5 +22,19 @@
             }
         ],
         "expires": "2027-03-31"
+    },
+    "m_tab_manager_switch_to_ai_tab": {
+        "description": "User taps an existing Duck.ai tab in the tab switcher, including the currently active one; measures how often users return to AI conversations via the switcher. Mirrors the iOS pixel of the same name",
+        "owners": ["karlenDimla"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_tab_manager_close_ai_tab": {
+        "description": "User closes a single Duck.ai tab from the tab switcher via the close button or swipe; tracks AI tab lifecycle. Mirrors the iOS pixel of the same name",
+        "owners": ["karlenDimla"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
     }
 }

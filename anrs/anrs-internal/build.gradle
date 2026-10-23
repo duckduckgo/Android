@@ -16,8 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -29,8 +28,8 @@ dependencies {
 	implementation project(":anrs-store")
     implementation "com.duckduckgo.crashkit:android-crashkit:_"
 
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(':codegen-annotations')
     implementation project(':di')
     implementation project(':design-system')
     implementation project(':common-utils')
@@ -46,7 +45,6 @@ dependencies {
 
     implementation KotlinX.coroutines.android
     implementation AndroidX.core.ktx
-    implementation Google.dagger
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation AndroidX.lifecycle.runtime.ktx
@@ -78,9 +76,6 @@ dependencies {
 
 android {
     namespace "com.duckduckgo.app.anr.internal"
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     lint {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"

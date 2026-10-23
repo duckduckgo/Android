@@ -60,9 +60,10 @@ class EffectiveModelProviderTest {
         whenever(it.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
     }
     private val store = RealNativeInputStateStore(
-        dagger.Lazy { tabRepositoryProvider },
+        lazy { tabRepositoryProvider },
         browserModeStateHolder,
-        RealTextSelectionRepository(),
+        RealTextSelectionRepository(lazy { mock() }, mock()),
+        ChatStateStore(),
     )
     private val modelStateFlow = MutableStateFlow(
         ModelState(

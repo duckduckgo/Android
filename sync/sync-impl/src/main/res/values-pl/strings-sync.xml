@@ -306,6 +306,7 @@
     <string name="sync_simplified_settings_download_recovery_code_item_hint">Zapisz ten kod w bezpiecznym miejscu, aby móc za jego pomocą odzyskać dane, jeśli stracisz dostęp do tego urządzenia.</string>
     <string name="sync_simplified_settings_data_expiration_notice">Danych Sync &amp; Backup nie można odzyskać po 18 miesiącach braku aktywności. <annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
     <string name="sync_simplified_settings_delete_account_item">Wyłącz i usuń dane serwera</string>
+    <string name="sync_simplified_settings_turn_off_item">Wyłącz Sync &amp; Backup</string>
     <string name="sync_simplified_settings_storage_permission_message">Zapisywanie pliku PDF do odzyskiwania wymaga uprawnienia do pamięci</string>
     <string name="sync_simplified_settings_learn_more_screen_title">Sync &amp; Backup</string>
 
@@ -320,6 +321,26 @@
     <string name="sync_simplified_settings_delete_server_data_dialog_body">Wszystkie urządzenia korzystające z Sync &amp; Backup zostaną odłączone, a zsynchronizowane dane usunięte z serwera.</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Usuń dane serwera</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">Anuluj</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_title_v2">Tej czynności nie można cofnąć.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body_v2">Wszystkie urządzenia korzystające z Sync &amp; Backup zostaną odłączone, a zsynchronizowane dane – usunięte z serwera.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button_v2">Usuń trwale</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button_v2">Anuluj</string>
+
+    <!-- Sync settings screen: turn off sheet -->
+    <string name="sync_simplified_settings_turn_off_sheet_remove_title" instruction="Placeholder is a device name. e.g., Samsung S23">Usunąć urządzenie %1$s z Sync &amp; Backup?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_body" instruction="Placeholder is a device name. e.g., Samsung S23">Urządzenie %1$s nie będzie już mieć dostępu do zsynchronizowanych danych na innych urządzeniach.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item">Usunąć również dane z serwera?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Wyłącz Sync &amp; Backup, usuń wszystkie zsynchronizowane dane z serwera i dezaktywuj swój kod odzyskiwania.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Usuń urządzenie</string>
+    <string name="sync_simplified_settings_turn_off_sheet_title">Wyłączyć Sync &amp; Backup?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_body">Wszystkie urządzenia korzystające z Sync &amp; Backup zostaną odłączone, a zsynchronizowane dane – usunięte z serwera.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Wyłącz i usuń dane z serwera</string>
+
+    <!-- Sync settings screen: turn off this device dialog -->
+    <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">Usunąć urządzenie %1$s z Sync &amp; Backup?</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">Urządzenie %1$s nie będzie już mieć dostępu do zsynchronizowanych danych. Zakładki, dane autouzupełniania i czaty Duck.ai pozostaną na Twoich urządzeniach.</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_primary_button">Usuń</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_secondary_button">Anuluj</string>
 
     <!-- Sync settings screen: require device passcode dialog -->
     <string name="sync_simplified_settings_require_passcode_dialog_title">Zabezpiecz urządzenie, aby korzystać z Sync &amp; Backup</string>
@@ -329,6 +350,8 @@
     <!-- Sync This Device screen -->
     <string name="sync_simplified_setup_header_headline">Zsynchronizuj to urządzenie z komputerem znajdującym się w pobliżu.</string>
     <string name="sync_simplified_setup_header_body">Pomożemy Ci zsynchronizować urządzenia.</string>
+    <string name="sync_simplified_setup_header_headline_v2">Czy masz w pobliżu inne urządzenie? Synchronizuj swoje urządzenia.</string>
+    <string name="sync_simplified_setup_header_body_v2">Nie masz teraz pod ręką innego urządzenia? Zsynchronizuj tylko to urządzenie, a z innym zsynchronizujesz je później.</string>
     <string name="sync_simplified_setup_primary_button">Synchronizuj z innym urządzeniem</string>
     <string name="sync_simplified_setup_secondary_button">Synchronizuj tylko to urządzenie</string>
     <string name="sync_simplified_setup_secondary_button_syncing">Łączenie...</string>
@@ -353,10 +376,14 @@
     <string name="sync_simplified_scanner_camera_header_headline">Zeskanuj kod QR, aby zsynchronizować</string>
     <string name="sync_simplified_scanner_camera_header_body">Otwórz <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo na komputer</annotation></b>\n<annotation type="gap">\n</annotation>i przejdź do <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synchronizuj z innym urządzeniem</annotation></string>
     <string name="sync_simplified_scanner_camera_primary_button">Jestem gotowy(-a) do skanowania</string>
+    <string name="sync_simplified_scanner_camera_primary_button_v2">Rozumiem</string>
     <string name="sync_simplified_scanner_camera_invalid_code_message">Niestety, zeskanowany kod jest nieprawidłowy.</string>
     <string name="sync_simplified_scanner_no_permission_headline">Wymagane jest uprawnienie do aparatu</string>
     <string name="sync_simplified_scanner_no_permission_body">Przejdź do ustawień urządzenia i zezwól tej aplikacji na dostęp do aparatu.</string>
     <string name="sync_simplified_scanner_no_permission_primary_button">Przejdź do ustawień</string>
+    <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo potrzebuje dostępu do Twojego aparatu.</string>
+    <string name="sync_simplified_scanner_no_permission_body_v2">Do zeskanowania kodu QR wymagany jest dostęp do aparatu.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button_v2">Zmień uprawnienia</string>
     <string name="sync_simplified_scanner_no_hardware_headline">Aparat niedostępny</string>
 
     <!-- Scanner screen: manual entry tab -->
@@ -376,7 +403,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Funkcja Sync &amp; Backup jest kompleksowo szyfrowana na wszystkich Twoich urządzeniach.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Sprawdź drugie urządzenie</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Sprawdź drugie urządzenie.</string>
     <string name="sync_simplified_pairing_headline_recovery">Odzyskiwanie danych</string>
     <string name="sync_simplified_pairing_body">Łączenie...</string>
 
@@ -411,6 +438,8 @@
     <string name="sync_simplified_edit_device_sync_this_device_item">Synchronizuj to urządzenie</string>
     <string name="sync_simplified_edit_device_remove_notice_this_device">To urządzenie nie będzie już mieć dostępu do zsynchronizowanych danych, jeśli je usuniesz.</string>
     <string name="sync_simplified_edit_device_remove_notice_another_device">To urządzenie nie będzie już mieć dostępu do zsynchronizowanych danych, jeśli ta opcja zostanie wyłączona.</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Urządzenie %1$s nie będzie już mieć dostępu do zsynchronizowanych danych na innych urządzeniach, jeśli ta opcja zostanie wyłączona.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Urządzenie %1$s nie będzie już mieć dostępu do zsynchronizowanych danych na innych urządzeniach.</string>
 
     <!-- Edit Device screen: edit name dialog -->
     <string name="sync_simplified_edit_device_edit_name_dialog_title">Edytuj nazwę</string>
@@ -422,6 +451,8 @@
     <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s” nie będzie już w stanie uzyskać dostępu do zsynchronizowanych danych.</string>
     <string name="sync_simplified_edit_device_remove_dialog_primary_button">Usuń</string>
     <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Anuluj</string>
+    <string name="sync_simplified_edit_device_remove_dialog_title_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Usunąć urządzenie %1$s z Sync &amp; Backup?</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Urządzenie %1$s nie będzie już mieć dostępu do zsynchronizowanych danych. Zakładki, dane autouzupełniania i czaty Duck.ai pozostaną na Twoich urządzeniach.</string>
 
     <!-- Edit Device screen: turn off sync dialog -->
     <string name="sync_simplified_edit_device_turn_off_dialog_title">Wyłączyć Sync &amp; Backup?</string>

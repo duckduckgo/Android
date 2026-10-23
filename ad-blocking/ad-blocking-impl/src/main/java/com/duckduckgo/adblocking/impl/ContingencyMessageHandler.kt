@@ -25,9 +25,10 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -44,9 +45,9 @@ interface ContingencyMessageHandler {
     fun cancelPendingShow()
 }
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(scope = AppScope::class, boundType = ContingencyMessageHandler::class)
-@ContributesMultibinding(scope = AppScope::class, boundType = MainProcessLifecycleObserver::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(scope = AppScope::class, binding = binding<ContingencyMessageHandler>())
+@ContributesIntoSet(scope = AppScope::class, binding = binding<MainProcessLifecycleObserver>())
 class RealContingencyMessageHandler @Inject constructor(
     private val feature: AdBlockingExtensionFeature,
     private val store: ContingencyMessageStore,

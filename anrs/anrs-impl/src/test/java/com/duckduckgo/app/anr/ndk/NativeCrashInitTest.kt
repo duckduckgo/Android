@@ -60,7 +60,6 @@ class NativeCrashInitTest {
         whenever(mockNativeCrashFeature.nativeCrashReportsFullWebViewVersion()).thenReturn(mockToggle)
         whenever(mockNativeCrashFeature.nativeCrashHandling()).thenReturn(mockEnabledToggle)
         whenever(mockNativeCrashFeature.nativeCrashHandlingSecondaryProcess()).thenReturn(mockEnabledToggle)
-        whenever(mockNativeCrashFeature.useCrashpad()).thenReturn(mockEnabledToggle)
         whenever(mockCrashpadInitializer.initialize(any(), anyOrNull())).thenReturn(true)
     }
 
@@ -125,13 +124,6 @@ class NativeCrashInitTest {
         verify(mockCrashpadInitializer, never()).initialize(any(), anyOrNull())
     }
 
-    @Test
-    fun `onCreate skips Crashpad init when useCrashpad toggle disabled`() {
-        whenever(mockNativeCrashFeature.useCrashpad()).thenReturn(mockToggle)
-        buildNativeCrashInit(isMainProcess = true).onCreate(mockLifecycleOwner)
-        verify(mockCrashpadInitializer, never()).initialize(any(), anyOrNull())
-    }
-
     // ── Handler registered pixel ───────────────────────────────────────────────
 
     @Test
@@ -165,7 +157,7 @@ class NativeCrashInitTest {
     }
 
     @Test
-    fun `onCrash pixel params include version, process name, and customTab`() {
+    fun `onCrash pixel params include version, process name, customTab and webview`() {
         whenever(mockAppBuildConfig.versionName).thenReturn("5.0.0")
         whenever(mockAppBuildConfig.flavor).thenReturn(BuildFlavor.FDROID)
         whenever(mockCustomTabDetector.isCustomTab()).thenReturn(true)
@@ -175,7 +167,15 @@ class NativeCrashInitTest {
 
         verify(mockPixel).enqueueFire(
             eq(APPLICATION_CRASH_NATIVE),
-            eq(mapOf("v" to "5.0.0-FDROID", "pn" to "com.example:vpn", "customTab" to "true")),
+            eq(
+                mapOf(
+                    "v" to "5.0.0-FDROID",
+                    "pn" to "com.example:vpn",
+                    "customTab" to "true",
+                    "webViewPackage" to "com.google.android.webview",
+                    "webViewVersion" to "120",
+                ),
+            ),
             any(),
             any(),
         )
@@ -203,7 +203,6 @@ class NativeCrashInitTest {
         isMainProcess: Boolean = true,
         processName: String = "com.example",
     ) = NativeCrashInit(
-        context = mock(),
         isMainProcess = isMainProcess,
         customTabDetector = mockCustomTabDetector,
         appBuildConfig = mockAppBuildConfig,

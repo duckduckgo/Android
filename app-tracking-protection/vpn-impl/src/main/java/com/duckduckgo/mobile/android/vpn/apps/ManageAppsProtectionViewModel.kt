@@ -19,8 +19,8 @@ package com.duckduckgo.mobile.android.vpn.apps
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.lifecycle.*
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.isIgnoringBatteryOptimizations
 import com.duckduckgo.di.scopes.ActivityScope
@@ -37,9 +37,9 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -372,7 +372,7 @@ fun interface AppTpBatteryOptimizationsChecker {
     fun isIgnoringBatteryOptimizations(): Boolean
 }
 
-@Module
+@BindingContainer
 @ContributesTo(ActivityScope::class)
 class IgnoringBatteryOptimizationsModule {
     @Provides

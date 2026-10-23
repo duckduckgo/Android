@@ -58,4 +58,10 @@
     <string name="browserMenuForward">Vooruit</string>
     <string name="browserMenuRefresh">Vernieuwen</string>
     <string name="browserMenuFireTabsData">Tabbladen en gegevens verwijderen</string>
+
+    <!-- Duck.ai tab + menu -->
+    <string name="chatMenuPopupNewVoiceChat">Nieuwe spraakchat</string>
+    <string name="chatMenuPopupNewImage">Nieuwe afbeelding</string>
+    <string name="chatMenuPopupNewTab">Nieuw tabblad</string>
+    <string name="chatMenuPopupNewFireTab">Nieuw Fire-tabblad</string>
 </resources>

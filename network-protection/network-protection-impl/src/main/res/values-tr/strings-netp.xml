@@ -89,8 +89,8 @@
     <string name="netpManagementManageItemExclusion">Hariç Tutulan Uygulamalar</string>
     <string name="netpManagementManageItemExclusionSubtitleEmpty">Yok</string>
     <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
-        <item quantity="one">%1$d uygulama</item>
-        <item quantity="other">%1$d uygulama</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d uygulama</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d uygulama</item>
     </plurals>
     <string name="netpManagementVpnSettings">VPN Ayarları</string>
 
@@ -242,14 +242,14 @@
     <string name="netpAutoExcludePromptTitle">VPN\'lerle uyumlu olmayan uygulamaları hariç tutmak ister misiniz?</string>
     <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">VPN bağlıyken %1$s bulduk.</string>
     <plurals name="netpAutoExcludeAppLabel">
-        <item quantity="one">VPN\'lerle uyumlu olmayan %1$d yeni uygulama. Bunları kullanmak için bu uygulamaları hariç tutun</item>
-        <item quantity="other">VPN\'lerle uyumlu olmayan %1$d yeni uygulama. Bunları kullanmak için bu uygulamaları hariç tutun</item>
+        <item quantity="one" instruction="Placeholder is a number">VPN\'lerle uyumlu olmayan %1$d yeni uygulama. Bunları kullanmak için bu uygulamaları hariç tutun</item>
+        <item quantity="other" instruction="Placeholder is a number">VPN\'lerle uyumlu olmayan %1$d yeni uygulama. Bunları kullanmak için bu uygulamaları hariç tutun</item>
     </plurals>
 
     <string name="netpAutoExcludePromptExcludeAllTitle">VPN\'lerle uyumlu olmayan tüm uygulamaları hariç tutmak ister misiniz?</string>
     <plurals name="netpAutoExcludeAllAppLabel">
-        <item quantity="one">VPN\'lerle uyumlu olmayan %1$d diğer uygulama. Kullanmak için uygulamayı hariç tutun</item>
-        <item quantity="other">VPN\'lerle uyumlu olmayan %1$d diğer uygulama. Kullanmak için bu uygulamaları hariç tutun</item>
+        <item quantity="one" instruction="Placeholder is a number">VPN\'lerle uyumlu olmayan %1$d diğer uygulama. Kullanmak için uygulamayı hariç tutun</item>
+        <item quantity="other" instruction="Placeholder is a number">VPN\'lerle uyumlu olmayan %1$d diğer uygulama. Kullanmak için bu uygulamaları hariç tutun</item>
     </plurals>
     <string name="netpAutoExcludePromptOptionEnable">Uyumlu olmayan uygulamaları otomatik olarak hariç tutun</string>
     <string name="netpAutoExcludePromptActionAdd">Uygulamaları Hariç Tut</string>

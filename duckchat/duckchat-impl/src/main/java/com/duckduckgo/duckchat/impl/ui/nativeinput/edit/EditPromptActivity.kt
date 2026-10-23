@@ -19,13 +19,11 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.edit
 import android.os.Bundle
 import androidx.core.view.doOnAttach
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.R
@@ -50,9 +48,6 @@ class EditPromptActivity : DuckDuckGoActivity() {
     lateinit var nativeInputStatePublisher: NativeInputStatePublisher
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     @Inject
@@ -69,10 +64,7 @@ class EditPromptActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         setContentView(binding.root)
         with(binding.includeToolbar.toolbar) {
@@ -83,9 +75,7 @@ class EditPromptActivity : DuckDuckGoActivity() {
             setNavigationOnClickListener { finish() }
         }
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         val sessionId = params?.sessionId
         val payload = sessionId?.let { editPromptSessionStore.payload(it) }
@@ -100,7 +90,6 @@ class EditPromptActivity : DuckDuckGoActivity() {
             adoptEditAttachments(payload.images, payload.files)
             text = payload.prompt
             onChatSent = { submit(sessionId) }
-            hideMainButtons()
             // configureForEdit's own widget setup runs on attach; focusing before that leaves the
             // field not yet focusable. Queuing after it (registered later, so it runs after) fixes it.
             asView().doOnAttach { focusInput(this@EditPromptActivity) }

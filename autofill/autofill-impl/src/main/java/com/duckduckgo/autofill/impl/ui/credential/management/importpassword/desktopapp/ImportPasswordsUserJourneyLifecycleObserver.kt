@@ -24,8 +24,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.api.DeviceSyncState.SyncAccountState.SignedIn
 import com.duckduckgo.sync.api.DeviceSyncState.Type.DESKTOP
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.VERBOSE
@@ -36,11 +37,11 @@ import kotlin.time.DurationUnit.HOURS
 import kotlin.time.DurationUnit.MILLISECONDS
 import kotlin.time.toDuration
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class ImportPasswordsUserJourneyLifecycleObserver @Inject constructor(
     private val dataStore: ImportPasswordsViaDesktopSyncDataStore,
     private val deviceSyncState: DeviceSyncState,

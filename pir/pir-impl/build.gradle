@@ -16,8 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
     id 'androidx.room'
 }
@@ -25,10 +24,10 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
+    ksp project(':codegen-ksp')
     implementation project(":pir-api")
 
-    implementation project(':anvil-annotations')
+    implementation project(':codegen-annotations')
     implementation project(':browser-api')
     implementation project(':design-system')
     implementation project(':common-utils')
@@ -38,6 +37,7 @@ dependencies {
     implementation project(':navigation-api')
     implementation project(':network-protection-api')
     implementation project(':remote-messaging-api')
+    implementation project(':settings-api')
     implementation project(':subscriptions-api')
     implementation project(':statistics-api')
     implementation project(':tracker-detection-api')
@@ -49,7 +49,6 @@ dependencies {
     implementation AndroidX.appCompat
     implementation AndroidX.core.ktx
     implementation AndroidX.webkit
-    implementation Google.dagger
     implementation Google.android.material
     implementation KotlinX.coroutines.android
 
@@ -101,9 +100,6 @@ android {
     namespace "com.duckduckgo.pir.impl"
     sourceSets {
         test.assets.srcDirs += files("$projectDir/schemas")
-    }
-    anvil {
-        generateDaggerFactories = true // default is false
     }
     lint {
         baseline file("lint-baseline.xml")

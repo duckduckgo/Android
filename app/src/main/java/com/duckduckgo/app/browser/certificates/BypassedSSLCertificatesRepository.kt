@@ -17,7 +17,7 @@
 package com.duckduckgo.app.browser.certificates
 
 import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface BypassedSSLCertificatesRepository {
@@ -27,7 +27,7 @@ interface BypassedSSLCertificatesRepository {
     fun contains(domain: String): Boolean
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealBypassedSSLCertificatesRepository @Inject constructor() : BypassedSSLCertificatesRepository {
 
     private val trustedSites: MutableList<String> = mutableListOf()

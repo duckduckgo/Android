@@ -28,10 +28,12 @@ import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayabl
 import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnStepPlugin.Companion.VPN_STEP_ID
 import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnViewModel.Command
 import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnViewModel.VPNActivationError
+import com.duckduckgo.networkprotection.impl.subscription.onboarding.experiment.SubscriptionOnboardingExperimentMetrics
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.SKIPPED
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -40,6 +42,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -50,6 +53,7 @@ class SubscriptionOnboardingVpnViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private val controller: SubscriptionOnboardingController = mock()
+    private val subscriptionOnboardingExperimentMetrics: SubscriptionOnboardingExperimentMetrics = mock()
 
     @Test
     fun whenConnectionInfoLoadsThenViewStateShowsIpAndFlagFormattedLocation() = runTest {
@@ -87,7 +91,6 @@ class SubscriptionOnboardingVpnViewModelTest {
 
     @Test
     fun whenVpnReconnectsAfterConnectedThenStaysOnSuccessAndNoError() = runTest {
-        // Once connected, later CONNECTING/DISCONNECTED churn must not rewind the screen or invent a failure.
         val networkProtectionState = mock<NetworkProtectionState>().apply {
             whenever(getConnectionStateFlow()).thenReturn(flowOf(CONNECTED, CONNECTING, DISCONNECTED))
         }
@@ -97,6 +100,7 @@ class SubscriptionOnboardingVpnViewModelTest {
             networkProtectionState,
             mock<WgTunnelConfig>(),
             coroutineRule.testDispatcherProvider,
+            subscriptionOnboardingExperimentMetrics,
         )
 
         testee.viewState().test {
@@ -153,6 +157,7 @@ class SubscriptionOnboardingVpnViewModelTest {
             networkProtectionState,
             mock<WgTunnelConfig>(),
             coroutineRule.testDispatcherProvider,
+            subscriptionOnboardingExperimentMetrics,
         )
 
         testee.viewState().test {
@@ -174,6 +179,7 @@ class SubscriptionOnboardingVpnViewModelTest {
             networkProtectionState,
             mock<WgTunnelConfig>(),
             coroutineRule.testDispatcherProvider,
+            subscriptionOnboardingExperimentMetrics,
         )
 
         testee.onVpnPermissionDenied()
@@ -186,6 +192,46 @@ class SubscriptionOnboardingVpnViewModelTest {
             assertFalse(state.activating)
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenVpnActivatedInOnboardingThenFiresVpnActivatedMetric() = runTest {
+        val networkProtectionState = mock<NetworkProtectionState>().apply {
+            whenever(getConnectionStateFlow()).thenReturn(flowOf(CONNECTED))
+        }
+        val testee = SubscriptionOnboardingVpnViewModel(
+            controller,
+            FakeConnectionService(ConnectionInfo(ip = "137.220.87.36", city = "Birmingham", country = "GB")),
+            networkProtectionState,
+            mock<WgTunnelConfig>(),
+            coroutineRule.testDispatcherProvider,
+            subscriptionOnboardingExperimentMetrics,
+        )
+
+        testee.onVpnPermissionGranted()
+        advanceUntilIdle()
+
+        verify(subscriptionOnboardingExperimentMetrics).fireVpnActivated()
+    }
+
+    @Test
+    fun whenActivationFailsThenDoesNotFireVpnActivatedMetric() = runTest {
+        val networkProtectionState = mock<NetworkProtectionState>().apply {
+            whenever(getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        }
+        val testee = SubscriptionOnboardingVpnViewModel(
+            controller,
+            FakeConnectionService(ConnectionInfo(ip = "137.220.87.36", city = "Birmingham", country = "GB")),
+            networkProtectionState,
+            mock<WgTunnelConfig>(),
+            coroutineRule.testDispatcherProvider,
+            subscriptionOnboardingExperimentMetrics,
+        )
+
+        testee.onVpnPermissionGranted()
+        advanceUntilIdle()
+
+        verify(subscriptionOnboardingExperimentMetrics, never()).fireVpnActivated()
     }
 
     @Test
@@ -273,6 +319,7 @@ class SubscriptionOnboardingVpnViewModelTest {
             networkProtectionState,
             mock<WgTunnelConfig>(),
             coroutineRule.testDispatcherProvider,
+            subscriptionOnboardingExperimentMetrics,
         )
     }
 

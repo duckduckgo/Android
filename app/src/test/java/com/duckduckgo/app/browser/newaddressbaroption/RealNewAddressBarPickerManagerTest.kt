@@ -24,6 +24,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -47,6 +48,7 @@ class RealNewAddressBarPickerManagerTest {
     private val dialogFactoryMock: NewAddressBarPickerBottomSheetDialogFactory = mock()
     private val pixelMock: Pixel = mock()
     private val appThemeMock: AppTheme = mock()
+    private val promptExposureReporterMock: PromptExposureReporter = mock()
     private val dialogMock: BottomSheetDialog = mock()
 
     private lateinit var testee: RealNewAddressBarPickerManager
@@ -66,6 +68,7 @@ class RealNewAddressBarPickerManagerTest {
                     dialogFactoryMock,
                     pixelMock,
                     appThemeMock,
+                    promptExposureReporterMock,
                     coroutineTestRule.testScope,
                     coroutineTestRule.testDispatcherProvider,
                 )
@@ -167,6 +170,7 @@ class RealNewAddressBarPickerManagerTest {
             capturedCallback!!.onDisplayed()
             verify(pixelMock).fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_DISPLAYED_COUNT)
             verify(pixelMock).fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_DISPLAYED_DAILY, type = Pixel.PixelType.Daily())
+            verify(promptExposureReporterMock).reportPromptShown("new_address_bar_picker")
         }
 
     @Test

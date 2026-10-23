@@ -306,6 +306,7 @@
     <string name="sync_simplified_settings_download_recovery_code_item_hint">Használd ezt a kódot az adataid helyreállításához, ha elveszíted a hozzáférést ehhez az eszközhöz – őrizd meg egy biztonságos helyen.</string>
     <string name="sync_simplified_settings_data_expiration_notice">A Sync &amp; Backup-adatok 18 hónapnyi inaktivitás után nem állíthatók vissza. <annotation type="learn_more_link">További információ</annotation></string>
     <string name="sync_simplified_settings_delete_account_item">Kikapcsolás és szerveradatok törlése</string>
+    <string name="sync_simplified_settings_turn_off_item">Sync &amp; Backup kikapcsolása</string>
     <string name="sync_simplified_settings_storage_permission_message">A helyreállítási PDF mentéséhez tárolási engedély szükséges</string>
     <string name="sync_simplified_settings_learn_more_screen_title">Sync &amp; Backup</string>
 
@@ -320,6 +321,26 @@
     <string name="sync_simplified_settings_delete_server_data_dialog_body">A Sync &amp; Backup szolgáltatást használó összes eszköz le lesz választva, és a szinkronizált adataid törlődnek a szerverről.</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Szerveradatok törlése</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">Mégsem</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_title_v2">Ez a művelet nem vonható vissza.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body_v2">A Sync &amp; Backup funkciót használó összes eszköz le lesz választva, és a szinkronizált adataid törlődnek a szerverről.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button_v2">Végleges törlés</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button_v2">Mégsem</string>
+
+    <!-- Sync settings screen: turn off sheet -->
+    <string name="sync_simplified_settings_turn_off_sheet_remove_title" instruction="Placeholder is a device name. e.g., Samsung S23">Eltávolítod a(z) %1$s eszközt a Sync &amp; Backup funkcióból?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_body" instruction="Placeholder is a device name. e.g., Samsung S23">A(z) „%1$s” többé nem fog hozzáférni a szinkronizált adataidhoz a többi eszközön.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item">A szerveradatokat is törlöd?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Kapcsold ki a Sync &amp; Backup funkciót, töröld az összes szinkronizált adatot a szerverről és deaktiváld a helyreállítási kódodat.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Eszköz eltávolítása</string>
+    <string name="sync_simplified_settings_turn_off_sheet_title">Kikapcsolod a Sync &amp; Backup funkciót?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_body">A Sync &amp; Backup funkciót használó összes eszköz le lesz választva, és a szinkronizált adataid törlődnek a szerverről.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Kikapcsolás és szerveradatok törlése</string>
+
+    <!-- Sync settings screen: turn off this device dialog -->
+    <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">Eltávolítod a(z) %1$s eszközt a Sync &amp; Backup funkcióból?</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">A(z) „%1$s” többé nem férhet hozzá a szinkronizált adatokhoz. A könyvjelzők, az automatikus kitöltési adatok és a Duck.ai-csevegések továbbra is az eszközeiden maradnak.</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_primary_button">Eltávolítás</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_secondary_button">Mégsem</string>
 
     <!-- Sync settings screen: require device passcode dialog -->
     <string name="sync_simplified_settings_require_passcode_dialog_title">Eszköz lezárása a Sync &amp; Backup használatához</string>
@@ -329,6 +350,8 @@
     <!-- Sync This Device screen -->
     <string name="sync_simplified_setup_header_headline">Szinkronizáld ezt az eszközt egy közeli számítógéppel.</string>
     <string name="sync_simplified_setup_header_body">Segítünk szinkronizálni az eszközeidet.</string>
+    <string name="sync_simplified_setup_header_headline_v2">Van másik eszköz a közelben? Szinkronizáld az eszközeidet.</string>
+    <string name="sync_simplified_setup_header_body_v2">Most nincs másik eszköz? Csak ezt az eszközt szinkronizáld, és később pedig szinkronizálj másikkal.</string>
     <string name="sync_simplified_setup_primary_button">Szinkronizálás másik eszközzel</string>
     <string name="sync_simplified_setup_secondary_button">Csak ennek az eszköznek a szinkronizálása</string>
     <string name="sync_simplified_setup_secondary_button_syncing">Csatlakozás…</string>
@@ -353,10 +376,14 @@
     <string name="sync_simplified_scanner_camera_header_headline">Olvasd be a QR-kódot a szinkronizáláshoz</string>
     <string name="sync_simplified_scanner_camera_header_body">Nyisd meg a <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo for Desktop</annotation></b>\n<annotation type="gap">\n</annotation>alkalmazást, és lépj a <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Szinkronizálás másik eszközzel</annotation> menüpontra</string>
     <string name="sync_simplified_scanner_camera_primary_button">Készen állok a beolvasásra</string>
+    <string name="sync_simplified_scanner_camera_primary_button_v2">Értem</string>
     <string name="sync_simplified_scanner_camera_invalid_code_message">Sajnáljuk, a beolvasott kód érvénytelen.</string>
     <string name="sync_simplified_scanner_no_permission_headline">Kamera engedély szükséges</string>
     <string name="sync_simplified_scanner_no_permission_body">Nyisd meg az eszköz beállításait, és engedélyezd ennek az alkalmazásnak a kamerához való hozzáférést.</string>
     <string name="sync_simplified_scanner_no_permission_primary_button">Lépj a Beállítások menübe</string>
+    <string name="sync_simplified_scanner_no_permission_headline_v2">A DuckDuckGónak hozzá kell férnie a kamerádhoz.</string>
+    <string name="sync_simplified_scanner_no_permission_body_v2">A QR-kód beolvasásához kamera-hozzáférési engedély szükséges.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button_v2">Engedélyek módosítása</string>
     <string name="sync_simplified_scanner_no_hardware_headline">Kamera nem elérhető</string>
 
     <!-- Scanner screen: manual entry tab -->
@@ -376,7 +403,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">A Sync &amp; Backup végpontok közötti titkosítással működik minden eszközödön.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Ellenőrizd a másik eszközödet</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Nézd meg a másik eszközödön.</string>
     <string name="sync_simplified_pairing_headline_recovery">Adatok helyreállítása</string>
     <string name="sync_simplified_pairing_body">Csatlakozás…</string>
 
@@ -411,6 +438,8 @@
     <string name="sync_simplified_edit_device_sync_this_device_item">Eszköz szinkronizálása</string>
     <string name="sync_simplified_edit_device_remove_notice_this_device">Ez az eszköz többé nem fog hozzáférni a szinkronizált adataidhoz, ha eltávolítod.</string>
     <string name="sync_simplified_edit_device_remove_notice_another_device">Ez az eszköz többé nem fog hozzáférni a szinkronizált adataidhoz, ha ezt kikapcsolod.</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">A(z) „%1$s” többé nem fog hozzáférni a szinkronizált adataidhoz a többi eszközön, ha ezt kikapcsolod.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">A(z) „%1$s” többé nem fog hozzáférni a szinkronizált adataidhoz a többi eszközön.</string>
 
     <!-- Edit Device screen: edit name dialog -->
     <string name="sync_simplified_edit_device_edit_name_dialog_title">Név szerkesztése</string>
@@ -422,6 +451,8 @@
     <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">A(z) „%1$s” többé nem férhet hozzá a szinkronizált adatokhoz.</string>
     <string name="sync_simplified_edit_device_remove_dialog_primary_button">Eltávolítás</string>
     <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Mégsem</string>
+    <string name="sync_simplified_edit_device_remove_dialog_title_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Eltávolítod a(z) %1$s eszközt a Sync &amp; Backup funkcióból?</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body_v2" instruction="Placeholder is a device name. e.g., Samsung S23">A(z) „%1$s” többé nem férhet hozzá a szinkronizált adatokhoz. A könyvjelzők, az automatikus kitöltési adatok és a Duck.ai-csevegések továbbra is az eszközeiden maradnak.</string>
 
     <!-- Edit Device screen: turn off sync dialog -->
     <string name="sync_simplified_edit_device_turn_off_dialog_title">Kikapcsolod a Sync &amp; Backup funkciót?</string>

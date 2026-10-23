@@ -49,4 +49,5 @@ enum class Component {
     PROGRESS_SPINNER,
     SKELETON,
     APP_TRACKING_PROTECTION_BANNER,
+    CONTEXT_MENU,
 }

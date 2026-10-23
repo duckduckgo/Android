@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.passkey
 
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.passkey.PasskeyUsageResult.CreateFailed
 import com.duckduckgo.autofill.impl.passkey.PasskeyUsageResult.Created
 import com.duckduckgo.autofill.impl.passkey.PasskeyUsageResult.UseFailed
@@ -26,16 +27,17 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import logcat.LogPriority.INFO
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class PasskeyUsedContentScopeJsMessageHandler @Inject constructor(
     private val parser: PasskeyUsedMessageParser,
     private val pixelSender: PasskeyUsagePixelSender,
+    private val autofillFeature: AutofillFeature,
 ) : ContentScopeJsMessageHandlersPlugin {
 
     override fun getJsMessageHandler(): JsMessageHandler = object : JsMessageHandler {
@@ -44,6 +46,9 @@ class PasskeyUsedContentScopeJsMessageHandler @Inject constructor(
             jsMessaging: JsMessaging,
             jsMessageCallback: JsMessageCallback?,
         ) {
+            // With the flag off, WebView WebAuthn support is never enabled, so every page that
+            // probes navigator.credentials reports NotSupportedError. Those are not real attempts.
+            if (!autofillFeature.passkeySupport().isEnabled()) return
             processResult(parser.parse(jsMessage))
         }
 

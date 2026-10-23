@@ -58,4 +58,10 @@
     <string name="browserMenuForward">Naprej</string>
     <string name="browserMenuRefresh">Osveži</string>
     <string name="browserMenuFireTabsData">Izbriši zavihke in podatke</string>
+
+    <!-- Duck.ai tab + menu -->
+    <string name="chatMenuPopupNewVoiceChat">Nov glasovni klepet</string>
+    <string name="chatMenuPopupNewImage">Nova slika</string>
+    <string name="chatMenuPopupNewTab">Nov zavihek</string>
+    <string name="chatMenuPopupNewFireTab">Nov zavihek Fire</string>
 </resources>

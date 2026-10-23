@@ -24,16 +24,15 @@ import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.NEVER
 import com.duckduckgo.app.icon.api.AppIcon
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
 interface SettingsDataStore {
@@ -133,17 +132,16 @@ interface SettingsDataStore {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = SettingsDataStore::class,
+    binding = binding<SettingsDataStore>(),
 )
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = AutoCompleteSettings::class,
+    binding = binding<AutoCompleteSettings>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class SettingsSharedPreferences @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
-    private val brandDesignUpdateToggles: Lazy<OnboardingBrandDesignUpdateToggles>,
 ) : SettingsDataStore,
     AutoCompleteSettings {
     private val fireAnimationMapper = FireAnimationPrefsMapper()
@@ -349,16 +347,9 @@ class SettingsSharedPreferences @Inject constructor(
     }
 
     private fun selectedFireAnimationSavedValue(): FireAnimation {
-        val flagOn = isFireAnimationUpdateEnabled()
         val savedValue = preferences.getString(KEY_SELECTED_FIRE_ANIMATION, null)
-        val implicitDefault = if (flagOn) FireAnimation.Inferno else FireAnimation.HeroFire
-        val resolved = fireAnimationMapper.fireAnimationFrom(savedValue, implicitDefault)
-        // mask saved INFERNO to HeroFire when the flag is off so the kill switch fully rolls back the new animation
-        return if (!flagOn && resolved == FireAnimation.Inferno) FireAnimation.HeroFire else resolved
-    }
-
-    private fun isFireAnimationUpdateEnabled(): Boolean {
-        return brandDesignUpdateToggles.get().fireAnimationUpdate().isEnabled()
+        val implicitDefault = FireAnimation.Inferno
+        return fireAnimationMapper.fireAnimationFrom(savedValue, implicitDefault)
     }
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }

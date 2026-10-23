@@ -306,6 +306,7 @@
     <string name="sync_simplified_settings_download_recovery_code_item_hint">Tenhle kód můžeš použít k obnovení svých dat, pokud k tomuhle zařízení ztratíš přístup. Bezpečně si ho ulož.</string>
     <string name="sync_simplified_settings_data_expiration_notice">Data Sync &amp; Backup nelze obnovit po 18 měsících nečinnosti. <annotation type="learn_more_link">Další informace</annotation></string>
     <string name="sync_simplified_settings_delete_account_item">Vypnout a smazat data serveru</string>
+    <string name="sync_simplified_settings_turn_off_item">Vypnout Sync &amp; Backup</string>
     <string name="sync_simplified_settings_storage_permission_message">Povol ukládání, aby se mohlo uložit PDF pro obnovení</string>
     <string name="sync_simplified_settings_learn_more_screen_title">Sync &amp; Backup</string>
 
@@ -320,6 +321,26 @@
     <string name="sync_simplified_settings_delete_server_data_dialog_body">Dojde k odpojení všech zařízení používajících Sync &amp; Backup a smazání synchronizovaných dat ze serveru.</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Smazat data ze serveru</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">Zrušit</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_title_v2">Tuto akci nepůjde vrátit zpět.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body_v2">Dojde k odpojení všech zařízení používajících Sync &amp; Backup a smazání synchronizovaných dat ze serveru.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button_v2">Smazat natrvalo</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button_v2">Zrušit</string>
+
+    <!-- Sync settings screen: turn off sheet -->
+    <string name="sync_simplified_settings_turn_off_sheet_remove_title" instruction="Placeholder is a device name. e.g., Samsung S23">Odebrat %1$s ze Sync &amp; Backup?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_body" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s“ už nebude mít přístup k tvým synchronizovaným datům na ostatních zařízeních.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item">Smazat i data ze serveru?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Vypni Sync &amp; Backup a smaž všechna synchronizovaná data ze serveru a deaktivuj svůj kód pro obnovení.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Smazat zařízení</string>
+    <string name="sync_simplified_settings_turn_off_sheet_title">Vypnout Sync &amp; Backup?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_body">Dojde k odpojení všech zařízení používajících Sync &amp; Backup a smazání synchronizovaných dat ze serveru.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Vypnout a smazat data serveru</string>
+
+    <!-- Sync settings screen: turn off this device dialog -->
+    <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">Odebrat %1$s ze Sync &amp; Backup?</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s“ už nebude mít přístup k synchronizovaným datům. Záložky, data pro automatické vyplnění a chaty Duck.ai zůstanou na tvých zařízeních.</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_primary_button">Odstranit</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_secondary_button">Zrušit</string>
 
     <!-- Sync settings screen: require device passcode dialog -->
     <string name="sync_simplified_settings_require_passcode_dialog_title">Zabezpeč své zařízení, ať můžeš používat funkci Sync &amp; Backup</string>
@@ -329,6 +350,8 @@
     <!-- Sync This Device screen -->
     <string name="sync_simplified_setup_header_headline">Synchronizuj toto zařízení s blízkým počítačem.</string>
     <string name="sync_simplified_setup_header_body">Pomůžeme ti synchronizovat tvá zařízení.</string>
+    <string name="sync_simplified_setup_header_headline_v2">Máš poblíž jiné zařízení? Synchronizuj svá zařízení.</string>
+    <string name="sync_simplified_setup_header_body_v2">Nemáš teď po ruce žádné jiné zařízení? Synchronizuj zatím jen tohle zařízení a později přidej další.</string>
     <string name="sync_simplified_setup_primary_button">Synchronizovat s jiným zařízením</string>
     <string name="sync_simplified_setup_secondary_button">Synchronizovat pouze toto zařízení</string>
     <string name="sync_simplified_setup_secondary_button_syncing">Připojování…</string>
@@ -353,10 +376,14 @@
     <string name="sync_simplified_scanner_camera_header_headline">Naskenuj QR kód.</string>
     <string name="sync_simplified_scanner_camera_header_body">Otevři <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo pro počítač</annotation></b>\n<annotation type="gap">\n</annotation>a přejdi do <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synchronizace s jiným zařízením</annotation></string>
     <string name="sync_simplified_scanner_camera_primary_button">Můžu začít skenovat</string>
+    <string name="sync_simplified_scanner_camera_primary_button_v2">Rozumím</string>
     <string name="sync_simplified_scanner_camera_invalid_code_message">Naskenovaný kód je bohužel neplatný.</string>
     <string name="sync_simplified_scanner_no_permission_headline">Je potřeba přístup k fotoaparátu</string>
     <string name="sync_simplified_scanner_no_permission_body">Přejdi do nastavení zařízení a povol aplikaci přístup k fotoaparátu.</string>
     <string name="sync_simplified_scanner_no_permission_primary_button">Přejít do Nastavení</string>
+    <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo potřebuje přístup k fotoaparátu.</string>
+    <string name="sync_simplified_scanner_no_permission_body_v2">K naskenování QR kódu je potřeba přístup k fotoaparátu.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button_v2">Změnit oprávnění</string>
     <string name="sync_simplified_scanner_no_hardware_headline">Fotoaparát není dostupný</string>
 
     <!-- Scanner screen: manual entry tab -->
@@ -376,7 +403,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Funkce Sync &amp; Backup používá end-to-end šifrování na všech tvých zařízeních.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Podívej se na své druhé zařízení</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Podívej se na své další zařízení.</string>
     <string name="sync_simplified_pairing_headline_recovery">Obnovují se data</string>
     <string name="sync_simplified_pairing_body">Připojování…</string>
 
@@ -411,6 +438,8 @@
     <string name="sync_simplified_edit_device_sync_this_device_item">Synchronizovat toto zařízení</string>
     <string name="sync_simplified_edit_device_remove_notice_this_device">Pokud toto zařízení odebereš, už nebude mít přístup k tvým synchronizovaným datům.</string>
     <string name="sync_simplified_edit_device_remove_notice_another_device">Pokud tuhle možnost vypneš, tohle zařízení už nebude mít přístup k tvým synchronizovaným datům.</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Pokud bude tahle možnost vypnutá, „%1$s“ už nebude mít přístup k tvým synchronizovaným datům na ostatních zařízeních.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s“ už nebude mít přístup k tvým synchronizovaným datům na ostatních zařízeních.</string>
 
     <!-- Edit Device screen: edit name dialog -->
     <string name="sync_simplified_edit_device_edit_name_dialog_title">Upravit název</string>
@@ -422,6 +451,8 @@
     <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s“ už nebude mít přístup k synchronizovaným datům.</string>
     <string name="sync_simplified_edit_device_remove_dialog_primary_button">Odstranit</string>
     <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Zrušit</string>
+    <string name="sync_simplified_edit_device_remove_dialog_title_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Odebrat %1$s ze Sync &amp; Backup?</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body_v2" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s“ už nebude mít přístup k synchronizovaným datům. Záložky, data pro automatické vyplnění a chaty Duck.ai zůstanou na tvých zařízeních.</string>
 
     <!-- Edit Device screen: turn off sync dialog -->
     <string name="sync_simplified_edit_device_turn_off_dialog_title">Vypnout Sync &amp; Backup?</string>

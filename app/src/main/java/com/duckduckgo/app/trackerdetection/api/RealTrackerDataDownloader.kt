@@ -16,17 +16,22 @@
 
 package com.duckduckgo.app.trackerdetection.api
 
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
+import com.duckduckgo.app.trackerdetection.db.TrackerDetectionDatabase
 import com.duckduckgo.common.utils.extensions.extractETag
 import com.duckduckgo.common.utils.store.BinaryDataStore
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.JsonDataException
+import com.squareup.moshi.JsonReader
+import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesBinding
 import io.reactivex.Completable
 import logcat.logcat
 import okhttp3.Headers
+import okio.BufferedSource
+import okio.ByteString.Companion.decodeHex
 import java.io.IOException
 import javax.inject.Inject
 
@@ -35,9 +40,12 @@ class RealTrackerDataDownloader @Inject constructor(
     private val trackerListService: TrackerListService,
     private val binaryDataStore: BinaryDataStore,
     private val trackerDataLoader: TrackerDataLoader,
-    private val appDatabase: AppDatabase,
+    private val trackerDetectionDatabase: TrackerDetectionDatabase,
     private val metadataDao: TdsMetadataDao,
+    @TrackerDetectionMoshi moshi: Moshi,
 ) : TrackerDataDownloader {
+
+    private val tdsAdapter = moshi.adapter(TdsJson::class.java)
 
     override fun downloadTds(): Completable {
         return Completable.fromAction {
@@ -50,13 +58,14 @@ class RealTrackerDataDownloader @Inject constructor(
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
 
-            val body = response.body()!!
+            val tdsJson = response.body()!!.use { parseTds(it.source()) }
+                ?: throw IOException("Empty tds.json body")
             val eTag = response.headers().extractETag()
             val oldEtag = metadataDao.eTag()
             if (eTag != oldEtag) {
                 logcat { "Updating tds data from server" }
-                appDatabase.runInTransaction {
-                    trackerDataLoader.persistTds(eTag, body)
+                trackerDetectionDatabase.runInTransaction {
+                    trackerDataLoader.persistTds(eTag, tdsJson)
                     trackerDataLoader.loadTrackers()
                 }
             }
@@ -72,6 +81,26 @@ class RealTrackerDataDownloader @Inject constructor(
             }
             return@fromAction
         }
+    }
+
+    /**
+     * Applies the same document-level rules as Retrofit's MoshiResponseBodyConverter (a UTF-8 BOM is
+     * skipped, trailing content is rejected), which Moshi's JsonAdapter leaves to the caller.
+     */
+    private fun parseTds(source: BufferedSource): TdsJson? {
+        if (source.rangeEquals(0, UTF8_BOM)) {
+            source.skip(UTF8_BOM.size.toLong())
+        }
+        val reader = JsonReader.of(source)
+        val tdsJson = tdsAdapter.fromJson(reader)
+        if (reader.peek() != JsonReader.Token.END_DOCUMENT) {
+            throw JsonDataException("JSON document was not fully consumed.")
+        }
+        return tdsJson
+    }
+
+    companion object {
+        private val UTF8_BOM = "EFBBBF".decodeHex()
     }
 }
 

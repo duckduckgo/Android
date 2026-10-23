@@ -16,7 +16,7 @@
 
 package com.duckduckgo.sync.impl
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
@@ -141,6 +141,15 @@ interface SyncFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun canUsePatchEndpointForLegacyDeviceRename(): Toggle
+
+    /**
+     * When enabled:
+     *   - On-device authentication is moved from the sync settings to the last possible moment before syncing.
+     *   - Camera permission is request upfront when opening barcode scanner.
+     *   - Account deletion flow is explicit about deletion results.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun canUseImprovedSyncFlow(): Toggle
 }
 
 /**

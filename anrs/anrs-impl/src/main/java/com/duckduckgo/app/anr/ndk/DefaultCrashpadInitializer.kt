@@ -21,7 +21,7 @@ import com.duckduckgo.android_crashkit.Crashpad
 import com.duckduckgo.android_crashkit.CrashpadConfig
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)

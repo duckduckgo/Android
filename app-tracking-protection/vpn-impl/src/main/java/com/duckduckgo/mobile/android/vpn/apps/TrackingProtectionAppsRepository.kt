@@ -32,8 +32,9 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerManualExcludedApp
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.networkprotection.api.NetworkProtectionExclusionList
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -70,13 +71,13 @@ interface TrackingProtectionAppsRepository {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = TrackingProtectionAppsRepository::class,
+    binding = binding<TrackingProtectionAppsRepository>(),
 )
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = SystemAppOverridesProvider::class,
+    binding = binding<SystemAppOverridesProvider>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealTrackingProtectionAppsRepository @Inject constructor(
     private val packageManager: PackageManager,
     private val appTrackerRepository: AppTrackerRepository,

@@ -46,8 +46,8 @@
     <string name="atp_OnInitialNotification">"Rakenduse jälgimise kaitse on lubatud ja blokeerib jälgimiskatsed kõigis sinu rakendustes"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Jälgimitegevuste otsimine… piiks… piiks"</string>
     <plurals name="atp_OnNotification">
-        <item quantity="one"><![CDATA[ Jälgimiskatsed blokeeriti <b>%1$d rakenduses</b> (viimase tunni jooksul).]]></item>
-        <item quantity="other"><![CDATA[ Jälgimiskatsed blokeeritud <b>%1$d rakenduses</b> (viimase tunni jooksul).]]></item>
+        <item quantity="one" instruction="Placeholder is a number"><![CDATA[ Jälgimiskatsed blokeeriti <b>%1$d rakenduses</b> (viimase tunni jooksul).]]></item>
+        <item quantity="other" instruction="Placeholder is a number"><![CDATA[ Jälgimiskatsed blokeeritud <b>%1$d rakenduses</b> (viimase tunni jooksul).]]></item>
     </plurals>
     <string name="atp_DisabledNotification">Rakenduse jälgimise kaitse on keelatud. Jälgimiskatsete blokeerimise jätkamiseks puuduta.</string>
     <string name="atp_RevokedNotification">VPN-rakendus sinu seadmes keelas rakenduse jälgimise kaitse. Puuduta selle uuesti lubamiseks.</string>
@@ -59,13 +59,13 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatset %2$d rakenduses, muu hulgas %3$s</b> (viimase päeva jooksul).]]></string>
 
     <plurals name="atp_DailyTopCompanyNotification">
-        <item quantity="one"><![CDATA[%1$s proovis jälgida sind <b>%2$d rakenduses</b> (viimase päeva jooksul). <b>Lisateave</b>]]></item>
-        <item quantity="other"><![CDATA[%1$s proovis jälgida sind <b>%2$d rakenduses</b> (viimase päeva jooksul). <b>Lisateave</b>]]></item>
+        <item quantity="one" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[%1$s proovis jälgida sind <b>%2$d rakenduses</b> (viimase päeva jooksul). <b>Lisateave</b>]]></item>
+        <item quantity="other" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[%1$s proovis jälgida sind <b>%2$d rakenduses</b> (viimase päeva jooksul). <b>Lisateave</b>]]></item>
     </plurals>
 
     <plurals name="atp_DailyCompanyBlockedNotification">
-        <item quantity="one"><![CDATA[App Tracking Protection blokeeris kõige rohkem jälgimiskatseid rakenduses <b>%1$s</b> (viimase päeva jooksul).]]></item>
-        <item quantity="other"><![CDATA[App Tracking Protection blokeeris kõige rohkem jälgimiskatseid rakenduses <b>%1$s</b> ja <b>%2$s</b> (viimase päeva jooksul).]]></item>
+        <item quantity="one" instruction="Placeholder is the name of an app"><![CDATA[App Tracking Protection blokeeris kõige rohkem jälgimiskatseid rakenduses <b>%1$s</b> (viimase päeva jooksul).]]></item>
+        <item quantity="other" instruction="Both placeholders are the name of an app"><![CDATA[App Tracking Protection blokeeris kõige rohkem jälgimiskatseid rakenduses <b>%1$s</b> ja <b>%2$s</b> (viimase päeva jooksul).]]></item>
     </plurals>
 
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$s %2$d korra rakenduses %3$s</b> (viimase päeva jooksul).]]></string>
@@ -85,8 +85,8 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimise katset rakenduses %2$s</b> ja %3$d muus rakenduses (viimase nädala jooksul).]]></string>
 
     <plurals name="atp_WeeklyCompanyTeaserNotification">
-        <item quantity="one"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$s %2$drakenduses, %3$s</b> (viimase nädala jooksul).]]></item>
-        <item quantity="other"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$s kokku %2$d rakenduses, muu hulgas %3$s</b> (viimase nädala jooksul).]]></item>
+        <item quantity="one" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$s %2$drakenduses, %3$s</b> (viimase nädala jooksul).]]></item>
+        <item quantity="other" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of one of the apps where it happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$s kokku %2$d rakenduses, muu hulgas %3$s</b> (viimase nädala jooksul).]]></item>
     </plurals>
 
     <string name="atp_EnableCTA">Luba rakenduse jälgimise kaitse</string>
@@ -269,12 +269,12 @@
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">
-        <item quantity="one">%1$d katse. Teada olevalt kogutakse järgmist:</item>
-        <item quantity="other">%1$d katset. Teada olevalt kogutakse järgmist:</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d katse. Teada olevalt kogutakse järgmist:</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d katset. Teada olevalt kogutakse järgmist:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">DuckDuckGo blokeeris %1$d jälgimiskatse</item>
-        <item quantity="other">DuckDuckGo blokeeris %1$d jälgimiskatset</item>
+        <item quantity="one" instruction="Placeholder is a number">DuckDuckGo blokeeris %1$d jälgimiskatse</item>
+        <item quantity="other" instruction="Placeholder is a number">DuckDuckGo blokeeris %1$d jälgimiskatset</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Teata selle rakendusega seotud probleemist</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Kuva %1$d rohkem</string>

@@ -86,6 +86,11 @@
     <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">A(z) „%1$s” webhely hozzá akar férni a kamerádhoz</string>
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">A(z) „%1$s” webhely hozzá akar férni a mikrofonodhoz</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">A(z) „%1$s” webhely hozzá akar férni a kamerádhoz és a mikrofonodhoz</string>
+    <string name="sitePermissionsTieredThirdPartyLocationDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">A(z) „%1$s” hozzá szeretne férni a tartózkodási helyedhez ezen a webhelyen</string>
+    <string name="sitePermissionsTieredThirdPartyCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">A(z) „%1$s” hozzá szeretne férni a kamerádhoz ezen a webhelyen</string>
+    <string name="sitePermissionsTieredThirdPartyMicDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">A(z) „%1$s” hozzá szeretne férni a mikrofonodhoz ezen a webhelyen</string>
+    <string name="sitePermissionsTieredThirdPartyMicAndCameraDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">A(z) „%1$s” hozzá szeretne férni a kamerádhoz és a mikrofonodhoz ezen a webhelyen</string>
+    <string name="sitePermissionsTieredThirdPartyDrmDialogTitle" instruction="Placeholder is a third-party website embedded in the website the user is visiting">A(z) „%1$s” hozzá szeretne férni a digitális jogkezelő (DRM) szoftveredhez ezen a webhelyen</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">Ha nem engedélyezed, előfordulhat, hogy a webhelyen lévő videók nem lesznek lejátszhatók, de ez a webhely nem fog hozzáférni a DRM-szoftver által biztosított eszközazonosítókhoz.</string>
 
     <!-- Reminder dialog -->
@@ -104,5 +109,22 @@
     <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">A DuckDuckGo nem tudott kamera-hozzáférést adni a webhelynek</string>
     <string name="sitePermissionsTieredMicDeniedSnackBarMessage">A DuckDuckGo nem tudott mikrofon-hozzáférést adni a webhelynek</string>
     <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">A DuckDuckGo nem tudott kamera- és mikrofon-hozzáférést adni a webhelynek</string>
+
+    <!-- Permission settings redesign -->
+    <string name="permissionSettingsAlwaysAllow" instruction="Permission setting option: the site gets the permission without asking">Engedélyezés mindig</string>
+    <string name="permissionSettingsAskEachTime" instruction="Permission setting option: the site has to ask for the permission every time">Rákérdezés minden alkalommal</string>
+    <string name="permissionSettingsLocationDialogTitle">A webhelyek engedélyt kérhetnek a tartózkodási helyedhez</string>
+    <string name="permissionSettingsLocationDialogMessage">Ha az „Engedélyezés soha” lehetőséget választod, bizonyos funkciókat nem fogsz tudni használni a webhelyeken, például a térképes útvonaltervezést vagy a közeli üzletek megjelenítését.</string>
+    <string name="permissionSettingsCameraDialogTitle">Webhelyek kameraengedély-kérésnek megengedése</string>
+    <string name="permissionSettingsCameraDialogMessage">Ha az „Engedélyezés soha” lehetőséget választod, nem fogsz tudni olyan funkciókat használni a webhelyeken, mint a videócsevegés.</string>
+    <string name="permissionSettingsMicrophoneDialogTitle">Webhelyek mikrofonengedély-kérésének megengedése</string>
+    <string name="permissionSettingsMicrophoneDialogMessage">Ha az „Engedélyezés soha” lehetőséget választod, nem fogsz tudni olyan funkciókat használni a webhelyeken, mint a hangcsevegés.</string>
+    <string name="permissionSettingsDrmDialogTitle">Webhelyeknek digitális jogkezelési (DRM) engedélykérésének megengedése</string>
+    <string name="permissionSettingsDrmTitle" instruction="Name of a permission setting for playing protected video content">Digitális jogkezelés (DRM)</string>
+    <string name="permissionsPerWebsiteRedesignHeader" instruction="Placeholder is the name of a website">Engedélyek a következőhöz: %1$s</string>
+    <string name="permissionsPerWebsiteRemovePermissions" instruction="Button that removes all saved permissions for the website shown on the screen">Engedélyek eltávolítása</string>
+    <string name="permissionsRemovedForSiteSnackbar" instruction="Placeholder is the name of a website">&lt;b&gt;%1$s&lt;/b&gt; engedélyei eltávolítva</string>
+    <string name="permissionsRemovedForAllSitesSnackbar">Minden webhely engedélye eltávolítva</string>
+    <string name="permissionSettingsDrmDialogMessage">Ha az „Engedélyezés soha” lehetőséget választod, előfordulhat, hogy a webhelyen található videók nem lesznek lejátszhatók.</string>
 
 </resources>

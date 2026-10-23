@@ -20,8 +20,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
 import com.duckduckgo.adblocking.impl.databinding.ActivityAdBlockingSettingsBinding
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.view.listitem.DaxListItem
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.ui.view.text.DaxTextView
@@ -46,7 +46,7 @@ class AdBlockingSettingsActivity : BaseAdBlockingSettingsActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        maybeEnableEdgeToEdge()
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
         configure()
     }

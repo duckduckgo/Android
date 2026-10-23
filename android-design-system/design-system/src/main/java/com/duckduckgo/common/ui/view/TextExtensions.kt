@@ -34,6 +34,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
+import androidx.annotation.DimenRes
 import androidx.core.content.ContextCompat
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.mobile.android.R
@@ -46,6 +47,18 @@ fun Context.getColorFromAttr(
 ): Int {
     theme.resolveAttribute(attrColor, typedValue, resolveRefs)
     return typedValue.data
+}
+
+fun Context.getDimensionFromAttr(
+    @AttrRes attr: Int,
+    @DimenRes fallback: Int,
+): Float {
+    val typedValue = TypedValue()
+    return if (theme.resolveAttribute(attr, typedValue, true) && typedValue.type == TypedValue.TYPE_DIMENSION) {
+        typedValue.getDimension(resources.displayMetrics)
+    } else {
+        resources.getDimension(fallback)
+    }
 }
 
 fun Context.defaultSelectableItemBackground(

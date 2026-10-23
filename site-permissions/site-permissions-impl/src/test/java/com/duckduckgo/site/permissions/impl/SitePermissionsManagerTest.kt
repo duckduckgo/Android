@@ -35,8 +35,8 @@ import com.duckduckgo.site.permissions.impl.drm.DrmPolicyManager
 import com.duckduckgo.site.permissions.impl.drm.DrmPolicyReason
 import com.duckduckgo.site.permissions.impl.drm.DrmSessionStore
 import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
+import com.duckduckgo.site.permissions.impl.feature.SitePermissionsDialogRedesignFeature
 import com.duckduckgo.site.permissions.impl.feature.SitePermissionsSystemRecoveryFeature
-import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
@@ -71,6 +71,7 @@ class SitePermissionsManagerTest {
     private val mockDrmPolicyManager: DrmPolicyManager = mock()
     private val drmSessionStore = DrmSessionStore()
     private val mockPixel: Pixel = mock()
+    private val sitePermissionsDialogRedesignFeature = FakeFeatureToggleFactory.create(SitePermissionsDialogRedesignFeature::class.java)
 
     private val testee by lazy {
         SitePermissionsManagerImpl(
@@ -84,6 +85,7 @@ class SitePermissionsManagerTest {
             mockDrmPolicyManager,
             drmSessionStore,
             mockPixel,
+            sitePermissionsDialogRedesignFeature,
         )
     }
 
@@ -349,8 +351,8 @@ class SitePermissionsManagerTest {
     fun whenClearAllButFireproofThenDontDeleteEntitiesWhichDomainIsInTheFireproofList() = runTest {
         val fireproofDomain = "domain.com"
         val testFireproofList = listOf(fireproofDomain, "domain1.com")
-        val testSitePermissionsList = listOf(SitePermissionsEntity(fireproofDomain), SitePermissionsEntity("domain2.com"))
-        whenever(mockSitePermissionsRepository.sitePermissionsForAllWebsites()).thenReturn(testSitePermissionsList)
+        val testSitePermissionsList = setOf(fireproofDomain, "domain2.com")
+        whenever(mockSitePermissionsRepository.domainsWithPermissions()).thenReturn(testSitePermissionsList)
 
         testee.clearAllButFireproof(testFireproofList)
         verify(mockSitePermissionsRepository, never()).deletePermissionsForSite(fireproofDomain)
@@ -360,17 +362,44 @@ class SitePermissionsManagerTest {
     fun whenClearAllButFireproofThenDeleteEntitiesWhichDomainIsNotInTheFireproofList() = runTest {
         val domain = "domain2.com"
         val testFireproofList = listOf("domain.com", "domain1.com")
-        val testSitePermissionsList = listOf(SitePermissionsEntity("domain.com"), SitePermissionsEntity(domain))
-        whenever(mockSitePermissionsRepository.sitePermissionsForAllWebsites()).thenReturn(testSitePermissionsList)
+        val testSitePermissionsList = setOf("domain.com", domain)
+        whenever(mockSitePermissionsRepository.domainsWithPermissions()).thenReturn(testSitePermissionsList)
 
         testee.clearAllButFireproof(testFireproofList)
         verify(mockSitePermissionsRepository).deletePermissionsForSite(domain)
     }
 
     @Test
+    fun whenClearForDomainsButFireproofThenDeleteOnlyNonFireproofHostsUnderThoseDomains() = runTest {
+        sitePermissionsDialogRedesignFeature.self().setRawStoredState(Toggle.State(true))
+        sitePermissionsDialogRedesignFeature.singleTabBurnClearing().setRawStoredState(Toggle.State(true))
+        whenever(mockSitePermissionsRepository.domainsWithPermissions()).thenReturn(
+            setOf("maps.example.com", "www.example.com", "other.com", "192.168.1.1"),
+        )
+
+        testee.clearForDomainsButFireproof(setOf("example.com", "192.168.1.1"), listOf("www.example.com"))
+
+        verify(mockSitePermissionsRepository).deletePermissionsForSite("maps.example.com")
+        verify(mockSitePermissionsRepository).deletePermissionsForSite("192.168.1.1")
+        verify(mockSitePermissionsRepository, never()).deletePermissionsForSite("www.example.com")
+        verify(mockSitePermissionsRepository, never()).deletePermissionsForSite("other.com")
+    }
+
+    @Test
+    fun whenClearForDomainsButFireproofAndSingleTabBurnClearingDisabledThenNothingDeleted() = runTest {
+        sitePermissionsDialogRedesignFeature.self().setRawStoredState(Toggle.State(true))
+        sitePermissionsDialogRedesignFeature.singleTabBurnClearing().setRawStoredState(Toggle.State(false))
+
+        testee.clearForDomainsButFireproof(setOf("example.com"), emptyList())
+
+        verify(mockSitePermissionsRepository, never()).domainsWithPermissions()
+        verify(mockSitePermissionsRepository, never()).deletePermissionsForSite(any())
+    }
+
+    @Test
     fun whenClearAllButFireproofThenDrmSessionChoicesAreCleared() = runTest {
         drmSessionStore.save(tabId, "domain.com", true)
-        whenever(mockSitePermissionsRepository.sitePermissionsForAllWebsites()).thenReturn(emptyList())
+        whenever(mockSitePermissionsRepository.domainsWithPermissions()).thenReturn(emptySet())
 
         testee.clearAllButFireproof(listOf("domain.com"))
 

@@ -29,7 +29,7 @@ import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.connectivity.VpnConnectivityLossListenerPlugin
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -41,16 +41,15 @@ import java.net.InetSocketAddress
 import java.net.Socket
 import java.nio.channels.SocketChannel
 import javax.inject.Inject
-import javax.inject.Provider
 
 // We use an IP address instead of a domain name to skip DNS resolution
 private const val PROBED_ADDRESS = "1.1.1.1"
 
-@ContributesMultibinding(VpnScope::class)
+@ContributesIntoSet(VpnScope::class)
 class NetworkConnectivityHealthHandler @Inject constructor(
     private val context: Context,
     private val pixel: DeviceShieldPixels,
-    private val trackerBlockingVpnService: Provider<TrackerBlockingVpnService>,
+    private val trackerBlockingVpnService: () -> TrackerBlockingVpnService,
     private val vpnConnectivityLossListenerPluginPoint: PluginPoint<VpnConnectivityLossListenerPlugin>,
     private val dispatcherProvider: DispatcherProvider,
 ) : VpnServiceCallbacks {
@@ -115,7 +114,7 @@ class NetworkConnectivityHealthHandler @Inject constructor(
             var socket: Socket? = null
             try {
                 socket = SocketChannel.open().socket()
-                trackerBlockingVpnService.get().protect(socket)
+                trackerBlockingVpnService().protect(socket)
                 socket.connect(InetSocketAddress(PROBED_ADDRESS, 443), 5000)
                 logcat { "Validated $activeNetwork device network has connectivity to $PROBED_ADDRESS" }
                 return true

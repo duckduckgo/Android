@@ -33,6 +33,8 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AnotherDevicePromptOption
+import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationResult
+import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationSource
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
@@ -40,11 +42,13 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
+import com.duckduckgo.sync.impl.pixels.SyncPixels.TurnOffOption
 import com.duckduckgo.sync.impl.stats.DailyStats
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -54,6 +58,9 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.time.LocalDate
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 @RunWith(TestParameterInjector::class)
 class RealSyncPixelsTest {
@@ -82,7 +89,39 @@ class RealSyncPixelsTest {
     }
 
     @Test
-    fun `when daily pixel is called then pixel is fired`() {
+    fun `when daily pixel is called then pixel is fired as daily`() {
+        testee.fireDailyPixel()
+
+        verify(pixel).fire(SyncPixelName.SYNC_DAILY, emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when daily pixel is called and legacy timestamp is today then pixel is not fired`() {
+        sharedPreferences.edit().putString("SYNC_DAILY_timestamp", utcToday()).apply()
+
+        testee.fireDailyPixel()
+
+        verifyNoInteractions(pixel)
+    }
+
+    @Test
+    fun `when daily pixel is called and legacy timestamp is before today then pixel is fired as daily`() {
+        sharedPreferences.edit().putString("SYNC_DAILY_timestamp", utcYesterday()).apply()
+
+        testee.fireDailyPixel()
+
+        verify(pixel).fire(SyncPixelName.SYNC_DAILY, emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when daily pixel is called then legacy timestamp is not stored`() {
+        testee.fireDailyPixel()
+
+        assertNull(sharedPreferences.getString("SYNC_DAILY_timestamp", null))
+    }
+
+    @Test
+    fun `when daily success rate pixel is called then pixel is fired as daily`() {
         val dailyStats = givenSomeDailyStats()
 
         testee.fireDailySuccessRatePixel()
@@ -93,26 +132,20 @@ class RealSyncPixelsTest {
                 put(SyncPixelParameters.COUNT, dailyStats.attempts)
                 put(SyncPixelParameters.DATE, dailyStats.date)
                 putAll(dailyStats.apiErrorStats)
+                putAll(dailyStats.operationErrorStats)
             },
+            type = Pixel.PixelType.Daily(),
         )
     }
 
     @Test
-    fun `when daily pixel is called twice then pixel is fired once`() {
-        val dailyStats = givenSomeDailyStats()
+    fun `when daily success rate pixel is called and legacy timestamp is today then pixel is not fired`() {
+        givenSomeDailyStats()
+        sharedPreferences.edit().putString("SYNC_DAILY_SUCCESS_RATE_PIXEL_timestamp", utcToday()).apply()
 
         testee.fireDailySuccessRatePixel()
-        testee.fireDailySuccessRatePixel()
 
-        verify(pixel, times(1)).fire(
-            SyncPixelName.SYNC_DAILY_SUCCESS_RATE_PIXEL,
-            buildMap {
-                put(SyncPixelParameters.COUNT, dailyStats.attempts)
-                put(SyncPixelParameters.DATE, dailyStats.date)
-                putAll(dailyStats.apiErrorStats)
-                putAll(dailyStats.operationErrorStats)
-            },
-        )
+        verifyNoInteractions(pixel)
     }
 
     @Test
@@ -226,6 +259,22 @@ class RealSyncPixelsTest {
             mapOf(
                 SyncPixelParameters.SYNC_SCANNER_CAMERA_PERMISSION_BEFORE_REQUESTING to "false",
                 SyncPixelParameters.SYNC_SCANNER_CAMERA_PERMISSION_AFTER_REQUESTING to "true",
+            ),
+        )
+    }
+
+    @Test
+    fun `when setup authentication result is reported then the pixel carries the result and source`(
+        @TestParameter result: AuthenticationResult,
+        @TestParameter source: AuthenticationSource,
+    ) {
+        testee.fireSetupAuthenticationResult(result, source)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_AUTHENTICATION_RESULT,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_AUTHENTICATION_RESULT to result.value,
+                SyncPixelParameters.SYNC_SETUP_AUTHENTICATION_SOURCE to source.value,
             ),
         )
     }
@@ -1045,6 +1094,46 @@ class RealSyncPixelsTest {
     }
 
     @Test
+    fun `when turn off sheet is shown then the pixel is fired`() {
+        testee.fireTurnOffSheetShown()
+
+        verify(pixel).fire(SyncPixelName.SYNC_TURN_OFF_SHEET_SHOWN)
+    }
+
+    @Test
+    fun `when turn off option is selected then the pixel carries the option`(
+        @TestParameter option: TurnOffOption,
+    ) {
+        testee.fireTurnOffOptionSelected(option)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_TURN_OFF_OPTION_SELECTED,
+            mapOf(SyncPixelParameters.OPTION to option.value),
+        )
+    }
+
+    @Test
+    fun `when delete server data confirmation is shown then the pixel is fired`() {
+        testee.fireDeleteServerDataConfirmationShown()
+
+        verify(pixel).fire(SyncPixelName.SYNC_DELETE_SERVER_DATA_CONFIRMATION_SHOWN)
+    }
+
+    @Test
+    fun `when delete server data confirmation is confirmed then the pixel is fired`() {
+        testee.fireDeleteServerDataConfirmationConfirmed()
+
+        verify(pixel).fire(SyncPixelName.SYNC_DELETE_SERVER_DATA_CONFIRMATION_CONFIRMED)
+    }
+
+    @Test
+    fun `when delete server data confirmation is dismissed then the pixel is fired`() {
+        testee.fireDeleteServerDataConfirmationDismissed()
+
+        verify(pixel).fire(SyncPixelName.SYNC_DELETE_SERVER_DATA_CONFIRMATION_DISMISSED)
+    }
+
+    @Test
     fun `when unified device read succeeds then daily pixel is fired`() {
         testee.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OwnRowResolvedDeviceInfo)
 
@@ -1151,6 +1240,10 @@ class RealSyncPixelsTest {
 
         return dailyStats
     }
+
+    private fun utcToday(): String = LocalDate.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE)
+
+    private fun utcYesterday(): String = LocalDate.now(ZoneOffset.UTC).minusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE)
 
     enum class ProtocolVersion(
         val value: String,

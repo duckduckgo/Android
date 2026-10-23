@@ -24,8 +24,6 @@ import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreen
@@ -60,11 +58,14 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsMa
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialMode.ListMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialMode.Locked
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialMode.Viewing
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ExternalImportAuthSuppressor
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementCredentialsMode
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementDeviceUnsupportedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementDisabledMode
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementListMode
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementLockedMode
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.gone
@@ -72,9 +73,7 @@ import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
 import com.google.android.material.snackbar.Snackbar
@@ -96,10 +95,10 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
     lateinit var deviceAuthenticator: DeviceAuthenticator
 
     @Inject
-    lateinit var pixel: Pixel
+    lateinit var externalImportAuthSuppressor: ExternalImportAuthSuppressor
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+    lateinit var pixel: Pixel
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -111,17 +110,12 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
             window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.AUTOFILL)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         setContentView(binding.root)
         setupToolbar(binding.toolbar)
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         observeViewModel()
         sendLaunchPixel(savedInstanceState)
@@ -157,9 +151,10 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
 
     override fun onStart() {
         super.onStart()
+        val suppressAuthPrompt = externalImportAuthSuppressor.consumeSuppression()
         lifecycleScope.launch {
             viewModel.onViewStarted()
-            viewModel.launchDeviceAuth()
+            viewModel.launchDeviceAuth(suppressAuthPrompt)
         }
     }
 

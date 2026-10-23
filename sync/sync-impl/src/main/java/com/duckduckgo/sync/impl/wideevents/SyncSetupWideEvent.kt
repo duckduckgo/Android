@@ -21,8 +21,8 @@ import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.SyncBuildConfig
 import com.duckduckgo.sync.impl.SyncFeature
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.FLOW_VERSION_V1
 import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.FLOW_VERSION_V2
 import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.FLOW_VERSION_V2_1
@@ -30,9 +30,8 @@ import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.UI_VERSION_V2
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_FLOW_VERSION
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_UI_VERSION
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEventImpl.Companion.STEP_DEVICE_AUTH_NOT_ENROLLED
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -56,19 +55,19 @@ interface SyncSetupWideEvent {
     suspend fun onSyncRestoreStarted()
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class SyncSetupWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
     private val syncFeature: Lazy<SyncFeature>,
     private val dispatchers: DispatcherProvider,
-    private val deviceAuthenticator: DeviceAuthenticator,
+    private val buildConfig: SyncBuildConfig,
 ) : SyncSetupWideEvent {
 
     private var cachedFlowId: Long? = null
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        syncFeature.get().sendSyncSetupWideEvent().isEnabled()
+        syncFeature.value.sendSyncSetupWideEvent().isEnabled()
     }
 
     private suspend fun getCurrentWideEventId(): Long? {
@@ -96,7 +95,7 @@ class SyncSetupWideEventImpl @Inject constructor(
             name = FLOW_NAME,
             flowEntryPoint = source,
             metadata = buildMap {
-                put(KEY_USER_AUTH_REQUIRED, deviceAuthenticator.isAuthenticationRequired().toString())
+                put(KEY_USER_AUTH_REQUIRED, buildConfig.isAuthRequired.toString())
                 putAll(uiMetadata())
                 putAll(flowMetadata())
             },
@@ -112,6 +111,10 @@ class SyncSetupWideEventImpl @Inject constructor(
      * If the dialog prompting user to enroll in device auth is shown, abort the flow, see [onEnrollDeviceAuthDialogShown].
      * If the dialog is never shown, the flow will become stale and be reported as [FlowStatus.Unknown] with last step being [STEP_DEVICE_AUTH_NOT_ENROLLED]
      * which indicates an issue.
+     *
+     * When we authenticate on the intro screen, the enroll dialog does not abort the flow, because the user can enroll and retry
+     * without leaving the screen. There, [STEP_DEVICE_AUTH_NOT_ENROLLED] can be followed by [STEP_USER_AUTH] and a successful finish,
+     * and leaving the screen finishes the flow as [FlowStatus.Cancelled].
      */
     override suspend fun onDeviceAuthNotEnrolled() {
         if (!isFeatureEnabled()) return
@@ -251,7 +254,7 @@ class SyncSetupWideEventImpl @Inject constructor(
     private fun uiMetadata(): Map<String, String> = mapOf(SYNC_SETUP_UI_VERSION to UI_VERSION_V2)
 
     private fun flowMetadata(): Map<String, String> = buildMap {
-        val feature = syncFeature.get()
+        val feature = syncFeature.value
         val flowVersion = if (feature.canUseV2ConnectFlow().isEnabled()) {
             if (feature.canUseExchangeV2Point1().isEnabled()) {
                 FLOW_VERSION_V2_1

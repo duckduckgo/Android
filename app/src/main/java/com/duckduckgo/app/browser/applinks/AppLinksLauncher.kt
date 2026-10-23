@@ -26,7 +26,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat

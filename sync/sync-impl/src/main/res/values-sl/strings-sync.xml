@@ -306,6 +306,7 @@
     <string name="sync_simplified_settings_download_recovery_code_item_hint">Uporabite to kodo za obnovitev podatkov, če izgubite dostop do te naprave – hranite jo na varnem.</string>
     <string name="sync_simplified_settings_data_expiration_notice">Podatkov funkcije Sync &amp; Backup ni mogoče obnoviti po 18 mesecih nedejavnosti. <annotation type="learn_more_link">Več o tem</annotation></string>
     <string name="sync_simplified_settings_delete_account_item">Izklopi in izbriši podatke strežnika</string>
+    <string name="sync_simplified_settings_turn_off_item">Izklopi Sync &amp; Backup</string>
     <string name="sync_simplified_settings_storage_permission_message">Možnost »Shrani obnovitveni PDF« zahteva dovoljenje za shranjevanje</string>
     <string name="sync_simplified_settings_learn_more_screen_title">Sinhronizacija in varnostno kopiranje</string>
 
@@ -320,6 +321,26 @@
     <string name="sync_simplified_settings_delete_server_data_dialog_body">Povezava z vsemi napravami, ki uporabljajo Sync &amp; Backup, bo prekinjena, sinhronizirani podatki pa bodo izbrisani iz strežnika.</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Izbriši podatke strežnika</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">Prekliči</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_title_v2">Tega dejanja ni mogoče razveljaviti.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body_v2">Povezava z vsemi napravami, ki uporabljajo Sync &amp; Backup, bo prekinjena, sinhronizirani podatki pa bodo izbrisani iz strežnika.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button_v2">Trajno izbriši</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button_v2">Prekliči</string>
+
+    <!-- Sync settings screen: turn off sheet -->
+    <string name="sync_simplified_settings_turn_off_sheet_remove_title" instruction="Placeholder is a device name. e.g., Samsung S23">Želite napravo %1$s odstraniti iz Sync &amp; Backup?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_body" instruction="Placeholder is a device name. e.g., Samsung S23">Naprava »%1$s« ne bo več mogla dostopati do vaših sinhroniziranih podatkov v drugih napravah.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item">Želite izbrisati tudi podatke strežnika?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Izklopi funkcijo Sync &amp; Backup, izbriši vse sinhronizirane podatke s strežnika in deaktiviraj obnovitveno kodo.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Odstranit napravo</string>
+    <string name="sync_simplified_settings_turn_off_sheet_title">Želite izklopiti funkcijo Sync &amp; Backup?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_body">Povezava z vsemi napravami, ki uporabljajo Sync &amp; Backup, bo prekinjena, sinhronizirani podatki pa bodo izbrisani iz strežnika.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Izklopi in izbriši podatke v strežniku</string>
+
+    <!-- Sync settings screen: turn off this device dialog -->
+    <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">Želite napravo %1$s odstraniti iz Sync &amp; Backup?</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">Naprava »%1$s« ne bo več mogla dostopati do sinhroniziranih podatkov. Zaznamki, podatki za samodejno izpolnjevanje in klepeti Duck.ai bodo ostali v vaših napravah.</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_primary_button">Odstrani</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_secondary_button">Prekliči</string>
 
     <!-- Sync settings screen: require device passcode dialog -->
     <string name="sync_simplified_settings_require_passcode_dialog_title">Za uporabo funkcije Sync &amp; Backup zavarujte svojo napravo</string>
@@ -329,6 +350,8 @@
     <!-- Sync This Device screen -->
     <string name="sync_simplified_setup_header_headline">Sinhronizirajte to napravo z bližnjim računalnikom.</string>
     <string name="sync_simplified_setup_header_body">Pomagali vam bomo sinhronizirati vaše naprave.</string>
+    <string name="sync_simplified_setup_header_headline_v2">Imate v bližini drugo napravo? Sinhronizirajte svoje naprave.</string>
+    <string name="sync_simplified_setup_header_body_v2">Trenutno nimate druge naprave? Sinhronizirajte samo to napravo, z drugo pa sinhronizirajte pozneje.</string>
     <string name="sync_simplified_setup_primary_button">Sinhroniziraj z drugo napravo</string>
     <string name="sync_simplified_setup_secondary_button">Sinhroniziraj samo to napravo</string>
     <string name="sync_simplified_setup_secondary_button_syncing">Povezovanje ...</string>
@@ -353,10 +376,14 @@
     <string name="sync_simplified_scanner_camera_header_headline">Skenirajte kodo QR za sinhronizacijo</string>
     <string name="sync_simplified_scanner_camera_header_body">Odprite <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo za namizje</annotation></b>\n<annotation type="gap">\n</annotation>in pojdite v <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sinhroniziraj z drugo napravo</annotation></string>
     <string name="sync_simplified_scanner_camera_primary_button">Pripravljen/a sem na skeniranje</string>
+    <string name="sync_simplified_scanner_camera_primary_button_v2">Razumem</string>
     <string name="sync_simplified_scanner_camera_invalid_code_message">Oprostite, skenirana koda je neveljavna.</string>
     <string name="sync_simplified_scanner_no_permission_headline">Zahtevano je dovoljenje za fotoaparat</string>
     <string name="sync_simplified_scanner_no_permission_body">Pojdite v nastavitve naprave in tej aplikaciji dovolite dostop do fotoaparata.</string>
     <string name="sync_simplified_scanner_no_permission_primary_button">Odprite nastavitve</string>
+    <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo potrebuje dostop do vašega fotoaparata.</string>
+    <string name="sync_simplified_scanner_no_permission_body_v2">Za skeniranje kode QR je potrebno dovoljenje za fotoaparat.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button_v2">Sprememba dovoljenj</string>
     <string name="sync_simplified_scanner_no_hardware_headline">Fotoaparat ni na voljo</string>
 
     <!-- Scanner screen: manual entry tab -->
@@ -376,7 +403,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Sync &amp; Backup je šifriran v celoti v vseh vaših napravah.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Preveri drugo napravo</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Preverite drugo napravo.</string>
     <string name="sync_simplified_pairing_headline_recovery">Obnovitev podatkov</string>
     <string name="sync_simplified_pairing_body">Povezovanje ...</string>
 
@@ -411,6 +438,8 @@
     <string name="sync_simplified_edit_device_sync_this_device_item">Sinhroniziraj to napravo</string>
     <string name="sync_simplified_edit_device_remove_notice_this_device">Če napravo odstranite, ne bo več mogla dostopati do vaših sinhroniziranih podatkov.</string>
     <string name="sync_simplified_edit_device_remove_notice_another_device">Ta naprava ne bo več mogla dostopati do vaših sinhroniziranih podatkov, če to izklopite.</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Naprava »%1$s« ne bo več mogla dostopati do vaših sinhroniziranih podatkov v drugih napravah, če je ta možnost izklopljena.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Naprava »%1$s« ne bo več mogla dostopati do vaših sinhroniziranih podatkov v drugih napravah.</string>
 
     <!-- Edit Device screen: edit name dialog -->
     <string name="sync_simplified_edit_device_edit_name_dialog_title">Uredi ime</string>
@@ -422,6 +451,8 @@
     <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">Naprava »%1$s« ne bo več mogla dostopati do sinhroniziranih podatkov.</string>
     <string name="sync_simplified_edit_device_remove_dialog_primary_button">Odstrani</string>
     <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Prekliči</string>
+    <string name="sync_simplified_edit_device_remove_dialog_title_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Želite napravo %1$s odstraniti iz Sync &amp; Backup?</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Naprava »%1$s« ne bo več mogla dostopati do sinhroniziranih podatkov. Zaznamki, podatki za samodejno izpolnjevanje in klepeti Duck.ai bodo ostali v vaših napravah.</string>
 
     <!-- Edit Device screen: turn off sync dialog -->
     <string name="sync_simplified_edit_device_turn_off_dialog_title">Želite izklopiti funkcijo Sync &amp; Backup?</string>

@@ -25,25 +25,19 @@ import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Stay
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.BackPressed
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.StepFinished
-import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
-import dagger.SingleInstanceIn
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
-/**
- * Builds the linear-onboarding plan from the step plugins contributed across feature modules. Plugins are
- * collected in `@PriorityKey` order, filtered by [SubscriptionOnboardingStepPlugin.shouldShow], and each
- * becomes a [SubscriptionOnboardingActivityStep]. Already-completed steps are skipped on re-entry via the
- * step precondition. Running off the end of the plan completes the run (the activity finishes to Settings).
- */
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class SubscriptionOnboardingPlanProvider @Inject constructor(
     private val stepPlugins: PluginPoint<SubscriptionOnboardingStepPlugin>,
-    private val stepStore: SubscriptionOnboardingStepStore,
+    private val onboardingStore: SubscriptionOnboardingStore,
 ) {
 
     suspend fun buildPlan(): LinearOnboardingPlan {
         val (available, unavailable) = stepPlugins.getPlugins().partition { it.shouldShow() }
-        unavailable.forEach { stepStore.setCompleted(it.stepId) }
+        unavailable.forEach { onboardingStore.setStepCompleted(it.stepId) }
         return LinearOnboardingPlan(
             id = SUBSCRIPTION_ONBOARDING_PLAN_ID,
             steps = available.map { stepPlugin -> activityStep(stepPlugin) },
@@ -54,7 +48,7 @@ class SubscriptionOnboardingPlanProvider @Inject constructor(
         SubscriptionOnboardingActivityStep(
             id = stepPlugin.stepId,
             stepPlugin = stepPlugin,
-            precondition = { !stepStore.isCompleted(stepPlugin.stepId) },
+            precondition = { !onboardingStore.isStepCompleted(stepPlugin.stepId) },
             transition = { event ->
                 when {
                     event is StepFinished && event.stepId == stepPlugin.stepId -> Advance

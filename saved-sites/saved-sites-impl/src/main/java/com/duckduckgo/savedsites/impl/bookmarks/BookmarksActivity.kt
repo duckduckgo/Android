@@ -26,6 +26,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
@@ -36,15 +37,17 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.SimpleItemAnimator
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.tabs.BrowserNav
-import com.duckduckgo.autofill.api.ImportFromGoogle
-import com.duckduckgo.autofill.api.ImportFromGoogle.ImportFromGoogleResult
+import com.duckduckgo.autofill.api.ImportFromGoogleLauncher
+import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.BookmarksImportRequest
+import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.ImportFromGoogleResult
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
@@ -54,9 +57,7 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
@@ -134,10 +135,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     lateinit var bookmarksSortingFeature: BookmarksSortingFeature
 
     @Inject
-    lateinit var importFromGoogle: ImportFromGoogle
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+    lateinit var importFromGoogleLauncher: ImportFromGoogleLauncher
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -173,6 +171,8 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                 binding.searchBar
             }
 
+    private lateinit var googleBookmarksImport: ActivityResultLauncher<BookmarksImportRequest>
+
     private val startBookmarkFoldersActivityForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             if (result.resultCode == RESULT_OK) {
@@ -184,16 +184,14 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        contentBookmarksBinding = ContentBookmarksBinding.bind(binding.root)
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
+        googleBookmarksImport = registerForActivityResult(importFromGoogleLauncher.bookmarksImportContract()) { result ->
+            onGoogleBookmarkImportResult(result)
         }
+        contentBookmarksBinding = ContentBookmarksBinding.bind(binding.root)
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
         configureToolbar()
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         setupBookmarksRecycler()
         observeViewModel()
@@ -318,21 +316,16 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                     }
                 }
             }
-
-            GOOGLE_BOOKMARK_IMPORT_REQUEST_CODE -> onProcessGoogleBookmarkImportResult(data)
         }
     }
 
-    private fun onProcessGoogleBookmarkImportResult(data: Intent?) {
-        lifecycleScope.launch {
-            val result = importFromGoogle.parseResult(data)
-
-            when (result) {
-                is ImportFromGoogleResult.Success -> dismissImportBookmarksDialog()
-                is ImportFromGoogleResult.Error -> dismissImportBookmarksDialog()
-                is ImportFromGoogleResult.UserCancelled -> {
-                    // User cancelled - no action needed
-                }
+    private fun onGoogleBookmarkImportResult(result: ImportFromGoogleResult) {
+        when (result) {
+            is ImportFromGoogleResult.Success -> dismissImportBookmarksDialog()
+            is ImportFromGoogleResult.Error -> dismissImportBookmarksDialog()
+            is ImportFromGoogleResult.Unavailable -> showMessage(getString(R.string.importBookmarksError))
+            is ImportFromGoogleResult.UserCancelled -> {
+                // User cancelled - no action needed
             }
         }
     }
@@ -388,7 +381,11 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                 viewModel.onSelected(bookmark)
             },
             onBookmarkOverflowClick = { anchor, bookmark ->
-                showBookmarkOverFlowMenu(anchor, bookmark)
+                if (appBrandDesignUpdateToggles.radius().isEnabled()) {
+                    showBookmarkPopupMenu(anchor, bookmark)
+                } else {
+                    showBookmarkOverFlowMenu(anchor, bookmark)
+                }
             },
             onLongClick = {
                 if (viewModel.viewState.value?.sortingMode == NAME) {
@@ -399,7 +396,11 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                 viewModel.onBookmarkFolderSelected(bookmarkFolder)
             },
             onBookmarkFolderOverflowClick = { anchor, bookmarkFolder ->
-                showFolderOverflowMenu(anchor, bookmarkFolder)
+                if (appBrandDesignUpdateToggles.radius().isEnabled()) {
+                    showFolderPopupMenu(anchor, bookmarkFolder)
+                } else {
+                    showFolderOverflowMenu(anchor, bookmarkFolder)
+                }
             },
         )
         contentBookmarksBinding.recycler.adapter = bookmarksAdapter
@@ -486,19 +487,12 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                     }
                 },
             )
-            .setEdgeToEdgeEnabled(edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS))
         faviconPrompt.show()
     }
 
-    @Suppress("DEPRECATION")
     private fun launchBookmarkImportWebFlow() {
         lifecycleScope.launch {
-            val intent = importFromGoogle.getBookmarksImportLaunchIntent()
-            if (intent != null) {
-                startActivityForResult(intent, GOOGLE_BOOKMARK_IMPORT_REQUEST_CODE)
-            } else {
-                showMessage(getString(R.string.importBookmarksError))
-            }
+            importFromGoogleLauncher.launchBookmarksImport(googleBookmarksImport)
         }
     }
 
@@ -862,6 +856,46 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         popup.show()
     }
 
+    private fun showFolderPopupMenu(
+        anchor: View,
+        bookmarkFolder: BookmarkFolder,
+    ) {
+        val popup = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
+        popup.apply {
+            onMenuItemClicked(contentView.findViewById(R.id.edit)) {
+                viewModel.onEditBookmarkFolderRequested(bookmarkFolder)
+            }
+            onMenuItemClicked(contentView.findViewById(R.id.delete)) {
+                viewModel.onDeleteBookmarkFolderRequested(bookmarkFolder)
+            }
+            showAnchoredView(this@BookmarksActivity, binding.root, anchor)
+        }
+    }
+
+    private fun showBookmarkPopupMenu(
+        anchor: View,
+        bookmark: SavedSite.Bookmark,
+    ) {
+        val popup = PopupMenu(layoutInflater, R.layout.popup_window_edit_favorite_delete_menu)
+        val favoriteItem = popup.contentView.findViewById<PopupMenuItemView>(R.id.addRemoveFavorite)
+        favoriteItem.setPrimaryText(
+            getString(if (bookmark.isFavorite) R.string.removeFromFavorites else R.string.addToFavoritesMenu),
+        )
+        popup.apply {
+            onMenuItemClicked(contentView.findViewById(R.id.edit)) {
+                viewModel.onEditSavedSiteRequested(bookmark)
+            }
+            onMenuItemClicked(favoriteItem) {
+                addRemoveFavorite(bookmark)
+            }
+            onMenuItemClicked(contentView.findViewById(R.id.delete)) {
+                viewModel.onDeleteSavedSiteRequested(bookmark)
+                viewModel.onBookmarkItemDeletedFromOverflowMenu()
+            }
+            showAnchoredView(this@BookmarksActivity, binding.root, anchor)
+        }
+    }
+
     private fun addRemoveFavorite(bookmark: SavedSite.Bookmark) {
         if (bookmark.isFavorite) {
             viewModel.removeFavorite(bookmark)
@@ -897,7 +931,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
 
         private const val IMPORT_BOOKMARKS_REQUEST_CODE = 111
         private const val EXPORT_BOOKMARKS_REQUEST_CODE = 112
-        private const val GOOGLE_BOOKMARK_IMPORT_REQUEST_CODE = 113
 
         private val EXPORT_BOOKMARKS_FILE_NAME: String
             get() = "bookmarks_ddg_${formattedTimestamp()}.html"

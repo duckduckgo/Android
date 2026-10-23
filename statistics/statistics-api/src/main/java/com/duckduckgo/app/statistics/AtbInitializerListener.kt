@@ -26,6 +26,5 @@ interface AtbInitializerListener {
 
     companion object {
         const val PRIORITY_REINSTALL_LISTENER = 10
-        const val PRIORITY_AURA_EXPERIMENT_MANAGER = 20
     }
 }

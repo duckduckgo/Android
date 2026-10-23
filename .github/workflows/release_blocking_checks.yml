@@ -1,7 +1,5 @@
 name: Release Blocking Checks
 
-run-name: 'Release Blocking Checks (${{ inputs.ddg_di || ''default DI'' }})'
-
 on:
   workflow_call:
     inputs:
@@ -14,11 +12,6 @@ on:
         required: false
         type: boolean
         default: true
-      ddg_di:
-        description: 'DI framework to build with. Leave empty to use ddg.di from gradle.properties; set AnvilDagger or Metro to pin one.'
-        required: false
-        type: string
-        default: ''
   workflow_dispatch:
     inputs:
       commit:
@@ -30,15 +23,9 @@ on:
         required: false
         type: boolean
         default: true
-      ddg_di:
-        description: 'DI framework to build with. Leave empty to use ddg.di from gradle.properties; set AnvilDagger or Metro to pin one.'
-        required: false
-        type: string
-        default: ''
 
-# The DI framework is part of the group because a single caller runs this workflow once per DI
 concurrency:
-  group: ${{ github.workflow_ref }}-${{ github.ref }}-${{ inputs.commit }}-${{ inputs.ddg_di || 'default' }}
+  group: ${{ github.workflow_ref }}-${{ github.ref }}-${{ inputs.commit }}
   cancel-in-progress: true
 
 jobs:
@@ -46,7 +33,6 @@ jobs:
     uses: ./.github/workflows/nightly.yml
     with:
       commit: ${{ inputs.commit }}
-      ddg_di: ${{ inputs.ddg_di }}
     secrets: inherit
 
   end-to-end:
@@ -55,7 +41,6 @@ jobs:
     with:
       commit: ${{ inputs.commit }}
       create_asana_tasks: ${{ inputs.create_asana_tasks }}
-      ddg_di: ${{ inputs.ddg_di }}
     secrets: inherit
 
   privacy:
@@ -63,5 +48,4 @@ jobs:
     uses: ./.github/workflows/privacy.yml
     with:
       commit: ${{ inputs.commit }}
-      ddg_di: ${{ inputs.ddg_di }}
     secrets: inherit

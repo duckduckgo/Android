@@ -57,7 +57,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     PREONBOARDING_SYNC_RESTORE_SHOWN_UNIQUE("sync-auto-restore_onboarding_prompt_shown_unique"),
     PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE("sync-auto-restore_onboarding_restore_tapped_unique"),
     PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE("sync-auto-restore_onboarding_skip_tapped_unique"),
-    PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE("m_preonboarding_skip_onboarding_shown_unique"),
     PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE("m_preonboarding_choose_search_experience_impressions_unique"),
     PREONBOARDING_AICHAT_SELECTED("m_preonboarding_aichat_selected"),
     PREONBOARDING_SEARCH_ONLY_SELECTED("m_preonboarding_search_only_selected"),
@@ -70,8 +69,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     AI_CHAT_UNIFIED_INPUT_CHAT_HEADER_UPGRADE_TAPPED("m_aichat_unified_input_chat_header_upgrade_tapped"),
     AI_CHAT_UNIFIED_INPUT_FREE_LABEL_SHOWN("m_aichat_unified_input_free_label_shown"),
     PREONBOARDING_SKIP_ONBOARDING_PRESSED("m_preonboarding_skip-onboarding-pressed"),
-    PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED("m_preonboarding_confirm-skip-onboarding-pressed"),
-    PREONBOARDING_RESUME_ONBOARDING_PRESSED("m_preonboarding_resume-onboarding-pressed"),
     ONBOARDING_SEARCH_CUSTOM("m_onboarding_search_custom"),
     ONBOARDING_VISIT_SITE_CUSTOM("m_onboarding_visit_site_custom"),
     ONBOARDING_DAX_CTA_SHOWN("m_odc_s"),
@@ -92,12 +89,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     DEFAULT_BROWSER_UNSET("m_db_u"),
     DEFAULT_BROWSER_DIALOG_NOT_SHOWN("m_dbd_ns"),
 
-    WIDGET_CTA_SHOWN("m_wc_s"),
-    WIDGET_CTA_LAUNCHED("m_wc_l"),
-    WIDGET_CTA_DISMISSED("m_wc_d"),
-    WIDGET_LEGACY_CTA_SHOWN("m_wlc_s"),
-    WIDGET_LEGACY_CTA_LAUNCHED("m_wlc_l"),
-    WIDGET_LEGACY_CTA_DISMISSED("m_wlc_d"),
     WIDGETS_ADDED(pixelName = "m_w_a"),
     WIDGETS_DELETED(pixelName = "m_w_d"),
     FAVORITE_WIDGET_CONFIGURATION_SHOWN(pixelName = "m_sfw_cs"),
@@ -512,8 +503,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ERROR_CODE_PIXEL("m_errorpageshown_code"),
 
     APP_VERSION_AT_SEARCH_TIME("app_version_at_search_time"),
-
-    BLOCKLIST_TDS_FAILURE("blocklist_experiment_tds_download_failure"),
 
     SET_AS_DEFAULT_SYSTEM_DIALOG_IMPRESSION("m_set-as-default_system-dialog_impression"),
     SET_AS_DEFAULT_SYSTEM_DIALOG_CLICK("m_set-as-default_system-dialog_click"),

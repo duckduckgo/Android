@@ -19,7 +19,7 @@ package com.duckduckgo.privacy.config.impl
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
 

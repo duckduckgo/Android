@@ -16,7 +16,7 @@
 
 package com.duckduckgo.sync.impl.engine
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
 
 @ContributesPluginPoint(AppScope::class)

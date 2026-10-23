@@ -17,8 +17,8 @@
 package com.duckduckgo.duckchat.impl.contextual
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import org.json.JSONArray
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -30,12 +30,16 @@ import javax.inject.Inject
  * [serializedPageContext] is the page context the dialog had attached at submit time, so "Ask about
  * page" keeps its context across the hand-off. When it is null the dialog had no context attached
  * (never available, or the user removed it), and the sheet must not auto-attach one on hand-off.
+ *
+ * [carriesTermsConsent] is false for canned prompts (a suggestion or Summarize): the user never typed
+ * them, so sending one must not record ToS consent and Duck.ai shows the terms instead.
  */
 data class ContextualEntryPrompt(
     val tabId: String,
     val prompt: NativeInputPrompt,
     val serializedPageContext: String?,
     val selectionsJson: JSONArray? = null,
+    val carriesTermsConsent: Boolean = true,
 )
 
 /**
@@ -58,7 +62,7 @@ interface ContextualEntryPromptStore {
     fun clearAll()
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealContextualEntryPromptStore @Inject constructor() : ContextualEntryPromptStore {
 

@@ -46,8 +46,8 @@
     <string name="atp_OnInitialNotification">"App Tracking Protection on käytössä ja estää seurantayritykset kaikissa sovelluksissasi"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Skannataan seurantatoiminnan varalta... piip... puup"</string>
     <plurals name="atp_OnNotification">
-        <item quantity="one"><![CDATA[ Seurantayrityksiä estetty <b>%1$d sovelluksessa</b> (viimeisen tunnin aikana).]]></item>
-        <item quantity="other"><![CDATA[ Seurantayrityksiä estetty <b>kaikkiaan %1$d sovelluksessa</b> (viimeisen tunnin aikana).]]></item>
+        <item quantity="one" instruction="Placeholder is a number"><![CDATA[ Seurantayrityksiä estetty <b>%1$d sovelluksessa</b> (viimeisen tunnin aikana).]]></item>
+        <item quantity="other" instruction="Placeholder is a number"><![CDATA[ Seurantayrityksiä estetty <b>kaikkiaan %1$d sovelluksessa</b> (viimeisen tunnin aikana).]]></item>
     </plurals>
     <string name="atp_DisabledNotification">App Tracking Protection poistettu käytöstä. Napauta jatkaaksesi seurantayritysten estämistä.</string>
     <string name="atp_RevokedNotification">Laitteessasi oleva VPN-sovellus poisti App Tracking Protectionin käytöstä. Ota uudelleen käyttöön napauttamalla.</string>
@@ -59,13 +59,13 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ App Tracking Protection esti <b>%1$d seurantayritystä %2$d sovelluksessa, mukaan lukien %3$s</b> (viimeisen päivän aikana).]]></string>
 
     <plurals name="atp_DailyTopCompanyNotification">
-        <item quantity="one"><![CDATA[%1$s yritti seurata sinua <b>%2$d sovelluksessa</b> (viimeisen päivän aikana). <b>Näytä lisää</b>]]></item>
-        <item quantity="other"><![CDATA[%1$s yritti seurata sinua <b>kaikkiaan %2$d sovelluksessa</b> (viimeisen päivän aikana). <b>Näytä lisää</b>]]></item>
+        <item quantity="one" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[%1$s yritti seurata sinua <b>%2$d sovelluksessa</b> (viimeisen päivän aikana). <b>Näytä lisää</b>]]></item>
+        <item quantity="other" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[%1$s yritti seurata sinua <b>kaikkiaan %2$d sovelluksessa</b> (viimeisen päivän aikana). <b>Näytä lisää</b>]]></item>
     </plurals>
 
     <plurals name="atp_DailyCompanyBlockedNotification">
-        <item quantity="one"><![CDATA[App Tracking Protection esti eniten seurantayrityksiä kohteessa <b>%1$s</b> (viimeisen päivän aikana).]]></item>
-        <item quantity="other"><![CDATA[App Tracking Protection esti eniten seurantayrityksiä kohteissa <b>%1$s</b> ja <b>%2$s</b> (viimeisen päivän aikana).]]></item>
+        <item quantity="one" instruction="Placeholder is the name of an app"><![CDATA[App Tracking Protection esti eniten seurantayrityksiä kohteessa <b>%1$s</b> (viimeisen päivän aikana).]]></item>
+        <item quantity="other" instruction="Both placeholders are the name of an app"><![CDATA[App Tracking Protection esti eniten seurantayrityksiä kohteissa <b>%1$s</b> ja <b>%2$s</b> (viimeisen päivän aikana).]]></item>
     </plurals>
 
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[App Tracking Protection esti <b>%1$s %2$d kerran kohteessa %3$s</b> (viimeisen päivän aikana).]]></string>
@@ -85,8 +85,8 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[App Tracking Protection esti <b>%1$d seurantayritystä %2$s</b> ja %3$d muissa sovelluksissa (viime viikolla).]]></string>
 
     <plurals name="atp_WeeklyCompanyTeaserNotification">
-        <item quantity="one"><![CDATA[App Tracking Protection esti yrityksen <b>%1$s %2$d sovelluksessa, mukaan lukien %3$s</b> (viime viikolla).]]></item>
-        <item quantity="other"><![CDATA[App Tracking Protection esti yrityksen <b>%1$s kaikkiaan %2$d sovelluksessa, mukaan lukien %3$s</b> (viime viikolla).]]></item>
+        <item quantity="one" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[App Tracking Protection esti yrityksen <b>%1$s %2$d sovelluksessa, mukaan lukien %3$s</b> (viime viikolla).]]></item>
+        <item quantity="other" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of one of the apps where it happened"><![CDATA[App Tracking Protection esti yrityksen <b>%1$s kaikkiaan %2$d sovelluksessa, mukaan lukien %3$s</b> (viime viikolla).]]></item>
     </plurals>
 
     <string name="atp_EnableCTA">Ota App Tracking Protection käyttöön</string>
@@ -269,12 +269,12 @@
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">
-        <item quantity="one">%1$d yritys. Tiedetään keräävän:</item>
-        <item quantity="other">%1$d yritystä. Tiedetään keräävän:</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d yritys. Tiedetään keräävän:</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d yritystä. Tiedetään keräävän:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">DuckDuckGo esti %1$d seurantayrityksen</item>
-        <item quantity="other">DuckDuckGo esti %1$d seurantayritystä</item>
+        <item quantity="one" instruction="Placeholder is a number">DuckDuckGo esti %1$d seurantayrityksen</item>
+        <item quantity="other" instruction="Placeholder is a number">DuckDuckGo esti %1$d seurantayritystä</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Ilmoita ongelmasta tässä sovelluksessa</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Näytä %1$d lisää</string>

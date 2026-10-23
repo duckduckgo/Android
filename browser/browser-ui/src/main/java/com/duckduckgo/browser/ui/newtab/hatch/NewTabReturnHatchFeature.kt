@@ -16,7 +16,7 @@
 
 package com.duckduckgo.browser.ui.newtab.hatch
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
@@ -32,4 +32,7 @@ interface NewTabReturnHatchFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun closeNewTabOnReturn(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun afterInactivityEntry(): Toggle
 }

@@ -22,30 +22,30 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class OnboardingCompletedMetricObserver @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val userStageStore: UserStageStore,
-    private val onboardingPromptsExperimentMetrics: OnboardingPromptsExperimentMetrics,
     private val segmentedOnboardingExperimentMetrics: SegmentedOnboardingExperimentMetrics,
     private val onboardingPasswordImportExperimentMetrics: OnboardingPasswordImportExperimentMetrics,
+    private val contextualOnboardingTimeLimit: ContextualOnboardingTimeLimit,
 ) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
         userStageStore.userAppStageFlow()
-            .filter { it == AppStage.ESTABLISHED }
+            .filter { it == AppStage.ESTABLISHED && !contextualOnboardingTimeLimit.wasOnboardingEndedByTimeLimit() }
             .onEach {
-                onboardingPromptsExperimentMetrics.fireOnboardingCompletedMetric()
                 segmentedOnboardingExperimentMetrics.fireOnboardingCompletedMetric()
                 onboardingPasswordImportExperimentMetrics.fireOnboardingCompletedMetric()
             }

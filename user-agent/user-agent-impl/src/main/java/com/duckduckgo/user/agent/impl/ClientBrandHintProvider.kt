@@ -34,7 +34,7 @@ import com.duckduckgo.user.agent.impl.remoteconfig.ClientBrandsHints
 import com.duckduckgo.user.agent.impl.remoteconfig.ClientBrandsHints.CHROME
 import com.duckduckgo.user.agent.impl.remoteconfig.ClientBrandsHints.DDG
 import com.duckduckgo.user.agent.impl.remoteconfig.ClientBrandsHints.WEBVIEW
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.logcat

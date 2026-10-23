@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.onboarding.ui.page.extendedonboarding
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
@@ -47,6 +47,6 @@ interface ExtendedOnboardingFeatureToggles {
     @Experiment
     fun freeTrialCopy(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun duckAiOnboarding(): Toggle
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun contextualOnboardingTimeLimit(): Toggle
 }

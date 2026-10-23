@@ -23,16 +23,17 @@ import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability.Availa
 import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability.Unavailable
 import com.duckduckgo.persistentstorage.api.PersistentStorageKey
 import com.duckduckgo.persistentstorage.api.PersistentStorageUnavailableException
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesBinding(AppScope::class, boundType = PersistentStorage::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<PersistentStorage>())
+@SingleIn(AppScope::class)
 class RealPersistentStorage @Inject constructor(
     private val blockStoreWrapper: BlockStoreWrapper,
     private val dispatchers: DispatcherProvider,

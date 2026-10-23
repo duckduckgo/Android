@@ -22,7 +22,7 @@ import com.duckduckgo.app.browser.trafficquality.remote.FeaturesRequestHeaderSto
 import com.duckduckgo.app.browser.trafficquality.remote.TrafficQualityAppVersion
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit

@@ -16,8 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -28,8 +27,8 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(':codegen-annotations')
     implementation project(':di')
     implementation project(':common-utils')
     implementation project(':design-system')
@@ -62,7 +61,6 @@ dependencies {
 
     implementation Square.retrofit2.converter.moshi
     implementation Square.okHttp3.okHttp
-    implementation Google.dagger
     implementation AndroidX.core.ktx
 
     // Testing dependencies
@@ -80,9 +78,6 @@ dependencies {
 }
 
 android {
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     testOptions {
         unitTests {
             includeAndroidResources = true

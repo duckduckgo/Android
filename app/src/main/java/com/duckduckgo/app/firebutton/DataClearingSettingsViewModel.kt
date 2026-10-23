@@ -19,11 +19,9 @@ package com.duckduckgo.app.firebutton
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.store.FireDataStore
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.clear.FireClearOption.DUCKAI_CHATS
@@ -31,6 +29,7 @@ import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -58,12 +57,10 @@ class DataClearingSettingsViewModel @Inject constructor(
     private val fireDataStore: FireDataStore,
     private val dispatcherProvider: DispatcherProvider,
     fireproofWebsiteRepository: FireproofWebsiteRepository,
-    private val brandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
 ) : ViewModel() {
 
     data class ViewState(
         val selectedFireAnimation: FireAnimation = FireAnimation.HeroFire,
-        val isFireAnimationUpdateEnabled: Boolean = false,
         val clearDuckAiData: Boolean = false,
         val showClearDuckAiDataSetting: Boolean = false,
         val fireproofWebsitesCount: Int = 0,
@@ -74,7 +71,6 @@ class DataClearingSettingsViewModel @Inject constructor(
         data object LaunchFireproofWebsites : Command()
         data class LaunchFireAnimationSettings(
             val animation: FireAnimation,
-            val isFireAnimationUpdateEnabled: Boolean,
         ) : Command()
         data object LaunchFireDialog : Command()
         data object LaunchAutomaticDataClearingSettings : Command()
@@ -102,9 +98,6 @@ class DataClearingSettingsViewModel @Inject constructor(
 
     private fun loadInitialState() {
         viewModelScope.launch {
-            val isFireAnimationUpdateEnabled = withContext(dispatcherProvider.io()) {
-                brandDesignUpdateToggles.fireAnimationUpdate().isEnabled()
-            }
             val initialFireAnimation = withContext(dispatcherProvider.io()) {
                 settingsDataStore.selectedFireAnimation
             }
@@ -117,7 +110,6 @@ class DataClearingSettingsViewModel @Inject constructor(
             _viewState.update {
                 it.copy(
                     selectedFireAnimation = initialFireAnimation,
-                    isFireAnimationUpdateEnabled = isFireAnimationUpdateEnabled,
                     clearDuckAiData = initialClearDuckAi,
                     showClearDuckAiDataSetting = initialShowClearDuckAi,
                 )
@@ -140,7 +132,6 @@ class DataClearingSettingsViewModel @Inject constructor(
             _commands.send(
                 Command.LaunchFireAnimationSettings(
                     animation = state.selectedFireAnimation,
-                    isFireAnimationUpdateEnabled = state.isFireAnimationUpdateEnabled,
                 ),
             )
         }

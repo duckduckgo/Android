@@ -20,7 +20,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.DuckChatInternal
@@ -152,6 +152,15 @@ class ModelPickerViewModel @Inject constructor(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
         initialValue = modelManager.modelState.value.selectedModelShortName,
+    )
+
+    /** Provider icon of the model shown on the chip, used when the chip collapses to an icon. */
+    val chipIconRes: StateFlow<Int> = combine(modelManager.modelState, effectiveModelId) { modelState, id ->
+        modelState.models.firstOrNull { it.id == id }?.let(::getIconResForModel) ?: R.drawable.ic_ai_model_oss_16
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = R.drawable.ic_ai_model_oss_16,
     )
 
     /** True once a model was picked during the current recovery window (set synchronously in onModelTapped). */

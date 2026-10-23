@@ -108,6 +108,18 @@
                 "key": "customTab",
                 "description": "Whether a Custom Tab was active in this process when the crash was reported. Reflects the reporting launch, not the crashed session.",
                 "type": "boolean"
+            },
+            {
+                "key": "webViewPackage",
+                "description": "Package name of the WebView provider in use when the crash was reported.",
+                "type": "string",
+                "examples": ["com.google.android.webview"]
+            },
+            {
+                "key": "webViewVersion",
+                "description": "Major version of the WebView provider when the crash was reported, or the full version when the nativeCrashReportsFullWebViewVersion flag is enabled.",
+                "type": "string",
+                "examples": ["153", "153.0.8010.39"]
             }
         ]
     }

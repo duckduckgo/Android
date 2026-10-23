@@ -28,8 +28,9 @@ import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
 import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.api.JsonToMatchingAttributeMapper
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
@@ -37,15 +38,15 @@ import javax.inject.Inject
  * Matches the user's NTP-after-idle state, combining the after-idle "open on launch" option with the
  * return-to-tab card visibility into a single value.
  */
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = JsonToMatchingAttributeMapper::class,
+    binding = binding<JsonToMatchingAttributeMapper>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = AttributeMatcherPlugin::class,
+    binding = binding<AttributeMatcherPlugin>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RMFNtpAfterIdleStateMatchingAttribute @Inject constructor(
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
@@ -64,10 +65,8 @@ class RMFNtpAfterIdleStateMatchingAttribute @Inject constructor(
         jsonMatchingAttribute: JsonMatchingAttribute,
     ): MatchingAttribute? {
         if (key != NtpAfterIdleStateMatchingAttribute.KEY) return null
-        // Rollout gate: when either flag is off, leave the attribute unmapped so RMF treats it as Unknown(fallback).
-        val rolloutEnabled = androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled() &&
-            androidBrowserConfigFeature.ntpAsDefaultAfterIdleReturn().isEnabled()
-        if (!rolloutEnabled) return null
+        // Rollout gate: when the flag is off, leave the attribute unmapped so RMF treats it as Unknown(fallback).
+        if (!androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) return null
         val value = jsonMatchingAttribute.value
         if (value is List<*>) {
             val states = value.filterIsInstance<String>()

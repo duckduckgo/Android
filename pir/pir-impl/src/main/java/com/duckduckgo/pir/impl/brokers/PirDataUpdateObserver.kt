@@ -24,21 +24,24 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.checker.PirEligibility
+import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
+import com.duckduckgo.pir.impl.freemium.PirFreeScanWorkWindow
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class PirDataUpdateObserver @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
@@ -50,6 +53,7 @@ class PirDataUpdateObserver @Inject constructor(
     private val currentTimeProvider: CurrentTimeProvider,
     private val pirPixelSender: PirPixelSender,
     private val pirScanScheduler: PirScanScheduler,
+    private val pirFreeScanWorkWindow: PirFreeScanWorkWindow,
 ) : MainProcessLifecycleObserver {
     override fun onCreate(owner: LifecycleOwner) {
         coroutineScope.launch(dispatcherProvider.io()) {
@@ -73,10 +77,20 @@ class PirDataUpdateObserver @Inject constructor(
                                 logcat { "PIR-update: Failed to complete." }
                             }
 
-                            // Re-apply the periodic scan schedule so changes to the interval/constraints
+                            // Re-apply the periodic work specs so changes to the interval/constraints
                             // (e.g. after an app update) are picked up by already-enrolled users
                             if (pirRepository.getValidUserProfileQueries().isNotEmpty()) {
-                                pirScanScheduler.reschedulePirScans()
+                                when {
+                                    eligibility.runMode == PirRunMode.SCAN_ONLY && !pirFreeScanWorkWindow.isOpen() ->
+                                        // Re-applying the schedule would resurrect the retired worker every app start.
+                                        pirScanScheduler.cancelScheduledScanWorker()
+
+                                    eligibility.runMode == PirRunMode.SCAN_ONLY -> pirScanScheduler.rescheduleScanWork()
+
+                                    // Also the way back for a free user who subscribes: eligibility re-emits as
+                                    // SCAN_AND_OPT_OUT and the work they were never scheduled is enqueued here.
+                                    else -> pirScanScheduler.rescheduleAllWork()
+                                }
                             }
                         }
 

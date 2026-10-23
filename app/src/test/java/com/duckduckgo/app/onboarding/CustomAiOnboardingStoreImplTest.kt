@@ -16,14 +16,12 @@
 
 package com.duckduckgo.app.onboarding
 
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.referral.api.AppInstallationReferrerStateListener
 import com.duckduckgo.referral.api.ParsedReferrerResult
-import dagger.Lazy
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -49,8 +47,6 @@ class CustomAiOnboardingStoreImplTest {
     private val enabledToggle: Toggle = mock { on { isEnabled() } doReturn true }
     private val disabledToggle: Toggle = mock { on { isEnabled() } doReturn false }
     private val customAiOnboardingFeature: CustomAiOnboardingFeature = mock()
-    private val brandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
-
     private val resolvedListener = object : AppInstallationReferrerStateListener {
         override fun initialiseReferralRetrieval() {}
         override suspend fun waitForReferrerCode(): ParsedReferrerResult = ParsedReferrerResult.ReferrerNotFound
@@ -63,16 +59,14 @@ class CustomAiOnboardingStoreImplTest {
     private fun store(listener: AppInstallationReferrerStateListener = resolvedListener) =
         CustomAiOnboardingStoreImpl(
             sharedPreferencesProvider = sharedPreferencesProvider,
-            referrerStateListener = Lazy { listener },
+            referrerStateListener = lazy { listener },
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             customAiOnboardingFeature = customAiOnboardingFeature,
-            brandDesignUpdateToggles = brandDesignUpdateToggles,
         )
 
     @Before
     fun setup() {
         whenever(customAiOnboardingFeature.self()).thenReturn(enabledToggle)
-        whenever(brandDesignUpdateToggles.brandDesignUpdate()).thenReturn(enabledToggle)
     }
 
     @Test
@@ -85,14 +79,6 @@ class CustomAiOnboardingStoreImplTest {
     @Test
     fun `when referrer ai but custom ai feature disabled then resolves false`() = runTest {
         whenever(customAiOnboardingFeature.self()).thenReturn(disabledToggle)
-        val store = store()
-        store.process(mapOf("origin" to "funnel_playstore", "onboarding" to "ai"))
-        assertFalse(store.resolve())
-    }
-
-    @Test
-    fun `when referrer ai but brand design disabled then resolves false`() = runTest {
-        whenever(brandDesignUpdateToggles.brandDesignUpdate()).thenReturn(disabledToggle)
         val store = store()
         store.process(mapOf("origin" to "funnel_playstore", "onboarding" to "ai"))
         assertFalse(store.resolve())

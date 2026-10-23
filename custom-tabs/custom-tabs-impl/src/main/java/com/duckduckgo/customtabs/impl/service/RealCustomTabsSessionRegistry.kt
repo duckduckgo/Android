@@ -19,8 +19,9 @@ package com.duckduckgo.customtabs.impl.service
 import androidx.browser.customtabs.CustomTabsSessionToken
 import com.duckduckgo.customtabs.api.CustomTabsSessionRegistry
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
@@ -29,9 +30,9 @@ interface InternalCustomTabsSessionRegistry : CustomTabsSessionRegistry {
     fun clearSession(sessionToken: CustomTabsSessionToken)
 }
 
-@ContributesBinding(scope = AppScope::class, boundType = CustomTabsSessionRegistry::class)
-@ContributesBinding(scope = AppScope::class, boundType = InternalCustomTabsSessionRegistry::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesBinding(scope = AppScope::class, binding = binding<CustomTabsSessionRegistry>())
+@ContributesBinding(scope = AppScope::class, binding = binding<InternalCustomTabsSessionRegistry>())
+@SingleIn(AppScope::class)
 class RealCustomTabsSessionRegistry @Inject constructor() : InternalCustomTabsSessionRegistry {
 
     private val packageBySession = ConcurrentHashMap<CustomTabsSessionToken, String>()

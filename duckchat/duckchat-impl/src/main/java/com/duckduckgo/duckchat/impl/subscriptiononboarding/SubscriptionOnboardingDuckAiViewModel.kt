@@ -19,7 +19,7 @@ package com.duckduckgo.duckchat.impl.subscriptiononboarding
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -31,6 +31,7 @@ import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.UserTier
 import com.duckduckgo.duckchat.impl.subscriptiononboarding.SubscriptionOnboardingDuckAiStepPlugin.Companion.DUCK_AI_STEP_ID
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.SKIPPED
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -79,8 +80,8 @@ class SubscriptionOnboardingDuckAiViewModel @Inject constructor(
             duckAiModelManager.modelState.value.models.firstOrNull { it.id == selectedId }?.let {
                 duckAiModelManager.selectModel(it)
             }
-            duckChat.openDuckChat(SUBSCRIPTION_ONBOARDING)
-            controller.exitOnboarding()
+            val duckAi = duckChat
+            controller.onStepFinished(DUCK_AI_STEP_ID, COMPLETED) { duckAi.openDuckChat(SUBSCRIPTION_ONBOARDING) }
         }
     }
 

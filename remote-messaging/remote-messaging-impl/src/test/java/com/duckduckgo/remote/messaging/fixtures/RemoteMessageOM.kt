@@ -124,6 +124,14 @@ object RemoteMessageOM {
         imageUrl = imageUrl,
     )
 
+    fun actionableItemsContent(
+        titleText: String = "Complete your setup",
+        listItems: List<CardItem> = actionableListItems(),
+    ) = Content.ActionableItems(
+        titleText = titleText,
+        listItems = listItems,
+    )
+
     fun aSmallMessage(
         id: String = "id",
         content: Content = smallContent(),
@@ -219,6 +227,54 @@ object RemoteMessageOM {
             surfaces = surfaces,
         )
     }
+
+    fun anActionableItemsMessage(
+        id: String = "id",
+        content: Content = actionableItemsContent(),
+        exclusionRules: List<Int> = emptyList(),
+        matchingRules: List<Int> = emptyList(),
+        surfaces: List<Surface> = emptyList(),
+    ): RemoteMessage {
+        return RemoteMessage(
+            id = id,
+            content = content,
+            exclusionRules = exclusionRules,
+            matchingRules = matchingRules,
+            surfaces = surfaces,
+        )
+    }
+
+    fun actionableListItems(
+        defaultBrowserTitleText: String = "Set as default browser",
+        defaultBrowserDescriptionText: String = "Open links in DuckDuckGo",
+        defaultBrowserPrimaryActionText: String = "Set as default",
+        addWidgetTitleText: String = "Add widget",
+        addWidgetDescriptionText: String = "Search from your home screen",
+        addWidgetPrimaryActionText: String = "Add widget",
+    ) = listOf(
+        CardItem.ListItem(
+            id = "setup_default_browser",
+            type = CardItemType.ONE_ACTION_ITEM,
+            titleText = defaultBrowserTitleText,
+            descriptionText = defaultBrowserDescriptionText,
+            placeholder = ANNOUNCE,
+            primaryAction = Action.DefaultBrowser,
+            primaryActionText = defaultBrowserPrimaryActionText,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+        ),
+        CardItem.ListItem(
+            id = "setup_add_widget",
+            type = CardItemType.ONE_ACTION_ITEM,
+            titleText = addWidgetTitleText,
+            descriptionText = addWidgetDescriptionText,
+            placeholder = RADAR,
+            primaryAction = urlAction(),
+            primaryActionText = addWidgetPrimaryActionText,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+        ),
+    )
 
     fun translatedListItems(
         item1TitleText: String = "Item Title 1",

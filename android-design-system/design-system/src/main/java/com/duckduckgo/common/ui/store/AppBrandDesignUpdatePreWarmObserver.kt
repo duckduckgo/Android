@@ -21,8 +21,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,8 +34,8 @@ import javax.inject.Inject
  * Interim scaffolding for the brand design update. The follow-up theme project deletes this observer
  * with the flag.
  */
-@ContributesMultibinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(AppScope::class)
+@SingleIn(AppScope::class)
 class AppBrandDesignUpdatePreWarmObserver @Inject constructor(
     private val toggles: AppBrandDesignUpdateToggles,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -45,6 +45,7 @@ class AppBrandDesignUpdatePreWarmObserver @Inject constructor(
     override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             toggles.theme().isEnabled()
+            toggles.radius().isEnabled()
             toggles.addressBar().isEnabled()
             toggles.pictograms().isEnabled()
         }

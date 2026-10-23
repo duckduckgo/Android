@@ -22,7 +22,9 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.checker.PirEligibility
+import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
+import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import com.duckduckgo.pir.impl.scheduling.PirJobsRunner
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -31,6 +33,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -64,24 +67,35 @@ class PirScheduledScanRemoteWorkerTest {
 
     @Test
     fun whenForegroundScanServiceRunningThenSkipsRunWithSuccessWithoutRunningJobs() = runTest {
-        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled))
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)))
         whenever(mockMonitor.isRunning()).thenReturn(true)
 
         val result = buildWorker().doRemoteWork()
 
         assertEquals(ListenableWorker.Result.success(), result)
-        verify(mockPirJobsRunner, never()).runEligibleJobs(any(), any())
+        verify(mockPirJobsRunner, never()).runEligibleJobs(any(), any(), any())
     }
 
     @Test
     fun whenForegroundScanServiceNotRunningThenRunsEligibleJobs() = runTest {
-        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled))
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)))
         whenever(mockMonitor.isRunning()).thenReturn(false)
-        whenever(mockPirJobsRunner.runEligibleJobs(any(), any())).thenReturn(kotlin.Result.success(Unit))
+        whenever(mockPirJobsRunner.runEligibleJobs(any(), any(), any())).thenReturn(kotlin.Result.success(Unit))
 
         val result = buildWorker().doRemoteWork()
 
         assertEquals(ListenableWorker.Result.success(), result)
-        verify(mockPirJobsRunner).runEligibleJobs(any(), any())
+        verify(mockPirJobsRunner).runEligibleJobs(any(), any(), any())
+    }
+
+    @Test
+    fun whenEligibilityIsScanOnlyThenRunnerReceivesScanOnlyMode() = runTest {
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_ONLY)))
+        whenever(mockMonitor.isRunning()).thenReturn(false)
+        whenever(mockPirJobsRunner.runEligibleJobs(any(), any(), any())).thenReturn(kotlin.Result.success(Unit))
+
+        buildWorker().doRemoteWork()
+
+        verify(mockPirJobsRunner).runEligibleJobs(any(), eq(PirExecutionType.SCHEDULED), eq(PirRunMode.SCAN_ONLY))
     }
 }

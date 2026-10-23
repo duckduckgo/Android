@@ -5,7 +5,7 @@ across modules.
 
 ## Registering a screen
 
-Define an `ActivityParams` type and annotate the activity. Anvil codegen generates the mapper.
+Define an `ActivityParams` type and annotate the activity. Our KSP codegen generates the mapper.
 
 ```kotlin
 // In the feature's -api module

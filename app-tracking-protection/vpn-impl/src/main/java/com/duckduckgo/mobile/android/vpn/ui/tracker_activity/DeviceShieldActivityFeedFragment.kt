@@ -27,13 +27,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.recyclerviewext.StickyHeadersLinearLayoutManager
 import com.duckduckgo.common.utils.FragmentViewModelFactory
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
@@ -60,9 +58,6 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
 
     @Inject
     lateinit var trackerFeedAdapter: TrackerFeedAdapter
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -95,7 +90,7 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
         // This fragment is reused both full-screen (DeviceShieldMostRecentActivity) and nested inside the
         // dashboard's ScrollView (DeviceShieldTrackerActivity). Only reserve the navigation-bar inset when we're
         // the top-level scroller; when nested in a scrolling ancestor, that outer scroller already handles it.
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.VPN) && !binding.activityRecyclerView.hasVerticalScrollAncestor()) {
+        if (!binding.activityRecyclerView.hasVerticalScrollAncestor()) {
             edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.activityRecyclerView)
         }
 

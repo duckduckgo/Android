@@ -7,7 +7,7 @@ Pixels are lightweight telemetry events sent via HTTP with a name and optional p
 - Conversion and retention (e.g., subscription purchase, activation, onboarding completion)
 
 The privacy invariants every pixel must satisfy (no PII, no URLs, no correlation IDs, bucketed numbers,
-bounded enums) are in CLAUDE.md and apply to all outbound data — they are not repeated here.
+bounded enums) are in AGENTS.md and apply to all outbound data — they are not repeated here.
 
 ## Types of Pixels
 
@@ -65,6 +65,8 @@ Every pixel fired in code **must** have a corresponding entry in a definition fi
 - Find the appropriate definition file for your feature area (or create a new one)
 - Add an entry keyed by the full pixel name
 - Include `description`, `owners`, `triggers`, `parameters`, and `suffixes` fields
+- Choose `triggers` with the decision procedure in `.claude/rules/pixel-definitions.md` — classify by
+  the event that causes the pixel to fire, and never default to `["other"]`
 - The `owners` field must contain the author's GitHub username
 - Match the format of existing entries in the same file
 

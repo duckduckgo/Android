@@ -29,7 +29,7 @@ interface AuthJwtValidator {
      * @param jwt The access token to be validated, provided as a string.
      * @param jwkSet The JSON Web Key set containing cryptographic keys used to validate the token's signature.
      * @return [AccessTokenClaims] object that contains the claims from the validated token.
-     * @throws IllegalArgumentException if the token or the JWK set is invalid or cannot be processed.
+     * @throws TokenValidationException if the token or the JWK set is invalid or cannot be processed.
      */
     fun validateAccessToken(jwt: String, jwkSet: String): AccessTokenClaims
 
@@ -39,7 +39,7 @@ interface AuthJwtValidator {
      * @param jwt The refresh token to be validated, provided as a string.
      * @param jwkSet The JSON Web Key set containing cryptographic keys used to validate the token's signature.
      * @return [RefreshTokenClaims] object that contains the claims from the validated token.
-     * @throws IllegalArgumentException if the token or the JWK set is invalid or cannot be processed.
+     * @throws TokenValidationException if the token or the JWK set is invalid or cannot be processed.
      */
     fun validateRefreshToken(jwt: String, jwkSet: String): RefreshTokenClaims
 }

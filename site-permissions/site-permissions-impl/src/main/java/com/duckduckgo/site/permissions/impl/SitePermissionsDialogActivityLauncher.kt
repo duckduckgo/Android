@@ -59,7 +59,7 @@ import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSe
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback
 import com.google.android.material.snackbar.Snackbar
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
@@ -72,6 +72,7 @@ private enum class PermissionTier(@StringRes val textId: Int) {
     ALLOW_WHILE_USING_SITE(R.string.sitePermissionsDialogAllowWhileUsingSiteButton),
     ALLOW_THIS_TIME(R.string.sitePermissionsDialogAllowThisTimeButton),
     NEVER_ALLOW(R.string.sitePermissionsDialogNeverAllowButton),
+    DENY(R.string.sitePermissionsDialogDenyButton),
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -143,6 +144,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     R.string.sitePermissionsMicAndCameraDialogTitle,
                     R.string.sitePermissionsMicAndCameraDialogSubtitle,
                     R.string.sitePermissionsTieredMicAndCameraDialogTitle,
+                    R.string.sitePermissionsTieredThirdPartyMicAndCameraDialogTitle,
                     CommonR.drawable.ic_video_24,
                     url,
                     SitePermissionsPixelValues.CAMERA_AND_MICROPHONE,
@@ -160,6 +162,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                         R.string.sitePermissionsMicDialogTitle,
                         R.string.sitePermissionsMicDialogSubtitle,
                         R.string.sitePermissionsTieredMicDialogTitle,
+                        R.string.sitePermissionsTieredThirdPartyMicDialogTitle,
                         CommonR.drawable.ic_microphone_24,
                         url,
                         SitePermissionsPixelValues.MICROPHONE,
@@ -175,6 +178,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     R.string.sitePermissionsCameraDialogTitle,
                     R.string.sitePermissionsCameraDialogSubtitle,
                     R.string.sitePermissionsTieredCameraDialogTitle,
+                    R.string.sitePermissionsTieredThirdPartyCameraDialogTitle,
                     CommonR.drawable.ic_video_24,
                     url,
                     SitePermissionsPixelValues.CAMERA,
@@ -207,10 +211,10 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         val isDdgSite = domain == "duckduckgo.com"
 
         if (sitePermissionsDialogRedesignFeature.self().isEnabled()) {
-            val titleRes = if (isDdgSite) {
-                R.string.sitePermissionsTieredDdgLocationDialogTitle
-            } else {
-                R.string.sitePermissionsTieredLocationDialogTitle
+            val titleRes = when {
+                isDdgSite -> R.string.sitePermissionsTieredDdgLocationDialogTitle
+                isThirdParty -> R.string.sitePermissionsTieredThirdPartyLocationDialogTitle
+                else -> R.string.sitePermissionsTieredLocationDialogTitle
             }
             showTieredSitePermissionsDialog(
                 iconRes = CommonR.drawable.ic_location_24,
@@ -268,6 +272,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         @StringRes titleRes: Int,
         @StringRes messageRes: Int,
         @StringRes tieredTitleRes: Int,
+        @StringRes tieredThirdPartyTitleRes: Int,
         @DrawableRes tieredIconRes: Int,
         url: String,
         pixelType: String,
@@ -278,7 +283,10 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         if (sitePermissionsDialogRedesignFeature.self().isEnabled()) {
             showTieredSitePermissionsDialog(
                 iconRes = tieredIconRes,
-                title = String.format(activity.getString(tieredTitleRes), url.websiteFromGeoLocationsApiOrigin()),
+                title = String.format(
+                    activity.getString(if (isThirdParty) tieredThirdPartyTitleRes else tieredTitleRes),
+                    url.websiteFromGeoLocationsApiOrigin(),
+                ),
                 messageRes = null,
                 pixelType = pixelType,
                 faviconUrl = null,
@@ -324,10 +332,13 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         onPermissionAllowed: (Boolean) -> Unit,
         onPermissionDenied: (Boolean) -> Unit = ::denyPermissions,
     ) {
-        val tiers = if (isThirdParty) {
-            listOf(PermissionTier.ALLOW_THIS_TIME, PermissionTier.NEVER_ALLOW)
-        } else {
-            listOf(PermissionTier.ALLOW_WHILE_USING_SITE, PermissionTier.ALLOW_THIS_TIME, PermissionTier.NEVER_ALLOW)
+        val tiers = when {
+            browserMode == BrowserMode.FIRE && drmPolicyFeature.fireModeDenyButton().isEnabled() -> listOf(
+                PermissionTier.ALLOW_THIS_TIME,
+                PermissionTier.DENY,
+            )
+            isThirdParty -> listOf(PermissionTier.ALLOW_THIS_TIME, PermissionTier.NEVER_ALLOW)
+            else -> listOf(PermissionTier.ALLOW_WHILE_USING_SITE, PermissionTier.ALLOW_THIS_TIME, PermissionTier.NEVER_ALLOW)
         }
 
         StackedAlertDialogBuilder(activity)
@@ -357,11 +368,14 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                                 sendNegativeDialogClickPixel(pixelType, rememberChoice = true)
                                 onPermissionDenied(true)
                             }
+
+                            PermissionTier.DENY -> denyOnce()
                         }
                     }
 
-                    // The tiered dialog has no explicit deny-once button; dismissing it is that choice.
-                    override fun onDialogCancelled() {
+                    override fun onDialogCancelled() = denyOnce()
+
+                    private fun denyOnce() {
                         sendNegativeDialogClickPixel(pixelType, rememberChoice = false)
                         onPermissionDenied(false)
                     }
@@ -405,7 +419,12 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             sendDialogImpressionPixel(SitePermissionsPixelValues.DRM)
             showTieredSitePermissionsDialog(
                 iconRes = CommonR.drawable.ic_video_player_24,
-                title = String.format(activity.getString(R.string.drmSitePermissionDialogTitle), title),
+                title = String.format(
+                    activity.getString(
+                        if (isThirdParty) R.string.sitePermissionsTieredThirdPartyDrmDialogTitle else R.string.drmSitePermissionDialogTitle,
+                    ),
+                    title,
+                ),
                 messageRes = R.string.sitePermissionsTieredDrmDialogSubtitle,
                 pixelType = SitePermissionsPixelValues.DRM,
                 faviconUrl = url,

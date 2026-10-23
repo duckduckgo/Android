@@ -18,12 +18,12 @@ package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.SegmentedOnboardingFeatureToggles.Cohorts
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -36,13 +36,11 @@ interface SegmentedOnboardingExperimentManager {
     }
 }
 
-@ContributesBinding(AppScope::class, boundType = SegmentedOnboardingExperimentManager::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<SegmentedOnboardingExperimentManager>())
+@SingleIn(AppScope::class)
 class SegmentedOnboardingExperimentManagerImpl @Inject constructor(
-    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val segmentedOnboardingFeatureToggles: SegmentedOnboardingFeatureToggles,
     private val onboardingPasswordImportToggles: OnboardingPasswordImportToggles,
-    private val onboardingPromptsToggles: OnboardingPromptsToggles,
     private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
     private val onboardingPrivacyConfigPersistedGate: OnboardingPrivacyConfigPersistedGate,
@@ -63,9 +61,6 @@ class SegmentedOnboardingExperimentManagerImpl @Inject constructor(
     }
 
     private suspend fun checkPrerequisites() =
-        onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled() &&
-            onboardingBrandDesignUpdateToggles.configDrivenDialogs().isEnabled() &&
-            !onboardingPromptsToggles.addToDockAndWidgetExperimentJul25().isEnabled() &&
-            !onboardingPasswordImportToggles.passwordImportExperimentAug25().isEnabled() &&
+        !onboardingPasswordImportToggles.passwordImportExperimentAug25().isEnabled() &&
             !appBuildConfig.isAppReinstall()
 }

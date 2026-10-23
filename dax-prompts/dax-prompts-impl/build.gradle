@@ -16,15 +16,14 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
+    ksp project(':codegen-ksp')
     implementation project(':dax-prompts-api')
     implementation project(':prompts-coordinator-api')
     implementation project(':browser-api')
@@ -33,7 +32,7 @@ dependencies {
     implementation project(':navigation-api')
     implementation project(':app-build-config-api')
 
-    implementation project(':anvil-annotations')
+    implementation project(':codegen-annotations')
     implementation project(':di')
     implementation project(':statistics-api')
     api AndroidX.dataStore.preferences
@@ -49,10 +48,6 @@ dependencies {
     implementation AndroidX.lifecycle.commonJava8
     implementation AndroidX.lifecycle.liveDataKtx
     implementation AndroidX.work.runtimeKtx
-
-    // Dagger
-    compileOnly "org.glassfish:javax.annotation:10.0-b28"
-    implementation Google.dagger
 
     implementation KotlinX.coroutines.core
     testImplementation (KotlinX.coroutines.test) {
@@ -86,9 +81,6 @@ dependencies {
 
 android {
     namespace "com.duckduckgo.daxprompts.impl"
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     lint {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"

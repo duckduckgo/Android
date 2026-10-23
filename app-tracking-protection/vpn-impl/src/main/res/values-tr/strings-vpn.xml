@@ -46,8 +46,8 @@
     <string name="atp_OnInitialNotification">"Uygulama İzleme Koruması etkinleştirildi ve uygulamalarınızdaki izleme girişimlerini engelliyor"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"İzleme etkinliği taranıyor… bip… bop"</string>
     <plurals name="atp_OnNotification">
-        <item quantity="one"><![CDATA[ <b>%1$d uygulamada</b> engellenen izleme girişimleri (son bir saat).]]></item>
-        <item quantity="other"><![CDATA[ <b>%1$d uygulamada</b> engellenen izleme girişimleri (son bir saat).]]></item>
+        <item quantity="one" instruction="Placeholder is a number"><![CDATA[ <b>%1$d uygulamada</b> engellenen izleme girişimleri (son bir saat).]]></item>
+        <item quantity="other" instruction="Placeholder is a number"><![CDATA[ <b>%1$d uygulamada</b> engellenen izleme girişimleri (son bir saat).]]></item>
     </plurals>
     <string name="atp_DisabledNotification">Uygulama İzleme Koruması devre dışı. İzleme girişimlerini engellemeye devam etmek için dokunun.</string>
     <string name="atp_RevokedNotification">Cihazınızdaki bir VPN uygulaması Uygulama İzleme Korumasını devre dışı bıraktı. Yeniden etkinleştirmek için dokunun.</string>
@@ -59,13 +59,13 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ Uygulama İzleme Koruması <b>%3$s dâhil %2$d uygulamada %1$d izleme girişimini</b> engelledi (son bir gün).]]></string>
 
     <plurals name="atp_DailyTopCompanyNotification">
-        <item quantity="one"><![CDATA[%1$s <b>%2$d uygulamada</b> sizi izleme girişiminde bulundu (son bir gün). <b>Daha Fazla Bilgi</b>]]></item>
-        <item quantity="other"><![CDATA[%1$s <b>%2$d uygulamada</b> sizi izleme girişiminde bulundu (son bir gün). <b>Daha Fazla Bilgi</b>]]></item>
+        <item quantity="one" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[%1$s <b>%2$d uygulamada</b> sizi izleme girişiminde bulundu (son bir gün). <b>Daha Fazla Bilgi</b>]]></item>
+        <item quantity="other" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[%1$s <b>%2$d uygulamada</b> sizi izleme girişiminde bulundu (son bir gün). <b>Daha Fazla Bilgi</b>]]></item>
     </plurals>
 
     <plurals name="atp_DailyCompanyBlockedNotification">
-        <item quantity="one"><![CDATA[Uygulama İzleme Koruması en çok izleme girişimini <b>%1$s</b> (geçtiğimiz gün) adresinde engelledi.]]></item>
-        <item quantity="other"><![CDATA[Uygulama İzleme Koruması en çok izleme girişimini <b>%1$s</b> ve <b>%2$s</b> (geçtiğimiz gün) adreslerinde engelledi.]]></item>
+        <item quantity="one" instruction="Placeholder is the name of an app"><![CDATA[Uygulama İzleme Koruması en çok izleme girişimini <b>%1$s</b> (geçtiğimiz gün) adresinde engelledi.]]></item>
+        <item quantity="other" instruction="Both placeholders are the name of an app"><![CDATA[Uygulama İzleme Koruması en çok izleme girişimini <b>%1$s</b> ve <b>%2$s</b> (geçtiğimiz gün) adreslerinde engelledi.]]></item>
     </plurals>
 
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Uygulama İzleme Koruması <b>%1$s uygulamasını %3$s uygulamasında %2$d kez</b> engelledi (son bir gün).]]></string>
@@ -85,8 +85,8 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[Uygulama İzleme Koruması <b>%2$s</b> ve %3$d diğer uygulamada %1$d izleme girişimini engelledi (son bir hafta).]]></string>
 
     <plurals name="atp_WeeklyCompanyTeaserNotification">
-        <item quantity="one"><![CDATA[Uygulama İzleme Koruması <b>%3$s dâhil %2$d uygulamada %1$s uygulamasını</b> engelledi (son bir hafta).]]></item>
-        <item quantity="other"><![CDATA[Uygulama İzleme Koruması <b>%3$s dâhil %2$d uygulamada %1$s uygulamasını</b> engelledi (son bir hafta).]]></item>
+        <item quantity="one" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Uygulama İzleme Koruması <b>%3$s dâhil %2$d uygulamada %1$s uygulamasını</b> engelledi (son bir hafta).]]></item>
+        <item quantity="other" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of one of the apps where it happened"><![CDATA[Uygulama İzleme Koruması <b>%3$s dâhil %2$d uygulamada %1$s uygulamasını</b> engelledi (son bir hafta).]]></item>
     </plurals>
 
     <string name="atp_EnableCTA">Uygulama İzleme Korumasını Etkinleştir</string>
@@ -269,12 +269,12 @@
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">
-        <item quantity="one">%1$d girişim. Şunları topladığı biliniyor:</item>
-        <item quantity="other">%1$d girişimi. Şunları topladığı biliniyor:</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d girişim. Şunları topladığı biliniyor:</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d girişimi. Şunları topladığı biliniyor:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">DuckDuckGo, %1$d İzleme Girişimini Engelledi</item>
-        <item quantity="other">DuckDuckGo, %1$d İzleme Girişimini Engelledi</item>
+        <item quantity="one" instruction="Placeholder is a number">DuckDuckGo, %1$d İzleme Girişimini Engelledi</item>
+        <item quantity="other" instruction="Placeholder is a number">DuckDuckGo, %1$d İzleme Girişimini Engelledi</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Bu Uygulamayla İlgili Bir Sorun Bildirin</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">%1$d tane daha göster</string>

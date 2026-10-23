@@ -132,21 +132,6 @@
             }
         ]
     },
-    "onboarding_add-to-dock": {
-        "description": "Add-to-Dock onboarding page. shown when the page is displayed; clicked when the user taps Continue. Unique once per user per event.",
-        "owners": ["catalinradoiu"],
-        "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": [
-            "appVersion",
-            "onboardingEvent",
-            "onboardingInstallType",
-            "onboardingDaysSinceInstall",
-            "onboardingFlow",
-            "onboardingPixelSource",
-            { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage"] }
-        ]
-    },
     "onboarding_widget-prompt": {
         "description": "Widget-prompt onboarding page. shown when the page is displayed; clicked engage/dismiss on the Add widget / Skip CTAs; confirmed added/not_added after the system add-widget prompt returns. Unique once per user per (event, value).",
         "owners": ["catalinradoiu"],
@@ -159,6 +144,8 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
+            "onboardingDownloadReasonVariant",
+            "inputPreviewAction",
             {
                 "key": "value",
                 "type": "string",
@@ -316,6 +303,7 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
+            "onboardingDownloadReasonVariant",
             {
                 "key": "value",
                 "type": "string",
@@ -489,6 +477,28 @@
             "onboardingDownloadReasonVariant",
             "inputPreviewAction",
             { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
+        ]
+    },
+    "onboarding_time-limit": {
+        "description": "Contextual onboarding ended by the time limit (days since install or app opens) before the user completed or skipped it. reached once per user; value is the limit that ended it.",
+        "owners": ["aibrahim-"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "event",
+                "type": "string",
+                "description": "Event type for the onboarding instrumentation standard",
+                "enum": ["reached"]
+            },
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingDownloadReasonVariant",
+            "inputPreviewAction",
+            { "key": "value", "type": "string", "description": "The limit that ended onboarding.", "enum": ["days", "app-opens"] }
         ]
     },
     "onboarding_download-choice": {

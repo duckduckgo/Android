@@ -16,8 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -28,11 +27,10 @@ dependencies {
     implementation project(':feature-toggles-api')
     implementation project(path: ':common-utils')
 
-    ksp project(':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':di')
 
-    implementation Google.dagger
     implementation KotlinX.coroutines.core
     implementation "com.squareup.logcat:logcat:_"
 
@@ -47,9 +45,6 @@ dependencies {
 
 android {
     namespace "com.duckduckgo.dataclearing.impl"
-    anvil {
-        generateDaggerFactories = true
-    }
     testOptions {
         unitTests {
             returnDefaultValues = true

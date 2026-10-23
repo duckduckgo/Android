@@ -16,15 +16,14 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
+    ksp project(':codegen-ksp')
     implementation project(":new-tab-page-api")
     implementation project(':browser-api')
     implementation project(':duckchat-api')
@@ -51,14 +50,13 @@ dependencies {
     // Room
     implementation AndroidX.room.runtime
 
-    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':di')
     ksp AndroidX.room.compiler
     api AndroidX.dataStore.preferences
 
     implementation KotlinX.coroutines.android
     implementation AndroidX.core.ktx
-    implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
 
     testImplementation Testing.junit4
@@ -78,9 +76,6 @@ dependencies {
 
 android {
     namespace "com.duckduckgo.newtabpage.impl"
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     lintOptions {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"

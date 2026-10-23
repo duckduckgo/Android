@@ -19,7 +19,6 @@ package com.duckduckgo.autofill.impl.ui.credential.management
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
@@ -32,7 +31,7 @@ import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.asString
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
-import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
+import com.duckduckgo.autofill.impl.importing.capability.PasswordImportAvailability
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DELETE_LOGIN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
@@ -96,12 +95,13 @@ import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -138,7 +138,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     private val autofillBreakageReportDataStore: AutofillSiteBreakageReportingDataStore,
     private val autofillBreakageReportCanShowRules: AutofillBreakageReportCanShowRules,
     private val autofillFeature: AutofillFeature,
-    private val importGooglePasswordsCapabilityChecker: ImportGooglePasswordsCapabilityChecker,
+    private val passwordImportAvailability: PasswordImportAvailability,
     private val autofillEffectDispatcher: AutofillEffectDispatcher,
 ) : ViewModel() {
 
@@ -311,7 +311,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         }
     }
 
-    suspend fun launchDeviceAuth() {
+    suspend fun launchDeviceAuth(suppressAuthPrompt: Boolean = false) {
         if (!autofillStore.autofillAvailable()) {
             logcat(VERBOSE) { "Can't access secure storage so can't offer autofill functionality" }
             deviceUnsupported()
@@ -328,6 +328,9 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         val shouldAskAuth = credentialCount == null || credentialCount == 0
         if (shouldAskAuth) {
             logcat(VERBOSE) { "No credentials; can skip showing device auth" }
+            unlock()
+        } else if (suppressAuthPrompt) {
+            logcat(VERBOSE) { "Auth prompt suppressed by caller; unlocking without device auth" }
             unlock()
         } else {
             addCommand(LaunchDeviceAuth)
@@ -463,8 +466,8 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
 
         viewModelScope.launch(dispatchers.io()) {
             val gpmImport = autofillFeature.self().isEnabled() && autofillFeature.canImportFromGooglePasswordManager().isEnabled()
-            val webViewSupportsImportingPasswords = importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()
-            val canImport = gpmImport && webViewSupportsImportingPasswords
+            val canImportPasswords = passwordImportAvailability.canImport()
+            val canImport = gpmImport && canImportPasswords
             logcat(VERBOSE) { "Can import from Google Password Manager: $canImport" }
             _viewState.value = _viewState.value.copy(
                 canImportFromGooglePasswords = canImport,

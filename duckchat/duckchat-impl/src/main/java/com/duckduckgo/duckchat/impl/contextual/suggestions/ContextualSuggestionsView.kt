@@ -29,17 +29,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ItemContextualSuggestionBinding
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -99,7 +99,7 @@ class ContextualSuggestionsView @JvmOverloads constructor(
         attachmentsJob += attachmentViewModel.attachmentState
             .onEach { state ->
                 val others = state.images.size + state.files.size + if (state.pageContext != null) 1 else 0
-                viewModel.onAttachmentsChanged(state.textSelections.size, others)
+                viewModel.onAttachmentsChanged(state.textSelections.size, others, attachmentViewModel.textSelectionsTabId)
             }
             .launchIn(scope)
     }

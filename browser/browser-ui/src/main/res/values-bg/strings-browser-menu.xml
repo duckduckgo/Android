@@ -58,4 +58,10 @@
     <string name="browserMenuForward">Напред</string>
     <string name="browserMenuRefresh">Опресняване</string>
     <string name="browserMenuFireTabsData">Изтриване на раздели и данни</string>
+
+    <!-- Duck.ai tab + menu -->
+    <string name="chatMenuPopupNewVoiceChat">Нов гласов чат</string>
+    <string name="chatMenuPopupNewImage">Ново изображение</string>
+    <string name="chatMenuPopupNewTab">Нов раздел</string>
+    <string name="chatMenuPopupNewFireTab">Нов раздел Fire</string>
 </resources>

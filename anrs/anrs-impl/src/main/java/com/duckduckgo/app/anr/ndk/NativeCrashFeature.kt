@@ -18,8 +18,8 @@ package com.duckduckgo.app.anr.ndk
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -27,11 +27,11 @@ import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -54,13 +54,10 @@ interface NativeCrashFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun nativeCrashReportsFullWebViewVersion(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun useCrashpad(): Toggle
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @RemoteFeatureStoreNamed(NativeCrashFeature::class)
 class NativeCrashFeatureMultiProcessStore @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,

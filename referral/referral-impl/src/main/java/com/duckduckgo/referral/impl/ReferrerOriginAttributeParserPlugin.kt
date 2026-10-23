@@ -19,13 +19,13 @@ package com.duckduckgo.referral.impl
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.referral.api.ReferrerParserPlugin
 import com.duckduckgo.verifiedinstallation.installsource.VerificationCheckPlayStoreInstall
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class ReferrerOriginAttributeParserPlugin @Inject constructor(
     private val appReferrerDataStore: AppReferrerDataStore,
     private val playStoreInstallChecker: VerificationCheckPlayStoreInstall,
@@ -39,6 +39,11 @@ class ReferrerOriginAttributeParserPlugin @Inject constructor(
             if (origin == null && playStoreInstallChecker.installedFromPlayStore()) {
                 logcat(VERBOSE) { "No origin attribute referrer data available; assigning one" }
                 origin = DEFAULT_ATTRIBUTION_FOR_PLAY_STORE_INSTALLS
+            }
+
+            if (origin == null && appReferrerDataStore.utmOriginAttributeCampaign != null) {
+                logcat(VERBOSE) { "No origin attribute referrer data available; keeping the persisted origin" }
+                return@runCatching
             }
 
             logcat(INFO) { "Persisting referrer origin attribute value: $origin" }

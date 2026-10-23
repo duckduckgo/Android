@@ -17,7 +17,9 @@
 package com.duckduckgo.duckchat.impl.models
 
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -26,15 +28,16 @@ import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.store.SelectedModel
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -85,7 +88,7 @@ interface DuckAiModelManager {
     fun getResolvedReasoningEffort(): String?
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDuckAiModelManager @Inject constructor(
     private val modelsService: DuckAiModelsService,
@@ -94,6 +97,7 @@ class RealDuckAiModelManager @Inject constructor(
     private val duckAiHostProvider: DuckAiHostProvider,
     private val duckChatFeature: Lazy<DuckChatFeature>,
     private val duckChatPixels: Lazy<DuckChatPixels>,
+    private val cookiesManager: CookieManagerProvider,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : DuckAiModelManager {
@@ -121,18 +125,22 @@ class RealDuckAiModelManager @Inject constructor(
             } catch (e: Exception) {
                 logcat { "Duck.ai Model Manager: failed to restore cached selection: ${e.message}" }
             }
-            // Status as well as entitlements: signing in or out changes whether the response carries
-            // model labels, and entitlements stay empty either way when there is no subscription.
-            combine(
-                subscriptions.getEntitlements(),
-                subscriptions.getSubscriptionStatusFlow(),
-            ) { entitlements, status -> entitlements to status }
-                .distinctUntilChanged()
-                .collect {
-                    logcat { "Duck.ai Model Manager: subscription state changed, re-fetching models" }
-                    fetchModels()
-                }
         }
+    }
+
+    // Status as well as entitlements: signing in or out changes whether the response carries
+    // model labels, and entitlements stay empty either way when there is no subscription.
+    private val subscriptionChangeObserver = appCoroutineScope.launch(dispatcherProvider.io(), start = CoroutineStart.LAZY) {
+        combine(
+            subscriptions.getEntitlements(),
+            subscriptions.getSubscriptionStatusFlow(),
+        ) { entitlements, status -> entitlements to status }
+            .distinctUntilChanged()
+            .drop(1)
+            .collect {
+                logcat { "Duck.ai Model Manager: subscription state changed, re-fetching models" }
+                fetchModels()
+            }
     }
 
     /**
@@ -171,6 +179,7 @@ class RealDuckAiModelManager @Inject constructor(
     }
 
     override suspend fun fetchModels() {
+        subscriptionChangeObserver.start()
         withContext(dispatcherProvider.io()) {
             try {
                 val userTier = resolveUserTier()
@@ -229,13 +238,18 @@ class RealDuckAiModelManager @Inject constructor(
 
     private suspend fun fetchModelsResponse(): AIChatModelsResponse {
         val url = DuckAiModelsService.modelsUrl(duckAiHostProvider.getHost())
-        return modelsService.getModels(url, authorizationHeader())
+        val cookies = if (duckAiHostProvider.isCustomHost()) {
+            cookiesManager.forMode(BrowserMode.REGULAR)?.getCookie(url)
+        } else {
+            null
+        }
+        return modelsService.getModels(url, authorizationHeader(), cookies)
     }
 
     // The picker sublines (model `label`) are only returned on an authenticated request, so the
     // token rides along only while the updated pickers are the ones consuming it.
     private suspend fun authorizationHeader(): String? {
-        if (!duckChatFeature.get().updatedPickers().isEnabled()) return null
+        if (!duckChatFeature.value.updatedPickers().isEnabled()) return null
         return runCatching {
             subscriptions.getAccessToken()?.takeUnless { it.isBlank() }?.let { "Bearer $it" }
         }.getOrElse {
@@ -409,7 +423,7 @@ class RealDuckAiModelManager @Inject constructor(
             .filter { ModelLabel.from(it) == ModelLabel.UNKNOWN }
             .map { it.sanitisedLabel() }
             .distinct()
-            .forEach { duckChatPixels.get().fireUnknownModelLabel(it) }
+            .forEach { duckChatPixels.value.fireUnknownModelLabel(it) }
     }
 
     // The label is a backend-authored id, so keep the pixel to that shape rather than passing
@@ -421,7 +435,7 @@ class RealDuckAiModelManager @Inject constructor(
 
     /** Labelled models lead the list, as the backend marks them as the ones to recommend. */
     private suspend fun List<AIChatModel>.sortLabelledFirst(): List<AIChatModel> {
-        if (!duckChatFeature.get().updatedPickers().isEnabled()) return this
+        if (!duckChatFeature.value.updatedPickers().isEnabled()) return this
         return sortedBy { if (it.label != null) 0 else 1 }
     }
 

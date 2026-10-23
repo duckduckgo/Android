@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutConditionNotFound
@@ -37,13 +38,14 @@ import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.duckduckgo.pir.impl.scripts.models.asActionType
 import com.duckduckgo.pir.impl.scripts.models.getDetails
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = EventHandler::class,
+    binding = binding<EventHandler>(),
 )
 class BrokerActionFailedEventHandler @Inject constructor(
     private val pirRunStateHandler: PirRunStateHandler,
@@ -214,6 +216,7 @@ class BrokerActionFailedEventHandler @Inject constructor(
                 stepType = currentBrokerStep.step.stepType,
                 completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
                 actionType = currentAction.asActionType(),
+                isFreeScan = (currentBrokerStep as? ScanStep)?.isFreeScan == true,
             ),
         )
     }

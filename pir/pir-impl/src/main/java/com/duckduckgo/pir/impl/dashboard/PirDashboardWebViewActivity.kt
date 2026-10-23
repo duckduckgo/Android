@@ -17,6 +17,7 @@
 package com.duckduckgo.pir.impl.dashboard
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
@@ -25,26 +26,28 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.pir.api.dashboard.PirDashboardWebViewScreen
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command.SendJsEvent
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command.SendResponseToJs
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebViewClient
+import com.duckduckgo.pir.impl.dashboard.purchase.PirPurchaseRoute.NativePurchaseFlow
 import com.duckduckgo.pir.impl.databinding.ActivityPirDashboardWebviewBinding
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.json.JSONObject
@@ -52,7 +55,7 @@ import javax.inject.Inject
 import javax.inject.Named
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(PirDashboardWebViewScreen::class)
+@ContributeToActivityStarter(PirDashboardWebViewScreen::class, screenName = "pir.main")
 class PirDashboardWebViewActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -69,10 +72,10 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
     lateinit var pirDashboardUrlProvider: PirDashboardUrlProvider
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     @Inject
-    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val viewModel: PirDashboardWebViewViewModel by bindViewModel()
 
@@ -80,25 +83,41 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.WEBVIEW)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        setupCloseToolbarIfNeeded()
+        configureEdgeToEdgeInsets()
 
         setupWebView()
         observeCommands()
 
         pirNotificationManager.createNotificationChannel()
         lifecycle.addObserver(viewModel)
+
+        // avoid counting relaunch from Recents as fresh launch
+        val launchedFromRecents = (intent.flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0
+        viewModel.onLaunched(
+            isRestored = savedInstanceState != null || launchedFromRecents,
+            fromFreemiumScanCompleteNotification = intent.getBooleanExtra(EXTRA_FROM_FREEMIUM_SCAN_COMPLETE_NOTIFICATION, false),
+        )
     }
 
     override fun onDestroy() {
         cleanupWebView()
         super.onDestroy()
+    }
+
+    private fun setupCloseToolbarIfNeeded() {
+        if (!intent.getBooleanExtra(EXTRA_SHOW_CLOSE_BUTTON, false)) return
+
+        binding.includeToolbar.appBarLayout.isVisible = true
+        setupToolbar(binding.includeToolbar.toolbar)
+        binding.includeToolbar.toolbar.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_close_24)
+        supportActionBar?.title = ""
+
+        val toolbarColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
+        binding.includeToolbar.appBarLayout.setBackgroundColor(toolbarColor)
+        binding.includeToolbar.toolbar.setBackgroundColor(toolbarColor)
     }
 
     private fun configureEdgeToEdgeInsets() {
@@ -129,6 +148,11 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
         )
 
         binding.pirWebView.webViewClient = webViewClient
+        webViewClient.listener = object : PirDashboardWebViewClient.Listener {
+            override fun onSubscriptionPurchaseRequested(route: NativePurchaseFlow) {
+                viewModel.onSubscriptionPurchaseRequested(route)
+            }
+        }
         binding.pirWebView.webChromeClient = object : WebChromeClient() {
 
             override fun onCreateWindow(
@@ -161,6 +185,7 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
     }
 
     private fun cleanupWebView() {
+        webViewClient.listener = null
         binding.pirWebView.stopLoading()
         binding.pirWebView.removeJavascriptInterface(pirWebJsMessaging.context)
         binding.webViewContainer.removeView(binding.pirWebView)
@@ -181,6 +206,13 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
             is Command.ShowManualConfigWarning -> {
                 binding.manualConfigWarning.isVisible = command.show
             }
+
+            Command.ReloadWebView -> binding.pirWebView.reload()
+
+            is Command.LaunchSubscriptionPurchase -> globalActivityStarter.start(
+                this,
+                SubscriptionPurchase(origin = command.origin, featurePage = command.featurePage),
+            )
         }
     }
 
@@ -190,5 +222,10 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
 
     private fun sendResponseToJs(data: JsCallbackData) {
         pirWebJsMessaging.onResponse(data)
+    }
+
+    companion object {
+        const val EXTRA_SHOW_CLOSE_BUTTON = "extra_show_close_button"
+        const val EXTRA_FROM_FREEMIUM_SCAN_COMPLETE_NOTIFICATION = "extra_from_freemium_scan_complete_notification"
     }
 }

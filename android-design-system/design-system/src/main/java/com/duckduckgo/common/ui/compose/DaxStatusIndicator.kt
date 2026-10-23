@@ -60,14 +60,14 @@ fun DaxStatusIndicator(
     }
     Row(
         modifier = modifier
-            .heightIn(min = StatusIndicatorDefaults.minHeight)
+            .heightIn(min = StatusIndicatorDefaults.MinHeight)
             .semantics(mergeDescendants = true) { },
-        horizontalArrangement = Arrangement.spacedBy(space = StatusIndicatorDefaults.spacing),
+        horizontalArrangement = Arrangement.spacedBy(space = StatusIndicatorDefaults.Spacing),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             modifier = Modifier
-                .size(StatusIndicatorDefaults.iconSize)
+                .size(StatusIndicatorDefaults.IconSize)
                 .clip(CircleShape)
                 .background(
                     color = if (active) {
@@ -107,9 +107,9 @@ enum class Status {
 }
 
 internal object StatusIndicatorDefaults {
-    internal val iconSize = 8.dp
-    internal val spacing = 4.dp
-    internal val minHeight = 16.dp
+    internal val IconSize = 8.dp
+    internal val Spacing = 4.dp
+    internal val MinHeight = 16.dp
 
     internal val disabledDotColor: Color
         @Composable

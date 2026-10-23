@@ -16,17 +16,13 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     namespace 'com.duckduckgo.eventhub.impl'
 
 
@@ -36,8 +32,8 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
     implementation project(path: ':privacy-config-api')
@@ -56,9 +52,6 @@ dependencies {
     // Room
     implementation AndroidX.room.runtime
     ksp AndroidX.room.compiler
-
-    // Dagger
-    implementation Google.dagger
 
     // Moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"

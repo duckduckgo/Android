@@ -87,9 +87,6 @@ internal class AppearanceViewModelTest {
     private lateinit var mockOmnibarFeatureRepository: OmnibarRepository
 
     @Mock
-    private lateinit var mockAddressBarTrackersAnimationManager: com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
-
-    @Mock
     private lateinit var mockAppBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     private val enabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
@@ -108,10 +105,6 @@ internal class AppearanceViewModelTest {
         whenever(mockTabSwitcherDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
         whenever(mockOmnibarFeatureRepository.isSplitOmnibarAvailable).thenReturn(false)
         whenever(mockAppBrandDesignUpdateToggles.appIcon()).thenReturn(disabledToggle)
-        runTest {
-            whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        }
-
         initializeViewModel()
     }
 
@@ -124,7 +117,6 @@ internal class AppearanceViewModelTest {
                 mockPixel,
                 coroutineTestRule.testDispatcherProvider,
                 mockTabSwitcherDataStore,
-                mockAddressBarTrackersAnimationManager,
                 mockAppBrandDesignUpdateToggles,
                 mockOmnibarFeatureRepository,
             )
@@ -390,32 +382,6 @@ internal class AppearanceViewModelTest {
         }
 
     @Test
-    fun `when address bar trackers animation feature is disabled then toggle should be hidden`() =
-        runTest {
-            whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-            initializeViewModel()
-
-            testee.viewState().test {
-                val value = expectMostRecentItem()
-                assertEquals(false, value.shouldShowAddressBarTrackersAnimationItem)
-                cancelAndConsumeRemainingEvents()
-            }
-        }
-
-    @Test
-    fun `when address bar trackers animation feature is enabled then toggle should be visible`() =
-        runTest {
-            whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
-            initializeViewModel()
-
-            testee.viewState().test {
-                val value = expectMostRecentItem()
-                assertEquals(true, value.shouldShowAddressBarTrackersAnimationItem)
-                cancelAndConsumeRemainingEvents()
-            }
-        }
-
-    @Test
     fun `when tracker count in address bar setting is stored then it persists correctly`() =
         runTest {
             whenever(mockAppSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
@@ -442,30 +408,26 @@ internal class AppearanceViewModelTest {
         }
 
     @Test
-    fun `when both feature flag and user preference are enabled then viewState shows both enabled`() =
+    fun `when user preference is enabled then viewState shows preference enabled`() =
         runTest {
-            whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
             whenever(mockAppSettingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
             initializeViewModel()
 
             testee.viewState().test {
                 val value = expectMostRecentItem()
-                assertEquals(true, value.shouldShowAddressBarTrackersAnimationItem)
                 assertEquals(true, value.isAddressBarTrackersAnimationEnabled)
                 cancelAndConsumeRemainingEvents()
             }
         }
 
     @Test
-    fun `when feature flag is enabled but user preference is disabled then toggle is visible but unchecked`() =
+    fun `when user preference is disabled then toggle is visible but unchecked`() =
         runTest {
-            whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
             whenever(mockAppSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
             initializeViewModel()
 
             testee.viewState().test {
                 val value = expectMostRecentItem()
-                assertEquals(true, value.shouldShowAddressBarTrackersAnimationItem) // Toggle visible
                 assertEquals(false, value.isAddressBarTrackersAnimationEnabled) // But unchecked
                 cancelAndConsumeRemainingEvents()
             }

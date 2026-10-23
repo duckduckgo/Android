@@ -50,8 +50,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import androidx.transition.Fade
 import androidx.transition.TransitionManager
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.databinding.ActivityTabSwitcherBinding
@@ -86,6 +84,8 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
 import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenWithParams
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.button.ButtonType
@@ -101,13 +101,14 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.TabSwitcher
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsScreens.DownloadsScreenNoParams
+import com.duckduckgo.duckchat.api.DuckAiChatsMenu
+import com.duckduckgo.duckchat.api.DuckChatHistorySource
+import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemRenderer
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import kotlinx.coroutines.CoroutineScope
@@ -154,6 +155,9 @@ class TabSwitcherActivity :
     lateinit var addressDisplayFormatter: com.duckduckgo.app.browser.AddressDisplayFormatter
 
     @Inject
+    lateinit var duckAiTabGridItemRenderer: DuckAiTabGridItemRenderer
+
+    @Inject
     lateinit var urlDisplayRepository: com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 
     @Inject
@@ -169,13 +173,13 @@ class TabSwitcherActivity :
         get() = currentBrowserMode == BrowserMode.FIRE
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var duckAiChatsMenu: Lazy<DuckAiChatsMenu>
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
@@ -188,6 +192,7 @@ class TabSwitcherActivity :
             dispatchers = dispatchers,
             trackerCountAnimator = trackerCountAnimator,
             addressDisplayFormatter = addressDisplayFormatter,
+            duckAiTabGridItemRenderer = duckAiTabGridItemRenderer,
         )
     }
 
@@ -296,15 +301,12 @@ class TabSwitcherActivity :
 
         if (switchToRequestedModeIfNeeded(savedInstanceState)) return
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)
-        if (edgeToEdgeEnabled) {
-            val barStyle = if (isDarkThemeEnabled()) {
-                SystemBarStyle.dark(Color.TRANSPARENT)
-            } else {
-                SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-            }
-            enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
+        val barStyle = if (isDarkThemeEnabled()) {
+            SystemBarStyle.dark(Color.TRANSPARENT)
+        } else {
+            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
         }
+        enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
 
         setContentView(binding.root)
 
@@ -329,9 +331,7 @@ class TabSwitcherActivity :
         configureNavigationBar()
         configureFireTabsEmptyState()
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         configureObservers()
         observeBrowserModeChanges()
@@ -936,6 +936,23 @@ class TabSwitcherActivity :
                 viewModel.onBrowserModeToggled(BrowserMode.REGULAR, BrowserModeSwitchSource.TAB_SWITCHER_EXIT)
                 finishAfterTransition()
             }
+            Command.ShowDuckAiChatsMenu -> showDuckAiChatsMenu()
+        }
+    }
+
+    private fun showDuckAiChatsMenu() {
+        lifecycleScope.launch {
+            duckAiChatsMenu.value.show(
+                anchorView = findViewById(R.id.duckAIToolbarButton),
+                options = DuckAiChatsMenu.Options(
+                    chatHistorySource = DuckChatHistorySource.TAB_SWITCHER,
+                    menuStyle = DuckAiChatsMenu.ChatsMenuStyle.COMPACT,
+                ),
+                listener = object : DuckAiChatsMenu.Listener {
+                    override fun onNewChatSelected() = viewModel.onDuckAiNewChatSelected()
+                    override fun onChatSelected(chatUrl: String) = viewModel.onDuckAiChatSelected(chatUrl)
+                },
+            )
         }
     }
 
@@ -968,6 +985,12 @@ class TabSwitcherActivity :
             dynamicMenu = viewState.dynamicInterface,
             navigationBar = binding.navigationBar,
         )
+
+        if (viewState.isDuckAiChatsMenuEnabled) {
+            menu.findItem(R.id.duckAIToolbarButton).setIcon(CommonR.drawable.ic_chats_24)
+            // Creating the menu starts loading recent chats, so the popup opens without waiting on the read.
+            duckAiChatsMenu.value
+        }
 
         menu.findItem(R.id.newTabToolbarButton).setTitle(
             when (currentBrowserMode) {

@@ -18,22 +18,41 @@ package com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goo
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.InBrowserPromo
+import com.duckduckgo.autofill.impl.importing.AutofillImportRedesignFeature
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
+import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
+import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportResult
+import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportResult.Failure
+import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangePasswordImporter
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason
+import com.duckduckgo.autofill.impl.importing.wideevents.CredentialImportWideEvent
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.Command.StartCredentialExchange
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.Command.StartWebFlow
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.BrowserPromoPreImport
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.DeterminingFirstView
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.Importing
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.PreImport
+import com.duckduckgo.codegen.annotations.ContributesViewModel
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.credentialexchange.api.CredentialExchangeResult
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
 
@@ -43,7 +62,27 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val importPasswordsPixelSender: ImportPasswordsPixelSender,
     private val autofillStore: InternalAutofillStore,
+    private val promptExposureReporter: PromptExposureReporter,
+    private val credentialExchangePasswordImporter: CredentialExchangePasswordImporter,
+    private val webViewCapabilityChecker: ImportGooglePasswordsCapabilityChecker,
+    private val credentialImportWideEvent: CredentialImportWideEvent,
+    private val importRedesignFeature: AutofillImportRedesignFeature,
+    private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
 ) : ViewModel() {
+
+    fun determineInitialUi(launchSource: AutofillImportLaunchSource, canShowPreImportDialog: Boolean) {
+        viewModelScope.launch {
+            val (isRedesignEnabled, isPictogramsEnabled) = withContext(dispatchers.io()) {
+                importRedesignFeature.self().isEnabled() to appBrandDesignUpdateToggles.pictograms().isEnabled()
+            }
+            _viewState.update { it.copy(isRedesignEnabled = isRedesignEnabled, isPictogramsEnabled = isPictogramsEnabled) }
+            if (canShowPreImportDialog) {
+                shouldShowInitialInstructionalPrompt(launchSource)
+            } else {
+                onDirectImportRequested(launchSource)
+            }
+        }
+    }
 
     fun onImportFlowFinishedSuccessfully() {
         viewModelScope.launch(dispatchers.main()) {
@@ -56,24 +95,91 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
             when (it) {
                 is ImportResult.InProgress -> {
                     logcat { "Import in progress" }
-                    _viewState.value = ViewState(viewMode = Importing)
+                    _viewState.value = viewState.value.copy(viewMode = Importing)
                 }
 
                 is ImportResult.Finished -> {
                     logcat { "Import finished: ${it.savedCredentials} imported. ${it.numberSkipped} skipped." }
-                    _viewState.value = ViewState(viewMode = ViewMode.ImportSuccess(it))
+                    _viewState.value = viewState.value.copy(viewMode = ViewMode.ImportSuccess(it))
                 }
             }
         }
     }
 
-    fun onImportFlowFinishedWithError() {
-        _viewState.value = ViewState(viewMode = ViewMode.ImportError)
+    fun onWebFlowFinishedSuccessfully() {
+        credentialImportWideEvent.onWebFlowSucceeded()
+        onImportFlowFinishedSuccessfully()
+    }
+
+    fun onWebFlowFinishedWithError(reason: UserCannotImportReason) {
+        credentialImportWideEvent.onWebFlowFailed(reason)
+        _viewState.value = viewState.value.copy(viewMode = ViewMode.ImportError)
+    }
+
+    fun onWebFlowCancelled(canShowPreImportDialog: Boolean) {
+        credentialImportWideEvent.onWebFlowCancelled()
+        onImportFlowCancelledByUser(canShowPreImportDialog)
+    }
+
+    fun onImportButtonClicked(importSource: AutofillImportLaunchSource) {
+        sendStartImportCommand(viewState.value.usesCredentialExchange, importSource)
+    }
+
+    fun onDirectImportRequested(importSource: AutofillImportLaunchSource) {
+        viewModelScope.launch {
+            sendStartImportCommand(credentialExchangePasswordImporter.isSupported(), importSource)
+        }
+    }
+
+    private fun sendStartImportCommand(useCredentialExchange: Boolean, importSource: AutofillImportLaunchSource) {
+        if (useCredentialExchange) {
+            if (credentialExchangeInProgress) return
+            credentialExchangeInProgress = true
+        }
+        credentialImportWideEvent.onImportStarted(importSource, useCredentialExchange)
+        command.trySend(if (useCredentialExchange) StartCredentialExchange else StartWebFlow)
+    }
+
+    fun onCredentialExchangeFinished(
+        result: CredentialExchangeResult,
+        importSource: AutofillImportLaunchSource,
+        canShowPreImportDialog: Boolean,
+    ) {
+        credentialExchangeInProgress = false
+        viewModelScope.launch {
+            when (val converted = credentialExchangePasswordImporter.convertAndDeduplicate(result)) {
+                is CredentialExchangeImportResult.Success -> {
+                    credentialImporter.import(converted.credentials, converted.originalCount, importSource)
+                    credentialImportWideEvent.onCredentialExchangeSucceeded(converted.exporterPackageName)
+                    onImportFlowFinishedSuccessfully()
+                }
+                is CredentialExchangeImportResult.Cancelled -> {
+                    credentialImportWideEvent.onCredentialExchangeCancelled()
+                    onImportFlowCancelledByUser(canShowPreImportDialog)
+                }
+                is Failure -> onExchangeCredentialsFailure(converted)
+            }
+        }
+    }
+
+    /**
+     * When there's a failure in the exchange credentials flow, we fallback to the web-based flow if that's supported
+     */
+    private suspend fun onExchangeCredentialsFailure(failure: Failure) {
+        if (webViewCapabilityChecker.webViewCapableOfImporting()) {
+            logcat(WARN) { "Credential exchange failed (${failure.reason}), falling back to web flow" }
+            credentialImportWideEvent.onCredentialExchangeFellBackToWebFlow(failure.reason, failure.exporterPackageName)
+            command.trySend(StartWebFlow)
+        } else {
+            logcat(WARN) { "Credential exchange failed (${failure.reason}), web flow not supported" }
+            credentialImportWideEvent.onCredentialExchangeFailed(failure.reason, failure.exporterPackageName)
+            _viewState.value = viewState.value.copy(viewMode = ViewMode.ImportError)
+        }
     }
 
     fun onImportFlowCancelledByUser(canShowPreImportDialog: Boolean) {
         if (!canShowPreImportDialog) {
-            _viewState.value = ViewState(viewMode = ViewMode.FlowTerminated)
+            _viewState.value = viewState.value.copy(viewMode = ViewMode.FlowTerminated)
         }
     }
 
@@ -90,7 +196,15 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
             autofillStore.inBrowserImportPromoShownCount += 1
         }
         importPasswordsPixelSender.onImportPasswordsDialogDisplayed(importSource)
-        _viewState.value = viewState.value.copy(viewMode = viewMode)
+        // Only the password-field promo is app-originated; the other sources are opened by the user.
+        if (importSource == AutofillImportLaunchSource.InBrowserPromo) {
+            promptExposureReporter.reportPromptShown(IMPORT_PASSWORDS_GOOGLE_PROMPT_ID)
+        }
+
+        viewModelScope.launch {
+            val usesCredentialExchange = credentialExchangePasswordImporter.isSupported()
+            _viewState.value = viewState.value.copy(viewMode = viewMode, usesCredentialExchange = usesCredentialExchange)
+        }
     }
 
     fun onInBrowserPromoDismissed() {
@@ -104,7 +218,21 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState: StateFlow<ViewState> = _viewState
 
-    data class ViewState(val viewMode: ViewMode = DeterminingFirstView)
+    private val command = Channel<Command>(1, DROP_OLDEST)
+    private var credentialExchangeInProgress = false
+    fun commands(): Flow<Command> = command.receiveAsFlow()
+
+    data class ViewState(
+        val viewMode: ViewMode = DeterminingFirstView,
+        val usesCredentialExchange: Boolean = false,
+        val isRedesignEnabled: Boolean = false,
+        val isPictogramsEnabled: Boolean = false,
+    )
+
+    sealed interface Command {
+        data object StartWebFlow : Command
+        data object StartCredentialExchange : Command
+    }
 
     sealed interface ViewMode {
         data object DeterminingFirstView : ViewMode
@@ -114,5 +242,9 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
         data class ImportSuccess(val importResult: ImportResult.Finished) : ViewMode
         data object ImportError : ViewMode
         data object FlowTerminated : ViewMode
+    }
+
+    private companion object {
+        const val IMPORT_PASSWORDS_GOOGLE_PROMPT_ID = "import_passwords_google"
     }
 }

@@ -22,20 +22,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.text.HtmlCompat
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.store.AppTheme
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.getSerializable
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ContentVpnAlwaysOnAlertBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import dagger.android.support.AndroidSupportInjection
 import logcat.logcat
 import javax.inject.Inject
 
@@ -51,15 +49,10 @@ class AlwaysOnAlertDialogFragment : BottomSheetDialogFragment() {
 
     @Inject lateinit var appTheme: AppTheme
 
-    @Inject lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
     private lateinit var listener: Listener
     private lateinit var fragmentType: FragmentType
 
-    override fun getTheme(): Int = if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-        com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialogCollapsed_EdgeToEdge
-    } else {
-        com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialogCollapsed
-    }
+    override fun getTheme(): Int = com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialogCollapsed_EdgeToEdge
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -74,9 +67,7 @@ class AlwaysOnAlertDialogFragment : BottomSheetDialogFragment() {
         return ContentVpnAlwaysOnAlertBinding.inflate(inflater, container, false).apply {
             fragmentType = requireArguments().getSerializable<FragmentType>(ARGUMENT_FRAGMENT_TYPE) ?: FragmentType.ALWAYS_ON
             configureViews(this)
-            if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-                root.applyBottomSystemBarInsetPadding()
-            }
+            root.applyBottomSystemBarInsetPadding()
         }.root
     }
 

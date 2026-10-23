@@ -17,8 +17,18 @@
 package com.duckduckgo.pir.impl.checker
 
 sealed interface PirEligibility {
-    data object Enabled : PirEligibility
+    data class Enabled(val runMode: PirRunMode) : PirEligibility
     data class Disabled(val reason: DisabledReason) : PirEligibility
+}
+
+/**
+ * What work an eligible user is allowed to run.
+ */
+enum class PirRunMode {
+    SCAN_AND_OPT_OUT,
+
+    /** A freemium user: scans only, never opt-outs and never repeat maintenance scans. */
+    SCAN_ONLY,
 }
 
 enum class DisabledReason {
@@ -30,3 +40,6 @@ enum class DisabledReason {
 
 val PirEligibility.isEnabled: Boolean
     get() = this is PirEligibility.Enabled
+
+val PirEligibility?.runModeOrNull: PirRunMode?
+    get() = (this as? PirEligibility.Enabled)?.runMode

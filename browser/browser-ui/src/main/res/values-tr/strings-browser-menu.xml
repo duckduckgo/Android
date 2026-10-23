@@ -58,4 +58,10 @@
     <string name="browserMenuForward">İleri</string>
     <string name="browserMenuRefresh">Yenile</string>
     <string name="browserMenuFireTabsData">Sekmeleri ve Verileri Sil</string>
+
+    <!-- Duck.ai tab + menu -->
+    <string name="chatMenuPopupNewVoiceChat">Yeni Sesli Sohbet</string>
+    <string name="chatMenuPopupNewImage">Yeni Görsel</string>
+    <string name="chatMenuPopupNewTab">Yeni Sekme</string>
+    <string name="chatMenuPopupNewFireTab">Yeni Fire Sekmesi</string>
 </resources>

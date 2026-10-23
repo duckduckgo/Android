@@ -22,13 +22,15 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.browser.ui.browsermenu.BrowserMenuViewState
 import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface BrowserMenuViewStateFactory {
@@ -46,11 +48,12 @@ interface BrowserMenuViewStateFactory {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealBrowserMenuViewStateFactory @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val newDownloadState: NewDownloadState,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    private val appBuildConfig: AppBuildConfig,
 ) : BrowserMenuViewStateFactory {
     override fun create(
         omnibarViewMode: Omnibar.ViewMode,
@@ -110,6 +113,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             showAutofill = browserViewState.showAutofill,
             showDownloadDot = newDownloadState.hasNewDownload(),
             canGoForward = browserViewState.canGoForward,
+            showInternalFeedback = appBuildConfig.isInternalBuild(),
         )
     }
 
@@ -169,6 +173,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             isSSLError = browserViewState.sslError != NONE,
             canPrintPage = browserViewState.canPrintPage,
             showDownloadPdfMenuItem = browserViewState.currentPdfCachedUri != null,
+            showInternalFeedback = appBuildConfig.isInternalBuild(),
             pageContextHeader = createBrowserHeaderContextState(browserViewState, title, tabId, shortUrl, omnibarText, serpLogoUrl, siteUrl),
         )
     }

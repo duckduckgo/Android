@@ -31,14 +31,15 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChatContextual
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
-import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
+import com.duckduckgo.duckchat.api.DuckChatHistoryParams
+import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
@@ -62,7 +63,10 @@ class RealDuckChatContextual @Inject constructor(
         textSelection: String?,
         showChatSurface: () -> Unit,
     ) {
-        if (anchor == null || !duckChatInternal.isContextualSheetRedesignEnabled()) {
+        // Every caller already gates on contextual mode, so this is a backstop. Falling back to
+        // showChatSurface() would open the contextual sheet — the very thing the mode disables.
+        if (!duckChatInternal.isDuckChatContextualModeEnabled()) return
+        if (anchor == null) {
             showChatSurface()
             return
         }
@@ -102,17 +106,9 @@ class RealDuckChatContextual @Inject constructor(
     }
 
     override fun createChatSurface(tabId: String): Fragment {
-        return if (duckChatInternal.isContextualSheetRedesignEnabled()) {
-            DuckChatContextualWebViewFragment().apply {
-                arguments = Bundle().apply {
-                    putString(DuckChatContextualWebViewFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
-                }
-            }
-        } else {
-            DuckChatContextualFragment().apply {
-                arguments = Bundle().apply {
-                    putString(DuckChatContextualFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
-                }
+        return DuckChatContextualWebViewFragment().apply {
+            arguments = Bundle().apply {
+                putString(DuckChatContextualWebViewFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
             }
         }
     }
@@ -151,7 +147,7 @@ class RealDuckChatContextual @Inject constructor(
         if (duckChatInternal.isContextualMenuAllChatsEnabled()) {
             popup.onMenuItemClicked(content.findViewById(R.id.contextualChatMenuAllChats)) {
                 duckChatPixels.reportContextualAddressBarMenuAllChatsSelected()
-                globalActivityStarter.start(activity, DuckChatHistoryNoParams)
+                globalActivityStarter.start(activity, DuckChatHistoryParams(DuckChatHistorySource.ADDRESS_BAR))
             }
         } else {
             content.findViewById<View>(R.id.contextualChatMenuAllChats).gone()

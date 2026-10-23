@@ -26,7 +26,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adclick.api.AdClickManager
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.bookmarks.BookmarkAddedDialogPlugin
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
@@ -49,8 +48,6 @@ import com.duckduckgo.app.browser.httperrors.StringSiteErrorHandlerImpl
 import com.duckduckgo.app.browser.logindetection.*
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlightPlugin
 import com.duckduckgo.app.browser.menu.TopInContextSection
-import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
-import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
 import com.duckduckgo.app.browser.suggestredirect.DnsLookupApi29Impl
 import com.duckduckgo.app.browser.suggestredirect.DnsLookupPreApi29Impl
 import com.duckduckgo.app.browser.suggestredirect.HostnameResolver
@@ -66,9 +63,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
@@ -82,8 +77,10 @@ import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.file.FileDeleter
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import com.duckduckgo.di.scopes.AppScope
@@ -99,21 +96,20 @@ import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.referral.api.AppReferrer
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.request.interception.api.RequestBlocklist
-import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.tracker.detection.api.TrackerDetector
 import com.duckduckgo.user.agent.api.UserAgentProvider
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
-import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.IntoSet
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
 import javax.inject.Qualifier
 import kotlin.time.Duration.Companion.milliseconds
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class BrowserModule {
 
@@ -123,9 +119,6 @@ class BrowserModule {
         statisticsStore: StatisticsDataStore,
         variantManager: VariantManager,
         appReferrer: AppReferrer,
-        duckChat: DuckChat,
-        androidBrowserConfigFeature: AndroidBrowserConfigFeature,
-        serpSettingsFeature: SerpSettingsFeature,
         deviceInfo: DeviceInfo,
     ): RequestRewriter {
         return DuckDuckGoRequestRewriter(
@@ -133,15 +126,12 @@ class BrowserModule {
             statisticsStore,
             variantManager,
             appReferrer,
-            duckChat,
-            androidBrowserConfigFeature,
-            serpSettingsFeature,
             deviceInfo,
         )
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @IntoSet
     fun defaultBrowserObserver(
         defaultBrowserDetector: DefaultBrowserDetector,
@@ -245,13 +235,13 @@ class BrowserModule {
     @Provides
     fun databaseCleanerHelper(): DatabaseCleaner = DatabaseCleanerHelper()
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun gridViewColumnCalculator(context: Context): GridViewColumnCalculator {
         return GridViewColumnCalculator(context)
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun webViewPreviewPersister(
         context: Context,
@@ -261,7 +251,7 @@ class BrowserModule {
         return FileBasedWebViewPreviewPersister(context, fileDeleter, dispatchers)
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun faviconPersister(
         context: Context,
@@ -317,7 +307,7 @@ class BrowserModule {
         )
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun thirdPartyCookieManager(
         cookieManagerProvider: CookieManagerProvider,
@@ -328,24 +318,12 @@ class BrowserModule {
         return AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository, thirdPartyCookieNames, duckAiHostProvider)
     }
 
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun providePageLoadedPixelDao(appDatabase: AppDatabase): PageLoadedPixelDao {
-        return appDatabase.pageLoadedPixelDao()
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun providePagePaintedPixelDao(appDatabase: AppDatabase): PagePaintedPixelDao {
-        return appDatabase.pagePaintedPixelDao()
-    }
-
     private val Context.indonesiaNewTabSectionDataStore: DataStore<Preferences> by preferencesDataStore(
         name = "indonesia_new_tab_section_store",
     )
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @IndonesiaNewTabSection
     fun provideIndonesiaNewTabSectionDataStore(context: Context): DataStore<Preferences> {
         return context.indonesiaNewTabSectionDataStore
@@ -361,7 +339,7 @@ class BrowserModule {
         return HttpCodeSiteErrorHandlerImpl()
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideHostnameResolver(
         appBuildConfig: AppBuildConfig,

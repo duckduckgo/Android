@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.tabs
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
@@ -34,10 +34,35 @@ interface TabManagerFeatureFlags {
     fun tabInsertionFixes(): Toggle
 
     /**
+     * Kill switch for fetching the page title and favicon of tabs opened in the background, before they are loaded.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun backgroundTabPrefetch(): Toggle
+
+    /**
      * Reports the furthest a user went back in the tab activation order, so that the effect of
      * lowering the retained fragment limit can be sized before it is changed.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     @Toggle.InternalAlwaysEnabled
     fun tabMaxReuseDistancePixel(): Toggle
+
+    /**
+     * The Duck.ai button opens the chats menu (New Chat, recent chats, View all) instead of opening a new Duck.ai tab.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiChatsMenu(): Toggle
+
+    /**
+     * The Duck.ai "+" menu shows a "New Tab" header, drops the "New" prefix from its items, renames New Tab to Search
+     * (opening on the Search input in the current browser mode) and removes New Fire Tab.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiPlusMenuUpdate(): Toggle
+
+    /**
+     * Shows Duck.ai tabs in the tab switcher grid as a rich card instead of the tab preview.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun richDuckAiGridTabItem(): Toggle
 }

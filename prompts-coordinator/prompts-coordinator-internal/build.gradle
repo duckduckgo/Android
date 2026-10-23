@@ -16,8 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -31,10 +30,9 @@ dependencies {
     implementation project(':prompts-coordinator-api')
     implementation project(':prompts-coordinator-impl')
 
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(':codegen-annotations')
     implementation project(':di')
 
-    implementation Google.dagger
     implementation KotlinX.coroutines.core
 }

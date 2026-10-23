@@ -24,7 +24,6 @@
         android:layout_height="match_parent"
         android:importantForAccessibility="no"
         android:scaleType="centerCrop"
-        android:background="@android:color/black"
         android:visibility="gone"
         app:lottie_loop="false" />
 
@@ -67,7 +66,7 @@
                     android:importantForAccessibility="no"
                     app:lottie_autoPlay="false"
                     app:lottie_loop="false"
-                    app:lottie_rawRes="@raw/fire_dialog_animation" />
+                    app:lottie_rawRes="@raw/fire_dialog_animation_brand_design" />
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/dialogTitle"

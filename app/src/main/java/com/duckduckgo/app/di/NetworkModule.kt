@@ -24,12 +24,11 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.user.agent.api.UserAgentProvider
-import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
-import dagger.Lazy
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import okhttp3.Cache
@@ -47,12 +46,12 @@ import java.net.SocketAddress
 import java.net.URI
 import javax.inject.Named
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class NetworkModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Named("api")
     fun apiOkHttpClient(
         context: Context,
@@ -89,7 +88,7 @@ class NetworkModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Named("nonCaching")
     fun pixelOkHttpClient(
         apiRequestInterceptor: ApiRequestInterceptor,
@@ -111,7 +110,7 @@ class NetworkModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Named("api")
     fun apiRetrofit(
         @Named("api") okHttpClient: Lazy<OkHttpClient>,
@@ -119,7 +118,7 @@ class NetworkModule {
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Url.API)
-            .callFactory { okHttpClient.get().newCall(it) }
+            .callFactory { okHttpClient.value.newCall(it) }
             .addConverterFactory(ScalarsConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(MoshiConverterFactory.create(moshi))
@@ -127,7 +126,7 @@ class NetworkModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Named("nonCaching")
     fun nonCachingRetrofit(
         @Named("nonCaching") okHttpClient: Lazy<OkHttpClient>,
@@ -135,7 +134,7 @@ class NetworkModule {
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Url.API)
-            .callFactory { okHttpClient.get().newCall(it) }
+            .callFactory { okHttpClient.value.newCall(it) }
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()

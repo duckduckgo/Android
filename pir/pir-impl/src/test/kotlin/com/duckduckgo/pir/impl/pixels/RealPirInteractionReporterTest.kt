@@ -66,14 +66,28 @@ class RealPirInteractionReporterTest {
         whenever(mockPirRepository.getLastPirInteractionMauPixelTimeMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseDateMs)
 
-        testee.attemptFirePixel()
+        testee.attemptFirePixel(isAuthenticated = true)
 
-        verify(mockPirPixelSender).reportInteractionDAU()
+        verify(mockPirPixelSender).reportInteractionDAU(isAuthenticated = true)
         verify(mockPirRepository).setLastPirInteractionDauPixelTimeMs(baseDateMs)
-        verify(mockPirPixelSender).reportInteractionWAU()
+        verify(mockPirPixelSender).reportInteractionWAU(isAuthenticated = true)
         verify(mockPirRepository).setLastPirInteractionWauPixelTimeMs(baseDateMs)
-        verify(mockPirPixelSender).reportInteractionMAU()
+        verify(mockPirPixelSender).reportInteractionMAU(isAuthenticated = true)
         verify(mockPirRepository).setLastPirInteractionMauPixelTimeMs(baseDateMs)
+    }
+
+    @Test
+    fun whenFreeUserThenFiresAllPixelsAsFree() = coroutineRule.testScope.runTest {
+        whenever(mockPirRepository.getLastPirInteractionDauPixelTimeMs()).thenReturn(0L)
+        whenever(mockPirRepository.getLastPirInteractionWauPixelTimeMs()).thenReturn(0L)
+        whenever(mockPirRepository.getLastPirInteractionMauPixelTimeMs()).thenReturn(0L)
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseDateMs)
+
+        testee.attemptFirePixel(isAuthenticated = false)
+
+        verify(mockPirPixelSender).reportInteractionDAU(isAuthenticated = false)
+        verify(mockPirPixelSender).reportInteractionWAU(isAuthenticated = false)
+        verify(mockPirPixelSender).reportInteractionMAU(isAuthenticated = false)
     }
 
     @Test
@@ -83,9 +97,9 @@ class RealPirInteractionReporterTest {
         whenever(mockPirRepository.getLastPirInteractionMauPixelTimeMs()).thenReturn(baseDateMs)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(oneDayLaterMs)
 
-        testee.attemptFirePixel()
+        testee.attemptFirePixel(isAuthenticated = true)
 
-        verify(mockPirPixelSender).reportInteractionDAU()
+        verify(mockPirPixelSender).reportInteractionDAU(isAuthenticated = true)
         verify(mockPirRepository).setLastPirInteractionDauPixelTimeMs(oneDayLaterMs)
         verifyNoMoreInteractions(mockPirPixelSender)
         verify(mockPirRepository, never()).setLastPirInteractionWauPixelTimeMs(any())
@@ -99,7 +113,7 @@ class RealPirInteractionReporterTest {
         whenever(mockPirRepository.getLastPirInteractionMauPixelTimeMs()).thenReturn(baseDateMs)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseDateMs)
 
-        testee.attemptFirePixel()
+        testee.attemptFirePixel(isAuthenticated = true)
 
         verifyNoInteractions(mockPirPixelSender)
         verify(mockPirRepository, never()).setLastPirInteractionDauPixelTimeMs(any())
@@ -114,9 +128,9 @@ class RealPirInteractionReporterTest {
         whenever(mockPirRepository.getLastPirInteractionMauPixelTimeMs()).thenReturn(baseDateMs)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(sevenDaysLaterMs)
 
-        testee.attemptFirePixel()
+        testee.attemptFirePixel(isAuthenticated = true)
 
-        verify(mockPirPixelSender).reportInteractionWAU()
+        verify(mockPirPixelSender).reportInteractionWAU(isAuthenticated = true)
         verify(mockPirRepository).setLastPirInteractionWauPixelTimeMs(sevenDaysLaterMs)
         verifyNoMoreInteractions(mockPirPixelSender)
         verify(mockPirRepository, never()).setLastPirInteractionDauPixelTimeMs(any())
@@ -130,9 +144,9 @@ class RealPirInteractionReporterTest {
         whenever(mockPirRepository.getLastPirInteractionMauPixelTimeMs()).thenReturn(baseDateMs)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(twentyEightDaysLaterMs)
 
-        testee.attemptFirePixel()
+        testee.attemptFirePixel(isAuthenticated = true)
 
-        verify(mockPirPixelSender).reportInteractionMAU()
+        verify(mockPirPixelSender).reportInteractionMAU(isAuthenticated = true)
         verify(mockPirRepository).setLastPirInteractionMauPixelTimeMs(twentyEightDaysLaterMs)
         verifyNoMoreInteractions(mockPirPixelSender)
         verify(mockPirRepository, never()).setLastPirInteractionDauPixelTimeMs(any())
@@ -146,11 +160,11 @@ class RealPirInteractionReporterTest {
         whenever(mockPirRepository.getLastPirInteractionMauPixelTimeMs()).thenReturn(baseDateMs)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(twentyEightDaysLaterMs)
 
-        testee.attemptFirePixel()
+        testee.attemptFirePixel(isAuthenticated = true)
 
-        verify(mockPirPixelSender).reportInteractionDAU()
-        verify(mockPirPixelSender).reportInteractionWAU()
-        verify(mockPirPixelSender).reportInteractionMAU()
+        verify(mockPirPixelSender).reportInteractionDAU(isAuthenticated = true)
+        verify(mockPirPixelSender).reportInteractionWAU(isAuthenticated = true)
+        verify(mockPirPixelSender).reportInteractionMAU(isAuthenticated = true)
     }
 
     @Test
@@ -161,7 +175,7 @@ class RealPirInteractionReporterTest {
         whenever(mockPirRepository.getLastPirInteractionMauPixelTimeMs()).thenReturn(futureDateMs)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseDateMs)
 
-        testee.attemptFirePixel()
+        testee.attemptFirePixel(isAuthenticated = true)
 
         verifyNoInteractions(mockPirPixelSender)
     }
@@ -174,13 +188,13 @@ class RealPirInteractionReporterTest {
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseDateMs)
 
         val startVirtualTime = testScheduler.currentTime
-        testee.attemptFirePixel()
+        testee.attemptFirePixel(isAuthenticated = true)
         val elapsed = testScheduler.currentTime - startVirtualTime
 
         // All three pixels fire, each preceded by a jitter delay of at least the 500ms minimum.
-        verify(mockPirPixelSender).reportInteractionDAU()
-        verify(mockPirPixelSender).reportInteractionWAU()
-        verify(mockPirPixelSender).reportInteractionMAU()
+        verify(mockPirPixelSender).reportInteractionDAU(isAuthenticated = true)
+        verify(mockPirPixelSender).reportInteractionWAU(isAuthenticated = true)
+        verify(mockPirPixelSender).reportInteractionMAU(isAuthenticated = true)
         assert(elapsed >= 3 * 500L)
     }
 
@@ -198,11 +212,11 @@ class RealPirInteractionReporterTest {
         whenever(mockPirRepository.getLastPirInteractionMauPixelTimeMs()).thenReturn(baseDateMs)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseDateMs)
 
-        val first = launch { testee.attemptFirePixel() }
-        val second = launch { testee.attemptFirePixel() }
+        val first = launch { testee.attemptFirePixel(isAuthenticated = true) }
+        val second = launch { testee.attemptFirePixel(isAuthenticated = true) }
         first.join()
         second.join()
 
-        verify(mockPirPixelSender, times(1)).reportInteractionDAU()
+        verify(mockPirPixelSender, times(1)).reportInteractionDAU(isAuthenticated = true)
     }
 }

@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser.santize
 import android.content.Intent
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject

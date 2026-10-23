@@ -20,10 +20,9 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
-import com.duckduckgo.sync.api.DeviceSyncState.Type
 import com.duckduckgo.sync.impl.ConnectedDevice
-import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ViewDeviceHeaderBinding
+import com.duckduckgo.sync.impl.headerImageRes
 
 class DeviceHeaderView @JvmOverloads constructor(
     context: Context,
@@ -39,13 +38,7 @@ class DeviceHeaderView @JvmOverloads constructor(
     fun setState(
         device: ConnectedDevice,
     ) {
-        binding.image.setImageResource(device.deviceType.type().toHeaderImageRes())
+        binding.image.setImageResource(device.deviceType.headerImageRes())
         binding.headlineText.text = device.deviceName
     }
-}
-
-private fun Type.toHeaderImageRes() = when (this) {
-    Type.MOBILE -> R.drawable.ic_header_synced_device_mobile
-    Type.DESKTOP -> R.drawable.ic_header_synced_device_desktop
-    Type.UNKNOWN -> R.drawable.ic_header_synced_device_mobile
 }

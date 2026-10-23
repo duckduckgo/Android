@@ -20,26 +20,26 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController.Event
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import javax.inject.Inject
 
-/**
- * Relays step events to the host. AppScope so steps and the retained host ViewModel share one instance across
- * configuration changes. SharedFlow with no replay: buffered, not delivered to later runs.
- */
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealSubscriptionOnboardingController @Inject constructor() : SubscriptionOnboardingController {
 
     private val _events = MutableSharedFlow<Event>(extraBufferCapacity = 10)
     override val events: Flow<Event> = _events.asSharedFlow()
 
-    override fun onStepFinished(stepId: String, outcome: SubscriptionOnboardingStepOutcome) {
-        _events.tryEmit(Event.StepFinished(stepId, outcome))
+    override fun onStepFinished(
+        stepId: String,
+        outcome: SubscriptionOnboardingStepOutcome,
+        handoff: (() -> Unit)?,
+    ) {
+        _events.tryEmit(Event.StepFinished(stepId, outcome, handoff))
     }
 
     override fun onBack() {

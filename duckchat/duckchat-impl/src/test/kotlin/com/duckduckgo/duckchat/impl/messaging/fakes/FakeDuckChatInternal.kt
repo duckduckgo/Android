@@ -22,7 +22,6 @@ import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
-import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.EditPromptRequest
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
@@ -47,10 +46,8 @@ class FakeDuckChatInternal(
     private val showInAddressBarUserSetting = MutableStateFlow(false)
     private val showInVoiceSearchUserSetting = MutableStateFlow(false)
     private val showInVoiceChatUserSetting = MutableStateFlow(false)
-    private val _chatState = MutableStateFlow(ChatState.READY)
     private val inputScreenUserSettingEnabled = MutableStateFlow(false)
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
-    private val nativeInputFieldUserSettingEnabled = MutableStateFlow(false)
     private val nativeChatInputEnabled = MutableStateFlow(false)
     private val nativeInputNavBarEnabled = MutableStateFlow(false)
     private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow<Boolean>(false)
@@ -98,7 +95,6 @@ class FakeDuckChatInternal(
 
     override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = cosmeticInputScreenUserSettingEnabled
     override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachmentUserSettingEnabled
-    override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = nativeInputFieldUserSettingEnabled
     override fun observeNativeChatInputEnabled(): Flow<Boolean> = nativeChatInputEnabled
     override fun observeNativeInputNavBarEnabled(): Flow<Boolean> = nativeInputNavBarEnabled
 
@@ -133,10 +129,6 @@ class FakeDuckChatInternal(
         automaticContextAttachmentUserSettingEnabled.value = isEnabled
     }
 
-    fun setNativeInputFieldEnabled(isEnabled: Boolean) {
-        nativeInputFieldUserSettingEnabled.value = isEnabled
-    }
-
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> = enableDuckChatUserSetting
 
     override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> = showInBrowserMenuUserSetting
@@ -160,12 +152,6 @@ class FakeDuckChatInternal(
     override fun isVoiceSearchEntryPointEnabled(): Boolean = false
 
     override fun isDuckChatUserEnabled(): Boolean = enableDuckChatUserSetting.value
-
-    override fun updateChatState(state: ChatState) {
-        _chatState.value = state
-    }
-
-    override val chatState: StateFlow<ChatState> = _chatState
 
     private val _showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
 
@@ -201,8 +187,6 @@ class FakeDuckChatInternal(
 
     override fun isDuckChatContextualModeEnabled(): Boolean = false
 
-    override fun isContextualSheetRedesignEnabled(): Boolean = false
-
     override fun isContextualMenuAllChatsEnabled(): Boolean = false
 
     override fun resolvedTogglePosition(): NativeInputState.ToggleSelection = NativeInputState.ToggleSelection.SEARCH
@@ -236,8 +220,6 @@ class FakeDuckChatInternal(
     override fun openDuckChatImageGeneration(entryPoint: DuckChatEntryPoint) { }
 
     override fun buildChatUrl(chatId: String): String = "https://duck.ai?chatID=$chatId"
-
-    override fun getChatProtectionUrl(): String = "https://duck.ai/chat?chatProtection=open"
 
     private val _defaultTogglePosition = MutableStateFlow<String?>(null)
 

@@ -40,6 +40,7 @@ import com.duckduckgo.lint.NoSystemLoadLibraryDetector.Companion.NO_SYSTEM_LOAD_
 import com.duckduckgo.lint.NonCancellableDetector.Companion.ISSUE_NON_CANCELLABLE
 import com.duckduckgo.lint.NoPostValueOnSingleLiveEventDetector.Companion.NO_POST_VALUE_ON_SINGLE_LIVE_EVENT
 import com.duckduckgo.lint.WebViewCompatApisUsageDetector
+import com.duckduckgo.lint.NoNewAppDatabaseTableDetector.Companion.NO_NEW_APP_DATABASE_TABLE
 import com.duckduckgo.lint.NoNewBrowserFeatureToggleDetector.Companion.NO_NEW_BROWSER_FEATURE_TOGGLE
 import com.duckduckgo.lint.RemoteFeatureNameDetector.Companion.UNDERSCORE_IN_FEATURE_NAME
 import com.duckduckgo.lint.WrongPluginPointCollectorDetector.Companion.WRONG_PLUGIN_POINT_ISSUE
@@ -49,10 +50,13 @@ import com.duckduckgo.lint.strings.PlaceholderDetector.Companion.PLACEHOLDER_MIS
 import com.duckduckgo.lint.ui.ColorAttributeInXmlDetector.Companion.INVALID_COLOR_ATTRIBUTE
 import com.duckduckgo.lint.ui.DaxButtonStylingDetector.Companion.INVALID_DAX_BUTTON_DUCK_SANS
 import com.duckduckgo.lint.ui.DaxButtonStylingDetector.Companion.INVALID_DAX_BUTTON_PROPERTY
+import com.duckduckgo.lint.ui.DaxContextMenuContentDetector.Companion.INVALID_DAX_CONTEXT_MENU_CONTENT_USAGE
+import com.duckduckgo.lint.ui.DaxContextMenuItemContentDetector.Companion.INVALID_DAX_CONTEXT_MENU_ITEM_CONTENT_USAGE
 import com.duckduckgo.lint.ui.DaxDividerColorUsageDetector.Companion.INVALID_DAX_DIVIDER_COLOR_USAGE
 import com.duckduckgo.lint.ui.DaxListItemColorUsageDetector.Companion.INVALID_DAX_LIST_ITEM_COLOR_USAGE
 import com.duckduckgo.lint.ui.DaxListItemContentDetector.Companion.INVALID_DAX_LIST_ITEM_CONTENT_USAGE
 import com.duckduckgo.lint.ui.DaxTextColorUsageDetector.Companion.INVALID_DAX_TEXT_COLOR_USAGE
+import com.duckduckgo.lint.ui.DefaultsObjectCasingDetector.Companion.DEFAULTS_PROPERTY_CASING
 import com.duckduckgo.lint.ui.NoRawM3AlertDialogUsageDetector.Companion.NO_RAW_M3_ALERT_DIALOG_USAGE
 import com.duckduckgo.lint.ui.NoRawM3ButtonUsageDetector.Companion.NO_RAW_M3_BUTTON_USAGE
 import com.duckduckgo.lint.ui.NoRawM3SliderUsageDetector.Companion.NO_RAW_M3_SLIDER_USAGE
@@ -88,6 +92,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             WRONG_PLUGIN_POINT_ISSUE,
             UNDERSCORE_IN_FEATURE_NAME,
             NO_NEW_BROWSER_FEATURE_TOGGLE,
+            NO_NEW_APP_DATABASE_TABLE,
             NO_SINGLETON_ISSUE,
             NO_LIFECYCLE_OBSERVER_ISSUE,
             NO_FRAGMENT_ISSUE,
@@ -133,6 +138,8 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             INVALID_DAX_SECURE_TEXT_FIELD_TRAILING_ICON_USAGE,
             INVALID_DAX_LIST_ITEM_CONTENT_USAGE,
             INVALID_DAX_LIST_ITEM_COLOR_USAGE,
+            INVALID_DAX_CONTEXT_MENU_ITEM_CONTENT_USAGE,
+            INVALID_DAX_CONTEXT_MENU_CONTENT_USAGE,
             NO_MATERIAL3_SWITCH_USAGE,
             NO_MATERIAL3_TOP_APP_BAR_USAGE,
             NO_MATERIAL3_RADIO_BUTTON_USAGE,
@@ -146,6 +153,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_RAW_M3_SURFACE_USAGE,
             NO_RAW_M3_SNACKBAR_USAGE,
             NO_RAW_M3_SLIDER_USAGE,
+            DEFAULTS_PROPERTY_CASING,
 
         ).plus(WebViewCompatApisUsageDetector.issues)
 

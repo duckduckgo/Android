@@ -18,7 +18,7 @@ package com.duckduckgo.app.browser.modals
 
 import com.duckduckgo.app.cta.ui.SubscriptionPromoFlow
 import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 /**
@@ -34,16 +34,13 @@ interface NewTabPageModalPresenter {
         flow: SubscriptionPromoFlow,
         isFreeTrialCopy: Boolean,
     ): Boolean
-
-    /** Shows the Add Widget promo. Valid only on the New Tab Page. */
-    suspend fun showAddWidgetPromo(supportsAutomaticAdd: Boolean): Boolean
 }
 
 /**
  * Holds the presenter for the visible browser tab: last registered wins, and a tab only clears the
  * presenter if it is still the registered one, so stale unregister calls are safe.
  */
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class NewTabPageModalPresenterRegistry @Inject constructor() {
 
     @Volatile

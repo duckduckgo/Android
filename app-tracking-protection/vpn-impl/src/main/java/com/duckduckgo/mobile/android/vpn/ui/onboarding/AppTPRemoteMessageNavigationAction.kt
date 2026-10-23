@@ -21,12 +21,13 @@ import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.JsonActionType.APP_TP_ONBOARDING
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
 import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import javax.inject.*
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     AppScope::class,
-    boundType = MessageActionMapperPlugin::class,
+    binding = binding<MessageActionMapperPlugin>(),
 )
 class AppTPRemoteMessageNavigationAction @Inject constructor() : MessageActionMapperPlugin {
 

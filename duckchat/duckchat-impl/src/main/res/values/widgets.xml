@@ -31,6 +31,15 @@
         </item>
     </style>
 
+    <style name="Widget.DuckDuckGo.DuckAiTabCardChatType">
+        <item name="android:background">@drawable/background_duck_ai_tab_card_chat_type</item>
+        <item name="android:drawablePadding">@dimen/keyline_2</item>
+        <item name="android:paddingHorizontal">@dimen/keyline_2</item>
+        <item name="android:paddingVertical">6dp</item>
+        <item name="android:textAppearance">@style/Typography.DuckDuckGo.Caption</item>
+        <item name="android:textColor">?attr/daxColorPrimaryText</item>
+    </style>
+
     <style name="Widget.DuckDuckGo.DuckAiContextualEntryDialogStyle" parent="@style/Widget.Design.BottomSheet.Modal">
         <item name="android:background">@android:color/transparent</item>
     </style>

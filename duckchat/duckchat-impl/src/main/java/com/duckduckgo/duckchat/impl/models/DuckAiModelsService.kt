@@ -16,7 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.models
 
-import com.duckduckgo.anvil.annotations.ContributesServiceApi
+import com.duckduckgo.codegen.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -28,6 +28,7 @@ interface DuckAiModelsService {
     suspend fun getModels(
         @Url url: String,
         @Header("Authorization") authorization: String?,
+        @Header("Cookie") cookies: String?,
     ): AIChatModelsResponse
 
     companion object {

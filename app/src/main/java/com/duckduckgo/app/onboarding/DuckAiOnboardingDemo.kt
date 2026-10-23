@@ -22,14 +22,14 @@ import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
  * The in-browser Duck.ai onboarding demo (the fire-button CTA sequence). Owns turning the demo on so
- * both the legacy onboarding-done path and the linear-onboarding `duck_ai_demo` step arm it identically.
+ * both the onboarding-done path and the linear-onboarding `duck_ai_demo` step arm it identically.
  */
 interface DuckAiOnboardingDemo {
     /**
@@ -42,7 +42,7 @@ interface DuckAiOnboardingDemo {
     fun isActive(): Boolean
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDuckAiOnboardingDemo @Inject constructor(
     private val onboardingStore: OnboardingStore,

@@ -29,7 +29,7 @@
     <string name="autoconsentPromptFootnote">Poți oricând să modifici ulterior din Setări.</string>
     <string name="autoconsentPromptCpmOnMessage">Unele module cookie nu pot fi respinse. Le putem accepta pentru tine.</string>
     <string name="autoconsentPromptCpmOnPrimaryButton">Acceptați modulele cookie pentru mine</string>
-    <string name="autoconsentPromptCpmOnPrimaryButtonV2">Respingeți dacă este posibil sau acceptați pentru mine</string>
+    <string name="autoconsentPromptCpmOnPrimaryButtonV2">Respinge dacă este posibil sau acceptă pentru mine</string>
     <string name="autoconsentPromptCpmOnSecondaryButton">Le voi accepta personal</string>
     <string name="autoconsentPromptCpmOffMessage">Ne vom ocupa noi de ele pentru tine. Vom respinge modulele cookie când este posibil și le vom accepta pe cele care nu pot fi respinse.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Respingeți dacă este posibil sau acceptați pentru mine</string>

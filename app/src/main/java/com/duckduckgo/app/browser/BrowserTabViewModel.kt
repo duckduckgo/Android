@@ -51,7 +51,6 @@ import com.duckduckgo.adblocking.api.AdBlockingOmnibarAnimationProvider
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.adclick.api.AdClickManager
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SSLErrorType.EXPIRED
@@ -68,6 +67,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.WebViewErrorResponse.SSL_PROTOCOL_ERROR
+import com.duckduckgo.app.browser.WebViewErrorResponse.TIMEOUT
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
@@ -113,7 +113,6 @@ import com.duckduckgo.app.browser.commands.Command.HideSSLError
 import com.duckduckgo.app.browser.commands.Command.HideWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.HideWebContent
 import com.duckduckgo.app.browser.commands.Command.InjectEmailAddress
-import com.duckduckgo.app.browser.commands.Command.LaunchAddWidgetOnboarding
 import com.duckduckgo.app.browser.commands.Command.LaunchAutofillSettings
 import com.duckduckgo.app.browser.commands.Command.LaunchBookmarksActivity
 import com.duckduckgo.app.browser.commands.Command.LaunchDuckAiOnboardingFireDialog
@@ -146,7 +145,6 @@ import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.app.browser.commands.Command.SendSms
 import com.duckduckgo.app.browser.commands.Command.SetBrowserBackground
 import com.duckduckgo.app.browser.commands.Command.SetContentAllowsSwipeToRefresh
-import com.duckduckgo.app.browser.commands.Command.SetOnboardingDialogBackground
 import com.duckduckgo.app.browser.commands.Command.ShareLink
 import com.duckduckgo.app.browser.commands.Command.ShowAppLinkPrompt
 import com.duckduckgo.app.browser.commands.Command.ShowAutoconsentAnimation
@@ -259,24 +257,22 @@ import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Acti
 import com.duckduckgo.app.browser.webview.SCAM_PROTECTION_LEARN_MORE_URL
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
+import com.duckduckgo.app.cta.ui.ContextualDaxDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
-import com.duckduckgo.app.cta.ui.DaxDuckAiEndBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiEndBubbleCta
-import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
-import com.duckduckgo.app.cta.ui.DaxEndBrandDesignUpdateBubbleCta
-import com.duckduckgo.app.cta.ui.DaxFireButtonBrandDesignUpdateContextualCta
-import com.duckduckgo.app.cta.ui.DaxMainNetworkBrandDesignUpdateContextualCta
-import com.duckduckgo.app.cta.ui.DaxNoTrackersBrandDesignUpdateContextualCta
-import com.duckduckgo.app.cta.ui.DaxSerpBrandDesignUpdateContextualCta
-import com.duckduckgo.app.cta.ui.DaxSiteSuggestionsBrandDesignUpdateContextualCta
-import com.duckduckgo.app.cta.ui.DaxSubscriptionBrandDesignUpdateBubbleCta
-import com.duckduckgo.app.cta.ui.DaxTrackersBlockedBrandDesignUpdateContextualCta
-import com.duckduckgo.app.cta.ui.DaxTryASearchBrandDesignUpdateBubbleCta
-import com.duckduckgo.app.cta.ui.DaxVisitSiteOptionsBrandDesignUpdateBubbleCta
-import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
+import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonContextualCta
+import com.duckduckgo.app.cta.ui.DaxEndBubbleCta
+import com.duckduckgo.app.cta.ui.DaxFireButtonContextualCta
+import com.duckduckgo.app.cta.ui.DaxMainNetworkContextualCta
+import com.duckduckgo.app.cta.ui.DaxNoTrackersContextualCta
+import com.duckduckgo.app.cta.ui.DaxSerpContextualCta
+import com.duckduckgo.app.cta.ui.DaxSiteSuggestionsContextualCta
+import com.duckduckgo.app.cta.ui.DaxSubscriptionBubbleCta
+import com.duckduckgo.app.cta.ui.DaxTrackersBlockedContextualCta
+import com.duckduckgo.app.cta.ui.DaxTryASearchBubbleCta
+import com.duckduckgo.app.cta.ui.DaxVisitSiteOptionsBubbleCta
 import com.duckduckgo.app.cta.ui.SubscriptionPromoFlow
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -299,8 +295,7 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
+import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY
@@ -361,6 +356,7 @@ import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchFeature
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
@@ -393,6 +389,7 @@ import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
@@ -430,10 +427,8 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
-import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.serp.logos.api.SerpLogos
-import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
@@ -444,7 +439,6 @@ import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
-import dagger.Lazy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -585,11 +579,9 @@ class BrowserTabViewModel @Inject constructor(
     private val autoconsentPixelManager: AutoconsentPixelManager,
     private val omnibarRepository: OmnibarRepository,
     private val contentScopeScriptsSubscriptionEventPluginPoint: PluginPoint<ContentScopeScriptsSubscriptionEventPlugin>,
-    private val serpSettingsFeature: SerpSettingsFeature,
     private val pageContextJSHelper: PageContextJSHelper,
     private val tabPageContextRepository: TabPageContextRepository,
     private val syncStatusChangedObserver: SyncStatusChangedObserver,
-    private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val serpLogos: SerpLogos,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
     private val pageLoadWideEvent: PageLoadWideEvent,
@@ -608,7 +600,6 @@ class BrowserTabViewModel @Inject constructor(
     private val cachedFileDownloader: CachedFileDownloader,
     private val newDownloadState: NewDownloadState,
     private val downloadsRepository: DownloadsRepository,
-    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val onboardingStore: OnboardingStore,
     private val autocompleteHistoryDeleteFeature: AutocompleteHistoryDeleteFeature,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
@@ -714,45 +705,33 @@ class BrowserTabViewModel @Inject constructor(
      * Always-on autocomplete pipeline tied to the omnibar's text. Kept in sync with the
      * omnibar via [onOmnibarTextRendered] so the native-input widget can restore the
      * omnibar's autocomplete results when it closes — even if in-widget typing temporarily
-     * overwrote [autoCompleteStateFlow]. Gated on the native-input user setting so that
-     * users without the widget don't pay for a duplicate pipeline.
+     * overwrote [autoCompleteStateFlow].
      */
     private val omnibarTextStateFlow = MutableStateFlow("")
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     internal val omnibarAutocompleteCache: StateFlow<AutoCompleteResult> =
-        duckChat.observeNativeInputFieldUserSettingEnabled()
-            .catch { t ->
-                logcat(WARN) { "Native input setting flow failed: ${t.asLog()}" }
-                emit(false)
-            }
-            .flatMapLatest { isNativeInputEnabled ->
-                if (!isNativeInputEnabled) {
-                    flowOf(AutoCompleteResult("", emptyList()))
+        omnibarTextStateFlow
+            .debounce(300)
+            .distinctUntilChanged()
+            .flatMapLatest { query ->
+                // Skip page URLs — omnibarViewState emits on every navigation, and
+                // running the fetch against full URLs would be both wasteful and
+                // wrong (the autocomplete API expects user-typed queries).
+                val isQueryLike = query.isNotBlank() &&
+                    !UriString.isWebUrl(query) &&
+                    !duckPlayer.isDuckPlayerUri(query)
+                if (!isQueryLike || !autoCompleteSettings.autoCompleteSuggestionsEnabled) {
+                    flowOf(AutoCompleteResult(query, emptyList()))
                 } else {
-                    omnibarTextStateFlow
-                        .debounce(300)
-                        .distinctUntilChanged()
-                        .flatMapLatest { query ->
-                            // Skip page URLs — omnibarViewState emits on every navigation, and
-                            // running the fetch against full URLs would be both wasteful and
-                            // wrong (the autocomplete API expects user-typed queries).
-                            val isQueryLike = query.isNotBlank() &&
-                                !UriString.isWebUrl(query) &&
-                                !duckPlayer.isDuckPlayerUri(query)
-                            if (!isQueryLike || !autoCompleteSettings.autoCompleteSuggestionsEnabled) {
-                                flowOf(AutoCompleteResult(query, emptyList()))
-                            } else {
-                                // Catch inside flatMapLatest so a failed fetch only drops this query's
-                                // result — without it, .catch + stateIn(Eagerly) would terminate the
-                                // pipeline for the ViewModel's lifetime (no equivalent of the existing
-                                // pipeline's ConflatedJob restart).
-                                autoComplete.autoComplete(query)
-                                    .catch { t ->
-                                        logcat(WARN) { "Failed to get omnibar autocomplete: ${t.asLog()}" }
-                                        emit(AutoCompleteResult(query, emptyList()))
-                                    }
-                            }
+                    // Catch inside flatMapLatest so a failed fetch only drops this query's
+                    // result — without it, .catch + stateIn(Eagerly) would terminate the
+                    // pipeline for the ViewModel's lifetime (no equivalent of the existing
+                    // pipeline's ConflatedJob restart).
+                    autoComplete.autoComplete(query)
+                        .catch { t ->
+                            logcat(WARN) { "Failed to get omnibar autocomplete: ${t.asLog()}" }
+                            emit(AutoCompleteResult(query, emptyList()))
                         }
                 }
             }
@@ -761,19 +740,32 @@ class BrowserTabViewModel @Inject constructor(
 
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
 
+    private enum class PulseCtaEffect { FORCE, SUPPRESS, DEFAULT }
+
     @ExperimentalCoroutinesApi
     @FlowPreview
     private val showPulseAnimation: LiveData<Boolean> =
         combine(
-            ctaViewState.asFlow().map {
-                it.cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || it.cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta
+            ctaViewState.asFlow().map { state ->
+                when {
+                    // The trackers dialog points at the privacy shield; a fire pulse would compete.
+                    state.cta is DaxTrackersBlockedContextualCta -> PulseCtaEffect.SUPPRESS
+                    state.cta is DaxDuckAiFireButtonContextualCta -> PulseCtaEffect.FORCE
+                    else -> PulseCtaEffect.DEFAULT
+                }
             }.distinctUntilChanged(),
             ctaViewModel.showFireButtonPulseAnimation,
-        ) { isShowingDuckAiFireButtonCta, showPulseAnimation -> isShowingDuckAiFireButtonCta || showPulseAnimation }
-            .asLiveData(context = viewModelScope.coroutineContext)
+        ) { ctaEffect, showPulseAnimation ->
+            when (ctaEffect) {
+                PulseCtaEffect.SUPPRESS -> false
+                PulseCtaEffect.FORCE -> true
+                PulseCtaEffect.DEFAULT -> showPulseAnimation
+            }
+        }.asLiveData(context = viewModelScope.coroutineContext)
 
     private var autoCompleteJob = ConflatedJob()
     private var serpLogoJob = ConflatedJob()
+    private var favouriteSerpLogoUrl: String? = null
     private var pdfDownloadJob = ConflatedJob()
     private var suggestRedirectJob = ConflatedJob()
 
@@ -817,8 +809,8 @@ class BrowserTabViewModel @Inject constructor(
 
     /** Non-null while this tab is displayed inside a Custom Tab. [clientPackage] is the verified
      * calling package (when known), used by [handleAppLink]'s trusted-caller launch carve-out.
-     * [referrerPackage] is the best-effort, non-verified android-app:// referrer, used only for the
-     * prompt-skip decision in [appLinkClicked], never the launch carve-out. */
+     * [referrerPackage] is the best-effort, non-verified android-app:// referrer, used only for links back to the
+     * caller (skipping confirmation prompts, or overriding "Never" in Open Links in Apps), never the launch carve-out. */
     private data class CustomTabContext(val clientPackage: String?, val referrerPackage: String?)
     private var customTab: CustomTabContext? = null
 
@@ -919,10 +911,6 @@ class BrowserTabViewModel @Inject constructor(
         navigationAwareLoginDetector.loginEventLiveData.observeForever(loginDetectionObserver)
         showPulseAnimation.observeForever(fireButtonAnimation)
 
-        viewModelScope.launch {
-            addressBarTrackersAnimationManager.fetchFeatureState()
-        }
-
         observeSyncStatusChangesForDuckChat()
         observeSubscriptionChangesForDuckChat()
 
@@ -984,20 +972,17 @@ class BrowserTabViewModel @Inject constructor(
             }.flowOn(dispatchers.main())
             .launchIn(viewModelScope)
 
-        combine(
-            serpEasterEggLogosToggles.setFavourite().enabled(),
-            serpLogos.favouriteSerpEasterEggLogoUrlFlow,
-        ) { isEnabled, favouriteUrl ->
-            isEnabled to favouriteUrl
-        }.flowOn(dispatchers.io())
-            .onEach { (isEnabled, favouriteUrl) ->
+        serpLogos.favouriteSerpEasterEggLogoUrlFlow
+            .flowOn(dispatchers.io())
+            .onEach { favouriteUrl ->
+                favouriteSerpLogoUrl = favouriteUrl
                 val currentUrl = url
                 if (currentUrl != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentUrl)) {
-                    if (isEnabled && favouriteUrl != null) {
+                    if (favouriteUrl != null) {
                         // Favourite is set - show it
                         omnibarViewState.value =
                             currentOmnibarViewState().copy(serpLogo = SerpLogo.EasterEgg(logoUrl = favouriteUrl, isFavourite = true))
-                    } else if (isEnabled && favouriteUrl == null || !isEnabled) {
+                    } else {
                         // Favourite was cleared - show Dax (Normal logo)
                         omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = SerpLogo.Normal)
                     }
@@ -1318,11 +1303,9 @@ class BrowserTabViewModel @Inject constructor(
             showErrorWithAction()
         }
 
-        if (serpSettingsFeature.storeSerpSettings().isEnabled()) {
-            viewModelScope.launch {
-                contentScopeScriptsSubscriptionEventPluginPoint.getPlugins().forEach { plugin ->
-                    _subscriptionEventDataChannel.send(plugin.getSubscriptionEventData())
-                }
+        viewModelScope.launch {
+            contentScopeScriptsSubscriptionEventPluginPoint.getPlugins().forEach { plugin ->
+                _subscriptionEventDataChannel.send(plugin.getSubscriptionEventData())
             }
         }
     }
@@ -1528,23 +1511,20 @@ class BrowserTabViewModel @Inject constructor(
 
         val cta = currentCtaViewState().cta
 
-        if (cta is OnboardingDaxDialogCta) {
+        if (cta is ContextualDaxDialogCta) {
             onDismissOnboardingDaxDialog(cta)
         }
 
         when (cta) {
-            is DaxBubbleCta.DaxIntroSearchOptionsCta,
-            is DaxTryASearchBrandDesignUpdateBubbleCta,
+            is DaxTryASearchBubbleCta,
             -> {
                 if (!ctaViewModel.isSuggestedSearchOption(query)) {
                     pixel.fire(ONBOARDING_SEARCH_CUSTOM, type = Unique())
                 }
             }
 
-            is DaxBubbleCta.DaxIntroVisitSiteOptionsCta,
-            is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta,
-            is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
-            is DaxSiteSuggestionsBrandDesignUpdateContextualCta,
+            is DaxVisitSiteOptionsBubbleCta,
+            is DaxSiteSuggestionsContextualCta,
             -> {
                 if (!ctaViewModel.isSuggestedSiteOption(query)) {
                     pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
@@ -2310,7 +2290,9 @@ class BrowserTabViewModel @Inject constructor(
                 queryOrFullUrl = omnibarTextForUrl(url, true),
                 omnibarText = omnibarTextForUrl(url, isFullUrlEnabled.value),
                 forceExpand = true,
-                serpLogo = null,
+                serpLogo = favouriteSerpLogoUrl
+                    ?.takeIf { duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url) }
+                    ?.let { SerpLogo.EasterEgg(logoUrl = it, isFavourite = true) },
             )
         val currentBrowserViewState = currentBrowserViewState()
         val domain = site?.domain
@@ -2413,29 +2395,20 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun updateLoadingStatePrivacy(domain: String) {
         val privacyProtectionDisabled = isPrivacyProtectionDisabled(domain)
         withContext(dispatchers.main()) {
-            // TODO when removing the flag we should tidy this logic up
-            if (addressBarTrackersAnimationManager.isFeatureEnabled()) {
-                val site = site
-                val isTrackersAnimationEnabled = isTrackersAnimationEnabled(
-                    privacyProtectionDisabled = privacyProtectionDisabled,
-                    maliciousSiteBlocked = currentBrowserViewState().maliciousSiteBlocked,
-                    site = site,
-                    previousUrl = previousUrl,
-                )
+            val site = site
+            val isTrackersAnimationEnabled = isTrackersAnimationEnabled(
+                privacyProtectionDisabled = privacyProtectionDisabled,
+                maliciousSiteBlocked = currentBrowserViewState().maliciousSiteBlocked,
+                site = site,
+                previousUrl = previousUrl,
+            )
 
-                previousUrl = site?.url
+            previousUrl = site?.url
 
-                loadingViewState.value = currentLoadingViewState().copy(
-                    trackersAnimationEnabled = isTrackersAnimationEnabled,
-                    url = site?.url ?: "",
-                )
-            } else {
-                loadingViewState.value =
-                    currentLoadingViewState().copy(
-                        trackersAnimationEnabled = !(privacyProtectionDisabled || currentBrowserViewState().maliciousSiteBlocked),
-                        url = site?.url ?: "",
-                    )
-            }
+            loadingViewState.value = currentLoadingViewState().copy(
+                trackersAnimationEnabled = isTrackersAnimationEnabled,
+                url = site?.url ?: "",
+            )
         }
     }
 
@@ -2631,6 +2604,24 @@ class BrowserTabViewModel @Inject constructor(
         errorPagePendingDismissal = currentBrowserViewState().browserError != OMITTED
     }
 
+    override fun onPageLoadTimeout() {
+        val state = currentBrowserViewState()
+        val canShowError = state.browserShowing &&
+            state.sslError == NONE &&
+            !state.maliciousSiteBlocked &&
+            (state.browserError == OMITTED || state.browserError == LOADING)
+        if (!canShowError) return
+
+        errorPagePendingDismissal = false
+        browserViewState.value = state.copy(
+            browserError = TIMEOUT,
+            redirectSuggestion = null,
+            showPrivacyShield = HighlightableButton.Visible(enabled = false),
+        )
+        command.value = WebViewError(TIMEOUT, url.orEmpty())
+        suggestRedirectJob.cancel()
+    }
+
     override fun pageRefreshed(refreshedUrl: String) {
         logcat { "pageRefreshed URL: $url refreshedUrl $refreshedUrl" }
         if (url == null || refreshedUrl == url) {
@@ -2699,7 +2690,7 @@ class BrowserTabViewModel @Inject constructor(
         }
         when (currentBrowserViewState().browserError) {
             OMITTED, LOADING -> badUrlErrorPageWideEvent.onPageLoadFinished(tabId)
-            BAD_URL, CONNECTION, SSL_PROTOCOL_ERROR -> Unit
+            BAD_URL, CONNECTION, SSL_PROTOCOL_ERROR, TIMEOUT -> Unit
         }
         if (!currentBrowserViewState().maliciousSiteBlocked && site != null) {
             navigationStateChanged(webViewNavigationState)
@@ -2720,11 +2711,9 @@ class BrowserTabViewModel @Inject constructor(
 
     private suspend fun evaluateSerpLogoState(url: String?) {
         if (url != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            val isSetFavouriteEnabled = serpEasterEggLogosToggles.setFavourite().isEnabled()
             val favouriteLogoUrl = serpLogos.favouriteSerpEasterEggLogoUrlFlow.firstOrNull()
 
-            // Don't extract logo if favourite feature is enabled AND a favourite is set
-            if (isSetFavouriteEnabled && favouriteLogoUrl != null) {
+            if (favouriteLogoUrl != null) {
                 omnibarViewState.value = currentOmnibarViewState().copy(
                     serpLogo = SerpLogo.EasterEgg(
                         logoUrl = favouriteLogoUrl,
@@ -3395,6 +3384,10 @@ class BrowserTabViewModel @Inject constructor(
         command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site, reportFlow = reportFlow))
     }
 
+    fun onInternalFeedbackSelected() {
+        command.value = OpenInNewTab(INTERNAL_FEEDBACK_URL, tabId)
+    }
+
     fun onPrivacyProtectionMenuClicked(clickedFromCustomTab: Boolean = false) {
         val domain = site?.domain ?: return
         appCoroutineScope.launch(dispatchers.io()) {
@@ -3905,25 +3898,11 @@ class BrowserTabViewModel @Inject constructor(
         true
     }
 
-    override suspend fun showAddWidgetPromo(supportsAutomaticAdd: Boolean): Boolean = withContext(dispatchers.main()) {
-        if (!canShowPromo()) return@withContext false
-        if (currentBrowserViewState().browserShowing) return@withContext false
-        if (currentCtaViewState().cta != null) return@withContext false
-        val cta = if (supportsAutomaticAdd) HomePanelCta.AddWidgetAutoOnboarding else HomePanelCta.AddWidgetInstructions
-        ctaViewState.value = currentCtaViewState().copy(
-            cta = cta,
-            isBrowserShowing = false,
-            isErrorShowing = false,
-        )
-        true
-    }
-
     private fun canShowPromo(): Boolean =
         currentGlobalLayoutState() is Browser && !currentBrowserViewState().maliciousSiteBlocked
 
     private fun showOrHideKeyboard(cta: Cta?, reportLandingFocus: Boolean = true) {
         val shouldHideKeyboard = cta?.shouldDropAddressBarFocusWhenShown() == true ||
-            duckAiFeatureState.showInputScreen.value ||
             currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark ||
             (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard)
 
@@ -3943,7 +3922,7 @@ class BrowserTabViewModel @Inject constructor(
 
     /**
      * The input-screen mode the next auto-launched input screen on this tab should open in, cleared as
-     * it is read. Prefers this tab's own launch target (e.g. "New Search" → Search) and falls back to
+     * it is read. Prefers this tab's own launch target (e.g. "New Tab" → Search) and falls back to
      * the post-onboarding signal (→ Duck.ai). Returns `null` when neither is armed.
      */
     fun consumeInitialInputMode(): InputMode? =
@@ -3951,14 +3930,12 @@ class BrowserTabViewModel @Inject constructor(
             ?: if (onboardingInputScreenLaunchTarget.consumeOpenOnDuckAi()) InputMode.DUCK_AI else null
 
     fun onUserClickCtaOkButton(cta: Cta) {
-        releaseAddWidgetModalSlot(cta)
         viewModelScope.launch {
             ctaViewModel.onUserClickCtaOkButton(cta)
         }
         val onboardingCommand =
             when (cta) {
-                is HomePanelCta.AddWidgetInstructions, is HomePanelCta.AddWidgetAutoOnboarding -> LaunchAddWidgetOnboarding
-                is OnboardingDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
+                is ContextualDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
                 is DaxBubbleCta -> {
                     onDaxBubbleCtaOkButtonClicked(cta)
                     null
@@ -3978,14 +3955,13 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onUserClickCtaSecondaryButton(cta: Cta) {
-        releaseAddWidgetModalSlot(cta)
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta, viaSkipBtn = true)
             if (cta is BrokenSitePromptDialogCta) {
                 onBrokenSiteCtaDismissButtonClicked(cta)
             }
 
-            if (cta is DaxEndBrandDesignUpdateBubbleCta) {
+            if (cta is DaxEndBubbleCta) {
                 val updatedCta = refreshCta()
                 if (updatedCta != null) {
                     showOrHideKeyboard(updatedCta)
@@ -3996,20 +3972,14 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun releaseAddWidgetModalSlot(cta: Cta) {
-        if (cta !is HomePanelCta) return
-        ctaViewState.value = currentCtaViewState().copy(cta = null)
-    }
-
     fun onUserClickCtaDismissButton(cta: Cta) {
-        releaseAddWidgetModalSlot(cta)
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta, viaCloseBtn = true)
             if (cta is DaxBubbleCta) {
                 command.value = HideOnboardingDaxBubbleCta(cta)
-            } else if (cta is OnboardingDaxDialogCta) {
+            } else if (cta is ContextualDaxDialogCta) {
                 command.value = HideOnboardingDaxDialog(cta)
-                if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta || cta is DaxTrackersBlockedBrandDesignUpdateContextualCta) {
+                if (cta is DaxTrackersBlockedContextualCta) {
                     if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
                         browserViewState.value =
                             currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
@@ -4025,7 +3995,7 @@ class BrowserTabViewModel @Inject constructor(
             viewModelScope.launch {
                 ctaViewModel.onUserDismissedCta(it)
             }
-            if ((cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta || cta is DaxTrackersBlockedBrandDesignUpdateContextualCta) &&
+            if (cta is DaxTrackersBlockedContextualCta &&
                 currentBrowserViewState().showPrivacyShield.isHighlighted()
             ) {
                 browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
@@ -4050,13 +4020,17 @@ class BrowserTabViewModel @Inject constructor(
         isForMainFrame: Boolean,
         hasGesture: Boolean,
     ): Boolean {
+        val appLinksEnabled = appSettingsPreferencesStore.appLinksEnabled
+        val trustedCallerOverridesDisabledAppLinks = !appLinksEnabled &&
+            appLinksHandler.isTrustedCaller(appLink, trustedCallerPackage(nonHttpLink = false, overridingDisabledAppLinks = true))
         return appLinksHandler.handleAppLink(
             isForMainFrame,
             appLink,
             hasGesture,
             customTab?.clientPackage,
-            appSettingsPreferencesStore.appLinksEnabled,
+            appLinksEnabled,
             !appSettingsPreferencesStore.showAppLinksPrompt,
+            trustedCallerOverridesDisabledAppLinks,
         ) { appLinkClicked(appLink) }
     }
 
@@ -4104,6 +4078,17 @@ class BrowserTabViewModel @Inject constructor(
         appLinksHandler.setUserQueryState(false)
     }
 
+    private fun trustedCallerPackage(
+        nonHttpLink: Boolean,
+        overridingDisabledAppLinks: Boolean,
+    ): String? {
+        val enabled = customTabsFeature.handleTrustedCallers().isEnabled() &&
+            (!nonHttpLink || customTabsFeature.handleTrustedCallersNonHttpLinks().isEnabled()) &&
+            (!overridingDisabledAppLinks || customTabsFeature.handleTrustedCallersWhenAppLinksDisabled().isEnabled())
+        if (!enabled) return null
+        return customTab?.let { it.clientPackage ?: it.referrerPackage }
+    }
+
     override fun handleNonHttpAppLink(nonHttpAppLink: NonHttpAppLink): Boolean {
         nonHttpAppLinkClicked(nonHttpAppLink)
         return true
@@ -4112,13 +4097,37 @@ class BrowserTabViewModel @Inject constructor(
     fun nonHttpAppLinkClicked(appLink: NonHttpAppLink) {
         if (nonHttpAppLinkChecker.isPermitted(appLink.intent)) {
             if (!appSettingsPreferencesStore.appLinksEnabled) {
-                appLink.fallbackUrl?.let { fallbackUrl ->
-                    command.value = NavigationCommand.Navigate(fallbackUrl, getUrlHeaders(fallbackUrl))
+                val trustedCallerPackage = trustedCallerPackage(nonHttpLink = true, overridingDisabledAppLinks = true)
+                if (trustedCallerPackage != null) {
+                    command.value = HandleNonHttpAppLink(
+                        nonHttpAppLink = appLink,
+                        headers = getUrlHeaders(appLink.fallbackUrl),
+                        showConfirmation = false,
+                        trustedCallerPackage = trustedCallerPackage,
+                        finishCustomTabOnTrustedCallerLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
+                        trustedCallerOnly = true,
+                    )
+                    return
                 }
+                navigateToFallbackUrl(appLink.fallbackUrl)
                 return
             }
-            command.value = HandleNonHttpAppLink(appLink, getUrlHeaders(appLink.fallbackUrl), appSettingsPreferencesStore.showAppLinksPrompt)
+            command.value = HandleNonHttpAppLink(
+                nonHttpAppLink = appLink,
+                headers = getUrlHeaders(appLink.fallbackUrl),
+                showConfirmation = appSettingsPreferencesStore.showAppLinksPrompt,
+                trustedCallerPackage = trustedCallerPackage(nonHttpLink = true, overridingDisabledAppLinks = false),
+                finishCustomTabOnTrustedCallerLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
+            )
         }
+    }
+
+    fun onTrustedCallerLaunchUnavailable(fallbackUrl: String?) {
+        navigateToFallbackUrl(fallbackUrl)
+    }
+
+    private fun navigateToFallbackUrl(fallbackUrl: String?) {
+        fallbackUrl?.let { command.value = NavigationCommand.Navigate(it, getUrlHeaders(it)) }
     }
 
     fun onPrintSelected() {
@@ -4708,12 +4717,8 @@ class BrowserTabViewModel @Inject constructor(
                 forceRenderingTicker = System.currentTimeMillis(),
             )
         if (!orientationChanged) return
-        viewModelScope.launch(dispatchers.io()) {
-            if (onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
-                withContext(dispatchers.main()) {
-                    command.value = Command.ReinflateBrandDesignContextualDialog
-                }
-            }
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = Command.ReinflateBrandDesignContextualDialog
         }
     }
 
@@ -4755,7 +4760,7 @@ class BrowserTabViewModel @Inject constructor(
             CONNECTION -> badUrlErrorPageWideEvent.onConnectionErrorPageDisplayed(tabId)
             SSL_PROTOCOL_ERROR -> badUrlErrorPageWideEvent.onOtherErrorPageDisplayed(tabId)
             OMITTED -> badUrlErrorPageWideEvent.onOmittedErrorReceived(tabId)
-            LOADING -> Unit
+            LOADING, TIMEOUT -> Unit
         }
         if (errorType == BAD_URL &&
             suggestRedirectOnUnresolvedErrorFeature.self().isEnabled() &&
@@ -4933,17 +4938,17 @@ class BrowserTabViewModel @Inject constructor(
             when {
                 // 400 errors
                 statusCode == HTTP_STATUS_CODE_BAD_REQUEST_ERROR ->
-                    httpErrorPixels.get().updateCountPixel(
+                    httpErrorPixels.value.updateCountPixel(
                         HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY,
                     )
                 // all 4xx errors apart from 400
                 statusCode / 100 == HTTP_STATUS_CODE_CLIENT_ERROR_PREFIX ->
-                    httpErrorPixels.get().updateCountPixel(
+                    httpErrorPixels.value.updateCountPixel(
                         HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_4XX_DAILY,
                     )
                 // all 5xx errors
                 statusCode / 100 == HTTP_STATUS_CODE_SERVER_ERROR_PREFIX ->
-                    httpErrorPixels.get().update5xxCountPixel(
+                    httpErrorPixels.value.update5xxCountPixel(
                         HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY,
                         statusCode,
                     )
@@ -5215,7 +5220,7 @@ class BrowserTabViewModel @Inject constructor(
                             unblockDuckAiOnboardingCta()
                         }
                     }
-                    duckChatJSHelper.consumeTabContextPromptOnHandoff(method)?.let { event ->
+                    duckChatJSHelper.consumeTabContextPromptOnHandoff(method, browserMode)?.let { event ->
                         // There is a pending tab context prompt waiting to be sent
                         withContext(dispatchers.main()) {
                             _subscriptionEventDataChannel.send(event)
@@ -5492,9 +5497,9 @@ class BrowserTabViewModel @Inject constructor(
         return null
     }
 
-    private fun onOnboardingCtaOkButtonClicked(onboardingCta: OnboardingDaxDialogCta): Command? {
+    private fun onOnboardingCtaOkButtonClicked(onboardingCta: ContextualDaxDialogCta): Command? {
         val shouldDismiss = when (onboardingCta) {
-            is DaxDuckAiFireButtonBrandDesignUpdateContextualCta -> false
+            is DaxDuckAiFireButtonContextualCta -> false
             else -> true
         }
         if (shouldDismiss) {
@@ -5502,17 +5507,12 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         return when (onboardingCta) {
-            is OnboardingDaxDialogCta.DaxSerpCta,
-            is DaxSerpBrandDesignUpdateContextualCta,
+            is DaxSerpContextualCta,
             -> {
                 viewModelScope.launch {
                     val cta =
                         withContext(dispatchers.io()) {
-                            ctaViewModel.getSiteSuggestionsDialogCta(
-                                onSiteSuggestionOptionClicked = { index ->
-                                    onUserSelectedOnboardingSiteSuggestionOption(index)
-                                },
-                            )
+                            ctaViewModel.getSiteSuggestionsDialogCta()
                         }
                     ctaViewState.value = currentCtaViewState().copy(cta = cta)
                     if (cta == null) {
@@ -5522,12 +5522,9 @@ class BrowserTabViewModel @Inject constructor(
                 null
             }
 
-            is OnboardingDaxDialogCta.DaxTrackersBlockedCta,
-            is DaxTrackersBlockedBrandDesignUpdateContextualCta,
-            is OnboardingDaxDialogCta.DaxNoTrackersCta,
-            is DaxNoTrackersBrandDesignUpdateContextualCta,
-            is OnboardingDaxDialogCta.DaxMainNetworkCta,
-            is DaxMainNetworkBrandDesignUpdateContextualCta,
+            is DaxTrackersBlockedContextualCta,
+            is DaxNoTrackersContextualCta,
+            is DaxMainNetworkContextualCta,
             -> {
                 viewModelScope.launch {
                     val cta =
@@ -5542,10 +5539,9 @@ class BrowserTabViewModel @Inject constructor(
                 null
             }
 
-            is OnboardingDaxDialogCta.DaxFireButtonCta,
-            is DaxFireButtonBrandDesignUpdateContextualCta,
+            is DaxFireButtonContextualCta,
             -> LaunchFireDialogFromOnboardingDialog(onboardingCta)
-            is DaxDuckAiFireButtonBrandDesignUpdateContextualCta,
+            is DaxDuckAiFireButtonContextualCta,
             -> LaunchDuckAiOnboardingFireDialog
 
             else -> HideOnboardingDaxDialog(onboardingCta)
@@ -5561,8 +5557,7 @@ class BrowserTabViewModel @Inject constructor(
             }
         }
         when (cta) {
-            is DaxBubbleCta.DaxSubscriptionCta,
-            is DaxSubscriptionBrandDesignUpdateBubbleCta,
+            is DaxSubscriptionBubbleCta,
             -> {
                 viewModelScope.launch {
                     val uri = "https://duckduckgo.com/pro".toUri().buildUpon()
@@ -5577,13 +5572,11 @@ class BrowserTabViewModel @Inject constructor(
                     command.value = LaunchSubscription(uri)
                 }
             }
-            is DaxBubbleCta.DaxEndCta,
             is DaxDuckAiEndBubbleCta,
-            is DaxDuckAiEndBrandDesignUpdateBubbleCta,
             -> {
                 refresh()
             }
-            is DaxEndBrandDesignUpdateBubbleCta -> {
+            is DaxEndBubbleCta -> {
                 if (cta.segmentedPathWithAiInput == DownloadReasonSelection.SEARCH) {
                     viewModelScope.launch {
                         ctaViewState.value = currentCtaViewState().copy(cta = null)
@@ -5599,7 +5592,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun onDismissOnboardingDaxDialog(cta: OnboardingDaxDialogCta) {
+    private fun onDismissOnboardingDaxDialog(cta: ContextualDaxDialogCta) {
         onUserDismissedCta(cta)
         command.value = HideOnboardingDaxDialog(cta)
     }
@@ -5615,13 +5608,13 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         // Defer cleanup (CTA dismiss, highlight removal) until the fire action actually completes.
-        if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
+        if (cta is DaxDuckAiFireButtonContextualCta) {
             return
         }
 
-        if (cta is OnboardingDaxDialogCta.DaxFireButtonCta || cta is DaxFireButtonBrandDesignUpdateContextualCta) {
+        if (cta is DaxFireButtonContextualCta) {
             onUserDismissedCta(cta)
-            command.value = HideOnboardingDaxDialog(cta as OnboardingDaxDialogCta)
+            command.value = HideOnboardingDaxDialog(cta as ContextualDaxDialogCta)
         }
 
         if (currentBrowserViewState().fireButton.isHighlighted()) {
@@ -5647,7 +5640,7 @@ class BrowserTabViewModel @Inject constructor(
         if (cta != null) {
             ctaViewModel.onContextualSiteLinkTapped(cta)
         }
-        if (cta is OnboardingDaxDialogCta) {
+        if (cta is ContextualDaxDialogCta) {
             onDismissOnboardingDaxDialog(cta)
         }
     }
@@ -5724,7 +5717,7 @@ class BrowserTabViewModel @Inject constructor(
         URLUtil.isNetworkUrl(text) || URLUtil.isAssetUrl(text) || URLUtil.isFileUrl(text) || URLUtil.isContentUrl(text)
 
     fun onNewTabShown() {
-        newTabPixels.get().fireNewTabDisplayed()
+        newTabPixels.value.fireNewTabDisplayed()
     }
 
     fun handleMenuRefreshAction() {
@@ -5745,7 +5738,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun setBrowserBackground(lightModeEnabled: Boolean) {
         val cta = ctaViewState.value?.cta
-        if (cta is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
+        if (cta is DaxBubbleCta) {
             command.value = SetBrowserBackground(
                 cta.backgroundRes,
                 useRebrandBackground = true,
@@ -5756,10 +5749,6 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
         }
-    }
-
-    fun setOnboardingDialogBackground(lightModeEnabled: Boolean) {
-        command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
     }
 
     private fun getBackgroundResource(lightModeEnabled: Boolean): Int =
@@ -5813,7 +5802,7 @@ class BrowserTabViewModel @Inject constructor(
      */
     fun openDuckAiChatById(chatUrl: String) {
         browserInteractionsPlugins.getPlugins().forEach { it.onChatSelected() }
-        navigateToDuckAi(chatUrl, DuckChatEntryPoint.CHAT_HISTORY_OPEN_CHAT, hasPrompt = false)
+        navigateToDuckAi(chatUrl, DuckChatEntryPoint.CHAT_SUGGESTION_INPUT, hasPrompt = false)
     }
 
     /**
@@ -5846,34 +5835,57 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun openNewImageDuckChat(viewMode: ViewMode) {
-        val entryPoint = if (viewMode == ViewMode.NewTab) {
-            DuckChatEntryPoint.BROWSING_MENU_NTP
-        } else {
-            DuckChatEntryPoint.BROWSING_MENU_WEBPAGE
-        }
-        duckChat.openDuckChatImageGeneration(entryPoint)
+    fun openNewVoiceChatFromChatMenu() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_COUNT)
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_DAILY, type = Daily())
+        duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
     }
 
+    fun openNewImageDuckChatFromChatMenu() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_COUNT)
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_DAILY, type = Daily())
+        duckChat.openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
+    }
+
+    fun onNewTabFromChatMenuSelected() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_TAB_TAPPED_COUNT)
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_TAB_TAPPED_DAILY, type = Daily())
+        recordPendingNewTabOpenedExit()
+    }
+
+    fun onNewFireTabFromChatMenuSelected() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_FIRE_TAB_TAPPED_COUNT)
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_FIRE_TAB_TAPPED_DAILY, type = Daily())
+        recordPendingFireTabOpenedExit()
+    }
+
+    /** New Chat from the Duck.ai omnibar "+" menu, which is only ever shown in a Duck.ai chat. */
+    fun openNewDuckChatFromChatMenu() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
+        openNewDuckChatTab(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, fromDuckAiChat = true)
+    }
+
+    /** New Chat from the browsing menu, which is reachable from any view mode. */
     fun openNewDuckChat(viewMode: ViewMode) {
-        if (viewMode == ViewMode.DuckAI) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
-            duckAiSessionCallback.onNewChatCreated(tabId)
-            viewModelScope.launch {
-                val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
-                _subscriptionEventDataChannel.send(subscriptionEvent)
-            }
-        } else {
-            val url = duckChat.getDuckChatUrl("", false)
-            val entryPoint = if (viewMode == ViewMode.NewTab) {
-                DuckChatEntryPoint.BROWSING_MENU_NTP
-            } else {
-                DuckChatEntryPoint.BROWSING_MENU_WEBPAGE
-            }
-            duckChat.reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
-            command.value = OpenInNewTab(url, tabId)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
+        val entryPoint = when (viewMode) {
+            ViewMode.NewTab -> DuckChatEntryPoint.BROWSING_MENU_NTP
+            ViewMode.DuckAI -> DuckChatEntryPoint.BROWSING_MENU_DUCKAI
+            else -> DuckChatEntryPoint.BROWSING_MENU_WEBPAGE
         }
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
+        openNewDuckChatTab(entryPoint, fromDuckAiChat = viewMode == ViewMode.DuckAI)
+    }
+
+    private fun openNewDuckChatTab(
+        entryPoint: DuckChatEntryPoint,
+        fromDuckAiChat: Boolean,
+    ) {
+        if (fromDuckAiChat) {
+            duckAiSessionCallback.onNewChatCreated(tabId)
+            recordPendingNewTabOpenedExit()
+        }
+        duckChat.reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
+        command.value = OpenInNewTab(duckChat.getDuckChatUrl("", false), tabId)
     }
 
     fun onCustomizeResponsesClicked() {
@@ -5885,7 +5897,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onDuckChatSidebarButtonPressed() {
         if (duckAiFeatureState.nativeDuckAiSidebar.value) {
-            openDuckChatHistory()
+            openDuckChatHistory(DuckChatHistorySource.SIDEBAR)
         } else {
             openDuckChatSidebar()
         }
@@ -5898,9 +5910,9 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun openDuckChatHistory() {
+    fun openDuckChatHistory(source: DuckChatHistorySource) {
         if (currentBrowserViewState().showDuckChatHistoryOption) {
-            command.value = Command.LaunchDuckChatHistory
+            command.value = Command.LaunchDuckChatHistory(source)
         } else {
             viewModelScope.launch {
                 val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)
@@ -5946,10 +5958,8 @@ class BrowserTabViewModel @Inject constructor(
             command.value = HideKeyboardForChat
         }
 
-        if (!duckAiFeatureState.showInputScreen.value) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED_DAILY, type = Daily())
-        }
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED)
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED_DAILY, type = Daily())
 
         when {
             // Contextual chat is about the page you're viewing, so on a page it's only offered from
@@ -6019,9 +6029,8 @@ class BrowserTabViewModel @Inject constructor(
                 autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ANIMATION_SHOWN_DAILY)
             }
             if (adBlockingAnimationClaimed) return // ad-blocking badge is exclusive: suppress the animation, but the pixel above still fires
-            // TODO remove launch once address bar trackers animation is enabled permanently
             viewModelScope.launch {
-                if (addressBarTrackersAnimationManager.isFeatureEnabled() && trackersCount().isNotEmpty()) {
+                if (trackersCount().isNotEmpty()) {
                     command.value = Command.EnqueueCookiesAnimation(isCosmetic)
                 } else {
                     command.value = ShowAutoconsentAnimation(isCosmetic)
@@ -6065,17 +6074,6 @@ class BrowserTabViewModel @Inject constructor(
         // No-op: experiment pixel tracking removed
     }
 
-    fun onUserSelectedOnboardingDialogOption(
-        cta: Cta,
-        index: Int?,
-    ) {
-        // No-op: experiment pixel tracking removed
-    }
-
-    fun onUserSelectedOnboardingSiteSuggestionOption(index: Int) {
-        // No-op: experiment pixel tracking removed
-    }
-
     fun onLogoReceived(serpLogo: SerpLogo) {
         omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = serpLogo)
     }
@@ -6104,7 +6102,7 @@ class BrowserTabViewModel @Inject constructor(
             if (customAiOnboardingStore.isEnabled()) return@launch
 
             val cta = ctaViewState.value?.cta ?: return@launch
-            if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
+            if (cta is DaxDuckAiFireButtonContextualCta) {
                 ctaViewModel.onUserDismissedCta(cta = cta)
             }
         }
@@ -6144,6 +6142,8 @@ class BrowserTabViewModel @Inject constructor(
         private const val CLIENT_SIDE_HIT_KEY = "clientSideHit"
 
         private const val ABOUT_BLANK = "about:blank"
+
+        private const val INTERNAL_FEEDBACK_URL = "https://internalapps.duckduckgo.com/internal-feedback/"
 
         // https://www.iso.org/iso-3166-country-codes.html
         private val PRINT_LETTER_FORMAT_COUNTRIES_ISO3166_2 =

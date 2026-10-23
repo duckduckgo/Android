@@ -36,6 +36,7 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.FileLimits
 import com.duckduckgo.duckchat.impl.models.ImageLimits
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ConversationFileUsage
@@ -49,6 +50,7 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentProcessor
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -123,14 +125,16 @@ class AttachmentViewModelTest {
         whenever(it.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
     }
     private val nativeInputStateStore = RealNativeInputStateStore(
-        dagger.Lazy { tabRepositoryProvider },
+        lazy { tabRepositoryProvider },
         browserModeStateHolder,
-        RealTextSelectionRepository(),
+        RealTextSelectionRepository(lazy { mock() }, mock()),
+        ChatStateStore(),
     )
 
     private lateinit var viewModel: AttachmentViewModel
 
-    private val textSelectionRepository = RealTextSelectionRepository()
+    private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
+    private val textSelectionRepository = RealTextSelectionRepository(lazy { duckChatPixels }, selectionJourney)
     private val textSelectionPayloadBuilder: TextSelectionPayloadBuilder = mock()
 
     @Before
@@ -147,6 +151,7 @@ class AttachmentViewModelTest {
             duckChatPixels = duckChatPixels,
             textSelectionRepository = textSelectionRepository,
             textSelectionPayloadBuilder = textSelectionPayloadBuilder,
+            selectionJourney = selectionJourney,
         )
     }
 
@@ -389,6 +394,16 @@ class AttachmentViewModelTest {
         viewModel.getTextSelectionsJson()
 
         assertTrue(viewModel.attachmentState.value.textSelections.isEmpty())
+        verify(selectionJourney).onPromptSubmitted("tab-1")
+    }
+
+    @Test
+    fun whenNoTextSelectionsToConsumeThenJourneyNotSubmitted() = runTest {
+        viewModel.bindTextSelections("tab-1", textSelection = null)
+
+        viewModel.getTextSelectionsJson()
+
+        verify(selectionJourney, never()).onPromptSubmitted(any())
     }
 
     @Test

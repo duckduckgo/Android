@@ -511,12 +511,43 @@ class ExecuteBrokerStepActionEventHandlerTest {
         assertEquals(testProfileQueryId, capturedPixel.firstValue.profileQueryId)
         assertEquals(3, capturedPixel.firstValue.currentActionAttemptCount)
         assertEquals(action, capturedPixel.firstValue.currentAction)
+        assertEquals(false, capturedPixel.firstValue.isFreeScan)
 
         // Verify PushJsAction
         val sideEffect = result.sideEffect as PushJsAction
         assertEquals("action-nav", sideEffect.actionId)
         assertEquals(action, sideEffect.action)
         assertNull(result.nextEvent)
+    }
+
+    @Test
+    fun whenFreeScanStepActionStartsThenEmittedStateIsFreeScan() = runTest {
+        val action = BrokerAction.Navigate(id = "action-nav", url = "https://example.com")
+        val scanStep = ScanStep(
+            broker = testBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(action),
+                scanType = "initial",
+            ),
+            isFreeScan = true,
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStep = scanStep,
+            profileQuery = testProfileQuery,
+            currentActionIndex = 0,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+
+        testee.invoke(state, ExecuteBrokerStepAction(UserProfile(userProfile = testProfileQuery)))
+
+        val captured = argumentCaptor<BrokerScanActionStarted>()
+        verify(mockPirRunStateHandler).handleState(captured.capture())
+        assertEquals(true, captured.firstValue.isFreeScan)
     }
 
     @Test

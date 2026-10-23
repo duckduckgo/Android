@@ -64,10 +64,11 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <FrameLayout
+    <com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterDockLayout
         android:id="@+id/entryInputContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/entryNativeInputCard"
@@ -90,6 +91,14 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-    </FrameLayout>
+        <com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterView
+            android:id="@+id/entryNativeInputFooter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:clipChildren="false"
+            android:clipToPadding="false" />
+
+    </com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterDockLayout>
 
 </LinearLayout>

@@ -1,6 +1,5 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 import static de.fayard.refreshVersions.core.Versions.versionFor
-import static com.gradle.develocity.agent.gradle.test.JUnitXmlDialect.*
 import com.gradle.develocity.agent.gradle.test.ImportJUnitXmlReports
 
 buildscript {
@@ -20,10 +19,10 @@ buildscript {
         google()
         mavenCentral()
         maven { url "https://plugins.gradle.org/m2/" }
-        maven { url "https://central.sonatype.com/repository/maven-snapshots/" }
     }
     dependencies {
         classpath(Android.tools.build.gradlePlugin)
+        classpath "com.android.tools.build:gradle-kotlin:${versionFor(project, Android.tools.build.gradlePlugin)}"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -34,10 +33,8 @@ buildscript {
 }
 
 plugins {
-    id 'com.squareup.anvil' apply false
     id 'org.jetbrains.dokka'
     id 'com.osacky.fulladle'
-    id 'org.jetbrains.kotlin.android' apply false
     id 'org.jetbrains.kotlin.plugin.compose' apply false
     id 'com.google.devtools.ksp' apply false
     id 'com.diffplug.spotless' apply false
@@ -64,7 +61,6 @@ allprojects {
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
-        maven { url 'https://central.sonatype.com/repository/maven-snapshots/' }
         if (rootProject.ext.proprietaryFontAvailable) {
             maven {
                 url = uri("https://maven.pkg.github.com/duckduckgo/native-apps-ducksans")
@@ -89,7 +85,7 @@ subprojects {
         apply plugin: 'org.jetbrains.dokka'
     }
 
-    String[] allowAndroidTestsIn = ["app", "sync-lib", "httpsupgrade-impl", "pir-impl", "feature-toggles-impl"]
+    String[] allowAndroidTestsIn = ["app", "sync-lib", "httpsupgrade-impl", "pir-impl", "feature-toggles-impl", "app-database"]
     if (!allowAndroidTestsIn.contains(project.name)) {
         project.projectDir.eachFile(groovy.io.FileType.DIRECTORIES) { File parent ->
             if (parent.name == "src") {
@@ -123,33 +119,27 @@ subprojects {
             incoming.beforeResolve {
 
                 plugins.each { plugin ->
-                    // API modules cannot use the anvil plugin
+                    // API modules cannot use the Metro plugin
                     if (projectPath.endsWith("api")) {
-                        if (plugin.toString().contains("com.squareup.anvil.plugin")) {
+                        if (plugin.toString().contains("dev.zacsweers.metro")) {
                             throw new GradleException("Invalid plugin $projectPath -> " +
-                                    "'api' modules can't use the anvil plugin")
+                                    "'api' modules can't use the Metro plugin")
                         }
                     }
-                    if (!projectPath.endsWith(":app") && plugin.toString().toLowerCase().contains("kapt")) {
+                    if (plugin.toString().toLowerCase().contains("kapt")) {
                         throw new GradleException("Invalid usage of kapt $projectPath -> " +
                                 "Use ksp instead of kapt")
                     }
                 }
 
                 for (dependency in dependencies) {
-                    // API modules cannot depend on dagger/anvil
-                    if (projectPath.endsWith("api")
-                            && projectPath != ":feature-toggles-api"
-                            && projectPath != ":settings-api") {
-                        def notAllowedDeps = ["anvil", "dagger"]
-                        if (notAllowedDeps.contains(dependency.name)) {
-                            throw new GradleException("Invalid dependency $projectPath -> " +
-                                    "'api' modules can't depend on dagger/anvil")
-                        }
+                    if (dependency.group == "com.google.dagger" || dependency.group == "com.squareup.anvil") {
+                        throw new GradleException("Invalid dependency $projectPath -> ${dependency.group}:${dependency.name}. " +
+                                "Dagger and Anvil were replaced by Metro")
                     }
 
                     if (dependency instanceof ProjectDependency) {
-                        def dependencyPath = dependency.dependencyProject.path
+                        def dependencyPath = dependency.path
                         if (dependencyPath == projectPath) continue
                         // internal modules have to use internalImplementation
                         // when a non internal configuration is built (i.e. PlayDebug) no internal dependencies should be found
@@ -221,7 +211,7 @@ subprojects {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         }
     }
-    pluginManager.withPlugin('org.jetbrains.kotlin.android') {
+    pluginManager.withPlugin('com.android.base') {
         kotlin {
             jvmToolchain(21)
         }
@@ -233,9 +223,6 @@ subprojects {
     }
 
     plugins.withId('com.google.devtools.ksp') {
-        ksp {
-            arg("ddg.di", findProperty('ddg.di') ?: 'AnvilDagger')
-        }
         afterEvaluate {
             configurations.configureEach { config ->
                 if (config.name == 'ksp') {
@@ -252,53 +239,16 @@ subprojects {
     }
 }
 
-// Metro dual-build: conditionally swap Anvil for Metro based on ddg.di property
-def diFramework = findProperty('ddg.di') ?: 'AnvilDagger'
-logger.lifecycle("DI FRAMEWORK: ${diFramework}")
-if (diFramework == 'Metro') {
-    subprojects {
-        // Metro must be applied after Kotlin but during plugin application (not afterEvaluate).
-        // Nest callbacks: first wait for Kotlin, then check for Anvil.
-        def applyMetro = {
-            pluginManager.withPlugin('com.squareup.anvil') {
-                // Disable Anvil's component merging — Metro handles it
-                anvil {
-                    disableComponentMerging.set(true)
-                }
-                apply plugin: 'dev.zacsweers.metro'
-                metro {
-                    enableKClassToClassMapKeyInterop.set(true)
-                    interop {
-                        includeDaggerAnnotations.set(true)
-                        includeJavaxAnnotations.set(true)
-                        includeAnvilAnnotations.set(true)
-                        enableDaggerRuntimeInterop.set(true)
-                        enableDaggerAnvilInterop.set(true)
-                    }
-                }
-                // Disable Anvil's Kotlin compiler plugin entirely — it forces languageVersion=1.9
-                // which is incompatible with Metro. Metro replaces all Anvil functionality.
-                afterEvaluate {
-                    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-                        compilerOptions {
-                            languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_3)
-                            apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_3)
-                        }
-                        // Remove Anvil from the compiler plugin classpath so it can't
-                        // override language version or run its K1 compiler plugin
-                        pluginClasspath.setFrom(pluginClasspath.filter {
-                            !it.name.contains("anvil")
-                        })
-                    }
-                    // Disable KAPT tasks — Metro replaces Dagger
-                    tasks.matching { it.name.contains("kapt") || it.name.contains("Kapt") }.configureEach {
-                        enabled = false
-                    }
-                }
+subprojects {
+    plugins.withId('dev.zacsweers.metro') {
+        metro {
+            interop {
+                includeJavax()
             }
         }
-        pluginManager.withPlugin('org.jetbrains.kotlin.android', applyMetro)
-        pluginManager.withPlugin('org.jetbrains.kotlin.jvm', applyMetro)
+        dependencies {
+            implementation "javax.inject:javax.inject:_"
+        }
     }
 }
 
@@ -311,9 +261,6 @@ def isCI = System.getenv('CI') != null
 subprojects {
     tasks.withType(Test).configureEach {
         useJUnitPlatform()
-        // Expose the active DI framework to tests so Anvil/Dagger-specific
-        // assertions can be skipped under Metro
-        systemProperty 'ddg.di', findProperty('ddg.di') ?: 'AnvilDagger'
         develocity.testRetry {
             maxRetries = isCI ? 1 : 0
             maxFailures = 5
@@ -359,10 +306,7 @@ fladle {
             debugApk.set(project.provider {
                 def dir = rootProject.file("app/build/outputs/apk/internal/release")
                 def apks = dir.exists() ? (dir.listFiles() ?: []).findAll { it.name.endsWith("-internal-release.apk") } : []
-                if (apks.isEmpty()) {
-                    throw new GradleException("No internalRelease APK in $dir — run :app:assembleInternalRelease first")
-                }
-                apks.first().absolutePath
+                apks.isEmpty() ? new File(dir, "missing-internal-release.apk").absolutePath : apks.first().absolutePath
             })
             instrumentationApk.set(rootProject.file("macrobenchmark/build/outputs/apk/release/macrobenchmark-release.apk").absolutePath)
             additionalTestApks.set([])
@@ -380,27 +324,28 @@ fladle {
     }
 }
 
-afterEvaluate {
-    // Export Firebase Test Lab (Flank) tests to Develocity
-    tasks.matching { it.name.startsWith("execFlank") }.names.each {
-        ImportJUnitXmlReports.register(
-                tasks,
-                tasks.named(it),
-                ANDROID_FIREBASE
-        ).configure {
-            // Import FullJUnitReport.xml, not JUnitReport.xml. fullJunitResult=true makes
-            // Flank emit this extra report carrying the flaky markers (failure nodes on
-            // passed-after-retry tests) that the ANDROID_FIREBASE dialect needs to detect
-            // flaky tests; the plain JUnitReport.xml has no such markers (imports fine but
-            // always reports 0 flaky).
-            reports.setFrom(file("build/fladle/fladleResults/FullJUnitReport.xml"))
+tasks.matching { it.name == "execFlankPerfTests" }.configureEach {
+    doFirst {
+        if (!file(config.debugApk.get()).exists()) {
+            throw new GradleException("No internalRelease APK in app/build/outputs/apk/internal/release — run :app:assembleInternalRelease first")
         }
+    }
+}
+
+afterEvaluate {
+    // Import FullJUnitReport.xml, not JUnitReport.xml. fullJunitResult=true makes
+    // Flank emit this extra report carrying the flaky markers (failure nodes on
+    // passed-after-retry tests) that the ANDROID_FIREBASE dialect needs to detect
+    // flaky tests; the plain JUnitReport.xml has no such markers (imports fine but
+    // always reports 0 flaky).
+    tasks.withType(ImportJUnitXmlReports).matching { it.name.startsWith("execFlank") }.configureEach {
+        reports.setFrom(file("build/fladle/fladleResults/FullJUnitReport.xml"))
     }
 }
 
 tasks.register('aiConfigCheck') {
     group = 'verification'
-    description = 'Validates AI config (.claude/rules, .claude/docs, .claude/skills) against CLAUDE.md and checks for dangling references.'
+    description = 'Validates AI config (.claude/rules, .claude/docs, .claude/skills) against AGENTS.md and checks for dangling references.'
     def repoRoot = layout.projectDirectory.asFile
     doLast {
         def checker = new com.duckduckgo.gradle.AiConfigChecker(repoRoot)
@@ -413,4 +358,7 @@ tasks.register('aiConfigCheck') {
     }
 }
 
-apply plugin: 'android-reporting'
+
+// :app adds the privacy Flank configs to this project's fladle extension, and fladle only registers
+// tasks for the configs present when this project finishes evaluating, so :app must be evaluated first.
+evaluationDependsOn(':app')
