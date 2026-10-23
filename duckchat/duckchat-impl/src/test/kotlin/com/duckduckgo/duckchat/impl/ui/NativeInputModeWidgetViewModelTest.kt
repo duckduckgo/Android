@@ -1944,6 +1944,7 @@ class NativeInputModeWidgetViewModelTest {
             hasImageAttachment = false,
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
         )
 
         verify(responseWaitWideEvent).onNativePromptSubmitted("tab-A", "medium", Tool.IMAGE_GENERATION.rawValue)
@@ -1960,6 +1961,7 @@ class NativeInputModeWidgetViewModelTest {
             hasImageAttachment = false,
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
         )
 
         verifyNoInteractions(responseWaitWideEvent)
@@ -1976,6 +1978,7 @@ class NativeInputModeWidgetViewModelTest {
             hasImageAttachment = false,
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
         )
         viewModel.fireStopGenerationTapped()
 

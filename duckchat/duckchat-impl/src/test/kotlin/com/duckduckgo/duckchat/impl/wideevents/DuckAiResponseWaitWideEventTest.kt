@@ -87,7 +87,7 @@ class DuckAiResponseWaitWideEventTest {
     private fun createTestee() = DuckAiResponseWaitWideEventImpl(
         wideEventClient = wideEventClient,
         duckChat = duckChat,
-        duckChatFeature = { duckChatFeature },
+        duckChatFeature = lazy { duckChatFeature },
         flowStore = flowStore,
         dispatchers = coroutineRule.testDispatcherProvider,
         appCoroutineScope = coroutineRule.testScope,

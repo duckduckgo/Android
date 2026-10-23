@@ -29,10 +29,10 @@ import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -61,9 +61,9 @@ interface DuckAiResponseWaitWideEvent {
  * Open flows are saved to [DuckAiResponseWaitFlowStore] after every change and restored as the consumer's first
  * action, so a wait that outlives the process can still record the user's return.
  */
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = DuckAiResponseWaitWideEvent::class)
-@ContributesMultibinding(AppScope::class, boundType = BrowserLifecycleObserver::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<DuckAiResponseWaitWideEvent>())
+@ContributesIntoSet(AppScope::class, binding = binding<BrowserLifecycleObserver>())
 class DuckAiResponseWaitWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
     private val duckChat: DuckChat,
@@ -412,7 +412,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         flows.toList().forEach { abort(it) }
     }
 
-    private fun isFeatureDisabled(): Boolean = !duckChatFeature.get().sendDuckAiResponseWaitWideEvent().isEnabled()
+    private fun isFeatureDisabled(): Boolean = !duckChatFeature.value.sendDuckAiResponseWaitWideEvent().isEnabled()
 
     private fun computeTabState(tabId: String?, url: String?): TabState {
         val uri = url?.takeIf { it.isNotBlank() }?.toUri()

@@ -19,14 +19,15 @@ package com.duckduckgo.duckchat.impl.wideevents
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
 /**
  * The single [DuckAiSessionCallback] binding, so each wide event stays unaware of the others.
  * The session event is called first so its behaviour never depends on the response-wait event.
  */
-@ContributesBinding(AppScope::class, boundType = DuckAiSessionCallback::class)
+@ContributesBinding(AppScope::class, binding = binding<DuckAiSessionCallback>())
 class DuckAiSessionCallbackFanOut @Inject constructor(
     private val session: RealDuckAiSessionWideEvent,
     private val responseWait: DuckAiResponseWaitWideEventImpl,
