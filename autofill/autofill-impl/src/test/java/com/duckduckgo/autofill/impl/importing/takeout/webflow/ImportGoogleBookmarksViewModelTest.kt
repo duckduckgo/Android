@@ -50,7 +50,14 @@ class ImportGoogleBookmarksViewModelTest {
     }
 
     @Test
-    fun `when created then web flow shown`() {
+    fun `when created then web flow loading shown`() {
+        assertEquals(ViewMode.WebFlowLoading, testee.viewState.value.viewMode)
+    }
+
+    @Test
+    fun `when waiting for export stopped while web flow loading then web flow shown`() {
+        testee.onWaitingForExportStopped()
+
         assertEquals(ViewMode.WebFlow, testee.viewState.value.viewMode)
     }
 
@@ -149,7 +156,18 @@ class ImportGoogleBookmarksViewModelTest {
     }
 
     @Test
+    fun `when result screen done clicked during web flow loading then no exit`() = runTest {
+        testee.commands.test {
+            testee.onResultScreenDoneClicked()
+
+            expectNoEvents()
+        }
+    }
+
+    @Test
     fun `when result screen done clicked during web flow then no exit`() = runTest {
+        testee.onWaitingForExportStopped()
+
         testee.commands.test {
             testee.onResultScreenDoneClicked()
 

@@ -15,6 +15,22 @@
   -->
 
 <resources>
+    <string name="importPasswordsRedesignSuccessTitle">Import complete!</string>
     <string name="importPasswordsRedesignSuccessPrimaryButton">Done</string>
+    <string name="importPasswordsRedesignErrorTitle">Import complete!</string>
     <string name="importPasswordsRedesignErrorPrimaryButton">Got It</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Hang tight — keep this window open. It shouldn’t take more than a minute or two.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google may ask for your password.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google will email you confirming your data has been exported. You don’t need to do anything.</string>
+
+    <!-- Bookmarks import redesign: success -->
+    <string name="importBookmarksRedesignSuccessTitle">Import complete!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported">Bookmarks imported: <![CDATA[<b>%1$d</b>]]></string>
+    <string name="importBookmarksRedesignSuccessPrimaryButton">Done</string>
+
+    <!-- Bookmarks import redesign: error -->
+    <string name="importBookmarksRedesignErrorTitle">Import complete!</string>
+    <string name="importBookmarksRedesignErrorPrimaryButton">Done</string>
 </resources>

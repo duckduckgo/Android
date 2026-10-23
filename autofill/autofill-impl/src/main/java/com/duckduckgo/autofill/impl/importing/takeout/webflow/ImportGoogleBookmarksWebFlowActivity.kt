@@ -20,6 +20,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.core.os.BundleCompat
+import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -93,8 +95,12 @@ class ImportGoogleBookmarksWebFlowActivity :
     }
 
     private fun configureEdgeToEdgeInsets() {
-        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
-        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        if (isRedesignEnabled) {
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
+        } else {
+            edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+            edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        }
         edgeToEdgeHandler.applyNavigationBarInsets(binding.fragmentContainer, drawBehindGestureNav = true)
     }
 
@@ -112,7 +118,7 @@ class ImportGoogleBookmarksWebFlowActivity :
 
     private fun renderViewState(viewState: ViewState) {
         when (viewState.viewMode) {
-            is ViewMode.WebFlow -> {
+            is ViewMode.WebFlowLoading, is ViewMode.WebFlow -> {
                 showWebFlowFragment()
                 hideProgressOverlay()
             }
@@ -123,13 +129,22 @@ class ImportGoogleBookmarksWebFlowActivity :
             }
 
             is ViewMode.Success -> showResultFragment {
-                ImportFinishedFragment.newInstanceSuccess(bookmarksImported = viewState.viewMode.importedCount)
+                if (isRedesignEnabled) {
+                    ImportFinishedRedesignFragment.newInstanceSuccess(importedCount = viewState.viewMode.importedCount)
+                } else {
+                    ImportFinishedFragment.newInstanceSuccess(bookmarksImported = viewState.viewMode.importedCount)
+                }
             }
 
             is ViewMode.Error -> showResultFragment {
-                ImportFinishedFragment.newInstanceFailure(getString(R.string.importBookmarksErrorGenericMessage))
+                if (isRedesignEnabled) {
+                    ImportFinishedRedesignFragment.newInstanceError()
+                } else {
+                    ImportFinishedFragment.newInstanceFailure(getString(R.string.importBookmarksErrorGenericMessage))
+                }
             }
         }
+        binding.includeToolbar.appBarLayout.isVisible = !isRedesignEnabled || viewState.viewMode is ViewMode.WebFlow
         updateToolbarTitle(viewState.viewMode)
     }
 
@@ -141,7 +156,7 @@ class ImportGoogleBookmarksWebFlowActivity :
         }
     }
 
-    private fun showResultFragment(createFragment: () -> ImportFinishedFragment) {
+    private fun showResultFragment(createFragment: () -> Fragment) {
         if (supportFragmentManager.findFragmentByTag(RESULT_TAG) != null) return
         logcat { "Bookmark-import: Showing result fragment" }
         supportFragmentManager.commit {
@@ -151,8 +166,13 @@ class ImportGoogleBookmarksWebFlowActivity :
 
     private fun showProgressOverlay() {
         if (supportFragmentManager.findFragmentByTag(PROGRESS_OVERLAY_TAG) != null) return
+        val progressFragment = if (isRedesignEnabled) {
+            ImportGoogleBookmarksInProgressRedesignFragment.newInstance()
+        } else {
+            ImportGoogleBookmarksAutomationInProgressViewFragment.newInstance()
+        }
         supportFragmentManager.commit {
-            add(R.id.fragment_container, ImportGoogleBookmarksAutomationInProgressViewFragment.newInstance(), PROGRESS_OVERLAY_TAG)
+            add(R.id.fragment_container, progressFragment, PROGRESS_OVERLAY_TAG)
         }
     }
 
@@ -197,10 +217,13 @@ class ImportGoogleBookmarksWebFlowActivity :
             setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_close_24)
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        // the redesign starts without a toolbar, and we can't wait for the first view state because it may arrive after the first frame
+        binding.includeToolbar.appBarLayout.isVisible = !isRedesignEnabled
+        binding.includeToolbar.topBrowserOutlineStroke.isVisible = !isRedesignEnabled
     }
 
     private fun updateToolbarTitle(viewMode: ViewMode) {
-        val title = if (viewMode == ViewMode.WebFlow) {
+        val title = if (viewMode == ViewMode.WebFlowLoading || viewMode == ViewMode.WebFlow) {
             getString(R.string.importBookmarksFromGoogleWebFlowTitle)
         } else {
             ""
