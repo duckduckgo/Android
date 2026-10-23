@@ -636,11 +636,14 @@ class RealSubscriptionsManager @Inject constructor(
 
             if (subscription.isActive()) {
                 val isFreeTrial = subscription.activeOffers.contains(ActiveOfferType.TRIAL)
-                pixelSender.reportPurchaseSuccess(isFreeTrial)
-                pixelSender.reportSubscriptionActivated()
                 val isPlanSwitch = isPlanSwitchPending
                 isPlanSwitchPending = false
-                if (isPlanSwitch) pixelSender.reportSubscriptionSwitch()
+                if (isPlanSwitch) {
+                    pixelSender.reportSubscriptionSwitch()
+                } else {
+                    pixelSender.reportPurchaseSuccess(isFreeTrial)
+                }
+                pixelSender.reportSubscriptionActivated()
                 emitEntitlementsValues()
                 _currentPurchaseState.emit(CurrentPurchase.Success(isFreeTrial, isPlanSwitch = isPlanSwitch))
                 authRepository.registerLocalPurchasedAt()

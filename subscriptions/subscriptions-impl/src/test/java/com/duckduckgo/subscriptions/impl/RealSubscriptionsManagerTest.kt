@@ -2803,6 +2803,7 @@ class RealSubscriptionsManagerTest {
             assertEquals(CurrentPurchase.Success(isFreeTrial = false, isPlanSwitch = true), awaitItem())
 
             verify(pixelSender).reportSubscriptionSwitch()
+            verify(pixelSender, never()).reportPurchaseSuccess(any())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -2828,6 +2829,7 @@ class RealSubscriptionsManagerTest {
             assertEquals(CurrentPurchase.Success(isFreeTrial = false, isPlanSwitch = false), awaitItem())
 
             verify(pixelSender, never()).reportSubscriptionSwitch()
+            verify(pixelSender).reportPurchaseSuccess(isFreeTrial = false)
 
             cancelAndConsumeRemainingEvents()
         }
