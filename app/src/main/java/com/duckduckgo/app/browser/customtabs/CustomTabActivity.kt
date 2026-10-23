@@ -165,6 +165,11 @@ class CustomTabActivity : DuckDuckGoActivity() {
         if (launchMode == CustomTabLaunchMode.LEGACY) finishAndRemoveTask() else finish()
     }
 
+    fun finishIfOutsideBrowserTask() {
+        // Otherwise the tab stays behind the caller (or in its own card) after the page moved to DDG's browser.
+        if (!launchMode.isInBrowserTask) finish()
+    }
+
     private fun renderView(viewState: ViewState) {
         val fragment = BrowserTabFragment.newInstanceForCustomTab(
             tabId = viewState.tabId,

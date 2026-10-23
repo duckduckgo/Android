@@ -39,6 +39,9 @@ enum class CustomTabLaunchMode {
             DOCUMENT_TASK, DOCUMENT_TASK_HIDE_BROWSER_TASK -> Intent.FLAG_ACTIVITY_NEW_DOCUMENT or Intent.FLAG_ACTIVITY_MULTIPLE_TASK
         }
 
+    val isInBrowserTask: Boolean
+        get() = this == LEGACY
+
     companion object {
         fun resolve(
             keepOnAppSwitchEnabled: Boolean,
