@@ -83,7 +83,7 @@ fun DaxBrandButton(
 ) {
     ProvideDuckDuckGoTheme(
         colors = DuckDuckGoTheme.colors,
-        shapes = DuckDuckGoTheme.shapes.copy(medium = DaxBrandButtonDefaults.shape),
+        shapes = DuckDuckGoTheme.shapes.copy(medium = DaxBrandButtonDefaults.Shape),
         typography = DuckDuckGoTheme.typography.copy(
             button = textStyle,
         ),
@@ -114,7 +114,7 @@ private object DaxBrandButtonDefaults {
         SmallTextStyle.asTextStyle.copy(fontSize = 16.sp),
     )
 
-    val shape: Shape = RoundedCornerShape(percent = 50)
+    val Shape: Shape = RoundedCornerShape(percent = 50)
 
     val adsColorButtonBrandContainer: Color
         @Composable @ReadOnlyComposable get() = if (DuckDuckGoTheme.colors.isDark) {

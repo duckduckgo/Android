@@ -78,11 +78,11 @@ fun DaxPromoBottomSheetDialog(
         sheetGesturesEnabled = sheetGesturesEnabled,
         content = {
             Column(
-                verticalArrangement = Arrangement.spacedBy(space = DaxPromoBottomSheetDefaults.sheetVerticalGap),
-                modifier = Modifier.padding(all = DaxPromoBottomSheetDefaults.sheetPadding),
+                verticalArrangement = Arrangement.spacedBy(space = DaxPromoBottomSheetDefaults.SheetVerticalGap),
+                modifier = Modifier.padding(all = DaxPromoBottomSheetDefaults.SheetPadding),
             ) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(space = DaxPromoBottomSheetDefaults.sheetHorizontalGap),
+                    horizontalArrangement = Arrangement.spacedBy(space = DaxPromoBottomSheetDefaults.SheetHorizontalGap),
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
@@ -90,11 +90,11 @@ fun DaxPromoBottomSheetDialog(
                         Image(
                             painter = promoIcon,
                             contentDescription = null,
-                            modifier = Modifier.size(size = DaxPromoBottomSheetDefaults.imageSize),
+                            modifier = Modifier.size(size = DaxPromoBottomSheetDefaults.ImageSize),
                         )
                     }
                     Column(
-                        verticalArrangement = Arrangement.spacedBy(space = DaxPromoBottomSheetDefaults.contentSpacing),
+                        verticalArrangement = Arrangement.spacedBy(space = DaxPromoBottomSheetDefaults.ContentSpacing),
                         content = {
                             if (title != null) {
                                 DaxText(
@@ -114,7 +114,7 @@ fun DaxPromoBottomSheetDialog(
                 if (buttons != null) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(
-                            space = DaxPromoBottomSheetDefaults.buttonSpacing,
+                            space = DaxPromoBottomSheetDefaults.ButtonSpacing,
                             alignment = Alignment.End,
                         ),
                         verticalAlignment = Alignment.CenterVertically,
@@ -128,12 +128,12 @@ fun DaxPromoBottomSheetDialog(
 }
 
 private object DaxPromoBottomSheetDefaults {
-    internal val sheetPadding = 24.dp
-    internal val sheetVerticalGap = 16.dp
-    internal val sheetHorizontalGap = 16.dp
-    internal val imageSize = 48.dp
-    internal val contentSpacing = 8.dp
-    internal val buttonSpacing = 8.dp
+    internal val SheetPadding = 24.dp
+    internal val SheetVerticalGap = 16.dp
+    internal val SheetHorizontalGap = 16.dp
+    internal val ImageSize = 48.dp
+    internal val ContentSpacing = 8.dp
+    internal val ButtonSpacing = 8.dp
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
