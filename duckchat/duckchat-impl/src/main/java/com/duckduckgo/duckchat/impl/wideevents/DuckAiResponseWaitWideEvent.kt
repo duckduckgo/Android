@@ -356,6 +356,12 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
                 abort(flow)
                 return
             }
+            // A page-side stream such as a regenerate is the next prompt in this chat, which ends a returned flow.
+            flow.returned && flow.done && status.startsWith(START_STREAM_PREFIX) && status != STATUS_RESTART_STREAM -> {
+                wideEventClient.flowStep(flow.flowId, STEP_PROMPT_AFTER_RETURN)
+                finish(flow, REASON_RETURNED)
+                return
+            }
             status in LOADING_STATUSES || status.startsWith(START_STREAM_PREFIX) -> {
                 flow.lastState = STATE_LOADING
                 flow.awaitingReloadedStream = false
@@ -417,7 +423,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
     private fun computeTabState(tabId: String?, url: String?): TabState {
         val uri = url?.takeIf { it.isNotBlank() }?.toUri()
         val isDuckAi = uri != null && duckChat.isDuckChatUrl(uri)
-        return TabState(tabId, url, isDuckAi, uri?.toChatIdOrNull(duckChat))
+        return TabState(tabId, isDuckAi, uri?.toChatIdOrNull(duckChat))
     }
 
     private sealed class Action {
@@ -436,7 +442,6 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
 
     private data class TabState(
         val tabId: String?,
-        val url: String?,
         val isDuckAi: Boolean,
         val chatId: String?,
     )
@@ -545,6 +550,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         const val STATUS_ERROR = "error"
         const val STATUS_BLOCKED = "blocked"
         const val START_STREAM_PREFIX = "start_stream:"
+        const val STATUS_RESTART_STREAM = "start_stream:restart_stream"
         val LOADING_STATUSES = setOf("loading", "streaming")
 
         const val TOOL_GENERATE_IMAGE = "GenerateImage"

@@ -667,6 +667,28 @@ class DuckAiResponseWaitWideEventTest {
     }
 
     @Test
+    fun `when returned and done then a stream started by the page records prompt_after_return and finishes returned`() = runTest {
+        promptInChat()
+        switchToOtherSite()
+        testee.onResponseState("t1", "ready")
+        idle()
+        onChat("t1", "A")
+        idle()
+
+        testee.onResponseState("t1", "start_stream:regenerate")
+        testee.onResponseState("t1", "error")
+        idle()
+
+        verify(wideEventClient).flowStep(eq(1L), eq("prompt_after_return"), eq(true), any())
+        verify(wideEventClient).flowFinish(
+            eq(1L),
+            eq(FlowStatus.Success),
+            eq(mapOf("status_reason" to "returned", "response_result" to "ready")),
+        )
+        assertEquals(emptyList<Long>(), flowStore.flows.map { it.flowId })
+    }
+
+    @Test
     fun `when tab closed while away then flow stays open`() = runTest {
         promptInChat()
 
