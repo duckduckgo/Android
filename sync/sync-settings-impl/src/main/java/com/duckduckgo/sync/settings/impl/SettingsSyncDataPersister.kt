@@ -26,6 +26,7 @@ import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
 import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
+import com.duckduckgo.sync.settings.api.PrefixSyncableSetting
 import com.duckduckgo.sync.settings.api.SyncableSetting
 import com.duckduckgo.sync.settings.impl.SettingsSyncDataPersister.Adapters.Companion.updatesAdapter
 import com.squareup.moshi.*
@@ -57,7 +58,7 @@ class SettingsSyncDataPersister @Inject constructor(
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
         if (changes.type == SETTINGS) {
-            val syncableSettings = syncableSettings.getPlugins()
+            val syncableSettings = syncableSettings.activePlugins()
             return runBlocking(dispatchers.io()) {
                 logcat(INFO) { "Sync-Settings: persist() changes=${changes.jsonString}" }
                 val result = process(changes, syncableSettings, conflictResolution)
@@ -117,16 +118,17 @@ class SettingsSyncDataPersister @Inject constructor(
     ): SyncMergeResult {
         settings.entries.forEach { entry ->
             logcat(INFO) { "Sync-Settings: processEntries() entry=${entry.key}" }
-            val syncableFeature = syncableSettings.firstOrNull { it.key == entry.key } ?: return@forEach
+            val syncableFeature = syncableSettings.firstOrNull { it.key == entry.key }
+            if (syncableFeature == null) {
+                syncableSettings.filterIsInstance<PrefixSyncableSetting>()
+                    .firstOrNull { entry.key.startsWith(it.keyPrefix) }
+                    ?.onRemoteValue(entry.key, entry.decryptedValue())
+                return@forEach
+            }
             logcat(INFO) { "Sync-Settings: plugin found for ${entry.key}" }
             when (conflictResolution) {
                 SyncConflictResolution.DEDUPLICATION -> {
-                    val valueUpdated = if (entry.isDeleted()) {
-                        syncableFeature.deduplicate(null)
-                    } else {
-                        val decryptedValue = entry.value.takeUnless { it.isNullOrEmpty() }?.let { syncCrypto.decrypt(it) }
-                        syncableFeature.deduplicate(decryptedValue)
-                    }
+                    val valueUpdated = syncableFeature.deduplicate(entry.decryptedValue())
                     if (valueUpdated) {
                         settingsSyncMetadataDao.addOrUpdate(
                             SettingsSyncMetadataEntity(
@@ -153,14 +155,12 @@ class SettingsSyncDataPersister @Inject constructor(
         val hasDataChangedWhileSyncing = entityModifiedMillis > clientModifiedSinceMillis
         if (hasDataChangedWhileSyncing) return SyncMergeResult.Error(reason = "Data changed while syncing")
 
-        if (entry.isDeleted()) {
-            syncableFeature.save(null)
-        } else {
-            val decryptedValue = entry.value.takeUnless { it.isNullOrEmpty() }?.let { syncCrypto.decrypt(it) }
-            syncableFeature.save(decryptedValue)
-        }
+        syncableFeature.save(entry.decryptedValue())
         return Success()
     }
+
+    private fun SettingEntryResponse.decryptedValue(): String? =
+        if (isDeleted()) null else value.takeUnless { it.isNullOrEmpty() }?.let { syncCrypto.decrypt(it) }
 
     override fun onSyncDisabled() {
         syncSettingsSyncStore.serverModifiedSince = "0"

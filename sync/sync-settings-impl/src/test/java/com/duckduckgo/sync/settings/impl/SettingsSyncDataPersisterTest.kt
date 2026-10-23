@@ -26,6 +26,7 @@ import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.TIMESTAMP
+import com.duckduckgo.sync.settings.api.PrefixSyncableSetting
 import org.junit.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -161,7 +162,43 @@ class SettingsSyncDataPersisterTest {
         assertEquals("2023-08-31T10:06:16.022Z", settingSyncStore.clientModifiedSince)
     }
 
+    @Test
+    fun whenEntryMatchesNoKeyButPrefixThenDeliverToPrefixSetting() {
+        val prefixSetting = FakePrefixSyncableSetting(enabled = true)
+        prefixTestee(prefixSetting).onSuccess(SyncChangesResponse(SyncableType.SETTINGS, prefixedResponse), TIMESTAMP)
+
+        assertEquals(listOf("sent_links_from_other" to "payload"), prefixSetting.received)
+    }
+
+    @Test
+    fun whenPrefixSettingDisabledThenEntryIsSkipped() {
+        val prefixSetting = FakePrefixSyncableSetting(enabled = false)
+        prefixTestee(prefixSetting).onSuccess(SyncChangesResponse(SyncableType.SETTINGS, prefixedResponse), TIMESTAMP)
+
+        assertTrue(prefixSetting.received.isEmpty())
+    }
+
+    private fun prefixTestee(prefixSetting: FakePrefixSyncableSetting) = SettingsSyncDataPersister(
+        syncableSettings = SyncableSettingsPluginPoint(mutableListOf(duckAddressSetting, prefixSetting)),
+        settingsSyncMetadataDao = metadataDao,
+        syncSettingsSyncStore = settingSyncStore,
+        syncCrypto = FakeCrypto(),
+        dispatchers = coroutineRule.testDispatcherProvider,
+    )
+
+    private class FakePrefixSyncableSetting(private val enabled: Boolean) : FakeSyncableSetting(), PrefixSyncableSetting {
+        val received = mutableListOf<Pair<String, String?>>()
+        override val keyPrefix = "sent_links_from_"
+        override fun isEnabled() = enabled
+        override fun onRemoteValue(key: String, value: String?) {
+            received += key to value
+        }
+    }
+
     companion object {
+        private val prefixedResponse =
+            """{"settings":{"entries":[{"key":"sent_links_from_other","value":"payload"}],"last_modified":"2026-10-21T10:00:00Z"}}"""
+
         val responseWithDeletedObject = FileUtilities.loadText(javaClass.classLoader!!, "json/settings_with_deleted_object_response.json")
         val responseWithValuesObject = FileUtilities.loadText(javaClass.classLoader!!, "json/settings_with_values_response.json")
     }

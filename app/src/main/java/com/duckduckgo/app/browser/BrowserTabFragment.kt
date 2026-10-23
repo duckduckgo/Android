@@ -379,6 +379,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.sync.api.SendToDevices
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
@@ -442,6 +443,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>
+
+    @Inject
+    lateinit var sendToDevices: SendToDevices
 
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
@@ -2914,7 +2918,7 @@ class BrowserTabFragment :
             is Command.DownloadImage -> requestImageDownload(it.url, it.requestUserConfirmation)
             is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
             is Command.DismissFindInPage -> webView?.findAllAsync("")
-            is Command.ShareLink -> launchSharePageChooser(it.url, it.title)
+            is Command.ShareLink -> shareLink(it.url, it.title)
             is Command.SharePromoLinkRMF -> launchSharePromoRMFPageChooser(it.url, it.shareTitle)
             is Command.CopyLink -> clipboardManager.setPrimaryClip(ClipData.newPlainText(null, it.url))
             is Command.ShowFileChooser -> launchFilePicker(it.filePathCallback, it.fileChooserParams)
@@ -5158,6 +5162,16 @@ class BrowserTabFragment :
                 HtmlCompat.fromHtml(getString(R.string.privacyProtectionDisabledConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
                 Snackbar.LENGTH_LONG,
             ).show()
+    }
+
+    private fun shareLink(
+        url: String,
+        title: String,
+    ) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val shown = sendToDevices.showShareSheet(url, title) { launchSharePageChooser(url, title) }
+            if (!shown) launchSharePageChooser(url, title)
+        }
     }
 
     private fun launchSharePageChooser(

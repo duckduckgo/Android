@@ -150,6 +150,9 @@ interface SyncFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun canUseImprovedSyncFlow(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun sendToDevices(): Toggle
 }
 
 /**

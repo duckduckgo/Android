@@ -25,6 +25,7 @@ import com.duckduckgo.sync.api.engine.SyncChangesRequest
 import com.duckduckgo.sync.api.engine.SyncableDataProvider
 import com.duckduckgo.sync.api.engine.SyncableType
 import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
+import com.duckduckgo.sync.settings.api.PrefixSyncableSetting
 import com.duckduckgo.sync.settings.api.SyncableSetting
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -45,7 +46,7 @@ class SettingsSyncDataProvider @Inject constructor(
 
     override fun getType(): SyncableType = SETTINGS
     override fun getChanges(): SyncChangesRequest {
-        val syncableSettings = syncableSettings.getPlugins()
+        val syncableSettings = syncableSettings.activePlugins()
         if (settingsSyncStore.serverModifiedSince == "0") {
             val keys = syncableSettings.map { it.key }
             logcat(INFO) { "Sync-Settings: initialize keys=$keys" }
@@ -137,6 +138,9 @@ class SyncSettingsUpdates(
     val updates: List<SettingEntry>,
     val modified_since: String,
 )
+
+internal fun PluginPoint<SyncableSetting>.activePlugins(): List<SyncableSetting> =
+    getPlugins().filter { (it as? PrefixSyncableSetting)?.isEnabled() != false }
 
 data class SettingEntry(
     val key: String,

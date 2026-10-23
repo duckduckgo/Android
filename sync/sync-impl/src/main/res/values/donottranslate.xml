@@ -17,4 +17,13 @@
 <resources>
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_example_code">eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNjgwRDQ1QjUtNUU2RS00MzQ3LTlDNDQtQjZGQkU4MEZDNEE3IiwicHJpbWFyelkasd92V9rZXkiOiJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFPSJ9fQ==</string>
+
+    <!-- Send to your devices (Hack Days) -->
+    <string name="send_to_devices_title">Send to your devices</string>
+    <string name="send_to_devices_more_options">More share options…</string>
+    <string name="send_to_devices_sent">Sent to %1$s</string>
+    <string name="send_to_devices_notification_title">Link from %1$s</string>
+    <string name="send_to_devices_too_long">This link is too long to send</string>
+    <string name="send_to_devices_unknown_device">another device</string>
+    <string name="send_to_devices_open">Open</string>
 </resources>
