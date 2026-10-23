@@ -151,7 +151,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
         get() = CustomTabLaunchMode.fromName(intent.getStringExtra(LAUNCH_MODE_EXTRA))
 
     private fun wereTabsClearedSinceLaunch(): Boolean =
-        settingsDataStore.tabsClearedTimestamp > intent.getLongExtra(LAUNCHED_AT_EXTRA, 0L)
+        settingsDataStore.tabsClearedCount > intent.getIntExtra(TABS_CLEARED_COUNT_EXTRA, 0)
 
     // The manifest hides legacy tabs from Recents, but a tab in its own task needs its card to be reachable.
     private fun showInRecents() {
@@ -189,12 +189,13 @@ class CustomTabActivity : DuckDuckGoActivity() {
             clientPackage: String? = null,
             referrerPackage: String? = null,
             launchMode: CustomTabLaunchMode = CustomTabLaunchMode.LEGACY,
+            tabsClearedCount: Int = 0,
         ): Intent {
             return Intent(context, CustomTabActivity::class.java).apply {
                 addFlags(launchMode.intentFlags)
                 putExtra(Intent.EXTRA_TEXT, text)
                 putExtra(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
-                putExtra(LAUNCHED_AT_EXTRA, System.currentTimeMillis())
+                putExtra(TABS_CLEARED_COUNT_EXTRA, tabsClearedCount)
                 if (toolbarColor != null) {
                     putExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, toolbarColor)
                 }
@@ -211,7 +212,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
         private const val CLIENT_PACKAGE_EXTRA = "CLIENT_PACKAGE_EXTRA"
         private const val REFERRER_PACKAGE_EXTRA = "REFERRER_PACKAGE_EXTRA"
         private const val LAUNCH_MODE_EXTRA = "LAUNCH_MODE_EXTRA"
-        private const val LAUNCHED_AT_EXTRA = "LAUNCHED_AT_EXTRA"
+        private const val TABS_CLEARED_COUNT_EXTRA = "TABS_CLEARED_COUNT_EXTRA"
     }
 
     private fun configureOnBackPressedListener() {

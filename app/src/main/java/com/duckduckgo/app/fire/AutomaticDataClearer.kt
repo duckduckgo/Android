@@ -98,6 +98,8 @@ class AutomaticDataClearer @Inject constructor(
 
     override var isFreshAppLaunch = true
 
+    // Reopened after the restart so the link isn't lost. Reset after every clear.
+    @Volatile
     override var deferredQuery: String? = null
 
     // Opening a custom tab from another app must not run the automatic clear, because the clear would close that tab.
@@ -184,6 +186,7 @@ class AutomaticDataClearer @Inject constructor(
             settingsDataStore.appIconChanged = false
 
             clearDataIfNeeded(appUsedSinceLastClear, appIconChanged)
+            deferredQuery = null
 
             isFreshAppLaunch = false
             settingsDataStore.clearAppBackgroundTimestamp()
@@ -283,9 +286,10 @@ class AutomaticDataClearer @Inject constructor(
                     dataClearerForegroundAppRestartPixel.incrementCount()
                 }
 
+                val query = deferredQuery
                 // need a moment to draw background color (reduces flickering UX)
                 Handler(Looper.getMainLooper()).postDelayed(100) {
-                    clearDataAction.killAndRestartProcess(notifyDataCleared = true, query = deferredQuery)
+                    clearDataAction.killAndRestartProcess(notifyDataCleared = true, query = query)
                 }
             } else {
                 postDataClearerState(FINISHED)

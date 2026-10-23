@@ -158,7 +158,7 @@ class ClearPersonalDataAction(
 
     override suspend fun closeCustomTabs() {
         withContext(dispatchers.io()) {
-            settingsDataStore.tabsClearedTimestamp = System.currentTimeMillis()
+            settingsDataStore.tabsClearedCount++
 
             // Custom tabs in their own Recents card live outside the browser task, so clearing tabs doesn't reach them.
             context.getSystemService<ActivityManager>()?.appTasks

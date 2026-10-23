@@ -114,10 +114,10 @@ class FakeSettingsDataStore :
             store["appUsedSinceLastClear"] = value
         }
 
-    override var tabsClearedTimestamp: Long
-        get() = store["tabsClearedTimestamp"] as Long? ?: 0L
+    override var tabsClearedCount: Int
+        get() = store["tabsClearedCount"] as Int? ?: 0
         set(value) {
-            store["tabsClearedTimestamp"] = value
+            store["tabsClearedCount"] = value
         }
 
     override var automaticallyClearWhatOption: ClearWhatOption

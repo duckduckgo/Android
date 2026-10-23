@@ -433,6 +433,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         observeBrowserModeChanges()
 
         viewModel.awaitClearDataFinishedNotification()
+        if (savedInstanceState == null && !intent.launchedFromRecents && dataClearer.dataClearerState.value != ApplicationClearDataState.FINISHED) {
+            dataClearer.deferredQuery = intent.intentText
+        }
         initializeServiceWorker()
 
         intent?.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
@@ -674,7 +677,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         } else {
             logcat(INFO) { "Automatic data clearer not yet finished, so deferring processing of intent" }
             lastIntent = intent
-            dataClearer.deferredQuery = intent.getStringExtra(EXTRA_TEXT)
+            dataClearer.deferredQuery = intent.intentText
         }
     }
 
@@ -1450,7 +1453,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 logcat(INFO) { "There was a deferred intent to process; handling now" }
                 launchNewSearchOrQuery(lastIntent)
                 lastIntent = null
-                dataClearer.deferredQuery = null
                 return
             }
 

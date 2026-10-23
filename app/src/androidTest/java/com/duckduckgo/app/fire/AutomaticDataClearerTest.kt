@@ -42,6 +42,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -350,6 +351,18 @@ class AutomaticDataClearerTest {
         verify(clearDataAction).killAndRestartProcess(notifyDataCleared = true)
     }
 
+    @UiThreadTest
+    @Test
+    fun whenAutomaticClearFinishesWithoutRestartThenDeferredQueryIsDropped() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(any(), any(), any())).thenReturn(false)
+
+        testee.deferredQuery = "https://example.com"
+        testee.onAppForegroundedAsync()
+
+        assertNull(testee.deferredQuery)
+    }
+
     @Test
     fun whenAutomaticClearNeedsRestartWithDeferredQueryThenQueryIsPassedToRestart() = runTest {
         whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
@@ -363,6 +376,7 @@ class AutomaticDataClearerTest {
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
 
         verify(clearDataAction).killAndRestartProcess(notifyDataCleared = true, query = "https://example.com")
+        assertNull(testee.deferredQuery)
     }
 
     @Test

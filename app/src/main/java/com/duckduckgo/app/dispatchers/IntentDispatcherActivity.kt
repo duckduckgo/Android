@@ -32,6 +32,7 @@ import com.duckduckgo.app.dispatchers.IntentDispatcherViewModel.ViewState
 import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.pixels.AppReturnPixelSender
 import com.duckduckgo.app.pixels.toPixelLaunchSourceValue
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.customtabs.api.CustomTabsSessionRegistry
@@ -55,6 +56,9 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var appReturnPixelSender: AppReturnPixelSender
+
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Sanitize before super.onCreate so lifecycle callbacks dispatched from there don't trip over
@@ -121,6 +125,7 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
                 isExternal = isExternal,
                 clientPackage = clientPackage,
                 referrerPackage = referrerPackage,
+                tabsClearedCount = settingsDataStore.tabsClearedCount,
             ),
         )
 
