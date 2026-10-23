@@ -133,6 +133,7 @@ internal fun DaxButton(
     colors: DaxButtonColors,
     rippleConfiguration: RippleConfiguration,
     modifier: Modifier = Modifier,
+    textModifier: Modifier = Modifier,
     size: DaxButtonSize = DaxButtonSize.Small,
     leadingIconPainter: Painter? = null,
     border: BorderStroke? = null,
@@ -168,6 +169,7 @@ internal fun DaxButton(
         DaxButtonText(
             text = text,
             color = contentColor,
+            modifier = textModifier,
         )
     }
 }
