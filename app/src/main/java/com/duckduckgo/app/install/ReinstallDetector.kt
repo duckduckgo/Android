@@ -77,6 +77,7 @@ class RealReinstallDetector @Inject constructor(
     private val persistentStorage: PersistentStorage,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
+    private val outOfSightLaunchDetector: OutOfSightLaunchDetector,
 ) : ReinstallDetector, MainProcessLifecycleObserver {
 
     private val sdkInt: Int = Build.VERSION.SDK_INT
@@ -110,6 +111,10 @@ class RealReinstallDetector @Inject constructor(
     }
 
     override suspend fun isAppReinstall(): Boolean = withContext(dispatcherProvider.io()) {
+        // The store wipes this launch's data but not the Downloads folder or Block Store, so checking now would leave a marker
+        // that makes the user's first real launch look like a reinstall
+        if (outOfSightLaunchDetector.isOutOfSightLaunch) return@withContext false
+
         savedAppReinstallValueOrNull() ?: reinstallCheckMutex.withLock {
             // The caller holding the lock can be cancelled, e.g. when onboarding's screen closes. Finishing the check keeps
             // creating the marker and saving the answer together, so the next caller can't find one without the other.
@@ -169,7 +174,7 @@ class RealReinstallDetector @Inject constructor(
     // like a reinstall. Holding the check's lock means a check still saving its answer has finished, and recorded whether the
     // save failed. Released before the Block Store call, so callers don't wait for the write.
     private suspend fun canStoreInstallSeenFlag(): Boolean = reinstallCheckMutex.withLock {
-        val answerSaved = savedAppReinstallValueOrNull() != null && !answerSaveFailed
+        val answerSaved = savedAppReinstallValueOrNull() != null && !answerSaveFailed && !outOfSightLaunchDetector.isOutOfSightLaunch
         val flagStored = runCatching { preferences.getBoolean(INSTALL_SEEN_FLAG_STORED_KEY, false) }.getOrDefault(false)
         answerSaved && !flagStored
     }

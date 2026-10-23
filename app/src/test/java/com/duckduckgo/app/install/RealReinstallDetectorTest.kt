@@ -22,6 +22,7 @@ import android.content.pm.InstallSourceInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Environment
+import android.view.Display
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
@@ -77,6 +78,7 @@ class RealReinstallDetectorTest {
     private val pixel: Pixel = mock()
     private val packageManager: PackageManager = mock()
     private val context: Context = mock()
+    private val outOfSightLaunchDetector = FakeOutOfSightLaunchDetector()
     private val ddgDownloadsDirectory = File(
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
         "DuckDuckGo",
@@ -392,6 +394,72 @@ class RealReinstallDetectorTest {
 
     @Test
     @Config(sdk = [34])
+    fun whenLaunchedOutOfSightThenIsNotReinstallAndNothingIsCreatedOrSaved() = runTest {
+        outOfSightLaunchDetector.isOutOfSightLaunch = true
+        val preferences = InMemorySharedPreferences()
+
+        assertFalse(reinstallDetectorWith(preferences).isAppReinstall())
+
+        assertFalse(ddgDownloadsDirectory.exists())
+        assertFalse(preferences.contains(APP_REINSTALLED_KEY))
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenLaunchedOutOfSightAndAFolderAlreadyExistsThenItIsNotReadAndNothingIsSaved() = runTest {
+        outOfSightLaunchDetector.isOutOfSightLaunch = true
+        givenDdgDownloadsDirectoryLastChangedAt(System.currentTimeMillis() - ONE_DAY_MS)
+        val preferences = InMemorySharedPreferences()
+
+        assertFalse(reinstallDetectorWith(preferences).isAppReinstall())
+
+        assertFalse(preferences.contains(APP_REINSTALLED_KEY))
+        verify(pixel, never()).fire(eq(ReinstallDetectorPixelName.RECENT_FOLDER), any(), any(), any())
+    }
+
+    @Test
+    @Config(sdk = [29])
+    fun whenBelowAndroid11AndLaunchedOutOfSightThenAppStartDoesNotTouchBlockStore() = runTest {
+        outOfSightLaunchDetector.isOutOfSightLaunch = true
+        val preferences = InMemorySharedPreferences()
+        val reinstallDetector = reinstallDetectorWith(
+            preferences,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            appCoroutineScope = coroutineTestRule.testScope,
+        )
+
+        reinstallDetector.onCreate(mock())
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(0, persistentStorage.retrieveCalls)
+        assertEquals(0, persistentStorage.storeCalls)
+        assertFalse(preferences.contains(APP_REINSTALLED_KEY))
+    }
+
+    @Test
+    @Config(sdk = [29])
+    fun whenBelowAndroid11AndOutOfSightLaunchIsSeenDuringTheCheckThenTheFlagIsNotWritten() = runTest {
+        val preferences = InMemorySharedPreferences()
+        val reinstallDetector = reinstallDetectorWith(
+            preferences,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            appCoroutineScope = coroutineTestRule.testScope,
+        )
+        persistentStorage.retrieveGate = CompletableDeferred()
+
+        reinstallDetector.onCreate(mock())
+        coroutineTestRule.testScope.testScheduler.runCurrent()
+        // The launch activity sees the display while app start is still reading Block Store
+        outOfSightLaunchDetector.isOutOfSightLaunch = true
+        persistentStorage.retrieveGate?.complete(Unit)
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(1, persistentStorage.retrieveCalls)
+        assertEquals(0, persistentStorage.storeCalls)
+    }
+
+    @Test
+    @Config(sdk = [34])
     fun whenAndroidVersionIs11OrAboveThenAppStartDoesNothing() = runTest {
         val preferences = InMemorySharedPreferences()
         val reinstallDetector = reinstallDetectorWith(
@@ -673,6 +741,7 @@ class RealReinstallDetectorTest {
             persistentStorage = persistentStorage,
             appCoroutineScope = appCoroutineScope,
             pixel = pixel,
+            outOfSightLaunchDetector = outOfSightLaunchDetector,
         )
     }
 
@@ -755,6 +824,13 @@ class RealReinstallDetectorTest {
             }
             return true
         }
+    }
+
+    private class FakeOutOfSightLaunchDetector : OutOfSightLaunchDetector {
+        @Volatile
+        override var isOutOfSightLaunch: Boolean = false
+
+        override fun onLaunchDisplay(display: Display?): Boolean = false
     }
 
     private class FakePersistentStorage : PersistentStorage {
