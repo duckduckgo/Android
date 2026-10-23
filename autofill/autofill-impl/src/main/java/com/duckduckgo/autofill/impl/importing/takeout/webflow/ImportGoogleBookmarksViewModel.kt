@@ -64,7 +64,7 @@ class ImportGoogleBookmarksViewModel @AssistedInject constructor(
         // We don't want those to take us off the result screen.
         _viewState.update { current ->
             when (current.viewMode) {
-                is ViewMode.WebFlow, is ViewMode.WaitingForExport -> current.copy(viewMode = viewMode)
+                is ViewMode.WebFlowLoading, is ViewMode.WebFlow, is ViewMode.WaitingForExport -> current.copy(viewMode = viewMode)
                 is ViewMode.Success, is ViewMode.Error -> current
             }
         }
@@ -101,16 +101,17 @@ class ImportGoogleBookmarksViewModel @AssistedInject constructor(
         val result = when (val viewMode = viewState.value.viewMode) {
             is ViewMode.Success -> ImportGoogleBookmarkResult.Success(viewMode.importedCount)
             is ViewMode.Error -> ImportGoogleBookmarkResult.Error(viewMode.reason)
-            is ViewMode.WebFlow, is ViewMode.WaitingForExport -> return
+            is ViewMode.WebFlowLoading, is ViewMode.WebFlow, is ViewMode.WaitingForExport -> return
         }
         viewModelScope.launch { _commands.send(Exit(result)) }
     }
 
     data class ViewState(
-        val viewMode: ViewMode = ViewMode.WebFlow,
+        val viewMode: ViewMode = ViewMode.WebFlowLoading,
     )
 
     sealed interface ViewMode {
+        data object WebFlowLoading : ViewMode
         data object WebFlow : ViewMode
         data object WaitingForExport : ViewMode
         data class Success(val importedCount: Int) : ViewMode
