@@ -26,6 +26,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityImportGoogleBookmarksWebflowBinding
+import com.duckduckgo.autofill.impl.importing.AutofillImportRedesignFeature
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksViewModel.Command
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksViewModel.ViewMode
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksViewModel.ViewState
@@ -59,20 +60,36 @@ class ImportGoogleBookmarksWebFlowActivity :
     @Inject
     lateinit var importViewModelFactory: ImportGoogleBookmarksViewModel.Factory
 
+    @Inject
+    lateinit var importRedesignFeature: AutofillImportRedesignFeature
+
     val binding: ActivityImportGoogleBookmarksWebflowBinding by viewBinding()
 
     private val viewModel by viewModels<ImportGoogleBookmarksViewModel> {
         ImportGoogleBookmarksViewModel.Factory.Provider(importViewModelFactory, getLaunchSource())
     }
 
+    private var isRedesignEnabled = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // we keep the design the flow started with, so a remote flag update can't switch the UI mid-import after recreation
+        isRedesignEnabled = if (savedInstanceState?.containsKey(KEY_IS_REDESIGN_ENABLED) == true) {
+            savedInstanceState.getBoolean(KEY_IS_REDESIGN_ENABLED)
+        } else {
+            importRedesignFeature.self().isEnabled()
+        }
         enableTransparentEdgeToEdge()
         setContentView(binding.root)
         configureToolbar()
         configureEdgeToEdgeInsets()
         configureResultListeners()
         observeViewModel()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(KEY_IS_REDESIGN_ENABLED, isRedesignEnabled)
     }
 
     private fun configureEdgeToEdgeInsets() {
@@ -208,5 +225,6 @@ class ImportGoogleBookmarksWebFlowActivity :
         private const val RESULT_TAG = "result"
         private const val PROGRESS_OVERLAY_TAG = "progress_overlay"
         private const val UNKNOWN_LAUNCH_SOURCE = "unknown"
+        private const val KEY_IS_REDESIGN_ENABLED = "is_redesign_enabled"
     }
 }
