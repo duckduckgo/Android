@@ -1,6 +1,6 @@
 {
     "android-duckai-response-wait": {
-        "description": "Captures how long a user waits on a Duck.ai response in the full Duck.ai tab, whether they leave while it is pending, and whether they come back to it.",
+        "description": "Captures how long a user waits on a Duck.ai response in the full Duck.ai tab, whether they leave while it is pending, and whether they come back to it. Not sampled: every flow is recorded.",
         "owners": ["LukasPaczos"],
         "meta": {
             "type": "android-duckai-response-wait",

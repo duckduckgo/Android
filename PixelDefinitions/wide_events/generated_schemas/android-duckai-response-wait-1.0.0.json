@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "description": "Captures how long a user waits on a Duck.ai response in the full Duck.ai tab, whether they leave while it is pending, and whether they come back to it.",
+    "description": "Captures how long a user waits on a Duck.ai response in the full Duck.ai tab, whether they leave while it is pending, and whether they come back to it. Not sampled: every flow is recorded.",
     "$comment": "{\"owners\":[\"LukasPaczos\"]}",
     "type": "object",
     "required": ["meta", "global", "feature", "app"],
@@ -24,7 +24,7 @@
                 },
                 "version": {
                     "type": "string",
-                    "description": "The version of the app sending the event. Release builds are X.Y.Z; internal and nightly builds append the build number and channel suffix.",
+                    "description": "The version of the app when the event's flow started. Release builds are X.Y.Z; internal and nightly builds append the build number and channel suffix.",
                     "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+(-[a-z]+)?)?$"
                 },
                 "form_factor": { "type": "string", "description": "The form factor of the current device", "enum": ["phone", "tablet"] },
