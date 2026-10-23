@@ -408,6 +408,31 @@ class WideEventRepositoryTest {
         }
 
     @Test
+    fun `when inserting wide event with process-start cleanupPolicy, its owner is stored`() =
+        runTest {
+            val policy =
+                WideEventRepository.CleanupPolicy.OnProcessStart(
+                    ownerProcessName = ":vpn",
+                    ignoreIfIntervalTimeoutPresent = true,
+                    status = WideEventRepository.WideEventStatus.UNKNOWN,
+                    metadata = emptyMap(),
+                )
+
+            val eventId =
+                wideEventRepository.insertWideEvent(
+                    name = "cleanup_event",
+                    flowEntryPoint = null,
+                    metadata = emptyMap(),
+                    cleanupPolicy = policy,
+                    metaType = "android-test-event",
+                    metaVersion = "1.0.0",
+                )
+
+            val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+            assertEquals(policy, event.cleanupPolicy)
+        }
+
+    @Test
     fun `when starting an interval, it is tracked correctly`() =
         runTest {
             val eventId =

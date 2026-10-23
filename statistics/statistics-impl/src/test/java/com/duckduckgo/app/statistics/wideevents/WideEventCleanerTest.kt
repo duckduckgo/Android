@@ -83,6 +83,7 @@ class WideEventCleanerTest {
                     flowEntryPoint = null,
                     cleanupPolicy =
                     WideEventRepository.CleanupPolicy.OnProcessStart(
+                        ownerProcessName = "main",
                         ignoreIfIntervalTimeoutPresent = false,
                         status = WideEventRepository.WideEventStatus.CANCELLED,
                         metadata = mapOf("reason" to "test"),
@@ -120,6 +121,7 @@ class WideEventCleanerTest {
                     flowEntryPoint = null,
                     cleanupPolicy =
                     WideEventRepository.CleanupPolicy.OnProcessStart(
+                        ownerProcessName = "main",
                         ignoreIfIntervalTimeoutPresent = true,
                         status = WideEventRepository.WideEventStatus.CANCELLED,
                         metadata = mapOf("reason" to "test"),
@@ -162,6 +164,7 @@ class WideEventCleanerTest {
                     flowEntryPoint = null,
                     cleanupPolicy =
                     WideEventRepository.CleanupPolicy.OnProcessStart(
+                        ownerProcessName = "main",
                         ignoreIfIntervalTimeoutPresent = false,
                         status = WideEventRepository.WideEventStatus.CANCELLED,
                         metadata = mapOf("reason" to "test"),

@@ -31,6 +31,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -56,12 +57,17 @@ class WideEventClientTest {
 
     private val fakeRandom = FakeRandom()
 
+    private companion object {
+        const val PROCESS_NAME = ":vpn"
+    }
+
     private val wideEventClient =
         WideEventClientImpl(
             wideEventRepository = wideEventRepository,
             wideEventFeature = lazy { wideEventFeature },
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             random = fakeRandom,
+            processName = PROCESS_NAME,
         )
 
     @Test
@@ -86,6 +92,7 @@ class WideEventClientTest {
                 flowEntryPoint = flowEntryPoint,
                 metadata = mapOf("free_trial_eligible" to "true", "user_type" to "premium"),
                 cleanupPolicy = WideEventRepository.CleanupPolicy.OnProcessStart(
+                    ownerProcessName = PROCESS_NAME,
                     ignoreIfIntervalTimeoutPresent = true,
                     status = WideEventRepository.WideEventStatus.UNKNOWN,
                     metadata = emptyMap(),
@@ -94,6 +101,20 @@ class WideEventClientTest {
                 metaType = "android-subscription-purchase",
                 metaVersion = "1.0.0",
             )
+        }
+
+    @Test
+    fun `when flowStart called with process-start policy then the current process owns the event`() =
+        runTest {
+            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any(), anyOrNull(), any()))
+                .thenReturn(1L)
+
+            wideEventClient.flowStart(name = "flow", cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false))
+
+            val policyCaptor = argumentCaptor<WideEventRepository.CleanupPolicy>()
+            verify(wideEventRepository).insertWideEvent(any(), anyOrNull(), any(), policyCaptor.capture(), any(), anyOrNull(), any())
+            val policy = policyCaptor.firstValue as WideEventRepository.CleanupPolicy.OnProcessStart
+            assertEquals(PROCESS_NAME, policy.ownerProcessName)
         }
 
     @Test

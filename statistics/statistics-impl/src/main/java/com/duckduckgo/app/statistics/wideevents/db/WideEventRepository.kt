@@ -101,6 +101,7 @@ interface WideEventRepository {
         abstract val metadata: Map<String, String>
 
         data class OnProcessStart(
+            val ownerProcessName: String,
             val ignoreIfIntervalTimeoutPresent: Boolean,
             override val status: WideEventStatus,
             override val metadata: Map<String, String> = emptyMap(),
