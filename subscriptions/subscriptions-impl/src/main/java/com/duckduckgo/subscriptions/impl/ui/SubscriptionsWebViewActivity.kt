@@ -652,9 +652,6 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 onPurchaseSuccess(subscriptionEventData = null, launchOnboarding = false)
             }
             is PurchaseStateView.Success -> {
-                if (!purchaseState.isPlanSwitch) {
-                    pixelSender.reportPurchaseSuccessOrigin(params.origin, purchaseState.isFreeTrial)
-                }
                 onPurchaseSuccess(purchaseState.subscriptionEventData, purchaseState.launchOnboarding)
             }
             is PurchaseStateView.Recovered -> {
