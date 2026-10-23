@@ -42,6 +42,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -256,7 +257,7 @@ class AutomaticDataClearerTest {
         testee.onAppForegroundedAsync()
 
         verify(dataClearing).clearDataUsingAutomaticFireOptions(false)
-        verify(clearDataAction, never()).killAndRestartProcess(any(), any(), any())
+        verify(clearDataAction, never()).killAndRestartProcess(any(), any(), any(), anyOrNull())
     }
 
     @Test
@@ -272,6 +273,49 @@ class AutomaticDataClearerTest {
 
         verify(clearDataAction).setAppUsedSinceLastClearFlag(false)
         verify(clearDataAction).killAndRestartProcess(notifyDataCleared = true)
+    }
+
+    @Test
+    fun whenAutomaticClearNeedsRestartWithDeferredQueryThenQueryIsPassedToRestart() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(false, true, false)).thenReturn(true)
+        whenever(dataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(true)
+
+        testee.isFreshAppLaunch = false
+        testee.deferredQuery = "https://example.com"
+        testee.onAppForegroundedAsync()
+        Thread.sleep(200)
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+
+        verify(clearDataAction).killAndRestartProcess(notifyDataCleared = true, query = "https://example.com")
+    }
+
+    @Test
+    fun whenBrowserOpensFromCustomTabWhileClearIsPendingThenRestartKeepsTheQuery() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(false, true, false)).thenReturn(true)
+        whenever(dataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(true)
+        lateinit var customTab: CustomTabActivity
+        lateinit var dispatcher: IntentDispatcherActivity
+        InstrumentationRegistry.getInstrumentation().runOnMainSync {
+            customTab = CustomTabActivity()
+            dispatcher = IntentDispatcherActivity()
+        }
+
+        testee.isFreshAppLaunch = false
+        testee.onActivityStarted(customTab)
+        testee.onOpen(isFreshLaunch = false)
+        testee.onActivityCreated(dispatcher, null)
+        testee.onActivityStarted(dispatcher)
+        InstrumentationRegistry.getInstrumentation().runOnMainSync { testee.onActivityStarted(Activity()) }
+        testee.deferredQuery = "https://example.com"
+        testee.onActivityStopped(customTab)
+        testee.onActivityStopped(dispatcher)
+        testee.onActivityDestroyed(dispatcher)
+        Thread.sleep(200)
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+
+        verify(clearDataAction).killAndRestartProcess(notifyDataCleared = true, query = "https://example.com")
     }
 
     @Test

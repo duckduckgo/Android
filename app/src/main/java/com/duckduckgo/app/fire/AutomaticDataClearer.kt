@@ -59,6 +59,7 @@ import kotlin.coroutines.CoroutineContext
 interface DataClearer {
     val dataClearerState: LiveData<ApplicationClearDataState>
     var isFreshAppLaunch: Boolean
+    var deferredQuery: String?
 }
 
 @ContributesBinding(
@@ -96,6 +97,8 @@ class AutomaticDataClearer @Inject constructor(
     }
 
     override var isFreshAppLaunch = true
+
+    override var deferredQuery: String? = null
 
     // Opening a custom tab doesn't count as opening the app, so the clear waits until only browser activities are in front.
     // Not just the last started activity: a dispatcher is transparent, so the browser task underneath it starts too, and
@@ -282,7 +285,7 @@ class AutomaticDataClearer @Inject constructor(
 
                 // need a moment to draw background color (reduces flickering UX)
                 Handler(Looper.getMainLooper()).postDelayed(100) {
-                    clearDataAction.killAndRestartProcess(notifyDataCleared = true)
+                    clearDataAction.killAndRestartProcess(notifyDataCleared = true, query = deferredQuery)
                 }
             } else {
                 postDataClearerState(FINISHED)

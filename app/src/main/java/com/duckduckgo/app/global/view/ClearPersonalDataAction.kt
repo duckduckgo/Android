@@ -106,8 +106,14 @@ interface ClearDataAction {
      * @param notifyDataCleared whether to notify that data has been cleared
      * @param enableTransitionAnimation whether to enable transition animation during restart
      * @param deletedTabCount number of tabs that were deleted (shown in the snackbar)
+     * @param query opened in the browser after the restart
      */
-    fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean = true, deletedTabCount: Int = 0)
+    fun killAndRestartProcess(
+        notifyDataCleared: Boolean,
+        enableTransitionAnimation: Boolean = true,
+        deletedTabCount: Int = 0,
+        query: String? = null,
+    )
 }
 
 class ClearPersonalDataAction(
@@ -133,9 +139,9 @@ class ClearPersonalDataAction(
     private val sitePreferencesDataClearer: SitePreferencesDataClearer,
 ) : ClearDataAction {
 
-    override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean, deletedTabCount: Int) {
+    override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean, deletedTabCount: Int, query: String?) {
         logcat(INFO) { "Restarting process" }
-        FireActivity.triggerRestart(context, notifyDataCleared, enableTransitionAnimation, deletedTabCount)
+        FireActivity.triggerRestart(context, notifyDataCleared, enableTransitionAnimation, deletedTabCount, query)
     }
 
     override fun killProcess() {

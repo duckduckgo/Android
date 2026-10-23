@@ -674,6 +674,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         } else {
             logcat(INFO) { "Automatic data clearer not yet finished, so deferring processing of intent" }
             lastIntent = intent
+            dataClearer.deferredQuery = intent.getStringExtra(EXTRA_TEXT)
         }
     }
 
@@ -1449,6 +1450,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 logcat(INFO) { "There was a deferred intent to process; handling now" }
                 launchNewSearchOrQuery(lastIntent)
                 lastIntent = null
+                dataClearer.deferredQuery = null
                 return
             }
 
