@@ -58,7 +58,6 @@ class DuckAiResponseWaitFlowStoreTest {
                 left = true,
                 returned = false,
                 done = true,
-                result = "ready",
                 readyWhileAwayRecorded = true,
                 readyToReturnRunning = true,
                 chatSwitchedAway = false,
@@ -70,7 +69,6 @@ class DuckAiResponseWaitFlowStoreTest {
                 left = false,
                 returned = true,
                 done = false,
-                result = "unknown",
                 readyWhileAwayRecorded = false,
                 readyToReturnRunning = false,
                 chatSwitchedAway = true,
@@ -96,7 +94,7 @@ class DuckAiResponseWaitFlowStoreTest {
 
     @Test
     fun `load without chatSwitchedAway defaults it to false`() = runTest {
-        val json = """[{"flowId":1,"tabId":"t1","left":true,"returned":false,"done":false,"result":"unknown",""" +
+        val json = """[{"flowId":1,"tabId":"t1","left":true,"returned":false,"done":false,""" +
             """"readyWhileAwayRecorded":false,"readyToReturnRunning":false}]"""
         dataStore.edit { it[stringPreferencesKey("duckai_response_wait_open_flows")] = json }
 

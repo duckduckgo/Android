@@ -300,8 +300,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         flow.chatSwitchedAway = false
         if (!flow.returned) {
             flow.returned = true
-            val stateOnReturn = if (flow.pageReloaded) STATE_PAGE_RELOADED else flow.lastState
-            wideEventClient.flowStep(flow.flowId, STEP_RETURNED, metadata = mapOf(KEY_RESPONSE_STATE_ON_RETURN to stateOnReturn))
+            wideEventClient.flowStep(flow.flowId, STEP_RETURNED)
             wideEventClient.intervalEnd(flow.flowId, INTERVAL_LEAVE_TO_RETURN)
         }
         if (flow.readyToReturnRunning) {
@@ -342,7 +341,6 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         put(KEY_IMAGE_GENERATION, (selectedTool == TOOL_GENERATE_IMAGE).toString())
         put(KEY_WEB_SEARCH, (selectedTool == TOOL_WEB_SEARCH).toString())
         put(KEY_STATUS_REASON, REASON_NOT_RETURNED)
-        put(KEY_RESPONSE_RESULT, RESULT_UNKNOWN)
     }
 
     private suspend fun applyResponseState(tabId: String, status: String) {
@@ -363,18 +361,12 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
                 return
             }
             status in LOADING_STATUSES || status.startsWith(START_STREAM_PREFIX) -> {
-                flow.lastState = STATE_LOADING
-                flow.awaitingReloadedStream = false
                 flow.awaitingFirstStream = false
-                if (flow.result != RESULT_STOPPED) flow.done = false
+                flow.done = false
                 return
             }
             status == STATUS_READY || status == STATUS_ERROR -> {
                 if (flow.awaitingFirstStream && status == STATUS_READY) return
-                flow.lastState = status
-                // The reloaded page reports ready even for a response that failed before the process died.
-                val keepsError = flow.awaitingReloadedStream && flow.result == RESULT_ERROR && status == STATUS_READY
-                if (flow.result != RESULT_STOPPED && !keepsError) flow.result = status
                 flow.done = true
             }
             else -> return
@@ -383,20 +375,16 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         if (!flow.left) {
             finish(flow, REASON_WATCHED)
         } else if (!flow.onScreen && status == STATUS_READY && !flow.readyWhileAwayRecorded) {
-            // shortcut: an error while away has no step to carry it, so a flow that ends not_returned keeps
-            // response_result=unknown; add a dedicated step if the data turns out to need it.
             flow.readyWhileAwayRecorded = true
             flow.readyToReturnRunning = true
-            wideEventClient.flowStep(flow.flowId, STEP_READY_WHILE_AWAY, metadata = mapOf(KEY_RESPONSE_RESULT to RESULT_READY))
+            wideEventClient.flowStep(flow.flowId, STEP_READY_WHILE_AWAY)
             wideEventClient.intervalStart(flow.flowId, INTERVAL_READY_TO_RETURN, buckets = LEAVE_BUCKETS)
         }
     }
 
     private suspend fun applyStop(tabId: String) {
         val flow = flows.firstOrNull { it.onScreen && it.tabId == tabId } ?: return
-        flow.result = RESULT_STOPPED
-        flow.done = true
-        if (!flow.left) finish(flow, REASON_WATCHED)
+        finish(flow, REASON_STOPPED)
     }
 
     private suspend fun finish(flow: ResponseWait, statusReason: String) {
@@ -404,9 +392,9 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         wideEventClient.flowFinish(
             wideEventId = flow.flowId,
             status = FlowStatus.Success,
-            metadata = mapOf(KEY_STATUS_REASON to statusReason, KEY_RESPONSE_RESULT to flow.result),
+            metadata = mapOf(KEY_STATUS_REASON to statusReason),
         )
-        logcat(tag = TAG) { "Duck.ai response wait finished: reason=$statusReason, result=${flow.result}" }
+        logcat(tag = TAG) { "Duck.ai response wait finished: reason=$statusReason" }
     }
 
     private suspend fun abort(flow: ResponseWait) {
@@ -462,19 +450,11 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         var left = false
         var returned = false
         var done = false
-        var result = RESULT_UNKNOWN
-        var lastState = STATE_LOADING
         var readyWhileAwayRecorded = false
         var readyToReturnRunning = false
 
         // Set once the flow's tab shows a different chat, so tab-keyed matching and response states stop applying to it.
         var chatSwitchedAway = false
-
-        // Restored after process death: the reloaded page starts from scratch, so its state on return says nothing yet.
-        var pageReloaded = false
-
-        // Restored and no stream seen since, so a ready from the reloaded page can't be trusted to replace an error.
-        var awaitingReloadedStream = false
 
         fun toPersisted() = PersistedResponseWaitFlow(
             flowId = flowId,
@@ -483,7 +463,6 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
             left = left,
             returned = returned,
             done = done,
-            result = result,
             readyWhileAwayRecorded = readyWhileAwayRecorded,
             readyToReturnRunning = readyToReturnRunning,
             chatSwitchedAway = chatSwitchedAway,
@@ -497,12 +476,9 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         it.left = left
         it.returned = returned
         it.done = done
-        it.result = result
         it.readyWhileAwayRecorded = readyWhileAwayRecorded
         it.readyToReturnRunning = readyToReturnRunning
         it.chatSwitchedAway = chatSwitchedAway
-        it.pageReloaded = true
-        it.awaitingReloadedStream = true
     }
 
     private companion object {
@@ -515,9 +491,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         const val KEY_IMAGE_GENERATION = "user_requested_image_generation"
         const val KEY_WEB_SEARCH = "user_requested_web_search"
         const val KEY_STATUS_REASON = "status_reason"
-        const val KEY_RESPONSE_RESULT = "response_result"
         const val KEY_LEFT_VIA = "left_via"
-        const val KEY_RESPONSE_STATE_ON_RETURN = "response_state_on_return"
 
         const val STEP_LEFT = "left"
         const val STEP_RETURNED = "returned"
@@ -531,14 +505,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         const val REASON_WATCHED = "watched"
         const val REASON_RETURNED = "returned"
         const val REASON_NOT_RETURNED = "not_returned"
-
-        const val RESULT_READY = "ready"
-        const val RESULT_ERROR = "error"
-        const val RESULT_STOPPED = "stopped"
-        const val RESULT_UNKNOWN = "unknown"
-
-        const val STATE_LOADING = "loading"
-        const val STATE_PAGE_RELOADED = "page_reloaded"
+        const val REASON_STOPPED = "stopped"
 
         const val LEFT_VIA_APP_BACKGROUNDED = "app_backgrounded"
         const val LEFT_VIA_BACK_OR_CLOSE = "back_or_close"

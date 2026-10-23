@@ -114,7 +114,6 @@ class DuckAiResponseWaitWideEventTest {
         left: Boolean = true,
         returned: Boolean = false,
         done: Boolean = false,
-        result: String = "unknown",
         chatSwitchedAway: Boolean = false,
     ) = PersistedResponseWaitFlow(
         flowId = flowId,
@@ -123,7 +122,6 @@ class DuckAiResponseWaitWideEventTest {
         left = left,
         returned = returned,
         done = done,
-        result = result,
         readyWhileAwayRecorded = false,
         readyToReturnRunning = false,
         chatSwitchedAway = chatSwitchedAway,
@@ -168,7 +166,6 @@ class DuckAiResponseWaitWideEventTest {
                     "user_requested_image_generation" to "false",
                     "user_requested_web_search" to "true",
                     "status_reason" to "not_returned",
-                    "response_result" to "unknown",
                 ),
             ),
             cleanupPolicy = eq(CleanupPolicy.OnTimeout(duration = 24.hours, flowStatus = FlowStatus.Failure(reason = "not_returned"))),
@@ -192,7 +189,6 @@ class DuckAiResponseWaitWideEventTest {
                     "user_requested_image_generation" to "false",
                     "user_requested_web_search" to "false",
                     "status_reason" to "not_returned",
-                    "response_result" to "unknown",
                 ),
             ),
             cleanupPolicy = any(),
@@ -232,7 +228,7 @@ class DuckAiResponseWaitWideEventTest {
     }
 
     @Test
-    fun `when response ready without leaving then finishes SUCCESS watched with response_result ready`() = runTest {
+    fun `when response ready without leaving then finishes SUCCESS watched`() = runTest {
         promptInChat()
 
         testee.onResponseState("t1", "ready")
@@ -241,7 +237,7 @@ class DuckAiResponseWaitWideEventTest {
         verify(wideEventClient).flowFinish(
             eq(1L),
             eq(FlowStatus.Success),
-            eq(mapOf("status_reason" to "watched", "response_result" to "ready")),
+            eq(mapOf("status_reason" to "watched")),
         )
     }
 
@@ -262,12 +258,12 @@ class DuckAiResponseWaitWideEventTest {
         verify(wideEventClient, times(1)).flowFinish(
             eq(1L),
             eq(FlowStatus.Success),
-            eq(mapOf("status_reason" to "watched", "response_result" to "ready")),
+            eq(mapOf("status_reason" to "watched")),
         )
     }
 
     @Test
-    fun `when error arrives before the new prompt's stream then flow finishes watched with response_result error`() = runTest {
+    fun `when error arrives before the new prompt's stream then flow finishes watched`() = runTest {
         promptInChat(streamStarted = false)
 
         testee.onResponseState("t1", "error")
@@ -276,7 +272,7 @@ class DuckAiResponseWaitWideEventTest {
         verify(wideEventClient).flowFinish(
             eq(1L),
             eq(FlowStatus.Success),
-            eq(mapOf("status_reason" to "watched", "response_result" to "error")),
+            eq(mapOf("status_reason" to "watched")),
         )
     }
 
@@ -296,7 +292,7 @@ class DuckAiResponseWaitWideEventTest {
         verify(wideEventClient).flowFinish(
             eq(1L),
             eq(FlowStatus.Success),
-            eq(mapOf("status_reason" to "watched", "response_result" to "ready")),
+            eq(mapOf("status_reason" to "watched")),
         )
     }
 
@@ -312,7 +308,7 @@ class DuckAiResponseWaitWideEventTest {
     }
 
     @Test
-    fun `when stop tapped without leaving then finishes SUCCESS watched with response_result stopped`() = runTest {
+    fun `when stop tapped without leaving then finishes SUCCESS stopped`() = runTest {
         promptInChat()
 
         testee.onStopTapped("t1")
@@ -323,7 +319,7 @@ class DuckAiResponseWaitWideEventTest {
         verify(wideEventClient).flowFinish(
             eq(1L),
             eq(FlowStatus.Success),
-            eq(mapOf("status_reason" to "watched", "response_result" to "stopped")),
+            eq(mapOf("status_reason" to "stopped")),
         )
         verify(wideEventClient, times(1)).flowFinish(any(), any(), any())
     }
@@ -425,7 +421,7 @@ class DuckAiResponseWaitWideEventTest {
         verify(wideEventClient).flowFinish(
             eq(1L),
             eq(FlowStatus.Success),
-            eq(mapOf("status_reason" to "watched", "response_result" to "ready")),
+            eq(mapOf("status_reason" to "watched")),
         )
     }
 
@@ -443,7 +439,7 @@ class DuckAiResponseWaitWideEventTest {
         onChat("t1", null)
         idle()
 
-        verify(wideEventClient).flowStep(eq(1L), eq("returned"), eq(true), eq(mapOf("response_state_on_return" to "loading")))
+        verify(wideEventClient).flowStep(eq(1L), eq("returned"), eq(true), eq(emptyMap()))
     }
 
     @Test
@@ -526,7 +522,7 @@ class DuckAiResponseWaitWideEventTest {
         onChat("t1", "A")
         idle()
 
-        verify(wideEventClient).flowStep(eq(1L), eq("returned"), eq(true), eq(mapOf("response_state_on_return" to "loading")))
+        verify(wideEventClient).flowStep(eq(1L), eq("returned"), eq(true), eq(emptyMap()))
         verify(wideEventClient).intervalEnd(eq(1L), eq("leave_to_return_ms_bucketed"))
     }
 
@@ -538,7 +534,7 @@ class DuckAiResponseWaitWideEventTest {
         onChat("t2", "A")
         idle()
 
-        verify(wideEventClient).flowStep(eq(1L), eq("returned"), eq(true), eq(mapOf("response_state_on_return" to "loading")))
+        verify(wideEventClient).flowStep(eq(1L), eq("returned"), eq(true), eq(emptyMap()))
     }
 
     @Test
@@ -549,7 +545,7 @@ class DuckAiResponseWaitWideEventTest {
         testee.onResponseState("t1", "ready")
         idle()
 
-        verify(wideEventClient).flowStep(eq(1L), eq("response_ready_while_away"), eq(true), eq(mapOf("response_result" to "ready")))
+        verify(wideEventClient).flowStep(eq(1L), eq("response_ready_while_away"), eq(true), eq(emptyMap()))
         verify(wideEventClient).intervalStart(eq(1L), eq("ready_to_return_ms_bucketed"), isNull(), eq(LEAVE_BUCKETS))
         verify(wideEventClient, never()).intervalEnd(any(), eq("ready_to_return_ms_bucketed"))
 
@@ -557,11 +553,11 @@ class DuckAiResponseWaitWideEventTest {
         idle()
 
         verify(wideEventClient).intervalEnd(eq(1L), eq("ready_to_return_ms_bucketed"))
-        verify(wideEventClient).flowStep(eq(1L), eq("returned"), eq(true), eq(mapOf("response_state_on_return" to "ready")))
+        verify(wideEventClient).flowStep(eq(1L), eq("returned"), eq(true), eq(emptyMap()))
     }
 
     @Test
-    fun `when error while away then return records response_state_on_return error`() = runTest {
+    fun `when error while away then no response_ready_while_away step`() = runTest {
         promptInChat()
         switchToOtherSite()
         testee.onResponseState("t1", "error")
@@ -571,11 +567,10 @@ class DuckAiResponseWaitWideEventTest {
         idle()
 
         verify(wideEventClient, never()).flowStep(any(), eq("response_ready_while_away"), any(), any())
-        verify(wideEventClient).flowStep(eq(1L), eq("returned"), eq(true), eq(mapOf("response_state_on_return" to "error")))
     }
 
     @Test
-    fun `when stop tapped after returning then flow finishes returned with response_result stopped`() = runTest {
+    fun `when stop tapped after returning then flow finishes stopped`() = runTest {
         promptInChat()
         switchToOtherSite()
         onChat("t1", "A")
@@ -583,16 +578,13 @@ class DuckAiResponseWaitWideEventTest {
 
         testee.onStopTapped("t1")
         testee.onResponseState("t1", "ready")
-        idle()
-
-        verify(wideEventClient, never()).flowFinish(any(), any(), any())
-
         switchToOtherSite()
 
+        verify(wideEventClient).flowStep(eq(1L), eq("returned"), eq(true), eq(emptyMap()))
         verify(wideEventClient, times(1)).flowFinish(
             eq(1L),
             eq(FlowStatus.Success),
-            eq(mapOf("status_reason" to "returned", "response_result" to "stopped")),
+            eq(mapOf("status_reason" to "stopped")),
         )
     }
 
@@ -619,7 +611,7 @@ class DuckAiResponseWaitWideEventTest {
         verify(wideEventClient).flowFinish(
             eq(1L),
             eq(FlowStatus.Success),
-            eq(mapOf("status_reason" to "returned", "response_result" to "ready")),
+            eq(mapOf("status_reason" to "returned")),
         )
     }
 
@@ -641,7 +633,7 @@ class DuckAiResponseWaitWideEventTest {
         verify(wideEventClient).flowFinish(
             eq(1L),
             eq(FlowStatus.Success),
-            eq(mapOf("status_reason" to "returned", "response_result" to "ready")),
+            eq(mapOf("status_reason" to "returned")),
         )
         verify(wideEventClient, times(2)).flowStart(any(), anyOrNull(), any(), any(), any(), any())
         verify(wideEventClient).intervalStart(eq(2L), eq("prompt_to_leave_ms_bucketed"), isNull(), eq(PROMPT_BUCKETS))
@@ -661,7 +653,7 @@ class DuckAiResponseWaitWideEventTest {
         verify(wideEventClient).flowFinish(
             eq(1L),
             eq(FlowStatus.Success),
-            eq(mapOf("status_reason" to "returned", "response_result" to "ready")),
+            eq(mapOf("status_reason" to "returned")),
         )
         verify(wideEventClient, never()).flowStep(any(), eq("prompt_after_return"), any(), any())
     }
@@ -683,7 +675,7 @@ class DuckAiResponseWaitWideEventTest {
         verify(wideEventClient).flowFinish(
             eq(1L),
             eq(FlowStatus.Success),
-            eq(mapOf("status_reason" to "returned", "response_result" to "ready")),
+            eq(mapOf("status_reason" to "returned")),
         )
         assertEquals(emptyList<Long>(), flowStore.flows.map { it.flowId })
     }
@@ -726,7 +718,7 @@ class DuckAiResponseWaitWideEventTest {
         verify(wideEventClient).flowFinish(
             eq(2L),
             eq(FlowStatus.Success),
-            eq(mapOf("status_reason" to "watched", "response_result" to "ready")),
+            eq(mapOf("status_reason" to "watched")),
         )
         verify(wideEventClient, never()).flowFinish(eq(1L), any(), any())
     }
@@ -795,7 +787,7 @@ class DuckAiResponseWaitWideEventTest {
     @Test
     fun `when restarted with a returned and done flow then it finishes SUCCESS returned`() = runTest {
         restart(
-            stored = listOf(stored(returned = true, done = true, result = "ready")),
+            stored = listOf(stored(returned = true, done = true)),
             openIds = listOf(7L),
             landingTabId = null,
             landingUrl = null,
@@ -804,25 +796,25 @@ class DuckAiResponseWaitWideEventTest {
         verify(wideEventClient).flowFinish(
             eq(7L),
             eq(FlowStatus.Success),
-            eq(mapOf("status_reason" to "returned", "response_result" to "ready")),
+            eq(mapOf("status_reason" to "returned")),
         )
         assertEquals(emptyList<PersistedResponseWaitFlow>(), flowStore.flows)
     }
 
     @Test
-    fun `when restored flow returns then returned step has page_reloaded`() = runTest {
+    fun `when restored flow returns then returned step is recorded`() = runTest {
         restart(stored = listOf(stored()), openIds = listOf(7L), landingTabId = "t1", landingUrl = "$DUCK_AI_URL?chatID=A")
 
         verify(wideEventClient, never()).flowStart(any(), anyOrNull(), any(), any(), any(), any())
-        verify(wideEventClient).flowStep(eq(7L), eq("returned"), eq(true), eq(mapOf("response_state_on_return" to "page_reloaded")))
+        verify(wideEventClient).flowStep(eq(7L), eq("returned"), eq(true), eq(emptyMap()))
         verify(wideEventClient).intervalEnd(eq(7L), eq("leave_to_return_ms_bucketed"))
     }
 
     @Test
-    fun `when restored flow's chat opens in a different tab then returned step has page_reloaded`() = runTest {
+    fun `when restored flow's chat opens in a different tab then it counts as returned`() = runTest {
         restart(stored = listOf(stored(tabId = "t1")), openIds = listOf(7L), landingTabId = "t2", landingUrl = "$DUCK_AI_URL?chatID=A")
 
-        verify(wideEventClient).flowStep(eq(7L), eq("returned"), eq(true), eq(mapOf("response_state_on_return" to "page_reloaded")))
+        verify(wideEventClient).flowStep(eq(7L), eq("returned"), eq(true), eq(emptyMap()))
     }
 
     @Test
@@ -841,7 +833,7 @@ class DuckAiResponseWaitWideEventTest {
         verify(wideEventClient).flowFinish(
             eq(7L),
             eq(FlowStatus.Success),
-            eq(mapOf("status_reason" to "returned", "response_result" to "ready")),
+            eq(mapOf("status_reason" to "returned")),
         )
     }
 
@@ -915,49 +907,6 @@ class DuckAiResponseWaitWideEventTest {
     }
 
     @Test
-    fun `when restored flow had an error and reloaded page sends ready then it finishes with response_result error`() = runTest {
-        restart(
-            stored = listOf(stored(done = true, result = "error")),
-            openIds = listOf(7L),
-            landingTabId = "t1",
-            landingUrl = "$DUCK_AI_URL?chatID=A",
-        )
-
-        testee.onResponseState("t1", "ready")
-        testee.onClose()
-        idle()
-
-        verify(wideEventClient).flowFinish(
-            eq(7L),
-            eq(FlowStatus.Success),
-            eq(mapOf("status_reason" to "returned", "response_result" to "error")),
-        )
-    }
-
-    @Test
-    fun `when restored flow had an error and the stream resumes then ready replaces the error`() = runTest {
-        restart(
-            stored = listOf(stored(done = true, result = "error")),
-            openIds = listOf(7L),
-            landingTabId = "t1",
-            landingUrl = "$DUCK_AI_URL?chatID=A",
-        )
-
-        testee.onResponseState("t1", "ready")
-        testee.onResponseState("t1", "start_stream:restart_stream")
-        testee.onResponseState("t1", "loading")
-        testee.onResponseState("t1", "ready")
-        testee.onClose()
-        idle()
-
-        verify(wideEventClient).flowFinish(
-            eq(7L),
-            eq(FlowStatus.Success),
-            eq(mapOf("status_reason" to "returned", "response_result" to "ready")),
-        )
-    }
-
-    @Test
     fun `when restored tab-keyed flow was chat switched away then its tab showing Duck ai is not a return`() = runTest {
         restart(
             stored = listOf(stored(chatId = null, chatSwitchedAway = true)),
@@ -990,7 +939,7 @@ class DuckAiResponseWaitWideEventTest {
         duckChatFeature.sendDuckAiResponseWaitWideEvent().setRawStoredState(Toggle.State(enable = false))
 
         restart(
-            stored = listOf(stored(), stored(flowId = 8L, tabId = "t2", chatId = "B", returned = true, done = true, result = "ready")),
+            stored = listOf(stored(), stored(flowId = 8L, tabId = "t2", chatId = "B", returned = true, done = true)),
             openIds = listOf(7L, 8L),
             landingTabId = null,
             landingUrl = null,
@@ -1011,7 +960,7 @@ class DuckAiResponseWaitWideEventTest {
         testee.onLaunchLandingResolved("t1", "$DUCK_AI_URL?chatID=A")
         idle()
 
-        verify(wideEventClient).flowStep(eq(7L), eq("returned"), eq(true), eq(mapOf("response_state_on_return" to "page_reloaded")))
+        verify(wideEventClient).flowStep(eq(7L), eq("returned"), eq(true), eq(emptyMap()))
         assertEquals(listOf(7L), flowStore.flows.map { it.flowId })
     }
 

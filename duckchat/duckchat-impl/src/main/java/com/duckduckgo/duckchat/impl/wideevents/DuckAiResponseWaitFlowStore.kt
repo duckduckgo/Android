@@ -37,7 +37,6 @@ data class PersistedResponseWaitFlow(
     val left: Boolean,
     val returned: Boolean,
     val done: Boolean,
-    val result: String,
     val readyWhileAwayRecorded: Boolean,
     val readyToReturnRunning: Boolean,
     val chatSwitchedAway: Boolean,
@@ -79,7 +78,6 @@ class DuckAiResponseWaitFlowStoreImpl @Inject constructor(
         .put(LEFT, left)
         .put(RETURNED, returned)
         .put(DONE, done)
-        .put(RESULT, result)
         .put(READY_WHILE_AWAY_RECORDED, readyWhileAwayRecorded)
         .put(READY_TO_RETURN_RUNNING, readyToReturnRunning)
         .put(CHAT_SWITCHED_AWAY, chatSwitchedAway)
@@ -91,7 +89,6 @@ class DuckAiResponseWaitFlowStoreImpl @Inject constructor(
         left = getBoolean(LEFT),
         returned = getBoolean(RETURNED),
         done = getBoolean(DONE),
-        result = getString(RESULT),
         readyWhileAwayRecorded = getBoolean(READY_WHILE_AWAY_RECORDED),
         readyToReturnRunning = getBoolean(READY_TO_RETURN_RUNNING),
         chatSwitchedAway = optBoolean(CHAT_SWITCHED_AWAY, false),
@@ -106,7 +103,6 @@ class DuckAiResponseWaitFlowStoreImpl @Inject constructor(
         const val LEFT = "left"
         const val RETURNED = "returned"
         const val DONE = "done"
-        const val RESULT = "result"
         const val READY_WHILE_AWAY_RECORDED = "readyWhileAwayRecorded"
         const val READY_TO_RETURN_RUNNING = "readyToReturnRunning"
         const val CHAT_SWITCHED_AWAY = "chatSwitchedAway"
