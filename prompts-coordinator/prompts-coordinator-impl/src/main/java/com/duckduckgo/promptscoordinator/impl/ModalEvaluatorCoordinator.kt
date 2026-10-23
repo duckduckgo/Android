@@ -21,6 +21,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import com.duckduckgo.promptscoordinator.api.ModalTrigger
@@ -66,6 +67,7 @@ class ModalEvaluatorCoordinator @Inject constructor(
     private val promptsCoordinator: PromptsCoordinator,
     private val dispatchers: DispatcherProvider,
     private val promptExposureReporter: PromptExposureReporter,
+    private val customTabDetector: CustomTabDetector,
 ) : MainProcessLifecycleObserver, NewTabPageModalTrigger {
 
     private val evaluationMutex = Mutex()
@@ -85,6 +87,11 @@ class ModalEvaluatorCoordinator @Inject constructor(
 
     private suspend fun coordinateEvaluation(trigger: ModalTrigger) = evaluationMutex.withLock {
         logcat { "ModalEvaluatorCoordinator: Starting coordinated evaluation for trigger $trigger" }
+
+        if (customTabDetector.isCustomTab()) {
+            logcat { "ModalEvaluatorCoordinator: Evaluation skipped, a custom tab is showing" }
+            return@withLock
+        }
 
         var claimHeld = false
         val promptsCoordinatorEnabled = promptsCoordinator.isEnabled()

@@ -44,6 +44,7 @@ dependencies {
     implementation project(':feature-toggles-api')
     implementation project(':statistics-api')
     implementation project(':browser-api')
+    implementation project(':custom-tabs-api')
 
     ksp project(':codegen-ksp')
     implementation project(':codegen-annotations')
