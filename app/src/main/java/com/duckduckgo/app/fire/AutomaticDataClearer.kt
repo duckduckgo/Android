@@ -100,10 +100,9 @@ class AutomaticDataClearer @Inject constructor(
 
     override var deferredQuery: String? = null
 
-    // Opening a custom tab doesn't count as opening the app, so the clear waits until only browser activities are in front.
-    // Not just the last started activity: a dispatcher is transparent, so the browser task underneath it starts too, and
-    // until the dispatcher is destroyed it may still hand over to a custom tab. Decided when each event happens, because that
-    // hand-over leaves no custom tab activity started for a moment.
+    // Opening a custom tab from another app must not run the automatic clear, because the clear would close that tab.
+    // The clear waits until the user opens the browser itself. To tell the two apart, these count what is open:
+    // custom tabs, the activity that routes links into a custom tab, and everything else.
     private var startedCustomTabActivities = 0
     private var startedOtherActivities = 0
     private var liveIntentDispatchers = 0
@@ -134,7 +133,7 @@ class AutomaticDataClearer @Inject constructor(
         when (activity) {
             is CustomTabActivity -> {
                 startedCustomTabActivities--
-                onOpenIfPending()
+                if (!activity.isChangingConfigurations) onOpenIfPending()
             }
             is IntentDispatcherActivity -> Unit
             else -> startedOtherActivities--
@@ -154,8 +153,9 @@ class AutomaticDataClearer @Inject constructor(
     }
 
     private fun onOpenIfNotCustomTab() {
-        val isCustomTabInFront = startedCustomTabActivities > 0 || liveIntentDispatchers > 0
+        // Launched so the counters are up to date when this runs.
         launch {
+            val isCustomTabInFront = startedCustomTabActivities > 0 || liveIntentDispatchers > 0
             if (isOpenPending) {
                 if (isCustomTabInFront && customTabsFeature.keepCustomTabOnAppSwitch().isEnabled()) {
                     workManager.cancelAllWorkByTag(DataClearingWorker.WORK_REQUEST_TAG)

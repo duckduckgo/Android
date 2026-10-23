@@ -200,6 +200,16 @@ class DataClearingTest {
     }
 
     @Test
+    fun whenManualClearWithTabsAndKeepCustomTabDisabled_thenCloseCustomTabs() = runTest {
+        customTabsFeature.keepCustomTabOnAppSwitch().setRawStoredState(State(enable = false))
+        configureManualOptions(setOf(FireClearOption.TABS))
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true, browserMode = BrowserMode.REGULAR)
+
+        verify(mockClearDataAction).closeCustomTabs()
+    }
+
+    @Test
     fun whenManualClearWithoutTabs_thenDoNotCloseCustomTabs() = runTest {
         configureManualOptions(setOf(FireClearOption.DATA))
 
