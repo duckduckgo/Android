@@ -82,6 +82,7 @@ class RealReinstallDetector @Inject constructor(
     private val pixel: Pixel,
     private val currentTimeProvider: CurrentTimeProvider,
     private val appBuildConfig: AppBuildConfig,
+    private val outOfSightLaunchDetector: OutOfSightLaunchDetector,
 ) : ReinstallDetector, MainProcessLifecycleObserver {
 
     private val sdkInt: Int = Build.VERSION.SDK_INT
@@ -118,7 +119,13 @@ class RealReinstallDetector @Inject constructor(
         }
     }
 
-    override suspend fun isAppReinstall(): Boolean = reinstallCheck.await()
+    override suspend fun isAppReinstall(): Boolean {
+        // The store wipes this launch's data but not the Downloads folder or Block Store, so checking now would leave a marker
+        // that makes the user's first real launch look like a reinstall
+        if (outOfSightLaunchDetector.isOutOfSightLaunch) return false
+
+        return reinstallCheck.await()
+    }
 
     private suspend fun detectAndSaveAppReinstall(): Boolean =
         if (sdkInt < 30) {
@@ -185,6 +192,8 @@ class RealReinstallDetector @Inject constructor(
     // like a reinstall. Waiting for the shared check means a check still saving its answer has finished, and recorded whether
     // the save failed.
     private suspend fun canStoreInstallSeenFlag(): Boolean {
+        // Checked before waiting: waiting would start the check, which must not run during an out-of-sight launch
+        if (outOfSightLaunchDetector.isOutOfSightLaunch) return false
         reinstallCheck.await()
         val answerSaved = savedAppReinstallValueOrNull() != null && !answerSaveFailed
         val flagStored = runCatching { preferences.getBoolean(INSTALL_SEEN_FLAG_STORED_KEY, false) }.getOrDefault(false)

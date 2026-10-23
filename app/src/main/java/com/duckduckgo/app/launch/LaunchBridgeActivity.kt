@@ -16,11 +16,14 @@
 
 package com.duckduckgo.app.launch
 
+import android.os.Build
 import android.os.Bundle
+import android.view.Display
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.mode.AppLauncher
+import com.duckduckgo.app.install.OutOfSightLaunchDetector
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.pixels.AppReturnPixelSender
 import com.duckduckgo.app.pixels.toPixelLaunchSourceValue
@@ -37,9 +40,18 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var appReturnPixelSender: AppReturnPixelSender
 
+    @Inject
+    lateinit var outOfSightLaunchDetector: OutOfSightLaunchDetector
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+        if (outOfSightLaunchDetector.onLaunchDisplay(launchDisplay())) {
+            // Nobody sees this launch, and the store wipes the app's data afterwards. Starting onboarding would only leave the
+            // reinstall marker behind and send pixels for a launch the user never made.
+            finish()
+            return
+        }
         splashScreen.setKeepOnScreenCondition { true }
 
         appReturnPixelSender.fireIfNeeded(AppLauncher.toPixelLaunchSourceValue())
@@ -50,6 +62,14 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
 
         viewModel.start(intent)
     }
+
+    private fun launchDisplay(): Display? =
+        if (Build.VERSION.SDK_INT >= 30) {
+            display
+        } else {
+            @Suppress("DEPRECATION")
+            windowManager.defaultDisplay
+        }
 
     private fun configureObservers() {
         viewModel.command.observe(this) {
