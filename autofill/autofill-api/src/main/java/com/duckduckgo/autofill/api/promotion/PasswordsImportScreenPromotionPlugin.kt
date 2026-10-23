@@ -61,7 +61,7 @@ interface PasswordsImportScreenPromotionPlugin {
     }
 
     companion object {
-        const val PRIORITY_KEY_SYNC_PROMO = 100
-        const val PRIORITY_KEY_IMPORT_BOOKMARKS_PROMO = 200
+        const val PRIORITY_KEY_IMPORT_BOOKMARKS_PROMO = 100
+        const val PRIORITY_KEY_SYNC_PROMO = 200
     }
 }
