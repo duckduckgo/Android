@@ -25,6 +25,7 @@ import javax.inject.Inject
 
 enum class ReinstallDetectorPixelName(override val pixelName: String) : PixelName {
     BLOCK_STORE_CHECK_RESULT("atb_reinstall_check_block_store"),
+    RECENT_FOLDER("atb_reinstall_check_recent_folder"),
 }
 
 enum class BlockStoreCheckResult(val value: String) {
@@ -35,11 +36,24 @@ enum class BlockStoreCheckResult(val value: String) {
     ERROR("error"),
 }
 
+enum class RecentFolderAge(val value: String) {
+    UP_TO_10_SECONDS("0-10s"),
+    UP_TO_2_MINUTES("10s-2m"),
+    UP_TO_10_MINUTES("2-10m"),
+}
+
+enum class RecentFolderInstaller(val value: String) {
+    GALAXY_STORE("galaxy_store"),
+    PLAY_STORE("play_store"),
+    OTHER("other"),
+}
+
 @ContributesIntoSet(AppScope::class)
 class ReinstallDetectorPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(
             ReinstallDetectorPixelName.BLOCK_STORE_CHECK_RESULT.pixelName to PixelParameter.removeAtb(),
+            ReinstallDetectorPixelName.RECENT_FOLDER.pixelName to PixelParameter.removeAtb(),
         )
     }
 }
