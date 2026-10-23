@@ -55,7 +55,7 @@ interface PasswordsImportScreenPromotionPlugin {
 
     interface Callback {
         /**
-         * The host closes the import sheet when this is called.
+         * The host closes the import screen when this is called.
          */
         fun dismissHost()
     }
