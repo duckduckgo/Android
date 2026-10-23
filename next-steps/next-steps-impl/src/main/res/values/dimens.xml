@@ -21,4 +21,6 @@
     <dimen name="nextStepsStackPaddingBottom">16dp</dimen>
     <dimen name="nextStepsCardElevation">4dp</dimen>
     <dimen name="nextStepsBackCardElevation">1dp</dimen>
+    <dimen name="nextStepsCheckListItemIconSize">24dp</dimen>
+    <dimen name="nextStepsCheckListItemIconSpacing">10dp</dimen>
 </resources>
