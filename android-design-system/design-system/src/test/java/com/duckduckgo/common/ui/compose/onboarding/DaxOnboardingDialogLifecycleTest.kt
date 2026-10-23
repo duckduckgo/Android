@@ -63,7 +63,6 @@ import org.junit.Assert.assertNotSame
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -131,7 +130,6 @@ class DaxOnboardingDialogLifecycleTest {
     }
 
     @Test
-    @Ignore("Focus on a content slot element is lost across a rotation")
     fun rotationPreservesFocusedSlotAndAndroidViewUntilContentIsRemoved() {
         includeFocusAndView = true
         showDialog()
@@ -324,7 +322,6 @@ class DaxOnboardingDialogLifecycleTest {
     }
 
     @Test
-    @Ignore("Body is composed in a different branch when the title is empty, so toggling the title remounts it")
     fun sameKeyTitleRemovalAndRestorationPreserveBody() {
         showDialog()
         val body = identities.getValue("body")
@@ -344,7 +341,6 @@ class DaxOnboardingDialogLifecycleTest {
     }
 
     @Test
-    @Ignore("Body is composed in a different branch when the title is empty, so toggling the title remounts it")
     fun sameKeyTitleRemovedDuringTypingAndRestoredPreservesBodyAndCompletesOnce() {
         animate.value = true
         title.value = "This title should still be typing when it is removed from the dialog."

@@ -31,7 +31,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
 
@@ -50,6 +50,7 @@ internal class DaxOnboardingDialogShell(
     val dismissAlpha = Animatable(if (initiallyVisible) 1f else 0f)
     val tailDepth = Animatable(if (tailExtended) 1f else 0f)
     val tailPlacement = Animatable(tailPlacementFor(tail).toOffset(), Offset.VectorConverter)
+    val tailMirror = Animatable(tailPlacementFor(tail).mirrorFraction)
     val cardSize = Animatable(IntSize.Zero, IntSize.VectorConverter)
 
     suspend fun enter() {
@@ -63,6 +64,7 @@ internal class DaxOnboardingDialogShell(
         dismissAlpha.snapTo(1f)
         entered = true
         tailPlacement.snapTo(tailPlacementFor(tail).toOffset())
+        tailMirror.snapTo(tailPlacementFor(tail).mirrorFraction)
         tailDepth.snapTo(if (tailExtended) 1f else 0f)
         measuredSize?.let { cardSize.snapTo(it) }
     }
@@ -122,7 +124,7 @@ internal class DaxOnboardingDialogIntro(
                 phase = IntroPhase.Typing
             }
             IntroPhase.Typing -> {
-                snapshotFlow { hasTitle() }.first { !it }
+                snapshotFlow { hasTitle() }.firstOrNull { !it } ?: return
                 onTypingFinished()
             }
             IntroPhase.Content -> {
