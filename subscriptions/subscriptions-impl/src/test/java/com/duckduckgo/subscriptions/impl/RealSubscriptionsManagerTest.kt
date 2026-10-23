@@ -2775,6 +2775,65 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
+    fun whenSwitchSubscriptionPlanConfirmedThenReportsSwitchAndEmitsPlanSwitchSuccess() = runTest {
+        givenUserIsSignedIn()
+        givenActiveSubscription(productId = MONTHLY_PLAN_US)
+        givenPurchaseStored()
+        givenConfirmPurchaseSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+        whenever(playBillingManager.getLatestPurchaseToken()).thenReturn("validToken")
+        authRepository.setAccount(Account("test@test.com", "1234"))
+        authRepository.setFeatures(MONTHLY_PRO_PLAN_US, setOf(NETP))
+        givenAllowProTierPurchase(true)
+        givenPlansAvailable(MONTHLY_PRO_PLAN_US)
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.switchSubscriptionPlan(
+                activity = mock(),
+                planId = MONTHLY_PRO_PLAN_US,
+                offerId = null,
+                replacementMode = SubscriptionReplacementMode.DEFERRED,
+            )
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertEquals(CurrentPurchase.Success(isFreeTrial = false, isPlanSwitch = true), awaitItem())
+
+            verify(pixelSender).reportSubscriptionSwitch()
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurchaseConfirmedThenDoesNotReportSwitch() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        givenConfirmPurchaseSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase()
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertEquals(CurrentPurchase.Success(isFreeTrial = false, isPlanSwitch = false), awaitItem())
+
+            verify(pixelSender, never()).reportSubscriptionSwitch()
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenBlackFridayOfferAvailableWithFeatureFlagEnabledThenReturnTrue() = runTest {
         givenBlackFridayFeatureFlagEnabled(true)
 
@@ -2908,10 +2967,10 @@ class RealSubscriptionsManagerTest {
         subscriptionsFeature.allowProTierPurchase().setRawStoredState(State(remoteEnableState = value))
     }
 
-    private suspend fun givenActiveSubscription() {
+    private suspend fun givenActiveSubscription(productId: String = "ddg_privacy_pro") {
         authRepository.setSubscription(
             Subscription(
-                productId = "ddg_privacy_pro",
+                productId = productId,
                 billingPeriod = "P1M",
                 startedAt = 1234L,
                 expiresOrRenewsAt = 1234L,

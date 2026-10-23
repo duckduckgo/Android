@@ -90,6 +90,13 @@ class SubscriptionPixelSenderImplTest {
     }
 
     @Test
+    fun whenReportSubscriptionSwitchThenFiresSwitchPixel() {
+        testee.reportSubscriptionSwitch()
+
+        verify(pixel).fire(pixelName = "subscription_switch", type = Count)
+    }
+
+    @Test
     fun whenReportOfferScreenShownWithOriginThenFiresImpressionWithOrigin() {
         testee.reportOfferScreenShown("funnel_appsettings_android")
 

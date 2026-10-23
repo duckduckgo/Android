@@ -77,6 +77,12 @@ enum class SubscriptionPixel(
         withSuffix = false,
         includedParameters = setOf(APP_VERSION),
     ),
+    SUBSCRIPTION_SWITCH(
+        baseName = "subscription_switch",
+        type = Count,
+        withSuffix = false,
+        includedParameters = setOf(APP_VERSION),
+    ),
     OFFER_RESTORE_PURCHASE_CLICK(
         baseName = "m_privacy-pro_offer_restore-purchase_click",
         type = Count,

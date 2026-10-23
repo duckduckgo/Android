@@ -181,6 +181,13 @@
             "freeTrial"
         ]
     },
+    "subscription_switch": {
+        "description": "Fired when a switch of an active subscription to another plan is confirmed by the backend after Google Play billing completes.",
+        "owners": ["nalcalag"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_privacy-pro_app_subscription_active_d": {
         "description": "Fired once daily on app start for an active subscription",
         "owners": ["lmac012"],
