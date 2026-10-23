@@ -25,6 +25,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.browser.customtabs.CustomTabsFeature
+import com.duckduckgo.app.dispatchers.IntentDispatcherActivity
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.view.ClearDataAction
@@ -124,13 +125,85 @@ class AutomaticDataClearerTest {
         whenever(fireDataStore.getAutomaticallyClearWhenOption()).thenReturn(ClearWhenOption.APP_EXIT_ONLY)
         whenever(fireDataStore.getAutomaticClearOptions()).thenReturn(emptySet())
 
-        testee.onActivityStarted(CustomTabActivity())
+        val customTab = CustomTabActivity()
+        testee.onActivityStarted(customTab)
         testee.onOpen(isFreshLaunch = true)
+        testee.onActivityStopped(customTab)
         testee.onClose()
         testee.onOpen(isFreshLaunch = false)
         testee.onActivityStarted(Activity())
 
         verify(dataClearing).clearDataUsingAutomaticFireOptions(false)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenBrowserStartsUnderDispatcherThenDataIsNotCleared() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(any(), any(), any())).thenReturn(true)
+
+        val dispatcher = IntentDispatcherActivity()
+        testee.onActivityCreated(dispatcher, null)
+        testee.onActivityStarted(dispatcher)
+        testee.onOpen(isFreshLaunch = false)
+        testee.onActivityStarted(Activity())
+        testee.onActivityStarted(CustomTabActivity())
+        testee.onActivityStopped(dispatcher)
+        testee.onActivityDestroyed(dispatcher)
+
+        verify(dataClearing, never()).clearDataUsingAutomaticFireOptions(any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenDispatcherOpensBrowserThenDataIsClearedOnceDispatcherIsDestroyed() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(any(), any(), any())).thenReturn(true)
+        whenever(dataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(false)
+
+        val dispatcher = IntentDispatcherActivity()
+        testee.onActivityCreated(dispatcher, null)
+        testee.onActivityStarted(dispatcher)
+        testee.onOpen(isFreshLaunch = false)
+        testee.onActivityStarted(Activity())
+        testee.onActivityStopped(dispatcher)
+        verify(dataClearing, never()).clearDataUsingAutomaticFireOptions(any())
+
+        testee.onActivityDestroyed(dispatcher)
+
+        verify(dataClearing).clearDataUsingAutomaticFireOptions(false)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenCustomTabStopsWithBrowserInFrontThenDataIsCleared() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(any(), any(), any())).thenReturn(true)
+        whenever(dataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(false)
+
+        val customTab = CustomTabActivity()
+        testee.onActivityStarted(customTab)
+        testee.onOpen(isFreshLaunch = false)
+        testee.onActivityStarted(Activity())
+        verify(dataClearing, never()).clearDataUsingAutomaticFireOptions(any())
+
+        testee.onActivityStopped(customTab)
+
+        verify(dataClearing).clearDataUsingAutomaticFireOptions(false)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnlyCustomTabStopsThenDataIsNotCleared() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(any(), any(), any())).thenReturn(true)
+
+        val customTab = CustomTabActivity()
+        testee.onActivityStarted(customTab)
+        testee.onOpen(isFreshLaunch = false)
+        testee.onActivityStopped(customTab)
+
+        verify(dataClearing, never()).clearDataUsingAutomaticFireOptions(any())
     }
 
     @UiThreadTest

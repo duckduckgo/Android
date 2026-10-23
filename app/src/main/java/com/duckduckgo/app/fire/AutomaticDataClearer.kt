@@ -17,6 +17,7 @@
 package com.duckduckgo.app.fire
 
 import android.app.Activity
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
@@ -96,41 +97,73 @@ class AutomaticDataClearer @Inject constructor(
 
     override var isFreshAppLaunch = true
 
-    // Opening a custom tab doesn't count as opening the app, so the clear waits until another activity starts.
-    private var isCustomTabStarted = false
+    // Opening a custom tab doesn't count as opening the app, so the clear waits until only browser activities are in front.
+    // Not just the last started activity: a dispatcher is transparent, so the browser task underneath it starts too, and
+    // until the dispatcher is destroyed it may still hand over to a custom tab. Decided when each event happens, because that
+    // hand-over leaves no custom tab activity started for a moment.
+    private var startedCustomTabActivities = 0
+    private var startedOtherActivities = 0
+    private var liveIntentDispatchers = 0
     private var isOpenPending = false
 
     override fun onOpen(isFreshLaunch: Boolean) {
         isFreshAppLaunch = isFreshLaunch || (isOpenPending && isFreshAppLaunch)
         isOpenPending = true
+        onOpenIfNotCustomTab()
+    }
 
-        launch {
-            onOpenIfNotCustomTab()
-        }
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+        if (activity is IntentDispatcherActivity) liveIntentDispatchers++
     }
 
     override fun onActivityStarted(activity: Activity) {
-        isCustomTabStarted = activity.isCustomTabLaunch()
-        if (isOpenPending) {
-            launch {
-                onOpenIfNotCustomTab()
+        when (activity) {
+            is CustomTabActivity -> startedCustomTabActivities++
+            is IntentDispatcherActivity -> Unit
+            else -> {
+                startedOtherActivities++
+                onOpenIfPending()
             }
         }
     }
 
-    private suspend fun onOpenIfNotCustomTab() {
-        if (isOpenPending) {
-            if (isCustomTabStarted && customTabsFeature.keepCustomTabOnAppSwitch().isEnabled()) {
-                workManager.cancelAllWorkByTag(DataClearingWorker.WORK_REQUEST_TAG)
-                withContext(dispatchers.io()) { settingsDataStore.appUsedSinceLastClear = true }
-            } else {
-                isOpenPending = false
-                onAppForegroundedAsync()
+    override fun onActivityStopped(activity: Activity) {
+        when (activity) {
+            is CustomTabActivity -> {
+                startedCustomTabActivities--
+                onOpenIfPending()
             }
+            is IntentDispatcherActivity -> Unit
+            else -> startedOtherActivities--
         }
     }
 
-    private fun Activity.isCustomTabLaunch() = this is CustomTabActivity || this is IntentDispatcherActivity
+    override fun onActivityDestroyed(activity: Activity) {
+        if (activity is IntentDispatcherActivity) {
+            liveIntentDispatchers--
+            onOpenIfPending()
+        }
+    }
+
+    // With no browser activity started, only a custom tab is left in front, which never opens the app.
+    private fun onOpenIfPending() {
+        if (isOpenPending && startedOtherActivities > 0) onOpenIfNotCustomTab()
+    }
+
+    private fun onOpenIfNotCustomTab() {
+        val isCustomTabInFront = startedCustomTabActivities > 0 || liveIntentDispatchers > 0
+        launch {
+            if (isOpenPending) {
+                if (isCustomTabInFront && customTabsFeature.keepCustomTabOnAppSwitch().isEnabled()) {
+                    workManager.cancelAllWorkByTag(DataClearingWorker.WORK_REQUEST_TAG)
+                    withContext(dispatchers.io()) { settingsDataStore.appUsedSinceLastClear = true }
+                } else {
+                    isOpenPending = false
+                    onAppForegroundedAsync()
+                }
+            }
+        }
+    }
 
     @VisibleForTesting
     suspend fun onAppForegroundedAsync() {
