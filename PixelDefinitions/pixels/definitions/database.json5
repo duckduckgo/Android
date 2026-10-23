@@ -1,0 +1,28 @@
+{
+    "m_database_corruption": {
+        "description": "Fired when SQLite reports a local database as corrupt. The default corruption handling then deletes the database file, so all data stored in it (for app.db, bookmarks and favorites among others) is lost and the database is recreated empty.",
+        "owners": ["aibrahim-"],
+        "triggers": ["exception"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "db",
+                "description": "Database reported as corrupt, by file name without the .db extension.",
+                "type": "string",
+                "enum": ["app"]
+            },
+            {
+                "key": "pn",
+                "description": "Name of the process that detected the corruption.",
+                "type": "string",
+                "enum": ["main", ":vpn", ":pir", ":autofill", ":fire", "UNKNOWN", "ERROR"]
+            },
+            {
+                "key": "db_open",
+                "description": "Whether SQLite had already opened the database when it reported the corruption. False means the file could not be opened at all.",
+                "type": "boolean"
+            }
+        ]
+    }
+}
