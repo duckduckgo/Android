@@ -31,57 +31,71 @@ class WideEventCleanupPolicyEvaluatorTest {
     private val evaluator = WideEventCleanupPolicyEvaluator(processName = "main")
 
     @Test
-    fun `process-start event owned by this process is closed with the policy status`() {
+    fun `process-start event owned by this process is closed with the policy status when cleanup is process-scoped`() {
         val event = event(policy = processStartPolicy())
 
-        assertEquals(PROCESS_START_DECISION, evaluator.evaluate(event, NOW))
+        assertEquals(PROCESS_START_DECISION, evaluator.evaluate(event, NOW, processScopedCleanup = true))
     }
 
     @Test
-    fun `process-start event owned by another process stays open`() {
+    fun `process-start event owned by another process stays open when cleanup is process-scoped`() {
         val event = event(policy = processStartPolicy(ownerProcessName = ":vpn"))
 
-        assertNull(evaluator.evaluate(event, NOW))
+        assertNull(evaluator.evaluate(event, NOW, processScopedCleanup = true))
     }
 
     @Test
-    fun `process-start event owned by this process with pending interval timeout stays open when the policy says so`() {
+    fun `process-start event of any owner is closed when cleanup is not process-scoped`() {
+        val ownEvent = event(policy = processStartPolicy())
+        val otherProcessEvent = event(policy = processStartPolicy(ownerProcessName = ":vpn"))
+
+        assertEquals(PROCESS_START_DECISION, evaluator.evaluate(ownEvent, NOW, processScopedCleanup = false))
+        assertEquals(PROCESS_START_DECISION, evaluator.evaluate(otherProcessEvent, NOW, processScopedCleanup = false))
+    }
+
+    @Test
+    fun `abandoned process-start event with pending interval timeout stays open when the policy says so`() {
         val event = event(
             policy = processStartPolicy(ignoreIfIntervalTimeoutPresent = true),
             activeIntervals = listOf(interval(startedAt = NOW.minusSeconds(10), timeout = Duration.ofMinutes(1))),
         )
 
-        assertNull(evaluator.evaluate(event, NOW))
+        assertNull(evaluator.evaluate(event, NOW, processScopedCleanup = true))
     }
 
     @Test
-    fun `process-start event owned by this process with pending interval timeout is closed when the policy ignores it`() {
+    fun `abandoned process-start event with pending interval timeout is closed when the policy ignores it`() {
         val event = event(
             policy = processStartPolicy(ignoreIfIntervalTimeoutPresent = false),
             activeIntervals = listOf(interval(startedAt = NOW.minusSeconds(10), timeout = Duration.ofMinutes(1))),
         )
 
-        assertEquals(PROCESS_START_DECISION, evaluator.evaluate(event, NOW))
+        assertEquals(PROCESS_START_DECISION, evaluator.evaluate(event, NOW, processScopedCleanup = true))
     }
 
     @Test
-    fun `process-start event owned by this process with interval without timeout is closed regardless of the policy flag`() {
+    fun `abandoned process-start event with interval without timeout is closed regardless of the policy flag`() {
         val event = event(
             policy = processStartPolicy(ignoreIfIntervalTimeoutPresent = true),
             activeIntervals = listOf(interval(startedAt = NOW.minusSeconds(10), timeout = null)),
         )
 
-        assertEquals(PROCESS_START_DECISION, evaluator.evaluate(event, NOW))
+        assertEquals(PROCESS_START_DECISION, evaluator.evaluate(event, NOW, processScopedCleanup = true))
     }
 
     @Test
-    fun `timed-out event is closed with the policy status`() {
+    fun `timed-out event is closed with the policy status whether or not cleanup is process-scoped`() {
         val event = event(
             policy = CleanupPolicy.OnTimeout(duration = Duration.ofHours(1), status = WideEventStatus.FAILURE, metadata = mapOf("k" to "v")),
             createdAt = NOW.minus(Duration.ofHours(1)),
         )
 
-        assertEquals(CleanupDecision(status = WideEventStatus.FAILURE, metadata = mapOf("k" to "v")), evaluator.evaluate(event, NOW))
+        listOf(true, false).forEach { processScopedCleanup ->
+            assertEquals(
+                CleanupDecision(status = WideEventStatus.FAILURE, metadata = mapOf("k" to "v")),
+                evaluator.evaluate(event, NOW, processScopedCleanup),
+            )
+        }
     }
 
     @Test
@@ -91,7 +105,7 @@ class WideEventCleanupPolicyEvaluatorTest {
             createdAt = NOW.minus(Duration.ofMinutes(59)),
         )
 
-        assertNull(evaluator.evaluate(event, NOW))
+        assertNull(evaluator.evaluate(event, NOW, processScopedCleanup = false))
     }
 
     @Test
@@ -101,7 +115,7 @@ class WideEventCleanupPolicyEvaluatorTest {
             activeIntervals = listOf(interval(startedAt = NOW.minusSeconds(30), timeout = Duration.ofSeconds(30))),
         )
 
-        assertEquals(UNKNOWN_DECISION, evaluator.evaluate(event, NOW))
+        assertEquals(UNKNOWN_DECISION, evaluator.evaluate(event, NOW, processScopedCleanup = true))
     }
 
     @Test
@@ -117,18 +131,19 @@ class WideEventCleanupPolicyEvaluatorTest {
             activeIntervals = listOf(interval(startedAt = NOW.minus(Duration.ofHours(2)), timeout = Duration.ofMinutes(1))),
         )
 
-        assertNull(evaluator.evaluate(oldEventWithFreshInterval, NOW))
-        assertEquals(UNKNOWN_DECISION, evaluator.evaluate(freshEventWithOldInterval, NOW))
+        assertNull(evaluator.evaluate(oldEventWithFreshInterval, NOW, processScopedCleanup = true))
+        assertEquals(UNKNOWN_DECISION, evaluator.evaluate(freshEventWithOldInterval, NOW, processScopedCleanup = true))
     }
 
     @Test
-    fun `expired interval timeout closes events owned by another process`() {
+    fun `expired interval timeout closes process-start events of other processes`() {
+        val expiredInterval = interval(startedAt = NOW.minus(Duration.ofHours(1)), timeout = Duration.ofMinutes(1))
         val otherProcessEvent = event(
             policy = processStartPolicy(ownerProcessName = ":vpn", ignoreIfIntervalTimeoutPresent = true),
-            activeIntervals = listOf(interval(startedAt = NOW.minus(Duration.ofHours(1)), timeout = Duration.ofMinutes(1))),
+            activeIntervals = listOf(expiredInterval),
         )
 
-        assertEquals(UNKNOWN_DECISION, evaluator.evaluate(otherProcessEvent, NOW))
+        assertEquals(UNKNOWN_DECISION, evaluator.evaluate(otherProcessEvent, NOW, processScopedCleanup = true))
     }
 
     @Test
@@ -138,7 +153,7 @@ class WideEventCleanupPolicyEvaluatorTest {
             activeIntervals = listOf(interval(startedAt = NOW.minusSeconds(1), timeout = Duration.ofMinutes(1))),
         )
 
-        assertNull(evaluator.evaluate(event, NOW))
+        assertNull(evaluator.evaluate(event, NOW, processScopedCleanup = true))
     }
 
     private fun processStartPolicy(

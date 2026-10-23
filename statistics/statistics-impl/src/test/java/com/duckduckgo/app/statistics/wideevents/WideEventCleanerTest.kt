@@ -26,25 +26,22 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
-import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
-import org.mockito.kotlin.whenever
-import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
+import kotlin.random.Random
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -52,144 +49,267 @@ class WideEventCleanerTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private val wideEventRepository: WideEventRepository = mock()
+    private val repository = FakeWideEventRepository()
 
     private val timeProvider =
         object : CurrentTimeProvider {
-            var currentTime: Instant = Instant.parse("2025-12-03T10:15:30.00Z")
-
             override fun elapsedRealtime(): Long = throw UnsupportedOperationException()
 
-            override fun currentTimeMillis(): Long = currentTime.toEpochMilli()
+            override fun currentTimeMillis(): Long = NOW.toEpochMilli()
 
             override fun localDateTimeNow(): LocalDateTime = throw UnsupportedOperationException()
         }
 
-    @SuppressLint("DenyListedApi")
-    private val wideEventFeature: WideEventFeature =
-        FakeFeatureToggleFactory
-            .create(WideEventFeature::class.java)
-            .apply { self().setRawStoredState(State(true)) }
+    private val wideEventFeature: WideEventFeature = FakeFeatureToggleFactory.create(WideEventFeature::class.java)
 
     private val cleaner =
         WideEventCleaner(
-            appCoroutineScope = coroutineRule.testScope,
-            wideEventRepository = wideEventRepository,
+            wideEventRepository = repository,
             policyEvaluator = WideEventCleanupPolicyEvaluator(PROCESS_NAME),
-            currentTimeProvider = timeProvider,
             wideEventFeature = wideEventFeature,
+            currentTimeProvider = timeProvider,
+            appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
+
     private val lifecycleOwner: LifecycleOwner = mock()
 
     @Test
-    fun `every active event is cleaned up through the repository with the evaluator's decision`() =
+    fun `main process start runs the initial cleanup sweep`() =
         runTest {
-            whenever(wideEventRepository.getActiveWideEventIds()).thenReturn(listOf(1L, 2L))
-
             cleaner.onCreate(lifecycleOwner)
             advanceUntilIdle()
 
-            val decideCaptor = argumentCaptor<(WideEvent) -> CleanupDecision?>()
-            verify(wideEventRepository).cleanUpWideEvent(eq(1L), decideCaptor.capture())
-            verify(wideEventRepository).cleanUpWideEvent(eq(2L), decideCaptor.capture())
-
-            val decide = decideCaptor.firstValue
-            assertEquals(
-                CleanupDecision(status = WideEventRepository.WideEventStatus.CANCELLED, metadata = mapOf("reason" to "test")),
-                decide(processStartEvent(ownerProcessName = PROCESS_NAME)),
-            )
-            assertNull(decide(processStartEvent(ownerProcessName = ":vpn")))
-        }
-
-    @Test
-    fun `evaluation uses the time of the sweep`() =
-        runTest {
-            whenever(wideEventRepository.getActiveWideEventIds()).thenReturn(listOf(1L))
-            val event = timeoutEvent(createdAt = timeProvider.currentTime.minus(Duration.ofHours(1)), timeout = Duration.ofHours(1))
-
-            cleaner.onCreate(lifecycleOwner)
-            advanceUntilIdle()
-
-            val decideCaptor = argumentCaptor<(WideEvent) -> CleanupDecision?>()
-            verify(wideEventRepository).cleanUpWideEvent(eq(1L), decideCaptor.capture())
-            assertEquals(
-                CleanupDecision(status = WideEventRepository.WideEventStatus.UNKNOWN, metadata = emptyMap()),
-                decideCaptor.firstValue(event),
-            )
-        }
-
-    @Test
-    fun `when there are no active events nothing is cleaned up`() =
-        runTest {
-            whenever(wideEventRepository.getActiveWideEventIds()).thenReturn(emptyList())
-
-            cleaner.onCreate(lifecycleOwner)
-            advanceUntilIdle()
-
-            verify(wideEventRepository).getActiveWideEventIds()
-            verify(wideEventRepository, never()).cleanUpWideEvent(any(), any())
+            assertEquals(1, repository.sweeps)
         }
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun `when feature is disabled the repository is not touched`() =
+    fun `main process start runs no sweep when wide events are disabled`() =
         runTest {
             wideEventFeature.self().setRawStoredState(State(false))
 
             cleaner.onCreate(lifecycleOwner)
             advanceUntilIdle()
 
-            verifyNoInteractions(wideEventRepository)
+            assertEquals(0, repository.sweeps)
         }
 
     @Test
-    fun `a failing sweep does not propagate`() =
+    fun `a failing startup sweep does not propagate and a client can retry it`() =
         runTest {
-            whenever(wideEventRepository.getActiveWideEventIds()).thenThrow(IllegalStateException("db unavailable"))
+            var failing = true
+            repository.activeWideEventIds = { if (failing) throw IllegalStateException("db unavailable") else emptyList() }
 
             cleaner.onCreate(lifecycleOwner)
             advanceUntilIdle()
+
+            failing = false
+            cleaner.ensureInitialized()
+            assertEquals(2, repository.sweeps)
         }
 
+    @Test
+    fun `main process start and client operations share the same initialization`() =
+        runTest {
+            val client =
+                WideEventClientImpl(
+                    wideEventRepository = repository,
+                    wideEventFeature = lazy { wideEventFeature },
+                    dispatcherProvider = coroutineRule.testDispatcherProvider,
+                    random = Random.Default,
+                    processName = PROCESS_NAME,
+                    wideEventCleaner = cleaner,
+                )
+
+            cleaner.onCreate(lifecycleOwner)
+            advanceUntilIdle()
+            client.flowStart(name = "flow")
+            client.getFlowIds(name = "flow")
+
+            assertEquals(1, repository.sweeps)
+        }
+
+    @Test
+    fun `concurrent callers share one initial sweep`() =
+        runTest {
+            val gate = CompletableDeferred<Unit>()
+            repository.activeWideEventIds = {
+                gate.await()
+                emptyList()
+            }
+
+            val first = launch { cleaner.ensureInitialized() }
+            val second = launch { cleaner.ensureInitialized() }
+            advanceUntilIdle()
+            assertEquals(1, repository.sweeps)
+
+            gate.complete(Unit)
+            first.join()
+            second.join()
+
+            assertEquals(1, repository.sweeps)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `ensureInitialized does nothing when process-scoped cleanup is disabled`() =
+        runTest {
+            wideEventFeature.processScopedCleanup().setRawStoredState(State(false))
+
+            cleaner.ensureInitialized()
+
+            assertEquals(0, repository.sweeps)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `initialize sweeps even when process-scoped cleanup is disabled`() =
+        runTest {
+            wideEventFeature.processScopedCleanup().setRawStoredState(State(false))
+
+            cleaner.initialize()
+
+            assertEquals(1, repository.sweeps)
+        }
+
+    @Test
+    fun `initialization is skipped once a sweep succeeded`() =
+        runTest {
+            cleaner.ensureInitialized()
+            cleaner.ensureInitialized()
+
+            assertEquals(1, repository.sweeps)
+        }
+
+    @Test
+    fun `failed initialization is reported to callers and retried by the next call`() =
+        runTest {
+            var failing = true
+            repository.activeWideEventIds = { if (failing) throw IllegalStateException("db unavailable") else emptyList() }
+
+            val failure = runCatching { cleaner.ensureInitialized() }
+            assertTrue(failure.isFailure)
+
+            failing = false
+            cleaner.ensureInitialized()
+            cleaner.ensureInitialized()
+
+            assertEquals(2, repository.sweeps)
+        }
+
+    @Test
+    fun `callers waiting on a failed sweep each retry it`() =
+        runTest {
+            val gate = CompletableDeferred<Unit>()
+            repository.activeWideEventIds = {
+                gate.await()
+                throw IllegalStateException("db unavailable")
+            }
+
+            val callers = List(3) { launch { runCatching { cleaner.ensureInitialized() } } }
+            advanceUntilIdle()
+            assertEquals(1, repository.sweeps)
+
+            gate.complete(Unit)
+            callers.forEach { it.join() }
+
+            assertEquals(3, repository.sweeps)
+        }
+
+    @Test
+    fun `cancelling a caller does not cancel the shared sweep`() =
+        runTest {
+            val gate = CompletableDeferred<Unit>()
+            repository.activeWideEventIds = {
+                gate.await()
+                emptyList()
+            }
+
+            val caller = launch { cleaner.ensureInitialized() }
+            advanceUntilIdle()
+            assertEquals(1, repository.sweeps)
+            caller.cancelAndJoin()
+            gate.complete(Unit)
+            advanceUntilIdle()
+
+            cleaner.ensureInitialized()
+
+            assertEquals(1, repository.sweeps)
+        }
+
+    @Test
+    fun `a failing event is skipped and the remaining events are still cleaned up`() =
+        runTest {
+            val cleanedUp = mutableListOf<Long>()
+            repository.activeWideEventIds = { listOf(1L, 2L, 3L) }
+            repository.onCleanUp = { eventId, _ ->
+                if (eventId == 2L) throw IllegalStateException("unreadable row")
+                cleanedUp += eventId
+            }
+
+            cleaner.ensureInitialized()
+
+            assertEquals(listOf(1L, 3L), cleanedUp)
+            cleaner.ensureInitialized()
+            assertEquals(1, repository.sweeps)
+        }
+
+    @Test
+    fun `initial sweep closes process-start events owned by this process only`() =
+        runTest {
+            val decide = captureDecision { cleaner.ensureInitialized() }
+
+            assertEquals(PROCESS_START_DECISION, decide(processStartEvent(ownerProcessName = PROCESS_NAME)))
+            assertNull(decide(processStartEvent(ownerProcessName = ":vpn")))
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `initial sweep closes process-start events of every process when process-scoped cleanup is disabled`() =
+        runTest {
+            wideEventFeature.processScopedCleanup().setRawStoredState(State(false))
+
+            val decide = captureDecision { cleaner.initialize() }
+
+            assertEquals(PROCESS_START_DECISION, decide(processStartEvent(ownerProcessName = PROCESS_NAME)))
+            assertEquals(PROCESS_START_DECISION, decide(processStartEvent(ownerProcessName = ":vpn")))
+        }
+
+    private suspend fun captureDecision(sweep: suspend () -> Unit): (WideEvent) -> CleanupDecision? {
+        var decide: ((WideEvent) -> CleanupDecision?)? = null
+        repository.activeWideEventIds = { listOf(1L) }
+        repository.onCleanUp = { _, decision -> decide = decision }
+
+        sweep()
+
+        return checkNotNull(decide)
+    }
+
     private fun processStartEvent(ownerProcessName: String) =
-        event(
-            policy = WideEventRepository.CleanupPolicy.OnProcessStart(
+        WideEvent(
+            id = 1L,
+            name = "test",
+            status = null,
+            steps = emptyList(),
+            metadata = emptyMap(),
+            flowEntryPoint = null,
+            cleanupPolicy = WideEventRepository.CleanupPolicy.OnProcessStart(
                 ownerProcessName = ownerProcessName,
                 ignoreIfIntervalTimeoutPresent = false,
-                status = WideEventRepository.WideEventStatus.CANCELLED,
-                metadata = mapOf("reason" to "test"),
+                status = PROCESS_START_DECISION.status,
+                metadata = PROCESS_START_DECISION.metadata,
             ),
-            createdAt = timeProvider.currentTime,
+            activeIntervals = emptyList(),
+            createdAt = NOW,
+            metaType = "android-test",
+            metaVersion = "1.0.0",
+            appVersion = "5.123.0",
         )
 
-    private fun timeoutEvent(
-        createdAt: Instant,
-        timeout: Duration,
-    ) = event(
-        policy = WideEventRepository.CleanupPolicy.OnTimeout(duration = timeout, status = WideEventRepository.WideEventStatus.UNKNOWN),
-        createdAt = createdAt,
-    )
-
-    private fun event(
-        policy: WideEventRepository.CleanupPolicy,
-        createdAt: Instant,
-    ) = WideEvent(
-        id = 1L,
-        name = "test",
-        status = null,
-        steps = emptyList(),
-        metadata = emptyMap(),
-        flowEntryPoint = null,
-        cleanupPolicy = policy,
-        activeIntervals = emptyList(),
-        createdAt = createdAt,
-        metaType = "android-test",
-        metaVersion = "1.0.0",
-        appVersion = "5.123.0",
-    )
-
     private companion object {
+        val NOW: Instant = Instant.parse("2025-12-03T10:15:30.00Z")
         const val PROCESS_NAME = "main"
+        val PROCESS_START_DECISION = CleanupDecision(status = WideEventRepository.WideEventStatus.CANCELLED, metadata = mapOf("reason" to "test"))
     }
 }

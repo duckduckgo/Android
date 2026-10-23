@@ -28,15 +28,22 @@ import javax.inject.Inject
 class WideEventCleanupPolicyEvaluator @Inject constructor(
     @ProcessName private val processName: String,
 ) {
-    /** Returns how [event] should be closed as of [now], or null if it should stay open. */
+    /**
+     * Returns how [event] should be closed as of [now], or null if it should stay open.
+     *
+     * @param processScopedCleanup When true, only [CleanupPolicy.OnProcessStart] events started by this process are treated as
+     *   abandoned; a sweep run before this process records anything can only have inherited them. When false, such events of every
+     *   process are, which is how cleanup behaved before ownership was recorded.
+     */
     fun evaluate(
         event: WideEvent,
         now: Instant,
+        processScopedCleanup: Boolean,
     ): CleanupDecision? {
         when (val policy = event.cleanupPolicy) {
             is CleanupPolicy.OnProcessStart -> {
                 val hasIntervalTimeouts = event.activeIntervals.any { it.timeout != null }
-                if (policy.isOwnedByThisProcess() && (!hasIntervalTimeouts || !policy.ignoreIfIntervalTimeoutPresent)) {
+                if (policy.isAbandoned(processScopedCleanup) && (!hasIntervalTimeouts || !policy.ignoreIfIntervalTimeoutPresent)) {
                     return CleanupDecision(status = policy.status, metadata = policy.metadata)
                 }
             }
@@ -55,7 +62,8 @@ class WideEventCleanupPolicyEvaluator @Inject constructor(
     }
 
     // Events of other processes are cleaned up by those processes, which may still be running them.
-    private fun CleanupPolicy.OnProcessStart.isOwnedByThisProcess(): Boolean = ownerProcessName == processName
+    private fun CleanupPolicy.OnProcessStart.isAbandoned(processScopedCleanup: Boolean): Boolean =
+        !processScopedCleanup || ownerProcessName == processName
 
     private fun hasElapsed(
         since: Instant,
