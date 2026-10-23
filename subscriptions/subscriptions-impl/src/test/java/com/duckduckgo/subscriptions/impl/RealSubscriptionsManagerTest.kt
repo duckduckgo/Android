@@ -2804,6 +2804,7 @@ class RealSubscriptionsManagerTest {
 
             verify(pixelSender).reportSubscriptionSwitch()
             verify(pixelSender, never()).reportPurchaseSuccess(any())
+            verify(pixelSender, never()).reportSubscriptionActivated()
 
             cancelAndConsumeRemainingEvents()
         }
@@ -2830,6 +2831,7 @@ class RealSubscriptionsManagerTest {
 
             verify(pixelSender, never()).reportSubscriptionSwitch()
             verify(pixelSender).reportPurchaseSuccess(isFreeTrial = false)
+            verify(pixelSender).reportSubscriptionActivated()
 
             cancelAndConsumeRemainingEvents()
         }

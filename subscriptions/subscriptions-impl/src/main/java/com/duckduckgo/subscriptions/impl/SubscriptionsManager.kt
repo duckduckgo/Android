@@ -642,8 +642,8 @@ class RealSubscriptionsManager @Inject constructor(
                     pixelSender.reportSubscriptionSwitch()
                 } else {
                     pixelSender.reportPurchaseSuccess(isFreeTrial)
+                    pixelSender.reportSubscriptionActivated()
                 }
-                pixelSender.reportSubscriptionActivated()
                 emitEntitlementsValues()
                 _currentPurchaseState.emit(CurrentPurchase.Success(isFreeTrial, isPlanSwitch = isPlanSwitch))
                 authRepository.registerLocalPurchasedAt()
