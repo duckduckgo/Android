@@ -5881,9 +5881,8 @@ class BrowserTabViewModel @Inject constructor(
         fromDuckAiChat: Boolean,
     ) {
         if (fromDuckAiChat) {
-            // Exit intent first: duckai-response-wait reads a new chat with no pending exit as a chat switch in this tab.
-            recordPendingNewTabOpenedExit()
             duckAiSessionCallback.onNewChatCreated(tabId)
+            recordPendingNewTabOpenedExit()
         }
         duckChat.reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
         command.value = OpenInNewTab(duckChat.getDuckChatUrl("", false), tabId)

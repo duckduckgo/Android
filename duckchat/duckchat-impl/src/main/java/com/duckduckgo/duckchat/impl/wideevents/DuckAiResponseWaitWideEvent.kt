@@ -80,7 +80,6 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
     private var persisted = emptyList<PersistedResponseWaitFlow>()
     private var selectedTab: TabState? = null
     private var pendingExit: PendingExit? = null
-    private var newChatTabId: String? = null
 
     // Both default closed so nothing counts as on screen until the app has opened and resolved its landing.
     private var appOpen = false
@@ -138,9 +137,8 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
     // Flows start only from onNativePromptSubmitted, which carries the reasoning and tool metadata the start needs.
     override fun onPromptSubmitted(tabId: String) = Unit
 
-    override fun onNewChatCreated(tabId: String) {
-        channel.trySend(Action.NewChatCreated(tabId))
-    }
+    // Every native new chat opens in a new tab, and the tab switch records that leave.
+    override fun onNewChatCreated(tabId: String) = Unit
 
     override fun onOpen(isFreshLaunch: Boolean) {
         channel.trySend(Action.AppOpened)
@@ -163,17 +161,10 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
                 is Action.NativePromptSubmitted -> startFlow(action.tabId, action.reasoningEffort, action.selectedTool)
                 is Action.ResponseState -> applyResponseState(action.tabId, action.status)
                 is Action.StopTapped -> applyStop(action.tabId)
-                is Action.NewChatCreated -> {
-                    leaveForNewChat(action.tabId)
-                    reconcileOnScreen(appClosed = false)
-                }
                 else -> reconcileOnScreen(appClosed = action is Action.AppClosed)
             }
         }
-        if (action is Action.AppClosed) {
-            pendingExit = null
-            newChatTabId = null
-        }
+        if (action is Action.AppClosed) pendingExit = null
         val previousTabId = previousTab?.tabId
         if (previousTabId != null && previousTab != selectedTab) clearIntents(previousTabId)
     }
@@ -222,14 +213,12 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
             is Action.DuckAiPageVisible -> if (appOpen && launchResolved) selectedTab = computeTabState(action.tabId, action.url)
             is Action.SelectedTabChanged -> selectedTab = computeTabState(action.tabId, action.url)
             is Action.ExitIntent -> if (pendingExit == null) pendingExit = PendingExit(action.tabId, action.trigger)
-            is Action.NewChatCreated -> newChatTabId = action.tabId
             else -> Unit
         }
     }
 
     private fun clearIntents(tabId: String) {
         if (pendingExit?.tabId == tabId) pendingExit = null
-        if (newChatTabId == tabId) newChatTabId = null
     }
 
     private fun onScreen(): OnScreen? {
@@ -260,26 +249,11 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         }
     }
 
-    // With history off the URL never carries a chat ID, so a new chat in the same tab looks unchanged to reconcileOnScreen.
-    // A pending exit means the new chat opens in another tab, and the tab switch records that leave instead.
-    // A flow still waiting for its stream is the prompt that created the chat, so it hasn't left.
-    private suspend fun leaveForNewChat(tabId: String) {
-        if (pendingExit?.tabId == tabId) return
-        val flow = flows.firstOrNull { it.onScreen && it.chatId == null && it.tabId == tabId && !it.awaitingFirstStream } ?: return
-        newChatTabId = null
-        flow.onScreen = false
-        flow.chatSwitchedAway = true
-        recordLeave(flow, LEFT_VIA_CHAT_SWITCHED)
-    }
-
     private fun resolveLeftVia(flow: ResponseWait, appClosed: Boolean): String {
-        val current = selectedTab
-        val sameTab = current?.tabId == flow.tabId
+        val sameTab = selectedTab?.tabId == flow.tabId
         val pendingTrigger = pendingExit?.takeIf { it.tabId == flow.tabId }?.trigger
         return when {
             appClosed -> if (pendingTrigger == DuckAiSessionExitTrigger.BACK_OR_CLOSE) LEFT_VIA_BACK_OR_CLOSE else LEFT_VIA_APP_BACKGROUNDED
-            // The flow only leaves when it no longer matches, so the same tab still on Duck.ai shows another or a new chat.
-            sameTab && (current?.isDuckAi == true || newChatTabId == flow.tabId) -> LEFT_VIA_CHAT_SWITCHED
             else -> pendingTrigger?.name?.lowercase() ?: if (sameTab) LEFT_VIA_OTHER_NAVIGATION else LEFT_VIA_TAB_SWITCHED
         }
     }
@@ -406,7 +380,14 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         flows.toList().forEach { abort(it) }
     }
 
-    private fun isFeatureDisabled(): Boolean = !duckChatFeature.value.sendDuckAiResponseWaitWideEvent().isEnabled()
+    // The web input and the web sidebar can switch chats within a tab, which left_via has no value for.
+    private suspend fun isFeatureDisabled(): Boolean {
+        val feature = duckChatFeature.value
+        return !feature.sendDuckAiResponseWaitWideEvent().isEnabled() ||
+            !feature.nativeChatInput().isEnabled() ||
+            !feature.nativeDuckAiSidebar().isEnabled() ||
+            !duckChat.isChatHistoryAvailable()
+    }
 
     private fun computeTabState(tabId: String?, url: String?): TabState {
         val uri = url?.takeIf { it.isNotBlank() }?.toUri()
@@ -422,7 +403,6 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         data class DuckAiPageVisible(val tabId: String, val url: String) : Action()
         data class SelectedTabChanged(val tabId: String?, val url: String?) : Action()
         data class ExitIntent(val tabId: String, val trigger: DuckAiSessionExitTrigger) : Action()
-        data class NewChatCreated(val tabId: String) : Action()
         data object AppOpened : Action()
         data object AppClosed : Action()
         data object Recover : Action()
@@ -509,7 +489,6 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
 
         const val LEFT_VIA_APP_BACKGROUNDED = "app_backgrounded"
         const val LEFT_VIA_BACK_OR_CLOSE = "back_or_close"
-        const val LEFT_VIA_CHAT_SWITCHED = "chat_switched"
         const val LEFT_VIA_TAB_SWITCHED = "tab_switched"
         const val LEFT_VIA_OTHER_NAVIGATION = "other_navigation"
 

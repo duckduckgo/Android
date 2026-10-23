@@ -111,7 +111,6 @@
                                     "description": "How the user left the chat. Present only when step.left is present",
                                     "enum": [
                                         "app_backgrounded",
-                                        "chat_switched",
                                         "tab_switched",
                                         "new_tab_opened",
                                         "back_or_close",

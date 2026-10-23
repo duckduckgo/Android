@@ -67,6 +67,9 @@ class DuckAiResponseWaitWideEventTest {
     @Before
     fun setup() = runTest {
         duckChatFeature.sendDuckAiResponseWaitWideEvent().setRawStoredState(Toggle.State(enable = true))
+        duckChatFeature.nativeChatInput().setRawStoredState(Toggle.State(enable = true))
+        duckChatFeature.nativeDuckAiSidebar().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChat.isChatHistoryAvailable()).thenReturn(true)
         whenever(duckChat.isDuckChatUrl(any())).thenAnswer { invocation ->
             (invocation.arguments[0] as Uri).toString().startsWith(DUCK_AI_URL)
         }
@@ -367,46 +370,6 @@ class DuckAiResponseWaitWideEventTest {
     }
 
     @Test
-    fun `when chat switched while loading then left_via chat_switched`() = runTest {
-        promptInChat(chatId = "A")
-
-        onChat("t1", "B")
-        idle()
-
-        verify(wideEventClient).flowStep(eq(1L), eq("left"), eq(true), eq(mapOf("left_via" to "chat_switched")))
-    }
-
-    @Test
-    fun `when new chat created while loading then left_via chat_switched`() = runTest {
-        promptInChat(chatId = "A")
-
-        testee.onNewChatCreated("t1")
-        onChat("t1", null)
-        idle()
-
-        verify(wideEventClient).flowStep(eq(1L), eq("left"), eq(true), eq(mapOf("left_via" to "chat_switched")))
-    }
-
-    @Test
-    fun `when history is off and a new chat is created in the same tab then the old flow leaves and the next prompt starts a new flow`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
-            .thenReturn(Result.success(1L), Result.success(2L))
-        promptInChat(chatId = null)
-
-        testee.onNewChatCreated("t1")
-        testee.onResponseState("t1", "ready")
-        idle()
-
-        verify(wideEventClient).flowStep(eq(1L), eq("left"), eq(true), eq(mapOf("left_via" to "chat_switched")))
-        verify(wideEventClient, never()).flowFinish(any(), any(), any())
-        verify(wideEventClient, never()).flowStep(any(), eq("response_ready_while_away"), any(), any())
-
-        promptInChat(chatId = null)
-
-        verify(wideEventClient, times(2)).flowStart(any(), anyOrNull(), any(), any(), any(), any())
-    }
-
-    @Test
     fun `when the prompt's own chat is created before its stream then the flow stays and finishes watched`() = runTest {
         promptInChat(chatId = null, streamStarted = false)
 
@@ -452,16 +415,6 @@ class DuckAiResponseWaitWideEventTest {
         idle()
 
         verify(wideEventClient).flowStep(eq(1L), eq("left"), eq(true), eq(mapOf("left_via" to "new_tab_opened")))
-    }
-
-    @Test
-    fun `when same tab shows Duck ai without a chat id then left_via chat_switched`() = runTest {
-        promptInChat(tabId = "t1", chatId = "A")
-
-        testee.onSelectedTabChanged("t1", DUCK_AI_URL)
-        idle()
-
-        verify(wideEventClient).flowStep(eq(1L), eq("left"), eq(true), eq(mapOf("left_via" to "chat_switched")))
     }
 
     @Test
@@ -511,7 +464,7 @@ class DuckAiResponseWaitWideEventTest {
         onChat("t1", "B")
         idle()
 
-        verify(wideEventClient).flowStep(eq(1L), eq("left"), eq(true), eq(mapOf("left_via" to "chat_switched")))
+        verify(wideEventClient).flowStep(eq(1L), eq("left"), eq(true), any())
     }
 
     @Test
@@ -764,6 +717,33 @@ class DuckAiResponseWaitWideEventTest {
 
         verify(wideEventClient).flowAbort(1L)
         verify(wideEventClient, never()).flowFinish(any(), any(), any())
+    }
+
+    @Test
+    fun `when native input disabled then no flow starts`() = runTest {
+        duckChatFeature.nativeChatInput().setRawStoredState(Toggle.State(enable = false))
+
+        promptInChat()
+
+        verify(wideEventClient, never()).flowStart(any(), anyOrNull(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun `when native sidebar disabled then no flow starts`() = runTest {
+        duckChatFeature.nativeDuckAiSidebar().setRawStoredState(Toggle.State(enable = false))
+
+        promptInChat()
+
+        verify(wideEventClient, never()).flowStart(any(), anyOrNull(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun `when native chat history unavailable then no flow starts`() = runTest {
+        whenever(duckChat.isChatHistoryAvailable()).thenReturn(false)
+
+        promptInChat()
+
+        verify(wideEventClient, never()).flowStart(any(), anyOrNull(), any(), any(), any(), any())
     }
 
     @Test

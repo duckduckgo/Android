@@ -69,15 +69,7 @@
                 "key": "feature.data.ext.left_via",
                 "type": "string",
                 "description": "How the user left the chat. Present only when step.left is present",
-                "enum": [
-                    "app_backgrounded",
-                    "chat_switched",
-                    "tab_switched",
-                    "new_tab_opened",
-                    "back_or_close",
-                    "fire_tab_opened",
-                    "other_navigation"
-                ]
+                "enum": ["app_backgrounded", "tab_switched", "new_tab_opened", "back_or_close", "fire_tab_opened", "other_navigation"]
             },
             {
                 "key": "feature.data.ext.step.response_ready_while_away",
