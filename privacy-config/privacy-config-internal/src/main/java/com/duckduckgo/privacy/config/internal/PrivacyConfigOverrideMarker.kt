@@ -18,7 +18,7 @@ package com.duckduckgo.privacy.config.internal
 
 import android.util.Log
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 /** Emits the machine-readable result lines that adb tooling waits on. */

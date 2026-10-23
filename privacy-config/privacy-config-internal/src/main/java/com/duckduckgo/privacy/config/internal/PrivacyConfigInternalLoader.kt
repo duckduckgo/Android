@@ -22,7 +22,7 @@ import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader.ConfigDownloadResult
 import com.duckduckgo.privacy.config.internal.store.DevPrivacyConfigSettingsDataStore
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.net.URI
@@ -34,7 +34,7 @@ sealed interface OverrideCommand {
 }
 
 /** Shared forced-load path for Developer Settings and adb commands. */
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class PrivacyConfigInternalLoader @Inject constructor(
     private val downloader: PrivacyConfigDownloader,
     private val store: DevPrivacyConfigSettingsDataStore,
