@@ -34,6 +34,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewFontScale
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTextStyle
@@ -97,6 +98,8 @@ import kotlin.time.Duration
  * @param onIntroFinished Called after composition with the completed run’s content key; canceled runs do not call it.
  * @param dismiss Optional dismiss action and accessible content description.
  * @param step Optional step indicator centred on the painted top edge; `null` hides it.
+ * @param textHorizontalPadding Horizontal inset for the title and optional body.
+ * @param contentHorizontalPadding Horizontal inset for the content slot, independent of CTA insets.
  * @param content Optional content-keyed arbitrary content slot.
  */
 @Composable
@@ -118,9 +121,13 @@ fun DaxOnboardingDialog(
     onIntroFinished: (contentKey: String) -> Unit = {},
     dismiss: DaxOnboardingDialogDismiss? = null,
     step: DaxOnboardingDialogStep? = null,
+    headerToActionsSpacing: Dp = DaxOnboardingDialogDefaults.HeaderContentSpacing,
+    textHorizontalPadding: Dp = DaxOnboardingDialogDefaults.TextHorizontalPadding,
+    contentHorizontalPadding: Dp = DaxOnboardingDialogDefaults.ContentHorizontalPadding,
     content: (@Composable DaxOnboardingDialogContentScope.() -> Unit)? = null,
 ) {
     DaxOnboardingDialogCore(
+        useNativeCtaInsets = true,
         contentKey = contentKey,
         title = AnnotatedString(title),
         titleStyle = DuckDuckGoTheme.typography.onboardingTitle,
@@ -139,6 +146,9 @@ fun DaxOnboardingDialog(
         onIntroFinished = onIntroFinished,
         dismiss = dismiss,
         step = step,
+        headerToActionsSpacing = headerToActionsSpacing,
+        textHorizontalPadding = textHorizontalPadding,
+        contentHorizontalPadding = contentHorizontalPadding,
         content = content,
     )
 }
@@ -203,6 +213,7 @@ fun DaxOnboardingDialog(
     content: (@Composable DaxOnboardingDialogContentScope.() -> Unit)? = null,
 ) {
     DaxOnboardingDialogCore(
+        useNativeCtaInsets = true,
         contentKey = contentKey,
         title = AnnotatedString(title),
         titleStyle = DuckDuckGoTheme.typography.onboardingTitle,
@@ -285,6 +296,7 @@ fun DaxOnboardingDialog(
     content: (@Composable DaxOnboardingDialogContentScope.() -> Unit)? = null,
 ) {
     DaxOnboardingDialogCore(
+        useNativeCtaInsets = true,
         contentKey = contentKey,
         title = AnnotatedString(title),
         titleStyle = DuckDuckGoTheme.typography.onboardingTitle,

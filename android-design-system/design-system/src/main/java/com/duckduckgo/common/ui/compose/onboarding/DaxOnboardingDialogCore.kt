@@ -33,7 +33,6 @@ import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -41,8 +40,10 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.onFocusedBoundsChanged
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -82,7 +83,10 @@ import androidx.compose.ui.graphics.nativePaint
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -97,27 +101,30 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.constrainHeight
+import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
-import com.duckduckgo.common.ui.compose.button.DaxBrandButton
 import com.duckduckgo.common.ui.compose.button.DaxIconButton
 import com.duckduckgo.common.ui.compose.button.DaxIconButtonColors
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTextStyle
-import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.theme.LocalOnboardingColors
 import com.duckduckgo.common.ui.compose.theme.asTextStyle
 import com.duckduckgo.mobile.android.R
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
-import kotlin.math.roundToInt
 import kotlin.time.Duration
 
 internal data class DialogActionLayout(
@@ -130,19 +137,22 @@ internal fun dialogActionLayout(
     hasContent: Boolean,
     hasPrimaryCta: Boolean,
     hasSecondaryCta: Boolean,
+    headerToActionsSpacing: Dp = DaxOnboardingDialogDefaults.HeaderContentSpacing,
+    contentToPrimarySpacing: Dp = DaxOnboardingDialogDefaults.ContentToPrimaryCtaSpacing,
+    primaryToSecondarySpacing: Dp = DaxOnboardingDialogDefaults.CtaSpacing,
 ): DialogActionLayout = DialogActionLayout(
     headerToActions = if (hasContent || hasPrimaryCta || hasSecondaryCta) {
-        DaxOnboardingDialogDefaults.HeaderContentSpacing
+        headerToActionsSpacing
     } else {
         0.dp
     },
     contentToPrimary = if (hasContent && hasPrimaryCta) {
-        DaxOnboardingDialogDefaults.ContentToPrimaryCtaSpacing
+        contentToPrimarySpacing
     } else {
         0.dp
     },
     primaryToSecondary = if (hasPrimaryCta && hasSecondaryCta) {
-        DaxOnboardingDialogDefaults.CtaSpacing
+        primaryToSecondarySpacing
     } else {
         0.dp
     },
@@ -171,11 +181,13 @@ internal fun DaxOnboardingDialogCore(
     body: (@Composable () -> Unit)? = null,
     landscapeLayout: Boolean = false,
     step: DaxOnboardingDialogStep? = null,
+    headerToActionsSpacing: Dp = DaxOnboardingDialogDefaults.HeaderContentSpacing,
+    textHorizontalPadding: Dp = DaxOnboardingDialogDefaults.TextHorizontalPadding,
+    contentHorizontalPadding: Dp = DaxOnboardingDialogDefaults.ContentHorizontalPadding,
+    useNativeCtaInsets: Boolean = false,
 ) {
-    val titleLineHeightPx = with(LocalDensity.current) { titleStyle.asTextStyle.lineHeight.toPx() }
-    val titleLineSpacingExtraPx = with(LocalDensity.current) {
-        DaxOnboardingDialogDefaults.ViewTitleLineSpacingExtraMagnitude.toPx()
-    }
+    val titleMeasurer = rememberTextMeasurer()
+    val naturalTitleStyle = titleStyle.asTextStyle.copy(lineHeight = TextUnit.Unspecified)
     val inInspectionMode = LocalInspectionMode.current
     val compositionScope = rememberCoroutineScope()
     val motionScale = compositionScope.coroutineContext[MotionDurationScale]?.scaleFactor ?: 1f
@@ -221,9 +233,9 @@ internal fun DaxOnboardingDialogCore(
         intro.runPhase(
             shell = shell,
             hasHeader = { latestHeaderImage != null },
-            morphEnteredShell = {
+            morphEnteredShell = morphEnteredShell@{
                 if (replacingEnteredShell) {
-                    val target = snapshotFlow { cardSizeTracker.lastSize }.filterNotNull().first()
+                    val target = snapshotFlow { cardSizeTracker.lastSize }.filterNotNull().firstOrNull() ?: return@morphEnteredShell
                     if (cardSizeTracker.bounded) {
                         shell.cardSize.animateTo(target, boundsTween(boundsAnimationDuration))
                     } else {
@@ -244,16 +256,41 @@ internal fun DaxOnboardingDialogCore(
         )
     }
 
+    val dismissOffsetPx = with(LocalDensity.current) { DaxOnboardingDialogDefaults.DismissOffset.roundToPx() }
+    fun updateCardSize(size: IntSize) {
+        cardSizeTracker.naturalSize = size
+        val maximum = state.availableHeightPx?.let { (it - dismissOffsetPx).coerceAtLeast(0) } ?: cardSizeTracker.maxHeight
+        val target = IntSize(size.width, size.height.coerceAtMost(maximum))
+        cardSizeTracker.lastSize = target
+        val awaitingMorph = replacingEnteredShell && sampledAnimate && !cardSizeTracker.hasMeasured && !intro.settled
+        if (awaitingMorph) return
+        compositionScope.launch {
+            if (cardSizeTracker.hasMeasured && intro.settled && animate && motionScale != 0f) {
+                if (!shell.cardSize.isRunning || shell.cardSize.targetValue.height != target.height) {
+                    shell.cardSize.animateTo(target, boundsTween(boundsAnimationDuration))
+                }
+            } else {
+                cardSizeTracker.hasMeasured = true
+                shell.cardSize.snapTo(target)
+            }
+        }
+    }
+    LaunchedEffect(cardSizeTracker, state.availableHeightPx) {
+        cardSizeTracker.naturalSize?.let { updateCardSize(it) }
+    }
+
     val animateTailPosition = if (settled) animate else sampledAnimate
     LaunchedEffect(contentKey, tail, animateTailPosition, motionScale) {
         val target = tailPlacementFor(tail)
         if (animateTailPosition && motionScale != 0f && shell.tailPlacement.value.toPlacement().present && target.present) {
-            shell.tailPlacement.animateTo(
-                target.toOffset(),
-                tween(DaxOnboardingDialogDefaults.TailPositionDuration.inWholeMilliseconds.toInt(), easing = FastOutSlowInEasing),
-            )
+            val duration = DaxOnboardingDialogDefaults.TailPositionDuration.inWholeMilliseconds.toInt()
+            coroutineScope {
+                launch { shell.tailPlacement.animateTo(target.toOffset(), tween(duration, easing = FastOutSlowInEasing)) }
+                launch { shell.tailMirror.animateTo(target.mirrorFraction, tween(duration, easing = FastOutSlowInEasing)) }
+            }
         } else {
             shell.tailPlacement.snapTo(target.toOffset())
+            shell.tailMirror.snapTo(target.mirrorFraction)
         }
     }
     // Like the View dialogs, the tail is already at depth when content introduces itself; only a settled change animates.
@@ -270,7 +307,6 @@ internal fun DaxOnboardingDialogCore(
     }
     LaunchedEffect(contentScope, contentScope.readyVersion) { contentScope.deliverContentReady() }
 
-    // Orientation changes move the slot between layouts; it must keep state while contentScope stays delivered.
     val contentSlot = remember(contentScope) {
         movableContentOf<@Composable DaxOnboardingDialogContentScope.() -> Unit> { slot ->
             DisposableEffect(Unit) { onDispose { contentScope.clearReadyCallback() } }
@@ -280,17 +316,28 @@ internal fun DaxOnboardingDialogCore(
             }
         }
     }
-    // Title and body are called from different layout branches by orientation; a stable identity keeps typing progress.
-    val dialogTextSlot = remember(contentKey) { movableContentOf<@Composable () -> Unit> { it() } }
     val scrollState = remember(contentKey) { ScrollState(0) }
+    val focusedContentRequester = remember(contentKey) { BringIntoViewRequester() }
+    var focusedChild by remember(contentKey) { mutableStateOf<LayoutCoordinates?>(null) }
+    var scrollingContent by remember(contentKey) { mutableStateOf<LayoutCoordinates?>(null) }
+    LaunchedEffect(contentKey, scrollState) {
+        snapshotFlow { Triple(scrollState.viewportSize, focusedChild, scrollingContent) }
+            .collectLatest { (viewportHeight, child, parent) ->
+                if (viewportHeight > 0 && child?.isAttached == true && parent?.isAttached == true) {
+                    focusedContentRequester.bringIntoView(parent.localBoundingBoxOf(child, clipBounds = false))
+                }
+            }
+    }
     val tailAtRest = { !sampledAnimate && !intro.finished }
     val renderedTailPlacement = { if (tailAtRest()) tailPlacementFor(tail).toOffset() else shell.tailPlacement.value }
     val renderedTailDepth = { if (tailAtRest()) { if (tailExtended) 1f else 0f } else shell.tailDepth.value }
+    val renderedTailMirror = { if (tailAtRest()) tailPlacementFor(tail).mirrorFraction else shell.tailMirror.value }
     val bubbleShape = {
         DaxSpeechBubbleShape(
             cornerRadius = DaxOnboardingDialogDefaults.CornerRadius,
             tailPosition = tailPositionFor(tail, renderedTailPlacement()),
             depth = renderedTailDepth(),
+            mirrorFraction = renderedTailMirror(),
         )
     }
     val shellAlpha = { if (tailAtRest()) 1f else shell.cardAlpha.value }
@@ -339,21 +386,12 @@ internal fun DaxOnboardingDialogCore(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .onFocusedBoundsChanged { focusedChild = it }
+                            .onGloballyPositioned { scrollingContent = it }
+                            .bringIntoViewRequester(focusedContentRequester)
                             .onSizeChanged { size ->
-                                val target = IntSize(size.width, size.height.coerceAtMost(cardSizeTracker.maxHeight))
-                                cardSizeTracker.lastSize = target
-                                val awaitingMorph = replacingEnteredShell && sampledAnimate && !cardSizeTracker.hasMeasured && !intro.settled
-                                if (awaitingMorph) return@onSizeChanged
-                                compositionScope.launch {
-                                    if (cardSizeTracker.hasMeasured && intro.settled && animate && motionScale != 0f) {
-                                        if (!shell.cardSize.isRunning || shell.cardSize.targetValue.height != target.height) {
-                                            shell.cardSize.animateTo(target, boundsTween(boundsAnimationDuration))
-                                        }
-                                    } else {
-                                        cardSizeTracker.hasMeasured = true
-                                        shell.cardSize.snapTo(target)
-                                    }
-                                }
+                                state.updateContentHeight(requestSkip, size.height)
+                                updateCardSize(size)
                             }
                             .padding(
                                 top = DaxOnboardingDialogDefaults.TopPadding,
@@ -375,31 +413,30 @@ internal fun DaxOnboardingDialogCore(
                                 Spacer(Modifier.size(DaxOnboardingDialogDefaults.HeaderTitleSpacing))
                             }
 
-                            if (title.text.isNotEmpty()) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = DaxOnboardingDialogDefaults.TextHorizontalPadding),
-                                    horizontalAlignment = if (textAlign == DaxOnboardingDialogTextAlign.Center) {
-                                        Alignment.CenterHorizontally
-                                    } else {
-                                        Alignment.Start
-                                    },
-                                ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = textHorizontalPadding),
+                                horizontalAlignment = if (textAlign == DaxOnboardingDialogTextAlign.Center) {
+                                    Alignment.CenterHorizontally
+                                } else {
+                                    Alignment.Start
+                                },
+                            ) {
+                                if (title.text.isNotEmpty()) {
                                     Box(
                                         Modifier
                                             .fillMaxWidth()
                                             .layout { measurable, constraints ->
                                                 val placeable = measurable.measure(constraints)
-                                                // 1 line stays below 1.5 line heights; 2+ lines exceed it after View spacing.
-                                                val correction = if (placeable.height > titleLineHeightPx * 1.5f) {
-                                                    titleLineSpacingExtraPx.roundToInt()
-                                                } else {
-                                                    0
-                                                }
+                                                val naturalHeight = titleMeasurer.measure(
+                                                    text = title,
+                                                    style = naturalTitleStyle,
+                                                    constraints = constraints.copy(minHeight = 0),
+                                                ).size.height
                                                 layout(
                                                     placeable.width,
-                                                    (placeable.height + correction).coerceAtMost(constraints.maxHeight),
+                                                    constraints.constrainHeight(naturalHeight),
                                                 ) { placeable.place(0, 0) }
                                             }
                                             .then(if (titleMode == TitleRenderMode.Hidden) Modifier.clearAndSetSemantics { } else Modifier)
@@ -434,8 +471,10 @@ internal fun DaxOnboardingDialogCore(
                                             )
                                         }
                                     }
+                                }
 
-                                    if (body != null) {
+                                if (body != null) {
+                                    if (title.text.isNotEmpty()) {
                                         Spacer(
                                             Modifier.size(
                                                 if (landscapeLayout) {
@@ -445,18 +484,12 @@ internal fun DaxOnboardingDialogCore(
                                                 },
                                             ),
                                         )
-                                        Box(contentGate.drawAlpha { intro.contentAlpha.value }) { body.invoke() }
                                     }
-                                }
-                            } else if (body != null) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = DaxOnboardingDialogDefaults.TextHorizontalPadding)
-                                        .drawAlpha { intro.contentAlpha.value }
-                                        .then(contentGate),
-                                ) {
-                                    body.invoke()
+                                    Box(
+                                        contentGate
+                                            .then(if (title.text.isEmpty()) Modifier.fillMaxWidth() else Modifier)
+                                            .drawAlpha { intro.contentAlpha.value },
+                                    ) { body.invoke() }
                                 }
                             }
                         }
@@ -466,10 +499,24 @@ internal fun DaxOnboardingDialogCore(
                             val hasActions = content != null ||
                                 primaryCta != null ||
                                 secondaryCta != null
+                            val density = LocalDensity.current
+                            val contentToPrimarySpacing = if (useNativeCtaInsets) {
+                                with(density) { (20.dp.roundToPx() + 4.dp.roundToPx()).toDp() }
+                            } else {
+                                DaxOnboardingDialogDefaults.ContentToPrimaryCtaSpacing
+                            }
+                            val primaryToSecondarySpacing = if (useNativeCtaInsets) {
+                                with(density) { (2 * 4.dp.roundToPx()).toDp() }
+                            } else {
+                                DaxOnboardingDialogDefaults.CtaSpacing
+                            }
                             val actionLayout = dialogActionLayout(
                                 hasContent = content != null,
                                 hasPrimaryCta = primaryCta != null,
                                 hasSecondaryCta = secondaryCta != null,
+                                headerToActionsSpacing = headerToActionsSpacing,
+                                contentToPrimarySpacing = contentToPrimarySpacing,
+                                primaryToSecondarySpacing = primaryToSecondarySpacing,
                             )
                             if (!landscape && hasActions) {
                                 Spacer(Modifier.size(actionLayout.headerToActions))
@@ -479,7 +526,7 @@ internal fun DaxOnboardingDialogCore(
                                 Box(
                                     modifier = contentGate
                                         .fillMaxWidth()
-                                        .padding(horizontal = DaxOnboardingDialogDefaults.ContentHorizontalPadding)
+                                        .padding(horizontal = contentHorizontalPadding)
                                         .drawAlpha { intro.contentAlpha.value },
                                 ) {
                                     contentSlot(content)
@@ -488,7 +535,7 @@ internal fun DaxOnboardingDialogCore(
 
                             if (primaryCta != null) {
                                 Spacer(Modifier.height(actionLayout.contentToPrimary))
-                                DaxBrandButton(
+                                DaxOnboardingPrimaryButton(
                                     text = primaryCta.text,
                                     onClick = { if (intro.settled) primaryCta.onClick() },
                                     modifier = Modifier
@@ -497,7 +544,6 @@ internal fun DaxOnboardingDialogCore(
                                         .introCtaGate(settled, primaryCta.text)
                                         .drawAlpha { intro.contentAlpha.value },
                                     enabled = primaryCta.enabled,
-                                    textStyle = DuckDuckGoTheme.typography.onboardingButton,
                                 )
                             }
 
@@ -523,26 +569,49 @@ internal fun DaxOnboardingDialogCore(
                             }
                         }
 
-                        val dialogText: @Composable () -> Unit = { DialogText() }
-
-                        if (landscapeLayout) {
-                            Row(
-                                Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Column(Modifier.weight(1f)) { dialogTextSlot(dialogText) }
-                                Spacer(Modifier.width(DaxOnboardingDialogDefaults.LandscapeTextCtaSpacing))
-                                Column(Modifier.width(DaxOnboardingDialogDefaults.LandscapeCtaWidth)) {
-                                    DialogActions(landscape = true)
+                        Layout(
+                            content = {
+                                Column { DialogText() }
+                                Column { DialogActions(landscapeLayout) }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) { measurables, constraints ->
+                            val looseConstraints = constraints.copy(minWidth = 0, minHeight = 0)
+                            if (landscapeLayout) {
+                                val gap = DaxOnboardingDialogDefaults.LandscapeTextCtaSpacing.roundToPx()
+                                    .coerceAtMost(constraints.maxWidth)
+                                val actionsWidth = DaxOnboardingDialogDefaults.LandscapeCtaWidth.roundToPx()
+                                    .coerceAtMost(constraints.maxWidth - gap)
+                                val actions = measurables[1].measure(looseConstraints.copy(minWidth = actionsWidth, maxWidth = actionsWidth))
+                                val textWidth = if (constraints.hasBoundedWidth) constraints.maxWidth - actions.width - gap else 0
+                                val text = measurables[0].measure(
+                                    if (constraints.hasBoundedWidth) {
+                                        looseConstraints.copy(minWidth = textWidth, maxWidth = textWidth)
+                                    } else {
+                                        looseConstraints
+                                    },
+                                )
+                                val height = maxOf(text.height, actions.height)
+                                layout(constraints.constrainWidth(text.width + gap + actions.width), constraints.constrainHeight(height)) {
+                                    text.placeRelative(0, (height - text.height) / 2)
+                                    actions.placeRelative(text.width + gap, (height - actions.height) / 2)
+                                }
+                            } else {
+                                val text = measurables[0].measure(looseConstraints)
+                                val actions = measurables[1].measure(looseConstraints.offset(vertical = -text.height))
+                                layout(
+                                    constraints.constrainWidth(maxOf(text.width, actions.width)),
+                                    constraints.constrainHeight(text.height + actions.height),
+                                ) {
+                                    text.placeRelative(0, 0)
+                                    actions.placeRelative(0, text.height)
                                 }
                             }
-                        } else {
-                            dialogTextSlot(dialogText)
-                            DialogActions(landscape = false)
                         }
 
                         if (tail != DaxOnboardingDialogTail.None) {
-                            Spacer(Modifier.height(DaxOnboardingDialogDefaults.TailBandHeight))
+                            val tailBandHeight = with(LocalDensity.current) { onboardingTailBandHeightPx().toDp() }
+                            Spacer(Modifier.height(tailBandHeight))
                         }
                     }
                 }
@@ -580,7 +649,8 @@ internal fun DaxOnboardingDialogCore(
                 .padding(end = DaxOnboardingDialogDefaults.StepIndicatorEndInset)
                 .layout { measurable, constraints ->
                     val placeable = measurable.measure(constraints)
-                    layout(placeable.width, 0) { placeable.place(0, -placeable.height / 2) }
+                    // ConstraintLayout rounds negative solved coordinates toward zero.
+                    layout(placeable.width, 0) { placeable.place(0, (-placeable.height / 2 + .5f).toInt()) }
                 }
                 .graphicsLayer { alpha = shellAlpha() },
         )
@@ -610,6 +680,12 @@ internal fun tailPlacementFor(tail: DaxOnboardingDialogTail): DaxSpeechBubbleTai
         offsetDp = 80f,
         present = true,
     )
+    DaxOnboardingDialogTail.BottomStartMirrored -> DaxSpeechBubbleTailPlacement(
+        edgeFraction = 0f,
+        offsetDp = 96f,
+        present = true,
+        mirrorFraction = 1f,
+    )
 }
 
 internal fun DaxSpeechBubbleTailPlacement.toOffset(): Offset = Offset(edgeFraction, offsetDp)
@@ -623,6 +699,7 @@ private fun Offset.toPlacement(): DaxSpeechBubbleTailPlacement = DaxSpeechBubble
 private fun tailPositionFor(tail: DaxOnboardingDialogTail, placement: Offset): DaxSpeechBubbleTailPosition = when (tail) {
     DaxOnboardingDialogTail.None -> DaxSpeechBubbleTailPosition.None
     DaxOnboardingDialogTail.BottomStart,
+    DaxOnboardingDialogTail.BottomStartMirrored,
     DaxOnboardingDialogTail.BottomStartWide,
     DaxOnboardingDialogTail.BottomEnd,
     -> DaxSpeechBubbleTailPosition.Interpolated(placement.x, placement.y)
@@ -634,6 +711,7 @@ private val BoundsAnimationEasing = Easing(AccelerateDecelerateInterpolator()::g
 private fun boundsTween(duration: Duration) = tween<IntSize>(duration.inWholeMilliseconds.toInt(), easing = BoundsAnimationEasing)
 
 private class CardSizeTracker {
+    var naturalSize: IntSize? = null
     var lastSize by mutableStateOf<IntSize?>(null)
     var hasMeasured = false
     var maxHeight = Int.MAX_VALUE

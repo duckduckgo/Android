@@ -101,7 +101,7 @@ fun DaxBrandButton(
     }
 }
 
-private object DaxBrandButtonDefaults {
+internal object DaxBrandButtonDefaults {
 
     private const val DisabledAlpha = 0.38f
 

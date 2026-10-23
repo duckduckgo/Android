@@ -20,9 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.duckduckgo.common.ui.compose.theme.LocalOnboardingColors
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -57,7 +57,6 @@ object DaxOnboardingDialogDefaults {
     val HeaderImageSize: Dp = 96.dp
     val HeaderTitleSpacing: Dp = 16.dp
     val TitleBodySpacing: Dp = 16.dp
-    internal val ViewTitleLineSpacingExtraMagnitude = 1.sp
     val HeaderContentSpacing: Dp = 20.dp
 
     // The View CTA's 20dp margin plus the 4dp vertical inset of a small rebrand button.
@@ -120,3 +119,6 @@ object DaxOnboardingDialogDefaults {
         @ReadOnlyComposable
         get() = colors.shadow
 }
+
+internal fun Density.onboardingTailBandHeightPx(): Int =
+    DaxSpeechBubbleShape.TailHeight.toPx().toInt() + DaxOnboardingDialogDefaults.StrokeWidth.roundToPx()

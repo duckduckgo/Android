@@ -18,6 +18,7 @@ package com.duckduckgo.common.ui.compose.onboarding
 
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.TestMonotonicFrameClock
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
@@ -27,11 +28,10 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import kotlin.time.Duration
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 @Config(sdk = [28])
 @OptIn(ExperimentalTestApi::class)
 class DaxOnboardingDialogIntroTest {

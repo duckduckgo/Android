@@ -18,7 +18,6 @@
 
 package com.duckduckgo.common.ui.compose.onboarding
 
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RippleConfiguration
@@ -26,15 +25,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.dimensionResource
-import com.duckduckgo.common.ui.compose.button.DaxButton
 import com.duckduckgo.common.ui.compose.button.DaxButtonColors
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.theme.ProvideDuckDuckGoTheme
 import com.duckduckgo.mobile.android.R
 
 @Composable
-internal fun DaxOnboardingSecondaryButton(
+fun DaxOnboardingSecondaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -44,16 +41,15 @@ internal fun DaxOnboardingSecondaryButton(
     val container = colorResource(if (dark) R.color.white4 else R.color.black6)
     val content = colorResource(if (dark) R.color.white else R.color.black96)
     val pressed = colorResource(if (dark) R.color.white8 else R.color.black12)
-    val height = dimensionResource(R.dimen.rebrandButtonSmallHeight) - dimensionResource(R.dimen.rebrandButtonSmallVerticalInset) * 2
     ProvideDuckDuckGoTheme(
         colors = DuckDuckGoTheme.colors,
         shapes = DuckDuckGoTheme.shapes.copy(medium = CircleShape),
         typography = DuckDuckGoTheme.typography.copy(button = DuckDuckGoTheme.typography.onboardingButton),
     ) {
-        DaxButton(
+        DaxOnboardingButton(
             text = text,
             onClick = onClick,
-            modifier = modifier.height(height),
+            modifier = modifier,
             enabled = enabled,
             colors = DaxButtonColors(
                 containerColor = container,

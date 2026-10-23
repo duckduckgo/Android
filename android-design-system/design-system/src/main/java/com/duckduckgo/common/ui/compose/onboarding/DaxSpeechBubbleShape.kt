@@ -63,6 +63,7 @@ internal data class DaxSpeechBubbleTailPlacement(
     val edgeFraction: Float,
     val offsetDp: Float,
     val present: Boolean,
+    val mirrorFraction: Float = 0f,
 )
 
 internal fun logicalTailCenter(
@@ -75,13 +76,14 @@ internal fun logicalTailCenter(
  * Speech-bubble card shape with the onboarding tail cut into its bottom edge.
  *
  * The tail is the nine-cubic path from the legacy DaxBubbleBottomEdgeTreatment, scaled by [depth].
- * A 33.dp tail band is reserved inside the shape; the legacy path itself is 30.dp high. Tail
+ * The tail band reserves the native arrow height and stroke; the legacy path itself is 30.dp high. Tail
  * positions are layout-direction relative and are mirrored in RTL.
  */
 internal class DaxSpeechBubbleShape(
     private val cornerRadius: Dp,
     private val tailPosition: DaxSpeechBubbleTailPosition = DaxSpeechBubbleTailPosition.None,
     private val depth: Float = 1f,
+    private val mirrorFraction: Float = 0f,
 ) : Shape {
 
     override fun createOutline(
@@ -93,7 +95,7 @@ internal class DaxSpeechBubbleShape(
             val tailBandHeight = if (tailPosition is DaxSpeechBubbleTailPosition.None) {
                 0f
             } else {
-                DaxOnboardingDialogDefaults.TailBandHeight.toPx()
+                onboardingTailBandHeightPx().toFloat()
             }
             val bottom = size.height - tailBandHeight
             val radius = cornerRadius.toPx().coerceAtMost(minOf(size.width, bottom) / 2f).coerceAtLeast(0f)
@@ -137,7 +139,7 @@ internal class DaxSpeechBubbleShape(
                 fun tailY(y: Float): Float = bottom - y * scale
 
                 path.lineTo(tailX(0f), bottom)
-                TailCurves.forEach { curve ->
+                tailCurvesAt(mirrorFraction).forEach { curve ->
                     path.cubicTo(
                         x1 = tailX(curve.control1X),
                         y1 = tailY(curve.control1Y),
@@ -191,6 +193,23 @@ internal class DaxSpeechBubbleShape(
         val endY: Float,
     )
 
+    private fun tailCurvesAt(fraction: Float): List<Curve> {
+        val mirror = fraction.coerceIn(0f, 1f)
+        if (mirror == 0f) return TailCurves
+        if (mirror == 1f) return MirroredTailCurves
+        fun lerp(from: Float, to: Float): Float = from + (to - from) * mirror
+        return TailCurves.zip(MirroredTailCurves) { plain, reflected ->
+            Curve(
+                lerp(plain.control1X, reflected.control1X),
+                lerp(plain.control1Y, reflected.control1Y),
+                lerp(plain.control2X, reflected.control2X),
+                lerp(plain.control2Y, reflected.control2Y),
+                lerp(plain.endX, reflected.endX),
+                lerp(plain.endY, reflected.endY),
+            )
+        }
+    }
+
     companion object {
         val TailHeight = 30.dp
         val TailWidth = 47.14058.dp
@@ -206,6 +225,19 @@ internal class DaxSpeechBubbleShape(
             Curve(36.9208f, -6.20757f, 38.2915f, -3.99944f, 40.2158f, -2.46093f),
             Curve(42.1375f, -0.92451f, 44.6734f, 0f, TailWidth.value, 0f),
         )
+
+        private val MirroredTailCurves = TailCurves.indices.reversed().map { index ->
+            val curve = TailCurves[index]
+            val start = TailCurves.getOrNull(index - 1)
+            Curve(
+                control1X = TailWidth.value - curve.control2X,
+                control1Y = curve.control2Y,
+                control2X = TailWidth.value - curve.control1X,
+                control2Y = curve.control1Y,
+                endX = TailWidth.value - (start?.endX ?: 0f),
+                endY = start?.endY ?: 0f,
+            )
+        }
     }
 }
 
