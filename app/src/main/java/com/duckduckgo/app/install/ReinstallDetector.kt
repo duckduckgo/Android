@@ -90,6 +90,11 @@ class RealReinstallDetector @Inject constructor(
     // Keeps the two flag writers (after a new-install check, and on app start) from calling Block Store at once
     private val installSeenFlagWriteMutex = Mutex()
 
+    // A failed save leaves the answer readable in memory, so reading preferences again can't tell it from one that reached
+    // disk. Set before the check's lock is released.
+    @Volatile
+    private var answerSaveFailed = false
+
     override fun onCreate(owner: LifecycleOwner) {
         if (sdkInt >= 30) return
 
@@ -140,11 +145,11 @@ class RealReinstallDetector @Inject constructor(
         )
 
         // Saved even when Block Store failed, so every caller gets the same answer for this install instead of retrying a slow call
-        runCatching { saveAppReinstallValue(isReinstall) }
+        val answerSaved = runCatching { saveAppReinstallValue(isReinstall) }.getOrDefault(false)
 
         if (isReinstall) {
             runCatching { preferences.edit(commit = true) { putBoolean(INSTALL_SEEN_FLAG_STORED_KEY, true) } }
-        } else {
+        } else if (answerSaved) {
             // Written outside the lock: the answer is already saved, so callers shouldn't also wait for a second Block Store call
             appCoroutineScope.launch(dispatcherProvider.io()) { storeInstallSeenFlagIfMissing() }
         }
@@ -152,12 +157,18 @@ class RealReinstallDetector @Inject constructor(
     }
 
     private suspend fun storeInstallSeenFlagIfMissing() = installSeenFlagWriteMutex.withLock {
-        // Only once this install's answer is saved, so the flag can't make this install look like a reinstall
-        val answerSaved = savedAppReinstallValueOrNull() != null
-        val flagStored = runCatching { preferences.getBoolean(INSTALL_SEEN_FLAG_STORED_KEY, false) }.getOrDefault(false)
-        if (answerSaved && !flagStored) {
+        if (canStoreInstallSeenFlag()) {
             storeInstallSeenFlag()
         }
+    }
+
+    // Only safe once this install's answer is on disk: otherwise, after a restart, the flag alone would make this install look
+    // like a reinstall. Holding the check's lock means a check still saving its answer has finished, and recorded whether the
+    // save failed. Released before the Block Store call, so callers don't wait for the write.
+    private suspend fun canStoreInstallSeenFlag(): Boolean = reinstallCheckMutex.withLock {
+        val answerSaved = savedAppReinstallValueOrNull() != null && !answerSaveFailed
+        val flagStored = runCatching { preferences.getBoolean(INSTALL_SEEN_FLAG_STORED_KEY, false) }.getOrDefault(false)
+        answerSaved && !flagStored
     }
 
     private suspend fun storeInstallSeenFlag() {
@@ -186,8 +197,20 @@ class RealReinstallDetector @Inject constructor(
     private fun savedAppReinstallValue(): Boolean? =
         if (preferences.contains(APP_REINSTALLED_KEY)) preferences.getBoolean(APP_REINSTALLED_KEY, false) else null
 
-    private fun saveAppReinstallValue(isReinstall: Boolean) {
-        preferences.edit(commit = true) { putBoolean(APP_REINSTALLED_KEY, isReinstall) }
+    /**
+     * @return false if the answer may not have reached disk. Android keeps it readable in memory even then.
+     */
+    private fun saveAppReinstallValue(isReinstall: Boolean): Boolean {
+        val saved = try {
+            val editor = preferences.edit()
+            editor.putBoolean(APP_REINSTALLED_KEY, isReinstall)
+            editor.commit()
+        } catch (e: Exception) {
+            answerSaveFailed = true
+            throw e
+        }
+        if (!saved) answerSaveFailed = true
+        return saved
     }
 
     private fun detectAndSaveWithDownloadsFolder(): Boolean {
