@@ -1,5 +1,6 @@
 package com.duckduckgo.subscriptions.impl.withdrawal
 
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
@@ -12,6 +13,7 @@ import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -26,13 +28,22 @@ import java.math.BigDecimal
 
 class RealSubscriptionWithdrawalTest {
 
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
     private val subscriptionsService: SubscriptionsService = mock()
     private val subscriptionsManager: SubscriptionsManager = mock()
     private val withdrawalStore: WithdrawalStore = mock()
     private val currentTimeProvider: CurrentTimeProvider = mock {
         on { currentTimeMillis() } doReturn NOW
     }
-    private val withdrawal = RealSubscriptionWithdrawal(subscriptionsService, subscriptionsManager, withdrawalStore, currentTimeProvider)
+    private val withdrawal = RealSubscriptionWithdrawal(
+        subscriptionsService,
+        subscriptionsManager,
+        withdrawalStore,
+        currentTimeProvider,
+        coroutineTestRule.testDispatcherProvider,
+    )
 
     @Test
     fun whenEligibleThenReturnEligibility() = runTest {

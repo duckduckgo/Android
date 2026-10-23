@@ -188,7 +188,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
         loadWithdrawalOptionIfNeeded(subscription)
     }
 
-    private fun completedWithdrawalState(subscription: Subscription): CompletedWithdrawalState? {
+    private suspend fun completedWithdrawalState(subscription: Subscription): CompletedWithdrawalState? {
         if (subscription.isActive()) {
             subscriptionWithdrawal.clearCompletedWithdrawal()
             return null
