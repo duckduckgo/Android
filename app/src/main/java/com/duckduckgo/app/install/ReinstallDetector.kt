@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.install
 
+import android.content.Context
 import android.os.Build
 import android.os.Environment
 import androidx.core.content.edit
@@ -48,6 +49,7 @@ import logcat.LogPriority.WARN
 import logcat.logcat
 import java.io.File
 import javax.inject.Inject
+import kotlin.math.abs
 
 interface ReinstallDetector {
     /**
@@ -69,11 +71,13 @@ object InstallSeenPersistentStorageKey : PersistentStorageKey(
 @ContributesBinding(AppScope::class, binding = binding<ReinstallDetector>())
 @ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
 class RealReinstallDetector @Inject constructor(
+    private val context: Context,
     private val dispatcherProvider: DispatcherProvider,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val persistentStorage: PersistentStorage,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
+    private val outOfSightLaunchDetector: OutOfSightLaunchDetector,
 ) : ReinstallDetector, MainProcessLifecycleObserver {
 
     private val sdkInt: Int = Build.VERSION.SDK_INT
@@ -107,6 +111,10 @@ class RealReinstallDetector @Inject constructor(
     }
 
     override suspend fun isAppReinstall(): Boolean = withContext(dispatcherProvider.io()) {
+        // The store wipes this launch's data but not the Downloads folder or Block Store, so checking now would leave a marker
+        // that makes the user's first real launch look like a reinstall
+        if (outOfSightLaunchDetector.isOutOfSightLaunch) return@withContext false
+
         savedAppReinstallValueOrNull() ?: reinstallCheckMutex.withLock {
             // The caller holding the lock can be cancelled, e.g. when onboarding's screen closes. Finishing the check keeps
             // creating the marker and saving the answer together, so the next caller can't find one without the other.
@@ -166,7 +174,7 @@ class RealReinstallDetector @Inject constructor(
     // like a reinstall. Holding the check's lock means a check still saving its answer has finished, and recorded whether the
     // save failed. Released before the Block Store call, so callers don't wait for the write.
     private suspend fun canStoreInstallSeenFlag(): Boolean = reinstallCheckMutex.withLock {
-        val answerSaved = savedAppReinstallValueOrNull() != null && !answerSaveFailed
+        val answerSaved = savedAppReinstallValueOrNull() != null && !answerSaveFailed && !outOfSightLaunchDetector.isOutOfSightLaunch
         val flagStored = runCatching { preferences.getBoolean(INSTALL_SEEN_FLAG_STORED_KEY, false) }.getOrDefault(false)
         answerSaved && !flagStored
     }
@@ -221,10 +229,54 @@ class RealReinstallDetector @Inject constructor(
             // this is a new install
             false
         } else {
-            true
+            !wasCreatedAroundThisInstall(File(downloadDirectory, DDG_DOWNLOADS_DIRECTORY))
         }
         saveAppReinstallValue(appReinstallValue)
         return appReinstallValue
+    }
+
+    // Some stores launch the app out of sight while installing it, then wipe its private data: Samsung's Galaxy Store does
+    // this before the install is committed. The folder created by that launch outlives the wipe, so a folder last changed
+    // this close to the install time belongs to this install, not to a previous one.
+    private fun wasCreatedAroundThisInstall(directory: File): Boolean {
+        val modifiedAt = directory.lastModified()
+        val installedAt = runCatching { context.packageManager.getPackageInfo(context.packageName, 0).firstInstallTime }.getOrNull()
+        if (modifiedAt == 0L || installedAt == null) return false
+
+        val distanceFromInstallMs = abs(modifiedAt - installedAt)
+        val createdAroundThisInstall = distanceFromInstallMs <= SAME_INSTALL_WINDOW_MS
+        val secondsFromInstall = (modifiedAt - installedAt) / 1000
+        logcat(INFO) { "Reinstall check: folder changed ${secondsFromInstall}s from install time, same install=$createdAroundThisInstall" }
+        fireRecentFolderPixel(distanceFromInstallMs)
+        return createdAroundThisInstall
+    }
+
+    // Shows how often the rule above decides the answer, whether its window fits and which stores cause it. Reports up to
+    // 10 minutes, wider than the window, so near misses show up too.
+    private fun fireRecentFolderPixel(distanceFromInstallMs: Long) {
+        val age = when {
+            distanceFromInstallMs <= 10_000L -> RecentFolderAge.UP_TO_10_SECONDS
+            distanceFromInstallMs <= SAME_INSTALL_WINDOW_MS -> RecentFolderAge.UP_TO_2_MINUTES
+            distanceFromInstallMs <= RECENT_FOLDER_REPORT_WINDOW_MS -> RecentFolderAge.UP_TO_10_MINUTES
+            else -> return
+        }
+        pixel.fire(
+            ReinstallDetectorPixelName.RECENT_FOLDER,
+            parameters = mapOf(PARAM_AGE to age.value, PARAM_INSTALLER to installer().value),
+            type = Unique(),
+        )
+    }
+
+    private fun installer(): RecentFolderInstaller {
+        if (Build.VERSION.SDK_INT < 30) return RecentFolderInstaller.OTHER
+        val installerPackage = runCatching {
+            context.packageManager.getInstallSourceInfo(context.packageName).installingPackageName
+        }.getOrNull()
+        return when (installerPackage) {
+            GALAXY_STORE_PACKAGE -> RecentFolderInstaller.GALAXY_STORE
+            PLAY_STORE_PACKAGE -> RecentFolderInstaller.PLAY_STORE
+            else -> RecentFolderInstaller.OTHER
+        }
     }
 
     private fun getDownloadsDirectory(): File {
@@ -257,7 +309,15 @@ class RealReinstallDetector @Inject constructor(
         private const val APP_REINSTALLED_KEY = "appReinstalled"
         private const val INSTALL_SEEN_FLAG_STORED_KEY = "installSeenFlagStored"
         private const val PARAM_RESULT = "result"
+        private const val PARAM_AGE = "age"
+        private const val PARAM_INSTALLER = "installer"
         private const val DDG_DOWNLOADS_DIRECTORY = "DuckDuckGo"
+        private const val GALAXY_STORE_PACKAGE = "com.sec.android.app.samsungapps"
+        private const val PLAY_STORE_PACKAGE = "com.android.vending"
+
+        // The out-of-sight launch happens seconds before the install is committed. A reinstall within this window counts as new.
+        private const val SAME_INSTALL_WINDOW_MS = 2 * 60 * 1000L
+        private const val RECENT_FOLDER_REPORT_WINDOW_MS = 10 * 60 * 1000L
 
         // Nothing else bounds this step: the pre-ATB time limit can't stop it, so a stuck Play services call would hold back the ATB
         private const val BLOCK_STORE_TIME_LIMIT_MS = 10_000L

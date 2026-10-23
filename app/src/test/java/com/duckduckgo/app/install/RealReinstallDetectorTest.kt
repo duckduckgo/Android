@@ -16,8 +16,13 @@
 
 package com.duckduckgo.app.install
 
+import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.InstallSourceInfo
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.os.Environment
+import android.view.Display
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
@@ -71,6 +76,9 @@ class RealReinstallDetectorTest {
     private val dispatcherProvider = DefaultDispatcherProvider()
     private val persistentStorage = FakePersistentStorage()
     private val pixel: Pixel = mock()
+    private val packageManager: PackageManager = mock()
+    private val context: Context = mock()
+    private val outOfSightLaunchDetector = FakeOutOfSightLaunchDetector()
     private val ddgDownloadsDirectory = File(
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
         "DuckDuckGo",
@@ -79,6 +87,10 @@ class RealReinstallDetectorTest {
     @Before
     fun setUp() {
         ddgDownloadsDirectory.deleteRecursively()
+        whenever(context.packageName).thenReturn(PACKAGE_NAME)
+        whenever(context.packageManager).thenReturn(packageManager)
+        // Unless a test says otherwise, the app was installed long before any folder a test creates
+        givenFirstInstallTime(System.currentTimeMillis() - ONE_DAY_MS)
     }
 
     @After
@@ -104,6 +116,116 @@ class RealReinstallDetectorTest {
 
         assertTrue(reinstallDetectorWith(preferences).isAppReinstall())
         assertTrue(preferences.getBoolean(APP_REINSTALLED_KEY, false))
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenDdgDownloadsDirectoryWasCreatedSecondsBeforeTheInstallThenIsNotReinstall() = runTest {
+        val installedAt = System.currentTimeMillis()
+        givenFirstInstallTime(installedAt)
+        givenDdgDownloadsDirectoryLastChangedAt(installedAt - 3_000L)
+        val preferences = InMemorySharedPreferences()
+
+        assertFalse(reinstallDetectorWith(preferences).isAppReinstall())
+        assertFalse(preferences.getBoolean(APP_REINSTALLED_KEY, true))
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenDdgDownloadsDirectoryWasCreatedSecondsAfterTheInstallThenIsNotReinstall() = runTest {
+        val installedAt = System.currentTimeMillis() - 10_000L
+        givenFirstInstallTime(installedAt)
+        givenDdgDownloadsDirectoryLastChangedAt(installedAt + 5_000L)
+
+        assertFalse(reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall())
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenDdgDownloadsDirectoryIsOlderThanTheSameInstallWindowThenIsReinstall() = runTest {
+        val installedAt = System.currentTimeMillis()
+        givenFirstInstallTime(installedAt)
+        givenDdgDownloadsDirectoryLastChangedAt(installedAt - 3 * 60 * 1000L)
+
+        assertTrue(reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall())
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenInstallTimeIsUnavailableThenExistingDdgDownloadsDirectoryStillMeansReinstall() = runTest {
+        whenever(packageManager.getPackageInfo(PACKAGE_NAME, 0)).thenThrow(PackageManager.NameNotFoundException())
+        givenDdgDownloadsDirectoryLastChangedAt(System.currentTimeMillis())
+
+        assertTrue(reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall())
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenDdgDownloadsDirectoryWasCreatedSecondsBeforeAGalaxyStoreInstallThenRecentFolderPixelIsFired() = runTest {
+        val installedAt = System.currentTimeMillis()
+        givenFirstInstallTime(installedAt)
+        givenInstaller(GALAXY_STORE_PACKAGE)
+        givenDdgDownloadsDirectoryLastChangedAt(installedAt - 3_000L)
+
+        reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall()
+
+        verifyRecentFolderPixel(age = "0-10s", installer = "galaxy_store")
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenDdgDownloadsDirectoryWasChangedAMinuteAfterAPlayStoreInstallThenRecentFolderPixelSaysUpTo2Minutes() = runTest {
+        val installedAt = System.currentTimeMillis() - 2 * 60 * 1000L
+        givenFirstInstallTime(installedAt)
+        givenInstaller(PLAY_STORE_PACKAGE)
+        givenDdgDownloadsDirectoryLastChangedAt(installedAt + 60_000L)
+
+        reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall()
+
+        verifyRecentFolderPixel(age = "10s-2m", installer = "play_store")
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenDdgDownloadsDirectoryIsOutsideTheSameInstallWindowButRecentThenRecentFolderPixelIsFiredForAReinstall() = runTest {
+        val installedAt = System.currentTimeMillis()
+        givenFirstInstallTime(installedAt)
+        givenDdgDownloadsDirectoryLastChangedAt(installedAt - 5 * 60 * 1000L)
+
+        assertTrue(reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall())
+
+        verifyRecentFolderPixel(age = "2-10m", installer = "other")
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenInstallerCannotBeReadThenRecentFolderPixelSaysOther() = runTest {
+        val installedAt = System.currentTimeMillis()
+        givenFirstInstallTime(installedAt)
+        whenever(packageManager.getInstallSourceInfo(PACKAGE_NAME)).thenThrow(PackageManager.NameNotFoundException())
+        givenDdgDownloadsDirectoryLastChangedAt(installedAt - 3_000L)
+
+        reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall()
+
+        verifyRecentFolderPixel(age = "0-10s", installer = "other")
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenDdgDownloadsDirectoryIsOlderThan10MinutesThenRecentFolderPixelIsNotFired() = runTest {
+        givenDdgDownloadsDirectoryLastChangedAt(System.currentTimeMillis())
+
+        assertTrue(reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall())
+
+        verify(pixel, never()).fire(eq(ReinstallDetectorPixelName.RECENT_FOLDER), any(), any(), any())
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenDdgDownloadsDirectoryIsMissingThenRecentFolderPixelIsNotFired() = runTest {
+        reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall()
+
+        verify(pixel, never()).fire(eq(ReinstallDetectorPixelName.RECENT_FOLDER), any(), any(), any())
     }
 
     @Test
@@ -267,6 +389,72 @@ class RealReinstallDetectorTest {
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         assertEquals(0, persistentStorage.retrieveCalls)
+        assertEquals(0, persistentStorage.storeCalls)
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenLaunchedOutOfSightThenIsNotReinstallAndNothingIsCreatedOrSaved() = runTest {
+        outOfSightLaunchDetector.isOutOfSightLaunch = true
+        val preferences = InMemorySharedPreferences()
+
+        assertFalse(reinstallDetectorWith(preferences).isAppReinstall())
+
+        assertFalse(ddgDownloadsDirectory.exists())
+        assertFalse(preferences.contains(APP_REINSTALLED_KEY))
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenLaunchedOutOfSightAndAFolderAlreadyExistsThenItIsNotReadAndNothingIsSaved() = runTest {
+        outOfSightLaunchDetector.isOutOfSightLaunch = true
+        givenDdgDownloadsDirectoryLastChangedAt(System.currentTimeMillis() - ONE_DAY_MS)
+        val preferences = InMemorySharedPreferences()
+
+        assertFalse(reinstallDetectorWith(preferences).isAppReinstall())
+
+        assertFalse(preferences.contains(APP_REINSTALLED_KEY))
+        verify(pixel, never()).fire(eq(ReinstallDetectorPixelName.RECENT_FOLDER), any(), any(), any())
+    }
+
+    @Test
+    @Config(sdk = [29])
+    fun whenBelowAndroid11AndLaunchedOutOfSightThenAppStartDoesNotTouchBlockStore() = runTest {
+        outOfSightLaunchDetector.isOutOfSightLaunch = true
+        val preferences = InMemorySharedPreferences()
+        val reinstallDetector = reinstallDetectorWith(
+            preferences,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            appCoroutineScope = coroutineTestRule.testScope,
+        )
+
+        reinstallDetector.onCreate(mock())
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(0, persistentStorage.retrieveCalls)
+        assertEquals(0, persistentStorage.storeCalls)
+        assertFalse(preferences.contains(APP_REINSTALLED_KEY))
+    }
+
+    @Test
+    @Config(sdk = [29])
+    fun whenBelowAndroid11AndOutOfSightLaunchIsSeenDuringTheCheckThenTheFlagIsNotWritten() = runTest {
+        val preferences = InMemorySharedPreferences()
+        val reinstallDetector = reinstallDetectorWith(
+            preferences,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            appCoroutineScope = coroutineTestRule.testScope,
+        )
+        persistentStorage.retrieveGate = CompletableDeferred()
+
+        reinstallDetector.onCreate(mock())
+        coroutineTestRule.testScope.testScheduler.runCurrent()
+        // The launch activity sees the display while app start is still reading Block Store
+        outOfSightLaunchDetector.isOutOfSightLaunch = true
+        persistentStorage.retrieveGate?.complete(Unit)
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(1, persistentStorage.retrieveCalls)
         assertEquals(0, persistentStorage.storeCalls)
     }
 
@@ -547,11 +735,37 @@ class RealReinstallDetectorTest {
         val sharedPreferencesProvider: SharedPreferencesProvider = mock()
         whenever(sharedPreferencesProvider.getSharedPreferences(any(), any(), any())).thenReturn(preferences)
         return RealReinstallDetector(
+            context = context,
             dispatcherProvider = dispatcherProvider,
             sharedPreferencesProvider = sharedPreferencesProvider,
             persistentStorage = persistentStorage,
             appCoroutineScope = appCoroutineScope,
             pixel = pixel,
+            outOfSightLaunchDetector = outOfSightLaunchDetector,
+        )
+    }
+
+    private fun givenFirstInstallTime(installedAt: Long) {
+        whenever(packageManager.getPackageInfo(PACKAGE_NAME, 0)).thenReturn(PackageInfo().apply { firstInstallTime = installedAt })
+    }
+
+    private fun givenDdgDownloadsDirectoryLastChangedAt(changedAt: Long) {
+        ddgDownloadsDirectory.mkdirs()
+        assertTrue(ddgDownloadsDirectory.setLastModified(changedAt))
+    }
+
+    private fun givenInstaller(installerPackage: String) {
+        val installSourceInfo: InstallSourceInfo = mock()
+        whenever(installSourceInfo.installingPackageName).thenReturn(installerPackage)
+        whenever(packageManager.getInstallSourceInfo(PACKAGE_NAME)).thenReturn(installSourceInfo)
+    }
+
+    private fun verifyRecentFolderPixel(age: String, installer: String) {
+        verify(pixel).fire(
+            eq(ReinstallDetectorPixelName.RECENT_FOLDER),
+            eq(mapOf("age" to age, "installer" to installer)),
+            any(),
+            eq(Unique()),
         )
     }
 
@@ -610,6 +824,13 @@ class RealReinstallDetectorTest {
             }
             return true
         }
+    }
+
+    private class FakeOutOfSightLaunchDetector : OutOfSightLaunchDetector {
+        @Volatile
+        override var isOutOfSightLaunch: Boolean = false
+
+        override fun onLaunchDisplay(display: Display?): Boolean = false
     }
 
     private class FakePersistentStorage : PersistentStorage {
@@ -682,5 +903,9 @@ class RealReinstallDetectorTest {
         const val APP_REINSTALLED_KEY = "appReinstalled"
         const val INSTALL_SEEN_FLAG_STORED_KEY = "installSeenFlagStored"
         const val SAVE_DELAY_MS = 300L
+        const val PACKAGE_NAME = "com.duckduckgo.mobile.android"
+        const val ONE_DAY_MS = 24 * 60 * 60 * 1000L
+        const val GALAXY_STORE_PACKAGE = "com.sec.android.app.samsungapps"
+        const val PLAY_STORE_PACKAGE = "com.android.vending"
     }
 }
