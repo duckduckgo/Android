@@ -793,8 +793,9 @@ class RealNativeInputManager @Inject constructor(
         navBarTabCountObserver?.let { existing -> navBarTabCountLiveData?.removeObserver(existing) }
         navBarTabCountObserver = null
         navBarTabCountLiveData = null
-        floatingSubmitContainer?.let {
-            (it.parent as? ViewGroup)?.removeView(it)
+        floatingSubmitContainer?.let { container ->
+            val parent = container.parent as? ViewGroup
+            if (parent?.isInLayout == true) parent.post { parent.removeView(container) } else parent?.removeView(container)
             floatingSubmitContainer = null
         }
         if (removed) widgetRoot = null
