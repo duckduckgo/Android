@@ -196,7 +196,7 @@ class DataClearing @Inject constructor(
             shouldFireDataClearPixel = true,
         )
 
-        if (FireClearOption.TABS in options) {
+        if (FireClearOption.TABS in options && customTabsFeature.keepCustomTabOnAppSwitch().isEnabled()) {
             clearDataAction.closeCustomTabs()
         }
 
