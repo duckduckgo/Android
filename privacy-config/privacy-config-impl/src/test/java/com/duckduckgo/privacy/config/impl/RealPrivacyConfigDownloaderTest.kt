@@ -26,6 +26,11 @@ import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersisterTest.FakeFak
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersisterTest.FakePrivacyConfigCallbackPlugin
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
+import com.duckduckgo.privacy.config.store.PrivacyConfig
+import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -59,7 +64,50 @@ class RealPrivacyConfigDownloaderTest {
 
     @Before
     fun before() {
-        testee = RealPrivacyConfigDownloader(TestPrivacyConfigService(), mockPrivacyConfigPersister, pluginPoint, pixel, telemetry)
+        testee = RealPrivacyConfigDownloader(TestPrivacyConfigService(), mockPrivacyConfigPersister, pluginPoint, pixel, telemetry, mock())
+    }
+
+    @Test
+    fun whenForcedDownloadThenResetVersionAndEtagBeforeRequest() = runTest {
+        val repository = mock<PrivacyConfigRepository>()
+        val service = mock<PrivacyConfigService>()
+        whenever(service.privacyConfig()).thenAnswer {
+            verify(repository).insert(RESET_CONFIG)
+            throw RuntimeException("request observed")
+        }
+        testee = RealPrivacyConfigDownloader(service, mockPrivacyConfigPersister, pluginPoint, pixel, telemetry, repository)
+        assertTrue(testee.download(force = true) is Error)
+    }
+
+    @Test
+    fun whenForcedDownloadWaitsForExistingDownloadThenResetOnlyAfterExistingRequestCompletes() = runTest {
+        val repository = mock<PrivacyConfigRepository>()
+        val started = CompletableDeferred<Unit>()
+        val release = CompletableDeferred<Unit>()
+        var requests = 0
+        val service = object : PrivacyConfigService {
+            override suspend fun privacyConfig(): Response<JsonPrivacyConfig> {
+                requests++
+                if (requests == 1) {
+                    started.complete(Unit)
+                    release.await()
+                } else {
+                    verify(repository).insert(RESET_CONFIG)
+                }
+                throw RuntimeException("request observed")
+            }
+        }
+        testee = RealPrivacyConfigDownloader(service, mockPrivacyConfigPersister, pluginPoint, pixel, telemetry, repository)
+        val first = async { testee.download() }
+        started.await()
+        val forced = async { testee.download(force = true) }
+        runCurrent()
+        assertEquals(1, requests)
+        verify(repository, never()).insert(any())
+        release.complete(Unit)
+        first.await()
+        forced.await()
+        assertEquals(2, requests)
     }
 
     @Test
@@ -71,6 +119,7 @@ class RealPrivacyConfigDownloaderTest {
                 pluginPoint,
                 pixel,
                 telemetry,
+                mock(),
             )
         assertTrue(testee.download() is Error)
         verify(pixel).fire("m_privacy_config_download_error", mapOf("code" to "unknown", "message" to "unknown"))
@@ -86,6 +135,7 @@ class RealPrivacyConfigDownloaderTest {
                 pluginPoint,
                 pixel,
                 telemetry,
+                mock(),
             )
         assertTrue(testee.download() is Error)
         verify(pixel).fire("m_privacy_config_empty_error")
@@ -171,5 +221,6 @@ class RealPrivacyConfigDownloaderTest {
         private const val FEATURE_JSON = "{\"state\": \"enabled\"}"
         val unprotectedTemporaryList = listOf(FeatureException("example.com", "reason"))
         private val VARIANT_MANAGER_JSON = null
+        private val RESET_CONFIG = PrivacyConfig(version = -1, readme = "", eTag = "", timestamp = "")
     }
 }
