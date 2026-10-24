@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from asana_sync import CONFIG_VARIABLES, count_unexplained, github_run, file_finding_groups, load_config, markdown_to_asana_html, upsert_run_task
+from asana_sync import CONFIG_VARIABLES, count_unexplained, finding_tasks_section, github_run, file_finding_groups, load_config, markdown_to_asana_html, upsert_run_task
 
 GROUP = {
     "module": "a-api",
@@ -156,3 +156,16 @@ def test_a_job_does_not_update_another_jobs_task_from_the_same_run():
 
     tasks_api.update_task.assert_not_called()
     assert tasks_api.create_task.call_args[0][0]["data"]["custom_fields"] == {"RUN": "123/regression"}
+
+
+def test_report_links_to_each_finding_task():
+    tasks_api, stories_api = MagicMock(), MagicMock()
+    tasks_api.get_tasks_for_project.return_value = [{"name": "[API quality] a-api M4", "gid": "42", "permalink_url": "https://old"}]
+    tasks_api.create_task.return_value = {"permalink_url": "https://new"}
+    other = {**GROUP, "module": "b-api"}
+
+    filed = file_finding_groups(tasks_api, stories_api, CONFIG, "2026-10-05", [GROUP, other], "https://report")
+    html = markdown_to_asana_html(finding_tasks_section(filed))
+
+    assert '<code>a-api</code> M4: <a href="https://old">added to the open task</a>' in html
+    assert '<code>b-api</code> M4: <a href="https://new">new task</a>' in html
