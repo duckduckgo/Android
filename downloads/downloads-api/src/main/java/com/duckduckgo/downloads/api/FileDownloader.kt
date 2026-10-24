@@ -39,5 +39,7 @@ interface FileDownloader {
         val isUrlCompressed: Boolean = false,
         val fileName: String? = null,
         val browserMode: BrowserMode,
+        /** URL of the page the download was initiated from. Used to compute the Referer header of the download request. */
+        val referer: String? = null,
     ) : Serializable
 }
