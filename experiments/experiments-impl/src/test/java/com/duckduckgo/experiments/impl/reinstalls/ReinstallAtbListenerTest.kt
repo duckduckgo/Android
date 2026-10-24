@@ -19,12 +19,22 @@ package com.duckduckgo.experiments.impl.reinstalls
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.yield
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -178,5 +188,71 @@ class ReinstallAtbListenerTest {
         testee.beforeAtbInit()
 
         verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
+    }
+
+    @Test
+    fun whenReinstallCheckRunsPastTheTimeLimitThenVariantForReturningUserIsStillSet() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).doSuspendableAnswer {
+            delay(testee.beforeAtbInitTimeoutMillis() * 2)
+            true
+        }
+
+        val result = withTimeoutOrNull(testee.beforeAtbInitTimeoutMillis()) { testee.beforeAtbInit() }
+
+        assertNull(result)
+        verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
+    }
+
+    @Test
+    fun whenTimeLimitIsReachedBeforeTheReinstallCheckStartsThenCheckStillRunsAndVariantIsSet() = runBlocking {
+        val realDispatcherTestee = ReinstallAtbListener(
+            mockBackupDataStore,
+            mockStatisticsDataStore,
+            mockAppBuildConfig,
+            DefaultDispatcherProvider(),
+            mockReinstallerVariantProtectionFeature,
+            moshi,
+        )
+        whenever(mockBackupDataStore.clearBackupPreferences()).doAnswer { Thread.sleep(SLOW_BLOCKING_WORK_MS) }
+        // Like the real implementation, which switches context, the check notices cancellation as soon as it starts
+        whenever(mockAppBuildConfig.isAppReinstall()).doSuspendableAnswer {
+            yield()
+            true
+        }
+
+        val result = withTimeoutOrNull(SHORT_TIME_LIMIT_MS) { realDispatcherTestee.beforeAtbInit() }
+
+        assertNull(result)
+        verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
+    }
+
+    @Test
+    fun whenReinstallStepOnlyBlocksPastTheTimeLimitThenTheTimeLimitIsNotReported() = runBlocking {
+        val realDispatcherProvider = DefaultDispatcherProvider()
+        val realDispatcherTestee = ReinstallAtbListener(
+            mockBackupDataStore,
+            mockStatisticsDataStore,
+            mockAppBuildConfig,
+            realDispatcherProvider,
+            mockReinstallerVariantProtectionFeature,
+            moshi,
+        )
+        whenever(mockAppBuildConfig.isAppReinstall()).doSuspendableAnswer {
+            Thread.sleep(SLOW_BLOCKING_WORK_MS)
+            true
+        }
+
+        // Started on the listener's own dispatcher, as AtbInitializer does, so entering the step doesn't switch threads
+        val result = withContext(realDispatcherProvider.io()) {
+            withTimeoutOrNull(SHORT_TIME_LIMIT_MS) { realDispatcherTestee.beforeAtbInit() }
+        }
+
+        assertEquals(Unit, result)
+        verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
+    }
+
+    private companion object {
+        const val SHORT_TIME_LIMIT_MS = 50L
+        const val SLOW_BLOCKING_WORK_MS = 300L
     }
 }

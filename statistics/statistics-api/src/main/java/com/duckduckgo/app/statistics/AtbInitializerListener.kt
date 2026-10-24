@@ -21,7 +21,10 @@ interface AtbInitializerListener {
     /** This method will be called before initializing the ATB */
     suspend fun beforeAtbInit()
 
-    /** @return the timeout in milliseconds after which [beforeAtbInit] will be stopped */
+    /**
+     * @return the timeout in milliseconds after which [beforeAtbInit] is cancelled. Cancellation only takes effect at a suspension
+     * point: blocking work keeps running, and ATB initialization waits for it to finish.
+     */
     fun beforeAtbInitTimeoutMillis(): Long
 
     companion object {
