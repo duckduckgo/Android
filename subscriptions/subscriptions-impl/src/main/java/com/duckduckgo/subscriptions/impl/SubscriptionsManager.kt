@@ -331,6 +331,8 @@ class RealSubscriptionsManager @Inject constructor(
 
     private var experimentsAssigned = PurchaseExperiments()
 
+    private var isPlanSwitchPending: Boolean = false
+
     override suspend fun isSignedIn(): Boolean {
         return isSignedInV1() || isSignedInV2()
     }
@@ -379,6 +381,7 @@ class RealSubscriptionsManager @Inject constructor(
                         checkPurchase(it.packageName, it.purchaseToken)
                     }
                     is PurchaseState.Canceled -> {
+                        isPlanSwitchPending = false
                         subscriptionPurchaseWideEvent.onPurchaseCancelledByUser()
                         subscriptionSwitchWideEvent.onUserCancelled()
                         _currentPurchaseState.emit(CurrentPurchase.Canceled)
@@ -391,6 +394,7 @@ class RealSubscriptionsManager @Inject constructor(
                     }
 
                     is PurchaseState.Failure -> {
+                        isPlanSwitchPending = false
                         subscriptionPurchaseWideEvent.onBillingFlowPurchaseFailure(it.errorType)
                         subscriptionSwitchWideEvent.onSwitchFailed(it.errorType)
                         _currentPurchaseState.emit(CurrentPurchase.Failure(it.errorType))
@@ -481,6 +485,8 @@ class RealSubscriptionsManager @Inject constructor(
 
             subscriptionSwitchWideEvent.onTargetPlanRetrieved()
 
+            isPlanSwitchPending = true
+
             // Launch Google Play billing flow for subscription update
             logcat { "Subs: Launching subscription update flow for plan: $planId" }
 
@@ -498,6 +504,7 @@ class RealSubscriptionsManager @Inject constructor(
         } catch (e: Exception) {
             val error = extractError(e)
             logcat(ERROR) { "Subs: Failed to switch subscription plan: $error" }
+            isPlanSwitchPending = false
             _currentPurchaseState.emit(CurrentPurchase.Failure("Failed to switch subscription plan: $error"))
             subscriptionSwitchWideEvent.onSwitchFailed(javaClass.simpleName)
         }
@@ -629,10 +636,16 @@ class RealSubscriptionsManager @Inject constructor(
 
             if (subscription.isActive()) {
                 val isFreeTrial = subscription.activeOffers.contains(ActiveOfferType.TRIAL)
-                pixelSender.reportPurchaseSuccess(isFreeTrial)
-                pixelSender.reportSubscriptionActivated()
+                val isPlanSwitch = isPlanSwitchPending
+                isPlanSwitchPending = false
+                if (isPlanSwitch) {
+                    pixelSender.reportSubscriptionSwitch()
+                } else {
+                    pixelSender.reportPurchaseSuccess(isFreeTrial)
+                    pixelSender.reportSubscriptionActivated()
+                }
                 emitEntitlementsValues()
-                _currentPurchaseState.emit(CurrentPurchase.Success(isFreeTrial))
+                _currentPurchaseState.emit(CurrentPurchase.Success(isFreeTrial, isPlanSwitch = isPlanSwitch))
                 authRepository.registerLocalPurchasedAt()
 
                 subscriptionSwitchWideEvent.onSwitchConfirmationSuccess()
@@ -707,6 +720,7 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun handlePurchaseFailed() {
+        isPlanSwitchPending = false
         authRepository.purchaseToWaitingStatus()
         pixelSender.reportPurchaseFailureBackend()
         _currentPurchaseState.emit(CurrentPurchase.Waiting)
@@ -1126,6 +1140,7 @@ class RealSubscriptionsManager @Inject constructor(
         try {
             _currentPurchaseState.emit(CurrentPurchase.PreFlowInProgress)
 
+            isPlanSwitchPending = false
             pendingOnboardingEnrollmentIsFreeTrial = offerId in SubscriptionsConstants.LIST_OF_FREE_TRIAL_OFFERS
 
             subscriptionPurchaseWideEvent.onPurchaseFlowStarted(
@@ -1359,7 +1374,10 @@ sealed class CurrentPurchase {
     data object PreFlowInProgress : CurrentPurchase()
     data object PreFlowFinished : CurrentPurchase()
     data object InProgress : CurrentPurchase()
-    data class Success(val isFreeTrial: Boolean) : CurrentPurchase()
+    data class Success(
+        val isFreeTrial: Boolean,
+        val isPlanSwitch: Boolean = false,
+    ) : CurrentPurchase()
     data object Waiting : CurrentPurchase()
     data object Recovered : CurrentPurchase()
     data object Canceled : CurrentPurchase()
