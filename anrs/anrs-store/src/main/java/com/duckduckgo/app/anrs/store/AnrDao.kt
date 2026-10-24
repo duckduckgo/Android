@@ -41,4 +41,7 @@ interface AnrDao {
 
     @Query("SELECT * FROM anr_entity ORDER BY timestamp DESC LIMIT 1")
     fun latestAnr(): AnrEntity?
+
+    @Query("DELETE FROM anr_entity WHERE timestamp < :timestamp")
+    fun removeOldAnrs(timestamp: String)
 }
