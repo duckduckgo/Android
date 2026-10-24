@@ -275,14 +275,33 @@ public class Scorer {
      */
     static boolean isSealedCase(KtClassOrObject type, KtClassOrObject parent) {
         if (!(parent instanceof KtClass sealed) || !sealed.hasModifier(KtTokens.SEALED_KEYWORD) || sealed.getName() == null) return false;
+        // Without symbol resolution, a qualified supertype only counts when it names this parent: `other.Result` is
+        // another type that happens to share the name.
+        String path = nestedPath(sealed);
+        String packageName = sealed.getContainingKtFile().getPackageFqName().asString();
         for (KtSuperTypeListEntry entry : type.getSuperTypeListEntries()) {
-            if (entry.getTypeReference() != null
-                && entry.getTypeReference().getTypeElement() instanceof KtUserType user
-                && sealed.getName().equals(user.getReferencedName())) {
+            if (entry.getTypeReference() == null || !(entry.getTypeReference().getTypeElement() instanceof KtUserType user)) continue;
+            String written = qualifiedName(user);
+            if (written.equals(sealed.getName()) || written.equals(path) || written.equals(packageName + "." + path)) {
                 return true;
             }
         }
         return false;
+    }
+
+    /** `Outer.Result` for a `Result` nested in `Outer`. */
+    static String nestedPath(KtClassOrObject type) {
+        StringBuilder path = new StringBuilder(type.getName());
+        for (KtClassOrObject outer = PsiTreeUtil.getParentOfType(type, KtClassOrObject.class); outer != null;
+             outer = PsiTreeUtil.getParentOfType(outer, KtClassOrObject.class)) {
+            path.insert(0, outer.getName() + ".");
+        }
+        return path.toString();
+    }
+
+    /** The type's name as written, without type arguments: `a.b.Result` for `a.b.Result<T>`. */
+    static String qualifiedName(KtUserType user) {
+        return user.getQualifier() == null ? user.getReferencedName() : qualifiedName(user.getQualifier()) + "." + user.getReferencedName();
     }
 
     /** A property is documented by its type's KDoc through an `@property`/`@param` tag or a `[name]` link. */

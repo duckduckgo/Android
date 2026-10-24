@@ -17,11 +17,11 @@ env:
   # Asana IDs for the posting script; see scripts/api-quality/README.md.
   GH_API_QUALITY_PROJECT_ID: ${{ vars.GH_API_QUALITY_PROJECT_ID }}
   GH_API_QUALITY_TRIAGE_SECTION_ID: ${{ vars.GH_API_QUALITY_TRIAGE_SECTION_ID }}
-  GH_API_QUALITY_SCORECARDS_SECTION_ID: ${{ vars.GH_API_QUALITY_SCORECARDS_SECTION_ID }}
   GH_API_QUALITY_WEEKLY_REPORTS_SECTION_ID: ${{ vars.GH_API_QUALITY_WEEKLY_REPORTS_SECTION_ID }}
   GH_API_QUALITY_GITHUB_RUN_FIELD_KEY_ID: ${{ vars.GH_API_QUALITY_GITHUB_RUN_FIELD_KEY_ID }}
   GH_API_QUALITY_STATUS_FIELD_KEY_ID: ${{ vars.GH_API_QUALITY_STATUS_FIELD_KEY_ID }}
   GH_API_QUALITY_STATUS_FIELD_NEEDS_EXPLANATION_VALUE_ID: ${{ vars.GH_API_QUALITY_STATUS_FIELD_NEEDS_EXPLANATION_VALUE_ID }}
+  GH_API_QUALITY_RULES_URL: ${{ vars.GH_API_QUALITY_RULES_URL }}
 
 concurrency:
   group: api-quality-weekly
@@ -106,25 +106,26 @@ jobs:
         env:
           TODAY: ${{ steps.score.outputs.today }}
           LAST_WEEK: ${{ steps.score.outputs.last_week }}
+          PREVIOUS_SHA: ${{ steps.score.outputs.previous_sha }}
         run: |
-          python3 scripts/api-quality/compare.py \
-            --before "$RUNNER_TEMP/score-previous" --after "$RUNNER_TEMP/score-current" --mode weekly \
-            --out-md "$RUNNER_TEMP/o1.md" --out-json "$RUNNER_TEMP/new-findings.json"
+          baseline_args=()
           if [[ -n "$API_QUALITY_BASELINE_SHA" ]]; then
-            python3 scripts/api-quality/compare.py \
-              --before "$RUNNER_TEMP/score-baseline" --after "$RUNNER_TEMP/score-current" --mode weekly \
-              --title "O1: since the baseline (\`${API_QUALITY_BASELINE_SHA:0:10}\`)" --out-md "$RUNNER_TEMP/o1-baseline.md"
+            baseline_args=(--baseline "$RUNNER_TEMP/score-baseline")
           fi
+          python3 scripts/api-quality/compare.py \
+            --before "$RUNNER_TEMP/score-previous" --after "$RUNNER_TEMP/score-current" --mode weekly --weekly-report \
+            "${baseline_args[@]}" --out-md "$RUNNER_TEMP/body.md" --out-json "$RUNNER_TEMP/new-findings.json" \
+            --rules-url "$GH_API_QUALITY_RULES_URL" --link-base "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/blob/$(git rev-parse HEAD)"
           {
             echo "# API Weekly Report, $TODAY"
             echo
-            echo "Compared with $LAST_WEEK. \`develop\` at \`$(git rev-parse --short=10 HEAD)\`."
-            echo
-            cat "$RUNNER_TEMP/o1.md"
-            echo
-            if [[ -f "$RUNNER_TEMP/o1-baseline.md" ]]; then
-              cat "$RUNNER_TEMP/o1-baseline.md"
+            echo "- **This week:** \`develop\` at \`$(git rev-parse --short=10 HEAD)\`, $TODAY"
+            echo "- **Last week:** \`develop\` at \`${PREVIOUS_SHA:0:10}\`, $LAST_WEEK"
+            if [[ -n "$API_QUALITY_BASELINE_SHA" ]]; then
+              echo "- **Baseline:** \`${API_QUALITY_BASELINE_SHA:0:10}\`"
             fi
+            echo
+            cat "$RUNNER_TEMP/body.md"
           } > "$RUNNER_TEMP/report.md"
           cat "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
           mkdir -p "$RUNNER_TEMP/artifact"

@@ -51,11 +51,13 @@ jobs:
       - name: Compare
         id: compare
         env:
-          GUIDE_URL: ${{ vars.API_QUALITY_GUIDE_URL }}
+          RULES_URL: ${{ vars.GH_API_QUALITY_RULES_URL }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           python3 scripts/api-quality/compare.py \
             --before "$RUNNER_TEMP/score-base" --after "$RUNNER_TEMP/score-head" --mode pr \
-            --out-md "$RUNNER_TEMP/comment.md" --out-json "$RUNNER_TEMP/diff.json" --guide-url "$GUIDE_URL"
+            --out-md "$RUNNER_TEMP/comment.md" --out-json "$RUNNER_TEMP/diff.json" --rules-url "$RULES_URL" \
+            --link-base "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/blob/$HEAD_SHA"
           cat "$RUNNER_TEMP/comment.md" >> "$GITHUB_STEP_SUMMARY"
           echo "regressed=$(jq -r .regressed "$RUNNER_TEMP/diff.json")" >> "$GITHUB_OUTPUT"
 
