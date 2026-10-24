@@ -68,11 +68,16 @@ public class Scorer {
     static final Set<String> UNTYPED_TYPES = Set.of("Any", "Pair", "Triple");
     static final String[] RULES = {"M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8"};
 
-    enum Kind { TYPE, TOP_FUNCTION, TOP_PROPERTY, MEMBER_FUNCTION, MEMBER_PROPERTY }
+    /** SEALED_CASE: a subtype nested in its sealed parent. Counts for M6 but needs no KDoc, like an enum entry. */
+    enum Kind { TYPE, SEALED_CASE, TOP_FUNCTION, TOP_PROPERTY, MEMBER_FUNCTION, MEMBER_PROPERTY }
 
     record Decl(String module, String file, int line, String name, Kind kind, boolean documented) {
         boolean countsForM3() {
             return kind == Kind.TYPE || kind == Kind.TOP_FUNCTION;
+        }
+
+        boolean needsKdoc() {
+            return kind != Kind.SEALED_CASE;
         }
     }
 
@@ -187,7 +192,7 @@ public class Scorer {
     static void visitTopLevel(Module module, String rel, KtFile file, KtDeclaration d) {
         if (!isPublic(d)) return;
         if (d instanceof KtClassOrObject type) {
-            visitType(module, rel, file, type, "");
+            visitType(module, rel, file, type, "", null);
         } else if (d instanceof KtTypeAlias alias) {
             addDecl(module, rel, file, alias, alias.getName(), Kind.TYPE, alias.getDocComment() != null);
             checkTypeName(module, rel, file, alias, alias.getName());
@@ -203,11 +208,12 @@ public class Scorer {
         }
     }
 
-    static void visitType(Module module, String rel, KtFile file, KtClassOrObject type, String prefix) {
+    static void visitType(Module module, String rel, KtFile file, KtClassOrObject type, String prefix, KtClassOrObject parent) {
         boolean companion = type instanceof KtObjectDeclaration obj && obj.isCompanion();
         String name = companion ? prefix + "Companion" : prefix + type.getName();
         if (!companion) {
-            addDecl(module, rel, file, type, name, Kind.TYPE, type.getDocComment() != null);
+            Kind kind = isSealedCase(type, parent) ? Kind.SEALED_CASE : Kind.TYPE;
+            addDecl(module, rel, file, type, name, kind, type.getDocComment() != null);
             checkTypeName(module, rel, file, type, type.getName());
             for (KtSuperTypeListEntry entry : type.getSuperTypeListEntries()) {
                 checkTypeReference(module, rel, file, type, name, entry.getTypeReference(), false);
@@ -243,7 +249,7 @@ public class Scorer {
             }
             if (!isPublic(member) || member instanceof KtEnumEntry) continue;
             if (member instanceof KtClassOrObject nested) {
-                visitType(module, rel, file, nested, memberPrefix);
+                visitType(module, rel, file, nested, memberPrefix, type);
             } else if (member instanceof KtTypeAlias alias) {
                 addDecl(module, rel, file, alias, memberPrefix + alias.getName(), Kind.TYPE, alias.getDocComment() != null);
             } else if (member instanceof KtNamedFunction fn) {
@@ -260,6 +266,23 @@ public class Scorer {
                 checkVar(module, rel, file, prop, pname);
             }
         }
+    }
+
+    /**
+     * A case of a sealed hierarchy (`Success`, `Failure`) is named for what it is, and its parent's KDoc describes the set,
+     * as for enum entries. Only cases declared inside their parent are recognised: without symbol resolution, a top-level
+     * subtype can't be told apart from any other class.
+     */
+    static boolean isSealedCase(KtClassOrObject type, KtClassOrObject parent) {
+        if (!(parent instanceof KtClass sealed) || !sealed.hasModifier(KtTokens.SEALED_KEYWORD) || sealed.getName() == null) return false;
+        for (KtSuperTypeListEntry entry : type.getSuperTypeListEntries()) {
+            if (entry.getTypeReference() != null
+                && entry.getTypeReference().getTypeElement() instanceof KtUserType user
+                && sealed.getName().equals(user.getReferencedName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** A property is documented by its type's KDoc through an `@property`/`@param` tag or a `[name]` link. */
@@ -401,12 +424,12 @@ public class Scorer {
     }
 
     static void evaluate(Module module) {
-        List<Decl> top = module.decls.stream().filter(Decl::countsForM3).toList();
-        List<Decl> members = module.decls.stream().filter(d -> !d.countsForM3()).toList();
+        List<Decl> top = module.decls.stream().filter(d -> d.needsKdoc() && d.countsForM3()).toList();
+        List<Decl> members = module.decls.stream().filter(d -> d.needsKdoc() && !d.countsForM3()).toList();
         module.topKdoc = ratio(top);
         module.memberKdoc = ratio(members);
         for (Decl d : module.decls) {
-            if (!d.documented()) {
+            if (d.needsKdoc() && !d.documented()) {
                 module.findings.add(new Finding(module.name, d.countsForM3() ? "M3" : "M4", d.file(), d.line(), d.name(), "no KDoc"));
             }
         }

@@ -73,6 +73,9 @@ names the missing ones. Posting uses the existing `ASANA_ACCESS_TOKEN` secret.
   the contract and KDoc belong to the declaration they override.
 - **Declaration (M6):** each public type (top-level or nested, including type aliases; not companion objects or enum entries),
   top-level function or property, and member function or property. Primary-constructor `val`/`var` parameters count as properties.
+- **Sealed cases:** a class or object declared inside its `sealed` parent and extending it (`Result.Success`) needs no
+  KDoc, like an enum entry: it counts for M6 but not for M3. Its own members still count for M4. A subtype declared outside
+  its parent isn't recognised, since there's no symbol resolution.
 - **M3** covers types and top-level functions. **M4** covers member functions and properties, and top-level properties. A
   property is also documented when its class KDoc describes it with an `@property`/`@param` tag or a `[name]` link. A module with
   nothing to document for a check scores 100% on it.

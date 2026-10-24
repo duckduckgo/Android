@@ -200,8 +200,10 @@ def asana_apis():
 
 
 def file_finding_groups(tasks_api, stories_api, config, date, groups, report_url):
+    """Files or comments one task per group; returns `(group, task link, created)` for the report to link back to."""
     project = config["project"]
     existing = open_tasks_by_name(tasks_api, project)
+    filed = []
     for group in groups:
         name = finding_task_name(group)
         items = "".join(finding_lines(group))
@@ -212,6 +214,7 @@ def file_finding_groups(tasks_api, stories_api, config, date, groups, report_url
                 {},
             )
             log(f"Commented on {existing[name]['permalink_url']}")
+            filed.append((group, existing[name]["permalink_url"], False))
             continue
         notes = (
             f"<body>New finding in the <a href=\"{report_url}\">{date} weekly report</a>."
@@ -227,6 +230,15 @@ def file_finding_groups(tasks_api, stories_api, config, date, groups, report_url
             {"opt_fields": "permalink_url"},
         )
         log(f"Created finding task {task['permalink_url']}")
+        filed.append((group, task["permalink_url"], True))
+    return filed
+
+
+def finding_tasks_section(filed):
+    lines = ["", "## Finding tasks", ""]
+    for group, url, created in filed:
+        lines.append(f"- `{group['module']}` {group['rule']}: [{'new task' if created else 'added to the open task'}]({url})")
+    return "\n".join(lines) + "\n"
 
 
 def main():
@@ -249,7 +261,11 @@ def main():
     report_task = upsert_run_task(tasks_api, stories_api, config["project"], config["sections"]["weekly_reports"],
                                   f"API Weekly Report, {args.date}", markdown_to_asana_html(report),
                                   config["fields"]["github_run"], run_id, run_url)
-    file_finding_groups(tasks_api, stories_api, config, args.date, groups, report_task["permalink_url"])
+    filed = file_finding_groups(tasks_api, stories_api, config, args.date, groups, report_task["permalink_url"])
+    # The finding tasks link to the report, which exists first; the report links back once they exist.
+    if filed:
+        report += finding_tasks_section(filed)
+        tasks_api.update_task({"data": {"html_notes": markdown_to_asana_html(report)}}, report_task["gid"], {})
 
 
 if __name__ == "__main__":
