@@ -133,7 +133,8 @@ private val SERVERS_JSON = """
                   "ips": [
                     "162.245.204.100"
                   ],
-                  "port": 443
+                  "port": 443,
+                  "ports": [443, 51820]
                 }
               },
               {
@@ -182,7 +183,8 @@ private val SERVERS_JSON = """
                   "ips": [
                     "31.204.129.39"
                   ],
-                  "port": 443
+                  "port": 443,
+                  "ports": [443]
                 }
               },
               {
