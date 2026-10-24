@@ -18,14 +18,17 @@ package com.duckduckgo.autofill.impl.importing.takeout.webflow
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.core.os.BundleCompat
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityImportGoogleBookmarksWebflowBinding
-import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.Unknown
-import com.duckduckgo.autofill.impl.importing.takeout.webflow.journey.ImportGoogleBookmarksJourney
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksViewModel.Command
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksViewModel.ViewMode
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksViewModel.ViewState
 import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -34,6 +37,8 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import logcat.logcat
 import javax.inject.Inject
 
@@ -49,18 +54,16 @@ class ImportGoogleBookmarksWebFlowActivity :
     ImportGoogleBookmarksWebFlowFragment.WebViewVisibilityListener {
 
     @Inject
-    lateinit var appBuildConfig: AppBuildConfig
-
-    @Inject
-    lateinit var importJourney: ImportGoogleBookmarksJourney
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
+    @Inject
+    lateinit var importViewModelFactory: ImportGoogleBookmarksViewModel.Factory
 
     val binding: ActivityImportGoogleBookmarksWebflowBinding by viewBinding()
 
-    private var isOverlayCurrentlyShown = false
-    private var isOnResultScreen = false
+    private val viewModel by viewModels<ImportGoogleBookmarksViewModel> {
+        ImportGoogleBookmarksViewModel.Factory.Provider(importViewModelFactory, getLaunchSource())
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,10 +72,7 @@ class ImportGoogleBookmarksWebFlowActivity :
         configureToolbar()
         configureEdgeToEdgeInsets()
         configureResultListeners()
-        launchWebFlow()
-        if (savedInstanceState == null) {
-            importJourney.started(getLaunchSource())
-        }
+        observeViewModel()
     }
 
     private fun configureEdgeToEdgeInsets() {
@@ -81,146 +81,97 @@ class ImportGoogleBookmarksWebFlowActivity :
         edgeToEdgeHandler.applyNavigationBarInsets(binding.fragmentContainer, drawBehindGestureNav = true)
     }
 
-    private fun launchWebFlow() {
+    private fun observeViewModel() {
+        viewModel.viewState
+            .flowWithLifecycle(lifecycle)
+            .onEach { renderViewState(it) }
+            .launchIn(lifecycleScope)
+
+        viewModel.commands
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { command -> processCommand(command) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun renderViewState(viewState: ViewState) {
+        when (viewState.viewMode) {
+            is ViewMode.WebFlow -> {
+                showWebFlowFragment()
+                hideProgressOverlay()
+            }
+
+            is ViewMode.WaitingForExport -> {
+                showWebFlowFragment()
+                showProgressOverlay()
+            }
+
+            is ViewMode.Success -> showResultFragment {
+                ImportFinishedFragment.newInstanceSuccess(bookmarksImported = viewState.viewMode.importedCount)
+            }
+
+            is ViewMode.Error -> showResultFragment {
+                ImportFinishedFragment.newInstanceFailure(getString(R.string.importBookmarksErrorGenericMessage))
+            }
+        }
+        updateToolbarTitle(viewState.viewMode)
+    }
+
+    private fun showWebFlowFragment() {
+        if (supportFragmentManager.findFragmentByTag(WEB_FLOW_TAG) != null) return
         logcat { "Bookmark-import: Starting webflow" }
-        isOnResultScreen = false
-        replaceFragment(ImportGoogleBookmarksWebFlowFragment())
-        updateToolbarTitle()
-    }
-
-    private fun showSuccessFragment(bookmarkCount: Int) {
-        logcat { "Bookmark-import: Showing success fragment with $bookmarkCount bookmarks" }
-        val successFragment = ImportFinishedFragment.newInstanceSuccess(bookmarksImported = bookmarkCount)
-
-        successFragment.setOnDoneCallback {
-            finishWithSuccess(bookmarkCount)
-        }
-
-        replaceFragment(successFragment)
-        isOverlayCurrentlyShown = false
-        isOnResultScreen = true
-        updateToolbarTitle()
-    }
-
-    private fun showErrorFragment(errorReason: UserCannotImportReason) {
-        logcat { "Bookmark-import: Showing error fragment with reason: $errorReason" }
-
-        val messageId = R.string.importBookmarksErrorGenericMessage
-        val errorFragment = ImportFinishedFragment.newInstanceFailure(getString(messageId))
-
-        errorFragment.setOnDoneCallback {
-            finishWithFailure(errorReason)
-        }
-
-        replaceFragment(errorFragment)
-        isOverlayCurrentlyShown = false
-        isOnResultScreen = true
-        updateToolbarTitle()
-    }
-
-    private fun replaceFragment(fragment: Fragment) {
         supportFragmentManager.commit {
-            replace(R.id.fragment_container, fragment)
+            replace(R.id.fragment_container, ImportGoogleBookmarksWebFlowFragment(), WEB_FLOW_TAG)
+        }
+    }
+
+    private fun showResultFragment(createFragment: () -> ImportFinishedFragment) {
+        if (supportFragmentManager.findFragmentByTag(RESULT_TAG) != null) return
+        logcat { "Bookmark-import: Showing result fragment" }
+        supportFragmentManager.commit {
+            replace(R.id.fragment_container, createFragment(), RESULT_TAG)
+        }
+    }
+
+    private fun showProgressOverlay() {
+        if (supportFragmentManager.findFragmentByTag(PROGRESS_OVERLAY_TAG) != null) return
+        supportFragmentManager.commit {
+            add(R.id.fragment_container, ImportGoogleBookmarksAutomationInProgressViewFragment.newInstance(), PROGRESS_OVERLAY_TAG)
+        }
+    }
+
+    private fun hideProgressOverlay() {
+        val progressFragment = supportFragmentManager.findFragmentByTag(PROGRESS_OVERLAY_TAG) ?: return
+        supportFragmentManager.commit {
+            remove(progressFragment)
+        }
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            is Command.Exit -> exitWithResult(command.result)
         }
     }
 
     private fun configureResultListeners() {
-        supportFragmentManager.setFragmentResultListener(ImportGoogleBookmarkResult.Companion.RESULT_KEY, this) { _, result ->
+        supportFragmentManager.setFragmentResultListener(ImportGoogleBookmarkResult.RESULT_KEY, this) { _, result ->
             val importResult = BundleCompat.getParcelable(
                 result,
                 ImportGoogleBookmarkResult.RESULT_KEY_DETAILS,
                 ImportGoogleBookmarkResult::class.java,
             )
-            handleWebFlowResult(importResult)
+            viewModel.onWebFlowFinished(importResult)
+        }
+        supportFragmentManager.setFragmentResultListener(ImportFinishedFragment.RESULT_KEY_DONE, this) { _, _ ->
+            viewModel.onResultScreenDoneClicked()
         }
     }
 
-    private fun showProgressOverlay() {
-        isOverlayCurrentlyShown = true
-        updateToolbarTitle()
-
-        val progressFragment = supportFragmentManager.findFragmentByTag(PROGRESS_OVERLAY_TAG)
-        if (progressFragment == null) {
-            supportFragmentManager
-                .beginTransaction()
-                .add(R.id.fragment_container, ImportGoogleBookmarksAutomationInProgressViewFragment.newInstance(), PROGRESS_OVERLAY_TAG)
-                .commit()
+    private fun exitWithResult(result: ImportGoogleBookmarkResult) {
+        val resultBundle = Bundle().apply {
+            putParcelable(ImportGoogleBookmarkResult.RESULT_KEY_DETAILS, result)
         }
-    }
-
-    private fun hideProgressOverlay() {
-        isOverlayCurrentlyShown = false
-        updateToolbarTitle()
-
-        val progressFragment = supportFragmentManager.findFragmentByTag(PROGRESS_OVERLAY_TAG)
-        if (progressFragment != null) {
-            supportFragmentManager
-                .beginTransaction()
-                .remove(progressFragment)
-                .commit()
-        }
-    }
-
-    private fun handleWebFlowResult(result: ImportGoogleBookmarkResult?) {
-        when (result) {
-            is ImportGoogleBookmarkResult.Success -> {
-                logcat { "Bookmark-import: ${javaClass.simpleName}, WebFlow succeeded with ${result.importedCount} bookmarks" }
-                importJourney.finishedWithSuccess()
-                showSuccessFragment(result.importedCount)
-            }
-
-            is ImportGoogleBookmarkResult.UserCancelled -> {
-                logcat { "Bookmark-import: ${javaClass.simpleName}, User cancelled at ${result.stage}" }
-                importJourney.cancelled(result.stage)
-                exitUserCancelled(result.stage)
-            }
-
-            is ImportGoogleBookmarkResult.Error -> {
-                logcat { "Bookmark-import: ${javaClass.simpleName}, Import failed with reason: ${result.reason}" }
-                importJourney.finishedWithError(error = result.reason)
-                showErrorFragment(result.reason)
-            }
-
-            null -> {
-                logcat { "Bookmark-import: ${javaClass.simpleName}, Received null result" }
-                showErrorFragment(Unknown)
-            }
-        }
-    }
-
-    private fun exitWithResult(resultBundle: Bundle) {
         setResult(RESULT_OK, Intent().putExtras(resultBundle))
         finish()
-    }
-
-    private fun finishWithSuccess(bookmarkCount: Int) {
-        val result = Bundle().apply {
-            putParcelable(
-                ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS,
-                ImportGoogleBookmarkResult.Success(bookmarkCount),
-            )
-        }
-        exitWithResult(result)
-    }
-
-    private fun finishWithFailure(reason: UserCannotImportReason) {
-        val result = Bundle().apply {
-            putParcelable(
-                ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS,
-                ImportGoogleBookmarkResult.Error(reason),
-            )
-        }
-        exitWithResult(result)
-    }
-
-    fun exitUserCancelled(stage: String) {
-        val result = Bundle().apply {
-            putParcelable(
-                ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS,
-                ImportGoogleBookmarkResult.UserCancelled(stage),
-            )
-        }
-        exitWithResult(result)
     }
 
     private fun configureToolbar() {
@@ -229,26 +180,23 @@ class ImportGoogleBookmarksWebFlowActivity :
             setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_close_24)
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        updateToolbarTitle()
     }
 
-    private fun updateToolbarTitle() {
-        val title = if (isOverlayCurrentlyShown || isOnResultScreen) {
-            ""
-        } else {
+    private fun updateToolbarTitle(viewMode: ViewMode) {
+        val title = if (viewMode == ViewMode.WebFlow) {
             getString(R.string.importBookmarksFromGoogleWebFlowTitle)
+        } else {
+            ""
         }
         setTitle(title)
     }
 
     override fun showLoadingState() {
-        importJourney.startedWaitingForExport()
-        showProgressOverlay()
+        viewModel.onWaitingForExportStarted()
     }
 
     override fun hideLoadingState() {
-        importJourney.stoppedWaitingForExport()
-        hideProgressOverlay()
+        viewModel.onWaitingForExportStopped()
     }
 
     private fun getLaunchSource(): String {
@@ -256,6 +204,8 @@ class ImportGoogleBookmarksWebFlowActivity :
     }
 
     companion object {
+        private const val WEB_FLOW_TAG = "web_flow"
+        private const val RESULT_TAG = "result"
         private const val PROGRESS_OVERLAY_TAG = "progress_overlay"
         private const val UNKNOWN_LAUNCH_SOURCE = "unknown"
     }
