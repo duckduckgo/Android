@@ -17,8 +17,6 @@
 package com.duckduckgo.app.browser.omnibar
 
 import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
@@ -28,16 +26,13 @@ import android.transition.Fade
 import android.transition.TransitionManager
 import android.transition.TransitionSet
 import android.util.AttributeSet
-import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.animation.OvershootInterpolator
-import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.ProgressBar
-import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.Toolbar
@@ -74,12 +69,10 @@ import com.duckduckgo.app.browser.nativeinput.applyDuckAiIconStyling
 import com.duckduckgo.app.browser.omnibar.Omnibar.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.LogoClickListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.NativeInputLaunchListener
-import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.TextListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchNativeInput
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.MoveCaretToFront
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartAdBlockingAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
@@ -115,7 +108,6 @@ import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
-import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
@@ -136,7 +128,6 @@ import com.duckduckgo.serp.logos.api.SerpLogos
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
@@ -161,7 +152,6 @@ class OmnibarLayout @JvmOverloads constructor(
     ) : this(context, OmnibarType.SINGLE_TOP, attrs, defStyle)
 
     data class TransitionState(
-        val showClearButton: Boolean,
         val showVoiceSearch: Boolean,
         val showTabsMenu: Boolean,
         val showFireIcon: Boolean,
@@ -250,7 +240,6 @@ class OmnibarLayout @JvmOverloads constructor(
     private val iconsContainer: View by lazy { findViewById(R.id.iconsContainer) }
     private val shieldIconPulseAnimationContainer: View by lazy { findViewById(R.id.shieldIconPulseAnimationContainer) }
     private val omniBarContentContainer: View by lazy { findViewById(R.id.omniBarContentContainer) }
-    private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
     private val leadingIconContainer: View by lazy { findViewById(R.id.omnibarIconContainer) }
     private val duckAIHeader: View by lazy { findViewById(R.id.duckAIHeader) }
@@ -290,8 +279,6 @@ class OmnibarLayout @JvmOverloads constructor(
     private val legacyAddressBarRadius by lazy {
         resources.getDimension(CommonR.dimen.largeShapeCornerRadius)
     }
-
-    private var focusAnimator: ValueAnimator? = null
 
     init {
         inflate(context, R.layout.view_omnibar, this)
@@ -349,7 +336,6 @@ class OmnibarLayout @JvmOverloads constructor(
     internal val searchIcon: ImageView by lazy { findViewById(R.id.searchIcon) }
     override val daxIcon: ImageView by lazy { findViewById(R.id.daxIcon) }
     internal val globeIcon: ImageView by lazy { findViewById(R.id.globeIcon) }
-    internal val clearTextButton: ImageView by lazy { findViewById(R.id.clearTextButton) }
     internal val fireIconImageView: ImageView by lazy { findViewById(R.id.fireIconImageView) }
     internal val placeholder: View by lazy { findViewById(R.id.placeholder) }
     internal val voiceSearchButton: ImageView by lazy { findViewById(R.id.voiceSearchButton) }
@@ -366,7 +352,6 @@ class OmnibarLayout @JvmOverloads constructor(
             addTransition(
                 Fade().apply {
                     duration = omnibarAnimationManager.getFadeDuration()
-                    addTarget(clearTextButton)
                     addTarget(voiceSearchButton)
                     addTarget(fireIconMenu)
                     addTarget(plusIconMenu)
@@ -382,7 +367,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
     internal fun omnibarViews(): List<View> =
         listOf(
-            clearTextButton,
             omnibarTextInput,
             searchIcon,
         )
@@ -415,21 +399,6 @@ class OmnibarLayout @JvmOverloads constructor(
                 viewModel.onOmnibarScrollingEnabledChanged(value)
             }
         }
-
-    override val isEditing: Boolean
-        get() {
-            return if (isAttachedToWindow) {
-                viewModel.viewState.value.hasFocus
-            } else {
-                false
-            }
-        }
-
-    override val isEditingFlow by lazy {
-        viewModel.viewState.map {
-            isAttachedToWindow && it.hasFocus
-        }
-    }
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
@@ -490,53 +459,12 @@ class OmnibarLayout @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         conflatedStateJob.cancel()
         conflatedCommandJob.cancel()
-        focusAnimator?.cancel()
         findInPage.findInPageContainer.viewTreeObserver.removeOnGlobalLayoutListener(findInPageLayoutVisibilityChangeListener)
         super.onDetachedFromWindow()
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun setOmnibarTextListener(textListener: TextListener) {
         omnibarTextListener = textListener
-
-        omnibarTextInput.onFocusChangeListener =
-            OnFocusChangeListener { _, hasFocus: Boolean ->
-                if (isAttachedToWindow) {
-                    viewModel.onOmnibarFocusChanged(hasFocus, omnibarTextInput.text.toString())
-                    omnibarTextListener?.onFocusChanged(hasFocus, omnibarTextInput.text.toString())
-                }
-            }
-
-        omnibarTextInput.onBackKeyListener =
-            object : KeyboardAwareEditText.OnBackKeyListener {
-                override fun onBackKey(): Boolean {
-                    if (isAttachedToWindow) {
-                        viewModel.onBackKeyPressed()
-                        return omnibarTextListener?.onBackKeyPressed() ?: false
-                    }
-                    return false
-                }
-            }
-
-        omnibarTextInput.setOnEditorActionListener(
-            TextView.OnEditorActionListener { _, actionId, keyEvent ->
-                if (isAttachedToWindow) {
-                    if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
-                        viewModel.onEnterKeyPressed()
-                        omnibarTextListener?.onEnterPressed()
-                        return@OnEditorActionListener true
-                    }
-                }
-                false
-            },
-        )
-
-        omnibarTextInput.setOnTouchListener { _, event ->
-            if (isAttachedToWindow) {
-                viewModel.onUserTouchedOmnibarTextInput(event.action)
-            }
-            false
-        }
 
         omnibarTextInput.replaceTextChangedListener(
             object : TextChangedWatcher() {
@@ -547,17 +475,10 @@ class OmnibarLayout @JvmOverloads constructor(
                     if (isAttachedToWindow) {
                         viewModel.onInputStateChanged(
                             omnibarTextInput.text.toString(),
-                            omnibarTextInput.hasFocus(),
                             clearQuery,
                             deleteLastCharacter,
                         )
                     }
-                    omnibarTextListener?.onOmnibarTextChanged(
-                        OmnibarTextState(
-                            omnibarTextInput.text.toString(),
-                            omnibarTextInput.hasFocus(),
-                        ),
-                    )
                 }
 
                 override fun beforeTextChanged(
@@ -572,18 +493,6 @@ class OmnibarLayout @JvmOverloads constructor(
                 }
             },
         )
-
-        omnibarTextInput.showSuggestionsListener =
-            object : ShowSuggestionsListener {
-                override fun showSuggestions() {
-                    omnibarTextListener?.onShowSuggestions(
-                        OmnibarTextState(
-                            omnibarTextInput.text.toString(),
-                            omnibarTextInput.hasFocus(),
-                        ),
-                    )
-                }
-            }
     }
 
     override fun setOmnibarItemPressedListener(itemPressedListener: ItemPressedListener) {
@@ -617,17 +526,8 @@ class OmnibarLayout @JvmOverloads constructor(
             }
             omnibarItemPressedListener?.onPrivacyShieldPressed()
         }
-        clearTextButton.setOnClickListener {
-            if (isAttachedToWindow) {
-                viewModel.onClearTextButtonPressed()
-            }
-        }
         voiceSearchButton.setOnClickListener {
             omnibarItemPressedListener?.onVoiceSearchPressed()
-        }
-        backIcon.setOnClickListener {
-            viewModel.onBackButtonPressed()
-            omnibarItemPressedListener?.onBackButtonPressed()
         }
         duckAIHeader.setOnClickListener {
             viewModel.onDuckAiHeaderClicked()
@@ -679,12 +579,6 @@ class OmnibarLayout @JvmOverloads constructor(
             lastSeenPrivacyShield = null
         }
 
-        if (viewState.hasFocus || isFindInPageVisible) {
-            animateOmnibarFocusedState(focused = true)
-        } else {
-            animateOmnibarFocusedState(focused = false)
-        }
-
         omnibarCardShadow.isGone = viewState.viewMode is ViewMode.CustomTab && !isFindInPageVisible
 
         renderButtons(viewState)
@@ -727,10 +621,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
     fun processCommand(command: Command) {
         when (command) {
-            Command.CancelAnimations -> {
-                cancelAddressBarAnimations()
-            }
-
             is StartCookiesAnimation -> {
                 createCookiesAnimation(command.isCosmetic)
             }
@@ -741,10 +631,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
             Command.AdBlockingAnimationSuppressed -> {
                 omnibarTextListener?.onAdBlockingAnimationSuppressed()
-            }
-
-            MoveCaretToFront -> {
-                moveCaretToFront()
             }
 
             is StartTrackersAnimation -> {
@@ -764,15 +650,6 @@ class OmnibarLayout @JvmOverloads constructor(
                 onLogoClicked(command.url)
             }
 
-            is Command.FocusInputField -> {
-                omnibarTextInput.postDelayed(
-                    {
-                        omnibarTextInput.requestFocus()
-                    },
-                    200,
-                )
-            }
-
             is Command.CancelEasterEggLogoAnimation -> cancelEasterEggLogoAnimation()
 
             is Command.CopyUrlToClipboard -> {
@@ -785,12 +662,6 @@ class OmnibarLayout @JvmOverloads constructor(
         val notificationShownAutomatically = clipboardInteractor.copyToClipboard(toCopy = command.url, isSensitive = false)
         if (!notificationShownAutomatically) {
             Toast.makeText(context, R.string.urlCopiedToClipboard, Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun moveCaretToFront() {
-        omnibarTextInput.post {
-            omnibarTextInput.setSelection(0)
         }
     }
 
@@ -884,14 +755,13 @@ class OmnibarLayout @JvmOverloads constructor(
     fun renderButtons(viewState: ViewState) {
         val newTransitionState =
             TransitionState(
-                showClearButton = viewState.showClearButton,
                 showVoiceSearch = viewState.showVoiceSearch,
                 showTabsMenu = viewState.showTabsMenu && !viewState.showFindInPage,
                 showFireIcon = viewState.showFireIcon && !viewState.showFindInPage,
                 showBrowserMenu = viewState.showBrowserMenu && !viewState.showFindInPage,
                 showBrowserMenuHighlight = viewState.showBrowserMenuHighlight,
                 showChatMenu = viewState.showChatMenu,
-                showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
+                showSpacer = viewState.showVoiceSearch,
                 showDuckSidebar = viewState.showDuckAISidebar,
                 isDuckAiMode = viewState.viewMode is ViewMode.DuckAI,
                 isNativeChatInputEnabled = viewState.isNativeChatInputEnabled,
@@ -910,7 +780,6 @@ class OmnibarLayout @JvmOverloads constructor(
             TransitionManager.beginDelayedTransition(toolbarContainer, omniBarButtonTransitionSet)
         }
 
-        clearTextButton.isVisible = viewState.showClearButton
         voiceSearchButton.isVisible = viewState.showVoiceSearch
         tabsMenu.isVisible = newTransitionState.showTabsMenu
         // The fire/+ slot is shared: in a Duck.ai chat the + icon takes over from fire as the
@@ -932,7 +801,7 @@ class OmnibarLayout @JvmOverloads constructor(
         browserMenuHighlight.isVisible = newTransitionState.showBrowserMenuHighlight
         aiChatMenu?.isVisible = newTransitionState.showChatMenu
         applyAiChatMenuStyling(viewState.showContextualSheetIcon)
-        aiChatDivider.isVisible = (viewState.showVoiceSearch || viewState.showClearButton) && viewState.showChatMenu
+        aiChatDivider.isVisible = viewState.showVoiceSearch && viewState.showChatMenu
         duckAISidebar.isVisible = newTransitionState.showDuckSidebar
 
         if (omnibarAnimationManager.isFeatureEnabled()) {
@@ -942,18 +811,6 @@ class OmnibarLayout @JvmOverloads constructor(
         previousTransitionState = newTransitionState
 
         applyEnabledState(viewState)
-
-        val showBackArrow = viewState.hasFocus
-        if (showBackArrow) {
-            backIcon.show()
-            searchIcon.gone()
-            shieldIcon.gone()
-            daxIcon.gone()
-            globeIcon.gone()
-            duckPlayerIcon.gone()
-        } else {
-            backIcon.hide()
-        }
     }
 
     private fun renderBrowserMode(viewState: ViewState) {
@@ -962,7 +819,6 @@ class OmnibarLayout @JvmOverloads constructor(
         // with a bottom omnibar after tab swipe).
         ensureBrowserAddressFieldVisible()
 
-        renderOutline(viewState.hasFocus)
         renderOmnibarText(viewState)
         if (viewState.expanded) {
             setExpanded(true, viewState.expandedAnimated)
@@ -1299,10 +1155,6 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun renderOutline(enabled: Boolean) {
-        omniBarContainer.isPressed = enabled
-    }
-
     private fun configureCustomTabOmnibar(customTab: ViewMode.CustomTab) {
         if (omnibarRepository.isNewCustomTabEnabled) {
             customTabToolbarColor = customTab.toolbarColor
@@ -1620,16 +1472,6 @@ class OmnibarLayout @JvmOverloads constructor(
         viewModel.setDraftTextIfNtpOrSerp(query)
     }
 
-    private fun enableTextInputClickCatcher() {
-        omnibarTextInputClickCatcher.isVisible = true
-
-        omnibarTextInput.apply {
-            isEnabled = false
-            isFocusable = false
-            isFocusableInTouchMode = false
-        }
-    }
-
     private fun applyEnabledState(viewState: ViewState) {
         val state = viewState.enabledState
         val isLocked = state != EnabledState.ALL
@@ -1640,7 +1482,6 @@ class OmnibarLayout @JvmOverloads constructor(
         applyEnabled(browserMenu, nonFireEnabled)
         aiChatMenu?.let { applyEnabled(it, nonFireEnabled) }
         applyEnabled(voiceSearchButton, nonFireEnabled)
-        applyEnabled(clearTextButton, nonFireEnabled)
         applyEnabled(duckAISidebar, nonFireEnabled)
         applyEnabled(duckAIHeader, nonFireEnabled)
         applyEnabled(duckAIFreePill, nonFireEnabled)
@@ -1648,10 +1489,6 @@ class OmnibarLayout @JvmOverloads constructor(
         applyEnabled(plusIconMenu, nonFireEnabled)
         applyEnabled(fireIconMenu, fireEnabled)
         omnibarTextInput.alpha = if (nonFireEnabled) 1.0f else LOCKED_INPUT_ALPHA
-
-        // The click catcher always covers the text input: it routes a tap to the native input,
-        // or swallows it while the omnibar is locked.
-        enableTextInputClickCatcher()
 
         // When locked, the click catcher should not launch the input screen.
         if (isLocked) {
@@ -1684,10 +1521,6 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun animateOmnibarFocusedState(focused: Boolean) {
-        // temporarily disable focus animation
-    }
-
     private fun onFindInPageShown() {
         omniBarContentContainer.hide()
         customTabToolbarContainerWrapper.hide()
@@ -1700,7 +1533,6 @@ class OmnibarLayout @JvmOverloads constructor(
             omniBarContainer.show()
             browserMenu.gone()
         }
-        animateOmnibarFocusedState(focused = true)
         viewModel.onFindInPageRequested()
     }
 
@@ -1710,9 +1542,6 @@ class OmnibarLayout @JvmOverloads constructor(
         if (viewModel.viewState.value.viewMode is ViewMode.CustomTab) {
             omniBarContainer.hide()
             browserMenu.isVisible = viewModel.viewState.value.showBrowserMenu
-        }
-        if (!viewModel.viewState.value.hasFocus) {
-            animateOmnibarFocusedState(focused = false)
         }
         viewModel.onFindInPageDismissed()
     }

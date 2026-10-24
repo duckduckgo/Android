@@ -136,8 +136,8 @@ change that compiles can still break or silently do nothing on the other side.
 
 ## Feature flags
 
-Native input itself has no flag: the omnibar click catcher always routes to it, and the omnibar's leftover
-focus code is dead (see **Refactor in progress**). The flags below gate Duck.ai-side integrations and default on, so "it's behind a flag" is not a reason for thin coverage. Check
+Native input itself has no flag: the omnibar's `omnibarTextInput` is display-only and its click catcher always
+routes a tap to the native input. The flags below gate Duck.ai-side integrations and default on, so "it's behind a flag" is not a reason for thin coverage. Check
 `DuckChatFeature.kt` for current defaults.
 
 | Flag | Gates |
@@ -170,7 +170,6 @@ change needs them, check the linked task first.
 | Still hand-wired | Direction | Task |
 |---|---|---|
 | Card chrome duplicated in every host layout, shaped by `applyOmnibarShape` and `applyPositionChrome` | One card owned and styled inside the widget | https://app.asana.com/0/0/1217275429788919/f |
-| Legacy focused state in `OmnibarLayout` | Omnibar becomes display-only; the widget owns all text input | https://app.asana.com/0/0/1215373984475612/f |
 | `DuckChat` god-interface in `duckchat-api` | Split into single-responsibility `DuckAi*` interfaces | https://app.asana.com/0/0/1215641620311419/f |
 
 Browser controls stay with the host by design and are not becoming plugins: the leading fire (found by walking
