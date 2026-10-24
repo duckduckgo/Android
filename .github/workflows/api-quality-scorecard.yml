@@ -1,0 +1,121 @@
+name: API quality scorecard
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Commit SHA or tag to score (optional, defaults to the latest commit of the branch above)'
+        required: false
+        type: string
+      create_asana_task:
+        description: 'Create an Asana task with the scorecard'
+        required: false
+        type: boolean
+        default: false
+  workflow_call:
+    inputs:
+      ref:
+        description: 'Branch, tag or commit to score (optional, defaults to the calling commit)'
+        required: false
+        type: string
+      create_asana_task:
+        description: 'Create an Asana task with the scorecard'
+        required: false
+        type: boolean
+        default: false
+
+# Asana IDs for the posting scripts; see scripts/api-quality/README.md.
+env:
+  GH_API_QUALITY_PROJECT_ID: ${{ vars.GH_API_QUALITY_PROJECT_ID }}
+  GH_API_QUALITY_TRIAGE_SECTION_ID: ${{ vars.GH_API_QUALITY_TRIAGE_SECTION_ID }}
+  GH_API_QUALITY_SCORECARDS_SECTION_ID: ${{ vars.GH_API_QUALITY_SCORECARDS_SECTION_ID }}
+  GH_API_QUALITY_WEEKLY_REPORTS_SECTION_ID: ${{ vars.GH_API_QUALITY_WEEKLY_REPORTS_SECTION_ID }}
+  GH_API_QUALITY_GITHUB_RUN_FIELD_KEY_ID: ${{ vars.GH_API_QUALITY_GITHUB_RUN_FIELD_KEY_ID }}
+  GH_API_QUALITY_STATUS_FIELD_KEY_ID: ${{ vars.GH_API_QUALITY_STATUS_FIELD_KEY_ID }}
+  GH_API_QUALITY_STATUS_FIELD_NEEDS_EXPLANATION_VALUE_ID: ${{ vars.GH_API_QUALITY_STATUS_FIELD_NEEDS_EXPLANATION_VALUE_ID }}
+
+permissions:
+  contents: read
+
+jobs:
+  scorecard:
+    name: API quality scorecard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Pick the date
+        id: date
+        run: echo "today=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+
+      - name: Score
+        id: score
+        uses: ./.github/actions/api-quality-score
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          out-dir: ${{ runner.temp }}/scorecard
+          label: ${{ steps.date.outputs.today }}
+
+      - name: Write summary
+        id: summary
+        env:
+          REF: ${{ inputs.ref || github.ref_name }}
+          SHA: ${{ steps.score.outputs.sha }}
+        run: |
+          short_sha="${SHA:0:10}"
+          echo "short_sha=$short_sha" >> "$GITHUB_OUTPUT"
+          {
+            echo "Scored \`$REF\` at \`$short_sha\`."
+            echo
+            cat "$RUNNER_TEMP"/scorecard/api-quality-scorecard-*.md
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload scorecard
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-quality-scorecard-${{ steps.date.outputs.today }}-${{ steps.summary.outputs.short_sha }}
+          path: ${{ runner.temp }}/scorecard
+          retention-days: 90
+
+      - name: Describe the Asana task
+        if: inputs.create_asana_task
+        env:
+          REF: ${{ inputs.ref || github.ref_name }}
+          SHA: ${{ steps.score.outputs.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          fleet="$(PYTHONPATH=scripts/api-quality python3 - "$RUNNER_TEMP/scorecard" <<'PY'
+          import sys
+          from compare import load_run
+          f = load_run(sys.argv[1]).fleet()
+          print(f"Weighted average: {f['weighted'] * 100:.1f}%")
+          print(f"Unweighted average: {f['unweighted'] * 100:.1f}%")
+          print(f"Points: {f['points']} / {f['max_points']}")
+          print(f"Public declarations: {f['declarations']:,}")
+          PY
+          )"
+          {
+            echo "API quality scorecard of \`$REF\` at \`${SHA:0:10}\`."
+            echo
+            echo "$fleet" | sed 's/^/- /'
+            echo
+            echo "Full scorecard and CSVs: [the run's Artifacts section]($RUN_URL)."
+          } > "$RUNNER_TEMP/asana.md"
+
+      # A re-run updates the task its first attempt created, found by the run ID, instead of creating another.
+      - name: Create or update the Asana task
+        if: inputs.create_asana_task
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          NAME: API Quality Scorecard, ${{ inputs.ref || github.ref_name }}, ${{ steps.date.outputs.today }}
+        run: |
+          pip install -r scripts/api-quality/requirements.txt
+          python3 scripts/api-quality/asana_task.py --kind scorecard --name "$NAME" --notes-md "$RUNNER_TEMP/asana.md"
