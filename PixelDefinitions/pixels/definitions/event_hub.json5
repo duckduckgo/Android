@@ -1,38 +1,706 @@
 {
-    "webTelemetry_adwallDetection_day": {
-        "description": "Daily bucketed count of adwall detections across all pages. Fired by the eventHub feature at the end of each 1-day period.",
+    "webTelemetry_adwalls_day": {
+        "description": "Daily bucketed count of adwall detections across all pages. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubAdwallCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_adwalls_week": {
+        "description": "Weekly bucketed count of adwall detections across all pages. Fired by the eventHub feature at the end of each 7-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubAdwallCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_recaptcha_day": {
+        "description": "Daily bucketed count of page loads where a Google reCAPTCHA challenge was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_recaptcha_week": {
+        "description": "Weekly bucketed count of page loads where a Google reCAPTCHA challenge was detected. Fired by the eventHub feature at the end of each 7-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_hcaptcha_day": {
+        "description": "Daily bucketed count of page loads where an hCaptcha challenge was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_hcaptcha_week": {
+        "description": "Weekly bucketed count of page loads where an hCaptcha challenge was detected. Fired by the eventHub feature at the end of each 7-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_turnstile_day": {
+        "description": "Daily bucketed count of page loads where a Cloudflare Turnstile challenge was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_turnstile_week": {
+        "description": "Weekly bucketed count of page loads where a Cloudflare Turnstile challenge was detected. Fired by the eventHub feature at the end of each 7-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_cloudflare_day": {
+        "description": "Daily bucketed count of page loads where a Cloudflare interstitial challenge was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_cloudflare_week": {
+        "description": "Weekly bucketed count of page loads where a Cloudflare interstitial challenge was detected. Fired by the eventHub feature at the end of each 7-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_datadome_day": {
+        "description": "Daily bucketed count of page loads where a DataDome challenge was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_datadome_week": {
+        "description": "Weekly bucketed count of page loads where a DataDome challenge was detected. Fired by the eventHub feature at the end of each 7-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_imperva_day": {
+        "description": "Daily bucketed count of page loads where an Imperva challenge was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_imperva_week": {
+        "description": "Weekly bucketed count of page loads where an Imperva challenge was detected. Fired by the eventHub feature at the end of each 7-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_arkose_day": {
+        "description": "Daily bucketed count of page loads where an Arkose Labs (FunCaptcha) challenge was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_arkose_week": {
+        "description": "Weekly bucketed count of page loads where an Arkose Labs (FunCaptcha) challenge was detected. Fired by the eventHub feature at the end of each 7-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_geetest_day": {
+        "description": "Daily bucketed count of page loads where a GeeTest challenge was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_geetest_week": {
+        "description": "Weekly bucketed count of page loads where a GeeTest challenge was detected. Fired by the eventHub feature at the end of each 7-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_awswaf_day": {
+        "description": "Daily bucketed count of page loads where an AWS WAF challenge was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_awswaf_week": {
+        "description": "Weekly bucketed count of page loads where an AWS WAF challenge was detected. Fired by the eventHub feature at the end of each 7-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_perimeterx_day": {
+        "description": "Daily bucketed count of page loads where a PerimeterX challenge was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_perimeterx_week": {
+        "description": "Weekly bucketed count of page loads where a PerimeterX challenge was detected. Fired by the eventHub feature at the end of each 7-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_other_day": {
+        "description": "Daily bucketed count of page loads where a captcha challenge that matches no known provider was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_captcha_other_week": {
+        "description": "Weekly bucketed count of page loads where a captcha challenge that matches no known provider was detected. Fired by the eventHub feature at the end of each 7-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_challenge_cloudflare_day": {
+        "description": "Daily bucketed count of page loads where a Cloudflare or DDoS-Guard \"Just a moment\" challenge interstitial was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_challenge_generic_day": {
+        "description": "Daily bucketed count of page loads where a page titled as a human or security verification check was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_blockPage_cloudflare_day": {
+        "description": "Daily bucketed count of page loads where a Cloudflare access denied or error page was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_blockPage_generic_day": {
+        "description": "Daily bucketed count of page loads where web application firewall block wording was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_blockPage_vendor_day": {
+        "description": "Daily bucketed count of page loads where an Incapsula, Sucuri, Distil, CloudFront or Cloudflare block page was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_blockPage_verificationfailed_day": {
+        "description": "Daily bucketed count of page loads where a message that browser or device verification failed was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_blockPage_vercel_day": {
+        "description": "Daily bucketed count of page loads where a Vercel Security Checkpoint page was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_blockPage_toomanyrequests_day": {
+        "description": "Daily bucketed count of page loads where an HTTP 429 or \"too many requests\" page was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_blockPage_networksecurity_day": {
+        "description": "Daily bucketed count of page loads where a \"blocked by network security\" page was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_blockPage_title_day": {
+        "description": "Daily bucketed count of page loads where a page titled as a blocked URL or a seized domain was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_blockPage_forbidden_day": {
+        "description": "Daily bucketed count of page loads where an HTTP 403 forbidden or \"access is denied\" page was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_errorPage_unavailable_day": {
+        "description": "Daily bucketed count of page loads where a page titled \"Website temporarily unavailable\" was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_errorPage_soft404_day": {
+        "description": "Daily bucketed count of page loads where a \"page not found\", \"404 not found\" or \"access denied\" page was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_geoblock_day": {
+        "description": "Daily bucketed count of page loads where a message that content is not available in the user's region or country was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_blankPage_empty_day": {
+        "description": "Daily bucketed count of page loads where the page showed no title and no visible text. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_adwall_vendor_day": {
+        "description": "Daily bucketed count of page loads where PageFair or FuckAdBlock anti-adblock text was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "eventHub_baseline_day": {
+        "description": "Daily bucketed count of periods in which EventHub ran at all. Serves as the denominator for the other eventHub telemetry — it counts nothing beyond the period itself. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBaseline", "eventHubAttributionPeriod"]
+    },
+    "eventHub_baseline_week": {
+        "description": "Weekly bucketed count of periods in which EventHub ran at all. Serves as the denominator for the other eventHub telemetry — it counts nothing beyond the period itself. Fired by the eventHub feature at the end of each 7-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBaseline", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_admiralAdwalls_day": {
+        "description": "Daily bucketed count of Admiral-served adwall detections across all pages. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubAdmiralAdwallCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_admiralAdwalls_week": {
+        "description": "Weekly bucketed count of Admiral-served adwall detections across all pages. Fired by the eventHub feature at the end of each 7-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubAdmiralAdwallCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_video_unavailable_day": {
+        "description": "Daily bucketed count of page loads where a video was unavailable. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_video_unavailable_week": {
+        "description": "Weekly bucketed count of page loads where a video was unavailable. Fired by the eventHub feature at the end of each 7-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    // One pixel carries every YouTube interference signal, one parameter per signal.
+    "webTelemetry_youtubeInterference_day": {
+        "description": "Daily bucketed counts of YouTube interference detections, one parameter per signal. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
         "parameters": [
-            {
-                "key": "count",
-                "type": "string",
-                "description": "Bucketed adwall detection count for the period",
-                "pattern": "^\\d+(-\\d+|\\+)?$"
-            },
-            {
-                "key": "attributionPeriod",
-                "type": "integer",
-                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
-            }
+            "appVersion",
+            "eventHubYoutubeVideoAdCount",
+            "eventHubYoutubeStaticAdCount",
+            "eventHubYoutubePlayabilityErrorCount",
+            "eventHubYoutubeAdBlockerCount",
+            "eventHubYoutubeBufferingCount",
+            "eventHubAttributionPeriod"
         ]
     },
-    "webTelemetry_adwallDetection_week": {
-        "description": "Weekly bucketed count of adwall detections across all pages. Fired by the eventHub feature at the end of each 7-day period.",
+    "webTelemetry_pageLoadTime_day": {
+        "description": "Daily bucketed counts of page loads detected as a slow page load, one parameter per load time bucket, for all loads and for reloads. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
+        "suffixes": ["form_factor"],
         "parameters": [
+            "appVersion",
             {
-                "key": "count",
+                "keyPattern": "^load[A-Za-z0-9_-]+$",
                 "type": "string",
-                "description": "Bucketed adwall detection count for the period",
+                "description": "Count of detected page loads in the period, per load time bucket. The key is `load` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
                 "pattern": "^\\d+(-\\d+|\\+)?$"
             },
             {
-                "key": "attributionPeriod",
-                "type": "integer",
-                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
-            }
+                "keyPattern": "^slowReload[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per reload load time bucket. The key is `slowReload` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_errorPhraseCount_day": {
+        "description": "Daily bucketed counts of page loads detected as a page showing error text, one parameter per occurrence count bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "keyPattern": "^count[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per occurrence count bucket. The key is `count` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_soft404Features_day": {
+        "description": "Daily bucketed counts of page loads detected as an error page served as a successful response, one parameter per error term count bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "keyPattern": "^keywords[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per error term count bucket. The key is `keywords` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_failurePhrasesSmallPage_day": {
+        "description": "Daily bucketed counts of page loads detected as a page showing a generic failure message, one parameter per rendered text length bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "keyPattern": "^text[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per rendered text length bucket. The key is `text` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_stylesMissing_day": {
+        "description": "Daily bucketed counts of page loads detected as a page with missing stylesheets, one parameter per missing stylesheet count bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "keyPattern": "^sheets[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per missing stylesheet count bucket. The key is `sheets` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_brokenImages_day": {
+        "description": "Daily bucketed counts of page loads detected as a page with images that failed to load, one parameter per broken image count bucket and per broken image share bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "keyPattern": "^count[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per broken image count bucket. The key is `count` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "keyPattern": "^share[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per broken image share bucket. The key is `share` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_forbiddenPage_day": {
+        "description": "Daily bucketed counts of page loads detected as an access-forbidden error page, one parameter per detection route and response status bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "keyPattern": "^wording_status[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per response status, on the `wording` detection route, bucket. The key is `wording_status` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "keyPattern": "^bareForbidden_status[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per response status, on the `bareForbidden` detection route, bucket. The key is `bareForbidden_status` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_rateLimitedPage_day": {
+        "description": "Daily bucketed counts of page loads detected as a rate-limit error page, one parameter per detection route and response status bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "keyPattern": "^wording_status[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per response status, on the `wording` detection route, bucket. The key is `wording_status` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "keyPattern": "^bareTooManyRequests_status[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per response status, on the `bareTooManyRequests` detection route, bucket. The key is `bareTooManyRequests_status` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_wafAssetsPage_day": {
+        "description": "Daily bucketed counts of page loads detected as a web application firewall page, one parameter per detection route and rendered text length bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "keyPattern": "^littleText_text[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per rendered text length, on the `littleText` detection route, bucket. The key is `littleText_text` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "keyPattern": "^errorStatus_text[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per rendered text length, on the `errorStatus` detection route, bucket. The key is `errorStatus_text` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_appRootEmpty_day": {
+        "description": "Daily bucketed counts of page loads detected as an app page that rendered no content, one parameter per load time bucket and per failed script count bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "keyPattern": "^load[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per load time bucket. The key is `load` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "keyPattern": "^scripts[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per failed script count bucket. The key is `scripts` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_noTextOrTitle_day": {
+        "description": "Daily bucketed counts of page loads detected as a blank page, one parameter per response size bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "keyPattern": "^size[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per response size bucket. The key is `size` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_noContentfulPaint_day": {
+        "description": "Daily bucketed counts of page loads detected as a page that painted no content, one parameter per load time bucket and per first paint state. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "keyPattern": "^load[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per load time bucket. The key is `load` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "keyPattern": "^firstPaint[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per first paint state bucket. The key is `firstPaint` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_viewportEmpty_day": {
+        "description": "Daily bucketed counts of page loads detected as a page whose viewport stayed empty, one parameter per empty viewport sample bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "keyPattern": "^empty[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per empty viewport sample bucket. The key is `empty` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_slowFirstInput_day": {
+        "description": "Daily bucketed counts of page loads detected as a page slow to respond to its first input, one parameter per input delay bucket and per input-to-paint duration bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "keyPattern": "^delay[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per input delay bucket. The key is `delay` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "keyPattern": "^duration[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per input-to-paint duration bucket. The key is `duration` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_failedSubresources_day": {
+        "description": "Daily bucketed counts of page loads detected as a page with failed subresource loads, one parameter per failed script, stylesheet and image count bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "keyPattern": "^scripts[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per failed script count bucket. The key is `scripts` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "keyPattern": "^styles[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per failed stylesheet count bucket. The key is `styles` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "keyPattern": "^images[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per failed image count bucket. The key is `images` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_vercelCheckpoint_day": {
+        "description": "Daily bucketed counts of page loads detected as a page held at a Vercel bot checkpoint, one parameter per outcome and time bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "keyPattern": "^cleared_shown[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per time shown, for checkpoints that cleared, bucket. The key is `cleared_shown` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "keyPattern": "^held[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per hold time, for checkpoints still showing, bucket. The key is `held` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_challenge_day": {
+        "description": "Daily bucketed counts of page loads detected as a bot or human-verification challenge page, one parameter per response status bucket and per rendered text length bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "keyPattern": "^status[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per response status bucket. The key is `status` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "keyPattern": "^text[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per rendered text length bucket. The key is `text` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
+        ]
+    },
+    "webTelemetry_blockPage_day": {
+        "description": "Daily bucketed counts of page loads detected as a bot-protection block page, one parameter per response status bucket and per rendered text length bucket. The webDetection remote config sets the detection conditions. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "keyPattern": "^status[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per response status bucket. The key is `status` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "keyPattern": "^text[A-Za-z0-9_-]+$",
+                "type": "string",
+                "description": "Count of detected page loads in the period, per rendered text length bucket. The key is `text` followed by the bucket name. The webDetection remote config sets the buckets in the key, and the eventHub remote config sets the count buckets in the value",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            "eventHubAttributionPeriod"
         ]
     },
     "webTelemetry_detectorPerf_day": {
