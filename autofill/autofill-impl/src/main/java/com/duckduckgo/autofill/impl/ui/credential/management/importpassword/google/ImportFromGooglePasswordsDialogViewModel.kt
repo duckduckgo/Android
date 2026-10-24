@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.InBrowserPromo
+import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.importing.AutofillImportRedesignFeature
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
@@ -43,6 +44,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.credentialexchange.api.CredentialExchangeResult
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -51,10 +53,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.time.Duration.Companion.seconds
 
 @ContributesViewModel(FragmentScope::class)
 class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
@@ -100,9 +106,31 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
 
                 is ImportResult.Finished -> {
                     logcat { "Import finished: ${it.savedCredentials} imported. ${it.numberSkipped} skipped." }
-                    _viewState.value = viewState.value.copy(viewMode = ViewMode.ImportSuccess(it))
+                    showSuccess(it)
                 }
             }
+        }
+    }
+
+    private suspend fun showSuccess(result: ImportResult.Finished) {
+        if (viewState.value.isRedesignEnabled) {
+            // we don't let a broken promo plugin keep the user on the importing screen
+            withTimeoutOrNull(PROMO_TIMEOUT) { awaitPromo(result) }
+        }
+        _viewState.update { it.copy(viewMode = ViewMode.ImportSuccess(result), promoRequest = null) }
+    }
+
+    private suspend fun awaitPromo(result: ImportResult.Finished) {
+        try {
+            suspendCancellableCoroutine { continuation ->
+                val data = PasswordsImportScreenPromotionPlugin.ImportResult(
+                    successCount = result.savedCredentials,
+                    skippedCount = result.numberSkipped,
+                )
+                _viewState.update { it.copy(promoRequest = RealPromoRequest(data, continuation)) }
+            }
+        } finally {
+            _viewState.update { it.copy(promoRequest = null) }
         }
     }
 
@@ -227,6 +255,7 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
         val usesCredentialExchange: Boolean = false,
         val isRedesignEnabled: Boolean = false,
         val isPictogramsEnabled: Boolean = false,
+        val promoRequest: PromoRequest? = null,
     )
 
     sealed interface Command {
@@ -244,7 +273,27 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
         data object FlowTerminated : ViewMode
     }
 
-    private companion object {
-        const val IMPORT_PASSWORDS_GOOGLE_PROMPT_ID = "import_passwords_google"
+    interface PromoRequest {
+        val data: PasswordsImportScreenPromotionPlugin.ImportResult
+
+        /**
+         * Called once the promo is in place, or once we know there is none.
+         */
+        fun onPromoResolved()
+    }
+
+    // we hold the continuation of the call that created the request, so an answer can only resume that call, and only once
+    private class RealPromoRequest(
+        override val data: PasswordsImportScreenPromotionPlugin.ImportResult,
+        private val continuation: CancellableContinuation<Unit>,
+    ) : PromoRequest {
+        override fun onPromoResolved() {
+            if (continuation.isActive) continuation.resume(Unit)
+        }
+    }
+
+    companion object {
+        private const val IMPORT_PASSWORDS_GOOGLE_PROMPT_ID = "import_passwords_google"
+        val PROMO_TIMEOUT = 1.seconds
     }
 }

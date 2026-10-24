@@ -43,6 +43,7 @@ import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.PasswordManagementPromo
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Unknown
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillImportPasswordsScreen
+import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentImportFromGooglePasswordDialogBinding
 import com.duckduckgo.autofill.impl.deviceauth.AutofillAuthorizationGracePeriod
@@ -55,6 +56,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goog
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog.ImportPasswordsDialog.Companion.KEY_TAB_ID
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog.ImportPasswordsDialog.Companion.KEY_URL
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.Command
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.PromoRequest
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.BrowserPromoPreImport
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.DeterminingFirstView
@@ -71,6 +73,7 @@ import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.credentialexchange.api.CredentialExchangeLauncher
 import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.FragmentScope
@@ -78,6 +81,8 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -112,6 +117,9 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
+    @Inject
+    lateinit var importScreenPromotionPlugins: PluginPoint<PasswordsImportScreenPromotionPlugin>
+
     private val viewModel by bindViewModel<ImportFromGooglePasswordsDialogViewModel>()
 
     private var _binding: ContentImportFromGooglePasswordDialogBinding? = null
@@ -125,6 +133,16 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     private var ignoreCancellationEvents = false
 
     private var successImport = false
+
+    private var promoJob: Job? = null
+
+    private var handledPromoRequest: PromoRequest? = null
+
+    private val promoCallback = object : PasswordsImportScreenPromotionPlugin.Callback {
+        override fun dismissHost() {
+            dismiss()
+        }
+    }
 
     private val importGooglePasswordsFlowLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
         if (activityResult.resultCode == Activity.RESULT_OK) {
@@ -258,6 +276,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         logcat { "Autofill-import: rendering ${viewState.viewMode}, redesign enabled: ${viewState.isRedesignEnabled}" }
         handleViewStateSideEffects(viewState)
         renderContentVisibility(viewState)
+        renderPromoRequest(viewState.promoRequest)
         if (viewState.isRedesignEnabled) {
             renderRedesignViewState(viewState)
         } else {
@@ -336,6 +355,28 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
             }
         }
         redesignSelectViewToShow(binding.browserPromoPreImport.root)
+    }
+
+    private fun renderPromoRequest(request: PromoRequest?) {
+        if (request === handledPromoRequest) return
+        // the request is gone (timed out) or replaced, so whatever is still running for the old one is stale
+        promoJob?.cancel()
+        handledPromoRequest = request
+        if (request == null) return
+
+        promoJob = viewLifecycleOwner.lifecycleScope.launch {
+            val promo = importScreenPromotionPlugins.getPlugins().firstNotNullOfOrNull { plugin ->
+                plugin.getView(requireContext(), request.data, promoCallback)
+            }
+            // a plugin may ignore cancellation and still return, so we check before touching views
+            ensureActive()
+            with(binding.importSuccess.successPromoContainer) {
+                isVisible = promo != null
+                removeAllViews()
+                promo?.let(::addView)
+            }
+            request.onPromoResolved()
+        }
     }
 
     private fun redesignShowImportSuccessView(result: CredentialImporter.ImportResult.Finished) {
