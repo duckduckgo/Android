@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.impl.messaging
 
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
+import androidx.annotation.MainThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -59,12 +60,15 @@ class SubscriptionMessagingInterface @Inject constructor(
     pixelSender: SubscriptionPixelSender,
     subscriptionsChecker: SubscriptionsChecker,
     duckAiHostProvider: DuckAiHostProvider,
-    subscriptionsFeature: SubscriptionsFeature,
+    private val subscriptionsFeature: SubscriptionsFeature,
 ) : JsMessaging {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
     private lateinit var webView: WebView
     private lateinit var jsMessageCallback: JsMessageCallback
+
+    @Volatile
+    private var checkSenderHost: Boolean = true
 
     private val handlers = listOf(
         SubscriptionsHandler(),
@@ -82,7 +86,7 @@ class SubscriptionMessagingInterface @Inject constructor(
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)
             val url = runBlocking(dispatcherProvider.main()) {
-                webView.url?.toUri()?.host
+                if (checkSenderHost) webView.senderHost() else webView.url?.toUri()?.host
             }
             jsMessage?.let {
                 logcat { jsMessage.toString() }
@@ -101,6 +105,7 @@ class SubscriptionMessagingInterface @Inject constructor(
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
         this.webView = webView
         this.jsMessageCallback = jsMessageCallback
+        this.checkSenderHost = subscriptionsFeature.bridgeOriginCheck().isEnabled()
         this.webView.addJavascriptInterface(this, context)
     }
 
@@ -136,6 +141,19 @@ class SubscriptionMessagingInterface @Inject constructor(
         val host = url ?: return false
         val eTld = host.toTldPlusOne()
         return allowedDomains.contains(host) || (eTld != null && allowedDomains.contains(eTld))
+    }
+
+    /**
+     * The host of the document sending messages, or null when the WebView can't tell. While a navigation is pending,
+     * [WebView.getUrl] can already report its destination even though the previous document is still running and still
+     * sending messages; the committed back/forward entry keeps naming that previous document until the navigation
+     * commits. Only a host both agree on is the sender's.
+     */
+    @MainThread
+    private fun WebView.senderHost(): String? {
+        val host = url?.toUri()?.host ?: return null
+        val committedHost = copyBackForwardList().currentItem?.url?.toUri()?.host
+        return host.takeIf { it == committedHost }
     }
 
     inner class SubscriptionsHandler : JsMessageHandler {
