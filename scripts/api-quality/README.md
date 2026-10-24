@@ -58,11 +58,11 @@ Variables*), which the workflows pass in as environment variables of the same na
 |---|---|
 | `GH_API_QUALITY_PROJECT_ID` | The project |
 | `GH_API_QUALITY_TRIAGE_SECTION_ID` | Its Triage section: finding and regression tasks |
-| `GH_API_QUALITY_SCORECARDS_SECTION_ID` | Its Scorecards section: scorecard tasks |
 | `GH_API_QUALITY_WEEKLY_REPORTS_SECTION_ID` | Its Weekly Reports section: weekly report tasks |
 | `GH_API_QUALITY_GITHUB_RUN_FIELD_KEY_ID` | The "GitHub run" text field, which lets a re-run find and update its own task |
 | `GH_API_QUALITY_STATUS_FIELD_KEY_ID` | The "API quality status" single-select field |
 | `GH_API_QUALITY_STATUS_FIELD_NEEDS_EXPLANATION_VALUE_ID` | Its "Needs explanation" option, set on every new finding and regression task |
+| `GH_API_QUALITY_RULES_URL` | Optional: the "API quality rules and scores" task, linked at the end of PR comments, reports and finding tasks |
 
 Scheduled weekly runs post once `GH_API_QUALITY_PROJECT_ID` is set. A run that posts with any variable missing fails and
 names the missing ones. Posting uses the existing `ASANA_ACCESS_TOKEN` secret.
