@@ -24,9 +24,8 @@ import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.widget.WidgetType
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.nextsteps.api.NextStepCompletionCheck
+import com.duckduckgo.nextsteps.impl.NextStepsCompletionChecker
 import com.duckduckgo.nextsteps.impl.NextStepsItemsStore
 import com.duckduckgo.nextsteps.impl.NextStepsTelemetry
 import com.duckduckgo.nextsteps.impl.isNextStepsForNewTabPage
@@ -58,7 +57,7 @@ class NextStepsItemsViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val remoteMessageModel: RemoteMessageModel,
     private val itemsStore: NextStepsItemsStore,
-    private val completionChecks: PluginPoint<NextStepCompletionCheck>,
+    private val completionChecker: NextStepsCompletionChecker,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
     private val telemetry: NextStepsTelemetry,
 ) : ViewModel(), DefaultLifecycleObserver {
@@ -203,10 +202,9 @@ class NextStepsItemsViewModel @Inject constructor(
         message: RemoteMessage?,
         dismissedIds: Set<String>,
     ): List<CardItem.ListItem> {
-        val configItems = (message?.content as? Content.ActionableItems)?.listItems?.filterIsInstance<CardItem.ListItem>() ?: return emptyList()
-        val checks = completionChecks.getPlugins().associateBy { it.itemId }
-        val supportedItems = configItems.filter { it.id in checks }
-        val completedIds = refreshCompletedItemIds(supportedItems, checks)
+        val configItems = (message?.content as? Content.ActionableItems)?.listItems ?: return emptyList()
+        val supportedItems = completionChecker.supportedItems(configItems)
+        val completedIds = refreshCompletedItemIds(supportedItems)
         val remaining = supportedItems.filter { it.id !in completedIds && it.id !in dismissedIds }
         val onScreen = _viewState.value.items
         val isNewMessage = _viewState.value.message?.id != message.id
@@ -217,19 +215,12 @@ class NextStepsItemsViewModel @Inject constructor(
         }
     }
 
-    // Runs the completion checks for the items not yet known to be complete, records the new ones, and returns every completed id.
-    private suspend fun refreshCompletedItemIds(
-        items: List<CardItem.ListItem>,
-        checks: Map<String, NextStepCompletionCheck>,
-    ): Set<String> = withContext(dispatchers.io()) {
-        val completedBefore = itemsStore.completedItemIds()
-        val idsToCheck = items.map { it.id } - completedBefore
-        val completedNow = idsToCheck.filter { checks.getValue(it).isComplete() }.toSet()
-        if (completedNow.isNotEmpty()) {
-            telemetry.onCardsCompleted(completedNow)
-            itemsStore.addCompletedItemIds(completedNow)
+    private suspend fun refreshCompletedItemIds(items: List<CardItem.ListItem>): Set<String> {
+        val completion = completionChecker.refresh(items)
+        if (completion.newlyCompletedIds.isNotEmpty()) {
+            telemetry.onCardsCompleted(completion.newlyCompletedIds)
         }
-        completedBefore + completedNow
+        return completion.completedIds
     }
 
     private suspend fun loadItems(

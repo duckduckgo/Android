@@ -15,30 +15,50 @@
  */
 package com.duckduckgo.nextsteps.impl.ui.checklist
 
+import android.annotation.SuppressLint
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.duckduckgo.app.global.DefaultRoleBrowserDialog
+import com.duckduckgo.app.widget.WidgetType
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.nextsteps.api.NextStepCompletionCheck
+import com.duckduckgo.nextsteps.impl.NextStepsCompletionChecker
 import com.duckduckgo.nextsteps.impl.NextStepsItemsStore
 import com.duckduckgo.nextsteps.impl.isNextStepsForNewTabPage
+import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+@SuppressLint("NoLifecycleObserver") // Completion can change while the host opens another screen.
 @ContributesViewModel(ViewScope::class)
 class NextStepsCheckListViewModel @Inject constructor(
-    dispatchers: DispatcherProvider,
-    remoteMessageModel: RemoteMessageModel,
+    private val dispatchers: DispatcherProvider,
+    private val remoteMessageModel: RemoteMessageModel,
     private val itemsStore: NextStepsItemsStore,
-    private val completionChecks: PluginPoint<NextStepCompletionCheck>,
-) : ViewModel() {
+    private val completionChecker: NextStepsCompletionChecker,
+    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
+) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
         val message: RemoteMessage? = null,
@@ -51,20 +71,132 @@ class NextStepsCheckListViewModel @Inject constructor(
         )
     }
 
-    val viewState: Flow<ViewState> = remoteMessageModel.observeActiveMessages()
-        .map { message -> message?.takeIf { it.isNextStepsForNewTabPage() } }
-        .map { message -> message?.toViewState() ?: ViewState() }
-        .flowOn(dispatchers.io())
+    sealed class Command {
+        data class LaunchAddWidget(val widgetType: WidgetType) : Command()
+        data object LaunchDefaultBrowserDialog : Command()
+        data object LaunchDefaultBrowserSettings : Command()
+        data class LaunchScreen(
+            val screen: String,
+            val payload: String,
+        ) : Command()
 
-    private fun RemoteMessage.toViewState(): ViewState {
+        /** [toPosition] is the index the item will hold once the sorted state is applied. */
+        data class AnimateItemCompletion(
+            val itemId: String,
+            val toPosition: Int,
+        ) : Command()
+    }
+
+    private val _viewState = MutableStateFlow(ViewState())
+    val viewState = _viewState.asStateFlow()
+
+    private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
+    private val refresh = MutableSharedFlow<Unit>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST).apply { tryEmit(Unit) }
+
+    private var pendingCompletionItemId: String? = null
+    private var animatingCompletionItemId: String? = null
+    private var shownMessageId: String? = null
+    private var completionOrder: List<String> = emptyList()
+    private var sectionJob: Job? = null
+
+    fun commands(): Flow<Command> = command.receiveAsFlow()
+
+    private val activeMessage: Flow<RemoteMessage?> = remoteMessageModel.observeActiveMessages()
+        .map { message -> message?.takeIf { it.isNextStepsForNewTabPage() } }
+
+    fun onViewAttached() {
+        sectionJob?.cancel()
+        sectionJob = activeMessage
+            .combine(refresh) { message, _ -> message }
+            .onEach { message -> _viewState.value = message?.toViewState() ?: ViewState() }
+            .launchIn(viewModelScope)
+    }
+
+    override fun onResume(owner: LifecycleOwner) {
+        refresh.tryEmit(Unit)
+    }
+
+    fun onViewDetached() {
+        sectionJob?.cancel()
+        sectionJob = null
+        pendingCompletionItemId = null
+        animatingCompletionItemId = null
+        shownMessageId = null
+    }
+
+    fun onItemClicked(itemId: String) {
+        val item = _viewState.value.items.firstOrNull { it.item.id == itemId }?.takeIf { !it.completed } ?: return
+        val nextCommand = when (val action = item.item.primaryAction) {
+            is Action.DefaultBrowser -> {
+                if (defaultRoleBrowserDialog.shouldShowDialog()) {
+                    Command.LaunchDefaultBrowserDialog
+                } else {
+                    Command.LaunchDefaultBrowserSettings
+                }
+            }
+
+            is Action.AddWidget -> Command.LaunchAddWidget(WidgetType.fromValue(action.value))
+            is Action.Navigation -> Command.LaunchScreen(action.value, action.additionalParameters?.get("payload").orEmpty())
+            else -> null
+        } ?: return
+        pendingCompletionItemId = itemId
+        viewModelScope.launch { command.send(nextCommand) }
+    }
+
+    fun onDefaultBrowserDialogShown() {
+        defaultRoleBrowserDialog.dialogShown()
+    }
+
+    fun onItemCompletionAnimated(itemId: String) {
+        if (animatingCompletionItemId != itemId) return
+        animatingCompletionItemId = null
+        _viewState.update { state ->
+            state.copy(items = state.items.map { if (it.item.id == itemId) it.copy(completed = true) else it }.sortedItems())
+        }
+    }
+
+    fun onSectionDismissed() {
+        val message = _viewState.value.message ?: return
+        viewModelScope.launch {
+            val firstDismissal = withContext(dispatchers.io()) { itemsStore.markMessageDismissed(message.id) }
+            if (firstDismissal) {
+                remoteMessageModel.onMessageDismissed(message)
+            }
+        }
+    }
+
+    private suspend fun RemoteMessage.toViewState(): ViewState {
         val content = this.content as Content.ActionableItems
-        val supportedIds = completionChecks.getPlugins().map { it.itemId }.toSet()
-        val completedIds = itemsStore.completedItemIds()
-        val items = content.listItems
-            .filterIsInstance<CardItem.ListItem>()
-            .filter { it.id in supportedIds }
-            .map { ViewState.Item(item = it, completed = it.id in completedIds) }
-            .sortedBy { it.completed }
+        val supportedItems = completionChecker.supportedItems(content.listItems)
+        val completedIds = completionChecker.refresh(supportedItems).completedIds
+        completionOrder = completedIds.toList()
+        val settledItems = supportedItems.map { ViewState.Item(item = it, completed = it.id in completedIds) }.sortedItems()
+        startCompletionAnimationIfDue(settledItems)
+        val items = supportedItems
+            .map { ViewState.Item(item = it, completed = it.id in completedIds && it.id != animatingCompletionItemId) }
+            .sortedItems()
+        if (items.isNotEmpty() && shownMessageId != id) {
+            shownMessageId = id
+            remoteMessageModel.onMessageShown(this)
+        }
         return ViewState(message = this, title = content.titleText, items = items)
     }
+
+    // The completed item keeps its place and chevron until the view has played the completion animation.
+    private fun startCompletionAnimationIfDue(settledItems: List<ViewState.Item>) {
+        val pendingId = pendingCompletionItemId ?: return
+        val toPosition = settledItems.indexOfFirst { it.item.id == pendingId && it.completed }
+        if (toPosition < 0) return
+        pendingCompletionItemId = null
+        val wasShownIncomplete = _viewState.value.items.any { it.item.id == pendingId && !it.completed }
+        if (wasShownIncomplete) {
+            animatingCompletionItemId = pendingId
+            command.trySend(Command.AnimateItemCompletion(pendingId, toPosition))
+        }
+    }
+
+    // Remaining items keep the config order; completed items follow, the most recently completed first, so a
+    // newly completed item lands right below the remaining ones and the older ones sink.
+    private fun List<ViewState.Item>.sortedItems(): List<ViewState.Item> =
+        filter { !it.completed } + filter { it.completed }.sortedByDescending { completionOrder.indexOf(it.item.id) }
 }
