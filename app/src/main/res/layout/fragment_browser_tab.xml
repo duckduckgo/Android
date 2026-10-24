@@ -109,6 +109,7 @@
             android:layout_below="@id/daxDialogOnboardingCtaContent">
 
             <FrameLayout
+                android:id="@+id/webViewAndOverlaysContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:animateLayoutChanges="true">
