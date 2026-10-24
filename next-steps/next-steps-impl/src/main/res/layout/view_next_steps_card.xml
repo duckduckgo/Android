@@ -56,9 +56,8 @@
             android:contentDescription="@string/closeButtonContentDescription"
             android:padding="@dimen/keyline_1"
             android:src="@drawable/ic_close_16"
-            app:layout_constraintBottom_toBottomOf="@id/sectionTitle"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/sectionTitle" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/itemImage"

@@ -25,6 +25,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
     ksp project(':codegen-ksp')
     implementation project(':next-steps-api')
+    implementation project(':statistics-api')
     implementation project(':browser-api')
     implementation project(':codegen-annotations')
     implementation project(':di')

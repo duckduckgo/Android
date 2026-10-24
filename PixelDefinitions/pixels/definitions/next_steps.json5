@@ -1,0 +1,195 @@
+{
+    "next_steps_section_shown_unique": {
+        "description": "Fires once per install, the first time the stacked setup cards are rendered on the new tab page. Denominator for the per-user completion funnel.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["impression"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "next_steps_card_impression": {
+        "description": "Fires when a stacked setup card becomes the visible front card, on first render or promotion. Returning to an unchanged front does not count again.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["impression", "user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "card",
+                "type": "string",
+                "description": "Setup card identified by its code-supported item id.",
+                "enum": ["setup_default_browser", "setup_add_widget", "setup_sync"]
+            },
+            {
+                "key": "activeDay",
+                "type": "string",
+                "description": "Active day of the stacked setup cards, bucketed: calendar days on which a card was shown so far, starting at 0. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "calendarDay",
+                "type": "string",
+                "description": "Local calendar days since the stacked setup cards were first shown on this install, bucketed. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            }
+        ]
+    },
+    "next_steps_card_cta_clicked": {
+        "description": "Fires when the front setup card CTA is tapped and resolves to a launch command.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "card",
+                "type": "string",
+                "description": "Setup card identified by its code-supported item id.",
+                "enum": ["setup_default_browser", "setup_add_widget", "setup_sync"]
+            },
+            {
+                "key": "activeDay",
+                "type": "string",
+                "description": "Active day of the stacked setup cards, bucketed: calendar days on which a card was shown so far, starting at 0. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "calendarDay",
+                "type": "string",
+                "description": "Local calendar days since the stacked setup cards were first shown on this install, bucketed. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            }
+        ]
+    },
+    "next_steps_card_completed": {
+        "description": "Fires on the first detection of completion for the setup card whose CTA was last tapped. External completions without CTA attribution do not fire this pixel.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "card",
+                "type": "string",
+                "description": "Setup card identified by its code-supported item id.",
+                "enum": ["setup_default_browser", "setup_add_widget", "setup_sync"]
+            },
+            {
+                "key": "activeDay",
+                "type": "string",
+                "description": "Active day of the stacked setup cards, bucketed: calendar days on which a card was shown so far, starting at 0. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "calendarDay",
+                "type": "string",
+                "description": "Local calendar days since the stacked setup cards were first shown on this install, bucketed. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            }
+        ]
+    },
+    "next_steps_card_dismissed": {
+        "description": "Fires when the user dismisses the front setup card with its close button.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "card",
+                "type": "string",
+                "description": "Setup card identified by its code-supported item id.",
+                "enum": ["setup_default_browser", "setup_add_widget", "setup_sync"]
+            },
+            {
+                "key": "activeDay",
+                "type": "string",
+                "description": "Active day of the stacked setup cards, bucketed: calendar days on which a card was shown so far, starting at 0. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "calendarDay",
+                "type": "string",
+                "description": "Local calendar days since the stacked setup cards were first shown on this install, bucketed. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            }
+        ]
+    },
+    "next_steps_card_daily_impressions": {
+        "description": "Reports bucketed impressions for one eligible setup card and local day. Finalized on card retirement, a later impression day, or carousel end; classified by the recorded impressions.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["impression", "user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "card",
+                "type": "string",
+                "description": "Setup card identified by its code-supported item id.",
+                "enum": ["setup_default_browser", "setup_add_widget", "setup_sync"]
+            },
+            {
+                "key": "activeDay",
+                "type": "string",
+                "description": "Active day of the stacked setup cards, bucketed: calendar days on which a card was shown so far, starting at 0. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "calendarDay",
+                "type": "string",
+                "description": "Local calendar days since the stacked setup cards were first shown on this install, bucketed. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "impressions",
+                "type": "string",
+                "description": "Number of front-card impressions for this card on the recorded local day, bucketed. Zero denotes an eligible card that never reached the front.",
+                "enum": ["0", "1", "2", "3-4", "5-7", "8+"]
+            }
+        ]
+    },
+    "next_steps_cards_dismissed": {
+        "description": "Fires when the stacked setup cards end: the user completed or dismissed every card, or RMF took the message out of the active slot (auto-dismiss, replacement by another message, config removal) while cards were still open.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["user_interaction", "feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "activeDay",
+                "type": "string",
+                "description": "Active day of the stacked setup cards, bucketed: calendar days on which a card was shown so far, starting at 0. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "calendarDay",
+                "type": "string",
+                "description": "Local calendar days since the stacked setup cards were first shown on this install, bucketed. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the cards ended: every card completed or dismissed by the user, or RMF removed the message.",
+                "enum": ["all_cards_done", "auto"]
+            },
+            {
+                "key": "completed",
+                "type": "string",
+                "description": "Cards completed while the stack was on screen, by CTA or elsewhere. Cards already complete before the first render are not counted.",
+                "enum": ["0", "1", "2", "3"]
+            },
+            {
+                "key": "dismissed",
+                "type": "string",
+                "description": "Cards the user closed with the X while the stack was on screen.",
+                "enum": ["0", "1", "2", "3"]
+            }
+        ]
+    }
+}
