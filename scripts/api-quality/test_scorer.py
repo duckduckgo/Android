@@ -103,3 +103,21 @@ def test_reformatting_a_type_keeps_the_same_finding(tmp_path):
     spread = score(tmp_path / "spread", "/** Doc. */\ninterface A {\n    /** Doc. */\n    fun f(m: Map<\n        String ,\n        Any\n    >)\n}\n")
 
     assert one_line == spread
+
+
+def test_sealed_cases_need_no_kdoc_but_still_count_toward_size(tmp_path):
+    out = score_run(tmp_path, (
+        "/** Doc. */\nsealed interface Result {\n"
+        "    data object Loading : Result\n"
+        "    data class Success(val value: Int) : Result\n"
+        "    class Helper\n"
+        "}\n"
+    ))
+
+    with open(out / "api-quality-findings-t.csv", newline="") as f:
+        undocumented = {row["declaration"] for row in csv.DictReader(f) if row["detail"] == "no KDoc"}
+    with open(out / "api-quality-declarations-t.csv", newline="") as f:
+        kinds = {row["declaration"]: row["kind"] for row in csv.DictReader(f)}
+    assert undocumented == {"Result.Helper", "Result.Success.value"}
+    assert kinds["Result.Loading"] == kinds["Result.Success"] == "SEALED_CASE"
+    assert kinds["Result.Helper"] == "TYPE"

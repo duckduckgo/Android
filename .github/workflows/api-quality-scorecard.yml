@@ -96,16 +96,16 @@ jobs:
           import sys
           from compare import load_run
           f = load_run(sys.argv[1]).fleet()
-          print(f"Weighted average: {f['weighted'] * 100:.1f}%")
-          print(f"Unweighted average: {f['unweighted'] * 100:.1f}%")
-          print(f"Points: {f['points']} / {f['max_points']}")
-          print(f"Public declarations: {f['declarations']:,}")
+          print(f"- Weighted average: {f['weighted'] * 100:.1f}%")
+          print(f"- Unweighted average: {f['unweighted'] * 100:.1f}%")
+          print(f"- Points: {f['points']} / {f['max_points']}")
+          print(f"- Public declarations: {f['declarations']:,}")
           PY
           )"
           {
             echo "API quality scorecard of \`$REF\` at \`${SHA:0:10}\`."
             echo
-            echo "$fleet" | sed 's/^/- /'
+            echo "$fleet"
             echo
             echo "Full scorecard and CSVs: [the run's Artifacts section]($RUN_URL)."
           } > "$RUNNER_TEMP/asana.md"

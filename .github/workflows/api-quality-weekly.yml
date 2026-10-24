@@ -73,9 +73,11 @@ jobs:
             last_week="$(date -u -d "$today -7 days" +%F)"
             previous_sha="$(git rev-list -1 --first-parent --before="$last_week 06:00" origin/develop)"
           fi
-          echo "today=$today" >> "$GITHUB_OUTPUT"
-          echo "last_week=$last_week" >> "$GITHUB_OUTPUT"
-          echo "previous_sha=$previous_sha" >> "$GITHUB_OUTPUT"
+          {
+            echo "today=$today"
+            echo "last_week=$last_week"
+            echo "previous_sha=$previous_sha"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Score last week
         uses: ./.github/actions/api-quality-score
