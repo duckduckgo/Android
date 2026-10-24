@@ -54,6 +54,7 @@ import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookma
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.NoCredentialsAvailable
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.PromptUserToConfirmFlowCancellation
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.PromptUserToSelectFromStoredCredentials
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.FirstPageLoading
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.HideWebPage
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.Initializing
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.LoadingWebPage
@@ -72,6 +73,7 @@ import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -84,6 +86,7 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class ImportGoogleBookmarksWebFlowFragment :
@@ -148,6 +151,7 @@ class ImportGoogleBookmarksWebFlowFragment :
         initialiseToolbar()
         configureWebView()
         configureBackButtonHandler()
+        configureInProgressCancelListener()
 
         observeViewState()
         observeCommands()
@@ -177,6 +181,7 @@ class ImportGoogleBookmarksWebFlowFragment :
                     is LoadingWebPage -> loadFirstWebpage(viewState.url)
                     is NavigatingBack -> binding?.webView?.goBack()
                     is Initializing -> {}
+                    is FirstPageLoading -> {}
                     is ShowWebPage -> hideImportProgressDialog()
                     is HideWebPage -> showImportProgressDialog()
                 }
@@ -235,6 +240,7 @@ class ImportGoogleBookmarksWebFlowFragment :
     private fun configureWebView() {
         binding?.webView?.let { webView ->
             webView.webViewClient = ImportGoogleBookmarksWebFlowWebViewClient(this)
+            webView.setBackgroundColor(webView.context.getColorFromAttr(CommonR.attr.daxColorBackground))
             configureWebViewSettings(webView)
             configureDownloadInterceptor(webView)
             configureAutofill(webView)
@@ -338,6 +344,12 @@ class ImportGoogleBookmarksWebFlowFragment :
     private fun initialiseToolbar() {
         with(getToolbar()) {
             setNavigationOnClickListener { askUserToConfirmCancellation() }
+        }
+    }
+
+    private fun configureInProgressCancelListener() {
+        setFragmentResultListener(ImportGoogleBookmarksInProgressRedesignFragment.RESULT_KEY_CANCEL) { _, _ ->
+            askUserToConfirmCancellation()
         }
     }
 
