@@ -114,7 +114,6 @@
     <attr name="daxColorAccentAltPrimary" format="color"/>
 
     <attr name="daxColorTabHighlight" format="color"/>
-    <attr name="daxColorTabDuckAiContentContainer" format="color"/>
     <attr name="daxColorTabDuckAiContentTypeBorder" format="color"/>
 
     <attr name="daxColorButtonPrimaryText" format="color"/>
