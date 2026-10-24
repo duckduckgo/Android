@@ -294,6 +294,13 @@ interface DuckChatFeature {
     fun nativeToSConsent(): Toggle
 
     /**
+     * @return `true` when the native input shows the privacy disclaimer for image and file attachments.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun attachmentPrivacyDisclaimer(): Toggle
+
+    /**
      * @return `true` when the duckduckgo.com homepage may list the user's Duck.ai chats via `getAIChats`.
      * If the remote feature is not present defaults to `internal`.
      */
