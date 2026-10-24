@@ -133,6 +133,10 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
 
     enum class SwipeDecision { HORIZONTAL, VERTICAL, CANCEL_LONG_PRESS }
 
+    private companion object {
+        const val HORIZONTAL_SWIPE_DOMINANCE_RATIO = 1.5f
+    }
+
     private var initialTouchX = 0f
     private var initialTouchY = 0f
     private var longPressActivated = false
@@ -328,7 +332,7 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
         val dy = abs(y - initialTouchY)
 
         return when {
-            dx > dy && dx > touchSlop -> SwipeDecision.HORIZONTAL
+            dx > dy * HORIZONTAL_SWIPE_DOMINANCE_RATIO && dx > touchSlop -> SwipeDecision.HORIZONTAL
             dy > dx && dy > touchSlop -> SwipeDecision.VERTICAL
             dx > touchSlop || dy > touchSlop -> SwipeDecision.CANCEL_LONG_PRESS
             else -> null
