@@ -1,0 +1,145 @@
+name: API quality compare
+
+on:
+  workflow_dispatch:
+    inputs:
+      main_ref:
+        description: 'Branch, tag or commit to check'
+        required: true
+        type: string
+        default: 'develop'
+      reference_ref:
+        description: 'Branch, tag or commit to compare it with'
+        required: true
+        type: string
+      create_asana_task:
+        description: 'Create an Asana task if the main ref regressed'
+        required: false
+        type: boolean
+        default: false
+  workflow_call:
+    inputs:
+      main_ref:
+        description: 'Branch, tag or commit to check'
+        required: true
+        type: string
+      reference_ref:
+        description: 'Branch, tag or commit to compare it with'
+        required: true
+        type: string
+      create_asana_task:
+        description: 'Create an Asana task if the main ref regressed'
+        required: false
+        type: boolean
+        default: false
+    outputs:
+      regressed:
+        description: "'true' when the main ref has a new finding or a lower module score than the reference"
+        value: ${{ jobs.compare.outputs.regressed }}
+
+# Asana IDs for the posting scripts; see scripts/api-quality/README.md.
+env:
+  GH_API_QUALITY_PROJECT_ID: ${{ vars.GH_API_QUALITY_PROJECT_ID }}
+  GH_API_QUALITY_TRIAGE_SECTION_ID: ${{ vars.GH_API_QUALITY_TRIAGE_SECTION_ID }}
+  GH_API_QUALITY_SCORECARDS_SECTION_ID: ${{ vars.GH_API_QUALITY_SCORECARDS_SECTION_ID }}
+  GH_API_QUALITY_WEEKLY_REPORTS_SECTION_ID: ${{ vars.GH_API_QUALITY_WEEKLY_REPORTS_SECTION_ID }}
+  GH_API_QUALITY_GITHUB_RUN_FIELD_KEY_ID: ${{ vars.GH_API_QUALITY_GITHUB_RUN_FIELD_KEY_ID }}
+  GH_API_QUALITY_STATUS_FIELD_KEY_ID: ${{ vars.GH_API_QUALITY_STATUS_FIELD_KEY_ID }}
+  GH_API_QUALITY_STATUS_FIELD_NEEDS_EXPLANATION_VALUE_ID: ${{ vars.GH_API_QUALITY_STATUS_FIELD_NEEDS_EXPLANATION_VALUE_ID }}
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    name: API quality compare
+    runs-on: ubuntu-latest
+    outputs:
+      regressed: ${{ steps.compare.outputs.regressed }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Score the reference
+        id: reference
+        uses: ./.github/actions/api-quality-score
+        with:
+          ref: ${{ inputs.reference_ref }}
+          out-dir: ${{ runner.temp }}/out/reference
+          label: reference
+
+      - name: Score the main ref
+        id: main
+        uses: ./.github/actions/api-quality-score
+        with:
+          ref: ${{ inputs.main_ref }}
+          out-dir: ${{ runner.temp }}/out/main
+          label: main
+          previous-scores: ${{ runner.temp }}/out/reference/api-quality-scores-reference.csv
+
+      - name: Compare
+        id: compare
+        env:
+          MAIN_REF: ${{ inputs.main_ref }}
+          MAIN_SHA: ${{ steps.main.outputs.sha }}
+          REFERENCE_REF: ${{ inputs.reference_ref }}
+          REFERENCE_SHA: ${{ steps.reference.outputs.sha }}
+        run: |
+          out="$RUNNER_TEMP/out"
+          python3 scripts/api-quality/compare.py \
+            --before "$out/reference" --after "$out/main" --mode weekly --title "API quality: $MAIN_REF compared with $REFERENCE_REF" \
+            --out-md "$out/comparison.md" --out-json "$out/comparison.json"
+          regressed="$(jq -r .regressed "$out/comparison.json")"
+          echo "regressed=$regressed" >> "$GITHUB_OUTPUT"
+          {
+            if [[ "$regressed" == "true" ]]; then
+              echo "❌ **\`$MAIN_REF\` regressed** compared with \`$REFERENCE_REF\`: see Regressions below."
+            else
+              echo "✅ **No regression**: \`$MAIN_REF\` has no new finding and no lower module score than \`$REFERENCE_REF\`."
+            fi
+            echo
+            echo "Before = \`$REFERENCE_REF\` at \`${REFERENCE_SHA:0:10}\`. After = \`$MAIN_REF\` at \`${MAIN_SHA:0:10}\`."
+            echo
+            cat "$out/comparison.md"
+          } > "$out/summary.md"
+          cat "$out/summary.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload comparison
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-quality-compare-${{ github.run_id }}
+          path: ${{ runner.temp }}/out
+          retention-days: 90
+
+      # The task lands in Triage as Needs explanation. A re-run updates the task its first attempt created, found by the
+      # run ID, instead of creating another.
+      - name: Create or update the Asana task
+        if: steps.compare.outputs.regressed == 'true' && inputs.create_asana_task
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          NAME: 'API quality regression: ${{ inputs.main_ref }} compared with ${{ inputs.reference_ref }}'
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          {
+            cat "$RUNNER_TEMP/out/summary.md"
+            echo
+            echo "Scorecards and CSVs: [the run's Artifacts section]($RUN_URL)."
+          } > "$RUNNER_TEMP/asana.md"
+          pip install -r scripts/api-quality/requirements.txt
+          python3 scripts/api-quality/asana_task.py --kind regression --name "$NAME" --notes-md "$RUNNER_TEMP/asana.md"
+
+      - name: Fail on regression
+        if: steps.compare.outputs.regressed == 'true'
+        env:
+          MAIN_REF: ${{ inputs.main_ref }}
+          REFERENCE_REF: ${{ inputs.reference_ref }}
+        run: |
+          echo "::error::$MAIN_REF regressed compared with $REFERENCE_REF. The run summary lists what changed."
+          exit 1
