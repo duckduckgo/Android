@@ -1,0 +1,109 @@
+name: API quality check
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+    paths:
+      - '**/*-api/src/main/**'
+      - 'scripts/api-quality/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  api_quality:
+    name: API quality check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # The PR head is scored rather than the checked-out merge commit, and compared with the merge base rather than the
+      # base branch tip, so changes that landed on the base branch after the PR branched off don't show up as its findings.
+      - name: Find the merge base
+        id: merge_base
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: echo "sha=$(git merge-base "$BASE_SHA" "$HEAD_SHA")" >> "$GITHUB_OUTPUT"
+
+      - name: Score the merge base
+        uses: ./.github/actions/api-quality-score
+        with:
+          ref: ${{ steps.merge_base.outputs.sha }}
+          out-dir: ${{ runner.temp }}/score-base
+          label: base
+
+      - name: Score the PR
+        uses: ./.github/actions/api-quality-score
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          out-dir: ${{ runner.temp }}/score-head
+          label: head
+
+      - name: Compare
+        id: compare
+        env:
+          GUIDE_URL: ${{ vars.API_QUALITY_GUIDE_URL }}
+        run: |
+          python3 scripts/api-quality/compare.py \
+            --before "$RUNNER_TEMP/score-base" --after "$RUNNER_TEMP/score-head" --mode pr \
+            --out-md "$RUNNER_TEMP/comment.md" --out-json "$RUNNER_TEMP/diff.json" --guide-url "$GUIDE_URL"
+          cat "$RUNNER_TEMP/comment.md" >> "$GITHUB_STEP_SUMMARY"
+          echo "regressed=$(jq -r .regressed "$RUNNER_TEMP/diff.json")" >> "$GITHUB_OUTPUT"
+
+      - name: Upload scorecards
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-quality-pr-${{ github.event.pull_request.number }}
+          path: |
+            ${{ runner.temp }}/score-base
+            ${{ runner.temp }}/score-head
+            ${{ runner.temp }}/comment.md
+            ${{ runner.temp }}/diff.json
+          retention-days: 30
+
+      - name: Update PR comment
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const MARKER = '<!-- api-quality-check -->';
+            const temp = process.env.RUNNER_TEMP;
+            const changed = JSON.parse(fs.readFileSync(`${temp}/diff.json`, 'utf8')).changed;
+            const body = fs.readFileSync(`${temp}/comment.md`, 'utf8');
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issue_number = context.payload.pull_request.number;
+
+            try {
+              const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number, per_page: 100 });
+              const existing = comments.find(c => c.user?.type === 'Bot' && c.body?.includes(MARKER));
+              if (!changed) {
+                if (existing) await github.rest.issues.deleteComment({ owner, repo, comment_id: existing.id });
+                return;
+              }
+              if (existing) {
+                await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+              } else {
+                await github.rest.issues.createComment({ owner, repo, issue_number, body });
+              }
+            } catch (e) {
+              // Fork PRs run with a read-only token, so commenting may fail; the job summary still has the result.
+              core.warning(`Could not update the API quality comment: ${e.message}`);
+            }
+
+      # Not a required check, so a failure flags the regression without blocking the merge.
+      - name: Fail on regression
+        if: steps.compare.outputs.regressed == 'true'
+        run: |
+          echo "::error::This PR adds API quality findings or lowers a module score. The run summary and the PR comment list them."
+          exit 1
