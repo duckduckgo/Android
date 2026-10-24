@@ -41,11 +41,11 @@ on:
 env:
   GH_API_QUALITY_PROJECT_ID: ${{ vars.GH_API_QUALITY_PROJECT_ID }}
   GH_API_QUALITY_TRIAGE_SECTION_ID: ${{ vars.GH_API_QUALITY_TRIAGE_SECTION_ID }}
-  GH_API_QUALITY_SCORECARDS_SECTION_ID: ${{ vars.GH_API_QUALITY_SCORECARDS_SECTION_ID }}
   GH_API_QUALITY_WEEKLY_REPORTS_SECTION_ID: ${{ vars.GH_API_QUALITY_WEEKLY_REPORTS_SECTION_ID }}
   GH_API_QUALITY_GITHUB_RUN_FIELD_KEY_ID: ${{ vars.GH_API_QUALITY_GITHUB_RUN_FIELD_KEY_ID }}
   GH_API_QUALITY_STATUS_FIELD_KEY_ID: ${{ vars.GH_API_QUALITY_STATUS_FIELD_KEY_ID }}
   GH_API_QUALITY_STATUS_FIELD_NEEDS_EXPLANATION_VALUE_ID: ${{ vars.GH_API_QUALITY_STATUS_FIELD_NEEDS_EXPLANATION_VALUE_ID }}
+  GH_API_QUALITY_RULES_URL: ${{ vars.GH_API_QUALITY_RULES_URL }}
 
 permissions:
   contents: read
@@ -95,7 +95,8 @@ jobs:
           out="$RUNNER_TEMP/out"
           python3 scripts/api-quality/compare.py \
             --before "$out/reference" --after "$out/main" --mode weekly --title "API quality: $MAIN_REF compared with $REFERENCE_REF" \
-            --out-md "$out/comparison.md" --out-json "$out/comparison.json"
+            --out-md "$out/comparison.md" --out-json "$out/comparison.json" --rules-url "$GH_API_QUALITY_RULES_URL" \
+            --link-base "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/blob/$MAIN_SHA"
           regressed="$(jq -r .regressed "$out/comparison.json")"
           echo "regressed=$regressed" >> "$GITHUB_OUTPUT"
           {
@@ -133,7 +134,7 @@ jobs:
             echo "Scorecards and CSVs: [the run's Artifacts section]($RUN_URL)."
           } > "$RUNNER_TEMP/asana.md"
           pip install -r scripts/api-quality/requirements.txt
-          python3 scripts/api-quality/asana_task.py --kind regression --name "$NAME" --notes-md "$RUNNER_TEMP/asana.md"
+          python3 scripts/api-quality/asana_task.py --name "$NAME" --notes-md "$RUNNER_TEMP/asana.md"
 
       - name: Fail on regression
         if: steps.compare.outputs.regressed == 'true'

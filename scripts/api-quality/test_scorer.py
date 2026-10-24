@@ -121,3 +121,18 @@ def test_sealed_cases_need_no_kdoc_but_still_count_toward_size(tmp_path):
     assert undocumented == {"Result.Helper", "Result.Success.value"}
     assert kinds["Result.Loading"] == kinds["Result.Success"] == "SEALED_CASE"
     assert kinds["Result.Helper"] == "TYPE"
+
+
+def test_only_subtypes_of_the_enclosing_sealed_type_are_cases(tmp_path):
+    out = score_run(tmp_path, (
+        "/** Doc. */\nsealed interface Result {\n"
+        "    data object Plain : Result\n"
+        "    data object Qualified : x.Result\n"
+        "    data object Foreign : other.Result\n"
+        "}\n"
+    ))
+
+    with open(out / "api-quality-declarations-t.csv", newline="") as f:
+        kinds = {row["declaration"]: row["kind"] for row in csv.DictReader(f)}
+    assert kinds["Result.Plain"] == kinds["Result.Qualified"] == "SEALED_CASE"
+    assert kinds["Result.Foreign"] == "TYPE"

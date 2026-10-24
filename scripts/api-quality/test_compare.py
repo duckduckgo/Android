@@ -4,7 +4,7 @@
 import csv
 import json
 
-from compare import diff_runs, load_run, main, regressed, regression_reasons, render_pr
+from compare import diff_runs, load_run, main, regressed, regression_reasons, render_pr, render_weekly
 
 SCORES_HEADER = ["module", "score", "declarations", "top_kdoc", "member_kdoc", "failing"]
 FINDINGS_HEADER = ["module", "rule", "file", "line", "declaration", "detail"]
@@ -78,14 +78,14 @@ def test_size_finding_survives_a_change_in_declaration_count(tmp_path):
     assert diff.new == [] and diff.resolved == []
 
 
-def test_pr_comment_says_so_when_nothing_changed(tmp_path):
+def test_pr_comment_says_so_when_nothing_was_added(tmp_path):
     before = write_run(tmp_path / "before", [["a-api", 8, 1, "", "", ""]], [])
     after = write_run(tmp_path / "after", [["a-api", 8, 1, "", "", ""]], [])
     b, a = load_run(before), load_run(after)
 
     comment = render_pr(b, a, diff_runs(b, a))
 
-    assert "doesn't change any API quality finding" in comment
+    assert "✅ No new API quality findings." in comment
 
 
 def test_weekly_json_groups_new_findings_by_module_and_rule(tmp_path, monkeypatch):
@@ -96,13 +96,15 @@ def test_weekly_json_groups_new_findings_by_module_and_rule(tmp_path, monkeypatc
     ])
     out_md, out_json = tmp_path / "report.md", tmp_path / "new.json"
     monkeypatch.setattr("sys.argv", ["compare.py", "--before", str(before), "--after", str(after), "--mode", "weekly",
-                                     "--out-md", str(out_md), "--out-json", str(out_json)])
+                                     "--out-md", str(out_md), "--out-json", str(out_json), "--link-base", "https://gh/blob/sha",
+                                     "--weekly-report"])
 
     main()
 
     groups = json.loads(out_json.read_text())["new"]
-    assert [(g["module"], g["rule"], len(g["findings"]), g["score_effect"]) for g in groups] == [("a-api", "M3", 2, "8/8 → 7/8")]
-    assert "### New findings" in out_md.read_text()
+    assert [(g["module"], g["rule"], len(g["findings"])) for g in groups] == [("a-api", "M3", 2)]
+    assert groups[0]["findings"][0]["url"] == "https://gh/blob/sha/A.kt#L1"
+    assert "| `a-api` | M3: Top-level declarations documented | <!-- task:a-api:M3 --> |" in out_md.read_text()
 
 
 def test_new_finding_is_a_regression(tmp_path):
@@ -162,19 +164,52 @@ def test_score_drop_from_a_move_is_a_regression_that_names_the_move(tmp_path):
     reasons = regression_reasons(b, a, diff_runs(b, a))
 
     assert len(reasons) == 1
-    assert "`b-api`: score 8/8 → 7/8" in reasons[0] and "moved in from `a-api`" in reasons[0]
+    assert "`b-api`: Score 8/8 → 7/8" in reasons[0] and "moved in from `a-api`" in reasons[0]
 
 
-def test_pr_comment_lists_every_new_finding_with_its_location(tmp_path):
+def test_pr_comment_lists_every_new_finding_with_a_link_to_its_line(tmp_path):
     before = write_run(tmp_path / "before", [["a-api", 8, 1, "", "", ""]], [])
     after = write_run(tmp_path / "after", [["a-api", 7, 7, "", "", "M3"]],
-                      [["a-api", "M3", f"F{i}.kt", i, f"F{i}", "no KDoc"] for i in range(6)])
+                      [["a-api", "M3", f"src/F{i}.kt", i, f"F{i}", "no KDoc"] for i in range(6)])
     b, a = load_run(before), load_run(after)
 
-    comment = render_pr(b, a, diff_runs(b, a))
+    comment = render_pr(b, a, diff_runs(b, a), rules_url="https://rules", link_base="https://gh/blob/sha")
 
-    assert "and 1 more" in comment
-    assert all(f"`F{i}.kt:{i}`" in comment for i in range(6))
+    assert all(f"| `a-api` | [F{i}.kt:{i}](https://gh/blob/sha/src/F{i}.kt#L{i}) | `F{i}`: no KDoc<br>**Fix:** Add a KDoc line saying what it's for. |"
+               in comment for i in range(6))
+    assert "[API quality rules and scores](https://rules)" in comment
+
+
+def test_weekly_report_lists_each_regression_once_and_resolved_by_module(tmp_path):
+    before = write_run(tmp_path / "before", [["a-api", 8, 2, "", "", ""], ["b-api", 7, 2, "", "", "M8"]],
+                       [["b-api", "M8", "B.kt", 1, "B.x", "public var"]])
+    after = write_run(tmp_path / "after", [["a-api", 7, 4, "", "", "M3"], ["b-api", 8, 2, "", "", ""]], [
+        ["a-api", "M3", "A.kt", 1, "A", "no KDoc"],
+        ["a-api", "M3", "C.kt", 1, "C", "no KDoc"],
+    ])
+    b, a = load_run(before), load_run(after)
+
+    report = render_weekly(b, a, diff_runs(b, a), weekly_report=True)
+
+    assert report.count("| `a-api` | M3") == 1
+    assert "| `b-api` | M8 |" in report
+    assert "| `a-api` | 8/8 | 7/8 |" in report
+    assert "score effect" not in report.lower()
+
+
+def test_weekly_report_opens_with_a_summary_and_has_an_o2_placeholder(tmp_path):
+    base = write_run(tmp_path / "base", [["a-api", 6, 2, "", "", "M3 M4"]], [])
+    before = write_run(tmp_path / "before", [["a-api", 8, 2, "", "", ""]], [])
+    after = write_run(tmp_path / "after", [["a-api", 7, 4, "", "", "M3"]], [["a-api", "M3", "A.kt", 1, "A", "no KDoc"]])
+    b, a = load_run(before), load_run(after)
+
+    report = render_weekly(b, a, diff_runs(b, a), baseline=load_run(base), weekly_report=True)
+
+    assert report.startswith("## Summary\n\n| Metric | Baseline | Last week | This week | Goal |")
+    assert "| Score, weighted by declarations | 75.0% | 100.0% | 87.5% | 75% |" in report
+    assert "| New findings |  |  | 1 |  |" in report
+    assert "| Finding tasks untriaged after 14 days |  |  | — <!-- awaiting-triage --> | 0 |" in report
+    assert report.index("## O1: API code quality") < report.index("## O2: API review process\n\n[Under construction]")
 
 
 def test_moving_the_debt_to_another_copy_of_a_name_in_one_module_is_new(tmp_path):
@@ -224,3 +259,23 @@ def test_hiding_one_constructor_and_exposing_a_same_named_one_is_new(tmp_path):
 
     assert [f.file for f in diff.new] == ["a/two/A.kt"]
     assert regressed(b, a, diff)
+
+
+def test_pr_comment_keeps_generic_types_in_code(tmp_path):
+    before = write_run(tmp_path / "before", [["a-api", 8, 1, "", "", ""]], [])
+    after = write_run(tmp_path / "after", [["a-api", 7, 1, "", "", "M8"]],
+                      [["a-api", "M8", "A.kt", 1, "A.items", "MutableList in MutableList<String>"]])
+    b, a = load_run(before), load_run(after)
+
+    assert "`A.items`: MutableList in `MutableList<String>`" in render_pr(b, a, diff_runs(b, a))
+
+
+def test_comparison_lists_each_regression_with_its_line_details_and_fix(tmp_path):
+    before = write_run(tmp_path / "before", [["a-api", 8, 1, "", "", ""]], [])
+    after = write_run(tmp_path / "after", [["a-api", 7, 2, "", "", "M8"]], [["a-api", "M8", "src/A.kt", 4, "A.x", "public var"]])
+    b, a = load_run(before), load_run(after)
+
+    report = render_weekly(b, a, diff_runs(b, a), "API quality: x compared with y", link_base="https://gh/blob/sha")
+
+    assert "| API | Line | Details | Fix |" in report and "<!-- task:" not in report
+    assert "| `a-api` | [A.kt:4](https://gh/blob/sha/src/A.kt#L4) | `A.x`: public var | Expose a `val`" in report

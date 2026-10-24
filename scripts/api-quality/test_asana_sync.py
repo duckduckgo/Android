@@ -5,8 +5,10 @@ from datetime import datetime, timezone
 from unittest.mock import MagicMock
 
 import pytest
+from asana.rest import ApiException
 
-from asana_sync import CONFIG_VARIABLES, count_unexplained, finding_tasks_section, github_run, file_finding_groups, load_config, markdown_to_asana_html, upsert_run_task
+from asana_sync import (CONFIG_VARIABLES, count_unexplained, file_finding_groups, finding_notes, github_run, link_tasks,
+                        load_config, markdown_to_asana_html, upsert_run_task, with_rich_text)
 
 GROUP = {
     "module": "a-api",
@@ -16,15 +18,29 @@ GROUP = {
 }
 CONFIG = {
     "project": "P",
-    "sections": {"triage": "T", "scorecards": "SC", "weekly_reports": "W"},
+    "sections": {"triage": "T", "weekly_reports": "W"},
     "fields": {"github_run": "RUN", "status": "STATUS", "status_needs_explanation": "NEEDS"},
 }
 
 
-def test_tables_become_list_items_labelled_by_header():
+def test_tables_become_asana_tables_with_a_bold_header():
     notes = markdown_to_asana_html("## Scores\n\n| Module | Score |\n|---|---|\n| `a-api` | 7/8 |\n")
 
-    assert notes == "<body><h2>Scores</h2><ul><li><code>a-api</code> · Score: 7/8</li></ul></body>"
+    assert notes == ("<body><h2>Scores</h2><table><tr><td><strong>Module</strong></td><td><strong>Score</strong></td></tr>"
+                     "<tr><td><code>a-api</code></td><td>7/8</td></tr></table></body>")
+
+
+def test_tables_can_fall_back_to_list_items_labelled_by_header():
+    notes = markdown_to_asana_html("## Scores\n\n| Module | Score |\n|---|---|\n| `a-api` | 7/8 |\n", tables=False)
+
+    assert notes == "<body><h2>Scores</h2><ul><li><code>a-api</code>, Score: 7/8</li></ul></body>"
+
+
+def test_a_rejected_table_is_retried_as_a_list():
+    call = MagicMock(side_effect=[ApiException(status=400), "ok"])
+
+    assert with_rich_text(call, "| A | B |\n|---|---|\n| 1 | 2 |\n") == "ok"
+    assert "<table>" in call.call_args_list[0][0][0] and "<ul>" in call.call_args_list[1][0][0]
 
 
 def test_html_in_report_text_is_escaped():
@@ -39,7 +55,7 @@ def test_new_group_creates_a_task_in_triage_needing_explanation():
     file_finding_groups(tasks_api, stories_api, CONFIG, "2026-10-05", [GROUP], "https://report")
 
     data = tasks_api.create_task.call_args[0][0]["data"]
-    assert data["name"] == "[API quality] a-api M4"
+    assert data["name"] == "[API quality] a-api: Members documented"
     assert data["projects"] == ["P"]
     assert data["memberships"] == [{"project": "P", "section": "T"}]
     assert data["custom_fields"] == {"STATUS": "NEEDS"}
@@ -49,7 +65,7 @@ def test_new_group_creates_a_task_in_triage_needing_explanation():
 
 def test_existing_open_task_gets_a_comment_instead_of_a_duplicate():
     tasks_api, stories_api = MagicMock(), MagicMock()
-    tasks_api.get_tasks_for_project.return_value = [{"name": "[API quality] a-api M4", "gid": "42", "permalink_url": "u"}]
+    tasks_api.get_tasks_for_project.return_value = [{"name": "[API quality] a-api: Members documented", "gid": "42", "permalink_url": "u"}]
 
     file_finding_groups(tasks_api, stories_api, CONFIG, "2026-10-05", [GROUP], "https://report")
 
@@ -107,7 +123,7 @@ def test_unexplained_counts_old_finding_tasks_still_needing_explanation_in_any_s
 
     tasks_api = MagicMock()
     tasks_api.get_tasks_for_project.return_value = [
-        task("[API quality] a-api M4", "2026-09-01T00:00:00Z", "NEEDS"),
+        task("[API quality] a-api: Members documented", "2026-09-01T00:00:00Z", "NEEDS"),
         task("[API quality] b-api M4", "2026-09-01T00:00:00Z", "FIX_PLANNED"),
         task("[API quality] c-api M4", "2026-10-10T00:00:00Z", "NEEDS"),
         task("Manual ticket", "2026-09-01T00:00:00Z", "NEEDS"),
@@ -138,17 +154,17 @@ def test_run_tag_keeps_task_kinds_of_one_run_apart(monkeypatch):
     monkeypatch.setenv("GITHUB_SERVER_URL", "https://github.com")
     monkeypatch.setenv("GITHUB_REPOSITORY", "o/r")
 
-    scorecard, url = github_run("scorecard")
+    weekly, url = github_run("weekly")
     regression, _ = github_run("regression")
 
-    assert (scorecard, regression) == ("123/scorecard", "123/regression")
+    assert (weekly, regression) == ("123/weekly", "123/regression")
     assert url == "https://github.com/o/r/actions/runs/123"
 
 
 def test_a_job_does_not_update_another_jobs_task_from_the_same_run():
     tasks_api, stories_api = MagicMock(), MagicMock()
     tasks_api.get_tasks_for_project.return_value = [
-        {"gid": "1", "permalink_url": "scorecard", "custom_fields": [{"gid": "RUN", "text_value": "123/scorecard"}]},
+        {"gid": "1", "permalink_url": "weekly", "custom_fields": [{"gid": "RUN", "text_value": "123/weekly"}]},
     ]
     tasks_api.create_task.return_value = {"permalink_url": "regression"}
 
@@ -158,14 +174,36 @@ def test_a_job_does_not_update_another_jobs_task_from_the_same_run():
     assert tasks_api.create_task.call_args[0][0]["data"]["custom_fields"] == {"RUN": "123/regression"}
 
 
-def test_report_links_to_each_finding_task():
+def test_report_links_each_regression_to_its_task():
     tasks_api, stories_api = MagicMock(), MagicMock()
-    tasks_api.get_tasks_for_project.return_value = [{"name": "[API quality] a-api M4", "gid": "42", "permalink_url": "https://old"}]
+    tasks_api.get_tasks_for_project.return_value = [{"name": "[API quality] a-api: Members documented", "gid": "42", "permalink_url": "https://old"}]
     tasks_api.create_task.return_value = {"permalink_url": "https://new"}
     other = {**GROUP, "module": "b-api"}
+    report = "| `a-api` | M4 | <!-- task:a-api:M4 --> |\n| `b-api` | M4 | <!-- task:b-api:M4 --> |\n"
 
     filed = file_finding_groups(tasks_api, stories_api, CONFIG, "2026-10-05", [GROUP, other], "https://report")
-    html = markdown_to_asana_html(finding_tasks_section(filed))
+    linked = link_tasks(report, filed)
 
-    assert '<code>a-api</code> M4: <a href="https://old">added to the open task</a>' in html
-    assert '<code>b-api</code> M4: <a href="https://new">new task</a>' in html
+    assert "| `a-api` | M4 | [task](https://old) |" in linked
+    assert "| `b-api` | M4 | [task](https://new) |" in linked
+    assert "<!--" not in link_tasks(report, [])
+
+
+def test_finding_task_says_what_broke_and_how_to_fix_it_without_score_or_deadline():
+    notes = finding_notes({**GROUP, "findings": [{**GROUP["findings"][0], "url": "https://github.com/f#L3"}]},
+                          "2026-10-05", "https://report", "https://rules")
+
+    assert notes.startswith('<body>Detected in the <a href="https://report">2026-10-05 weekly report</a>.')
+    assert notes.index("API:") < notes.index("Lines:") < notes.index("Details:") < notes.index("How to fix:")
+    assert '<a href="https://github.com/f#L3">A.kt:3</a>' in notes
+    assert "\n\nPlease update the API quality status field above and add a comment if needed." in notes
+    assert notes.endswith('<strong>Ref:</strong> <a href="https://rules">API quality rules and scores</a></body>')
+    assert "7/8" not in notes and "14 days" not in notes
+
+
+
+def test_a_paragraph_after_a_table_is_separated_by_an_empty_line():
+    notes = markdown_to_asana_html("## T\n\nIntro\n\n| A |\n|---|\n| 1 |\n\nFor more details: x\n")
+
+    assert "<h2>T</h2>Intro\n<table>" in notes
+    assert "</table>\nFor more details: x\n" in notes
