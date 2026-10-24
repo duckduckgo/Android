@@ -17,7 +17,13 @@
                 "key": "plugin",
                 "description": "The class name of the plugin which timed out",
                 "type": "string",
-                "enum": ["AuraExperimentManager", "EmptyReferrerStateListener", "PlayStoreAppReferrerStateListener", "ReinstallAtbListener"]
+                "enum": [
+                    "AuraExperimentManager",
+                    "EmptyReferrerStateListener",
+                    "PlayStoreAppReferrerStateListener",
+                    "ReinstallAtbListener",
+                    "SamsungStoreInstallAttribution"
+                ]
             }
         ]
     }
