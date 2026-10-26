@@ -347,6 +347,18 @@
                     tools:secondaryText="You can withdraw and get a full refund until October 15, 2026"
                     tools:visibility="visible" />
 
+                <com.duckduckgo.common.ui.view.InfoPanel
+                    android:id="@+id/withdrawalErrorPanel"
+                    style="@style/Widget.DuckDuckGo.InfoPanel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/keyline_4"
+                    android:layout_marginBottom="@dimen/keyline_2"
+                    android:visibility="gone"
+                    app:panelBackground="@drawable/info_panel_alert_background"
+                    app:panelDrawable="@drawable/ic_exclamation_yellow_16"
+                    tools:visibility="visible" />
+
                 <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />

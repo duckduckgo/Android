@@ -169,6 +169,6 @@
     <string name="subscriptionStatusNotSubscribed">Not Subscribed</string>
     <string name="subscriptionWithdrawnTitle" instruction="Placeholder is the date the user withdrew from their subscription, e.g. October 6, 2026">You withdrew on %1$s.</string>
     <string name="subscriptionWithdrawnRefund" instruction="Placeholder is the refund amount with currency, e.g. €9.99">Your refund of %1$s is being processed.</string>
-    <string name="subscriptionWithdrawError">We couldn\'t process your withdrawal. Please try again.</string>
+    <string name="subscriptionWithdrawErrorAlert">We couldn\'t process your withdrawal automatically. Please visit <annotation type="withdrawal_help_link">this page</annotation> to complete your withdrawal.</string>
 
 </resources>

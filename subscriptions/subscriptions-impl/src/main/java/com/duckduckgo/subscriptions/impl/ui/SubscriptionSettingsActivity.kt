@@ -67,9 +67,9 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToWithdrawalHelp
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.LaunchOnboarding
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialog
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalError
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.CompletedWithdrawalState
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.OnboardingEntryPoint
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
@@ -170,6 +170,13 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
         binding.withdraw.setClickListener {
             viewModel.onWithdrawClicked()
+        }
+
+        binding.withdrawalErrorPanel.setClickableLink(
+            annotation = WITHDRAWAL_HELP_ANNOTATION,
+            fullText = getText(string.subscriptionWithdrawErrorAlert),
+        ) {
+            viewModel.onWithdrawalHelpLinkClicked()
         }
 
         if (savedInstanceState == null) {
@@ -321,6 +328,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         if (withdrawal != null) {
             binding.withdraw.setSecondaryText(getString(string.subscriptionSettingWithdrawDeadline, withdrawal.deadline))
         }
+        binding.withdrawalErrorPanel.isVisible = viewState.showWithdrawalErrorAlert
 
         if (viewState.email == null) {
             binding.manageEmail.gone()
@@ -404,7 +412,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
             LaunchOnboarding -> globalActivityStarter.start(this, SubscriptionOnboardingScreenWithEmptyParams)
             is ShowWithdrawalDialog -> showWithdrawalDialog(command)
-            ShowWithdrawalError -> Toast.makeText(this, string.subscriptionWithdrawError, Toast.LENGTH_LONG).show()
+            GoToWithdrawalHelp -> goToWithdrawalHelp()
         }
     }
 
@@ -430,6 +438,16 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 },
             )
             .show()
+    }
+
+    private fun goToWithdrawalHelp() {
+        globalActivityStarter.start(
+            this,
+            SubscriptionsWebViewActivityWithParams(
+                url = WITHDRAWAL_HELP_URL,
+                toolbarConfig = CustomTitle(""), // empty toolbar
+            ),
+        )
     }
 
     private fun goToFaqs() {
@@ -548,6 +566,8 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         const val PRIVACY_POLICY_URL = "https://duckduckgo.com/pro/privacy-terms"
 
         private const val WITHDRAWAL_DIALOG_CONFIRM_POSITION = 0
+        private const val WITHDRAWAL_HELP_ANNOTATION = "withdrawal_help_link"
+        private const val WITHDRAWAL_HELP_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/cancel-or-change-subscription"
         private const val PURCHASE_VIEW_PLANS_ORIGIN = "funnel_subscriptionsettings_android__viewplans"
     }
 }

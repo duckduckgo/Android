@@ -29,8 +29,8 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToWithdrawalHelp
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialog
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalError
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
@@ -949,12 +949,62 @@ class SubscriptionSettingsViewModelTest {
     }
 
     @Test
-    fun whenWithdrawalConfirmedAndFailsThenShowWithdrawalError() = runTest {
-        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failure(WithdrawalResult.FailureReason.UNKNOWN))
+    fun whenWithdrawalNoLongerEligibleThenHideWithdrawalOptionWithoutAlert() = runTest {
+        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
+        whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failure(WithdrawalResult.FailureReason.NOT_ELIGIBLE))
+        stubReadySubscription(platform = "stripe")
+        viewModel.onCreate(mock())
 
-        viewModel.commands().test {
+        viewModel.viewState.test {
+            assertNotNull((expectMostRecentItem() as Ready).withdrawal)
             viewModel.onWithdrawalConfirmed()
-            assertEquals(ShowWithdrawalError, awaitItem())
+            val state = expectMostRecentItem() as Ready
+            assertNull(state.withdrawal)
+            assertFalse(state.showWithdrawalErrorAlert)
+        }
+    }
+
+    @Test
+    fun whenWithdrawalFailsForOtherReasonThenShowErrorAlertAndKeepOption() = runTest {
+        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
+        whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failure(WithdrawalResult.FailureReason.UNKNOWN))
+        stubReadySubscription(platform = "stripe")
+        viewModel.onCreate(mock())
+
+        viewModel.viewState.test {
+            assertNotNull((expectMostRecentItem() as Ready).withdrawal)
+            viewModel.onWithdrawalConfirmed()
+            val state = expectMostRecentItem() as Ready
+            assertNotNull(state.withdrawal)
+            assertTrue(state.showWithdrawalErrorAlert)
+        }
+    }
+
+    @Test
+    fun whenWithdrawalErrorAlertShownThenItSurvivesRerender() = runTest {
+        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
+        whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failure(WithdrawalResult.FailureReason.UNKNOWN))
+        stubReadySubscription(platform = "stripe")
+        viewModel.onCreate(mock())
+
+        viewModel.viewState.test {
+            expectMostRecentItem()
+            viewModel.onWithdrawalConfirmed()
+            expectMostRecentItem()
+            viewModel.onResume(mock())
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertTrue((viewModel.viewState.value as Ready).showWithdrawalErrorAlert)
+    }
+
+    @Test
+    fun whenWithdrawalHelpLinkClickedThenGoToWithdrawalHelp() = runTest {
+        viewModel.commands().test {
+            viewModel.onWithdrawalHelpLinkClicked()
+            assertEquals(GoToWithdrawalHelp, awaitItem())
         }
     }
 
