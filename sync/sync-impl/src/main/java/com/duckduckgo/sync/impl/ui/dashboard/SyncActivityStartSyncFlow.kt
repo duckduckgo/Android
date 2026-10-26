@@ -18,4 +18,4 @@ package com.duckduckgo.sync.impl.ui.dashboard
 
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 
-data class SyncActivityWithSourceParams(val source: String?) : GlobalActivityStarter.ActivityParams
+data class SyncActivityStartSyncFlow(val source: String?) : GlobalActivityStarter.ActivityParams

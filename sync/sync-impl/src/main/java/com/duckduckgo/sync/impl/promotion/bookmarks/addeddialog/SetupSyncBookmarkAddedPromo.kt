@@ -30,12 +30,12 @@ import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.sync.api.SyncState
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.promotion.SyncPromotions
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
 import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -77,7 +77,7 @@ class SetupSyncBookmarkAddedPromo @Inject constructor(
     }
 
     private fun onLaunchSyncFlow(activity: AppCompatActivity) {
-        val intent = globalActivityStarter.startIntent(activity, SyncActivityWithEmptyParams)
+        val intent = globalActivityStarter.startIntent(activity, SyncActivityStartSyncFlow(source = null))
         activity.startActivity(intent)
     }
 

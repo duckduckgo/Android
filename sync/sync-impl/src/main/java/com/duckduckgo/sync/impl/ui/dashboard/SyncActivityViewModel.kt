@@ -294,6 +294,16 @@ class SyncActivityViewModel @Inject constructor(
         ) : Command()
     }
 
+    fun processSourceDeepLink(source: String?) {
+        viewModelScope.launch(dispatchers.io()) {
+            if (syncAccountRepository.isSignedIn()) {
+                onAddAnotherDevice()
+            } else {
+                onSyncThisDevice(source)
+            }
+        }
+    }
+
     fun onSyncWithAnotherDevice() {
         viewModelScope.launch(dispatchers.io()) {
             if (syncAutoRestore.canRestore()) {

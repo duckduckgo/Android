@@ -275,6 +275,30 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenLaunchedFromPromotionAndNotSignedInThenLaunchCreateAccountFlow() = runTest {
+        givenUserHasDeviceAuthentication(true)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        testee.commands().test {
+            testee.processSourceDeepLink(source = "promotion_passwords")
+            awaitItem().assertCommandType(IntroCreateAccount::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLaunchedFromPromotionAndSignedInThenEmitCommandAddAnotherDevice() = runTest {
+        givenUserHasDeviceAuthentication(true)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+
+        testee.commands().test {
+            testee.processSourceDeepLink(source = "promotion_passwords")
+            awaitItem().assertCommandType(Command.AddAnotherDevice::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenSyncThisDeviceThenLaunchCreateAccountFlow() = runTest {
         givenUserHasDeviceAuthentication(true)
         testee.commands().test {
