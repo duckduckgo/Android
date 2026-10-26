@@ -114,7 +114,7 @@ jobs:
         run: |
           python3 perf-benchmarks/pageload_benchmark.py \
             --results-dir pageload-artifacts \
-            --device ftl-mediumphone-api31 \
+            --device ftl-pixel9-api36 \
             --github-action-run-id "${{ github.run_id }}" \
             --git-commit-sha "${{ github.sha }}" \
             ${{ github.event_name == 'schedule' && '--report-pixel' || '' }}
