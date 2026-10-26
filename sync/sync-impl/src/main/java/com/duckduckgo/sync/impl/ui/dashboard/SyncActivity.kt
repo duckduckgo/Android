@@ -106,7 +106,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class, screenName = "sync")
-@ContributeToActivityStarter(SyncActivityWithSourceParams::class)
+@ContributeToActivityStarter(SyncActivityStartSyncFlow::class)
 @ContributeToActivityStarter(SyncActivityFromSetupUrl::class)
 @ContributeToActivityStarter(SyncActivityWithAnotherDevice::class)
 class SyncActivity : DuckDuckGoActivity() {
@@ -139,11 +139,14 @@ class SyncActivity : DuckDuckGoActivity() {
     lateinit var authPromptRenderer: AuthPromptRenderer
 
     private val launchSource
-        get() = intent.getActivityParams(SyncActivityWithSourceParams::class.java)?.source
+        get() = intent.getActivityParams(SyncActivityStartSyncFlow::class.java)?.source
             ?: intent.getActivityParams(SyncActivityWithAnotherDevice::class.java)?.source
 
     private val syncSetupUrl
         get() = intent.getActivityParams(SyncActivityFromSetupUrl::class.java)?.url
+
+    private val shouldDeepLinkStartSync
+        get() = intent.getActivityParams(SyncActivityStartSyncFlow::class.java) != null
 
     private val isAnotherDeviceSync
         get() = intent.getActivityParams(SyncActivityWithAnotherDevice::class.java) != null
@@ -316,6 +319,7 @@ class SyncActivity : DuckDuckGoActivity() {
             val setupUrl = syncSetupUrl
             when {
                 setupUrl != null -> viewModel.processSetupDeepLink(setupUrl)
+                shouldDeepLinkStartSync -> viewModel.processSourceDeepLink(launchSource)
                 isAnotherDeviceSync -> viewModel.onSyncWithAnotherDevice()
             }
         }
