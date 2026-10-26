@@ -277,11 +277,51 @@ class SyncActivityViewModelTest {
     @Test
     fun whenLaunchedFromPromotionAndNotSignedInThenLaunchCreateAccountFlow() = runTest {
         givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
 
         testee.commands().test {
             testee.processSourceDeepLink(source = "promotion_passwords")
             awaitItem().assertCommandType(IntroCreateAccount::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLaunchedFromPromotionAndNotSignedInThenBackupThisDeviceTappedPixelNotFired() = runTest {
+        givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        testee.processSourceDeepLink(source = "promotion_passwords")
+
+        verify(syncPixels, never()).fireBackupThisDeviceTapped()
+    }
+
+    @Test
+    fun whenLaunchedFromPromotionAndCreateAccountDisabledThenNoCommandSent() = runTest {
+        givenUserHasDeviceAuthentication(true)
+        whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(true)
+        whenever(syncFeatureToggle.allowCreateAccount()).thenReturn(false)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        testee.commands().test {
+            testee.processSourceDeepLink(source = "promotion_passwords")
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLaunchedFromPromotionAndSetupFlowsDisabledThenContentIsShown() = runTest {
+        givenUserHasDeviceAuthentication(true)
+        whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(false)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        testee.processSourceDeepLink(source = "promotion_passwords")
+
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().isContentHidden)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -294,6 +334,71 @@ class SyncActivityViewModelTest {
         testee.commands().test {
             testee.processSourceDeepLink(source = "promotion_passwords")
             awaitItem().assertCommandType(Command.AddAnotherDevice::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLaunchedFromPromotionAndNotSignedInThenFirstViewStateHidesContent() = runTest {
+        givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        testee.processSourceDeepLink(source = "promotion_passwords")
+
+        testee.viewState().test {
+            assertTrue(awaitItem().isContentHidden)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLaunchedFromPromotionAndScreenExitsThenContentIsShown() = runTest {
+        givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        testee.processSourceDeepLink(source = "promotion_passwords")
+        testee.onScreenExit()
+
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().isContentHidden)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOpenedWithoutDeepLinkThenContentIsShown() = runTest {
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().isContentHidden)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLaunchedFromPromotionWithLegacySyncFlowThenContentIsShownForAuthentication() = runTest {
+        givenImprovedSyncFlowDisabled()
+        givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        testee.processSourceDeepLink(source = "promotion_passwords")
+
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().isContentHidden)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLaunchedFromPromotionAndSignedInThenContentIsShownForAuthentication() = runTest {
+        givenUserHasDeviceAuthentication(true)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+
+        testee.processSourceDeepLink(source = "promotion_passwords")
+
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().isContentHidden)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -1844,6 +1949,11 @@ class SyncActivityViewModelTest {
 
     private fun givenImprovedSyncFlowEnabled() {
         fakeSyncFeature.canUseImprovedSyncFlow().setRawStoredState(State(true))
+    }
+
+    private fun givenSetupFlowsAllowed() {
+        whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(true)
+        whenever(syncFeatureToggle.allowCreateAccount()).thenReturn(true)
     }
 
     private fun givenImprovedSyncFlowDisabled() {
