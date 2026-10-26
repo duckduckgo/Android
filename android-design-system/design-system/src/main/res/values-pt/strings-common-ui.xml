@@ -32,6 +32,7 @@
     <string name="removeAll">Remover tudo</string>
     <string name="undo">Anular</string>
     <string name="cancel">Cancelar</string>
+    <string name="done">Feito</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Sempre ligada</string>
