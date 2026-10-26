@@ -312,4 +312,16 @@
     <string name="importBookmarksErrorGenericMessage">Något gick fel</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Kontrollera att du är ansluten till internet och försök igen.</string>
 
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Importen är klar!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Vänta lite – låt det här fönstret vara öppet. Det bör inte ta mer än en minut eller två.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google kan be dig att ange ditt lösenord.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google skickar ett mejl till dig som bekräftar att dina data har exporterats. Du behöver inte göra någonting.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Importen är klar!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Importerade bokmärken: <b>%1$d</b>]]></string>
+
 </resources>
