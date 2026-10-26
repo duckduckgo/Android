@@ -108,7 +108,6 @@
                     android:id="@+id/tabChatItemTitle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_1"
                     android:drawablePadding="@dimen/keyline_1"
                     android:ellipsize="end"
                     android:maxLines="1"
@@ -126,7 +125,7 @@
                     android:layout_marginVertical="@dimen/keyline_1"
                     android:ellipsize="end"
                     android:maxLines="4"
-                    app:layout_constraintBottom_toTopOf="@id/tabChatItemType"
+                    app:layout_constraintBottom_toTopOf="@id/thumbnail"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tabChatItemTitle"
@@ -138,7 +137,8 @@
                     android:id="@+id/thumbnail"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_marginVertical="@dimen/keyline_1"
+                    android:layout_marginTop="@dimen/keyline_1"
+                    android:layout_marginBottom="@dimen/keyline_2"
                     android:background="@drawable/background_duck_ai_tab_card_image"
                     android:clipToOutline="true"
                     android:importantForAccessibility="no"
@@ -147,7 +147,7 @@
                     app:layout_constraintBottom_toTopOf="@id/tabChatItemType"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tabChatItemTitle" />
+                    app:layout_constraintTop_toBottomOf="@id/snippet" />
 
                 <com.duckduckgo.common.ui.view.Chip
                     android:id="@+id/tabChatItemType"
@@ -157,7 +157,8 @@
                     android:text="@string/duckAiTabCardChatTypeLabel"
                     app:drawableStartCompat="@drawable/ic_chat_16"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/thumbnail" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -173,7 +174,6 @@
                     android:id="@+id/tabChatItemVoiceTitle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_1"
                     android:drawablePadding="@dimen/keyline_1"
                     android:ellipsize="end"
                     android:maxLines="1"
@@ -206,7 +206,8 @@
                     android:text="@string/duckAiTabCardVoiceChatTypeLabel"
                     app:drawableStartCompat="@drawable/ic_ai_chat_voice_16"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tabChatItemVoiceFace" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <ImageView
