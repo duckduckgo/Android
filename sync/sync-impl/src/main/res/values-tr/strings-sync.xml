@@ -477,4 +477,12 @@
     <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">İptal</string>
     <string name="sync_simplified_deep_link_auth_prompt_title">Sync &amp; Backup\'ı ayarlayın</string>
     <string name="sync_simplified_deep_link_auth_prompt_message">Sync &amp; Backup kurulumu için cihazın kilidini açın</string>
+
+    <!-- Sync promo on passwords import success screen -->
+    <string name="sync_passwords_import_promo_title">Parolalarına mobilde ve Masaüstünde eriş.</string>
+    <string name="sync_passwords_import_promo_primary_button">Sync &amp; Backup\'ı aç</string>
+
+    <!-- Sync promo on bookmarks import success screen -->
+    <string name="sync_bookmarks_import_promo_title">Yer işaretlerine Mobilde ve Masaüstünde eriş.</string>
+    <string name="sync_bookmarks_import_promo_primary_button">Sync &amp; Backup\'ı aç</string>
 </resources>
