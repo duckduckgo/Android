@@ -19,9 +19,11 @@ package com.duckduckgo.autofill.impl.importing.takeout.webflow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksViewModel.Command.Exit
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.Unknown
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.journey.ImportGoogleBookmarksJourney
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
@@ -32,11 +34,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import logcat.logcat
+import kotlin.time.Duration.Companion.seconds
 
 class ImportGoogleBookmarksViewModel @AssistedInject constructor(
     @Assisted private val launchSource: String,
+    @Assisted private val isRedesignEnabled: Boolean,
     private val importJourney: ImportGoogleBookmarksJourney,
+    private val promotionPlugins: PluginPoint<BookmarksImportScreenPromotionPlugin>,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -75,7 +81,7 @@ class ImportGoogleBookmarksViewModel @AssistedInject constructor(
             is ImportGoogleBookmarkResult.Success -> {
                 logcat { "Bookmark-import: WebFlow succeeded with ${result.importedCount} bookmarks" }
                 importJourney.finishedWithSuccess()
-                _viewState.update { it.copy(viewMode = ViewMode.Success(result.importedCount)) }
+                viewModelScope.launch { showSuccess(result.importedCount) }
             }
 
             is ImportGoogleBookmarkResult.UserCancelled -> {
@@ -97,6 +103,19 @@ class ImportGoogleBookmarksViewModel @AssistedInject constructor(
         }
     }
 
+    private suspend fun showSuccess(importedCount: Int) {
+        val promo = if (isRedesignEnabled) findEligiblePromo(importedCount) else null
+        _viewState.update { it.copy(viewMode = ViewMode.Success(importedCount, promo)) }
+    }
+
+    private suspend fun findEligiblePromo(importedCount: Int): BookmarksImportScreenPromotionPlugin? {
+        val data = BookmarksImportScreenPromotionPlugin.ImportResult(successCount = importedCount)
+        // we don't let a broken promo plugin keep the user on the importing screen
+        return withTimeoutOrNull(PROMO_TIMEOUT) {
+            promotionPlugins.getPlugins().firstOrNull { it.isEligible(data) }
+        }
+    }
+
     fun onResultScreenDoneClicked() {
         val result = when (val viewMode = viewState.value.viewMode) {
             is ViewMode.Success -> ImportGoogleBookmarkResult.Success(viewMode.importedCount)
@@ -114,7 +133,10 @@ class ImportGoogleBookmarksViewModel @AssistedInject constructor(
         data object WebFlowLoading : ViewMode
         data object WebFlow : ViewMode
         data object WaitingForExport : ViewMode
-        data class Success(val importedCount: Int) : ViewMode
+        data class Success(
+            val importedCount: Int,
+            val promo: BookmarksImportScreenPromotionPlugin? = null,
+        ) : ViewMode
         data class Error(val reason: UserCannotImportReason) : ViewMode
     }
 
@@ -124,17 +146,25 @@ class ImportGoogleBookmarksViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(launchSource: String): ImportGoogleBookmarksViewModel
+        fun create(
+            launchSource: String,
+            isRedesignEnabled: Boolean,
+        ): ImportGoogleBookmarksViewModel
 
         class Provider(
             private val assistedFactory: Factory,
             private val launchSource: String,
+            private val isRedesignEnabled: Boolean,
         ) : ViewModelProvider.Factory {
 
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(launchSource) as T
+                return assistedFactory.create(launchSource, isRedesignEnabled) as T
             }
         }
+    }
+
+    companion object {
+        val PROMO_TIMEOUT = 1.seconds
     }
 }

@@ -20,6 +20,7 @@ import android.content.Context
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.InternalTestUserChecker
+import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin
 import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizer
@@ -151,3 +152,6 @@ private interface PasswordsScreenPromotionPluginPoint
 
 @ContributesPluginPoint(scope = AppScope::class, boundType = PasswordsImportScreenPromotionPlugin::class)
 private interface PasswordsImportScreenPromotionPluginPoint
+
+@ContributesPluginPoint(scope = AppScope::class, boundType = BookmarksImportScreenPromotionPlugin::class)
+private interface BookmarksImportScreenPromotionPluginPoint
