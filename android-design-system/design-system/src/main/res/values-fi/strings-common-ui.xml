@@ -32,6 +32,7 @@
     <string name="removeAll">Poista kaikki</string>
     <string name="undo">Kumoa</string>
     <string name="cancel">Peruuta</string>
+    <string name="done">Valmis</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Aina käytössä</string>
