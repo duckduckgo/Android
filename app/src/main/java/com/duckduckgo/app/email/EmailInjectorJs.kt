@@ -38,6 +38,7 @@ class EmailInjectorJs @Inject constructor(
     private val autofillFeature: AutofillFeature,
     private val emailProtectionJavascriptInjector: EmailProtectionJavascriptInjector,
     private val autofill: Autofill,
+    private val originCheckFeature: EmailBridgeOriginCheckFeature,
 ) : EmailInjector {
 
     override fun addJsInterface(
@@ -54,6 +55,7 @@ class EmailInjectorJs @Inject constructor(
                 dispatcherProvider,
                 autofillFeature,
                 autofill,
+                originCheckFeature,
                 onSignedInEmailProtectionPromptShown,
             ),
             JAVASCRIPT_INTERFACE_NAME,
