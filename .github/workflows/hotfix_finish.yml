@@ -12,6 +12,10 @@ on:
         required: false
         type: boolean
         default: true
+    outputs:
+      merge-conflict:
+        description: "'true' when merging the hotfix branch back stopped on a conflict"
+        value: ${{ jobs.hotfix-finish.outputs.merge-conflict }}
   workflow_dispatch:
     inputs:
       app-version:
@@ -27,11 +31,14 @@ on:
 env:
   ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
   GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
+  HOTFIX_CONFLICT_PLAYBOOK_URL: https://app.asana.com/1/137249556945/task/1219472906247295
 
 jobs:
   hotfix-finish:
     name: Finish hotfix (merge to main and develop, tag)
     runs-on: ubuntu-latest
+    outputs:
+      merge-conflict: ${{ steps.detect-merge-conflict.outputs.conflict }}
     env:
       GIT_MERGE_AUTOEDIT: no
 
@@ -79,8 +86,20 @@ jobs:
           bundler-cache: true
 
       - name: Finish hotfix (merge to main and develop, tag, push)
+        id: finish
         run: |
           bundle exec fastlane hotfix-finish
+
+      # git flow leaves the conflicted merge in progress, so MERGE_HEAD tells a conflict apart from other lane failures.
+      - name: Detect merge conflict
+        id: detect-merge-conflict
+        if: ${{ failure() && steps.finish.outcome == 'failure' }}
+        run: |
+          if git rev-parse -q --verify MERGE_HEAD >/dev/null; then
+            echo "conflict=true" >> "$GITHUB_OUTPUT"
+            echo "### Merging the hotfix into $(git branch --show-current) stopped on a conflict" >> "$GITHUB_STEP_SUMMARY"
+            echo "Nothing was pushed. Follow Where to start > Finish failed, keeping version ${{ inputs.app-version }}: $HOTFIX_CONFLICT_PLAYBOOK_URL" >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() && inputs.create_asana_task == true }}
@@ -90,5 +109,7 @@ jobs:
           asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
           asana-task-name: GH Workflow Failure - Finish Hotfix
-          asana-task-description: The Finish Hotfix workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-description: |
+            The Finish Hotfix workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+            ${{ steps.detect-merge-conflict.outputs.conflict == 'true' && format('Merging the hotfix back stopped on a conflict. Follow Where to start > Finish failed, keeping the same version: {0}', env.HOTFIX_CONFLICT_PLAYBOOK_URL) || '' }}
           action: 'create-asana-task'
