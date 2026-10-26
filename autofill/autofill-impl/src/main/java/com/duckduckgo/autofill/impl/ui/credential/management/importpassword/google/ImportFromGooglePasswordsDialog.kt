@@ -28,6 +28,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.core.os.BundleCompat
+import androidx.core.view.isEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentManager
@@ -56,7 +57,6 @@ import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goog
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog.ImportPasswordsDialog.Companion.KEY_TAB_ID
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog.ImportPasswordsDialog.Companion.KEY_URL
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.Command
-import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.PromoRequest
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.BrowserPromoPreImport
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.DeterminingFirstView
@@ -73,7 +73,6 @@ import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
-import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.credentialexchange.api.CredentialExchangeLauncher
 import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.FragmentScope
@@ -81,8 +80,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -117,9 +114,6 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
-    @Inject
-    lateinit var importScreenPromotionPlugins: PluginPoint<PasswordsImportScreenPromotionPlugin>
-
     private val viewModel by bindViewModel<ImportFromGooglePasswordsDialogViewModel>()
 
     private var _binding: ContentImportFromGooglePasswordDialogBinding? = null
@@ -133,10 +127,6 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     private var ignoreCancellationEvents = false
 
     private var successImport = false
-
-    private var promoJob: Job? = null
-
-    private var handledPromoRequest: PromoRequest? = null
 
     private val promoCallback = object : PasswordsImportScreenPromotionPlugin.Callback {
         override fun dismissHost() {
@@ -276,7 +266,6 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         logcat { "Autofill-import: rendering ${viewState.viewMode}, redesign enabled: ${viewState.isRedesignEnabled}" }
         handleViewStateSideEffects(viewState)
         renderContentVisibility(viewState)
-        renderPromoRequest(viewState.promoRequest)
         if (viewState.isRedesignEnabled) {
             renderRedesignViewState(viewState)
         } else {
@@ -319,7 +308,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
                 viewState.isPictogramsEnabled,
             )
             is ImportError -> redesignSelectViewToShow(binding.importError.root)
-            is ImportSuccess -> redesignShowImportSuccessView(viewState.viewMode.importResult)
+            is ImportSuccess -> redesignShowImportSuccessView(viewState.viewMode)
             is Importing -> redesignSelectViewToShow(binding.importing.root)
             is DeterminingFirstView -> Unit
             is FlowTerminated -> dismiss()
@@ -357,35 +346,20 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         redesignSelectViewToShow(binding.browserPromoPreImport.root)
     }
 
-    private fun renderPromoRequest(request: PromoRequest?) {
-        if (request === handledPromoRequest) return
-        // the request is gone (timed out) or replaced, so whatever is still running for the old one is stale
-        promoJob?.cancel()
-        handledPromoRequest = request
-        if (request == null) return
-
-        promoJob = viewLifecycleOwner.lifecycleScope.launch {
-            val promo = importScreenPromotionPlugins.getPlugins().firstNotNullOfOrNull { plugin ->
-                plugin.getView(requireContext(), request.data, promoCallback)
-            }
-            // a plugin may ignore cancellation and still return, so we check before touching views
-            ensureActive()
-            with(binding.importSuccess.successPromoContainer) {
-                isVisible = promo != null
-                removeAllViews()
-                promo?.let(::addView)
-            }
-            request.onPromoResolved()
-        }
-    }
-
-    private fun redesignShowImportSuccessView(result: CredentialImporter.ImportResult.Finished) {
+    private fun redesignShowImportSuccessView(viewMode: ImportSuccess) {
+        val result = viewMode.importResult
         with(binding.importSuccess) {
             val imported = getString(R.string.importPasswordsProcessingResultDialogResultPasswordsImported, result.savedCredentials)
             successImportedRow.setPrimaryText(imported.html(binding.root.context))
             val failed = getString(R.string.importPasswordsProcessingResultDialogResultDuplicatesSkipped, result.numberSkipped)
             successFailedRow.setPrimaryText(failed.html(binding.root.context))
             successFailedRow.isVisible = result.numberSkipped > 0
+
+            if (successPromoContainer.isEmpty()) {
+                val promo = viewMode.promo?.createView(requireContext(), promoCallback)
+                promo?.let(successPromoContainer::addView)
+                successPromoContainer.isVisible = promo != null
+            }
         }
         redesignSelectViewToShow(binding.importSuccess.root)
     }

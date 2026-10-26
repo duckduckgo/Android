@@ -23,26 +23,29 @@ import android.view.View
  * Lets features show a promo card on the passwords import success screen.
  *
  * The host asks plugins in priority order (lower priority key first, set with @PriorityKey)
- * and shows the first non-null view. At most one card is shown.
+ * and shows the card of the first eligible one. At most one card is shown.
  */
 interface PasswordsImportScreenPromotionPlugin {
 
     /**
-     * Returns the promo card, or null if this promo shouldn't show for this import.
+     * Whether this promo should show for this import.
      *
-     * Must be main-safe and cancellable: the host stops waiting after a timeout and drops a late result.
-     * Any ongoing work in the card should be tied to the returned view (start on attach, stop on detach),
-     * not to the Activity, because the card can be discarded without ever being attached.
+     * @param data result of the import that just finished
+     */
+    suspend fun isEligible(data: ImportResult): Boolean
+
+    /**
+     * Creates the promo card. Only called after [isEligible] returned true.
+     * Any ongoing work in the card should be tied to the returned view
+     * (start on attach, stop on detach).
      *
      * @param context context to inflate the card with
-     * @param data result of the import that just finished
      * @param callback lets the card tell the host what the user did
      */
-    suspend fun getView(
+    fun createView(
         context: Context,
-        data: ImportResult,
         callback: Callback,
-    ): View?
+    ): View
 
     /**
      * @param successCount number of passwords imported
