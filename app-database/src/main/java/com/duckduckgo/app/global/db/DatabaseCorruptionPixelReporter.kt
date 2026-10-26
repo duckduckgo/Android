@@ -43,8 +43,8 @@ class DatabaseCorruptionPixelReporter @Inject constructor(
     }
 
     private companion object {
-        const val PARAM_DATABASE = "db"
-        const val PARAM_PROCESS_NAME = "pn"
-        const val PARAM_DATABASE_OPEN = "db_open"
+        const val PARAM_DATABASE = "database"
+        const val PARAM_PROCESS_NAME = "process_name"
+        const val PARAM_DATABASE_OPEN = "database_open"
     }
 }

@@ -39,7 +39,7 @@ class DatabaseCorruptionPixelReporterTest {
 
         DatabaseCorruptionPixelReporter(lazyOf(pixel), processName = "main").report("app", db)
 
-        val params = mapOf("db" to "app", "pn" to "main", "db_open" to "true")
+        val params = mapOf("database" to "app", "process_name" to "main", "database_open" to "true")
         verify(pixel).fire(DATABASE_CORRUPTION_COUNT, params, emptyMap(), Count)
         verify(pixel).fire(DATABASE_CORRUPTION_DAILY, params, emptyMap(), Daily())
         verifyNoMoreInteractions(pixel)
@@ -51,7 +51,7 @@ class DatabaseCorruptionPixelReporterTest {
 
         DatabaseCorruptionPixelReporter(lazyOf(pixel), processName = ":vpn").report("app", db)
 
-        val params = mapOf("db" to "app", "pn" to ":vpn", "db_open" to "false")
+        val params = mapOf("database" to "app", "process_name" to ":vpn", "database_open" to "false")
         verify(pixel).fire(DATABASE_CORRUPTION_COUNT, params, emptyMap(), Count)
         verify(pixel).fire(DATABASE_CORRUPTION_DAILY, params, emptyMap(), Daily())
     }
