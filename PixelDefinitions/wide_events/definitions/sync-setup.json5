@@ -75,7 +75,7 @@
             }
         },
         "context": {
-            "name": ["promotion_passwords", "promotion_bookmarks"]
+            "name": ["promotion_passwords", "promotion_bookmarks", "promotion_passwords_import"]
         }
     }
 }

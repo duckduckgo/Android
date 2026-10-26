@@ -25,7 +25,7 @@
             {
                 "key": "context.name",
                 "description": "Entry point to the Sync setup flow, if available",
-                "enum": ["promotion_passwords", "promotion_bookmarks"]
+                "enum": ["promotion_passwords", "promotion_bookmarks", "promotion_passwords_import"]
             },
             {
                 "key": "feature.data.ext.user_auth_required",
