@@ -16,21 +16,30 @@
 
 package com.duckduckgo.autofill.impl.importing.takeout.webflow
 
+import android.content.Context
+import android.view.View
 import app.cash.turbine.test
+import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksViewModel.Command.Exit
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksViewModel.ViewMode
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.DownloadError
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.Unknown
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.journey.ImportGoogleBookmarksJourney
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import kotlin.time.Duration.Companion.milliseconds
 
 class ImportGoogleBookmarksViewModelTest {
 
@@ -39,10 +48,9 @@ class ImportGoogleBookmarksViewModelTest {
 
     private val mockImportJourney: ImportGoogleBookmarksJourney = mock()
 
-    private val testee = ImportGoogleBookmarksViewModel(
-        launchSource = "bookmarks_screen",
-        importJourney = mockImportJourney,
-    )
+    private val promotionPlugins = mutableListOf<BookmarksImportScreenPromotionPlugin>()
+
+    private val testee = createViewModel(isRedesignEnabled = false)
 
     @Test
     fun `when created then journey started with launch source`() {
@@ -85,6 +93,72 @@ class ImportGoogleBookmarksViewModelTest {
 
         assertEquals(ViewMode.Success(importedCount = 10), testee.viewState.value.viewMode)
         verify(mockImportJourney).finishedWithSuccess()
+    }
+
+    @Test
+    fun `when web flow finished with success and redesign enabled then waiting kept until promo decided`() {
+        val decision = CompletableDeferred<Boolean>()
+        val plugin = FakePromotionPlugin { decision.await() }
+        promotionPlugins += plugin
+        val testee = createViewModel(isRedesignEnabled = true)
+        testee.onWaitingForExportStarted()
+
+        testee.onWebFlowFinished(ImportGoogleBookmarkResult.Success(importedCount = 10))
+
+        assertEquals(ViewMode.WaitingForExport, testee.viewState.value.viewMode)
+        assertEquals(listOf(BookmarksImportScreenPromotionPlugin.ImportResult(successCount = 10)), plugin.requests)
+
+        decision.complete(true)
+
+        assertEquals(ViewMode.Success(importedCount = 10, promo = plugin), testee.viewState.value.viewMode)
+    }
+
+    @Test
+    fun `when several promos eligible then first eligible one in success`() {
+        val skipped = FakePromotionPlugin { false }
+        val first = FakePromotionPlugin { true }
+        val second = FakePromotionPlugin { true }
+        promotionPlugins += listOf(skipped, first, second)
+        val testee = createViewModel(isRedesignEnabled = true)
+
+        testee.onWebFlowFinished(ImportGoogleBookmarkResult.Success(importedCount = 10))
+
+        assertEquals(ViewMode.Success(importedCount = 10, promo = first), testee.viewState.value.viewMode)
+        assertTrue(second.requests.isEmpty())
+    }
+
+    @Test
+    fun `when no promo eligible then success shown without promo`() {
+        promotionPlugins += FakePromotionPlugin { false }
+        val testee = createViewModel(isRedesignEnabled = true)
+
+        testee.onWebFlowFinished(ImportGoogleBookmarkResult.Success(importedCount = 10))
+
+        assertEquals(ViewMode.Success(importedCount = 10, promo = null), testee.viewState.value.viewMode)
+    }
+
+    @Test
+    fun `when promo not decided in time then success shown without promo`() = runTest {
+        promotionPlugins += FakePromotionPlugin { awaitCancellation() }
+        val testee = createViewModel(isRedesignEnabled = true)
+        testee.onWaitingForExportStarted()
+        testee.onWebFlowFinished(ImportGoogleBookmarkResult.Success(importedCount = 10))
+        assertEquals(ViewMode.WaitingForExport, testee.viewState.value.viewMode)
+
+        advanceTimeBy(ImportGoogleBookmarksViewModel.PROMO_TIMEOUT + 1.milliseconds)
+
+        assertEquals(ViewMode.Success(importedCount = 10, promo = null), testee.viewState.value.viewMode)
+    }
+
+    @Test
+    fun `when web flow finished with success and redesign disabled then promos not asked`() {
+        val plugin = FakePromotionPlugin { true }
+        promotionPlugins += plugin
+
+        testee.onWebFlowFinished(ImportGoogleBookmarkResult.Success(importedCount = 10))
+
+        assertEquals(ViewMode.Success(importedCount = 10, promo = null), testee.viewState.value.viewMode)
+        assertTrue(plugin.requests.isEmpty())
     }
 
     @Test
@@ -173,5 +247,28 @@ class ImportGoogleBookmarksViewModelTest {
 
             expectNoEvents()
         }
+    }
+
+    private fun createViewModel(isRedesignEnabled: Boolean) = ImportGoogleBookmarksViewModel(
+        launchSource = "bookmarks_screen",
+        isRedesignEnabled = isRedesignEnabled,
+        importJourney = mockImportJourney,
+        promotionPlugins = object : PluginPoint<BookmarksImportScreenPromotionPlugin> {
+            override fun getPlugins() = promotionPlugins
+        },
+    )
+
+    private class FakePromotionPlugin(private val eligible: suspend () -> Boolean) : BookmarksImportScreenPromotionPlugin {
+        val requests = mutableListOf<BookmarksImportScreenPromotionPlugin.ImportResult>()
+
+        override suspend fun isEligible(data: BookmarksImportScreenPromotionPlugin.ImportResult): Boolean {
+            requests += data
+            return eligible()
+        }
+
+        override fun createView(
+            context: Context,
+            callback: BookmarksImportScreenPromotionPlugin.Callback,
+        ): View = error("the ViewModel never builds the card")
     }
 }
