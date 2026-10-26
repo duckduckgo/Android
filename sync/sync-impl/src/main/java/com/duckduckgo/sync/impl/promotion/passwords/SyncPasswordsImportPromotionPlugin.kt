@@ -17,25 +17,20 @@
 package com.duckduckgo.sync.impl.promotion.passwords
 
 import android.content.Context
-import android.graphics.Color
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import android.widget.FrameLayout
 import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin
 import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin.Callback
 import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin.Companion.PRIORITY_KEY_SYNC_PROMO
 import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin.ImportResult
 import com.duckduckgo.codegen.annotations.PriorityKey
-import com.duckduckgo.common.ui.view.getColorFromAttr
-import com.duckduckgo.common.ui.view.text.DaxTextView
-import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.promotion.widget.PromoMessageView
 import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
-import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesIntoMap(scope = AppScope::class)
 @PriorityKey(PRIORITY_KEY_SYNC_PROMO)
@@ -47,17 +42,13 @@ class SyncPasswordsImportPromotionPlugin @Inject constructor() : PasswordsImport
         context: Context,
         callback: Callback,
     ): View {
-        return FrameLayout(context).apply {
-            layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, 160.toPx(context))
-            setBackgroundColor(context.getColorFromAttr(CommonR.attr.daxColorAccentBlue))
-            addView(
-                DaxTextView(context).apply {
-                    text = "Dummy plugin"
-                    setTextColor(Color.WHITE)
-                },
-                FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER),
-            )
-            setOnClickListener { callback.dismissHost() }
+        return PromoMessageView(context).apply {
+            layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
+            headerImage = R.drawable.desktop_mobile_sync_96
+            title = context.getString(R.string.sync_passwords_import_promo_title)
+            primaryButtonText = context.getString(R.string.sync_passwords_import_promo_primary_button)
+            showCloseButton = false
+            showElevation = false
         }
     }
 }
