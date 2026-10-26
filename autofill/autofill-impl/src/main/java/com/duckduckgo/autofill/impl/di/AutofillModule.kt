@@ -149,5 +149,5 @@ interface UnusedAutofillResultPlugin
 @ContributesPluginPoint(scope = ActivityScope::class, boundType = PasswordsScreenPromotionPlugin::class)
 private interface PasswordsScreenPromotionPluginPoint
 
-@ContributesPluginPoint(scope = ActivityScope::class, boundType = PasswordsImportScreenPromotionPlugin::class)
+@ContributesPluginPoint(scope = AppScope::class, boundType = PasswordsImportScreenPromotionPlugin::class)
 private interface PasswordsImportScreenPromotionPluginPoint

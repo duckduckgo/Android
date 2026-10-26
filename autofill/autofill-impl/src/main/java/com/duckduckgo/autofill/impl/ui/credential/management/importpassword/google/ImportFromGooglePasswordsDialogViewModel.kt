@@ -41,10 +41,10 @@ import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goog
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.credentialexchange.api.CredentialExchangeResult
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
-import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -53,13 +53,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
-import kotlin.coroutines.resume
 import kotlin.time.Duration.Companion.seconds
 
 @ContributesViewModel(FragmentScope::class)
@@ -74,6 +72,7 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     private val credentialImportWideEvent: CredentialImportWideEvent,
     private val importRedesignFeature: AutofillImportRedesignFeature,
     private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
+    private val importScreenPromotionPlugins: PluginPoint<PasswordsImportScreenPromotionPlugin>,
 ) : ViewModel() {
 
     fun determineInitialUi(launchSource: AutofillImportLaunchSource, canShowPreImportDialog: Boolean) {
@@ -113,24 +112,18 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     }
 
     private suspend fun showSuccess(result: ImportResult.Finished) {
-        if (viewState.value.isRedesignEnabled) {
-            // we don't let a broken promo plugin keep the user on the importing screen
-            withTimeoutOrNull(PROMO_TIMEOUT) { awaitPromo(result) }
-        }
-        _viewState.update { it.copy(viewMode = ViewMode.ImportSuccess(result), promoRequest = null) }
+        val promo = if (viewState.value.isRedesignEnabled) findEligiblePromo(result) else null
+        _viewState.update { it.copy(viewMode = ViewMode.ImportSuccess(result, promo)) }
     }
 
-    private suspend fun awaitPromo(result: ImportResult.Finished) {
-        try {
-            suspendCancellableCoroutine { continuation ->
-                val data = PasswordsImportScreenPromotionPlugin.ImportResult(
-                    successCount = result.savedCredentials,
-                    skippedCount = result.numberSkipped,
-                )
-                _viewState.update { it.copy(promoRequest = RealPromoRequest(data, continuation)) }
-            }
-        } finally {
-            _viewState.update { it.copy(promoRequest = null) }
+    private suspend fun findEligiblePromo(result: ImportResult.Finished): PasswordsImportScreenPromotionPlugin? {
+        val data = PasswordsImportScreenPromotionPlugin.ImportResult(
+            successCount = result.savedCredentials,
+            skippedCount = result.numberSkipped,
+        )
+        // we don't let a broken promo plugin keep the user on the importing screen
+        return withTimeoutOrNull(PROMO_TIMEOUT) {
+            importScreenPromotionPlugins.getPlugins().firstOrNull { it.isEligible(data) }
         }
     }
 
@@ -255,7 +248,6 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
         val usesCredentialExchange: Boolean = false,
         val isRedesignEnabled: Boolean = false,
         val isPictogramsEnabled: Boolean = false,
-        val promoRequest: PromoRequest? = null,
     )
 
     sealed interface Command {
@@ -268,28 +260,12 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
         data object PreImport : ViewMode
         data object BrowserPromoPreImport : ViewMode
         data object Importing : ViewMode
-        data class ImportSuccess(val importResult: ImportResult.Finished) : ViewMode
+        data class ImportSuccess(
+            val importResult: ImportResult.Finished,
+            val promo: PasswordsImportScreenPromotionPlugin? = null,
+        ) : ViewMode
         data object ImportError : ViewMode
         data object FlowTerminated : ViewMode
-    }
-
-    interface PromoRequest {
-        val data: PasswordsImportScreenPromotionPlugin.ImportResult
-
-        /**
-         * Called once the promo is in place, or once we know there is none.
-         */
-        fun onPromoResolved()
-    }
-
-    // we hold the continuation of the call that created the request, so an answer can only resume that call, and only once
-    private class RealPromoRequest(
-        override val data: PasswordsImportScreenPromotionPlugin.ImportResult,
-        private val continuation: CancellableContinuation<Unit>,
-    ) : PromoRequest {
-        override fun onPromoResolved() {
-            if (continuation.isActive) continuation.resume(Unit)
-        }
     }
 
     companion object {

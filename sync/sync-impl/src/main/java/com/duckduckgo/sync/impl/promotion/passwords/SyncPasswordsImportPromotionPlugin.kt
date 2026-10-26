@@ -41,9 +41,10 @@ import com.duckduckgo.mobile.android.R as CommonR
 @PriorityKey(PRIORITY_KEY_SYNC_PROMO)
 class SyncPasswordsImportPromotionPlugin @Inject constructor() : PasswordsImportScreenPromotionPlugin {
 
-    override suspend fun getView(
+    override suspend fun isEligible(data: ImportResult): Boolean = true
+
+    override fun createView(
         context: Context,
-        data: ImportResult,
         callback: Callback,
     ): View {
         return FrameLayout(context).apply {
