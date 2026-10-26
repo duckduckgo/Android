@@ -27,16 +27,23 @@ import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugi
 import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin.ImportResult
 import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.promotion.widget.PromoMessageView
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityWithSourceParams
 import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
 
 @ContributesIntoMap(scope = AppScope::class)
 @PriorityKey(PRIORITY_KEY_SYNC_PROMO)
-class SyncPasswordsImportPromotionPlugin @Inject constructor() : PasswordsImportScreenPromotionPlugin {
+class SyncPasswordsImportPromotionPlugin @Inject constructor(
+    private val promotion: PasswordsImportSyncPromotion,
+    private val globalActivityStarter: GlobalActivityStarter,
+) : PasswordsImportScreenPromotionPlugin {
 
-    override suspend fun isEligible(data: ImportResult): Boolean = true
+    override suspend fun isEligible(data: ImportResult): Boolean {
+        return promotion.canShowPromotion(data.successCount)
+    }
 
     override fun createView(
         context: Context,
@@ -49,6 +56,10 @@ class SyncPasswordsImportPromotionPlugin @Inject constructor() : PasswordsImport
             primaryButtonText = context.getString(R.string.sync_passwords_import_promo_primary_button)
             showCloseButton = false
             showElevation = false
+            onPrimaryButtonClicked {
+                globalActivityStarter.start(context, SyncActivityWithSourceParams(source = "promotion_passwords_import"))
+                callback.dismissHost()
+            }
         }
     }
 }
