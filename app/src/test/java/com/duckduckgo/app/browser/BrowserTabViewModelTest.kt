@@ -1107,6 +1107,7 @@ class BrowserTabViewModelTest {
                 customErrorPagesFeature = fakeCustomErrorPagesFeature,
                 duckAiSessionCallback = mockDuckAiSessionCallback,
                 browserMenuAcknowledgement = mockBrowserMenuAcknowledgement,
+                sponsorBlockRepository = mock(),
             )
 
         testee.loadData("abc", null, false, false)

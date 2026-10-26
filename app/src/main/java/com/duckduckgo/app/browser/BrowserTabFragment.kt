@@ -185,6 +185,7 @@ import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
+import com.duckduckgo.app.browser.sponsorblock.SponsorSegment
 import com.duckduckgo.app.browser.suggestredirect.RedirectSuggestion
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
@@ -446,6 +447,8 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
+
+    private var skipSponsorSnackbar: Snackbar? = null
 
     override val coroutineContext: CoroutineContext
         get() = supervisorJob + dispatchers.main()
@@ -1221,6 +1224,7 @@ class BrowserTabFragment :
         configureObservers()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureWebView()
+        configureSponsorBlock()
         configureSwipeRefresh()
         configureAutoComplete()
         configureNewTab()
@@ -2117,6 +2121,30 @@ class BrowserTabFragment :
         context: Context,
     ) {
         shortcutBuilder.requestPinShortcut(context, homeShortcut)
+    }
+
+    private fun configureSponsorBlock() {
+        viewModel.sponsorSegmentToSkip
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { renderSkipSponsorSnackbar(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun renderSkipSponsorSnackbar(segment: SponsorSegment?) {
+        if (segment == null) {
+            skipSponsorSnackbar?.dismiss()
+            skipSponsorSnackbar = null
+            return
+        }
+        if (skipSponsorSnackbar?.isShownOrQueued == true) return
+        skipSponsorSnackbar = binding.rootView
+            .makeSnackbarWithNoBottomInset(R.string.sponsorSegmentMessage, Snackbar.LENGTH_INDEFINITE)
+            .setAction(R.string.skipSponsorSegment) { viewModel.onSponsorSegmentSkipped() }
+            .apply {
+                // Snackbars attach to rootView, where the fullscreen video layer would otherwise cover them.
+                view.elevation = binding.webViewFullScreenContainer.elevation + 1
+                show()
+            }
     }
 
     private fun configureObservers() {

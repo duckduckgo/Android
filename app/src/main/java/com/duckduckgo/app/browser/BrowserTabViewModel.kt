@@ -230,6 +230,11 @@ import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.returnsession.ReturnSessionLandingListener
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.sponsorblock.SPONSOR_BLOCK_FEATURE_NAME
+import com.duckduckgo.app.browser.sponsorblock.SPONSOR_BLOCK_LOG_TAG
+import com.duckduckgo.app.browser.sponsorblock.SponsorBlockRepository
+import com.duckduckgo.app.browser.sponsorblock.SponsorSegment
+import com.duckduckgo.app.browser.sponsorblock.YouTubeVideoId
 import com.duckduckgo.app.browser.suggestredirect.SuggestRedirectEvaluator
 import com.duckduckgo.app.browser.suggestredirect.SuggestRedirectOnUnresolvedErrorFeature
 import com.duckduckgo.app.browser.tabs.TabManager
@@ -617,6 +622,7 @@ class BrowserTabViewModel @Inject constructor(
     private val customErrorPagesFeature: CustomErrorPagesFeature,
     private val duckAiSessionCallback: DuckAiSessionCallback,
     private val browserMenuAcknowledgement: BrowserMenuAcknowledgement,
+    private val sponsorBlockRepository: SponsorBlockRepository,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -780,6 +786,8 @@ class BrowserTabViewModel @Inject constructor(
     private var serpLogoJob = ConflatedJob()
     private var favouriteSerpLogoUrl: String? = null
     private var pdfDownloadJob = ConflatedJob()
+    private val _sponsorSegmentToSkip = MutableStateFlow<SponsorSegment?>(null)
+    val sponsorSegmentToSkip: StateFlow<SponsorSegment?> = _sponsorSegmentToSkip.asStateFlow()
     private var suggestRedirectJob = ConflatedJob()
 
     private var site: Site? = null
@@ -1976,6 +1984,53 @@ class BrowserTabViewModel @Inject constructor(
         browserInteractionsPlugins.getPlugins().forEach { it.onBackPressed() }
     }
 
+    // The page detects segment boundaries on the video's own clock; native code only fetches segments and shows the skip UI.
+    private fun onSponsorBlockMessage(
+        method: String,
+        id: String?,
+        data: JSONObject?,
+    ) {
+        when (method) {
+            "getSkipSegments" -> {
+                val videoId = data?.optString("videoId")?.takeIf { YouTubeVideoId.isValid(it) } ?: return
+                if (id == null) return
+                logcat(tag = SPONSOR_BLOCK_LOG_TAG) { "[api] page requested segments for $videoId" }
+                viewModelScope.launch {
+                    val segments = sponsorBlockRepository.segmentsFor(videoId)
+                    val params = JSONObject().put(
+                        "segments",
+                        JSONArray(segments.map { JSONObject().put("start", it.startMs).put("end", it.endMs) }),
+                    )
+                    withContext(dispatchers.main()) {
+                        command.value = SendResponseToJs(JsCallbackData(params, SPONSOR_BLOCK_FEATURE_NAME, method, id))
+                    }
+                }
+            }
+
+            "segmentEntered" -> {
+                val segment = SponsorSegment(startMs = data?.optLong("start") ?: return, endMs = data.optLong("end"))
+                logcat(tag = SPONSOR_BLOCK_LOG_TAG) { "[button] show for $segment" }
+                _sponsorSegmentToSkip.value = segment
+            }
+
+            "segmentExited" -> hideSponsorSkipButton(reason = "segment exited")
+        }
+    }
+
+    private fun hideSponsorSkipButton(reason: String) {
+        if (_sponsorSegmentToSkip.value != null) logcat(tag = SPONSOR_BLOCK_LOG_TAG) { "[button] hide on $reason" }
+        _sponsorSegmentToSkip.value = null
+    }
+
+    fun onSponsorSegmentSkipped() {
+        val segment = _sponsorSegmentToSkip.value ?: return
+        logcat(tag = SPONSOR_BLOCK_LOG_TAG) { "[skip] asking page to skip $segment" }
+        _sponsorSegmentToSkip.value = null
+        _subscriptionEventDataChannel.trySend(
+            SubscriptionEventData(featureName = SPONSOR_BLOCK_FEATURE_NAME, subscriptionName = "skipSegment", params = JSONObject()),
+        )
+    }
+
     /**
      * Handles back navigation. Returns false if navigation could not be
      * handled at this level, giving system an opportunity to handle it
@@ -2771,6 +2826,8 @@ class BrowserTabViewModel @Inject constructor(
         webViewNavigationState: WebViewNavigationState,
         activeExperiments: List<Toggle>,
     ) {
+        // A full page load tears down the page script before it can report leaving the segment.
+        hideSponsorSkipButton(reason = "page load")
         if (!currentBrowserViewState().browserShowing) return
 
         this.activeExperiments = activeExperiments
@@ -5192,6 +5249,8 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         when (featureName) {
+            SPONSOR_BLOCK_FEATURE_NAME -> onSponsorBlockMessage(method, id, data)
+
             BROWSER_UI_LOCK_FEATURE_NAME -> {
                 when (method) {
                     "uiLockChanged" -> {

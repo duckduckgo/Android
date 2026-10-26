@@ -133,6 +133,9 @@
     <!-- Page load timeout error page: copy not final yet -->
     <string name="webViewErrorTimeout">This page is taking too long to load.</string>
 
+    <string name="sponsorSegmentMessage">Sponsored segment</string>
+    <string name="skipSponsorSegment">Skip</string>
+
     <!-- Fire animation rollout: relabel HeroFire to "Inferno Classic" when fireAnimationUpdate is on — pending translation -->
     <plurals name="fireDialogDeleteCountTitle">
         <item quantity="one" instruction="%1$d is the number of chats the user is about to delete.">Delete %1$d chat?</item>
