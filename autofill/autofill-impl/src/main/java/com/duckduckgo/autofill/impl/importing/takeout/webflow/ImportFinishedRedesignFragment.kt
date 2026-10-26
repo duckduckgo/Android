@@ -74,11 +74,11 @@ class ImportFinishedRedesignFragment : DuckDuckGoFragment(R.layout.fragment_impo
     ) {
         with(binding) {
             resultIcon.setImageResource(R.drawable.success_128)
-            resultTitle.setText(R.string.importBookmarksRedesignSuccessTitle)
+            resultTitle.setText(R.string.importBookmarksRedesignResultTitle)
             resultRow.setPrimaryText(getString(R.string.importBookmarksRedesignSuccessImportedRow, importedCount).html(requireContext()))
             resultRow.setLeadingIconResource(CommonR.drawable.check_recolorable_24)
             resultSecondaryText.isVisible = false
-            resultDoneButton.setText(R.string.importBookmarksRedesignSuccessPrimaryButton)
+            resultDoneButton.setText(CommonR.string.done)
             val promo = (importViewModel.viewState.value.viewMode as? ViewMode.Success)?.promo?.createView(requireContext(), promoCallback)
             promo?.let(resultPromoContainer::addView)
             resultPromoContainer.isVisible = promo != null
@@ -88,11 +88,11 @@ class ImportFinishedRedesignFragment : DuckDuckGoFragment(R.layout.fragment_impo
     private fun renderError(binding: FragmentImportBookmarksResultRedesignBinding) {
         with(binding) {
             resultIcon.setImageResource(R.drawable.bookmarks_import_128)
-            resultTitle.setText(R.string.importBookmarksRedesignErrorTitle)
+            resultTitle.setText(R.string.importBookmarksRedesignResultTitle)
             resultRow.setPrimaryText(getString(R.string.importBookmarksErrorGenericMessage))
             resultRow.setLeadingIconResource(CommonR.drawable.cross_recolorable_24)
             resultSecondaryText.isVisible = true
-            resultDoneButton.setText(R.string.importBookmarksRedesignErrorPrimaryButton)
+            resultDoneButton.setText(CommonR.string.done)
         }
     }
 
