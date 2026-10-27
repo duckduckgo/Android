@@ -62,6 +62,7 @@ import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.promotion.SyncDesktopAppPromotionLauncher
 import com.duckduckgo.sync.impl.ui.DeviceUnsupportedActivity
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AddAnotherDevice
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteAccount
@@ -140,8 +141,10 @@ class SyncActivity : DuckDuckGoActivity() {
     lateinit var authPromptRenderer: AuthPromptRenderer
 
     private val launchSource
-        get() = intent.getActivityParams(SyncActivityStartSyncFlow::class.java)?.source
-            ?: intent.getActivityParams(SyncActivityWithAnotherDevice::class.java)?.source
+        get() = SyncLaunchSource.from(
+            intent.getActivityParams(SyncActivityStartSyncFlow::class.java)?.source
+                ?: intent.getActivityParams(SyncActivityWithAnotherDevice::class.java)?.source,
+        )
 
     private val syncSetupUrl
         get() = intent.getActivityParams(SyncActivityFromSetupUrl::class.java)?.url
@@ -207,7 +210,8 @@ class SyncActivity : DuckDuckGoActivity() {
             is PreviousSessionReadyContract.Output.Resume -> {
                 processSyncCodeLauncher.launch(
                     ProcessSyncCodeContract.Input(
-                        source = SyncCodeSource.Restored(output.recoveryCode),
+                        codeSource = SyncCodeSource.Restored(output.recoveryCode),
+                        launchSource = launchSource,
                     ),
                 )
             }
@@ -452,7 +456,8 @@ class SyncActivity : DuckDuckGoActivity() {
                 }
                 processSyncCodeLauncher.launch(
                     ProcessSyncCodeContract.Input(
-                        source = SyncCodeSource.DeepLink(command.barcodeSyncUrl.asUrl(), syncEntryPoint),
+                        codeSource = SyncCodeSource.DeepLink(command.barcodeSyncUrl.asUrl(), syncEntryPoint),
+                        launchSource = launchSource,
                     ),
                 )
             }

@@ -21,6 +21,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import androidx.core.view.doOnAttach
 import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin
 import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin.Callback
 import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin.Companion.PRIORITY_KEY_SYNC_PROMO
@@ -30,6 +31,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.promotion.widget.PromoMessageView
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
 import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
@@ -56,8 +58,10 @@ class SyncBookmarksImportPromotionPlugin @Inject constructor(
             primaryButtonText = context.getString(R.string.sync_bookmarks_import_promo_primary_button)
             showCloseButton = false
             showElevation = false
+            doOnAttach { promotion.onPromotionDisplayed() }
             onPrimaryButtonClicked {
-                globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = "promotion_bookmarks_import"))
+                promotion.onPromotionConfirmed()
+                globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarksImport.value))
                 callback.dismissHost()
             }
         }

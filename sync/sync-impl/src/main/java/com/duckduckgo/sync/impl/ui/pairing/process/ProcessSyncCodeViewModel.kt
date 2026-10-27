@@ -50,6 +50,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
 import com.duckduckgo.sync.impl.pixels.fireSetupFailed
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.devices.ParcelableDevice
 import com.duckduckgo.sync.impl.ui.pairing.ExchangeV1PairingErrorContent
 import com.duckduckgo.sync.impl.ui.pairing.ExchangeV2PairingErrorContent
@@ -73,7 +74,8 @@ import kotlinx.coroutines.withContext
 import kotlin.time.Duration.Companion.seconds
 
 class ProcessSyncCodeViewModel @AssistedInject constructor(
-    @Assisted private val source: SyncCodeSource,
+    @Assisted private val codeSource: SyncCodeSource,
+    @Assisted private val launchSource: SyncLaunchSource,
     private val accountRepository: SyncAccountRepository,
     private val codeDispatcher: SyncCodeDispatcher,
     private val syncFeature: SyncFeature,
@@ -88,19 +90,19 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     internal val viewState = _viewState.asStateFlow()
 
-    private val syncCode: String get() = source.code
+    private val syncCode: String get() = codeSource.code
 
     private val screenType: ScreenType
         get() = when {
-            source is SyncCodeSource.DeepLink -> SYNC_EXCHANGE
-            source.entryPoint == SyncEntryPoint.SYNC_NEW_ACCOUNT -> SYNC_CONNECT
+            codeSource is SyncCodeSource.DeepLink -> SYNC_EXCHANGE
+            codeSource.entryPoint == SyncEntryPoint.SYNC_NEW_ACCOUNT -> SYNC_CONNECT
             else -> SYNC_EXCHANGE
         }
 
     private val animationCompletionSignal = CompletableDeferred<Unit>()
 
     init {
-        if (source is SyncCodeSource.DeepLink) {
+        if (codeSource is SyncCodeSource.DeepLink) {
             syncPixels.fireSetupDeepLinkFlowStarted()
         }
 
@@ -116,7 +118,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
     }
 
     fun onUserCanceled() {
-        when (source) {
+        when (codeSource) {
             is SyncCodeSource.DeepLink -> {
                 syncPixels.fireSetupDeepLinkFlowAbandoned()
             }
@@ -195,7 +197,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
         _commands.send(Command.RunAcknowledgmentAnimation)
         val authCode = decision.authCode
         withContext(dispatchers.io()) {
-            val existingDeviceId = if (source is SyncCodeSource.Restored) {
+            val existingDeviceId = if (codeSource is SyncCodeSource.Restored) {
                 syncAutoRestoreManager.retrieveRecoveryPayload()?.deviceId
             } else {
                 null
@@ -251,7 +253,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
     }
 
     private suspend fun emitV1Error(failure: Error) {
-        if (source is SyncCodeSource.Restored) {
+        if (codeSource is SyncCodeSource.Restored) {
             fireAutoRestoreFailurePixels(failure.code.toString(), failure.reason)
         }
         if (failure.code == ALREADY_SIGNED_IN.code && syncFeature.seamlessAccountSwitching().isEnabled()) {
@@ -267,8 +269,8 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
     }
 
     private suspend fun processV2Outcome(outcome: DispatchOutcome) {
-        syncPixels.fireSetupFailed(screenType, outcome)
-        syncPixels.fireSetupCancelledIfDenied(screenType, outcome)
+        syncPixels.fireSetupFailed(screenType, launchSource, outcome)
+        syncPixels.fireSetupCancelledIfDenied(screenType, launchSource, outcome)
 
         when (outcome) {
             // This screen only processes a code that was already scanned or entered, so it never displays one of its own.
@@ -322,7 +324,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
             }
 
             is DispatchOutcome.UpgradeRequired -> {
-                if (source is SyncCodeSource.Restored) {
+                if (codeSource is SyncCodeSource.Restored) {
                     fireAutoRestoreFailurePixels(outcome.codeMajor.toString(), SetupFailureReason.NEEDS_UPGRADE.value)
                 }
                 _viewState.update { it.copy(dialog = null) }
@@ -330,7 +332,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
             }
 
             is DispatchOutcome.Failed -> {
-                if (source is SyncCodeSource.Restored) {
+                if (codeSource is SyncCodeSource.Restored) {
                     fireAutoRestoreFailurePixels(outcome.code.toString(), outcome.reason)
                 }
                 _viewState.update { it.copy(dialog = null) }
@@ -343,7 +345,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
         accountRepository
             .getThisConnectedDevice()
             ?.let(ParcelableDevice::fromConnectedDevice)
-            ?.let { device -> SyncPairingResult.Success(device, source.entryPoint) }
+            ?.let { device -> SyncPairingResult.Success(device, codeSource.entryPoint) }
             ?: SyncPairingResult.Failure
     }
 
@@ -375,7 +377,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
     }
 
     private fun fireCodeParsedPixel(decision: RouteDecision) {
-        when (source) {
+        when (codeSource) {
             is SyncCodeSource.Scanned -> when (decision) {
                 is RouteDecision.V2InProgress -> {
                     syncPixels.fireBarcodeScannerParseSuccess(screenType, CodeVersion.V2, decision.codeType)
@@ -413,7 +415,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
         myRole: SetupRole?,
         peerKind: PeerKind?,
     ) {
-        when (source) {
+        when (codeSource) {
             is SyncCodeSource.DeepLink -> {
                 syncPixels.fireSetupDeepLinkFlowSuccess()
             }
@@ -423,7 +425,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
             }
 
             else -> {
-                syncPixels.fireSyncSetupFinishedSuccessfully(screenType, path, myRole, peerKind)
+                syncPixels.fireSyncSetupFinishedSuccessfully(screenType, launchSource, path, myRole, peerKind)
             }
         }
         syncPixels.fireLoginPixel()
@@ -486,17 +488,19 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(
-            source: SyncCodeSource,
+            codeSource: SyncCodeSource,
+            launchSource: SyncLaunchSource,
         ): ProcessSyncCodeViewModel
 
         class Provider(
             private val assistedFactory: Factory,
-            private val source: SyncCodeSource,
+            private val codeSource: SyncCodeSource,
+            private val launchSource: SyncLaunchSource,
         ) : ViewModelProvider.Factory {
 
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(source) as T
+                return assistedFactory.create(codeSource, launchSource) as T
             }
         }
     }

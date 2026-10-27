@@ -33,6 +33,7 @@ import com.duckduckgo.sync.impl.auth.SyncDeviceAuthenticator
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AnotherDevicePromptOption
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationSource
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
@@ -74,7 +75,7 @@ class SyncThisDeviceViewModel @AssistedInject constructor(
         }
     }
 
-    fun syncThisDevice(launchSource: String?) {
+    fun syncThisDevice(launchSource: SyncLaunchSource) {
         if (syncThisDeviceJob?.isActive == true) return
         syncPixels.fireSyncAnotherDevicePromptOptionTapped(AnotherDevicePromptOption.THIS_DEVICE_ONLY)
 

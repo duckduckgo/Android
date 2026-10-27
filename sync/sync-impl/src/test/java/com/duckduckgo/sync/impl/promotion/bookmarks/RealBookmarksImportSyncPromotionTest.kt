@@ -16,9 +16,11 @@
 
 package com.duckduckgo.sync.impl.promotion.bookmarks
 
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import com.duckduckgo.sync.impl.promotion.SyncPromotionFeature
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -27,6 +29,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 class RealBookmarksImportSyncPromotionTest {
     @get:Rule
@@ -38,6 +41,8 @@ class RealBookmarksImportSyncPromotionTest {
     private var isSyncEnabled = false
     private var isUserSignedIn = false
 
+    private val pixel: Pixel = mock()
+
     private val testee = RealBookmarksImportSyncPromotion(
         syncState = mock {
             on { isFeatureEnabled() } doAnswer { isSyncEnabled }
@@ -45,6 +50,7 @@ class RealBookmarksImportSyncPromotionTest {
         },
         syncPromotionFeature = syncPromotionFeature,
         dispatchers = coroutineTestRule.testDispatcherProvider,
+        pixel = pixel,
     )
 
     @Test
@@ -91,6 +97,20 @@ class RealBookmarksImportSyncPromotionTest {
 
         isUserSignedIn = true
         assertFalse(testee.canShowPromotion(importedBookmarks = 1))
+    }
+
+    @Test
+    fun `when promotion is displayed then fire displayed pixel`() {
+        testee.onPromotionDisplayed()
+
+        verify(pixel).fire(SyncPixelName.SYNC_FEATURE_PROMOTION_DISPLAYED, mapOf("source" to "bookmarks_import"))
+    }
+
+    @Test
+    fun `when promotion is confirmed then fire confirmed pixel`() {
+        testee.onPromotionConfirmed()
+
+        verify(pixel).fire(SyncPixelName.SYNC_FEATURE_PROMOTION_CONFIRMED, mapOf("source" to "bookmarks_import"))
     }
 
     private fun configurePromotionToShow() {

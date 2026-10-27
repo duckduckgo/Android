@@ -24,8 +24,16 @@
             },
             {
                 "key": "context.name",
-                "description": "Entry point to the Sync setup flow, if available",
-                "enum": ["promotion_passwords", "promotion_bookmarks", "promotion_passwords_import", "promotion_bookmarks_import"]
+                "description": "Entry point to the Sync setup flow: the promotion that opened Sync, or other for every other entry point",
+                "enum": [
+                    "promotion_passwords",
+                    "promotion_bookmarks",
+                    "promotion_passwords_import",
+                    "promotion_bookmarks_import",
+                    "promotion_bookmark_added_dialog",
+                    "promotion_ai_chat",
+                    "other"
+                ]
             },
             {
                 "key": "feature.data.ext.user_auth_required",
