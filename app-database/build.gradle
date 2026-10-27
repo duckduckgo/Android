@@ -46,6 +46,7 @@ dependencies {
     implementation project(path: ':saved-sites-api')
     implementation project(path: ':saved-sites-store')
     implementation project(path: ':app-build-config-api')
+    implementation project(path: ':statistics-api')
 
     implementation AndroidX.lifecycle.liveDataKtx
     implementation AndroidX.room.runtime
@@ -59,6 +60,7 @@ dependencies {
     ksp project(':codegen-ksp')
 
     testImplementation Testing.junit4
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
 
     androidTestImplementation AndroidX.archCore.testing
     androidTestImplementation AndroidX.room.testing
