@@ -447,7 +447,7 @@
             {
                 "key": "toggle_visible",
                 "type": "boolean",
-                "description": "Whether the resolved input-mode capability currently offers the Search/Duck.ai toggle"
+                "description": "Whether the user selected Search & Duck.ai in the address bar setting, read from storage when the pixel fires. False when the user turned Duck.ai off"
             },
             {
                 "key": "launch_source",
