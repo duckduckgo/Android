@@ -32,6 +32,7 @@
     <string name="removeAll">Премахване на всички</string>
     <string name="undo">Отмяна</string>
     <string name="cancel">Отмени</string>
+    <string name="done">Готово</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Винаги включено</string>
