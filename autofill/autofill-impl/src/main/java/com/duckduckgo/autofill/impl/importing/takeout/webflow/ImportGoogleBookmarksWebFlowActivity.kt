@@ -68,7 +68,7 @@ class ImportGoogleBookmarksWebFlowActivity :
     val binding: ActivityImportGoogleBookmarksWebflowBinding by viewBinding()
 
     private val viewModel by viewModels<ImportGoogleBookmarksViewModel> {
-        ImportGoogleBookmarksViewModel.Factory.Provider(importViewModelFactory, getLaunchSource())
+        ImportGoogleBookmarksViewModel.Factory.Provider(importViewModelFactory, getLaunchSource(), isRedesignEnabled)
     }
 
     private var isRedesignEnabled = false
@@ -130,15 +130,22 @@ class ImportGoogleBookmarksWebFlowActivity :
 
             is ViewMode.Success -> showResultFragment {
                 if (isRedesignEnabled) {
-                    ImportFinishedRedesignFragment.newInstanceSuccess(importedCount = viewState.viewMode.importedCount)
+                    ImportFinishedRedesignFragment.newInstanceSuccess(
+                        importedCount = viewState.viewMode.importedCount,
+                        launchSource = getLaunchSource(),
+                    )
                 } else {
-                    ImportFinishedFragment.newInstanceSuccess(bookmarksImported = viewState.viewMode.importedCount)
+                    ImportFinishedFragment.newInstanceSuccess(
+                        bookmarksImported = viewState.viewMode.importedCount,
+                    )
                 }
             }
 
             is ViewMode.Error -> showResultFragment {
                 if (isRedesignEnabled) {
-                    ImportFinishedRedesignFragment.newInstanceError()
+                    ImportFinishedRedesignFragment.newInstanceError(
+                        launchSource = getLaunchSource(),
+                    )
                 } else {
                     ImportFinishedFragment.newInstanceFailure(getString(R.string.importBookmarksErrorGenericMessage))
                 }
@@ -247,7 +254,7 @@ class ImportGoogleBookmarksWebFlowActivity :
         private const val WEB_FLOW_TAG = "web_flow"
         private const val RESULT_TAG = "result"
         private const val PROGRESS_OVERLAY_TAG = "progress_overlay"
-        private const val UNKNOWN_LAUNCH_SOURCE = "unknown"
         private const val KEY_IS_REDESIGN_ENABLED = "is_redesign_enabled"
+        private const val UNKNOWN_LAUNCH_SOURCE = "unknown"
     }
 }
