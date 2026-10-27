@@ -21,4 +21,40 @@
     <string name="devSettingsDuckAiUsageWarningsUsageActedOnRecorded">Recorded. Card hidden until the snapshot changes</string>
     <string name="devSettingsDuckAiUsageWarningsResetUsageDismissal">Reset usage notice state</string>
     <string name="devSettingsDuckAiUsageWarningsUsageDismissalReset">Usage notice dismissal and acted-on state reset</string>
+
+    <string name="devSettingsDuckAiPromoCampaignCapabilityTitle">Promo Campaign</string>
+    <string name="devSettingsDuckAiPromoCampaignCapabilitySubtitle">Inspect, seed and modify the promo record</string>
+    <string name="devSettingsDuckAiPromoCampaignTitle">Duck.ai Promo Campaign</string>
+    <string name="devSettingsDuckAiPromoCampaignRecord">Stored promo record</string>
+    <string name="devSettingsDuckAiPromoCampaignNone">None</string>
+    <string name="devSettingsDuckAiPromoCampaignRecordCorrupted">Corrupted. Clear it to recover</string>
+    <string name="devSettingsDuckAiPromoCampaignRecordValue" instruction="%1$s is the campaign ID, %2$s the promo ID, %3$s the terms, %4$s the dismissed campaign ID, %5$s the last claim attempt date and time">Campaign ID: %1$s\nPromo ID: %2$s\nTerms: %3$s\nDismissed campaign ID: %4$s\nLast claim attempt: %5$s</string>
+    <string name="devSettingsDuckAiPromoCampaignTermsValue" instruction="%1$.1f is the usage limit multiplier, %2$s the expiry date and time">%1$.1fx, expiring %2$s</string>
+    <string name="devSettingsDuckAiPromoCampaignSetupSection">Set up promo record</string>
+    <string name="devSettingsDuckAiPromoCampaignSetupSectionDescription">Uses the campaign ID below. Seeding replaces the stored record, dismissing only sets the dismissed campaign ID</string>
+    <string name="devSettingsDuckAiPromoCampaignCampaignId">Campaign ID</string>
+    <string name="devSettingsDuckAiPromoCampaignCampaignIdDefault">devSettings</string>
+    <string name="devSettingsDuckAiPromoCampaignSeedPendingPromo">Seed a pending promo</string>
+    <string name="devSettingsDuckAiPromoCampaignSeedExpiredPromo">Seed an already expired promo</string>
+    <string name="devSettingsDuckAiPromoCampaignDismissOffer">Dismiss offer</string>
+    <string name="devSettingsDuckAiPromoCampaignSimulateSection">Simulate transitions</string>
+    <string name="devSettingsDuckAiPromoCampaignSimulateSectionDescription">Acts on the stored promo</string>
+    <string name="devSettingsDuckAiPromoCampaignActivatePendingPromo">Activate pending promo</string>
+    <string name="devSettingsDuckAiPromoCampaignEndPromo">End promo</string>
+    <string name="devSettingsDuckAiPromoCampaignForceEndPromo">Force end promo</string>
+    <string name="devSettingsDuckAiPromoCampaignInvalidatePromo">Invalidate promo</string>
+    <string name="devSettingsDuckAiPromoCampaignClearRecord">Clear promo record</string>
+    <string name="devSettingsDuckAiPromoCampaignCampaignIdRequired">Enter a campaign ID</string>
+    <string name="devSettingsDuckAiPromoCampaignPendingPromoSeeded">Pending promo seeded</string>
+    <string name="devSettingsDuckAiPromoCampaignExpiredPromoSeeded">Expired promo seeded</string>
+    <string name="devSettingsDuckAiPromoCampaignOfferDismissed">Offer dismissed</string>
+    <string name="devSettingsDuckAiPromoCampaignOfferNotDismissed">Offer not dismissed because the promo has ended</string>
+    <string name="devSettingsDuckAiPromoCampaignPromoActivated">Promo activated</string>
+    <string name="devSettingsDuckAiPromoCampaignPromoEnded">Promo ended</string>
+    <string name="devSettingsDuckAiPromoCampaignPromoNotExpired">Promo not ended because it hasn\'t expired</string>
+    <string name="devSettingsDuckAiPromoCampaignPromoInvalidated">Promo invalidated</string>
+    <string name="devSettingsDuckAiPromoCampaignNoPromoStored">No promo stored</string>
+    <string name="devSettingsDuckAiPromoCampaignRecordCleared">Promo record cleared</string>
+    <string name="devSettingsDuckAiPromoCampaignStorageFailed">Couldn\'t read or write the promo record</string>
+    <string name="devSettingsDuckAiPromoCampaignRecordCorruptedFailed">The promo record is corrupted. Clear it to recover</string>
 </resources>
