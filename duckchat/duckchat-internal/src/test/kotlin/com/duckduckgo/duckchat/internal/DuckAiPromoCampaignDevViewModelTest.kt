@@ -106,7 +106,6 @@ class DuckAiPromoCampaignDevViewModelTest {
             inOrder.verify(promoCampaignRepository).initializePromo(eq(CAMPAIGN_ID), any())
             verify(promoCampaignRepository, never()).startPromo(any(), any())
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignPendingPromoSeeded), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -117,7 +116,6 @@ class DuckAiPromoCampaignDevViewModelTest {
 
             assertEquals(NOW, verifyPromoSeeded().expiresAtMillis)
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignExpiredPromoSeeded), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -128,7 +126,6 @@ class DuckAiPromoCampaignDevViewModelTest {
 
             verifyNothingSeeded()
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignCampaignIdRequired), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -139,7 +136,6 @@ class DuckAiPromoCampaignDevViewModelTest {
 
             verifyNothingSeeded()
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignCampaignIdRequired), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -150,7 +146,6 @@ class DuckAiPromoCampaignDevViewModelTest {
 
             verify(promoCampaignRepository).initializePromo(eq(CAMPAIGN_ID), any())
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignPendingPromoSeeded), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -161,7 +156,6 @@ class DuckAiPromoCampaignDevViewModelTest {
 
             verifyPromoSeeded()
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignExpiredPromoSeeded), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -174,7 +168,6 @@ class DuckAiPromoCampaignDevViewModelTest {
 
             verify(promoCampaignRepository).dismissCampaign(CAMPAIGN_ID)
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignOfferDismissed), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -187,7 +180,6 @@ class DuckAiPromoCampaignDevViewModelTest {
 
             verify(promoCampaignRepository).dismissCampaign(CAMPAIGN_ID)
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignOfferNotDismissed), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -198,7 +190,6 @@ class DuckAiPromoCampaignDevViewModelTest {
 
             verify(promoCampaignRepository, never()).dismissCampaign(any())
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignCampaignIdRequired), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -211,7 +202,6 @@ class DuckAiPromoCampaignDevViewModelTest {
 
             verify(promoCampaignRepository).dismissCampaign(CAMPAIGN_ID)
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignOfferDismissed), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -225,7 +215,6 @@ class DuckAiPromoCampaignDevViewModelTest {
             verify(promoCampaignRepository).startPromo(PROMO_ID, PromoTerms(multiplier = 2f, expiresAtMillis = NOW + 5.minutes.inWholeMilliseconds))
             verifyNothingSeeded()
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignPromoActivated), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -238,7 +227,6 @@ class DuckAiPromoCampaignDevViewModelTest {
 
             verify(promoCampaignRepository, never()).startPromo(any(), any())
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignNoPromoStored), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -251,7 +239,6 @@ class DuckAiPromoCampaignDevViewModelTest {
 
             verify(promoCampaignRepository).endPromo(checkExpiry = true)
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignPromoEnded), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -264,7 +251,6 @@ class DuckAiPromoCampaignDevViewModelTest {
 
             verify(promoCampaignRepository).endPromo(checkExpiry = true)
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignPromoNotExpired), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -277,7 +263,6 @@ class DuckAiPromoCampaignDevViewModelTest {
 
             verify(promoCampaignRepository, never()).endPromo(any())
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignNoPromoStored), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -290,7 +275,6 @@ class DuckAiPromoCampaignDevViewModelTest {
 
             verify(promoCampaignRepository).endPromo(checkExpiry = false)
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignPromoEnded), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -303,7 +287,6 @@ class DuckAiPromoCampaignDevViewModelTest {
 
             verify(promoCampaignRepository, never()).endPromo(any())
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignNoPromoStored), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -316,7 +299,6 @@ class DuckAiPromoCampaignDevViewModelTest {
 
             verify(promoCampaignRepository).invalidatePromo(PROMO_ID)
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignPromoInvalidated), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -329,7 +311,6 @@ class DuckAiPromoCampaignDevViewModelTest {
 
             verify(promoCampaignRepository, never()).invalidatePromo(any())
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignNoPromoStored), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -340,7 +321,6 @@ class DuckAiPromoCampaignDevViewModelTest {
 
             verify(promoCampaignRepository).clear()
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignRecordCleared), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -353,7 +333,6 @@ class DuckAiPromoCampaignDevViewModelTest {
 
             verify(promoCampaignRepository, never()).startPromo(any(), any())
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignStorageFailed), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -366,7 +345,6 @@ class DuckAiPromoCampaignDevViewModelTest {
 
             verify(promoCampaignRepository, never()).endPromo(any())
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignRecordCorruptedFailed), awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
