@@ -1,10 +1,13 @@
 package com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google
 
+import android.content.Context
+import android.view.View
 import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.InBrowserPromo
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.importing.AutofillImportRedesignFeature
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.Finished
@@ -25,17 +28,22 @@ import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goog
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewState
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.credentialexchange.api.CredentialExchangeFailure
 import com.duckduckgo.credentialexchange.api.CredentialExchangeResult
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -50,6 +58,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ImportFromGooglePasswordsDialogViewModelTest {
@@ -67,6 +76,7 @@ class ImportFromGooglePasswordsDialogViewModelTest {
     private val credentialImportWideEvent: CredentialImportWideEvent = mock()
     private val importRedesignFeature = FakeFeatureToggleFactory.create(AutofillImportRedesignFeature::class.java)
     private val appBrandDesignUpdateToggles = FakeFeatureToggleFactory.create(AppBrandDesignUpdateToggles::class.java)
+    private val promotionPlugins = mutableListOf<PasswordsImportScreenPromotionPlugin>()
     private val testee = ImportFromGooglePasswordsDialogViewModel(
         credentialImporter = credentialImporter,
         dispatchers = coroutineTestRule.testDispatcherProvider,
@@ -78,6 +88,9 @@ class ImportFromGooglePasswordsDialogViewModelTest {
         credentialImportWideEvent = credentialImportWideEvent,
         importRedesignFeature = importRedesignFeature,
         appBrandDesignUpdateToggles = appBrandDesignUpdateToggles,
+        importScreenPromotionPlugins = object : PluginPoint<PasswordsImportScreenPromotionPlugin> {
+            override fun getPlugins() = promotionPlugins
+        },
     )
 
     @Before
@@ -286,6 +299,83 @@ class ImportFromGooglePasswordsDialogViewModelTest {
             testee.onDirectImportRequested(TEST_SOURCE)
             assertEquals(Command.StartWebFlow, awaitItem())
         }
+    }
+
+    @Test
+    fun whenImportFinishedWithRedesignThenImportingKeptUntilPromoDecided() = runTest {
+        val decision = CompletableDeferred<Boolean>()
+        val plugin = FakePromotionPlugin { decision.await() }
+        promotionPlugins += plugin
+        configureImportFinished(savedCredentials = 10, numberSkipped = 2)
+        showRedesignedPreImportPrompt()
+
+        testee.onImportFlowFinishedSuccessfully()
+        runCurrent()
+
+        testee.viewState.value.assertIsImporting()
+        assertEquals(listOf(PasswordsImportScreenPromotionPlugin.ImportResult(successCount = 10, skippedCount = 2)), plugin.requests)
+
+        decision.complete(true)
+        runCurrent()
+
+        assertEquals(ImportSuccess(finished(savedCredentials = 10, numberSkipped = 2), promo = plugin), testee.viewState.value.viewMode)
+    }
+
+    @Test
+    fun whenSeveralPromosEligibleThenFirstEligibleOneInSuccess() = runTest {
+        val skipped = FakePromotionPlugin { false }
+        val first = FakePromotionPlugin { true }
+        val second = FakePromotionPlugin { true }
+        promotionPlugins += listOf(skipped, first, second)
+        configureImportFinished(savedCredentials = 10, numberSkipped = 0)
+        showRedesignedPreImportPrompt()
+
+        testee.onImportFlowFinishedSuccessfully()
+        runCurrent()
+
+        assertEquals(ImportSuccess(finished(savedCredentials = 10, numberSkipped = 0), promo = first), testee.viewState.value.viewMode)
+        assertTrue(second.requests.isEmpty())
+    }
+
+    @Test
+    fun whenNoPromoEligibleThenImportSuccessWithoutPromo() = runTest {
+        promotionPlugins += FakePromotionPlugin { false }
+        configureImportFinished(savedCredentials = 10, numberSkipped = 0)
+        showRedesignedPreImportPrompt()
+
+        testee.onImportFlowFinishedSuccessfully()
+        runCurrent()
+
+        assertEquals(ImportSuccess(finished(savedCredentials = 10, numberSkipped = 0), promo = null), testee.viewState.value.viewMode)
+    }
+
+    @Test
+    fun whenPromoNotDecidedInTimeThenImportSuccessWithoutPromo() = runTest {
+        promotionPlugins += FakePromotionPlugin { awaitCancellation() }
+        configureImportFinished(savedCredentials = 10, numberSkipped = 0)
+        showRedesignedPreImportPrompt()
+
+        testee.onImportFlowFinishedSuccessfully()
+        runCurrent()
+        testee.viewState.value.assertIsImporting()
+
+        advanceTimeBy(ImportFromGooglePasswordsDialogViewModel.PROMO_TIMEOUT + 1.milliseconds)
+
+        assertEquals(ImportSuccess(finished(savedCredentials = 10, numberSkipped = 0), promo = null), testee.viewState.value.viewMode)
+    }
+
+    @Test
+    fun whenImportFinishedWithoutRedesignThenPromosNotAsked() = runTest {
+        val plugin = FakePromotionPlugin { true }
+        promotionPlugins += plugin
+        configureImportFinished(savedCredentials = 10, numberSkipped = 0)
+        showPreImportPrompt()
+
+        testee.onImportFlowFinishedSuccessfully()
+        runCurrent()
+
+        assertEquals(ImportSuccess(finished(savedCredentials = 10, numberSkipped = 0), promo = null), testee.viewState.value.viewMode)
+        assertTrue(plugin.requests.isEmpty())
     }
 
     @Test
@@ -544,6 +634,12 @@ class ImportFromGooglePasswordsDialogViewModelTest {
         advanceUntilIdle()
     }
 
+    private fun TestScope.showRedesignedPreImportPrompt() {
+        importRedesignFeature.self().setRawStoredState(State(enable = true))
+        testee.determineInitialUi(TEST_SOURCE, canShowPreImportDialog = true)
+        advanceUntilIdle()
+    }
+
     private fun configureImportInProgress() {
         whenever(credentialImporter.getImportStatus()).thenReturn(listOf(InProgress).asFlow())
     }
@@ -552,12 +648,26 @@ class ImportFromGooglePasswordsDialogViewModelTest {
         savedCredentials: Int,
         numberSkipped: Int,
     ) {
-        whenever(credentialImporter.getImportStatus()).thenReturn(
-            listOf(
-                InProgress,
-                Finished(savedCredentials = savedCredentials, numberSkipped = numberSkipped, source = TEST_SOURCE),
-            ).asFlow(),
-        )
+        whenever(credentialImporter.getImportStatus()).thenReturn(listOf(InProgress, finished(savedCredentials, numberSkipped)).asFlow())
+    }
+
+    private fun finished(
+        savedCredentials: Int,
+        numberSkipped: Int,
+    ) = Finished(savedCredentials = savedCredentials, numberSkipped = numberSkipped, source = TEST_SOURCE)
+
+    private class FakePromotionPlugin(private val eligible: suspend () -> Boolean) : PasswordsImportScreenPromotionPlugin {
+        val requests = mutableListOf<PasswordsImportScreenPromotionPlugin.ImportResult>()
+
+        override suspend fun isEligible(data: PasswordsImportScreenPromotionPlugin.ImportResult): Boolean {
+            requests += data
+            return eligible()
+        }
+
+        override fun createView(
+            context: Context,
+            callback: PasswordsImportScreenPromotionPlugin.Callback,
+        ): View = error("the ViewModel never builds the card")
     }
 
     private suspend fun TurbineTestContext<ViewState>.awaitImportSuccess(): ImportSuccess {

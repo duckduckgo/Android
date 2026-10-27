@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.InBrowserPromo
+import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.importing.AutofillImportRedesignFeature
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
@@ -40,6 +41,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goog
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.credentialexchange.api.CredentialExchangeResult
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
@@ -52,9 +54,11 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 @ContributesViewModel(FragmentScope::class)
 class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
@@ -68,6 +72,7 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     private val credentialImportWideEvent: CredentialImportWideEvent,
     private val importRedesignFeature: AutofillImportRedesignFeature,
     private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
+    private val importScreenPromotionPlugins: PluginPoint<PasswordsImportScreenPromotionPlugin>,
 ) : ViewModel() {
 
     fun determineInitialUi(launchSource: AutofillImportLaunchSource, canShowPreImportDialog: Boolean) {
@@ -100,9 +105,25 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
 
                 is ImportResult.Finished -> {
                     logcat { "Import finished: ${it.savedCredentials} imported. ${it.numberSkipped} skipped." }
-                    _viewState.value = viewState.value.copy(viewMode = ViewMode.ImportSuccess(it))
+                    showSuccess(it)
                 }
             }
+        }
+    }
+
+    private suspend fun showSuccess(result: ImportResult.Finished) {
+        val promo = if (viewState.value.isRedesignEnabled) findEligiblePromo(result) else null
+        _viewState.update { it.copy(viewMode = ViewMode.ImportSuccess(result, promo)) }
+    }
+
+    private suspend fun findEligiblePromo(result: ImportResult.Finished): PasswordsImportScreenPromotionPlugin? {
+        val data = PasswordsImportScreenPromotionPlugin.ImportResult(
+            successCount = result.savedCredentials,
+            skippedCount = result.numberSkipped,
+        )
+        // we don't let a broken promo plugin keep the user on the importing screen
+        return withTimeoutOrNull(PROMO_TIMEOUT) {
+            importScreenPromotionPlugins.getPlugins().firstOrNull { it.isEligible(data) }
         }
     }
 
@@ -239,12 +260,16 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
         data object PreImport : ViewMode
         data object BrowserPromoPreImport : ViewMode
         data object Importing : ViewMode
-        data class ImportSuccess(val importResult: ImportResult.Finished) : ViewMode
+        data class ImportSuccess(
+            val importResult: ImportResult.Finished,
+            val promo: PasswordsImportScreenPromotionPlugin? = null,
+        ) : ViewMode
         data object ImportError : ViewMode
         data object FlowTerminated : ViewMode
     }
 
-    private companion object {
-        const val IMPORT_PASSWORDS_GOOGLE_PROMPT_ID = "import_passwords_google"
+    companion object {
+        private const val IMPORT_PASSWORDS_GOOGLE_PROMPT_ID = "import_passwords_google"
+        val PROMO_TIMEOUT = 1.seconds
     }
 }

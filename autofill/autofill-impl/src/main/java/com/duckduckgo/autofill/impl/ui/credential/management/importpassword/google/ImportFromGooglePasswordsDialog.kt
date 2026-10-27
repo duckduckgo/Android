@@ -28,6 +28,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.core.os.BundleCompat
+import androidx.core.view.isEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentManager
@@ -43,6 +44,7 @@ import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.PasswordManagementPromo
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Unknown
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillImportPasswordsScreen
+import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentImportFromGooglePasswordDialogBinding
 import com.duckduckgo.autofill.impl.deviceauth.AutofillAuthorizationGracePeriod
@@ -125,6 +127,12 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     private var ignoreCancellationEvents = false
 
     private var successImport = false
+
+    private val promoCallback = object : PasswordsImportScreenPromotionPlugin.Callback {
+        override fun dismissHost() {
+            dismiss()
+        }
+    }
 
     private val importGooglePasswordsFlowLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
         if (activityResult.resultCode == Activity.RESULT_OK) {
@@ -300,7 +308,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
                 viewState.isPictogramsEnabled,
             )
             is ImportError -> redesignSelectViewToShow(binding.importError.root)
-            is ImportSuccess -> redesignShowImportSuccessView(viewState.viewMode.importResult)
+            is ImportSuccess -> redesignShowImportSuccessView(viewState.viewMode)
             is Importing -> redesignSelectViewToShow(binding.importing.root)
             is DeterminingFirstView -> Unit
             is FlowTerminated -> dismiss()
@@ -338,13 +346,20 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         redesignSelectViewToShow(binding.browserPromoPreImport.root)
     }
 
-    private fun redesignShowImportSuccessView(result: CredentialImporter.ImportResult.Finished) {
+    private fun redesignShowImportSuccessView(viewMode: ImportSuccess) {
+        val result = viewMode.importResult
         with(binding.importSuccess) {
             val imported = getString(R.string.importPasswordsProcessingResultDialogResultPasswordsImported, result.savedCredentials)
             successImportedRow.setPrimaryText(imported.html(binding.root.context))
             val failed = getString(R.string.importPasswordsProcessingResultDialogResultDuplicatesSkipped, result.numberSkipped)
             successFailedRow.setPrimaryText(failed.html(binding.root.context))
             successFailedRow.isVisible = result.numberSkipped > 0
+
+            if (successPromoContainer.isEmpty()) {
+                val promo = viewMode.promo?.createView(requireContext(), promoCallback)
+                promo?.let(successPromoContainer::addView)
+                successPromoContainer.isVisible = promo != null
+            }
         }
         redesignSelectViewToShow(binding.importSuccess.root)
     }
