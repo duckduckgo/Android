@@ -56,8 +56,8 @@ internal object ExperimentMetricsConfigParser {
     private val RESERVED_NAMES = setOf("search", "app_use", "duck_ai_prompt_sent", "duck_ai_new_chat", "privacyToggleUsed")
 
     private val moshi: Moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-    private val settingsAdapter = moshi.adapter(ExperimentSettingsJson::class.java).lenient()
-    private val metricAdapter = moshi.adapter(MetricJson::class.java).lenient()
+    private val settingsAdapter by lazy { moshi.adapter(ExperimentSettingsJson::class.java).lenient() }
+    private val metricAdapter by lazy { moshi.adapter(MetricJson::class.java).lenient() }
 
     /** Never throws: an invalid metric is skipped and logged without affecting the others. */
     fun parse(settingsJson: String): List<MetricDefinition> {
