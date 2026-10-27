@@ -83,6 +83,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_R
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_CHANGE_PLAN_OR_BILLING_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_REMOVE_FROM_DEVICE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_SHOWN
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SWITCH
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelParameter.ACTIVATION_DAY
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelParameter.ACTIVATION_PLATFORM
@@ -104,6 +105,7 @@ interface SubscriptionPixelSender {
     fun reportPurchaseFailureAccountCreation()
     fun reportPurchaseSuccess(isFreeTrial: Boolean)
     fun reportPurchaseSuccessOrigin(origin: String?, isFreeTrial: Boolean)
+    fun reportSubscriptionSwitch()
     fun reportOfferRestorePurchaseClick()
     fun reportActivateSubscriptionEnterEmailClick()
     fun reportActivateSubscriptionRestorePurchaseClick()
@@ -230,6 +232,9 @@ class SubscriptionPixelSenderImpl @Inject constructor(
         }
         fire(PURCHASE_SUCCESS_ORIGIN, map)
     }
+
+    override fun reportSubscriptionSwitch() =
+        fire(SUBSCRIPTION_SWITCH)
 
     override fun reportOfferRestorePurchaseClick() =
         fire(OFFER_RESTORE_PURCHASE_CLICK)
