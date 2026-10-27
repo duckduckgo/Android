@@ -17,11 +17,6 @@
 package com.duckduckgo.app.install
 
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
-import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
-import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
-import com.duckduckgo.di.scopes.AppScope
-import dev.zacsweers.metro.ContributesIntoSet
-import javax.inject.Inject
 
 enum class ReinstallDetectorPixelName(override val pixelName: String) : PixelName {
     BLOCK_STORE_CHECK_RESULT("atb_reinstall_check_block_store"),
@@ -33,13 +28,4 @@ enum class BlockStoreCheckResult(val value: String) {
     UNAVAILABLE("unavailable"),
     TIMEOUT("timeout"),
     ERROR("error"),
-}
-
-@ContributesIntoSet(AppScope::class)
-class ReinstallDetectorPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
-    override fun names(): List<Pair<String, Set<PixelParameter>>> {
-        return listOf(
-            ReinstallDetectorPixelName.BLOCK_STORE_CHECK_RESULT.pixelName to PixelParameter.removeAtb(),
-        )
-    }
 }
