@@ -24,6 +24,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.core.os.BundleCompat
 import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.plusAssign
 import androidx.lifecycle.Lifecycle
@@ -106,7 +107,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class, screenName = "sync")
-@ContributeToActivityStarter(SyncActivityWithSourceParams::class)
+@ContributeToActivityStarter(SyncActivityStartSyncFlow::class)
 @ContributeToActivityStarter(SyncActivityFromSetupUrl::class)
 @ContributeToActivityStarter(SyncActivityWithAnotherDevice::class)
 class SyncActivity : DuckDuckGoActivity() {
@@ -139,11 +140,14 @@ class SyncActivity : DuckDuckGoActivity() {
     lateinit var authPromptRenderer: AuthPromptRenderer
 
     private val launchSource
-        get() = intent.getActivityParams(SyncActivityWithSourceParams::class.java)?.source
+        get() = intent.getActivityParams(SyncActivityStartSyncFlow::class.java)?.source
             ?: intent.getActivityParams(SyncActivityWithAnotherDevice::class.java)?.source
 
     private val syncSetupUrl
         get() = intent.getActivityParams(SyncActivityFromSetupUrl::class.java)?.url
+
+    private val shouldDeepLinkStartSync
+        get() = intent.getActivityParams(SyncActivityStartSyncFlow::class.java) != null
 
     private val isAnotherDeviceSync
         get() = intent.getActivityParams(SyncActivityWithAnotherDevice::class.java) != null
@@ -316,6 +320,12 @@ class SyncActivity : DuckDuckGoActivity() {
             val setupUrl = syncSetupUrl
             when {
                 setupUrl != null -> viewModel.processSetupDeepLink(setupUrl)
+                shouldDeepLinkStartSync -> {
+                    // The Sync flow opens only after a background check, so we hide the settings to stop them from flashing until it does.
+                    // We can't rely solely on the view state for that, because it arrives asynchronously and misses the first frame.
+                    binding.root.isInvisible = true
+                    viewModel.processSourceDeepLink(launchSource)
+                }
                 isAnotherDeviceSync -> viewModel.onSyncWithAnotherDevice()
             }
         }
@@ -339,6 +349,7 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
+        binding.root.isInvisible = viewState.isContentHidden
         binding.notifyMeContainer.isVisible = viewState.showAccount
         binding.syncHeader.setState(
             isSyncEnabled = viewState.showAccount,

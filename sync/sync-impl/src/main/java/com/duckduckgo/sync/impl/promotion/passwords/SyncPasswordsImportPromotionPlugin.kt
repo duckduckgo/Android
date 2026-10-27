@@ -30,7 +30,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.promotion.widget.PromoMessageView
-import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityWithSourceParams
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
 import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
 
@@ -57,7 +57,7 @@ class SyncPasswordsImportPromotionPlugin @Inject constructor(
             showCloseButton = false
             showElevation = false
             onPrimaryButtonClicked {
-                globalActivityStarter.start(context, SyncActivityWithSourceParams(source = "promotion_passwords_import"))
+                globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = "promotion_passwords_import"))
                 callback.dismissHost()
             }
         }
