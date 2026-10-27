@@ -174,7 +174,7 @@ class WgVpnNetworkStackTest {
         wgVpnNetworkStack.onPrepareVpn()
 
         verify(netpPixels).reportSwitchedToFallbackPort()
-        verify(wgTunnelConfig).setActivePort(51820L)
+        verify(wgTunnelConfig).setTunnelActivePort(51820L)
     }
 
     @SuppressLint("DenyListedApi")
