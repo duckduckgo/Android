@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/quizOneLineOverflow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_globe_24"
+        app:leadingIconSize="medium"
+        app:primaryText="Privacy dashboard"
+        app:trailingIcon="@drawable/ic_menu_vertical_24" />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:pillIcon="true"
+        app:pillText="New"
+        app:primaryText="Automatic updates"
+        app:showSwitch="true" />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/quizOneLineDisabled"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="This disabled privacy setting has a long label that wraps safely" />
+</LinearLayout>

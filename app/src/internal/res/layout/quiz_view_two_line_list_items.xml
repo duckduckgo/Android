@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/quizTwoLineOverflow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_globe_24"
+        app:leadingIconSize="medium"
+        app:primaryText="Sync bookmarks"
+        app:secondaryText="Keep your bookmarks private"
+        app:trailingIcon="@drawable/ic_menu_vertical_24" />
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:pillIcon="true"
+        app:pillText="Beta"
+        app:primaryText="Automatic backup"
+        app:secondaryText="Back up bookmarks on Wi-Fi"
+        app:showSwitch="true" />
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/quizTwoLineDisabled"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="This disabled privacy setting has a long label that wraps safely"
+        app:secondaryText="Its explanatory text also remains visible" />
+</LinearLayout>

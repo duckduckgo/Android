@@ -29,6 +29,32 @@
     <string name="devSettingsUseSandBoxSurvey">Use Sandbox Survey</string>
     <string name="devEnableWebContentDebuggingTitle">Web Content Debugging</string>
     <string name="devEnableWebContentDebuggingByline">Enable WebView debugging in Chrome DevTools</string>
+    <string name="devSettingsComposeQuizTitle">Compose or View?</string>
+    <string name="devSettingsComposeQuizSubtitleVertical">Identify vertically arranged Compose and View components</string>
+    <string name="composeQuizInstructionVertical">Each pair of cards shows the same ADS component: once with a View/XML API and once with Compose. Choose whether the top or bottom sample is implemented with Compose.</string>
+    <string name="composeQuizPromptTopBottom">Which sample is implemented with Compose: top or bottom?</string>
+    <string name="composeQuizChooseTop">Choose top</string>
+    <string name="composeQuizChooseBottom">Choose bottom</string>
+    <string name="composeQuizCorrect">Correct</string>
+    <string name="composeQuizIncorrect">Incorrect</string>
+    <string name="composeQuizTopIs" instruction="Label identifying the implementation shown at the top">Top: %1$s</string>
+    <string name="composeQuizBottomIs" instruction="Label identifying the implementation shown at the bottom">Bottom: %1$s</string>
+    <string name="composeQuizTopApi" instruction="Placeholder is the API name used by the implementation shown at the top">Top API: %1$s</string>
+    <string name="composeQuizBottomApi" instruction="Placeholder is the API name used by the implementation shown at the bottom">Bottom API: %1$s</string>
+    <string name="composeQuizBuiltBy" instruction="Credit line; placeholder is a person name">Built by %1$s</string>
+ <string name="composeQuizComponentBy" instruction="Credit for a sub-part; placeholders are component part name and person name">%1$s by %2$s</string>
+ <string name="composeQuizCreditSeparator" instruction="Separator between credit entries">" · "</string>
+ <string name="composeQuizPrevious">Previous</string>
+    <string name="composeQuizNext">Next</string>
+    <string name="composeQuizQuestionCounter" instruction="Question position and total within the selected group">Question %1$d of %2$d</string>
+    <string name="composeQuizHome">All groups</string>
+    <string name="composeQuizGroupCount" instruction="Number of questions available in a quiz group">%1$d questions</string>
+    <string name="composeQuizGroupButtons">Buttons</string>
+    <string name="composeQuizGroupInputs">Inputs and selection</string>
+    <string name="composeQuizGroupLists">Lists</string>
+    <string name="composeQuizGroupStatus">Status and loading</string>
+    <string name="composeQuizGroupDialogs">Dialogs</string>
+    <string name="composeQuizGroupMessaging">Messaging</string>
 
     <string name="devSettingsScreenUserAgentSection">User Agent</string>
     <string name="devSettingsScreenUserAgentOverride">Override UserAgent</string>

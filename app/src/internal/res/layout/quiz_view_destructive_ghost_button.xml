@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical">
+    <com.duckduckgo.common.ui.view.button.DaxButtonGhostDestructive android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Small" />
+    <com.duckduckgo.common.ui.view.button.DaxButtonGhostDestructive android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Large with icon" app:daxButtonSize="large" app:icon="@drawable/ic_add_24_solid_color" />
+    <com.duckduckgo.common.ui.view.button.DaxButtonGhostDestructive android:layout_width="wrap_content" android:layout_height="wrap_content" android:enabled="false" android:text="Disabled" />
+</LinearLayout>

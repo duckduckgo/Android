@@ -43,6 +43,7 @@ import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.Tabs
 import com.duckduckgo.app.dev.settings.customtabs.CustomTabsInternalSettingsActivity
 import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.dev.settings.notifications.NotificationsActivity
+import com.duckduckgo.app.dev.settings.quiz.ComposeQuizActivity
 import com.duckduckgo.app.dev.settings.tabs.DevTabsActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
@@ -117,6 +118,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         binding.customTabs.setOnClickListener { viewModel.customTabsClicked() }
         binding.notifications.setOnClickListener { viewModel.notificationsClicked() }
         binding.tabs.setOnClickListener { viewModel.tabsClicked() }
+        binding.composeQuiz.setOnClickListener { startActivity(ComposeQuizActivity.intent(this)) }
     }
 
     private fun observeViewModel() {
