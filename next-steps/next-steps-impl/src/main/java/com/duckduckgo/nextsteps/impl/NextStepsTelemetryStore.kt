@@ -35,6 +35,8 @@ data class NextStepsTelemetryState(
     /** Cards completed and dismissed while the carousel was on screen; reported when it ends. */
     val completedCards: Int = 0,
     val dismissedCards: Int = 0,
+    /** Cards whose completion was already reported; a second detection from another tab or after a restart sends nothing. */
+    val reportedCompletedCards: Set<String> = emptySet(),
 )
 
 interface NextStepsTelemetryStore {
@@ -64,6 +66,7 @@ class RealNextStepsTelemetryStore @Inject constructor(
         },
         completedCards = preferences.getInt(KEY_COMPLETED_CARDS, 0),
         dismissedCards = preferences.getInt(KEY_DISMISSED_CARDS, 0),
+        reportedCompletedCards = preferences.getStringSet(KEY_REPORTED_COMPLETED_CARDS, null).orEmpty(),
     )
 
     override fun save(state: NextStepsTelemetryState) {
@@ -76,6 +79,7 @@ class RealNextStepsTelemetryStore @Inject constructor(
             putStringSet(KEY_DAY_COUNTS, state.dayCounts.map { (id, count) -> "$id:$count" }.toSet())
             putInt(KEY_COMPLETED_CARDS, state.completedCards)
             putInt(KEY_DISMISSED_CARDS, state.dismissedCards)
+            putStringSet(KEY_REPORTED_COMPLETED_CARDS, state.reportedCompletedCards)
         }
     }
 
@@ -88,6 +92,7 @@ class RealNextStepsTelemetryStore @Inject constructor(
         const val KEY_OPEN_DAY = "KEY_OPEN_DAY"
         const val KEY_DAY_COUNTS = "KEY_DAY_COUNTS"
         const val KEY_COMPLETED_CARDS = "KEY_COMPLETED_CARDS"
+        const val KEY_REPORTED_COMPLETED_CARDS = "KEY_REPORTED_COMPLETED_CARDS"
         const val KEY_DISMISSED_CARDS = "KEY_DISMISSED_CARDS"
     }
 }

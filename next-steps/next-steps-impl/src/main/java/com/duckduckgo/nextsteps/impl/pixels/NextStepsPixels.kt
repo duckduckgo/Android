@@ -24,8 +24,7 @@ enum class NextStepsPixelName(override val pixelName: String) : Pixel.PixelName 
     SECTION_SHOWN_UNIQUE("next_steps_section_shown_unique"),
     CARD_IMPRESSION("next_steps_card_impression"),
     CARD_CTA_CLICKED("next_steps_card_cta_clicked"),
-    CARD_COMPLETED("next_steps_card_completed"),
-    CARD_DISMISSED("next_steps_card_dismissed"),
+    CARD_REMOVED("next_steps_card_removed"),
     CARD_DAILY_IMPRESSIONS("next_steps_card_daily_impressions"),
     CARDS_DISMISSED("next_steps_cards_dismissed"),
 }
@@ -36,12 +35,25 @@ interface NextStepsPixels {
     fun sectionShownUnique()
     fun cardImpression(card: String, days: Days)
     fun cardCtaClicked(card: String, days: Days)
-    fun cardCompleted(card: String, days: Days)
-    fun cardDismissed(card: String, days: Days)
+    fun cardRemoved(card: String, days: Days, reason: CardRemovalReason)
     fun cardDailyImpressions(card: String, days: Days, impressions: String)
     fun cardsDismissed(days: Days, reason: String, completed: Int, dismissed: Int)
 
     data class Days(val activeDay: String, val calendarDay: String)
+
+    enum class CardRemovalReason(val value: String) {
+        /** Detected complete after its CTA was the last one tapped. */
+        COMPLETED("completed"),
+
+        /** Closed with the X. */
+        DISMISSED("dismissed"),
+
+        /** Detected complete while in the stack, without a CTA tap on it. */
+        FINISHED_ELSEWHERE("finished_elsewhere"),
+
+        /** Already complete the first time the cards were evaluated, so it never entered the stack. */
+        ALREADY_COMPLETE("already_complete"),
+    }
 }
 
 @ContributesBinding(AppScope::class)
@@ -50,8 +62,9 @@ class RealNextStepsPixels @Inject constructor(private val pixel: Pixel) : NextSt
 
     override fun cardImpression(card: String, days: NextStepsPixels.Days) = fire(NextStepsPixelName.CARD_IMPRESSION, days, "card" to card)
     override fun cardCtaClicked(card: String, days: NextStepsPixels.Days) = fire(NextStepsPixelName.CARD_CTA_CLICKED, days, "card" to card)
-    override fun cardCompleted(card: String, days: NextStepsPixels.Days) = fire(NextStepsPixelName.CARD_COMPLETED, days, "card" to card)
-    override fun cardDismissed(card: String, days: NextStepsPixels.Days) = fire(NextStepsPixelName.CARD_DISMISSED, days, "card" to card)
+    override fun cardRemoved(card: String, days: NextStepsPixels.Days, reason: NextStepsPixels.CardRemovalReason) {
+        fire(NextStepsPixelName.CARD_REMOVED, days, "card" to card, "reason" to reason.value)
+    }
 
     override fun cardDailyImpressions(card: String, days: NextStepsPixels.Days, impressions: String) {
         fire(NextStepsPixelName.CARD_DAILY_IMPRESSIONS, days, "card" to card, "impressions" to impressions)

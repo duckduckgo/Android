@@ -44,6 +44,7 @@ class RealNextStepsTelemetryStoreTest {
             ctaClickedCardId = "setup_add_widget",
             openDay = 20002L,
             dayCounts = mapOf("setup_default_browser" to 0, "setup_add_widget" to 4),
+            reportedCompletedCards = setOf("setup_sync"),
         )
         testee.save(state)
         assertEquals(state, RealNextStepsTelemetryStore(preferencesProvider).state())

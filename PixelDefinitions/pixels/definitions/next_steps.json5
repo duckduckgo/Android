@@ -62,10 +62,10 @@
             }
         ]
     },
-    "next_steps_card_completed": {
-        "description": "Fires on the first detection of completion for the setup card whose CTA was last tapped. External completions without CTA attribution do not fire this pixel.",
+    "next_steps_card_removed": {
+        "description": "Fires once per setup card when it leaves the stack or is found already done: completed after its CTA was tapped, dismissed with the close button, finished elsewhere while in the stack, or already complete the first time the cards were evaluated (never shown).",
         "owners": ["catalinradoiu"],
-        "triggers": ["feature_lifecycle"],
+        "triggers": ["user_interaction", "feature_lifecycle"],
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
@@ -87,34 +87,12 @@
                 "type": "string",
                 "description": "Local calendar days since the stacked setup cards were first shown on this install, bucketed. Rollups carry the day they were counted on.",
                 "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
-            }
-        ]
-    },
-    "next_steps_card_dismissed": {
-        "description": "Fires when the user dismisses the front setup card with its close button.",
-        "owners": ["catalinradoiu"],
-        "triggers": ["user_interaction"],
-        "suffixes": ["form_factor"],
-        "parameters": [
-            "appVersion",
-            "atb",
-            {
-                "key": "card",
-                "type": "string",
-                "description": "Setup card identified by its code-supported item id.",
-                "enum": ["setup_default_browser", "setup_add_widget", "setup_sync"]
             },
             {
-                "key": "activeDay",
+                "key": "reason",
                 "type": "string",
-                "description": "Active day of the stacked setup cards, bucketed: calendar days on which a card was shown so far, starting at 0. Rollups carry the day they were counted on.",
-                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
-            },
-            {
-                "key": "calendarDay",
-                "type": "string",
-                "description": "Local calendar days since the stacked setup cards were first shown on this install, bucketed. Rollups carry the day they were counted on.",
-                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+                "description": "Why the card is gone: completed after its CTA was the last one tapped, dismissed with the close button, finished elsewhere while in the stack without a CTA tap, or already complete before the cards first rendered.",
+                "enum": ["completed", "dismissed", "finished_elsewhere", "already_complete"]
             }
         ]
     },

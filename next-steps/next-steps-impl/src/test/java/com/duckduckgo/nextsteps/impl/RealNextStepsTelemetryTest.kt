@@ -20,6 +20,10 @@ import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason.ALREADY_COMPLETE
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason.COMPLETED
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason.DISMISSED
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason.FINISHED_ELSEWHERE
 import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.Days
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -35,6 +39,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import java.time.LocalDate
 
@@ -87,7 +92,7 @@ class RealNextStepsTelemetryTest {
 
         testee.onCardsCompleted(setOf(A))
 
-        verify(pixels).cardCompleted(A, DAY_0)
+        verify(pixels).cardRemoved(A, DAY_0, COMPLETED)
         verify(pixels).cardDailyImpressions(A, DAY_0, "2")
         assertEquals(mapOf(B to 0), telemetryStore.state().dayCounts)
 
@@ -98,25 +103,65 @@ class RealNextStepsTelemetryTest {
     }
 
     @Test
-    fun `completion without a CTA tap sends the day count but no completion pixel`() = runTest {
+    fun `completion without a CTA tap is reported as finished elsewhere`() = runTest {
         testee.onFrontCardShown("message", A, setOf(A, B))
 
         testee.onCardsCompleted(setOf(A))
 
         verify(pixels).cardDailyImpressions(A, DAY_0, "1")
-        verify(pixels, never()).cardCompleted(any(), any())
+        verify(pixels).cardRemoved(A, DAY_0, FINISHED_ELSEWHERE)
     }
 
     @Test
-    fun `only the last tapped CTA receives the completion pixel`() = runTest {
+    fun `a card in the stack that was never in front is reported as finished elsewhere`() = runTest {
+        testee.onFrontCardShown("message", A, setOf(A, B))
+
+        testee.onCardsCompleted(setOf(B))
+
+        verify(pixels).cardDailyImpressions(B, DAY_0, "0")
+        verify(pixels).cardRemoved(B, DAY_0, FINISHED_ELSEWHERE)
+    }
+
+    @Test
+    fun `a card already complete at first evaluation is reported once across tabs`() = runTest {
+        testee.onCardsCompleted(setOf(A))
+        testee.onCardsCompleted(setOf(A))
+
+        verify(pixels, times(1)).cardRemoved(A, DAY_0, ALREADY_COMPLETE)
+    }
+
+    @Test
+    fun `completion of a dismissed card sends nothing`() = runTest {
+        testee.onFrontCardShown("message", A, setOf(A, B))
+        testee.onCardDismissed(A)
+        clearInvocations(pixels)
+
+        testee.onCardsCompleted(setOf(A))
+
+        verifyNoInteractions(pixels)
+    }
+
+    @Test
+    fun `completion after the carousel ended sends nothing`() = runTest {
+        testee.onFrontCardShown("message", A, setOf(A, B))
+        testee.onActiveMessageChanged(null)
+        clearInvocations(pixels)
+
+        testee.onCardsCompleted(setOf(B))
+
+        verifyNoInteractions(pixels)
+    }
+
+    @Test
+    fun `only the last tapped CTA is reported as completed`() = runTest {
         testee.onFrontCardShown("message", A, setOf(A, B))
         testee.onCtaClicked(A)
         testee.onCtaClicked(B)
 
         testee.onCardsCompleted(setOf(A, B))
 
-        verify(pixels, never()).cardCompleted(A, DAY_0)
-        verify(pixels).cardCompleted(B, DAY_0)
+        verify(pixels).cardRemoved(A, DAY_0, FINISHED_ELSEWHERE)
+        verify(pixels).cardRemoved(B, DAY_0, COMPLETED)
         assertNull(telemetryStore.state().ctaClickedCardId)
     }
 
@@ -128,7 +173,7 @@ class RealNextStepsTelemetryTest {
         val reports = (1..2).map { async { testee.onCardsCompleted(setOf(A)) } }
         reports.awaitAll()
 
-        verify(pixels, times(1)).cardCompleted(A, DAY_0)
+        verify(pixels, times(1)).cardRemoved(A, DAY_0, COMPLETED)
         verify(pixels, times(1)).cardDailyImpressions(A, DAY_0, "1")
         assertEquals(1, telemetryStore.state().completedCards)
     }
@@ -140,7 +185,7 @@ class RealNextStepsTelemetryTest {
 
         testee.onCardDismissed(A)
 
-        verify(pixels).cardDismissed(A, DAY_0)
+        verify(pixels).cardRemoved(A, DAY_0, DISMISSED)
         verify(pixels).cardDailyImpressions(A, DAY_0, "1")
         assertNull(telemetryStore.state().ctaClickedCardId)
         assertEquals(mapOf(B to 0), telemetryStore.state().dayCounts)
@@ -168,9 +213,11 @@ class RealNextStepsTelemetryTest {
     }
 
     @Test
-    fun `cards completed before the first impression are not counted in the summary`() = runTest {
+    fun `cards completed before the first impression are reported as already complete and not counted in the summary`() = runTest {
         testee.onCardsCompleted(setOf(A, B))
-        verifyNoInteractions(pixels)
+        verify(pixels).cardRemoved(A, DAY_0, ALREADY_COMPLETE)
+        verify(pixels).cardRemoved(B, DAY_0, ALREADY_COMPLETE)
+        verifyNoMoreInteractions(pixels)
 
         testee.onFrontCardShown("message", C, setOf(C))
         testee.onCardDismissed(C)
@@ -288,7 +335,7 @@ class RealNextStepsTelemetryTest {
         testee.onCardsCompleted(setOf(A))
 
         verify(pixels).cardDailyImpressions(A, DAY_0, "1")
-        verify(pixels).cardCompleted(A, Days(activeDay = "0", calendarDay = "1"))
+        verify(pixels).cardRemoved(A, Days(activeDay = "0", calendarDay = "1"), COMPLETED)
     }
 
     @Test
@@ -367,7 +414,7 @@ class RealNextStepsTelemetryTest {
         restored.onCardsCompleted(setOf(A))
         restored.onActiveMessageChanged(null)
 
-        verify(pixels).cardCompleted(A, DAY_0)
+        verify(pixels).cardRemoved(A, DAY_0, COMPLETED)
         verify(pixels).cardDailyImpressions(A, DAY_0, "1")
         verify(pixels).cardDailyImpressions(B, DAY_0, "0")
         verify(pixels).cardsDismissed(DAY_0, "auto", completed = 1, dismissed = 0)

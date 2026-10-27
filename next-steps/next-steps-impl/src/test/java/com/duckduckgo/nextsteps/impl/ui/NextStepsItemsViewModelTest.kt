@@ -28,6 +28,9 @@ import com.duckduckgo.nextsteps.impl.RealNextStepsItemsStore
 import com.duckduckgo.nextsteps.impl.RealNextStepsTelemetry
 import com.duckduckgo.nextsteps.impl.RealNextStepsTelemetryStore
 import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason.COMPLETED
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason.DISMISSED
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason.FINISHED_ELSEWHERE
 import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.Days
 import com.duckduckgo.nextsteps.impl.ui.NextStepsItemsViewModel.Command
 import com.duckduckgo.remote.messaging.api.Action
@@ -128,7 +131,7 @@ class NextStepsItemsViewModelTest {
         testee.onFrontCardDismissed()
         advanceUntilIdle()
 
-        verify(pixels).cardDismissed(defaultBrowserItem.id, DAY_0)
+        verify(pixels).cardRemoved(defaultBrowserItem.id, DAY_0, DISMISSED)
         verify(pixels).cardImpression(addWidgetItem.id, DAY_0)
         verify(remoteMessageModel, times(1)).onMessageShown(any())
         assertEquals(0, itemsStore.frontImpressions(addWidgetItem.id))
@@ -148,7 +151,7 @@ class NextStepsItemsViewModelTest {
         advanceUntilIdle()
 
         verify(pixels).cardCtaClicked(defaultBrowserItem.id, DAY_0)
-        verify(pixels).cardCompleted(defaultBrowserItem.id, DAY_0)
+        verify(pixels).cardRemoved(defaultBrowserItem.id, DAY_0, COMPLETED)
         verify(pixels, times(1)).cardImpression(addWidgetItem.id, DAY_0)
     }
 
@@ -167,7 +170,7 @@ class NextStepsItemsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(emptyList<Command>(), commands)
-        verify(pixels).cardCompleted(defaultBrowserItem.id, DAY_0)
+        verify(pixels).cardRemoved(defaultBrowserItem.id, DAY_0, COMPLETED)
         verify(pixels, times(1)).cardImpression(defaultBrowserItem.id, DAY_0)
         verify(pixels, times(1)).cardImpression(addWidgetItem.id, DAY_0)
         verify(remoteMessageModel, times(1)).onMessageShown(any())
@@ -230,7 +233,7 @@ class NextStepsItemsViewModelTest {
     }
 
     @Test
-    fun `when a card completes elsewhere then no completion pixel is sent and the next card waits for a new render`() = runTest {
+    fun `when a card completes elsewhere then it is reported as finished elsewhere and the next card waits for a new render`() = runTest {
         activeMessage.value = aMessage(content = nextStepsContent())
         advanceUntilIdle()
         defaultBrowserCheck.completed = true
@@ -238,7 +241,7 @@ class NextStepsItemsViewModelTest {
         testee.onResume(mock())
         advanceUntilIdle()
 
-        verify(pixels, never()).cardCompleted(any(), any())
+        verify(pixels).cardRemoved(defaultBrowserItem.id, DAY_0, FINISHED_ELSEWHERE)
         verify(pixels, never()).cardImpression(addWidgetItem.id, DAY_0)
         assertEquals(listOf(addWidgetItem), testee.viewState.value.items)
     }
@@ -270,7 +273,7 @@ class NextStepsItemsViewModelTest {
         testee.onPrimaryActionClicked()
         advanceUntilIdle()
         whenever(remoteMessageModel.onMessageDismissed(any())).thenAnswer {
-            verify(pixels, times(1)).cardCompleted(defaultBrowserItem.id, DAY_0)
+            verify(pixels, times(1)).cardRemoved(defaultBrowserItem.id, DAY_0, COMPLETED)
             verify(pixels).cardsDismissed(DAY_0, "all_cards_done", completed = 1, dismissed = 0)
             null
         }
@@ -281,7 +284,7 @@ class NextStepsItemsViewModelTest {
         advanceUntilIdle()
         telemetry.onActiveMessageChanged(null)
 
-        verify(pixels, times(1)).cardCompleted(defaultBrowserItem.id, DAY_0)
+        verify(pixels, times(1)).cardRemoved(defaultBrowserItem.id, DAY_0, COMPLETED)
         verify(pixels, times(1)).cardDailyImpressions(defaultBrowserItem.id, DAY_0, "2")
         verify(pixels, times(1)).cardsDismissed(any(), any(), any(), any())
     }

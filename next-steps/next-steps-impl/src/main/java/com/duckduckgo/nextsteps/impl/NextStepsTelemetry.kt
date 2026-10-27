@@ -19,6 +19,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.sync.Mutex
@@ -78,14 +79,16 @@ class RealNextStepsTelemetry @Inject constructor(
 
     override suspend fun onCardsCompleted(completedIds: Set<String>) {
         update { state, today ->
-            state.ctaClickedCardId?.takeIf { it in completedIds }?.let { pixels.cardCompleted(it, state.dayParams(today)) }
-            state.removeCards(completedIds, Removal.COMPLETED)
+            completedIds.forEach { cardId ->
+                state.completionReason(cardId)?.let { pixels.cardRemoved(cardId, state.dayParams(today), it) }
+            }
+            state.removeCards(completedIds, Removal.COMPLETED).copy(reportedCompletedCards = state.reportedCompletedCards + completedIds)
         }
     }
 
     override suspend fun onCardDismissed(cardId: String) {
         update { state, today ->
-            pixels.cardDismissed(cardId, state.dayParams(today))
+            pixels.cardRemoved(cardId, state.dayParams(today), CardRemovalReason.DISMISSED)
             state.removeCards(setOf(cardId), Removal.DISMISSED)
         }
     }
@@ -141,6 +144,14 @@ class RealNextStepsTelemetry @Inject constructor(
         } else {
             this
         }
+    }
+
+    private fun NextStepsTelemetryState.completionReason(cardId: String): CardRemovalReason? = when {
+        cardId in reportedCompletedCards -> null
+        cardId == ctaClickedCardId -> CardRemovalReason.COMPLETED
+        cardId in dayCounts -> CardRemovalReason.FINISHED_ELSEWHERE
+        firstRenderDay == null -> CardRemovalReason.ALREADY_COMPLETE
+        else -> null
     }
 
     private fun NextStepsTelemetryState.incrementImpressions(cardId: String): NextStepsTelemetryState =
