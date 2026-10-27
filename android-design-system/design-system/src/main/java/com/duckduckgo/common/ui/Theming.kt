@@ -60,14 +60,10 @@ object Theming {
 fun AppCompatActivity.applyTheme(
     theme: DuckDuckGoTheme,
     isFireMode: Boolean = false,
-    applyBrandDesignUpdate: Boolean = false,
     overlayStyleIds: List<Int> = emptyList(),
 ): BroadcastReceiver? {
     if (!FIXED_THEME_ACTIVITIES.contains(this.localClassName)) {
         setTheme(getThemeId(theme, isFireMode))
-    }
-    if (applyBrandDesignUpdate && this.theme.supportsRebrandOverlay()) {
-        this.theme.applyStyle(R.style.ThemeOverlay_Rebrand, true)
     }
     if (this.theme.supportsRebrandOverlay()) {
         overlayStyleIds.forEach { this.theme.applyStyle(it, true) }

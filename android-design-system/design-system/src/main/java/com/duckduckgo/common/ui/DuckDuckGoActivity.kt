@@ -81,7 +81,6 @@ abstract class DuckDuckGoActivity : InjectableActivity() {
         themeChangeReceiver = applyTheme(
             themingDataStore.theme,
             applyFireTheme,
-            appBrandDesignUpdateToggles.theme().isEnabled(),
             listOfNotNull(
                 R.style.ThemeOverlay_Rebrand_Radius.takeIf { appBrandDesignUpdateToggles.radius().isEnabled() },
             ),

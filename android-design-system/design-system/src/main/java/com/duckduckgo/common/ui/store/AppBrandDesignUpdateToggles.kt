@@ -39,13 +39,6 @@ interface AppBrandDesignUpdateToggles {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun appIcon(): Toggle
 
-    /**
-     * Gates theme-level design changes. This currently includes the rebrand button styling and
-     * theme-specific accent blue; future theme-controlled changes should use this sub-toggle.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun theme(): Toggle
-
     /** Gates the radius changes separately so the rest of the brand design update can roll out independently. */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun radius(): Toggle

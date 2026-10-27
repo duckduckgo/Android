@@ -160,14 +160,6 @@
         <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.DaxButton.TextButton.Destructive">
-        <item name="android:textColor">@color/button_primary_text_color_selector</item>
-        <item name="backgroundTint">@color/button_destructive_container_selector</item>
-        <item name="rippleColor">@color/button_destructive_ripple_selector</item>
-        <item name="iconTint">@color/button_primary_text_color_selector</item>
-        <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
-    </style>
-
     <style name="Widget.DuckDuckGo.DaxButton.Secondary" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="android:textColor">@color/button_secondary_text_color_selector</item>
         <item name="shapeAppearance">?attr/shapeAppearanceSmallComponent</item>
@@ -178,39 +170,11 @@
         <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.DaxButton.DestructiveSecondary" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="android:textColor">@color/button_destructive_secondary_text_color_selector</item>
-        <item name="shapeAppearance">?attr/shapeAppearanceSmallComponent</item>
-        <item name="strokeColor">@color/button_destructive_secondary_stroke_selector</item>
-        <item name="rippleColor">@color/button_destructive_secondary_ripple_selector</item>
-        <item name="iconTint">@color/button_destructive_secondary_text_color_selector</item>
-        <item name="iconPadding">@dimen/keyline_2</item>
-        <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
-    </style>
-
     <style name="Widget.DuckDuckGo.DaxButton.Ghost" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textColor">@color/button_secondary_text_color_selector</item>
         <item name="backgroundTint">@color/button_ghost_container_selector</item>
         <item name="rippleColor">@color/button_ghost_ripple_selector</item>
         <item name="iconTint">@color/button_secondary_text_color_selector</item>
-        <item name="iconPadding">@dimen/keyline_2</item>
-        <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
-    </style>
-
-    <style name="Widget.DuckDuckGo.DaxButton.DestructiveGhost" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textColor">@color/button_destructive_ghost_text_color_selector</item>
-        <item name="backgroundTint">@color/button_destructive_ghost_container_selector</item>
-        <item name="rippleColor">@color/button_desctructive_ghost_ripple_selector</item>
-        <item name="iconTint">@color/button_destructive_ghost_text_color_selector</item>
-        <item name="iconPadding">@dimen/keyline_2</item>
-        <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
-    </style>
-
-    <style name="Widget.DuckDuckGo.DaxButton.DestructiveGhostAlt" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textColor">@color/button_ghost_alt_text_color_selector</item>
-        <item name="backgroundTint">@color/button_ghost_alt_container_selector</item>
-        <item name="rippleColor">@color/button_ghost_alt_ripple_selector</item>
-        <item name="iconTint">@color/button_ghost_alt_text_color_selector</item>
         <item name="iconPadding">@dimen/keyline_2</item>
         <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
     </style>

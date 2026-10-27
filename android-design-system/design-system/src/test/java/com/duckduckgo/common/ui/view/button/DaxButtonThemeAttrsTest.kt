@@ -29,12 +29,9 @@ import org.robolectric.Robolectric
 @RunWith(AndroidJUnit4::class)
 class DaxButtonThemeAttrsTest {
 
-    private fun themedContext(overlay: Boolean): Context {
+    private fun themedContext(): Context {
         val context = ApplicationProvider.getApplicationContext<Context>()
         context.setTheme(R.style.Theme_DuckDuckGo_Light)
-        if (overlay) {
-            context.theme.applyStyle(R.style.ThemeOverlay_Rebrand, true)
-        }
         return context
     }
 
@@ -48,25 +45,8 @@ class DaxButtonThemeAttrsTest {
     }
 
     @Test
-    fun whenBaseThemeSmallThenLegacyMetricsApply() {
-        val button = DaxButtonPrimary(themedContext(overlay = false), buttonAttrs(large = false))
-        assertEquals(48, button.minHeight)
-        assertEquals(16, button.paddingLeft)
-        assertEquals(8, button.paddingTop)
-    }
-
-    @Test
-    fun whenBaseThemeLargeThenLegacyMetricsAndTextSizeApply() {
-        val button = DaxButtonPrimary(themedContext(overlay = false), buttonAttrs(large = true))
-        assertEquals(60, button.minHeight)
-        assertEquals(24, button.paddingLeft)
-        assertEquals(14, button.paddingTop)
-        assertEquals(15f, button.textSize)
-    }
-
-    @Test
-    fun whenOverlaySmallThenRebrandMetricsAndInsetsApply() {
-        val button = DaxButtonPrimary(themedContext(overlay = true), buttonAttrs(large = false))
+    fun whenBaseThemeSmallThenRebrandMetricsAndInsetsApply() {
+        val button = DaxButtonPrimary(themedContext(), buttonAttrs(large = false))
         assertEquals(48, button.minHeight)
         assertEquals(16, button.paddingLeft)
         assertEquals(10, button.paddingTop)
@@ -75,8 +55,8 @@ class DaxButtonThemeAttrsTest {
     }
 
     @Test
-    fun whenOverlayLargeThenRebrandMetricsAndLargeTextAppearanceApply() {
-        val button = DaxButtonPrimary(themedContext(overlay = true), buttonAttrs(large = true))
+    fun whenBaseThemeLargeThenRebrandMetricsAndLargeTextAppearanceApply() {
+        val button = DaxButtonPrimary(themedContext(), buttonAttrs(large = true))
         assertEquals(68, button.minHeight)
         assertEquals(24, button.paddingLeft)
         assertEquals(18, button.paddingTop)
@@ -87,7 +67,7 @@ class DaxButtonThemeAttrsTest {
 
     @Test
     fun whenLayoutSetsTextAppearanceThenLargeTextAppearanceIsNotApplied() {
-        val button = DaxButtonPrimary(themedContext(overlay = true), buttonAttrs(large = true, explicitTextAppearance = true))
+        val button = DaxButtonPrimary(themedContext(), buttonAttrs(large = true, explicitTextAppearance = true))
         assertEquals(12f, button.textSize)
     }
 }

@@ -89,7 +89,6 @@ class AppComponentsActivity : AppCompatActivity() {
             val brandDesignUpdateEnabled = appComponentsViewModel.brandDesignUpdateFlow.first()
             applyTheme(
                 selectedTheme,
-                applyBrandDesignUpdate = brandDesignUpdateEnabled,
                 overlayStyleIds = listOfNotNull(
                     CommonR.style.ThemeOverlay_Rebrand_Radius.takeIf { brandDesignUpdateEnabled },
                 ),

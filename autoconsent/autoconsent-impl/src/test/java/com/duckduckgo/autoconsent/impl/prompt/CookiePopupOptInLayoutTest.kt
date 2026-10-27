@@ -29,10 +29,9 @@ import kotlin.math.roundToInt
 import com.duckduckgo.mobile.android.R as CommonR
 
 /**
- * The screen stacks three theme sources: the layout root's onboarding overlay for the ?attr/onboarding*
- * sheet and bubble colors, the base theme for the brand button, and ThemeOverlay.Rebrand on the
- * secondary button alone for its filled variant. Inflating here is what catches one of them not
- * resolving.
+ * The screen stacks two theme sources: the layout root's onboarding overlay for the ?attr/onboarding*
+ * sheet and bubble colors, and the base theme for both buttons. Inflating here is what catches one of
+ * them not resolving.
  */
 @RunWith(AndroidJUnit4::class)
 class CookiePopupOptInLayoutTest {

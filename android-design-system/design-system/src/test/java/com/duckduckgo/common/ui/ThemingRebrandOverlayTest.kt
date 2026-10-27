@@ -37,7 +37,6 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.snackbar.Snackbar
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,7 +48,6 @@ import org.robolectric.annotation.Config
 
 private const val EXTRA_THEME = "theme"
 private const val EXTRA_THEME_RES_ID = "themeResId"
-private const val EXTRA_V1_ENABLED = "v1Enabled"
 private const val EXTRA_OVERLAYS = "overlays"
 private const val EXTRA_FIXED_LOCAL_CLASS_NAME = "fixedLocalClassName"
 private const val EXTRA_ENABLED_TOGGLE = "enabledToggle"
@@ -61,10 +59,8 @@ private class TestThemingDataStore(override var theme: DuckDuckGoTheme = DuckDuc
 }
 
 private fun configuredToggles(enabled: Set<String>): AppBrandDesignUpdateToggles {
-    val themeToggle = enabledToggle(false)
     val radiusToggle = enabledToggle(TOGGLE_RADIUS in enabled)
     return mock<AppBrandDesignUpdateToggles>().also { toggles ->
-        whenever(toggles.theme()).thenReturn(themeToggle)
         whenever(toggles.radius()).thenReturn(radiusToggle)
     }
 }
@@ -98,7 +94,6 @@ class ThemingRebrandOverlayTest {
             setTheme(intent.getIntExtra(EXTRA_THEME_RES_ID, R.style.Theme_DuckDuckGo_Dark))
             applyTheme(
                 theme = theme,
-                applyBrandDesignUpdate = intent.getBooleanExtra(EXTRA_V1_ENABLED, false),
                 overlayStyleIds = intent.getIntArrayExtra(EXTRA_OVERLAYS)?.toList().orEmpty(),
             )
             super.onCreate(savedInstanceState)
@@ -124,13 +119,11 @@ class ThemingRebrandOverlayTest {
 
     private fun fixedThemeActivity(
         themeResId: Int = R.style.Theme_DuckDuckGo_Dark,
-        applyBrandDesignUpdate: Boolean = false,
         overlayStyleIds: List<Int> = emptyList(),
         fixedLocalClassName: String = FIXED_THEME_ACTIVITIES[1],
     ): AppCompatActivity = buildThemedActivity(
         theme = DuckDuckGoTheme.LIGHT,
         themeResId = themeResId,
-        applyBrandDesignUpdate = applyBrandDesignUpdate,
         overlayStyleIds = overlayStyleIds,
         fixedLocalClassName = fixedLocalClassName,
     )
@@ -149,25 +142,21 @@ class ThemingRebrandOverlayTest {
 
     private fun themedActivity(
         theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT,
-        applyBrandDesignUpdate: Boolean = false,
         overlayStyleIds: List<Int> = emptyList(),
     ): AppCompatActivity = buildThemedActivity(
         theme = theme,
-        applyBrandDesignUpdate = applyBrandDesignUpdate,
         overlayStyleIds = overlayStyleIds,
     )
 
     private fun buildThemedActivity(
         theme: DuckDuckGoTheme,
         themeResId: Int = R.style.Theme_DuckDuckGo_Dark,
-        applyBrandDesignUpdate: Boolean = false,
         overlayStyleIds: List<Int> = emptyList(),
         fixedLocalClassName: String? = null,
     ): AppCompatActivity {
         val intent = Intent().apply {
             putExtra(EXTRA_THEME, theme.name)
             putExtra(EXTRA_THEME_RES_ID, themeResId)
-            putExtra(EXTRA_V1_ENABLED, applyBrandDesignUpdate)
             putExtra(EXTRA_OVERLAYS, overlayStyleIds.toIntArray())
             if (fixedLocalClassName != null) putExtra(EXTRA_FIXED_LOCAL_CLASS_NAME, fixedLocalClassName)
         }
@@ -209,43 +198,21 @@ class ThemingRebrandOverlayTest {
     }
 
     @Test
-    fun whenFixedThemeActivityWithBrandDesignUpdateThenRebrandStyleResolves() {
-        val activity = fixedThemeActivity(applyBrandDesignUpdate = true)
+    fun whenFixedThemeActivityThenRebrandStyleResolves() {
+        val activity = fixedThemeActivity()
         assertEquals(R.style.Widget_DuckDuckGo_DaxButton_Rebrand_Primary, resolveDaxButtonPrimary(activity))
     }
 
     @Test
-    fun whenFixedThemeActivityWithBrandDesignUpdateThenThemeStaysDark() {
-        val activity = fixedThemeActivity(applyBrandDesignUpdate = true)
+    fun whenFixedThemeActivityThenThemeStaysDark() {
+        val activity = fixedThemeActivity()
         assertFalse(resolveBoolean(activity, android.R.attr.isLightTheme))
     }
 
     @Test
-    fun whenFixedThemeActivityWithoutBrandDesignUpdateThenLegacyStyleResolves() {
-        val activity = fixedThemeActivity()
-        assertEquals(R.style.Widget_DuckDuckGo_DaxButton_TextButton_Primary, resolveDaxButtonPrimary(activity))
-    }
-
-    @Test
-    fun whenApplyThemeWithBrandDesignUpdateThenRebrandStyleResolves() {
-        val activity = themedActivity(applyBrandDesignUpdate = true)
-        assertEquals(R.style.Widget_DuckDuckGo_DaxButton_Rebrand_Primary, resolveDaxButtonPrimary(activity))
-    }
-
-    @Test
-    fun whenApplyThemeWithoutBrandDesignUpdateThenLegacyStyleResolves() {
+    fun whenApplyThemeThenRebrandStyleResolves() {
         val activity = themedActivity()
-        assertEquals(R.style.Widget_DuckDuckGo_DaxButton_TextButton_Primary, resolveDaxButtonPrimary(activity))
-    }
-
-    @Test
-    fun whenFixedThemeActivityThemeDoesNotSupportOverlayThenOverlayIsNotApplied() {
-        val activity = fixedThemeActivity(
-            themeResId = R.style.Theme_AppCompat_Transparent_NoActionBar,
-            applyBrandDesignUpdate = true,
-            fixedLocalClassName = FIXED_THEME_ACTIVITIES.first(),
-        )
-        assertNotEquals(R.style.Widget_DuckDuckGo_DaxButton_Rebrand_Primary, resolveDaxButtonPrimary(activity))
+        assertEquals(R.style.Widget_DuckDuckGo_DaxButton_Rebrand_Primary, resolveDaxButtonPrimary(activity))
     }
 
     @Test
@@ -470,32 +437,20 @@ class ThemingRebrandOverlayTest {
     }
 
     @Test
-    fun whenLightThemeWithBrandDesignUpdateThenAccentBlueIsPondwater60() {
-        val activity = themedActivity(applyBrandDesignUpdate = true)
+    fun whenLightThemeThenAccentBlueIsPondwater60() {
+        val activity = themedActivity()
         assertEquals(colorOf(R.color.pondwater60), resolveColor(activity, R.attr.daxColorAccentBlue))
     }
 
     @Test
-    fun whenDarkThemeWithBrandDesignUpdateThenAccentBlueIsPondwater40() {
-        val activity = themedActivity(DuckDuckGoTheme.DARK, applyBrandDesignUpdate = true)
+    fun whenDarkThemeThenAccentBlueIsPondwater40() {
+        val activity = themedActivity(DuckDuckGoTheme.DARK)
         assertEquals(colorOf(R.color.pondwater40), resolveColor(activity, R.attr.daxColorAccentBlue))
     }
 
     @Test
-    fun whenLightThemeWithoutBrandDesignUpdateThenAccentBlueIsUnchanged() {
+    fun whenThemedThenSwitchTrackFollowsAccentBlue() {
         val activity = themedActivity()
-        assertEquals(colorOf(R.color.blue50), resolveColor(activity, R.attr.daxColorAccentBlue))
-    }
-
-    @Test
-    fun whenDarkThemeWithoutBrandDesignUpdateThenAccentBlueIsUnchanged() {
-        val activity = themedActivity(DuckDuckGoTheme.DARK)
-        assertEquals(colorOf(R.color.blue30), resolveColor(activity, R.attr.daxColorAccentBlue))
-    }
-
-    @Test
-    fun whenBrandDesignUpdateThenSwitchTrackFollowsAccentBlue() {
-        val activity = themedActivity(applyBrandDesignUpdate = true)
         assertEquals(
             resolveColor(activity, R.attr.daxColorAccentBlue),
             resolveColor(activity, R.attr.daxColorSwitchTrackOn),
@@ -503,8 +458,8 @@ class ThemingRebrandOverlayTest {
     }
 
     @Test
-    fun whenBrandDesignUpdateThenStatusIndicatorOnColorIsRebrandGreen40() {
-        val activity = themedActivity(applyBrandDesignUpdate = true)
+    fun whenThemedThenStatusIndicatorOnColorIsRebrandGreen40() {
+        val activity = themedActivity()
 
         assertEquals(
             colorOf(R.color.rb_green40),
@@ -513,8 +468,8 @@ class ThemingRebrandOverlayTest {
     }
 
     @Test
-    fun whenLightThemeWithBrandDesignUpdateThenStatusIndicatorOffColorIsBlack36() {
-        val activity = themedActivity(applyBrandDesignUpdate = true)
+    fun whenLightThemeThenStatusIndicatorOffColorIsBlack36() {
+        val activity = themedActivity()
 
         assertEquals(
             colorOf(R.color.black36),
@@ -523,21 +478,11 @@ class ThemingRebrandOverlayTest {
     }
 
     @Test
-    fun whenDarkThemeWithBrandDesignUpdateThenStatusIndicatorOffColorIsWhite40() {
-        val activity = themedActivity(DuckDuckGoTheme.DARK, applyBrandDesignUpdate = true)
+    fun whenDarkThemeThenStatusIndicatorOffColorIsWhite40() {
+        val activity = themedActivity(DuckDuckGoTheme.DARK)
 
         assertEquals(
             colorOf(R.color.white40),
-            resolveStatusIndicatorColor(activity, enabled = false),
-        )
-    }
-
-    @Test
-    fun whenWithoutBrandDesignUpdateThenStatusIndicatorOffColorRemainsGray50() {
-        val activity = themedActivity()
-
-        assertEquals(
-            colorOf(R.color.gray50),
             resolveStatusIndicatorColor(activity, enabled = false),
         )
     }
