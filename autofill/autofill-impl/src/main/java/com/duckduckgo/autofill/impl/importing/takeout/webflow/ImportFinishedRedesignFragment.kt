@@ -66,6 +66,9 @@ class ImportFinishedRedesignFragment : DuckDuckGoFragment(R.layout.fragment_impo
         binding.resultDoneButton.setOnClickListener {
             setFragmentResult(ImportFinishedFragment.RESULT_KEY_DONE, Bundle())
         }
+        binding.resultDoneSecondaryButton.setOnClickListener {
+            setFragmentResult(ImportFinishedFragment.RESULT_KEY_DONE, Bundle())
+        }
     }
 
     private fun renderSuccess(
@@ -82,6 +85,8 @@ class ImportFinishedRedesignFragment : DuckDuckGoFragment(R.layout.fragment_impo
             val promo = (importViewModel.viewState.value.viewMode as? ViewMode.Success)?.promo?.createView(requireContext(), promoCallback)
             promo?.let(resultPromoContainer::addView)
             resultPromoContainer.isVisible = promo != null
+            resultDoneButton.isVisible = promo == null
+            resultDoneSecondaryButton.isVisible = promo != null
         }
     }
 

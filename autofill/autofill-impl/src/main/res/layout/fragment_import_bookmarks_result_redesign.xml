@@ -108,6 +108,14 @@
             app:daxButtonSize="large"
             tools:text="@string/importBookmarksRedesignSuccessPrimaryButton" />
 
+        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+            android:id="@+id/resultDoneSecondaryButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/importBookmarksRedesignSuccessPrimaryButton"
+            android:visibility="gone"
+            app:daxButtonSize="large" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

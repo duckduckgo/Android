@@ -236,7 +236,9 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         binding.preImport.preImportButton.setOnClickListener { onImportGcmButtonClicked() }
         binding.browserPromoPreImport.browserPromoImportButton.setOnClickListener { onImportGcmButtonClicked() }
         binding.browserPromoPreImport.browserPromoDeclineButton.setOnClickListener { viewModel.onInBrowserPromoDismissed() }
+        binding.importing.importingCancelButton.setOnClickListener { animateClosed() }
         binding.importSuccess.successDoneButton.setOnClickListener { dismiss() }
+        binding.importSuccess.successDoneSecondaryButton.setOnClickListener { dismiss() }
         binding.importError.errorDoneButton.setOnClickListener { dismiss() }
     }
 
@@ -301,6 +303,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     }
 
     private fun renderRedesignViewState(viewState: ViewState) {
+        binding.redesignCloseButton.isVisible = viewState.viewMode is PreImport || viewState.viewMode is BrowserPromoPreImport
         when (viewState.viewMode) {
             is PreImport -> redesignShowPreImportView(viewState.usesCredentialExchange)
             is BrowserPromoPreImport -> redesignShowInBrowserPromoPreImportView(
@@ -360,6 +363,9 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
                 promo?.let(successPromoContainer::addView)
                 successPromoContainer.isVisible = promo != null
             }
+            val hasPromo = successPromoContainer.isVisible
+            successDoneButton.isVisible = !hasPromo
+            successDoneSecondaryButton.isVisible = hasPromo
         }
         redesignSelectViewToShow(binding.importSuccess.root)
     }
