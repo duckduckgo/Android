@@ -312,4 +312,16 @@
     <string name="importBookmarksErrorGenericMessage">Възникна някаква грешка</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Моля, увери се, че имаш връзка с интернет и опитай отново.</string>
 
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Импортирането е завършено!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Изчакайте – оставете този прозорец отворен. Не би трябвало да отнеме повече от минута-две.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google може да поиска да въведете парола.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google ще изпрати имейл с потвърждение, че данните Ви са експортирани. Не е нужно да правите нищо.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Импортирането е завършено!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Импортирани отметки: <b>%1$d</b>]]></string>
+
 </resources>

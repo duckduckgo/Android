@@ -312,4 +312,16 @@
     <string name="importBookmarksErrorGenericMessage">Jokin meni pieleen</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Varmista, että sinulla on yhteys internetiin ja yritä uudelleen.</string>
 
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Tuonti valmis!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Odota hetki – pidä tämä ikkuna auki. Tämän ei pitäisi kestää enempää kuin minuutti tai kaksi.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google voi pyytää sinua antamaan salasanasi.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google lähettää sinulle sähköpostiviestin, jossa vahvistetaan, että tietosi on viety. Sinun ei tarvitse tehdä mitään.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Tuonti valmis!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Tuotuja kirjanmerkkejä: <b>%1$d</b>]]></string>
+
 </resources>

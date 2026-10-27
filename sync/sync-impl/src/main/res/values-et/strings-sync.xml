@@ -477,4 +477,12 @@
     <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">Tühista</string>
     <string name="sync_simplified_deep_link_auth_prompt_title">Seadista Sync &amp; Backup</string>
     <string name="sync_simplified_deep_link_auth_prompt_message">Ava seade, et seadistada Sync &amp; Backup</string>
+
+    <!-- Sync promo on passwords import success screen -->
+    <string name="sync_passwords_import_promo_title">Pääse ligi oma paroolidele mobiilis ja arvutis.</string>
+    <string name="sync_passwords_import_promo_primary_button">Lülita Sync &amp; Backup sisse</string>
+
+    <!-- Sync promo on bookmarks import success screen -->
+    <string name="sync_bookmarks_import_promo_title">Pääse oma järjehoidjatele ligi nii mobiilis kui ka arvutis.</string>
+    <string name="sync_bookmarks_import_promo_primary_button">Lülita Sync &amp; Backup sisse</string>
 </resources>

@@ -312,4 +312,16 @@
     <string name="importBookmarksErrorGenericMessage">Etwas ist schiefgelaufen</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Bitte stelle sicher, dass du mit dem Internet verbunden bist, und versuche es erneut.</string>
 
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Import abgeschlossen!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Warte kurz – lass dieses Fenster geöffnet. Es sollte nicht länger als ein oder zwei Minuten dauern.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google fragt möglicherweise nach deinem Passwort.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google sendet dir eine E-Mail, in der bestätigt wird, dass deine Daten exportiert wurden. Du musst nichts tun.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Import abgeschlossen!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Lesezeichen importiert: <b>%1$d</b>]]></string>
+
 </resources>

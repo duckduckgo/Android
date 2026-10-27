@@ -32,6 +32,7 @@
     <string name="removeAll">Pašalinti visus</string>
     <string name="undo">Anuliuoti</string>
     <string name="cancel">Atšaukti</string>
+    <string name="done">Atlikta</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Visada įjungta</string>

@@ -63,7 +63,7 @@
                 android:breakStrategy="balanced"
                 android:gravity="center_horizontal"
                 app:typography="h1"
-                tools:text="@string/importBookmarksRedesignSuccessTitle" />
+                tools:text="@string/importBookmarksRedesignResultTitle" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/resultRow"
@@ -114,13 +114,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:daxButtonSize="large"
-            tools:text="@string/importBookmarksRedesignSuccessPrimaryButton" />
+            tools:text="@string/done" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/resultDoneSecondaryButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/importBookmarksRedesignSuccessPrimaryButton"
+            android:text="@string/done"
             android:visibility="gone"
             app:daxButtonSize="large" />
 
