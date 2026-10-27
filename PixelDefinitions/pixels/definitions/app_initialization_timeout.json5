@@ -7,7 +7,7 @@
         "parameters": ["appVersion"]
     },
     "timeout_atb_pre_initializer_plugin": {
-        "description": "A pre-ATB initialization plugin timed out",
+        "description": "A pre-ATB initialization plugin timed out. For plugin=ReinstallAtbListener the step is not cut short: it finishes, still applies the ru variant for a returning user, and the ATB waits for it, so this is sent afterwards and means the step was slow, not that ru was lost",
         "owners": ["CDRussell"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],

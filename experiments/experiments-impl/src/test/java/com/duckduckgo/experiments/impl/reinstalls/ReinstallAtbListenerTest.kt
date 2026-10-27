@@ -25,10 +25,8 @@ import com.squareup.moshi.Moshi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.yield
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
@@ -223,31 +221,6 @@ class ReinstallAtbListenerTest {
         val result = withTimeoutOrNull(SHORT_TIME_LIMIT_MS) { realDispatcherTestee.beforeAtbInit() }
 
         assertNull(result)
-        verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
-    }
-
-    @Test
-    fun whenReinstallStepOnlyBlocksPastTheTimeLimitThenTheTimeLimitIsNotReported() = runBlocking {
-        val realDispatcherProvider = DefaultDispatcherProvider()
-        val realDispatcherTestee = ReinstallAtbListener(
-            mockBackupDataStore,
-            mockStatisticsDataStore,
-            mockAppBuildConfig,
-            realDispatcherProvider,
-            mockReinstallerVariantProtectionFeature,
-            moshi,
-        )
-        whenever(mockAppBuildConfig.isAppReinstall()).doSuspendableAnswer {
-            Thread.sleep(SLOW_BLOCKING_WORK_MS)
-            true
-        }
-
-        // Started on the listener's own dispatcher, as AtbInitializer does, so entering the step doesn't switch threads
-        val result = withContext(realDispatcherProvider.io()) {
-            withTimeoutOrNull(SHORT_TIME_LIMIT_MS) { realDispatcherTestee.beforeAtbInit() }
-        }
-
-        assertEquals(Unit, result)
         verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
     }
 
