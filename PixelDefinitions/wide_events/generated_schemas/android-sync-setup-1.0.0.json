@@ -144,7 +144,15 @@
                 "name": {
                     "type": "string",
                     "description": "Entry point the flow was started from",
-                    "enum": ["promotion_passwords", "promotion_bookmarks", "promotion_passwords_import", "promotion_bookmarks_import"]
+                    "enum": [
+                        "promotion_passwords",
+                        "promotion_bookmarks",
+                        "promotion_passwords_import",
+                        "promotion_bookmarks_import",
+                        "promotion_bookmark_added_dialog",
+                        "promotion_ai_chat",
+                        "other"
+                    ]
                 }
             }
         }

@@ -57,6 +57,7 @@ import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_DISABLED
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_ENABLED
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteServerData
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskEditDevice
@@ -328,15 +329,15 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    fun onSyncThisDevice(source: String? = null) {
+    fun onSyncThisDevice(launchSource: SyncLaunchSource = SyncLaunchSource.Other) {
         syncPixels.fireBackupThisDeviceTapped()
-        startSyncThisDevice(source)
+        startSyncThisDevice(launchSource)
     }
 
-    private fun startSyncThisDevice(source: String?) {
+    private fun startSyncThisDevice(launchSource: SyncLaunchSource) {
         viewState.update { it.setThisDeviceSyncInProgress() }
         viewModelScope.launch(dispatchers.io()) {
-            syncSetupWideEvent.onFlowStarted(source)
+            syncSetupWideEvent.onFlowStarted(launchSource)
             if (syncAutoRestore.canRestore()) {
                 if (isImprovedSyncFlow()) {
                     command.send(ShowPreviousSessionReady(SyncEntryPoint.SYNC_NEW_ACCOUNT, isAuthRequired = true))
@@ -824,13 +825,13 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    fun processSourceDeepLink(source: String?) {
+    fun processSourceDeepLink(launchSource: SyncLaunchSource) {
         isContentHidden.value = true
         viewModelScope.launch(dispatchers.io()) {
             when {
                 syncAccountRepository.isSignedIn() -> onAddAnotherDevice()
                 SetupFlows.CreateAccountFlow in disabledSetupFlows() -> isContentHidden.value = false
-                else -> startSyncThisDevice(source)
+                else -> startSyncThisDevice(launchSource)
             }
         }
     }

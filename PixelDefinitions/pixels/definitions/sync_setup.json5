@@ -320,6 +320,20 @@
                 "enum": ["connect", "exchange"]
             },
             {
+                "key": "launch_source",
+                "type": "string",
+                "description": "Which promotion opened Sync before the setup flow completed, or other for every other entry point",
+                "enum": [
+                    "promotion_bookmarks",
+                    "promotion_passwords",
+                    "promotion_bookmark_added_dialog",
+                    "promotion_ai_chat",
+                    "promotion_passwords_import",
+                    "promotion_bookmarks_import",
+                    "other"
+                ]
+            },
+            {
                 "key": "flow_version",
                 "type": "string",
                 "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled, v2.1 when canUseExchangeV2Point1 is also enabled)",
@@ -369,6 +383,20 @@
                 "type": "string",
                 "description": "Which sync setup flow failed",
                 "enum": ["connect", "exchange"]
+            },
+            {
+                "key": "launch_source",
+                "type": "string",
+                "description": "Which promotion opened Sync before the setup flow failed, or other for every other entry point",
+                "enum": [
+                    "promotion_bookmarks",
+                    "promotion_passwords",
+                    "promotion_bookmark_added_dialog",
+                    "promotion_ai_chat",
+                    "promotion_passwords_import",
+                    "promotion_bookmarks_import",
+                    "other"
+                ]
             },
             {
                 "key": "reason",
@@ -460,6 +488,20 @@
                 "type": "string",
                 "description": "Which sync setup flow was cancelled",
                 "enum": ["connect", "exchange"]
+            },
+            {
+                "key": "launch_source",
+                "type": "string",
+                "description": "Which promotion opened Sync before the setup flow was cancelled, or other for every other entry point",
+                "enum": [
+                    "promotion_bookmarks",
+                    "promotion_passwords",
+                    "promotion_bookmark_added_dialog",
+                    "promotion_ai_chat",
+                    "promotion_passwords_import",
+                    "promotion_bookmarks_import",
+                    "other"
+                ]
             },
             {
                 "key": "reason",

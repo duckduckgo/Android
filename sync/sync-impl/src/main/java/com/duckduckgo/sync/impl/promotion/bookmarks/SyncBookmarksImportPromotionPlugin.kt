@@ -31,6 +31,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.promotion.widget.PromoMessageView
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
 import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
@@ -60,7 +61,7 @@ class SyncBookmarksImportPromotionPlugin @Inject constructor(
             doOnAttach { promotion.onPromotionDisplayed() }
             onPrimaryButtonClicked {
                 promotion.onPromotionConfirmed()
-                globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = "promotion_bookmarks_import"))
+                globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarksImport.value))
                 callback.dismissHost()
             }
         }

@@ -35,6 +35,7 @@ import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.promotion.SyncPromotions
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
 import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.launch
@@ -77,7 +78,10 @@ class SetupSyncBookmarkAddedPromo @Inject constructor(
     }
 
     private fun onLaunchSyncFlow(activity: AppCompatActivity) {
-        val intent = globalActivityStarter.startIntent(activity, SyncActivityStartSyncFlow(source = null))
+        val intent = globalActivityStarter.startIntent(
+            activity,
+            SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarkAddedDialog.value),
+        )
         activity.startActivity(intent)
     }
 

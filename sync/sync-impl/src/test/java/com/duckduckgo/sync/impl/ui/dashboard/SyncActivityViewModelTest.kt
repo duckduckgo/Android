@@ -51,6 +51,7 @@ import com.duckduckgo.sync.impl.auth.FakeSyncDeviceAuthenticator
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskTurnOffSync
@@ -281,7 +282,7 @@ class SyncActivityViewModelTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
 
         testee.commands().test {
-            testee.processSourceDeepLink(source = "promotion_passwords")
+            testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionPasswords)
             awaitItem().assertCommandType(IntroCreateAccount::class)
             cancelAndIgnoreRemainingEvents()
         }
@@ -293,7 +294,7 @@ class SyncActivityViewModelTest {
         givenSetupFlowsAllowed()
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
 
-        testee.processSourceDeepLink(source = "promotion_passwords")
+        testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionPasswords)
 
         verify(syncPixels, never()).fireBackupThisDeviceTapped()
     }
@@ -306,7 +307,7 @@ class SyncActivityViewModelTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
 
         testee.commands().test {
-            testee.processSourceDeepLink(source = "promotion_passwords")
+            testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionPasswords)
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
@@ -318,7 +319,7 @@ class SyncActivityViewModelTest {
         whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(false)
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
 
-        testee.processSourceDeepLink(source = "promotion_passwords")
+        testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionPasswords)
 
         testee.viewState().test {
             assertFalse(expectMostRecentItem().isContentHidden)
@@ -332,7 +333,7 @@ class SyncActivityViewModelTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
 
         testee.commands().test {
-            testee.processSourceDeepLink(source = "promotion_passwords")
+            testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionPasswords)
             awaitItem().assertCommandType(Command.AddAnotherDevice::class)
             cancelAndIgnoreRemainingEvents()
         }
@@ -344,7 +345,7 @@ class SyncActivityViewModelTest {
         givenSetupFlowsAllowed()
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
 
-        testee.processSourceDeepLink(source = "promotion_passwords")
+        testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionPasswords)
 
         testee.viewState().test {
             assertTrue(awaitItem().isContentHidden)
@@ -358,7 +359,7 @@ class SyncActivityViewModelTest {
         givenSetupFlowsAllowed()
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
 
-        testee.processSourceDeepLink(source = "promotion_passwords")
+        testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionPasswords)
         testee.onScreenExit()
 
         testee.viewState().test {
@@ -382,7 +383,7 @@ class SyncActivityViewModelTest {
         givenSetupFlowsAllowed()
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
 
-        testee.processSourceDeepLink(source = "promotion_passwords")
+        testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionPasswords)
 
         testee.viewState().test {
             assertFalse(expectMostRecentItem().isContentHidden)
@@ -395,7 +396,7 @@ class SyncActivityViewModelTest {
         givenUserHasDeviceAuthentication(true)
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
 
-        testee.processSourceDeepLink(source = "promotion_passwords")
+        testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionPasswords)
 
         testee.viewState().test {
             assertFalse(expectMostRecentItem().isContentHidden)
@@ -486,7 +487,7 @@ class SyncActivityViewModelTest {
         testee.commands().test {
             testee.onSyncThisDevice()
             awaitItem()
-            verify(syncSetupWideEvent).onFlowStarted(source = null)
+            verify(syncSetupWideEvent).onFlowStarted(launchSource = SyncLaunchSource.Other)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -495,9 +496,9 @@ class SyncActivityViewModelTest {
     fun whenSyncThisDeviceWithSourceThenOnFlowStartedCalledWithSource() = runTest {
         givenUserHasDeviceAuthentication(true)
         testee.commands().test {
-            testee.onSyncThisDevice(source = "settings")
+            testee.onSyncThisDevice(launchSource = SyncLaunchSource.PromotionPasswords)
             awaitItem()
-            verify(syncSetupWideEvent).onFlowStarted(source = "settings")
+            verify(syncSetupWideEvent).onFlowStarted(launchSource = SyncLaunchSource.PromotionPasswords)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -509,7 +510,7 @@ class SyncActivityViewModelTest {
 
         testee.onSyncThisDevice()
 
-        verify(syncSetupWideEvent).onFlowStarted(source = null)
+        verify(syncSetupWideEvent).onFlowStarted(launchSource = SyncLaunchSource.Other)
         verify(syncSetupWideEvent).onDeviceAuthNotEnrolled()
     }
 
