@@ -1596,6 +1596,151 @@
   var encrypt = globalThis.crypto?.subtle?.encrypt?.bind(globalThis.crypto?.subtle);
   var decrypt = globalThis.crypto?.subtle?.decrypt?.bind(globalThis.crypto?.subtle);
 
+  // src/features.js
+  init_define_import_meta_trackerLookup();
+  var baseFeatures = (
+    /** @type {FeatureName[]} */
+    [
+      "fingerprintingAudio",
+      "fingerprintingBattery",
+      "fingerprintingCanvas",
+      "googleRejected",
+      "gpc",
+      "fingerprintingHardware",
+      "referrer",
+      "fingerprintingScreenSize",
+      "fingerprintingTemporaryStorage",
+      "navigatorInterface",
+      "elementHiding",
+      "exceptionHandler",
+      "apiManipulation"
+    ]
+  );
+  var otherFeatures = (
+    /** @type {FeatureName[]} */
+    [
+      "clickToLoad",
+      "contextMenu",
+      "cookie",
+      "messageBridge",
+      "duckPlayer",
+      "duckPlayerNative",
+      "duckAiDataClearing",
+      "duckAiChatHistory",
+      "harmfulApis",
+      "webCompat",
+      "webDetection",
+      "webEvents",
+      "webInterferenceDetection",
+      "detectorPerf",
+      "windowsPermissionUsage",
+      "uaChBrands",
+      "brokerProtection",
+      "performanceMetrics",
+      "breakageReporting",
+      "autofillImport",
+      "favicon",
+      "webTelemetry",
+      "pageContext",
+      "print",
+      "pageObserver",
+      "hover",
+      "browserUiLock",
+      "trackerProtection",
+      "tabSuspension",
+      "autofillPasskeys",
+      "textSelection",
+      "chromeWebstorePatching"
+    ]
+  );
+  var featureConfigDependencies = {
+    trackerProtection: ["contentBlocking", "trackerAllowlist", "clickToLoad"],
+    breakageReporting: ["webInterferenceDetection"],
+    cookie: ["adClickAttribution"]
+  };
+  var platformSupport = {
+    apple: ["webCompat", "duckPlayerNative", ...baseFeatures, "pageContext", "print", "trackerProtection"],
+    "apple-isolated": [
+      "contextMenu",
+      "duckPlayer",
+      "duckPlayerNative",
+      "brokerProtection",
+      "breakageReporting",
+      "performanceMetrics",
+      "clickToLoad",
+      "messageBridge",
+      "favicon",
+      "webDetection",
+      "webEvents",
+      "webInterferenceDetection",
+      "detectorPerf",
+      "webTelemetry",
+      "pageObserver",
+      "hover",
+      "tabSuspension",
+      "textSelection",
+      "chromeWebstorePatching"
+    ],
+    "apple-ai-clear": ["duckAiDataClearing"],
+    "apple-ai-history": ["duckAiChatHistory"],
+    android: [
+      ...baseFeatures,
+      "webCompat",
+      "webDetection",
+      "webEvents",
+      "webInterferenceDetection",
+      "detectorPerf",
+      "breakageReporting",
+      "duckPlayer",
+      "messageBridge",
+      "pageContext",
+      "browserUiLock"
+    ],
+    "android-broker-protection": ["brokerProtection"],
+    "android-ai-clear": ["duckAiDataClearing"],
+    "android-ai-history": ["duckAiChatHistory"],
+    "android-autofill-import": ["autofillImport"],
+    "android-adsjs": [
+      "apiManipulation",
+      "webCompat",
+      "fingerprintingHardware",
+      "fingerprintingScreenSize",
+      "fingerprintingTemporaryStorage",
+      "fingerprintingAudio",
+      "fingerprintingBattery",
+      "gpc",
+      "webDetection",
+      "webEvents",
+      "breakageReporting"
+    ],
+    windows: [
+      "cookie",
+      ...baseFeatures,
+      "webDetection",
+      "webEvents",
+      "webInterferenceDetection",
+      "detectorPerf",
+      "webTelemetry",
+      "windowsPermissionUsage",
+      "uaChBrands",
+      "duckPlayer",
+      "brokerProtection",
+      "breakageReporting",
+      "messageBridge",
+      "webCompat",
+      "pageContext",
+      "duckAiDataClearing",
+      "performanceMetrics",
+      "duckAiChatHistory",
+      "autofillPasskeys",
+      "chromeWebstorePatching"
+    ],
+    firefox: ["cookie", ...baseFeatures, "clickToLoad", "webDetection", "webEvents", "webInterferenceDetection", "breakageReporting"],
+    chrome: ["cookie", ...baseFeatures, "clickToLoad", "webDetection", "webEvents", "webInterferenceDetection", "breakageReporting"],
+    "chrome-mv3": ["cookie", ...baseFeatures, "clickToLoad", "webDetection", "webEvents", "webInterferenceDetection", "breakageReporting"],
+    integration: [...baseFeatures, ...otherFeatures]
+  };
+
   // src/utils.js
   var globalObj = typeof window === "undefined" ? globalThis : window;
   var Error3 = globalObj.Error;
@@ -1974,7 +2119,11 @@
     }
     return false;
   }
-  function processConfig(data2, userList, preferences, platformSpecificFeatures2 = []) {
+  function processConfig(data2, userList, preferences, platformSpecificFeatures2 = [], injectName = "android-broker-protection") {
+    const bundledFeatureNames = injectName ? platformSupport[injectName] : void 0;
+    if (bundledFeatureNames) {
+      data2 = pruneConfigFeatures(data2, bundledFeatureNames, featureConfigDependencies);
+    }
     const topLevelHostname = getTabHostname();
     const site = computeLimitedSiteObject();
     const allowlisted = userList.filter((domain) => domain === topLevelHostname).length > 0;
@@ -2014,6 +2163,22 @@
       default:
         return false;
     }
+  }
+  function pruneConfigFeatures(data2, featureNames, dependencies = {}) {
+    if (!data2?.features) return data2;
+    const keep = new Set2(featureNames);
+    for (const featureName of featureNames) {
+      for (const dependency of dependencies[featureName] ?? []) {
+        keep.add(dependency);
+      }
+    }
+    const features = {};
+    for (const [featureName, feature] of Object.entries(data2.features)) {
+      if (keep.has(featureName)) {
+        features[featureName] = feature;
+      }
+    }
+    return { ...data2, features };
   }
   function computeEnabledFeatures(data2, topLevelHostname, platform, platformSpecificFeatures2 = []) {
     const remoteFeatureNames = Object.keys(data2.features);
@@ -2097,146 +2262,6 @@
       createCustomEvent("sendMessageProxy" + messageSecret, { detail: JSON.stringify({ messageType, options }) })
     );
   }
-
-  // src/features.js
-  init_define_import_meta_trackerLookup();
-  var baseFeatures = (
-    /** @type {FeatureName[]} */
-    [
-      "fingerprintingAudio",
-      "fingerprintingBattery",
-      "fingerprintingCanvas",
-      "googleRejected",
-      "gpc",
-      "fingerprintingHardware",
-      "referrer",
-      "fingerprintingScreenSize",
-      "fingerprintingTemporaryStorage",
-      "navigatorInterface",
-      "elementHiding",
-      "exceptionHandler",
-      "apiManipulation"
-    ]
-  );
-  var otherFeatures = (
-    /** @type {FeatureName[]} */
-    [
-      "clickToLoad",
-      "contextMenu",
-      "cookie",
-      "messageBridge",
-      "duckPlayer",
-      "duckPlayerNative",
-      "duckAiDataClearing",
-      "duckAiChatHistory",
-      "harmfulApis",
-      "webCompat",
-      "webDetection",
-      "webEvents",
-      "webInterferenceDetection",
-      "detectorPerf",
-      "windowsPermissionUsage",
-      "uaChBrands",
-      "brokerProtection",
-      "performanceMetrics",
-      "breakageReporting",
-      "autofillImport",
-      "favicon",
-      "webTelemetry",
-      "pageContext",
-      "print",
-      "pageObserver",
-      "hover",
-      "browserUiLock",
-      "trackerProtection",
-      "tabSuspension",
-      "autofillPasskeys",
-      "textSelection",
-      "chromeWebstorePatching"
-    ]
-  );
-  var platformSupport = {
-    apple: ["webCompat", "duckPlayerNative", ...baseFeatures, "pageContext", "print", "trackerProtection"],
-    "apple-isolated": [
-      "contextMenu",
-      "duckPlayer",
-      "duckPlayerNative",
-      "brokerProtection",
-      "breakageReporting",
-      "performanceMetrics",
-      "clickToLoad",
-      "messageBridge",
-      "favicon",
-      "webDetection",
-      "webEvents",
-      "webInterferenceDetection",
-      "detectorPerf",
-      "webTelemetry",
-      "pageObserver",
-      "hover",
-      "tabSuspension",
-      "textSelection",
-      "chromeWebstorePatching"
-    ],
-    "apple-ai-clear": ["duckAiDataClearing"],
-    "apple-ai-history": ["duckAiChatHistory"],
-    android: [
-      ...baseFeatures,
-      "webCompat",
-      "webDetection",
-      "webEvents",
-      "webInterferenceDetection",
-      "detectorPerf",
-      "breakageReporting",
-      "duckPlayer",
-      "messageBridge",
-      "pageContext",
-      "browserUiLock"
-    ],
-    "android-broker-protection": ["brokerProtection"],
-    "android-ai-clear": ["duckAiDataClearing"],
-    "android-ai-history": ["duckAiChatHistory"],
-    "android-autofill-import": ["autofillImport"],
-    "android-adsjs": [
-      "apiManipulation",
-      "webCompat",
-      "fingerprintingHardware",
-      "fingerprintingScreenSize",
-      "fingerprintingTemporaryStorage",
-      "fingerprintingAudio",
-      "fingerprintingBattery",
-      "gpc",
-      "webDetection",
-      "webEvents",
-      "breakageReporting"
-    ],
-    windows: [
-      "cookie",
-      ...baseFeatures,
-      "webDetection",
-      "webEvents",
-      "webInterferenceDetection",
-      "detectorPerf",
-      "webTelemetry",
-      "windowsPermissionUsage",
-      "uaChBrands",
-      "duckPlayer",
-      "brokerProtection",
-      "breakageReporting",
-      "messageBridge",
-      "webCompat",
-      "pageContext",
-      "duckAiDataClearing",
-      "performanceMetrics",
-      "duckAiChatHistory",
-      "autofillPasskeys",
-      "chromeWebstorePatching"
-    ],
-    firefox: ["cookie", ...baseFeatures, "clickToLoad", "webDetection", "webEvents", "webInterferenceDetection", "breakageReporting"],
-    chrome: ["cookie", ...baseFeatures, "clickToLoad", "webDetection", "webEvents", "webInterferenceDetection", "breakageReporting"],
-    "chrome-mv3": ["cookie", ...baseFeatures, "clickToLoad", "webDetection", "webEvents", "webInterferenceDetection", "breakageReporting"],
-    integration: [...baseFeatures, ...otherFeatures]
-  };
 
   // src/performance.js
   init_define_import_meta_trackerLookup();
