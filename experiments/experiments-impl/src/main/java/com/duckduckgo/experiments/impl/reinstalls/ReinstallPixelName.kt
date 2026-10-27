@@ -17,21 +17,7 @@
 package com.duckduckgo.experiments.impl.reinstalls
 
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
-import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
-import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
-import com.duckduckgo.di.scopes.AppScope
-import dev.zacsweers.metro.ContributesIntoSet
-import javax.inject.Inject
 
 enum class ReinstallPixelName(override val pixelName: String) : PixelName {
     REINSTALL_CHECK_SLOW("atb_reinstall_check_slow"),
-}
-
-@ContributesIntoSet(AppScope::class)
-class ReinstallPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
-    override fun names(): List<Pair<String, Set<PixelParameter>>> {
-        return listOf(
-            ReinstallPixelName.REINSTALL_CHECK_SLOW.pixelName to PixelParameter.removeAtb(),
-        )
-    }
 }
