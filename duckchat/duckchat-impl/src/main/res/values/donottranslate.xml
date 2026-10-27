@@ -45,6 +45,4 @@
     <string name="duckChatOnboardingDuckAiStateOn">Turn Duck.ai On</string>
     <string name="duckChatOnboardingDuckAiStateOff">Keep Duck.ai Off</string>
 
-    <!-- Duck.ai attachment privacy footer -->
-    <string name="duckChatAttachmentPrivacyFooterMessage">Files are automatically scanned for illegal content. Flagged chats have limited data retention. <annotation type="learn_more_link">Learn more</annotation></string>
 </resources>

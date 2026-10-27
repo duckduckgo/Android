@@ -405,4 +405,6 @@
     <string name="duckAiTabCardListeningTitle" instruction="Header on a tab switcher card for a Duck.ai tab with a voice chat in progress, shown while Duck.ai is listening to the user.">À l\'écoute…</string>
     <string name="duckAiTabCardVoiceChatTypeLabel" instruction="Label on a tab switcher card marking the Duck.ai tab as a voice chat, as opposed to a text chat.">Chat vocal</string>
     <string name="duckAiTabCardTranscriptTypeLabel" instruction="Label on a tab switcher card for a finished Duck.ai voice chat, whose preview shows the conversation transcript.">Transcription</string>
+    <!-- Duck.ai attachment privacy footer -->
+    <string name="duckChatAttachmentPrivacyFooterMessage" instruction="Disclaimer under the Duck.ai input while an image or file is attached. The annotated phrase is a tappable link to a help page.">Les fichiers sont automatiquement analysés pour détecter tout contenu illégal. Les discussions signalées font l\'objet d\'une conservation limitée des données. <annotation type="learn_more_link">En savoir plus</annotation></string>
 </resources>
