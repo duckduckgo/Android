@@ -21,6 +21,7 @@ import android.os.Environment
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.common.utils.CurrentTimeProvider
@@ -74,6 +75,7 @@ class RealReinstallDetectorTest {
     private val persistentStorage = FakePersistentStorage()
     private val pixel: Pixel = mock()
     private val currentTimeProvider: CurrentTimeProvider = mock()
+    private val appBuildConfig: AppBuildConfig = mock()
     private val ddgDownloadsDirectory = File(
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
         "DuckDuckGo",
@@ -82,6 +84,7 @@ class RealReinstallDetectorTest {
     @Before
     fun setUp() {
         ddgDownloadsDirectory.deleteRecursively()
+        whenever(appBuildConfig.isNewInstall()).thenReturn(true)
     }
 
     @After
@@ -536,6 +539,25 @@ class RealReinstallDetectorTest {
     }
 
     @Test
+    @Config(sdk = [29])
+    fun whenBelowAndroid11AndAnUpdatedInstallRunsTheCheckThenTheFlagIsStoredButCheckResultPixelIsNotFired() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        val preferences = InMemorySharedPreferences()
+        val reinstallDetector = reinstallDetectorWith(
+            preferences,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            appCoroutineScope = coroutineTestRule.testScope,
+        )
+
+        reinstallDetector.onCreate(mock())
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertFalse(preferences.getBoolean(APP_REINSTALLED_KEY, true))
+        assertNotNull(persistentStorage.values[InstallSeenPersistentStorageKey.key])
+        verify(pixel, never()).fire(eq(ReinstallDetectorPixelName.BLOCK_STORE_CHECK_RESULT), any(), any(), any())
+    }
+
+    @Test
     @Config(sdk = [34])
     fun whenAndroidVersionIs11OrAboveThenCheckResultPixelIsNotFired() = runTest {
         reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall()
@@ -589,6 +611,7 @@ class RealReinstallDetectorTest {
             appCoroutineScope = appCoroutineScope,
             pixel = pixel,
             currentTimeProvider = currentTimeProvider,
+            appBuildConfig = appBuildConfig,
         )
     }
 

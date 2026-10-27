@@ -24,6 +24,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
@@ -77,6 +78,7 @@ class RealReinstallDetector @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val appBuildConfig: AppBuildConfig,
 ) : ReinstallDetector, MainProcessLifecycleObserver {
 
     private val sdkInt: Int = Build.VERSION.SDK_INT
@@ -138,12 +140,16 @@ class RealReinstallDetector @Inject constructor(
         }
         val isReinstall = checkResult == BlockStoreCheckResult.FOUND
         logcat(INFO) { "Reinstall check (Block Store): result=${checkResult.value}, reinstall=$isReinstall" }
-        // Without it there's no way to tell "Block Store dropped the flag" from "few reinstalls" from "Play services unavailable"
-        pixel.fire(
-            ReinstallDetectorPixelName.BLOCK_STORE_CHECK_RESULT,
-            parameters = mapOf(PARAM_RESULT to checkResult.value, PARAM_DURATION to readDurationBucket(readDurationMillis)),
-            type = Unique(),
-        )
+        // Without it there's no way to tell "Block Store dropped the flag" from "few reinstalls" from "Play services unavailable".
+        // Not sent for an update: installs from before Block Store detection run the check once after updating, would almost all
+        // report not_found, and would outnumber new installs for weeks.
+        if (runCatching { appBuildConfig.isNewInstall() }.getOrDefault(false)) {
+            pixel.fire(
+                ReinstallDetectorPixelName.BLOCK_STORE_CHECK_RESULT,
+                parameters = mapOf(PARAM_RESULT to checkResult.value, PARAM_DURATION to readDurationBucket(readDurationMillis)),
+                type = Unique(),
+            )
+        }
 
         // Saved even when Block Store failed, so every caller gets the same answer for this install instead of retrying a slow call
         val answerSaved = runCatching { saveAppReinstallValue(isReinstall) }.getOrDefault(false)
