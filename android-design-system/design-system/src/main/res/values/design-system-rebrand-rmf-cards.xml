@@ -25,7 +25,7 @@
         <item name="daxRmfCardButtonTheme">@style/ThemeOverlay.Rebrand.RmfCards.Buttons</item>
     </style>
 
-    <style name="ThemeOverlay.Rebrand.RmfCards.Buttons" parent="ThemeOverlay.Rebrand">
+    <style name="ThemeOverlay.Rebrand.RmfCards.Buttons" parent="">
         <item name="daxButtonGhost">@style/Widget.DuckDuckGo.DaxButton.Rebrand.SecondaryFill</item>
         <item name="daxButtonBrand">@style/Widget.DuckDuckGo.DaxButton.Rebrand.Primary</item>
     </style>
