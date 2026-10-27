@@ -67,6 +67,7 @@ class ReinstallAtbListenerTest {
         whenever(mockSelfToggle.isEnabled()).thenReturn(false)
         whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(false)
         whenever(mockCurrentTimeProvider.elapsedRealtime()).thenReturn(0L)
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(34)
 
         testee = ReinstallAtbListener(
             mockBackupDataStore,
@@ -293,6 +294,18 @@ class ReinstallAtbListenerTest {
             any(),
             any(),
         )
+    }
+
+    @Test
+    fun whenReinstallStepRunsPastTheTimeLimitBelowAndroid11ThenSlowCheckPixelIsNotFired() = runTest {
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(29)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockCurrentTimeProvider.elapsedRealtime()).thenReturn(0L, 4_000L)
+
+        testee.beforeAtbInit()
+
+        verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
+        verify(mockPixel, never()).fire(any<Pixel.PixelName>(), any(), any(), any())
     }
 
     @Test

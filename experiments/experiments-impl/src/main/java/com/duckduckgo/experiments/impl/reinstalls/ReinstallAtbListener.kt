@@ -64,7 +64,9 @@ class ReinstallAtbListener @Inject constructor(
         val ruApplied = isReinstall && applyReinstallVariant()
 
         val durationMillis = currentTimeProvider.elapsedRealtime() - startedAt
-        if (durationMillis > MAX_REINSTALL_WAIT_TIME_MS) {
+        // Below Android 11 a slow returning user is a reinstall that was never detected before, not one whose ru the step used to
+        // drop, so it would blur what this pixel counts. atb_reinstall_check_block_store times the check there instead.
+        if (durationMillis > MAX_REINSTALL_WAIT_TIME_MS && appBuildConfig.sdkInt >= 30) {
             pixel.fire(
                 ReinstallPixelName.REINSTALL_CHECK_SLOW,
                 parameters = mapOf(
