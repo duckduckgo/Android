@@ -23,6 +23,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
@@ -285,6 +286,21 @@ class RealReturnSessionWideEventTest {
             cleanupPolicy = any(),
             samplingProbability = eq(1.0f),
             definition = any(),
+        )
+    }
+
+    @Test
+    fun `when session starts then it declares definition version 1_0_1`() = runTest {
+        startSession()
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(wideEventClient).flowStart(
+            name = any(),
+            flowEntryPoint = anyOrNull(),
+            metadata = any(),
+            cleanupPolicy = any(),
+            samplingProbability = any(),
+            definition = eq(WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1))),
         )
     }
 

@@ -25,6 +25,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -113,6 +114,7 @@ class RealReturnSessionWideEvent @Inject constructor(
                 val togglePosition = if (toggleEnabled) duckChatInputModeState.getInitialToggleSelection().pixelValue() else null
                 val startResult = wideEventClient.flowStart(
                     name = FEATURE_NAME,
+                    definition = WideEventDefinition(version = DEFINITION_VERSION),
                     cleanupPolicy = CleanupPolicy.OnProcessStart(
                         ignoreIfIntervalTimeoutPresent = false,
                         flowStatus = FlowStatus.Unknown,
@@ -364,6 +366,7 @@ class RealReturnSessionWideEvent @Inject constructor(
     private companion object {
         const val TAG = "RealReturnSessionWideEvent"
         const val FEATURE_NAME = "return_session"
+        val DEFINITION_VERSION = WideEventDefinition.Version(minor = 0, patch = 1)
         const val REASON_SEARCH_SUBMITTED = "search_submitted"
         const val REASON_URL_SUBMITTED = "url_submitted"
         const val REASON_AI_PROMPT_SUBMITTED = "ai_prompt_submitted"

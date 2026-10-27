@@ -41,9 +41,8 @@
             },
             {
                 "key": "feature.data.ext.toggle_enabled",
-                "type": "string",
-                "description": "Whether the user selected Search & Duck.ai in the address bar setting, read from storage when the session starts. False when the user turned Duck.ai off",
-                "enum": ["true", "false"]
+                "type": "boolean",
+                "description": "Whether the user selected Search & Duck.ai in the address bar setting, read from storage when the session starts. False when the user turned Duck.ai off"
             },
             {
                 "key": "feature.data.ext.toggle_position",
