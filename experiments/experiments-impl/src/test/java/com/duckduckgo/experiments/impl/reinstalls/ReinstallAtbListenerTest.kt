@@ -17,6 +17,7 @@
 package com.duckduckgo.experiments.impl.reinstalls
 
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -254,9 +255,28 @@ class ReinstallAtbListenerTest {
 
         verify(mockPixel).fire(
             eq(ReinstallPixelName.REINSTALL_CHECK_SLOW),
-            eq(mapOf("returning_user" to "true", "duration" to "3-5")),
+            eq(mapOf("returning_user" to "true", "ru_applied" to "true", "duration" to "3-5")),
             any(),
+            eq(Unique()),
+        )
+    }
+
+    @Test
+    fun whenReinstallStepRunsPastTheTimeLimitForReturningUserWithProtectedVariantThenSlowCheckPixelSaysRuWasNotApplied() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockStatisticsDataStore.variant).thenReturn("de")
+        whenever(mockSelfToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.getSettings()).thenReturn("""{"variants":["de","df"]}""")
+        whenever(mockCurrentTimeProvider.elapsedRealtime()).thenReturn(0L, 4_000L)
+
+        testee.beforeAtbInit()
+
+        verify(mockPixel).fire(
+            eq(ReinstallPixelName.REINSTALL_CHECK_SLOW),
+            eq(mapOf("returning_user" to "true", "ru_applied" to "false", "duration" to "3-5")),
             any(),
+            eq(Unique()),
         )
     }
 
@@ -269,7 +289,7 @@ class ReinstallAtbListenerTest {
 
         verify(mockPixel).fire(
             eq(ReinstallPixelName.REINSTALL_CHECK_SLOW),
-            eq(mapOf("returning_user" to "false", "duration" to "1.5-3")),
+            eq(mapOf("returning_user" to "false", "ru_applied" to "false", "duration" to "1.5-3")),
             any(),
             any(),
         )
@@ -293,7 +313,7 @@ class ReinstallAtbListenerTest {
 
             verify(mockPixel).fire(
                 eq(ReinstallPixelName.REINSTALL_CHECK_SLOW),
-                eq(mapOf("returning_user" to "true", "duration" to bucket)),
+                eq(mapOf("returning_user" to "true", "ru_applied" to "true", "duration" to bucket)),
                 any(),
                 any(),
             )
