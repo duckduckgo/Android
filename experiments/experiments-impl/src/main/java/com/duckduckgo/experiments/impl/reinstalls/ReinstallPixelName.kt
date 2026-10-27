@@ -20,4 +20,5 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 
 enum class ReinstallPixelName(override val pixelName: String) : PixelName {
     REINSTALL_CHECK_SLOW("atb_reinstall_check_slow"),
+    BLOCK_STORE_RU_APPLIED("atb_reinstall_block_store_ru_applied"),
 }

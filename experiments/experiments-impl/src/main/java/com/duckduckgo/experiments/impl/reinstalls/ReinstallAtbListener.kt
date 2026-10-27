@@ -63,6 +63,12 @@ class ReinstallAtbListener @Inject constructor(
         val isReinstall = appBuildConfig.isAppReinstall()
         val ruApplied = isReinstall && applyReinstallVariant()
 
+        // Android 10 and older never got ru before Block Store detection, so this counts exactly what it adds to ru in the ATB data,
+        // and the rest of the change in ru can be read as the effect on Android 11 and later
+        if (ruApplied && appBuildConfig.sdkInt < 30) {
+            pixel.fire(ReinstallPixelName.BLOCK_STORE_RU_APPLIED, type = Unique())
+        }
+
         val durationMillis = currentTimeProvider.elapsedRealtime() - startedAt
         // Below Android 11 a slow returning user is a reinstall that was never detected before, not one whose ru the step used to
         // drop, so it would blur what this pixel counts. atb_reinstall_check_block_store times the check there instead.

@@ -49,6 +49,14 @@
         ],
         "expires": "2027-04-30"
     },
+    "atb_reinstall_block_store_ru_applied": {
+        "description": "A returning user on Android 10 and older was given the ru variant before the first ATB call. Sent once per install. Reinstalls there were never detected before Block Store detection, so this is exactly the number of ru installs it adds to the ATB data, and subtracting it from the change in ru gives the change on Android 11 and later. Not sent for a returning user whose protected experiment variant was kept, or for an update, because the step only runs before the first ATB call",
+        "owners": ["anikiki"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2027-04-30"
+    },
     "atb_reinstall_check_block_store": {
         "description": "The reinstall check on Android 10 and older finished reading the Block Store \"install seen\" flag. Sent once per new install or reinstall, only on Android 10 and older, where reinstalls are detected with Block Store instead of the Downloads folder. Not sent when an install from before Block Store detection runs the check once after updating, so the results describe new installs and reinstalls only. Shows whether detection works there: Block Store only keeps the flag through an uninstall when the device has Android backup turned on. Any result other than found counts the install as new. duration times the Block Store read itself, whichever caller started the check, so it shows how slow detection is on Android 10 and older",
         "owners": ["anikiki"],

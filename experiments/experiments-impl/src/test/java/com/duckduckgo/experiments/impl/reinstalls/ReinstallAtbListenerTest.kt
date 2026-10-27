@@ -305,7 +305,52 @@ class ReinstallAtbListenerTest {
         testee.beforeAtbInit()
 
         verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
-        verify(mockPixel, never()).fire(any<Pixel.PixelName>(), any(), any(), any())
+        verify(mockPixel, never()).fire(eq(ReinstallPixelName.REINSTALL_CHECK_SLOW), any(), any(), any())
+    }
+
+    @Test
+    fun whenRuIsAppliedBelowAndroid11ThenBlockStoreRuAppliedPixelIsFired() = runTest {
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(29)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+
+        testee.beforeAtbInit()
+
+        verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
+        verify(mockPixel).fire(eq(ReinstallPixelName.BLOCK_STORE_RU_APPLIED), eq(emptyMap()), any(), eq(Unique()))
+    }
+
+    @Test
+    fun whenNewUserBelowAndroid11ThenBlockStoreRuAppliedPixelIsNotFired() = runTest {
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(29)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+
+        testee.beforeAtbInit()
+
+        verify(mockPixel, never()).fire(eq(ReinstallPixelName.BLOCK_STORE_RU_APPLIED), any(), any(), any())
+    }
+
+    @Test
+    fun whenReturningUserBelowAndroid11KeepsAProtectedVariantThenBlockStoreRuAppliedPixelIsNotFired() = runTest {
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(29)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockStatisticsDataStore.variant).thenReturn("de")
+        whenever(mockSelfToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.getSettings()).thenReturn("""{"variants":["de","df"]}""")
+
+        testee.beforeAtbInit()
+
+        verify(mockPixel, never()).fire(eq(ReinstallPixelName.BLOCK_STORE_RU_APPLIED), any(), any(), any())
+    }
+
+    @Test
+    fun whenRuIsAppliedOnAndroid11OrAboveThenBlockStoreRuAppliedPixelIsNotFired() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+
+        testee.beforeAtbInit()
+
+        verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
+        verify(mockPixel, never()).fire(eq(ReinstallPixelName.BLOCK_STORE_RU_APPLIED), any(), any(), any())
     }
 
     @Test
