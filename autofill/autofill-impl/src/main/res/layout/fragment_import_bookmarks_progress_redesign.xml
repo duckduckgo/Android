@@ -23,6 +23,14 @@
     android:clickable="true"
     android:focusable="true">
 
+    <Space
+        android:id="@+id/importingTopSpace"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.core.widget.NestedScrollView
         android:id="@+id/importingScrollView"
         android:layout_width="0dp"
@@ -30,7 +38,7 @@
         app:layout_constraintBottom_toTopOf="@id/importingBottomContainer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/importingTopSpace">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -38,7 +46,7 @@
             android:gravity="center_horizontal"
             android:orientation="vertical"
             android:paddingHorizontal="@dimen/keyline_5"
-            android:paddingTop="@dimen/keyline_7"
+            android:paddingTop="20dp"
             android:paddingBottom="@dimen/keyline_5">
 
             <FrameLayout

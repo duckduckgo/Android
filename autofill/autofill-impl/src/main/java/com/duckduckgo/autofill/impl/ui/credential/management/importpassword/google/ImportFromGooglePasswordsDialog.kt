@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.core.os.BundleCompat
 import androidx.core.view.isEmpty
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentManager
@@ -303,7 +304,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     }
 
     private fun renderRedesignViewState(viewState: ViewState) {
-        binding.redesignCloseButton.isVisible = viewState.viewMode is PreImport || viewState.viewMode is BrowserPromoPreImport
+        binding.redesignCloseButton.isInvisible = viewState.viewMode !is PreImport && viewState.viewMode !is BrowserPromoPreImport
         when (viewState.viewMode) {
             is PreImport -> redesignShowPreImportView(viewState.usesCredentialExchange)
             is BrowserPromoPreImport -> redesignShowInBrowserPromoPreImportView(
