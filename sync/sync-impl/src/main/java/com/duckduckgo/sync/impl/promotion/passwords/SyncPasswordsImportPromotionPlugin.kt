@@ -21,6 +21,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import androidx.core.view.doOnAttach
 import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin
 import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin.Callback
 import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin.Companion.PRIORITY_KEY_SYNC_PROMO
@@ -56,7 +57,9 @@ class SyncPasswordsImportPromotionPlugin @Inject constructor(
             primaryButtonText = context.getString(R.string.sync_passwords_import_promo_primary_button)
             showCloseButton = false
             showElevation = false
+            doOnAttach { promotion.onPromotionDisplayed() }
             onPrimaryButtonClicked {
+                promotion.onPromotionConfirmed()
                 globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = "promotion_passwords_import"))
                 callback.dismissHost()
             }
