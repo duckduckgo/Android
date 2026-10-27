@@ -50,7 +50,7 @@
         "expires": "2027-04-30"
     },
     "atb_reinstall_check_block_store": {
-        "description": "The reinstall check on Android 10 and older finished reading the Block Store \"install seen\" flag. Sent once per install, only on Android 10 and older, where reinstalls are detected with Block Store instead of the Downloads folder. Shows whether detection works there: Block Store only keeps the flag through an uninstall when the device has Android backup turned on. Any result other than found counts the install as new",
+        "description": "The reinstall check on Android 10 and older finished reading the Block Store \"install seen\" flag. Sent once per install, only on Android 10 and older, where reinstalls are detected with Block Store instead of the Downloads folder. Shows whether detection works there: Block Store only keeps the flag through an uninstall when the device has Android backup turned on. Any result other than found counts the install as new. duration times the Block Store read itself, whichever caller started the check, so it shows how slow detection is on Android 10 and older",
         "owners": ["anikiki"],
         "triggers": ["feature_lifecycle"],
         "suffixes": ["form_factor"],
@@ -61,6 +61,12 @@
                 "description": "found: flag found, so the install is a reinstall. not_found: no flag, so a new install, or the flag didn't survive the uninstall. unavailable: Play services isn't available. timeout: Block Store didn't answer within the time limit. error: the read failed",
                 "type": "string",
                 "enum": ["found", "not_found", "unavailable", "timeout", "error"]
+            },
+            {
+                "key": "duration",
+                "description": "How long the Block Store read took, in seconds. A read that hits the 10s time limit is reported as 10+ with result=timeout",
+                "type": "string",
+                "enum": ["0-0.5", "0.5-1.5", "1.5-3", "3-5", "5-10", "10+"]
             }
         ],
         "expires": "2027-04-30"

@@ -24,6 +24,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -75,6 +76,7 @@ class RealReinstallDetector @Inject constructor(
     private val persistentStorage: PersistentStorage,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : ReinstallDetector, MainProcessLifecycleObserver {
 
     private val sdkInt: Int = Build.VERSION.SDK_INT
@@ -121,7 +123,9 @@ class RealReinstallDetector @Inject constructor(
         }
 
     private suspend fun detectAndSaveWithBlockStore(): Boolean {
+        val readStartedAt = currentTimeProvider.elapsedRealtime()
         val installSeen = callBlockStore { persistentStorage.retrieve(InstallSeenPersistentStorageKey) }
+        val readDurationMillis = currentTimeProvider.elapsedRealtime() - readStartedAt
         val checkResult = when {
             installSeen == null -> BlockStoreCheckResult.TIMEOUT
             installSeen.exceptionOrNull() is PersistentStorageUnavailableException -> BlockStoreCheckResult.UNAVAILABLE
@@ -137,7 +141,7 @@ class RealReinstallDetector @Inject constructor(
         // Without it there's no way to tell "Block Store dropped the flag" from "few reinstalls" from "Play services unavailable"
         pixel.fire(
             ReinstallDetectorPixelName.BLOCK_STORE_CHECK_RESULT,
-            parameters = mapOf(PARAM_RESULT to checkResult.value),
+            parameters = mapOf(PARAM_RESULT to checkResult.value, PARAM_DURATION to readDurationBucket(readDurationMillis)),
             type = Unique(),
         )
 
@@ -151,6 +155,15 @@ class RealReinstallDetector @Inject constructor(
             appCoroutineScope.launch(dispatcherProvider.io()) { storeInstallSeenFlagIfMissing() }
         }
         return isReinstall
+    }
+
+    private fun readDurationBucket(durationMillis: Long): String = when {
+        durationMillis <= 500L -> "0-0.5"
+        durationMillis <= 1_500L -> "0.5-1.5"
+        durationMillis <= 3_000L -> "1.5-3"
+        durationMillis <= 5_000L -> "3-5"
+        durationMillis < BLOCK_STORE_TIME_LIMIT_MS -> "5-10"
+        else -> "10+"
     }
 
     private suspend fun storeInstallSeenFlagIfMissing() = installSeenFlagWriteMutex.withLock {
@@ -248,6 +261,7 @@ class RealReinstallDetector @Inject constructor(
         private const val APP_REINSTALLED_KEY = "appReinstalled"
         private const val INSTALL_SEEN_FLAG_STORED_KEY = "installSeenFlagStored"
         private const val PARAM_RESULT = "result"
+        private const val PARAM_DURATION = "duration"
         private const val DDG_DOWNLOADS_DIRECTORY = "DuckDuckGo"
 
         // Nothing else bounds this step: the pre-ATB time limit can't stop it, so a stuck Play services call would hold back the ATB

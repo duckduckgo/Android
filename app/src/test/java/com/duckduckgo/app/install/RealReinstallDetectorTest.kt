@@ -23,6 +23,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
@@ -72,6 +73,7 @@ class RealReinstallDetectorTest {
     private val dispatcherProvider = DefaultDispatcherProvider()
     private val persistentStorage = FakePersistentStorage()
     private val pixel: Pixel = mock()
+    private val currentTimeProvider: CurrentTimeProvider = mock()
     private val ddgDownloadsDirectory = File(
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
         "DuckDuckGo",
@@ -541,10 +543,33 @@ class RealReinstallDetectorTest {
         verify(pixel, never()).fire(eq(ReinstallDetectorPixelName.BLOCK_STORE_CHECK_RESULT), any(), any(), any())
     }
 
-    private fun verifyCheckResultPixel(result: String) {
+    @Test
+    @Config(sdk = [29])
+    fun whenBelowAndroid11ThenCheckResultPixelReportsHowLongTheBlockStoreReadTook() = runTest {
+        // Keeps every check a fresh install: a stored flag would make the next one find it
+        persistentStorage.failStore = true
+        val expectedBuckets = mapOf(
+            500L to "0-0.5",
+            1_500L to "0.5-1.5",
+            3_000L to "1.5-3",
+            5_000L to "3-5",
+            9_999L to "5-10",
+            10_000L to "10+",
+        )
+
+        expectedBuckets.forEach { (durationMillis, bucket) ->
+            whenever(currentTimeProvider.elapsedRealtime()).thenReturn(0L, durationMillis)
+
+            reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall()
+
+            verifyCheckResultPixel("not_found", duration = bucket)
+        }
+    }
+
+    private fun verifyCheckResultPixel(result: String, duration: String = "0-0.5") {
         verify(pixel).fire(
             eq(ReinstallDetectorPixelName.BLOCK_STORE_CHECK_RESULT),
-            eq(mapOf("result" to result)),
+            eq(mapOf("result" to result, "duration" to duration)),
             any(),
             eq(Unique()),
         )
@@ -563,6 +588,7 @@ class RealReinstallDetectorTest {
             persistentStorage = persistentStorage,
             appCoroutineScope = appCoroutineScope,
             pixel = pixel,
+            currentTimeProvider = currentTimeProvider,
         )
     }
 
