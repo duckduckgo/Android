@@ -35,6 +35,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Subscr
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
 import com.duckduckgo.subscriptions.impl.withdrawal.CompletedWithdrawal
+import com.duckduckgo.subscriptions.impl.withdrawal.Refund
 import com.duckduckgo.subscriptions.impl.withdrawal.SubscriptionWithdrawal
 import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalEligibility
 import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult
@@ -936,7 +937,7 @@ class SubscriptionSettingsViewModelTest {
     fun whenWithdrawalConfirmedAndSucceedsThenHideWithdrawalOption() = runTest {
         subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
-        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(BigDecimal("9.99"), "EUR"))
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(Refund(amount = BigDecimal("9.99"), currency = "EUR")))
         stubReadySubscription(platform = "stripe")
         viewModel.onCreate(mock())
 
@@ -1012,7 +1013,7 @@ class SubscriptionSettingsViewModelTest {
     fun whenExpiredAfterWithdrawalThenShowCompletedWithdrawal() = runTest {
         subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
         whenever(subscriptionWithdrawal.getCompletedWithdrawal()).thenReturn(
-            CompletedWithdrawal(withdrawnAt = ELIGIBILITY.eligibleUntil, refundedAmount = BigDecimal("9.99"), currency = "EUR"),
+            CompletedWithdrawal(withdrawnAt = ELIGIBILITY.eligibleUntil, refund = Refund(amount = BigDecimal("9.99"), currency = "EUR")),
         )
         stubReadySubscription(platform = "stripe", status = EXPIRED)
 
@@ -1020,7 +1021,23 @@ class SubscriptionSettingsViewModelTest {
         viewModel.viewState.test {
             val completedWithdrawal = (expectMostRecentItem() as Ready).completedWithdrawal
             assertEquals("October 15, 2026", completedWithdrawal?.date)
-            assertTrue(completedWithdrawal!!.refundAmount.contains("9.99"))
+            assertTrue(completedWithdrawal!!.refundAmount!!.contains("9.99"))
+        }
+    }
+
+    @Test
+    fun whenExpiredAfterWithdrawalWithoutRefundThenShowCompletedWithdrawalWithoutAmount() = runTest {
+        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
+        whenever(subscriptionWithdrawal.getCompletedWithdrawal()).thenReturn(
+            CompletedWithdrawal(withdrawnAt = ELIGIBILITY.eligibleUntil, refund = null),
+        )
+        stubReadySubscription(platform = "stripe", status = EXPIRED)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            val completedWithdrawal = (expectMostRecentItem() as Ready).completedWithdrawal
+            assertEquals("October 15, 2026", completedWithdrawal?.date)
+            assertNull(completedWithdrawal!!.refundAmount)
         }
     }
 
@@ -1040,7 +1057,7 @@ class SubscriptionSettingsViewModelTest {
     fun whenWithdrawalFlagDisabledThenNoCompletedWithdrawal() = runTest {
         subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = false))
         whenever(subscriptionWithdrawal.getCompletedWithdrawal()).thenReturn(
-            CompletedWithdrawal(withdrawnAt = ELIGIBILITY.eligibleUntil, refundedAmount = BigDecimal("9.99"), currency = "EUR"),
+            CompletedWithdrawal(withdrawnAt = ELIGIBILITY.eligibleUntil, refund = Refund(amount = BigDecimal("9.99"), currency = "EUR")),
         )
         stubReadySubscription(platform = "stripe", status = EXPIRED)
 

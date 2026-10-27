@@ -22,7 +22,6 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
-import java.math.BigDecimal
 import javax.inject.Inject
 
 interface WithdrawalStore {
@@ -33,8 +32,7 @@ interface WithdrawalStore {
 
 data class CompletedWithdrawal(
     val withdrawnAt: Long,
-    val refundedAmount: BigDecimal,
-    val currency: String,
+    val refund: Refund?,
 )
 
 @SingleIn(AppScope::class)
@@ -49,16 +47,17 @@ class RealWithdrawalStore @Inject constructor(
 
     override fun getCompletedWithdrawal(): CompletedWithdrawal? {
         val withdrawnAt = preferences.getLong(KEY_WITHDRAWN_AT, 0L).takeIf { it > 0L } ?: return null
-        val refundedAmount = preferences.getString(KEY_REFUNDED_AMOUNT, null)?.toBigDecimalOrNull() ?: return null
-        val currency = preferences.getString(KEY_CURRENCY, null) ?: return null
-        return CompletedWithdrawal(withdrawnAt = withdrawnAt, refundedAmount = refundedAmount, currency = currency)
+        val refundedAmount = preferences.getString(KEY_REFUNDED_AMOUNT, null)?.toBigDecimalOrNull()
+        val currency = preferences.getString(KEY_CURRENCY, null)
+        val refund = if (refundedAmount != null && currency != null) Refund(amount = refundedAmount, currency = currency) else null
+        return CompletedWithdrawal(withdrawnAt = withdrawnAt, refund = refund)
     }
 
     override fun setCompletedWithdrawal(withdrawal: CompletedWithdrawal) {
         preferences.edit {
             putLong(KEY_WITHDRAWN_AT, withdrawal.withdrawnAt)
-            putString(KEY_REFUNDED_AMOUNT, withdrawal.refundedAmount.toPlainString())
-            putString(KEY_CURRENCY, withdrawal.currency)
+            putString(KEY_REFUNDED_AMOUNT, withdrawal.refund?.amount?.toPlainString())
+            putString(KEY_CURRENCY, withdrawal.refund?.currency)
         }
     }
 

@@ -21,13 +21,15 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
+import com.duckduckgo.subscriptions.impl.services.WithdrawResponse
 import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult.Failure
 import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult.Success
+import com.squareup.moshi.JsonDataException
+import com.squareup.moshi.JsonEncodingException
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.math.BigDecimal
-import java.util.Currency
 import javax.inject.Inject
 
 interface SubscriptionWithdrawal {
@@ -52,10 +54,8 @@ interface SubscriptionWithdrawal {
 }
 
 sealed class WithdrawalResult {
-    data class Success(
-        val refundedAmount: BigDecimal,
-        val currency: String,
-    ) : WithdrawalResult()
+    /** [refund] is null when the backend completed the withdrawal but the refunded amount could not be read. */
+    data class Success(val refund: Refund?) : WithdrawalResult()
 
     data class Failure(val reason: FailureReason) : WithdrawalResult()
 
@@ -66,6 +66,11 @@ sealed class WithdrawalResult {
         UNKNOWN,
     }
 }
+
+data class Refund(
+    val amount: BigDecimal,
+    val currency: String,
+)
 
 data class WithdrawalEligibility(
     val eligibleUntil: Long,
@@ -98,23 +103,24 @@ class RealSubscriptionWithdrawal @Inject constructor(
     }
 
     override suspend fun withdraw(): WithdrawalResult {
-        val response = try {
-            subscriptionsService.withdraw()
+        val refund = try {
+            subscriptionsService.withdraw().toRefund()
         } catch (e: HttpException) {
             return Failure(e.toFailureReason())
+        } catch (e: JsonDataException) {
+            // A body that can't be decoded only arrives with a 2xx, so the backend has already withdrawn the user
+            null
+        } catch (e: JsonEncodingException) {
+            null
         } catch (e: Exception) {
             return Failure(WithdrawalResult.FailureReason.UNKNOWN)
         }
 
-        val result = Success(
-            refundedAmount = response.refundedAmount.fromMinorUnits(response.currency),
-            currency = response.currency.uppercase(),
-        )
+        val result = Success(refund)
         // Saved before refreshing, so the expired status emitted by the refresh already renders as a withdrawal
         val completedWithdrawal = CompletedWithdrawal(
             withdrawnAt = currentTimeProvider.currentTimeMillis(),
-            refundedAmount = result.refundedAmount,
-            currency = result.currency,
+            refund = refund,
         )
         withContext(dispatcherProvider.io()) { withdrawalStore.setCompletedWithdrawal(completedWithdrawal) }
 
@@ -140,15 +146,9 @@ class RealSubscriptionWithdrawal @Inject constructor(
         else -> WithdrawalResult.FailureReason.UNKNOWN
     }
 
-    private fun Long.fromMinorUnits(currencyCode: String): BigDecimal {
-        val fractionDigits = runCatching { Currency.getInstance(currencyCode.uppercase()).defaultFractionDigits }
-            .getOrNull()
-            ?.takeIf { it >= 0 }
-            ?: DEFAULT_FRACTION_DIGITS
-        return BigDecimal.valueOf(this, fractionDigits)
-    }
-
-    private companion object {
-        private const val DEFAULT_FRACTION_DIGITS = 2
+    private fun WithdrawResponse.toRefund(): Refund? {
+        val amount = refundedAmount?.toBigDecimalOrNull() ?: return null
+        val currency = currency?.takeIf { it.isNotBlank() } ?: return null
+        return Refund(amount = amount, currency = currency.uppercase())
     }
 }

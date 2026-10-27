@@ -9,6 +9,7 @@ import com.duckduckgo.subscriptions.impl.services.WithdrawalEligibilityResponse
 import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult.Failure
 import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult.FailureReason
 import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult.Success
+import com.squareup.moshi.JsonDataException
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
@@ -85,26 +86,40 @@ class RealSubscriptionWithdrawalTest {
     }
 
     @Test
-    fun whenWithdrawSucceedsThenReturnRefundedAmountInMajorUnits() = runTest {
-        whenever(subscriptionsService.withdraw()).thenReturn(WithdrawResponse(refundedAmount = 999, currency = "gbp"))
+    fun whenWithdrawSucceedsThenReturnRefund() = runTest {
+        whenever(subscriptionsService.withdraw()).thenReturn(WithdrawResponse(refundedAmount = "9.99", currency = "gbp"))
 
         val result = withdrawal.withdraw()
 
-        assertEquals(Success(refundedAmount = BigDecimal("9.99"), currency = "GBP"), result)
+        assertEquals(Success(REFUND), result)
     }
 
     @Test
-    fun whenWithdrawSucceedsForZeroDecimalCurrencyThenAmountIsNotScaled() = runTest {
-        whenever(subscriptionsService.withdraw()).thenReturn(WithdrawResponse(refundedAmount = 1500, currency = "jpy"))
+    fun whenWithdrawSucceedsWithMalformedAmountThenReturnSuccessWithoutRefund() = runTest {
+        whenever(subscriptionsService.withdraw()).thenReturn(WithdrawResponse(refundedAmount = "9,99", currency = "gbp"))
 
-        val result = withdrawal.withdraw() as Success
+        assertEquals(Success(refund = null), withdrawal.withdraw())
+    }
 
-        assertEquals(BigDecimal("1500"), result.refundedAmount)
+    @Test
+    fun whenWithdrawSucceedsWithoutCurrencyThenReturnSuccessWithoutRefund() = runTest {
+        whenever(subscriptionsService.withdraw()).thenReturn(WithdrawResponse(refundedAmount = "9.99", currency = null))
+
+        assertEquals(Success(refund = null), withdrawal.withdraw())
+    }
+
+    @Test
+    fun whenWithdrawResponseCannotBeDecodedThenReturnSuccessWithoutRefund() = runTest {
+        whenever(subscriptionsService.withdraw()).thenAnswer { throw JsonDataException("Expected a string but was BEGIN_OBJECT") }
+
+        assertEquals(Success(refund = null), withdrawal.withdraw())
+        verify(withdrawalStore).setCompletedWithdrawal(CompletedWithdrawal(withdrawnAt = NOW, refund = null))
+        verify(subscriptionsManager).refreshSubscriptionData()
     }
 
     @Test
     fun whenWithdrawSucceedsThenRefreshSubscriptionAndAccessToken() = runTest {
-        whenever(subscriptionsService.withdraw()).thenReturn(WithdrawResponse(refundedAmount = 999, currency = "gbp"))
+        whenever(subscriptionsService.withdraw()).thenReturn(WithdrawResponse(refundedAmount = "9.99", currency = "gbp"))
 
         withdrawal.withdraw()
 
@@ -114,24 +129,24 @@ class RealSubscriptionWithdrawalTest {
 
     @Test
     fun whenWithdrawSucceedsButRefreshFailsThenStillReturnSuccess() = runTest {
-        whenever(subscriptionsService.withdraw()).thenReturn(WithdrawResponse(refundedAmount = 999, currency = "gbp"))
+        whenever(subscriptionsService.withdraw()).thenReturn(WithdrawResponse(refundedAmount = "9.99", currency = "gbp"))
         whenever(subscriptionsManager.refreshSubscriptionData()).thenThrow(RuntimeException())
 
         val result = withdrawal.withdraw()
 
-        assertEquals(Success(refundedAmount = BigDecimal("9.99"), currency = "GBP"), result)
+        assertEquals(Success(REFUND), result)
         verify(subscriptionsManager).refreshAccessToken()
     }
 
     @Test
     fun whenWithdrawSucceedsThenSaveCompletedWithdrawalBeforeRefreshing() = runTest {
-        whenever(subscriptionsService.withdraw()).thenReturn(WithdrawResponse(refundedAmount = 999, currency = "gbp"))
+        whenever(subscriptionsService.withdraw()).thenReturn(WithdrawResponse(refundedAmount = "9.99", currency = "gbp"))
 
         withdrawal.withdraw()
 
         inOrder(withdrawalStore, subscriptionsManager) {
             verify(withdrawalStore).setCompletedWithdrawal(
-                CompletedWithdrawal(withdrawnAt = NOW, refundedAmount = BigDecimal("9.99"), currency = "GBP"),
+                CompletedWithdrawal(withdrawnAt = NOW, refund = REFUND),
             )
             verify(subscriptionsManager).refreshSubscriptionData()
         }
@@ -186,6 +201,7 @@ class RealSubscriptionWithdrawalTest {
 
     private companion object {
         private const val NOW = 1792065600000L
+        private val REFUND = Refund(amount = BigDecimal("9.99"), currency = "GBP")
     }
 
     private fun eligibleResponse() = WithdrawalEligibilityResponse(

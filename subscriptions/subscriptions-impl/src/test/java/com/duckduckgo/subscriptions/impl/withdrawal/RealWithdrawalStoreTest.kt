@@ -17,7 +17,16 @@ class RealWithdrawalStoreTest {
 
     @Test
     fun whenWithdrawalSavedThenReturnIt() {
-        val withdrawal = CompletedWithdrawal(withdrawnAt = 1792065600000, refundedAmount = BigDecimal("9.99"), currency = "EUR")
+        val withdrawal = CompletedWithdrawal(withdrawnAt = 1792065600000, refund = Refund(amount = BigDecimal("9.99"), currency = "EUR"))
+
+        store.setCompletedWithdrawal(withdrawal)
+
+        assertEquals(withdrawal, store.getCompletedWithdrawal())
+    }
+
+    @Test
+    fun whenWithdrawalSavedWithoutRefundThenReturnIt() {
+        val withdrawal = CompletedWithdrawal(withdrawnAt = 1792065600000, refund = null)
 
         store.setCompletedWithdrawal(withdrawal)
 
@@ -26,7 +35,7 @@ class RealWithdrawalStoreTest {
 
     @Test
     fun whenClearedThenReturnNull() {
-        store.setCompletedWithdrawal(CompletedWithdrawal(withdrawnAt = 1792065600000, refundedAmount = BigDecimal("9.99"), currency = "EUR"))
+        store.setCompletedWithdrawal(CompletedWithdrawal(withdrawnAt = 1792065600000, refund = Refund(amount = BigDecimal("9.99"), currency = "EUR")))
 
         store.clear()
 

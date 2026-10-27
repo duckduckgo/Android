@@ -376,7 +376,10 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         binding.subscriptionActiveStatusContainer.isVisible = false
         binding.subscriptionExpiredStatusContainer.isVisible = false
         binding.completedWithdrawal.setPrimaryText(getString(string.subscriptionWithdrawnTitle, completedWithdrawal.date))
-        binding.completedWithdrawal.setSecondaryText(getString(string.subscriptionWithdrawnRefund, completedWithdrawal.refundAmount))
+        val refundText = completedWithdrawal.refundAmount
+            ?.let { getString(string.subscriptionWithdrawnRefund, it) }
+            ?: getString(string.subscriptionWithdrawnRefundWithoutAmount)
+        binding.completedWithdrawal.setSecondaryText(refundText)
         return true
     }
 

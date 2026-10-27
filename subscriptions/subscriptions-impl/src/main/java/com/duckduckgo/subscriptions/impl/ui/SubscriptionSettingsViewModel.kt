@@ -203,7 +203,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
     private fun CompletedWithdrawal.toCompletedWithdrawalState(): CompletedWithdrawalState {
         return CompletedWithdrawalState(
             date = DateFormat.getInstanceForSkeleton("ddMMMMyyyy").format(Date(withdrawnAt)),
-            refundAmount = formatAmount(refundedAmount, currency),
+            refundAmount = refund?.let { formatAmount(it.amount, it.currency) },
         )
     }
 
@@ -394,7 +394,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
 
     data class CompletedWithdrawalState(
         val date: String,
-        val refundAmount: String,
+        val refundAmount: String?,
     )
 
     data class WithdrawalOption(
