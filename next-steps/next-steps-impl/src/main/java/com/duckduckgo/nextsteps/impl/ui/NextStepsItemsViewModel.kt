@@ -217,7 +217,6 @@ class NextStepsItemsViewModel @Inject constructor(
         }
     }
 
-    // Runs the completion checks for the items not yet known to be complete, records the new ones, and returns every completed id.
     private suspend fun refreshCompletedItemIds(
         items: List<CardItem.ListItem>,
         checks: Map<String, NextStepCompletionCheck>,
