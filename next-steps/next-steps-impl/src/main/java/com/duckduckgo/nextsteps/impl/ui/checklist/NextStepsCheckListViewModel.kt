@@ -168,7 +168,7 @@ class NextStepsCheckListViewModel @Inject constructor(
     private suspend fun RemoteMessage.toViewState(): ViewState {
         val content = this.content as Content.ActionableItems
         val supportedItems = completionChecker.supportedItems(content.listItems)
-        val completedIds = completionChecker.refresh(supportedItems).completedIds
+        val completedIds = completionChecker.refresh(supportedItems)
         completionOrder = completedIds.toList()
         val settledItems = supportedItems.map { ViewState.Item(item = it, completed = it.id in completedIds) }.sortedItems()
         startCompletionAnimationIfDue(settledItems)
@@ -182,7 +182,6 @@ class NextStepsCheckListViewModel @Inject constructor(
         return ViewState(message = this, title = content.titleText, items = items)
     }
 
-    // The completed item keeps its place and chevron until the view has played the completion animation.
     private fun startCompletionAnimationIfDue(settledItems: List<ViewState.Item>) {
         val pendingId = pendingCompletionItemId ?: return
         val toPosition = settledItems.indexOfFirst { it.item.id == pendingId && it.completed }
@@ -195,8 +194,6 @@ class NextStepsCheckListViewModel @Inject constructor(
         }
     }
 
-    // Remaining items keep the config order; completed items follow, the most recently completed first, so a
-    // newly completed item lands right below the remaining ones and the older ones sink.
     private fun List<ViewState.Item>.sortedItems(): List<ViewState.Item> =
         filter { !it.completed } + filter { it.completed }.sortedByDescending { completionOrder.indexOf(it.item.id) }
 }

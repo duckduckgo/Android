@@ -37,8 +37,8 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.nextsteps.impl.R
 import com.duckduckgo.nextsteps.impl.databinding.ViewNextStepsCardBinding
 import com.duckduckgo.nextsteps.impl.databinding.ViewNextStepsStackedCardsBinding
-import com.duckduckgo.nextsteps.impl.ui.NextStepsItemsViewModel.Command
-import com.duckduckgo.nextsteps.impl.ui.NextStepsItemsViewModel.ViewState
+import com.duckduckgo.nextsteps.impl.ui.NextStepsStackedCardsViewModel.Command
+import com.duckduckgo.nextsteps.impl.ui.NextStepsStackedCardsViewModel.ViewState
 import com.duckduckgo.remote.messaging.api.CardItem
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -59,8 +59,8 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
 
     private val binding: ViewNextStepsStackedCardsBinding by viewBinding()
 
-    private val viewModel: NextStepsItemsViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NextStepsItemsViewModel::class.java]
+    private val viewModel: NextStepsStackedCardsViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NextStepsStackedCardsViewModel::class.java]
     }
 
     private val conflatedStateJob = ConflatedJob()

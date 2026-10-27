@@ -53,7 +53,7 @@ import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver") // Completion can change while the host opens another screen.
 @ContributesViewModel(ViewScope::class)
-class NextStepsItemsViewModel @Inject constructor(
+class NextStepsStackedCardsViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val remoteMessageModel: RemoteMessageModel,
     private val itemsStore: NextStepsItemsStore,
@@ -215,13 +215,8 @@ class NextStepsItemsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun refreshCompletedItemIds(items: List<CardItem.ListItem>): Set<String> {
-        val completion = completionChecker.refresh(items)
-        if (completion.newlyCompletedIds.isNotEmpty()) {
-            telemetry.onCardsCompleted(completion.newlyCompletedIds)
-        }
-        return completion.completedIds
-    }
+    private suspend fun refreshCompletedItemIds(items: List<CardItem.ListItem>): Set<String> =
+        completionChecker.refresh(items, onNewlyCompleted = telemetry::onCardsCompleted)
 
     private suspend fun loadItems(
         message: RemoteMessage,
