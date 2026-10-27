@@ -33,7 +33,7 @@ import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason.CO
 import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason.DISMISSED
 import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason.FINISHED_ELSEWHERE
 import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.Days
-import com.duckduckgo.nextsteps.impl.ui.NextStepsItemsViewModel.Command
+import com.duckduckgo.nextsteps.impl.ui.NextStepsStackedCardsViewModel.Command
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.CardItemType
@@ -61,7 +61,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 
-class NextStepsItemsViewModelTest {
+class NextStepsStackedCardsViewModelTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
@@ -84,14 +84,14 @@ class NextStepsItemsViewModelTest {
     private val completionChecks = FakePluginPoint(mutableListOf(defaultBrowserCheck, addWidgetCheck, syncCheck))
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog = mock()
 
-    private lateinit var testee: NextStepsItemsViewModel
+    private lateinit var testee: NextStepsStackedCardsViewModel
 
     @Before
     fun setUp() {
         testee = aViewModel()
     }
 
-    private fun aViewModel() = NextStepsItemsViewModel(
+    private fun aViewModel() = NextStepsStackedCardsViewModel(
         dispatchers = coroutineRule.testDispatcherProvider,
         remoteMessageModel = remoteMessageModel,
         itemsStore = itemsStore,

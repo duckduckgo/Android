@@ -22,34 +22,29 @@ import com.duckduckgo.remote.messaging.api.CardItem
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-/** Resolves which Next Steps items this app version can act on and which of them the user has already completed. */
 class NextStepsCompletionChecker @Inject constructor(
     private val itemsStore: NextStepsItemsStore,
     private val completionChecks: PluginPoint<NextStepCompletionCheck>,
     private val dispatchers: DispatcherProvider,
 ) {
 
-    /** [completedIds] keeps the completion order, oldest first. */
-    data class Completion(
-        val completedIds: Set<String>,
-        val newlyCompletedIds: Set<String>,
-    )
-
-    /** Items without a completion check cannot be tracked, so they are never shown. */
     fun supportedItems(items: List<CardItem>): List<CardItem.ListItem> {
         val supportedIds = completionChecks.getPlugins().map { it.itemId }.toSet()
         return items.filterIsInstance<CardItem.ListItem>().filter { it.id in supportedIds }
     }
 
-    /** Runs the checks for the items not yet known to be complete, records the new ones, and returns every completed id. */
-    suspend fun refresh(items: List<CardItem.ListItem>): Completion = withContext(dispatchers.io()) {
+    suspend fun refresh(
+        items: List<CardItem.ListItem>,
+        onNewlyCompleted: suspend (Set<String>) -> Unit = {},
+    ): Set<String> = withContext(dispatchers.io()) {
         val checks = completionChecks.getPlugins().associateBy { it.itemId }
         val completedBefore = itemsStore.completedItemIds()
         val idsToCheck = items.map { it.id } - completedBefore
         val completedNow = idsToCheck.filter { checks[it]?.isComplete() == true }.toSet()
         if (completedNow.isNotEmpty()) {
+            onNewlyCompleted(completedNow)
             itemsStore.addCompletedItemIds(completedNow)
         }
-        Completion(completedIds = completedBefore + completedNow, newlyCompletedIds = completedNow)
+        completedBefore + completedNow
     }
 }
