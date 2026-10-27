@@ -50,4 +50,7 @@ interface SyncPromotionFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun passwordsImport(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun bookmarksImport(): Toggle
 }
