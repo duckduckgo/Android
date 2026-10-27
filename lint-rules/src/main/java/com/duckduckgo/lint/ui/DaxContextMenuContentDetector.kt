@@ -44,8 +44,8 @@ class DaxContextMenuContentDetector : Detector(), SourceCodeScanner {
     internal class Handler(private val context: JavaContext) : UElementHandler() {
 
         override fun visitCallExpression(node: UCallExpression) {
-            if (node.methodName !in CONTEXT_MENU_COMPOSABLES) return
-            check(node, "content", CONTEXT_MENU_SCOPE)
+            val slotParamName = CONTEXT_MENU_COMPOSABLES[node.methodName] ?: return
+            check(node, slotParamName, CONTEXT_MENU_SCOPE)
         }
 
         private fun check(node: UCallExpression, paramName: String, scope: String) {
@@ -84,9 +84,10 @@ class DaxContextMenuContentDetector : Detector(), SourceCodeScanner {
 
     companion object {
         private const val CONTEXT_MENU_SCOPE = "com.duckduckgo.common.ui.compose.contextmenu.DaxContextMenuScope"
-        private val CONTEXT_MENU_COMPOSABLES = setOf(
-            "DaxContextMenu",
-            "DaxContextMenuIconButton",
+        private val CONTEXT_MENU_COMPOSABLES = mapOf(
+            "DaxContextMenu" to "content",
+            "DaxContextMenuIconButton" to "content",
+            "DaxSectionHeader" to "overflowMenuContent",
         )
 
         val INVALID_DAX_CONTEXT_MENU_CONTENT_USAGE: Issue = Issue
