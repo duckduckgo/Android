@@ -47,4 +47,7 @@ interface SyncPromotionFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun bookmarkAddedDialog(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun passwordsImport(): Toggle
 }
