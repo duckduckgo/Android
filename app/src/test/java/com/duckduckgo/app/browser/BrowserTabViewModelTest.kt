@@ -6990,44 +6990,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNotEditingUrlBarAndNotCancelledThenCanAutomaticallyShowAutofillPrompt() {
-        assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
-    }
-
-    @Test
-    fun whenNotEditingUrlBarAndCancelledThenCannotAutomaticallyShowAutofillPrompt() {
-        testee.cancelPendingAutofillRequestToChooseCredentials()
-        assertFalse(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
-    }
-
-    @Test
-    fun whenEditingUrlBarAndCancelledThenCannotAutomaticallyShowAutofillPrompt() {
-        testee.cancelPendingAutofillRequestToChooseCredentials()
-        assertFalse(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
-    }
-
-    @Test
-    fun whenNavigationStateChangesSameSiteThenShowAutofillPromptFlagIsReset() {
-        testee.cancelPendingAutofillRequestToChooseCredentials()
-        updateUrl("example.com", "example.com", true)
-        assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
-    }
-
-    @Test
-    fun whenNavigationStateChangesDifferentSiteThenShowAutofillPromptFlagIsReset() {
-        testee.cancelPendingAutofillRequestToChooseCredentials()
-        updateUrl("example.com", "foo.com", true)
-        assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
-    }
-
-    @Test
-    fun whenPageRefreshesThenShowAutofillPromptFlagIsReset() {
-        testee.cancelPendingAutofillRequestToChooseCredentials()
-        testee.onWebViewRefreshed()
-        assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
-    }
-
-    @Test
     fun whenShowingUserCredentialsSavedConfirmationAndCanAccessCredentialManagementScreenThenShouldShowLinkToViewCredential() =
         runTest {
             autofillCapabilityChecker.enabled = true
@@ -10366,34 +10328,13 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedWithFocusThenGetsDuckChatUrlWithAutoPrompt() {
-        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
-        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = false)
-        verify(mockDuckChat).getDuckChatUrl(eq("example"), eq(true), any())
-    }
-
-    @Test
-    fun whenOnDuckChatOmnibarButtonClickedResolvesToDuckChatUrlThenFiresOnAiPromptSubmitted() {
-        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
-        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
-        val plugin: BrowserInteractionsPlugin = mock()
-        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
-
-        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = false)
-
-        verify(plugin).onInputSubmitted()
-        verify(plugin).onAiPromptSubmitted(source = "address_bar_icon")
-        verify(plugin, never()).onUrlSubmitted()
-    }
-
-    @Test
     fun whenOnDuckChatOmnibarButtonClickedWithoutFocusThenGetsDuckChatUrl() {
         whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
         val plugin: BrowserInteractionsPlugin = mock()
         whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
 
-        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
+        testee.onDuckChatOmnibarButtonClicked(query = "example", isNtp = false)
 
         verify(mockDuckChat).getDuckChatUrl(eq("example"), eq(false), any())
         verify(plugin).onInputSubmitted()
@@ -10401,52 +10342,31 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedWithNullQueryAndFocusThenGetsDuckChatUrlWithAutoPrompt() {
-        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
-        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
-        val plugin: BrowserInteractionsPlugin = mock()
-        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
-
-        testee.onDuckChatOmnibarButtonClicked(query = null, hasFocus = true, isNtp = false)
-
-        verify(mockDuckChat).getDuckChatUrl(eq(""), eq(true), any())
-        verify(plugin).onInputSubmitted()
-        verify(plugin, never()).onAiPromptSubmitted()
-    }
-
-    @Test
     fun whenOnDuckChatOmnibarButtonClickedWithNullQueryWithoutFocusThenGetsDuckChatUrl() {
         whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
-        testee.onDuckChatOmnibarButtonClicked(query = null, hasFocus = false, isNtp = false)
+        testee.onDuckChatOmnibarButtonClicked(query = null, isNtp = false)
         verify(mockDuckChat).getDuckChatUrl(eq(""), eq(false), any())
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithNullQueryAndWithFocusThenGetsDuckChatUrl() {
+    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithNullQueryThenGetsDuckChatUrl() {
         whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
-        testee.onDuckChatOmnibarButtonClicked(query = null, hasFocus = true, isNtp = true)
+        testee.onDuckChatOmnibarButtonClicked(query = null, isNtp = true)
         verify(mockDuckChat).getDuckChatUrl(eq(""), eq(false), any())
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithBlankQueryAndWithFocusThenGetsDuckChatUrl() {
+    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithBlankQueryThenGetsDuckChatUrl() {
         whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
-        testee.onDuckChatOmnibarButtonClicked(query = " ", hasFocus = true, isNtp = true)
+        testee.onDuckChatOmnibarButtonClicked(query = " ", isNtp = true)
         verify(mockDuckChat).getDuckChatUrl(eq(" "), eq(false), any())
-    }
-
-    @Test
-    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithQueryAndWithFocusThenGetsDuckChatUrlWithAutoPrompt() {
-        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
-        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = true)
-        verify(mockDuckChat).getDuckChatUrl(eq("example"), eq(true), any())
     }
 
     @Test
     fun whenOnDuckChatOmnibarButtonClickedUnfocusedWithContextualModeThenShowsContextualSheet() {
         mockDuckAiContextualModeFlow.value = true
 
-        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
+        testee.onDuckChatOmnibarButtonClicked(query = "example", isNtp = false)
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.any { it is Command.ShowDuckAIContextualMode })
@@ -10456,7 +10376,7 @@ class BrowserTabViewModelTest {
     fun whenOnDuckChatOmnibarButtonClickedOnNtpWithBlankQueryThenShowsContextualMenu() {
         mockDuckAiContextualModeFlow.value = true
 
-        testee.onDuckChatOmnibarButtonClicked(query = null, hasFocus = true, isNtp = true)
+        testee.onDuckChatOmnibarButtonClicked(query = null, isNtp = true)
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.any { it is Command.ShowDuckAIContextualMode })
@@ -10467,9 +10387,9 @@ class BrowserTabViewModelTest {
         mockDuckAiContextualModeFlow.value = true
         whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
 
-        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = true)
+        testee.onDuckChatOmnibarButtonClicked(query = "example", isNtp = true)
 
-        verify(mockDuckChat).getDuckChatUrl(eq("example"), eq(true), any())
+        verify(mockDuckChat).getDuckChatUrl(eq("example"), eq(false), any())
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertFalse(commandCaptor.allValues.any { it is Command.ShowDuckAIContextualMode })
     }
@@ -10478,44 +10398,9 @@ class BrowserTabViewModelTest {
     fun whenOpenDuckChatFromOmnibarOnNtpThenOpensDuckChatWithoutPrompt() {
         whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
 
-        testee.openDuckChatFromOmnibar(query = null, hasFocus = false, isNtp = true)
+        testee.openDuckChatFromOmnibar(query = null)
 
         verify(mockDuckChat).getDuckChatUrl(eq(""), eq(false), any())
-    }
-
-    @Test
-    fun whenOnDuckChatOmnibarButtonClickedFocusedWithContextualModeThenOpensDuckChatNotContextualSheet() {
-        mockDuckAiContextualModeFlow.value = true
-        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
-
-        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = false)
-
-        verify(mockDuckChat).getDuckChatUrl(eq("example"), eq(true), any())
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertFalse(commandCaptor.allValues.any { it is Command.ShowDuckAIContextualMode })
-    }
-
-    @Test
-    fun whenOnDuckChatOmnibarButtonClickedWithFocusAndUrlQueryThenNavigateInsteadOfOpeningDuckChat() = runTest {
-        whenever(mockQueryUrlPredictor.isUrl("bbc.com")).thenReturn(true)
-        whenever(mockOmnibarConverter.convertQueryToUrl("bbc.com", null)).thenReturn("https://bbc.com")
-
-        testee.onDuckChatOmnibarButtonClicked(query = "bbc.com", hasFocus = true, isNtp = false)
-
-        verify(mockDuckChat, never()).getDuckChatUrl("bbc.com", true)
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.allValues.any { it is Navigate })
-    }
-
-    @Test
-    fun whenPredictorNotReadyAndUrlQueryEnteredThenIsUrlFallbackStillNavigates() {
-        whenever(mockQueryUrlPredictor.isReady()).thenReturn(false)
-        whenever(mockQueryUrlPredictor.isUrl("https://example.com")).thenReturn(true)
-        whenever(mockOmnibarConverter.convertQueryToUrl("https://example.com", null)).thenReturn("https://example.com")
-        testee.onDuckChatOmnibarButtonClicked(query = "https://example.com", hasFocus = true, isNtp = false)
-        verify(mockDuckChat, never()).getDuckChatUrl(any(), any(), any())
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.allValues.any { it is Navigate })
     }
 
     @Test
@@ -10524,7 +10409,7 @@ class BrowserTabViewModelTest {
         whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckAIUrl)
         whenever(mockOmnibarConverter.convertQueryToUrl(duckAIUrl, null)).thenReturn(duckAIUrl)
 
-        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = true)
+        testee.onDuckChatOmnibarButtonClicked(query = "example", isNtp = true)
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val command = commandCaptor.lastValue as Navigate
@@ -10829,7 +10714,6 @@ class BrowserTabViewModelTest {
                 fireButton = HighlightableButton.Gone,
             )
         testee.loadingViewState.value = loadingViewState().copy(isLoading = false)
-        testee.omnibarViewState.value = omnibarViewState().copy(isEditing = true)
 
         testee.onMaliciousSiteUserAction(VisitSite, exampleUrl.toUri(), Feed.PHISHING, false)
 
@@ -10845,7 +10729,6 @@ class BrowserTabViewModelTest {
         assertEquals(
             omnibarViewState().copy(
                 omnibarText = exampleUrl,
-                isEditing = false,
                 navigationChange = true,
             ),
             omnibarViewState(),
@@ -10864,7 +10747,6 @@ class BrowserTabViewModelTest {
                 fireButton = HighlightableButton.Gone,
             )
         testee.loadingViewState.value = loadingViewState().copy(isLoading = false)
-        testee.omnibarViewState.value = omnibarViewState().copy(isEditing = true)
 
         testee.onMaliciousSiteUserAction(VisitSite, exampleUrl.toUri(), Feed.PHISHING, false)
 
@@ -10880,7 +10762,6 @@ class BrowserTabViewModelTest {
         assertEquals(
             omnibarViewState().copy(
                 omnibarText = shortExampleUrl,
-                isEditing = false,
                 navigationChange = true,
             ),
             omnibarViewState(),
@@ -11206,7 +11087,6 @@ class BrowserTabViewModelTest {
                 maliciousSiteBlocked = true,
             )
         testee.loadingViewState.value = loadingViewState().copy(isLoading = false)
-        testee.omnibarViewState.value = omnibarViewState().copy(isEditing = true)
 
         testee.onMaliciousSiteUserAction(VisitSite, exampleUrl.toUri(), Feed.PHISHING, false)
 
@@ -11223,7 +11103,6 @@ class BrowserTabViewModelTest {
                 maliciousSiteBlocked = true,
             )
         testee.loadingViewState.value = loadingViewState().copy(isLoading = false)
-        testee.omnibarViewState.value = omnibarViewState().copy(isEditing = true)
 
         testee.onMaliciousSiteUserAction(VisitSite, exampleUrl.toUri(), Feed.PHISHING, false)
 
@@ -12601,7 +12480,7 @@ class BrowserTabViewModelTest {
     fun whenOnDuckChatOmnibarButtonClickedAndContextualModeEnabledAndNotNTPThenCommandSent() = runTest {
         mockDuckAiContextualModeFlow.emit(true)
 
-        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
+        testee.onDuckChatOmnibarButtonClicked(query = "example", isNtp = false)
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShowDuckAIContextualMode)
@@ -12616,7 +12495,7 @@ class BrowserTabViewModelTest {
         whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckAIUrl)
         whenever(mockOmnibarConverter.convertQueryToUrl(duckAIUrl, null)).thenReturn(duckAIUrl)
 
-        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = true)
+        testee.onDuckChatOmnibarButtonClicked(query = "example", isNtp = true)
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val command = commandCaptor.lastValue as Navigate
@@ -12648,7 +12527,7 @@ class BrowserTabViewModelTest {
         mockDuckAiContextualModeFlow.emit(true)
 
         testee.subscriptionEventDataFlow.test {
-            testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
+            testee.onDuckChatOmnibarButtonClicked(query = "example", isNtp = false)
 
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()

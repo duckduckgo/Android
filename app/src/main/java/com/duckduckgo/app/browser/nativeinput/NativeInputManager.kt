@@ -140,6 +140,9 @@ interface NativeInputManager {
     /** True when the widget is shown with the chat tab selected. */
     fun isChatTabSelected(): Boolean
 
+    /** True when the widget is shown and its text field has focus. */
+    fun hasInputFocus(): Boolean
+
     fun showNativeInput(
         tabId: String,
         layoutInflater: LayoutInflater,
@@ -301,6 +304,11 @@ class RealNativeInputManager @Inject constructor(
         if (!::rootView.isInitialized) return false
         val widget = widgetFrom(rootView) ?: return false
         return widget.isChatTabSelected()
+    }
+
+    override fun hasInputFocus(): Boolean {
+        if (!::rootView.isInitialized) return false
+        return widgetFrom(rootView)?.hasInputFocus() == true
     }
 
     override fun setPickingImage(picking: Boolean) {

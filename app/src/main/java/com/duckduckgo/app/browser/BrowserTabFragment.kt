@@ -168,7 +168,6 @@ import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.Omnibar.FindInPageListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.LogoClickListener
-import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.TextListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.*
@@ -1030,12 +1029,6 @@ class BrowserTabFragment :
                 credentials: List<LoginCredentials>,
                 triggerType: LoginTriggerType,
             ) {
-                if (triggerType == LoginTriggerType.AUTOPROMPT &&
-                    !(viewModel.canAutofillSelectCredentialsDialogCanAutomaticallyShow()) && omnibar.isEditing()
-                ) {
-                    logcat { "AutoPrompt is disabled, not showing dialog" }
-                    return
-                }
                 val url = webView?.url ?: return
                 if (url != originalUrl) {
                     logcat(WARN) { "WebView url has changed since autofill request; bailing" }
@@ -1344,7 +1337,6 @@ class BrowserTabFragment :
         configureOmnibarTextInput()
         configureItemPressedListener()
         configureCustomTab()
-        configureEditModeChangeDetection()
         configureNativeInputLauncher()
         configureLogoClickListener()
     }
@@ -1545,18 +1537,12 @@ class BrowserTabFragment :
         )
     }
 
-    private fun configureEditModeChangeDetection() {
-        if (swipingTabsFeature.isEnabled) {
-            omnibar.isInEditMode
-                .onEach { isInEditMode ->
-                    browserActivity?.onEditModeChanged(isInEditMode)
-                }.launchIn(lifecycleScope)
-        }
+    private fun onTabsButtonPressed() {
+        val isFocusedNtp = isFocusedNtp()
+        launch { viewModel.userLaunchingTabSwitcher(omnibar.viewMode, isFocusedNtp) }
     }
 
-    private fun onTabsButtonPressed() {
-        launch { viewModel.userLaunchingTabSwitcher(omnibar.viewMode, omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()) }
-    }
+    private fun isFocusedNtp(): Boolean = omnibar.viewMode == ViewMode.NewTab && nativeInputManager.hasInputFocus()
 
     private fun onTabsButtonLongPressed(): Boolean {
         return viewModel.onNewTabMenuItemClicked(longPress = true)
@@ -1605,10 +1591,9 @@ class BrowserTabFragment :
     }
 
     private fun onFireButtonPressed() {
-        val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
         val cta = viewModel.ctaViewState.value?.cta
         val isDuckAiOnboarding = cta is DaxDuckAiFireButtonContextualCta
-        browserActivity?.launchFire(launchedFromFocusedNtp = isFocusedNtp, isDuckAiOnboarding = isDuckAiOnboarding)
+        browserActivity?.launchFire(launchedFromFocusedNtp = isFocusedNtp(), isDuckAiOnboarding = isDuckAiOnboarding)
         viewModel.onFireMenuSelected(omnibar.viewMode)
     }
 
@@ -1638,14 +1623,6 @@ class BrowserTabFragment :
         webView?.onPause()
         hideKeyboard()
         voiceSearchLauncher.launch(requireActivity())
-    }
-
-    private fun onOmnibarDuckChatPressed(
-        query: String,
-        hasFocus: Boolean,
-        isNtp: Boolean,
-    ) {
-        viewModel.onDuckChatOmnibarButtonClicked(query = query, hasFocus = hasFocus, isNtp = isNtp)
     }
 
     private fun configureCustomTab() {
@@ -1938,7 +1915,7 @@ class BrowserTabFragment :
     }
 
     private fun launchBottomSheetMenu(addExtraDelay: Boolean) {
-        val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
+        val isFocusedNtp = isFocusedNtp()
         val delay = if (addExtraDelay) BOTTOM_SHEET_MENU_DELAY * 2 else BOTTOM_SHEET_MENU_DELAY
         // small delay added to let keyboard disappear and avoid jarring transition
         binding.rootView.postDelayed(delay) {
@@ -3125,7 +3102,7 @@ class BrowserTabFragment :
                 viewLifecycleOwner.lifecycleScope.launch(dispatchers.main()) {
                     duckChatContextual.launch(tabId, sourceUrl, anchor) {
                         if (sourceUrl == null) {
-                            viewModel.openDuckChatFromOmnibar(query = null, hasFocus = false, isNtp = true)
+                            viewModel.openDuckChatFromOmnibar(query = null)
                         } else {
                             showDuckChatContextualSheet(tabId)
                         }
@@ -3885,12 +3862,6 @@ class BrowserTabFragment :
     }
 
     private fun configureNewTab() {
-        newBrowserTab.newTabContainerScrollView.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
-            if (omnibar.isEditing()) {
-                hideKeyboard()
-            }
-        }
-
         binding.focusedView.setOnScrollChangeListener {
             hideKeyboardRetainFocus()
         }
@@ -4069,13 +4040,8 @@ class BrowserTabFragment :
 
                 override fun onDuckChatButtonPressed(anchor: View) {
                     duckChatButtonAnchor = anchor
-                    val hasFocus = omnibar.omnibarTextInput.hasFocus()
                     val isNtp = omnibar.viewMode == ViewMode.NewTab
-                    onOmnibarDuckChatPressed(query = omnibar.getText(), hasFocus = hasFocus, isNtp = isNtp)
-                }
-
-                override fun onBackButtonPressed() {
-                    hideKeyboard()
+                    viewModel.onDuckChatOmnibarButtonClicked(query = omnibar.getText(), isNtp = isNtp)
                 }
 
                 override fun onDuckAISidebarButtonPressed() {
@@ -4182,29 +4148,6 @@ class BrowserTabFragment :
     private fun configureOmnibarTextInput() {
         omnibar.addTextListener(
             object : TextListener {
-                override fun onFocusChanged(
-                    hasFocus: Boolean,
-                    query: String,
-                ) {
-                }
-
-                override fun onBackKeyPressed(): Boolean {
-                    return onOmnibarBackKeyPressed()
-                }
-
-                override fun onEnterPressed() {
-                    onUserSubmittedText(omnibar.getText())
-                }
-
-                override fun onTouchEvent(event: MotionEvent) {
-                }
-
-                override fun onOmnibarTextChanged(state: OmnibarTextState) {
-                }
-
-                override fun onShowSuggestions(state: OmnibarTextState) {
-                }
-
                 override fun onTrackersCountFinished() {
                     // no-op
                 }
@@ -4214,13 +4157,6 @@ class BrowserTabFragment :
                 }
             },
         )
-    }
-
-    private fun onOmnibarBackKeyPressed(): Boolean {
-        val wasOverlayVisible = binding.focusedView.isVisible || binding.autoCompleteSuggestionsList.isVisible
-        omnibar.omnibarTextInput.hideKeyboard()
-        binding.focusDummy.requestFocus()
-        return wasOverlayVisible
     }
 
     private fun onFindInPageDismissed() {
@@ -4323,9 +4259,6 @@ class BrowserTabFragment :
                     }
                 }
 
-                if (omnibar.omnibarTextInput.isFocused) {
-                    binding.focusDummy.requestFocus()
-                }
                 dismissAppLinkSnackBar()
                 false
             }
@@ -4457,13 +4390,6 @@ class BrowserTabFragment :
     private fun hideOnboardingDaxBubbleCta(cta: DaxBubbleCta?) {
         hideDaxBubbleCta(cta)
         renderer.showNewTab()
-        // When the input-screen feature is on, the omnibar's click catcher disables the text
-        // input, so requestFocus() can't succeed. Showing the IME there leaves the keyboard up
-        // with no focused field. Skip the keyboard call in that case and leave the user on the
-        // NTP — tapping the omnibar will launch the input screen as usual.
-        if (omnibar.omnibarTextInput.isFocusable) {
-            showKeyboard()
-        }
     }
 
     private fun hideDaxBubbleCta(cta: DaxBubbleCta?) {
@@ -6141,10 +6067,6 @@ class BrowserTabFragment :
                 omnibar.renderLoadingViewState(viewState)
 
                 if (viewState.trackersAnimationEnabled) {
-                    if (lastSeenOmnibarViewState?.isEditing == true) {
-                        omnibar.cancelTrackersAnimation()
-                    }
-
                     if (viewState.progress == MAX_PROGRESS) {
                         createTrackersAnimation()
                     }
@@ -6176,7 +6098,6 @@ class BrowserTabFragment :
                  * be started
                  */
                 if (
-                    lastSeenOmnibarViewState?.isEditing != true &&
                     lastSeenBrowserViewState?.browserShowing == true &&
                     lastSeenBrowserViewState?.maliciousSiteBlocked == false
                 ) {

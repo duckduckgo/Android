@@ -1,20 +1,17 @@
 appId: com.duckduckgo.mobile.android
 ---
-# with inputWithAiToggle="false" the address bar is in search-only mode, where the
-# `nativeInputOmnibar.nativeInputSearchOnly` remote flag (percentage rollout) decides
-# whether we get the native input widget or the legacy omnibar. Wait for either.
+# with inputWithAiToggle="false" the address bar is in search-only mode
 - extendedWaitUntil:
     visible:
-      id: "inputModeWidget|omnibarTextInput"
+      id: "inputModeWidget"
     timeout: 15000
 
-# focus whichever field is live and type a question
 - tapOn:
-    id: "omnibarTextInput|inputField"
+    id: "inputField"
 - inputText: "what is a car"
 
-# with inputWithAiToggle=false there is no Duck.ai tab — the Duck.ai icon is the
-# entry point to chat, and it carries the same id in both input paths
+# with inputWithAiToggle=false there is no Duck.ai tab, so the Duck.ai icon is the
+# entry point to chat
 - assertVisible:
     id: "aiChatIconMenu"
 - tapOn:
