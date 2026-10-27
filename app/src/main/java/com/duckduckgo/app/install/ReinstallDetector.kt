@@ -18,16 +18,15 @@ package com.duckduckgo.app.install
 
 import android.os.Build
 import android.os.Environment
-import androidx.core.content.edit
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
 import logcat.LogPriority.WARN
@@ -45,6 +44,7 @@ interface ReinstallDetector {
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealReinstallDetector @Inject constructor(
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : ReinstallDetector {
@@ -55,42 +55,32 @@ class RealReinstallDetector @Inject constructor(
         sharedPreferencesProvider.getSharedPreferences(PREFERENCES_FILE_NAME, false, false)
     }
 
-    // Onboarding and the pre-ATB plugins can ask at the same time on first launch. Without the lock, a second
-    // caller can see the folder the first one just created and answer "reinstall" for a new install.
-    // Not reentrant: nothing run while holding it may call isAppReinstall().
-    private val reinstallCheckMutex = Mutex()
+    // One check per process, shared by every caller. Onboarding and the pre-ATB plugins can ask at the same time on first
+    // launch, and a second check could see the folder the first one just created and answer "reinstall" for a new install.
+    // It runs in the app scope, so a cancelled caller only stops waiting; the check still saves its answer.
+    // Not reentrant: the check must not call isAppReinstall().
+    private val reinstallCheck: Deferred<Boolean> by lazy {
+        appCoroutineScope.async(dispatcherProvider.io()) {
+            runCatching { savedAppReinstallValue() ?: detectAndSaveAppReinstall() }.getOrDefault(false)
+        }
+    }
 
     override suspend fun isAppReinstall(): Boolean {
         if (sdkInt < 30) return false
 
-        return withContext(dispatcherProvider.io()) {
-            savedAppReinstallValueOrNull() ?: reinstallCheckMutex.withLock {
-                // The caller holding the lock can be cancelled, e.g. when onboarding's screen closes. Finishing the check keeps
-                // creating the marker and saving the answer together, so the next caller can't find one without the other.
-                withContext(NonCancellable) {
-                    runCatching { savedAppReinstallValue() ?: detectAndSaveAppReinstall() }.getOrDefault(false)
-                }
-            }
-        }
+        return reinstallCheck.await()
     }
-
-    private fun savedAppReinstallValueOrNull(): Boolean? = runCatching { savedAppReinstallValue() }.getOrNull()
 
     private fun savedAppReinstallValue(): Boolean? =
         if (preferences.contains(APP_REINSTALLED_KEY)) preferences.getBoolean(APP_REINSTALLED_KEY, false) else null
 
+    // The answer is saved before the folder is created. If only the folder were written, the next launch would find it and
+    // answer "reinstall" for a new install; if only the answer is saved, a later reinstall goes undetected, which is the lesser harm.
     private fun detectAndSaveAppReinstall(): Boolean {
-        val downloadDirectory = getDownloadsDirectory()
-        val ddgDirectoryExists = (downloadDirectory.list()?.asList() ?: emptyList()).contains(DDG_DOWNLOADS_DIRECTORY)
-        val appReinstallValue = if (!ddgDirectoryExists) {
-            createNewDirectory(DDG_DOWNLOADS_DIRECTORY)
-            // this is a new install
-            false
-        } else {
-            true
-        }
-        preferences.edit(commit = true) { putBoolean(APP_REINSTALLED_KEY, appReinstallValue) }
-        return appReinstallValue
+        val ddgDirectoryExists = getDownloadsDirectory().list()?.asList().orEmpty().contains(DDG_DOWNLOADS_DIRECTORY)
+        val saved = preferences.edit().putBoolean(APP_REINSTALLED_KEY, ddgDirectoryExists).commit()
+        if (!ddgDirectoryExists && saved) createNewDirectory(DDG_DOWNLOADS_DIRECTORY)
+        return ddgDirectoryExists
     }
 
     private fun getDownloadsDirectory(): File {

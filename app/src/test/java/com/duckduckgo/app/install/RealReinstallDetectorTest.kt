@@ -23,10 +23,14 @@ import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -39,11 +43,13 @@ import org.robolectric.annotation.Config
 import java.io.File
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 
 @RunWith(AndroidJUnit4::class)
 class RealReinstallDetectorTest {
 
     private val dispatcherProvider = DefaultDispatcherProvider()
+    private val appCoroutineScope = CoroutineScope(SupervisorJob())
     private val ddgDownloadsDirectory = File(
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
         "DuckDuckGo",
@@ -56,6 +62,7 @@ class RealReinstallDetectorTest {
 
     @After
     fun tearDown() {
+        appCoroutineScope.cancel()
         ddgDownloadsDirectory.deleteRecursively()
     }
 
@@ -81,6 +88,14 @@ class RealReinstallDetectorTest {
 
     @Test
     @Config(sdk = [34])
+    fun whenSavingTheAnswerFailsThenIsNotReinstallAndDirectoryIsNotCreated() = runTest {
+        assertFalse(reinstallDetectorWith(FailingToSaveSharedPreferences()).isAppReinstall())
+        // With the folder in place but no saved answer, the next launch would answer "reinstall" for this new install
+        assertFalse(ddgDownloadsDirectory.exists())
+    }
+
+    @Test
+    @Config(sdk = [34])
     fun whenAnswerIsAlreadySavedThenItIsReusedWithoutCheckingTheDirectory() = runTest {
         val preferences = InMemorySharedPreferences().apply { putBoolean(APP_REINSTALLED_KEY, true) }
 
@@ -99,7 +114,7 @@ class RealReinstallDetectorTest {
 
     @Test
     @Config(sdk = [34])
-    fun whenTwoCallersCheckAtTheSameTimeOnAFreshInstallThenBothGetTheSameAnswer() = runBlocking {
+    fun whenTwoCallersCheckAtTheSameTimeOnAFreshInstallThenTheCheckRunsOnceAndBothGetTheSameAnswer() = runBlocking {
         val preferences = SlowToSaveSharedPreferences()
         val reinstallDetector = reinstallDetectorWith(preferences)
 
@@ -110,11 +125,12 @@ class RealReinstallDetectorTest {
         assertFalse(first.await())
         assertFalse(second.await())
         assertFalse(preferences.getBoolean(APP_REINSTALLED_KEY, true))
+        assertEquals(1, preferences.saves.get())
     }
 
     @Test
     @Config(sdk = [34])
-    fun whenCallerHoldingTheLockIsCancelledThenAnswerIsStillSavedAndReused() = runBlocking {
+    fun whenFirstCallerIsCancelledThenAnswerIsStillSavedAndReused() = runBlocking {
         val preferences = SlowToSaveSharedPreferences()
         val reinstallDetector = reinstallDetectorWith(preferences)
 
@@ -123,37 +139,54 @@ class RealReinstallDetectorTest {
         first.cancel()
 
         assertTrue(runCatching { first.await() }.exceptionOrNull() is CancellationException)
-        assertFalse(preferences.getBoolean(APP_REINSTALLED_KEY, true))
         // The marker now exists, so checking Downloads again would answer "reinstall"
         assertFalse(reinstallDetector.isAppReinstall())
+        assertFalse(preferences.getBoolean(APP_REINSTALLED_KEY, true))
+        assertTrue(ddgDownloadsDirectory.exists())
     }
 
     private fun reinstallDetectorWith(preferences: SharedPreferences): RealReinstallDetector {
         val sharedPreferencesProvider: SharedPreferencesProvider = mock()
         whenever(sharedPreferencesProvider.getSharedPreferences(any(), any(), any())).thenReturn(preferences)
         return RealReinstallDetector(
+            appCoroutineScope = appCoroutineScope,
             dispatcherProvider = dispatcherProvider,
             sharedPreferencesProvider = sharedPreferencesProvider,
         )
     }
 
     /**
-     * Holds the first caller between creating the DuckDuckGo directory and saving its answer, which is where a second
-     * caller would see the directory and wrongly answer "reinstall".
+     * Holds the check while it saves its answer. A second check started meanwhile would find neither the answer nor the
+     * DuckDuckGo directory and save again.
      */
     private class SlowToSaveSharedPreferences(
         private val delegate: InMemorySharedPreferences = InMemorySharedPreferences(),
     ) : SharedPreferences by delegate, SharedPreferences.Editor by delegate {
         val saveStarted = CountDownLatch(1)
+        val saves = AtomicInteger(0)
 
         override fun edit(): SharedPreferences.Editor = this
 
         override fun putBoolean(key: String, value: Boolean): SharedPreferences.Editor {
+            saves.incrementAndGet()
             saveStarted.countDown()
             Thread.sleep(SAVE_DELAY_MS)
             delegate.putBoolean(key, value)
             return this
         }
+    }
+
+    private class FailingToSaveSharedPreferences(
+        private val delegate: InMemorySharedPreferences = InMemorySharedPreferences(),
+    ) : SharedPreferences by delegate, SharedPreferences.Editor by delegate {
+        override fun edit(): SharedPreferences.Editor = this
+
+        override fun putBoolean(key: String, value: Boolean): SharedPreferences.Editor {
+            delegate.putBoolean(key, value)
+            return this
+        }
+
+        override fun commit(): Boolean = false
     }
 
     private companion object {
