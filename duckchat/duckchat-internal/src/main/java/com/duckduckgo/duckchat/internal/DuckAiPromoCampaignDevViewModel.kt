@@ -66,25 +66,25 @@ class DuckAiPromoCampaignDevViewModel @Inject constructor(
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
     fun onSeedPendingPromoClicked(campaignId: String) {
-        updatePromoRecordForCampaign(campaignId) {
-            initializePromo(campaignId)
+        updatePromoRecordForCampaign(campaignId) { trimmedCampaignId ->
+            initializePromo(trimmedCampaignId)
             R.string.devSettingsDuckAiPromoCampaignPendingPromoSeeded
         }
     }
 
     fun onSeedExpiredPromoClicked(campaignId: String) {
-        updatePromoRecordForCampaign(campaignId) {
-            val promoId = initializePromo(campaignId)
+        updatePromoRecordForCampaign(campaignId) { trimmedCampaignId ->
+            val promoId = initializePromo(trimmedCampaignId)
             promoCampaignRepository.startPromo(promoId, devPromoTerms(expiresAtMillis = currentTimeProvider.currentTimeMillis()))
             R.string.devSettingsDuckAiPromoCampaignExpiredPromoSeeded
         }
     }
 
     fun onDismissOfferClicked(campaignId: String) {
-        updatePromoRecordForCampaign(campaignId) {
-            promoCampaignRepository.dismissCampaign(campaignId)
+        updatePromoRecordForCampaign(campaignId) { trimmedCampaignId ->
+            promoCampaignRepository.dismissCampaign(trimmedCampaignId)
             // Dismissing has no effect once the promo has ended
-            if (promoCampaignRepository.getPromoRecord()?.dismissedCampaignId == campaignId) {
+            if (promoCampaignRepository.getPromoRecord()?.dismissedCampaignId == trimmedCampaignId) {
                 R.string.devSettingsDuckAiPromoCampaignOfferDismissed
             } else {
                 R.string.devSettingsDuckAiPromoCampaignOfferNotDismissed
@@ -163,10 +163,10 @@ class DuckAiPromoCampaignDevViewModel @Inject constructor(
 
     private fun updatePromoRecordForCampaign(
         campaignId: String,
-        updateAndGetMessageResId: suspend () -> Int,
+        updateAndGetMessageResId: suspend (trimmedCampaignId: String) -> Int,
     ) {
         updatePromoRecord {
-            if (campaignId.isBlank()) R.string.devSettingsDuckAiPromoCampaignCampaignIdRequired else updateAndGetMessageResId()
+            if (campaignId.isBlank()) R.string.devSettingsDuckAiPromoCampaignCampaignIdRequired else updateAndGetMessageResId(campaignId.trim())
         }
     }
 

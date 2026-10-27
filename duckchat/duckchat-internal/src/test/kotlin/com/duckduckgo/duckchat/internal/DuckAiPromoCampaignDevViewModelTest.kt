@@ -144,6 +144,28 @@ class DuckAiPromoCampaignDevViewModelTest {
     }
 
     @Test
+    fun whenSeedPendingPromoClickedAndCampaignIdHasSurroundingWhitespaceThenTrimmedCampaignIdIsStored() = runTest {
+        testee.commands.test {
+            testee.onSeedPendingPromoClicked(" $CAMPAIGN_ID ")
+
+            verify(promoCampaignRepository).initializePromo(eq(CAMPAIGN_ID), any())
+            assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignPendingPromoSeeded), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSeedExpiredPromoClickedAndCampaignIdHasSurroundingWhitespaceThenTrimmedCampaignIdIsStored() = runTest {
+        testee.commands.test {
+            testee.onSeedExpiredPromoClicked(" $CAMPAIGN_ID ")
+
+            verifyPromoSeeded()
+            assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignExpiredPromoSeeded), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenDismissOfferClickedThenCampaignIsDismissedAndMessageIsShown() = runTest {
         whenever(promoCampaignRepository.getPromoRecord()).thenReturn(ACTIVE_RECORD.copy(dismissedCampaignId = CAMPAIGN_ID))
 
@@ -176,6 +198,19 @@ class DuckAiPromoCampaignDevViewModelTest {
 
             verify(promoCampaignRepository, never()).dismissCampaign(any())
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignCampaignIdRequired), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDismissOfferClickedAndCampaignIdHasSurroundingWhitespaceThenTrimmedCampaignIdIsDismissed() = runTest {
+        whenever(promoCampaignRepository.getPromoRecord()).thenReturn(ACTIVE_RECORD.copy(dismissedCampaignId = CAMPAIGN_ID))
+
+        testee.commands.test {
+            testee.onDismissOfferClicked(" $CAMPAIGN_ID ")
+
+            verify(promoCampaignRepository).dismissCampaign(CAMPAIGN_ID)
+            assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiPromoCampaignOfferDismissed), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }
