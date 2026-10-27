@@ -21,6 +21,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <Space
+        android:id="@+id/resultTopSpace"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.core.widget.NestedScrollView
         android:id="@+id/resultScrollView"
         android:layout_width="0dp"
@@ -28,7 +36,7 @@
         app:layout_constraintBottom_toTopOf="@id/resultButtons"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/resultTopSpace">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -36,7 +44,7 @@
             android:gravity="center_horizontal"
             android:orientation="vertical"
             android:paddingHorizontal="@dimen/keyline_5"
-            android:paddingTop="@dimen/keyline_7"
+            android:paddingTop="20dp"
             android:paddingBottom="@dimen/keyline_5">
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -107,6 +115,14 @@
             android:layout_height="wrap_content"
             app:daxButtonSize="large"
             tools:text="@string/importBookmarksRedesignSuccessPrimaryButton" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+            android:id="@+id/resultDoneSecondaryButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/importBookmarksRedesignSuccessPrimaryButton"
+            android:visibility="gone"
+            app:daxButtonSize="large" />
 
     </LinearLayout>
 
