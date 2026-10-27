@@ -52,12 +52,12 @@ class RealPortProbingCoordinator @Inject constructor(
     override suspend fun probeAndSelect(): PortProbeResult? {
         val config = wgTunnelConfig.getWgConfig()
         val serverIp = config?.serverIp() ?: return null
-        val advertisedPorts = wgTunnelConfig.getAdvertisedPorts()
+        val advertisedPorts = wgTunnelConfig.getServerAdvertisedPorts()
 
         if (advertisedPorts.size < 2) return null
 
         val serverDefaultPort = wgTunnelConfig.getServerDefaultPort()
-        val currentPort = wgTunnelConfig.getActivePort().takeIf { it > 0 } ?: config.currentEndpointPort()
+        val currentPort = wgTunnelConfig.getTunnelActivePort().takeIf { it > 0 } ?: config.currentEndpointPort()
 
         val candidatePorts = portSelector.orderCandidatePorts(
             serverDefaultPort = serverDefaultPort,

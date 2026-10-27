@@ -116,14 +116,14 @@ data class EligibleServerInfo(
 )
 
 data class Server(
-    val name: String,
-    val internalIp: String,
-    val attributes: Map<String, Any>,
-    val publicKey: String,
-    val hostnames: List<String>,
-    val ips: List<String>,
-    val port: Long,
-    val ports: List<Long>? = null,
+    val name: String = "",
+    val internalIp: String = "",
+    val attributes: Map<String, Any> = emptyMap(),
+    val publicKey: String = "",
+    val hostnames: List<String> = emptyList(),
+    val ips: List<String> = emptyList(),
+    val port: Long = 0L,
+    val ports: List<Long> = emptyList(),
 )
 
 data class EligibleLocation(

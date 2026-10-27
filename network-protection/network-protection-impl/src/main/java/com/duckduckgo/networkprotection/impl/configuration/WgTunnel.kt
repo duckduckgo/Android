@@ -97,17 +97,17 @@ interface WgTunnelConfig {
     /**
      * @return the endpoint port the tunnel was last configured with, or 0 if none
      */
-    fun getActivePort(): Long
+    fun getTunnelActivePort(): Long
 
     /**
      * @param port the endpoint port the tunnel is being configured with
      */
-    fun setActivePort(port: Long)
+    fun setTunnelActivePort(port: Long)
 
     /**
      * @return all ports advertised by the current server
      */
-    fun getAdvertisedPorts(): List<Long>
+    fun getServerAdvertisedPorts(): List<Long>
 
     /**
      * @return the server's default port
@@ -138,17 +138,18 @@ class RealWgTunnelConfig @Inject constructor(
 
     override fun setWgConfig(config: Config) {
         wgTunnelStore.wireguardConfig = config
+        wgTunnelStore.activePort = 0L
     }
 
-    override fun getActivePort(): Long {
+    override fun getTunnelActivePort(): Long {
         return wgTunnelStore.activePort
     }
 
-    override fun setActivePort(port: Long) {
+    override fun setTunnelActivePort(port: Long) {
         wgTunnelStore.activePort = port
     }
 
-    override fun getAdvertisedPorts(): List<Long> {
+    override fun getServerAdvertisedPorts(): List<Long> {
         return wgTunnelStore.advertisedPorts
     }
 

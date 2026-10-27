@@ -90,6 +90,14 @@ class RealWgServerApiTest {
     }
 
     @Test
+    fun whenServerSendsNullPortsThenAdvertisedPortsFallsBackToServerPort() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
+        internalWgServerDebugProvider.selectedServer = "egress.euw.1"
+
+        assertEquals(listOf(443L), internalApi.registerPublicKey("testpublickey")!!.ports)
+    }
+
+    @Test
     fun whenRegisterInInternalAndServerSelectedThenReturnSelectedServer() = runTest {
         whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
         internalWgServerDebugProvider.selectedServer = "egress.euw.2"

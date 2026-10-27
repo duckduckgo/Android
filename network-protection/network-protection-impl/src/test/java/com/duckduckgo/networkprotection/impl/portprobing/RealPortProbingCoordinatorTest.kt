@@ -41,21 +41,21 @@ class RealPortProbingCoordinatorTest {
     @Before
     fun setup() = runTest {
         whenever(wgTunnelConfig.getWgConfig()).thenReturn(createTestConfig(port = 443L))
-        whenever(wgTunnelConfig.getAdvertisedPorts()).thenReturn(listOf(443L, 51820L))
+        whenever(wgTunnelConfig.getServerAdvertisedPorts()).thenReturn(listOf(443L, 51820L))
         whenever(wgTunnelConfig.getServerDefaultPort()).thenReturn(443L)
         coordinator = RealPortProbingCoordinator(portProber, RealPortSelector(), wgTunnelConfig)
     }
 
     @Test
     fun whenOnlyOnePortAdvertisedThenSkipProbing() = runTest {
-        whenever(wgTunnelConfig.getAdvertisedPorts()).thenReturn(listOf(443L))
+        whenever(wgTunnelConfig.getServerAdvertisedPorts()).thenReturn(listOf(443L))
 
         assertNull(coordinator.probeAndSelect())
     }
 
     @Test
     fun whenNoPortRespondsThenKeepCurrentPortWithoutSwitching() = runTest {
-        whenever(wgTunnelConfig.getActivePort()).thenReturn(51820L)
+        whenever(wgTunnelConfig.getTunnelActivePort()).thenReturn(51820L)
         whenever(portProber.probePortsInParallel(any(), any(), any())).thenReturn(emptyList())
 
         val result = coordinator.probeAndSelect()!!
@@ -66,7 +66,7 @@ class RealPortProbingCoordinatorTest {
 
     @Test
     fun whenCurrentPortStillRespondsThenDoNotSwitch() = runTest {
-        whenever(wgTunnelConfig.getActivePort()).thenReturn(51820L)
+        whenever(wgTunnelConfig.getTunnelActivePort()).thenReturn(51820L)
         whenever(portProber.probePortsInParallel(any(), any(), any())).thenReturn(listOf(443L, 51820L))
 
         val result = coordinator.probeAndSelect()!!
@@ -77,7 +77,7 @@ class RealPortProbingCoordinatorTest {
 
     @Test
     fun whenOnlyAnotherPortRespondsThenSwitch() = runTest {
-        whenever(wgTunnelConfig.getActivePort()).thenReturn(443L)
+        whenever(wgTunnelConfig.getTunnelActivePort()).thenReturn(443L)
         whenever(portProber.probePortsInParallel(any(), any(), any())).thenReturn(listOf(51820L))
 
         val result = coordinator.probeAndSelect()!!
@@ -88,7 +88,7 @@ class RealPortProbingCoordinatorTest {
 
     @Test
     fun whenNoActivePortThenUseConfigPortAsCurrent() = runTest {
-        whenever(wgTunnelConfig.getActivePort()).thenReturn(0L)
+        whenever(wgTunnelConfig.getTunnelActivePort()).thenReturn(0L)
         whenever(portProber.probePortsInParallel(any(), any(), any())).thenReturn(listOf(443L))
 
         val result = coordinator.probeAndSelect()!!
@@ -99,7 +99,7 @@ class RealPortProbingCoordinatorTest {
 
     @Test
     fun whenProbingThenStopEarlyOnceDefaultAndCurrentPortsRespond() = runTest {
-        whenever(wgTunnelConfig.getActivePort()).thenReturn(51820L)
+        whenever(wgTunnelConfig.getTunnelActivePort()).thenReturn(51820L)
         whenever(portProber.probePortsInParallel(any(), any(), any())).thenReturn(listOf(443L, 51820L))
 
         coordinator.probeAndSelect()
@@ -109,7 +109,7 @@ class RealPortProbingCoordinatorTest {
 
     @Test
     fun whenCurrentPortNotAdvertisedThenStopEarlyOnDefaultPortOnly() = runTest {
-        whenever(wgTunnelConfig.getActivePort()).thenReturn(9999L)
+        whenever(wgTunnelConfig.getTunnelActivePort()).thenReturn(9999L)
         whenever(portProber.probePortsInParallel(any(), any(), any())).thenReturn(listOf(443L))
 
         coordinator.probeAndSelect()

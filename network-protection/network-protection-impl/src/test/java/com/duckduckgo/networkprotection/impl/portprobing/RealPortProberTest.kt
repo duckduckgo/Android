@@ -25,6 +25,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.net.DatagramPacket
@@ -102,6 +103,30 @@ class RealPortProberTest {
 
         assertEquals(listOf(responding), result)
         assertTrue("took ${elapsed}ms", elapsed < 900)
+    }
+
+    @Test
+    fun whenSocketProtectionFailsThenDoNotProbeAndCloseSocket() = runBlocking {
+        val socketCaptor = argumentCaptor<DatagramSocket>()
+        whenever(socketProtector.protect(socketCaptor.capture())).thenReturn(false)
+        val responding = startServer(reply = "DDG")
+
+        val result = prober.probePortsInParallel(LOCALHOST, listOf(responding), earlyExitPorts = emptySet())
+
+        assertEquals(emptyList<Long>(), result)
+        assertTrue(socketCaptor.firstValue.isClosed)
+    }
+
+    @Test
+    fun whenSocketSetupThrowsThenCloseSocket() = runBlocking {
+        val socketCaptor = argumentCaptor<DatagramSocket>()
+        whenever(socketProtector.protect(socketCaptor.capture())).thenThrow(RuntimeException())
+        val responding = startServer(reply = "DDG")
+
+        val result = prober.probePortsInParallel(LOCALHOST, listOf(responding), earlyExitPorts = emptySet())
+
+        assertEquals(emptyList<Long>(), result)
+        assertTrue(socketCaptor.firstValue.isClosed)
     }
 
     private fun startServer(reply: String?, ignoreFirst: Int = 0): Long {

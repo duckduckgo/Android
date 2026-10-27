@@ -89,15 +89,23 @@ class RealPortProber @Inject constructor(
     }
 
     private fun createProbeSocket(port: Long): DatagramSocket? {
+        val socket = runCatching { DatagramSocket() }.getOrElse { e ->
+            logcat { "Port probe: failed to create socket for port $port: ${e.message}" }
+            return null
+        }
         return try {
-            DatagramSocket().apply {
-                soTimeout = RETRANSMIT_INTERVAL_MS.toInt()
-                // Protect the socket so it bypasses the VPN
-                val protected = socketProtector.protect(this)
-                logcat { "Port probe: socket protection ${if (protected) "succeeded" else "FAILED"} for port $port" }
+            socket.soTimeout = RETRANSMIT_INTERVAL_MS.toInt()
+            // An unprotected probe is routed through the tunnel, so its result says nothing about direct reachability
+            if (socketProtector.protect(socket)) {
+                socket
+            } else {
+                logcat { "Port probe: socket protection FAILED for port $port" }
+                socket.close()
+                null
             }
         } catch (e: Exception) {
-            logcat { "Port probe: failed to create socket for port $port: ${e.message}" }
+            logcat { "Port probe: failed to set up socket for port $port: ${e.message}" }
+            socket.close()
             null
         }
     }

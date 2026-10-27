@@ -84,7 +84,7 @@ class WgVpnNetworkStack @Inject constructor(
             } else {
                 withServerDefaultPort(wgConfig!!)
             }
-            wgTunnelConfigLazy.value.setActivePort(wgConfig!!.currentEndpointPort())
+            wgTunnelConfigLazy.value.setTunnelActivePort(wgConfig!!.currentEndpointPort())
 
             val privateDns = dnsProvider.getPrivateDns()
             val dns = if (netPSettingsLocalConfig.blockMalware().isEnabled() && vpnRemoteFeatures.allowDnsBlockMalware().isEnabled()) {
