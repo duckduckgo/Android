@@ -46,12 +46,12 @@
             android:gravity="center_horizontal"
             android:orientation="vertical"
             android:paddingHorizontal="@dimen/keyline_5"
-            android:paddingTop="20dp"
+            android:paddingTop="@dimen/keyline_3"
             android:paddingBottom="@dimen/keyline_5">
 
             <FrameLayout
-                android:layout_width="168dp"
-                android:layout_height="168dp">
+                android:layout_width="112dp"
+                android:layout_height="112dp">
 
                 <ProgressBar
                     android:id="@+id/importingProgress"
@@ -59,7 +59,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:indeterminate="true"
-                    android:indeterminateDrawable="@drawable/bookmark_import_progress_bar"
+                    android:indeterminateDrawable="@drawable/bookmark_import_progress_bar_redesign"
                     android:indeterminateDuration="800" />
 
                 <androidx.appcompat.widget.AppCompatImageView
