@@ -30,8 +30,9 @@ import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
 interface SettingsDataStore {
@@ -78,6 +79,7 @@ interface SettingsDataStore {
      * If the app is cleared in the foreground, but the process isn't restarted, we can set this to true.
      */
     var appUsedSinceLastClear: Boolean
+    var tabsClearedCount: Int
     var automaticallyClearWhatOption: ClearWhatOption
     var automaticallyClearWhenOption: ClearWhenOption
     var appBackgroundedTimestamp: Long
@@ -131,13 +133,13 @@ interface SettingsDataStore {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = SettingsDataStore::class,
+    binding = binding<SettingsDataStore>(),
 )
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = AutoCompleteSettings::class,
+    binding = binding<AutoCompleteSettings>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class SettingsSharedPreferences @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
@@ -213,6 +215,10 @@ class SettingsSharedPreferences @Inject constructor(
     override var appUsedSinceLastClear: Boolean
         get() = preferences.getBoolean(KEY_APP_USED_SINCE_LAST_CLEAR, true)
         set(enabled) = preferences.edit(commit = true) { putBoolean(KEY_APP_USED_SINCE_LAST_CLEAR, enabled) }
+
+    override var tabsClearedCount: Int
+        get() = preferences.getInt(KEY_TABS_CLEARED_COUNT, 0)
+        set(value) = preferences.edit(commit = true) { putInt(KEY_TABS_CLEARED_COUNT, value) }
 
     override var automaticallyClearWhatOption: ClearWhatOption
         get() = automaticallyClearWhatSavedValue() ?: ClearWhatOption.CLEAR_NONE
@@ -377,6 +383,7 @@ class SettingsSharedPreferences @Inject constructor(
         const val KEY_USER_SELECTED_IDLE_THRESHOLD_SECONDS = "KEY_USER_SELECTED_IDLE_THRESHOLD_SECONDS"
         const val KEY_APP_NOTIFICATIONS_ENABLED = "APP_NOTIFCATIONS_ENABLED"
         const val KEY_APP_USED_SINCE_LAST_CLEAR = "APP_USED_SINCE_LAST_CLEAR"
+        const val KEY_TABS_CLEARED_COUNT = "TABS_CLEARED_COUNT"
         const val KEY_HIDE_TIPS = "HIDE_TIPS"
         const val KEY_APP_ICON = "APP_ICON"
         const val KEY_SELECTED_FIRE_ANIMATION = "SELECTED_FIRE_ANIMATION"

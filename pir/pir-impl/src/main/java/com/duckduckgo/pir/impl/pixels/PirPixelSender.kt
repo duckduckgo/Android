@@ -102,7 +102,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_UPDATE_BROKER_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_UPDATE_BROKER_SUCCESS
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
 

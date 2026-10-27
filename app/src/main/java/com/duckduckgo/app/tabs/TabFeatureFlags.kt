@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.tabs
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
@@ -59,4 +59,10 @@ interface TabManagerFeatureFlags {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun duckAiPlusMenuUpdate(): Toggle
+
+    /**
+     * Shows Duck.ai tabs in the tab switcher grid as a rich card instead of the tab preview.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun richDuckAiGridTabItem(): Toggle
 }

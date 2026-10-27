@@ -23,7 +23,6 @@ import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatsDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaEntity
-import dagger.Lazy
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.test.runTest
@@ -61,7 +60,7 @@ class RealDuckAiChatStoreTest {
     @Before
     fun setup() {
         filesDir = Files.createTempDirectory("duck_ai_test").toFile()
-        val storage = RealDuckAiBridgeStorage(settings = mock(), chats = chatsDao, fileMeta = fileMetaDao, filesDirLazy = Lazy { filesDir })
+        val storage = RealDuckAiBridgeStorage(settings = mock(), chats = chatsDao, fileMeta = fileMetaDao, filesDirLazy = lazy { filesDir })
         store = RealDuckAiChatStore(storage, coroutineTestRule.testDispatcherProvider, migrationPrefs)
     }
 
@@ -636,6 +635,99 @@ class RealDuckAiChatStoreTest {
         whenever(chatsDao.getById("missing")).thenReturn(null)
 
         assertEquals(null, store.getChatContent("missing"))
+    }
+
+    // --- getChatPreview ---
+
+    @Test
+    fun `getChatPreview returns chat metadata and last message text from one read`() = runTest {
+        givenChat("""{"chatId":"abc","title":"Test","messages":[{"role":"user","content":"hi"},{"role":"assistant","content":"Hello"}]}""")
+
+        val preview = store.getChatPreview("abc")
+
+        assertEquals("Test", preview?.chat?.title)
+        assertEquals("Hello", preview?.lastMessageText)
+        verify(chatsDao).getById("abc")
+    }
+
+    @Test
+    fun `getChatPreview reads text from rich content object`() = runTest {
+        givenChat("""{"chatId":"abc","messages":[{"role":"assistant","content":{"text":"Rich reply"}}]}""")
+
+        assertEquals("Rich reply", store.getChatPreview("abc")?.lastMessageText)
+    }
+
+    @Test
+    fun `getChatPreview joins text parts when content is empty`() = runTest {
+        givenChat(
+            """{"chatId":"abc","messages":[{"role":"assistant","content":"","parts":[
+                {"type":"reasoning","text":"thinking"},{"type":"text","text":"First"},{"type":"text","text":"Second"}]}]}""",
+        )
+
+        assertEquals("First\n\nSecond", store.getChatPreview("abc")?.lastMessageText)
+    }
+
+    @Test
+    fun `getChatPreview trims last message text`() = runTest {
+        givenChat("""{"chatId":"abc","messages":[{"role":"assistant","content":"  padded  \n"}]}""")
+
+        assertEquals("padded", store.getChatPreview("abc")?.lastMessageText)
+    }
+
+    @Test
+    fun `getChatPreview returns null text when there are no messages or only whitespace`() = runTest {
+        givenChat("""{"chatId":"abc","messages":[]}""")
+        assertNull(store.getChatPreview("abc")?.lastMessageText)
+
+        givenChat("""{"chatId":"abc"}""")
+        assertNull(store.getChatPreview("abc")?.lastMessageText)
+
+        givenChat("""{"chatId":"abc","messages":[{"role":"assistant","content":"   "}]}""")
+        assertNull(store.getChatPreview("abc")?.lastMessageText)
+    }
+
+    @Test
+    fun `getChatPreview keeps image generation flag`() = runTest {
+        givenChat(
+            """{"chatId":"abc","fileRefs":["ref"],"messages":[{"role":"assistant","parts":[{"type":"ui-component","name":"generate-image"}]}]}""",
+        )
+
+        val preview = store.getChatPreview("abc")
+
+        assertTrue(preview!!.chat.isImageGeneration)
+        assertEquals(listOf("ref"), preview.chat.fileRefs)
+        assertNull(preview.lastMessageText)
+    }
+
+    @Test
+    fun `getChatPreview is awaiting reply when last message is the user's or an assistant reply without text`() = runTest {
+        givenChat("""{"chatId":"abc","messages":[{"role":"user","content":"hi"}]}""")
+        assertTrue(store.getChatPreview("abc")!!.isAwaitingReply)
+
+        givenChat("""{"chatId":"abc","messages":[{"role":"user","content":"hi"},{"role":"assistant","content":"","parts":[]}]}""")
+        assertTrue(store.getChatPreview("abc")!!.isAwaitingReply)
+    }
+
+    @Test
+    fun `getChatPreview is not awaiting reply when there are no messages or the reply has text`() = runTest {
+        givenChat("""{"chatId":"abc","messages":[]}""")
+        assertFalse(store.getChatPreview("abc")!!.isAwaitingReply)
+
+        givenChat("""{"chatId":"abc","messages":[{"role":"user","content":"hi"},{"role":"assistant","content":"Hello"}]}""")
+        assertFalse(store.getChatPreview("abc")!!.isAwaitingReply)
+    }
+
+    @Test
+    fun `getChatPreview returns null when chat not found or JSON malformed`() = runTest {
+        whenever(chatsDao.getById("missing")).thenReturn(null)
+        assertNull(store.getChatPreview("missing"))
+
+        givenChat("not json")
+        assertNull(store.getChatPreview("abc"))
+    }
+
+    private fun givenChat(json: String) {
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", json))
     }
 
     @Test

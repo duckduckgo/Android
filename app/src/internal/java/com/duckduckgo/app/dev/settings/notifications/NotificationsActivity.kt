@@ -24,11 +24,11 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ActivityNotificationsBinding
 import com.duckduckgo.app.dev.settings.notifications.NotificationViewModel.Command.TriggerNotification
 import com.duckduckgo.app.dev.settings.notifications.NotificationViewModel.ViewState
 import com.duckduckgo.app.notification.NotificationFactory
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.common.ui.viewbinding.viewBinding

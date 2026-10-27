@@ -18,13 +18,13 @@ package com.duckduckgo.pir.impl.freemium.settings
 
 import android.content.Context
 import android.view.View
-import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.settings.api.ProSettingsPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
 
-@ContributesMultibinding(scope = ActivityScope::class)
+@ContributesIntoMap(scope = ActivityScope::class)
 @PriorityKey(550)
 class PirFreemiumSettings @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {

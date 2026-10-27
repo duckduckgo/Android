@@ -35,7 +35,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.R
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
@@ -102,7 +102,7 @@ class VpnReminderNotificationSpecification(context: Context) : NotificationSpec 
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class VpnReminderNotificationPlugin @Inject constructor(
     private val context: Context,
     private val schedulableNotification: VpnReminderNotification,

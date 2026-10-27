@@ -32,7 +32,6 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.withStarted
 import androidx.webkit.WebViewCompat
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.BrowserAutofill
@@ -67,6 +66,7 @@ import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubTy
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubType.PASSWORD
 import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT

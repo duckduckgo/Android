@@ -22,7 +22,7 @@ import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
 import com.duckduckgo.networkprotection.impl.config.PcapConfig
 import com.duckduckgo.networkprotection.impl.config.RealNetPDefaultConfigProvider
 import com.duckduckgo.networkprotection.internal.feature.NetPInternalFeatureToggles
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.io.File
 import java.io.FileOutputStream
 import java.net.InetAddress
@@ -30,7 +30,7 @@ import javax.inject.Inject
 
 @ContributesBinding(
     scope = VpnScope::class,
-    rank = ContributesBinding.RANK_HIGHEST,
+    priority = Int.MAX_VALUE,
 )
 class NetPInternalDefaultConfigProvider @Inject constructor(
     private val realNetPConfigProvider: RealNetPDefaultConfigProvider,

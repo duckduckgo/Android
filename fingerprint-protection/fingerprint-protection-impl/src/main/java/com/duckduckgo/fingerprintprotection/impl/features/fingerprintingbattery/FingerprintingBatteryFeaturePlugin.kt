@@ -22,10 +22,10 @@ import com.duckduckgo.fingerprintprotection.impl.fingerprintProtectionFeatureVal
 import com.duckduckgo.fingerprintprotection.store.FingerprintingBatteryEntity
 import com.duckduckgo.fingerprintprotection.store.features.fingerprintingbattery.FingerprintingBatteryRepository
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class FingerprintingBatteryFeaturePlugin @Inject constructor(
     private val fingerprintingBatteryRepository: FingerprintingBatteryRepository,
 ) : PrivacyFeaturePlugin {

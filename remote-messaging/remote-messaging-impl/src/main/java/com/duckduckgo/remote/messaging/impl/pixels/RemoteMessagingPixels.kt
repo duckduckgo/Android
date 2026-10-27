@@ -21,7 +21,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName.REMOTE_MESSAGE_SHOWN_UNIQUE
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface RemoteMessagingPixels {

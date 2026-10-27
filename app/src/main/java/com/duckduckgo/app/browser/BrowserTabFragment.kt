@@ -110,7 +110,6 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayerSettingsNoParams
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.bookmarks.dialog.BookmarkAddedConfirmationDialog
 import com.duckduckgo.app.bookmarks.dialog.BookmarkAddedConfirmationDialogFactory
@@ -290,6 +289,7 @@ import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.browsermode.api.WebViewModeInitializer
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.menu.PopupMenu
@@ -416,7 +416,6 @@ import java.io.File
 import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Named
-import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
 import kotlin.getValue
 
@@ -574,13 +573,13 @@ class BrowserTabFragment :
     lateinit var downloadsFileActions: DownloadsFileActions
 
     @Inject
-    lateinit var urlExtractingWebViewClient: Provider<UrlExtractingWebViewClient>
+    lateinit var urlExtractingWebViewClient: () -> UrlExtractingWebViewClient
 
     @Inject
-    lateinit var urlExtractor: Provider<DOMUrlExtractor>
+    lateinit var urlExtractor: () -> DOMUrlExtractor
 
     @Inject
-    lateinit var urlExtractorUserAgent: Provider<UserAgentProvider>
+    lateinit var urlExtractorUserAgent: () -> UserAgentProvider
 
     @Inject
     lateinit var voiceSearchLauncher: VoiceSearchLauncher
@@ -742,11 +741,7 @@ class BrowserTabFragment :
                 newState: Int,
             ) {
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                    if (nativeInputManager.isNativeInputActive()) {
-                        hideKeyboardImmediatelyRetainFocus()
-                    } else {
-                        hideKeyboardRetainFocus()
-                    }
+                    hideKeyboardImmediatelyRetainFocus()
                 }
             }
         }
@@ -1101,11 +1096,7 @@ class BrowserTabFragment :
                         }
 
                         is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
-                            if (nativeInputManager.isNativeInputEnabled()) {
-                                nativeInputManager.handleDuckAiVoiceResult(result.query)
-                            } else {
-                                duckChat.openDuckChatWithAutoPrompt(result.query, DuckChatEntryPoint.VOICE)
-                            }
+                            nativeInputManager.handleDuckAiVoiceResult(result.query)
                         }
                     }
                     resumeWebView()
@@ -1213,9 +1204,7 @@ class BrowserTabFragment :
             binding = binding,
         )
 
-        nativeInputManager.init(omnibar, binding.rootView, viewLifecycleOwner) {
-            nativeInputManager.hideNativeInput(animate = false)
-        }
+        nativeInputManager.init(omnibar, binding.rootView, viewLifecycleOwner)
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -1937,10 +1926,12 @@ class BrowserTabFragment :
         val intent =
             Intent(Intent.ACTION_VIEW).apply {
                 data = Uri.parse(url)
+                setPackage(requireContext().packageName)
             }
 
         if (requireActivity().packageManager.resolveActivity(intent, 0) != null) {
             startActivity(intent)
+            (activity as? CustomTabActivity)?.finishIfOutsideBrowserTask()
         } else {
             showToast(R.string.unableToOpenLink)
         }
@@ -2520,7 +2511,7 @@ class BrowserTabFragment :
     }
 
     private fun closeCustomTab() {
-        (activity as? CustomTabActivity)?.finishAndRemoveTask()
+        (activity as? CustomTabActivity)?.finishAndRemoveOwnTask()
     }
 
     private fun finishCustomTab() {
@@ -2569,7 +2560,7 @@ class BrowserTabFragment :
         binding.browserLayout.gone()
         maliciousWarningView.gone()
         sslErrorView.bind(handler, errorResponse) { action ->
-            viewModel.onSSLCertificateWarningAction(action, errorResponse.url)
+            viewModel.onSSLCertificateWarningAction(action, errorResponse.url, isActiveCustomTab())
         }
         sslErrorView.show()
 
@@ -2858,19 +2849,15 @@ class BrowserTabFragment :
             }
 
             is Command.ShowKeyboard -> {
-                if (nativeInputManager.isNativeInputActive()) {
-                    // Surface the native input widget so its onEnterComplete focuses the input
-                    // and brings up the keyboard via the same path as a manual omnibar tap.
-                    // Skip if the widget is already attached — Command.ShowKeyboard can fire
-                    // multiple times per session (e.g. CTA refresh / tab swipe back to NTP) and
-                    // showNativeInput() tears down and re-animates the widget on each call.
-                    // isNativeInputShown checks the single inputModeRoot across both positions; a
-                    // top-only check re-opened UTI on every swipe and stacked NTP content insets.
-                    if (!nativeInputManager.isNativeInputShown()) {
-                        showNativeInput()
-                    }
-                } else {
-                    showKeyboard()
+                // Surface the native input widget so its onEnterComplete focuses the input
+                // and brings up the keyboard via the same path as a manual omnibar tap.
+                // Skip if the widget is already attached — Command.ShowKeyboard can fire
+                // multiple times per session (e.g. CTA refresh / tab swipe back to NTP) and
+                // showNativeInput() tears down and re-animates the widget on each call.
+                // isNativeInputShown checks the single inputModeRoot across both positions; a
+                // top-only check re-opened UTI on every swipe and stacked NTP content insets.
+                if (!nativeInputManager.isNativeInputShown()) {
+                    showNativeInput()
                 }
             }
 
@@ -2879,11 +2866,7 @@ class BrowserTabFragment :
             }
 
             is Command.DropAddressBarFocus -> {
-                if (nativeInputManager.isNativeInputActive()) {
-                    nativeInputManager.hideNativeInput()
-                } else {
-                    hideKeyboard()
-                }
+                nativeInputManager.hideNativeInput()
             }
 
             is Command.ShowToast -> {
@@ -2997,12 +2980,7 @@ class BrowserTabFragment :
             is Command.CancelIncomingAutofillRequest -> injectAutofillCredentials(it.url, null)
             is Command.LaunchAutofillSettings -> launchAutofillManagementScreen(it.privacyProtectionEnabled)
             is Command.EditWithSelectedQuery -> {
-                if (nativeInputManager.isNativeInputActive()) {
-                    nativeInputManager.setText(it.query)
-                } else {
-                    omnibar.setText(it.query)
-                    omnibar.setTextSelection(it.query.length)
-                }
+                nativeInputManager.setText(it.query)
             }
 
             is ShowBackNavigationHistory -> showBackNavigationHistory(it)
@@ -3335,12 +3313,12 @@ class BrowserTabFragment :
 
     private fun extractUrlFromAmpLink(initialUrl: String) {
         context?.let {
-            val client = urlExtractingWebViewClient.get()
+            val client = urlExtractingWebViewClient()
             client.urlExtractionListener = viewModel
 
             logcat { "AMP link detection: Creating WebView for URL extraction" }
             urlExtractingWebView =
-                UrlExtractingWebView(requireContext(), client, urlExtractorUserAgent.get(), urlExtractor.get(), webViewModeInitializer, browserMode)
+                UrlExtractingWebView(requireContext(), client, urlExtractorUserAgent(), urlExtractor(), webViewModeInitializer, browserMode)
 
             urlExtractingWebView?.urlExtractionListener = viewModel
 
@@ -4208,8 +4186,6 @@ class BrowserTabFragment :
                     hasFocus: Boolean,
                     query: String,
                 ) {
-                    if (nativeInputManager.isNativeInputActive()) return
-                    onOmnibarTextFocusChanged(hasFocus, query)
                 }
 
                 override fun onBackKeyPressed(): Boolean {
@@ -4224,17 +4200,9 @@ class BrowserTabFragment :
                 }
 
                 override fun onOmnibarTextChanged(state: OmnibarTextState) {
-                    if (nativeInputManager.isNativeInputActive()) return
-                    onUserEnteredText(state.text, state.hasFocus)
                 }
 
                 override fun onShowSuggestions(state: OmnibarTextState) {
-                    if (nativeInputManager.isNativeInputActive()) return
-                    viewModel.triggerAutocomplete(
-                        state.text,
-                        state.hasFocus,
-                        true,
-                    )
                 }
 
                 override fun onTrackersCountFinished() {
@@ -4246,26 +4214,6 @@ class BrowserTabFragment :
                 }
             },
         )
-    }
-
-    private fun onOmnibarTextFocusChanged(
-        hasFocus: Boolean,
-        query: String,
-    ) {
-        viewModel.triggerAutocomplete(query, hasFocus, false)
-        if (hasFocus) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_SHOWN_DAILY, type = Daily())
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_SHOWN_COUNT)
-            cancelPendingAutofillRequestsToChooseCredentials()
-            removeDuckChatContextualSheet()
-        } else {
-            omnibar.omnibarTextInput.hideKeyboard()
-
-            // prevent a crash when the view is not initiliazed yet
-            if (view != null) {
-                binding.focusDummy.requestFocus()
-            }
-        }
     }
 
     private fun onOmnibarBackKeyPressed(): Boolean {
@@ -4714,11 +4662,6 @@ class BrowserTabFragment :
             }
             browserAutofill.rejectGeneratedPassword()
         }
-    }
-
-    private fun cancelPendingAutofillRequestsToChooseCredentials() {
-        browserAutofill.cancelPendingAutofillRequestToChooseCredentials()
-        viewModel.cancelPendingAutofillRequestToChooseCredentials()
     }
 
     private fun showAutofillDialogSaveCredentials(

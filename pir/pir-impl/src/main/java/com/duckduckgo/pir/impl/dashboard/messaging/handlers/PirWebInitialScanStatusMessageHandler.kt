@@ -36,7 +36,8 @@ import com.duckduckgo.pir.impl.notifications.PirScanCompleteNotifier
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scan.PirForegroundScanServiceStarter
 import com.duckduckgo.pir.impl.store.PirRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -48,9 +49,9 @@ import javax.inject.Inject
 /**
  * Handles the initial scan status message from Web which is used to retrieve the status of the initial scan.
  */
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = ActivityScope::class,
-    boundType = PirWebJsMessageHandler::class,
+    binding = binding<PirWebJsMessageHandler>(),
 )
 class PirWebInitialScanStatusMessageHandler @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,

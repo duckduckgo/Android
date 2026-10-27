@@ -16,21 +16,21 @@
 
 package com.duckduckgo.mobile.android.vpn.bugreport
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
 @ContributesBinding(ActivityScope::class)
-@SingleInstanceIn(ActivityScope::class)
+@SingleIn(ActivityScope::class)
 class RealVpnStateCollector @Inject constructor(
     private val vpnStateCollectors: PluginPoint<VpnStateCollectorPlugin>,
     private val dispatcherProvider: DispatcherProvider,

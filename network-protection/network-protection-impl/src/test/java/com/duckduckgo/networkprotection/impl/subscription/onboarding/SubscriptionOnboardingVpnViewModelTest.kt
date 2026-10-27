@@ -91,7 +91,6 @@ class SubscriptionOnboardingVpnViewModelTest {
 
     @Test
     fun whenVpnReconnectsAfterConnectedThenStaysOnSuccessAndNoError() = runTest {
-        // Once connected, later CONNECTING/DISCONNECTED churn must not rewind the screen or invent a failure.
         val networkProtectionState = mock<NetworkProtectionState>().apply {
             whenever(getConnectionStateFlow()).thenReturn(flowOf(CONNECTED, CONNECTING, DISCONNECTED))
         }

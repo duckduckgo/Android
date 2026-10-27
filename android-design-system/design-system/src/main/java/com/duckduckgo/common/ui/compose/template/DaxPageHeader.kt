@@ -70,8 +70,8 @@ fun DaxPageHeader(
     learnMoreClick: (() -> Unit)? = null,
 ) {
     Column(
-        modifier = modifier.padding(DaxPageHeaderDefaults.containerPaddingValues),
-        verticalArrangement = Arrangement.spacedBy(DaxPageHeaderDefaults.containerVerticalSpacing),
+        modifier = modifier.padding(DaxPageHeaderDefaults.ContainerPaddingValues),
+        verticalArrangement = Arrangement.spacedBy(DaxPageHeaderDefaults.ContainerVerticalSpacing),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         if (iconHeader != null) {
@@ -79,14 +79,14 @@ fun DaxPageHeader(
                 painter = iconHeader,
                 contentDescription = null,
                 modifier = Modifier.size(
-                    width = DaxPageHeaderDefaults.iconHeaderWidth,
-                    height = DaxPageHeaderDefaults.iconHeaderHeight,
+                    width = DaxPageHeaderDefaults.IconHeaderWidth,
+                    height = DaxPageHeaderDefaults.IconHeaderHeight,
                 ),
             )
         }
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(DaxPageHeaderDefaults.headerVerticalSpacing),
+            verticalArrangement = Arrangement.spacedBy(DaxPageHeaderDefaults.HeaderVerticalSpacing),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             DaxText(
@@ -138,11 +138,11 @@ fun DaxPageHeader(
 }
 
 internal object DaxPageHeaderDefaults {
-    internal val iconHeaderHeight = 96.dp
-    internal val iconHeaderWidth = 128.dp
-    internal val containerVerticalSpacing = 8.dp
-    internal val containerPaddingValues: PaddingValues = PaddingValues(all = 24.dp)
-    internal val headerVerticalSpacing = 4.dp
+    internal val IconHeaderHeight = 96.dp
+    internal val IconHeaderWidth = 128.dp
+    internal val ContainerVerticalSpacing = 8.dp
+    internal val ContainerPaddingValues: PaddingValues = PaddingValues(all = 24.dp)
+    internal val HeaderVerticalSpacing = 4.dp
     internal val titleTypography: DuckDuckGoTextStyle
         @Composable
         @ReadOnlyComposable

@@ -18,7 +18,7 @@ package com.duckduckgo.duckchat.internal
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.nativeinput.footer.highusage.HighUsageModelNoticeDismissalStore
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageNoticeActedOn

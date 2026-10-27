@@ -16,7 +16,7 @@
 
 package com.duckduckgo.contentscopescripts.impl
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
@@ -63,4 +63,14 @@ interface ContentScopeScriptsFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun cacheContentScopeExperiments(): Toggle
+
+    /**
+     * Kill-switch for checking a domain restricted message against the committed back/forward entry as well as the
+     * WebView url on the legacy messaging path.
+     * @return `true` when the remote config has the global "bridgeOriginCheck" clientContentFeatures
+     * sub-feature flag enabled.
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun bridgeOriginCheck(): Toggle
 }

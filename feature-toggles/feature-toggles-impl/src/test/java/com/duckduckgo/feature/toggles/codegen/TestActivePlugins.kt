@@ -16,8 +16,8 @@
 
 package com.duckduckgo.feature.toggles.codegen
 
-import com.duckduckgo.anvil.annotations.ContributesActivePlugin
-import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
+import com.duckduckgo.codegen.annotations.ContributesActivePlugin
+import com.duckduckgo.codegen.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue

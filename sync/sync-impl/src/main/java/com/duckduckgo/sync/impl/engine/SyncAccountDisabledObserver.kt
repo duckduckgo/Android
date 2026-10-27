@@ -23,16 +23,17 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.store.*
-import com.squareup.anvil.annotations.*
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.*
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class SyncAccountDisabledObserver @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,

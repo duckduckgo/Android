@@ -27,7 +27,7 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.emailprotection.EmailInjector
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
@@ -38,6 +38,7 @@ class EmailInjectorJs @Inject constructor(
     private val autofillFeature: AutofillFeature,
     private val emailProtectionJavascriptInjector: EmailProtectionJavascriptInjector,
     private val autofill: Autofill,
+    private val originCheckFeature: EmailBridgeOriginCheckFeature,
 ) : EmailInjector {
 
     override fun addJsInterface(
@@ -54,6 +55,7 @@ class EmailInjectorJs @Inject constructor(
                 dispatcherProvider,
                 autofillFeature,
                 autofill,
+                originCheckFeature,
                 onSignedInEmailProtectionPromptShown,
             ),
             JAVASCRIPT_INTERFACE_NAME,

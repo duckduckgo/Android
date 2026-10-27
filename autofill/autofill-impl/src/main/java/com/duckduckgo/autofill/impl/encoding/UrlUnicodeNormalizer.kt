@@ -18,7 +18,7 @@ package com.duckduckgo.autofill.impl.encoding
 
 import android.icu.text.IDNA
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
 

@@ -21,8 +21,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature.SubscriptionOnboardingCohorts.TREATMENT
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -38,7 +38,7 @@ interface SubscriptionOnboardingExperiments {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealSubscriptionOnboardingExperiments @Inject constructor(
     private val subscriptionsFeature: SubscriptionsFeature,
     private val dispatcherProvider: DispatcherProvider,

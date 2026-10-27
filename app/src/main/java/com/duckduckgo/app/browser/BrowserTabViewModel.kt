@@ -51,7 +51,6 @@ import com.duckduckgo.adblocking.api.AdBlockingOmnibarAnimationProvider
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.adclick.api.AdClickManager
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SSLErrorType.EXPIRED
@@ -357,6 +356,7 @@ import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchFeature
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
@@ -439,7 +439,6 @@ import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
-import dagger.Lazy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -706,45 +705,33 @@ class BrowserTabViewModel @Inject constructor(
      * Always-on autocomplete pipeline tied to the omnibar's text. Kept in sync with the
      * omnibar via [onOmnibarTextRendered] so the native-input widget can restore the
      * omnibar's autocomplete results when it closes — even if in-widget typing temporarily
-     * overwrote [autoCompleteStateFlow]. Gated on the native-input user setting so that
-     * users without the widget don't pay for a duplicate pipeline.
+     * overwrote [autoCompleteStateFlow].
      */
     private val omnibarTextStateFlow = MutableStateFlow("")
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     internal val omnibarAutocompleteCache: StateFlow<AutoCompleteResult> =
-        duckChat.observeNativeInputFieldUserSettingEnabled()
-            .catch { t ->
-                logcat(WARN) { "Native input setting flow failed: ${t.asLog()}" }
-                emit(false)
-            }
-            .flatMapLatest { isNativeInputEnabled ->
-                if (!isNativeInputEnabled) {
-                    flowOf(AutoCompleteResult("", emptyList()))
+        omnibarTextStateFlow
+            .debounce(300)
+            .distinctUntilChanged()
+            .flatMapLatest { query ->
+                // Skip page URLs — omnibarViewState emits on every navigation, and
+                // running the fetch against full URLs would be both wasteful and
+                // wrong (the autocomplete API expects user-typed queries).
+                val isQueryLike = query.isNotBlank() &&
+                    !UriString.isWebUrl(query) &&
+                    !duckPlayer.isDuckPlayerUri(query)
+                if (!isQueryLike || !autoCompleteSettings.autoCompleteSuggestionsEnabled) {
+                    flowOf(AutoCompleteResult(query, emptyList()))
                 } else {
-                    omnibarTextStateFlow
-                        .debounce(300)
-                        .distinctUntilChanged()
-                        .flatMapLatest { query ->
-                            // Skip page URLs — omnibarViewState emits on every navigation, and
-                            // running the fetch against full URLs would be both wasteful and
-                            // wrong (the autocomplete API expects user-typed queries).
-                            val isQueryLike = query.isNotBlank() &&
-                                !UriString.isWebUrl(query) &&
-                                !duckPlayer.isDuckPlayerUri(query)
-                            if (!isQueryLike || !autoCompleteSettings.autoCompleteSuggestionsEnabled) {
-                                flowOf(AutoCompleteResult(query, emptyList()))
-                            } else {
-                                // Catch inside flatMapLatest so a failed fetch only drops this query's
-                                // result — without it, .catch + stateIn(Eagerly) would terminate the
-                                // pipeline for the ViewModel's lifetime (no equivalent of the existing
-                                // pipeline's ConflatedJob restart).
-                                autoComplete.autoComplete(query)
-                                    .catch { t ->
-                                        logcat(WARN) { "Failed to get omnibar autocomplete: ${t.asLog()}" }
-                                        emit(AutoCompleteResult(query, emptyList()))
-                                    }
-                            }
+                    // Catch inside flatMapLatest so a failed fetch only drops this query's
+                    // result — without it, .catch + stateIn(Eagerly) would terminate the
+                    // pipeline for the ViewModel's lifetime (no equivalent of the existing
+                    // pipeline's ConflatedJob restart).
+                    autoComplete.autoComplete(query)
+                        .catch { t ->
+                            logcat(WARN) { "Failed to get omnibar autocomplete: ${t.asLog()}" }
+                            emit(AutoCompleteResult(query, emptyList()))
                         }
                 }
             }
@@ -3916,7 +3903,6 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun showOrHideKeyboard(cta: Cta?, reportLandingFocus: Boolean = true) {
         val shouldHideKeyboard = cta?.shouldDropAddressBarFocusWhenShown() == true ||
-            duckAiFeatureState.showInputScreen.value ||
             currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark ||
             (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard)
 
@@ -4952,17 +4938,17 @@ class BrowserTabViewModel @Inject constructor(
             when {
                 // 400 errors
                 statusCode == HTTP_STATUS_CODE_BAD_REQUEST_ERROR ->
-                    httpErrorPixels.get().updateCountPixel(
+                    httpErrorPixels.value.updateCountPixel(
                         HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY,
                     )
                 // all 4xx errors apart from 400
                 statusCode / 100 == HTTP_STATUS_CODE_CLIENT_ERROR_PREFIX ->
-                    httpErrorPixels.get().updateCountPixel(
+                    httpErrorPixels.value.updateCountPixel(
                         HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_4XX_DAILY,
                     )
                 // all 5xx errors
                 statusCode / 100 == HTTP_STATUS_CODE_SERVER_ERROR_PREFIX ->
-                    httpErrorPixels.get().update5xxCountPixel(
+                    httpErrorPixels.value.update5xxCountPixel(
                         HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY,
                         statusCode,
                     )
@@ -5432,7 +5418,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onSSLCertificateWarningAction(
         action: Action,
         url: String,
-        activeCustomTab: Boolean = false,
+        activeCustomTab: Boolean,
     ) {
         when (action) {
             is Action.Shown -> {
@@ -5731,7 +5717,7 @@ class BrowserTabViewModel @Inject constructor(
         URLUtil.isNetworkUrl(text) || URLUtil.isAssetUrl(text) || URLUtil.isFileUrl(text) || URLUtil.isContentUrl(text)
 
     fun onNewTabShown() {
-        newTabPixels.get().fireNewTabDisplayed()
+        newTabPixels.value.fireNewTabDisplayed()
     }
 
     fun handleMenuRefreshAction() {
@@ -5972,10 +5958,8 @@ class BrowserTabViewModel @Inject constructor(
             command.value = HideKeyboardForChat
         }
 
-        if (!duckAiFeatureState.showInputScreen.value) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED_DAILY, type = Daily())
-        }
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED)
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED_DAILY, type = Daily())
 
         when {
             // Contextual chat is about the page you're viewing, so on a page it's only offered from

@@ -27,8 +27,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.newtabpage.api.interactions.HatchInteractionsPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
@@ -39,10 +40,10 @@ import kotlinx.coroutines.sync.withLock
 import logcat.logcat
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
-@ContributesMultibinding(AppScope::class, boundType = BrowserLifecycleObserver::class)
-@ContributesMultibinding(AppScope::class, boundType = BrowserInteractionsPlugin::class)
-@ContributesMultibinding(AppScope::class, boundType = HatchInteractionsPlugin::class)
+@SingleIn(AppScope::class)
+@ContributesIntoSet(AppScope::class, binding = binding<BrowserLifecycleObserver>())
+@ContributesIntoSet(AppScope::class, binding = binding<BrowserInteractionsPlugin>())
+@ContributesIntoSet(AppScope::class, binding = binding<HatchInteractionsPlugin>())
 class RealPostIdleSessionWideEvent @Inject constructor(
     private val wideEventClient: WideEventClient,
     private val duckChatInputModeState: DuckChatInputModeState,

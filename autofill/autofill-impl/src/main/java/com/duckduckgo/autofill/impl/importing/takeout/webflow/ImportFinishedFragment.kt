@@ -21,13 +21,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentImportBookmarksResultBinding
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class ImportFinishedFragment : DuckDuckGoFragment() {
@@ -76,7 +77,7 @@ class ImportFinishedFragment : DuckDuckGoFragment() {
 
         binding?.run {
             bookmarksImportResult.setPrimaryText(getString(R.string.importBookmarksFromGoogleSuccessBookmarksCount, bookmarkCount))
-            bookmarksImportResult.setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.check_recolorable_24)
+            bookmarksImportResult.setLeadingIconResource(CommonR.drawable.check_recolorable_24)
             importResultTitle.text = getString(R.string.importBookmarksSuccessTitle)
             secondaryErrorInfo.gone()
         }
@@ -87,7 +88,7 @@ class ImportFinishedFragment : DuckDuckGoFragment() {
 
         binding?.run {
             bookmarksImportResult.setPrimaryText(error)
-            bookmarksImportResult.setLeadingIconResource(R.drawable.ic_cross_recolorable_red_24)
+            bookmarksImportResult.setLeadingIconResource(CommonR.drawable.cross_recolorable_24)
             importResultTitle.text = getString(R.string.importBookmarksErrorTitle)
             secondaryErrorInfo.show()
         }
@@ -98,7 +99,7 @@ class ImportFinishedFragment : DuckDuckGoFragment() {
     }
 
     private fun setupToolbar() {
-        val toolbar = activity?.findViewById<Toolbar>(com.duckduckgo.mobile.android.R.id.toolbar)
+        val toolbar = activity?.findViewById<Toolbar>(CommonR.id.toolbar)
         toolbar?.setNavigationOnClickListener {
             onDoneCallback?.invoke()
         }

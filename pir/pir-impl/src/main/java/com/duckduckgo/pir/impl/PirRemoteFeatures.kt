@@ -16,7 +16,7 @@
 
 package com.duckduckgo.pir.impl
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -26,8 +26,9 @@ import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 import com.duckduckgo.pir.api.PirFeature
 import com.duckduckgo.pir.api.dashboard.PirFeatureState
 import com.duckduckgo.pir.impl.store.PirRepository
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -77,10 +78,10 @@ interface PirRemoteFeatures {
     fun freemium(): Toggle
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = PirFeature::class,
+    binding = binding<PirFeature>(),
 )
 class PirRemoteFeatureImpl @Inject constructor(
     private val pirRemoteFeatures: PirRemoteFeatures,

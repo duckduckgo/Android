@@ -29,7 +29,7 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin.Type.DISABLED
 import com.duckduckgo.mobile.android.vpn.service.notification.getHighestPriorityPluginForType
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnReminderNotificationBuilder
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
 

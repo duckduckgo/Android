@@ -16,6 +16,8 @@
 
 package com.duckduckgo.contentscopescripts.impl.messaging
 
+import android.webkit.WebBackForwardList
+import android.webkit.WebHistoryItem
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -158,7 +160,7 @@ class ContentScopeScriptsJsMessagingTest {
     @Test
     fun `if interface is not registered do nothing`() =
         runTest {
-            whenever(mockWebView.url).thenReturn("https://example.com")
+            givenUrl("https://example.com")
 
             val message =
                 """
@@ -181,7 +183,7 @@ class ContentScopeScriptsJsMessagingTest {
     fun `when url is not allowed do nothing`() =
         runTest {
             givenInterfaceIsRegistered()
-            whenever(mockWebView.url).thenReturn("https://nowAllowed.com")
+            givenUrl("https://nowAllowed.com")
 
             val message =
                 """
@@ -317,7 +319,7 @@ class ContentScopeScriptsJsMessagingTest {
     fun `when processing message with subdomain of allowed domain then process message`() =
         runTest {
             contentScopeScriptsJsMessaging.register(mockWebView, callback)
-            whenever(mockWebView.url).thenReturn("https://subdomain.example.com")
+            givenUrl("https://subdomain.example.com")
 
             val message =
                 """
@@ -333,7 +335,7 @@ class ContentScopeScriptsJsMessagingTest {
     fun `when processing message with null url and handler has allowed domains then do nothing`() =
         runTest {
             contentScopeScriptsJsMessaging.register(mockWebView, callback)
-            whenever(mockWebView.url).thenReturn(null)
+            givenUrl(null)
 
             val message =
                 """
@@ -350,7 +352,7 @@ class ContentScopeScriptsJsMessagingTest {
         runTest {
             val messaging = givenMessaging(WebEventsPluginPoint())
             messaging.register(mockWebView, webEventsCallback)
-            whenever(mockWebView.url).thenReturn("https://example.com")
+            givenUrl("https://example.com")
 
             val message =
                 """
@@ -469,7 +471,7 @@ class ContentScopeScriptsJsMessagingTest {
         runTest {
             val messaging = givenMessaging(TwoHandlersPluginPoint())
             messaging.register(mockWebView, callback)
-            whenever(mockWebView.url).thenReturn("https://example.com")
+            givenUrl("https://example.com")
 
             val message =
                 """
@@ -488,7 +490,7 @@ class ContentScopeScriptsJsMessagingTest {
             contentScopeScriptsFeature.optimizeContentScopeMessaging().setRawStoredState(State(enable = false))
             val messaging = givenMessaging(handlers)
             messaging.register(mockWebView, callback)
-            whenever(mockWebView.url).thenReturn("https://example.com")
+            givenUrl("https://example.com")
 
             val message =
                 """
@@ -506,7 +508,7 @@ class ContentScopeScriptsJsMessagingTest {
             contentScopeScriptsFeature.optimizeContentScopeMessaging().setRawStoredState(State(enable = false))
             val messaging = givenMessaging(handlers)
             messaging.register(mockWebView, callback)
-            whenever(mockWebView.url).thenReturn("https://notAllowed.com")
+            givenUrl("https://notAllowed.com")
 
             val message =
                 """
@@ -524,7 +526,7 @@ class ContentScopeScriptsJsMessagingTest {
             contentScopeScriptsFeature.optimizeContentScopeMessaging().setRawStoredState(State(enable = false))
             val messaging = givenMessaging(handlers)
             messaging.register(mockWebView, callback)
-            whenever(mockWebView.url).thenReturn("https://example.com")
+            givenUrl("https://example.com")
 
             val message =
                 """
@@ -554,7 +556,7 @@ class ContentScopeScriptsJsMessagingTest {
             contentScopeScriptsFeature.optimizeContentScopeMessaging().setRawStoredState(State(enable = false))
             val messaging = givenMessaging(handlers)
             messaging.register(mockWebView, callback)
-            whenever(mockWebView.url).thenReturn("https://example.com")
+            givenUrl("https://example.com")
 
             val message =
                 """
@@ -573,7 +575,7 @@ class ContentScopeScriptsJsMessagingTest {
             contentScopeScriptsFeature.optimizeContentScopeMessaging().setRawStoredState(State(enable = false))
             val messaging = givenMessaging(handlers)
             messaging.register(mockWebView, callback)
-            whenever(mockWebView.url).thenReturn("https://example.com")
+            givenUrl("https://example.com")
 
             val message =
                 """
@@ -593,7 +595,7 @@ class ContentScopeScriptsJsMessagingTest {
             contentScopeScriptsFeature.optimizeContentScopeMessaging().setRawStoredState(State(enable = false))
             val messaging = givenMessaging(WebEventsPluginPoint())
             messaging.register(mockWebView, webEventsCallback)
-            whenever(mockWebView.url).thenReturn("https://example.com")
+            givenUrl("https://example.com")
 
             val message =
                 """
@@ -621,6 +623,59 @@ class ContentScopeScriptsJsMessagingTest {
             verify(mockWebView, never()).url
         }
 
+    @Test
+    fun `when optimization is disabled and url reports a pending navigation to an allowed domain then the restricted handler does not run`() =
+        runTest {
+            contentScopeScriptsFeature.optimizeContentScopeMessaging().setRawStoredState(State(enable = false))
+            val messaging = givenMessaging(handlers)
+            messaging.register(mockWebView, callback)
+            givenUrl("https://example.com", committedUrl = "https://third-party.test/")
+
+            messaging.process(webShareMessage("pending"), messaging.secret)
+
+            assertEquals(0, callback.counter)
+        }
+
+    @Test
+    fun `when optimization is disabled and the origin check is disabled then the url alone decides`() =
+        runTest {
+            contentScopeScriptsFeature.optimizeContentScopeMessaging().setRawStoredState(State(enable = false))
+            contentScopeScriptsFeature.bridgeOriginCheck().setRawStoredState(State(enable = false))
+            val messaging = givenMessaging(handlers)
+            messaging.register(mockWebView, callback)
+            givenUrl("https://example.com", committedUrl = "https://third-party.test/")
+
+            messaging.process(webShareMessage("pending"), messaging.secret)
+
+            assertEquals(1, callback.counter)
+        }
+
+    @Test
+    fun `when optimization is disabled and url reports a pending navigation then a handler with no allowed domains still runs`() =
+        runTest {
+            contentScopeScriptsFeature.optimizeContentScopeMessaging().setRawStoredState(State(enable = false))
+            val messaging = givenMessaging(WebEventsPluginPoint())
+            messaging.register(mockWebView, webEventsCallback)
+            givenUrl("https://example.com", committedUrl = "https://third-party.test/")
+
+            messaging.process(webEventMessage("e1"), messaging.secret)
+
+            assertEquals(1, webEventsCallback.counter)
+        }
+
+    @Test
+    fun `when optimization is disabled and privileged feature is called from its allowed host then process message`() =
+        runTest {
+            contentScopeScriptsFeature.optimizeContentScopeMessaging().setRawStoredState(State(enable = false))
+            val messaging = givenMessaging(PrivilegedPluginPoint())
+            messaging.register(mockWebView, callback)
+            givenUrl("https://duckduckgo.com/subscriptions")
+
+            messaging.process(authAccessTokenMessage("token"), messaging.secret)
+
+            assertEquals(1, callback.counter)
+        }
+
     // The tests above run on an UnconfinedTestDispatcher, where the consumer drains each message before the next one is
     // offered, so the queue never holds more than one. These use a StandardTestDispatcher instead: nothing runs until
     // advanceUntilIdle(), so messages genuinely queue and the consumer's ordering and recovery paths are exercised.
@@ -629,7 +684,7 @@ class ContentScopeScriptsJsMessagingTest {
         runTest {
             val messaging = givenQueuedMessaging(handlers)
             messaging.register(mockWebView, callback)
-            whenever(mockWebView.url).thenReturn("https://example.com")
+            givenUrl("https://example.com")
 
             listOf("first", "second", "third").forEach { messaging.process(webShareMessage(it), messaging.secret) }
             advanceUntilIdle()
@@ -642,7 +697,7 @@ class ContentScopeScriptsJsMessagingTest {
         runTest {
             val messaging = givenQueuedMessaging(handlers)
             messaging.register(mockWebView, callback)
-            whenever(mockWebView.url).thenReturn("https://example.com")
+            givenUrl("https://example.com")
             messaging.process(webShareMessage("stale"), messaging.secret)
 
             messaging.register(mockWebView, callback)
@@ -704,7 +759,7 @@ class ContentScopeScriptsJsMessagingTest {
         runTest {
             val messaging = givenQueuedMessaging(handlers)
             messaging.register(mockWebView, callback)
-            whenever(mockWebView.url).thenReturn("https://example.com")
+            givenUrl("https://example.com")
             messaging.process(webShareMessage("stale"), messaging.secret)
 
             messaging.register(mock(), webEventsCallback)
@@ -736,6 +791,11 @@ class ContentScopeScriptsJsMessagingTest {
     private fun webEventMessage(id: String) =
         """
         {"context":"contentScopeScripts","featureName":"webEvents","id":"$id","method":"webEvent","params":{"type":"t"}}
+        """.trimIndent()
+
+    private fun authAccessTokenMessage(id: String) =
+        """
+        {"context":"contentScopeScripts","featureName":"subscriptions","id":"$id","method":"getAuthAccessToken","params":{}}
         """.trimIndent()
 
     private fun TestScope.givenQueuedMessaging(
@@ -870,8 +930,41 @@ class ContentScopeScriptsJsMessagingTest {
         }
     }
 
+    private class PrivilegedPluginPoint : PluginPoint<ContentScopeJsMessageHandlersPlugin> {
+        override fun getPlugins(): Collection<ContentScopeJsMessageHandlersPlugin> = listOf(Plugin())
+
+        class Plugin : ContentScopeJsMessageHandlersPlugin {
+            override fun getJsMessageHandler(): JsMessageHandler =
+                object : JsMessageHandler {
+                    override fun process(
+                        jsMessage: JsMessage,
+                        jsMessaging: JsMessaging,
+                        jsMessageCallback: JsMessageCallback?,
+                    ) {
+                        jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
+                    }
+
+                    override val allowedDomains: List<String> = listOf("duckduckgo.com")
+                    override val featureName: String = "subscriptions"
+                    override val methods: List<String> = listOf("getAuthAccessToken")
+                }
+        }
+    }
+
     private fun givenInterfaceIsRegistered() {
         contentScopeScriptsJsMessaging.register(mockWebView, callback)
-        whenever(mockWebView.url).thenReturn("https://example.com")
+        givenUrl("https://example.com")
+    }
+
+    private fun givenUrl(
+        url: String?,
+        committedUrl: String? = url,
+    ) {
+        val currentItem: WebHistoryItem = mock()
+        whenever(currentItem.url).thenReturn(committedUrl)
+        val backForwardList: WebBackForwardList = mock()
+        whenever(backForwardList.currentItem).thenReturn(currentItem)
+        whenever(mockWebView.url).thenReturn(url)
+        whenever(mockWebView.copyBackForwardList()).thenReturn(backForwardList)
     }
 }

@@ -17,7 +17,6 @@
 package com.duckduckgo.sync.impl.pixels
 
 import android.content.SharedPreferences
-import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
@@ -71,9 +70,10 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TurnOffOption
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.duckduckgo.sync.store.SharedPrefsProvider
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -324,7 +324,7 @@ interface SyncPixels {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealSyncPixels @Inject constructor(
     private val pixel: Pixel,
     private val statsRepository: SyncStatsRepository,
@@ -561,14 +561,14 @@ class RealSyncPixels @Inject constructor(
         pixel: SyncPixelName,
         payload: Map<String, String> = emptyMap(),
     ) {
-        val now = getUtcIsoLocalDate()
-        val timestamp = preferences.getString(pixel.name.appendTimestampSuffix(), null)
+        // Older app versions stored the last fire date here instead of using PixelType.Daily. We only read it, so a device
+        // that fired the pixel before updating today doesn't fire it again. We can remove this check after a few releases
+        // once enough devices update to an app version that has this check and run it.
+        // https://app.asana.com/1/137249556945/project/1215321458176118/task/1219486501578915
+        val legacyTimestamp = preferences.getString(pixel.name.appendTimestampSuffix(), null)
+        if (legacyTimestamp == getUtcIsoLocalDate()) return
 
-        // check if pixel was already sent in the current day
-        if (timestamp == null || now > timestamp) {
-            this.pixel.fire(pixel, payload)
-                .also { preferences.edit { putString(pixel.name.appendTimestampSuffix(), now) } }
-        }
+        this.pixel.fire(pixel, payload, type = PixelType.Daily())
     }
 
     private fun getUtcIsoLocalDate(): String {
@@ -1303,9 +1303,9 @@ object SyncPixelParameters {
     const val AUTO_RESTORE_SOURCE_SETTINGS = "settings"
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = PixelParamRemovalPlugin::class,
+    binding = binding<PixelParamRemovalPlugin>(),
 )
 object SyncPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {

@@ -37,8 +37,9 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobR
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
 import com.duckduckgo.pir.impl.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.impl.store.PirRepository
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
@@ -69,9 +70,9 @@ interface PirEmailConfirmation {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = PirEmailConfirmation::class,
+    binding = binding<PirEmailConfirmation>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealPirEmailConfirmation @Inject constructor(
     private val repository: PirRepository,
     private val brokerStepsParser: BrokerStepsParser,

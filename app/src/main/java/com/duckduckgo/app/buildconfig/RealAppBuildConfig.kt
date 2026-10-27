@@ -28,8 +28,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
@@ -55,12 +54,7 @@ class RealAppBuildConfig @Inject constructor(
     override val applicationId: String = BuildConfig.APPLICATION_ID
     override val buildType: String = BuildConfig.BUILD_TYPE
     override val versionCode: Int = BuildConfig.VERSION_CODE
-    override val versionName: String
-        get() = if (isInternalBuild() || isDebug) {
-            "${BuildConfig.VERSION_NAME}-$diFramework"
-        } else {
-            BuildConfig.VERSION_NAME
-        }
+    override val versionName: String = BuildConfig.VERSION_NAME
     override val flavor: BuildFlavor
         get() = when (BuildConfig.FLAVOR) {
             "internal" -> BuildFlavor.INTERNAL
@@ -80,11 +74,6 @@ class RealAppBuildConfig @Inject constructor(
         }
     }
     override val isPerformanceTest: Boolean = BuildConfig.IS_PERFORMANCE_TEST
-    private val diFramework: String = if (BuildConfig.DEBUG || BuildConfig.FLAVOR == "internal") {
-        BuildConfig.DI_FRAMEWORK
-    } else {
-        ""
-    }
 
     override val isDefaultVariantForced: Boolean = BuildConfig.FORCE_DEFAULT_VARIANT
 
@@ -92,7 +81,7 @@ class RealAppBuildConfig @Inject constructor(
         get() = Locale.getDefault()
 
     override val variantName: String?
-        get() = variantManager.get().getVariantKey()
+        get() = variantManager.value.getVariantKey()
 
     override suspend fun isAppReinstall(): Boolean = withContext(dispatcherProvider.io()) {
         return@withContext kotlin.runCatching {

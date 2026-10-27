@@ -21,6 +21,10 @@ on:
         required: false
         type: boolean
         default: true
+    outputs:
+      cherry-pick-conflict:
+        description: "'true' when a fix commit failed to cherry-pick onto the hotfix branch"
+        value: ${{ jobs.hotfix-prepare.outputs.cherry-pick-conflict }}
   workflow_dispatch:
     inputs:
       app-version:
@@ -45,11 +49,14 @@ on:
 env:
   ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
   GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
+  HOTFIX_CONFLICT_PLAYBOOK_URL: https://app.asana.com/1/137249556945/task/1219472906247295
 
 jobs:
   hotfix-prepare:
     name: Create hotfix branch and cherry-pick fixes
     runs-on: ubuntu-latest
+    outputs:
+      cherry-pick-conflict: ${{ steps.cherry-pick.outputs.conflict }}
 
     steps:
       - name: Validate app-version
@@ -124,6 +131,7 @@ jobs:
           bundle exec fastlane hotfix-start version:${{ inputs.app-version }} release_notes:"${{ inputs.release-notes }}"
 
       - name: Cherry-pick fix commits
+        id: cherry-pick
         run: |
           commits=$(echo "${{ inputs.commit-hashes }}" | tr ',' ' ' | xargs)
           for sha in $commits; do
@@ -131,6 +139,9 @@ jobs:
             if ! git cherry-pick "$sha"; then
               echo "::error::Cherry-pick of '$sha' failed (likely a conflict). Aborting; no hotfix branch will be pushed."
               git cherry-pick --abort || true
+              echo "conflict=true" >> "$GITHUB_OUTPUT"
+              echo "### Cherry-pick of \`$sha\` failed" >> "$GITHUB_STEP_SUMMARY"
+              echo "Follow Where to start > Prepare failed, keeping version ${{ inputs.app-version }}: $HOTFIX_CONFLICT_PLAYBOOK_URL" >> "$GITHUB_STEP_SUMMARY"
               exit 1
             fi
           done
@@ -147,5 +158,7 @@ jobs:
           asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
           asana-task-name: GH Workflow Failure - Prepare Hotfix Branch
-          asana-task-description: The Prepare Hotfix Branch workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-description: |
+            The Prepare Hotfix Branch workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+            ${{ steps.cherry-pick.outputs.conflict == 'true' && format('A fix commit did not cherry-pick cleanly. Follow Where to start > Prepare failed, keeping the same version: {0}', env.HOTFIX_CONFLICT_PLAYBOOK_URL) || '' }}
           action: 'create-asana-task'

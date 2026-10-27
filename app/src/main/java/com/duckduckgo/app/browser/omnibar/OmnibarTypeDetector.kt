@@ -20,16 +20,17 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
 interface OmnibarTypeReporterPlugin
 
-@ContributesMultibinding(scope = AppScope::class, boundType = BrowserFeatureStateReporterPlugin::class)
-@ContributesBinding(scope = AppScope::class, boundType = OmnibarTypeReporterPlugin::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(scope = AppScope::class, binding = binding<BrowserFeatureStateReporterPlugin>())
+@ContributesBinding(scope = AppScope::class, binding = binding<OmnibarTypeReporterPlugin>())
+@SingleIn(AppScope::class)
 class OmnibarTypeDetector @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
 ) : OmnibarTypeReporterPlugin, BrowserFeatureStateReporterPlugin {

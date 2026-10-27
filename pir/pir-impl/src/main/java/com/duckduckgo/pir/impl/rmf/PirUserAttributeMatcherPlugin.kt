@@ -20,10 +20,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirUserUtils
 import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class PirUserAttributeMatcherPlugin @Inject constructor(
     private val pirUserUtils: PirUserUtils,
 ) : AttributeMatcherPlugin {

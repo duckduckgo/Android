@@ -23,7 +23,7 @@ import android.provider.OpenableColumns
 import android.util.Base64
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject

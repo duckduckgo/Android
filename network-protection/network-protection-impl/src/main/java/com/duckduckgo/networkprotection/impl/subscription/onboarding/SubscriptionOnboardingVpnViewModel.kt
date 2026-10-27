@@ -18,7 +18,7 @@ package com.duckduckgo.networkprotection.impl.subscription.onboarding
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
@@ -119,7 +119,6 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
                     }
                     DISCONNECTED -> if (!hasConnected) {
                         viewState.update {
-                            // Falling back to disconnected while activation was in progress means the VPN failed to start.
                             it.copy(
                                 vpnEnabled = false,
                                 activating = false,

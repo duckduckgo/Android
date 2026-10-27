@@ -32,6 +32,7 @@ import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
+import com.duckduckgo.sync.impl.pixels.SwitchedAccountDetector
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
@@ -50,9 +51,9 @@ import com.duckduckgo.sync.impl.ui.pairing.toExchangeV1PairingError
 import com.duckduckgo.sync.impl.ui.pairing.toExchangeV2PairingError
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl.ProtocolVersion
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.AssistedInject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -73,6 +74,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
     private val syncFeature: SyncFeature,
     private val qrEncoder: QREncoder,
     private val clipboard: ClipboardInteractor,
+    private val switchedAccountDetector: SwitchedAccountDetector,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
     private val _commands = Channel<Command>(Channel.BUFFERED)
@@ -90,6 +92,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
     init {
         viewModelScope.launch(dispatchers.io()) {
             isSignedIn = accountRepository.getAccountInfo().isSignedIn
+            switchedAccountDetector.onPairingStarted()
             pixels.fireSyncBarcodeScreenShown(syncType)
             when (protocolVersion()) {
                 ProtocolVersion.V1 -> startV1Presentation()
@@ -253,6 +256,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
                 is DispatchOutcome.LoggedIn -> {
                     _viewState.update { it.copy(dialog = null) }
                     pixels.fireLoginPixel()
+                    switchedAccountDetector.onPaired()
                     pixels.fireSyncSetupFinishedSuccessfully(syncType, outcome.path, outcome.myRole, outcome.peerKind)
                     _commands.send(Command.SetPairingResult(pairingResult()))
                     _commands.send(Command.Close)

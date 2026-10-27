@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.fire
 
+import android.app.Activity
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
@@ -25,6 +27,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.customtabs.CustomTabActivity
+import com.duckduckgo.app.browser.customtabs.CustomTabsFeature
+import com.duckduckgo.app.dispatchers.IntentDispatcherActivity
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.ApplicationClearDataState
@@ -33,13 +39,15 @@ import com.duckduckgo.app.global.ApplicationClearDataState.INITIALIZING
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.browser.api.ActivityLifecycleCallbacks
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -52,17 +60,22 @@ import kotlin.coroutines.CoroutineContext
 interface DataClearer {
     val dataClearerState: LiveData<ApplicationClearDataState>
     var isFreshAppLaunch: Boolean
+    var deferredQuery: String?
 }
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = DataClearer::class,
+    binding = binding<DataClearer>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = BrowserLifecycleObserver::class,
+    binding = binding<BrowserLifecycleObserver>(),
 )
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(
+    scope = AppScope::class,
+    binding = binding<ActivityLifecycleCallbacks>(),
+)
+@SingleIn(AppScope::class)
 class AutomaticDataClearer @Inject constructor(
     private val workManager: WorkManager,
     private val settingsDataStore: SettingsDataStore,
@@ -72,7 +85,8 @@ class AutomaticDataClearer @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val fireDataStore: FireDataStore,
     private val dataClearingWideEvent: DataClearingWideEvent,
-) : DataClearer, BrowserLifecycleObserver, CoroutineScope {
+    private val customTabsFeature: CustomTabsFeature,
+) : DataClearer, BrowserLifecycleObserver, ActivityLifecycleCallbacks, CoroutineScope {
 
     private val clearJob: Job = Job()
 
@@ -85,18 +99,90 @@ class AutomaticDataClearer @Inject constructor(
 
     override var isFreshAppLaunch = true
 
+    // Reopened after the restart so the link isn't lost. Reset after every clear.
+    @Volatile
+    override var deferredQuery: String? = null
+
+    // Opening a custom tab from another app must not run the automatic clear, because the clear would close that tab.
+    // The clear waits until the user opens the browser itself. To tell the two apart, these count what is open:
+    // custom tabs, the activity that routes links into a custom tab, and the browser.
+    private var startedCustomTabActivities = 0
+    private var startedBrowserActivities = 0
+    private var liveIntentDispatchers = 0
+    private var isAppOpenPending = false
+
+    // A custom tab has already used WebView in this process, so clearing its data needs a restart even on a fresh launch.
+    private var wasDeferredForCustomTab = false
+
     override fun onOpen(isFreshLaunch: Boolean) {
-        isFreshAppLaunch = isFreshLaunch
-        launch {
-            onAppForegroundedAsync()
+        isFreshAppLaunch = isFreshLaunch || (isAppOpenPending && isFreshAppLaunch)
+        isAppOpenPending = true
+        handleAppOpen()
+    }
+
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+        if (activity is IntentDispatcherActivity) liveIntentDispatchers++
+    }
+
+    override fun onActivityStarted(activity: Activity) {
+        when (activity) {
+            is CustomTabActivity -> startedCustomTabActivities++
+            is BrowserActivity -> {
+                startedBrowserActivities++
+                handleAppOpenIfBrowserStarted()
+            }
         }
     }
 
+    override fun onActivityStopped(activity: Activity) {
+        when (activity) {
+            is CustomTabActivity -> {
+                startedCustomTabActivities--
+                if (!activity.isChangingConfigurations) handleAppOpenIfBrowserStarted()
+            }
+            is BrowserActivity -> startedBrowserActivities--
+        }
+    }
+
+    override fun onActivityDestroyed(activity: Activity) {
+        if (activity is IntentDispatcherActivity) {
+            liveIntentDispatchers--
+            handleAppOpenIfBrowserStarted()
+        }
+    }
+
+    private fun handleAppOpenIfBrowserStarted() {
+        if (isAppOpenPending && startedBrowserActivities > 0) handleAppOpen()
+    }
+
+    private fun handleAppOpen() {
+        // Launched so the counters are up to date when this runs.
+        launch {
+            val hasAutomaticClearOptions = withContext(dispatchers.io()) { fireDataStore.getAutomaticClearOptions().isNotEmpty() }
+            if (!isAppOpenPending) return@launch
+            if (hasAutomaticClearOptions && isCustomTabInFront()) {
+                deferClearWhileInCustomTab()
+            } else {
+                isAppOpenPending = false
+                onBrowserOpenedAsync()
+            }
+        }
+    }
+
+    private fun isCustomTabInFront() = customTabsFeature.keepCustomTabOnAppSwitch().isEnabled() &&
+        (startedCustomTabActivities > 0 || liveIntentDispatchers > 0)
+
+    private suspend fun deferClearWhileInCustomTab() {
+        wasDeferredForCustomTab = true
+        workManager.cancelAllWorkByTag(DataClearingWorker.WORK_REQUEST_TAG)
+        withContext(dispatchers.io()) { settingsDataStore.appUsedSinceLastClear = true }
+    }
+
     @VisibleForTesting
-    suspend fun onAppForegroundedAsync() {
+    suspend fun onBrowserOpenedAsync() {
         postDataClearerState(INITIALIZING)
 
-        logcat { "onAppForegrounded; is from fresh app launch? $isFreshAppLaunch" }
+        logcat { "onBrowserOpened; is from fresh app launch? $isFreshAppLaunch" }
 
         workManager.cancelAllWorkByTag(DataClearingWorker.WORK_REQUEST_TAG)
 
@@ -108,6 +194,7 @@ class AutomaticDataClearer @Inject constructor(
             settingsDataStore.appIconChanged = false
 
             clearDataIfNeeded(appUsedSinceLastClear, appIconChanged)
+            deferredQuery = null
 
             isFreshAppLaunch = false
             settingsDataStore.clearAppBackgroundTimestamp()
@@ -134,6 +221,7 @@ class AutomaticDataClearer @Inject constructor(
     }
 
     override fun onClose() {
+        val isClearPending = isAppOpenPending
         launch {
             val timeNow = SystemClock.elapsedRealtime()
             logcat { "Recording when app backgrounded ($timeNow)" }
@@ -141,7 +229,8 @@ class AutomaticDataClearer @Inject constructor(
             postDataClearerState(INITIALIZING)
 
             withContext(dispatchers.io()) {
-                settingsDataStore.appBackgroundedTimestamp = timeNow
+                // Keep the original time so the pending clear still runs.
+                if (!isClearPending) settingsDataStore.appBackgroundedTimestamp = timeNow
 
                 val clearWhenOption = fireDataStore.getAutomaticallyClearWhenOption()
                 val clearOptions = fireDataStore.getAutomaticClearOptions()
@@ -198,16 +287,17 @@ class AutomaticDataClearer @Inject constructor(
                 dataClearingWideEvent.finishFailure(e)
                 throw e
             }
-            val needsRestart = !isFreshAppLaunch && shouldRestart
+            val needsRestart = (!isFreshAppLaunch || wasDeferredForCustomTab) && shouldRestart
             if (needsRestart) {
                 withContext(dispatchers.io()) {
                     clearDataAction.setAppUsedSinceLastClearFlag(false)
                     dataClearerForegroundAppRestartPixel.incrementCount()
                 }
 
+                val query = deferredQuery
                 // need a moment to draw background color (reduces flickering UX)
                 Handler(Looper.getMainLooper()).postDelayed(100) {
-                    clearDataAction.killAndRestartProcess(notifyDataCleared = true)
+                    clearDataAction.killAndRestartProcess(notifyDataCleared = true, query = query)
                 }
             } else {
                 postDataClearerState(FINISHED)

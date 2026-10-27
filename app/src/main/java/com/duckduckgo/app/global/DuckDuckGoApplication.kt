@@ -29,10 +29,10 @@ import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.di.android.AndroidInjector
+import com.duckduckgo.di.android.HasInjector
+import com.duckduckgo.di.android.getFactory
 import com.duckduckgo.referral.api.AppInstallationReferrerStateListener
-import dagger.android.AndroidInjector
-import dagger.android.HasDaggerInjector
-import dagger.android.getFactory
 import dev.zacsweers.metro.HasMemberInjections
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
@@ -49,7 +49,7 @@ private const val VPN_PROCESS_NAME = "vpn"
 private const val PIR_PROCESS_NAME = "pir"
 
 @HasMemberInjections
-open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() {
+open class DuckDuckGoApplication : HasInjector, MultiProcessApplication() {
 
     @Inject
     lateinit var uncaughtExceptionHandler: Thread.UncaughtExceptionHandler
@@ -74,14 +74,14 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     lateinit var appCoroutineScope: CoroutineScope
 
     @Inject
-    lateinit var injectorFactoryMap: dagger.android.InjectorFactoryMap
+    lateinit var injectorFactoryMap: com.duckduckgo.di.android.InjectorFactoryMap
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
     private val applicationCoroutineScope = CoroutineScope(SupervisorJob())
 
-    open lateinit var daggerAppComponent: AppComponent
+    open lateinit var appComponent: AppComponent
 
     override fun onMainProcessCreate() {
         configureLogging()
@@ -162,8 +162,8 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     }
 
     private fun configureDependencyInjection() {
-        daggerAppComponent = AppComponentFactory.create(this, applicationCoroutineScope)
-        daggerAppComponent.inject(this)
+        appComponent = AppComponentFactory.create(this, applicationCoroutineScope)
+        appComponent.inject(this)
     }
 
     private fun configureStrictMode() {
@@ -192,7 +192,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     // vtodo - Work around for https://crbug.com/558377
     // AndroidInjection.inject(this) creates a new instance of the DuckDuckGoApplication (because we are in a new process)
     // This has several disadvantages:
-    //   1. our app is of massive size, because we are duplicating our Dagger graph
+    //   1. our app is of massive size, because we are duplicating our DI graph
     //   2. we are hitting this bug in https://crbug.com/558377, because some of the injected dependencies may eventually
     //      depend in something webview-related
     //
@@ -240,19 +240,18 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     }
 
     /**
-     * Implementation of [HasDaggerInjector.daggerFactoryFor].
+     * Implementation of [HasInjector.injectorFactoryFor].
      * Similar to what dagger-android does, The [DuckDuckGoApplication] gets the [DuckDuckGoApplication.injectorFactoryMap]
-     * from DI. This holds all the Dagger factories for Android types, like Activities that we create. See [BookmarksActivityComponent.Factory]
-     * as an example.
+     * from DI. This holds all the injector factories for Android types, like Activities that we create.
      *
      * This method will return the [AndroidInjector.Factory] for the given key passed in as parameter.
      */
-    override fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*, *> {
+    override fun injectorFactoryFor(key: Class<*>): AndroidInjector.Factory<*, *> {
         return injectorFactoryMap.getFactory(key)
             ?: throw RuntimeException(
                 """
-                Could not find the dagger component for ${key.simpleName}.
-                You probably forgot to create the ${key.simpleName}Component
+                Could not find the injector for ${key.simpleName}.
+                You probably forgot to annotate your class with @InjectWith(Scope::class).
                 """.trimIndent(),
             )
     }

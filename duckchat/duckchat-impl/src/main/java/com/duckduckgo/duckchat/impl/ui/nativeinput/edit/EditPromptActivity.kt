@@ -19,8 +19,8 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.edit
 import android.os.Bundle
 import androidx.core.view.doOnAttach
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
@@ -90,7 +90,6 @@ class EditPromptActivity : DuckDuckGoActivity() {
             adoptEditAttachments(payload.images, payload.files)
             text = payload.prompt
             onChatSent = { submit(sessionId) }
-            hideMainButtons()
             // configureForEdit's own widget setup runs on attach; focusing before that leaves the
             // field not yet focusable. Queuing after it (registered later, so it runs after) fixes it.
             asView().doOnAttach { focusInput(this@EditPromptActivity) }

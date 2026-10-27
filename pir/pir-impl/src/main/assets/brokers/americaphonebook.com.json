@@ -1,8 +1,8 @@
 {
   "name": "America Phone Book",
   "url": "americaphonebook.com",
-  "version": "0.1.2",
-  "addedDatetime": 1758585600000,
+  "version": "0.1.3",
+  "addedDatetime": 1790121600000,
   "optOutUrl": "https://www.americaphonebook.com/search.php",
   "steps": [
     {

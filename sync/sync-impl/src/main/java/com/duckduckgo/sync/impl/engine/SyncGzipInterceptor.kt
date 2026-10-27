@@ -24,7 +24,8 @@ import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.SyncService
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.MediaType
@@ -37,9 +38,9 @@ import okio.buffer
 import java.io.IOException
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = ApiInterceptorPlugin::class,
+    binding = binding<ApiInterceptorPlugin>(),
 )
 class SyncGzipInterceptor @Inject constructor(
     private val syncFeature: SyncFeature,

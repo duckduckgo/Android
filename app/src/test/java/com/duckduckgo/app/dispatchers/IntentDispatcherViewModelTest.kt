@@ -24,6 +24,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayerSettingsNoParams
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.customtabs.CustomTabLaunchMode
+import com.duckduckgo.app.browser.customtabs.CustomTabsFeature
 import com.duckduckgo.app.browser.pdf.InlinePdfHandler
 import com.duckduckgo.app.browser.pdf.LocalPdfResult
 import com.duckduckgo.app.browser.pdf.PdfErrorType
@@ -36,7 +38,9 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerSource
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import kotlinx.coroutines.test.runTest
@@ -68,6 +72,7 @@ class IntentDispatcherViewModelTest {
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val inlinePdfHandler: InlinePdfHandler = mock()
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
+    private val customTabsFeature = FakeFeatureToggleFactory.create(CustomTabsFeature::class.java)
 
     private lateinit var testee: IntentDispatcherViewModel
 
@@ -82,6 +87,7 @@ class IntentDispatcherViewModelTest {
             appBuildConfig = mockAppBuildConfig,
             inlinePdfHandler = inlinePdfHandler,
             androidBrowserConfigFeature = androidBrowserConfigFeature,
+            customTabsFeature = customTabsFeature,
         )
 
         whenever(syncUrlIdentifier.shouldDelegateToSyncSetup(anyOrNull())).thenReturn(false)
@@ -434,6 +440,62 @@ class IntentDispatcherViewModelTest {
 
     private fun configureIsEmailProtectionLink(returnValue: Boolean) {
         whenever(emailProtectionLinkVerifier.shouldDelegateToInContextView(anyOrNull(), any())).thenReturn(returnValue)
+    }
+
+    @Test
+    fun whenKeepOnAppSwitchDisabledThenCustomTabLaunchModeIsLegacy() = runTest {
+        assertLaunchMode(enabled = false, intentFlags = Intent.FLAG_ACTIVITY_NEW_TASK, isTaskRoot = true, CustomTabLaunchMode.LEGACY)
+    }
+
+    @Test
+    fun whenKeepOnAppSwitchEnabledAndLaunchedWithoutNewTaskThenCustomTabLaunchModeIsCallerTask() = runTest {
+        assertLaunchMode(enabled = true, intentFlags = 0, isTaskRoot = false, CustomTabLaunchMode.CALLER_TASK)
+    }
+
+    @Test
+    fun whenKeepOnAppSwitchEnabledAndLaunchedWithNewTaskAsTaskRootThenCustomTabLaunchModeIsDocumentTask() = runTest {
+        assertLaunchMode(enabled = true, intentFlags = Intent.FLAG_ACTIVITY_NEW_TASK, isTaskRoot = true, CustomTabLaunchMode.DOCUMENT_TASK)
+    }
+
+    @Test
+    fun whenKeepOnAppSwitchEnabledAndLaunchedWithNewTaskIntoExistingTaskThenBrowserTaskIsHidden() = runTest {
+        assertLaunchMode(
+            enabled = true,
+            intentFlags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT,
+            isTaskRoot = false,
+            CustomTabLaunchMode.DOCUMENT_TASK_HIDE_BROWSER_TASK,
+        )
+    }
+
+    @Test
+    fun whenKeepOnAppSwitchEnabledAndNotACustomTabThenLaunchModeIsLegacy() = runTest {
+        customTabsFeature.keepCustomTabOnAppSwitch().setRawStoredState(State(enable = true))
+        configureHasSession(false)
+        whenever(mockIntent.intentText).thenReturn("https://example.com")
+
+        testee.onIntentReceived(mockIntent, isExternal = true, isTaskRoot = false)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.customTabRequested)
+            assertEquals(CustomTabLaunchMode.LEGACY, state.customTabLaunchMode)
+        }
+    }
+
+    private suspend fun assertLaunchMode(enabled: Boolean, intentFlags: Int, isTaskRoot: Boolean, expected: CustomTabLaunchMode) {
+        customTabsFeature.keepCustomTabOnAppSwitch().setRawStoredState(State(enable = enabled))
+        configureHasSession(true)
+        whenever(mockIntent.intentText).thenReturn("https://example.com")
+        whenever(mockIntent.hasExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR)).thenReturn(false)
+        whenever(mockIntent.flags).thenReturn(intentFlags)
+
+        testee.onIntentReceived(mockIntent, isExternal = true, isTaskRoot = isTaskRoot)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.customTabRequested)
+            assertEquals(expected, state.customTabLaunchMode)
+        }
     }
 
     private fun mockToggle(enabled: Boolean): Toggle {

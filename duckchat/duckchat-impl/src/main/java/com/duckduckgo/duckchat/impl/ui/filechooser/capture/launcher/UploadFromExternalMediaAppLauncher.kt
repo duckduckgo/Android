@@ -35,7 +35,7 @@ import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromEx
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.permission.ExternalMediaSystemPermissionsHelper
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.postprocess.MediaCaptureDelayedDeleter
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.postprocess.MediaCaptureImageMover
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.asLog

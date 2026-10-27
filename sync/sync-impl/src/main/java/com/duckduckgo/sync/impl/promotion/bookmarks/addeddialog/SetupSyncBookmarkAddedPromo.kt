@@ -21,8 +21,8 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.bookmarks.BookmarkAddedDialogPlugin
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.view.gone
@@ -36,11 +36,11 @@ import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.promotion.SyncPromotions
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ContributesMultibinding(scope = ActivityScope::class)
+@ContributesIntoMap(scope = ActivityScope::class)
 @PriorityKey(BookmarkAddedDialogPlugin.PRIORITY_KEY_SETUP_SYNC)
 class SetupSyncBookmarkAddedPromo @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,

@@ -27,7 +27,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.firstOrNull
 import logcat.logcat
 import javax.inject.Inject

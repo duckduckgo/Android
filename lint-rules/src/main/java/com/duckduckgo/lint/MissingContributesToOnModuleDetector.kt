@@ -38,36 +38,33 @@ class MissingContributesToOnModuleDetector : Detector(), SourceCodeScanner {
 
     internal class Handler(private val context: JavaContext) : UElementHandler() {
         override fun visitClass(node: UClass) {
-            val moduleAnnotation = node.uAnnotations.firstOrNull { it.qualifiedName == DAGGER_MODULE } ?: return
+            val moduleAnnotation = node.uAnnotations.firstOrNull { it.qualifiedName in MODULE_ANNOTATIONS } ?: return
 
-            val hasContributesTo = node.uAnnotations.any { it.qualifiedName == ANVIL_CONTRIBUTES_TO }
+            val hasContributesTo = node.uAnnotations.any { it.qualifiedName in CONTRIBUTES_TO }
             if (!hasContributesTo) {
                 context.report(
                     MISSING_CONTRIBUTES_TO_ON_MODULE,
                     moduleAnnotation,
                     context.getNameLocation(moduleAnnotation),
-                    "Dagger @Module must be annotated with @ContributesTo to be discovered by Metro DI. " +
+                    "@BindingContainer must be annotated with @ContributesTo to be discovered by Metro. " +
                         "Add @ContributesTo(AppScope::class) — or the appropriate scope (ActivityScope, FragmentScope, " +
-                        "VpnScope, etc.) — alongside @Module.",
+                        "VpnScope, etc.) — alongside @BindingContainer.",
                 )
             }
         }
     }
 
     companion object {
-        private const val DAGGER_MODULE = "dagger.Module"
-        private const val ANVIL_CONTRIBUTES_TO = "com.squareup.anvil.annotations.ContributesTo"
+        private val MODULE_ANNOTATIONS = setOf("dev.zacsweers.metro.BindingContainer")
+        private val CONTRIBUTES_TO = setOf("dev.zacsweers.metro.ContributesTo")
 
         val MISSING_CONTRIBUTES_TO_ON_MODULE = Issue.create(
             "MissingContributesToOnModule",
-            "Dagger @Module is missing @ContributesTo",
+            "@BindingContainer is missing @ContributesTo",
             """
-                Every Dagger @Module must also be annotated with @ContributesTo so that Metro DI can
-                auto-discover it. Add @ContributesTo(AppScope::class), or the appropriate scope
-                (ActivityScope, FragmentScope, VpnScope, etc.), alongside @Module.
-
-                This is required for the Anvil → Metro migration: Metro relies on @ContributesTo to
-                merge modules into the dependency graph.
+                Every Metro @BindingContainer must also be annotated with @ContributesTo, otherwise Metro
+                does not discover it and merge it into the dependency graph. Add @ContributesTo(AppScope::class),
+                or the appropriate scope (ActivityScope, FragmentScope, VpnScope, etc.), alongside @BindingContainer.
             """.trimIndent(),
             Category.CORRECTNESS,
             10,

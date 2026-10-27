@@ -20,8 +20,8 @@ import com.duckduckgo.autofill.impl.sharedcreds.SharedCredentialsParser.SharedCr
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher.ExtractedUrlParts
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface ShareableCredentialsUrlGenerator {
@@ -31,7 +31,7 @@ interface ShareableCredentialsUrlGenerator {
     ): List<ExtractedUrlParts>
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealShareableCredentialsUrlGenerator @Inject constructor(
     private val autofillUrlMatcher: AutofillUrlMatcher,

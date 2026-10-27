@@ -16,16 +16,10 @@
 
 package com.duckduckgo.app.browser.defaultbrowsing.prompts.store
 
-import androidx.room.Dao
-import androidx.room.Entity
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.PrimaryKey
-import androidx.room.Query
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.ZoneId
@@ -36,7 +30,7 @@ import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 @ContributesBinding(scope = AppScope::class)
-@SingleInstanceIn(scope = AppScope::class)
+@SingleIn(scope = AppScope::class)
 class DefaultBrowserPromptsAppUsageRepositoryImpl @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val defaultBrowserPromptsAppUsageDao: DefaultBrowserPromptsAppUsageDao,
@@ -72,19 +66,3 @@ class DefaultBrowserPromptsAppUsageRepositoryImpl @Inject constructor(
         }
     }
 }
-
-@Dao
-abstract class DefaultBrowserPromptsAppUsageDao {
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    abstract fun insert(defaultBrowserPromptsAppUsageEntity: DefaultBrowserPromptsAppUsageEntity)
-
-    @Query("SELECT COUNT(*) from default_browser_prompts_app_usage WHERE isoDateET > :isoDateET")
-    abstract fun getNumberOfDaysAppUsedSinceDateET(isoDateET: String): Long
-
-    @Query("SELECT isoDateET FROM default_browser_prompts_app_usage ORDER BY isoDateET ASC LIMIT 1")
-    abstract fun getFirstDay(): String?
-}
-
-@Entity(tableName = "default_browser_prompts_app_usage")
-data class DefaultBrowserPromptsAppUsageEntity(@PrimaryKey val isoDateET: String)

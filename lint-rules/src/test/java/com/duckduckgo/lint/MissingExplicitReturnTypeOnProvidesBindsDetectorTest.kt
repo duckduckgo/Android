@@ -18,19 +18,11 @@ package com.duckduckgo.lint
 
 import com.android.tools.lint.checks.infrastructure.TestFiles.kt
 import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
+import com.duckduckgo.lint.utils.METRO_DI_API
 import org.junit.Test
 
 @Suppress("UnstableApiUsage")
 class MissingExplicitReturnTypeOnProvidesBindsDetectorTest {
-
-    private val daggerStubs = kt(
-        """
-        package dagger
-        annotation class Module
-        annotation class Provides
-        annotation class Binds
-        """,
-    ).indented()
 
     private val depStubs = kt(
         """
@@ -42,43 +34,18 @@ class MissingExplicitReturnTypeOnProvidesBindsDetectorTest {
     ).indented()
 
     @Test
-    fun whenProvidesMethodOmitsReturnTypeThenFailWithError() {
-        lint()
-            .files(
-                daggerStubs,
-                depStubs,
-                kt(
-                    """
-                    package com.duckduckgo.example
-                    import dagger.Module
-                    import dagger.Provides
-
-                    @Module
-                    object FooModule {
-                        @Provides
-                        fun providesFoo() = RealFoo()
-                    }
-                    """,
-                ).indented(),
-            )
-            .issues(MissingExplicitReturnTypeOnProvidesBindsDetector.MISSING_EXPLICIT_RETURN_TYPE)
-            .run()
-            .expectErrorCount(1)
-    }
-
-    @Test
     fun whenProvidesMethodHasExplicitReturnTypeWithExpressionBodyThenSucceed() {
         lint()
             .files(
-                daggerStubs,
+                METRO_DI_API,
                 depStubs,
                 kt(
                     """
                     package com.duckduckgo.example
-                    import dagger.Module
-                    import dagger.Provides
+                    import dev.zacsweers.metro.BindingContainer
+                    import dev.zacsweers.metro.Provides
 
-                    @Module
+                    @BindingContainer
                     object FooModule {
                         @Provides
                         fun providesFoo(): Foo = RealFoo()
@@ -95,15 +62,15 @@ class MissingExplicitReturnTypeOnProvidesBindsDetectorTest {
     fun whenProvidesMethodHasExplicitReturnTypeWithBlockBodyThenSucceed() {
         lint()
             .files(
-                daggerStubs,
+                METRO_DI_API,
                 depStubs,
                 kt(
                     """
                     package com.duckduckgo.example
-                    import dagger.Module
-                    import dagger.Provides
+                    import dev.zacsweers.metro.BindingContainer
+                    import dev.zacsweers.metro.Provides
 
-                    @Module
+                    @BindingContainer
                     object FooModule {
                         @Provides
                         fun providesFoo(): Foo {
@@ -122,15 +89,15 @@ class MissingExplicitReturnTypeOnProvidesBindsDetectorTest {
     fun whenBindsMethodHasExplicitReturnTypeThenSucceed() {
         lint()
             .files(
-                daggerStubs,
+                METRO_DI_API,
                 depStubs,
                 kt(
                     """
                     package com.duckduckgo.example
-                    import dagger.Binds
-                    import dagger.Module
+                    import dev.zacsweers.metro.BindingContainer
+                    import dev.zacsweers.metro.Binds
 
-                    @Module
+                    @BindingContainer
                     abstract class FooModule {
                         @Binds
                         abstract fun bindFoo(impl: RealFoo): Foo
@@ -144,10 +111,35 @@ class MissingExplicitReturnTypeOnProvidesBindsDetectorTest {
     }
 
     @Test
+    fun whenMetroProvidesMethodOmitsReturnTypeThenFailWithError() {
+        lint()
+            .files(
+                METRO_DI_API,
+                depStubs,
+                kt(
+                    """
+                    package com.duckduckgo.example
+                    import dev.zacsweers.metro.BindingContainer
+                    import dev.zacsweers.metro.Provides
+
+                    @BindingContainer
+                    object FooModule {
+                        @Provides
+                        fun providesFoo() = RealFoo()
+                    }
+                    """,
+                ).indented(),
+            )
+            .issues(MissingExplicitReturnTypeOnProvidesBindsDetector.MISSING_EXPLICIT_RETURN_TYPE)
+            .run()
+            .expectErrorCount(1)
+    }
+
+    @Test
     fun whenRegularFunctionWithoutAnnotationOmitsReturnTypeThenSucceed() {
         lint()
             .files(
-                daggerStubs,
+                METRO_DI_API,
                 depStubs,
                 kt(
                     """
@@ -168,15 +160,15 @@ class MissingExplicitReturnTypeOnProvidesBindsDetectorTest {
     fun whenMultipleProvidesMethodsMissingReturnTypeThenFailForEach() {
         lint()
             .files(
-                daggerStubs,
+                METRO_DI_API,
                 depStubs,
                 kt(
                     """
                     package com.duckduckgo.example
-                    import dagger.Module
-                    import dagger.Provides
+                    import dev.zacsweers.metro.BindingContainer
+                    import dev.zacsweers.metro.Provides
 
-                    @Module
+                    @BindingContainer
                     object FooModule {
                         @Provides
                         fun providesFoo() = RealFoo()

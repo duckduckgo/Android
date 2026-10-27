@@ -24,14 +24,14 @@ import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
 import com.duckduckgo.promptscoordinator.impl.exposure.PromptExposurePixelParams.DAYS_SINCE_INSTALL
 import com.duckduckgo.promptscoordinator.impl.exposure.PromptExposurePixelParams.NTH_IN_WEEK
 import com.duckduckgo.promptscoordinator.impl.exposure.PromptExposurePixelParams.PROMPT_ID
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealPromptExposureReporter @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,

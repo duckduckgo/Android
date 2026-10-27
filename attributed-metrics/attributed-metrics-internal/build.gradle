@@ -1,15 +1,12 @@
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     namespace 'com.duckduckgo.attributed.metrics.internal'
     testOptions {
         unitTests {
@@ -19,8 +16,8 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(':codegen-annotations')
     implementation project(':attributed-metrics-api')
     implementation project(':attributed-metrics-impl')
     implementation project(':di')
@@ -32,7 +29,6 @@ dependencies {
     implementation AndroidX.appCompat
     implementation AndroidX.constraintLayout
     implementation Google.android.material
-    implementation Google.dagger
 
     testImplementation project(path: ':common-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

@@ -21,8 +21,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.store.PirDataStore
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -42,7 +42,7 @@ interface PirScanCompleteNotifier {
     suspend fun onRunCompleted(runMode: PirRunMode)
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealPirScanCompleteNotifier @Inject constructor(
     private val pirDataStore: PirDataStore,

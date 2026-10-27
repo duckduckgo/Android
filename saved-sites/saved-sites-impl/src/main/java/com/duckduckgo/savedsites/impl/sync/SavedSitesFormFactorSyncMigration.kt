@@ -23,7 +23,7 @@ import com.duckduckgo.savedsites.store.FavoritesDisplayMode.NATIVE
 import com.duckduckgo.savedsites.store.FavoritesDisplayMode.UNIFIED
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
 

@@ -23,8 +23,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -36,13 +37,13 @@ private const val IS_INITIALIZED = "IS_INITIALIZED"
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = VpnFeaturesRegistry::class,
+    binding = binding<VpnFeaturesRegistry>(),
 )
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = Vpn::class,
+    binding = binding<Vpn>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class VpnFeaturesRegistryImpl @Inject constructor(
     private val vpnServiceWrapper: VpnServiceWrapper,
     private val sharedPreferencesProvider: SharedPreferencesProvider,

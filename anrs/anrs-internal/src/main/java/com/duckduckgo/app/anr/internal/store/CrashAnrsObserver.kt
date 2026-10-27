@@ -27,8 +27,9 @@ import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
@@ -38,19 +39,19 @@ import logcat.logcat
 import okio.ByteString.Companion.encode
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = VpnProcessLifecycleObserver::class,
+    binding = binding<VpnProcessLifecycleObserver>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = PirProcessLifecycleObserver::class,
+    binding = binding<PirProcessLifecycleObserver>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class CrashAnrsObserver @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val coroutineDispatcher: DispatcherProvider,

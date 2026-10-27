@@ -110,7 +110,7 @@ class BadUrlErrorPageWideEventTest {
 
         testee = RealBadUrlErrorPageWideEvent(
             wideEventClient = wideEventClient,
-            badUrlErrorPageWideEventFeature = { badUrlErrorPageWideEventFeature },
+            badUrlErrorPageWideEventFeature = lazy { badUrlErrorPageWideEventFeature },
             suggestRedirectFeature = suggestRedirectFeature,
             regularTabRepository = regularTabRepository,
             fireTabRepository = fireTabRepository,

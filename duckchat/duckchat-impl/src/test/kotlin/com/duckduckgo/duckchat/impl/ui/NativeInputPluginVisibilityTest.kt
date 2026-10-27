@@ -20,6 +20,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.shouldFetchModels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.shouldShowModelPicker
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.shouldShowOptionsContainer
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.shouldShowPluginControls
@@ -116,6 +117,28 @@ class NativeInputPluginVisibilityTest {
     @Test
     fun `stop streaming hidden outside edit mode when not streaming`() {
         assertFalse(shouldShowStopStreaming(streaming = false, isEditMode = false))
+    }
+
+    @Test
+    fun `models fetched when picker attaches on duck ai tab`() {
+        assertTrue(shouldFetchModels(previous = null, current = stateOf(ToggleSelection.DUCK_AI, isChatStreaming = false)))
+    }
+
+    @Test
+    fun `models fetched when toggle switches to duck ai`() {
+        val previous = stateOf(ToggleSelection.SEARCH, isChatStreaming = false)
+        assertTrue(shouldFetchModels(previous, current = stateOf(ToggleSelection.DUCK_AI, isChatStreaming = false)))
+    }
+
+    @Test
+    fun `models not fetched on search tab`() {
+        assertFalse(shouldFetchModels(previous = null, current = stateOf(ToggleSelection.SEARCH, isChatStreaming = false)))
+    }
+
+    @Test
+    fun `models not refetched on further duck ai state updates`() {
+        val previous = stateOf(ToggleSelection.DUCK_AI, isChatStreaming = false)
+        assertFalse(shouldFetchModels(previous, current = stateOf(ToggleSelection.DUCK_AI, isChatStreaming = true)))
     }
 
     private fun stateOf(

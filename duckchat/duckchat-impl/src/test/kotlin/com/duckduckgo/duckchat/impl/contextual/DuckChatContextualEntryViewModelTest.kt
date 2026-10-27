@@ -55,7 +55,7 @@ class DuckChatContextualEntryViewModelTest {
     private val modelManager: DuckAiModelManager = mock()
     private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
     private val inputOutcomeTracker: InputOutcomeTracker = mock()
-    private val textSelectionRepository = RealTextSelectionRepository(dagger.Lazy { duckChatPixels }, selectionJourney)
+    private val textSelectionRepository = RealTextSelectionRepository(lazy { duckChatPixels }, selectionJourney)
     private val viewModel = DuckChatContextualEntryViewModel(
         store,
         duckChatPixels,

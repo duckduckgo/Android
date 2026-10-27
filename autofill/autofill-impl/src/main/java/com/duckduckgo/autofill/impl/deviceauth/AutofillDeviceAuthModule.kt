@@ -21,13 +21,13 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Qualifier
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class AutofillDeviceAuthModule {
 
@@ -36,7 +36,7 @@ class AutofillDeviceAuthModule {
     )
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @AutofillDeviceAuthStore
     fun providesDeviceAuthDataStore(context: Context): DataStore<Preferences> {
         return context.autofillDeviceAuthDataStore

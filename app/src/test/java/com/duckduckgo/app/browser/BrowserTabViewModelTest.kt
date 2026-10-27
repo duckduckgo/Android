@@ -376,7 +376,6 @@ import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
-import dagger.Lazy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -559,7 +558,6 @@ class BrowserTabViewModelTest {
     private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
     private val mockDuckChatInputModeState: DuckChatInputModeState = mock()
 
-    private val mockDuckAiFeatureStateInputScreenFlow = MutableStateFlow(false)
     private val mockInputModeCapability = MutableStateFlow(NativeInputState.InputMode.SEARCH_ONLY)
 
     private val mockDuckAiContextualModeFlow = MutableStateFlow(false)
@@ -581,7 +579,7 @@ class BrowserTabViewModelTest {
     private val mockPageLoadWideEvent: PageLoadWideEvent = mock()
     private val mockQueryUrlPredictor: QueryUrlPredictor = mock()
 
-    private val lazyFaviconManager = Lazy { mockFaviconManager }
+    private val lazyFaviconManager = lazy { mockFaviconManager }
 
     private lateinit var mockAutoCompleteApi: AutoComplete
 
@@ -689,7 +687,6 @@ class BrowserTabViewModelTest {
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
     private val voiceSessionEndTriggerFlow = MutableSharedFlow<String>(extraBufferCapacity = 8)
-    private val nativeInputUserSettingFlow = MutableStateFlow(false)
     private val mockDuckChat: DuckChat = mock {
         on { observeTriggerVoiceChatSessionEnd() } doReturn voiceSessionEndTriggerFlow
     }
@@ -869,10 +866,8 @@ class BrowserTabViewModelTest {
             whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers()).thenReturn(mockDisabledToggle)
             whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
             whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
-            whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(mockDuckAiFeatureStateInputScreenFlow)
             whenever(mockDuckAiFeatureState.showContextualMode).thenReturn(mockDuckAiContextualModeFlow)
             whenever(mockDuckAiFeatureState.nativeDuckAiSidebar).thenReturn(MutableStateFlow(false))
-            whenever(mockDuckAiFeatureState.nativeInputFieldEnabled).thenReturn(MutableStateFlow(false))
             whenever(mockDuckChatInputModeState.inputModeCapability).thenReturn(mockInputModeCapability)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
@@ -906,7 +901,6 @@ class BrowserTabViewModelTest {
                     linearOnboardingOrchestrator = mock<LinearOnboardingOrchestrator> {
                         on { state } doReturn MutableStateFlow(LinearOnboardingState.NotStarted)
                     },
-                    duckAiFeatureState = mockDuckAiFeatureState,
                     onboardingPixelSender = mockOnboardingPixelSender,
                     contextualOnboardingTimeLimit = FakeContextualOnboardingTimeLimit(),
                     contextualCtaSuppressorPlugins = mock(),
@@ -936,7 +930,6 @@ class BrowserTabViewModelTest {
             whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
             whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
             whenever(mockDuckChat.isChatHistoryAvailable()).thenReturn(false)
-            whenever(mockDuckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputUserSettingFlow)
             whenever(mockQueryUrlPredictor.isReady()).thenReturn(true)
             whenever(mockSyncStatusChangedObserver.syncStatusChangedEvents).thenReturn(syncStatusChangedEventsFlow)
             whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(subscriptionStatusFlow)
@@ -1032,8 +1025,8 @@ class BrowserTabViewModelTest {
                 bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
                 userBrowserProperties = mockUserBrowserProperties,
                 history = mockNavigationHistory,
-                newTabPixels = { mockNewTabPixels },
-                httpErrorPixels = { mockHttpErrorPixels },
+                newTabPixels = lazy { mockNewTabPixels },
+                httpErrorPixels = lazy { mockHttpErrorPixels },
                 duckPlayer = mockDuckPlayer,
                 duckChat = mockDuckChat,
                 duckAiHostProvider = mockDuckAiHostProvider,
@@ -1257,28 +1250,6 @@ class BrowserTabViewModelTest {
             testee.onViewVisible()
 
             assertCommandNotIssued<HideKeyboard>()
-        }
-
-    @Test
-    fun whenViewBecomesVisibleAndDuckAIPoCIsEnabledThenKeyboardNotShown() =
-        runTest {
-            whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(MutableStateFlow(true))
-
-            testee.onViewVisible()
-
-            assertCommandNotIssued<ShowKeyboard>()
-        }
-
-    @Test
-    fun whenViewBecomesVisibleAndInputModeTargetArmedThenTargetDoesNotForceKeyboardOverInputScreen() =
-        runTest {
-            whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(MutableStateFlow(true))
-            testee.loadData("abc", null, false, false, InputMode.SEARCH)
-
-            testee.onViewVisible()
-
-            // The launch target does not override the input-screen focus-drop rule.
-            assertCommandNotIssued<ShowKeyboard>()
         }
 
     @Test
@@ -2447,22 +2418,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNativeInputDisabledThenOmnibarAutocompleteCacheStaysEmpty() = runTest {
-        nativeInputUserSettingFlow.value = false
-        doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
-        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
-            flowOf(listOf(Bookmark("abc", "query", "https://example.com", lastModified = null))),
-        )
-
-        testee.onOmnibarTextRendered("query")
-        delay(500)
-
-        assertTrue(testee.omnibarAutocompleteCache.value.suggestions.isEmpty())
-    }
-
-    @Test
     fun whenAutoCompleteSettingDisabledThenOmnibarAutocompleteCacheStaysEmpty() = runTest {
-        nativeInputUserSettingFlow.value = true
         doReturn(false).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
 
         testee.onOmnibarTextRendered("query")
@@ -2473,7 +2429,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOmnibarTextRenderedWithBlankThenOmnibarAutocompleteCacheStaysEmpty() = runTest {
-        nativeInputUserSettingFlow.value = true
         doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
 
         testee.onOmnibarTextRendered("   ")
@@ -2507,7 +2462,6 @@ class BrowserTabViewModelTest {
      * Caller still needs to wait for the debounce.
      */
     private suspend fun primeOmnibarAutocompleteCacheForQuery() {
-        nativeInputUserSettingFlow.value = true
         stubAutoCompleteSourcesForQuery()
 
         testee.onOmnibarTextRendered("query")
@@ -3995,16 +3949,6 @@ class BrowserTabViewModelTest {
 
         assertFalse(browserViewState().browserShowing)
         assertTrue(result)
-    }
-
-    @Test
-    fun whenUserPressesBackAndGoesToHomeWithInputScreenEnabledThenKeyboardNotShown() {
-        whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(MutableStateFlow(true))
-
-        setupNavigation(isBrowsing = true, canGoBack = false, skipHome = false)
-        testee.onUserPressedBack()
-
-        assertCommandNotIssued<ShowKeyboard>()
     }
 
     @Test
@@ -8337,7 +8281,7 @@ class BrowserTabViewModelTest {
     fun whenSslCertificateBypassedThenUrlAddedToRepository() {
         val url = exampleUrl
 
-        testee.onSSLCertificateWarningAction(Action.Proceed, url)
+        testee.onSSLCertificateWarningAction(Action.Proceed, url, false)
 
         verify(mockBypassedSSLCertificatesRepository).add(url)
 
@@ -8348,23 +8292,23 @@ class BrowserTabViewModelTest {
     fun whenSslCertificateActionShownThenPixelsFired() {
         val url = exampleUrl
 
-        testee.onSSLCertificateWarningAction(Action.Shown(EXPIRED), url)
+        testee.onSSLCertificateWarningAction(Action.Shown(EXPIRED), url, false)
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_EXPIRED_SHOWN)
 
-        testee.onSSLCertificateWarningAction(Action.Shown(WRONG_HOST), url)
+        testee.onSSLCertificateWarningAction(Action.Shown(WRONG_HOST), url, false)
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_WRONG_HOST_SHOWN)
 
-        testee.onSSLCertificateWarningAction(Action.Shown(UNTRUSTED_HOST), url)
+        testee.onSSLCertificateWarningAction(Action.Shown(UNTRUSTED_HOST), url, false)
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_UNTRUSTED_SHOWN)
 
-        testee.onSSLCertificateWarningAction(Action.Shown(GENERIC), url)
+        testee.onSSLCertificateWarningAction(Action.Shown(GENERIC), url, false)
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_GENERIC_SHOWN)
     }
 
     @Test
     fun whenSslCertificateActionAdvanceThenPixelsFired() {
         val url = exampleUrl
-        testee.onSSLCertificateWarningAction(Action.Advance, url)
+        testee.onSSLCertificateWarningAction(Action.Advance, url, false)
 
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_ADVANCED_PRESSED)
     }
@@ -8372,7 +8316,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSslCertificateActionLeaveSiteThenPixelsFiredAndViewStatesUpdated() {
         val url = exampleUrl
-        testee.onSSLCertificateWarningAction(Action.LeaveSite, url)
+        testee.onSSLCertificateWarningAction(Action.LeaveSite, url, false)
 
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_CLOSE_PRESSED)
         assertEquals(NONE, browserViewState().sslError)
@@ -8423,7 +8367,7 @@ class BrowserTabViewModelTest {
 
         testee.onReceivedSslError(aHandler(), sslErrorResponse)
 
-        testee.onSSLCertificateWarningAction(Action.Proceed, url)
+        testee.onSSLCertificateWarningAction(Action.Proceed, url, false)
 
         assertCommandNotIssued<Command.HideSSLError>()
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_PROCEED_PRESSED)

@@ -18,8 +18,8 @@ package com.duckduckgo.duckchat.impl.nativeinput.footer
 
 import android.content.Context
 import android.view.View
-import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState

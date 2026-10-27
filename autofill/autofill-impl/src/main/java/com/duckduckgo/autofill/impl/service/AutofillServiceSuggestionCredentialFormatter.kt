@@ -20,8 +20,8 @@ import android.content.Context
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface AutofillServiceSuggestionCredentialFormatter {
@@ -35,7 +35,7 @@ data class SuggestionUISpecs(
     val icon: Int,
 )
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAutofillCredentialFormatter @Inject constructor(
     private val context: Context,

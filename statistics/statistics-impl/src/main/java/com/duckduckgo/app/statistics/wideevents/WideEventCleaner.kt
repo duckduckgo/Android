@@ -23,7 +23,7 @@ import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -31,7 +31,7 @@ import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class WideEventCleaner @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val wideEventRepository: WideEventRepository,
@@ -91,7 +91,7 @@ class WideEventCleaner @Inject constructor(
 
         event.activeIntervals
             .firstOrNull { interval ->
-                interval.timeout != null && isTimeoutReached(event.createdAt, interval.timeout)
+                interval.timeout != null && isTimeoutReached(interval.startedAt, interval.timeout)
             }?.let { interval ->
                 wideEventRepository.setWideEventStatus(
                     eventId = event.id,

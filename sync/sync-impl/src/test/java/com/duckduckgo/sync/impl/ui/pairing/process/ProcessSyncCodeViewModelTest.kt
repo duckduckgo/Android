@@ -41,6 +41,7 @@ import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.autorestore.RestorePayload
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
+import com.duckduckgo.sync.impl.pixels.SwitchedAccountDetector
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
@@ -97,6 +98,7 @@ class ProcessSyncCodeViewModelTest {
     private val codeDispatcher = mock<SyncCodeDispatcher>()
     private val syncPixels = mock<SyncPixels>()
     private val syncAutoRestoreManager = mock<SyncAutoRestoreManager>()
+    private val switchedAccountDetector = mock<SwitchedAccountDetector>()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
     private var accountInfo = AccountInfo()
@@ -112,6 +114,7 @@ class ProcessSyncCodeViewModelTest {
             syncFeature = syncFeature,
             syncPixels = syncPixels,
             syncAutoRestoreManager = syncAutoRestoreManager,
+            switchedAccountDetector = switchedAccountDetector,
             dispatchers = coroutineTestRule.testDispatcherProvider,
         )
     }
@@ -852,6 +855,80 @@ class ProcessSyncCodeViewModelTest {
     }
 
     @Test
+    fun `when the screen starts processing a code then the account before pairing is recorded`() = runTest {
+        givenLegacyCode(recoveryAuthCode)
+        givenProcessCodeSucceeds()
+
+        createTestee()
+
+        verify(switchedAccountDetector).onPairingStarted()
+    }
+
+    @Test
+    fun `when a legacy recovery login completes then the switched account tracker is notified`() = runTest {
+        givenLegacyCode(recoveryAuthCode)
+        givenProcessCodeSucceeds()
+        givenThisConnectedDevice()
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+            testee.onAnimationComplete()
+            awaitItem()
+            awaitItem()
+            cancel()
+        }
+        verify(switchedAccountDetector).onPaired()
+    }
+
+    @Test
+    fun `when a legacy exchange login completes then the switched account tracker is notified`() = runTest {
+        givenLegacyCode(exchangeAuthCode)
+        givenProcessCodeSucceeds()
+        givenThisConnectedDevice()
+        whenever(accountRepository.pollForRecoveryCodeAndLogin()).thenReturn(Result.Success(ExchangeResult.LoggedIn))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+            testee.onAnimationComplete()
+            awaitItem()
+            awaitItem()
+            cancel()
+        }
+        verify(switchedAccountDetector).onPaired()
+    }
+
+    @Test
+    fun `when a v2 login completes then the switched account tracker is notified`() = runTest {
+        givenV2Outcomes(DispatchOutcome.LoggedIn(path = SetupPath.RECOVERY))
+        givenThisConnectedDevice()
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+            testee.onAnimationComplete()
+            awaitItem()
+            awaitItem()
+            cancel()
+        }
+        verify(switchedAccountDetector).onPaired()
+    }
+
+    @Test
+    fun `when processing a legacy code fails then the switched account tracker is not notified`() = runTest {
+        givenLegacyCode(recoveryAuthCode)
+        whenever(accountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Error(code = LOGIN_FAILED.code, reason = "boom"))
+
+        createTestee()
+
+        verify(switchedAccountDetector, never()).onPaired()
+    }
+
+    @Test
     fun `when a deep link setup starts then the deep link started pixel is fired`() = runTest {
         givenV2Outcomes()
 
@@ -977,6 +1054,7 @@ class ProcessSyncCodeViewModelTest {
         }
         verify(syncPixels).fireUserAcceptedSwitchingAccount()
         verify(syncPixels).fireUserSwitchedAccount()
+        verify(switchedAccountDetector, never()).onPaired()
     }
 
     @Test

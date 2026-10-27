@@ -24,16 +24,17 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 /**
  * Reports which Duck.ai capabilities are active for the user on the daily feature state pixel.
  */
-@ContributesMultibinding(scope = AppScope::class, boundType = BrowserFeatureStateReporterPlugin::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(scope = AppScope::class, binding = binding<BrowserFeatureStateReporterPlugin>())
+@SingleIn(AppScope::class)
 class DuckAiFeatureStateReporterPlugin @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val duckChatFeature: DuckChatFeature,
@@ -47,7 +48,7 @@ class DuckAiFeatureStateReporterPlugin @Inject constructor(
         }
         return mapOf(
             DUCK_AI_INPUT_MODE to inputMode.pixelValue(),
-            DUCK_AI_NATIVE_INPUT to duckAiFeatureState.nativeInputFieldEnabled.value.toBinaryString(),
+            DUCK_AI_NATIVE_INPUT to true.toBinaryString(),
             DUCK_AI_CONTEXTUAL to duckAiFeatureState.showContextualMode.value.toBinaryString(),
         )
     }

@@ -52,19 +52,19 @@ import com.duckduckgo.sync.store.SyncStore
 import com.duckduckgo.sync.store.SyncUnavailableSharedPrefsStore
 import com.duckduckgo.sync.store.SyncUnavailableStore
 import com.journeyapps.barcodescanner.BarcodeEncoder
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Qualifier
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object SyncStoreModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providesSyncStore(
         sharedPrefsProvider: SharedPrefsProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
@@ -74,7 +74,7 @@ object SyncStoreModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providesSyncInternalEnvStore(
         context: Context,
     ): SyncInternalEnvDataStore {
@@ -82,19 +82,19 @@ object SyncStoreModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideSharedPrefsProvider(context: Context): SharedPrefsProvider {
         return SyncSharedPrefsProvider(context)
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providesNativeLib(context: Context): SyncLib {
         return SyncLib.create(context)
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideQREncoder(
         context: Context,
     ): QREncoder {
@@ -103,7 +103,7 @@ object SyncStoreModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideSyncDatabase(context: Context): SyncDatabase {
         return Room.databaseBuilder(context, SyncDatabase::class.java, "sync.db")
             .fallbackToDestructiveMigration()
@@ -126,7 +126,7 @@ object SyncStoreModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideSyncStatsRepository(
         syncStateRepository: SyncStateRepository,
         syncApiErrorRepository: SyncApiErrorRepository,
@@ -136,7 +136,7 @@ object SyncStoreModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideSyncFaviconsFetchingStore(
         context: Context,
     ): FaviconsFetchingStore {
@@ -144,7 +144,7 @@ object SyncStoreModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideSyncFaviconsFetchingPrompt(
         faviconFetchingStore: FaviconsFetchingStore,
         syncAccountRepository: SyncAccountRepository,
@@ -155,7 +155,7 @@ object SyncStoreModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideSyncPausedStore(
         sharedPrefsProvider: SharedPrefsProvider,
     ): SyncUnavailableStore {
@@ -167,7 +167,7 @@ object SyncStoreModule {
     )
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @SyncPromotion
     fun provideSyncPromotionsDataStore(context: Context): DataStore<Preferences> {
         return context.dataStore
@@ -178,7 +178,7 @@ object SyncStoreModule {
     )
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @SyncAutoRestoreStore
     fun provideSyncAutoRestoreDataStore(context: Context): DataStore<Preferences> {
         return context.autoRestoreDataStore

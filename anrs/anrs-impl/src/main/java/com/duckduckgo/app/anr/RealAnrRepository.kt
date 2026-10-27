@@ -21,7 +21,7 @@ import com.duckduckgo.anrs.api.AnrRepository
 import com.duckduckgo.app.anrs.store.AnrEntity
 import com.duckduckgo.app.anrs.store.AnrsDatabase
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)

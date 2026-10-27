@@ -25,7 +25,7 @@ import com.duckduckgo.app.survey.model.Survey.Status.DONE
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.util.*
 import javax.inject.Inject
 
@@ -70,8 +70,9 @@ class SurveyRepositoryImpl @Inject constructor(
             return 0L
         }
         // If any of the above, then remaining days since app install
-        if (survey.daysInstalled != null) {
-            return survey.daysInstalled - userBrowserProperties.daysSinceInstalled()
+        val daysInstalled = survey.daysInstalled
+        if (daysInstalled != null) {
+            return daysInstalled - userBrowserProperties.daysSinceInstalled()
         }
         return -1
     }
