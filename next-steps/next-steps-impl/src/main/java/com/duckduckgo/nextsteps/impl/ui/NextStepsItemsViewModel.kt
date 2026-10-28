@@ -260,8 +260,9 @@ class NextStepsItemsViewModel @Inject constructor(
                 command.trySend(Command.AnimateFrontCardCompletion)
             }
         }
-        if (front.id == animatingCompletionItemId) return listOf(front) + ordered.filter { it.id != front.id }
-        if (front.id !in ordered.ids()) {
+        if (front.id == animatingCompletionItemId) {
+            return listOf(front) + ordered.filter { it.id != front.id }
+        } else if (front.id !in ordered.ids()) {
             ordered.firstOrNull()?.let { promotedCard ->
                 viewModelScope.launch { telemetry.onFrontCardShown(message.id, promotedCard.id, ordered.ids()) }
             }
