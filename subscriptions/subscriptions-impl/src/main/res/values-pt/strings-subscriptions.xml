@@ -203,4 +203,17 @@
     <string name="subscriptionExpiredStatusIconContentDescription">A subscrição expirou</string>
     <string name="subscriptionActiveStatusIconContentDescription">Subscrição ativa</string>
 
+    <!-- Right of withdrawal -->
+    <string name="subscriptionSettingWithdraw" instruction="Subscription settings option to use the legal right of withdrawal: cancel the subscription within 14 days of purchase and get a full refund">Desistir do Contrato</string>
+    <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">Podes desistir e receber um reembolso total até %1$s</string>
+    <string name="subscriptionWithdrawDialogTitle">Cancelar a subscrição?</string>
+    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">A tua subscrição %1$s terminará imediatamente e receberás um reembolso de %2$s através do método de pagamento original no prazo de 14 dias.\n\nA VPN, a Personal Information Removal e os modelos avançados do Duck.ai deixarão de funcionar assim que confirmares.</string>
+    <string name="subscriptionWithdrawDialogConfirm">Confirmar levantamento</string>
+    <string name="subscriptionWithdrawDialogKeep">Manter subscrição</string>
+    <string name="subscriptionStatusNotSubscribed">Não subscrito</string>
+    <string name="subscriptionWithdrawnTitle" instruction="Placeholder is the date the user withdrew from their subscription, e.g. October 6, 2026">Desististe a %1$s.</string>
+    <string name="subscriptionWithdrawnRefund" instruction="Placeholder is the refund amount with currency, e.g. €9.99">O teu reembolso de %1$s está a ser processado.</string>
+    <string name="subscriptionWithdrawnRefundWithoutAmount">O teu reembolso está a ser processado.</string>
+    <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Não conseguimos processar automaticamente a tua desistência. Visita <annotation type="withdrawal_help_link">esta página</annotation> para concluíres a desistência.</string>
+
 </resources>
