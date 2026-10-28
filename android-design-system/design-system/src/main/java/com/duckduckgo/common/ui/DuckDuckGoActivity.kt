@@ -84,6 +84,7 @@ abstract class DuckDuckGoActivity : InjectableActivity() {
             appBrandDesignUpdateToggles.theme().isEnabled(),
             listOfNotNull(
                 R.style.ThemeOverlay_Rebrand_Radius.takeIf { appBrandDesignUpdateToggles.radius().isEnabled() },
+                R.style.ThemeOverlay_Rebrand_Badges.takeIf { appBrandDesignUpdateToggles.badges().isEnabled() },
             ),
         )
         super.onCreate(savedInstanceState)

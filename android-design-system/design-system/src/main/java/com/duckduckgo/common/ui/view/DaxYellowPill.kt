@@ -22,6 +22,7 @@ import android.util.TypedValue
 import android.view.Gravity
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
+import com.duckduckgo.common.ui.isRebrandAreaEnabled
 import com.duckduckgo.mobile.android.R
 
 /**
@@ -36,7 +37,11 @@ class DaxYellowPill @JvmOverloads constructor(
 ) : AppCompatTextView(context, attrs, defStyleAttr) {
 
     init {
-        setupView()
+        if (context.isRebrandAreaEnabled(R.attr.daxRebrandBadges)) {
+            setupRebrandView()
+        } else {
+            setupView()
+        }
         parseAttributes(attrs)
     }
 
@@ -54,6 +59,23 @@ class DaxYellowPill @JvmOverloads constructor(
         height = resources.getDimensionPixelSize(R.dimen.yellowPillHeight)
         gravity = Gravity.CENTER
 
+        maxLines = 1
+        isSingleLine = true
+        isAllCaps = true
+    }
+
+    private fun setupRebrandView() {
+        setBackgroundResource(R.drawable.background_yellow_pill_rebrand)
+        setTextAppearance(R.style.Typography_DuckDuckGo_Pill_Rebrand)
+        setTextColor(ContextCompat.getColor(context, R.color.pollen90))
+        includeFontPadding = false
+        setLineHeight(resources.getDimensionPixelSize(R.dimen.rebrandPillTextSize))
+
+        val horizontalPadding = resources.getDimensionPixelSize(R.dimen.keyline_2)
+        setPaddingRelative(horizontalPadding, 0, horizontalPadding, 0)
+
+        minimumHeight = resources.getDimensionPixelSize(R.dimen.rebrandPillMinHeight)
+        gravity = Gravity.CENTER
         maxLines = 1
         isSingleLine = true
         isAllCaps = true

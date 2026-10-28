@@ -48,6 +48,7 @@ class AppBrandDesignUpdatePreWarmObserver @Inject constructor(
             toggles.radius().isEnabled()
             toggles.addressBar().isEnabled()
             toggles.pictograms().isEnabled()
+            toggles.badges().isEnabled()
         }
     }
 }
