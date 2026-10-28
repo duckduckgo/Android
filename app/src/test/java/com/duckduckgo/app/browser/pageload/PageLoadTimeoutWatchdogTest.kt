@@ -602,6 +602,18 @@ class PageLoadTimeoutWatchdogTest {
     }
 
     @Test
+    fun whenUserInitiatedRequestBecomesDownloadThenNoTimeout() = watchdogTest { watchdog ->
+        watchdog.onUserInitiatedLoad()
+        watchdog.onMainFrameRequest(URL)
+        advanceToSeconds(1)
+        watchdog.onDownloadStarted()
+
+        advanceToSeconds(60)
+
+        assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
     fun whenContentBecomesVisibleAfterTimeoutThenRecoveredWithElapsedTime() = watchdogTest { watchdog ->
         watchdog.onMainFrameRequest(URL)
         advanceToSeconds(45)
