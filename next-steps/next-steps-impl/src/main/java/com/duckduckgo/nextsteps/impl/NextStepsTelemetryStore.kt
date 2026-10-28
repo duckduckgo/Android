@@ -32,6 +32,8 @@ data class NextStepsTelemetryState(
     val ctaClickedCardId: String? = null,
     val openDay: Long? = null,
     val dayCounts: Map<String, Int> = emptyMap(),
+    /** Front-card impressions per card over the whole install; never reset, so a CTA tap or removal can report how often the card was seen. */
+    val totalImpressions: Map<String, Int> = emptyMap(),
     /** Cards completed and dismissed while the carousel was on screen; reported when it ends. */
     val completedCards: Int = 0,
     val dismissedCards: Int = 0,
@@ -61,9 +63,8 @@ class RealNextStepsTelemetryStore @Inject constructor(
         displayedMessageId = preferences.getString(KEY_DISPLAYED_MESSAGE_ID, null),
         ctaClickedCardId = preferences.getString(KEY_CTA_CLICKED_CARD_ID, null),
         openDay = preferences.getLong(KEY_OPEN_DAY, 0).takeIf { preferences.contains(KEY_OPEN_DAY) },
-        dayCounts = preferences.getStringSet(KEY_DAY_COUNTS, null).orEmpty().associate { entry ->
-            entry.substringBeforeLast(":") to entry.substringAfterLast(":").toInt()
-        },
+        dayCounts = preferences.counts(KEY_DAY_COUNTS),
+        totalImpressions = preferences.counts(KEY_TOTAL_IMPRESSIONS),
         completedCards = preferences.getInt(KEY_COMPLETED_CARDS, 0),
         dismissedCards = preferences.getInt(KEY_DISMISSED_CARDS, 0),
         reportedCompletedCards = preferences.getStringSet(KEY_REPORTED_COMPLETED_CARDS, null).orEmpty(),
@@ -76,11 +77,20 @@ class RealNextStepsTelemetryStore @Inject constructor(
             putString(KEY_DISPLAYED_MESSAGE_ID, state.displayedMessageId)
             putString(KEY_CTA_CLICKED_CARD_ID, state.ctaClickedCardId)
             state.openDay?.let { putLong(KEY_OPEN_DAY, it) } ?: remove(KEY_OPEN_DAY)
-            putStringSet(KEY_DAY_COUNTS, state.dayCounts.map { (id, count) -> "$id:$count" }.toSet())
+            putCounts(KEY_DAY_COUNTS, state.dayCounts)
+            putCounts(KEY_TOTAL_IMPRESSIONS, state.totalImpressions)
             putInt(KEY_COMPLETED_CARDS, state.completedCards)
             putInt(KEY_DISMISSED_CARDS, state.dismissedCards)
             putStringSet(KEY_REPORTED_COMPLETED_CARDS, state.reportedCompletedCards)
         }
+    }
+
+    private fun SharedPreferences.counts(key: String): Map<String, Int> = getStringSet(key, null).orEmpty().associate { entry ->
+        entry.substringBeforeLast(":") to entry.substringAfterLast(":").toInt()
+    }
+
+    private fun SharedPreferences.Editor.putCounts(key: String, counts: Map<String, Int>) {
+        putStringSet(key, counts.map { (id, count) -> "$id:$count" }.toSet())
     }
 
     private companion object {
@@ -91,6 +101,7 @@ class RealNextStepsTelemetryStore @Inject constructor(
         const val KEY_CTA_CLICKED_CARD_ID = "KEY_CTA_CLICKED_CARD_ID"
         const val KEY_OPEN_DAY = "KEY_OPEN_DAY"
         const val KEY_DAY_COUNTS = "KEY_DAY_COUNTS"
+        const val KEY_TOTAL_IMPRESSIONS = "KEY_TOTAL_IMPRESSIONS"
         const val KEY_COMPLETED_CARDS = "KEY_COMPLETED_CARDS"
         const val KEY_REPORTED_COMPLETED_CARDS = "KEY_REPORTED_COMPLETED_CARDS"
         const val KEY_DISMISSED_CARDS = "KEY_DISMISSED_CARDS"

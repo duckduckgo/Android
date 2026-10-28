@@ -22,20 +22,21 @@ import javax.inject.Inject
 
 enum class NextStepsPixelName(override val pixelName: String) : Pixel.PixelName {
     SECTION_SHOWN_UNIQUE("next_steps_section_shown_unique"),
-    CARD_IMPRESSION("next_steps_card_impression"),
     CARD_CTA_CLICKED("next_steps_card_cta_clicked"),
     CARD_REMOVED("next_steps_card_removed"),
     CARD_DAILY_IMPRESSIONS("next_steps_card_daily_impressions"),
     CARDS_DISMISSED("next_steps_cards_dismissed"),
 }
 
-/** [activeDay] and [calendarDay] are the bucketed day values shared by every pixel; see [com.duckduckgo.nextsteps.impl.NextStepsTelemetryState]. */
+/**
+ * [activeDay] and [calendarDay] are the bucketed day values shared by every pixel; see [com.duckduckgo.nextsteps.impl.NextStepsTelemetryState].
+ * `impressionsSoFar` is the bucketed number of times the card was the front card on this install, so a per-impression pixel is not needed.
+ */
 interface NextStepsPixels {
     /** Once per install, the first time the stacked cards are rendered. */
     fun sectionShownUnique()
-    fun cardImpression(card: String, days: Days)
-    fun cardCtaClicked(card: String, days: Days)
-    fun cardRemoved(card: String, days: Days, reason: CardRemovalReason)
+    fun cardCtaClicked(card: String, days: Days, impressionsSoFar: String)
+    fun cardRemoved(card: String, days: Days, reason: CardRemovalReason, impressionsSoFar: String)
     fun cardDailyImpressions(card: String, days: Days, impressions: String)
     fun cardsDismissed(days: Days, reason: String, completed: Int, dismissed: Int)
 
@@ -60,10 +61,12 @@ interface NextStepsPixels {
 class RealNextStepsPixels @Inject constructor(private val pixel: Pixel) : NextStepsPixels {
     override fun sectionShownUnique() = pixel.fire(NextStepsPixelName.SECTION_SHOWN_UNIQUE, type = Pixel.PixelType.Unique())
 
-    override fun cardImpression(card: String, days: NextStepsPixels.Days) = fire(NextStepsPixelName.CARD_IMPRESSION, days, "card" to card)
-    override fun cardCtaClicked(card: String, days: NextStepsPixels.Days) = fire(NextStepsPixelName.CARD_CTA_CLICKED, days, "card" to card)
-    override fun cardRemoved(card: String, days: NextStepsPixels.Days, reason: NextStepsPixels.CardRemovalReason) {
-        fire(NextStepsPixelName.CARD_REMOVED, days, "card" to card, "reason" to reason.value)
+    override fun cardCtaClicked(card: String, days: NextStepsPixels.Days, impressionsSoFar: String) {
+        fire(NextStepsPixelName.CARD_CTA_CLICKED, days, "card" to card, "impressionsSoFar" to impressionsSoFar)
+    }
+
+    override fun cardRemoved(card: String, days: NextStepsPixels.Days, reason: NextStepsPixels.CardRemovalReason, impressionsSoFar: String) {
+        fire(NextStepsPixelName.CARD_REMOVED, days, "card" to card, "reason" to reason.value, "impressionsSoFar" to impressionsSoFar)
     }
 
     override fun cardDailyImpressions(card: String, days: NextStepsPixels.Days, impressions: String) {

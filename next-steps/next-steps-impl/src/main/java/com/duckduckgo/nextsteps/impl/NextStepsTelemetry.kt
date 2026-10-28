@@ -28,7 +28,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
- * Owns the Next Steps pixel state shared by every NTP tab: the day anchor, the open-day impression counters,
+ * Owns the Next Steps pixel state shared by every NTP tab: the day anchor, the open-day and lifetime impression counters,
  * CTA attribution and which message is on screen.
  */
 interface NextStepsTelemetry {
@@ -65,14 +65,13 @@ class RealNextStepsTelemetry @Inject constructor(
                 .endCarouselIfReplaced(messageId, today)
                 .markCarouselDisplayed(messageId, today)
                 .startNewDayIfChanged(today, cardIdsInStack)
-            pixels.cardImpression(cardId, displayed.dayParams(today))
             displayed.incrementImpressions(cardId)
         }
     }
 
     override suspend fun onCtaClicked(cardId: String) {
         update { state, today ->
-            pixels.cardCtaClicked(cardId, state.dayParams(today))
+            pixels.cardCtaClicked(cardId, state.dayParams(today), state.impressionsSoFar(cardId))
             state.copy(ctaClickedCardId = cardId)
         }
     }
@@ -80,7 +79,7 @@ class RealNextStepsTelemetry @Inject constructor(
     override suspend fun onCardsCompleted(completedIds: Set<String>) {
         update { state, today ->
             completedIds.forEach { cardId ->
-                state.completionReason(cardId)?.let { pixels.cardRemoved(cardId, state.dayParams(today), it) }
+                state.completionReason(cardId)?.let { pixels.cardRemoved(cardId, state.dayParams(today), it, state.impressionsSoFar(cardId)) }
             }
             state.removeCards(completedIds, Removal.COMPLETED).copy(reportedCompletedCards = state.reportedCompletedCards + completedIds)
         }
@@ -88,7 +87,7 @@ class RealNextStepsTelemetry @Inject constructor(
 
     override suspend fun onCardDismissed(cardId: String) {
         update { state, today ->
-            pixels.cardRemoved(cardId, state.dayParams(today), CardRemovalReason.DISMISSED)
+            pixels.cardRemoved(cardId, state.dayParams(today), CardRemovalReason.DISMISSED, state.impressionsSoFar(cardId))
             state.removeCards(setOf(cardId), Removal.DISMISSED)
         }
     }
@@ -154,8 +153,12 @@ class RealNextStepsTelemetry @Inject constructor(
         else -> null
     }
 
-    private fun NextStepsTelemetryState.incrementImpressions(cardId: String): NextStepsTelemetryState =
-        copy(dayCounts = dayCounts + (cardId to (dayCounts[cardId] ?: 0) + 1))
+    private fun NextStepsTelemetryState.incrementImpressions(cardId: String): NextStepsTelemetryState = copy(
+        dayCounts = dayCounts + (cardId to (dayCounts[cardId] ?: 0) + 1),
+        totalImpressions = totalImpressions + (cardId to (totalImpressions[cardId] ?: 0) + 1),
+    )
+
+    private fun NextStepsTelemetryState.impressionsSoFar(cardId: String): String = impressionsBucket(totalImpressions[cardId] ?: 0)
 
     private fun NextStepsTelemetryState.removeCards(cardIds: Set<String>, removal: Removal): NextStepsTelemetryState {
         val removed = cardIds.filter { it in dayCounts }.toSet()

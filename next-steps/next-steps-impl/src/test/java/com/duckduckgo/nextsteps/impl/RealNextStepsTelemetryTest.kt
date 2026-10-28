@@ -77,12 +77,12 @@ class RealNextStepsTelemetryTest {
         testee.onFrontCardShown("message", A, setOf(A, B))
 
         verify(pixels).sectionShownUnique()
-        verify(pixels).cardImpression(A, DAY_0)
         val state = telemetryStore.state()
         assertEquals("message", state.displayedMessageId)
         assertEquals(firstDay.toEpochDay(), state.firstRenderDay)
         assertEquals(1, state.activeDays)
         assertEquals(mapOf(A to 1, B to 0), state.dayCounts)
+        assertEquals(mapOf(A to 1), state.totalImpressions)
     }
 
     @Test
@@ -92,7 +92,7 @@ class RealNextStepsTelemetryTest {
 
         testee.onCardsCompleted(setOf(A))
 
-        verify(pixels).cardRemoved(A, DAY_0, COMPLETED)
+        verify(pixels).cardRemoved(A, DAY_0, COMPLETED, "2")
         verify(pixels).cardDailyImpressions(A, DAY_0, "2")
         assertEquals(mapOf(B to 0), telemetryStore.state().dayCounts)
 
@@ -109,7 +109,7 @@ class RealNextStepsTelemetryTest {
         testee.onCardsCompleted(setOf(A))
 
         verify(pixels).cardDailyImpressions(A, DAY_0, "1")
-        verify(pixels).cardRemoved(A, DAY_0, FINISHED_ELSEWHERE)
+        verify(pixels).cardRemoved(A, DAY_0, FINISHED_ELSEWHERE, "1")
     }
 
     @Test
@@ -119,7 +119,7 @@ class RealNextStepsTelemetryTest {
         testee.onCardsCompleted(setOf(B))
 
         verify(pixels).cardDailyImpressions(B, DAY_0, "0")
-        verify(pixels).cardRemoved(B, DAY_0, FINISHED_ELSEWHERE)
+        verify(pixels).cardRemoved(B, DAY_0, FINISHED_ELSEWHERE, "0")
     }
 
     @Test
@@ -127,7 +127,7 @@ class RealNextStepsTelemetryTest {
         testee.onCardsCompleted(setOf(A))
         testee.onCardsCompleted(setOf(A))
 
-        verify(pixels, times(1)).cardRemoved(A, DAY_0, ALREADY_COMPLETE)
+        verify(pixels, times(1)).cardRemoved(A, DAY_0, ALREADY_COMPLETE, "0")
     }
 
     @Test
@@ -160,8 +160,8 @@ class RealNextStepsTelemetryTest {
 
         testee.onCardsCompleted(setOf(A, B))
 
-        verify(pixels).cardRemoved(A, DAY_0, FINISHED_ELSEWHERE)
-        verify(pixels).cardRemoved(B, DAY_0, COMPLETED)
+        verify(pixels).cardRemoved(A, DAY_0, FINISHED_ELSEWHERE, "1")
+        verify(pixels).cardRemoved(B, DAY_0, COMPLETED, "0")
         assertNull(telemetryStore.state().ctaClickedCardId)
     }
 
@@ -173,7 +173,7 @@ class RealNextStepsTelemetryTest {
         val reports = (1..2).map { async { testee.onCardsCompleted(setOf(A)) } }
         reports.awaitAll()
 
-        verify(pixels, times(1)).cardRemoved(A, DAY_0, COMPLETED)
+        verify(pixels, times(1)).cardRemoved(A, DAY_0, COMPLETED, "1")
         verify(pixels, times(1)).cardDailyImpressions(A, DAY_0, "1")
         assertEquals(1, telemetryStore.state().completedCards)
     }
@@ -185,7 +185,7 @@ class RealNextStepsTelemetryTest {
 
         testee.onCardDismissed(A)
 
-        verify(pixels).cardRemoved(A, DAY_0, DISMISSED)
+        verify(pixels).cardRemoved(A, DAY_0, DISMISSED, "1")
         verify(pixels).cardDailyImpressions(A, DAY_0, "1")
         assertNull(telemetryStore.state().ctaClickedCardId)
         assertEquals(mapOf(B to 0), telemetryStore.state().dayCounts)
@@ -215,8 +215,8 @@ class RealNextStepsTelemetryTest {
     @Test
     fun `cards completed before the first impression are reported as already complete and not counted in the summary`() = runTest {
         testee.onCardsCompleted(setOf(A, B))
-        verify(pixels).cardRemoved(A, DAY_0, ALREADY_COMPLETE)
-        verify(pixels).cardRemoved(B, DAY_0, ALREADY_COMPLETE)
+        verify(pixels).cardRemoved(A, DAY_0, ALREADY_COMPLETE, "0")
+        verify(pixels).cardRemoved(B, DAY_0, ALREADY_COMPLETE, "0")
         verifyNoMoreInteractions(pixels)
 
         testee.onFrontCardShown("message", C, setOf(C))
@@ -236,7 +236,8 @@ class RealNextStepsTelemetryTest {
         verify(pixels).cardDailyImpressions(A, DAY_0, "1")
         verify(pixels).cardDailyImpressions(B, DAY_0, "0")
         verify(pixels).cardDailyImpressions(C, DAY_0, "0")
-        verify(pixels).cardImpression(B, Days(activeDay = "1", calendarDay = "1"))
+        testee.onCtaClicked(B)
+        verify(pixels).cardCtaClicked(B, Days(activeDay = "1", calendarDay = "1"), "1")
         assertEquals(mapOf(A to 0, B to 1, C to 0), telemetryStore.state().dayCounts)
     }
 
@@ -254,7 +255,8 @@ class RealNextStepsTelemetryTest {
 
         testee.onFrontCardShown("message", A, setOf(A, B))
 
-        verify(pixels).cardImpression(A, Days(activeDay = "1", calendarDay = "1"))
+        testee.onCtaClicked(A)
+        verify(pixels).cardCtaClicked(A, Days(activeDay = "1", calendarDay = "1"), "2")
         verify(pixels, times(1)).cardDailyImpressions(A, DAY_0, "1")
         verify(pixels, times(1)).cardDailyImpressions(B, DAY_0, "0")
         assertEquals(mapOf(A to 1, B to 0), telemetryStore.state().dayCounts)
@@ -322,7 +324,8 @@ class RealNextStepsTelemetryTest {
 
         testee.onFrontCardShown("message", A, setOf(A))
 
-        verify(pixels).cardImpression(A, Days(activeDay = "1", calendarDay = "3"))
+        testee.onCtaClicked(A)
+        verify(pixels).cardCtaClicked(A, Days(activeDay = "1", calendarDay = "3"), "2")
         assertEquals(2, telemetryStore.state().activeDays)
     }
 
@@ -335,7 +338,7 @@ class RealNextStepsTelemetryTest {
         testee.onCardsCompleted(setOf(A))
 
         verify(pixels).cardDailyImpressions(A, DAY_0, "1")
-        verify(pixels).cardRemoved(A, Days(activeDay = "0", calendarDay = "1"), COMPLETED)
+        verify(pixels).cardRemoved(A, Days(activeDay = "0", calendarDay = "1"), COMPLETED, "1")
     }
 
     @Test
@@ -400,7 +403,8 @@ class RealNextStepsTelemetryTest {
         verify(pixels).cardsDismissed(Days(activeDay = "0", calendarDay = "4-7"), "auto", completed = 0, dismissed = 0)
         verify(pixels).cardDailyImpressions(A, DAY_0, "1")
         verify(pixels).cardDailyImpressions(B, DAY_0, "0")
-        verify(pixels).cardImpression(B, Days(activeDay = "1", calendarDay = "4-7"))
+        testee.onCtaClicked(B)
+        verify(pixels).cardCtaClicked(B, Days(activeDay = "1", calendarDay = "4-7"), "1")
         assertEquals("new", telemetryStore.state().displayedMessageId)
         assertEquals(firstDay.toEpochDay(), telemetryStore.state().firstRenderDay)
     }
@@ -414,7 +418,7 @@ class RealNextStepsTelemetryTest {
         restored.onCardsCompleted(setOf(A))
         restored.onActiveMessageChanged(null)
 
-        verify(pixels).cardRemoved(A, DAY_0, COMPLETED)
+        verify(pixels).cardRemoved(A, DAY_0, COMPLETED, "1")
         verify(pixels).cardDailyImpressions(A, DAY_0, "1")
         verify(pixels).cardDailyImpressions(B, DAY_0, "0")
         verify(pixels).cardsDismissed(DAY_0, "auto", completed = 1, dismissed = 0)
@@ -430,7 +434,8 @@ class RealNextStepsTelemetryTest {
 
         testee.onFrontCardShown("message", A, setOf(A))
 
-        verify(pixels).cardImpression(A, Days(activeDay = "1", calendarDay = "1"))
+        testee.onCtaClicked(A)
+        verify(pixels).cardCtaClicked(A, Days(activeDay = "1", calendarDay = "1"), "3-4")
         verify(pixels, never()).cardDailyImpressions(any(), any(), any())
         assertEquals(firstDay.plusDays(2).toEpochDay(), telemetryStore.state().openDay)
         assertEquals(mapOf(A to 2), telemetryStore.state().dayCounts)
@@ -446,7 +451,7 @@ class RealNextStepsTelemetryTest {
             clearInvocations(pixels)
             today = firstDay.plusDays(offset)
             testee.onCtaClicked(A)
-            verify(pixels).cardCtaClicked(A, Days(activeDay = "0", calendarDay = expected))
+            verify(pixels).cardCtaClicked(A, Days(activeDay = "0", calendarDay = expected), "1")
         }
     }
 
@@ -459,7 +464,7 @@ class RealNextStepsTelemetryTest {
 
             testee.onCtaClicked(A)
 
-            verify(pixels).cardCtaClicked(A, Days(activeDay = expected, calendarDay = "0"))
+            verify(pixels).cardCtaClicked(A, Days(activeDay = expected, calendarDay = "0"), "0")
         }
     }
 
@@ -487,7 +492,7 @@ class RealNextStepsTelemetryTest {
     fun `an event before any impression reports day zero`() = runTest {
         testee.onCtaClicked(A)
 
-        verify(pixels).cardCtaClicked(A, DAY_0)
+        verify(pixels).cardCtaClicked(A, DAY_0, "0")
     }
 
     @Test
@@ -499,6 +504,43 @@ class RealNextStepsTelemetryTest {
 
         verify(pixels, times(1)).cardDailyImpressions(any(), any(), any())
         verify(pixels).cardDailyImpressions(A, DAY_0, "1")
+    }
+
+    @Test
+    fun `cta tap and removal carry the card's impressions over every day`() = runTest {
+        repeat(2) { testee.onFrontCardShown("message", A, setOf(A, B)) }
+        today = today.plusDays(1)
+        testee.onFrontCardShown("message", A, setOf(A, B))
+
+        testee.onCtaClicked(A)
+        testee.onCardsCompleted(setOf(A))
+
+        verify(pixels).cardCtaClicked(A, Days(activeDay = "1", calendarDay = "1"), "3-4")
+        verify(pixels).cardRemoved(A, Days(activeDay = "1", calendarDay = "1"), COMPLETED, "3-4")
+        verify(pixels).cardDailyImpressions(A, Days(activeDay = "1", calendarDay = "1"), "1")
+    }
+
+    @Test
+    fun `impressions keep counting across carousels`() = runTest {
+        testee.onFrontCardShown("old", A, setOf(A))
+        testee.onActiveMessageChanged(null)
+        testee.onFrontCardShown("new", A, setOf(A))
+
+        testee.onCardDismissed(A)
+
+        verify(pixels).cardRemoved(A, DAY_0, DISMISSED, "2")
+    }
+
+    @Test
+    fun `impressions so far buckets cover the boundaries`() = runTest {
+        for ((count, expected) in listOf(0 to "0", 1 to "1", 2 to "2", 3 to "3-4", 4 to "3-4", 5 to "5-7", 7 to "5-7", 8 to "8+", 20 to "8+")) {
+            telemetryStore.save(NextStepsTelemetryState(firstRenderDay = firstDay.toEpochDay(), activeDays = 1, totalImpressions = mapOf(A to count)))
+            clearInvocations(pixels)
+
+            testee.onCtaClicked(A)
+
+            verify(pixels).cardCtaClicked(A, DAY_0, expected)
+        }
     }
 
     private companion object {
