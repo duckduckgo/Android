@@ -541,6 +541,8 @@ dependencies {
     internalImplementation project(':traces-api')
     internalImplementation project(':traces-impl')
     internalImplementation project(':vpn-internal')
+    internalImplementation "androidx.compose.animation:animation-graphics"
+    internalImplementation "com.airbnb.android:lottie-compose:_"
     internalImplementation(AndroidX.tracing) {
         because 'it backs the internal-flavor PageLoadTracer; other flavors bind a no-op instead'
     }
