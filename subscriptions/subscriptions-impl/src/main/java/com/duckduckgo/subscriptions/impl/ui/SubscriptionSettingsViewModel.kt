@@ -42,6 +42,7 @@ import com.duckduckgo.subscriptions.impl.repository.PendingPlan
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore.Companion.MAX_COMPLETED_ENTRY_POINT_VIEWS
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.DismissWithdrawalDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
@@ -49,6 +50,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToWithdrawalHelp
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.LaunchOnboarding
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialog
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialogError
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
@@ -97,7 +99,6 @@ class SubscriptionSettingsViewModel @Inject constructor(
     private var withdrawalOption: WithdrawalOption? = null
     private var withdrawalEligibilityRequested = false
     private var withdrawalInProgress = false
-    private var showWithdrawalErrorAlert = false
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
@@ -183,7 +184,6 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 onboardingEntryPoint = onboardingEntryPoint(subscription),
                 withdrawal = withdrawalOption.takeIf { canWithdraw(subscription) },
                 completedWithdrawal = completedWithdrawalState(subscription),
-                showWithdrawalErrorAlert = showWithdrawalErrorAlert,
             ),
         )
 
@@ -253,20 +253,17 @@ class SubscriptionSettingsViewModel @Inject constructor(
 
         viewModelScope.launch {
             val result = subscriptionWithdrawal.withdraw()
-            showWithdrawalErrorAlert = result is WithdrawalResult.Failure && result.reason != WithdrawalResult.FailureReason.NOT_ELIGIBLE
-            // A successful withdrawal ends the subscription, and a 409 means the user is no longer eligible: either way the option goes
-            if (!showWithdrawalErrorAlert) {
+            val canRetry = result is WithdrawalResult.Failure && result.reason != WithdrawalResult.FailureReason.NOT_ELIGIBLE
+            if (canRetry) {
+                command.send(ShowWithdrawalDialogError)
+            } else {
+                // A successful withdrawal ends the subscription, and a 409 means the user is no longer eligible: either way the option goes
                 withdrawalOption = null
-            }
-            _viewState.update { state ->
-                if (state is Ready) {
-                    state.copy(withdrawal = withdrawalOption, showWithdrawalErrorAlert = showWithdrawalErrorAlert)
-                } else {
-                    state
+                _viewState.update { state -> if (state is Ready) state.copy(withdrawal = null) else state }
+                command.send(DismissWithdrawalDialog)
+                if (result is WithdrawalResult.Success) {
+                    emitChanges()
                 }
-            }
-            if (result is WithdrawalResult.Success) {
-                emitChanges()
             }
             withdrawalInProgress = false
         }
@@ -388,6 +385,8 @@ class SubscriptionSettingsViewModel @Inject constructor(
         data object LaunchOnboarding : Command()
         data class ShowWithdrawalDialog(val tierNameResId: Int, val refundAmount: String) : Command()
         data object GoToWithdrawalHelp : Command()
+        data object DismissWithdrawalDialog : Command()
+        data object ShowWithdrawalDialogError : Command()
     }
 
     data class OnboardingEntryPoint(val percentage: Int)
@@ -426,7 +425,6 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val onboardingEntryPoint: OnboardingEntryPoint? = null,
             val withdrawal: WithdrawalOption? = null,
             val completedWithdrawal: CompletedWithdrawalState? = null,
-            val showWithdrawalErrorAlert: Boolean = false,
         ) : ViewState()
     }
 

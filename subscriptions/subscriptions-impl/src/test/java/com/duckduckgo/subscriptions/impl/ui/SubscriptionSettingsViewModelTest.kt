@@ -25,12 +25,14 @@ import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.PendingPlan
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.DismissWithdrawalDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToWithdrawalHelp
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialog
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialogError
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
@@ -55,6 +57,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.math.BigDecimal
@@ -950,7 +953,7 @@ class SubscriptionSettingsViewModelTest {
     }
 
     @Test
-    fun whenWithdrawalNoLongerEligibleThenHideWithdrawalOptionWithoutAlert() = runTest {
+    fun whenWithdrawalNoLongerEligibleThenHideWithdrawalOption() = runTest {
         subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
         whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failure(WithdrawalResult.FailureReason.NOT_ELIGIBLE))
@@ -960,14 +963,12 @@ class SubscriptionSettingsViewModelTest {
         viewModel.viewState.test {
             assertNotNull((expectMostRecentItem() as Ready).withdrawal)
             viewModel.onWithdrawalConfirmed()
-            val state = expectMostRecentItem() as Ready
-            assertNull(state.withdrawal)
-            assertFalse(state.showWithdrawalErrorAlert)
+            assertNull((expectMostRecentItem() as Ready).withdrawal)
         }
     }
 
     @Test
-    fun whenWithdrawalFailsForOtherReasonThenShowErrorAlertAndKeepOption() = runTest {
+    fun whenWithdrawalFailsForOtherReasonThenKeepWithdrawalOption() = runTest {
         subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
         whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failure(WithdrawalResult.FailureReason.UNKNOWN))
@@ -977,28 +978,53 @@ class SubscriptionSettingsViewModelTest {
         viewModel.viewState.test {
             assertNotNull((expectMostRecentItem() as Ready).withdrawal)
             viewModel.onWithdrawalConfirmed()
-            val state = expectMostRecentItem() as Ready
-            assertNotNull(state.withdrawal)
-            assertTrue(state.showWithdrawalErrorAlert)
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertNotNull((viewModel.viewState.value as Ready).withdrawal)
+    }
+
+    @Test
+    fun whenWithdrawalSucceedsThenDismissWithdrawalDialog() = runTest {
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(Refund(amount = BigDecimal("9.99"), currency = "EUR")))
+        stubReadySubscription(platform = "stripe")
+
+        viewModel.commands().test {
+            viewModel.onWithdrawalConfirmed()
+            assertEquals(DismissWithdrawalDialog, awaitItem())
         }
     }
 
     @Test
-    fun whenWithdrawalErrorAlertShownThenItSurvivesRerender() = runTest {
-        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
-        whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
+    fun whenWithdrawalNoLongerEligibleThenDismissWithdrawalDialog() = runTest {
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failure(WithdrawalResult.FailureReason.NOT_ELIGIBLE))
+        stubReadySubscription(platform = "stripe")
+
+        viewModel.commands().test {
+            viewModel.onWithdrawalConfirmed()
+            assertEquals(DismissWithdrawalDialog, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenWithdrawalFailsForOtherReasonThenShowErrorInWithdrawalDialog() = runTest {
         whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failure(WithdrawalResult.FailureReason.UNKNOWN))
         stubReadySubscription(platform = "stripe")
-        viewModel.onCreate(mock())
 
-        viewModel.viewState.test {
-            expectMostRecentItem()
+        viewModel.commands().test {
             viewModel.onWithdrawalConfirmed()
-            expectMostRecentItem()
-            viewModel.onResume(mock())
-            cancelAndIgnoreRemainingEvents()
+            assertEquals(ShowWithdrawalDialogError, awaitItem())
         }
-        assertTrue((viewModel.viewState.value as Ready).showWithdrawalErrorAlert)
+    }
+
+    @Test
+    fun whenWithdrawalRetriedAfterFailureThenWithdrawAgain() = runTest {
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failure(WithdrawalResult.FailureReason.UNKNOWN))
+        stubReadySubscription(platform = "stripe")
+
+        viewModel.onWithdrawalConfirmed()
+        viewModel.onWithdrawalConfirmed()
+
+        verify(subscriptionWithdrawal, times(2)).withdraw()
     }
 
     @Test

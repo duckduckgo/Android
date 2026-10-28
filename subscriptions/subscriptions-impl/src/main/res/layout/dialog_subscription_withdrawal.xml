@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/keyline_3">
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/withdrawalError"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_4"
+        android:accessibilityLiveRegion="polite"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="?daxColorDestructive"
+        app:typography="body2" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
+        android:id="@+id/withdrawalConfirmButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/subscriptionWithdrawDialogConfirm"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/withdrawalError" />
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/withdrawalConfirmSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:importantForAccessibility="no"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:indicatorSize="20dp"
+        app:layout_constraintBottom_toBottomOf="@id/withdrawalConfirmButton"
+        app:layout_constraintEnd_toEndOf="@id/withdrawalConfirmButton"
+        app:layout_constraintStart_toStartOf="@id/withdrawalConfirmButton"
+        app:layout_constraintTop_toTopOf="@id/withdrawalConfirmButton"
+        app:trackThickness="2dp" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+        android:id="@+id/withdrawalKeepButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_1"
+        android:text="@string/subscriptionWithdrawDialogKeep"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/withdrawalConfirmButton" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
