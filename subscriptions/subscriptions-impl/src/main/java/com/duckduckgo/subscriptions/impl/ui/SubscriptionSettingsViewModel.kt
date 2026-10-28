@@ -235,8 +235,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
 
         viewModelScope.launch {
             val result = subscriptionWithdrawal.withdraw()
-            val canRetry = result is WithdrawalResult.Failure && result.reason != WithdrawalResult.FailureReason.NOT_ELIGIBLE
-            if (canRetry) {
+            if (result == WithdrawalResult.Failed) {
                 command.send(ShowWithdrawalDialogError)
             } else {
                 // A successful withdrawal ends the subscription, and a 409 means the user is no longer eligible: either way the option goes

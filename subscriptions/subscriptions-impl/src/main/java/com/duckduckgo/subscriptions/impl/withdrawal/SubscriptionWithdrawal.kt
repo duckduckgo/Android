@@ -23,7 +23,6 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.duckduckgo.subscriptions.impl.services.WithdrawResponse
-import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult.Failure
 import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult.Success
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
@@ -56,14 +55,10 @@ sealed class WithdrawalResult {
     /** [refund] is null when the backend completed the withdrawal but the refunded amount could not be read. */
     data class Success(val refund: Refund?) : WithdrawalResult()
 
-    data class Failure(val reason: FailureReason) : WithdrawalResult()
+    /** The backend no longer allows this subscription to be withdrawn, so trying again won't help. */
+    data object NotEligible : WithdrawalResult()
 
-    enum class FailureReason {
-        NOT_ELIGIBLE,
-        NOT_STRIPE_SUBSCRIPTION,
-        NO_SUBSCRIPTION,
-        UNKNOWN,
-    }
+    data object Failed : WithdrawalResult()
 }
 
 data class Refund(
@@ -110,27 +105,20 @@ class RealSubscriptionWithdrawal @Inject constructor(
         val refund = try {
             subscriptionsService.withdraw().toRefund()
         } catch (e: HttpException) {
-            return Failure(e.toFailureReason())
+            return if (e.code() == HTTP_CONFLICT) WithdrawalResult.NotEligible else WithdrawalResult.Failed
         } catch (e: JsonDataException) {
             // A body that can't be decoded only arrives with a 2xx, so the backend has already withdrawn the user
             null
         } catch (e: JsonEncodingException) {
             null
         } catch (e: Exception) {
-            return Failure(WithdrawalResult.FailureReason.UNKNOWN)
+            return WithdrawalResult.Failed
         }
 
         // The withdrawn account has nothing left to manage, so it goes the same way as removing it from the device
         subscriptionsManager.signOut()
 
         return Success(refund)
-    }
-
-    private fun HttpException.toFailureReason(): WithdrawalResult.FailureReason = when (code()) {
-        400 -> WithdrawalResult.FailureReason.NOT_STRIPE_SUBSCRIPTION
-        404 -> WithdrawalResult.FailureReason.NO_SUBSCRIPTION
-        409 -> WithdrawalResult.FailureReason.NOT_ELIGIBLE
-        else -> WithdrawalResult.FailureReason.UNKNOWN
     }
 
     private fun WithdrawResponse.toRefund(): Refund? {
@@ -141,5 +129,6 @@ class RealSubscriptionWithdrawal @Inject constructor(
 
     private companion object {
         private const val STRIPE_PLATFORM = "stripe"
+        private const val HTTP_CONFLICT = 409
     }
 }

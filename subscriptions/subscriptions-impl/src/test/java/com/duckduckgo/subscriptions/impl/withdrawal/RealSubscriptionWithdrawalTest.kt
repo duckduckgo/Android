@@ -14,8 +14,6 @@ import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.duckduckgo.subscriptions.impl.services.WithdrawResponse
 import com.duckduckgo.subscriptions.impl.services.WithdrawalEligibilityResponse
-import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult.Failure
-import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult.FailureReason
 import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult.Success
 import com.squareup.moshi.JsonDataException
 import kotlinx.coroutines.test.runTest
@@ -161,36 +159,36 @@ class RealSubscriptionWithdrawalTest {
     fun whenWithdrawReturns409ThenNotEligible() = runTest {
         whenever(subscriptionsService.withdraw()).thenThrow(httpException(409))
 
-        assertEquals(Failure(FailureReason.NOT_ELIGIBLE), withdrawal.withdraw())
+        assertEquals(WithdrawalResult.NotEligible, withdrawal.withdraw())
         verify(subscriptionsManager, never()).signOut()
     }
 
     @Test
-    fun whenWithdrawReturns400ThenNotStripeSubscription() = runTest {
+    fun whenWithdrawReturns400ThenFailed() = runTest {
         whenever(subscriptionsService.withdraw()).thenThrow(httpException(400))
 
-        assertEquals(Failure(FailureReason.NOT_STRIPE_SUBSCRIPTION), withdrawal.withdraw())
+        assertEquals(WithdrawalResult.Failed, withdrawal.withdraw())
     }
 
     @Test
-    fun whenWithdrawReturns404ThenNoSubscription() = runTest {
+    fun whenWithdrawReturns404ThenFailed() = runTest {
         whenever(subscriptionsService.withdraw()).thenThrow(httpException(404))
 
-        assertEquals(Failure(FailureReason.NO_SUBSCRIPTION), withdrawal.withdraw())
+        assertEquals(WithdrawalResult.Failed, withdrawal.withdraw())
     }
 
     @Test
-    fun whenWithdrawReturns500ThenUnknown() = runTest {
+    fun whenWithdrawReturns500ThenFailed() = runTest {
         whenever(subscriptionsService.withdraw()).thenThrow(httpException(500))
 
-        assertEquals(Failure(FailureReason.UNKNOWN), withdrawal.withdraw())
+        assertEquals(WithdrawalResult.Failed, withdrawal.withdraw())
     }
 
     @Test
-    fun whenWithdrawThrowsThenUnknown() = runTest {
+    fun whenWithdrawThrowsThenFailed() = runTest {
         whenever(subscriptionsService.withdraw()).thenThrow(RuntimeException())
 
-        assertEquals(Failure(FailureReason.UNKNOWN), withdrawal.withdraw())
+        assertEquals(WithdrawalResult.Failed, withdrawal.withdraw())
     }
 
     private fun subscription(

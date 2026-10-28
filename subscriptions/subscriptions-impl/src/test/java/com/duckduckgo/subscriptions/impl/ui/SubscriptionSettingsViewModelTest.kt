@@ -918,7 +918,7 @@ class SubscriptionSettingsViewModelTest {
     fun whenWithdrawalNoLongerEligibleThenHideWithdrawalOption() = runTest {
         whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
-        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failure(WithdrawalResult.FailureReason.NOT_ELIGIBLE))
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.NotEligible)
         stubReadySubscription(platform = "stripe")
         viewModel.onCreate(mock())
 
@@ -933,7 +933,7 @@ class SubscriptionSettingsViewModelTest {
     fun whenWithdrawalFailsForOtherReasonThenKeepWithdrawalOption() = runTest {
         whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
-        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failure(WithdrawalResult.FailureReason.UNKNOWN))
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failed)
         stubReadySubscription(platform = "stripe")
         viewModel.onCreate(mock())
 
@@ -958,7 +958,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenWithdrawalNoLongerEligibleThenDismissWithdrawalDialog() = runTest {
-        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failure(WithdrawalResult.FailureReason.NOT_ELIGIBLE))
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.NotEligible)
         stubReadySubscription(platform = "stripe")
 
         viewModel.commands().test {
@@ -969,7 +969,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenWithdrawalFailsForOtherReasonThenShowErrorInWithdrawalDialog() = runTest {
-        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failure(WithdrawalResult.FailureReason.UNKNOWN))
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failed)
         stubReadySubscription(platform = "stripe")
 
         viewModel.commands().test {
@@ -980,7 +980,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenWithdrawalRetriedAfterFailureThenWithdrawAgain() = runTest {
-        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failure(WithdrawalResult.FailureReason.UNKNOWN))
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failed)
         stubReadySubscription(platform = "stripe")
 
         viewModel.onWithdrawalConfirmed()
@@ -1037,7 +1037,7 @@ class SubscriptionSettingsViewModelTest {
     fun whenWithdrawalNoLongerEligibleThenNoCompletedWithdrawal() = runTest {
         whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
-        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failure(WithdrawalResult.FailureReason.NOT_ELIGIBLE))
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.NotEligible)
         stubReadySubscription(platform = "stripe")
         viewModel.onCreate(mock())
 
