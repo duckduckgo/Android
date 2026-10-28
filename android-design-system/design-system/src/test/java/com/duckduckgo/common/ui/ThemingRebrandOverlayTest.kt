@@ -26,8 +26,12 @@ import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.common.ui.Theming.Constants.FIXED_DARK_THEME_ACTIVITIES
 import com.duckduckgo.common.ui.Theming.Constants.FIXED_THEME_ACTIVITIES
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
+import com.duckduckgo.common.ui.store.NewThemeSetting
 import com.duckduckgo.common.ui.store.ThemingDataStore
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.R
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.snackbar.Snackbar
@@ -36,6 +40,8 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
@@ -44,6 +50,7 @@ private const val EXTRA_THEME = "theme"
 private const val EXTRA_THEME_RES_ID = "themeResId"
 private const val EXTRA_FIXED_LOCAL_CLASS_NAME = "fixedLocalClassName"
 private const val EXTRA_FIRE_THEME = "fireTheme"
+private const val EXTRA_NEW_THEME = "newTheme"
 
 private class TestThemingDataStore(override var theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT) : ThemingDataStore {
     override fun isCurrentlySelected(theme: DuckDuckGoTheme): Boolean = this.theme == theme
@@ -71,7 +78,7 @@ class ThemingRebrandOverlayTest {
         override fun onCreate(savedInstanceState: Bundle?) {
             val theme = DuckDuckGoTheme.valueOf(intent.getStringExtra(EXTRA_THEME) ?: DuckDuckGoTheme.LIGHT.name)
             setTheme(intent.getIntExtra(EXTRA_THEME_RES_ID, R.style.Theme_DuckDuckGo_Dark))
-            applyTheme(theme = theme)
+            applyTheme(theme = theme, useNewTheme = intent.getBooleanExtra(EXTRA_NEW_THEME, false))
             super.onCreate(savedInstanceState)
         }
 
@@ -88,17 +95,22 @@ class ThemingRebrandOverlayTest {
             themingDataStore = TestThemingDataStore(
                 DuckDuckGoTheme.valueOf(intent.getStringExtra(EXTRA_THEME) ?: DuckDuckGoTheme.LIGHT.name),
             )
+            newThemeSetting = NewThemeSetting(
+                mock<AppBrandDesignUpdateToggles>().also { whenever(it.newTheme()).thenReturn(mock<Toggle>()) },
+            )
             onCreate(savedInstanceState, injectDependencies = false)
         }
     }
 
     private fun fixedThemeActivity(
         themeResId: Int = R.style.Theme_DuckDuckGo_Dark,
-        fixedLocalClassName: String = FIXED_THEME_ACTIVITIES[1],
+        fixedLocalClassName: String = FIXED_THEME_ACTIVITIES[0],
+        useNewTheme: Boolean = false,
     ): AppCompatActivity = buildThemedActivity(
         theme = DuckDuckGoTheme.LIGHT,
         themeResId = themeResId,
         fixedLocalClassName = fixedLocalClassName,
+        useNewTheme = useNewTheme,
     )
 
     private fun resolveColor(
@@ -119,8 +131,10 @@ class ThemingRebrandOverlayTest {
         theme: DuckDuckGoTheme,
         themeResId: Int = R.style.Theme_DuckDuckGo_Dark,
         fixedLocalClassName: String? = null,
+        useNewTheme: Boolean = false,
     ): AppCompatActivity {
         val intent = Intent().apply {
+            putExtra(EXTRA_NEW_THEME, useNewTheme)
             putExtra(EXTRA_THEME, theme.name)
             putExtra(EXTRA_THEME_RES_ID, themeResId)
             if (fixedLocalClassName != null) putExtra(EXTRA_FIXED_LOCAL_CLASS_NAME, fixedLocalClassName)
@@ -168,8 +182,17 @@ class ThemingRebrandOverlayTest {
 
     @Test
     fun whenFixedThemeActivityThenThemeStaysDark() {
-        val activity = fixedThemeActivity()
+        val activity = fixedThemeActivity(fixedLocalClassName = FIXED_DARK_THEME_ACTIVITIES[0])
         assertFalse(resolveBoolean(activity, android.R.attr.isLightTheme))
+    }
+
+    @Test
+    fun whenFixedDarkActivityAndNewThemeThenNewDarkThemeApplied() {
+        val activity = fixedThemeActivity(fixedLocalClassName = FIXED_DARK_THEME_ACTIVITIES[0], useNewTheme = true)
+
+        assertFalse(resolveBoolean(activity, android.R.attr.isLightTheme))
+        assertEquals(R.style.Theme_DuckDuckGo_New_Dark, resolveResourceId(activity, R.attr.daxThemeDark))
+        assertEquals(R.style.Theme_DuckDuckGo_New_Light, resolveResourceId(activity, R.attr.daxThemeLight))
     }
 
     @Test

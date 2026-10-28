@@ -21,7 +21,6 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -37,6 +36,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.common.ui.onboardingThemedContext
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.show
@@ -47,7 +47,6 @@ import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
-import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class DefaultBrowserPage :
@@ -75,13 +74,7 @@ class DefaultBrowserPage :
 
     override fun onGetLayoutInflater(savedInstanceState: Bundle?): LayoutInflater {
         val inflater = super.onGetLayoutInflater(savedInstanceState)
-        val themeRes = if (appTheme.isLightModeEnabled()) {
-            CommonR.style.Theme_DuckDuckGo_Light_Onboarding
-        } else {
-            CommonR.style.Theme_DuckDuckGo_Dark_Onboarding
-        }
-        val contextThemeWrapper = ContextThemeWrapper(inflater.context, themeRes)
-        return inflater.cloneInContext(contextThemeWrapper)
+        return inflater.cloneInContext(inflater.context.onboardingThemedContext(isDark = !appTheme.isLightModeEnabled()))
     }
 
     override fun onViewCreated(

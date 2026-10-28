@@ -21,7 +21,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.os.Bundle
-import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -61,6 +60,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Onboarding
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillImportPasswordsScreen
 import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.common.ui.onboardingThemedContext
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
@@ -143,12 +143,7 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
 
     override fun onGetLayoutInflater(savedInstanceState: Bundle?): LayoutInflater {
         val inflater = super.onGetLayoutInflater(savedInstanceState)
-        val themeRes = if (appTheme.isLightModeEnabled()) {
-            CommonR.style.Theme_DuckDuckGo_Light_Onboarding
-        } else {
-            CommonR.style.Theme_DuckDuckGo_Dark_Onboarding
-        }
-        return inflater.cloneInContext(ContextThemeWrapper(inflater.context, themeRes))
+        return inflater.cloneInContext(inflater.context.onboardingThemedContext(isDark = !appTheme.isLightModeEnabled()))
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

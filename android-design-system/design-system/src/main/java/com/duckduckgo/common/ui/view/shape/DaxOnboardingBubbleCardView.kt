@@ -23,10 +23,10 @@ import android.graphics.Outline
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.util.TypedValue
-import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewOutlineProvider
 import androidx.core.content.ContextCompat
+import com.duckduckgo.common.ui.onboardingThemedContext
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.mobile.android.R
@@ -273,12 +273,7 @@ constructor(
             return context
         }
         val nightMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-        val themeRes = if (nightMode == Configuration.UI_MODE_NIGHT_YES) {
-            R.style.Theme_DuckDuckGo_Dark_Onboarding
-        } else {
-            R.style.Theme_DuckDuckGo_Light_Onboarding
-        }
-        return ContextThemeWrapper(context, themeRes)
+        return context.onboardingThemedContext(isDark = nightMode == Configuration.UI_MODE_NIGHT_YES)
     }
 
     /**

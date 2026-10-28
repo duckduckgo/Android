@@ -24,6 +24,7 @@ import com.duckduckgo.app.browser.omnibar.animations.addressbar.LottiePrivacyShi
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.ui.store.NewThemeSetting
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -33,7 +34,7 @@ import org.mockito.kotlin.whenever
 class LottiePrivacyShieldAnimationHelperTest {
 
     private val browserViewMode = Omnibar.ViewMode.Browser("cnn.com")
-    private val customTabShieldDrawableFactory = CustomTabShieldDrawableFactory()
+    private val customTabShieldDrawableFactory = CustomTabShieldDrawableFactory(NewThemeSetting(mock()))
 
     @Test
     fun whenPrivacyShieldProtectedThenUseColorShieldAnimation() = runTest {

@@ -21,7 +21,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_cookie_popup_sheet"
-    android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding">
+    android:theme="?attr/daxOnboardingThemeOverlay">
 
     <ImageView
         android:id="@+id/cookiePopupOptInIllustration"
@@ -171,7 +171,7 @@
                 android:contentDescription="@string/closeButtonContentDescription"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:focusable="true"
-                android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding"
+                android:theme="?attr/daxOnboardingThemeOverlay"
                 android:translationZ="8dp"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="@id/cookiePopupOptInBubble"

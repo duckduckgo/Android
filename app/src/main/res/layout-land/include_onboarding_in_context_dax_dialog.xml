@@ -27,7 +27,7 @@
     android:clipToPadding="false"
     android:paddingTop="@dimen/keyline_4"
     android:paddingBottom="@dimen/keyline_4"
-    android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding"
+    android:theme="?attr/daxOnboardingThemeOverlay"
     tools:alpha="1">
 
     <com.duckduckgo.app.onboarding.ui.view.OnboardingFillImageView
@@ -170,7 +170,7 @@
         android:foreground="?attr/selectableItemBackgroundBorderless"
         android:outlineProvider="none"
         android:padding="8dp"
-        android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding"
+        android:theme="?attr/daxOnboardingThemeOverlay"
         android:translationZ="8dp"
         app:layout_constraintEnd_toEndOf="@id/contextualBrandDesignCardView"
         app:layout_constraintTop_toTopOf="@id/contextualBrandDesignCardView"

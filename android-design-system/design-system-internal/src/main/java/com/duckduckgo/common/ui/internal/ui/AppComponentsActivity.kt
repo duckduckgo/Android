@@ -86,7 +86,7 @@ class AppComponentsActivity : AppCompatActivity() {
         val (selectedTheme, brandDesignUpdateEnabled) = runBlocking {
             val selectedTheme = appComponentsViewModel.themeFlow.first()
             val brandDesignUpdateEnabled = appComponentsViewModel.brandDesignUpdateFlow.first()
-            applyTheme(selectedTheme)
+            applyTheme(selectedTheme, useNewTheme = brandDesignUpdateEnabled)
             selectedTheme to brandDesignUpdateEnabled
         }
         super.onCreate(savedInstanceState)
