@@ -423,6 +423,18 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
+    fun whenPurchaseFlowIfSubscriptionFailsWith401ThenDoNotRequestLogout() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionFails(httpResponseCode = 401)
+        givenCreateAccountSucceeds()
+
+        purchase()
+        advanceUntilIdle()
+
+        verify(authClient, never()).tryLogout(any())
+    }
+
+    @Test
     fun whenPurchaseFlowIfUserNotSignedInAndNotPurchaseStoredThenCreateAccount() = runTest {
         givenUserIsNotSignedIn()
         givenCreateAccountSucceeds()
@@ -1343,6 +1355,10 @@ class RealSubscriptionsManagerTest {
         assertNull(authRepository.getSubscription())
         verify(pixelSender).reportAuthV2InvalidRefreshTokenDetected()
         verify(pixelSender).reportAuthV2InvalidRefreshTokenSignedOut()
+
+        // Access token is invalid, so call to /logout can't succeed anyway.
+        advanceUntilIdle()
+        verify(authClient, never()).tryLogout(any())
     }
 
     @Test
@@ -1364,6 +1380,10 @@ class RealSubscriptionsManagerTest {
         assertNull(authRepository.getRefreshTokenV2())
         assertNull(authRepository.getAccount())
         assertNull(authRepository.getSubscription())
+
+        // Account doesn't exist, so there is no point in notifying BE about logout.
+        advanceUntilIdle()
+        verify(authClient, never()).tryLogout(any())
 
         // Store login has 0 chance of success when account doesn't exist, so there should be no attempt.
         verify(authClient, never()).authorize(any())
@@ -1624,6 +1644,16 @@ class RealSubscriptionsManagerTest {
         givenUrlPortalFails()
 
         assertNull(subscriptionsManager.getPortalUrl())
+    }
+
+    @Test
+    fun whenSignOutThenRequestLogoutWithAccessToken() = runTest {
+        givenUserIsSignedIn()
+
+        subscriptionsManager.signOut()
+        advanceUntilIdle()
+
+        verify(authClient).tryLogout(FAKE_ACCESS_TOKEN_V2)
     }
 
     @Test
