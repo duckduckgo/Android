@@ -102,6 +102,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
     private val withdrawalDialog = SubscriptionWithdrawalDialog(
         context = this,
         onConfirm = { viewModel.onWithdrawalConfirmed() },
+        onDismissed = { viewModel.onWithdrawalDialogDismissed() },
         onHelpLinkClicked = { viewModel.onWithdrawalHelpLinkClicked() },
     )
 

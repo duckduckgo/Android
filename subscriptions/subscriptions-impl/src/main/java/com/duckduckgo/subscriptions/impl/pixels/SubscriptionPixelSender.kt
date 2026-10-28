@@ -83,6 +83,10 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_R
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_CHANGE_PLAN_OR_BILLING_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_REMOVE_FROM_DEVICE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_SHOWN
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_WITHDRAWAL_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_CONFIRM_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_DISMISS
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_SHOWN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SWITCH
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelParameter.ACTIVATION_DAY
@@ -129,6 +133,10 @@ interface SubscriptionPixelSender {
     fun reportAppSettingsPartnerBenefitsClick()
     fun reportSubscriptionSettingsChangePlanOrBillingClick()
     fun reportSubscriptionSettingsRemoveFromDeviceClick()
+    fun reportSubscriptionSettingsWithdrawalClick()
+    fun reportSubscriptionSettingsWithdrawalDialogShown()
+    fun reportSubscriptionSettingsWithdrawalDialogConfirmClick()
+    fun reportSubscriptionSettingsWithdrawalDialogDismissed()
     fun reportMonthlyPriceClick()
     fun reportYearlyPriceClick()
     fun reportOnboardingFaqClick()
@@ -304,6 +312,18 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportSubscriptionSettingsRemoveFromDeviceClick() =
         fire(SUBSCRIPTION_SETTINGS_REMOVE_FROM_DEVICE_CLICK)
+
+    override fun reportSubscriptionSettingsWithdrawalClick() =
+        fire(SUBSCRIPTION_SETTINGS_WITHDRAWAL_CLICK)
+
+    override fun reportSubscriptionSettingsWithdrawalDialogShown() =
+        fire(SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_SHOWN)
+
+    override fun reportSubscriptionSettingsWithdrawalDialogConfirmClick() =
+        fire(SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_CONFIRM_CLICK)
+
+    override fun reportSubscriptionSettingsWithdrawalDialogDismissed() =
+        fire(SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_DISMISS)
 
     override fun reportMonthlyPriceClick() =
         fire(SUBSCRIPTION_PRICE_MONTHLY_CLICK)

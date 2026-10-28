@@ -29,6 +29,7 @@ import com.duckduckgo.subscriptions.impl.databinding.DialogSubscriptionWithdrawa
 class SubscriptionWithdrawalDialog(
     private val context: Context,
     private val onConfirm: () -> Unit,
+    private val onDismissed: () -> Unit,
     private val onHelpLinkClicked: () -> Unit,
 ) {
     private var dialog: DaxAlertDialog? = null
@@ -47,7 +48,10 @@ class SubscriptionWithdrawalDialog(
             renderInProgress(content)
             onConfirm()
         }
-        content.withdrawalKeepButton.setOnClickListener { dismiss() }
+        content.withdrawalKeepButton.setOnClickListener {
+            dismiss()
+            onDismissed()
+        }
 
         val dialog = CustomAlertDialogBuilder(context)
             .setTitle(R.string.subscriptionWithdrawDialogTitle)
