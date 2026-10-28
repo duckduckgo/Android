@@ -228,6 +228,7 @@ interface SubscriptionsManager {
      * Signs the user out and deletes all the data from the device
      *
      * @param invalidateTokens if true, a request will be made to BE to invalidate refresh+access token pair.
+     * Should be set to true, unless it is known that the access token is invalid already.
      */
     suspend fun signOut(invalidateTokens: Boolean = true)
 
