@@ -25,6 +25,7 @@ import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Disabled
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
 import com.duckduckgo.adblocking.impl.R
 import com.duckduckgo.adblocking.impl.databinding.ActivityAdBlockingSettingsV2Binding
+import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.DuckPlayerSection
 import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.view.StatusIndicatorView
@@ -64,6 +65,7 @@ class AdBlockingSettingsV2Activity : BaseAdBlockingSettingsActivity() {
         setContentView(binding.root)
         setTitle(R.string.ad_blocking_settings_title_v2)
         binding.adBlockingStatusIndicator.setStatus(StatusIndicatorView.Status.ALWAYS_ON)
+        binding.duckPlayerSettingsLink.setOnClickListener { viewModel.onDuckPlayerClicked() }
         configure()
     }
 
@@ -74,6 +76,9 @@ class AdBlockingSettingsV2Activity : BaseAdBlockingSettingsActivity() {
         if (state.disabledUntilRelaunch) {
             binding.blockAdsToggleUntilRelaunch.quietlySetIsChecked(state.isEnabled, untilRelaunchToggleListener)
         }
+        binding.duckPlayerEntry.isVisible = state.duckPlayerSection == DuckPlayerSection.Entry
+        binding.duckPlayerDescription.isVisible = state.duckPlayerSection == DuckPlayerSection.Entry
+        binding.duckPlayerSettingsLink.isVisible = state.duckPlayerSection == DuckPlayerSection.Link
         binding.duckPlayerEntry.setSecondaryText(
             when (state.duckPlayerMode) {
                 Enabled -> getString(R.string.duck_player_mode_always)
