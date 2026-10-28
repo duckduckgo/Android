@@ -26,10 +26,6 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.DialogSubscriptionWithdrawalBinding
 
-/**
- * Confirmation dialog for withdrawing from a subscription. Built with custom buttons because the stacked dialog
- * dismisses on every click, and this one has to stay open while the request runs and show an error if it fails.
- */
 class SubscriptionWithdrawalDialog(
     private val context: Context,
     private val onConfirm: () -> Unit,

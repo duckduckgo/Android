@@ -403,7 +403,7 @@ interface SubscriptionsFeature {
     fun bridgeOriginCheck(): Toggle
 
     /**
-     * When enabled, eligible Stripe subscribers can withdraw from their subscription for a full refund
+     * When enabled, eligible Stripe subscribers can withdraw from their subscription
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun subscriptionWithdrawal(): Toggle
