@@ -483,6 +483,6 @@
     <string name="sync_passwords_import_promo_primary_button">Sync &amp; Backup bekapcsolása</string>
 
     <!-- Sync promo on bookmarks import success screen -->
-    <string name="sync_bookmarks_import_promo_title">Férj hozzá a jelszavaidhoz mobilon és asztali gépen.</string>
+    <string name="sync_bookmarks_import_promo_title">Férj hozzá a könyvjelzőidhez mobilon és asztali gépen.</string>
     <string name="sync_bookmarks_import_promo_primary_button">Sync &amp; Backup bekapcsolása</string>
 </resources>
