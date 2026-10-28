@@ -22,6 +22,7 @@ import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RuntimeEnvironment
@@ -32,20 +33,14 @@ import com.duckduckgo.mobile.android.R as CommonR
 class ModelPickerViewTest {
 
     @Test
-    fun whenRadiusIsDisabledThenPopupKeepsUnclipped8DpCorners() {
-        assertPopupClipping(radiusEnabled = false, expectedRadiusDp = 8f)
-    }
-
-    @Test
     @Config(qualifiers = "xhdpi")
-    fun whenRadiusIsEnabledThenPopupClipsChildrenTo16DpCorners() {
-        assertPopupClipping(radiusEnabled = true, expectedRadiusDp = 16f)
+    fun whenThemedThenPopupClipsChildrenTo16DpCorners() {
+        assertPopupClipping(expectedRadiusDp = 16f)
     }
 
-    private fun assertPopupClipping(radiusEnabled: Boolean, expectedRadiusDp: Float) {
+    private fun assertPopupClipping(expectedRadiusDp: Float) {
         listOf(CommonR.style.Theme_DuckDuckGo_Light, CommonR.style.Theme_DuckDuckGo_Dark).forEach { themeResId ->
             val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), themeResId)
-            if (radiusEnabled) context.theme.applyStyle(CommonR.style.ThemeOverlay_Rebrand_Radius, true)
             val picker = ModelPickerView(context)
             // Exercise the production popup without attaching the unrelated injected view model.
             val rows = ModelPickerView::class.java.getDeclaredMethod("buildMenuContainer")
@@ -58,7 +53,7 @@ class ModelPickerViewTest {
             val outline = Outline().also { viewport.outlineProvider.getOutline(viewport, it) }
 
             assertEquals(expectedRadiusDp * context.resources.displayMetrics.density, outline.radius, 0f)
-            assertEquals("The rounded viewport must own clipping", radiusEnabled, viewport.clipToOutline)
+            assertTrue("The rounded viewport must own clipping", viewport.clipToOutline)
         }
     }
 }

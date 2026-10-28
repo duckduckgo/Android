@@ -29,7 +29,6 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.os.BundleCompat
 import androidx.core.view.children
 import androidx.core.view.isVisible
@@ -381,11 +380,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                 viewModel.onSelected(bookmark)
             },
             onBookmarkOverflowClick = { anchor, bookmark ->
-                if (appBrandDesignUpdateToggles.radius().isEnabled()) {
-                    showBookmarkPopupMenu(anchor, bookmark)
-                } else {
-                    showBookmarkOverFlowMenu(anchor, bookmark)
-                }
+                showBookmarkPopupMenu(anchor, bookmark)
             },
             onLongClick = {
                 if (viewModel.viewState.value?.sortingMode == NAME) {
@@ -396,11 +391,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                 viewModel.onBookmarkFolderSelected(bookmarkFolder)
             },
             onBookmarkFolderOverflowClick = { anchor, bookmarkFolder ->
-                if (appBrandDesignUpdateToggles.radius().isEnabled()) {
-                    showFolderPopupMenu(anchor, bookmarkFolder)
-                } else {
-                    showFolderOverflowMenu(anchor, bookmarkFolder)
-                }
+                showFolderPopupMenu(anchor, bookmarkFolder)
             },
         )
         contentBookmarksBinding.recycler.adapter = bookmarksAdapter
@@ -626,10 +617,10 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         } else {
             when (sortingMode) {
                 MANUAL -> {
-                    popupBinding.sortManually.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
+                    popupBinding.sortManually.setTrailingIconResource(commonR.drawable.ic_check_24)
                 }
                 NAME -> {
-                    popupBinding.sortByName.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
+                    popupBinding.sortByName.setTrailingIconResource(commonR.drawable.ic_check_24)
                 }
             }
         }
@@ -789,71 +780,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
 
     override fun onPromotionDismissed() {
         viewModel.onPromotionDismissed()
-    }
-
-    private fun showFolderOverflowMenu(
-        anchor: View,
-        bookmarkFolder: BookmarkFolder,
-    ) {
-        val wrapper = ContextThemeWrapper(this, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_PopupMenu)
-        val popup = androidx.appcompat.widget.PopupMenu(wrapper, anchor)
-        popup.menuInflater.inflate(R.menu.bookmark_folder_popup_menu, popup.menu)
-
-        popup.setOnMenuItemClickListener { menuItem: MenuItem ->
-            when (menuItem.itemId) {
-                R.id.bookmark_folder_edit -> {
-                    viewModel.onEditBookmarkFolderRequested(bookmarkFolder)
-                }
-
-                R.id.bookmark_folder_delete -> {
-                    viewModel.onDeleteBookmarkFolderRequested(bookmarkFolder)
-                }
-            }
-            true
-        }
-        popup.setOnDismissListener {
-            // Respond to popup being dismissed.
-        }
-        // Show the popup menu.
-        popup.show()
-    }
-
-    private fun showBookmarkOverFlowMenu(
-        anchor: View,
-        bookmark: SavedSite.Bookmark,
-    ) {
-        val wrapper = ContextThemeWrapper(this, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_PopupMenu)
-        val popup = androidx.appcompat.widget.PopupMenu(wrapper, anchor)
-        popup.menuInflater.inflate(R.menu.bookmark_popup_menu, popup.menu)
-
-        if (bookmark.isFavorite) {
-            popup.menu.findItem(R.id.bookmark_add_to_favorites).title = getString(R.string.removeFromFavorites)
-        } else {
-            popup.menu.findItem(R.id.bookmark_add_to_favorites).title = getString(R.string.addToFavoritesMenu)
-        }
-
-        popup.setOnMenuItemClickListener { menuItem: MenuItem ->
-            when (menuItem.itemId) {
-                R.id.bookmark_edit -> {
-                    viewModel.onEditSavedSiteRequested(bookmark)
-                }
-
-                R.id.bookmark_add_to_favorites -> {
-                    addRemoveFavorite(bookmark)
-                }
-
-                R.id.bookmark_delete -> {
-                    viewModel.onDeleteSavedSiteRequested(bookmark)
-                    viewModel.onBookmarkItemDeletedFromOverflowMenu()
-                }
-            }
-            true
-        }
-        popup.setOnDismissListener {
-            // Respond to popup being dismissed.
-        }
-        // Show the popup menu.
-        popup.show()
     }
 
     private fun showFolderPopupMenu(

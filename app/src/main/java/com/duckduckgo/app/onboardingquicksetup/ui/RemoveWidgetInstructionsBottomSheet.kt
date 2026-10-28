@@ -27,20 +27,15 @@ import com.duckduckgo.app.browser.databinding.BottomSheetRemoveWidgetInstruction
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.setRoundCorners
-import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class RemoveWidgetInstructionsBottomSheet : BottomSheetDialogFragment() {
-
-    @Inject
-    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -53,16 +48,13 @@ class RemoveWidgetInstructionsBottomSheet : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?,
     ): View {
         val binding = BottomSheetRemoveWidgetInstructionsBinding.inflate(inflater, container, false)
-        if (appBrandDesignUpdateToggles.radius().isEnabled()) {
-            binding.root.applyRadiusOverlayToSheetBackground()
-        }
         binding.removeWidgetInstructionsDoneButton.setOnClickListener { dismiss() }
         binding.removeWidgetInstructionsCloseButton.setOnClickListener { dismiss() }
         binding.root.applyBottomSystemBarInsetPadding()
         return binding.root
     }
 
-    override fun getTheme(): Int = com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge
+    override fun getTheme(): Int = CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge
 
     override fun onCreateDialog(savedInstanceState: Bundle?): android.app.Dialog {
         val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog

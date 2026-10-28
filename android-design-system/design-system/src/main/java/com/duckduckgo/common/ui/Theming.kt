@@ -21,8 +21,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
-import android.content.res.Resources
-import android.util.TypedValue
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
@@ -60,19 +58,12 @@ object Theming {
 fun AppCompatActivity.applyTheme(
     theme: DuckDuckGoTheme,
     isFireMode: Boolean = false,
-    overlayStyleIds: List<Int> = emptyList(),
 ): BroadcastReceiver? {
     if (!FIXED_THEME_ACTIVITIES.contains(this.localClassName)) {
         setTheme(getThemeId(theme, isFireMode))
     }
-    if (this.theme.supportsRebrandOverlay()) {
-        overlayStyleIds.forEach { this.theme.applyStyle(it, true) }
-    }
     return registerForThemeChangeBroadcast()
 }
-
-internal fun Resources.Theme.supportsRebrandOverlay(): Boolean =
-    resolveAttribute(R.attr.daxColorRebrandButtonPrimaryContainer, TypedValue(), true)
 
 fun AppCompatActivity.getThemeId(
     theme: DuckDuckGoTheme,

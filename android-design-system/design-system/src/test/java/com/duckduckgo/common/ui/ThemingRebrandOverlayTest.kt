@@ -19,9 +19,7 @@ package com.duckduckgo.common.ui
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.content.res.Resources
 import android.graphics.RectF
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.TypedValue
@@ -29,9 +27,7 @@ import android.view.ContextThemeWrapper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.ui.Theming.Constants.FIXED_THEME_ACTIVITIES
-import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.ThemingDataStore
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.R
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.snackbar.Snackbar
@@ -40,32 +36,18 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
 private const val EXTRA_THEME = "theme"
 private const val EXTRA_THEME_RES_ID = "themeResId"
-private const val EXTRA_OVERLAYS = "overlays"
 private const val EXTRA_FIXED_LOCAL_CLASS_NAME = "fixedLocalClassName"
-private const val EXTRA_ENABLED_TOGGLE = "enabledToggle"
-private const val TOGGLE_RADIUS = "radius"
 private const val EXTRA_FIRE_THEME = "fireTheme"
 
 private class TestThemingDataStore(override var theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT) : ThemingDataStore {
     override fun isCurrentlySelected(theme: DuckDuckGoTheme): Boolean = this.theme == theme
 }
-
-private fun configuredToggles(enabled: Set<String>): AppBrandDesignUpdateToggles {
-    val radiusToggle = enabledToggle(TOGGLE_RADIUS in enabled)
-    return mock<AppBrandDesignUpdateToggles>().also { toggles ->
-        whenever(toggles.radius()).thenReturn(radiusToggle)
-    }
-}
-
-private fun enabledToggle(enabled: Boolean): Toggle = mock<Toggle>().also { whenever(it.isEnabled()).thenReturn(enabled) }
 
 @RunWith(AndroidJUnit4::class)
 class ThemingRebrandOverlayTest {
@@ -75,9 +57,6 @@ class ThemingRebrandOverlayTest {
         activity.theme.resolveAttribute(R.attr.daxButtonPrimary, value, true)
         return value.resourceId
     }
-
-    private fun themeFor(styleResId: Int): Resources.Theme =
-        ContextThemeWrapper(RuntimeEnvironment.getApplication(), styleResId).theme
 
     private fun resolveBoolean(
         activity: Context,
@@ -92,10 +71,7 @@ class ThemingRebrandOverlayTest {
         override fun onCreate(savedInstanceState: Bundle?) {
             val theme = DuckDuckGoTheme.valueOf(intent.getStringExtra(EXTRA_THEME) ?: DuckDuckGoTheme.LIGHT.name)
             setTheme(intent.getIntExtra(EXTRA_THEME_RES_ID, R.style.Theme_DuckDuckGo_Dark))
-            applyTheme(
-                theme = theme,
-                overlayStyleIds = intent.getIntArrayExtra(EXTRA_OVERLAYS)?.toList().orEmpty(),
-            )
+            applyTheme(theme = theme)
             super.onCreate(savedInstanceState)
         }
 
@@ -103,7 +79,7 @@ class ThemingRebrandOverlayTest {
             intent.getStringExtra(EXTRA_FIXED_LOCAL_CLASS_NAME) ?: super.getLocalClassName()
     }
 
-    class ToggleAwareActivity : DuckDuckGoActivity() {
+    class FireAwareActivity : DuckDuckGoActivity() {
         override val applyFireTheme: Boolean
             get() = intent.getBooleanExtra(EXTRA_FIRE_THEME, false)
 
@@ -112,19 +88,16 @@ class ThemingRebrandOverlayTest {
             themingDataStore = TestThemingDataStore(
                 DuckDuckGoTheme.valueOf(intent.getStringExtra(EXTRA_THEME) ?: DuckDuckGoTheme.LIGHT.name),
             )
-            appBrandDesignUpdateToggles = configuredToggles(setOfNotNull(intent.getStringExtra(EXTRA_ENABLED_TOGGLE)))
             onCreate(savedInstanceState, injectDependencies = false)
         }
     }
 
     private fun fixedThemeActivity(
         themeResId: Int = R.style.Theme_DuckDuckGo_Dark,
-        overlayStyleIds: List<Int> = emptyList(),
         fixedLocalClassName: String = FIXED_THEME_ACTIVITIES[1],
     ): AppCompatActivity = buildThemedActivity(
         theme = DuckDuckGoTheme.LIGHT,
         themeResId = themeResId,
-        overlayStyleIds = overlayStyleIds,
         fixedLocalClassName = fixedLocalClassName,
     )
 
@@ -140,39 +113,29 @@ class ThemingRebrandOverlayTest {
     private fun colorOf(colorRes: Int): Int =
         RuntimeEnvironment.getApplication().resources.getColor(colorRes, null)
 
-    private fun themedActivity(
-        theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT,
-        overlayStyleIds: List<Int> = emptyList(),
-    ): AppCompatActivity = buildThemedActivity(
-        theme = theme,
-        overlayStyleIds = overlayStyleIds,
-    )
+    private fun themedActivity(theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT): AppCompatActivity = buildThemedActivity(theme = theme)
 
     private fun buildThemedActivity(
         theme: DuckDuckGoTheme,
         themeResId: Int = R.style.Theme_DuckDuckGo_Dark,
-        overlayStyleIds: List<Int> = emptyList(),
         fixedLocalClassName: String? = null,
     ): AppCompatActivity {
         val intent = Intent().apply {
             putExtra(EXTRA_THEME, theme.name)
             putExtra(EXTRA_THEME_RES_ID, themeResId)
-            putExtra(EXTRA_OVERLAYS, overlayStyleIds.toIntArray())
             if (fixedLocalClassName != null) putExtra(EXTRA_FIXED_LOCAL_CLASS_NAME, fixedLocalClassName)
         }
         return Robolectric.buildActivity(ThemedActivity::class.java, intent).setup().get()
     }
 
-    private fun toggleAwareActivity(
-        enabledToggle: String?,
+    private fun fireAwareActivity(
         theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT,
         fireTheme: Boolean = false,
     ): AppCompatActivity {
         val intent = Intent()
-            .putExtra(EXTRA_ENABLED_TOGGLE, enabledToggle)
             .putExtra(EXTRA_THEME, theme.name)
             .putExtra(EXTRA_FIRE_THEME, fireTheme)
-        return Robolectric.buildActivity(ToggleAwareActivity::class.java, intent).setup().get()
+        return Robolectric.buildActivity(FireAwareActivity::class.java, intent).setup().get()
     }
 
     private fun resolveDimension(
@@ -216,94 +179,9 @@ class ThemingRebrandOverlayTest {
     }
 
     @Test
-    fun whenFixedThemeActivityWithRadiusOverlayThenAllRadiusValuesResolveToRebrandValues() {
-        val activity = fixedThemeActivity(
-            overlayStyleIds = listOf(R.style.ThemeOverlay_Rebrand_Radius),
-        )
-
-        assertEquals(28f, resolveDimension(activity, R.attr.daxContainerRadius), 0f)
-        assertEquals(28f, resolveDimension(activity, R.attr.daxDialogRadius), 0f)
-        assertEquals(28f, resolveDimension(activity, R.attr.daxSheetRadius), 0f)
-        assertEquals(28f, resolveDimension(activity, R.attr.daxLargeSheetRadius), 0f)
-        assertEquals(16f, resolveDimension(activity, R.attr.daxMenuRadius), 0f)
-        assertEquals(48f, resolveDimension(activity, R.attr.daxSearchBarRadius), 0f)
-        assertEquals(1000f, resolveDimension(activity, R.attr.daxChipRadius), 0f)
-        assertEquals(1000f, resolveDimension(activity, R.attr.daxDuckAiPromptRadius), 0f)
-        assertEquals(28f, resolveDimension(activity, R.attr.daxWhatsNewCardRadius), 0f)
-        assertTrue(resolveBoolean(activity, R.attr.daxMenuClipToOutline))
-        assertEquals(28f, resolveDimension(activity, R.attr.daxOnboardingSheetRadius), 0f)
-        assertEquals(28f, resolveDimension(activity, R.attr.daxInfoPanelRadius), 0f)
-        assertEquals(48f, resolveDimension(activity, R.attr.daxMessageCtaCloseButtonSize), 0f)
-        assertEquals(
-            R.drawable.selectable_message_cta_close_button_ripple,
-            resolveResourceId(activity, R.attr.daxMessageCtaCloseButtonBackground),
-        )
-        assertFalse(resolveBoolean(activity, R.attr.daxMessageCtaClipToPadding))
-        assertEquals(1000f, resolveDimension(activity, R.attr.daxPillRadius), 0f)
-    }
-
-    @Test
-    fun whenOverlayListAbsentThenRadiusValuesRemainBaseValues() {
-        val activity = fixedThemeActivity()
-
-        assertEquals(16f, resolveDimension(activity, R.attr.daxContainerRadius), 0f)
-        assertEquals(12f, resolveDimension(activity, R.attr.daxDialogRadius), 0f)
-        assertEquals(12f, resolveDimension(activity, R.attr.daxSheetRadius), 0f)
-        assertEquals(16f, resolveDimension(activity, R.attr.daxLargeSheetRadius), 0f)
-        assertEquals(8f, resolveDimension(activity, R.attr.daxMenuRadius), 0f)
-        assertEquals(8f, resolveDimension(activity, R.attr.daxSearchBarRadius), 0f)
-        assertEquals(8f, resolveDimension(activity, R.attr.daxChipRadius), 0f)
-        assertEquals(12f, resolveDimension(activity, R.attr.daxDuckAiPromptRadius), 0f)
-        assertEquals(12f, resolveDimension(activity, R.attr.daxWhatsNewCardRadius), 0f)
-        assertFalse(resolveBoolean(activity, R.attr.daxMenuClipToOutline))
-        assertEquals(36f, resolveDimension(activity, R.attr.daxOnboardingSheetRadius), 0f)
-        assertEquals(8f, resolveDimension(activity, R.attr.daxInfoPanelRadius), 0f)
-        assertEquals(40f, resolveDimension(activity, R.attr.daxMessageCtaCloseButtonSize), 0f)
-        assertEquals(
-            resolveResourceId(activity, android.R.attr.selectableItemBackground),
-            resolveResourceId(activity, R.attr.daxMessageCtaCloseButtonBackground),
-        )
-        assertTrue(resolveBoolean(activity, R.attr.daxMessageCtaClipToPadding))
-        assertEquals(2f, resolveDimension(activity, R.attr.daxPillRadius), 0f)
-    }
-
-    @Test
-    fun whenUnsupportedFixedThemeWithRadiusOverlayThenRadiusValuesAreNotApplied() {
-        val activity = fixedThemeActivity(
-            themeResId = R.style.Theme_AppCompat_Transparent_NoActionBar,
-            overlayStyleIds = listOf(R.style.ThemeOverlay_Rebrand_Radius),
-            fixedLocalClassName = FIXED_THEME_ACTIVITIES.first(),
-        )
-
-        listOf(
-            R.attr.daxContainerRadius,
-            R.attr.daxDialogRadius,
-            R.attr.daxSheetRadius,
-            R.attr.daxLargeSheetRadius,
-            R.attr.daxMenuRadius,
-            R.attr.daxSearchBarRadius,
-            R.attr.daxChipRadius,
-            R.attr.daxDuckAiPromptRadius,
-            R.attr.daxWhatsNewCardRadius,
-            R.attr.daxMenuClipToOutline,
-            R.attr.daxOnboardingSheetRadius,
-            R.attr.daxInfoPanelRadius,
-            R.attr.daxMessageCtaCloseButtonSize,
-            R.attr.daxMessageCtaCloseButtonBackground,
-            R.attr.daxMessageCtaClipToPadding,
-            R.attr.daxPillRadius,
-        ).forEach { attr ->
-            assertFalse(activity.theme.resolveAttribute(attr, TypedValue(), true))
-        }
-    }
-
-    @Test
-    fun whenLightAndDarkThemesWithRadiusOverlayThenRadiusValuesResolve() {
+    fun whenLightAndDarkThemesThenRadiusValuesResolveToRebrandValues() {
         listOf(DuckDuckGoTheme.LIGHT, DuckDuckGoTheme.DARK).forEach { theme ->
-            val activity = themedActivity(
-                theme,
-                overlayStyleIds = listOf(R.style.ThemeOverlay_Rebrand_Radius),
-            )
+            val activity = themedActivity(theme)
 
             assertEquals(28f, resolveDimension(activity, R.attr.daxContainerRadius), 0f)
             assertEquals(28f, resolveDimension(activity, R.attr.daxDialogRadius), 0f)
@@ -328,10 +206,16 @@ class ThemingRebrandOverlayTest {
     }
 
     @Test
-    fun whenRadiusOverlayAtNonDefaultDensityThenRadiusScalesWithDensity() {
-        val activity = fixedThemeActivity(
-            overlayStyleIds = listOf(R.style.ThemeOverlay_Rebrand_Radius),
-        )
+    fun whenFixedThemeActivityThenRadiusValuesResolveToRebrandValues() {
+        val activity = fixedThemeActivity()
+
+        assertEquals(28f, resolveDimension(activity, R.attr.daxContainerRadius), 0f)
+        assertEquals(48f, resolveDimension(activity, R.attr.daxSearchBarRadius), 0f)
+    }
+
+    @Test
+    fun whenAtNonDefaultDensityThenRadiusScalesWithDensity() {
+        val activity = fixedThemeActivity()
         val configuration = Configuration(activity.resources.configuration).apply {
             densityDpi = DisplayMetrics.DENSITY_XHIGH
         }
@@ -343,36 +227,11 @@ class ThemingRebrandOverlayTest {
     }
 
     @Test
-    fun whenDuckDuckGoActivityRadiusToggleIsEnabledThenRadiusOverlayIsApplied() {
-        val activity = toggleAwareActivity(TOGGLE_RADIUS)
-
-        assertEquals(28f, resolveDimension(activity, R.attr.daxContainerRadius), 0f)
-        assertEquals(28f, resolveDimension(activity, R.attr.daxDialogRadius), 0f)
-        assertEquals(28f, resolveDimension(activity, R.attr.daxSheetRadius), 0f)
-        assertEquals(28f, resolveDimension(activity, R.attr.daxLargeSheetRadius), 0f)
-        assertEquals(16f, resolveDimension(activity, R.attr.daxMenuRadius), 0f)
-        assertEquals(48f, resolveDimension(activity, R.attr.daxSearchBarRadius), 0f)
-        assertEquals(1000f, resolveDimension(activity, R.attr.daxChipRadius), 0f)
-        assertEquals(1000f, resolveDimension(activity, R.attr.daxDuckAiPromptRadius), 0f)
-        assertEquals(28f, resolveDimension(activity, R.attr.daxWhatsNewCardRadius), 0f)
-        assertTrue(resolveBoolean(activity, R.attr.daxMenuClipToOutline))
-        assertEquals(28f, resolveDimension(activity, R.attr.daxOnboardingSheetRadius), 0f)
-        assertEquals(28f, resolveDimension(activity, R.attr.daxInfoPanelRadius), 0f)
-        assertEquals(48f, resolveDimension(activity, R.attr.daxMessageCtaCloseButtonSize), 0f)
-        assertEquals(
-            R.drawable.selectable_message_cta_close_button_ripple,
-            resolveResourceId(activity, R.attr.daxMessageCtaCloseButtonBackground),
-        )
-        assertFalse(resolveBoolean(activity, R.attr.daxMessageCtaClipToPadding))
-        assertEquals(1000f, resolveDimension(activity, R.attr.daxPillRadius), 0f)
-    }
-
-    @Test
     @Config(qualifiers = "xhdpi")
-    fun whenRadiusToggleIsEnabledThenSnackbarCornersAre16DpInRegularAndFireThemes() {
+    fun whenThemedThenSnackbarCornersAre16DpInRegularAndFireThemes() {
         listOf(DuckDuckGoTheme.LIGHT, DuckDuckGoTheme.DARK).forEach { theme ->
             listOf(false, true).forEach { fireTheme ->
-                val activity = toggleAwareActivity(TOGGLE_RADIUS, theme, fireTheme)
+                val activity = fireAwareActivity(theme, fireTheme)
                 val background = Snackbar.make(activity.findViewById(android.R.id.content), "Message", Snackbar.LENGTH_SHORT)
                     .view.background as MaterialShapeDrawable
                 val shape = background.shapeAppearanceModel
@@ -385,55 +244,14 @@ class ThemingRebrandOverlayTest {
     }
 
     @Test
-    @Config(qualifiers = "xhdpi")
-    fun whenRadiusToggleIsDisabledThenSnackbarCornersRemain4DpInRegularAndFireThemes() {
-        listOf(DuckDuckGoTheme.LIGHT, DuckDuckGoTheme.DARK).forEach { theme ->
-            listOf(false, true).forEach { fireTheme ->
-                val activity = toggleAwareActivity(null, theme, fireTheme)
-                val background = Snackbar.make(activity.findViewById(android.R.id.content), "Message", Snackbar.LENGTH_SHORT)
-                    .view.background as GradientDrawable
-
-                assertEquals(4f * activity.resources.displayMetrics.density, background.cornerRadius, 0f)
-            }
-        }
-    }
-
-    @Test
-    fun whenLightFireInputModeCardWithRadiusOverlayThenMenuRadiusSurvivesCardTheme() {
-        val activity = fixedThemeActivity(
-            themeResId = R.style.Theme_DuckDuckGo_Light_Fire,
-            overlayStyleIds = listOf(R.style.ThemeOverlay_Rebrand_Radius),
-        )
-        val card = ContextThemeWrapper(activity, resolveResourceId(activity, R.attr.daxInputModeCardThemeOverlay))
-
-        assertEquals(16f, resolveDimension(card, R.attr.daxMenuRadius), 0f)
-        assertTrue(resolveBoolean(card, R.attr.daxMenuClipToOutline))
-    }
-
-    @Test
-    fun whenLightFireInputModeCardWithoutRadiusOverlayThenMenuRadiusIsBaseValue() {
+    fun whenLightFireInputModeCardThenMenuRadiusSurvivesCardTheme() {
         val activity = fixedThemeActivity(themeResId = R.style.Theme_DuckDuckGo_Light_Fire)
         val cardOverlay = resolveResourceId(activity, R.attr.daxInputModeCardThemeOverlay)
         val card = ContextThemeWrapper(activity, cardOverlay)
 
         assertEquals(R.style.ThemeOverlay_DuckDuckGo_InputModeCard_DarkFire, cardOverlay)
-        assertEquals(8f, resolveDimension(card, R.attr.daxMenuRadius), 0f)
-        assertFalse(resolveBoolean(card, R.attr.daxMenuClipToOutline))
-    }
-
-    @Test
-    fun whenThemeIsDuckDuckGoDarkThenRebrandOverlayIsSupported() {
-        assertTrue(themeFor(R.style.Theme_DuckDuckGo_Dark).supportsRebrandOverlay())
-    }
-
-    @Test
-    fun whenThemeIsDuckDuckGoLightThenRebrandOverlayIsSupported() {
-        assertTrue(themeFor(R.style.Theme_DuckDuckGo_Light).supportsRebrandOverlay())
-    }
-
-    @Test
-    fun whenThemeIsAppCompatTransparentThenRebrandOverlayIsNotSupported() {
-        assertFalse(themeFor(R.style.Theme_AppCompat_Transparent_NoActionBar).supportsRebrandOverlay())
+        assertEquals(16f, resolveDimension(card, R.attr.daxMenuRadius), 0f)
+        assertTrue(resolveBoolean(card, R.attr.daxMenuClipToOutline))
     }
 
     @Test

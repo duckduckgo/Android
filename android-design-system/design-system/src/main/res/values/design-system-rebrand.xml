@@ -72,7 +72,6 @@
     <dimen name="rebrandInputRadius">48dp</dimen>
     <dimen name="rebrandContainerRadius">28dp</dimen>
     <dimen name="rebrandMessageCtaCloseButtonSize">48dp</dimen>
-    <dimen name="daxYellowPillCornerRadius">2dp</dimen>
 
     <style name="Typography.DuckDuckGo.Rebrand.Button" parent="Typography.DuckDuckGo">
         <item name="android:textSize">15sp</item>
@@ -161,32 +160,6 @@
 
     <style name="ThemeOverlay.Rebrand.AddressBarAnimation" parent="">
         <item name="cookiesAnimationRadius">@dimen/rebrandInputRadius</item>
-    </style>
-
-    <style name="ThemeOverlay.Rebrand.Radius" parent="">
-        <item name="snackbarStyle">@style/Widget.DuckDuckGo.Snackbar.Rebrand</item>
-        <item name="daxContainerRadius">@dimen/rebrandContainerRadius</item>
-        <item name="daxDialogRadius">@dimen/rebrandContainerRadius</item>
-        <item name="daxSheetRadius">@dimen/rebrandContainerRadius</item>
-        <item name="daxLargeSheetRadius">@dimen/rebrandContainerRadius</item>
-        <item name="daxMenuRadius">@dimen/largeShapeCornerRadius</item>
-        <item name="daxSearchBarRadius">@dimen/rebrandInputRadius</item>
-        <item name="daxChipRadius">@dimen/pillShapeCornerRadius</item>
-        <item name="daxDuckAiPromptRadius">@dimen/pillShapeCornerRadius</item>
-        <item name="daxWhatsNewCardRadius">@dimen/rebrandContainerRadius</item>
-        <item name="daxMenuClipToOutline">true</item>
-        <item name="daxOnboardingSheetRadius">@dimen/rebrandContainerRadius</item>
-        <item name="daxInfoPanelRadius">@dimen/rebrandContainerRadius</item>
-        <item name="daxMessageCtaCloseButtonSize">@dimen/rebrandMessageCtaCloseButtonSize</item>
-        <item name="daxMessageCtaCloseButtonBackground">@drawable/selectable_message_cta_close_button_ripple</item>
-        <item name="daxMessageCtaClipToPadding">false</item>
-        <item name="daxPillRadius">@dimen/pillShapeCornerRadius</item>
-        <item name="daxInputModeCardDarkFireThemeOverlay">@style/ThemeOverlay.DuckDuckGo.InputModeCard.DarkFire.Radius</item>
-    </style>
-
-    <style name="ThemeOverlay.DuckDuckGo.InputModeCard.DarkFire.Radius" parent="ThemeOverlay.DuckDuckGo.InputModeCard.DarkFire">
-        <item name="daxMenuRadius">@dimen/largeShapeCornerRadius</item>
-        <item name="daxMenuClipToOutline">true</item>
     </style>
 
 </resources>
