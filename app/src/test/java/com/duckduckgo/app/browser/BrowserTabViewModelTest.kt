@@ -2542,7 +2542,7 @@ class BrowserTabViewModelTest {
         completeLoadedPage()
         testee.willOverrideUrl("http://example.com/hop1")
         testee.onMainFrameNavigationDecided(true)
-        whenever(mockAppLinksHandler.handleAppLink(any(), any(), any(), anyOrNull(), any(), any(), any())).thenReturn(true)
+        whenever(mockAppLinksHandler.handleAppLink(any(), any(), any(), anyOrNull(), any(), any(), any(), any())).thenReturn(true)
 
         val handled = testee.handleAppLink(SpecialUrlDetector.UrlType.AppLink(uriString = "http://app.example.com/hop2"), true, true)
         testee.onMainFrameNavigationDecided(false)
@@ -2906,7 +2906,7 @@ class BrowserTabViewModelTest {
     fun whenSslErrorProceededThenProgressOfCommittedPageIsNotSwallowed() {
         givenNavigationRequestedThenSslError()
 
-        testee.onSSLCertificateWarningAction(Action.Proceed, exampleUrl)
+        testee.onSSLCertificateWarningAction(Action.Proceed, exampleUrl, false)
         setBrowserShowing(true)
         reportProgress(40)
 
@@ -2917,7 +2917,7 @@ class BrowserTabViewModelTest {
     fun whenSslErrorLeftThenProgressOfCommittedPageIsNotSwallowed() {
         givenNavigationRequestedThenSslError()
 
-        testee.onSSLCertificateWarningAction(Action.LeaveSite, exampleUrl)
+        testee.onSSLCertificateWarningAction(Action.LeaveSite, exampleUrl, false)
         testee.recoverFromWarningPage(showBrowser = true)
         reportProgress(40)
 
@@ -2928,7 +2928,7 @@ class BrowserTabViewModelTest {
     fun whenSslErrorLeftWithoutHistoryThenProgressOfCommittedPageIsNotSwallowed() {
         givenNavigationRequestedThenSslError()
 
-        testee.onSSLCertificateWarningAction(Action.LeaveSite, exampleUrl)
+        testee.onSSLCertificateWarningAction(Action.LeaveSite, exampleUrl, false)
         testee.recoverFromWarningPage(showBrowser = false)
         setBrowserShowing(true)
         reportProgress(40)
