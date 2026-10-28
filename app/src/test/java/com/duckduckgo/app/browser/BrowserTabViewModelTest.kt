@@ -10290,6 +10290,33 @@ class BrowserTabViewModelTest {
         }
 
     @Test
+    fun whenProcessJsCallbackMessageForDuckChatThenPassTabUrlAsPageUrl() =
+        runTest {
+            val serpUrl = "https://duckduckgo.com/?q=test"
+            loadUrl(serpUrl)
+
+            testee.processJsCallbackMessage(
+                DUCK_CHAT_FEATURE_NAME,
+                "openAIChat",
+                "id",
+                data = null,
+                false,
+            ) { "someUrl" }
+
+            verify(mockDuckChatJSHelper).processJsCallbackMessage(
+                eq(DUCK_CHAT_FEATURE_NAME),
+                eq("openAIChat"),
+                eq("id"),
+                anyOrNull(),
+                any(),
+                anyOrNull(),
+                any(),
+                any(),
+                eq(serpUrl),
+            )
+        }
+
+    @Test
     fun whenProcessJsCallbackMessageForDuckChatAndResponseIsNullThenNoResponseEmitted() =
         runTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
