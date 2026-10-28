@@ -24,7 +24,6 @@
         android:id="@+id/withdrawalError"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/keyline_4"
         android:accessibilityLiveRegion="polite"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
@@ -37,10 +36,12 @@
         android:id="@+id/withdrawalConfirmButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
         android:text="@string/subscriptionWithdrawDialogConfirm"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/withdrawalError" />
+        app:layout_constraintTop_toBottomOf="@id/withdrawalError"
+        app:layout_goneMarginTop="0dp" />
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/withdrawalConfirmSpinner"
