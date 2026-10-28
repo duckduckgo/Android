@@ -140,7 +140,6 @@
                 android:id="@+id/duckPlayerSettingsLink"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_2"
                 android:layout_marginTop="@dimen/keyline_4"
                 android:text="@string/ad_blocking_settings_duck_player_link"
                 android:visibility="gone"
