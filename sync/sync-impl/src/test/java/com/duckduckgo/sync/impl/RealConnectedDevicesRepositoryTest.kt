@@ -41,6 +41,7 @@ import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.AccountErrorCodes.GENERIC_ERROR
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel
 import com.duckduckgo.sync.store.AccountInfoPublicKey
@@ -115,7 +116,7 @@ class RealConnectedDevicesRepositoryTest {
         prepareForEncryption()
         whenever(syncApi.getDevices(anyString())).thenReturn(getDevicesSuccess)
 
-        val result = testee.getConnectedDevices() as Success
+        val result = testee.getConnectedDevices(reportAccountErrorPixel = true) as Success
 
         assertEquals(listOfConnectedDevices, result.data)
     }
@@ -129,7 +130,7 @@ class RealConnectedDevicesRepositoryTest {
         prepareForEncryption()
         whenever(syncApi.getDevices(anyString())).thenReturn(getDevicesSuccess)
 
-        val result = testee.getConnectedDevices() as Success
+        val result = testee.getConnectedDevices(reportAccountErrorPixel = true) as Success
 
         verify(syncStore).connectedDevicesCount = result.data.size
     }
@@ -145,7 +146,7 @@ class RealConnectedDevicesRepositoryTest {
             Success(DeviceEntries(entries = listOf(anotherDevice, anotherRemoteDevice, thisDevice), entriesV2 = null)),
         )
 
-        val result = testee.getConnectedDevices() as Success
+        val result = testee.getConnectedDevices(reportAccountErrorPixel = true) as Success
 
         assertTrue(result.data.first().thisDevice)
     }
@@ -161,7 +162,7 @@ class RealConnectedDevicesRepositoryTest {
             Success(DeviceEntries(entries = listOf(anotherDevice, thisDevice, anotherRemoteDevice), entriesV2 = null)),
         )
 
-        val result = testee.getConnectedDevices() as Success
+        val result = testee.getConnectedDevices(reportAccountErrorPixel = true) as Success
 
         assertEquals(listOf(deviceId, "anotherDeviceId", "anotherRemoteDeviceId"), result.data.map { it.deviceId })
     }
@@ -173,7 +174,7 @@ class RealConnectedDevicesRepositoryTest {
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(syncApi.getDevices(anyString())).thenReturn(getDevicesError)
 
-        val result = testee.getConnectedDevices() as Error
+        val result = testee.getConnectedDevices(reportAccountErrorPixel = true) as Error
 
         assertEquals(getDevicesError.code, result.code)
     }
@@ -197,7 +198,7 @@ class RealConnectedDevicesRepositoryTest {
         givenDeviceListRequest()
         whenever(syncApi.getDevices(anyString())).thenReturn(getDevicesError)
 
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verify(syncStore, never()).connectedDevicesCount = any()
     }
@@ -207,7 +208,7 @@ class RealConnectedDevicesRepositoryTest {
         givenDeviceListRequest()
         whenever(syncApi.getDevices(anyString())).thenReturn(Error(reason = "timeout"))
 
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verify(syncStore, never()).connectedDevicesCount = any()
     }
@@ -218,7 +219,7 @@ class RealConnectedDevicesRepositoryTest {
         whenever(syncApi.getDevices(anyString())).thenReturn(getDevicesSuccess)
         whenever(syncStore.userId).thenReturn(userId, null)
 
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verify(syncStore, never()).connectedDevicesCount = any()
     }
@@ -229,7 +230,7 @@ class RealConnectedDevicesRepositoryTest {
         whenever(syncApi.getDevices(anyString())).thenReturn(getDevicesSuccess)
         whenever(syncStore.userId).thenReturn(userId, "anotherUserId")
 
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verify(syncStore, never()).connectedDevicesCount = any()
     }
@@ -248,11 +249,46 @@ class RealConnectedDevicesRepositoryTest {
             Success(DeviceEntries(entries = listOf(thisDevice, otherDevice), entriesV2 = null)),
         )
 
-        val result = testee.getConnectedDevices() as Success
+        val result = testee.getConnectedDevices(reportAccountErrorPixel = true) as Success
 
         verify(remoteDeviceLogout).logout("otherDeviceId")
         verify(remoteDeviceLogout, never()).logout(deviceId)
         assertTrue(result.data.isEmpty())
+    }
+
+    @Test
+    fun whenFetchFailsThenAccountErrorPixelFired() {
+        givenDeviceListRequest()
+        whenever(syncApi.getDevices(anyString())).thenReturn(getDevicesError)
+
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
+
+        verify(syncPixels).fireSyncAccountErrorPixel(getDevicesError, SyncAccountOperation.GENERIC)
+    }
+
+    @Test
+    fun whenFetchFailsWithErrorPixelsOffThenNoAccountErrorPixelFired() {
+        givenDeviceListRequest()
+        whenever(syncApi.getDevices(anyString())).thenReturn(getDevicesError)
+
+        testee.getConnectedDevices(reportAccountErrorPixel = false)
+
+        verify(syncPixels, never()).fireSyncAccountErrorPixel(any(), any())
+    }
+
+    @Test
+    fun whenDecryptionAndRemoteLogoutFailWithErrorPixelsOffThenNoAccountErrorPixelFired() {
+        givenAuthenticatedDevice()
+        prepareForEncryption()
+        val otherDevice = Device(deviceId = "otherDeviceId", deviceName = "otherDeviceName", jwIat = "", deviceType = "otherDeviceType")
+        whenever(nativeLib.decryptData(anyString(), anyString())).thenThrow(NegativeArraySizeException())
+        whenever(syncApi.getDevices(anyString())).thenReturn(Success(DeviceEntries(entries = listOf(otherDevice), entriesV2 = null)))
+        whenever(syncApi.logout(token, "otherDeviceId")).thenReturn(Error(reason = "timeout"))
+
+        testee.getConnectedDevices(reportAccountErrorPixel = false)
+
+        verify(syncApi).logout(token, "otherDeviceId")
+        verify(syncPixels, never()).fireSyncAccountErrorPixel(any(), any())
     }
 
     // ----- entries_v2 device-list path (Track C) ----------------------------------------------
@@ -276,7 +312,7 @@ class RealConnectedDevicesRepositoryTest {
             ),
         )
 
-        val result = testee.getConnectedDevices() as Success
+        val result = testee.getConnectedDevices(reportAccountErrorPixel = true) as Success
 
         assertEquals(1, result.data.size)
         assertEquals("Chrome/148", result.data[0].deviceName)
@@ -302,7 +338,7 @@ class RealConnectedDevicesRepositoryTest {
             DecryptAllResult(decrypted = emptyList(), undecryptable = emptyList()),
         )
 
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verify(thirdPartyDeviceListDecryptor).decryptAll(listOf(v2Entry), deviceId, snapshotBefore)
     }
@@ -325,7 +361,7 @@ class RealConnectedDevicesRepositoryTest {
             ),
         )
 
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verify(syncPixels).fireUnifiedDeviceListPixel(
             UnifiedDeviceListPixel.OwnRowResolvedLegacy(DeviceInfoReadFailureReason.BLOB_ABSENT),
@@ -350,7 +386,7 @@ class RealConnectedDevicesRepositoryTest {
             ),
         )
 
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verify(syncPixels, never()).fireUnifiedDeviceListPixel(
             UnifiedDeviceListPixel.OwnRowResolvedLegacy(DeviceInfoReadFailureReason.BLOB_ABSENT),
@@ -375,7 +411,7 @@ class RealConnectedDevicesRepositoryTest {
             ),
         )
 
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verify(syncPixels).fireUnifiedDeviceListPixel(
             UnifiedDeviceListPixel.AccountInfoKeyUnavailable(AccountInfoKeyUnavailableReason.RATE_LIMITED),
@@ -387,7 +423,7 @@ class RealConnectedDevicesRepositoryTest {
     fun whenDdgWrapIsUnavailableThenRepairsCachedAccountInfoKey() = runTest {
         givenAccountInfoDdgWrapUnavailable()
 
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verify(accountInfoDdgWrapRepairer).repair("account-info-kid")
     }
@@ -396,8 +432,8 @@ class RealConnectedDevicesRepositoryTest {
     fun whenDdgWrapRepairSucceedsThenDoesNotRepairAgainForSameAccount() = runTest {
         givenAccountInfoDdgWrapUnavailable()
 
-        testee.getConnectedDevices()
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verify(accountInfoDdgWrapRepairer, times(1)).repair("account-info-kid")
     }
@@ -407,8 +443,8 @@ class RealConnectedDevicesRepositoryTest {
         givenAccountInfoDdgWrapUnavailable()
         whenever(accountInfoDdgWrapRepairer.repair("account-info-kid")).thenReturn(Error(reason = "repair failed"))
 
-        testee.getConnectedDevices()
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verify(accountInfoDdgWrapRepairer, times(2)).repair("account-info-kid")
     }
@@ -431,7 +467,7 @@ class RealConnectedDevicesRepositoryTest {
             ),
         )
 
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verify(syncPixels).fireUnifiedDeviceListPixel(
             UnifiedDeviceListPixel.OtherRowDeviceInfoFailedDecryption(DeviceCredential.THIRD_PARTY),
@@ -451,7 +487,7 @@ class RealConnectedDevicesRepositoryTest {
             Success(DeviceEntries(entries = listOf(ddgDevice), entriesV2 = null)),
         )
 
-        val result = testee.getConnectedDevices() as Success
+        val result = testee.getConnectedDevices(reportAccountErrorPixel = true) as Success
 
         // Fell back to legacy decrypt — same library path as the legacy `entries`-only response.
         assertEquals(1, result.data.size)
@@ -465,7 +501,7 @@ class RealConnectedDevicesRepositoryTest {
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(syncApi.getDevices(anyString())).thenReturn(Error(reason = "boom"))
 
-        val result = testee.getConnectedDevices() as Error
+        val result = testee.getConnectedDevices(reportAccountErrorPixel = true) as Error
 
         assertEquals(GENERIC_ERROR.code, result.code)
     }
@@ -484,7 +520,7 @@ class RealConnectedDevicesRepositoryTest {
             DecryptAllResult(decrypted = emptyList(), undecryptable = listOf("d-other")),
         )
 
-        val result = testee.getConnectedDevices() as Success
+        val result = testee.getConnectedDevices(reportAccountErrorPixel = true) as Success
 
         assertTrue(result.data.isEmpty())
         verify(remoteDeviceLogout).logout("d-other")
@@ -505,7 +541,7 @@ class RealConnectedDevicesRepositoryTest {
             DecryptAllResult(decrypted = emptyList(), undecryptable = listOf(deviceId)),
         )
 
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verifyNoInteractions(remoteDeviceLogout)
     }
@@ -519,7 +555,7 @@ class RealConnectedDevicesRepositoryTest {
         prepareForEncryption()
         whenever(syncApi.getDevices(anyString())).thenReturn(getDevicesSuccess)
 
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verify(thirdPartyDeviceListDecryptor, never()).decryptAll(any(), anyOrNull(), any())
     }
@@ -530,7 +566,7 @@ class RealConnectedDevicesRepositoryTest {
         syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
         whenever(deviceInfoUpdater.setThisDeviceName(name = any(), source = eq(DeviceInfoUpdateSource.REPAIR))).thenReturn(Success(emptyList()))
 
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verify(deviceInfoUpdater).setThisDeviceName(name = deviceName, source = DeviceInfoUpdateSource.REPAIR)
     }
@@ -541,8 +577,8 @@ class RealConnectedDevicesRepositoryTest {
         syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
         whenever(deviceInfoUpdater.setThisDeviceName(name = any(), source = eq(DeviceInfoUpdateSource.REPAIR))).thenReturn(Success(emptyList()))
 
-        testee.getConnectedDevices()
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verify(deviceInfoUpdater, times(1)).setThisDeviceName(name = anyString(), source = eq(DeviceInfoUpdateSource.REPAIR))
     }
@@ -555,8 +591,8 @@ class RealConnectedDevicesRepositoryTest {
             deviceInfoUpdater.setThisDeviceName(name = any(), source = eq(DeviceInfoUpdateSource.REPAIR)),
         ).thenReturn(Error(reason = "no network"))
 
-        testee.getConnectedDevices()
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verify(deviceInfoUpdater, times(2)).setThisDeviceName(name = anyString(), source = eq(DeviceInfoUpdateSource.REPAIR))
     }
@@ -567,9 +603,9 @@ class RealConnectedDevicesRepositoryTest {
         syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
         whenever(deviceInfoUpdater.setThisDeviceName(name = any(), source = eq(DeviceInfoUpdateSource.REPAIR))).thenReturn(Success(emptyList()))
 
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
         whenever(syncStore.userId).thenReturn("anotherUserId")
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verify(deviceInfoUpdater, times(2)).setThisDeviceName(name = anyString(), source = eq(DeviceInfoUpdateSource.REPAIR))
     }
@@ -580,7 +616,7 @@ class RealConnectedDevicesRepositoryTest {
         syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
         whenever(syncStore.userId).thenReturn(null)
 
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verifyNoInteractions(deviceInfoUpdater)
     }
@@ -591,7 +627,7 @@ class RealConnectedDevicesRepositoryTest {
         givenThisDeviceInfoUnresolvedOnRead()
         syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = false))
 
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verifyNoInteractions(deviceInfoUpdater)
     }
@@ -601,7 +637,7 @@ class RealConnectedDevicesRepositoryTest {
         givenThisDeviceInfoUnresolvedOnRead(unresolved = false)
         syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
 
-        testee.getConnectedDevices()
+        testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verifyNoInteractions(deviceInfoUpdater)
     }

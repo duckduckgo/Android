@@ -972,7 +972,7 @@ class AppSyncAccountRepository @Inject constructor(
     }
 
     override fun getConnectedDevices(): Result<List<ConnectedDevice>> =
-        when (val result = connectedDevicesRepository.getConnectedDevices()) {
+        when (val result = connectedDevicesRepository.getConnectedDevices(reportAccountErrorPixel = true)) {
             is Error -> result.copy(code = GENERIC_ERROR.code)
             is Success -> result
         }
