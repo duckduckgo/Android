@@ -68,10 +68,12 @@ internal fun DaxSkeletonLine(
 internal fun DaxSkeletonCircle(
     modifier: Modifier = Modifier,
     size: Dp = DaxSkeletonDefaults.CircleSize,
+    color: Color = DaxSkeletonDefaults.color,
 ) {
     DaxSkeletonShape(
         modifier = modifier.size(size),
         shape = CircleShape,
+        color = color,
     )
 }
 
@@ -79,10 +81,11 @@ internal fun DaxSkeletonCircle(
 private fun DaxSkeletonShape(
     shape: Shape,
     modifier: Modifier = Modifier,
+    color: Color = DaxSkeletonDefaults.color,
 ) {
     Box(
         modifier = modifier
-            .background(color = DaxSkeletonDefaults.color, shape = shape)
+            .background(color = color, shape = shape)
             .clearAndSetSemantics { },
     )
 }

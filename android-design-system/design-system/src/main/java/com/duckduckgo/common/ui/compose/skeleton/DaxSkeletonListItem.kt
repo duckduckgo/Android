@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -46,6 +47,7 @@ fun DaxSkeletonListItem(
     hasLeadingIcon: Boolean = true,
     hasTwoLines: Boolean = false,
     animated: Boolean = true,
+    leadingColor: Color = DaxSkeletonDefaults.color,
 ) {
     val rowMinHeight = when {
         hasTwoLines -> DaxListItemDefaults.TwoLineMinHeight
@@ -56,7 +58,7 @@ fun DaxSkeletonListItem(
         minHeight = rowMinHeight,
         modifier = modifier.daxSkeletonShimmer(animated),
         contentSpacing = DaxSkeletonListItemDefaults.LineGap,
-        leadingContent = if (hasLeadingIcon) { { DaxSkeletonCircle() } } else null,
+        leadingContent = if (hasLeadingIcon) { { DaxSkeletonCircle(color = leadingColor) } } else null,
         trailingSpacerWidth = DaxSkeletonListItemDefaults.PaddingEnd,
     ) {
         DaxSkeletonLine(modifier = Modifier.fillMaxWidth())
