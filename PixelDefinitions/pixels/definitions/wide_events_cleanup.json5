@@ -1,0 +1,9 @@
+{
+    "wide_events_cleanup_failure": {
+        "description": "A wide-event cleanup sweep failed in a process. Until a sweep succeeds, no wide event can be recorded in that process, so this signals wide-event data loss.",
+        "owners": ["lmac012"],
+        "triggers": ["exception"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    }
+}

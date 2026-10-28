@@ -76,6 +76,7 @@ class WideEventClientTest {
 
                 override fun localDateTimeNow(): LocalDateTime = throw UnsupportedOperationException()
             },
+            pixel = mock(),
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )

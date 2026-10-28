@@ -19,6 +19,9 @@ package com.duckduckgo.app.statistics.wideevents
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.statistics.pixels.StatisticsPixelName
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -51,6 +54,7 @@ class WideEventCleaner @Inject constructor(
     private val policyEvaluator: WideEventCleanupPolicyEvaluator,
     private val wideEventFeature: WideEventFeature,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val pixel: Pixel,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
@@ -91,7 +95,10 @@ class WideEventCleaner @Inject constructor(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
+            // Until a sweep succeeds, client operations in this process fail, so a persistent failure needs to be visible.
             logcat(WARN) { "Wide event cleanup sweep failed: ${e.asLog()}" }
+            pixel.enqueueFire(pixelName = StatisticsPixelName.WIDE_EVENTS_CLEANUP_FAILURE_COUNT.pixelName)
+            pixel.enqueueFire(pixelName = StatisticsPixelName.WIDE_EVENTS_CLEANUP_FAILURE_DAILY.pixelName, type = Daily())
             Result.failure(e)
         }
 
