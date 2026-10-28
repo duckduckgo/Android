@@ -19,7 +19,6 @@ package com.duckduckgo.adblocking.impl.ui
 import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
-import com.duckduckgo.adblocking.impl.domain.SettingsPlacement
 import com.duckduckgo.adblocking.impl.ui.AdBlockingProtectionsSettingsEntryViewModel.Command.OpenSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.flow.flowOf
@@ -45,8 +44,8 @@ class AdBlockingProtectionsSettingsEntryViewModelTest {
     )
 
     @Test
-    fun whenPlacementIsProtectionsThenVisible() = runTest {
-        whenever(statusChecker.settingsPlacementFlow()).thenReturn(flowOf(SettingsPlacement.Protections))
+    fun whenSettingsVisibleThenVisible() = runTest {
+        whenever(statusChecker.observeSettingsVisible()).thenReturn(flowOf(true))
 
         val viewModel = createViewModel()
         viewModel.onStart(lifecycleOwner)
@@ -57,8 +56,8 @@ class AdBlockingProtectionsSettingsEntryViewModelTest {
     }
 
     @Test
-    fun whenPlacementIsHiddenThenNotVisible() = runTest {
-        whenever(statusChecker.settingsPlacementFlow()).thenReturn(flowOf(SettingsPlacement.Hidden))
+    fun whenSettingsNotVisibleThenNotVisible() = runTest {
+        whenever(statusChecker.observeSettingsVisible()).thenReturn(flowOf(false))
 
         val viewModel = createViewModel()
         viewModel.onStart(lifecycleOwner)

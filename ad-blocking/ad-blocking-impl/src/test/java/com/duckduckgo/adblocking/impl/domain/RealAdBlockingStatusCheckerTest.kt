@@ -212,26 +212,26 @@ class RealAdBlockingStatusCheckerTest {
     }
 
     @Test
-    fun whenKillSwitchOnThenPlacementIsProtections() = runTest {
+    fun whenKillSwitchOnThenSettingsVisible() = runTest {
         killSwitchEnabledFlow.value = true
 
-        assertEquals(SettingsPlacement.Protections, checker.settingsPlacementFlow().first())
+        assertTrue(checker.observeSettingsVisible().first())
     }
 
     @Test
-    fun whenKillSwitchOffThenPlacementIsHidden() = runTest {
+    fun whenKillSwitchOffThenSettingsNotVisible() = runTest {
         killSwitchEnabledFlow.value = false
 
-        assertEquals(SettingsPlacement.Hidden, checker.settingsPlacementFlow().first())
+        assertFalse(checker.observeSettingsVisible().first())
     }
 
     @Test
-    fun whenKillSwitchChangesThenPlacementReflectsIt() = runTest {
+    fun whenKillSwitchChangesThenSettingsVisibilityReflectsIt() = runTest {
         killSwitchEnabledFlow.value = true
-        assertEquals(SettingsPlacement.Protections, checker.settingsPlacementFlow().first())
+        assertTrue(checker.observeSettingsVisible().first())
 
         killSwitchEnabledFlow.value = false
-        assertEquals(SettingsPlacement.Hidden, checker.settingsPlacementFlow().first())
+        assertFalse(checker.observeSettingsVisible().first())
     }
 
     @Test

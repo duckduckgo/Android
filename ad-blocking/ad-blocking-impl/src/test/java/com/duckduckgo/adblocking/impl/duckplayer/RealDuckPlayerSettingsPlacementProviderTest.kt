@@ -21,7 +21,6 @@ import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.DISAB
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
-import com.duckduckgo.adblocking.impl.domain.SettingsPlacement
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacement.Hidden
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacement.InAdBlocking
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacement.Standalone
@@ -43,18 +42,18 @@ class RealDuckPlayerSettingsPlacementProviderTest(private val testCase: TestCase
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
         fun data(): List<TestCase> = listOf(
-            TestCase(standaloneSettings = false, SettingsPlacement.Protections, ENABLED, expected = InAdBlocking),
-            TestCase(standaloneSettings = false, SettingsPlacement.Protections, DISABLED_WIH_HELP_LINK, expected = InAdBlocking),
-            TestCase(standaloneSettings = false, SettingsPlacement.Protections, DISABLED, expected = Hidden),
-            TestCase(standaloneSettings = false, SettingsPlacement.Hidden, ENABLED, expected = Standalone),
-            TestCase(standaloneSettings = false, SettingsPlacement.Hidden, DISABLED_WIH_HELP_LINK, expected = Standalone),
-            TestCase(standaloneSettings = false, SettingsPlacement.Hidden, DISABLED, expected = Hidden),
-            TestCase(standaloneSettings = true, SettingsPlacement.Protections, ENABLED, expected = Standalone),
-            TestCase(standaloneSettings = true, SettingsPlacement.Protections, DISABLED_WIH_HELP_LINK, expected = Standalone),
-            TestCase(standaloneSettings = true, SettingsPlacement.Protections, DISABLED, expected = Hidden),
-            TestCase(standaloneSettings = true, SettingsPlacement.Hidden, ENABLED, expected = Standalone),
-            TestCase(standaloneSettings = true, SettingsPlacement.Hidden, DISABLED_WIH_HELP_LINK, expected = Standalone),
-            TestCase(standaloneSettings = true, SettingsPlacement.Hidden, DISABLED, expected = Hidden),
+            TestCase(standaloneSettings = false, adBlockingSettingsVisible = true, ENABLED, expected = InAdBlocking),
+            TestCase(standaloneSettings = false, adBlockingSettingsVisible = true, DISABLED_WIH_HELP_LINK, expected = InAdBlocking),
+            TestCase(standaloneSettings = false, adBlockingSettingsVisible = true, DISABLED, expected = Hidden),
+            TestCase(standaloneSettings = false, adBlockingSettingsVisible = false, ENABLED, expected = Standalone),
+            TestCase(standaloneSettings = false, adBlockingSettingsVisible = false, DISABLED_WIH_HELP_LINK, expected = Standalone),
+            TestCase(standaloneSettings = false, adBlockingSettingsVisible = false, DISABLED, expected = Hidden),
+            TestCase(standaloneSettings = true, adBlockingSettingsVisible = true, ENABLED, expected = Standalone),
+            TestCase(standaloneSettings = true, adBlockingSettingsVisible = true, DISABLED_WIH_HELP_LINK, expected = Standalone),
+            TestCase(standaloneSettings = true, adBlockingSettingsVisible = true, DISABLED, expected = Hidden),
+            TestCase(standaloneSettings = true, adBlockingSettingsVisible = false, ENABLED, expected = Standalone),
+            TestCase(standaloneSettings = true, adBlockingSettingsVisible = false, DISABLED_WIH_HELP_LINK, expected = Standalone),
+            TestCase(standaloneSettings = true, adBlockingSettingsVisible = false, DISABLED, expected = Hidden),
         )
     }
 
@@ -70,7 +69,7 @@ class RealDuckPlayerSettingsPlacementProviderTest(private val testCase: TestCase
             on { standaloneSettings() } doReturn standaloneSettingsToggle
         }
         val statusChecker: AdBlockingStatusChecker = mock {
-            on { settingsPlacementFlow() } doReturn flowOf(testCase.adBlockingPlacement)
+            on { observeSettingsVisible() } doReturn flowOf(testCase.adBlockingSettingsVisible)
         }
         val provider = RealDuckPlayerSettingsPlacementProvider(duckPlayer, duckPlayerFeature, statusChecker)
 
@@ -79,7 +78,7 @@ class RealDuckPlayerSettingsPlacementProviderTest(private val testCase: TestCase
 
     data class TestCase(
         val standaloneSettings: Boolean,
-        val adBlockingPlacement: SettingsPlacement,
+        val adBlockingSettingsVisible: Boolean,
         val duckPlayerState: DuckPlayerState,
         val expected: DuckPlayerSettingsPlacement,
     )
