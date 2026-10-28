@@ -35,7 +35,6 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -89,9 +88,6 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
-
-    @Inject
-    lateinit var appTheme: AppTheme
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
@@ -315,19 +311,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun configureHeaderAnimation() {
-        if (appTheme.isLightModeEnabled()) {
-            binding.netpStatusImage.setAnimation(R.raw.vpn_header)
-        } else {
-            binding.netpStatusImage.setAnimation(R.raw.vpn_header_dark)
-        }
-
-        if (appBrandDesignUpdateToggles.pictograms().isEnabled()) {
-            binding.netpStatusImage.setAnimation(R.raw.vpn_header_brand_update)
-            binding.netpStatusImage.layoutParams = binding.netpStatusImage.layoutParams.apply {
-                width = resources.getDimensionPixelSize(R.dimen.netp_header_animation_width)
-                height = resources.getDimensionPixelSize(R.dimen.netp_header_animation_height)
-            }
-        }
+        binding.netpStatusImage.setAnimation(R.raw.vpn_header)
     }
 
     private fun handleAnimation(newState: ConnectionState) {

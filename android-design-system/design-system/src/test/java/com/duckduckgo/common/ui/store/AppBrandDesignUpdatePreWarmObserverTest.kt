@@ -35,10 +35,7 @@ class AppBrandDesignUpdatePreWarmObserverTest {
     var coroutineRule = CoroutineTestRule()
 
     private val toggles = mock<AppBrandDesignUpdateToggles>()
-    private val themeFeature = mock<Toggle>()
-    private val radiusFeature = mock<Toggle>()
-    private val addressBarFeature = mock<Toggle>()
-    private val pictogramsFeature = mock<Toggle>()
+    private val selfFeature = mock<Toggle>()
     private val dispatcherProvider = mock<DispatcherProvider>()
 
     private val testee = AppBrandDesignUpdatePreWarmObserver(
@@ -50,20 +47,14 @@ class AppBrandDesignUpdatePreWarmObserverTest {
     @Before
     fun setup() {
         whenever(dispatcherProvider.io()).thenReturn(coroutineRule.testDispatcher)
-        whenever(toggles.theme()).thenReturn(themeFeature)
-        whenever(toggles.radius()).thenReturn(radiusFeature)
-        whenever(toggles.addressBar()).thenReturn(addressBarFeature)
-        whenever(toggles.pictograms()).thenReturn(pictogramsFeature)
+        whenever(toggles.self()).thenReturn(selfFeature)
     }
 
     @Test
-    fun whenOnCreateThenBrandFeatureTogglesAreRead() {
+    fun whenOnCreateThenBrandFeatureToggleIsRead() {
         testee.onCreate(mock())
 
-        verify(themeFeature).isEnabled()
-        verify(radiusFeature).isEnabled()
-        verify(addressBarFeature).isEnabled()
-        verify(pictogramsFeature).isEnabled()
+        verify(selfFeature).isEnabled()
     }
 
     @Test

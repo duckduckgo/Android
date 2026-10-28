@@ -28,7 +28,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.setRoundCorners
-import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.android.support.AndroidSupportInjection
@@ -45,9 +44,6 @@ class QuickSetupAddressBarPositionBottomSheet : BottomSheetDialogFragment() {
 
     @Inject
     lateinit var appTheme: AppTheme
-
-    @Inject
-    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     private lateinit var initialSelection: OmnibarType
     private var showSplitOption: Boolean = false
@@ -76,9 +72,6 @@ class QuickSetupAddressBarPositionBottomSheet : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?,
     ): View {
         val binding = BottomSheetQuickSetupAddressBarPositionBinding.inflate(inflater, container, false)
-        if (appBrandDesignUpdateToggles.radius().isEnabled()) {
-            binding.root.applyRadiusOverlayToSheetBackground()
-        }
 
         with(binding.addressBarPicker) {
             setLightMode(appTheme.isLightModeEnabled())
@@ -102,7 +95,7 @@ class QuickSetupAddressBarPositionBottomSheet : BottomSheetDialogFragment() {
         return binding.root
     }
 
-    override fun getTheme(): Int = com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge
+    override fun getTheme(): Int = CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge
 
     override fun onCreateDialog(savedInstanceState: Bundle?): android.app.Dialog {
         val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog

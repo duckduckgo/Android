@@ -27,38 +27,31 @@ import org.junit.Test
 class RebrandPrivacyShieldLayoutTest {
 
     @Test
-    fun whenAddressBarRebrandEnabledAndShieldProtectedThenAnimationFillsSlot() {
+    fun whenShieldProtectedThenAnimationFillsSlot() {
         assertEquals(
             RebrandPrivacyShieldLayout(slotSizeDp = 44, contentInsetDp = 0),
-            resolveRebrandPrivacyShieldLayout(PROTECTED, isAddressBarRebrandEnabled = true),
+            resolveRebrandPrivacyShieldLayout(PROTECTED),
         )
     }
 
     @Test
-    fun whenAddressBarRebrandEnabledAndShieldUnprotectedThenIconIsCenteredInSlot() {
+    fun whenShieldUnprotectedThenIconIsCenteredInSlot() {
         assertEquals(
             RebrandPrivacyShieldLayout(slotSizeDp = 44, contentInsetDp = 2),
-            resolveRebrandPrivacyShieldLayout(UNPROTECTED, isAddressBarRebrandEnabled = true),
+            resolveRebrandPrivacyShieldLayout(UNPROTECTED),
         )
     }
 
     @Test
-    fun whenAddressBarRebrandEnabledAndShieldMaliciousThenIconIsCenteredInSlot() {
+    fun whenShieldMaliciousThenIconIsCenteredInSlot() {
         assertEquals(
             RebrandPrivacyShieldLayout(slotSizeDp = 44, contentInsetDp = 2),
-            resolveRebrandPrivacyShieldLayout(MALICIOUS, isAddressBarRebrandEnabled = true),
+            resolveRebrandPrivacyShieldLayout(MALICIOUS),
         )
-    }
-
-    @Test
-    fun whenAddressBarRebrandDisabledThenRebrandLayoutIsNotApplied() {
-        assertNull(resolveRebrandPrivacyShieldLayout(PROTECTED, isAddressBarRebrandEnabled = false))
-        assertNull(resolveRebrandPrivacyShieldLayout(UNPROTECTED, isAddressBarRebrandEnabled = false))
-        assertNull(resolveRebrandPrivacyShieldLayout(MALICIOUS, isAddressBarRebrandEnabled = false))
     }
 
     @Test
     fun whenShieldUnknownThenRebrandLayoutIsNotApplied() {
-        assertNull(resolveRebrandPrivacyShieldLayout(UNKNOWN, isAddressBarRebrandEnabled = true))
+        assertNull(resolveRebrandPrivacyShieldLayout(UNKNOWN))
     }
 }

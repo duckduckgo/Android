@@ -62,7 +62,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.ui.PulseAnimation
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.codegen.annotations.InjectWith
-import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -117,6 +116,7 @@ import kotlinx.coroutines.launch
 import logcat.logcat
 import org.json.JSONArray
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 interface NativeInputWidget {
 
@@ -296,9 +296,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     @Inject
     lateinit var browserMode: BrowserMode
-
-    @Inject
-    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -925,9 +922,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
             isFocused = inputField.hasFocus() || previewEnterFocus,
         )
         val verticalPadAttr = if (expanded) {
-            com.duckduckgo.mobile.android.R.dimen.keyline_2
+            CommonR.dimen.keyline_2
         } else {
-            com.duckduckgo.mobile.android.R.dimen.keyline_1
+            CommonR.dimen.keyline_1
         }
         val verticalPad = resources.getDimensionPixelSize(verticalPadAttr)
         setPadding(paddingLeft, verticalPad, paddingRight, verticalPad)
@@ -1030,7 +1027,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         inputModeWidgetUnifiedBack.visibility =
             if (state.shouldShowCardRowBack(isEditing = isEditWidget)) VISIBLE else GONE
         inputModeWidgetBack.setBackgroundResource(
-            com.duckduckgo.mobile.android.R.drawable.selectable_circular_container_ripple,
+            CommonR.drawable.selectable_circular_container_ripple,
         )
     }
 
@@ -1643,35 +1640,27 @@ class NativeInputModeWidget @JvmOverloads constructor(
         // condition (not an early return) so a bottom Duck.ai frame still reaches the reset below.
         val isBrowserSearchOnly = state.inputContext == NativeInputState.InputContext.BROWSER && !state.toggleVisible
         if (state.isBottom) {
-            val radius = when {
-                !isBrowserSearchOnly -> com.duckduckgo.mobile.android.R.dimen.extraLargeShapeCornerRadius
-                appBrandDesignUpdateToggles.addressBar().isEnabled() -> com.duckduckgo.mobile.android.R.dimen.rebrandInputRadius
-                else -> com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius
-            }
+            val radius = if (isBrowserSearchOnly) CommonR.dimen.rebrandInputRadius else CommonR.dimen.extraLargeShapeCornerRadius
             card.radius = card.resources.getDimension(radius)
         }
         if (isBrowserSearchOnly && !state.isBottom) {
-            val targetTopMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginTop)
-            val targetHorizontalMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginHorizontal)
-            if (appBrandDesignUpdateToggles.addressBar().isEnabled()) {
-                card.shapeAppearanceModel = card.shapeAppearanceModel.withCornerSize(ShapeAppearanceModel.PILL)
-            } else {
-                card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
-            }
+            val targetTopMargin = card.resources.getDimensionPixelSize(CommonR.dimen.omnibarCardMarginTop)
+            val targetHorizontalMargin = card.resources.getDimensionPixelSize(CommonR.dimen.omnibarCardMarginHorizontal)
+            card.shapeAppearanceModel = card.shapeAppearanceModel.withCornerSize(ShapeAppearanceModel.PILL)
             lp.topMargin = targetTopMargin - card.paddingTop
             lp.marginStart = targetHorizontalMargin - card.paddingLeft
             lp.marginEnd = targetHorizontalMargin - card.paddingRight
         } else if (isBrowserSearchOnly && state.isBottom) {
             // Bottom search-only omnibar: 16dp leading (paddingStart keyline_2 + this keyline_2) and 16dp
             // trailing (paddingEnd keyline_1 + this) so the field is centred when full-width.
-            lp.marginStart = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
-            lp.marginEnd = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginHorizontal) -
-                card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
+            lp.marginStart = card.resources.getDimensionPixelSize(CommonR.dimen.keyline_2)
+            lp.marginEnd = card.resources.getDimensionPixelSize(CommonR.dimen.omnibarCardMarginHorizontal) -
+                card.resources.getDimensionPixelSize(CommonR.dimen.keyline_1)
         } else {
             // Reset the start margin so the omnibar value doesn't leak onto the shared Duck.ai card.
             // The bottom card keeps keyline_1 (Duck.ai needs 8dp with the wrapper's paddingEnd).
             lp.marginStart = 0
-            lp.marginEnd = if (state.isBottom) card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1) else 0
+            lp.marginEnd = if (state.isBottom) card.resources.getDimensionPixelSize(CommonR.dimen.keyline_1) else 0
         }
         card.layoutParams = lp
     }

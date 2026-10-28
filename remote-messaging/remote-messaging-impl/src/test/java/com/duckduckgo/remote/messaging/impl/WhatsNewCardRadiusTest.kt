@@ -35,20 +35,14 @@ import com.duckduckgo.mobile.android.R as CommonR
 class WhatsNewCardRadiusTest {
 
     @Test
-    fun whenRadiusOverlayIsAbsentThenBothWhatsNewCardsKeep12DpCorners() {
-        assertCardRadii(overlayEnabled = false, expectedDp = 12f)
-    }
-
-    @Test
     @Config(qualifiers = "xhdpi")
-    fun whenRadiusOverlayIsAppliedThenBothWhatsNewCardsUse28DpCorners() {
-        assertCardRadii(overlayEnabled = true, expectedDp = 28f)
+    fun whenThemedThenBothWhatsNewCardsUse28DpCorners() {
+        assertCardRadii(expectedDp = 28f)
     }
 
-    private fun assertCardRadii(overlayEnabled: Boolean, expectedDp: Float) {
+    private fun assertCardRadii(expectedDp: Float) {
         listOf(CommonR.style.Theme_DuckDuckGo_Light, CommonR.style.Theme_DuckDuckGo_Dark).forEach { themeResId ->
             val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), themeResId)
-            if (overlayEnabled) context.theme.applyStyle(CommonR.style.ThemeOverlay_Rebrand_Radius, true)
             val expectedRadius = expectedDp * context.resources.displayMetrics.density
 
             val ripple = checkNotNull(ContextCompat.getDrawable(context, R.drawable.background_remote_message_entry)) as RippleDrawable

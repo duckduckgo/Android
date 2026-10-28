@@ -39,15 +39,6 @@ import com.duckduckgo.widget.WidgetTheme
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
-internal fun resolveWidgetConfigurationBackgroundAttr(isPictogramsEnabled: Boolean): Int =
-    if (isPictogramsEnabled) CommonR.attr.daxColorSurfaceTertiary else CommonR.attr.daxColorSurface
-
-internal fun resolveWidgetConfigurationPreview(
-    roundedPreview: Int,
-    legacyPreview: Int,
-    isAddressBarRebrandEnabled: Boolean,
-): Int = if (isAddressBarRebrandEnabled) roundedPreview else legacyPreview
-
 @InjectWith(ActivityScope::class)
 class WidgetThemeConfiguration : DuckDuckGoActivity() {
 
@@ -71,13 +62,7 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
         val binding = ActivityWidgetConfigurationBinding.inflate(layoutInflater)
         enableTransparentEdgeToEdge()
         setContentView(binding.root)
-        binding.widgetConfigPanel.setBackgroundColor(
-            getColorFromAttr(
-                resolveWidgetConfigurationBackgroundAttr(
-                    isPictogramsEnabled = appBrandDesignUpdateToggles.pictograms().isEnabled(),
-                ),
-            ),
-        )
+        binding.widgetConfigPanel.setBackgroundColor(getColorFromAttr(CommonR.attr.daxColorSurfaceTertiary))
         edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
         edgeToEdgeHandler.applyNavigationBarInsets(binding.widgetConfigPanel, drawBehindGestureNav = false)
         val extras = intent.extras
@@ -93,39 +78,23 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
             finish()
         }
 
-        val isAddressBarRebrandEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled()
-        fun setWidgetPreview(roundedPreview: Int, legacyPreview: Int) {
-            binding.widgetConfigPreview.setImageResource(
-                resolveWidgetConfigurationPreview(
-                    roundedPreview = roundedPreview,
-                    legacyPreview = legacyPreview,
-                    isAddressBarRebrandEnabled = isAddressBarRebrandEnabled,
-                ),
-            )
+        fun setWidgetPreview(preview: Int) {
+            binding.widgetConfigPreview.setImageResource(preview)
         }
 
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.Q) {
             binding.widgetConfigThemeSystem.visibility = View.VISIBLE
             binding.widgetConfigThemeSystem.isChecked = true
-            setWidgetPreview(
-                R.drawable.image_preview_search_favorites_widget_daynight,
-                R.drawable.image_preview_search_favorites_widget_legacy_daynight,
-            )
+            setWidgetPreview(R.drawable.image_preview_search_favorites_widget_daynight)
         } else {
             binding.widgetConfigThemeSystem.visibility = View.GONE
             val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
             if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
                 binding.widgetConfigThemeDark.isChecked = true
-                setWidgetPreview(
-                    R.drawable.image_preview_search_favorites_widget_dark,
-                    R.drawable.image_preview_search_favorites_widget_legacy_dark,
-                )
+                setWidgetPreview(R.drawable.image_preview_search_favorites_widget_dark)
             } else {
                 binding.widgetConfigThemeLight.isChecked = true
-                setWidgetPreview(
-                    R.drawable.image_preview_search_favorites_widget_light,
-                    R.drawable.image_preview_search_favorites_widget_legacy_light,
-                )
+                setWidgetPreview(R.drawable.image_preview_search_favorites_widget_light)
             }
         }
 
@@ -134,28 +103,16 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
                 R.id.widgetConfigThemeSystem -> {
                     val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
                     if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
-                        setWidgetPreview(
-                            R.drawable.image_preview_search_favorites_widget_dark,
-                            R.drawable.image_preview_search_favorites_widget_legacy_dark,
-                        )
+                        setWidgetPreview(R.drawable.image_preview_search_favorites_widget_dark)
                     } else {
-                        setWidgetPreview(
-                            R.drawable.image_preview_search_favorites_widget_light,
-                            R.drawable.image_preview_search_favorites_widget_legacy_light,
-                        )
+                        setWidgetPreview(R.drawable.image_preview_search_favorites_widget_light)
                     }
                 }
                 R.id.widgetConfigThemeLight -> {
-                    setWidgetPreview(
-                        R.drawable.image_preview_search_favorites_widget_light,
-                        R.drawable.image_preview_search_favorites_widget_legacy_light,
-                    )
+                    setWidgetPreview(R.drawable.image_preview_search_favorites_widget_light)
                 }
                 R.id.widgetConfigThemeDark -> {
-                    setWidgetPreview(
-                        R.drawable.image_preview_search_favorites_widget_dark,
-                        R.drawable.image_preview_search_favorites_widget_legacy_dark,
-                    )
+                    setWidgetPreview(R.drawable.image_preview_search_favorites_widget_dark)
                 }
             }
         }

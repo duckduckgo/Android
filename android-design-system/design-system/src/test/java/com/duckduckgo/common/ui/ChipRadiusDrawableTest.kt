@@ -31,24 +31,18 @@ import org.robolectric.annotation.Config
 class ChipRadiusDrawableTest {
 
     @Test
-    fun whenRadiusOverlayIsAbsentThenChipDrawablesKeepTheirDifferentRadii() {
-        assertChipRadii(overlayEnabled = false, expectedDp = listOf(8f, 12f))
-    }
-
-    @Test
     @Config(qualifiers = "xhdpi")
-    fun whenRadiusOverlayIsAppliedThenAllChipDrawablesUsePillRadius() {
-        assertChipRadii(overlayEnabled = true, expectedDp = listOf(1000f, 1000f))
+    fun whenThemedThenAllChipDrawablesUsePillRadius() {
+        assertChipRadii(expectedDp = listOf(1000f, 1000f))
     }
 
-    private fun assertChipRadii(overlayEnabled: Boolean, expectedDp: List<Float>) {
+    private fun assertChipRadii(expectedDp: List<Float>) {
         val drawables = listOf(
             R.drawable.chip_background,
             R.drawable.duck_ai_prompt_background,
         )
         listOf(R.style.Theme_DuckDuckGo_Light, R.style.Theme_DuckDuckGo_Dark).forEach { themeResId ->
             val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), themeResId)
-            if (overlayEnabled) context.theme.applyStyle(R.style.ThemeOverlay_Rebrand_Radius, true)
             val density = context.resources.displayMetrics.density
             drawables.zip(expectedDp).forEach { (drawableResId, radiusDp) ->
                 val drawable = checkNotNull(AppCompatResources.getDrawable(context, drawableResId)) as GradientDrawable

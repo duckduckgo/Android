@@ -52,34 +52,6 @@
             app:layout_constraintTop_toBottomOf="@id/title"
             app:typography="body1" />
 
-        <ImageView
-            android:id="@+id/positiveFeedbackButton"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginTop="34dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:contentDescription="@string/feedbackInitialDisambiguationHappyButtonContentDescription"
-            android:focusable="true"
-            app:layout_constraintEnd_toStartOf="@id/negativeFeedbackButton"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/subtitle"
-            tools:src="@drawable/button_happy_light_theme" />
-
-        <ImageView
-            android:id="@+id/negativeFeedbackButton"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginStart="28dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/feedbackInitialDisambiguationSadButtonContentDescription"
-            app:layout_constraintBottom_toBottomOf="@id/positiveFeedbackButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/positiveFeedbackButton"
-            app:layout_constraintTop_toTopOf="@id/positiveFeedbackButton"
-            tools:src="@drawable/button_sad_light_theme" />
-
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/positiveFeedbackBrandButton"
             android:layout_width="100dp"
@@ -89,7 +61,6 @@
             android:contentDescription="@string/feedbackInitialDisambiguationHappyButtonContentDescription"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackgroundBorderless"
-            android:visibility="gone"
             app:layout_constraintEnd_toStartOf="@id/negativeFeedbackBrandButton"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
@@ -107,7 +78,7 @@
                 android:layout_gravity="center"
                 android:importantForAccessibility="no"
                 android:scaleType="fitCenter"
-                tools:src="@drawable/response_good_56" />
+                android:src="@drawable/response_good_56" />
 
         </com.google.android.material.card.MaterialCardView>
 
@@ -120,7 +91,6 @@
             android:clickable="true"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackgroundBorderless"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/positiveFeedbackBrandButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/positiveFeedbackBrandButton"
@@ -138,7 +108,7 @@
                 android:layout_gravity="center"
                 android:importantForAccessibility="no"
                 android:scaleType="fitCenter"
-                tools:src="@drawable/response_bad_56" />
+                android:src="@drawable/response_bad_56" />
 
         </com.google.android.material.card.MaterialCardView>
 

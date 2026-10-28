@@ -19,6 +19,5 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:textAppearance="@style/Typography.DuckDuckGo.Rebrand.ButtonDuckSans"
-    android:theme="@style/ThemeOverlay.Rebrand"
     tools:ignore="DeprecatedWidgetInXml,InvalidDaxButtonDuckSans,InvalidDaxButtonProperty"
     tools:text="Secondary option" />

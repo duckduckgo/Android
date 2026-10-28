@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser.newaddressbaroption
 
 import android.content.Context
-import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.di.scopes.AppScope
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dev.zacsweers.metro.ContributesBinding
@@ -32,9 +31,7 @@ interface NewAddressBarPickerBottomSheetDialogFactory {
 }
 
 @ContributesBinding(AppScope::class)
-class RealNewAddressBarPickerBottomSheetDialogFactory @Inject constructor(
-    private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
-) : NewAddressBarPickerBottomSheetDialogFactory {
+class RealNewAddressBarPickerBottomSheetDialogFactory @Inject constructor() : NewAddressBarPickerBottomSheetDialogFactory {
     override fun create(
         context: Context,
         isLightMode: Boolean,
@@ -44,6 +41,5 @@ class RealNewAddressBarPickerBottomSheetDialogFactory @Inject constructor(
             context = context,
             isLightMode = isLightMode,
             callback = callback,
-            radiusOverlayEnabled = appBrandDesignUpdateToggles.radius().isEnabled(),
         )
 }

@@ -115,7 +115,6 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/keyline_5"
                 android:text="@string/fireTabsNewTabButton"
-                android:theme="@style/ThemeOverlay.Rebrand"
                 app:daxButtonSize="small"
                 app:icon="@drawable/ic_add_16" />
 

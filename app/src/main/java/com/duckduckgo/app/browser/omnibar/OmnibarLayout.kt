@@ -34,7 +34,6 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.Toast
-import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
@@ -106,7 +105,6 @@ import com.duckduckgo.browser.ui.tabs.TabSwitcherButton
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.gone
@@ -192,9 +190,6 @@ class OmnibarLayout @JvmOverloads constructor(
     lateinit var serpLogos: SerpLogos
 
     @Inject
-    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
-
-    @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
@@ -268,32 +263,12 @@ class OmnibarLayout @JvmOverloads constructor(
         resources.getDimensionPixelSize(CommonR.dimen.omnibarCardMarginBottom)
     }
 
-    private val shieldIconBoxSize by lazy {
-        resources.getDimensionPixelSize(CommonR.dimen.toolbarIcon)
-    }
-
-    private val rebrandAddressBarRadius by lazy {
-        resources.getDimension(CommonR.dimen.rebrandInputRadius)
-    }
-
-    private val legacyAddressBarRadius by lazy {
-        resources.getDimension(CommonR.dimen.largeShapeCornerRadius)
-    }
-
     init {
         inflate(context, R.layout.view_omnibar, this)
 
         AndroidSupportInjection.inject(this)
 
         renderPosition()
-
-        applyAddressBarRebrandRadius(
-            appBrandDesignUpdateToggles.addressBar().isEnabled(),
-            rebrandAddressBarRadius,
-            legacyAddressBarRadius,
-            omnibarCardShadow,
-            omnibarCardView,
-        )
 
         omnibarCardShadow.addBottomShadow()
     }
@@ -412,7 +387,7 @@ class OmnibarLayout @JvmOverloads constructor(
     private val conflatedStateJob = ConflatedJob()
     private val conflatedCommandJob = ConflatedJob()
 
-    private var lastSeenPrivacyShield: Pair<PrivacyShieldState, Boolean>? = null
+    private var lastSeenPrivacyShield: PrivacyShieldState? = null
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -542,14 +517,6 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     fun render(viewState: ViewState) {
-        applyAddressBarRebrandRadius(
-            viewState.isAddressBarRebrandEnabled,
-            rebrandAddressBarRadius,
-            legacyAddressBarRadius,
-            omnibarCardShadow,
-            omnibarCardView,
-        )
-
         when (viewState.viewMode) {
             is ViewMode.CustomTab -> {
                 renderCustomTabMode(viewState, viewState.viewMode)
@@ -573,7 +540,6 @@ class OmnibarLayout @JvmOverloads constructor(
             renderPrivacyShield(
                 privacyShieldState = viewState.privacyShield,
                 viewMode = viewState.viewMode,
-                isAddressBarRebrandEnabled = viewState.isAddressBarRebrandEnabled,
             )
         } else {
             lastSeenPrivacyShield = null
@@ -727,7 +693,6 @@ class OmnibarLayout @JvmOverloads constructor(
                 daxIcon.gone()
                 shieldIcon.gone()
                 searchIcon.gone()
-                duckPlayerIcon.setImageResource(resolveDuckPlayerIcon(viewState.isAddressBarRebrandEnabled))
                 duckPlayerIcon.show()
             }
 
@@ -892,7 +857,7 @@ class OmnibarLayout @JvmOverloads constructor(
     ) {
         logcat { "Omnibar: renderCustomTabMode $viewState" }
         configureCustomTabOmnibar(viewMode)
-        renderCustomTab(viewMode, viewState.isAddressBarRebrandEnabled)
+        renderCustomTab(viewMode)
     }
 
     override fun decorate(decoration: Decoration) {
@@ -1088,11 +1053,9 @@ class OmnibarLayout @JvmOverloads constructor(
     private fun renderPrivacyShield(
         privacyShieldState: PrivacyShieldState,
         viewMode: ViewMode,
-        isAddressBarRebrandEnabled: Boolean,
     ) {
-        val renderState = privacyShieldState to isAddressBarRebrandEnabled
-        renderIfChanged(renderState, lastSeenPrivacyShield) {
-            lastSeenPrivacyShield = renderState
+        renderIfChanged(privacyShieldState, lastSeenPrivacyShield) {
+            lastSeenPrivacyShield = privacyShieldState
             val shieldIconView =
                 if (viewMode is ViewMode.Browser || viewMode is ViewMode.Pdf) {
                     shieldIcon
@@ -1107,22 +1070,19 @@ class OmnibarLayout @JvmOverloads constructor(
                 browserMode == BrowserMode.FIRE -> false
                 viewMode is ViewMode.CustomTab &&
                     shouldUseCustomTabToolbarColorForShield(
-                        isAddressBarRebrandEnabled = isAddressBarRebrandEnabled,
                         isNewCustomTabEnabled = omnibarRepository.isNewCustomTabEnabled,
                         isDefaultToolbarColor = isDefaultToolbarColor(viewMode.toolbarColor),
                     ) -> isColorLight(viewMode.toolbarColor)
                 else -> null // Use default theme-based selection
             }
 
-            val boxed = privacyShieldView.setAnimationView(
+            privacyShieldView.setAnimationView(
                 shieldIconView,
                 privacyShieldState,
                 viewMode,
                 useLightAnimation,
-                isAddressBarRebrandEnabled,
             )
-            val rebrandLayout = resolveRebrandPrivacyShieldLayout(privacyShieldState, isAddressBarRebrandEnabled)
-            if (boxed && rebrandLayout != null) {
+            resolveRebrandPrivacyShieldLayout(privacyShieldState)?.let { rebrandLayout ->
                 val slotSize = rebrandLayout.slotSizeDp.toPx(context)
                 val contentInset = rebrandLayout.contentInsetDp.toPx(context)
                 shieldIconView.updateLayoutParams<MarginLayoutParams> {
@@ -1132,25 +1092,6 @@ class OmnibarLayout @JvmOverloads constructor(
                 }
                 shieldIconView.setPadding(contentInset, contentInset, contentInset, contentInset)
                 shieldIconView.scaleType = ImageView.ScaleType.CENTER_INSIDE
-            } else if (privacyShieldState != PrivacyShieldState.UNKNOWN) {
-                val isNewCustomTab =
-                    viewMode is ViewMode.CustomTab && omnibarRepository.isNewCustomTabEnabled
-                shieldIconView.updateLayoutParams<MarginLayoutParams> {
-                    width = if (isNewCustomTab) {
-                        shieldIconBoxSize
-                    } else {
-                        LayoutParams.WRAP_CONTENT
-                    }
-                    height = LayoutParams.MATCH_PARENT
-                    marginStart = 0
-                }
-                shieldIconView.setPadding(0, 0, 0, 0)
-                shieldIconView.scaleType =
-                    if (isNewCustomTab) {
-                        ImageView.ScaleType.MATRIX
-                    } else {
-                        ImageView.ScaleType.FIT_CENTER
-                    }
             }
         }
     }
@@ -1282,12 +1223,8 @@ class OmnibarLayout @JvmOverloads constructor(
         return ColorUtils.blendARGB(mainToolbarColor, blendColor, 0.12f)
     }
 
-    private fun renderCustomTab(
-        viewMode: ViewMode.CustomTab,
-        isAddressBarRebrandEnabled: Boolean,
-    ) {
+    private fun renderCustomTab(viewMode: ViewMode.CustomTab) {
         logcat { "Omnibar: updateCustomTabTitle $decoration" }
-        val duckPlayerIcon = resolveDuckPlayerIcon(isAddressBarRebrandEnabled)
 
         if (omnibarRepository.isNewCustomTabEnabled) {
             with(newCustomTabToolbarContainer) {
@@ -1297,7 +1234,6 @@ class OmnibarLayout @JvmOverloads constructor(
                 }
 
                 customTabShieldIcon.isInvisible = viewMode.showDuckPlayerIcon
-                customTabDuckPlayerIcon.setImageResource(duckPlayerIcon)
                 customTabDuckPlayerIcon.isVisible = viewMode.showDuckPlayerIcon
             }
         } else {
@@ -1316,7 +1252,6 @@ class OmnibarLayout @JvmOverloads constructor(
                 }
 
                 customTabShieldIcon.isInvisible = viewMode.showDuckPlayerIcon
-                customTabDuckPlayerIcon.setImageResource(duckPlayerIcon)
                 customTabDuckPlayerIcon.isVisible = viewMode.showDuckPlayerIcon
             }
         }
@@ -1592,34 +1527,23 @@ class OmnibarLayout @JvmOverloads constructor(
 }
 
 internal fun shouldUseCustomTabToolbarColorForShield(
-    isAddressBarRebrandEnabled: Boolean,
     isNewCustomTabEnabled: Boolean,
     isDefaultToolbarColor: Boolean,
-): Boolean = if (isAddressBarRebrandEnabled) {
-    !isNewCustomTabEnabled || !isDefaultToolbarColor
-} else {
-    isNewCustomTabEnabled && !isDefaultToolbarColor
-}
+): Boolean = !isNewCustomTabEnabled || !isDefaultToolbarColor
 
 internal data class RebrandPrivacyShieldLayout(
     val slotSizeDp: Int,
     val contentInsetDp: Int,
 )
 
-internal fun resolveRebrandPrivacyShieldLayout(
-    privacyShieldState: PrivacyShieldState,
-    isAddressBarRebrandEnabled: Boolean,
-): RebrandPrivacyShieldLayout? {
-    if (!isAddressBarRebrandEnabled) return null
-
-    return when (privacyShieldState) {
+internal fun resolveRebrandPrivacyShieldLayout(privacyShieldState: PrivacyShieldState): RebrandPrivacyShieldLayout? =
+    when (privacyShieldState) {
         PrivacyShieldState.PROTECTED -> RebrandPrivacyShieldLayout(slotSizeDp = 44, contentInsetDp = 0)
         PrivacyShieldState.UNPROTECTED,
         PrivacyShieldState.MALICIOUS,
         -> RebrandPrivacyShieldLayout(slotSizeDp = 44, contentInsetDp = 2)
         PrivacyShieldState.UNKNOWN -> null
     }
-}
 
 /**
  * Whether the fire icon should occupy the shared fire/+ leading slot in the omnibar.
@@ -1643,11 +1567,3 @@ internal fun shouldShowPlusIcon(
     isDuckAiMode: Boolean,
     isNativeChatInputEnabled: Boolean,
 ): Boolean = showFireIcon && isDuckAiMode && isNativeChatInputEnabled
-
-@DrawableRes
-internal fun resolveDuckPlayerIcon(isAddressBarRebrandEnabled: Boolean): Int =
-    if (isAddressBarRebrandEnabled) {
-        R.drawable.video_player_color_24_brand_update
-    } else {
-        R.drawable.video_player_color_24
-    }

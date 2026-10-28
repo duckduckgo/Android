@@ -197,7 +197,6 @@
                     android:alpha="0"
                     android:text="@string/preOnboardingDaxDialog1SecondaryButton"
                     android:textAppearance="@style/Typography.DuckDuckGo.Rebrand.ButtonDuckSans"
-                    android:theme="@style/ThemeOverlay.Rebrand"
                     android:visibility="gone"
                     tools:alpha="1"
                     tools:ignore="DeprecatedWidgetInXml,InvalidDaxButtonDuckSans,InvalidDaxButtonProperty"

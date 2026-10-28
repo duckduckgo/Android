@@ -20,9 +20,7 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
-import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.PrivacyShield.MALICIOUS
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
@@ -43,28 +41,31 @@ class LottiePrivacyShieldAnimationHelperResolveShieldAssetTest {
     private val customTabShieldDrawableFactory = mock<CustomTabShieldDrawableFactory>()
     private val testee = LottiePrivacyShieldAnimationHelper(
         appTheme = mock<AppTheme>(),
-        omnibarRepository = mock<OmnibarRepository>(),
         customTabShieldDrawableFactory = customTabShieldDrawableFactory,
     )
 
     @Test
-    fun whenBrandIconsEnabledAndProtectedThenBoxedColorShield() {
-        assertEquals(R.raw.shield_color_24 to true, resolve(PROTECTED))
+    fun whenProtectedThenColorShield() {
+        assertEquals(R.raw.shield_color_24, testee.resolveShieldAsset(PROTECTED))
     }
 
     @Test
-    fun whenBrandIconsEnabledAndUnprotectedThenBoxedAlertShieldRegardlessOfTheme() {
-        assertEquals(R.drawable.shield_alert_24 to true, resolve(UNPROTECTED))
-        assertEquals(R.drawable.shield_alert_24 to true, resolve(UNPROTECTED, isLightMode = false))
+    fun whenUnprotectedThenAlertShield() {
+        assertEquals(R.drawable.shield_alert_24, testee.resolveShieldAsset(UNPROTECTED))
     }
 
     @Test
-    fun whenBrandIconsEnabledAndMaliciousThenBoxedStaticExclamation() {
-        assertEquals(R.drawable.exclamation_recolorable_24 to true, resolve(MALICIOUS))
+    fun whenMaliciousThenStaticExclamation() {
+        assertEquals(R.drawable.exclamation_recolorable_24, testee.resolveShieldAsset(MALICIOUS))
     }
 
     @Test
-    fun whenBrandIconsEnabledAndLightCustomTabThenDoNotTintWholeStaticShield() = runTest {
+    fun whenUnknownThenNoAsset() {
+        assertNull(testee.resolveShieldAsset(UNKNOWN))
+    }
+
+    @Test
+    fun whenLightCustomTabThenDoNotTintWholeStaticShield() = runTest {
         val holder: LottieAnimationView = mock()
         val context: Context = mock()
         val drawable: Drawable = mock()
@@ -76,14 +77,13 @@ class LottiePrivacyShieldAnimationHelperResolveShieldAssetTest {
             privacyShield = UNPROTECTED,
             viewMode = ViewMode.CustomTab(0, "example.com", "example.com"),
             useLightAnimation = true,
-            isAddressBarRebrandEnabled = true,
         )
 
         verify(holder).setImageDrawable(drawable)
     }
 
     @Test
-    fun whenBrandIconsEnabledAndDarkCustomTabThenDoNotTintWholeStaticShield() = runTest {
+    fun whenDarkCustomTabThenDoNotTintWholeStaticShield() = runTest {
         val holder: LottieAnimationView = mock()
         val context: Context = mock()
         val drawable: Drawable = mock()
@@ -95,131 +95,21 @@ class LottiePrivacyShieldAnimationHelperResolveShieldAssetTest {
             privacyShield = UNPROTECTED,
             viewMode = ViewMode.CustomTab(0, "example.com", "example.com"),
             useLightAnimation = false,
-            isAddressBarRebrandEnabled = true,
         )
 
         verify(holder).setImageDrawable(drawable)
     }
 
     @Test
-    fun whenBrandIconsEnabledAndNormalBrowserThenUseStaticShieldWithoutCustomTabTint() = runTest {
+    fun whenNormalBrowserThenUseStaticShieldWithoutCustomTabTint() = runTest {
         val holder: LottieAnimationView = mock()
         testee.setAnimationView(
             holder = holder,
             privacyShield = UNPROTECTED,
             viewMode = ViewMode.Browser("example.com"),
             useLightAnimation = false,
-            isAddressBarRebrandEnabled = true,
         )
 
         verify(holder).setImageResource(R.drawable.shield_alert_24)
     }
-
-    @Test
-    fun whenBrandIconsDisabledAfterEnabledThenRestoreLegacyShield() = runTest {
-        val holder: LottieAnimationView = mock()
-        val context: Context = mock()
-        val drawable: Drawable = mock()
-        val customTab = ViewMode.CustomTab(0, "example.com", "example.com")
-        whenever(holder.context).thenReturn(context)
-        whenever(customTabShieldDrawableFactory.create(any(), eq(R.drawable.shield_alert_24), eq(false))).thenReturn(drawable)
-
-        testee.setAnimationView(
-            holder = holder,
-            privacyShield = UNPROTECTED,
-            viewMode = customTab,
-            useLightAnimation = false,
-            isAddressBarRebrandEnabled = true,
-        )
-        testee.setAnimationView(
-            holder = holder,
-            privacyShield = UNPROTECTED,
-            viewMode = customTab,
-            useLightAnimation = false,
-            isAddressBarRebrandEnabled = false,
-        )
-
-        verify(holder).setAnimation(R.raw.dark_unprotected_shield)
-    }
-
-    @Test
-    fun whenBrandIconsEnabledAndLegacyCustomTabThenStillUsesBoxedColorShield() {
-        assertEquals(
-            R.raw.shield_color_24 to true,
-            resolve(PROTECTED, isLegacyCustomTab = true),
-        )
-    }
-
-    @Test
-    fun whenBrandIconsDisabledAndProtectedThenTrackersShieldRegardlessOfTheme() {
-        assertEquals(
-            R.raw.address_bar_trackers_animation_shield to false,
-            resolve(PROTECTED, brandIconsEnabled = false),
-        )
-        assertEquals(
-            R.raw.address_bar_trackers_animation_shield to false,
-            resolve(PROTECTED, isLightMode = false, brandIconsEnabled = false),
-        )
-    }
-
-    @Test
-    fun whenBrandIconsDisabledAndLegacyCustomTabProtectedThenLegacyCustomTabShieldUnboxed() {
-        assertEquals(
-            R.raw.protected_shield_custom_tab to false,
-            resolve(PROTECTED, isLegacyCustomTab = true, brandIconsEnabled = false),
-        )
-    }
-
-    @Test
-    fun whenBrandIconsDisabledAndLegacyCustomTabProtectedDarkThenDarkLegacyCustomTabShieldUnboxed() {
-        assertEquals(
-            R.raw.dark_protected_shield_custom_tab to false,
-            resolve(PROTECTED, isLightMode = false, isLegacyCustomTab = true, brandIconsEnabled = false),
-        )
-    }
-
-    @Test
-    fun whenBrandIconsDisabledAndUnprotectedThenLegacyUnprotectedShieldUnboxed() {
-        assertEquals(
-            R.raw.unprotected_shield to false,
-            resolve(UNPROTECTED, brandIconsEnabled = false),
-        )
-    }
-
-    @Test
-    fun whenBrandIconsDisabledAndUnprotectedDarkThenDarkLegacyUnprotectedShieldUnboxed() {
-        assertEquals(
-            R.raw.dark_unprotected_shield to false,
-            resolve(UNPROTECTED, isLightMode = false, brandIconsEnabled = false),
-        )
-    }
-
-    @Test
-    fun whenBrandIconsDisabledAndMaliciousThenLegacyAlertRedUnboxed() {
-        assertEquals(
-            R.raw.alert_red to false,
-            resolve(MALICIOUS, brandIconsEnabled = false),
-        )
-    }
-
-    @Test
-    fun whenBrandIconsDisabledAndMaliciousDarkThenLegacyAlertRedDarkUnboxed() {
-        assertEquals(
-            R.raw.alert_red_dark to false,
-            resolve(MALICIOUS, isLightMode = false, brandIconsEnabled = false),
-        )
-    }
-
-    @Test
-    fun whenUnknownThenNoAsset() {
-        assertNull(resolve(UNKNOWN))
-        assertNull(resolve(UNKNOWN, brandIconsEnabled = false))
-    }
-
-    private fun resolve(
-        privacyShield: PrivacyShield,
-        isLightMode: Boolean = true,
-        isLegacyCustomTab: Boolean = false,
-        brandIconsEnabled: Boolean = true,
-    ) = testee.resolveShieldAsset(privacyShield, isLightMode, isLegacyCustomTab, brandIconsEnabled)
 }

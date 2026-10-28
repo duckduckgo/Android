@@ -21,9 +21,6 @@ import android.graphics.drawable.RippleDrawable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.impl.promotion.SyncPromotions
 import kotlinx.coroutines.flow.emptyFlow
@@ -45,20 +42,9 @@ class SetupSyncBookmarkAddedPromoRadiusTest {
     val coroutineTestRule = CoroutineTestRule()
 
     @Test
-    fun whenRadiusToggleIsDisabledThenPromoBackgroundAndRippleKeep8DpCorners() = runTest {
-        assertPromoRadii(radiusEnabled = false, expectedDp = 8f)
-    }
-
-    @Test
     @Config(qualifiers = "xhdpi")
-    fun whenRadiusToggleIsEnabledThenPromoBackgroundAndRippleUse16DpIndependentlyOfMenuRadius() = runTest {
-        assertPromoRadii(radiusEnabled = true, expectedDp = 16f)
-    }
-
-    private suspend fun assertPromoRadii(radiusEnabled: Boolean, expectedDp: Float) {
-        val toggles = FakeFeatureToggleFactory.create(AppBrandDesignUpdateToggles::class.java)
-        toggles.self().setRawStoredState(State(enable = true))
-        toggles.radius().setRawStoredState(State(enable = radiusEnabled))
+    fun whenPromoViewCreatedThenBackgroundAndRippleUse16DpCorners() = runTest {
+        val expectedDp = 16f
         val syncPromotions = mock<SyncPromotions>()
         whenever(syncPromotions.canShowBookmarkAddedDialogPromotion()).thenReturn(true)
         val syncStateMonitor = mock<SyncStateMonitor>()
@@ -81,18 +67,11 @@ class SetupSyncBookmarkAddedPromoRadiusTest {
                     syncPromotions = syncPromotions,
                     syncStateMonitor = syncStateMonitor,
                     syncPixels = mock(),
-                    appBrandDesignUpdateToggles = toggles,
                 )
                 val ripple = checkNotNull(promo.getView()).background as RippleDrawable
                 val mask = ripple.findDrawableByLayerId(android.R.id.mask) as GradientDrawable
                 val background = ripple.getDrawable(1) as GradientDrawable
                 val expectedRadius = expectedDp * activity.resources.displayMetrics.density
-                val menuRadius = activity.obtainStyledAttributes(intArrayOf(CommonR.attr.daxMenuRadius))
-                try {
-                    assertEquals(8f * activity.resources.displayMetrics.density, menuRadius.getDimension(0, 0f), 0f)
-                } finally {
-                    menuRadius.recycle()
-                }
 
                 assertEquals(expectedRadius, background.cornerRadius, 0f)
                 assertEquals(expectedRadius, mask.cornerRadius, 0f)

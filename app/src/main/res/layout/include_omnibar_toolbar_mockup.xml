@@ -27,7 +27,7 @@
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/mockOmniBarContainerShadow"
-        app:cardCornerRadius="@dimen/largeShapeCornerRadius"
+        app:cardCornerRadius="@dimen/rebrandInputRadius"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_marginStart="@dimen/omnibarCardMarginHorizontal"
@@ -44,6 +44,7 @@
             style="@style/Widget.DuckDuckGo.OmnibarCardView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:cardCornerRadius="@dimen/rebrandInputRadius"
             app:cardElevation="0dp">
 
             <LinearLayout

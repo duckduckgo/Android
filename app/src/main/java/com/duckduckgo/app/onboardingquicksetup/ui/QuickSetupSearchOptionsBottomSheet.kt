@@ -27,7 +27,6 @@ import com.duckduckgo.app.browser.databinding.BottomSheetQuickSetupSearchOptions
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.setRoundCorners
-import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.android.support.AndroidSupportInjection
@@ -44,9 +43,6 @@ class QuickSetupSearchOptionsBottomSheet : BottomSheetDialogFragment() {
 
     @Inject
     lateinit var appTheme: AppTheme
-
-    @Inject
-    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     private var initialWithAi: Boolean = true
     private var withAi: Boolean = true
@@ -70,9 +66,6 @@ class QuickSetupSearchOptionsBottomSheet : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?,
     ): View {
         val binding = BottomSheetQuickSetupSearchOptionsBinding.inflate(inflater, container, false)
-        if (appBrandDesignUpdateToggles.radius().isEnabled()) {
-            binding.root.applyRadiusOverlayToSheetBackground()
-        }
         this.binding = binding
 
         with(binding.inputScreenPicker) {
@@ -96,7 +89,7 @@ class QuickSetupSearchOptionsBottomSheet : BottomSheetDialogFragment() {
         return binding.root
     }
 
-    override fun getTheme(): Int = com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge
+    override fun getTheme(): Int = CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge
 
     override fun onCreateDialog(savedInstanceState: Bundle?): android.app.Dialog {
         val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog

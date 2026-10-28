@@ -26,30 +26,19 @@ import org.junit.runner.RunWith
 import org.robolectric.RuntimeEnvironment
 
 @RunWith(AndroidJUnit4::class)
-class CookieAnimationRadiusOverlayTest {
+class CookieAnimationRadiusTest {
 
     @Test
-    fun whenAddressBarRebrandIsDisabledThenGeneralRebrandOverlayKeepsLegacyCookieRadius() {
-        val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), R.style.Theme_DuckDuckGo_Light)
-        context.theme.applyStyle(R.style.ThemeOverlay_Rebrand, true)
+    fun whenLightAndDarkThemesThenCookieAnimationUsesRebrandInputRadius() {
+        listOf(R.style.Theme_DuckDuckGo_Light, R.style.Theme_DuckDuckGo_Dark).forEach { themeResId ->
+            val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), themeResId)
 
-        assertEquals(
-            context.resources.getDimension(R.dimen.cookiesAnimationRadius),
-            resolveDimension(context, R.attr.cookiesAnimationRadius),
-            0f,
-        )
-    }
-
-    @Test
-    fun whenAddressBarRebrandIsEnabledThenAddressBarAnimationOverlayUsesRebrandCookieRadius() {
-        val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), R.style.Theme_DuckDuckGo_Light)
-        context.theme.applyStyle(R.style.ThemeOverlay_Rebrand_AddressBarAnimation, true)
-
-        assertEquals(
-            context.resources.getDimension(R.dimen.rebrandInputRadius),
-            resolveDimension(context, R.attr.cookiesAnimationRadius),
-            0f,
-        )
+            assertEquals(
+                context.resources.getDimension(R.dimen.rebrandInputRadius),
+                resolveDimension(context, R.attr.cookiesAnimationRadius),
+                0f,
+            )
+        }
     }
 
     private fun resolveDimension(

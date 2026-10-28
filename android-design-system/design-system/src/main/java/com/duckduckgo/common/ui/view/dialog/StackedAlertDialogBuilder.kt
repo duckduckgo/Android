@@ -139,7 +139,7 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
      * Opts into the brand design update styling: a fixed-width card with wider corners, the header
      * image inside a circular container, and full-width buttons with centred labels.
      *
-     * Opt-in per dialog rather than driven by the ThemeOverlay.Rebrand overlay, so dialogs that have not been
+     * Opt-in per dialog rather than driven by the theme, so dialogs that have not been
      * redesigned keep their current appearance.
      *
      * Figma: https://www.figma.com/design/aMaDTBcE9Fsfu40NbjzcrH/Permission--iOS-Android-?node-id=1229-26621

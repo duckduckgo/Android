@@ -52,7 +52,6 @@ import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import com.duckduckgo.mobile.android.R as CommonR
 
 class AppComponentsActivity : AppCompatActivity() {
 
@@ -87,13 +86,7 @@ class AppComponentsActivity : AppCompatActivity() {
         val (selectedTheme, brandDesignUpdateEnabled) = runBlocking {
             val selectedTheme = appComponentsViewModel.themeFlow.first()
             val brandDesignUpdateEnabled = appComponentsViewModel.brandDesignUpdateFlow.first()
-            applyTheme(
-                selectedTheme,
-                applyBrandDesignUpdate = brandDesignUpdateEnabled,
-                overlayStyleIds = listOfNotNull(
-                    CommonR.style.ThemeOverlay_Rebrand_Radius.takeIf { brandDesignUpdateEnabled },
-                ),
-            )
+            applyTheme(selectedTheme)
             selectedTheme to brandDesignUpdateEnabled
         }
         super.onCreate(savedInstanceState)

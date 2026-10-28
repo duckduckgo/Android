@@ -21,11 +21,8 @@ import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewGroup
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.RelativeCornerSize
 import org.junit.Assert.assertEquals
@@ -35,84 +32,43 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RuntimeEnvironment
+import com.duckduckgo.mobile.android.R as CommonR
 
 @RunWith(AndroidJUnit4::class)
 class NativeInputModeWidgetShapeTest {
 
     @Test
-    fun `when address bar rebrand is disabled top browser search-only state uses legacy radius`() {
+    fun `when top browser search-only state is rendered it uses pill shape`() {
         val subject = createSubject()
 
-        subject.render(rebrandEnabled = false)
-
-        assertEquals(
-            subject.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius),
-            subject.cornerSize(),
-        )
-    }
-
-    @Test
-    fun `when address bar rebrand is enabled top browser search-only state uses pill shape`() {
-        val subject = createSubject()
-
-        subject.render(rebrandEnabled = true)
+        subject.render()
 
         assertTrue(subject.card.shapeAppearanceModel.topLeftCornerSize is RelativeCornerSize)
         assertEquals(32f, subject.cornerSize())
     }
 
     @Test
-    fun `when address bar rebrand is enabled bottom browser search-only state uses rebrand radius`() {
+    fun `when bottom browser search-only state is rendered it uses rebrand radius`() {
         val subject = createSubject(inputPosition = NativeInputState.InputPosition.BOTTOM)
 
-        subject.render(rebrandEnabled = true)
+        subject.render()
 
         assertEquals(
-            subject.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.rebrandInputRadius),
+            subject.context.resources.getDimension(CommonR.dimen.rebrandInputRadius),
             subject.card.radius,
         )
         assertFalse(subject.card.useCompatPadding)
     }
 
     @Test
-    fun `when address bar rebrand is disabled bottom browser search-only state uses legacy radius`() {
-        val subject = createSubject(inputPosition = NativeInputState.InputPosition.BOTTOM)
-
-        subject.render(rebrandEnabled = false)
-
-        assertEquals(
-            subject.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius),
-            subject.cornerSize(),
-        )
-    }
-
-    @Test
-    fun `enabling address bar rebrand preserves top browser search-only geometry`() {
-        val subject = createSubject()
-
-        subject.render(rebrandEnabled = false)
-        val legacyHeight = subject.measureHeight()
-        val legacyPaddingTop = subject.card.paddingTop
-        val legacyTop = subject.visibleTop()
-        assertTrue(legacyPaddingTop > 0)
-
-        subject.render(rebrandEnabled = true)
-
-        assertTrue(subject.card.useCompatPadding)
-        assertEquals(legacyHeight, subject.measureHeight())
-        assertEquals(legacyPaddingTop, subject.card.paddingTop)
-        assertEquals(legacyTop, subject.visibleTop())
-    }
-
-    @Test
     fun `when top browser search-only transitions to bottom Duck AI it restores the fixed corner radius`() {
         val subject = createSubject()
 
-        subject.render(rebrandEnabled = true)
+        subject.render()
         subject.renderDuckAi()
 
         assertEquals(
-            subject.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.extraLargeShapeCornerRadius),
+            subject.context.resources.getDimension(CommonR.dimen.extraLargeShapeCornerRadius),
             subject.cornerSize(),
         )
     }
@@ -121,37 +77,11 @@ class NativeInputModeWidgetShapeTest {
     fun `when bottom browser search-only transitions to bottom Duck AI it restores the fixed corner radius`() {
         val subject = createSubject(inputPosition = NativeInputState.InputPosition.BOTTOM)
 
-        subject.render(rebrandEnabled = true)
+        subject.render()
         subject.renderDuckAi()
 
         assertEquals(
-            subject.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.extraLargeShapeCornerRadius),
-            subject.cornerSize(),
-        )
-    }
-
-    @Test
-    fun `when address bar rebrand is disabled bottom Duck AI uses extra large radius`() {
-        val subject = createSubject(inputPosition = NativeInputState.InputPosition.BOTTOM)
-
-        subject.render(rebrandEnabled = false)
-        subject.renderDuckAi()
-
-        assertEquals(
-            subject.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.extraLargeShapeCornerRadius),
-            subject.cornerSize(),
-        )
-    }
-
-    @Test
-    fun `when rebrand changes from enabled to disabled top browser search-only restores the fixed corner radius`() {
-        val subject = createSubject()
-
-        subject.render(rebrandEnabled = true)
-        subject.render(rebrandEnabled = false)
-
-        assertEquals(
-            subject.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius),
+            subject.context.resources.getDimension(CommonR.dimen.extraLargeShapeCornerRadius),
             subject.cornerSize(),
         )
     }
@@ -165,7 +95,7 @@ class NativeInputModeWidgetShapeTest {
         }
         val originalShape = subject.card.shapeAppearanceModel
 
-        subject.render(rebrandEnabled = true)
+        subject.render()
 
         assertSame(originalShape, subject.card.shapeAppearanceModel)
     }
@@ -173,7 +103,7 @@ class NativeInputModeWidgetShapeTest {
     private fun createSubject(inputPosition: NativeInputState.InputPosition = NativeInputState.InputPosition.TOP): Subject {
         val context = ContextThemeWrapper(
             RuntimeEnvironment.getApplication(),
-            com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Light,
+            CommonR.style.Theme_DuckDuckGo_Light,
         )
         val isBottom = inputPosition == NativeInputState.InputPosition.BOTTOM
         val elevation = (if (isBottom) 3f else 6f) * context.resources.displayMetrics.density
@@ -182,12 +112,10 @@ class NativeInputModeWidgetShapeTest {
             useCompatPadding = !isBottom
             maxCardElevation = elevation
             cardElevation = elevation
-            radius = context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
+            radius = context.resources.getDimension(CommonR.dimen.largeShapeCornerRadius)
         }
         val widget = NativeInputModeWidget(context)
         card.addView(widget)
-        val toggles = FakeFeatureToggleFactory.create(AppBrandDesignUpdateToggles::class.java)
-        widget.appBrandDesignUpdateToggles = toggles
         NativeInputModeWidget::class.java.getDeclaredField("nativeInputState").apply {
             isAccessible = true
             set(
@@ -207,21 +135,19 @@ class NativeInputModeWidgetShapeTest {
         val heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
         val sampleBounds = RectF(0f, 0f, 200f, 64f)
 
-        return Subject(context, card, widget, toggles, applyOmnibarShape, widthSpec, heightSpec, sampleBounds)
+        return Subject(context, card, widget, applyOmnibarShape, widthSpec, heightSpec, sampleBounds)
     }
 
     private data class Subject(
         val context: ContextThemeWrapper,
         val card: MaterialCardView,
         val widget: NativeInputModeWidget,
-        val toggles: AppBrandDesignUpdateToggles,
         val applyOmnibarShape: java.lang.reflect.Method,
         val widthSpec: Int,
         val heightSpec: Int,
         val sampleBounds: RectF,
     ) {
-        fun render(rebrandEnabled: Boolean) {
-            toggles.addressBar().setRawStoredState(State(enable = rebrandEnabled))
+        fun render() {
             applyOmnibarShape.invoke(widget)
         }
 
