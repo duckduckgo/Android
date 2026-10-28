@@ -23,7 +23,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
-import com.duckduckgo.sync.impl.metrics.ConnectedDevicesObserver
 import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel
@@ -31,7 +30,9 @@ import com.duckduckgo.sync.store.SyncStore
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.logcat
 import java.util.concurrent.atomic.AtomicReference
@@ -45,13 +46,24 @@ interface ConnectedDevicesRepository {
      * [AccountErrorCodes.GENERIC_ERROR] for everything else, such as no connection, an empty response, or missing credentials.
      */
     fun getConnectedDevices(): Result<List<ConnectedDevice>>
+
+    /**
+     * Lets callers observe how many devices are on the sync account, this one included, without fetching the device list.
+     * The count reflects the last successful [getConnectedDevices], so it can be stale until the next one, and is 0 when this
+     * device is signed out.
+     */
+    fun latestConnectedDeviceCountFlow(): Flow<Int>
+
+    /**
+     * The current value of [latestConnectedDeviceCountFlow], for callers that need it once without collecting.
+     */
+    suspend fun latestConnectedDeviceCount(): Int
 }
 
 @ContributesBinding(AppScope::class)
 @SingleIn(AppScope::class)
 @WorkerThread
 class RealConnectedDevicesRepository @Inject constructor(
-    private val connectedDevicesObserver: ConnectedDevicesObserver,
     private val syncDeviceIds: SyncDeviceIds,
     private val nativeLib: SyncLib,
     private val syncApi: SyncApi,
@@ -73,17 +85,32 @@ class RealConnectedDevicesRepository @Inject constructor(
     // Same latch shape for a missing ddg account_info wrap. Released on failure so the next list load can retry.
     private val repairedAccountInfoDdgWrapForUserId = AtomicReference<String?>(null)
 
+    override fun latestConnectedDeviceCountFlow(): Flow<Int> = syncStore.connectedDevicesCountFlow()
+
+    override suspend fun latestConnectedDeviceCount(): Int {
+        return withContext(dispatcherProvider.io()) {
+            syncStore.connectedDevicesCount
+        }
+    }
+
     override fun getConnectedDevices(): Result<List<ConnectedDevice>> {
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
             ?: return Error(reason = "Token Empty")
         val primaryKey = syncStore.primaryKey.takeUnless { it.isNullOrEmpty() }
             ?: return Error(reason = "PrimaryKey not found")
 
-        return if (syncFeature.canUseV2ConnectFlow().isEnabled()) {
+        val userId = syncStore.userId
+        val result = if (syncFeature.canUseV2ConnectFlow().isEnabled()) {
             getConnectedDevicesV2(token, primaryKey)
         } else {
             getConnectedDevicesLegacy(token, primaryKey)
         }
+        // A fetch can still be in flight when the user signs out or switches account. Comparing the user id covers both: sign-out clears
+        // it and a switch replaces it, so we never undo the reset to 0 or write the old account's count over the new one.
+        if (result is Success && userId != null && syncStore.userId == userId) {
+            syncStore.connectedDevicesCount = result.data.size
+        }
+        return result
     }
 
     private fun getConnectedDevicesV2(
@@ -249,11 +276,7 @@ class RealConnectedDevicesRepository @Inject constructor(
         deviceType = type?.takeUnless { it.isEmpty() }?.let { DeviceType(it) } ?: DeviceType(),
     )
 
-    private fun finishWith(devices: List<ConnectedDevice>): Result<List<ConnectedDevice>> {
-        val sorted = devices.sortedByDescending { it.thisDevice }
-        connectedDevicesObserver.onDevicesUpdated(sorted)
-        return Success(sorted)
-    }
+    private fun finishWith(devices: List<ConnectedDevice>): Result<List<ConnectedDevice>> = Success(devices.sortedByDescending { it.thisDevice })
 
     private fun Error.alsoFireAccountErrorPixel(): Error {
         syncPixels.fireSyncAccountErrorPixel(this, SyncAccountOperation.GENERIC)

@@ -41,11 +41,12 @@ import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.AccountErrorCodes.GENERIC_ERROR
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
-import com.duckduckgo.sync.impl.metrics.ConnectedDevicesObserver
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel
 import com.duckduckgo.sync.store.AccountInfoPublicKey
 import com.duckduckgo.sync.store.SyncStore
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -71,7 +72,6 @@ class RealConnectedDevicesRepositoryTest {
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
 
-    private val connectedDevicesObserver: ConnectedDevicesObserver = mock()
     private val syncDeviceIds: SyncDeviceIds = mock()
     private val nativeLib: SyncLib = mock()
     private val syncApi: SyncApi = mock()
@@ -89,7 +89,6 @@ class RealConnectedDevicesRepositoryTest {
     @Before
     fun before() {
         testee = RealConnectedDevicesRepository(
-            connectedDevicesObserver = connectedDevicesObserver,
             syncDeviceIds = syncDeviceIds,
             nativeLib = nativeLib,
             syncApi = syncApi,
@@ -122,7 +121,8 @@ class RealConnectedDevicesRepositoryTest {
     }
 
     @Test
-    fun getConnectedDevicesSucceedsThenNotifyDevicesObserver() {
+    fun getConnectedDevicesSucceedsThenUpdateDevicesCount() {
+        whenever(syncStore.userId).thenReturn(userId)
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(syncStore.deviceId).thenReturn(deviceId)
@@ -131,7 +131,7 @@ class RealConnectedDevicesRepositoryTest {
 
         val result = testee.getConnectedDevices() as Success
 
-        verify(connectedDevicesObserver).onDevicesUpdated(any())
+        verify(syncStore).connectedDevicesCount = result.data.size
     }
 
     @Test
@@ -176,6 +176,62 @@ class RealConnectedDevicesRepositoryTest {
         val result = testee.getConnectedDevices() as Error
 
         assertEquals(getDevicesError.code, result.code)
+    }
+
+    @Test
+    fun latestConnectedDeviceCountFlowReturnsStoredCount() = runTest {
+        whenever(syncStore.connectedDevicesCountFlow()).thenReturn(flowOf(3))
+
+        assertEquals(3, testee.latestConnectedDeviceCountFlow().first())
+    }
+
+    @Test
+    fun latestConnectedDeviceCountReturnsStoredCount() = runTest {
+        whenever(syncStore.connectedDevicesCount).thenReturn(3)
+
+        assertEquals(3, testee.latestConnectedDeviceCount())
+    }
+
+    @Test
+    fun getConnectedDevicesRejectedByServerThenKeepDevicesCount() {
+        givenDeviceListRequest()
+        whenever(syncApi.getDevices(anyString())).thenReturn(getDevicesError)
+
+        testee.getConnectedDevices()
+
+        verify(syncStore, never()).connectedDevicesCount = any()
+    }
+
+    @Test
+    fun getConnectedDevicesFailsWithoutServerResponseThenKeepDevicesCount() {
+        givenDeviceListRequest()
+        whenever(syncApi.getDevices(anyString())).thenReturn(Error(reason = "timeout"))
+
+        testee.getConnectedDevices()
+
+        verify(syncStore, never()).connectedDevicesCount = any()
+    }
+
+    @Test
+    fun whenFetchCompletesAfterSignOutThenDevicesCountNotUpdated() {
+        givenDeviceListRequest()
+        whenever(syncApi.getDevices(anyString())).thenReturn(getDevicesSuccess)
+        whenever(syncStore.userId).thenReturn(userId, null)
+
+        testee.getConnectedDevices()
+
+        verify(syncStore, never()).connectedDevicesCount = any()
+    }
+
+    @Test
+    fun whenFetchCompletesAfterAccountSwitchThenDevicesCountNotUpdated() {
+        givenDeviceListRequest()
+        whenever(syncApi.getDevices(anyString())).thenReturn(getDevicesSuccess)
+        whenever(syncStore.userId).thenReturn(userId, "anotherUserId")
+
+        testee.getConnectedDevices()
+
+        verify(syncStore, never()).connectedDevicesCount = any()
     }
 
     @Test
@@ -589,6 +645,13 @@ class RealConnectedDevicesRepositoryTest {
                 keyUnavailableReason = AccountInfoKeyUnavailableReason.NO_WRAP_FOR_OUR_CREDENTIAL,
             ),
         )
+    }
+
+    private fun givenDeviceListRequest() {
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncStore.primaryKey).thenReturn(primaryKey)
+        whenever(syncStore.deviceId).thenReturn(deviceId)
+        prepareForEncryption()
     }
 
     private fun givenAuthenticatedDevice() {

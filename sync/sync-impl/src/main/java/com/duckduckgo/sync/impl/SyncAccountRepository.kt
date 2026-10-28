@@ -17,14 +17,17 @@
 package com.duckduckgo.sync.impl
 
 import android.util.Base64
-import androidx.annotation.*
+import androidx.annotation.WorkerThread
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.*
-import com.duckduckgo.sync.api.engine.*
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
-import com.duckduckgo.sync.crypto.*
+import com.duckduckgo.sync.crypto.AccountKeys
+import com.duckduckgo.sync.crypto.LoginKeys
+import com.duckduckgo.sync.crypto.SyncCryptoResult
+import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.API_CODE.GONE
 import com.duckduckgo.sync.impl.API_CODE.NOT_FOUND
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
@@ -34,7 +37,9 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.EXCHANGE_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.GENERIC_ERROR
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
-import com.duckduckgo.sync.impl.ExchangeResult.*
+import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
+import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
+import com.duckduckgo.sync.impl.ExchangeResult.Pending
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
@@ -43,12 +48,18 @@ import com.duckduckgo.sync.impl.SyncAuthCode.Exchange
 import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
 import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
-import com.duckduckgo.sync.impl.pixels.*
+import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
+import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel
+import com.duckduckgo.sync.impl.pixels.toAccountInfoKeyCreateFailureReason
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
-import com.duckduckgo.sync.store.*
-import com.squareup.moshi.*
+import com.duckduckgo.sync.store.ScopedPassword
+import com.duckduckgo.sync.store.SyncStore
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
@@ -63,7 +74,7 @@ import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 import java.util.UUID
-import javax.inject.*
+import javax.inject.Inject
 
 interface SyncAccountRepository {
 
@@ -191,8 +202,6 @@ class AppSyncAccountRepository @Inject constructor(
      */
     private var exchangeDeviceDetailsAsInviter: DeviceDetailsForKeyExchange? = null
     private var exchangeDeviceDetailsAsReceiver: DeviceDetailsForKeyExchange? = null
-
-    private val connectedDevicesCached: MutableList<ConnectedDevice> = mutableListOf()
 
     override fun isSyncSupported(): Boolean {
         return syncStore.isEncryptionSupported()
@@ -385,7 +394,8 @@ class AppSyncAccountRepository @Inject constructor(
         if (isSignedIn()) {
             val allowSwitchAccount = syncFeature.seamlessAccountSwitching().isEnabled()
             val error = Error(code = ALREADY_SIGNED_IN.code, reason = "Already signed in").alsoFireAlreadySignedInErrorPixel()
-            if (allowSwitchAccount && connectedDevicesCached.size == 1) {
+            val deviceCount = runBlocking { connectedDevicesRepository.latestConnectedDeviceCount() }
+            if (allowSwitchAccount && deviceCount == 1) {
                 val thisDeviceId = syncStore.deviceId.orEmpty()
                 val result = logout(thisDeviceId)
                 if (result is Error) {
@@ -928,7 +938,8 @@ class AppSyncAccountRepository @Inject constructor(
     }
 
     override fun deleteAccount(): Result<Boolean> {
-        syncPixels.fireUserConfirmedToTurnOffSyncAndDelete(connectedDevicesCached.size)
+        val deviceCount = runBlocking { connectedDevicesRepository.latestConnectedDeviceCount() }
+        syncPixels.fireUserConfirmedToTurnOffSyncAndDelete(deviceCount)
 
         val token = syncStore.token.takeUnless {
             it.isNullOrEmpty()
@@ -962,17 +973,8 @@ class AppSyncAccountRepository @Inject constructor(
 
     override fun getConnectedDevices(): Result<List<ConnectedDevice>> =
         when (val result = connectedDevicesRepository.getConnectedDevices()) {
-            is Error -> {
-                connectedDevicesCached.clear()
-                result.copy(code = GENERIC_ERROR.code)
-            }
-            is Success -> {
-                connectedDevicesCached.apply {
-                    clear()
-                    addAll(result.data)
-                }
-                result
-            }
+            is Error -> result.copy(code = GENERIC_ERROR.code)
+            is Success -> result
         }
 
     override fun isSignedIn() = syncStore.isSignedIn()
