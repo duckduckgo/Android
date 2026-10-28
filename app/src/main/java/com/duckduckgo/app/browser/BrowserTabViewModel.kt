@@ -224,6 +224,7 @@ import com.duckduckgo.app.browser.pdf.PdfDownloadTooltipDataStore
 import com.duckduckgo.app.browser.pdf.PdfErrorType
 import com.duckduckgo.app.browser.pdf.PdfPixelName
 import com.duckduckgo.app.browser.pdf.PdfRenderDecision
+import com.duckduckgo.app.browser.progressbar.NavigationProgressState
 import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.returnsession.ReturnSessionLandingListener
@@ -800,10 +801,7 @@ class BrowserTabViewModel @Inject constructor(
     // Needed for PageLoadWideEvent: it identifies which page load the progress events belong to.
     private var pageLoadNavigationId: Long? = null
     private var hasExitedFixedProgress = false
-    private var hasCompletedPageLoad = false
-
-    // Loading was started at the user's intent (link tap / submit) and no main-frame commit has happened yet.
-    private var isNavigationPendingCommit = false
+    private var navigationState = NavigationProgressState()
 
     private var allowlistRefreshTriggerJob: Job? = null
     private var refreshTriggerJob: Job? = null
@@ -1745,7 +1743,7 @@ class BrowserTabViewModel @Inject constructor(
     override fun willOverrideUrl(newUrl: String) {
         site?.nextUrl = newUrl
         // Link tap: shouldOverrideUrlLoading fires here, well before pageStarted, open the gate now
-        onNavigationRequested()
+        navigationState = navigationState.onNavigationRequested(isStartProgressAtIntentEnabled())
         logcat { "SSLError: willOverride is $newUrl" }
         navigationAwareLoginDetector.onEvent(NavigationEvent.Redirect(newUrl))
         val previousSiteStillLoading = currentLoadingViewState().isLoading && !isAwaitingCommitAtIntent()
@@ -2197,7 +2195,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onPageContentStart(url: String) {
-        onNavigationCommitted()
+        navigationState = navigationState.onNavigationCommitted(isStartProgressAtIntentEnabled())
         showWebContent()
     }
 
@@ -2210,66 +2208,30 @@ class BrowserTabViewModel @Inject constructor(
         progressBarUpgradeFeature.behaviourUpdate().isEnabled() && progressBarUpgradeFeature.startProgressAtIntent().isEnabled()
 
     // Pending state is only meaningful with the flag on, so every read goes through here
-    private fun isAwaitingCommitAtIntent() = isStartProgressAtIntentEnabled() && isNavigationPendingCommit
+    private fun isAwaitingCommitAtIntent() = navigationState.isAwaitingCommitAtIntent(isStartProgressAtIntentEnabled())
 
     // User tapped a link or submitted a URL that will load in this tab
     private fun onNavigationIntent(url: String) {
         if (!isStartProgressAtIntentEnabled()) return
         if (!isSameDocumentNavigation(url)) {
-            onNavigationRequested()
+            navigationState = navigationState.onNavigationRequested(isStartProgressAtIntentEnabled())
             onNavigationPendingCommit()
         }
     }
 
-    // The WebView reports a link tap well before the navigation is decided, so only the gate reopens here
-    private fun onNavigationRequested() {
-        if (isStartProgressAtIntentEnabled()) hasCompletedPageLoad = false
-    }
-
     // The navigation is confirmed to load in this tab: show the bar until it commits
     private fun onNavigationPendingCommit() {
-        if (!isStartProgressAtIntentEnabled()) return
-        val isAlreadyLoading = currentLoadingViewState().isLoading
-        isNavigationPendingCommit = true
-        // Restarting a running bar would show a second cycle
-        if (!isAlreadyLoading) startLoading(initialProgress = 0)
-    }
-
-    // The new page committed: its progress drives the bar from now on
-    private fun onNavigationCommitted() {
-        hasCompletedPageLoad = false
-        if (isStartProgressAtIntentEnabled()) isNavigationPendingCommit = false
-    }
-
-    // Another load (committed main frame, error page or follow-up) now owns the bar, so the outgoing page's progress is no longer held back
-    private fun releasePendingNavigation() {
-        if (!isStartProgressAtIntentEnabled()) return
-        isNavigationPendingCommit = false
+        val startAtIntent = isStartProgressAtIntentEnabled()
+        navigationState = navigationState.onNavigationPendingCommit(startAtIntent)
+        if (!startAtIntent) return
+        currentLoadingViewState().onIntentStart()?.let { loadingViewState.value = it }
     }
 
     // The navigation won't commit in this tab (external app, download, SSL warning, timeout, home), so end the bar we started
     private fun onNavigationAbandoned() {
         if (!isAwaitingCommitAtIntent()) return
-        isNavigationPendingCommit = false
-        // Progress stays 0 while pending, so a non-zero value means the bar belongs to a page that is still loading
-        if (currentLoadingViewState().progress == 0) finishLoading()
-    }
-
-    // An error page replaces the load, so the gate reopens and the pending navigation ends
-    private fun onErrorReceived() {
-        if (!isStartProgressAtIntentEnabled()) return
-        onPageChanged()
-        releasePendingNavigation()
-    }
-
-    // The page reached 100%: later iframe/sub-resource progress must not bring the bar back
-    private fun onPageLoadCompleted() {
-        hasCompletedPageLoad = true
-    }
-
-    // The page URL changed without a new load start, so the previous completion must not suppress its progress
-    private fun onPageChanged() {
-        hasCompletedPageLoad = false
+        navigationState = navigationState.onNavigationAbandoned(isStartProgressAtIntentEnabled())
+        currentLoadingViewState().onNavigationAbandoned()?.let { loadingViewState.value = it }
     }
 
     private fun startLoading(
@@ -2496,7 +2458,7 @@ class BrowserTabViewModel @Inject constructor(
 
         isProcessingTrackingLink = false
         isLinkOpenedInNewTab = false
-        onPageChanged()
+        navigationState = navigationState.onPageChanged()
 
         automaticSavedLoginsMonitor.clearAutoSavedLoginId(tabId)
     }
@@ -2730,7 +2692,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onMainFrameLoadStarted(navigationId: Long) {
-        releasePendingNavigation()
+        // The new load now owns the bar, so the outgoing page's progress is no longer held back
+        navigationState = navigationState.releasePendingNavigation(isStartProgressAtIntentEnabled())
         pageLoadNavigationId = navigationId
         hasExitedFixedProgress = false
         errorPagePendingDismissal = currentBrowserViewState().browserError != OMITTED
@@ -2784,7 +2747,7 @@ class BrowserTabViewModel @Inject constructor(
 
         // Once a page load completes, ignore subsequent progress events (iframes, subresources)
         // until a new navigation starts (pageStarted/onPageContentStart resets hasCompletedPageLoad)
-        if (progressBarUpgradeFeature.behaviourUpdate().isEnabled() && hasCompletedPageLoad) return
+        if (navigationState.ignoresProgress(progressBarUpgradeFeature.behaviourUpdate().isEnabled())) return
 
         val isLoading = newProgress < 100 || isProcessingTrackingLink
         val progress = currentLoadingViewState()
@@ -2806,7 +2769,7 @@ class BrowserTabViewModel @Inject constructor(
         updateLoadingProgress(isLoading, reportedProgress)
 
         if (newProgress == 100) {
-            onPageLoadCompleted()
+            navigationState = navigationState.onPageLoadCompleted()
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
         }
@@ -2903,7 +2866,7 @@ class BrowserTabViewModel @Inject constructor(
                 maliciousSiteBlocked = false,
             )
         navigationStateChanged(webViewNavigationState)
-        onNavigationCommitted()
+        navigationState = navigationState.onNavigationCommitted(isStartProgressAtIntentEnabled())
         resetCompletedProgress()
 
         command.value = Command.PageStarted
@@ -4866,7 +4829,8 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         errorCode: String,
     ) {
-        onErrorReceived()
+        // An error page replaces the load: reopen the gate and end the pending navigation
+        navigationState = navigationState.onErrorReceived(isStartProgressAtIntentEnabled())
         if (errorType != OMITTED) {
             errorPagePendingDismissal = false
             browserViewState.value =
