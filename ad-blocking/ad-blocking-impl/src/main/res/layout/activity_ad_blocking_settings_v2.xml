@@ -136,16 +136,14 @@
                 app:textType="secondary"
                 app:typography="body2" />
 
-            <com.duckduckgo.common.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.button.DaxButtonGhost
                 android:id="@+id/duckPlayerSettingsLink"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_4"
+                android:layout_marginHorizontal="@dimen/keyline_2"
                 android:layout_marginTop="@dimen/keyline_4"
                 android:text="@string/ad_blocking_settings_duck_player_link"
-                android:textColor="?attr/daxColorAccentBlue"
                 android:visibility="gone"
-                app:typography="body2"
                 tools:visibility="visible" />
 
         </LinearLayout>
