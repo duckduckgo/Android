@@ -159,17 +159,4 @@
     <string name="subscriptionOnboardingSettingsCardDescription">Some premium protections aren\'t active yet.</string>
     <string name="subscriptionOnboardingSettingsCardButton">Continue Setup</string>
 
-    <!-- Right of withdrawal -->
-    <string name="subscriptionSettingWithdraw">Withdraw from Contract</string>
-    <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">You can withdraw and get a full refund until %1$s</string>
-    <string name="subscriptionWithdrawDialogTitle">Withdraw from your subscription?</string>
-    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Your %1$s subscription will end right away and you\'ll be refunded %2$s to your original payment method within 14 days.\n\nVPN, Personal Information Removal and advanced Duck.ai models stop working once you confirm.</string>
-    <string name="subscriptionWithdrawDialogConfirm">Confirm Withdrawal</string>
-    <string name="subscriptionWithdrawDialogKeep">Keep Subscription</string>
-    <string name="subscriptionStatusNotSubscribed">Not Subscribed</string>
-    <string name="subscriptionWithdrawnTitle" instruction="Placeholder is the date the user withdrew from their subscription, e.g. October 6, 2026">You withdrew on %1$s.</string>
-    <string name="subscriptionWithdrawnRefund" instruction="Placeholder is the refund amount with currency, e.g. €9.99">Your refund of %1$s is being processed.</string>
-    <string name="subscriptionWithdrawnRefundWithoutAmount">Your refund is being processed.</string>
-    <string name="subscriptionWithdrawErrorAlert">We couldn\'t process your withdrawal automatically. Please visit <annotation type="withdrawal_help_link">this page</annotation> to complete your withdrawal.</string>
-
 </resources>
