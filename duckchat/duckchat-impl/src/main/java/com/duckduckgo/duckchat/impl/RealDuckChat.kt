@@ -960,16 +960,30 @@ class RealDuckChat @Inject constructor(
         duckChatFeatureRepository.setLastUsedTogglePosition(position)
     }
 
-    override fun resolvedTogglePosition(): NativeInputState.ToggleSelection {
-        val defaultPosition = DefaultTogglePosition.fromName(duckChatFeatureRepository.observeDefaultTogglePosition().value)
-        val configured = if (defaultPosition == DefaultTogglePosition.LAST_USED) {
-            DefaultTogglePosition.fromName(duckChatFeatureRepository.observeLastUsedTogglePosition().value)
-        } else {
-            defaultPosition
-        }
+    override fun resolvedTogglePosition(): NativeInputState.ToggleSelection = toggleSelectionFor(
+        defaultPosition = duckChatFeatureRepository.observeDefaultTogglePosition().value,
+    ) { duckChatFeatureRepository.observeLastUsedTogglePosition().value }
+
+    override suspend fun getInitialToggleSelection(): NativeInputState.ToggleSelection = withContext(dispatchers.io()) {
+        toggleSelectionFor(
+            defaultPosition = duckChatFeatureRepository.getDefaultTogglePosition(),
+        ) { duckChatFeatureRepository.getLastUsedTogglePosition() }
+    }
+
+    private inline fun toggleSelectionFor(defaultPosition: String?, lastUsedPosition: () -> String?): NativeInputState.ToggleSelection {
+        val default = DefaultTogglePosition.fromName(defaultPosition)
+        val configured = if (default == DefaultTogglePosition.LAST_USED) DefaultTogglePosition.fromName(lastUsedPosition()) else default
         return when (configured) {
             DefaultTogglePosition.DUCK_AI -> NativeInputState.ToggleSelection.DUCK_AI
             else -> NativeInputState.ToggleSelection.SEARCH
+        }
+    }
+
+    override suspend fun getSelectedInputMode(): NativeInputState.InputMode = withContext(dispatchers.io()) {
+        if (duckChatFeatureRepository.isDuckChatUserEnabled() && duckChatFeatureRepository.isInputScreenUserSettingEnabled()) {
+            NativeInputState.InputMode.SEARCH_AND_DUCK_AI
+        } else {
+            NativeInputState.InputMode.SEARCH_ONLY
         }
     }
 

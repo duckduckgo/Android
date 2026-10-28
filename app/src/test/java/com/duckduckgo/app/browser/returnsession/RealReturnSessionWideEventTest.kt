@@ -23,7 +23,10 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.CompletableDeferred
@@ -59,6 +62,7 @@ class RealReturnSessionWideEventTest {
     private val wideEventClient: WideEventClient = mock()
     private val settingsDataStore: SettingsDataStore = mock()
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore = mock()
+    private val duckChatInputModeState: DuckChatInputModeState = mock()
 
     // MutableSharedFlow, not StateFlow: needs to be able to re-emit the same value (simulating the
     // underlying DataStore re-emitting on an unrelated Preferences write) without built-in dedup.
@@ -72,6 +76,7 @@ class RealReturnSessionWideEventTest {
         "after_idle" to "false",
         "landed_on" to "ntp_user_initiated",
         "status_reason" to "app_terminated",
+        "toggle_enabled" to "false",
     )
 
     @Before
@@ -80,6 +85,8 @@ class RealReturnSessionWideEventTest {
         whenever(showOnAppLaunchOptionDataStore.optionFlow).thenReturn(optionFlow)
         whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(0L)
         returnSessionWideEventFeature.self().setRawStoredState(Toggle.State(true))
+        whenever(duckChatInputModeState.getSelectedInputMode()).thenReturn(NativeInputState.InputMode.SEARCH_ONLY)
+        whenever(duckChatInputModeState.getInitialToggleSelection()).thenReturn(NativeInputState.ToggleSelection.SEARCH)
 
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(Result.success(123L))
         whenever(wideEventClient.intervalStart(any(), any(), anyOrNull(), anyOrNull())).thenReturn(Result.success(Unit))
@@ -97,6 +104,7 @@ class RealReturnSessionWideEventTest {
         settingsDataStore = settingsDataStore,
         showOnAppLaunchOptionDataStore = showOnAppLaunchOptionDataStore,
         returnSessionWideEventFeature = lazy { returnSessionWideEventFeature },
+        duckChatInputModeState = duckChatInputModeState,
         dispatchers = coroutineRule.testDispatcherProvider,
         appCoroutineScope = coroutineRule.testScope,
     )
@@ -277,6 +285,71 @@ class RealReturnSessionWideEventTest {
             metadata = eq(defaultMetadata),
             cleanupPolicy = any(),
             samplingProbability = eq(1.0f),
+            definition = any(),
+        )
+    }
+
+    @Test
+    fun `when session starts then it declares definition version 1_0_1`() = runTest {
+        startSession()
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(wideEventClient).flowStart(
+            name = any(),
+            flowEntryPoint = anyOrNull(),
+            metadata = any(),
+            cleanupPolicy = any(),
+            samplingProbability = any(),
+            definition = eq(WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1))),
+        )
+    }
+
+    @Test
+    fun `when user selected search only then toggle_enabled is false and toggle_position is omitted`() = runTest {
+        startSession()
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(wideEventClient).flowStart(
+            name = any(),
+            flowEntryPoint = anyOrNull(),
+            metadata = eq(defaultMetadata),
+            cleanupPolicy = any(),
+            samplingProbability = any(),
+            definition = any(),
+        )
+    }
+
+    @Test
+    fun `when user selected search and duck ai opening on search then toggle_position is search`() = runTest {
+        whenever(duckChatInputModeState.getSelectedInputMode()).thenReturn(NativeInputState.InputMode.SEARCH_AND_DUCK_AI)
+
+        startSession()
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(wideEventClient).flowStart(
+            name = any(),
+            flowEntryPoint = anyOrNull(),
+            metadata = eq(defaultMetadata + mapOf("toggle_enabled" to "true", "toggle_position" to "search")),
+            cleanupPolicy = any(),
+            samplingProbability = any(),
+            definition = any(),
+        )
+    }
+
+    @Test
+    fun `when user selected search and duck ai opening on duck ai then toggle_position is duck_ai`() = runTest {
+        whenever(duckChatInputModeState.getSelectedInputMode()).thenReturn(NativeInputState.InputMode.SEARCH_AND_DUCK_AI)
+        whenever(duckChatInputModeState.getInitialToggleSelection()).thenReturn(NativeInputState.ToggleSelection.DUCK_AI)
+
+        startSession()
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(wideEventClient).flowStart(
+            name = any(),
+            flowEntryPoint = anyOrNull(),
+            metadata = eq(defaultMetadata + mapOf("toggle_enabled" to "true", "toggle_position" to "duck_ai")),
+            cleanupPolicy = any(),
+            samplingProbability = any(),
             definition = any(),
         )
     }

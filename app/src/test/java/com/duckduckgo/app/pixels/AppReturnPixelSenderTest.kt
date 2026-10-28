@@ -28,7 +28,6 @@ import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -61,10 +60,10 @@ class AppReturnPixelSenderTest {
     private lateinit var testee: RealAppReturnPixelSender
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
         whenever(idleThresholdResolver.effectiveThresholdSeconds(anyOrNull())).thenReturn(1800L)
         whenever(showOnAppLaunchOptionDataStore.optionFlow).thenReturn(flowOf(ShowOnAppLaunchOption.NewTabPage))
-        whenever(duckChatInputModeState.inputModeCapability).thenReturn(MutableStateFlow(NativeInputState.InputMode.SEARCH_ONLY))
+        whenever(duckChatInputModeState.getSelectedInputMode()).thenReturn(NativeInputState.InputMode.SEARCH_ONLY)
         whenever(unsentForgetAllPixelStore.lastClearTimestamp).thenReturn(0L)
         androidBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(State(enable = false))
 
@@ -137,10 +136,9 @@ class AppReturnPixelSenderTest {
     }
 
     @Test
-    fun whenToggleCapabilityIsSearchAndDuckAiThenParamsCarryToggleVisibleTrue() = runTest {
+    fun whenUserSelectedSearchAndDuckAiThenParamsCarryToggleVisibleTrue() = runTest {
         whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(0L)
-        whenever(duckChatInputModeState.inputModeCapability)
-            .thenReturn(MutableStateFlow(NativeInputState.InputMode.SEARCH_AND_DUCK_AI))
+        whenever(duckChatInputModeState.getSelectedInputMode()).thenReturn(NativeInputState.InputMode.SEARCH_AND_DUCK_AI)
 
         testee.fireIfNeeded("standard")
         advanceUntilIdle()

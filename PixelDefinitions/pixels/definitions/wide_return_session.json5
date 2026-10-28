@@ -40,6 +40,17 @@
                 "enum": ["0", "60000", "300000", "900000", "1800000", "3600000"]
             },
             {
+                "key": "feature.data.ext.toggle_enabled",
+                "type": "boolean",
+                "description": "Whether the user selected Search & Duck.ai in the address bar setting, read from storage when the session starts. False when the user turned Duck.ai off"
+            },
+            {
+                "key": "feature.data.ext.toggle_position",
+                "type": "string",
+                "description": "Side of the Search/Duck.ai toggle the input opens on, from the default position setting with last used resolved. Present only when toggle_enabled is true",
+                "enum": ["search", "duck_ai"]
+            },
+            {
                 "key": "feature.data.ext.status_reason",
                 "type": "string",
                 "description": "Reason the session ended",
