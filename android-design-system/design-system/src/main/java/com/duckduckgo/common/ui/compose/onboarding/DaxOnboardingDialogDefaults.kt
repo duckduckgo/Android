@@ -61,6 +61,7 @@ object DaxOnboardingDialogDefaults {
 
     // The View CTA's 20dp margin plus the 4dp vertical inset of a small rebrand button.
     val ContentToPrimaryCtaSpacing: Dp = 24.dp
+    val CtaSpacing: Dp = 8.dp
     val DismissSize: Dp = 32.dp
     val DismissOffset: Dp = 4.dp
     val TailBandHeight: Dp = DaxSpeechBubbleShape.TailHeight + StrokeWidth

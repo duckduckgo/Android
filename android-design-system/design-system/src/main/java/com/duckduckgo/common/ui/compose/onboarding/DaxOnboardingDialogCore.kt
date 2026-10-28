@@ -136,21 +136,29 @@ import kotlin.time.Duration
 internal data class DialogActionLayout(
     val headerToActions: Dp,
     val contentToPrimary: Dp,
+    val primaryToSecondary: Dp,
 )
 
 internal fun dialogActionLayout(
     hasContent: Boolean,
     hasPrimaryCta: Boolean,
+    hasSecondaryCta: Boolean,
     headerToActionsSpacing: Dp = DaxOnboardingDialogDefaults.HeaderContentSpacing,
     contentToPrimarySpacing: Dp = DaxOnboardingDialogDefaults.ContentToPrimaryCtaSpacing,
+    primaryToSecondarySpacing: Dp = DaxOnboardingDialogDefaults.CtaSpacing,
 ): DialogActionLayout = DialogActionLayout(
-    headerToActions = if (hasContent || hasPrimaryCta) {
+    headerToActions = if (hasContent || hasPrimaryCta || hasSecondaryCta) {
         headerToActionsSpacing
     } else {
         0.dp
     },
     contentToPrimary = if (hasContent && hasPrimaryCta) {
         contentToPrimarySpacing
+    } else {
+        0.dp
+    },
+    primaryToSecondary = if (hasPrimaryCta && hasSecondaryCta) {
+        primaryToSecondarySpacing
     } else {
         0.dp
     },
@@ -171,6 +179,7 @@ internal fun DaxOnboardingDialogCore(
     tail: DaxOnboardingDialogTail,
     tailExtended: Boolean,
     primaryCta: DaxOnboardingDialogCta?,
+    secondaryCta: DaxOnboardingDialogCta?,
     onIntroFinished: (contentKey: String) -> Unit,
     dismiss: DaxOnboardingDialogDismiss?,
     content: (@Composable DaxOnboardingDialogContentScope.() -> Unit)?,
@@ -504,18 +513,27 @@ internal fun DaxOnboardingDialogCore(
 
                         @Composable
                         fun DialogActions(landscape: Boolean) {
-                            val hasActions = content != null || primaryCta != null
+                            val hasActions = content != null ||
+                                primaryCta != null ||
+                                secondaryCta != null
                             val density = LocalDensity.current
                             val contentToPrimarySpacing = if (useNativeCtaInsets) {
                                 with(density) { (20.dp.roundToPx() + 4.dp.roundToPx()).toDp() }
                             } else {
                                 DaxOnboardingDialogDefaults.ContentToPrimaryCtaSpacing
                             }
+                            val primaryToSecondarySpacing = if (useNativeCtaInsets) {
+                                with(density) { (2 * 4.dp.roundToPx()).toDp() }
+                            } else {
+                                DaxOnboardingDialogDefaults.CtaSpacing
+                            }
                             val actionLayout = dialogActionLayout(
                                 hasContent = content != null,
                                 hasPrimaryCta = primaryCta != null,
+                                hasSecondaryCta = secondaryCta != null,
                                 headerToActionsSpacing = headerToActionsSpacing,
                                 contentToPrimarySpacing = contentToPrimarySpacing,
+                                primaryToSecondarySpacing = primaryToSecondarySpacing,
                             )
                             if (!landscape && hasActions) {
                                 Spacer(Modifier.size(actionLayout.headerToActions))
@@ -546,7 +564,24 @@ internal fun DaxOnboardingDialogCore(
                                 )
                             }
 
-                            if (primaryCta != null) {
+                            if (secondaryCta != null) {
+                                DaxOnboardingSecondaryButton(
+                                    text = secondaryCta.text,
+                                    onClick = { if (intro.settled) secondaryCta.onClick() },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(
+                                            start = DaxOnboardingDialogDefaults.ContentHorizontalPadding,
+                                            end = DaxOnboardingDialogDefaults.ContentHorizontalPadding,
+                                            top = actionLayout.primaryToSecondary,
+                                        )
+                                        .introCtaGate(settled, secondaryCta.text)
+                                        .drawAlpha { intro.contentAlpha.value },
+                                    enabled = secondaryCta.enabled,
+                                )
+                            }
+
+                            if (primaryCta != null || secondaryCta != null) {
                                 Spacer(Modifier.height(4.dp))
                             }
                         }

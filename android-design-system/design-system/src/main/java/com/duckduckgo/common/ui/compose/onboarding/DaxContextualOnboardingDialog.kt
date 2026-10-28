@@ -73,8 +73,8 @@ import kotlin.time.Duration
  * becomes true when the intro settles, and the ready callback reports natural animation (`true`)
  * or snap/skip (`false`) once after composition. Bounds snap during the intro and animate settled
  * same-key changes. Inspection previews and reduced motion show settled content.
- * The primary CTA currently uses the existing ADS button placeholder; a dedicated onboarding
- * brand button is intentionally a separate component.
+ * Primary and secondary CTAs currently use the existing ADS button placeholders; a dedicated
+ * onboarding brand button is intentionally a separate component.
  * Tail geometry is logical-direction relative: `None` is flat, `BottomStart` is 80dp from logical
  * start, `BottomStartWide` is 96dp, and `BottomEnd` is 80dp from logical end. `tailExtended = false`
  * retracts the tail depth; `true` fully extends it. `dismiss` is a 32dp affordance at logical
@@ -97,6 +97,7 @@ import kotlin.time.Duration
  * @param tail Speech-bubble tail position.
  * @param tailExtended Whether the configured tail is fully extended.
  * @param primaryCta Optional primary CTA.
+ * @param secondaryCta Optional secondary CTA.
  * @param onIntroFinished Called after composition with the completed run’s content key; canceled runs do not call it.
  * @param dismiss Optional dismiss action and accessible content description.
  * @param content Optional content-keyed arbitrary content slot.
@@ -116,6 +117,7 @@ fun DaxContextualOnboardingDialog(
     tail: DaxOnboardingDialogTail = DaxOnboardingDialogTail.None,
     tailExtended: Boolean = true,
     primaryCta: DaxOnboardingDialogCta? = null,
+    secondaryCta: DaxOnboardingDialogCta? = null,
     onIntroFinished: (contentKey: String) -> Unit = {},
     dismiss: DaxOnboardingDialogDismiss? = null,
     content: (@Composable DaxOnboardingDialogContentScope.() -> Unit)? = null,
@@ -135,6 +137,7 @@ fun DaxContextualOnboardingDialog(
         tail = tail,
         tailExtended = tailExtended,
         primaryCta = primaryCta,
+        secondaryCta = secondaryCta,
         onIntroFinished = onIntroFinished,
         dismiss = dismiss,
         content = content,
@@ -175,6 +178,7 @@ fun DaxContextualOnboardingDialog(
  * @param tail Speech-bubble tail position.
  * @param tailExtended Whether the configured tail is fully extended.
  * @param primaryCta Optional primary CTA.
+ * @param secondaryCta Optional secondary CTA.
  * @param onIntroFinished Called after composition with the completed run’s content key; canceled runs do not call it.
  * @param dismiss Optional dismiss action and accessible content description.
  * @param content Optional content-keyed arbitrary content slot.
@@ -194,6 +198,7 @@ fun DaxContextualOnboardingDialog(
     tail: DaxOnboardingDialogTail = DaxOnboardingDialogTail.None,
     tailExtended: Boolean = true,
     primaryCta: DaxOnboardingDialogCta? = null,
+    secondaryCta: DaxOnboardingDialogCta? = null,
     onIntroFinished: (contentKey: String) -> Unit = {},
     dismiss: DaxOnboardingDialogDismiss? = null,
     content: (@Composable DaxOnboardingDialogContentScope.() -> Unit)? = null,
@@ -213,6 +218,7 @@ fun DaxContextualOnboardingDialog(
         tail = tail,
         tailExtended = tailExtended,
         primaryCta = primaryCta,
+        secondaryCta = secondaryCta,
         onIntroFinished = onIntroFinished,
         dismiss = dismiss,
         content = content,
@@ -254,6 +260,7 @@ fun DaxContextualOnboardingDialog(
  * @param tail Speech-bubble tail position.
  * @param tailExtended Whether the configured tail is fully extended.
  * @param primaryCta Optional primary CTA.
+ * @param secondaryCta Optional secondary CTA.
  * @param onIntroFinished Called after composition with the completed run’s content key; canceled runs do not call it.
  * @param dismiss Optional dismiss action and accessible content description.
  * @param content Optional content-keyed arbitrary content slot.
@@ -273,6 +280,7 @@ fun DaxContextualOnboardingDialog(
     tail: DaxOnboardingDialogTail = DaxOnboardingDialogTail.None,
     tailExtended: Boolean = true,
     primaryCta: DaxOnboardingDialogCta? = null,
+    secondaryCta: DaxOnboardingDialogCta? = null,
     onIntroFinished: (contentKey: String) -> Unit = {},
     dismiss: DaxOnboardingDialogDismiss? = null,
     content: (@Composable DaxOnboardingDialogContentScope.() -> Unit)? = null,
@@ -292,6 +300,7 @@ fun DaxContextualOnboardingDialog(
         tail = tail,
         tailExtended = tailExtended,
         primaryCta = primaryCta,
+        secondaryCta = secondaryCta,
         onIntroFinished = onIntroFinished,
         dismiss = dismiss,
         content = content,
@@ -399,6 +408,7 @@ private fun DaxContextualOnboardingDialogEmptyTitlePreview() {
             animate = false,
             tail = DaxOnboardingDialogTail.BottomStartWide,
             primaryCta = DaxOnboardingDialogCta("Continue") {},
+            secondaryCta = DaxOnboardingDialogCta("Not now") {},
         )
     }
 }

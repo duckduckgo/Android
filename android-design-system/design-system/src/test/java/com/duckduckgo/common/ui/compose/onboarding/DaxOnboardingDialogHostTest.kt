@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ComposeView
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+import com.duckduckgo.common.ui.compose.theme.LocalOnboardingColors
 import com.duckduckgo.common.ui.compose.theme.Mandarin50
 import com.duckduckgo.common.ui.compose.theme.OnboardingTheme
 import org.junit.Assert.assertEquals
@@ -133,22 +135,43 @@ class DaxOnboardingDialogHostTest {
     }
 
     @Test
-    fun primaryCtaFadesWithoutADisabledColorJumpUnderAHeightProbingViewHost() {
+    fun secondaryCtaKeepsItsRebrandAppearanceUnderAHeightProbingViewHost() {
+        assertSecondaryAppearance { HeightProbingHost(it) }
+    }
+
+    @Test
+    fun secondaryCtaKeepsItsRebrandAppearanceUnderAWidthAlternatingViewHost() {
+        assertSecondaryAppearance { WidthAlternatingHost(it) }
+    }
+
+    @Test
+    fun ctasFadeWithoutADisabledColorJumpUnderAHeightProbingViewHost() {
         compose.mainClock.autoAdvance = false
         animate.value = true
         title.value = ""
         ActivityScenario.launch(ComponentActivity::class.java).use { scenario ->
             lateinit var view: ComposeView
-            scenario.onActivity { activity -> view = showDialog(activity, HeightProbingHost(activity), paletteReference = true) }
+            scenario.onActivity { activity -> view = showDialog(activity, HeightProbingHost(activity), secondary = true, paletteReference = true) }
             compose.assertCtasFinishWithoutColorJump(view, state) { referenceBounds }
         }
     }
 
     private var referenceBounds = Rect.Zero
+    private var surface = Color.Unspecified
+
+    private fun assertSecondaryAppearance(host: (ComponentActivity) -> FrameLayout) {
+        ActivityScenario.launch(ComponentActivity::class.java).use { scenario ->
+            lateinit var view: ComposeView
+            scenario.onActivity { activity -> view = showDialog(activity, host(activity), secondary = true) }
+            frames()
+            compose.assertSecondaryCtaAppearance(view, surface)
+        }
+    }
 
     private fun showDialog(
         activity: ComponentActivity,
         host: FrameLayout,
+        secondary: Boolean = false,
         paletteReference: Boolean = false,
     ): ComposeView {
         val view = ComposeView(activity).apply {
@@ -156,12 +179,14 @@ class DaxOnboardingDialogHostTest {
             setContent {
                 DuckDuckGoTheme(isDarkTheme = false) {
                     OnboardingTheme {
+                        surface = LocalOnboardingColors.current.surfaceTertiary
                         DaxOnboardingDialog(
                             contentKey = contentKey.value,
                             title = title.value,
                             state = state,
                             animate = animate.value,
                             primaryCta = DaxOnboardingDialogCta(text = "Continue", onClick = {}),
+                            secondaryCta = if (secondary) DaxOnboardingDialogCta(text = "Skip for now", onClick = {}) else null,
                             onIntroFinished = { finished.add(it) },
                         ) {
                             Box(

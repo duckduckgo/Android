@@ -456,6 +456,7 @@ class DaxOnboardingDialogTest {
                             title = "Title",
                             state = state,
                             primaryCta = DaxOnboardingDialogCta("Continue", onClick = {}),
+                            secondaryCta = DaxOnboardingDialogCta("Skip for now", onClick = {}),
                         )
                         Box(Modifier.size(24.dp).onFocusChanged { afterFocused = it.isFocused }.focusable())
                     }
@@ -474,6 +475,8 @@ class DaxOnboardingDialogTest {
             focus.moveFocus(FocusDirection.Next)
         }
         compose.onNodeWithText("Continue").assertIsFocused()
+        compose.runOnIdle { focus.moveFocus(FocusDirection.Next) }
+        compose.onNodeWithText("Skip for now").assertIsFocused()
     }
 
     @Test
