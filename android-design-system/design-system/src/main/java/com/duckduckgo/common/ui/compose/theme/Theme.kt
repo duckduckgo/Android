@@ -103,7 +103,7 @@ fun DuckDuckGoTheme(
         ),
         brand = DuckDuckGoBrandColors(
             accentBlue = Blue50,
-            accentYellow = Yellow50,
+            alertYellow = Yellow50,
             accentBrand50 = Blue50.copy(alpha = .5f),
             accentBrand20 = Blue50_20,
         ),
@@ -165,7 +165,7 @@ fun DuckDuckGoTheme(
         ),
         brand = DuckDuckGoBrandColors(
             accentBlue = Blue30,
-            accentYellow = Yellow50,
+            alertYellow = Yellow50,
             accentBrand50 = Blue30.copy(alpha = .5f),
             accentBrand20 = Blue30_20,
         ),

@@ -22,5 +22,5 @@
     android:paddingStart="@dimen/keyline_4"
     android:paddingTop="@dimen/keyline_2"
     android:paddingEnd="@dimen/keyline_4"
-    android:textColor="?attr/daxColorTertiaryText"
+    android:textColor="?attr/daxColorTextTertiary"
     app:typography="caption" />

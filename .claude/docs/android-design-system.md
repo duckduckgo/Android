@@ -111,7 +111,7 @@ Theme attributes, never `@color/`:
 
 `?attr/daxColorBackground` (screen) · `?attr/daxColorSurface` (toolbars, navigation, dialogs) ·
 `?attr/daxColorContainer` (object containers, e.g. favicon background) · `?attr/daxColorPrimaryText` ·
-`?attr/daxColorSecondaryText` · `?attr/daxColorTertiaryText` (hints, placeholders) ·
+`?attr/daxColorSecondaryText` · `?attr/daxColorTextTertiary` (hints, placeholders) ·
 `?attr/daxColorPrimaryIcon` · `?attr/daxColorSecondaryIcon` · `?attr/daxColorAccentBlue` (accent,
 CTAs) · `?attr/daxColorDestructive` · `?attr/daxColorLines` (dividers)
 
