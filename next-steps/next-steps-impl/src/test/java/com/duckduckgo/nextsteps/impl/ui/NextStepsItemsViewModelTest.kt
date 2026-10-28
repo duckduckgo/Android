@@ -179,7 +179,7 @@ class NextStepsItemsViewModelTest {
     }
 
     @Test
-    fun `when the last card completes after its CTA opened a full screen then no impression is counted and the summary ends the carousel`() = runTest {
+    fun `when the last card completes after its CTA opened a full screen then nothing is counted and the summary ends the carousel`() = runTest {
         activeMessage.value = aMessage(content = Content.ActionableItems(titleText = "Complete your setup", listItems = listOf(defaultBrowserItem)))
         advanceUntilIdle()
         testee.onPrimaryActionClicked()

@@ -524,11 +524,12 @@ class RealNextStepsTelemetryTest {
     fun `impressions keep counting across carousels`() = runTest {
         testee.onFrontCardShown("old", A, setOf(A))
         testee.onActiveMessageChanged(null)
+        today = today.plusDays(1)
         testee.onFrontCardShown("new", A, setOf(A))
 
         testee.onCardDismissed(A)
 
-        verify(pixels).cardRemoved(A, DAY_0, DISMISSED, "2")
+        verify(pixels).cardRemoved(A, Days(activeDay = "1", calendarDay = "1"), DISMISSED, "2")
     }
 
     @Test
