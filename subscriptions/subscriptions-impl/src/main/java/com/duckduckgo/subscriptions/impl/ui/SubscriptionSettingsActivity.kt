@@ -29,11 +29,8 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
-import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
-import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
@@ -59,7 +56,6 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ADVANCED_SUBSCRI
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FAQS_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionSettingsBinding
-import com.duckduckgo.subscriptions.impl.databinding.DialogSubscriptionWithdrawalBinding
 import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.ChangePlanActivity.Companion.ChangePlanScreenWithEmptyParams
@@ -79,6 +75,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Subscr
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.CustomTitle
+import com.duckduckgo.subscriptions.impl.withdrawal.SubscriptionWithdrawalDialog
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -102,8 +99,11 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
     private val viewModel: SubscriptionSettingsViewModel by bindViewModel()
     private val binding: ActivitySubscriptionSettingsBinding by viewBinding()
-    private var withdrawalDialog: DaxAlertDialog? = null
-    private var withdrawalDialogContent: DialogSubscriptionWithdrawalBinding? = null
+    private val withdrawalDialog = SubscriptionWithdrawalDialog(
+        context = this,
+        onConfirm = { viewModel.onWithdrawalConfirmed() },
+        onHelpLinkClicked = { viewModel.onWithdrawalHelpLinkClicked() },
+    )
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -411,65 +411,14 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             }
 
             LaunchOnboarding -> globalActivityStarter.start(this, SubscriptionOnboardingScreenWithEmptyParams)
-            is ShowWithdrawalDialog -> showWithdrawalDialog(command)
-            DismissWithdrawalDialog -> dismissWithdrawalDialog()
-            ShowWithdrawalDialogError -> withdrawalDialogContent?.let { renderWithdrawalError(it) }
+            is ShowWithdrawalDialog -> withdrawalDialog.show(getString(command.tierNameResId), command.refundAmount)
+            DismissWithdrawalDialog -> withdrawalDialog.dismiss()
+            ShowWithdrawalDialogError -> withdrawalDialog.showError()
             GoToWithdrawalHelp -> goToWithdrawalHelp()
         }
     }
 
     // Built with custom buttons because the stacked dialog dismisses on every click: it has to stay open while the request runs
-    private fun showWithdrawalDialog(command: ShowWithdrawalDialog) {
-        val content = DialogSubscriptionWithdrawalBinding.inflate(layoutInflater)
-        content.withdrawalConfirmSpinner.setIndicatorColor(content.withdrawalConfirmButton.currentTextColor)
-        content.withdrawalError.addClickableLink(WITHDRAWAL_HELP_ANNOTATION, getText(string.subscriptionWithdrawErrorAlert)) {
-            dismissWithdrawalDialog()
-            viewModel.onWithdrawalHelpLinkClicked()
-        }
-
-        val dialog = CustomAlertDialogBuilder(this)
-            .setTitle(string.subscriptionWithdrawDialogTitle)
-            .setMessage(getString(string.subscriptionWithdrawDialogMessage, getString(command.tierNameResId), command.refundAmount))
-            .setView(content)
-        content.withdrawalConfirmButton.setOnClickListener {
-            renderWithdrawalInProgress(content)
-            viewModel.onWithdrawalConfirmed()
-        }
-        content.withdrawalKeepButton.setOnClickListener { dismissWithdrawalDialog() }
-
-        withdrawalDialog = dialog
-        withdrawalDialogContent = content
-        dialog.show()
-    }
-
-    private fun dismissWithdrawalDialog() {
-        withdrawalDialog?.dismiss()
-        withdrawalDialog = null
-        withdrawalDialogContent = null
-    }
-
-    private fun renderWithdrawalInProgress(content: DialogSubscriptionWithdrawalBinding) {
-        with(content.withdrawalConfirmButton) {
-            text = ""
-            contentDescription = getString(string.subscriptionWithdrawDialogConfirm)
-            isClickable = false
-        }
-        content.withdrawalKeepButton.isEnabled = false
-        content.withdrawalError.gone()
-        content.withdrawalConfirmSpinner.show()
-    }
-
-    private fun renderWithdrawalError(content: DialogSubscriptionWithdrawalBinding) {
-        with(content.withdrawalConfirmButton) {
-            setText(string.subscriptionWithdrawDialogConfirm)
-            contentDescription = null
-            isClickable = true
-        }
-        content.withdrawalKeepButton.isEnabled = true
-        content.withdrawalConfirmSpinner.gone()
-        content.withdrawalError.show()
-    }
-
     private fun goToWithdrawalHelp() {
         globalActivityStarter.start(
             this,
@@ -595,7 +544,6 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         const val LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email"
         const val PRIVACY_POLICY_URL = "https://duckduckgo.com/pro/privacy-terms"
 
-        private const val WITHDRAWAL_HELP_ANNOTATION = "withdrawal_help_link"
         private const val WITHDRAWAL_HELP_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/cancel-or-change-subscription"
         private const val PURCHASE_VIEW_PLANS_ORIGIN = "funnel_subscriptionsettings_android__viewplans"
     }
