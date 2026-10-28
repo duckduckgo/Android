@@ -21,4 +21,4 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 /**
  * Use this model to launch the YouTube Ad Blocking settings screen.
  */
-object AdBlockingSettingsV2NoParams : GlobalActivityStarter.ActivityParams
+object AdBlockingSettingsNoParams : GlobalActivityStarter.ActivityParams

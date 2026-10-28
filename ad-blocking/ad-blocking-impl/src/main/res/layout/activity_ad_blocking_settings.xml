@@ -19,7 +19,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.AdBlockingSettingsV2Activity">
+    tools:context=".ui.AdBlockingSettingsActivity">
 
     <include
         android:id="@+id/includeToolbar"
