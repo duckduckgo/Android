@@ -67,7 +67,6 @@ import com.duckduckgo.app.browser.mode.DuckAiPinShortcut
 import com.duckduckgo.app.browser.mode.SearchWidgetDuckAi
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
-import com.duckduckgo.app.browser.omnibar.applyAddressBarRebrandRadius
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.state.ModeSwitchRecreateSignal
 import com.duckduckgo.app.browser.tabs.TabManager
@@ -947,7 +946,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun configureEdgeToEdge() {
-        val toolbarColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
+        val toolbarColor = getColorFromAttr(CommonR.attr.daxColorToolbar)
         val barStyle = if (isDarkThemeEnabled()) {
             SystemBarStyle.dark(toolbarColor)
         } else {
@@ -1480,7 +1479,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 tabPager.registerOnPageChangeCallback(onTabPageChangeListener)
                 tabPager.setPageTransformer(
                     MarginPageTransformer(
-                        resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_1)
+                        resources.getDimension(CommonR.dimen.keyline_1)
                             .toPx()
                             .toInt(),
                     ),
@@ -1852,10 +1851,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun bindMockupToolbars() {
-        val mockupBrowserMenuIcon = com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24
-        val isAddressBarRebrandEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled()
-        val rebrandInputRadius = resources.getDimension(CommonR.dimen.rebrandInputRadius)
-        val legacyInputRadius = resources.getDimension(CommonR.dimen.largeShapeCornerRadius)
+        val mockupBrowserMenuIcon = CommonR.drawable.ic_menu_hamburger_24
         binding.topMockupToolbar.browserMenuImageView.setImageResource(mockupBrowserMenuIcon)
         binding.bottomMockupToolbar.browserMenuImageView.setImageResource(mockupBrowserMenuIcon)
         binding.navigationBarMockup.browserMenuImageView.setImageResource(mockupBrowserMenuIcon)
@@ -1864,14 +1860,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> {
                 binding.bottomMockupToolbar.appBarLayoutMockup.gone()
                 omnibarToolbarMockupBinding = binding.topMockupToolbar
-                applyAddressBarRebrandRadius(
-                    isAddressBarRebrandEnabled,
-                    rebrandInputRadius,
-                    legacyInputRadius,
-                    omnibarToolbarMockupBinding.mockOmniBarContainerShadow,
-                    omnibarToolbarMockupBinding.omniBarContainerMockup,
-                )
-
                 if (!duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value) {
                     omnibarToolbarMockupBinding.aiChatIconMockup.isVisible = false
                 }
@@ -1889,14 +1877,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             OmnibarType.SINGLE_BOTTOM -> {
                 binding.topMockupToolbar.appBarLayoutMockup.gone()
                 omnibarToolbarMockupBottomBinding = binding.bottomMockupToolbar
-                applyAddressBarRebrandRadius(
-                    isAddressBarRebrandEnabled,
-                    rebrandInputRadius,
-                    legacyInputRadius,
-                    omnibarToolbarMockupBottomBinding.mockOmniBarContainerShadow,
-                    omnibarToolbarMockupBottomBinding.omniBarContainerMockup,
-                )
-
                 if (!duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value) {
                     omnibarToolbarMockupBottomBinding.aiChatIconMockup.isVisible = false
                 }

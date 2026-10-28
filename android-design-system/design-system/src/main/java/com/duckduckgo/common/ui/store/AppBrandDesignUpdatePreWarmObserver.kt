@@ -44,7 +44,6 @@ class AppBrandDesignUpdatePreWarmObserver @Inject constructor(
 
     override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            toggles.addressBar().isEnabled()
             toggles.pictograms().isEnabled()
         }
     }

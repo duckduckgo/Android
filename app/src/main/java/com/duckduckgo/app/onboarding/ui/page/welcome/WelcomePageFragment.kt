@@ -61,7 +61,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Onboarding
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillImportPasswordsScreen
 import com.duckduckgo.codegen.annotations.InjectWith
-import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
@@ -94,9 +93,6 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
 
     @Inject
     lateinit var appTheme: AppTheme
-
-    @Inject
-    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     @Inject
     lateinit var addWidgetLauncher: AddWidgetLauncher
@@ -186,7 +182,6 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
                 contentValues = viewModel.contentValues,
                 onBeforeContentBound = viewModel::onBeforeContentBound,
                 isLightMode = { appTheme.isLightModeEnabled() },
-                isAddressBarRebrandEnabled = { appBrandDesignUpdateToggles.addressBar().isEnabled() },
             ),
             cardStage = CardStageImpl(binding),
             background = BackgroundControllerImpl(

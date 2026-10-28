@@ -253,7 +253,7 @@
         <item name="autocompleteListItemEndPadding">22dp</item>
         <item name="autocompleteListItemIconMargin">@dimen/keyline_2</item>
 
-        <item name="cookiesAnimationRadius">@dimen/cookiesAnimationRadius</item>
+        <item name="cookiesAnimationRadius">@dimen/rebrandInputRadius</item>
         <item name="cookiesAnimationHeight">@dimen/cookiesAnimationHeight</item>
 
         <!-- Design System Component Colors Dark -->
@@ -431,7 +431,7 @@
         <item name="autocompleteListItemWithoutTrailIconEndPadding">46dp</item>
         <item name="autocompleteListItemIconMargin">@dimen/keyline_2</item>
 
-        <item name="cookiesAnimationRadius">@dimen/cookiesAnimationRadius</item>
+        <item name="cookiesAnimationRadius">@dimen/rebrandInputRadius</item>
         <item name="cookiesAnimationHeight">@dimen/cookiesAnimationHeight</item>
 
         <!-- Design System Component Colors Light -->

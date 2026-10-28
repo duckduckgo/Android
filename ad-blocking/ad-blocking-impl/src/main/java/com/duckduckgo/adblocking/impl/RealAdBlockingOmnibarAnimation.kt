@@ -26,6 +26,7 @@ import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @SingleIn(FragmentScope::class)
 @ContributesBinding(scope = FragmentScope::class, binding = binding<AdBlockingOmnibarAnimationProvider>())
@@ -64,9 +65,7 @@ class RealAdBlockingOmnibarAnimation @Inject constructor(
 
     private fun showBadge(): AdBlockingAnimation.Show =
         AdBlockingAnimation.Show(
-            // TODO update to new video_player_color_24.xml resource when AppBrandDesignUpdateToggles.addressBar() is removed
-            // https://app.asana.com/1/137249556945/task/1218241775291270?focus=true
-            icon = R.drawable.ic_video_player_blocked_color_24,
+            icon = CommonR.drawable.video_player_color_24,
             text = R.string.ad_blocking_omnibar_badge_text,
         )
 

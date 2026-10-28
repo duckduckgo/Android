@@ -16,10 +16,8 @@
 
 package com.duckduckgo.app.browser.omnibar.animations.addressbar
 
-import androidx.annotation.RawRes
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.PrivacyShield.MALICIOUS
@@ -32,13 +30,11 @@ import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import logcat.logcat
 import javax.inject.Inject
-import kotlin.to
 
 @ContributesBinding(AppScope::class)
 @SingleIn(AppScope::class)
 class LottiePrivacyShieldAnimationHelper @Inject internal constructor(
     private val appTheme: AppTheme,
-    private val omnibarRepository: OmnibarRepository,
     private val customTabShieldDrawableFactory: CustomTabShieldDrawableFactory,
 ) : PrivacyShieldAnimationHelper {
 
@@ -47,23 +43,11 @@ class LottiePrivacyShieldAnimationHelper @Inject internal constructor(
         privacyShield: PrivacyShield,
         viewMode: ViewMode,
         useLightAnimation: Boolean?,
-        isAddressBarRebrandEnabled: Boolean,
-    ): Boolean {
-        val isLegacyCustomTab = viewMode is ViewMode.CustomTab && !omnibarRepository.isNewCustomTabEnabled
+    ) {
         val isLightMode = useLightAnimation ?: appTheme.isLightModeEnabled()
-        val (assetRes, boxed) = resolveShieldAsset(
-            privacyShield,
-            isLightMode,
-            isLegacyCustomTab,
-            isAddressBarRebrandEnabled,
-        )
-            ?: return false
-        val isStatic = when (privacyShield) {
-            UNPROTECTED, MALICIOUS -> isAddressBarRebrandEnabled
-            PROTECTED, UNKNOWN -> false
-        }
+        val assetRes = resolveShieldAsset(privacyShield) ?: return
+        val isStatic = privacyShield == UNPROTECTED || privacyShield == MALICIOUS
         val customTabIsLightTheme = if (
-            isStatic &&
             privacyShield == UNPROTECTED &&
             viewMode is ViewMode.CustomTab &&
             useLightAnimation != null
@@ -94,42 +78,12 @@ class LottiePrivacyShieldAnimationHelper @Inject internal constructor(
         } else {
             logcat { "Shield: $privacyShield - no change" }
         }
-
-        return boxed
     }
 
-    internal fun resolveShieldAsset(
-        privacyShield: PrivacyShield,
-        isLightMode: Boolean,
-        isLegacyCustomTab: Boolean,
-        brandIconsEnabled: Boolean,
-    ): Pair<Int, Boolean>? {
-        if (privacyShield == UNKNOWN) return null
-
-        if (brandIconsEnabled) {
-            return when (privacyShield) {
-                PROTECTED -> R.raw.shield_color_24 to true
-                UNPROTECTED -> R.drawable.shield_alert_24 to true
-                MALICIOUS -> R.drawable.exclamation_recolorable_24 to true
-                UNKNOWN -> null
-            }
-        }
-
-        return when (privacyShield) {
-            PROTECTED -> legacyProtectedShield(isLightMode, isLegacyCustomTab) to false
-            UNPROTECTED -> (if (isLightMode) R.raw.unprotected_shield else R.raw.dark_unprotected_shield) to false
-            MALICIOUS -> (if (isLightMode) R.raw.alert_red else R.raw.alert_red_dark) to false
-            UNKNOWN -> null
-        }
-    }
-
-    @RawRes
-    private fun legacyProtectedShield(
-        isLightMode: Boolean,
-        isLegacyCustomTab: Boolean,
-    ): Int = when {
-        isLegacyCustomTab && isLightMode -> R.raw.protected_shield_custom_tab
-        isLegacyCustomTab -> R.raw.dark_protected_shield_custom_tab
-        else -> R.raw.address_bar_trackers_animation_shield
+    internal fun resolveShieldAsset(privacyShield: PrivacyShield): Int? = when (privacyShield) {
+        PROTECTED -> R.raw.shield_color_24
+        UNPROTECTED -> R.drawable.shield_alert_24
+        MALICIOUS -> R.drawable.exclamation_recolorable_24
+        UNKNOWN -> null
     }
 }

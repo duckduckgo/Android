@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.omnibar.animations.addressbar
 
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.AppTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -35,38 +34,15 @@ class BrowserLottieTrackersAnimatorHelperResolveCookieAnimationTest {
         theme = mock<AppTheme>(),
         addressBarTrackersAnimator = mock<AddressBarTrackersAnimator>(),
         commonAddressBarAnimationHelper = mock<CommonAddressBarAnimationHelper>(),
-        appBrandDesignUpdateToggles = mock<AppBrandDesignUpdateToggles>(),
     )
 
     @Test
-    fun whenBrandIconsEnabledAndLightThenBrandUpdateLightAnimation() {
-        assertEquals(
-            R.raw.cookie_icon_animated_light_brand_update,
-            testee.resolveCookieAnimation(isLightMode = true, brandIconsEnabled = true),
-        )
+    fun whenLightThenLightAnimation() {
+        assertEquals(R.raw.cookie_icon_animated_light, testee.resolveCookieAnimation(isLightMode = true))
     }
 
     @Test
-    fun whenBrandIconsEnabledAndDarkThenBrandUpdateDarkAnimation() {
-        assertEquals(
-            R.raw.cookie_icon_animated_dark_brand_update,
-            testee.resolveCookieAnimation(isLightMode = false, brandIconsEnabled = true),
-        )
-    }
-
-    @Test
-    fun whenBrandIconsDisabledAndLightThenLegacyLightAnimation() {
-        assertEquals(
-            R.raw.cookie_icon_animated_light,
-            testee.resolveCookieAnimation(isLightMode = true, brandIconsEnabled = false),
-        )
-    }
-
-    @Test
-    fun whenBrandIconsDisabledAndDarkThenLegacyDarkAnimation() {
-        assertEquals(
-            R.raw.cookie_icon_animated_dark,
-            testee.resolveCookieAnimation(isLightMode = false, brandIconsEnabled = false),
-        )
+    fun whenDarkThenDarkAnimation() {
+        assertEquals(R.raw.cookie_icon_animated_dark, testee.resolveCookieAnimation(isLightMode = false))
     }
 }

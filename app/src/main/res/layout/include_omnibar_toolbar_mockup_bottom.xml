@@ -39,7 +39,7 @@
             android:layout_marginTop="@dimen/omnibarCardMarginBottom"
             android:layout_marginEnd="@dimen/omnibarCardMarginEnd"
             android:layout_marginBottom="@dimen/omnibarCardMarginTop"
-            app:cardCornerRadius="@dimen/largeShapeCornerRadius"
+            app:cardCornerRadius="@dimen/rebrandInputRadius"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/iconsContainer"
             app:layout_constraintStart_toStartOf="parent"
@@ -50,6 +50,7 @@
                 style="@style/Widget.DuckDuckGo.OmnibarCardView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                app:cardCornerRadius="@dimen/rebrandInputRadius"
                 app:cardElevation="0dp">
 
                 <LinearLayout

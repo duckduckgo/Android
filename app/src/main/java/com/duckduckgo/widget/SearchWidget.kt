@@ -35,12 +35,11 @@ import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
-class SearchWidgetLight : SearchWidget(R.layout.search_widget_light, WidgetTheme.LIGHT)
+class SearchWidgetLight : SearchWidget(R.layout.search_widget_light)
 
 @HasMemberInjections
 open class SearchWidget(
     val layoutId: Int = R.layout.search_widget_dark,
-    private val widgetTheme: WidgetTheme = WidgetTheme.DARK,
 ) : AppWidgetProvider() {
 
     @Inject
@@ -112,7 +111,6 @@ open class SearchWidget(
                 context = context,
                 remoteViews = views,
                 fromFavWidget = false,
-                widgetTheme = widgetTheme,
             )
             appWidgetManager.updateAppWidget(appWidgetId, views)
             logcat { "SearchWidget updateAppWidget completed for widget id = $appWidgetId" }

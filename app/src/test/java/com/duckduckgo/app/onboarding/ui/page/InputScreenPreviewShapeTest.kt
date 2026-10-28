@@ -56,16 +56,13 @@ class InputScreenPreviewShapeTest {
     private val baseShape = ShapeAppearanceModel.builder().build()
 
     @Test
-    fun whenAddressBarRebrandEnabledThenUsesHalfTheRebrandInputRadius() {
+    fun whenShapeAppliedThenUsesHalfTheRebrandInputRadius() {
         val suppliedRebrandInputRadius = 10f
         val card = card(
-            shapeResources(
-                rebrandInputRadius = suppliedRebrandInputRadius,
-                legacyRadius = 3f,
-            ),
+            shapeResources(rebrandInputRadius = suppliedRebrandInputRadius),
         )
 
-        card.applyInputScreenPreviewShape(isAddressBarRebrandEnabled = true)
+        card.applyInputScreenPreviewShape()
 
         val shape = argumentCaptor<ShapeAppearanceModel>()
         verify(card).shapeAppearanceModel = shape.capture()
@@ -77,25 +74,7 @@ class InputScreenPreviewShapeTest {
     }
 
     @Test
-    fun whenAddressBarRebrandDisabledThenUsesLegacyRadius() {
-        val suppliedLegacyRadius = 3f
-        val card = card(
-            shapeResources(
-                rebrandInputRadius = 10f,
-                legacyRadius = suppliedLegacyRadius,
-            ),
-        )
-
-        card.applyInputScreenPreviewShape(isAddressBarRebrandEnabled = false)
-
-        val shape = argumentCaptor<ShapeAppearanceModel>()
-        verify(card).shapeAppearanceModel = shape.capture()
-        assertFixedCorners(shape.firstValue, suppliedLegacyRadius)
-        verify(card.resources).getDimension(CommonR.dimen.largeShapeCornerRadius)
-    }
-
-    @Test
-    fun whenAddressBarRebrandEnabledThenUsesConfiguredHorizontalAndVerticalInsets() {
+    fun whenInsetsAppliedThenUsesConfiguredHorizontalAndVerticalInsets() {
         val horizontalInset = 31
         val verticalInset = 17
         val context = contextWithInsets(
@@ -105,7 +84,7 @@ class InputScreenPreviewShapeTest {
         val (container, input) = inputFixture(context)
         val actionIcon = container.getChildAt(1)
 
-        input.applyInputScreenPreviewInsets(isAddressBarRebrandEnabled = true, actionIcon = actionIcon)
+        input.applyInputScreenPreviewInsets(actionIcon)
 
         val inputMargins = input.layoutParams as ViewGroup.MarginLayoutParams
         assertEquals(horizontalInset, container.paddingStart + inputMargins.marginStart + input.paddingStart)
@@ -122,35 +101,15 @@ class InputScreenPreviewShapeTest {
     }
 
     @Test
-    fun whenAddressBarRebrandEnabledAndInputAlreadyHasStartPaddingThenUsesConfiguredInsetOnce() {
+    fun whenInputAlreadyHasStartPaddingThenUsesConfiguredInsetOnce() {
         val horizontalInset = 31
         val context = contextWithInsets(horizontalInset = horizontalInset)
         val (container, input) = inputFixture(context, inputStartPadding = horizontalInset)
 
-        input.applyInputScreenPreviewInsets(isAddressBarRebrandEnabled = true, actionIcon = container.getChildAt(1))
+        input.applyInputScreenPreviewInsets(container.getChildAt(1))
 
         val margins = input.layoutParams as ViewGroup.MarginLayoutParams
         assertEquals(horizontalInset, container.paddingStart + margins.marginStart + input.paddingStart)
-    }
-
-    @Test
-    fun whenAddressBarRebrandDisabledThenKeepsExistingInsets() {
-        val context = contextWithInsets()
-        val (container, input) = inputFixture(context)
-        val actionIcon = container.getChildAt(1)
-        val initialInputMarginStart = (input.layoutParams as ViewGroup.MarginLayoutParams).marginStart
-        val initialActionIconMarginEnd = (actionIcon.layoutParams as ViewGroup.MarginLayoutParams).marginEnd
-        val initialInputPadding = listOf(input.paddingStart, input.paddingTop, input.paddingEnd, input.paddingBottom)
-        val initialContainerPadding = listOf(container.paddingStart, container.paddingTop, container.paddingEnd, container.paddingBottom)
-
-        input.applyInputScreenPreviewInsets(isAddressBarRebrandEnabled = false, actionIcon = actionIcon)
-
-        assertEquals(initialInputMarginStart, (input.layoutParams as ViewGroup.MarginLayoutParams).marginStart)
-        assertEquals(initialActionIconMarginEnd, (actionIcon.layoutParams as ViewGroup.MarginLayoutParams).marginEnd)
-        assertEquals(initialInputPadding, listOf(input.paddingStart, input.paddingTop, input.paddingEnd, input.paddingBottom))
-        assertEquals(initialContainerPadding, listOf(container.paddingStart, container.paddingTop, container.paddingEnd, container.paddingBottom))
-        verify(context.resources, never()).getDimensionPixelSize(CommonR.dimen.keyline_4)
-        verify(context.resources, never()).getDimensionPixelSize(CommonR.dimen.keyline_3)
     }
 
     @Test
@@ -202,12 +161,8 @@ class InputScreenPreviewShapeTest {
         assertEquals(switchedInput.maxLines, restoredInput.maxLines)
     }
 
-    private fun shapeResources(
-        rebrandInputRadius: Float,
-        legacyRadius: Float,
-    ): Resources = mock {
+    private fun shapeResources(rebrandInputRadius: Float): Resources = mock {
         on { getDimension(CommonR.dimen.rebrandInputRadius) } doReturn rebrandInputRadius
-        on { getDimension(CommonR.dimen.largeShapeCornerRadius) } doReturn legacyRadius
     }
 
     private fun card(resources: Resources): MaterialCardView = mock {
