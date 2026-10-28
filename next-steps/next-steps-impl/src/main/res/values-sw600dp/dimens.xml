@@ -16,4 +16,5 @@
 <resources>
     <dimen name="nextStepsCloseButtonSize">30dp</dimen>
     <dimen name="nextStepsItemImageSize">96dp</dimen>
+    <dimen name="nextStepsItemTitleTextSize">18sp</dimen>
 </resources>
