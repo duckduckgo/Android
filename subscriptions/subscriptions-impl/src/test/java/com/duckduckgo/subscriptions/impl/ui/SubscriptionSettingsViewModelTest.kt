@@ -833,7 +833,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenStripeSubscriptionEligibleForWithdrawalThenShowWithdrawalOption() = runTest {
-        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
         stubReadySubscription(platform = "stripe")
 
@@ -848,7 +848,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenStripeSubscriptionNotEligibleForWithdrawalThenHideWithdrawalOption() = runTest {
-        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(null)
         stubReadySubscription(platform = "stripe")
 
@@ -859,8 +859,8 @@ class SubscriptionSettingsViewModelTest {
     }
 
     @Test
-    fun whenWithdrawalFlagDisabledThenDoNotCheckEligibility() = runTest {
-        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = false))
+    fun whenSubscriptionNotWithdrawableThenDoNotCheckEligibility() = runTest {
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(false)
         stubReadySubscription(platform = "stripe")
 
         viewModel.onCreate(mock())
@@ -871,44 +871,8 @@ class SubscriptionSettingsViewModelTest {
     }
 
     @Test
-    fun whenNotStripeSubscriptionThenDoNotCheckEligibility() = runTest {
-        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
-        stubReadySubscription(platform = "android")
-
-        viewModel.onCreate(mock())
-        viewModel.viewState.test {
-            assertNull((expectMostRecentItem() as Ready).withdrawal)
-        }
-        verify(subscriptionWithdrawal, never()).getEligibility()
-    }
-
-    @Test
-    fun whenStripeFreeTrialThenDoNotCheckEligibility() = runTest {
-        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
-        stubReadySubscription(platform = "stripe", activeOffers = listOf(ActiveOfferType.TRIAL))
-
-        viewModel.onCreate(mock())
-        viewModel.viewState.test {
-            assertNull((expectMostRecentItem() as Ready).withdrawal)
-        }
-        verify(subscriptionWithdrawal, never()).getEligibility()
-    }
-
-    @Test
-    fun whenStripeSubscriptionExpiredThenDoNotCheckEligibility() = runTest {
-        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
-        stubReadySubscription(platform = "stripe", status = EXPIRED)
-
-        viewModel.onCreate(mock())
-        viewModel.viewState.test {
-            assertNull((expectMostRecentItem() as Ready).withdrawal)
-        }
-        verify(subscriptionWithdrawal, never()).getEligibility()
-    }
-
-    @Test
     fun whenWithdrawClickedThenShowWithdrawalDialog() = runTest {
-        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
         stubReadySubscription(platform = "stripe")
         viewModel.onCreate(mock())
@@ -936,7 +900,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenWithdrawalConfirmedAndSucceedsThenHideWithdrawalOption() = runTest {
-        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
         whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(Refund(amount = BigDecimal("9.99"), currency = "EUR")))
         stubReadySubscription(platform = "stripe")
@@ -952,7 +916,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenWithdrawalNoLongerEligibleThenHideWithdrawalOption() = runTest {
-        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
         whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failure(WithdrawalResult.FailureReason.NOT_ELIGIBLE))
         stubReadySubscription(platform = "stripe")
@@ -967,7 +931,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenWithdrawalFailsForOtherReasonThenKeepWithdrawalOption() = runTest {
-        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
         whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failure(WithdrawalResult.FailureReason.UNKNOWN))
         stubReadySubscription(platform = "stripe")
@@ -1035,7 +999,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenWithdrawalSucceedsThenShowCompletedWithdrawal() = runTest {
-        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
         whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(Refund(amount = BigDecimal("9.99"), currency = "EUR")))
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(ELIGIBILITY.eligibleUntil)
@@ -1053,7 +1017,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenWithdrawalSucceedsWithoutRefundThenShowCompletedWithdrawalWithoutAmount() = runTest {
-        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
         whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(refund = null))
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(ELIGIBILITY.eligibleUntil)
@@ -1071,7 +1035,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenWithdrawalNoLongerEligibleThenNoCompletedWithdrawal() = runTest {
-        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
         whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failure(WithdrawalResult.FailureReason.NOT_ELIGIBLE))
         stubReadySubscription(platform = "stripe")
@@ -1087,7 +1051,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenCompletedWithdrawalShownAndAccountSignedOutThenItStaysOnResume() = runTest {
-        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
         whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(Refund(amount = BigDecimal("9.99"), currency = "EUR")))
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(ELIGIBILITY.eligibleUntil)

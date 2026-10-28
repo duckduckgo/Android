@@ -17,7 +17,10 @@
 package com.duckduckgo.subscriptions.impl.withdrawal
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.api.ActiveOfferType
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.duckduckgo.subscriptions.impl.services.WithdrawResponse
 import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult.Failure
@@ -30,6 +33,12 @@ import java.math.BigDecimal
 import javax.inject.Inject
 
 interface SubscriptionWithdrawal {
+    /**
+     * Whether [subscription] is the kind that can be withdrawn from: an active, paid Stripe subscription.
+     * The backend still has the final say through [getEligibility].
+     */
+    fun isWithdrawable(subscription: Subscription): Boolean
+
     /**
      * Returns the withdrawal the user can make right now, or null when they are not eligible
      * or eligibility could not be determined.
@@ -72,7 +81,15 @@ data class WithdrawalEligibility(
 class RealSubscriptionWithdrawal @Inject constructor(
     private val subscriptionsService: SubscriptionsService,
     private val subscriptionsManager: SubscriptionsManager,
+    private val subscriptionsFeature: SubscriptionsFeature,
 ) : SubscriptionWithdrawal {
+
+    override fun isWithdrawable(subscription: Subscription): Boolean {
+        return subscriptionsFeature.subscriptionWithdrawal().isEnabled() &&
+            subscription.platform.equals(STRIPE_PLATFORM, ignoreCase = true) &&
+            subscription.isActive() &&
+            ActiveOfferType.TRIAL !in subscription.activeOffers
+    }
 
     override suspend fun getEligibility(): WithdrawalEligibility? {
         val response = runCatching { subscriptionsService.withdrawalEligibility() }.getOrNull() ?: return null
@@ -120,5 +137,9 @@ class RealSubscriptionWithdrawal @Inject constructor(
         val amount = refundedAmount?.toBigDecimalOrNull() ?: return null
         val currency = currency?.takeIf { it.isNotBlank() } ?: return null
         return Refund(amount = amount, currency = currency.uppercase())
+    }
+
+    private companion object {
+        private const val STRIPE_PLATFORM = "stripe"
     }
 }

@@ -1,6 +1,16 @@
 package com.duckduckgo.subscriptions.impl.withdrawal
 
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.subscriptions.api.ActiveOfferType
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.duckduckgo.subscriptions.impl.services.WithdrawResponse
 import com.duckduckgo.subscriptions.impl.services.WithdrawalEligibilityResponse
@@ -11,7 +21,9 @@ import com.squareup.moshi.JsonDataException
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -25,7 +37,37 @@ class RealSubscriptionWithdrawalTest {
 
     private val subscriptionsService: SubscriptionsService = mock()
     private val subscriptionsManager: SubscriptionsManager = mock()
-    private val withdrawal = RealSubscriptionWithdrawal(subscriptionsService, subscriptionsManager)
+    private val subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java, FakeToggleStore()).apply {
+        subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = true))
+    }
+    private val withdrawal = RealSubscriptionWithdrawal(subscriptionsService, subscriptionsManager, subscriptionsFeature)
+
+    @Test
+    fun whenActivePaidStripeSubscriptionThenWithdrawable() {
+        assertTrue(withdrawal.isWithdrawable(subscription()))
+    }
+
+    @Test
+    fun whenWithdrawalFlagDisabledThenNotWithdrawable() {
+        subscriptionsFeature.subscriptionWithdrawal().setRawStoredState(Toggle.State(remoteEnableState = false))
+
+        assertFalse(withdrawal.isWithdrawable(subscription()))
+    }
+
+    @Test
+    fun whenNotStripeSubscriptionThenNotWithdrawable() {
+        assertFalse(withdrawal.isWithdrawable(subscription(platform = "google")))
+    }
+
+    @Test
+    fun whenStripeFreeTrialThenNotWithdrawable() {
+        assertFalse(withdrawal.isWithdrawable(subscription(activeOffers = listOf(ActiveOfferType.TRIAL))))
+    }
+
+    @Test
+    fun whenStripeSubscriptionExpiredThenNotWithdrawable() {
+        assertFalse(withdrawal.isWithdrawable(subscription(status = EXPIRED)))
+    }
 
     @Test
     fun whenEligibleThenReturnEligibility() = runTest {
@@ -150,6 +192,20 @@ class RealSubscriptionWithdrawalTest {
 
         assertEquals(Failure(FailureReason.UNKNOWN), withdrawal.withdraw())
     }
+
+    private fun subscription(
+        platform: String = "stripe",
+        status: SubscriptionStatus = AUTO_RENEWABLE,
+        activeOffers: List<ActiveOfferType> = emptyList(),
+    ) = Subscription(
+        productId = SubscriptionsConstants.MONTHLY_PLAN_ROW,
+        billingPeriod = "Monthly",
+        startedAt = 1760950800000,
+        expiresOrRenewsAt = 1763629200000,
+        status = status,
+        platform = platform,
+        activeOffers = activeOffers,
+    )
 
     private fun httpException(code: Int) = HttpException(Response.error<Any>(code, "".toResponseBody()))
 

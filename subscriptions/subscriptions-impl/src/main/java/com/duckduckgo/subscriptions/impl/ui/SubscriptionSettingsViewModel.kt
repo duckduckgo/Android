@@ -182,7 +182,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 pendingTierNameResId = pendingTierNameResId,
                 effectiveTier = effectiveTier,
                 onboardingEntryPoint = onboardingEntryPoint(subscription),
-                withdrawal = withdrawalOption.takeIf { canWithdraw(subscription) },
+                withdrawal = withdrawalOption.takeIf { subscriptionWithdrawal.isWithdrawable(subscription) },
             ),
         )
 
@@ -196,16 +196,9 @@ class SubscriptionSettingsViewModel @Inject constructor(
         )
     }
 
-    private fun canWithdraw(subscription: Subscription): Boolean {
-        return subscriptionsFeature.subscriptionWithdrawal().isEnabled() &&
-            subscription.platform.equals(STRIPE_PLATFORM, ignoreCase = true) &&
-            subscription.isActive() &&
-            ActiveOfferType.TRIAL !in subscription.activeOffers
-    }
-
     // Eligibility needs a Stripe lookup on the backend, so it is requested once per screen rather than on every resume
     private suspend fun loadWithdrawalOptionIfNeeded(subscription: Subscription) {
-        if (!canWithdraw(subscription) || withdrawalEligibilityRequested) return
+        if (!subscriptionWithdrawal.isWithdrawable(subscription) || withdrawalEligibilityRequested) return
         withdrawalEligibilityRequested = true
 
         val eligibility = subscriptionWithdrawal.getEligibility() ?: return
@@ -419,7 +412,6 @@ class SubscriptionSettingsViewModel @Inject constructor(
 
     companion object {
         private const val COMPLETE_PERCENTAGE = 100
-        private const val STRIPE_PLATFORM = "stripe"
         private const val INCOMPLETE_CARD_WINDOW_MILLIS = 14L * 24 * 60 * 60 * 1000
     }
 }
