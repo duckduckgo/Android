@@ -262,7 +262,12 @@ class RealNativeInputManagerTest {
         val endAction = argumentCaptor<Runnable>()
         verify(fade).withEndAction(endAction.capture())
         endAction.firstValue.run()
-        rootView.addView(TestNativeInputWidget(context).apply { id = com.duckduckgo.duckchat.impl.R.id.inputModeWidget })
+        rootView.addView(
+            FrameLayout(context).apply {
+                id = R.id.inputModeRoot
+                addView(TestNativeInputWidget(context).apply { id = com.duckduckgo.duckchat.impl.R.id.inputModeWidget })
+            },
+        )
         clearInvocations(omnibar)
 
         testee.onKeyboardVisibilityChanged(true)
@@ -304,6 +309,24 @@ class RealNativeInputManagerTest {
         nativeChatInputEnabled.value = false
 
         assertNull(rootView.findViewById<View?>(R.id.inputModeRoot))
+    }
+
+    @Test
+    fun whenContextualSheetWidgetIsAttachedThenInputFocusIsReadFromOmnibarWidget() {
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(false))
+        whenever(omnibar.viewMode).thenReturn(Omnibar.ViewMode.NewTab)
+        testee.init(omnibar, rootView, lifecycleOwner)
+        val sheetWidget: NativeInputWidget = mock()
+        whenever(sheetWidget.hasInputFocus()).thenReturn(true)
+        rootView.addView(TestNativeInputWidget(context, sheetWidget).apply { id = com.duckduckgo.duckchat.impl.R.id.inputModeWidget })
+        rootView.addView(
+            FrameLayout(context).apply {
+                id = R.id.inputModeRoot
+                addView(TestNativeInputWidget(context).apply { id = com.duckduckgo.duckchat.impl.R.id.inputModeWidget })
+            },
+        )
+
+        assertFalse(testee.hasInputFocus())
     }
 
     @Test
@@ -583,7 +606,10 @@ class RealNativeInputManagerTest {
         }
 
         val widget = TestNativeInputWidget(context).apply { id = com.duckduckgo.duckchat.impl.R.id.inputModeWidget }
-        val widgetView = FrameLayout(context).apply { addView(widget) }
+        val widgetView = FrameLayout(context).apply {
+            id = R.id.inputModeRoot
+            addView(widget)
+        }
         val layoutInflater: LayoutInflater = mock()
         whenever(layoutInflater.inflate(any<Int>(), any<ViewGroup>(), any<Boolean>())).thenReturn(widgetView)
         testee.showNativeInput(

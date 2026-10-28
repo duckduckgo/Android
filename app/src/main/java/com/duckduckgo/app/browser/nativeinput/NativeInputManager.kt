@@ -249,6 +249,9 @@ class RealNativeInputManager @Inject constructor(
         return widgetView.findViewById<View?>(com.duckduckgo.duckchat.impl.R.id.inputModeWidget) as? NativeInputWidget
     }
 
+    // The contextual sheet's widget shares the id and also lives under rootView, so look inside the omnibar wrapper only.
+    private fun omnibarWidget(): NativeInputWidget? = rootView.findViewById<View?>(R.id.inputModeRoot)?.let(::widgetFrom)
+
     override fun init(
         omnibar: Omnibar,
         rootView: ViewGroup,
@@ -290,7 +293,7 @@ class RealNativeInputManager @Inject constructor(
             }
             .launchIn(lifecycleOwner.lifecycleScope)
         voiceSearchAvailability.observeVoiceSearchAvailability()
-            .onEach { widgetFrom(rootView)?.let { widget -> updateVoiceButtons(widget) } }
+            .onEach { omnibarWidget()?.let { widget -> updateVoiceButtons(widget) } }
             .launchIn(lifecycleOwner.lifecycleScope)
     }
 
@@ -302,13 +305,13 @@ class RealNativeInputManager @Inject constructor(
 
     override fun isChatTabSelected(): Boolean {
         if (!::rootView.isInitialized) return false
-        val widget = widgetFrom(rootView) ?: return false
+        val widget = omnibarWidget() ?: return false
         return widget.isChatTabSelected()
     }
 
     override fun hasInputFocus(): Boolean {
         if (!::rootView.isInitialized) return false
-        return widgetFrom(rootView)?.hasInputFocus() == true
+        return omnibarWidget()?.hasInputFocus() == true
     }
 
     override fun setPickingImage(picking: Boolean) {
@@ -319,30 +322,30 @@ class RealNativeInputManager @Inject constructor(
 
     override fun setText(text: String) {
         if (!::rootView.isInitialized) return
-        val widget = widgetFrom(rootView) ?: return
+        val widget = omnibarWidget() ?: return
         widget.text = text
     }
 
     override fun refreshChatSuggestions() {
         if (!::rootView.isInitialized) return
-        val widget = widgetFrom(rootView) ?: return
+        val widget = omnibarWidget() ?: return
         widget.refreshChatSuggestions()
     }
 
     override fun onChatDeleteConfirmed() {
         if (!::rootView.isInitialized) return
-        val widget = widgetFrom(rootView) ?: return
+        val widget = omnibarWidget() ?: return
         widget.onChatDeleteConfirmed()
     }
 
     override fun onChatDeleteCancelled() {
         if (!::rootView.isInitialized) return
-        val widget = widgetFrom(rootView) ?: return
+        val widget = omnibarWidget() ?: return
         widget.onChatDeleteCancelled()
     }
 
     override fun handleDuckAiVoiceResult(query: String) {
-        val widget = widgetFrom(rootView)
+        val widget = omnibarWidget()
         if (widget != null) {
             widget.nextDuckAiEntryPoint = DuckChatEntryPoint.VOICE
             try {
@@ -496,7 +499,7 @@ class RealNativeInputManager @Inject constructor(
     override fun onKeyboardVisibilityChanged(isVisible: Boolean) {
         if (!::rootView.isInitialized) return
         if (isExiting) return
-        val widget = widgetFrom(rootView) ?: return
+        val widget = omnibarWidget() ?: return
         val widgetRoot = widgetRoot
 
         if (omnibarController.isDuckAiMode()) {
@@ -590,7 +593,7 @@ class RealNativeInputManager @Inject constructor(
             return
         }
 
-        if (omnibarController.isDuckAiMode() && rootView.findViewById<View?>(com.duckduckgo.duckchat.impl.R.id.inputModeWidget) != null) return
+        if (omnibarController.isDuckAiMode() && omnibarWidget() != null) return
 
         animator.cancelAnimation()
         isExiting = false
@@ -1118,7 +1121,7 @@ class RealNativeInputManager @Inject constructor(
     /** The toggle-row back arrow is the inverse of the nav bar: it fills in as the back affordance only
      *  while the nav bar is hidden, so exactly one back arrow shows at a time. */
     private fun syncBackArrowToNavBar() {
-        widgetFrom(rootView)?.setNavBarVisible(navBarShown == true)
+        omnibarWidget()?.setNavBarVisible(navBarShown == true)
     }
 
     /** On the user's first keystroke (empty to non-empty), latches the nav bar off for the rest of this input session and slide it out. */

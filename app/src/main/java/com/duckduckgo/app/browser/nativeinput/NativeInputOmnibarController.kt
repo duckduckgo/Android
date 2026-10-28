@@ -237,7 +237,7 @@ class RealNativeInputOmnibarController(
         block()
         val listener = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             if ((!nativeInputStateBugKillSwitch.self().isEnabled() || overlayActive) &&
-                rootView.findViewById<View?>(com.duckduckgo.duckchat.impl.R.id.inputModeWidget) != null
+                rootView.findViewById<View?>(R.id.inputModeRoot) != null
             ) {
                 block()
             }
