@@ -283,11 +283,11 @@ class RealConnectedDevicesRepositoryTest {
         val otherDevice = Device(deviceId = "otherDeviceId", deviceName = "otherDeviceName", jwIat = "", deviceType = "otherDeviceType")
         whenever(nativeLib.decryptData(anyString(), anyString())).thenThrow(NegativeArraySizeException())
         whenever(syncApi.getDevices(anyString())).thenReturn(Success(DeviceEntries(entries = listOf(otherDevice), entriesV2 = null)))
-        whenever(syncApi.logout(token, "otherDeviceId")).thenReturn(Error(reason = "timeout"))
+        whenever(remoteDeviceLogout.logout("otherDeviceId", false)).thenReturn(Error(reason = "timeout"))
 
         testee.getConnectedDevices(reportAccountErrorPixel = false)
 
-        verify(syncApi).logout(token, "otherDeviceId")
+        verify(remoteDeviceLogout).logout("otherDeviceId", false)
         verify(syncPixels, never()).fireSyncAccountErrorPixel(any(), any())
     }
 
