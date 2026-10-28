@@ -65,7 +65,6 @@
     <!-- 1dp above the legacy AppBarLayout's lifted elevation (4dp) so floated overlays clear it. -->
     <dimen name="omnibarFloatElevation">5dp</dimen>
     <dimen name="cookiesAnimationHeight">34dp</dimen>
-    <dimen name="cookiesAnimationRadius">14dp</dimen>
 
     <!-- Buttons -->
     <dimen name="buttonLargeHeight">60dp</dimen>

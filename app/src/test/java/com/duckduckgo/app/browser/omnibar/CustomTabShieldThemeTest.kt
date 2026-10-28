@@ -23,23 +23,11 @@ import org.junit.Test
 class CustomTabShieldThemeTest {
 
     @Test
-    fun whenRebrandEnabledAndLegacyCustomTabUsesDefaultToolbarColorThenUseToolbarColor() {
+    fun whenLegacyCustomTabUsesDefaultToolbarColorThenUseToolbarColor() {
         assertTrue(
             shouldUseCustomTabToolbarColorForShield(
-                isAddressBarRebrandEnabled = true,
                 isNewCustomTabEnabled = false,
                 isDefaultToolbarColor = true,
-            ),
-        )
-    }
-
-    @Test
-    fun whenRebrandDisabledAndLegacyCustomTabUsesCustomToolbarColorThenUseAmbientTheme() {
-        assertFalse(
-            shouldUseCustomTabToolbarColorForShield(
-                isAddressBarRebrandEnabled = false,
-                isNewCustomTabEnabled = false,
-                isDefaultToolbarColor = false,
             ),
         )
     }
@@ -48,7 +36,6 @@ class CustomTabShieldThemeTest {
     fun whenNewCustomTabUsesDefaultToolbarColorThenUseAmbientTheme() {
         assertFalse(
             shouldUseCustomTabToolbarColorForShield(
-                isAddressBarRebrandEnabled = true,
                 isNewCustomTabEnabled = true,
                 isDefaultToolbarColor = true,
             ),
@@ -59,7 +46,6 @@ class CustomTabShieldThemeTest {
     fun whenNewCustomTabUsesCustomToolbarColorThenUseToolbarColor() {
         assertTrue(
             shouldUseCustomTabToolbarColorForShield(
-                isAddressBarRebrandEnabled = false,
                 isNewCustomTabEnabled = true,
                 isDefaultToolbarColor = false,
             ),

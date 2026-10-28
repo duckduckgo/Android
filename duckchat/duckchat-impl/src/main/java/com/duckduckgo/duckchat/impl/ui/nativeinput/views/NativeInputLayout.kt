@@ -98,10 +98,7 @@ class NativeInputLayout @JvmOverloads constructor(
      * the per-tab store they share can briefly emit a top BROWSER search-only state that would otherwise turn
      * them into the omnibar pill.
      */
-    internal fun applyOmnibarShape(
-        state: NativeInputState,
-        rebrandAddressBar: Boolean,
-    ) {
+    internal fun applyOmnibarShape(state: NativeInputState) {
         if (surface != Surface.OMNIBAR_TOP && surface != Surface.OMNIBAR_BOTTOM) return
         val lp = layoutParams as? MarginLayoutParams ?: return
         // Only the top browser search-only omnibar takes the wide-omnibar shape; isBottom is part of this
@@ -111,21 +108,13 @@ class NativeInputLayout @JvmOverloads constructor(
         val isBottomDuckAi = state.isBottom && state.inputContext == NativeInputState.InputContext.DUCK_AI
         strokeWidth = if (isBottomDuckAi) resources.getDimensionPixelSize(CommonR.dimen.horizontalDividerHeight) else 0
         if (state.isBottom) {
-            val radius = when {
-                !isBrowserSearchOnly -> CommonR.dimen.extraLargeShapeCornerRadius
-                rebrandAddressBar -> CommonR.dimen.rebrandInputRadius
-                else -> CommonR.dimen.largeShapeCornerRadius
-            }
+            val radius = if (isBrowserSearchOnly) CommonR.dimen.rebrandInputRadius else CommonR.dimen.extraLargeShapeCornerRadius
             this.radius = resources.getDimension(radius)
         }
         if (isBrowserSearchOnly && !state.isBottom) {
             val targetTopMargin = resources.getDimensionPixelSize(CommonR.dimen.omnibarCardMarginTop)
             val targetHorizontalMargin = resources.getDimensionPixelSize(CommonR.dimen.omnibarCardMarginHorizontal)
-            if (rebrandAddressBar) {
-                shapeAppearanceModel = shapeAppearanceModel.withCornerSize(ShapeAppearanceModel.PILL)
-            } else {
-                radius = resources.getDimension(CommonR.dimen.largeShapeCornerRadius)
-            }
+            shapeAppearanceModel = shapeAppearanceModel.withCornerSize(ShapeAppearanceModel.PILL)
             lp.topMargin = targetTopMargin - paddingTop
             lp.marginStart = targetHorizontalMargin - paddingLeft
             lp.marginEnd = targetHorizontalMargin - paddingRight

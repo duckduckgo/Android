@@ -63,7 +63,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.ui.PulseAnimation
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.codegen.annotations.InjectWith
-import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -117,6 +116,7 @@ import kotlinx.coroutines.launch
 import logcat.logcat
 import org.json.JSONArray
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 interface NativeInputWidget {
 
@@ -297,9 +297,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     @Inject
     lateinit var browserMode: BrowserMode
-
-    @Inject
-    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -932,9 +929,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
             isFocused = inputField.hasFocus() || previewEnterFocus,
         )
         val verticalPadAttr = if (expanded) {
-            com.duckduckgo.mobile.android.R.dimen.keyline_2
+            CommonR.dimen.keyline_2
         } else {
-            com.duckduckgo.mobile.android.R.dimen.keyline_1
+            CommonR.dimen.keyline_1
         }
         val verticalPad = resources.getDimensionPixelSize(verticalPadAttr)
         setPadding(paddingLeft, verticalPad, paddingRight, verticalPad)
@@ -1037,7 +1034,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         inputModeWidgetUnifiedBack.visibility =
             if (state.shouldShowCardRowBack(isEditing = isEditWidget)) VISIBLE else GONE
         inputModeWidgetBack.setBackgroundResource(
-            com.duckduckgo.mobile.android.R.drawable.selectable_circular_container_ripple,
+            CommonR.drawable.selectable_circular_container_ripple,
         )
     }
 
@@ -1658,7 +1655,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun applyOmnibarShape() {
         val state = nativeInputState ?: return
-        (parent as? NativeInputLayout)?.applyOmnibarShape(state, appBrandDesignUpdateToggles.addressBar().isEnabled())
+        (parent as? NativeInputLayout)?.applyOmnibarShape(state)
     }
 
     override fun bindInputEvents(

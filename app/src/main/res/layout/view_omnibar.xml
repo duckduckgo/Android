@@ -76,7 +76,7 @@
                     android:layout_marginTop="@dimen/omnibarCardMarginTop"
                     android:layout_marginEnd="@dimen/omnibarCardMarginEnd"
                     android:layout_marginBottom="@dimen/omnibarCardMarginBottom"
-                    app:cardCornerRadius="@dimen/largeShapeCornerRadius">
+                    app:cardCornerRadius="@dimen/rebrandInputRadius">
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/omniBarContainer"
@@ -84,6 +84,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:theme="?attr/daxOmnibarThemeOverlay"
+                        app:cardCornerRadius="@dimen/rebrandInputRadius"
                         app:cardElevation="0dp"
                         app:strokeWidth="0dp">
 
