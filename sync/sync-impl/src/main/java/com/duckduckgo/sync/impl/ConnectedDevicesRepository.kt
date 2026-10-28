@@ -109,6 +109,7 @@ class RealConnectedDevicesRepository @Inject constructor(
         // it and a switch replaces it, so we never undo the reset to 0 or write the old account's count over the new one.
         if (result is Success && userId != null && syncStore.userId == userId) {
             syncStore.connectedDevicesCount = result.data.size
+            logcat { "Sync-ConnectedDevices: stored connected devices count ${result.data.size}" }
         }
         return result
     }
