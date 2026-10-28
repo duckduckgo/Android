@@ -195,7 +195,7 @@ class NextStepsItemsViewModelTest {
     }
 
     @Test
-    fun `when the front card completes without a CTA in this tab then no impression is counted`() = runTest {
+    fun `when the front card completes without a CTA in this tab then the promoted card gets one impression`() = runTest {
         activeMessage.value = aMessage(content = nextStepsContent())
         advanceUntilIdle()
         testee.onStop(mock())
@@ -204,7 +204,7 @@ class NextStepsItemsViewModelTest {
         testee.onResume(mock())
         advanceUntilIdle()
 
-        assertEquals(0, impressions(addWidgetItem.id))
+        assertEquals(1, impressions(addWidgetItem.id))
         assertEquals(listOf(addWidgetItem), testee.viewState.value.items)
     }
 
@@ -233,7 +233,7 @@ class NextStepsItemsViewModelTest {
     }
 
     @Test
-    fun `when a card completes elsewhere then it is reported as finished elsewhere and the next card waits for a new render`() = runTest {
+    fun `when a card completes elsewhere then it is reported as finished elsewhere and the promoted card gets an impression`() = runTest {
         activeMessage.value = aMessage(content = nextStepsContent())
         advanceUntilIdle()
         defaultBrowserCheck.completed = true
@@ -242,7 +242,7 @@ class NextStepsItemsViewModelTest {
         advanceUntilIdle()
 
         verify(pixels).cardRemoved(defaultBrowserItem.id, DAY_0, FINISHED_ELSEWHERE, "1")
-        assertEquals(0, impressions(addWidgetItem.id))
+        assertEquals(1, impressions(addWidgetItem.id))
         assertEquals(listOf(addWidgetItem), testee.viewState.value.items)
     }
 

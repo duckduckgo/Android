@@ -258,13 +258,15 @@ class NextStepsItemsViewModel @Inject constructor(
             if (completed.animate) {
                 animatingCompletionItemId = front.id
                 command.trySend(Command.AnimateFrontCardCompletion)
-            } else if (animatingCompletionItemId == null) {
-                ordered.firstOrNull()?.let { promotedCard ->
-                    viewModelScope.launch { telemetry.onFrontCardShown(message.id, promotedCard.id, ordered.ids()) }
-                }
             }
         }
-        return if (front.id == animatingCompletionItemId) listOf(front) + ordered.filter { it.id != front.id } else ordered
+        if (front.id == animatingCompletionItemId) return listOf(front) + ordered.filter { it.id != front.id }
+        if (front.id !in ordered.ids()) {
+            ordered.firstOrNull()?.let { promotedCard ->
+                viewModelScope.launch { telemetry.onFrontCardShown(message.id, promotedCard.id, ordered.ids()) }
+            }
+        }
+        return ordered
     }
 
     private fun List<CardItem.ListItem>.sortedByOrder(order: List<String>): List<CardItem.ListItem> =
