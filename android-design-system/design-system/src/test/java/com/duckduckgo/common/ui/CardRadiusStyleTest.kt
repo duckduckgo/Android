@@ -31,27 +31,8 @@ import com.google.android.material.R as MaterialR
 class CardRadiusStyleTest {
 
     @Test
-    fun whenRadiusOverlayIsAbsentThenSharedCardsUse16Dp() {
-        listOf(
-            R.style.Theme_DuckDuckGo_Light,
-            R.style.Theme_DuckDuckGo_Dark,
-        ).forEach { themeRes ->
-            listOf(
-                R.style.Widget_DuckDuckGo_MessageCta,
-                R.style.Widget_DuckDuckGo_Hatch,
-            ).forEach { styleRes ->
-                assertEquals(
-                    RuntimeEnvironment.getApplication().resources.getDimension(R.dimen.largeShapeCornerRadius),
-                    resolvedCardCorner(themeRes, styleRes, overlayEnabled = false),
-                    0f,
-                )
-            }
-        }
-    }
-
-    @Test
     @Config(qualifiers = "xhdpi")
-    fun whenRadiusOverlayIsAppliedThenSharedCardsUse28Dp() {
+    fun whenThemedThenSharedCardsUse28Dp() {
         listOf(
             R.style.Theme_DuckDuckGo_Light,
             R.style.Theme_DuckDuckGo_Dark,
@@ -62,7 +43,7 @@ class CardRadiusStyleTest {
             ).forEach { styleRes ->
                 assertEquals(
                     RuntimeEnvironment.getApplication().resources.getDimension(R.dimen.rebrandContainerRadius),
-                    resolvedCardCorner(themeRes, styleRes, overlayEnabled = true),
+                    resolvedCardCorner(themeRes, styleRes),
                     0f,
                 )
             }
@@ -72,12 +53,8 @@ class CardRadiusStyleTest {
     private fun resolvedCardCorner(
         @StyleRes themeRes: Int,
         @StyleRes styleRes: Int,
-        overlayEnabled: Boolean,
     ): Float {
         val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), themeRes)
-        if (overlayEnabled) {
-            context.theme.applyStyle(R.style.ThemeOverlay_Rebrand_Radius, true)
-        }
         val values = context.obtainStyledAttributes(styleRes, intArrayOf(MaterialR.attr.cardCornerRadius))
         return try {
             values.getDimension(0, -1f)

@@ -30,34 +30,17 @@ import org.robolectric.annotation.Config
 class DaxBubbleCardViewRadiusTest {
 
     @Test
-    fun whenRadiusOverlayIsAbsentThenBubbleUsesLegacy12DpRadius() {
-        assertBubbleRadius(
-            overlayEnabled = false,
-            expectedDimen = R.dimen.mediumShapeCornerRadius,
-        )
-    }
-
-    @Test
     @Config(qualifiers = "xhdpi")
-    fun whenRadiusOverlayIsAppliedThenBubbleUses28DpRadius() {
-        assertBubbleRadius(
-            overlayEnabled = true,
-            expectedDimen = R.dimen.rebrandContainerRadius,
-        )
+    fun whenThemedThenBubbleUses28DpRadius() {
+        assertBubbleRadius(expectedDimen = R.dimen.rebrandContainerRadius)
     }
 
-    private fun assertBubbleRadius(
-        overlayEnabled: Boolean,
-        expectedDimen: Int,
-    ) {
+    private fun assertBubbleRadius(expectedDimen: Int) {
         listOf(
             R.style.Theme_DuckDuckGo_Light,
             R.style.Theme_DuckDuckGo_Dark,
         ).forEach { themeRes ->
             val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), themeRes)
-            if (overlayEnabled) {
-                context.theme.applyStyle(R.style.ThemeOverlay_Rebrand_Radius, true)
-            }
             val shape = DaxBubbleCardView(context).shapeAppearanceModel
             val expected = context.resources.getDimension(expectedDimen)
             val bounds = RectF()

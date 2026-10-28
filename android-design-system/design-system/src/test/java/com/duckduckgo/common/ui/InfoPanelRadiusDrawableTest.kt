@@ -31,26 +31,12 @@ import org.robolectric.annotation.Config
 class InfoPanelRadiusDrawableTest {
 
     @Test
-    fun whenRadiusOverlayIsAbsentThenViewSystemInfoPanelUses8DpInLightAndDarkThemes() {
-        assertPanelCornerRadius(
-            overlayEnabled = false,
-            expectedDimen = R.dimen.smallShapeCornerRadius,
-        )
-    }
-
-    @Test
     @Config(qualifiers = "xhdpi")
-    fun whenRadiusOverlayIsAppliedThenViewSystemInfoPanelUses28DpInLightAndDarkThemes() {
-        assertPanelCornerRadius(
-            overlayEnabled = true,
-            expectedDimen = R.dimen.rebrandContainerRadius,
-        )
+    fun whenThemedThenViewSystemInfoPanelUses28DpInLightAndDarkThemes() {
+        assertPanelCornerRadius(expectedDimen = R.dimen.rebrandContainerRadius)
     }
 
-    private fun assertPanelCornerRadius(
-        overlayEnabled: Boolean,
-        expectedDimen: Int,
-    ) {
+    private fun assertPanelCornerRadius(expectedDimen: Int) {
         val drawableResIds = listOf(
             R.drawable.info_panel_alert_background,
             R.drawable.info_panel_tooltip_background,
@@ -60,9 +46,6 @@ class InfoPanelRadiusDrawableTest {
             R.style.Theme_DuckDuckGo_Dark,
         ).forEach { themeResId ->
             val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), themeResId)
-            if (overlayEnabled) {
-                context.theme.applyStyle(R.style.ThemeOverlay_Rebrand_Radius, true)
-            }
             val expectedRadius = context.resources.getDimension(expectedDimen)
             drawableResIds.forEach { drawableResId ->
                 val drawable = checkNotNull(AppCompatResources.getDrawable(context, drawableResId)) as GradientDrawable

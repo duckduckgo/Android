@@ -33,19 +33,8 @@ import com.google.android.material.R as MaterialR
 class BottomSheetDialogExtensionsTest {
 
     @Test
-    fun whenRadiusOverlayIsAbsentThenSetRoundCornersUsesTheLegacy12DpRadius() {
-        val dialog = themedDialog(radiusOverlayEnabled = false)
-        dialog.setRoundCorners()
-
-        assertTopCornerRadius(
-            dialog,
-            RuntimeEnvironment.getApplication().resources.getDimension(R.dimen.dialogBorderRadius),
-        )
-    }
-
-    @Test
-    fun whenRadiusOverlayIsAppliedThenSetRoundCornersUsesTheRebrand28DpRadius() {
-        val dialog = themedDialog(radiusOverlayEnabled = true)
+    fun whenSetRoundCornersThenUsesTheRebrand28DpRadius() {
+        val dialog = themedDialog()
         dialog.setRoundCorners()
 
         assertTopCornerRadius(
@@ -55,19 +44,8 @@ class BottomSheetDialogExtensionsTest {
     }
 
     @Test
-    fun whenRadiusOverlayIsAbsentThenSetRoundCornersUsesTheQuickSetup36DpRadius() {
-        val dialog = themedDialog(radiusOverlayEnabled = false)
-        dialog.setRoundCorners(R.attr.daxOnboardingSheetRadius, R.dimen.onboardingBottomSheetCornerRadius)
-
-        assertTopCornerRadius(
-            dialog,
-            RuntimeEnvironment.getApplication().resources.getDimension(R.dimen.onboardingBottomSheetCornerRadius),
-        )
-    }
-
-    @Test
-    fun whenRadiusOverlayIsAppliedThenSetRoundCornersUsesTheQuickSetup28DpRadius() {
-        val dialog = themedDialog(radiusOverlayEnabled = true)
+    fun whenSetRoundCornersWithOnboardingAttrThenUsesTheQuickSetup28DpRadius() {
+        val dialog = themedDialog()
         dialog.setRoundCorners(R.attr.daxOnboardingSheetRadius, R.dimen.onboardingBottomSheetCornerRadius)
 
         assertTopCornerRadius(
@@ -76,11 +54,8 @@ class BottomSheetDialogExtensionsTest {
         )
     }
 
-    private fun themedDialog(radiusOverlayEnabled: Boolean): BottomSheetDialog {
+    private fun themedDialog(): BottomSheetDialog {
         val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), R.style.Theme_DuckDuckGo_Light)
-        if (radiusOverlayEnabled) {
-            context.theme.applyStyle(R.style.ThemeOverlay_Rebrand_Radius, true)
-        }
         return BottomSheetDialog(context, R.style.Widget_DuckDuckGo_BottomSheetDialog).apply {
             setContentView(FrameLayout(context))
         }

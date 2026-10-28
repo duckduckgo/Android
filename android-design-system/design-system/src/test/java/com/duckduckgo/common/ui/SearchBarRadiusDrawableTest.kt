@@ -32,20 +32,14 @@ import org.robolectric.annotation.Config
 class SearchBarRadiusDrawableTest {
 
     @Test
-    fun whenRadiusOverlayIsAbsentThenSearchBarDrawablesUse8DpInLightAndDarkThemes() {
-        assertSearchBarCornerRadii(overlayEnabled = false, expectedDimen = R.dimen.smallShapeCornerRadius)
-    }
-
-    @Test
     @Config(qualifiers = "xhdpi")
-    fun whenRadiusOverlayIsAppliedThenSearchBarDrawablesUse48DpInLightAndDarkThemes() {
-        assertSearchBarCornerRadii(overlayEnabled = true, expectedDimen = R.dimen.rebrandInputRadius)
+    fun whenThemedThenSearchBarDrawablesUse48DpInLightAndDarkThemes() {
+        assertSearchBarCornerRadii(expectedDimen = R.dimen.rebrandInputRadius)
     }
 
-    private fun assertSearchBarCornerRadii(overlayEnabled: Boolean, expectedDimen: Int) {
+    private fun assertSearchBarCornerRadii(expectedDimen: Int) {
         listOf(R.style.Theme_DuckDuckGo_Light, R.style.Theme_DuckDuckGo_Dark).forEach { themeResId ->
             val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), themeResId)
-            if (overlayEnabled) context.theme.applyStyle(R.style.ThemeOverlay_Rebrand_Radius, true)
             val expectedRadius = context.resources.getDimension(expectedDimen)
 
             val background = checkNotNull(AppCompatResources.getDrawable(context, R.drawable.omnibar_field_background)) as GradientDrawable

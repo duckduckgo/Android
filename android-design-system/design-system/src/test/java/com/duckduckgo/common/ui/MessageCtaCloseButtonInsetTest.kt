@@ -27,6 +27,8 @@ import android.widget.ImageView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.mobile.android.R
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RuntimeEnvironment
@@ -36,41 +38,23 @@ import org.robolectric.annotation.Config
 class MessageCtaCloseButtonInsetTest {
 
     @Test
-    fun whenRadiusOverlayIsAbsentThenCloseIconIs8DpFromTopAndEnd() {
-        assertCloseIconInset(overlayEnabled = false, expectedInsetDp = 8)
+    @Config(qualifiers = "xhdpi")
+    fun whenThemedThenCloseIconIs12DpFromTopAndEnd() {
+        assertCloseIconInset(expectedInsetDp = 12)
     }
 
     @Test
     @Config(qualifiers = "xhdpi")
-    fun whenRadiusOverlayIsAppliedThenCloseIconIs12DpFromTopAndEnd() {
-        assertCloseIconInset(overlayEnabled = true, expectedInsetDp = 12)
+    fun whenThemedThenCloseButtonRippleFitsInsideCardCorner() {
+        assertCloseButtonUsesInsetCircularRipple()
     }
 
     @Test
-    fun whenRadiusOverlayIsAbsentThenCloseButtonDoesNotUseRebrandRippleInset() {
-        assertCloseButtonUsesInsetCircularRipple(overlayEnabled = false, expectedRebrandRipple = false)
+    fun whenThemedThenRemoteMessageContentDrawsIntoPadding() {
+        assertRemoteMessageContentDrawsIntoPadding()
     }
 
-    @Test
-    @Config(qualifiers = "xhdpi")
-    fun whenRadiusOverlayIsAppliedThenCloseButtonRippleFitsInsideCardCorner() {
-        assertCloseButtonUsesInsetCircularRipple(overlayEnabled = true, expectedRebrandRipple = true)
-    }
-
-    @Test
-    fun whenRadiusOverlayIsAbsentThenRemoteMessageContentClipsToPadding() {
-        assertRemoteMessageContentClipsToPadding(overlayEnabled = false, expectedClipToPadding = true)
-    }
-
-    @Test
-    fun whenRadiusOverlayIsAppliedThenRemoteMessageContentDrawsIntoPadding() {
-        assertRemoteMessageContentClipsToPadding(overlayEnabled = true, expectedClipToPadding = false)
-    }
-
-    private fun assertCloseIconInset(
-        overlayEnabled: Boolean,
-        expectedInsetDp: Int,
-    ) {
+    private fun assertCloseIconInset(expectedInsetDp: Int) {
         listOf(
             R.style.Theme_DuckDuckGo_Light,
             R.style.Theme_DuckDuckGo_Dark,
@@ -80,9 +64,6 @@ class MessageCtaCloseButtonInsetTest {
                 R.layout.view_promo_message_cta,
             ).forEach { layoutResId ->
                 val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), themeResId)
-                if (overlayEnabled) {
-                    context.theme.applyStyle(R.style.ThemeOverlay_Rebrand_Radius, true)
-                }
                 val card = LayoutInflater.from(context).inflate(layoutResId, null) as ViewGroup
                 val container = card.getChildAt(0) as ViewGroup
                 val close = card.findViewById<ImageView>(R.id.close)
@@ -105,10 +86,7 @@ class MessageCtaCloseButtonInsetTest {
         }
     }
 
-    private fun assertCloseButtonUsesInsetCircularRipple(
-        overlayEnabled: Boolean,
-        expectedRebrandRipple: Boolean,
-    ) {
+    private fun assertCloseButtonUsesInsetCircularRipple() {
         listOf(
             R.style.Theme_DuckDuckGo_Light,
             R.style.Theme_DuckDuckGo_Dark,
@@ -118,9 +96,6 @@ class MessageCtaCloseButtonInsetTest {
                 R.layout.view_promo_message_cta,
             ).forEach { layoutResId ->
                 val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), themeResId)
-                if (overlayEnabled) {
-                    context.theme.applyStyle(R.style.ThemeOverlay_Rebrand_Radius, true)
-                }
                 val card = LayoutInflater.from(context).inflate(layoutResId, null) as ViewGroup
                 val close = card.findViewById<ImageView>(R.id.close)
                 val inset = close.background as? InsetDrawable
@@ -136,27 +111,21 @@ class MessageCtaCloseButtonInsetTest {
                     close.layoutParams.height - expectedInset,
                 )
 
-                assertEquals(expectedRebrandRipple, hasCircularMask && hasExpectedInsets)
+                assertTrue(hasCircularMask && hasExpectedInsets)
             }
         }
     }
 
-    private fun assertRemoteMessageContentClipsToPadding(
-        overlayEnabled: Boolean,
-        expectedClipToPadding: Boolean,
-    ) {
+    private fun assertRemoteMessageContentDrawsIntoPadding() {
         listOf(
             R.style.Theme_DuckDuckGo_Light,
             R.style.Theme_DuckDuckGo_Dark,
         ).forEach { themeResId ->
             val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), themeResId)
-            if (overlayEnabled) {
-                context.theme.applyStyle(R.style.ThemeOverlay_Rebrand_Radius, true)
-            }
             val card = LayoutInflater.from(context).inflate(R.layout.view_remote_message_cta, null) as ViewGroup
             val container = card.getChildAt(0) as ViewGroup
 
-            assertEquals(expectedClipToPadding, container.clipToPadding)
+            assertFalse(container.clipToPadding)
         }
     }
 }

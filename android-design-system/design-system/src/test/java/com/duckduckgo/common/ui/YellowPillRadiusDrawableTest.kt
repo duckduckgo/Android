@@ -35,20 +35,9 @@ import org.robolectric.annotation.GraphicsMode
 class YellowPillRadiusDrawableTest {
 
     @Test
-    fun whenRadiusOverlayIsAbsentThenYellowPillUses2DpInLightAndDarkThemes() {
-        assertPillCornerRadius(
-            overlayEnabled = false,
-            expectedDimen = R.dimen.daxYellowPillCornerRadius,
-        )
-    }
-
-    @Test
     @Config(qualifiers = "xhdpi")
-    fun whenRadiusOverlayIsAppliedThenYellowPillUsesPillRadiusInLightAndDarkThemes() {
-        assertPillCornerRadius(
-            overlayEnabled = true,
-            expectedDimen = R.dimen.pillShapeCornerRadius,
-        )
+    fun whenThemedThenYellowPillUsesPillRadiusInLightAndDarkThemes() {
+        assertPillCornerRadius(expectedDimen = R.dimen.pillShapeCornerRadius)
     }
 
     @Test
@@ -105,19 +94,13 @@ class YellowPillRadiusDrawableTest {
         assertTrue(pill.measuredHeight > context.resources.getDimensionPixelSize(R.dimen.rebrandPillMinHeight))
     }
 
-    private fun assertPillCornerRadius(
-        overlayEnabled: Boolean,
-        expectedDimen: Int,
-    ) {
+    private fun assertPillCornerRadius(expectedDimen: Int) {
         listOf(
             R.style.Theme_DuckDuckGo_Light,
             R.style.Theme_DuckDuckGo_Dark,
         ).forEach { themeResId ->
             listOf(false, true).forEach { badgesEnabled ->
                 val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), themeResId)
-                if (overlayEnabled) {
-                    context.theme.applyStyle(R.style.ThemeOverlay_Rebrand_Radius, true)
-                }
                 if (badgesEnabled) {
                     context.theme.applyStyle(R.style.ThemeOverlay_Rebrand_Badges, true)
                 }
