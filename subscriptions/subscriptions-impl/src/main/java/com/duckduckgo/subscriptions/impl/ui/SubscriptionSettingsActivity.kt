@@ -418,7 +418,6 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    // Built with custom buttons because the stacked dialog dismisses on every click: it has to stay open while the request runs
     private fun goToWithdrawalHelp() {
         globalActivityStarter.start(
             this,

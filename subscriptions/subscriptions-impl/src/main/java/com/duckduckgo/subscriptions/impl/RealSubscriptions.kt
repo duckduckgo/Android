@@ -404,7 +404,6 @@ interface SubscriptionsFeature {
 
     /**
      * When enabled, eligible Stripe subscribers can withdraw from their subscription for a full refund
-     * from Subscription Settings.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun subscriptionWithdrawal(): Toggle

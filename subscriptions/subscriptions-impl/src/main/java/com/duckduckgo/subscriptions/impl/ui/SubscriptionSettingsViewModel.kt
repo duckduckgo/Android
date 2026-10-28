@@ -196,7 +196,6 @@ class SubscriptionSettingsViewModel @Inject constructor(
         )
     }
 
-    // Eligibility needs a Stripe lookup on the backend, so it is requested once per screen rather than on every resume
     private suspend fun loadWithdrawalOptionIfNeeded(subscription: Subscription) {
         if (!subscriptionWithdrawal.isWithdrawable(subscription) || withdrawalEligibilityRequested) return
         withdrawalEligibilityRequested = true
@@ -238,9 +237,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
             if (result == WithdrawalResult.Failed) {
                 command.send(ShowWithdrawalDialogError)
             } else {
-                // A successful withdrawal ends the subscription, and a 409 means the user is no longer eligible: either way the option goes
                 withdrawalOption = null
-                // The account is already signed out at this point, so the withdrawn screen is only shown until the user leaves it
                 val completedWithdrawal = (result as? WithdrawalResult.Success)?.let { completedWithdrawalState(it.refund) }
                 _viewState.update { state ->
                     if (state is Ready) state.copy(withdrawal = null, completedWithdrawal = completedWithdrawal) else state

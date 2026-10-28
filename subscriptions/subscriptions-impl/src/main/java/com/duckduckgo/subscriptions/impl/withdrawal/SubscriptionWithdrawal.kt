@@ -33,29 +33,22 @@ import javax.inject.Inject
 
 interface SubscriptionWithdrawal {
     /**
-     * Whether [subscription] is the kind that can be withdrawn from: an active, paid Stripe subscription.
-     * The backend still has the final say through [getEligibility].
+     * Whether [subscription] is the kind that can be withdrawn from.
      */
     fun isWithdrawable(subscription: Subscription): Boolean
 
-    /**
-     * Returns the withdrawal the user can make right now, or null when they are not eligible
-     * or eligibility could not be determined.
-     */
+    /** Returns the withdrawal available to the user, or null if there is none. */
     suspend fun getEligibility(): WithdrawalEligibility?
 
-    /**
-     * Ends the subscription immediately, refunds the user and, on success, removes the account from this device.
-     * Safe to call again after a failure: the backend finishes an interrupted withdrawal without refunding twice.
-     */
+    /** Withdraws the user from their subscription. Safe to call again after a failure. */
     suspend fun withdraw(): WithdrawalResult
 }
 
 sealed class WithdrawalResult {
-    /** [refund] is null when the backend completed the withdrawal but the refunded amount could not be read. */
+    /** [refund] is null when the refunded amount is unknown. */
     data class Success(val refund: Refund?) : WithdrawalResult()
 
-    /** The backend no longer allows this subscription to be withdrawn, so trying again won't help. */
+    /** The subscription can no longer be withdrawn from. */
     data object NotEligible : WithdrawalResult()
 
     data object Failed : WithdrawalResult()
@@ -107,7 +100,7 @@ class RealSubscriptionWithdrawal @Inject constructor(
         } catch (e: HttpException) {
             return if (e.code() == HTTP_CONFLICT) WithdrawalResult.NotEligible else WithdrawalResult.Failed
         } catch (e: JsonDataException) {
-            // A body that can't be decoded only arrives with a 2xx, so the backend has already withdrawn the user
+            // The withdrawal succeeded even though the response couldn't be read
             null
         } catch (e: JsonEncodingException) {
             null
@@ -115,7 +108,7 @@ class RealSubscriptionWithdrawal @Inject constructor(
             return WithdrawalResult.Failed
         }
 
-        // The withdrawn account has nothing left to manage, so it goes the same way as removing it from the device
+        // A withdrawn account has nothing left to manage on this device
         subscriptionsManager.signOut()
 
         return Success(refund)
