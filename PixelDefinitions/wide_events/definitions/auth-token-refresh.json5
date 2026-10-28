@@ -1,10 +1,10 @@
 {
     "android-auth-token-refresh": {
         "description": "App refreshes the auth v2 token pair, from reading the stored refresh token through fetching, validating and saving the new tokens. CANCELLED means the account no longer exists in the backend and the user was signed out.",
-        "owners": ["lmac012"],
+        "owners": ["lmac012", "Kyriakos-Georgiopoulos"],
         "meta": {
             "type": "android-auth-token-refresh",
-            "version": "1.2"
+            "version": "1.3"
         },
         "feature": {
             "name": "auth-token-refresh",
@@ -16,10 +16,35 @@
                         "description": "User's subscription status when the refresh started",
                         "enum": ["Auto-Renewable", "Not Auto-Renewable", "Grace Period", "Inactive", "Expired", "Unknown", "Waiting"]
                     },
+                    "subscription_platform": {
+                        "type": "string",
+                        "description": "Where the stored subscription was bought, as last reported by the backend. 'unknown' when no subscription is stored.",
+                        "enum": ["google", "stripe", "apple", "unknown"]
+                    },
                     "process_name": {
                         "type": "string",
                         "description": "App process the refresh ran in. 'main' is the browser process, the others are the app's secondary processes. 'UNKNOWN'/'ERROR' mean the process name could not be resolved.",
                         "enum": ["main", ":vpn", ":pir", ":autofill", ":fire", "UNKNOWN", "ERROR"]
+                    },
+                    "last_refresh_process": {
+                        "type": "string",
+                        "description": "App process that last refreshed the token pair successfully on this device, as recorded in the shared token store. 'unknown' before the first successful refresh since sign-in. Compared with process_name it shows which process rotated the token a failing process still holds.",
+                        "enum": ["main", ":vpn", ":pir", ":autofill", ":fire", "unknown"]
+                    },
+                    "verified_install": {
+                        "type": "string",
+                        "description": "Whether this is a verified Play Store install: play release build, production package, installed from Play, production signing certificate.",
+                        "enum": ["true", "false"]
+                    },
+                    "consecutive_failures_bucket": {
+                        "type": "string",
+                        "description": "How many refreshes in a row had failed on this device before this one, counting backend and client failures but not network errors, rounded down to a bucket boundary. Reset by a successful refresh or a sign-out.",
+                        "enum": ["0", "1", "2", "3", "5", "10", "20", "50"]
+                    },
+                    "time_since_last_success_h_bucketed": {
+                        "type": "string",
+                        "description": "Whole hours since the last successful refresh on this device, rounded down to a bucket boundary and clamped at 30 days. -1 when no refresh has succeeded since sign-in.",
+                        "enum": ["-1", "0", "1", "4", "24", "72", "168", "720"]
                     },
                     "netp_is_enabled": {
                         "type": "string",
@@ -71,6 +96,21 @@
                         "description": "Why the Play store login fallback failed. PurchaseInfoNotAvailable carries the reason Play could not be queried.",
                         "pattern": "^(NoActivePurchase|AccountExternalIdMismatch|AuthenticationError|TokenValidationFailed|UnknownError|PurchaseInfoNotAvailable - .+)$",
                         "examples": ["NoActivePurchase", "AuthenticationError", "PurchaseInfoNotAvailable - billing_client_not_ready"]
+                    },
+                    "recovery_strategy": {
+                        "type": "string",
+                        "description": "How the app tried to recover the session after the backend rejected the refresh token. Only present when a recovery ran.",
+                        "enum": ["play_login"]
+                    },
+                    "recovery_outcome": {
+                        "type": "string",
+                        "description": "What the recovery ended with: the session was recovered, the attempt was deferred to the next refresh, or the user was signed out. Only present when a recovery ran.",
+                        "enum": ["recovered", "deferred", "signed_out"]
+                    },
+                    "store_error": {
+                        "type": "string",
+                        "description": "Why the token store failed. 'unavailable' means the encrypted store could not be opened, 'missing' means the store opened but had no refresh token entry, 'unreadable' means the entry exists but its value could not be decrypted, 'write_failed' means the new token pair could not be committed. Only present when step.token_read or step.token_save is false.",
+                        "enum": ["unavailable", "missing", "unreadable", "write_failed"]
                     },
                     "token_validation_failed_token": {
                         "type": "string",
@@ -136,8 +176,8 @@
                     },
                     "failure_reason": {
                         "type": "string",
-                        "description": "Exception class name of the failure. Only present on FAILURE events. TokenValidationException when the newly fetched tokens failed validation; see token_validation_failure_reason.",
-                        "examples": ["HttpException", "SocketTimeoutException", "TokenValidationException"]
+                        "description": "Exception class name of the failure. Only present on FAILURE events. TokenValidationException when the newly fetched tokens failed validation; see token_validation_failure_reason. TokenStoreException when the stored refresh token could not be read or the new pair could not be written; see store_error.",
+                        "examples": ["HttpException", "SocketTimeoutException", "TokenValidationException", "TokenStoreException"]
                     },
                     "signed_out": {
                         "type": "string",
@@ -151,8 +191,8 @@
                     },
                     "step.token_read": {
                         "type": "string",
-                        "description": "Parameter present if the stored refresh token was read successfully",
-                        "enum": ["true"]
+                        "description": "true if the stored refresh token was read successfully, false if the store had none; see store_error.",
+                        "enum": ["true", "false"]
                     },
                     "step.jwks_fetch": {
                         "type": "string",
@@ -172,6 +212,11 @@
                     "step.play_login": {
                         "type": "string",
                         "description": "true if the Play store login fallback recovered the session, false if it failed",
+                        "enum": ["true", "false"]
+                    },
+                    "step.token_save": {
+                        "type": "string",
+                        "description": "true if the new token pair was committed to the store, false if the commit failed; see store_error. Absent when the refresh ended before a new pair was available, or failed after the commit for another reason.",
                         "enum": ["true", "false"]
                     }
                 }
