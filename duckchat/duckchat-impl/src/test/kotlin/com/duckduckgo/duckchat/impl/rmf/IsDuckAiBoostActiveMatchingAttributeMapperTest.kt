@@ -22,8 +22,8 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Test
 
-class IsDuckAiBoostActiveAttributeMapperTest {
-    private val testee = IsDuckAiBoostActiveAttributeMapper()
+class IsDuckAiBoostActiveMatchingAttributeMapperTest {
+    private val testee = IsDuckAiBoostActiveMatchingAttributeMapper()
 
     @Test
     fun `when key matches and value is true, then returns attribute with remote value true`() {

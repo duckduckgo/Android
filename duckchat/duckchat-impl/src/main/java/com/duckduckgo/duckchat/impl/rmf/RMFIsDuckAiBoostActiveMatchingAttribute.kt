@@ -41,7 +41,7 @@ class IsDuckAiBoostActiveAttributeMatcherPlugin @Inject constructor(
 }
 
 @ContributesIntoSet(AppScope::class)
-class IsDuckAiBoostActiveAttributeMapper @Inject constructor() : JsonToMatchingAttributeMapper {
+class IsDuckAiBoostActiveMatchingAttributeMapper @Inject constructor() : JsonToMatchingAttributeMapper {
     override fun map(
         key: String,
         jsonMatchingAttribute: JsonMatchingAttribute,
