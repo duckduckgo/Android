@@ -32,11 +32,4 @@ interface AppBrandDesignUpdateToggles {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
-
-    /**
-     * Gates pictogram swaps that change drawable type or call-site behaviour. The remaining
-     * pictogram swaps are flavour-gated.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun pictograms(): Toggle
 }

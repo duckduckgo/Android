@@ -28,8 +28,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * Pre-warms the `appBrandDesignUpdate` toggle's in-memory cache off the main thread so the
- * synchronous read in `DuckDuckGoActivity.onCreate` is usually a cache hit, not a first-read disk hit.
+ * Pre-warms the `appBrandDesignUpdate` toggle's in-memory cache off the main thread so synchronous
+ * reads on the main thread are usually a cache hit, not a first-read disk hit.
  *
  * Interim scaffolding for the brand design update. The follow-up theme project deletes this observer
  * with the flag.
@@ -44,7 +44,7 @@ class AppBrandDesignUpdatePreWarmObserver @Inject constructor(
 
     override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            toggles.pictograms().isEnabled()
+            toggles.self().isEnabled()
         }
     }
 }

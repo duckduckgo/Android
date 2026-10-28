@@ -39,9 +39,6 @@ import com.duckduckgo.widget.WidgetTheme
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
-internal fun resolveWidgetConfigurationBackgroundAttr(isPictogramsEnabled: Boolean): Int =
-    if (isPictogramsEnabled) CommonR.attr.daxColorSurfaceTertiary else CommonR.attr.daxColorSurface
-
 @InjectWith(ActivityScope::class)
 class WidgetThemeConfiguration : DuckDuckGoActivity() {
 
@@ -65,13 +62,7 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
         val binding = ActivityWidgetConfigurationBinding.inflate(layoutInflater)
         enableTransparentEdgeToEdge()
         setContentView(binding.root)
-        binding.widgetConfigPanel.setBackgroundColor(
-            getColorFromAttr(
-                resolveWidgetConfigurationBackgroundAttr(
-                    isPictogramsEnabled = appBrandDesignUpdateToggles.pictograms().isEnabled(),
-                ),
-            ),
-        )
+        binding.widgetConfigPanel.setBackgroundColor(getColorFromAttr(CommonR.attr.daxColorSurfaceTertiary))
         edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
         edgeToEdgeHandler.applyNavigationBarInsets(binding.widgetConfigPanel, drawBehindGestureNav = false)
         val extras = intent.extras

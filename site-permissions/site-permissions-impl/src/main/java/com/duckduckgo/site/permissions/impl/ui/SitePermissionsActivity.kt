@@ -157,7 +157,6 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
             viewModel = viewModel,
             lifecycleOwner = this,
             faviconManager = faviconManager,
-            appBrandDesignUpdateToggles = appBrandDesignUpdateToggles,
             permissionSettingsRedesign = sitePermissionsDialogRedesignFeature.permissionSettingsRedesign().isEnabled(),
             onPermissionSettingClicked = { showPermissionDialog(it) },
         )

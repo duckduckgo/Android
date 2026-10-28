@@ -27,7 +27,6 @@ import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goog
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.PreImport
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewState
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.credentialexchange.api.CredentialExchangeFailure
 import com.duckduckgo.credentialexchange.api.CredentialExchangeResult
@@ -75,7 +74,6 @@ class ImportFromGooglePasswordsDialogViewModelTest {
     private val webViewCapabilityChecker: ImportGooglePasswordsCapabilityChecker = mock()
     private val credentialImportWideEvent: CredentialImportWideEvent = mock()
     private val importRedesignFeature = FakeFeatureToggleFactory.create(AutofillImportRedesignFeature::class.java)
-    private val appBrandDesignUpdateToggles = FakeFeatureToggleFactory.create(AppBrandDesignUpdateToggles::class.java)
     private val promotionPlugins = mutableListOf<PasswordsImportScreenPromotionPlugin>()
     private val testee = ImportFromGooglePasswordsDialogViewModel(
         credentialImporter = credentialImporter,
@@ -87,7 +85,6 @@ class ImportFromGooglePasswordsDialogViewModelTest {
         webViewCapabilityChecker = webViewCapabilityChecker,
         credentialImportWideEvent = credentialImportWideEvent,
         importRedesignFeature = importRedesignFeature,
-        appBrandDesignUpdateToggles = appBrandDesignUpdateToggles,
         importScreenPromotionPlugins = object : PluginPoint<PasswordsImportScreenPromotionPlugin> {
             override fun getPlugins() = promotionPlugins
         },
@@ -386,26 +383,6 @@ class ImportFromGooglePasswordsDialogViewModelTest {
         advanceUntilIdle()
 
         assertTrue(testee.viewState.value.isRedesignEnabled)
-    }
-
-    @Test
-    fun whenInitialUiDeterminedAndPictogramsEnabledThenViewStateHasPictogramsEnabled() = runTest {
-        appBrandDesignUpdateToggles.pictograms().setRawStoredState(State(enable = true))
-
-        testee.determineInitialUi(TEST_SOURCE, canShowPreImportDialog = true)
-        advanceUntilIdle()
-
-        assertTrue(testee.viewState.value.isPictogramsEnabled)
-    }
-
-    @Test
-    fun whenInitialUiDeterminedAndPictogramsDisabledThenViewStateHasPictogramsDisabled() = runTest {
-        appBrandDesignUpdateToggles.pictograms().setRawStoredState(State(enable = false))
-
-        testee.determineInitialUi(TEST_SOURCE, canShowPreImportDialog = true)
-        advanceUntilIdle()
-
-        assertFalse(testee.viewState.value.isPictogramsEnabled)
     }
 
     @Test
