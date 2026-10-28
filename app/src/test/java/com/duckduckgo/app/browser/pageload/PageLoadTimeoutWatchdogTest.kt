@@ -602,6 +602,18 @@ class PageLoadTimeoutWatchdogTest {
     }
 
     @Test
+    fun whenUserInitiatedRequestIsNavigatedAwayThenNoTimeout() = watchdogTest { watchdog ->
+        watchdog.onUserInitiatedLoad()
+        watchdog.onMainFrameRequest(URL)
+        advanceToSeconds(1)
+        watchdog.onNavigatedAway()
+
+        advanceToSeconds(60)
+
+        assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
     fun whenContentBecomesVisibleAfterTimeoutThenRecoveredWithElapsedTime() = watchdogTest { watchdog ->
         watchdog.onMainFrameRequest(URL)
         advanceToSeconds(45)

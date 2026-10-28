@@ -2269,6 +2269,13 @@ class BrowserWebViewClientTest {
     }
 
     @Test
+    fun whenDownloadStartedThenWatchdogIsNavigatedAway() {
+        testee.onDownloadStarted()
+
+        verify(mockPageLoadTimeoutWatchdog).onNavigatedAway()
+    }
+
+    @Test
     fun whenTabForegroundedThenWatchdogIsForegrounded() {
         testee.onTabForegrounded()
 
