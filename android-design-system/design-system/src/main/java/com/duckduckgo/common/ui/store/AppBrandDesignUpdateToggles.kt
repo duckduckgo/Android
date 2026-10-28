@@ -33,12 +33,6 @@ interface AppBrandDesignUpdateToggles {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
-    /**
-     * Off leaves Change app icon below the theme and night mode settings on the Appearance screen.
-     * */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun appIcon(): Toggle
-
     /** Gates the radius changes separately so the rest of the brand design update can roll out independently. */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun radius(): Toggle
