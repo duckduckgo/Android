@@ -32,6 +32,7 @@ import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundAnimator
 import com.duckduckgo.app.onboarding.ui.page.OnboardingDecorationFitCorrector
 import com.duckduckgo.app.onboarding.ui.page.OnboardingLayoutHelper
 import com.duckduckgo.app.onboarding.ui.page.welcome.Embellishment
+import com.duckduckgo.app.onboarding.ui.page.welcome.OnboardingStage
 import com.duckduckgo.common.ui.view.toPx
 
 interface EmbellishmentController {
@@ -59,12 +60,31 @@ interface EmbellishmentController {
  * @param onDecorationHidden callback to the host that a decoration that used to fit no longer does
  */
 class EmbellishmentControllerImpl(
-    private val binding: ContentOnboardingWelcomePageBinding,
+    private val binding: OnboardingStage,
     private val onDecorationHidden: () -> Unit,
     private val cardBottomInsetPx: () -> Int,
-    cardContent: View = binding.daxDialogCta.cardContainer,
+    cardContent: View,
+    private val cardBottomMarginPx: () -> Int = { 0 },
     canCorrectDecoration: () -> Boolean = { true },
+    unclippedContentHeightPx: (() -> Int)? = null,
+    onAvailableHeightChanged: (Int?) -> Unit = {},
+    contentBottomOverflowPx: () -> Int = { 0 },
 ) : EmbellishmentController {
+
+    constructor(
+        binding: ContentOnboardingWelcomePageBinding,
+        onDecorationHidden: () -> Unit,
+        cardBottomInsetPx: () -> Int,
+        cardContent: View = binding.daxDialogCta.cardContainer,
+        canCorrectDecoration: () -> Boolean = { true },
+    ) : this(
+        OnboardingStage(binding.root),
+        onDecorationHidden,
+        cardBottomInsetPx,
+        cardContent,
+        { (binding.daxDialogCta.cardView.layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin ?: 0 },
+        canCorrectDecoration,
+    )
 
     /**
      * Every animator started here that has not finished on its own, so a superseding [transition] can end() them
@@ -84,11 +104,14 @@ class EmbellishmentControllerImpl(
 
     private val fitCorrector = OnboardingDecorationFitCorrector(
         root = binding.root,
-        dialog = binding.daxDialogCta.root,
+        dialog = binding.dialog,
         cardContainer = cardContent,
         onDecorationHidden = onDecorationHidden,
         cardBottomInsetPx = cardBottomInsetPx,
         canCorrectDecoration = canCorrectDecoration,
+        unclippedContentHeightPx = unclippedContentHeightPx,
+        onAvailableHeightChanged = onAvailableHeightChanged,
+        contentBottomOverflowPx = contentBottomOverflowPx,
     )
 
     private val decorations: Map<Embellishment, Decoration> = mapOf(
@@ -200,7 +223,7 @@ class EmbellishmentControllerImpl(
         releaseCardBottomInset()
         val fitHeightPx = OnboardingLayoutHelper.calculateDecorationHeight(
             rootView = binding.root,
-            dialogView = binding.daxDialogCta.root,
+            dialogView = binding.dialog,
             decorationView = decoration.view,
             maxHeightPx = decoration.maxHeightPx(),
             minHeightPx = decoration.minHeightPx(),
@@ -225,16 +248,15 @@ class EmbellishmentControllerImpl(
     // A bottom-anchored predecessor can leave a bottom inset on the card. Clear it before measuring so it does not
     // count against the decoration's room; the fit corrector re-applies it if this dialog is bottom-anchored too.
     private fun releaseCardBottomInset() {
-        val params = binding.daxDialogCta.root.layoutParams as? ViewGroup.MarginLayoutParams ?: return
+        val params = binding.dialog.layoutParams as? ViewGroup.MarginLayoutParams ?: return
         if (params.bottomMargin != 0) {
             params.bottomMargin = 0
-            binding.daxDialogCta.root.layoutParams = params
+            binding.dialog.layoutParams = params
         }
     }
 
     private fun sideWingBottomOverlapPx(): Int {
-        val cardBottomMargin = (binding.daxDialogCta.cardView.layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin ?: return 0
-        return (cardBottomMargin - SIDE_WING_CARD_GAP_DP.toPx()).coerceAtLeast(0)
+        return (cardBottomMarginPx() - SIDE_WING_CARD_GAP_DP.toPx()).coerceAtLeast(0)
     }
 
     private fun buildWalkingDax(): Decoration {

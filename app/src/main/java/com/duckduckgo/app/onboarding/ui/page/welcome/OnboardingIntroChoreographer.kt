@@ -44,8 +44,9 @@ import com.duckduckgo.mobile.android.R as CommonR
  * which owns it from then on, so the two never animate it at the same time.
  */
 class OnboardingIntroChoreographer(
-    private val binding: ContentOnboardingWelcomePageBinding,
+    private val binding: OnboardingStage,
 ) {
+    constructor(binding: ContentOnboardingWelcomePageBinding) : this(OnboardingStage(binding.root))
 
     private var introAnimatorSet: AnimatorSet? = null
     private var outroAnimatorSet: AnimatorSet? = null

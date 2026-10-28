@@ -561,6 +561,7 @@ dependencies {
     }
 
     implementation AndroidX.appCompat
+    implementation "androidx.compose.animation:animation-graphics"
     implementation AndroidX.activity.compose
     implementation Google.android.material
     implementation AndroidX.constraintLayout
@@ -631,6 +632,7 @@ dependencies {
 
     // Lottie
     implementation "com.airbnb.android:lottie:_"
+    implementation "com.airbnb.android:lottie-compose:_"
 
     // Security crypto
     implementation AndroidX.security.crypto
@@ -664,6 +666,8 @@ dependencies {
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation 'org.junit.vintage:junit-vintage-engine:_'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:_'
+    testImplementation "androidx.compose.ui:ui-test-junit4"
+    debugImplementation "androidx.compose.ui:ui-test-manifest"
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.core

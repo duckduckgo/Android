@@ -31,6 +31,9 @@ class OnboardingDecorationFitCorrector(
     private val onDecorationHidden: () -> Unit = {},
     private val cardBottomInsetPx: () -> Int = { 0 },
     private val canCorrectDecoration: () -> Boolean = { true },
+    private val unclippedContentHeightPx: (() -> Int)? = null,
+    private val onAvailableHeightChanged: (Int?) -> Unit = {},
+    private val contentBottomOverflowPx: () -> Int = { 0 },
 ) {
 
     private var decoration: View? = null
@@ -73,24 +76,31 @@ class OnboardingDecorationFitCorrector(
 
         val deco = decoration
         val decorationShown = deco != null && !deco.isGone
-        if (syncCardBottomInset(decorationShown)) return false
+        val insetChanged = syncCardBottomInset(decorationShown)
+        val availableSpan = if (OnboardingLayoutHelper.isInScrollableContainer(dialog, root)) null else availableCardSpan()
+        onAvailableHeightChanged(
+            availableSpan?.let { (it - dialog.paddingTop - dialog.paddingBottom + contentBottomOverflowPx()).coerceAtLeast(0) },
+        )
+        if (insetChanged) return false
 
         if (deco == null) return !syncCardClamp()
-        if (deco.isGone) return true
+        if (deco.isGone) return unclippedContentHeightPx == null || !syncCardClamp()
         if (OnboardingLayoutHelper.isInScrollableContainer(dialog, root)) return true
-        if (syncCardClamp()) return false
+        // Fitting a bounded viewport before its decoration can collapse the Android focus owner to zero height.
+        if (unclippedContentHeightPx == null && syncCardClamp()) return false
         // Compose card morphs report intermediate measured bounds; their initial fit already used the incoming content.
         if (!canCorrectDecoration()) return true
 
-        val viewport = cardContainer.parent as? View ?: return true
+        val viewport = if (unclippedContentHeightPx != null) cardContainer else cardContainer.parent as? View ?: return true
 
         // Use measured (settled) heights, not laid-out heights: during an inter-dialog ChangeBounds the
         // laid-out height is mid-animation and still reports the previous, taller dialog, which would
         // wrongly hide the decoration. measuredHeight reflects the post-transition target throughout.
         val dialogHeight = dialog.measuredHeight.takeIf { it > 0 } ?: dialog.height
         val viewportHeight = viewport.measuredHeight.takeIf { it > 0 } ?: viewport.height
-        val cardContainerHeight = cardContainer.measuredHeight.takeIf { it > 0 } ?: cardContainer.height
-        if (dialogHeight == 0 || viewportHeight == 0) return true
+        val cardContainerHeight = unclippedContentHeightPx?.invoke()
+            ?: cardContainer.measuredHeight.takeIf { it > 0 } ?: cardContainer.height
+        if (unclippedContentHeightPx == null && (dialogHeight == 0 || viewportHeight == 0)) return true
 
         val overflow = (cardContainerHeight - viewportHeight).coerceAtLeast(0)
         val available = root.height - root.paddingTop - root.paddingBottom
@@ -122,6 +132,7 @@ class OnboardingDecorationFitCorrector(
             return false
         }
 
+        if (unclippedContentHeightPx != null && syncCardClamp()) return false
         return true
     }
 
@@ -153,24 +164,38 @@ class OnboardingDecorationFitCorrector(
         return height + params.bottomMargin
     }
 
+    private fun availableCardSpan(): Int? {
+        val params = dialog.layoutParams as? ConstraintLayout.LayoutParams ?: return null
+        val roomBelowCard = when {
+            params.bottomToBottom == ConstraintLayout.LayoutParams.PARENT_ID -> 0
+            params.bottomToTop != ConstraintLayout.LayoutParams.UNSET ->
+                decoration?.takeIf { !it.isGone }?.let { roomBelowCard(it) } ?: return null
+            else -> return null
+        }
+        return root.height - root.paddingTop - root.paddingBottom - params.topMargin - params.bottomMargin - roomBelowCard
+    }
+
     // Clamp only on overflow: constrainedHeight rounds a fitting wrap down a pixel → a permanent scrollbar.
     private fun syncCardClamp(): Boolean {
         val params = dialog.layoutParams as? ConstraintLayout.LayoutParams ?: return false
-        val roomBelowCard = when {
-            params.bottomToBottom == ConstraintLayout.LayoutParams.PARENT_ID -> 0
-            // Anchored above a decoration: unclamped, the card overruns it instead of scrolling.
-            params.bottomToTop != ConstraintLayout.LayoutParams.UNSET ->
-                decoration?.takeIf { !it.isGone }?.let { roomBelowCard(it) } ?: return false
-            else -> return false
-        }
-        val content = cardContainer.measuredHeight.takeIf { it > 0 } ?: return false
-        val span = root.height - root.paddingTop - root.paddingBottom -
-            params.topMargin - params.bottomMargin - roomBelowCard
+        val span = availableCardSpan() ?: return false
+        val content = (unclippedContentHeightPx?.invoke() ?: cardContainer.measuredHeight).takeIf { it > 0 } ?: return false
         // A bounded card reports its viewport height, so reaching the span does not prove its content fits.
-        val retainClamp = params.constrainedHeight && dialog.measuredHeight >= span
-        val shouldClamp = dialog.paddingTop + content > span || retainClamp
-        if (params.constrainedHeight == shouldClamp) return false
-        dialog.updateLayoutParams<ConstraintLayout.LayoutParams> { constrainedHeight = shouldClamp }
+        val retainClamp = unclippedContentHeightPx == null && params.constrainedHeight && dialog.measuredHeight >= span
+        val shouldClamp = dialog.paddingTop + content - contentBottomOverflowPx() > span || retainClamp
+        val maxHeight = if (shouldClamp) span.coerceAtLeast(0) else 0
+        val maxHeightChanged = unclippedContentHeightPx != null && params.matchConstraintMaxHeight != maxHeight
+        val height = if (shouldClamp) maxHeight else ViewGroup.LayoutParams.WRAP_CONTENT
+        val heightChanged = unclippedContentHeightPx != null && params.height != height
+        if (params.constrainedHeight == shouldClamp && !maxHeightChanged && !heightChanged) return false
+        dialog.updateLayoutParams<ConstraintLayout.LayoutParams> {
+            constrainedHeight = shouldClamp
+            if (unclippedContentHeightPx != null) {
+                matchConstraintMaxHeight = maxHeight
+                // A wrap-content probe temporarily expands Compose's viewport and resets its scroll offset before the final constrained measure.
+                this.height = height
+            }
+        }
         return true
     }
 }

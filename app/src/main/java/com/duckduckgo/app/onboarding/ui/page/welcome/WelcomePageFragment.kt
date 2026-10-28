@@ -38,7 +38,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBinding
+import com.duckduckgo.app.browser.databinding.ContentOnboardingComposePageBinding
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
@@ -71,7 +71,7 @@ import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
-class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_welcome_page) {
+class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_compose_page) {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -94,7 +94,7 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
-    private val binding: ContentOnboardingWelcomePageBinding by viewBinding()
+    private val binding: ContentOnboardingComposePageBinding by viewBinding()
     private val viewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[WelcomePageViewModel::class.java]
     }
@@ -149,24 +149,12 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
         super.onViewCreated(view, savedInstanceState)
 
         ViewGroupCompat.installCompatInsetsDispatch(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.daxDialogCta.root) { v, windowInsets ->
-            val insets = windowInsets.getInsets(
-                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
-            )
-            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                topMargin = insets.top
-            }
-            // Under adjustResize, systemBars().bottom already includes the keyboard height while the IME shows,
-            // which would leave the card measuring against a gap that is about to disappear. Unless the focus is
-            // inside the card: reserving the keyboard's height is then what keeps the card's content scrollable.
-            val cardOwnsTheKeyboard = v.findFocus() != null
-            if (!windowInsets.isVisible(WindowInsetsCompat.Type.ime()) || cardOwnsTheKeyboard) {
-                cardBottomInsetPx = insets.bottom + DIALOG_BOTTOM_INSET_GAP_DP.toPx()
-            }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.daxDialogCta) { v, windowInsets ->
+            cardBottomInsetPx = v.applyOnboardingDialogInsets(windowInsets, cardBottomInsetPx)
             windowInsets
         }
 
-        intro = OnboardingIntroChoreographer(binding)
+        intro = OnboardingIntroChoreographer(OnboardingStage(binding.root))
 
         engine = ComposeOnboardingDialogRenderer(
             binding = binding,
@@ -178,7 +166,6 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
             cardBottomInsetPx = { cardBottomInsetPx },
             emit = viewModel::onEvent,
             execute = viewModel::onContentInteraction,
-            coroutineScope = viewLifecycleOwner.lifecycleScope,
         )
 
         binding.root.setOnClickListener { engine?.skipRunningAnimations() }
@@ -372,8 +359,16 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
         intro?.release()
         intro = null
     }
+}
 
-    private companion object {
-        const val DIALOG_BOTTOM_INSET_GAP_DP = 16
+internal fun View.applyOnboardingDialogInsets(windowInsets: WindowInsetsCompat, previousBottomInset: Int): Int {
+    val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+    updateLayoutParams<ViewGroup.MarginLayoutParams> { topMargin = insets.top }
+    // Under adjustResize, keep the IME's space while the card owns focus so its content stays scrollable.
+    val cardOwnsTheKeyboard = findFocus() != null
+    return if (!windowInsets.isVisible(WindowInsetsCompat.Type.ime()) || cardOwnsTheKeyboard) {
+        insets.bottom + 16.toPx()
+    } else {
+        previousBottomInset
     }
 }
