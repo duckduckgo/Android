@@ -45,6 +45,7 @@ import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.NativeInputEventListener
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputLayout
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
@@ -70,8 +71,10 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.clearInvocations
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.spy
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -127,6 +130,60 @@ class RealNativeInputManagerTest {
             edgeToEdgeHandler,
             duckAiChatStore,
         )
+    }
+
+    @Test
+    fun whenDuckAiWidgetIsAddedThenBottomCardChromeIsAlreadyApplied() {
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(true))
+        whenever(duckAiFeatureState.showVoiceSearchToggle).thenReturn(MutableStateFlow(false))
+        whenever(duckAiFeatureState.showVoiceChatEntry).thenReturn(MutableStateFlow(false))
+        whenever(omnibar.viewMode).thenReturn(Omnibar.ViewMode.DuckAI)
+        whenever(omnibar.getText()).thenReturn("")
+        testee.init(omnibar, rootView, lifecycleOwner)
+        rootView.addView(FrameLayout(context).apply { id = R.id.includeNewBrowserTab })
+        val card: NativeInputLayout = mock()
+        val widgetDelegate: NativeInputWidget = mock()
+        val widget = TestNativeInputWidget(context, widgetDelegate).apply { id = com.duckduckgo.duckchat.impl.R.id.inputModeWidget }
+        val widgetView = spy(FrameLayout(context)).apply {
+            id = R.id.inputModeRoot
+            addView(widget)
+        }
+        doReturn(widget).whenever(widgetView).findViewById<View>(com.duckduckgo.duckchat.impl.R.id.inputModeWidget)
+        doReturn(card).whenever(widgetView).findViewById<View>(R.id.inputModeWidgetCard)
+        val inflater: LayoutInflater = mock()
+        whenever(inflater.inflate(any<Int>(), any<ViewGroup>(), any<Boolean>())).thenReturn(widgetView)
+        var inspectedBeforeConfiguration = false
+        rootView.setOnHierarchyChangeListener(
+            object : ViewGroup.OnHierarchyChangeListener {
+                override fun onChildViewAdded(parent: View, child: View) {
+                    if (child !== widgetView) return
+                    inspectedBeforeConfiguration = true
+                    verify(card).surface = NativeInputLayout.Surface.OMNIBAR_BOTTOM
+                    verify(widgetDelegate, never()).configure(any(), any(), any(), any())
+                }
+
+                override fun onChildViewRemoved(parent: View, child: View) = Unit
+            },
+        )
+
+        testee.showNativeInput(
+            tabId = "tab",
+            layoutInflater = inflater,
+            lifecycleOwner = lifecycleOwner,
+            tabs = mock<LiveData<List<TabEntity>>>(),
+            currentTabUrl = emptyFlow(),
+            callbacks = NativeInputCallbacks(
+                onSearchTextChanged = {},
+                onSearchSubmitted = {},
+                onDuckAiChatSubmitted = { _, _, _, _, _, _, _ -> },
+                onChatSuggestionSelected = {},
+                onClearAutocomplete = {},
+                onStopTapped = {},
+            ),
+        )
+
+        assertTrue(inspectedBeforeConfiguration)
+        verify(widgetDelegate).configure(tabId = "tab", isDuckAiMode = true, isBottom = true, forceImageGeneration = false)
     }
 
     @Test
