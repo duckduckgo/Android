@@ -276,6 +276,9 @@ class BrowserWebViewClient @Inject constructor(
             pageLoadTimeoutWatchdog.onRedirect(url.toString())
         }
         val overridden = shouldOverride(view, url, request.isForMainFrame, request.isRedirect, request.hasGesture())
+        if (request.isForMainFrame) {
+            webViewClientListener?.onMainFrameNavigationDecided(loadsInThisTab = !overridden)
+        }
         if (isMainFrameRedirect && overridden) {
             pageLoadTimeoutWatchdog.onNavigationCancelled(url.toString())
         }
