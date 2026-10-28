@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.AddressDisplayFormatter
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_TITLE
@@ -86,6 +87,12 @@ class TabSwitcherAdapterTest {
             addressDisplayFormatter = addressDisplayFormatter,
             duckAiTabGridItemRenderer = duckAiTabGridItemRenderer,
         )
+    }
+
+    @Test
+    fun whenInfoPanelsIsEnabledThenOnlyRebrandTrackerLayoutIsSelected() {
+        assertEquals(R.layout.item_tab_switcher_animation_info_panel, adapter.trackerInfoPanelLayout(isRebrandEnabled = false))
+        assertEquals(R.layout.item_tab_switcher_animation_info_panel_rebrand, adapter.trackerInfoPanelLayout(isRebrandEnabled = true))
     }
 
     // --- DuckAiTab routing ---

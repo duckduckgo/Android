@@ -57,6 +57,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import coil3.compose.rememberAsyncImagePainter
 import com.airbnb.lottie.compose.LottieAnimation
@@ -103,6 +105,7 @@ import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
+import com.duckduckgo.common.ui.isRebrandAreaEnabled
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.MessageCta
 import com.duckduckgo.common.ui.view.MessageCta.Message
@@ -340,6 +343,12 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     ) : ComponentViewHolder(inflate(parent, R.layout.component_info_panel)) {
 
         init {
+            if (view.context.isRebrandAreaEnabled(CommonR.attr.daxRebrandInfoPanels)) {
+                view.findViewById<View>(R.id.info_panel_protections).visibility = View.VISIBLE
+                view.findViewById<View>(R.id.compose_label).updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    topToBottom = R.id.info_panel_protections
+                }
+            }
             view.setupThemedComposeView(R.id.info_panel_tooltip_compose, isDarkTheme = isDarkTheme) {
                 DaxInfoPanel(
                     body = "This is a Tooltip Compose Info Panel, interesting information can be shown here",

@@ -66,4 +66,7 @@ interface AppBrandDesignUpdateToggles {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun badges(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun infoPanels(): Toggle
 }
