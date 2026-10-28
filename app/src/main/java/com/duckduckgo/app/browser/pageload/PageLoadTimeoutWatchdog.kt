@@ -95,6 +95,11 @@ interface PageLoadTimeoutWatchdog {
     fun onNavigatedAway()
 
     /**
+     * The main-frame request was handed to the download listener, so no page is going to load.
+     */
+    fun onDownloadStarted()
+
+    /**
      * The tab is no longer visible. The clock stops, and a load that is still pending is not timed out while backgrounded.
      */
     fun onBackgrounded()
@@ -194,6 +199,8 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
     override fun onEngineError() = disarm()
 
     override fun onNavigatedAway() = disarm()
+
+    override fun onDownloadStarted() = disarm()
 
     override fun onBackgrounded() {
         backgrounded = true

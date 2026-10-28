@@ -602,11 +602,11 @@ class PageLoadTimeoutWatchdogTest {
     }
 
     @Test
-    fun whenUserInitiatedRequestIsNavigatedAwayThenNoTimeout() = watchdogTest { watchdog ->
+    fun whenUserInitiatedRequestBecomesDownloadThenNoTimeout() = watchdogTest { watchdog ->
         watchdog.onUserInitiatedLoad()
         watchdog.onMainFrameRequest(URL)
         advanceToSeconds(1)
-        watchdog.onNavigatedAway()
+        watchdog.onDownloadStarted()
 
         advanceToSeconds(60)
 

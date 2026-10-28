@@ -2269,10 +2269,11 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenDownloadStartedThenWatchdogIsNavigatedAway() {
+    fun whenDownloadStartedThenWatchdogIsNotifiedOfDownload() {
         testee.onDownloadStarted()
 
-        verify(mockPageLoadTimeoutWatchdog).onNavigatedAway()
+        verify(mockPageLoadTimeoutWatchdog).onDownloadStarted()
+        verify(mockPageLoadTimeoutWatchdog, never()).onNavigatedAway()
     }
 
     @Test
