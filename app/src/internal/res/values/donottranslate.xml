@@ -127,6 +127,11 @@
 
     <!-- Onboarding Dev Settings -->
     <string name="onboardingDevSettingsTitle">Onboarding Dev Settings</string>
+    <string name="onboardingDevSettingsReplayTitle">Replay pre-browser onboarding</string>
+    <string name="onboardingDevSettingsReplaySubtitle">Restart the welcome flow without clearing app data</string>
+    <string name="composeSamplesTitle">Compose Samples</string>
+    <string name="composeSamplesOnboardingTitle">Onboarding</string>
+    <string name="composeSamplesOnboardingSubtitle">Replay the linear onboarding flow with the Compose Dax onboarding dialogs</string>
     <string name="onboardingDevSettingsStateSection">Onboarding state</string>
     <string name="onboardingDevSettingsCompletedTitle">Onboarding completed</string>
     <string name="onboardingDevSettingsSkippedTitle">Onboarding skipped</string>

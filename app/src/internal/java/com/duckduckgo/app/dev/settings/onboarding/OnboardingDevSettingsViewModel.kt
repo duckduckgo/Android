@@ -29,9 +29,11 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -44,17 +46,26 @@ class OnboardingDevSettingsViewModel @Inject constructor(
     private val ctaViewModel: CtaViewModel,
     private val contextualOnboardingTimeLimit: ContextualOnboardingTimeLimit,
     private val dispatchers: DispatcherProvider,
+    private val replayer: PreBrowserOnboardingReplayer,
 ) : ViewModel() {
 
     data class ViewState(
         val onboardingCompleted: Boolean = false,
         val onboardingSkipped: Boolean = false,
+        val replaying: Boolean = false,
         val ctaDismissedStates: Map<CtaId, Boolean> = emptyMap(),
         val visibleCtaIds: List<CtaId> = emptyList(),
     )
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
+
+    sealed interface Command {
+        data object ReplayPreBrowserOnboarding : Command
+    }
+
+    private val _commands = Channel<Command>(Channel.BUFFERED)
+    val commands = _commands.receiveAsFlow()
 
     private suspend fun visibleCtaIds(): List<CtaId> {
         val requiredDialogs = ctaViewModel.requiredDaxOnboardingCtas()
@@ -83,9 +94,19 @@ class OnboardingDevSettingsViewModel @Inject constructor(
             _viewState.value = ViewState(
                 onboardingCompleted = completed,
                 onboardingSkipped = skipped,
+                replaying = _viewState.value.replaying,
                 ctaDismissedStates = ctaStates,
                 visibleCtaIds = visibleCtas,
             )
+        }
+    }
+
+    fun replayPreBrowserOnboarding() {
+        if (_viewState.value.replaying) return
+        _viewState.value = _viewState.value.copy(replaying = true)
+        viewModelScope.launch {
+            replayer.prepareReplay(useComposeDialogs = false)
+            _commands.send(Command.ReplayPreBrowserOnboarding)
         }
     }
 

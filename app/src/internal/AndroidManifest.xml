@@ -38,6 +38,10 @@
             android:label="@string/onboardingDevSettingsTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
+            android:name="com.duckduckgo.app.dev.settings.compose.ComposeSamplesActivity"
+            android:label="@string/composeSamplesTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
             android:name="com.duckduckgo.app.dev.settings.modals.ModalCoordinatorDevSettingsActivity"
             android:label="@string/modalCoordinatorDevSettingsTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
