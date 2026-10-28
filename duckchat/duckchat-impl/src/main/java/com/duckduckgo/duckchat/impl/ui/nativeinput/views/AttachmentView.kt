@@ -43,6 +43,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.menu.applyMenuRadiusClipping
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -59,6 +60,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @SuppressLint("ViewConstructor")
 @InjectWith(ViewScope::class)
@@ -133,7 +135,7 @@ class AttachmentView(
         val iconSize = context.resources.getDimensionPixelSize(R.dimen.nativeInputButtonSize)
         return ImageView(context).apply {
             layoutParams = LayoutParams(iconSize, iconSize)
-            setBackgroundResource(com.duckduckgo.mobile.android.R.drawable.selectable_item_rounded_corner_background)
+            setBackgroundResource(CommonR.drawable.selectable_item_rounded_corner_background)
             importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
             scaleType = ImageView.ScaleType.CENTER
             setImageResource(R.drawable.ic_attach_16)
@@ -202,7 +204,7 @@ class AttachmentView(
     private fun buildLimitErrorView(parent: LinearLayout): TextView {
         return TextView(context).apply {
             setPadding(12.toPx(), 4.toPx(), 12.toPx(), 4.toPx())
-            setTextColor(resources.getColor(com.duckduckgo.mobile.android.R.color.red50, null))
+            setTextColor(context.getColorFromAttr(CommonR.attr.daxColorDestructive))
             textSize = 13f
             setTypeface(typeface, Typeface.BOLD)
             visibility = GONE
@@ -331,7 +333,7 @@ class AttachmentView(
         val popup = PopupWindow(
             ScrollView(context).apply {
                 addView(container)
-                setBackgroundResource(com.duckduckgo.mobile.android.R.drawable.popup_menu_bg)
+                setBackgroundResource(CommonR.drawable.popup_menu_bg)
                 applyMenuRadiusClipping()
                 isVerticalScrollBarEnabled = false
             },
@@ -347,7 +349,7 @@ class AttachmentView(
         if (supportsImages) {
             addMenuItem(
                 container = container,
-                iconRes = com.duckduckgo.mobile.android.R.drawable.ic_camera_24,
+                iconRes = CommonR.drawable.ic_camera_24,
                 titleRes = R.string.attachmentTakePhoto,
             ) {
                 popup.dismiss()
@@ -357,7 +359,7 @@ class AttachmentView(
 
             addMenuItem(
                 container = container,
-                iconRes = com.duckduckgo.mobile.android.R.drawable.ic_image_24,
+                iconRes = CommonR.drawable.ic_image_24,
                 titleRes = R.string.attachmentAttachPhoto,
             ) {
                 popup.dismiss()
@@ -395,7 +397,7 @@ class AttachmentView(
 
     private fun addMenuItem(container: LinearLayout, iconRes: Int, titleRes: Int, onClick: () -> Unit) {
         val row = LayoutInflater.from(context).inflate(R.layout.view_options_menu_item, container, false)
-        row.minimumHeight = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.popupMenuItemHeight)
+        row.minimumHeight = resources.getDimensionPixelSize(CommonR.dimen.popupMenuItemHeight)
         row.findViewById<ImageView>(R.id.optionsMenuItemIcon).setImageResource(iconRes)
         row.findViewById<DaxTextView>(R.id.optionsMenuItemTitle).setText(titleRes)
         row.findViewById<DaxTextView>(R.id.optionsMenuItemSubtitle).visibility = GONE
@@ -407,7 +409,7 @@ class AttachmentView(
     private fun showAtPosition(popup: PopupWindow) {
         val button = getChildAt(0) ?: this
         val loc = IntArray(2).also { button.getLocationOnScreen(it) }
-        val y = resources.displayMetrics.heightPixels - loc[1] + resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
+        val y = resources.displayMetrics.heightPixels - loc[1] + resources.getDimensionPixelSize(CommonR.dimen.keyline_1)
         popup.showAtLocation(rootView, Gravity.BOTTOM or Gravity.START, loc[0], y)
     }
 
