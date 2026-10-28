@@ -27,7 +27,9 @@ import android.view.ContextThemeWrapper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.ui.Theming.Constants.FIXED_THEME_ACTIVITIES
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.ThemingDataStore
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.R
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.snackbar.Snackbar
@@ -36,6 +38,8 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
@@ -88,6 +92,9 @@ class ThemingRebrandOverlayTest {
             themingDataStore = TestThemingDataStore(
                 DuckDuckGoTheme.valueOf(intent.getStringExtra(EXTRA_THEME) ?: DuckDuckGoTheme.LIGHT.name),
             )
+            appBrandDesignUpdateToggles = mock<AppBrandDesignUpdateToggles>().also {
+                whenever(it.newTheme()).thenReturn(mock<Toggle>())
+            }
             onCreate(savedInstanceState, injectDependencies = false)
         }
     }

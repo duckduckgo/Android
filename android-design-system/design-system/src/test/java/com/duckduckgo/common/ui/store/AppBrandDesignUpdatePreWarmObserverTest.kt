@@ -36,6 +36,7 @@ class AppBrandDesignUpdatePreWarmObserverTest {
 
     private val toggles = mock<AppBrandDesignUpdateToggles>()
     private val selfFeature = mock<Toggle>()
+    private val newThemeFeature = mock<Toggle>()
     private val dispatcherProvider = mock<DispatcherProvider>()
 
     private val testee = AppBrandDesignUpdatePreWarmObserver(
@@ -48,6 +49,7 @@ class AppBrandDesignUpdatePreWarmObserverTest {
     fun setup() {
         whenever(dispatcherProvider.io()).thenReturn(coroutineRule.testDispatcher)
         whenever(toggles.self()).thenReturn(selfFeature)
+        whenever(toggles.newTheme()).thenReturn(newThemeFeature)
     }
 
     @Test
@@ -55,6 +57,7 @@ class AppBrandDesignUpdatePreWarmObserverTest {
         testee.onCreate(mock())
 
         verify(selfFeature).isEnabled()
+        verify(newThemeFeature).isEnabled()
     }
 
     @Test
