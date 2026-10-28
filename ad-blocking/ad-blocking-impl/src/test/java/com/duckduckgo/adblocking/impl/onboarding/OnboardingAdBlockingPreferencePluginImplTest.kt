@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -68,13 +67,6 @@ class OnboardingAdBlockingPreferencePluginImplTest {
             Preference(primaryText = "Block ads", iconRes = CommonR.drawable.ads_blocked_color_24),
             testee.getPreference(),
         )
-    }
-
-    @Test
-    fun `when settings show the entry elsewhere then the preference is offered`() = runTest {
-        whenever(statusChecker.settingsPlacementFlow()).thenReturn(flowOf(SettingsPlacement.Other))
-
-        assertNotNull(testee.getPreference())
     }
 
     @Test

@@ -57,18 +57,6 @@ class AdBlockingProtectionsSettingsEntryViewModelTest {
     }
 
     @Test
-    fun whenPlacementIsOtherThenNotVisible() = runTest {
-        whenever(statusChecker.settingsPlacementFlow()).thenReturn(flowOf(SettingsPlacement.Other))
-
-        val viewModel = createViewModel()
-        viewModel.onStart(lifecycleOwner)
-
-        viewModel.viewState.test {
-            assertFalse(awaitItem().isVisible)
-        }
-    }
-
-    @Test
     fun whenPlacementIsHiddenThenNotVisible() = runTest {
         whenever(statusChecker.settingsPlacementFlow()).thenReturn(flowOf(SettingsPlacement.Hidden))
 

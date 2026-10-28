@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import logcat.logcat
 import javax.inject.Inject
@@ -87,7 +88,6 @@ sealed interface AdBlockingState {
  */
 sealed interface SettingsPlacement {
     data object Protections : SettingsPlacement
-    data object Other : SettingsPlacement
     data object Hidden : SettingsPlacement
 }
 
@@ -129,15 +129,8 @@ class RealAdBlockingStatusChecker @Inject constructor(
         }
 
     override fun settingsPlacementFlow(): Flow<SettingsPlacement> =
-        combine(
-            feature.self().enabled(),
-            feature.adBlockingUXImprovements().enabled(),
-        ) { killSwitchOn, uxImprovementsEnabled ->
-            when {
-                !killSwitchOn -> SettingsPlacement.Hidden
-                uxImprovementsEnabled -> SettingsPlacement.Protections
-                else -> SettingsPlacement.Other
-            }
+        feature.self().enabled().map { killSwitchOn ->
+            if (killSwitchOn) SettingsPlacement.Protections else SettingsPlacement.Hidden
         }
 
     override fun observeState(): Flow<AdBlockingState> =

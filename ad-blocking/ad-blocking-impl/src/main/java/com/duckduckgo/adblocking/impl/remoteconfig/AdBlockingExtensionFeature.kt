@@ -42,14 +42,6 @@ interface AdBlockingExtensionFeature {
     fun enableContingencyMode(): Toggle
 
     /**
-     * When enabled, UX improvements for ad blocking phase 2 will be available.
-     * To be removed after phase 2 initial rollout
-     *
-     */
-    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.TRUE)
-    fun adBlockingUXImprovements(): Toggle
-
-    /**
      * When enabled, ad blocking animation will show on the omnibar if all other conditions met
      */
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.TRUE)

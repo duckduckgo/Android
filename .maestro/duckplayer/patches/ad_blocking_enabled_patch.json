@@ -16,13 +16,5 @@
       "state": "enabled",
       "minSupportedVersion": 0
     }
-  },
-  {
-    "op": "add",
-    "path": "/features/adBlockingExtension/features/adBlockingUXImprovements",
-    "value": {
-      "state": "enabled",
-      "minSupportedVersion": 0
-    }
   }
 ]

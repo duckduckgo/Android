@@ -51,7 +51,6 @@ class RealAdBlockingOmnibarAnimationTest {
     fun setup() {
         whenever(statusChecker.canInject()).thenReturn(true)
         feature.showAdBlockingOmnibarAnimation().setRawStoredState(Toggle.State(enable = true))
-        feature.adBlockingUXImprovements().setRawStoredState(Toggle.State(enable = true))
         testee = RealAdBlockingOmnibarAnimation(statusChecker, RealAdBlockingExtensionDomainMatcher(), feature)
     }
 
@@ -63,12 +62,6 @@ class RealAdBlockingOmnibarAnimationTest {
     @Test
     fun whenShowAdBlockingOmnibarAnimationDisabledThenSkip() = runTest {
         feature.showAdBlockingOmnibarAnimation().setRawStoredState(Toggle.State(enable = false))
-        assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=abc123", pageChanged = true) is AdBlockingAnimation.Skip)
-    }
-
-    @Test
-    fun whenAdBlockingUXImprovementsDisabledThenSkip() = runTest {
-        feature.adBlockingUXImprovements().setRawStoredState(Toggle.State(enable = false))
         assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=abc123", pageChanged = true) is AdBlockingAnimation.Skip)
     }
 
