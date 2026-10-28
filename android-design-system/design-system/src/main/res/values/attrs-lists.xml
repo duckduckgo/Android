@@ -71,7 +71,6 @@
         <!-- Medium 24dp (default) -->
         <enum name="medium" value="1" />
     </attr>
-    <attr name="textColorOverride" format="color"/>
     <attr name="showOverflowMenu" format="boolean"/>
 
     <!--Section Header Item view-->
