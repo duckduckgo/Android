@@ -16,8 +16,6 @@
 
 package com.duckduckgo.subscriptions.impl.withdrawal
 
-import com.duckduckgo.common.utils.CurrentTimeProvider
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
@@ -27,7 +25,6 @@ import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult.Success
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
 import dev.zacsweers.metro.ContributesBinding
-import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.math.BigDecimal
 import javax.inject.Inject
@@ -40,17 +37,10 @@ interface SubscriptionWithdrawal {
     suspend fun getEligibility(): WithdrawalEligibility?
 
     /**
-     * Ends the subscription immediately and refunds the user. Safe to call again after a failure:
-     * the backend finishes an interrupted withdrawal without refunding twice.
+     * Ends the subscription immediately, refunds the user and, on success, removes the account from this device.
+     * Safe to call again after a failure: the backend finishes an interrupted withdrawal without refunding twice.
      */
     suspend fun withdraw(): WithdrawalResult
-
-    /**
-     * Returns the last withdrawal made on this device, or null if there is none.
-     */
-    suspend fun getCompletedWithdrawal(): CompletedWithdrawal?
-
-    suspend fun clearCompletedWithdrawal()
 }
 
 sealed class WithdrawalResult {
@@ -82,9 +72,6 @@ data class WithdrawalEligibility(
 class RealSubscriptionWithdrawal @Inject constructor(
     private val subscriptionsService: SubscriptionsService,
     private val subscriptionsManager: SubscriptionsManager,
-    private val withdrawalStore: WithdrawalStore,
-    private val currentTimeProvider: CurrentTimeProvider,
-    private val dispatcherProvider: DispatcherProvider,
 ) : SubscriptionWithdrawal {
 
     override suspend fun getEligibility(): WithdrawalEligibility? {
@@ -116,27 +103,10 @@ class RealSubscriptionWithdrawal @Inject constructor(
             return Failure(WithdrawalResult.FailureReason.UNKNOWN)
         }
 
-        val result = Success(refund)
-        // Saved before refreshing, so the expired status emitted by the refresh already renders as a withdrawal
-        val completedWithdrawal = CompletedWithdrawal(
-            withdrawnAt = currentTimeProvider.currentTimeMillis(),
-            refund = refund,
-        )
-        withContext(dispatcherProvider.io()) { withdrawalStore.setCompletedWithdrawal(completedWithdrawal) }
+        // The withdrawn account has nothing left to manage, so it goes the same way as removing it from the device
+        subscriptionsManager.signOut()
 
-        // The backend expires the subscription in the same request; refresh so access is revoked locally right away
-        runCatching { subscriptionsManager.refreshSubscriptionData() }
-        runCatching { subscriptionsManager.refreshAccessToken() }
-
-        return result
-    }
-
-    override suspend fun getCompletedWithdrawal(): CompletedWithdrawal? = withContext(dispatcherProvider.io()) {
-        withdrawalStore.getCompletedWithdrawal()
-    }
-
-    override suspend fun clearCompletedWithdrawal() = withContext(dispatcherProvider.io()) {
-        withdrawalStore.clear()
+        return Success(refund)
     }
 
     private fun HttpException.toFailureReason(): WithdrawalResult.FailureReason = when (code()) {

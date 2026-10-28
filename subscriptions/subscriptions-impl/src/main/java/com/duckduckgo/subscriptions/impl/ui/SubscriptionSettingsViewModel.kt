@@ -54,7 +54,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
-import com.duckduckgo.subscriptions.impl.withdrawal.CompletedWithdrawal
+import com.duckduckgo.subscriptions.impl.withdrawal.Refund
 import com.duckduckgo.subscriptions.impl.withdrawal.SubscriptionWithdrawal
 import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalEligibility
 import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult
@@ -183,26 +183,15 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 effectiveTier = effectiveTier,
                 onboardingEntryPoint = onboardingEntryPoint(subscription),
                 withdrawal = withdrawalOption.takeIf { canWithdraw(subscription) },
-                completedWithdrawal = completedWithdrawalState(subscription),
             ),
         )
 
         loadWithdrawalOptionIfNeeded(subscription)
     }
 
-    private suspend fun completedWithdrawalState(subscription: Subscription): CompletedWithdrawalState? {
-        if (subscription.isActive()) {
-            subscriptionWithdrawal.clearCompletedWithdrawal()
-            return null
-        }
-        if (!subscriptionsFeature.subscriptionWithdrawal().isEnabled()) return null
-
-        return subscriptionWithdrawal.getCompletedWithdrawal()?.toCompletedWithdrawalState()
-    }
-
-    private fun CompletedWithdrawal.toCompletedWithdrawalState(): CompletedWithdrawalState {
+    private fun completedWithdrawalState(refund: Refund?): CompletedWithdrawalState {
         return CompletedWithdrawalState(
-            date = DateFormat.getInstanceForSkeleton("ddMMMMyyyy").format(Date(withdrawnAt)),
+            date = DateFormat.getInstanceForSkeleton("ddMMMMyyyy").format(Date(currentTimeProvider.currentTimeMillis())),
             refundAmount = refund?.let { formatAmount(it.amount, it.currency) },
         )
     }
@@ -259,11 +248,12 @@ class SubscriptionSettingsViewModel @Inject constructor(
             } else {
                 // A successful withdrawal ends the subscription, and a 409 means the user is no longer eligible: either way the option goes
                 withdrawalOption = null
-                _viewState.update { state -> if (state is Ready) state.copy(withdrawal = null) else state }
-                command.send(DismissWithdrawalDialog)
-                if (result is WithdrawalResult.Success) {
-                    emitChanges()
+                // The account is already signed out at this point, so the withdrawn screen is only shown until the user leaves it
+                val completedWithdrawal = (result as? WithdrawalResult.Success)?.let { completedWithdrawalState(it.refund) }
+                _viewState.update { state ->
+                    if (state is Ready) state.copy(withdrawal = null, completedWithdrawal = completedWithdrawal) else state
                 }
+                command.send(DismissWithdrawalDialog)
             }
             withdrawalInProgress = false
         }
@@ -320,7 +310,6 @@ class SubscriptionSettingsViewModel @Inject constructor(
         pixelSender.reportSubscriptionSettingsRemoveFromDeviceClick()
 
         viewModelScope.launch {
-            subscriptionWithdrawal.clearCompletedWithdrawal()
             subscriptionsManager.signOut()
             command.send(FinishSignOut)
         }

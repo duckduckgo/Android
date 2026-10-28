@@ -1,7 +1,5 @@
 package com.duckduckgo.subscriptions.impl.withdrawal
 
-import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.duckduckgo.subscriptions.impl.services.WithdrawResponse
@@ -14,11 +12,7 @@ import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
-import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -29,22 +23,9 @@ import java.math.BigDecimal
 
 class RealSubscriptionWithdrawalTest {
 
-    @get:Rule
-    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
-
     private val subscriptionsService: SubscriptionsService = mock()
     private val subscriptionsManager: SubscriptionsManager = mock()
-    private val withdrawalStore: WithdrawalStore = mock()
-    private val currentTimeProvider: CurrentTimeProvider = mock {
-        on { currentTimeMillis() } doReturn NOW
-    }
-    private val withdrawal = RealSubscriptionWithdrawal(
-        subscriptionsService,
-        subscriptionsManager,
-        withdrawalStore,
-        currentTimeProvider,
-        coroutineTestRule.testDispatcherProvider,
-    )
+    private val withdrawal = RealSubscriptionWithdrawal(subscriptionsService, subscriptionsManager)
 
     @Test
     fun whenEligibleThenReturnEligibility() = runTest {
@@ -113,52 +94,25 @@ class RealSubscriptionWithdrawalTest {
         whenever(subscriptionsService.withdraw()).thenAnswer { throw JsonDataException("Expected a string but was BEGIN_OBJECT") }
 
         assertEquals(Success(refund = null), withdrawal.withdraw())
-        verify(withdrawalStore).setCompletedWithdrawal(CompletedWithdrawal(withdrawnAt = NOW, refund = null))
-        verify(subscriptionsManager).refreshSubscriptionData()
+        verify(subscriptionsManager).signOut()
     }
 
     @Test
-    fun whenWithdrawSucceedsThenRefreshSubscriptionAndAccessToken() = runTest {
+    fun whenWithdrawSucceedsThenSignOut() = runTest {
         whenever(subscriptionsService.withdraw()).thenReturn(WithdrawResponse(refundedAmount = "9.99", currency = "gbp"))
 
         withdrawal.withdraw()
 
-        verify(subscriptionsManager).refreshSubscriptionData()
-        verify(subscriptionsManager).refreshAccessToken()
+        verify(subscriptionsManager).signOut()
     }
 
     @Test
-    fun whenWithdrawSucceedsButRefreshFailsThenStillReturnSuccess() = runTest {
-        whenever(subscriptionsService.withdraw()).thenReturn(WithdrawResponse(refundedAmount = "9.99", currency = "gbp"))
-        whenever(subscriptionsManager.refreshSubscriptionData()).thenThrow(RuntimeException())
-
-        val result = withdrawal.withdraw()
-
-        assertEquals(Success(REFUND), result)
-        verify(subscriptionsManager).refreshAccessToken()
-    }
-
-    @Test
-    fun whenWithdrawSucceedsThenSaveCompletedWithdrawalBeforeRefreshing() = runTest {
-        whenever(subscriptionsService.withdraw()).thenReturn(WithdrawResponse(refundedAmount = "9.99", currency = "gbp"))
-
-        withdrawal.withdraw()
-
-        inOrder(withdrawalStore, subscriptionsManager) {
-            verify(withdrawalStore).setCompletedWithdrawal(
-                CompletedWithdrawal(withdrawnAt = NOW, refund = REFUND),
-            )
-            verify(subscriptionsManager).refreshSubscriptionData()
-        }
-    }
-
-    @Test
-    fun whenWithdrawFailsThenDoNotSaveCompletedWithdrawal() = runTest {
+    fun whenWithdrawFailsThenDoNotSignOut() = runTest {
         whenever(subscriptionsService.withdraw()).thenThrow(httpException(500))
 
         withdrawal.withdraw()
 
-        verify(withdrawalStore, never()).setCompletedWithdrawal(any())
+        verify(subscriptionsManager, never()).signOut()
     }
 
     @Test
@@ -166,7 +120,7 @@ class RealSubscriptionWithdrawalTest {
         whenever(subscriptionsService.withdraw()).thenThrow(httpException(409))
 
         assertEquals(Failure(FailureReason.NOT_ELIGIBLE), withdrawal.withdraw())
-        verify(subscriptionsManager, never()).refreshSubscriptionData()
+        verify(subscriptionsManager, never()).signOut()
     }
 
     @Test
@@ -200,7 +154,6 @@ class RealSubscriptionWithdrawalTest {
     private fun httpException(code: Int) = HttpException(Response.error<Any>(code, "".toResponseBody()))
 
     private companion object {
-        private const val NOW = 1792065600000L
         private val REFUND = Refund(amount = BigDecimal("9.99"), currency = "GBP")
     }
 
