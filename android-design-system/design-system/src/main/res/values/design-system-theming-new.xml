@@ -103,39 +103,40 @@
         <item name="tabSwitcherTrackersAnimationInfoPanelBackgroundColor">@color/green12</item>
 
         <!-- Design System Reference Colors Dark -->
-        <item name="preferredStatusBarColor">@color/background_background_dark</item>
-        <item name="preferredNavigationBarColor">@color/background_background_dark</item>
-        <item name="daxColorBackground">@color/background_background_dark</item>
+        <item name="preferredStatusBarColor">?attr/daxColorBackground</item>
+        <item name="preferredNavigationBarColor">?attr/daxColorBackground</item>
+        <item name="daxColorBackground">@color/new_background_dark</item>
         <item name="daxColorBackgroundInverted">@color/gray0</item>
-        <item name="daxColorSurface">@color/background_surface_dark</item>
-        <item name="daxColorSurfaceSecondary">@color/background_surface_secondary_dark</item>
-        <item name="daxColorSurfaceTertiary">@color/background_surface_tertiary_dark</item>
+        <item name="daxColorSurface">@color/new_surface_dark</item>
+        <item name="daxColorSurfaceSecondary">@color/new_surface_dark</item>
+        <item name="daxColorSurfaceTertiary">@color/gray85</item>
         <item name="daxColorContainer">@color/white12</item>
         <item name="daxColorWindow">@color/background_window_dark</item>
         <item name="daxColorDuckAiBackground">@color/background_duck_ai_dark</item>
-        <item name="daxColorPrimaryText">@color/text_primary_dark</item>
+        <item name="daxColorPrimaryText">@color/white</item>
         <item name="daxColorPrimaryInvertedText">@color/black84</item>
-        <item name="daxColorSecondaryText">@color/text_secondary_dark</item>
-        <item name="daxColorTertiaryText">@color/white48</item>
+        <item name="daxColorSecondaryText">@color/new_text_secondary_dark</item>
+        <item name="daxColorTertiaryText">@color/white40</item>
         <item name="daxColorPrimaryIcon">@color/icon_primary_dark</item>
-        <item name="daxColorSecondaryIcon">@color/icon_secondary_dark</item>
-        <item name="daxColorDestructive">@color/alertRedOnDarkDefault</item>
+        <item name="daxColorSecondaryIcon">@color/white48</item>
+        <item name="daxColorDestructive">@color/rb_red40</item>
         <item name="daxColorIconDisabled">@color/icon_tertiary_dark</item>
         <item name="daxColorContainerDisabled">@color/white18</item>
         <item name="daxColorTextDisabled">@color/white36</item>
         <item name="daxColorLines">@color/lines_dark</item>
         <item name="daxColorShade">@color/shade_dark</item>
         <item name="daxColorShadeSolid">@color/shade_dark_solid</item>
-        <item name="daxColorAccentBlue">?attr/daxColorRebrandAccentBlue</item>
-        <item name="daxColorAccentYellow">@color/yellow50</item>
-        <item name="daxColorAccentContentPrimary">@color/accent_content_primary_dark</item>
+        <item name="daxColorAccentBlue">@color/pondwater40</item>
+        <item name="daxColorAccentYellow">@color/pollen50</item>
+        <item name="daxColorAccentContentPrimary">@color/eggshell90</item>
+        <item name="daxColorAccentTertiary">@color/pondwater60</item>
         <item name="daxColorRipple">@color/white12</item>
         <item name="daxLogoTitleText">@color/white</item>
         <item name="daxOmnibarTextColorHighlight">@color/blue30_20</item>
 
         <!-- Controls -->
-        <item name="daxColorControlFillPrimary">@color/controls_fill_primary_dark</item>
-        <item name="daxColorControlDecorationTertiary">@color/controls_decoration_tertiary_dark</item>
+        <item name="daxColorControlFillPrimary">@color/white6</item>
+        <item name="daxColorControlDecorationTertiary">@color/new_decoration_tertiary_dark</item>
         <item name="daxColorControlRaisedFillPrimary">@color/white18</item>
         <item name="daxColorControlRaisedBackdrop">@color/white12</item>
 
@@ -166,10 +167,10 @@
         <item name="daxColorButtonBrandContainer">@color/pollen40</item>
         <item name="daxColorButtonBrandContainerPressed">@color/pollen60</item>
         <item name="daxColorButtonBrandText">@color/pollen100</item>
-        <item name="daxColorRebrandAccentBlue">@color/pondwater40</item>
-        <item name="daxColorRebrandButtonPrimaryContainer">@color/pondwater40</item>
-        <item name="daxColorRebrandButtonPrimaryContainerPressed">@color/pondwater60</item>
-        <item name="daxColorRebrandButtonPrimaryText">@color/eggshell90</item>
+        <item name="daxColorRebrandAccentBlue">?attr/daxColorAccentBlue</item>
+        <item name="daxColorRebrandButtonPrimaryContainer">?attr/daxColorAccentBlue</item>
+        <item name="daxColorRebrandButtonPrimaryContainerPressed">?attr/daxColorAccentTertiary</item>
+        <item name="daxColorRebrandButtonPrimaryText">?attr/daxColorAccentContentPrimary</item>
         <item name="daxColorRebrandButtonSecondaryFillContainer">@color/white4</item>
         <item name="daxColorRebrandButtonSecondaryFillContainerPressed">@color/white8</item>
         <item name="daxColorRebrandButtonSecondaryFillText">@color/white</item>
@@ -183,10 +184,10 @@
         <item name="daxColorRebrandButtonDestructiveGhostText">@color/rb_red40</item>
 
         <!-- Fab -->
-        <item name="daxColorFabPrimaryContainer">@color/blue20</item>
-        <item name="daxColorFabPrimaryContainerPressed">?attr/daxColorButtonPrimaryContainerPressed</item>
-        <item name="daxColorFabPrimaryText">@color/black</item>
-        <item name="daxColorFabPrimaryIcon">@color/black</item>
+        <item name="daxColorFabPrimaryContainer">?attr/daxColorAccentBlue</item>
+        <item name="daxColorFabPrimaryContainerPressed">?attr/daxColorAccentTertiary</item>
+        <item name="daxColorFabPrimaryText">?attr/daxColorAccentContentPrimary</item>
+        <item name="daxColorFabPrimaryIcon">?attr/daxColorAccentContentPrimary</item>
         <item name="daxColorFabSecondaryContainer">@color/blue0</item>
         <item name="daxColorFabSecondaryContainerPressed">@color/blue20</item>
         <item name="daxColorFabSecondaryIcon">@color/blue70</item>
@@ -214,7 +215,7 @@
         <item name="daxInfoPanelAlertBackgroundColor">@color/daxInfoPanelAlertBackgroundColorDark</item>
 
         <!-- Input Screen -->
-        <item name="daxColorBackdrop">@color/daxColorBackdropDark</item>
+        <item name="daxColorBackdrop">@color/new_backdrop_dark</item>
         <item name="daxColorInputModeIndicator">@color/white18</item>
         <item name="daxColorInputModeIndicatorShadow">@color/black</item>
 
@@ -256,39 +257,40 @@
         <item name="tabSwitcherTrackersAnimationInfoPanelBackgroundColor">@color/green0</item>
 
         <!-- Design System Reference Colors Light -->
-        <item name="preferredStatusBarColor">@color/background_background_light</item>
-        <item name="preferredNavigationBarColor">@color/background_background_light</item>
-        <item name="daxColorBackground">@color/background_background_light</item>
+        <item name="preferredStatusBarColor">?attr/daxColorBackground</item>
+        <item name="preferredNavigationBarColor">?attr/daxColorBackground</item>
+        <item name="daxColorBackground">@color/new_background_light</item>
         <item name="daxColorBackgroundInverted">@color/gray100</item>
-        <item name="daxColorSurface">@color/background_surface_light</item>
+        <item name="daxColorSurface">@color/background_surface_secondary_light</item>
         <item name="daxColorSurfaceSecondary">@color/background_surface_secondary_light</item>
-        <item name="daxColorSurfaceTertiary">@color/background_surface_tertiary_light</item>
+        <item name="daxColorSurfaceTertiary">@color/white</item>
         <item name="daxColorContainer">@color/black6</item>
         <item name="daxColorWindow">@color/background_window_light</item>
         <item name="daxColorDuckAiBackground">@color/background_duck_ai_light</item>
-        <item name="daxColorPrimaryText">@color/text_primary_light</item>
+        <item name="daxColorPrimaryText">@color/black96</item>
         <item name="daxColorPrimaryInvertedText">@color/white84</item>
-        <item name="daxColorSecondaryText">@color/text_secondary_light</item>
-        <item name="daxColorTertiaryText">@color/black48</item>
-        <item name="daxColorPrimaryIcon">@color/icon_primary_light</item>
-        <item name="daxColorSecondaryIcon">@color/icon_secondary_light</item>
+        <item name="daxColorSecondaryText">@color/black60</item>
+        <item name="daxColorTertiaryText">@color/black36</item>
+        <item name="daxColorPrimaryIcon">@color/black84</item>
+        <item name="daxColorSecondaryIcon">@color/black60</item>
         <item name="daxColorIconDisabled">@color/icon_tertiary_light</item>
-        <item name="daxColorDestructive">@color/alertRedOnLightDefault</item>
+        <item name="daxColorDestructive">@color/rb_red50</item>
         <item name="daxColorContainerDisabled">@color/black6</item>
         <item name="daxColorTextDisabled">@color/black36</item>
         <item name="daxColorLines">@color/lines_light</item>
         <item name="daxColorShade">@color/shade_light</item>
         <item name="daxColorShadeSolid">@color/shade_light_solid</item>
-        <item name="daxColorAccentBlue">?attr/daxColorRebrandAccentBlue</item>
-        <item name="daxColorAccentYellow">@color/yellow50</item>
-        <item name="daxColorAccentContentPrimary">@color/accent_content_primary_light</item>
+        <item name="daxColorAccentBlue">@color/pondwater60</item>
+        <item name="daxColorAccentYellow">@color/pollen50</item>
+        <item name="daxColorAccentContentPrimary">@color/white</item>
+        <item name="daxColorAccentTertiary">@color/pondwater80</item>
         <item name="daxColorRipple">@color/black6</item>
         <item name="daxLogoTitleText">@color/gray85</item>
         <item name="daxOmnibarTextColorHighlight">@color/blue50_20</item>
 
         <!-- Controls -->
-        <item name="daxColorControlFillPrimary">@color/controls_fill_primary_light</item>
-        <item name="daxColorControlDecorationTertiary">@color/controls_decoration_tertiary_light</item>
+        <item name="daxColorControlFillPrimary">@color/black6</item>
+        <item name="daxColorControlDecorationTertiary">@color/new_decoration_tertiary_light</item>
         <item name="daxColorControlRaisedFillPrimary">@color/white</item>
         <item name="daxColorControlRaisedBackdrop">@color/black9</item>
 
@@ -320,10 +322,10 @@
         <item name="daxColorButtonBrandContainer">@color/mandarin50</item>
         <item name="daxColorButtonBrandContainerPressed">@color/mandarin70</item>
         <item name="daxColorButtonBrandText">@color/white</item>
-        <item name="daxColorRebrandAccentBlue">@color/pondwater60</item>
-        <item name="daxColorRebrandButtonPrimaryContainer">@color/pondwater60</item>
-        <item name="daxColorRebrandButtonPrimaryContainerPressed">@color/pondwater80</item>
-        <item name="daxColorRebrandButtonPrimaryText">@color/white</item>
+        <item name="daxColorRebrandAccentBlue">?attr/daxColorAccentBlue</item>
+        <item name="daxColorRebrandButtonPrimaryContainer">?attr/daxColorAccentBlue</item>
+        <item name="daxColorRebrandButtonPrimaryContainerPressed">?attr/daxColorAccentTertiary</item>
+        <item name="daxColorRebrandButtonPrimaryText">?attr/daxColorAccentContentPrimary</item>
         <item name="daxColorRebrandButtonSecondaryFillContainer">@color/black6</item>
         <item name="daxColorRebrandButtonSecondaryFillContainerPressed">@color/black12</item>
         <item name="daxColorRebrandButtonSecondaryFillText">@color/black96</item>
@@ -337,10 +339,10 @@
         <item name="daxColorRebrandButtonDestructiveGhostText">@color/rb_red60</item>
 
         <!-- Fab -->
-        <item name="daxColorFabPrimaryContainer">@color/blue50</item>
-        <item name="daxColorFabPrimaryContainerPressed">?attr/daxColorButtonPrimaryContainerPressed</item>
-        <item name="daxColorFabPrimaryText">@color/white</item>
-        <item name="daxColorFabPrimaryIcon">@color/white</item>
+        <item name="daxColorFabPrimaryContainer">?attr/daxColorAccentBlue</item>
+        <item name="daxColorFabPrimaryContainerPressed">?attr/daxColorAccentTertiary</item>
+        <item name="daxColorFabPrimaryText">?attr/daxColorAccentContentPrimary</item>
+        <item name="daxColorFabPrimaryIcon">?attr/daxColorAccentContentPrimary</item>
         <item name="daxColorFabSecondaryContainer">@color/blue0</item>
         <item name="daxColorFabSecondaryContainerPressed">@color/blue20</item>
         <item name="daxColorFabSecondaryIcon">@color/blue70</item>
@@ -368,7 +370,7 @@
         <item name="daxInfoPanelAlertBackgroundColor">@color/daxInfoPanelAlertBackgroundColorLight</item>
 
         <!-- Input Screen -->
-        <item name="daxColorBackdrop">@color/controls_fill_primary_light</item>
+        <item name="daxColorBackdrop">@color/new_backdrop_light</item>
         <item name="daxColorInputModeIndicator">@color/white84</item>
         <item name="daxColorInputModeIndicatorShadow">@color/gray60</item>
 
