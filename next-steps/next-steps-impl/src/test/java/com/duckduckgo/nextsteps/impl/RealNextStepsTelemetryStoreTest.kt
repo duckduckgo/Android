@@ -17,6 +17,7 @@ package com.duckduckgo.nextsteps.impl
 
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.Variant
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -42,11 +43,14 @@ class RealNextStepsTelemetryStoreTest {
             firstRenderDay = 20000L,
             activeDays = 2,
             displayedMessageId = "message",
-            ctaClickedCardId = "setup_add_widget",
+            displayedVariant = Variant.CHECK_LIST,
+            ctaClickedItemId = "setup_add_widget",
             openDay = 20002L,
             dayCounts = mapOf("setup_default_browser" to 0, "setup_add_widget" to 4),
             totalImpressions = mapOf("setup_default_browser" to 3, "setup_add_widget" to 9),
-            reportedCompletedCards = setOf("setup_sync"),
+            completedItems = 1,
+            dismissedItems = 2,
+            reportedCompletedItems = setOf("setup_sync"),
         )
         testee.save(state)
         assertEquals(state, RealNextStepsTelemetryStore(preferencesProvider).state())

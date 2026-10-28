@@ -27,7 +27,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.nextsteps.impl.NextStepsCompletionChecker
 import com.duckduckgo.nextsteps.impl.NextStepsItemsStore
+import com.duckduckgo.nextsteps.impl.NextStepsTelemetry
 import com.duckduckgo.nextsteps.impl.isNextStepsForNewTabPage
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.Variant
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.Content
@@ -58,6 +60,7 @@ class NextStepsCheckListViewModel @Inject constructor(
     private val itemsStore: NextStepsItemsStore,
     private val completionChecker: NextStepsCompletionChecker,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
+    private val telemetry: NextStepsTelemetry,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -149,7 +152,10 @@ class NextStepsCheckListViewModel @Inject constructor(
             else -> null
         } ?: return
         pendingCompletion = PendingCompletion(itemId)
-        viewModelScope.launch { command.send(nextCommand) }
+        viewModelScope.launch {
+            telemetry.onCtaClicked(Variant.CHECK_LIST, itemId)
+            command.send(nextCommand)
+        }
     }
 
     fun onDefaultBrowserDialogShown() {
@@ -170,6 +176,7 @@ class NextStepsCheckListViewModel @Inject constructor(
         viewModelScope.launch {
             val firstDismissal = withContext(dispatchers.io()) { itemsStore.markMessageDismissed(message.id) }
             if (firstDismissal) {
+                telemetry.onSectionDismissed()
                 remoteMessageModel.onMessageDismissed(message)
             }
         }
@@ -178,7 +185,7 @@ class NextStepsCheckListViewModel @Inject constructor(
     private suspend fun RemoteMessage.toViewState(): ViewState {
         val content = this.content as Content.ActionableItems
         val supportedItems = completionChecker.supportedItems(content.listItems)
-        val completedIds = completionChecker.refresh(supportedItems)
+        val completedIds = completionChecker.refresh(supportedItems) { telemetry.onItemsCompleted(Variant.CHECK_LIST, it) }
         completionOrder = completedIds.toList()
         val settledListItems = supportedItems.map { ViewState.ListItem(item = it, completed = it.id in completedIds) }.sortedItems()
         startCompletionAnimationIfDue(settledListItems)
@@ -187,6 +194,7 @@ class NextStepsCheckListViewModel @Inject constructor(
             .sortedItems()
         if (listItems.isNotEmpty() && shownMessageId != id) {
             shownMessageId = id
+            telemetry.onCheckListShown(id, settledListItems.filter { !it.completed }.map { it.item.id }.toSet())
             remoteMessageModel.onMessageShown(this)
         }
         return ViewState(message = this, title = content.titleText, listItems = listItems)

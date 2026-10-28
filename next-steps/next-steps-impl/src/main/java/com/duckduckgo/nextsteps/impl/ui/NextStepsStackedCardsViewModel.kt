@@ -29,6 +29,7 @@ import com.duckduckgo.nextsteps.impl.NextStepsCompletionChecker
 import com.duckduckgo.nextsteps.impl.NextStepsItemsStore
 import com.duckduckgo.nextsteps.impl.NextStepsTelemetry
 import com.duckduckgo.nextsteps.impl.isNextStepsForNewTabPage
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.Variant
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.Content
@@ -155,7 +156,7 @@ class NextStepsStackedCardsViewModel @Inject constructor(
         } ?: return
         pendingCompletion = PendingCompletion(item.id)
         viewModelScope.launch {
-            telemetry.onCtaClicked(item.id)
+            telemetry.onCtaClicked(Variant.STACKED_CARDS, item.id)
             command.send(nextCommand)
         }
     }
@@ -168,7 +169,7 @@ class NextStepsStackedCardsViewModel @Inject constructor(
         val dismissedId = _viewState.value.items.firstOrNull()?.id ?: return
         val remaining = removeFrontCard()
         viewModelScope.launch {
-            telemetry.onCardDismissed(dismissedId)
+            telemetry.onItemDismissed(dismissedId)
             withContext(dispatchers.io()) { itemsStore.addDismissedItemId(dismissedId) }
             onFrontCardRemoved(remaining)
         }
@@ -216,7 +217,7 @@ class NextStepsStackedCardsViewModel @Inject constructor(
     }
 
     private suspend fun refreshCompletedItemIds(items: List<CardItem.ListItem>): Set<String> =
-        completionChecker.refresh(items, onNewlyCompleted = telemetry::onCardsCompleted)
+        completionChecker.refresh(items) { telemetry.onItemsCompleted(Variant.STACKED_CARDS, it) }
 
     private suspend fun loadItems(
         message: RemoteMessage,
@@ -278,7 +279,7 @@ class NextStepsStackedCardsViewModel @Inject constructor(
     private fun dismissMessage(message: RemoteMessage) {
         viewModelScope.launch {
             if (itemsStore.markMessageDismissed(message.id)) {
-                telemetry.onAllCardsDone()
+                telemetry.onAllItemsDone()
                 remoteMessageModel.onMessageDismissed(message)
             }
         }
