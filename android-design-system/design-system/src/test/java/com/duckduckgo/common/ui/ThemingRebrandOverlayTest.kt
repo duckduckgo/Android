@@ -56,6 +56,7 @@ private const val EXTRA_ENABLED_TOGGLE = "enabledToggle"
 private const val TOGGLE_RADIUS = "radius"
 private const val TOGGLE_BADGES = "badges"
 private const val TOGGLE_INFO_PANELS = "infoPanels"
+private const val TOGGLE_DIALOG_SPACING = "dialogSpacing"
 private const val EXTRA_FIRE_THEME = "fireTheme"
 
 private class TestThemingDataStore(override var theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT) : ThemingDataStore {
@@ -67,11 +68,13 @@ private fun configuredToggles(enabled: Set<String>): AppBrandDesignUpdateToggles
     val radiusToggle = enabledToggle(TOGGLE_RADIUS in enabled)
     val badgesToggle = enabledToggle(TOGGLE_BADGES in enabled)
     val infoPanelsToggle = enabledToggle(TOGGLE_INFO_PANELS in enabled)
+    val dialogSpacingToggle = enabledToggle(TOGGLE_DIALOG_SPACING in enabled)
     return mock<AppBrandDesignUpdateToggles>().also { toggles ->
         whenever(toggles.theme()).thenReturn(themeToggle)
         whenever(toggles.radius()).thenReturn(radiusToggle)
         whenever(toggles.badges()).thenReturn(badgesToggle)
         whenever(toggles.infoPanels()).thenReturn(infoPanelsToggle)
+        whenever(toggles.dialogSpacing()).thenReturn(dialogSpacingToggle)
     }
 }
 
@@ -432,6 +435,20 @@ class ThemingRebrandOverlayTest {
         val activity = toggleAwareActivity(null)
 
         assertFalse(activity.isRebrandAreaEnabled(R.attr.daxRebrandInfoPanels))
+    }
+
+    @Test
+    fun whenDuckDuckGoActivityDialogSpacingToggleIsEnabledThenDialogSpacingOverlayIsApplied() {
+        val activity = toggleAwareActivity(TOGGLE_DIALOG_SPACING)
+
+        assertTrue(activity.isRebrandAreaEnabled(R.attr.daxRebrandDialogSpacing))
+    }
+
+    @Test
+    fun whenDuckDuckGoActivityDialogSpacingToggleIsDisabledThenDialogSpacingOverlayIsNotApplied() {
+        val activity = toggleAwareActivity(null)
+
+        assertFalse(activity.isRebrandAreaEnabled(R.attr.daxRebrandDialogSpacing))
     }
 
     @Test
