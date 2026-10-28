@@ -140,7 +140,7 @@ class ColorPaletteFragment : Fragment() {
             DaxColorAttributeListItem(
                 text = "Accent Yellow",
                 dotColors = DaxColorDotColors(
-                    fillColor = DuckDuckGoTheme.colors.brand.accentYellow,
+                    fillColor = DuckDuckGoTheme.colors.brand.alertYellow,
                     strokeColor = DuckDuckGoTheme.colors.backgrounds.backgroundInverted,
                 ),
             )

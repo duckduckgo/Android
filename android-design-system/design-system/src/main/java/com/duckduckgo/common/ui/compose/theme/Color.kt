@@ -75,7 +75,7 @@ data class DuckDuckGoTextFieldColors(
 @Immutable
 data class DuckDuckGoBrandColors(
     val accentBlue: Color,
-    val accentYellow: Color,
+    val alertYellow: Color,
     val accentBrand50: Color,
     val accentBrand20: Color,
 )

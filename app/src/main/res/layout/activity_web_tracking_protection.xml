@@ -113,7 +113,7 @@
                 android:visibility="gone"
                 tools:visibility="visible"
                 android:text="@string/webTrackingProtectionExplanationTitle"
-                android:textColor="?daxColorTertiaryText"
+                android:textColor="?daxColorTextTertiary"
                 app:typography="h4" />
 
             <androidx.recyclerview.widget.RecyclerView

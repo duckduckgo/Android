@@ -28,6 +28,7 @@ import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageLimitFooterMessage.Icon
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageLimitFooterMessage.Severity
+import com.duckduckgo.mobile.android.R as CommonR
 
 class UsageLimitFooterView @JvmOverloads constructor(
     context: Context,
@@ -71,7 +72,7 @@ class UsageLimitFooterView @JvmOverloads constructor(
                 alert.visibility = GONE
                 ring.progress = icon.progress
                 ring.setColors(
-                    track = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorLines),
+                    track = context.getColorFromAttr(CommonR.attr.daxColorLines),
                     progress = context.getColorFromAttr(icon.severity.colorAttr()),
                 )
             }
@@ -85,8 +86,8 @@ class UsageLimitFooterView @JvmOverloads constructor(
     }
 
     private fun Severity.colorAttr(): Int = when (this) {
-        Severity.INFO -> com.duckduckgo.mobile.android.R.attr.daxColorPrimaryIcon
-        Severity.WARNING -> com.duckduckgo.mobile.android.R.attr.daxColorAccentYellow
-        Severity.CRITICAL -> com.duckduckgo.mobile.android.R.attr.daxColorDestructive
+        Severity.INFO -> CommonR.attr.daxColorPrimaryIcon
+        Severity.WARNING -> CommonR.attr.daxColorAlertYellow
+        Severity.CRITICAL -> CommonR.attr.daxColorDestructive
     }
 }

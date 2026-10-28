@@ -38,10 +38,10 @@
         daxColorDestructive - Destructive element (Destructive button)
         daxColorLines - Dividers between elements
         daxColorAccentBlue - Main accent color (Button primary)
-        daxColorAccentYellow
+        daxColorAlertYellow
         daxColorContainerDisabled - Disabled color applied to background elements like buttons
         daxColorTextDisabled - Disabled color applied to text elements
-        daxColorTertiaryText - Tertiary text color
+        daxColorTextTertiary - Tertiary text color
     -->
     <attr name="daxColorBackground" format="color"/>
     <attr name="daxColorBackgroundInverted" format="color"/>
@@ -54,7 +54,7 @@
     <attr name="daxColorPrimaryText" format="color"/>
     <attr name="daxColorPrimaryInvertedText" format="color"/>
     <attr name="daxColorSecondaryText" format="color"/>
-    <attr name="daxColorTertiaryText" format="color"/>
+    <attr name="daxColorTextTertiary" format="color"/>
     <attr name="daxColorPrimaryIcon" format="color"/>
     <attr name="daxColorSecondaryIcon" format="color"/>
     <attr name="daxColorIconDisabled" format="color"/>
@@ -63,7 +63,7 @@
     <attr name="daxColorShade" format="color"/>
     <attr name="daxColorShadeSolid" format="color"/>
     <attr name="daxColorAccentBlue" format="color"/>
-    <attr name="daxColorAccentYellow" format="color"/>
+    <attr name="daxColorAlertYellow" format="color"/>
     <attr name="daxColorAccentContentPrimary" format="color"/>
     <attr name="daxColorAccentTertiary" format="color"/>
     <attr name="daxColorContainerDisabled" format="color"/>
@@ -83,7 +83,7 @@
 
     <!-- Visual Design Specific Colors -->
     <attr name="daxColorControlFillPrimary" format="color"/>
-    <attr name="daxColorControlDecorationTertiary" format="color"/>
+    <attr name="daxColorDecorationTertiary" format="color"/>
 
     <attr name="daxColorButtonPrimaryContainer" format="color"/>
     <attr name="daxColorButtonPrimaryContainerPressed" format="color"/>
