@@ -22,14 +22,12 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.view.isGone
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.ui.menu.PopupMenu
-import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.divider.HorizontalDivider
 import com.duckduckgo.common.ui.view.setEnabledOpacity
@@ -61,7 +59,6 @@ class SitePermissionsAdapter(
     private val viewModel: SitePermissionsViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
-    private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
     private val permissionSettingsRedesign: Boolean,
     private val onPermissionSettingClicked: (SitePermissionSetting) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -113,7 +110,6 @@ class SitePermissionsAdapter(
 
             SITES_EMPTY -> {
                 val binding = ViewSitePermissionsEmptyListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                binding.sitesEmptyImage.isGone = appBrandDesignUpdateToggles.pictograms().isEnabled()
                 SitePermissionsSimpleViewHolder(binding)
             }
 

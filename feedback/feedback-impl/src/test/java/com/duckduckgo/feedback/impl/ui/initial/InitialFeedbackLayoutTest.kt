@@ -33,7 +33,7 @@ import com.duckduckgo.mobile.android.R as DesignSystemR
 class InitialFeedbackLayoutTest {
 
     @Test
-    fun responseChoicesKeepLegacyImagesAndProvideHiddenBrandCards() {
+    fun responseChoicesAreVisibleBrandCards() {
         val context = ContextThemeWrapper(
             ApplicationProvider.getApplicationContext(),
             DesignSystemR.style.Theme_DuckDuckGo_Light,
@@ -41,21 +41,11 @@ class InitialFeedbackLayoutTest {
         val root = LayoutInflater.from(context)
             .inflate(R.layout.content_feedback, null, false)
 
-        val positiveImage = root.findViewById<ImageView>(R.id.positiveFeedbackButton)
-        val negativeImage = root.findViewById<ImageView>(R.id.negativeFeedbackButton)
         val positiveCard = root.findViewById<MaterialCardView>(R.id.positiveFeedbackBrandButton)
         val negativeCard = root.findViewById<MaterialCardView>(R.id.negativeFeedbackBrandButton)
 
-        assertEquals(ImageView::class.java, positiveImage.javaClass)
-        assertEquals(ImageView::class.java, negativeImage.javaClass)
-        assertEquals(100, positiveImage.layoutParams.width)
-        assertEquals(100, positiveImage.layoutParams.height)
-        assertEquals(100, negativeImage.layoutParams.width)
-        assertEquals(100, negativeImage.layoutParams.height)
-        assertEquals(android.view.View.VISIBLE, positiveImage.visibility)
-        assertEquals(android.view.View.VISIBLE, negativeImage.visibility)
-        assertEquals(android.view.View.GONE, positiveCard.visibility)
-        assertEquals(android.view.View.GONE, negativeCard.visibility)
+        assertEquals(android.view.View.VISIBLE, positiveCard.visibility)
+        assertEquals(android.view.View.VISIBLE, negativeCard.visibility)
         assertTrue(positiveCard.isClickable)
         assertTrue(positiveCard.isFocusable)
         assertTrue(negativeCard.isClickable)
