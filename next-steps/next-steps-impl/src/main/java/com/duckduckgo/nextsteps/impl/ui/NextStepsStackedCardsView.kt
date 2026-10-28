@@ -104,7 +104,6 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
         binding.backCard.primaryAction.isEnabled = false
         binding.backCard.root.isClickable = false
 
-        // DaxTextView typography overrides any XML textSize, and there is no typography for the larger tablet title
         val itemTitleTextSize = resources.getDimension(R.dimen.nextStepsItemTitleTextSize)
         binding.frontCard.itemTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, itemTitleTextSize)
         binding.backCard.itemTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, itemTitleTextSize)
