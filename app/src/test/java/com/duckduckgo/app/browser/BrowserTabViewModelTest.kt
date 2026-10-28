@@ -10259,6 +10259,7 @@ class BrowserTabViewModelTest {
                     anyOrNull(),
                     any(),
                     any(),
+                    anyOrNull(),
                 ),
             ).thenReturn(jsCallbackData)
             testee.processJsCallbackMessage(
@@ -10277,6 +10278,7 @@ class BrowserTabViewModelTest {
                 anyOrNull(),
                 any(),
                 any(),
+                anyOrNull(),
             )
             // Not the single-slot command LiveData: a DuckChat reply can be held open for minutes
             // (the edit screen) while the fragment is stopped, so it goes on its own buffered channel.
@@ -10301,6 +10303,7 @@ class BrowserTabViewModelTest {
                     anyOrNull(),
                     any(),
                     any(),
+                    anyOrNull(),
                 ),
             ).thenReturn(null)
             testee.processJsCallbackMessage(
@@ -10319,6 +10322,7 @@ class BrowserTabViewModelTest {
                 anyOrNull(),
                 any(),
                 any(),
+                anyOrNull(),
             )
             testee.duckChatJsResponseFlow.test {
                 expectNoEvents()
@@ -10928,6 +10932,7 @@ class BrowserTabViewModelTest {
                     any(),
                     any(),
                     any(),
+                    anyOrNull(),
                 ),
             ).thenReturn(null)
             testee.processJsCallbackMessage(
