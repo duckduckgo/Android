@@ -15,9 +15,6 @@
   -->
 
 <resources>
-    <!-- Input Screen -->
-    <color name="daxColorBackdropDark">#080808</color>
-
     <!-- Widgets -->
     <color name="searchWidgetBackgroundColorLight">#F2F2F2</color>
     <color name="searchWidgetBackgroundColorDark">#282828</color>
