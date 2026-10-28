@@ -50,20 +50,24 @@ class OnboardingDecorationFitCorrectorTest {
         val body: View,
         val corrector: OnboardingDecorationFitCorrector,
     ) {
-        fun measureAndLayout() {
+        fun measureAndLayout(height: Int = 2015) {
             body.forceLayout()
             content.forceLayout()
             dialog.forceLayout()
             root.forceLayout()
             root.measure(
                 View.MeasureSpec.makeMeasureSpec(1920, View.MeasureSpec.EXACTLY),
-                View.MeasureSpec.makeMeasureSpec(2015, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY),
             )
-            root.layout(0, 0, 1920, 2015)
+            root.layout(0, 0, 1920, height)
         }
     }
 
-    private fun boundedHarness(): BoundedHarness {
+    private fun boundedHarness(
+        contentBottomOverflowPx: Int = 0,
+        unclippedContentHeightPx: (() -> Int)? = null,
+        onAvailableHeightChanged: (Int?) -> Unit = {},
+    ): BoundedHarness {
         val root = ConstraintLayout(context)
         val dialog = ConstraintLayout(context).apply {
             id = View.generateViewId()
@@ -95,8 +99,61 @@ class OnboardingDecorationFitCorrectorTest {
                 verticalBias = 0f
             },
         )
-        val corrector = OnboardingDecorationFitCorrector(root, dialog, content, cardBottomInsetPx = { 220 })
+        val corrector = OnboardingDecorationFitCorrector(
+            root,
+            dialog,
+            content,
+            cardBottomInsetPx = { 220 },
+            onAvailableHeightChanged = onAvailableHeightChanged,
+            unclippedContentHeightPx = unclippedContentHeightPx,
+            contentBottomOverflowPx = { contentBottomOverflowPx },
+        )
         return BoundedHarness(root, dialog, content, body, corrector)
+    }
+
+    @Test
+    fun availableHeightFollowsStageSpaceWhenContentHeightDoesNotChange() {
+        val available = mutableListOf<Int?>()
+        val h = boundedHarness { available.add(it) }
+        h.measureAndLayout()
+        h.corrector.correctOnce()
+        h.measureAndLayout()
+        h.corrector.correctOnce()
+        assertEquals(1675, available.last())
+
+        h.measureAndLayout(height = 2500)
+        h.corrector.correctOnce()
+        assertEquals(2160, available.last())
+        assertEquals(1686, h.body.layoutParams.height)
+    }
+
+    @Test
+    fun tailOutsideTheBodyDoesNotClampContentThatFitsTheNativeBodyBudget() {
+        val available = mutableListOf<Int?>()
+        val h = boundedHarness(contentBottomOverflowPx = 88, unclippedContentHeightPx = { 1710 }) { available.add(it) }
+        h.body.layoutParams.height = 1710
+        h.measureAndLayout()
+
+        assertTrue(h.corrector.correctOnce())
+        assertFalse((h.dialog.layoutParams as ConstraintLayout.LayoutParams).constrainedHeight)
+        assertEquals(1763, available.last())
+        assertEquals(1830, h.dialog.measuredHeight)
+    }
+
+    @Test
+    fun overflowingBodyKeepsTheHostBoundedAndPublishesTheTailOutsideItsViewport() {
+        val available = mutableListOf<Int?>()
+        val h = boundedHarness(contentBottomOverflowPx = 88, unclippedContentHeightPx = { 1900 }) { available.add(it) }
+        h.body.layoutParams.height = 1900
+        h.measureAndLayout()
+        assertFalse(h.corrector.correctOnce())
+        h.measureAndLayout()
+
+        assertTrue(h.corrector.correctOnce())
+        assertTrue((h.dialog.layoutParams as ConstraintLayout.LayoutParams).constrainedHeight)
+        assertEquals(1795, h.dialog.measuredHeight)
+        assertEquals(1675, h.content.measuredHeight)
+        assertEquals(1763, available.last())
     }
 
     @Test
@@ -161,6 +218,7 @@ class OnboardingDecorationFitCorrectorTest {
         cardBottomInsetPxProvider: () -> Int = { cardBottomInsetPx },
         onDecorationHidden: () -> Unit = {},
         canCorrectDecoration: () -> Boolean = { true },
+        unclippedContentHeightPx: (() -> Int)? = null,
     ): Harness {
         val root = ConstraintLayout(context)
         root.setPadding(0, 0, 0, rootPaddingBottom)
@@ -211,9 +269,46 @@ class OnboardingDecorationFitCorrectorTest {
             onDecorationHidden,
             cardBottomInsetPxProvider,
             canCorrectDecoration,
+            unclippedContentHeightPx,
         )
         corrector.track(decoration, minHeightPx = minHeightPx, maxHeightPx = maxHeightPx, bottomOverlapPx = bottomOverlapPx)
         return Harness(corrector, dialog, decoration)
+    }
+
+    @Test
+    fun whenComposeViewportClipsContentThenDecorationFitsUnclippedHeightBeforeClamp() {
+        val h = harness(
+            rootHeight = 500, dialogHeight = 220, dialogTopMargin = 20,
+            contentHeight = 180, viewportHeight = 220,
+            decorationHeight = 199, minHeightPx = 0, maxHeightPx = 199,
+            unclippedContentHeightPx = { 400 },
+        )
+        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
+            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+            bottomToTop = h.decoration.id
+        }
+
+        assertFalse(h.corrector.correctOnce())
+        assertEquals(40, h.decoration.layoutParams.height)
+        assertFalse((h.dialog.layoutParams as ConstraintLayout.LayoutParams).constrainedHeight)
+    }
+
+    @Test
+    fun whenComposeViewportHasNoRoomThenDecorationHidesUsingUnclippedContent() {
+        val h = harness(
+            rootHeight = 200, dialogHeight = 0, dialogTopMargin = 24,
+            contentHeight = 0, viewportHeight = 0,
+            decorationHeight = 199, minHeightPx = 0, maxHeightPx = 199,
+            unclippedContentHeightPx = { 300 },
+        )
+        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
+            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+            bottomToTop = h.decoration.id
+        }
+
+        assertFalse(h.corrector.correctOnce())
+        assertTrue(h.decoration.isGone)
+        assertFalse((h.dialog.layoutParams as ConstraintLayout.LayoutParams).constrainedHeight)
     }
 
     @Test
