@@ -55,6 +55,7 @@ import com.duckduckgo.lint.ui.DaxContextMenuItemContentDetector.Companion.INVALI
 import com.duckduckgo.lint.ui.DaxDividerColorUsageDetector.Companion.INVALID_DAX_DIVIDER_COLOR_USAGE
 import com.duckduckgo.lint.ui.DaxListItemColorUsageDetector.Companion.INVALID_DAX_LIST_ITEM_COLOR_USAGE
 import com.duckduckgo.lint.ui.DaxListItemContentDetector.Companion.INVALID_DAX_LIST_ITEM_CONTENT_USAGE
+import com.duckduckgo.lint.ui.DaxOnboardingDialogNestedScrollDetector.Companion.NESTED_SCROLL_IN_DAX_ONBOARDING_DIALOG
 import com.duckduckgo.lint.ui.DaxTextColorUsageDetector.Companion.INVALID_DAX_TEXT_COLOR_USAGE
 import com.duckduckgo.lint.ui.DefaultsObjectCasingDetector.Companion.DEFAULTS_PROPERTY_CASING
 import com.duckduckgo.lint.ui.NoRawM3AlertDialogUsageDetector.Companion.NO_RAW_M3_ALERT_DIALOG_USAGE
@@ -140,6 +141,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             INVALID_DAX_LIST_ITEM_COLOR_USAGE,
             INVALID_DAX_CONTEXT_MENU_ITEM_CONTENT_USAGE,
             INVALID_DAX_CONTEXT_MENU_CONTENT_USAGE,
+            NESTED_SCROLL_IN_DAX_ONBOARDING_DIALOG,
             NO_MATERIAL3_SWITCH_USAGE,
             NO_MATERIAL3_TOP_APP_BAR_USAGE,
             NO_MATERIAL3_RADIO_BUTTON_USAGE,
