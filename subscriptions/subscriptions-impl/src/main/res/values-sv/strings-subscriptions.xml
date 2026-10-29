@@ -203,4 +203,17 @@
     <string name="subscriptionExpiredStatusIconContentDescription">Prenumerationen har gått ut</string>
     <string name="subscriptionActiveStatusIconContentDescription">Prenumerationen är aktiv</string>
 
+    <!-- Right of withdrawal -->
+    <string name="subscriptionSettingWithdraw" instruction="Subscription settings option to use the legal right of withdrawal: cancel the subscription within 14 days of purchase and get a full refund">Frånträda avtalet</string>
+    <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">Du kan ångra dig och få full återbetalning fram till %1$s</string>
+    <string name="subscriptionWithdrawDialogTitle">Avsluta din prenumeration?</string>
+    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Din %1$s -prenumeration avslutas direkt och du får %2$s återbetalat till din ursprungliga betalningsmetod inom 14 dagar.\n\nVPN, Personal Information Removal och avancerade Duck.ai-modeller slutar fungera när du bekräftar.</string>
+    <string name="subscriptionWithdrawDialogConfirm">Bekräfta uttag</string>
+    <string name="subscriptionWithdrawDialogKeep">Behåll abonnemang</string>
+    <string name="subscriptionStatusNotSubscribed">Inte prenumererad</string>
+    <string name="subscriptionWithdrawnTitle" instruction="Placeholder is the date the user withdrew from their subscription, e.g. October 6, 2026">Du avslutade abonnemanget %1$s.</string>
+    <string name="subscriptionWithdrawnRefund" instruction="Placeholder is the refund amount with currency, e.g. €9.99">Din återbetalning på %1$s behandlas.</string>
+    <string name="subscriptionWithdrawnRefundWithoutAmount">Din återbetalning behandlas.</string>
+    <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Vi kunde inte behandla din uppsägning automatiskt. Besök <annotation type="withdrawal_help_link">den här sidan</annotation> för att slutföra uppsägningen.</string>
+
 </resources>
