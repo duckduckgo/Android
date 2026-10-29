@@ -60,9 +60,11 @@ class RealNextStepsTelemetry @Inject constructor(
 
     override suspend fun onFrontCardShown(messageId: String, cardId: String, cardIdsInStack: Set<String>) {
         update { state, today ->
-            if (state.firstRenderDay == null) pixels.sectionShownUnique()
-            val displayed = state
-                .endCarouselIfReplaced(messageId, today)
+            val current = state.endCarouselIfReplaced(messageId, today)
+            if (current.firstRenderDay == null) {
+                pixels.sectionShownUnique(messageId)
+            }
+            val displayed = current
                 .markCarouselDisplayed(messageId, today)
                 .startNewDayIfChanged(today, cardIdsInStack)
             displayed.incrementImpressions(cardId)
@@ -121,13 +123,20 @@ class RealNextStepsTelemetry @Inject constructor(
         if (displayedMessageId != null && displayedMessageId != messageId) endCarousel(DismissReason.AUTO, today) else this
 
     private fun NextStepsTelemetryState.markCarouselDisplayed(messageId: String, today: Long): NextStepsTelemetryState =
-        copy(firstRenderDay = firstRenderDay ?: today, displayedMessageId = messageId)
+        copy(
+            firstRenderDay = firstRenderDay ?: today,
+            displayedMessageId = messageId,
+        )
 
     /** On a new calendar day: sends the previous day's counts, then starts counting again with zero for every card in the stack. */
     private fun NextStepsTelemetryState.startNewDayIfChanged(today: Long, cardIdsInStack: Set<String>): NextStepsTelemetryState {
         val state = sendCountsIfDayEnded(today)
         if (state.openDay != null) return state
-        return state.copy(activeDays = activeDays + 1, openDay = today, dayCounts = cardIdsInStack.associateWith { 0 })
+        return state.copy(
+            activeDays = state.activeDays + 1,
+            openDay = today,
+            dayCounts = cardIdsInStack.associateWith { 0 },
+        )
     }
 
     /**
@@ -177,6 +186,8 @@ class RealNextStepsTelemetry @Inject constructor(
         pixels.cardsDismissed(dayParams(today), reason.value, completedCards, dismissedCards)
         return copy(
             displayedMessageId = null,
+            firstRenderDay = null,
+            activeDays = 0,
             ctaClickedCardId = null,
             openDay = null,
             dayCounts = emptyMap(),

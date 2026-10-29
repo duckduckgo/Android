@@ -1,6 +1,6 @@
 {
     "next_steps_section_shown_unique": {
-        "description": "Fires once per install, the first time the stacked setup cards are rendered on the new tab page. Denominator for the per-user completion funnel.",
+        "description": "Fires once per RMF message ID per install, the first time its stacked setup cards are rendered on the new tab page. The message ID is used only for local deduplication and is not sent.",
         "owners": ["catalinradoiu"],
         "triggers": ["impression"],
         "suffixes": ["form_factor"],
@@ -22,13 +22,13 @@
             {
                 "key": "activeDay",
                 "type": "string",
-                "description": "Active day of the stacked setup cards, bucketed: calendar days on which a card was shown so far, starting at 0. Rollups carry the day they were counted on.",
+                "description": "Active day within the current carousel, bucketed: calendar days on which a card was shown, starting at 0 for each new carousel. Rollups carry the day they were counted on.",
                 "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
             },
             {
                 "key": "calendarDay",
                 "type": "string",
-                "description": "Local calendar days since the stacked setup cards were first shown on this install, bucketed. Rollups carry the day they were counted on.",
+                "description": "Local calendar days since the current carousel was first shown, bucketed; resets to 0 for each new carousel. Rollups carry the day they were counted on.",
                 "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
             },
             {
@@ -40,7 +40,7 @@
         ]
     },
     "next_steps_card_removed": {
-        "description": "Fires once per setup card when it leaves the stack or is found already done: completed after its CTA was tapped, dismissed with the close button, finished elsewhere while in the stack, or already complete the first time the cards were evaluated (never shown).",
+        "description": "Fires once per setup card when it leaves the stack or is found already done: completed after its CTA was tapped, dismissed with the close button, finished elsewhere while in the stack, or already complete before the current section first rendered, with completion reporting deduplicated across sections.",
         "owners": ["catalinradoiu"],
         "triggers": ["user_interaction", "feature_lifecycle"],
         "suffixes": ["form_factor"],
@@ -55,19 +55,19 @@
             {
                 "key": "activeDay",
                 "type": "string",
-                "description": "Active day of the stacked setup cards, bucketed: calendar days on which a card was shown so far, starting at 0. Rollups carry the day they were counted on.",
+                "description": "Active day within the current carousel, bucketed: calendar days on which a card was shown, starting at 0 for each new carousel. Rollups carry the day they were counted on.",
                 "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
             },
             {
                 "key": "calendarDay",
                 "type": "string",
-                "description": "Local calendar days since the stacked setup cards were first shown on this install, bucketed. Rollups carry the day they were counted on.",
+                "description": "Local calendar days since the current carousel was first shown, bucketed; resets to 0 for each new carousel. Rollups carry the day they were counted on.",
                 "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
             },
             {
                 "key": "reason",
                 "type": "string",
-                "description": "Why the card is gone: completed after its CTA was the last one tapped, dismissed with the close button, finished elsewhere while in the stack without a CTA tap, or already complete before the cards first rendered.",
+                "description": "Why the card is gone: completed after its CTA was the last one tapped, dismissed with the close button, finished elsewhere while in the stack without a CTA tap, or already complete before the current section first rendered.",
                 "enum": ["completed", "dismissed", "finished_elsewhere", "already_complete"]
             },
             {
@@ -94,13 +94,13 @@
             {
                 "key": "activeDay",
                 "type": "string",
-                "description": "Active day of the stacked setup cards, bucketed: calendar days on which a card was shown so far, starting at 0. Rollups carry the day they were counted on.",
+                "description": "Active day within the current carousel, bucketed: calendar days on which a card was shown, starting at 0 for each new carousel. Rollups carry the day they were counted on.",
                 "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
             },
             {
                 "key": "calendarDay",
                 "type": "string",
-                "description": "Local calendar days since the stacked setup cards were first shown on this install, bucketed. Rollups carry the day they were counted on.",
+                "description": "Local calendar days since the current carousel was first shown, bucketed; resets to 0 for each new carousel. Rollups carry the day they were counted on.",
                 "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
             },
             {
@@ -121,13 +121,13 @@
             {
                 "key": "activeDay",
                 "type": "string",
-                "description": "Active day of the stacked setup cards, bucketed: calendar days on which a card was shown so far, starting at 0. Rollups carry the day they were counted on.",
+                "description": "Active day within the current carousel, bucketed: calendar days on which a card was shown, starting at 0 for each new carousel. Rollups carry the day they were counted on.",
                 "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
             },
             {
                 "key": "calendarDay",
                 "type": "string",
-                "description": "Local calendar days since the stacked setup cards were first shown on this install, bucketed. Rollups carry the day they were counted on.",
+                "description": "Local calendar days since the current carousel was first shown, bucketed; resets to 0 for each new carousel. Rollups carry the day they were counted on.",
                 "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
             },
             {
