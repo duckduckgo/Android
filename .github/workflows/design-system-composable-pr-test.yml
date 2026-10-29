@@ -3,7 +3,7 @@ name: Design System Composable PR Tests
 on:
   pull_request:
     paths:
-      - 'design-system/src/main/java/com/duckduckgo/common/ui/compose/**/*.kt'
+      - 'android-design-system/design-system/src/main/java/com/duckduckgo/common/ui/compose/**/*.kt'
     types: [opened, synchronize, reopened]
 
 concurrency:
@@ -71,7 +71,7 @@ jobs:
           maestro_test_name: design_system_pr_${{ github.event.pull_request.number }}_${{ github.sha }}
           maestro_timeout: 15
           maestro_app_file: apk/internal.apk
-          maestro_api_level: '30'
+          maestro_api_level: 34
           maestro_include_tags: androidDesignSystemTest
           test_suite_name: Design System PR Tests
           create_asana_error_task: false
