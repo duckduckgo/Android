@@ -84,6 +84,12 @@ class SyncPromotionsImplTest {
     }
 
     @Test
+    fun whenCouldShowPasswordPromoButRedesignFlagEnabledThenCannotShowPromo() = runTest {
+        syncPromotionFeature.leveragePromosRedesign().setRawStoredState(State(enable = true))
+        assertFalse(testee.canShowPasswordsPromotion(savedPasswords = 5))
+    }
+
+    @Test
     fun whenCouldShowPasswordPromoButSyncFlagDisabledThenCannotShowPromo() = runTest {
         configureSyncFeatureFlagState(state = false)
         assertFalse(testee.canShowPasswordsPromotion(savedPasswords = 5))
