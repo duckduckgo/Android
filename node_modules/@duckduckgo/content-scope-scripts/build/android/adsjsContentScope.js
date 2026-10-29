@@ -4121,12 +4121,23 @@
     init() {
       const apiChanges = this.getFeatureSetting("apiChanges");
       if (apiChanges) {
-        for (const scope in apiChanges) {
-          const change = apiChanges[scope];
-          if (!this.checkIsValidAPIChange(change)) {
+        const scopes = objectKeys(apiChanges).sort();
+        const failedScopes = [];
+        for (const scope of scopes) {
+          if (failedScopes.some((failed) => scope.startsWith(`${failed}.`))) {
             continue;
           }
-          this.applyApiChange(scope, change);
+          const change = apiChanges[scope];
+          if (!this.checkIsValidAPIChange(change)) {
+            failedScopes.push(scope);
+            continue;
+          }
+          try {
+            this.applyApiChange(scope, change);
+          } catch (e) {
+            failedScopes.push(scope);
+            this.log.error(`Failed to apply change to ${scope}:`, e);
+          }
         }
       }
     }
