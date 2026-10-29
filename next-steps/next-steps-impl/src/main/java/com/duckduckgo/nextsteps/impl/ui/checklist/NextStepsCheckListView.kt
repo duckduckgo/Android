@@ -21,12 +21,14 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
+import androidx.core.view.isVisible
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
-import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.transition.ChangeBounds
 import androidx.transition.Fade
 import androidx.transition.Transition
@@ -44,13 +46,13 @@ import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.nextsteps.impl.R
 import com.duckduckgo.nextsteps.impl.databinding.ViewNextStepsCheckListBinding
-import com.duckduckgo.nextsteps.impl.databinding.ViewNextStepsCheckListDividerBinding
 import com.duckduckgo.nextsteps.impl.databinding.ViewNextStepsCheckListItemBinding
 import com.duckduckgo.nextsteps.impl.ui.NextStepsActionLauncher
 import com.duckduckgo.nextsteps.impl.ui.checklist.NextStepsCheckListViewModel.Command
 import com.duckduckgo.nextsteps.impl.ui.checklist.NextStepsCheckListViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
@@ -74,8 +76,6 @@ class NextStepsCheckListView @JvmOverloads constructor(
 
     private val conflatedStateJob = ConflatedJob()
     private val conflatedCommandJob = ConflatedJob()
-    private var lifecycleOwner: LifecycleOwner? = null
-    private var renderedState: ViewState? = null
     private var completionAnimationRunning = false
 
     init {
@@ -93,12 +93,14 @@ class NextStepsCheckListView @JvmOverloads constructor(
 
         actionLauncher.register(context)
 
-        val lifecycleOwner = findViewTreeLifecycleOwner()!!.also { this.lifecycleOwner = it }
+        val lifecycleOwner = findViewTreeLifecycleOwner()!!
         lifecycleOwner.lifecycle.addObserver(viewModel)
         viewModel.onViewAttached()
-        conflatedStateJob += viewModel.viewState
-            .onEach { render(it) }
-            .launchIn(lifecycleOwner.lifecycleScope)
+        conflatedStateJob += lifecycleOwner.lifecycleScope.launch {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.viewState.collect { render(it) }
+            }
+        }
         conflatedCommandJob += viewModel.commands()
             .onEach { processCommand(it) }
             .launchIn(lifecycleOwner.lifecycleScope)
@@ -106,13 +108,11 @@ class NextStepsCheckListView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         completionAnimationRunning = false
-        renderedState = null
         conflatedStateJob.cancel()
         conflatedCommandJob.cancel()
         viewModel.onViewDetached()
         actionLauncher.unregister()
-        lifecycleOwner?.lifecycle?.removeObserver(viewModel)
-        lifecycleOwner = null
+        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
         super.onDetachedFromWindow()
     }
 
@@ -131,51 +131,61 @@ class NextStepsCheckListView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
-        // The rows are rebuilt on render, so a state emitted mid-animation is applied once the animation ends.
-        if (completionAnimationRunning) return
-        if (viewState == renderedState) return
-        renderedState = viewState
-        if (viewState.message == null || viewState.items.isEmpty()) {
-            gone()
-            return
+        if (!completionAnimationRunning) {
+            if (viewState.message == null || viewState.items.isEmpty()) {
+                gone()
+                return
+            }
+            binding.sectionTitle.text = viewState.title
+            bindItems(viewState.items)
+            show()
         }
-        binding.sectionTitle.text = viewState.title
-        bindItems(viewState.items)
-        show()
     }
 
     private fun bindItems(items: List<ViewState.Item>) {
+        val container = binding.itemsContainer
         val inflater = LayoutInflater.from(context)
-        binding.itemsContainer.removeAllViews()
-        items.forEachIndexed { index, item ->
-            if (index > 0) {
-                binding.itemsContainer.addView(ViewNextStepsCheckListDividerBinding.inflate(inflater, binding.itemsContainer, false).root)
+        val existingRows = container.children.associateBy { it.tag }
+        val rows = items.map { item ->
+            existingRows[item.item.id] ?: ViewNextStepsCheckListItemBinding.inflate(inflater, container, false).root.apply { tag = item.item.id }
+        }
+        rows.forEachIndexed { index, row ->
+            if (container.getChildAt(index) !== row) {
+                container.removeView(row)
+                container.addView(row, index)
             }
-            val row = ViewNextStepsCheckListItemBinding.inflate(inflater, binding.itemsContainer, false)
-            row.root.tag = item.item.id
+        }
+        while (container.childCount > rows.size) {
+            container.removeViewAt(container.childCount - 1)
+        }
+        items.forEachIndexed { index, item ->
+            val row = ViewNextStepsCheckListItemBinding.bind(rows[index])
+            row.divider.isVisible = index > 0
             row.bind(item)
-            binding.itemsContainer.addView(row.root)
         }
     }
 
     private fun ViewNextStepsCheckListItemBinding.bind(item: ViewState.Item) {
         itemTitle.text = item.item.titleText
+        actionButton.alpha = 1f
+        completedIcon.alpha = 1f
         if (item.completed) {
             actionButton.gone()
             completedIcon.show()
-            root.setOnClickListener(null)
-            root.isClickable = false
+            itemRow.setOnClickListener(null)
+            itemRow.isClickable = false
         } else {
             completedIcon.gone()
             actionButton.show()
-            root.setOnClickListener { viewModel.onItemClicked(item.item.id) }
-            actionButton.setOnClickListener { viewModel.onItemClicked(item.item.id) }
+            itemRow.setOnClickListener { viewModel.onItemClicked(item.item.id) }
         }
         val imageUrl = item.item.imageUrl
         if (imageUrl.isNullOrEmpty()) {
             Glide.with(itemImage).clear(itemImage)
+            itemImage.tag = null
             itemImage.gone()
-        } else {
+        } else if (itemImage.tag != imageUrl) {
+            itemImage.tag = imageUrl
             itemImage.show()
             Glide.with(itemImage)
                 .load(imageUrl)
@@ -184,10 +194,6 @@ class NextStepsCheckListView @JvmOverloads constructor(
         }
     }
 
-    /**
-     * Plays the completion feedback for the row of [itemId]: the chevron crossfades into the checkmark, then the row
-     * slides to [toPosition]. [onAnimationEnd] runs once the row is in its final position.
-     */
     private fun animateItemCompletion(
         itemId: String,
         toPosition: Int,
@@ -199,12 +205,10 @@ class NextStepsCheckListView @JvmOverloads constructor(
         val finish = {
             completionAnimationRunning = false
             onAnimationEnd()
-            render(viewModel.viewState.value)
         }
         val rowBinding = ViewNextStepsCheckListItemBinding.bind(row)
-        row.setOnClickListener(null)
-        row.isClickable = false
-        rowBinding.actionButton.isClickable = false
+        rowBinding.itemRow.setOnClickListener(null)
+        rowBinding.itemRow.isClickable = false
         rowBinding.completedIcon.alpha = 0f
         rowBinding.completedIcon.show()
         rowBinding.completedIcon.animate().alpha(1f).setDuration(COMPLETION_CROSSFADE_MS).start()
@@ -225,12 +229,9 @@ class NextStepsCheckListView @JvmOverloads constructor(
     ) {
         val container = binding.itemsContainer
         val rowIndex = container.indexOfChild(row)
-        val rowCount = (container.childCount + 1) / 2
-        val targetChildIndex = (toPosition * 2).coerceIn(0, container.childCount - 1)
-        if (rowIndex < 0 || rowIndex == targetChildIndex || rowCount < 2) return onAnimationEnd()
+        val targetIndex = toPosition.coerceIn(0, container.childCount - 1)
+        if (rowIndex < 0 || rowIndex == targetIndex) return onAnimationEnd()
 
-        // Rows alternate with dividers, so a divider travels with the row to keep one between every pair.
-        val divider = container.getChildAt(if (rowIndex == 0) 1 else rowIndex - 1)
         val transition = TransitionSet()
             .addTransition(ChangeBounds())
             .addTransition(Fade())
@@ -242,14 +243,10 @@ class NextStepsCheckListView @JvmOverloads constructor(
                 },
             )
         TransitionManager.beginDelayedTransition(binding.checkListCard, transition)
-        container.removeView(divider)
         container.removeView(row)
-        if (targetChildIndex == 0) {
-            container.addView(row, 0)
-            container.addView(divider, 1)
-        } else {
-            container.addView(divider, targetChildIndex - 1)
-            container.addView(row, targetChildIndex)
+        container.addView(row, targetIndex)
+        container.children.forEachIndexed { index, child ->
+            ViewNextStepsCheckListItemBinding.bind(child).divider.isVisible = index > 0
         }
     }
 
