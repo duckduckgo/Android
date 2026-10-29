@@ -5280,6 +5280,7 @@ class BrowserTabFragment :
                 mimeType = mimeType,
                 subfolder = Environment.DIRECTORY_DOWNLOADS,
                 browserMode = browserMode,
+                referer = webView?.url,
             )
 
         if (hasWriteStoragePermission()) {
@@ -5298,6 +5299,7 @@ class BrowserTabFragment :
                 url = url,
                 subfolder = Environment.DIRECTORY_DOWNLOADS,
                 browserMode = browserMode,
+                referer = webView?.url,
             )
 
         if (hasWriteStoragePermission()) {

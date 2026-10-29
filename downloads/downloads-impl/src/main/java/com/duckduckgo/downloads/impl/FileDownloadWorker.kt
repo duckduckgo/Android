@@ -69,6 +69,7 @@ private const val MIME_TYPE = "MIME_TYPE"
 private const val SUBFOLDER = "SUBFOLDER"
 private const val DIRECTORY = "DIRECTORY"
 private const val BROWSER_MODE = "BROWSER_MODE"
+private const val REFERER = "REFERER"
 
 @VisibleForTesting
 internal const val IS_URL_COMPRESSED = "IS_URL_COMPRESSED"
@@ -85,6 +86,7 @@ fun FileDownloader.PendingFileDownload.toInputData(): Data {
         .putString(DIRECTORY, directory.absolutePath)
         .putBoolean(IS_URL_COMPRESSED, urlTooLarge)
         .putString(BROWSER_MODE, browserMode.name)
+        .putString(REFERER, referer)
         .build()
 }
 
@@ -99,6 +101,7 @@ fun Data.toPendingFileDownload(): FileDownloader.PendingFileDownload {
         directory = File(getString(DIRECTORY)!!),
         isUrlCompressed = false,
         browserMode = getString(BROWSER_MODE)?.let { BrowserMode.valueOf(it) } ?: BrowserMode.REGULAR,
+        referer = getString(REFERER),
     )
 }
 
