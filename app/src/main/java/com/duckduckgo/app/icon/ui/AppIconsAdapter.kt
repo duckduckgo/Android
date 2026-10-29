@@ -50,7 +50,7 @@ class AppIconsAdapter(
         setPadding(metrics.selectionInset, metrics.selectionInset, metrics.selectionInset, metrics.selectionInset)
         foreground = AppIconOutlineDrawable(
             strokeWidthPx = metrics.selectionStrokeWidth,
-            outlineColor = context.getColorFromAttr(CommonR.attr.daxColorControlDecorationTertiary),
+            outlineColor = context.getColorFromAttr(CommonR.attr.daxColorDecorationTertiary),
         )
     }
 

@@ -22,7 +22,7 @@
     </item>
     <item>
         <shape android:shape="oval">
-            <solid android:color="?attr/daxColorRebrandAccentBlue" />
+            <solid android:color="?attr/daxColorAccentBlue" />
         </shape>
     </item>
 </ripple>

@@ -41,10 +41,8 @@
     <attr name="daxColorRebrandButtonDestructiveSecondaryText" format="color" />
     <attr name="daxColorRebrandButtonDestructiveGhostContainerPressed" format="color" />
     <attr name="daxColorRebrandButtonDestructiveGhostText" format="color" />
-    <attr name="daxColorRebrandAccentBlue" format="color" />
     <attr name="daxColorStatusIndicatorOn" format="color" />
     <attr name="daxColorStatusIndicatorOff" format="color" />
-    <attr name="daxColorRebrandStatusIndicatorOff" format="color" />
     <attr name="daxColorStatusRed" format="color" />
     <attr name="daxContainerRadius" format="dimension" />
     <attr name="daxDialogRadius" format="dimension" />

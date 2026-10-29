@@ -147,7 +147,6 @@
         <item name="daxColorWhite">@color/white</item>
         <item name="daxColorBlack">@color/black84</item>
         <item name="daxColorStatusIndicatorOn">@color/rb_green40</item>
-        <item name="daxColorStatusIndicatorOff">?attr/daxColorRebrandStatusIndicatorOff</item>
         <item name="daxColorFireModeAccentLight">@color/mandarin50</item>
         <item name="daxColorFireModeAccentDark">@color/mandarin40</item>
         <item name="daxColorFireModeAccentLightTranslucent">@color/mandarin50_translucent</item>
@@ -214,7 +213,7 @@
         <item name="daxColorPrimaryText">@color/white</item>
         <item name="daxColorPrimaryInvertedText">@color/black84</item>
         <item name="daxColorSecondaryText">@color/new_text_secondary_dark</item>
-        <item name="daxColorTertiaryText">@color/white40</item>
+        <item name="daxColorTextTertiary">@color/white40</item>
         <item name="daxColorPrimaryIcon">@color/icon_primary_dark</item>
         <item name="daxColorSecondaryIcon">@color/white48</item>
         <item name="daxColorDestructive">@color/rb_red40</item>
@@ -225,7 +224,7 @@
         <item name="daxColorShade">@color/shade_dark</item>
         <item name="daxColorShadeSolid">@color/shade_dark_solid</item>
         <item name="daxColorAccentBlue">@color/pondwater40</item>
-        <item name="daxColorAccentYellow">@color/pollen50</item>
+        <item name="daxColorAlertYellow">@color/pollen50</item>
         <item name="daxColorAccentContentPrimary">@color/eggshell90</item>
         <item name="daxColorAccentTertiary">@color/pondwater60</item>
         <item name="daxColorRipple">@color/white12</item>
@@ -234,7 +233,7 @@
 
         <!-- Controls -->
         <item name="daxColorControlFillPrimary">@color/white6</item>
-        <item name="daxColorControlDecorationTertiary">@color/new_decoration_tertiary_dark</item>
+        <item name="daxColorDecorationTertiary">@color/new_decoration_tertiary_dark</item>
         <item name="daxColorControlRaisedFillPrimary">@color/white18</item>
         <item name="daxColorControlRaisedBackdrop">@color/white12</item>
 
@@ -265,7 +264,6 @@
         <item name="daxColorButtonBrandContainer">@color/pollen40</item>
         <item name="daxColorButtonBrandContainerPressed">@color/pollen60</item>
         <item name="daxColorButtonBrandText">@color/pollen100</item>
-        <item name="daxColorRebrandAccentBlue">?attr/daxColorAccentBlue</item>
         <item name="daxColorRebrandButtonPrimaryContainer">?attr/daxColorAccentBlue</item>
         <item name="daxColorRebrandButtonPrimaryContainerPressed">?attr/daxColorAccentTertiary</item>
         <item name="daxColorRebrandButtonPrimaryText">?attr/daxColorAccentContentPrimary</item>
@@ -318,7 +316,7 @@
         <item name="daxColorInputModeIndicatorShadow">@color/black</item>
 
         <!--Rebrand Status-->
-        <item name="daxColorRebrandStatusIndicatorOff">@color/white40</item>
+        <item name="daxColorStatusIndicatorOff">@color/white40</item>
         <item name="daxColorStatusRed">@color/alertRedOnDarkDefault</item>
 
         <item name="daxContainerRadius">@dimen/rebrandContainerRadius</item>
@@ -368,7 +366,7 @@
         <item name="daxColorPrimaryText">@color/black96</item>
         <item name="daxColorPrimaryInvertedText">@color/white84</item>
         <item name="daxColorSecondaryText">@color/black60</item>
-        <item name="daxColorTertiaryText">@color/black36</item>
+        <item name="daxColorTextTertiary">@color/black36</item>
         <item name="daxColorPrimaryIcon">@color/black84</item>
         <item name="daxColorSecondaryIcon">@color/black60</item>
         <item name="daxColorIconDisabled">@color/icon_tertiary_light</item>
@@ -379,7 +377,7 @@
         <item name="daxColorShade">@color/shade_light</item>
         <item name="daxColorShadeSolid">@color/shade_light_solid</item>
         <item name="daxColorAccentBlue">@color/pondwater60</item>
-        <item name="daxColorAccentYellow">@color/pollen50</item>
+        <item name="daxColorAlertYellow">@color/pollen50</item>
         <item name="daxColorAccentContentPrimary">@color/white</item>
         <item name="daxColorAccentTertiary">@color/pondwater80</item>
         <item name="daxColorRipple">@color/black6</item>
@@ -388,7 +386,7 @@
 
         <!-- Controls -->
         <item name="daxColorControlFillPrimary">@color/black6</item>
-        <item name="daxColorControlDecorationTertiary">@color/new_decoration_tertiary_light</item>
+        <item name="daxColorDecorationTertiary">@color/new_decoration_tertiary_light</item>
         <item name="daxColorControlRaisedFillPrimary">@color/white</item>
         <item name="daxColorControlRaisedBackdrop">@color/black9</item>
 
@@ -420,7 +418,6 @@
         <item name="daxColorButtonBrandContainer">@color/mandarin50</item>
         <item name="daxColorButtonBrandContainerPressed">@color/mandarin70</item>
         <item name="daxColorButtonBrandText">@color/white</item>
-        <item name="daxColorRebrandAccentBlue">?attr/daxColorAccentBlue</item>
         <item name="daxColorRebrandButtonPrimaryContainer">?attr/daxColorAccentBlue</item>
         <item name="daxColorRebrandButtonPrimaryContainerPressed">?attr/daxColorAccentTertiary</item>
         <item name="daxColorRebrandButtonPrimaryText">?attr/daxColorAccentContentPrimary</item>
@@ -473,7 +470,7 @@
         <item name="daxColorInputModeIndicatorShadow">@color/gray60</item>
 
         <!--Rebrand Status-->
-        <item name="daxColorRebrandStatusIndicatorOff">@color/black36</item>
+        <item name="daxColorStatusIndicatorOff">@color/black36</item>
         <item name="daxColorStatusRed">@color/rb_red50</item>
 
         <item name="daxContainerRadius">@dimen/rebrandContainerRadius</item>
