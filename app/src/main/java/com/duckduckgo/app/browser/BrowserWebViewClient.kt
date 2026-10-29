@@ -803,6 +803,9 @@ class BrowserWebViewClient @Inject constructor(
         logcat(VERBOSE) { "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
         url?.let { pageLoadTimeoutWatchdog.onFinished(it) }
 
+        // WebView reports the outgoing page's progress for a never-committing (204) navigation, so this can't wait for the progress check below.
+        if (url != null && url != ABOUT_BLANK && url != webView.url) webViewClientListener?.onNavigationFinishedWithoutCommit()
+
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
             pageLoadTraceMarker.onPageFinished(url, webView.progress)

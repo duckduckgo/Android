@@ -201,6 +201,11 @@ interface WebViewClientListener {
      */
     fun onMainFrameNavigationCommitted()
 
+    /**
+     * For navigations that never commit, e.g. HTTP 204.
+     */
+    fun onNavigationFinishedWithoutCommit()
+
     fun pageFinished(
         webView: WebView,
         webViewNavigationState: WebViewNavigationState,

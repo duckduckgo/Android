@@ -2209,6 +2209,8 @@ class BrowserTabViewModel @Inject constructor(
         navigationState = navigationState.releasePendingNavigation()
     }
 
+    override fun onNavigationFinishedWithoutCommit() = onNavigationAbandoned()
+
     private fun isStartProgressAtIntentEnabled() =
         progressBarUpgradeFeature.behaviourUpdate().isEnabled() && progressBarUpgradeFeature.startProgressAtIntent().isEnabled()
 
@@ -2237,7 +2239,13 @@ class BrowserTabViewModel @Inject constructor(
         val awaitingCommit = isAwaitingCommitAtIntent()
         navigationState = navigationState.onNavigationAbandoned()
         if (!awaitingCommit) return
-        currentLoadingViewState().onNavigationAbandoned()?.let { loadingViewState.value = it }
+        val loading = currentLoadingViewState()
+        val ended = loading.onNavigationAbandoned()
+        when {
+            ended != null -> loadingViewState.value = ended
+            // The outgoing page finished while its progress was held back, so nothing else will end its bar
+            loading.isLoading && navigationState.hasCompletedPageLoad -> finishLoading(finalProgress = 100)
+        }
     }
 
     private fun startLoading(

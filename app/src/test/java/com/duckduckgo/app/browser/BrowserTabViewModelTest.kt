@@ -2327,6 +2327,88 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenPendingNavigationFinishesWithoutCommitThenLoadingEnds() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        testee.willOverrideUrl("http://example.com/no-content")
+        testee.onMainFrameNavigationDecided(true)
+        assertEquals(true, loadingViewState().isLoading)
+
+        testee.onNavigationFinishedWithoutCommit()
+        reportProgress(100)
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenPendingNavigationFinishesWithoutCommitThenProgressNoLongerHeldBack() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        testee.willOverrideUrl("http://example.com/no-content")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.onNavigationFinishedWithoutCommit()
+        reportProgress(40)
+
+        assertEquals(40, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenRedirectedNavigationFinishesWithoutCommitThenLoadingEnds() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        testee.willOverrideUrl("http://example.com/redirect")
+        testee.onMainFrameNavigationDecided(true)
+        testee.willOverrideUrl("http://example.com/no-content")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.onNavigationFinishedWithoutCommit()
+        reportProgress(100)
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenPendingNavigationFinishesWithoutCommitWhileOutgoingPageLoadingThenOutgoingProgressFlowsAgain() {
+        enableStartProgressAtIntent()
+        reportProgress(30)
+        testee.willOverrideUrl("http://example.com/no-content")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.onNavigationFinishedWithoutCommit()
+        reportProgress(60)
+        assertEquals(60, loadingViewState().progress)
+        reportProgress(100)
+
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenOutgoingPageCompletedWhilePendingAndNavigationFinishesWithoutCommitThenLoadingEnds() {
+        enableStartProgressAtIntent()
+        reportProgress(30)
+        testee.willOverrideUrl("http://example.com/no-content")
+        testee.onMainFrameNavigationDecided(true)
+        reportProgress(100)
+
+        testee.onNavigationFinishedWithoutCommit()
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenNavigationFinishesWithoutCommitWithNothingPendingThenRunningBarUntouched() {
+        enableStartProgressAtIntent()
+        reportProgress(50)
+
+        testee.onNavigationFinishedWithoutCommit()
+
+        assertEquals(true, loadingViewState().isLoading)
+        assertEquals(50, loadingViewState().progress)
+    }
+
+    @Test
     fun whenStartProgressAtIntentDisabledAndMainFrameNavigationCommittedThenProgressFlows() {
         fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
         setBrowserShowing(true)
@@ -2341,6 +2423,22 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenFlagOffAndCompletedPageAndNavigationFinishesWithoutCommitThenLoadingStateUntouched() {
+        enableStartProgressAtIntent()
+        reportProgress(30)
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+        reportProgress(100)
+        fakeProgressBarUpgradeFeature.startProgressAtIntent().setRawStoredState(State(enable = false))
+        val before = loadingViewState()
+        assertEquals(true, before.isLoading)
+
+        testee.onNavigationFinishedWithoutCommit()
+
+        assertEquals(before, loadingViewState())
+    }
+
+    @Test
     fun whenBehaviourUpdateOffAndStartProgressAtIntentOnThenNewCallbacksChangeNothing() {
         fakeProgressBarUpgradeFeature.startProgressAtIntent().setRawStoredState(State(enable = true))
         setBrowserShowing(true)
@@ -2348,10 +2446,26 @@ class BrowserTabViewModelTest {
         val before = loadingViewState()
 
         testee.onMainFrameNavigationCommitted()
+        testee.onNavigationFinishedWithoutCommit()
 
         assertEquals(before, loadingViewState())
         reportProgress(70)
         assertEquals(70, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenFlagFlippedOffWhilePendingAndAbandonedThenProgressNotSwallowedAfterFlippingBackOn() {
+        enableStartProgressAtIntent()
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+        fakeProgressBarUpgradeFeature.startProgressAtIntent().setRawStoredState(State(enable = false))
+        testee.onNavigationFinishedWithoutCommit()
+        fakeProgressBarUpgradeFeature.startProgressAtIntent().setRawStoredState(State(enable = true))
+
+        reportProgress(100)
+
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
     }
 
     @Test
@@ -2367,6 +2481,18 @@ class BrowserTabViewModelTest {
 
         assertEquals(false, loadingViewState().isLoading)
         assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenStartProgressAtIntentDisabledAndNavigationFinishesWithoutCommitThenRunningBarUntouched() {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+        reportProgress(50)
+
+        testee.onNavigationFinishedWithoutCommit()
+
+        assertEquals(true, loadingViewState().isLoading)
+        assertEquals(50, loadingViewState().progress)
     }
 
     @Test

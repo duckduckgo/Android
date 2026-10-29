@@ -895,6 +895,73 @@ class BrowserWebViewClientTest {
     }
 
     @Test
+    fun whenOnPageFinishedForUrlOtherThanCommittedPageThenNavigationFinishedWithoutCommitNotifiedEvenIfProgressNotComplete() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.url).thenReturn("https://outgoing.example.com/")
+        whenever(mockWebView.progress).thenReturn(0)
+
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+
+        verify(listener).onNavigationFinishedWithoutCommit()
+    }
+
+    @Test
+    fun whenOnPageFinishedForUrlOtherThanCommittedPageWithCompleteProgressThenNavigationFinishedWithoutCommitNotified() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.url).thenReturn("https://outgoing.example.com/")
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+
+        verify(listener).onNavigationFinishedWithoutCommit()
+    }
+
+    @Test
+    fun whenOnPageFinishedForCommittedPageThenNavigationFinishedWithoutCommitNotNotified() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.url).thenReturn(EXAMPLE_URL)
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+
+        verify(listener, never()).onNavigationFinishedWithoutCommit()
+    }
+
+    @Test
+    fun whenOnPageFinishedForAboutBlankThenNavigationFinishedWithoutCommitNotNotified() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.url).thenReturn(EXAMPLE_URL)
+
+        testee.onPageFinished(mockWebView, "about:blank")
+
+        verify(listener, never()).onNavigationFinishedWithoutCommit()
+    }
+
+    @Test
+    fun whenOnPageFinishedWithNoCommittedPageThenNavigationFinishedWithoutCommitNotified() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.url).thenReturn(null)
+
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+
+        verify(listener).onNavigationFinishedWithoutCommit()
+    }
+
+    @Test
+    fun whenOnPageFinishedWithNullUrlThenNavigationFinishedWithoutCommitNotNotified() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.url).thenReturn(EXAMPLE_URL)
+
+        testee.onPageFinished(mockWebView, null)
+
+        verify(listener, never()).onNavigationFinishedWithoutCommit()
+    }
+
+    @Test
     fun whenMainFrameWebUrlLoadsInTabThenNavigationDecidedAsLoadingInThisTab() {
         givenMainFrameRequestRoutedTo(Web(EXAMPLE_URL))
 
