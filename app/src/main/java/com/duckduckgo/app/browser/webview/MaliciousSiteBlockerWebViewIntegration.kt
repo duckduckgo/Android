@@ -153,8 +153,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             return IsMaliciousViewData.Ignored
         }
 
-        val belongsToCurrentPage = documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host
-        val isForIframe = (isForIframe(request) && belongsToCurrentPage)
+        val isForIframe = isForIframe(request) && documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host
 
         // Only main frames and current-page iframes are checked; returning here spares every other subresource an IO dispatch on WebView's request threads.
         if (!request.isForMainFrame && !isForIframe) {
