@@ -876,7 +876,8 @@ class RealSubscriptionsManager @Inject constructor(
             }
         }
 
-        return saveTokens(newTokens)
+        saveTokens(newTokens)
+        return AccessToken(newTokens.accessToken, newTokens.accessTokenClaims.expiresAt)
     }
 
     override suspend fun refreshSubscriptionData() {
@@ -964,15 +965,13 @@ class RealSubscriptionsManager @Inject constructor(
         )
     }
 
-    private suspend fun saveTokens(tokens: ValidatedTokenPair): AccessToken = with(tokens) {
+    private suspend fun saveTokens(tokens: ValidatedTokenPair) = with(tokens) {
         try {
-            val newAccessToken = AccessToken(accessToken, accessTokenClaims.expiresAt)
-            authRepository.setAccessTokenV2(newAccessToken)
+            authRepository.setAccessTokenV2(AccessToken(accessToken, accessTokenClaims.expiresAt))
             authRepository.setRefreshTokenV2(RefreshToken(refreshToken, refreshTokenClaims.expiresAt))
             authRepository.setEntitlements(accessTokenClaims.entitlements)
             authRepository.setAccount(Account(email = accessTokenClaims.email, externalId = accessTokenClaims.accountExternalId))
             backgroundTokenRefresh.schedule()
-            newAccessToken
         } catch (e: Exception) {
             pixelSender.reportAuthV2TokenStoreError()
             throw e
