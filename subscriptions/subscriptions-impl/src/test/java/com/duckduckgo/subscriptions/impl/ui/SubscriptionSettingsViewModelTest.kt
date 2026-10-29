@@ -990,6 +990,49 @@ class SubscriptionSettingsViewModelTest {
     }
 
     @Test
+    fun whenWithdrawClickedThenWithdrawalClickAndDialogShownPixelsAreSent() = runTest {
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
+        whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
+        stubReadySubscription(platform = "stripe")
+        viewModel.onCreate(mock())
+        viewModel.viewState.test { expectMostRecentItem() }
+
+        viewModel.onWithdrawClicked()
+
+        verify(pixelSender).reportSubscriptionSettingsWithdrawalClick()
+        verify(pixelSender).reportSubscriptionSettingsWithdrawalDialogShown()
+    }
+
+    @Test
+    fun whenWithdrawClickedWithoutWithdrawalOptionThenNoWithdrawalPixelsAreSent() = runTest {
+        stubReadySubscription(platform = "stripe")
+        viewModel.onCreate(mock())
+        viewModel.viewState.test { expectMostRecentItem() }
+
+        viewModel.onWithdrawClicked()
+
+        verify(pixelSender, never()).reportSubscriptionSettingsWithdrawalClick()
+        verify(pixelSender, never()).reportSubscriptionSettingsWithdrawalDialogShown()
+    }
+
+    @Test
+    fun whenWithdrawalConfirmedThenConfirmClickPixelIsSent() = runTest {
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failed)
+        stubReadySubscription(platform = "stripe")
+
+        viewModel.onWithdrawalConfirmed()
+
+        verify(pixelSender).reportSubscriptionSettingsWithdrawalDialogConfirmClick()
+    }
+
+    @Test
+    fun whenWithdrawalDialogDismissedThenDismissPixelIsSent() = runTest {
+        viewModel.onWithdrawalDialogDismissed()
+
+        verify(pixelSender).reportSubscriptionSettingsWithdrawalDialogDismissed()
+    }
+
+    @Test
     fun whenWithdrawalHelpLinkClickedThenGoToWithdrawalHelp() = runTest {
         viewModel.commands().test {
             viewModel.onWithdrawalHelpLinkClicked()

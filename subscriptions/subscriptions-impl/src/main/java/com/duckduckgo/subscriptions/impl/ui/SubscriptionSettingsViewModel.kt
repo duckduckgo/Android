@@ -223,6 +223,8 @@ class SubscriptionSettingsViewModel @Inject constructor(
 
     fun onWithdrawClicked() {
         val option = (_viewState.value as? Ready)?.withdrawal ?: return
+        pixelSender.reportSubscriptionSettingsWithdrawalClick()
+        pixelSender.reportSubscriptionSettingsWithdrawalDialogShown()
         viewModelScope.launch {
             command.send(ShowWithdrawalDialog(tierNameResId = option.tierNameResId, refundAmount = option.refundAmount))
         }
@@ -231,6 +233,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
     fun onWithdrawalConfirmed() {
         if (withdrawalInProgress) return
         withdrawalInProgress = true
+        pixelSender.reportSubscriptionSettingsWithdrawalDialogConfirmClick()
 
         viewModelScope.launch {
             val result = subscriptionWithdrawal.withdraw()
@@ -246,6 +249,10 @@ class SubscriptionSettingsViewModel @Inject constructor(
             }
             withdrawalInProgress = false
         }
+    }
+
+    fun onWithdrawalDialogDismissed() {
+        pixelSender.reportSubscriptionSettingsWithdrawalDialogDismissed()
     }
 
     fun onWithdrawalHelpLinkClicked() {
