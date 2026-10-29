@@ -196,6 +196,7 @@ interface NativeInputWidget {
     )
     fun storePendingPrompt(query: String)
     fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, forceImageGeneration: Boolean = false)
+    fun setOmnibarPosition(isBottom: Boolean)
     fun configureContextual(tabId: String)
     fun configureForEdit(sessionId: String)
     fun setFooterSuppressed(suppressed: Boolean)
@@ -1541,9 +1542,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
         viewModel.setVoiceChatAvailable(voiceChatAvailable)
     }
 
+    override fun setOmnibarPosition(isBottom: Boolean) {
+        (parent as? NativeInputLayout)?.setOmnibarPosition(isBottom)
+    }
+
     override fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, forceImageGeneration: Boolean) {
         activeTabId = tabId
-        (parent as? NativeInputLayout)?.setOmnibarPosition(isBottom)
+        setOmnibarPosition(isBottom)
         doOnAttach {
             viewModel.configure(tabId, isDuckAiMode, isBottom, forceImageGeneration)
             publishGatingSnapshot()

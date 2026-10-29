@@ -66,7 +66,6 @@ import com.duckduckgo.duckchat.api.NativeInputEventListener
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.toChatIdOrNull
-import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputLayout
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -826,8 +825,7 @@ class RealNativeInputManager @Inject constructor(
 
     private fun createWidgetView(layoutInflater: LayoutInflater, isBottom: Boolean): View {
         val view = layoutInflater.inflate(R.layout.input_mode_widget_card_view, rootView, false)
-        view.findViewById<NativeInputLayout>(R.id.inputModeWidgetCard)?.surface =
-            if (isBottom) NativeInputLayout.Surface.OMNIBAR_BOTTOM else NativeInputLayout.Surface.OMNIBAR_TOP
+        widgetFrom(view)?.setOmnibarPosition(isBottom)
         applyPositionChrome(view, isBottom)
         return view
     }
@@ -837,7 +835,7 @@ class RealNativeInputManager @Inject constructor(
      * XMLs is set here from [isBottom]: the row's side paddings, the card's resting margins, the inline nav
      * buttons' gravity and margins, and the footer's bottom margin. The card's surface is set before attachment,
      * since attaching starts state collection before configure runs. Its shape and horizontal insets stay
-     * state-driven (NativeInputLayout.applyOmnibarShape); the leading fire is gated on bottom by the widget itself.
+     * state-driven (the card's applyOmnibarShape); the leading fire is gated on bottom by the widget itself.
      */
     private fun applyPositionChrome(view: View, isBottom: Boolean) {
         val card = view.findViewById<View>(R.id.inputModeWidgetCard) ?: return
