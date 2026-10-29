@@ -203,4 +203,17 @@
     <string name="subscriptionExpiredStatusIconContentDescription">Abonnement is verlopen</string>
     <string name="subscriptionActiveStatusIconContentDescription">Abonnement actief</string>
 
+    <!-- Right of withdrawal -->
+    <string name="subscriptionSettingWithdraw" instruction="Subscription settings option to use the legal right of withdrawal: cancel the subscription within 14 days of purchase and get a full refund">Overeenkomst herroepen</string>
+    <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">Je kunt je tot en met %1$s terugtrekken en krijgt het volledige bedrag terug</string>
+    <string name="subscriptionWithdrawDialogTitle">Je abonnement opzeggen?</string>
+    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Je %1$s-abonnement eindigt direct en je krijgt %2$s binnen 14 dagen teruggestort via je oorspronkelijke betaalmethode.\n\nVPN, Personal Information Removal en geavanceerde Duck.ai-modellen werken niet meer zodra je bevestigt.</string>
+    <string name="subscriptionWithdrawDialogConfirm">Opname bevestigen</string>
+    <string name="subscriptionWithdrawDialogKeep">Abonnement behouden</string>
+    <string name="subscriptionStatusNotSubscribed">Niet geabonneerd</string>
+    <string name="subscriptionWithdrawnTitle" instruction="Placeholder is the date the user withdrew from their subscription, e.g. October 6, 2026">Je hebt je op %1$s teruggetrokken.</string>
+    <string name="subscriptionWithdrawnRefund" instruction="Placeholder is the refund amount with currency, e.g. €9.99">Je terugbetaling van %1$s wordt verwerkt.</string>
+    <string name="subscriptionWithdrawnRefundWithoutAmount">Je terugbetaling wordt verwerkt.</string>
+    <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">We konden je opzegging niet automatisch verwerken. Ga naar <annotation type="withdrawal_help_link">deze pagina</annotation> om je opzegging af te ronden.</string>
+
 </resources>
