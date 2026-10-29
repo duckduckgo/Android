@@ -54,7 +54,7 @@ env:
 jobs:
   hotfix-prepare:
     name: Create hotfix branch and cherry-pick fixes
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     outputs:
       cherry-pick-conflict: ${{ steps.cherry-pick.outputs.conflict }}
 
@@ -123,7 +123,7 @@ jobs:
       - name: Set up ruby env
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7.2
+          ruby-version: .ruby-version
           bundler-cache: true
 
       - name: Start hotfix (create branch, bump version and release notes)

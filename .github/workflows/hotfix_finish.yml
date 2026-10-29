@@ -36,7 +36,7 @@ env:
 jobs:
   hotfix-finish:
     name: Finish hotfix (merge to main and develop, tag)
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     outputs:
       merge-conflict: ${{ steps.detect-merge-conflict.outputs.conflict }}
     env:
@@ -82,7 +82,7 @@ jobs:
       - name: Set up ruby env
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7.2
+          ruby-version: .ruby-version
           bundler-cache: true
 
       - name: Finish hotfix (merge to main and develop, tag, push)
