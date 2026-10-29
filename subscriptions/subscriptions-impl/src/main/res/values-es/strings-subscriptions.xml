@@ -203,4 +203,17 @@
     <string name="subscriptionExpiredStatusIconContentDescription">Suscripción caducada</string>
     <string name="subscriptionActiveStatusIconContentDescription">Suscripción activa</string>
 
+    <!-- Right of withdrawal -->
+    <string name="subscriptionSettingWithdraw" instruction="Subscription settings option to use the legal right of withdrawal: cancel the subscription within 14 days of purchase and get a full refund">Desistir del contrato</string>
+    <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">Puedes desistir y obtener un reembolso completo hasta %1$s</string>
+    <string name="subscriptionWithdrawDialogTitle">¿Cancelar la suscripción?</string>
+    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Tu suscripción a %1$s finalizará de inmediato y se te reembolsarán %2$s en tu método de pago original en un plazo de 14 días.\n\nLa VPN, Personal Information Removal y los modelos avanzados de Duck.ai dejarán de funcionar una vez que confirmes.</string>
+    <string name="subscriptionWithdrawDialogConfirm">Confirmar retirada</string>
+    <string name="subscriptionWithdrawDialogKeep">Mantener la suscripción</string>
+    <string name="subscriptionStatusNotSubscribed">No suscrito</string>
+    <string name="subscriptionWithdrawnTitle" instruction="Placeholder is the date the user withdrew from their subscription, e.g. October 6, 2026">Desististe el día %1$s.</string>
+    <string name="subscriptionWithdrawnRefund" instruction="Placeholder is the refund amount with currency, e.g. €9.99">Se está procesando el reembolso de %1$s.</string>
+    <string name="subscriptionWithdrawnRefundWithoutAmount">Se está procesando el reembolso.</string>
+    <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">No hemos podido procesar tu retirada automáticamente. Visita <annotation type="withdrawal_help_link">esta página</annotation> para completar la retirada.</string>
+
 </resources>
