@@ -69,9 +69,10 @@ tags:
             timeout: 50000
             speed: 60
             element:
-              text: "Promo Bottom Sheet"
+              id: "com.duckduckgo.mobile.android:id/actionBottomSheetButton"
             direction: DOWN
-        - tapOn: "Action Bottom Sheet"
+        - tapOn:
+            id: "com.duckduckgo.mobile.android:id/actionBottomSheetButton"
         - assertVisible: "Primary Item"
         - tapOn: "Primary Item"
         - tapOn:
@@ -103,6 +104,27 @@ tags:
             id: "com.duckduckgo.mobile.android:id/no_hide_button"
         - tapOn:
             id: "com.duckduckgo.mobile.android:id/primaryCta"
+        - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
+            element:
+              text: "Onboarding Dialogs"
+            direction: DOWN
+        - assertVisible: "Onboarding Dialogs"
+        - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
+            element:
+              text: "Onboarding title"
+            direction: DOWN
+        - assertVisible: "Onboarding title"
+        - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
+            element:
+              text: "A private browser with Dax"
+            direction: DOWN
+        - assertVisible: "A private browser with Dax"
         - tapOn: "LAYOUTS"
         - assertVisible: "Dax Dialog Card"
         - tapOn: "NAVIGATION"
