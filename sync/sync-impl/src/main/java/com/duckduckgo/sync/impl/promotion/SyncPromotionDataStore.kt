@@ -25,6 +25,7 @@ import com.duckduckgo.sync.impl.di.SyncPromotion
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialog
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreenMultiDevice
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.ChatTabPage
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreen
 import dev.zacsweers.metro.ContributesBinding
@@ -41,6 +42,7 @@ interface SyncPromotionDataStore {
 
     sealed interface PromotionType {
         object BookmarksScreen : PromotionType
+        object BookmarksScreenMultiDevice : PromotionType
         object PasswordsScreen : PromotionType
         object BookmarkAddedDialog : PromotionType
         object ChatTabPage : PromotionType
@@ -85,6 +87,7 @@ class SyncPromotionDataStoreImpl @Inject constructor(
         return when (this) {
             BookmarkAddedDialog -> bookmarkAddedDialogPromoDismissedKey
             BookmarksScreen -> bookmarksScreenPromoDismissedKey
+            BookmarksScreenMultiDevice -> bookmarksScreenMultiDevicePromoDismissedKey
             PasswordsScreen -> passwordsPromoDismissedKey
             ChatTabPage -> chatTabPagePromoDismissedKey
         }
@@ -94,6 +97,7 @@ class SyncPromotionDataStoreImpl @Inject constructor(
         return when (this) {
             BookmarkAddedDialog -> bookmarkAddedDialogPromoImpressionsKey
             BookmarksScreen -> bookmarksScreenPromoImpressionsKey
+            BookmarksScreenMultiDevice -> bookmarksScreenMultiDevicePromoImpressionsKey
             PasswordsScreen -> passwordsPromoImpressionsKey
             ChatTabPage -> chatTabPagePromoImpressionsKey
         }
@@ -102,6 +106,8 @@ class SyncPromotionDataStoreImpl @Inject constructor(
     companion object {
         private val bookmarksScreenPromoDismissedKey = longPreferencesKey("bookmarks_promo_dismissed")
         private val bookmarksScreenPromoImpressionsKey = longPreferencesKey("bookmarks_promo_impressions")
+        private val bookmarksScreenMultiDevicePromoDismissedKey = longPreferencesKey("bookmarks_multi_device_promo_dismissed")
+        private val bookmarksScreenMultiDevicePromoImpressionsKey = longPreferencesKey("bookmarks_multi_device_promo_impressions")
         private val bookmarkAddedDialogPromoDismissedKey = longPreferencesKey("bookmark_added_dialog_promo_dismissed")
         private val bookmarkAddedDialogPromoImpressionsKey = longPreferencesKey("bookmark_added_dialog_promo_impressions")
         private val passwordsPromoDismissedKey = longPreferencesKey("passwords_promo_dismissed")
