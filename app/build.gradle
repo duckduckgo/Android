@@ -162,13 +162,6 @@ android {
                 signingConfig = null
             }
         }
-        benchmark {
-            initWith release
-            applicationIdSuffix ".benchmark"
-            debuggable false
-            signingConfig signingConfigs.debug
-            matchingFallbacks = ["release"]
-        }
     }
     flavorDimensions "store"
     productFlavors {
