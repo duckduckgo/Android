@@ -22,6 +22,7 @@ import android.content.ContextWrapper
 import android.content.Intent
 import android.provider.Settings
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
@@ -102,6 +103,10 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
         binding.backCard.closeButton.isEnabled = false
         binding.backCard.primaryAction.isEnabled = false
         binding.backCard.root.isClickable = false
+
+        val itemTitleTextSize = resources.getDimension(R.dimen.nextStepsItemTitleTextSize)
+        binding.frontCard.itemTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, itemTitleTextSize)
+        binding.backCard.itemTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, itemTitleTextSize)
     }
 
     override fun onAttachedToWindow() {

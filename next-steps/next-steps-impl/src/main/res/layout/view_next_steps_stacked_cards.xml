@@ -36,7 +36,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_max="600dp" />
+            app:layout_constraintWidth_max="512dp" />
 
         <include
             android:id="@+id/frontCard"
@@ -46,7 +46,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_max="600dp" />
+            app:layout_constraintWidth_max="512dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

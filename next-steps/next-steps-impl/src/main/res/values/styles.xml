@@ -15,7 +15,7 @@
   -->
 <resources>
     <style name="Widget.DuckDuckGo.NextStepsCard" parent="Widget.MaterialComponents.CardView">
-        <item name="cardBackgroundColor">?attr/daxColorSurface</item>
+        <item name="cardBackgroundColor">?attr/daxColorWindow</item>
         <item name="cardCornerRadius">@dimen/extraLargeShapeCornerRadius</item>
         <item name="cardElevation">@dimen/nextStepsCardElevation</item>
     </style>

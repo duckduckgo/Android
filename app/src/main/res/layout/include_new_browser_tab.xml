@@ -72,10 +72,22 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
-                    android:id="@+id/newTabReturnHatchView"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:clipChildren="false">
+
+                    <com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
+                        android:id="@+id/newTabReturnHatchView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:clipChildren="false"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintWidth_max="@dimen/newTabPageSectionMaxWidth" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <FrameLayout
                     android:id="@+id/newTabContainerLayout"
