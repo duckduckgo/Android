@@ -63,9 +63,9 @@ class NextStepsCheckListViewModel @Inject constructor(
     data class ViewState(
         val message: RemoteMessage? = null,
         val title: String = "",
-        val items: List<Item> = emptyList(),
+        val listItems: List<ListItem> = emptyList(),
     ) {
-        data class Item(
+        data class ListItem(
             val item: CardItem.ListItem,
             val completed: Boolean,
         )
@@ -134,7 +134,7 @@ class NextStepsCheckListViewModel @Inject constructor(
     }
 
     fun onItemClicked(itemId: String) {
-        val item = _viewState.value.items.firstOrNull { it.item.id == itemId }?.takeIf { !it.completed } ?: return
+        val item = _viewState.value.listItems.firstOrNull { it.item.id == itemId }?.takeIf { !it.completed } ?: return
         val nextCommand = when (val action = item.item.primaryAction) {
             is Action.DefaultBrowser -> {
                 if (defaultRoleBrowserDialog.shouldShowDialog()) {
@@ -160,7 +160,7 @@ class NextStepsCheckListViewModel @Inject constructor(
         if (animatingCompletionItemId == itemId) {
             animatingCompletionItemId = null
             _viewState.update { state ->
-                state.copy(items = state.items.map { if (it.item.id == itemId) it.copy(completed = true) else it }.sortedItems())
+                state.copy(listItems = state.listItems.map { if (it.item.id == itemId) it.copy(completed = true) else it }.sortedItems())
             }
         }
     }
@@ -180,21 +180,21 @@ class NextStepsCheckListViewModel @Inject constructor(
         val supportedItems = completionChecker.supportedItems(content.listItems)
         val completedIds = completionChecker.refresh(supportedItems)
         completionOrder = completedIds.toList()
-        val settledItems = supportedItems.map { ViewState.Item(item = it, completed = it.id in completedIds) }.sortedItems()
-        startCompletionAnimationIfDue(settledItems)
-        val items = supportedItems
-            .map { ViewState.Item(item = it, completed = it.id in completedIds && it.id != animatingCompletionItemId) }
+        val settledListItems = supportedItems.map { ViewState.ListItem(item = it, completed = it.id in completedIds) }.sortedItems()
+        startCompletionAnimationIfDue(settledListItems)
+        val listItems = supportedItems
+            .map { ViewState.ListItem(item = it, completed = it.id in completedIds && it.id != animatingCompletionItemId) }
             .sortedItems()
-        if (items.isNotEmpty() && shownMessageId != id) {
+        if (listItems.isNotEmpty() && shownMessageId != id) {
             shownMessageId = id
             remoteMessageModel.onMessageShown(this)
         }
-        return ViewState(message = this, title = content.titleText, items = items)
+        return ViewState(message = this, title = content.titleText, listItems = listItems)
     }
 
-    private fun startCompletionAnimationIfDue(settledItems: List<ViewState.Item>) {
+    private fun startCompletionAnimationIfDue(settledListItems: List<ViewState.ListItem>) {
         val pending = pendingCompletion ?: return
-        val toPosition = settledItems.indexOfFirst { it.item.id == pending.itemId && it.completed }
+        val toPosition = settledListItems.indexOfFirst { it.item.id == pending.itemId && it.completed }
         if (toPosition < 0) return
         pendingCompletion = null
         if (pending.animate) {
@@ -203,6 +203,6 @@ class NextStepsCheckListViewModel @Inject constructor(
         }
     }
 
-    private fun List<ViewState.Item>.sortedItems(): List<ViewState.Item> =
+    private fun List<ViewState.ListItem>.sortedItems(): List<ViewState.ListItem> =
         filter { !it.completed } + filter { it.completed }.sortedByDescending { completionOrder.indexOf(it.item.id) }
 }

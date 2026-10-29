@@ -132,21 +132,21 @@ class NextStepsCheckListView @JvmOverloads constructor(
 
     private fun render(viewState: ViewState) {
         if (!completionAnimationRunning) {
-            if (viewState.message == null || viewState.items.isEmpty()) {
+            if (viewState.message == null || viewState.listItems.isEmpty()) {
                 gone()
                 return
             }
             binding.sectionTitle.text = viewState.title
-            bindItems(viewState.items)
+            bindItems(viewState.listItems)
             show()
         }
     }
 
-    private fun bindItems(items: List<ViewState.Item>) {
+    private fun bindItems(listItems: List<ViewState.ListItem>) {
         val container = binding.itemsContainer
         val inflater = LayoutInflater.from(context)
         val existingRows = container.children.associateBy { it.tag }
-        val rows = items.map { item ->
+        val rows = listItems.map { item ->
             existingRows[item.item.id] ?: ViewNextStepsCheckListItemBinding.inflate(inflater, container, false).root.apply { tag = item.item.id }
         }
         rows.forEachIndexed { index, row ->
@@ -158,18 +158,18 @@ class NextStepsCheckListView @JvmOverloads constructor(
         while (container.childCount > rows.size) {
             container.removeViewAt(container.childCount - 1)
         }
-        items.forEachIndexed { index, item ->
+        listItems.forEachIndexed { index, item ->
             val row = ViewNextStepsCheckListItemBinding.bind(rows[index])
             row.divider.isVisible = index > 0
             row.bind(item)
         }
     }
 
-    private fun ViewNextStepsCheckListItemBinding.bind(item: ViewState.Item) {
-        itemTitle.text = item.item.titleText
+    private fun ViewNextStepsCheckListItemBinding.bind(listItem: ViewState.ListItem) {
+        itemTitle.text = listItem.item.titleText
         actionButton.alpha = 1f
         completedIcon.alpha = 1f
-        if (item.completed) {
+        if (listItem.completed) {
             actionButton.gone()
             completedIcon.show()
             itemRow.setOnClickListener(null)
@@ -177,9 +177,9 @@ class NextStepsCheckListView @JvmOverloads constructor(
         } else {
             completedIcon.gone()
             actionButton.show()
-            itemRow.setOnClickListener { viewModel.onItemClicked(item.item.id) }
+            itemRow.setOnClickListener { viewModel.onItemClicked(listItem.item.id) }
         }
-        val imageUrl = item.item.imageUrl
+        val imageUrl = listItem.item.imageUrl
         if (imageUrl.isNullOrEmpty()) {
             Glide.with(itemImage).clear(itemImage)
             itemImage.tag = null

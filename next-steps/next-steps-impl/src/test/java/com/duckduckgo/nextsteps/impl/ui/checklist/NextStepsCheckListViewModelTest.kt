@@ -88,7 +88,7 @@ class NextStepsCheckListViewModelTest {
         advanceUntilIdle()
 
         assertNull(testee.viewState.value.message)
-        assertTrue(testee.viewState.value.items.isEmpty())
+        assertTrue(testee.viewState.value.listItems.isEmpty())
     }
 
     @Test
@@ -114,8 +114,8 @@ class NextStepsCheckListViewModelTest {
 
         val state = testee.viewState.value
         assertEquals("Complete your setup", state.title)
-        assertEquals(listOf(defaultBrowserItem, addWidgetItem, syncItem), state.items.map { it.item })
-        assertTrue(state.items.none { it.completed })
+        assertEquals(listOf(defaultBrowserItem, addWidgetItem, syncItem), state.listItems.map { it.item })
+        assertTrue(state.listItems.none { it.completed })
     }
 
     @Test
@@ -124,7 +124,7 @@ class NextStepsCheckListViewModelTest {
         activeMessage.value = aMessage(content = nextStepsContent(listOf(defaultBrowserItem, unsupported)))
         advanceUntilIdle()
 
-        assertEquals(listOf(defaultBrowserItem), testee.viewState.value.items.map { it.item })
+        assertEquals(listOf(defaultBrowserItem), testee.viewState.value.listItems.map { it.item })
     }
 
     @Test
@@ -134,8 +134,8 @@ class NextStepsCheckListViewModelTest {
         advanceUntilIdle()
 
         val state = testee.viewState.value
-        assertEquals(listOf(addWidgetItem, syncItem, defaultBrowserItem), state.items.map { it.item })
-        assertTrue(state.items.last().completed)
+        assertEquals(listOf(addWidgetItem, syncItem, defaultBrowserItem), state.listItems.map { it.item })
+        assertTrue(state.listItems.last().completed)
         assertTrue(commands.isEmpty())
         assertEquals(setOf(defaultBrowserItem.id), itemsStore.completedItemIds())
     }
@@ -232,13 +232,13 @@ class NextStepsCheckListViewModelTest {
         advanceUntilIdle()
 
         assertEquals(Command.AnimateItemCompletion(syncItem.id, toPosition = 2), commands.last())
-        assertEquals(listOf(defaultBrowserItem, addWidgetItem, syncItem), testee.viewState.value.items.map { it.item })
-        assertTrue(testee.viewState.value.items.none { it.completed })
+        assertEquals(listOf(defaultBrowserItem, addWidgetItem, syncItem), testee.viewState.value.listItems.map { it.item })
+        assertTrue(testee.viewState.value.listItems.none { it.completed })
 
         testee.onItemCompletionAnimated(syncItem.id)
 
-        assertEquals(listOf(defaultBrowserItem, addWidgetItem, syncItem), testee.viewState.value.items.map { it.item })
-        assertTrue(testee.viewState.value.items.last().completed)
+        assertEquals(listOf(defaultBrowserItem, addWidgetItem, syncItem), testee.viewState.value.listItems.map { it.item })
+        assertTrue(testee.viewState.value.listItems.last().completed)
     }
 
     @Test
@@ -254,9 +254,9 @@ class NextStepsCheckListViewModelTest {
         assertEquals(Command.AnimateItemCompletion(defaultBrowserItem.id, toPosition = 2), commands.last())
         testee.onItemCompletionAnimated(defaultBrowserItem.id)
 
-        assertEquals(listOf(addWidgetItem, syncItem, defaultBrowserItem), testee.viewState.value.items.map { it.item })
-        assertTrue(testee.viewState.value.items.last().completed)
-        assertFalse(testee.viewState.value.items.first().completed)
+        assertEquals(listOf(addWidgetItem, syncItem, defaultBrowserItem), testee.viewState.value.listItems.map { it.item })
+        assertTrue(testee.viewState.value.listItems.last().completed)
+        assertFalse(testee.viewState.value.listItems.first().completed)
     }
 
     @Test
@@ -272,9 +272,9 @@ class NextStepsCheckListViewModelTest {
         advanceUntilIdle()
 
         assertEquals(Command.AnimateItemCompletion(defaultBrowserItem.id, toPosition = 1), commands.last())
-        assertEquals(listOf(defaultBrowserItem, addWidgetItem, syncItem), testee.viewState.value.items.map { it.item })
+        assertEquals(listOf(defaultBrowserItem, addWidgetItem, syncItem), testee.viewState.value.listItems.map { it.item })
         testee.onItemCompletionAnimated(defaultBrowserItem.id)
-        assertEquals(listOf(addWidgetItem, defaultBrowserItem, syncItem), testee.viewState.value.items.map { it.item })
+        assertEquals(listOf(addWidgetItem, defaultBrowserItem, syncItem), testee.viewState.value.listItems.map { it.item })
     }
 
     @Test
@@ -289,7 +289,7 @@ class NextStepsCheckListViewModelTest {
         advanceUntilIdle()
         assertEquals(Command.AnimateItemCompletion(defaultBrowserItem.id, toPosition = 2), commands.last())
         testee.onItemCompletionAnimated(defaultBrowserItem.id)
-        assertEquals(listOf(addWidgetItem, syncItem, defaultBrowserItem), testee.viewState.value.items.map { it.item })
+        assertEquals(listOf(addWidgetItem, syncItem, defaultBrowserItem), testee.viewState.value.listItems.map { it.item })
 
         testee.onItemClicked(addWidgetItem.id)
         advanceUntilIdle()
@@ -298,7 +298,7 @@ class NextStepsCheckListViewModelTest {
         advanceUntilIdle()
         assertEquals(Command.AnimateItemCompletion(addWidgetItem.id, toPosition = 1), commands.last())
         testee.onItemCompletionAnimated(addWidgetItem.id)
-        assertEquals(listOf(syncItem, addWidgetItem, defaultBrowserItem), testee.viewState.value.items.map { it.item })
+        assertEquals(listOf(syncItem, addWidgetItem, defaultBrowserItem), testee.viewState.value.listItems.map { it.item })
     }
 
     @Test
@@ -311,7 +311,7 @@ class NextStepsCheckListViewModelTest {
         testee.onResume(mock())
         advanceUntilIdle()
         testee.onItemCompletionAnimated(defaultBrowserItem.id)
-        assertEquals(listOf(addWidgetItem, syncItem, defaultBrowserItem), testee.viewState.value.items.map { it.item })
+        assertEquals(listOf(addWidgetItem, syncItem, defaultBrowserItem), testee.viewState.value.listItems.map { it.item })
 
         testee.onItemClicked(syncItem.id)
         advanceUntilIdle()
@@ -321,7 +321,7 @@ class NextStepsCheckListViewModelTest {
 
         assertEquals(Command.AnimateItemCompletion(syncItem.id, toPosition = 1), commands.last())
         testee.onItemCompletionAnimated(syncItem.id)
-        assertEquals(listOf(addWidgetItem, syncItem, defaultBrowserItem), testee.viewState.value.items.map { it.item })
+        assertEquals(listOf(addWidgetItem, syncItem, defaultBrowserItem), testee.viewState.value.listItems.map { it.item })
     }
 
     @Test
@@ -334,8 +334,8 @@ class NextStepsCheckListViewModelTest {
         advanceUntilIdle()
 
         assertTrue(commands.isEmpty())
-        assertEquals(listOf(defaultBrowserItem, syncItem, addWidgetItem), testee.viewState.value.items.map { it.item })
-        assertTrue(testee.viewState.value.items.last().completed)
+        assertEquals(listOf(defaultBrowserItem, syncItem, addWidgetItem), testee.viewState.value.listItems.map { it.item })
+        assertTrue(testee.viewState.value.listItems.last().completed)
     }
 
     @Test
@@ -351,8 +351,8 @@ class NextStepsCheckListViewModelTest {
         advanceUntilIdle()
 
         assertTrue(commands.none { it is Command.AnimateItemCompletion })
-        assertEquals(listOf(defaultBrowserItem, addWidgetItem, syncItem), testee.viewState.value.items.map { it.item })
-        assertTrue(testee.viewState.value.items.last().completed)
+        assertEquals(listOf(defaultBrowserItem, addWidgetItem, syncItem), testee.viewState.value.listItems.map { it.item })
+        assertTrue(testee.viewState.value.listItems.last().completed)
     }
 
     @Test
@@ -368,7 +368,7 @@ class NextStepsCheckListViewModelTest {
         advanceUntilIdle()
 
         assertTrue(commands.none { it is Command.AnimateItemCompletion })
-        assertTrue(testee.viewState.value.items.last().completed)
+        assertTrue(testee.viewState.value.listItems.last().completed)
     }
 
     @Test
@@ -392,8 +392,8 @@ class NextStepsCheckListViewModelTest {
         activeMessage.value = aMessage(content = nextStepsContent())
         advanceUntilIdle()
 
-        assertEquals(3, testee.viewState.value.items.size)
-        assertTrue(testee.viewState.value.items.all { it.completed })
+        assertEquals(3, testee.viewState.value.listItems.size)
+        assertTrue(testee.viewState.value.listItems.all { it.completed })
         verify(remoteMessageModel, never()).onMessageDismissed(any())
     }
 
@@ -409,8 +409,8 @@ class NextStepsCheckListViewModelTest {
         testee.onResume(mock())
         advanceUntilIdle()
 
-        assertEquals(3, testee.viewState.value.items.size)
-        assertTrue(testee.viewState.value.items.all { it.completed })
+        assertEquals(3, testee.viewState.value.listItems.size)
+        assertTrue(testee.viewState.value.listItems.all { it.completed })
         assertTrue(commands.isEmpty())
         verify(remoteMessageModel, never()).onMessageDismissed(any())
     }
@@ -429,11 +429,11 @@ class NextStepsCheckListViewModelTest {
         advanceUntilIdle()
 
         assertTrue(commands.last() is Command.AnimateItemCompletion)
-        assertFalse(testee.viewState.value.items.all { it.completed })
+        assertFalse(testee.viewState.value.listItems.all { it.completed })
         testee.onItemCompletionAnimated(syncItem.id)
 
-        assertEquals(3, testee.viewState.value.items.size)
-        assertTrue(testee.viewState.value.items.all { it.completed })
+        assertEquals(3, testee.viewState.value.listItems.size)
+        assertTrue(testee.viewState.value.listItems.all { it.completed })
         verify(remoteMessageModel, never()).onMessageDismissed(any())
     }
 
