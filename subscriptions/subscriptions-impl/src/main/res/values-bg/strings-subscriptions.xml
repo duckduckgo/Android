@@ -203,4 +203,17 @@
     <string name="subscriptionExpiredStatusIconContentDescription">Абонаментът е изтекъл</string>
     <string name="subscriptionActiveStatusIconContentDescription">Абонаментът е активен</string>
 
+    <!-- Right of withdrawal -->
+    <string name="subscriptionSettingWithdraw" instruction="Subscription settings option to use the legal right of withdrawal: cancel the subscription within 14 days of purchase and get a full refund">Отказ от договора</string>
+    <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">Можете да се откажете и да получите пълно възстановяване на сумата до %1$s</string>
+    <string name="subscriptionWithdrawDialogTitle">Отказвате ли се от абонамента?</string>
+    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Абонаментът Ви за %1$s ще бъде прекратен веднага и сумата %2$s ще бъде възстановена по първоначалния начин на плащане в рамките на 14 дни.\n\nVPN, Personal Information Removal и усъвършенстваните модели на Duck.ai ще спрат да работят, щом потвърдите.</string>
+    <string name="subscriptionWithdrawDialogConfirm">Потвърждаване на отказа</string>
+    <string name="subscriptionWithdrawDialogKeep">Запазване на абонамента</string>
+    <string name="subscriptionStatusNotSubscribed">Няма активен абонамент</string>
+    <string name="subscriptionWithdrawnTitle" instruction="Placeholder is the date the user withdrew from their subscription, e.g. October 6, 2026">Отказахте се на %1$s.</string>
+    <string name="subscriptionWithdrawnRefund" instruction="Placeholder is the refund amount with currency, e.g. €9.99">Възстановяването на сумата %1$s се обработва.</string>
+    <string name="subscriptionWithdrawnRefundWithoutAmount">Възстановяването на сумата се обработва.</string>
+    <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Не успяхме да обработим отказа автоматично. Посетете <annotation type="withdrawal_help_link">тази страница</annotation>, за да завършите отказа.</string>
+
 </resources>
