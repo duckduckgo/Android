@@ -22,6 +22,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.impl.ConnectedDevicesRepository
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.promotion.FakeSyncPromotionDataStore
+import com.duckduckgo.sync.impl.promotion.SyncPromotionAppInstall
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreenMultiDevice
 import com.duckduckgo.sync.impl.promotion.SyncPromotionFeature
@@ -52,7 +53,7 @@ class RealSyncBookmarksMultiDevicePromotionTest {
     // ConnectedDevicesRepository properties
     private var connectedDeviceCount = 0
 
-    // AppInstall properties
+    // SyncPromotionAppInstall properties
     private var installAge: Duration? = null
 
     private val testee = RealSyncBookmarksMultiDevicePromotion(
@@ -67,7 +68,7 @@ class RealSyncBookmarksMultiDevicePromotionTest {
             onBlocking { latestConnectedDeviceCount() } doAnswer { connectedDeviceCount }
         },
         dispatchers = coroutineTestRule.testDispatcherProvider,
-        appInstall = mock {
+        appInstall = mock<SyncPromotionAppInstall> {
             onBlocking { getInstallAge() } doAnswer { installAge }
         },
     )

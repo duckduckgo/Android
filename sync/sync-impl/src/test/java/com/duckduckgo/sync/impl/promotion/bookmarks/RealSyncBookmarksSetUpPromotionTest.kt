@@ -20,6 +20,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.impl.promotion.FakeSyncPromotionDataStore
+import com.duckduckgo.sync.impl.promotion.SyncPromotionAppInstall
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
 import com.duckduckgo.sync.impl.promotion.SyncPromotionFeature
 import kotlinx.coroutines.test.runTest
@@ -44,7 +45,7 @@ class RealSyncBookmarksSetUpPromotionTest {
     private var isSyncEnabled = false
     private var isUserSignedIn = false
 
-    // AppInstall properties
+    // SyncPromotionAppInstall properties
     private var installAge: Duration? = null
 
     private val testee = RealSyncBookmarksSetUpPromotion(
@@ -55,7 +56,7 @@ class RealSyncBookmarksSetUpPromotionTest {
         syncPromotionFeature = syncPromotionFeature,
         promotionDataStore = promotionDataStore,
         dispatchers = coroutineTestRule.testDispatcherProvider,
-        appInstall = mock {
+        appInstall = mock<SyncPromotionAppInstall> {
             onBlocking { getInstallAge() } doAnswer { installAge }
         },
     )
