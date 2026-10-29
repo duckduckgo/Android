@@ -1,8 +1,6 @@
 name: Startup Benchmark
 
 on:
-  push:
-    branches: [feature/gerard/startup-baseline-profile]
   workflow_dispatch:
     inputs:
       tests:
