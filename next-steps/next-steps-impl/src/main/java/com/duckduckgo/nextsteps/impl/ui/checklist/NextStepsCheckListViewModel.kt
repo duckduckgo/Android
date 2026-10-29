@@ -93,7 +93,12 @@ class NextStepsCheckListViewModel @Inject constructor(
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     private val refresh = MutableSharedFlow<Unit>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST).apply { tryEmit(Unit) }
 
-    private var pendingCompletionItemId: String? = null
+    private data class PendingCompletion(
+        val itemId: String,
+        val animate: Boolean = true,
+    )
+
+    private var pendingCompletion: PendingCompletion? = null
     private var animatingCompletionItemId: String? = null
     private var shownMessageId: String? = null
     private var completionOrder: List<String> = emptyList()
@@ -116,10 +121,14 @@ class NextStepsCheckListViewModel @Inject constructor(
         refresh.tryEmit(Unit)
     }
 
+    override fun onStop(owner: LifecycleOwner) {
+        pendingCompletion = pendingCompletion?.copy(animate = false)
+    }
+
     fun onViewDetached() {
         sectionJob?.cancel()
         sectionJob = null
-        pendingCompletionItemId = null
+        pendingCompletion = null
         animatingCompletionItemId = null
         shownMessageId = null
     }
@@ -139,7 +148,7 @@ class NextStepsCheckListViewModel @Inject constructor(
             is Action.Navigation -> Command.LaunchScreen(action.value, action.additionalParameters?.get("payload").orEmpty())
             else -> null
         } ?: return
-        pendingCompletionItemId = itemId
+        pendingCompletion = PendingCompletion(itemId)
         viewModelScope.launch { command.send(nextCommand) }
     }
 
@@ -148,10 +157,11 @@ class NextStepsCheckListViewModel @Inject constructor(
     }
 
     fun onItemCompletionAnimated(itemId: String) {
-        if (animatingCompletionItemId != itemId) return
-        animatingCompletionItemId = null
-        _viewState.update { state ->
-            state.copy(items = state.items.map { if (it.item.id == itemId) it.copy(completed = true) else it }.sortedItems())
+        if (animatingCompletionItemId == itemId) {
+            animatingCompletionItemId = null
+            _viewState.update { state ->
+                state.copy(items = state.items.map { if (it.item.id == itemId) it.copy(completed = true) else it }.sortedItems())
+            }
         }
     }
 
@@ -183,14 +193,13 @@ class NextStepsCheckListViewModel @Inject constructor(
     }
 
     private fun startCompletionAnimationIfDue(settledItems: List<ViewState.Item>) {
-        val pendingId = pendingCompletionItemId ?: return
-        val toPosition = settledItems.indexOfFirst { it.item.id == pendingId && it.completed }
+        val pending = pendingCompletion ?: return
+        val toPosition = settledItems.indexOfFirst { it.item.id == pending.itemId && it.completed }
         if (toPosition < 0) return
-        pendingCompletionItemId = null
-        val wasShownIncomplete = _viewState.value.items.any { it.item.id == pendingId && !it.completed }
-        if (wasShownIncomplete) {
-            animatingCompletionItemId = pendingId
-            command.trySend(Command.AnimateItemCompletion(pendingId, toPosition))
+        pendingCompletion = null
+        if (pending.animate) {
+            animatingCompletionItemId = pending.itemId
+            command.trySend(Command.AnimateItemCompletion(pending.itemId, toPosition))
         }
     }
 

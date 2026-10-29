@@ -339,6 +339,23 @@ class NextStepsCheckListViewModelTest {
     }
 
     @Test
+    fun `when the clicked item completes after its action opened a full screen then it is marked completed without animation`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        testee.onItemClicked(syncItem.id)
+        advanceUntilIdle()
+
+        testee.onStop(mock())
+        syncCheck.completed = true
+        testee.onResume(mock())
+        advanceUntilIdle()
+
+        assertTrue(commands.none { it is Command.AnimateItemCompletion })
+        assertEquals(listOf(defaultBrowserItem, addWidgetItem, syncItem), testee.viewState.value.items.map { it.item })
+        assertTrue(testee.viewState.value.items.last().completed)
+    }
+
+    @Test
     fun `when the view is detached after a click then no animation runs on the next attach`() = runTest {
         activeMessage.value = aMessage(content = nextStepsContent())
         advanceUntilIdle()
@@ -368,7 +385,7 @@ class NextStepsCheckListViewModelTest {
     }
 
     @Test
-    fun `when every item is completed then the section stays visible`() = runTest {
+    fun `when every item is already completed then the section stays visible`() = runTest {
         defaultBrowserCheck.completed = true
         addWidgetCheck.completed = true
         syncCheck.completed = true
@@ -378,6 +395,60 @@ class NextStepsCheckListViewModelTest {
         assertEquals(3, testee.viewState.value.items.size)
         assertTrue(testee.viewState.value.items.all { it.completed })
         verify(remoteMessageModel, never()).onMessageDismissed(any())
+    }
+
+    @Test
+    fun `when all items complete outside the page then resuming keeps the completed section visible`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        testee.onStop(mock())
+
+        defaultBrowserCheck.completed = true
+        addWidgetCheck.completed = true
+        syncCheck.completed = true
+        testee.onResume(mock())
+        advanceUntilIdle()
+
+        assertEquals(3, testee.viewState.value.items.size)
+        assertTrue(testee.viewState.value.items.all { it.completed })
+        assertTrue(commands.isEmpty())
+        verify(remoteMessageModel, never()).onMessageDismissed(any())
+    }
+
+    @Test
+    fun `when the last clicked item completes then the section stays visible after the row animation`() = runTest {
+        defaultBrowserCheck.completed = true
+        addWidgetCheck.completed = true
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        testee.onItemClicked(syncItem.id)
+        advanceUntilIdle()
+
+        syncCheck.completed = true
+        testee.onResume(mock())
+        advanceUntilIdle()
+
+        assertTrue(commands.last() is Command.AnimateItemCompletion)
+        assertFalse(testee.viewState.value.items.all { it.completed })
+        testee.onItemCompletionAnimated(syncItem.id)
+
+        assertEquals(3, testee.viewState.value.items.size)
+        assertTrue(testee.viewState.value.items.all { it.completed })
+        verify(remoteMessageModel, never()).onMessageDismissed(any())
+    }
+
+    @Test
+    fun `when the completed section is dismissed by the user then the message is dismissed once`() = runTest {
+        defaultBrowserCheck.completed = true
+        val message = aMessage(content = nextStepsContent(listOf(defaultBrowserItem)))
+        activeMessage.value = message
+        advanceUntilIdle()
+
+        testee.onSectionDismissed()
+        testee.onSectionDismissed()
+        advanceUntilIdle()
+
+        verify(remoteMessageModel, times(1)).onMessageDismissed(message)
     }
 
     private class FakePluginPoint(private val plugins: List<NextStepCompletionCheck>) : PluginPoint<NextStepCompletionCheck> {
