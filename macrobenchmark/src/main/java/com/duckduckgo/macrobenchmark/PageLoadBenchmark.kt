@@ -36,13 +36,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 
 /**
- * The Gradle build type supplies this value so the test APK and target app always use the same
- * package.
- */
-internal val TARGET_PACKAGE: String
-    get() = BuildConfig.TARGET_PACKAGE
-
-/**
  * Page-load benchmark: drives N sequential navigations to a deterministic test page inside a SINGLE
  * measured iteration, producing one Perfetto trace containing N `ddg.pageLoad` async sections
  * (added by the app in BrowserWebViewClient via PageLoadTraceMarker).

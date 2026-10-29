@@ -618,7 +618,6 @@ dependencies {
     // Android KTX
     implementation AndroidX.core.ktx
     implementation AndroidX.core.splashscreen
-    implementation "androidx.profileinstaller:profileinstaller:_"
     baselineProfile project(':macrobenchmark')
     implementation AndroidX.fragment.ktx
 

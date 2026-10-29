@@ -16,8 +16,6 @@
 
 package com.duckduckgo.macrobenchmark
 
-import android.app.Instrumentation
-import android.content.Intent
 import androidx.benchmark.macro.BaselineProfileMode
 import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.StartupMode
@@ -25,11 +23,9 @@ import androidx.benchmark.macro.StartupTimingMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import androidx.test.uiautomator.uiAutomator
-import com.duckduckgo.testseeder.api.TestSeederKey
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,12 +39,6 @@ class StartupBenchmark {
 
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private val device = UiDevice.getInstance(instrumentation)
-
-    private fun completeOnboardingIfNeeded() {
-        if (device.hasObject(BROWSER_TAB)) return
-        launchWithOnboardingSkipped(instrumentation)
-        check(device.wait(Until.hasObject(BROWSER_TAB), SCREEN_TIMEOUT_MS)) { "Browser tab was not shown after onboarding" }
-    }
 
     @Test
     fun noCompilation() = measureStartup(CompilationMode.None())
@@ -74,9 +64,8 @@ class StartupBenchmark {
             startupMode = StartupMode.COLD,
             iterations = ITERATIONS,
             setupBlock = {
-                // Compilation reset reinstalls the app on unrooted devices, clearing onboarding, so re-check every time.
-                completeOnboardingIfNeeded()
-                device.executeShellCommand("am force-stop $TARGET_PACKAGE")
+                startActivityAndWait(seededLaunchIntent(instrumentation))
+                awaitBrowserTab(instrumentation)
                 pressHome()
             },
         ) {
@@ -86,17 +75,6 @@ class StartupBenchmark {
     }
 
     private companion object {
-        val BROWSER_TAB = By.res(TARGET_PACKAGE, "newTabRootLayout")
         const val ITERATIONS = 20
-        const val SCREEN_TIMEOUT_MS = 30_000L
     }
-}
-
-/** Seeds onboarding as completed on a fresh launch; seeding only runs from an intent that creates the launch activity. */
-internal fun launchWithOnboardingSkipped(instrumentation: Instrumentation) {
-    val launchIntent = checkNotNull(instrumentation.context.packageManager.getLaunchIntentForPackage(TARGET_PACKAGE))
-        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        .putExtra(TestSeederKey.IS_MACROBENCHMARK.key, "true")
-        .putExtra(TestSeederKey.SKIP_ONBOARDING.key, "true")
-    instrumentation.context.startActivity(launchIntent)
 }

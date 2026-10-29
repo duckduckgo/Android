@@ -19,7 +19,6 @@ package com.duckduckgo.macrobenchmark
 import androidx.benchmark.macro.junit4.BaselineProfileRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import org.junit.Before
@@ -34,7 +33,6 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 class StartupBaselineProfileGenerator {
-
     @get:Rule
     val baselineProfileRule = BaselineProfileRule()
 
@@ -42,10 +40,9 @@ class StartupBaselineProfileGenerator {
     private val device = UiDevice.getInstance(instrumentation)
 
     @Before
-    fun completeOnboarding() {
+    fun setUp() {
         device.executeShellCommand("pm clear $TARGET_PACKAGE")
-        launchWithOnboardingSkipped(instrumentation)
-        check(device.wait(Until.hasObject(BROWSER_TAB), SCREEN_TIMEOUT_MS)) { "Browser tab was not shown after onboarding" }
+        completeOnboarding(instrumentation)
         device.pressHome()
     }
 
@@ -59,10 +56,5 @@ class StartupBaselineProfileGenerator {
         pressHome()
         startActivityAndWait()
         check(device.wait(Until.hasObject(BROWSER_TAB), SCREEN_TIMEOUT_MS)) { "Browser tab was not shown" }
-    }
-
-    private companion object {
-        const val SCREEN_TIMEOUT_MS = 30_000L
-        val BROWSER_TAB = By.res(TARGET_PACKAGE, "newTabRootLayout")
     }
 }

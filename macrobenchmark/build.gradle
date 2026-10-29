@@ -40,6 +40,7 @@ android {
         benchmark {
             signingConfig signingConfigs.debugKey
             buildConfigField "String", "TARGET_PACKAGE", "\"com.duckduckgo.mobile.android.benchmark\""
+            matchingFallbacks = ["release"]
         }
     }
 
