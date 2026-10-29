@@ -19,7 +19,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/daxColorSurfaceTertiary">
 
     <Space
         android:id="@+id/resultTopSpace"
@@ -51,6 +52,7 @@
                 android:id="@+id/resultIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/keyline_5"
                 android:importantForAccessibility="no"
                 android:scaleType="fitCenter"
                 tools:srcCompat="@drawable/success_128" />
@@ -59,7 +61,6 @@
                 android:id="@+id/resultTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_5"
                 android:breakStrategy="balanced"
                 android:gravity="center_horizontal"
                 app:typography="h1"

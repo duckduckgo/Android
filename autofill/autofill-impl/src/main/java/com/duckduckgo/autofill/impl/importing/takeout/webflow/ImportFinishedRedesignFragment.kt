@@ -77,14 +77,14 @@ class ImportFinishedRedesignFragment : DuckDuckGoFragment(R.layout.fragment_impo
     ) {
         with(binding) {
             resultIcon.setImageResource(R.drawable.success_128)
-            resultTitle.setText(R.string.importBookmarksRedesignResultTitle)
-            resultRow.setPrimaryText(getString(R.string.importBookmarksRedesignSuccessImportedRow, importedCount).html(requireContext()))
-            resultRow.setLeadingIconResource(CommonR.drawable.check_recolorable_24)
+            resultTitle.text = getString(R.string.importBookmarksRedesignSuccessImportedRow, importedCount).html(requireContext())
+            resultRow.isVisible = false
             resultSecondaryText.isVisible = false
             resultDoneButton.setText(CommonR.string.done)
             val promo = (importViewModel.viewState.value.viewMode as? ViewMode.Success)?.promo?.createView(requireContext(), promoCallback)
             promo?.let(resultPromoContainer::addView)
             resultPromoContainer.isVisible = promo != null
+            resultIcon.isVisible = promo == null
             resultDoneButton.isVisible = promo == null
             resultDoneSecondaryButton.isVisible = promo != null
         }
