@@ -312,4 +312,16 @@
     <string name="importBookmarksErrorGenericMessage">Hiba történt</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Kérlek, győződj meg róla, hogy csatlakozol az internethez, és próbáld újra.</string>
 
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Importálás kész!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Várj türelemmel – hagyd nyitva ezt az ablakot. Nem fog tovább tartani egy-két percnél.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">A Google megkérhet, hogy add meg a jelszavad.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">A Google küld neked egy e-mailt, amelyben megerősíti, hogy az adataid exportálásra kerültek. Nincs semmi teendőd.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Importálás kész!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Importált könyvjelzők: <b>%1$d</b>]]></string>
+
 </resources>

@@ -318,4 +318,16 @@
     <string name="importBookmarksErrorGenericMessage">Ceva nu a funcționat corect</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Asigură-te că ești conectat la internet și încearcă din nou.</string>
 
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Import finalizat!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Așteaptă puțin – ține această fereastră deschisă. Nu ar trebui să dureze mai mult de un minut sau două.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google îți poate cere parola.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google îți va trimite un e-mail ca să confirme că datele tale au fost exportate. Nu trebuie să faci nimic.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Import finalizat!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Marcaje importate: <b>%1$d</b>]]></string>
+
 </resources>

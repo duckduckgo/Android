@@ -477,4 +477,12 @@
     <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">Annuleren</string>
     <string name="sync_simplified_deep_link_auth_prompt_title">Sync &amp; Backup instellen</string>
     <string name="sync_simplified_deep_link_auth_prompt_message">Ontgrendel het apparaat om \'Sync &amp; Backup\' in te stellen</string>
+
+    <!-- Sync promo on passwords import success screen -->
+    <string name="sync_passwords_import_promo_title">Krijg toegang tot je wachtwoorden op mobiel en desktop.</string>
+    <string name="sync_passwords_import_promo_primary_button">Sync &amp; Backup inschakelen</string>
+
+    <!-- Sync promo on bookmarks import success screen -->
+    <string name="sync_bookmarks_import_promo_title">Krijg toegang tot je bladwijzers op mobiel en desktop.</string>
+    <string name="sync_bookmarks_import_promo_primary_button">Sync &amp; Backup inschakelen</string>
 </resources>

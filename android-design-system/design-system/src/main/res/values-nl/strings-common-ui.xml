@@ -32,6 +32,7 @@
     <string name="removeAll">Alles verwijderen</string>
     <string name="undo">Ongedaan maken</string>
     <string name="cancel">Annuleren</string>
+    <string name="done">Klaar</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Altijd aan</string>

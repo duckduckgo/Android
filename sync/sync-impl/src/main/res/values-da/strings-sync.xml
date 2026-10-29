@@ -477,4 +477,12 @@
     <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">Annuller</string>
     <string name="sync_simplified_deep_link_auth_prompt_title">Opsætning af Sync &amp; Backup</string>
     <string name="sync_simplified_deep_link_auth_prompt_message">Lås enheden op for at konfigurere Sync &amp; Backup</string>
+
+    <!-- Sync promo on passwords import success screen -->
+    <string name="sync_passwords_import_promo_title">Få adgang til dine adgangskoder på mobil og computer.</string>
+    <string name="sync_passwords_import_promo_primary_button">Slå Sync &amp; Backup til</string>
+
+    <!-- Sync promo on bookmarks import success screen -->
+    <string name="sync_bookmarks_import_promo_title">Få adgang til dine bogmærker på mobil og computer.</string>
+    <string name="sync_bookmarks_import_promo_primary_button">Slå Sync &amp; Backup til</string>
 </resources>
