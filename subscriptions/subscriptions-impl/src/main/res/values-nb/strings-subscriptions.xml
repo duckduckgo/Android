@@ -203,4 +203,17 @@
     <string name="subscriptionExpiredStatusIconContentDescription">Abonnementet er utløpt</string>
     <string name="subscriptionActiveStatusIconContentDescription">Abonnementet er aktivt</string>
 
+    <!-- Right of withdrawal -->
+    <string name="subscriptionSettingWithdraw" instruction="Subscription settings option to use the legal right of withdrawal: cancel the subscription within 14 days of purchase and get a full refund">Trekke seg fra kontrakten</string>
+    <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">Du kan trekke deg og få full refusjon frem til %1$s</string>
+    <string name="subscriptionWithdrawDialogTitle">Vil du trekke deg fra abonnementet?</string>
+    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">%1$s-abonnementet ditt avsluttes umiddelbart, og du får refundert %2$s til den opprinnelige betalingsmåten innen 14 dager.\n\nVPN, Personal Information Removal og avanserte Duck.ai-modeller slutter å fungere når du bekrefter.</string>
+    <string name="subscriptionWithdrawDialogConfirm">Bekreft at du trekker deg fra abonnementet</string>
+    <string name="subscriptionWithdrawDialogKeep">Behold abonnementet</string>
+    <string name="subscriptionStatusNotSubscribed">Abonnerer ikke</string>
+    <string name="subscriptionWithdrawnTitle" instruction="Placeholder is the date the user withdrew from their subscription, e.g. October 6, 2026">Du trakk deg fra abonnementet %1$s.</string>
+    <string name="subscriptionWithdrawnRefund" instruction="Placeholder is the refund amount with currency, e.g. €9.99">Refusjonen din på %1$s er under behandling.</string>
+    <string name="subscriptionWithdrawnRefundWithoutAmount">Refusjonen din er under behandling.</string>
+    <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Vi kunne ikke behandle forespørselen om å trekke deg fra abonnementet automatisk. Gå til <annotation type="withdrawal_help_link">denne siden</annotation> for å få avsluttet abonnementet.</string>
+
 </resources>
