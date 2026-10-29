@@ -877,6 +877,24 @@ class BrowserWebViewClientTest {
         }
 
     @Test
+    fun whenOnPageStartedThenNavigationCommittedNotifiedBeforePageStarted() =
+        runTest {
+            testee.onPageStarted(webView, EXAMPLE_URL, null)
+
+            inOrder(listener) {
+                verify(listener).onMainFrameNavigationCommitted()
+                verify(listener).pageStarted(any(), any())
+            }
+        }
+
+    @Test
+    fun whenOnPageStartedForAboutBlankThenNavigationCommittedNotified() {
+        testee.onPageStarted(webView, "about:blank", null)
+
+        verify(listener).onMainFrameNavigationCommitted()
+    }
+
+    @Test
     fun whenMainFrameWebUrlLoadsInTabThenNavigationDecidedAsLoadingInThisTab() {
         givenMainFrameRequestRoutedTo(Web(EXAMPLE_URL))
 

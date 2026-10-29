@@ -2195,13 +2195,18 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onPageContentStart(url: String) {
-        navigationState = navigationState.onNavigationCommitted(isStartProgressAtIntentEnabled())
+        navigationState = navigationState.onNavigationCommitted()
         showWebContent()
     }
 
     override fun onMainFrameNavigationDecided(loadsInThisTab: Boolean) {
         if (!isStartProgressAtIntentEnabled()) return
         if (loadsInThisTab) onNavigationPendingCommit() else onNavigationAbandoned()
+    }
+
+    // Released here, not in pageStarted: it is posted and can land after the next navigation became pending.
+    override fun onMainFrameNavigationCommitted() {
+        navigationState = navigationState.releasePendingNavigation()
     }
 
     private fun isStartProgressAtIntentEnabled() =
@@ -2229,8 +2234,9 @@ class BrowserTabViewModel @Inject constructor(
 
     // The navigation won't commit in this tab (external app, download, SSL warning, timeout, home), so end the bar we started
     private fun onNavigationAbandoned() {
-        if (!isAwaitingCommitAtIntent()) return
-        navigationState = navigationState.onNavigationAbandoned(isStartProgressAtIntentEnabled())
+        val awaitingCommit = isAwaitingCommitAtIntent()
+        navigationState = navigationState.onNavigationAbandoned()
+        if (!awaitingCommit) return
         currentLoadingViewState().onNavigationAbandoned()?.let { loadingViewState.value = it }
     }
 
@@ -2692,8 +2698,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onMainFrameLoadStarted(navigationId: Long) {
-        // The new load now owns the bar, so the outgoing page's progress is no longer held back
-        navigationState = navigationState.releasePendingNavigation(isStartProgressAtIntentEnabled())
         pageLoadNavigationId = navigationId
         hasExitedFixedProgress = false
         errorPagePendingDismissal = currentBrowserViewState().browserError != OMITTED
@@ -2866,7 +2870,7 @@ class BrowserTabViewModel @Inject constructor(
                 maliciousSiteBlocked = false,
             )
         navigationStateChanged(webViewNavigationState)
-        navigationState = navigationState.onNavigationCommitted(isStartProgressAtIntentEnabled())
+        navigationState = navigationState.onNavigationCommitted()
         resetCompletedProgress()
 
         command.value = Command.PageStarted

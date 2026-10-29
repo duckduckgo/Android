@@ -2219,6 +2219,7 @@ class BrowserTabViewModelTest {
     fun whenMainFrameNavigationDecidedAsLeavingThisTabAfterCommitThenRunningBarKeepsRunning() {
         enableStartProgressAtIntent()
         testee.onMainFrameNavigationDecided(true)
+        testee.onMainFrameNavigationCommitted()
         testee.onPageContentStart("http://example.com/next")
 
         testee.onMainFrameNavigationDecided(false)
@@ -2284,6 +2285,7 @@ class BrowserTabViewModelTest {
         testee.onMainFrameNavigationDecided(true)
         testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
 
+        testee.onMainFrameNavigationCommitted()
         testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
         testee.progressChanged(40, WebViewNavigationState(mockStack, 40))
         assertEquals(40, loadingViewState().progress)
@@ -2296,27 +2298,75 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenMainFrameLoadStartedAfterNavigationRequestedThenRealProgressFlows() {
+    fun whenMainFrameNavigationCommittedAfterNavigationRequestedThenRealProgressFlows() {
         enableStartProgressAtIntent()
         testee.willOverrideUrl("http://example.com/next")
         testee.onMainFrameNavigationDecided(true)
 
-        testee.onMainFrameLoadStarted(1L)
+        testee.onMainFrameNavigationCommitted()
         testee.progressChanged(40, WebViewNavigationState(mockStack, 40))
 
         assertEquals(40, loadingViewState().progress)
     }
 
     @Test
-    fun whenPageContentStartAfterNavigationRequestedThenRealProgressFlows() {
+    fun whenPreviousCommitCallbacksArriveAfterNewNavigationPendingThenOutgoingProgressStaysHeldBack() {
+        enableStartProgressAtIntent()
+        testee.willOverrideUrl("http://example.com/first")
+        testee.onMainFrameNavigationDecided(true)
+        testee.onMainFrameNavigationCommitted()
+        testee.willOverrideUrl("http://example.com/client-redirect")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        testee.onPageContentStart("http://example.com/first")
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+
+        assertEquals(true, loadingViewState().isLoading)
+        assertEquals(0, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenStartProgressAtIntentDisabledAndMainFrameNavigationCommittedThenProgressFlows() {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+        reportProgress(30)
+        val states = recordLoadingStates()
+
+        testee.onMainFrameNavigationCommitted()
+        reportProgress(60)
+
+        assertEquals(60, loadingViewState().progress)
+        assertTrue(states.drop(1).none { it.progress != 60 })
+    }
+
+    @Test
+    fun whenBehaviourUpdateOffAndStartProgressAtIntentOnThenNewCallbacksChangeNothing() {
+        fakeProgressBarUpgradeFeature.startProgressAtIntent().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+        reportProgress(50)
+        val before = loadingViewState()
+
+        testee.onMainFrameNavigationCommitted()
+
+        assertEquals(before, loadingViewState())
+        reportProgress(70)
+        assertEquals(70, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenFlagFlippedOffWhilePendingAndCommittedThenProgressNotSwallowedAfterFlippingBackOn() {
         enableStartProgressAtIntent()
         testee.willOverrideUrl("http://example.com/next")
         testee.onMainFrameNavigationDecided(true)
+        fakeProgressBarUpgradeFeature.startProgressAtIntent().setRawStoredState(State(enable = false))
+        testee.onMainFrameNavigationCommitted()
+        fakeProgressBarUpgradeFeature.startProgressAtIntent().setRawStoredState(State(enable = true))
 
-        testee.onPageContentStart("http://example.com/next")
-        testee.progressChanged(40, WebViewNavigationState(mockStack, 40))
+        reportProgress(100)
 
-        assertEquals(40, loadingViewState().progress)
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
     }
 
     @Test
@@ -2398,6 +2448,7 @@ class BrowserTabViewModelTest {
         enableStartProgressAtIntent()
         testee.willOverrideUrl("http://example.com/next")
         testee.onMainFrameNavigationDecided(true)
+        testee.onMainFrameNavigationCommitted()
         testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
         testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
 
@@ -2421,6 +2472,7 @@ class BrowserTabViewModelTest {
         testee.willOverrideUrl("https://www.example.com/")
         testee.onMainFrameNavigationDecided(true)
         testee.progressChanged(30, WebViewNavigationState(mockStack, 30))
+        testee.onMainFrameNavigationCommitted()
         testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
         testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
 
@@ -2525,6 +2577,7 @@ class BrowserTabViewModelTest {
             testee.willOverrideUrl("http://example.com/hop3")
             testee.onMainFrameNavigationDecided(true)
             advanceTimeBy(2000)
+            testee.onMainFrameNavigationCommitted()
             testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
             reportProgress(30)
             reportProgress(100)
@@ -2950,6 +3003,7 @@ class BrowserTabViewModelTest {
         testee.onMaliciousSiteUserAction(VisitSite, maliciousUri, Feed.PHISHING, activeCustomTab = false)
         assertEquals(true, loadingViewState().isLoading)
         setBrowserShowing(true)
+        testee.onMainFrameNavigationCommitted()
         testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
         reportProgress(60)
         assertEquals(60, loadingViewState().progress)
@@ -2966,6 +3020,7 @@ class BrowserTabViewModelTest {
 
         testee.willOverrideUrl("http://example.com/missing")
         testee.onMainFrameNavigationDecided(true)
+        testee.onMainFrameNavigationCommitted()
         testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
         reportProgress(40)
         reportProgress(100)
@@ -3023,6 +3078,7 @@ class BrowserTabViewModelTest {
         testee.onMainFrameNavigationDecided(true)
 
         testee.onUserPressedBack()
+        testee.onMainFrameNavigationCommitted()
         testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
         reportProgress(40)
         assertEquals(40, loadingViewState().progress)
@@ -3086,6 +3142,7 @@ class BrowserTabViewModelTest {
             testee.willOverrideUrl("http://example.com/next")
             testee.onMainFrameNavigationDecided(true)
         }
+        testee.onMainFrameNavigationCommitted()
         testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
         reportProgress(40)
         reportProgress(100)

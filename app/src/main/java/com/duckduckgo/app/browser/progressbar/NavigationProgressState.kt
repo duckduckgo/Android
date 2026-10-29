@@ -34,17 +34,16 @@ data class NavigationProgressState(
     fun onNavigationPendingCommit(startAtIntent: Boolean): NavigationProgressState =
         if (startAtIntent) copy(isNavigationPendingCommit = true) else this
 
-    fun onNavigationCommitted(startAtIntent: Boolean): NavigationProgressState =
-        copy(hasCompletedPageLoad = false, isNavigationPendingCommit = isNavigationPendingCommit && !startAtIntent)
+    // Leaves the pending flag alone: commit callbacks can be delivered after a newer navigation became pending
+    fun onNavigationCommitted(): NavigationProgressState = copy(hasCompletedPageLoad = false)
 
-    fun releasePendingNavigation(startAtIntent: Boolean): NavigationProgressState =
-        if (startAtIntent) copy(isNavigationPendingCommit = false) else this
+    // Not guarded by the flag: a pending set while it was on must not outlive a flip to off
+    fun releasePendingNavigation(): NavigationProgressState = copy(isNavigationPendingCommit = false)
 
-    fun onNavigationAbandoned(startAtIntent: Boolean): NavigationProgressState =
-        if (isAwaitingCommitAtIntent(startAtIntent)) copy(isNavigationPendingCommit = false) else this
+    fun onNavigationAbandoned(): NavigationProgressState = releasePendingNavigation()
 
     fun onErrorReceived(startAtIntent: Boolean): NavigationProgressState =
-        if (startAtIntent) onPageChanged().releasePendingNavigation(startAtIntent) else this
+        if (startAtIntent) onPageChanged().releasePendingNavigation() else releasePendingNavigation()
 
     fun onPageLoadCompleted(): NavigationProgressState = copy(hasCompletedPageLoad = true)
 

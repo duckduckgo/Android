@@ -196,6 +196,11 @@ interface WebViewClientListener {
      */
     fun onMainFrameNavigationDecided(loadsInThisTab: Boolean)
 
+    /**
+     * Called synchronously from onPageStarted, so unlike [pageStarted] it can't land after a newer shouldOverrideUrlLoading.
+     */
+    fun onMainFrameNavigationCommitted()
+
     fun pageFinished(
         webView: WebView,
         webViewNavigationState: WebViewNavigationState,

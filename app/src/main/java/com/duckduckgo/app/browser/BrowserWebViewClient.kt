@@ -642,6 +642,7 @@ class BrowserWebViewClient @Inject constructor(
         }
 
         lastInterceptedAppSchemeUrl = null
+        webViewClientListener?.onMainFrameNavigationCommitted()
         if (url != null && pageLoadFeature.pageLoadTimeoutWatchdog().isEnabled()) pageLoadTimeoutWatchdog.onCommitted(url)
 
         var wideEventNavigation: Pair<String, Long>? = null
