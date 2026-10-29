@@ -203,4 +203,17 @@
     <string name="subscriptionExpiredStatusIconContentDescription">Tellimus on aegunud</string>
     <string name="subscriptionActiveStatusIconContentDescription">Tellimus on aktiivne</string>
 
+    <!-- Right of withdrawal -->
+    <string name="subscriptionSettingWithdraw" instruction="Subscription settings option to use the legal right of withdrawal: cancel the subscription within 14 days of purchase and get a full refund">Tagane lepingust</string>
+    <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">Sa võid taganeda ja saada kogu raha tagasi kuni %1$s</string>
+    <string name="subscriptionWithdrawDialogTitle">Kas soovid tellimusest loobuda?</string>
+    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Sinu %1$s tellimus lõpeb kohe ja %2$s tagastatakse 14 päeva jooksul sinu algsele makseviisile.\n\nVPN, Personal Information Removal ja Duck.ai täiustatud mudelid lakkavad töötamast, kui oled kinnitanud.</string>
+    <string name="subscriptionWithdrawDialogConfirm">Kinnita väljamakse</string>
+    <string name="subscriptionWithdrawDialogKeep">Jäta tellimus alles</string>
+    <string name="subscriptionStatusNotSubscribed">Pole tellitud</string>
+    <string name="subscriptionWithdrawnTitle" instruction="Placeholder is the date the user withdrew from their subscription, e.g. October 6, 2026">Sa taganesid %1$s.</string>
+    <string name="subscriptionWithdrawnRefund" instruction="Placeholder is the refund amount with currency, e.g. €9.99">Sinu %1$s tagasimakset töödeldakse.</string>
+    <string name="subscriptionWithdrawnRefundWithoutAmount">Sinu tagasimakset töödeldakse.</string>
+    <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Me ei saanud sinu taganemisavaldust automaatselt töödelda. Palun mine <annotation type="withdrawal_help_link">sellele lehele</annotation>, et taganemine lõpule viia.</string>
+
 </resources>
