@@ -203,4 +203,17 @@
     <string name="subscriptionExpiredStatusIconContentDescription">Η συνδρομή έληξε</string>
     <string name="subscriptionActiveStatusIconContentDescription">Ενεργή συνδρομή</string>
 
+    <!-- Right of withdrawal -->
+    <string name="subscriptionSettingWithdraw" instruction="Subscription settings option to use the legal right of withdrawal: cancel the subscription within 14 days of purchase and get a full refund">Υπαναχώρηση από τη σύμβαση</string>
+    <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">Μπορείτε να υπαναχωρήσετε και να λάβετε πλήρη επιστροφή χρημάτων μέχρι %1$s</string>
+    <string name="subscriptionWithdrawDialogTitle">Θέλετε να υπαναχωρήσετε από τη συνδρομή σας;</string>
+    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Η συνδρομή σας στο %1$s θα λήξει αμέσως και θα σας επιστραφούν τα χρήματα %2$s στην αρχική μέθοδο πληρωμής σας εντός 14 ημερών.\n\nΤο VPN, η λειτουργία Personal Information Removal και τα προηγμένα μοντέλα του Duck.ai θα σταματήσουν να λειτουργούν μόλις επιβεβαιώσετε.</string>
+    <string name="subscriptionWithdrawDialogConfirm">Επιβεβαίωση υπαναχώρησης</string>
+    <string name="subscriptionWithdrawDialogKeep">Διατήρηση συνδρομής</string>
+    <string name="subscriptionStatusNotSubscribed">Δεν έχει γίνει εγγραφή</string>
+    <string name="subscriptionWithdrawnTitle" instruction="Placeholder is the date the user withdrew from their subscription, e.g. October 6, 2026">Υπαναχωρήσατε %1$s.</string>
+    <string name="subscriptionWithdrawnRefund" instruction="Placeholder is the refund amount with currency, e.g. €9.99">Η επιστροφή χρημάτων σας ύψους %1$s διεκπεραιώνεται.</string>
+    <string name="subscriptionWithdrawnRefundWithoutAmount">Η επιστροφή χρημάτων σας διεκπεραιώνεται.</string>
+    <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Δεν μπορέσαμε να επεξεργαστούμε αυτόματα την υπαναχώρησή σας. Επισκεφθείτε <annotation type="withdrawal_help_link">αυτήν τη σελίδα</annotation> για να ολοκληρώσετε την υπαναχώρησή σας.</string>
+
 </resources>

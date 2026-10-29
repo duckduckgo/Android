@@ -203,4 +203,17 @@
     <string name="subscriptionExpiredStatusIconContentDescription">Prenumerata baigėsi</string>
     <string name="subscriptionActiveStatusIconContentDescription">Prenumerata aktyvi</string>
 
+    <!-- Right of withdrawal -->
+    <string name="subscriptionSettingWithdraw" instruction="Subscription settings option to use the legal right of withdrawal: cancel the subscription within 14 days of purchase and get a full refund">Atsisakyti sutarties</string>
+    <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">Gali atsisakyti ir susigrąžinti visus pinigus iki %1$s</string>
+    <string name="subscriptionWithdrawDialogTitle">Atsisakyti prenumeratos?</string>
+    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Tavo %1$s prenumerata baigsis iš karto, o %2$s suma per 14 dienų bus grąžinta pradiniu mokėjimo būdu.VPN, „Personal Information Removal“ ir pažangūs „Duck.ai“ modeliai nustos veikti, kai patvirtinsi.</string>
+    <string name="subscriptionWithdrawDialogConfirm">Patvirtinti atsisakymą</string>
+    <string name="subscriptionWithdrawDialogKeep">Tęsti prenumeratą</string>
+    <string name="subscriptionStatusNotSubscribed">Neužsiprenumeruota</string>
+    <string name="subscriptionWithdrawnTitle" instruction="Placeholder is the date the user withdrew from their subscription, e.g. October 6, 2026">Atsisakei prenumeratos %1$s.</string>
+    <string name="subscriptionWithdrawnRefund" instruction="Placeholder is the refund amount with currency, e.g. €9.99">Apdorojamas %1$s sumos grąžinimas.</string>
+    <string name="subscriptionWithdrawnRefundWithoutAmount">Apdorojamas pinigų grąžinimas.</string>
+    <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Nepavyko automatiškai apdoroti prenumeratos atsisakymo. Apsilankyk <annotation type="withdrawal_help_link">šiame puslapyje</annotation>, kad užbaigtum atsisakymą.</string>
+
 </resources>
