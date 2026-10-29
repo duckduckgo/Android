@@ -17,6 +17,7 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
+import java.time.Instant
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -177,5 +178,84 @@ class SyncPromotionDataStoreImplTest {
 
         testee.clearPromoHistory(BookmarksScreen)
         assertNull(testee.getTimeSinceLastPromoImpression(BookmarksScreen))
+    }
+
+    @Test
+    fun whenInitializedThenBookmarksScreenPromoHasNoLastImpressionTime() = runTest {
+        assertNull(testee.getLastPromoImpressionTime(BookmarksScreen))
+    }
+
+    @Test
+    fun whenBookmarksPromoImpressionRecordedThenLastImpressionTimeIsCurrentTime() = runTest {
+        testee.recordPromoImpression(BookmarksScreen)
+        assertEquals(Instant.ofEpochMilli(currentTimeMillis), testee.getLastPromoImpressionTime(BookmarksScreen))
+    }
+
+    @Test
+    fun whenLastImpressionTimeSetThenTimeSinceLastImpressionIsMeasuredFromIt() = runTest {
+        val time = Instant.ofEpochMilli(currentTimeMillis - 5.hours.inWholeMilliseconds)
+
+        testee.setLastPromoImpressionTime(BookmarksScreen, time)
+        assertEquals(time, testee.getLastPromoImpressionTime(BookmarksScreen))
+        assertEquals(5.hours, testee.getTimeSinceLastPromoImpression(BookmarksScreen))
+    }
+
+    @Test
+    fun whenPromoImpressionsClearedThenImpressionDataIsRemoved() = runTest {
+        testee.recordPromoImpression(BookmarksScreen)
+
+        testee.clearPromoImpressions(BookmarksScreen)
+        assertEquals(0L, testee.getPromoImpressionCount(BookmarksScreen))
+        assertNull(testee.getLastPromoImpressionTime(BookmarksScreen))
+    }
+
+    @Test
+    fun whenPromoImpressionsClearedThenDismissalIsKept() = runTest {
+        testee.recordPromoDismissed(BookmarksScreen)
+
+        testee.clearPromoImpressions(BookmarksScreen)
+        assertTrue(testee.hasPromoBeenDismissed(BookmarksScreen))
+    }
+
+    @Test
+    fun whenAllPromoHistoryClearedThenEveryPromoHasNoData() = runTest {
+        testee.recordPromoDismissed(BookmarksScreen)
+        testee.recordPromoImpression(PasswordsScreen)
+
+        testee.clearAllPromoHistory()
+        assertFalse(testee.hasPromoBeenDismissed(BookmarksScreen))
+        assertEquals(0L, testee.getPromoImpressionCount(PasswordsScreen))
+        assertNull(testee.getLastPromoImpressionTime(PasswordsScreen))
+    }
+
+    @Test
+    fun whenInitializedThenBookmarksScreenPromoHasNoDismissTime() = runTest {
+        assertNull(testee.getPromoDismissTime(BookmarksScreen))
+    }
+
+    @Test
+    fun whenDismissTimeSetThenPromoHasBeenDismissedAtThatTime() = runTest {
+        val time = Instant.ofEpochMilli(5_000L)
+
+        testee.setPromoDismissTime(BookmarksScreen, time)
+        assertEquals(time, testee.getPromoDismissTime(BookmarksScreen))
+        assertTrue(testee.hasPromoBeenDismissed(BookmarksScreen))
+    }
+
+    @Test
+    fun whenPromoDismissalClearedThenPromoHasNotBeenDismissed() = runTest {
+        testee.recordPromoDismissed(BookmarksScreen)
+
+        testee.clearPromoDismissal(BookmarksScreen)
+        assertFalse(testee.hasPromoBeenDismissed(BookmarksScreen))
+        assertNull(testee.getPromoDismissTime(BookmarksScreen))
+    }
+
+    @Test
+    fun whenPromoDismissalClearedThenImpressionsAreKept() = runTest {
+        testee.recordPromoImpression(BookmarksScreen)
+
+        testee.clearPromoDismissal(BookmarksScreen)
+        assertEquals(1L, testee.getPromoImpressionCount(BookmarksScreen))
     }
 }

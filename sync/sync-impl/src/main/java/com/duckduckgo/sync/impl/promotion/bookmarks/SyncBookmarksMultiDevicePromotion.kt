@@ -16,12 +16,12 @@
 
 package com.duckduckgo.sync.impl.promotion.bookmarks
 
-import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.impl.ConnectedDevicesRepository
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.promotion.SyncPromotionAppInstall
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreenMultiDevice
@@ -48,7 +48,7 @@ class RealSyncBookmarksMultiDevicePromotion @Inject constructor(
     private val promotionDataStore: SyncPromotionDataStore,
     private val connectedDevicesRepository: ConnectedDevicesRepository,
     private val dispatchers: DispatcherProvider,
-    private val appInstall: AppInstall,
+    private val appInstall: SyncPromotionAppInstall,
 ) : SyncBookmarksMultiDevicePromotion {
 
     override suspend fun canShowPromotion(savedBookmarks: Int): Boolean {
