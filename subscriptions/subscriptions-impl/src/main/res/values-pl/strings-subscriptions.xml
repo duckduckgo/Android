@@ -203,4 +203,17 @@
     <string name="subscriptionExpiredStatusIconContentDescription">Subskrypcja wygasła</string>
     <string name="subscriptionActiveStatusIconContentDescription">Subskrypcja aktywna</string>
 
+    <!-- Right of withdrawal -->
+    <string name="subscriptionSettingWithdraw" instruction="Subscription settings option to use the legal right of withdrawal: cancel the subscription within 14 days of purchase and get a full refund">Odstąp od umowy</string>
+    <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">Możesz zrezygnować i otrzymać pełny zwrot pieniędzy do %1$s</string>
+    <string name="subscriptionWithdrawDialogTitle">Zrezygnować z subskrypcji?</string>
+    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Twoja subskrypcja %1$s zakończy się od razu, a kwota %2$s zostanie zwrócona na pierwotną metodę płatności w ciągu 14 dni.\n\nFunkcje VPN i Personal Information Removal oraz zaawansowane modele Duck.ai przestaną działać, gdy potwierdzisz.</string>
+    <string name="subscriptionWithdrawDialogConfirm">Potwierdź rezygnację</string>
+    <string name="subscriptionWithdrawDialogKeep">Zachowaj subskrypcję</string>
+    <string name="subscriptionStatusNotSubscribed">Brak subskrypcji</string>
+    <string name="subscriptionWithdrawnTitle" instruction="Placeholder is the date the user withdrew from their subscription, e.g. October 6, 2026">Rezygnacja nastąpiła w dniu %1$s.</string>
+    <string name="subscriptionWithdrawnRefund" instruction="Placeholder is the refund amount with currency, e.g. €9.99">Trwa przetwarzanie zwrotu pieniędzy w wysokości %1$s.</string>
+    <string name="subscriptionWithdrawnRefundWithoutAmount">Trwa przetwarzanie zwrotu pieniędzy.</string>
+    <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Nie udało nam się automatycznie przetworzyć Twojej rezygnacji. Odwiedź <annotation type="withdrawal_help_link">tę stronę</annotation>, aby dokończyć proces.</string>
+
 </resources>
