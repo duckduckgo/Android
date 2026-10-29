@@ -58,9 +58,10 @@ object Theming {
 fun AppCompatActivity.applyTheme(
     theme: DuckDuckGoTheme,
     isFireMode: Boolean = false,
+    useNewTheme: Boolean = false,
 ): BroadcastReceiver? {
     if (!FIXED_THEME_ACTIVITIES.contains(this.localClassName)) {
-        setTheme(getThemeId(theme, isFireMode))
+        setTheme(getThemeId(theme, isFireMode, useNewTheme))
     }
     return registerForThemeChangeBroadcast()
 }
@@ -68,19 +69,18 @@ fun AppCompatActivity.applyTheme(
 fun AppCompatActivity.getThemeId(
     theme: DuckDuckGoTheme,
     isFireMode: Boolean = false,
+    useNewTheme: Boolean = false,
 ): Int {
-    return when (theme) {
-        SYSTEM_DEFAULT -> getSystemDefaultTheme(isFireMode)
-        DARK -> if (isFireMode) R.style.Theme_DuckDuckGo_Dark_Fire else R.style.Theme_DuckDuckGo_Dark
-        else -> if (isFireMode) R.style.Theme_DuckDuckGo_Light_Fire else R.style.Theme_DuckDuckGo_Light
+    val isDark = when (theme) {
+        SYSTEM_DEFAULT -> isInNightMode()
+        DARK -> true
+        else -> false
     }
-}
-
-private fun Context.getSystemDefaultTheme(isFireMode: Boolean): Int {
-    return if (isInNightMode()) {
-        if (isFireMode) R.style.Theme_DuckDuckGo_Dark_Fire else R.style.Theme_DuckDuckGo_Dark
-    } else {
-        if (isFireMode) R.style.Theme_DuckDuckGo_Light_Fire else R.style.Theme_DuckDuckGo_Light
+    return when {
+        useNewTheme && isDark -> if (isFireMode) R.style.Theme_DuckDuckGo_New_Dark_Fire else R.style.Theme_DuckDuckGo_New_Dark
+        useNewTheme -> if (isFireMode) R.style.Theme_DuckDuckGo_New_Light_Fire else R.style.Theme_DuckDuckGo_New_Light
+        isDark -> if (isFireMode) R.style.Theme_DuckDuckGo_Dark_Fire else R.style.Theme_DuckDuckGo_Dark
+        else -> if (isFireMode) R.style.Theme_DuckDuckGo_Light_Fire else R.style.Theme_DuckDuckGo_Light
     }
 }
 
