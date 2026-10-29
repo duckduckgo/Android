@@ -221,13 +221,6 @@ android {
     }
 }
 
-if (diFramework != 'Metro') {
-    // Required for legacy-kapt
-    configurations.matching { it.name.startsWith("kapt") && it.name != "kapt" }.configureEach {
-        extendsFrom(configurations.kapt)
-    }
-}
-
 baselineProfile {
     automaticGenerationDuringBuild = false
     saveInSrc = true
