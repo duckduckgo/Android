@@ -18,11 +18,20 @@ package com.duckduckgo.nextsteps.impl.ui
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.widget.WidgetType
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.nextsteps.api.NextStepCompletionCheck
 import com.duckduckgo.nextsteps.impl.NextStepsItemsStore
+import com.duckduckgo.nextsteps.impl.NextStepsTelemetryStore
 import com.duckduckgo.nextsteps.impl.RealNextStepsItemsStore
+import com.duckduckgo.nextsteps.impl.RealNextStepsTelemetry
+import com.duckduckgo.nextsteps.impl.RealNextStepsTelemetryStore
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason.COMPLETED
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason.DISMISSED
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason.FINISHED_ELSEWHERE
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.Days
 import com.duckduckgo.nextsteps.impl.ui.NextStepsItemsViewModel.Command
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.CardItem
@@ -49,6 +58,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.LocalDateTime
 
 class NextStepsItemsViewModelTest {
 
@@ -61,6 +71,12 @@ class NextStepsItemsViewModelTest {
     }
 
     private val itemsStore: NextStepsItemsStore = RealNextStepsItemsStore(FakeSharedPreferencesProvider(), coroutineRule.testDispatcherProvider)
+    private val telemetryStore: NextStepsTelemetryStore = RealNextStepsTelemetryStore(FakeSharedPreferencesProvider())
+    private val pixels: NextStepsPixels = mock()
+    private val clock: CurrentTimeProvider = mock {
+        whenever(it.localDateTimeNow()).thenReturn(LocalDateTime.of(2026, 10, 21, 12, 0))
+    }
+    private val telemetry = RealNextStepsTelemetry(telemetryStore, pixels, clock, coroutineRule.testDispatcherProvider)
     private val defaultBrowserCheck = FakeCompletionCheck("setup_default_browser")
     private val addWidgetCheck = FakeCompletionCheck("setup_add_widget")
     private val syncCheck = FakeCompletionCheck("setup_sync")
@@ -80,7 +96,198 @@ class NextStepsItemsViewModelTest {
         itemsStore = itemsStore,
         completionChecks = completionChecks,
         defaultRoleBrowserDialog = defaultRoleBrowserDialog,
+        telemetry = telemetry,
     ).also { it.onViewAttached() }
+
+    @Test
+    fun `when a new tab page renders the cards then one impression is counted for the front card`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+
+        advanceUntilIdle()
+
+        assertEquals(1, impressions(defaultBrowserItem.id))
+        assertEquals(0, impressions(addWidgetItem.id))
+    }
+
+    @Test
+    fun `when the host resumes with the same front card then no impression is counted`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+
+        testee.onResume(mock())
+        advanceUntilIdle()
+        testee.onViewDetached()
+        testee.onViewAttached()
+        advanceUntilIdle()
+
+        assertEquals(1, impressions())
+    }
+
+    @Test
+    fun `when the front card is dismissed then the next card gets an impression and rotation is untouched`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+
+        testee.onFrontCardDismissed()
+        advanceUntilIdle()
+
+        verify(pixels).cardRemoved(defaultBrowserItem.id, DAY_0, DISMISSED, "1")
+        assertEquals(1, impressions(addWidgetItem.id))
+        verify(remoteMessageModel, times(1)).onMessageShown(any())
+        assertEquals(0, itemsStore.frontImpressions(addWidgetItem.id))
+    }
+
+    @Test
+    fun `when the front card completes after its CTA then completion is sent and the next card gets an impression`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        testee.onPrimaryActionClicked()
+        advanceUntilIdle()
+        defaultBrowserCheck.completed = true
+
+        testee.onResume(mock())
+        advanceUntilIdle()
+        testee.onFrontCardCompletionAnimated()
+        advanceUntilIdle()
+
+        verify(pixels).cardCtaClicked(defaultBrowserItem.id, DAY_0, "1")
+        verify(pixels).cardRemoved(defaultBrowserItem.id, DAY_0, COMPLETED, "1")
+        assertEquals(1, impressions(addWidgetItem.id))
+    }
+
+    @Test
+    fun `when the front card completes after its CTA opened a full screen then the next card gets one impression without animation`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        testee.onPrimaryActionClicked()
+        assertEquals(Command.LaunchDefaultBrowserSettings, testee.commands().first())
+        val commands = mutableListOf<Command>()
+        val job = testee.commands().onEach { commands.add(it) }.launchIn(this)
+        testee.onStop(mock())
+        defaultBrowserCheck.completed = true
+
+        testee.onResume(mock())
+        advanceUntilIdle()
+
+        assertEquals(emptyList<Command>(), commands)
+        verify(pixels).cardRemoved(defaultBrowserItem.id, DAY_0, COMPLETED, "1")
+        assertEquals(1, impressions(defaultBrowserItem.id))
+        assertEquals(1, impressions(addWidgetItem.id))
+        verify(remoteMessageModel, times(1)).onMessageShown(any())
+        assertEquals(0, itemsStore.frontImpressions(addWidgetItem.id))
+        job.cancel()
+    }
+
+    @Test
+    fun `when the last card completes after its CTA opened a full screen then nothing is counted and the summary ends the carousel`() = runTest {
+        activeMessage.value = aMessage(content = Content.ActionableItems(titleText = "Complete your setup", listItems = listOf(defaultBrowserItem)))
+        advanceUntilIdle()
+        testee.onPrimaryActionClicked()
+        advanceUntilIdle()
+        testee.onStop(mock())
+        defaultBrowserCheck.completed = true
+
+        testee.onResume(mock())
+        advanceUntilIdle()
+
+        assertEquals(1, impressions())
+        verify(pixels).cardsDismissed(DAY_0, "all_cards_done", completed = 1, dismissed = 0)
+    }
+
+    @Test
+    fun `when the front card completes without a CTA in this tab then the promoted card gets one impression`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        testee.onStop(mock())
+        defaultBrowserCheck.completed = true
+
+        testee.onResume(mock())
+        advanceUntilIdle()
+
+        assertEquals(1, impressions(addWidgetItem.id))
+        assertEquals(listOf(addWidgetItem), testee.viewState.value.items)
+    }
+
+    @Test
+    fun `when the CTA is tapped again while the card animates out then the next card gets one impression from the animation`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        testee.onPrimaryActionClicked()
+        assertEquals(Command.LaunchDefaultBrowserSettings, testee.commands().first())
+        defaultBrowserCheck.completed = true
+        testee.onResume(mock())
+        advanceUntilIdle()
+        assertEquals(Command.AnimateFrontCardCompletion, testee.commands().first())
+        testee.onPrimaryActionClicked()
+        assertEquals(Command.LaunchDefaultBrowserSettings, testee.commands().first())
+        testee.onStop(mock())
+
+        testee.onResume(mock())
+        advanceUntilIdle()
+        assertEquals(0, impressions(addWidgetItem.id))
+        testee.onFrontCardCompletionAnimated()
+        advanceUntilIdle()
+
+        assertEquals(1, impressions(addWidgetItem.id))
+        assertEquals(listOf(addWidgetItem), testee.viewState.value.items)
+    }
+
+    @Test
+    fun `when a card completes elsewhere then it is reported as finished elsewhere and the promoted card gets an impression`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        defaultBrowserCheck.completed = true
+
+        testee.onResume(mock())
+        advanceUntilIdle()
+
+        verify(pixels).cardRemoved(defaultBrowserItem.id, DAY_0, FINISHED_ELSEWHERE, "1")
+        assertEquals(1, impressions(addWidgetItem.id))
+        assertEquals(listOf(addWidgetItem), testee.viewState.value.items)
+    }
+
+    @Test
+    fun `when the last card is dismissed then the summary is sent once before RMF is notified`() = runTest {
+        val message = aMessage(content = Content.ActionableItems("Setup", listOf(defaultBrowserItem)))
+        activeMessage.value = message
+        aViewModel()
+        advanceUntilIdle()
+        whenever(remoteMessageModel.onMessageDismissed(any())).thenAnswer {
+            verify(pixels).cardsDismissed(DAY_0, "all_cards_done", completed = 0, dismissed = 1)
+            null
+        }
+
+        testee.onFrontCardDismissed()
+        advanceUntilIdle()
+        telemetry.onActiveMessageChanged(null)
+
+        verify(pixels, times(1)).cardsDismissed(any(), any(), any(), any())
+        verify(remoteMessageModel, times(1)).onMessageDismissed(message)
+    }
+
+    @Test
+    fun `when two tabs detect the final completion then it is reported once before RMF dismissal`() = runTest {
+        activeMessage.value = aMessage(content = Content.ActionableItems(titleText = "Setup", listItems = listOf(defaultBrowserItem)))
+        val other = aViewModel()
+        advanceUntilIdle()
+        testee.onPrimaryActionClicked()
+        advanceUntilIdle()
+        whenever(remoteMessageModel.onMessageDismissed(any())).thenAnswer {
+            verify(pixels, times(1)).cardRemoved(defaultBrowserItem.id, DAY_0, COMPLETED, "2")
+            verify(pixels).cardsDismissed(DAY_0, "all_cards_done", completed = 1, dismissed = 0)
+            null
+        }
+        defaultBrowserCheck.completed = true
+
+        other.onResume(mock())
+        testee.onResume(mock())
+        advanceUntilIdle()
+        telemetry.onActiveMessageChanged(null)
+
+        verify(pixels, times(1)).cardRemoved(defaultBrowserItem.id, DAY_0, COMPLETED, "2")
+        verify(pixels, times(1)).cardDailyImpressions(defaultBrowserItem.id, DAY_0, "2")
+        verify(pixels, times(1)).cardsDismissed(any(), any(), any(), any())
+    }
 
     @Test
     fun `when the section is detached then a new message is ignored`() = runTest {
@@ -274,6 +481,50 @@ class NextStepsItemsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(listOf(addWidgetItem), otherTab.viewState.value.items)
+    }
+
+    @Test
+    fun `when the final card is dismissed then all tabs clear it and RMF is notified once`() = runTest {
+        val message = aMessage(content = Content.ActionableItems("Setup", listOf(defaultBrowserItem)))
+        activeMessage.value = message
+        val otherTab = aViewModel()
+        advanceUntilIdle()
+
+        testee.onFrontCardDismissed()
+        advanceUntilIdle()
+
+        assertEquals(emptyList<CardItem.ListItem>(), testee.viewState.value.items)
+        assertEquals(emptyList<CardItem.ListItem>(), otherTab.viewState.value.items)
+        verify(remoteMessageModel, times(1)).onMessageDismissed(message)
+    }
+
+    @Test
+    fun `when every step is complete on multiple tabs then RMF is notified once`() = runTest {
+        defaultBrowserCheck.completed = true
+        addWidgetCheck.completed = true
+        val message = aMessage(content = nextStepsContent())
+        activeMessage.value = message
+        aViewModel()
+
+        advanceUntilIdle()
+
+        verify(remoteMessageModel, times(1)).onMessageDismissed(message)
+    }
+
+    @Test
+    fun `when a later message also has no remaining steps then it is dismissed separately`() = runTest {
+        defaultBrowserCheck.completed = true
+        addWidgetCheck.completed = true
+        val message = aMessage(content = nextStepsContent())
+        activeMessage.value = message
+        advanceUntilIdle()
+
+        val laterMessage = message.copy(id = "next_message")
+        activeMessage.value = laterMessage
+        advanceUntilIdle()
+
+        verify(remoteMessageModel, times(1)).onMessageDismissed(message)
+        verify(remoteMessageModel, times(1)).onMessageDismissed(laterMessage)
     }
 
     @Test
@@ -620,6 +871,7 @@ class NextStepsItemsViewModelTest {
         advanceUntilIdle()
         testee.onPrimaryActionClicked()
         assertEquals(Command.LaunchDefaultBrowserSettings, testee.commands().first())
+        verify(pixels).cardCtaClicked(defaultBrowserItem.id, DAY_0, "1")
         val commands = mutableListOf<Command>()
         val job = testee.commands().onEach { commands.add(it) }.launchIn(this)
         testee.onStop(mock())
@@ -936,6 +1188,7 @@ class NextStepsItemsViewModelTest {
 
         assertEquals(emptyList<Command>(), commands)
         assertEquals(listOf(item), testee.viewState.value.items)
+        verify(pixels, never()).cardCtaClicked(any(), any(), any())
         job.cancel()
     }
 
@@ -982,6 +1235,10 @@ class NextStepsItemsViewModelTest {
         listItems = listOf(defaultBrowserItem, addWidgetItem),
     )
 
+    private fun impressions(cardId: String) = telemetryStore.state().totalImpressions[cardId] ?: 0
+
+    private fun impressions() = telemetryStore.state().totalImpressions.values.sum()
+
     private fun aMessage(
         content: Content,
         surfaces: List<Surface> = listOf(Surface.NEW_TAB_PAGE),
@@ -994,6 +1251,7 @@ class NextStepsItemsViewModelTest {
     )
 
     private companion object {
+        val DAY_0 = Days(activeDay = "0", calendarDay = "0")
         const val MESSAGE_ID = "android_complete_your_setup"
     }
 }
