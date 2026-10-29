@@ -65,6 +65,7 @@
     <attr name="daxColorAccentBlue" format="color"/>
     <attr name="daxColorAccentYellow" format="color"/>
     <attr name="daxColorAccentContentPrimary" format="color"/>
+    <attr name="daxColorAccentTertiary" format="color"/>
     <attr name="daxColorContainerDisabled" format="color"/>
     <attr name="daxColorTextDisabled" format="color"/>
     <attr name="daxColorRipple" format="color"/>
