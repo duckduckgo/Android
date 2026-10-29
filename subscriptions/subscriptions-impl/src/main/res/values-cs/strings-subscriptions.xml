@@ -203,4 +203,17 @@
     <string name="subscriptionExpiredStatusIconContentDescription">Předplatné vypršelo</string>
     <string name="subscriptionActiveStatusIconContentDescription">Předplatné aktivní</string>
 
+    <!-- Right of withdrawal -->
+    <string name="subscriptionSettingWithdraw" instruction="Subscription settings option to use the legal right of withdrawal: cancel the subscription within 14 days of purchase and get a full refund">Odstoupit od smlouvy</string>
+    <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">Můžeš odstoupit a získat plnou částku zpět až do %1$s</string>
+    <string name="subscriptionWithdrawDialogTitle">Chceš odstoupit od předplatného?</string>
+    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Předplatné %1$s skončí okamžitě a částka %2$s ti bude do 14 dnů vrácena původním způsobem platby.\n\nFunkce VPN, Personal Information Removal a pokročilé modely Duck.ai přestanou fungovat ihned po potvrzení.</string>
+    <string name="subscriptionWithdrawDialogConfirm">Potvrdit zrušení</string>
+    <string name="subscriptionWithdrawDialogKeep">Ponechat předplatné</string>
+    <string name="subscriptionStatusNotSubscribed">Nemáš předplatné</string>
+    <string name="subscriptionWithdrawnTitle" instruction="Placeholder is the date the user withdrew from their subscription, e.g. October 6, 2026">Od předplatného jsi odstoupil/a dne %1$s.</string>
+    <string name="subscriptionWithdrawnRefund" instruction="Placeholder is the refund amount with currency, e.g. €9.99">Vrácení částky %1$s se zpracovává.</string>
+    <string name="subscriptionWithdrawnRefundWithoutAmount">Vrácení peněz se zpracovává.</string>
+    <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Nepodařilo se nám automaticky zpracovat tvoje zrušení předplatného. Přejdi prosím na <annotation type="withdrawal_help_link">tuto stránku</annotation> a dokonči zrušení.</string>
+
 </resources>
