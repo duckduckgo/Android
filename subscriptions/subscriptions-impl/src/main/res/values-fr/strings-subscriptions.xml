@@ -203,4 +203,17 @@
     <string name="subscriptionExpiredStatusIconContentDescription">Abonnement expiré</string>
     <string name="subscriptionActiveStatusIconContentDescription">Abonnement actif</string>
 
+    <!-- Right of withdrawal -->
+    <string name="subscriptionSettingWithdraw" instruction="Subscription settings option to use the legal right of withdrawal: cancel the subscription within 14 days of purchase and get a full refund">Se rétracter du contrat</string>
+    <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">Tu peux te rétracter et obtenir un remboursement intégral jusqu’au %1$s</string>
+    <string name="subscriptionWithdrawDialogTitle">Te désabonner ?</string>
+    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Ton abonnement %1$s prendra fin immédiatement et le montant de %2$s te sera remboursé sur ton moyen de paiement initial sous 14 jours.\n\nVPN, Personal Information Removal et les modèles avancés de Duck.ai cesseront de fonctionner une fois que tu auras confirmé.</string>
+    <string name="subscriptionWithdrawDialogConfirm">Confirmer le retrait</string>
+    <string name="subscriptionWithdrawDialogKeep">Garder l’abonnement</string>
+    <string name="subscriptionStatusNotSubscribed">Non abonné(e)</string>
+    <string name="subscriptionWithdrawnTitle" instruction="Placeholder is the date the user withdrew from their subscription, e.g. October 6, 2026">Tu as procédé à ta rétractation le %1$s.</string>
+    <string name="subscriptionWithdrawnRefund" instruction="Placeholder is the refund amount with currency, e.g. €9.99">Ton remboursement de %1$s est en cours de traitement.</string>
+    <string name="subscriptionWithdrawnRefundWithoutAmount">Ton remboursement est en cours de traitement.</string>
+    <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Nous n\'avons pas pu traiter automatiquement votre demande de rétractation. Veuillez visiter <annotation type="withdrawal_help_link">cette page</annotation> pour finaliser votre demande de rétractation.</string>
+
 </resources>
