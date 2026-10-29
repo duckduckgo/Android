@@ -696,8 +696,17 @@ class RealPirRunStateHandler @Inject constructor(
                          * - Update the corresponding ScanJobRecord
                          * For every stored extractedProfile that reappears in the results and whose opt-out was previously
                          * REMOVED, we revert it back to REQUESTED and report a reappearance pixel.
+                         * For every stored extractedProfile marked REMOVED although a profile with the same identifier was
+                         * found, we report a pixel: other platforms match on the identifier alone and would have kept it.
                          */
                         jobRecordUpdater.markRemovedOptOutJobRecords(it, brokerName, state.profileQueryId)
+                            .forEach { removal ->
+                                pixelSender.reportBrokerOptOutRemovedWithIdentifierFound(
+                                    brokerUrl = state.broker.url,
+                                    changedField = removal.changedField,
+                                    previousStatus = removal.previousStatus,
+                                )
+                            }
 
                         if (it.isNotEmpty()) {
                             jobRecordUpdater.markReappearedOptOutJobRecords(it, brokerName, state.profileQueryId)

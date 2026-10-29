@@ -32,6 +32,7 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJob
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus.ERROR
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus.MATCHES_FOUND
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus.NO_MATCH_FOUND
+import com.duckduckgo.pir.impl.scheduling.RemovedProfileWithIdentifierFound.ChangedField
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import dev.zacsweers.metro.ContributesBinding
@@ -102,12 +103,13 @@ interface JobRecordUpdater {
      * @param newExtractedProfiles Newly [ExtractedProfile]s for the [brokerName] and [profileQueryId]
      * @param brokerName The name of the broker associated with the scan job.
      * @param profileQueryId The ID of the [ProfileQuery] related to the scan job.
+     * @return The newly removed records whose identifier was still found in [newExtractedProfiles].
      */
     suspend fun markRemovedOptOutJobRecords(
         newExtractedProfiles: List<ExtractedProfile>,
         brokerName: String,
         profileQueryId: Long,
-    )
+    ): List<RemovedProfileWithIdentifierFound>
 
     /**
      * This method compares the [newExtractedProfiles] from the ones currently stored locally and
@@ -270,6 +272,24 @@ interface JobRecordUpdater {
     suspend fun markRecordsAsRemovedByUser(extractedProfileId: Long)
 }
 
+/**
+ * A stored profile marked removed although the same scan found a profile with the same identifier, so only its name
+ * or profile URL changed. Apple and Windows match profiles on the identifier alone, so they would have kept it.
+ *
+ * @property changedField Which part of the match key no longer matched.
+ * @property previousStatus Status of the opt-out job before it was marked removed.
+ */
+data class RemovedProfileWithIdentifierFound(
+    val changedField: ChangedField,
+    val previousStatus: OptOutJobStatus,
+) {
+    enum class ChangedField {
+        NAME,
+        PROFILE_URL,
+        NAME_AND_PROFILE_URL,
+    }
+}
+
 @ContributesBinding(AppScope::class)
 class RealJobRecordUpdater @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
@@ -378,8 +398,8 @@ class RealJobRecordUpdater @Inject constructor(
         newExtractedProfiles: List<ExtractedProfile>,
         brokerName: String,
         profileQueryId: Long,
-    ) {
-        withContext(dispatcherProvider.io()) {
+    ): List<RemovedProfileWithIdentifierFound> {
+        return withContext(dispatcherProvider.io()) {
             val currentTimeMillis = currentTimeProvider.currentTimeMillis()
             val storedExtractedProfiles =
                 repository.getExtractedProfiles(brokerName, profileQueryId)
@@ -403,23 +423,51 @@ class RealJobRecordUpdater @Inject constructor(
                 logcat { "PIR-JOB-RECORD: Removed Profiles $removedExtractedProfiles" }
 
                 val profileQuery = repository.getUserProfileQuery(profileQueryId)
-                removedExtractedProfiles.forEach { extractedProfile ->
-                    updateOptOutJobRecordAsRemoved(
+                val newProfilesByIdentifier = newExtractedProfiles.filter { it.identifier.isNotEmpty() }.associateBy { it.identifier }
+                removedExtractedProfiles.mapNotNull { extractedProfile ->
+                    val previousRecord = updateOptOutJobRecordAsRemoved(
                         profileQuery = profileQuery,
                         extractedProfileId = extractedProfile.dbId,
                         removedDateInMillis = currentTimeMillis,
                     )
+                    val foundProfile = newProfilesByIdentifier[extractedProfile.identifier]
+                    // Already-removed jobs are skipped so the stale half of an earlier split isn't reported on every scan.
+                    if (previousRecord == null || previousRecord.status == OptOutJobStatus.REMOVED || foundProfile == null) {
+                        return@mapNotNull null
+                    }
+                    RemovedProfileWithIdentifierFound(
+                        changedField = changedFieldBetween(extractedProfile, foundProfile),
+                        previousStatus = previousRecord.status,
+                    )
                 }
+            } else {
+                emptyList()
             }
         }
     }
 
+    private fun changedFieldBetween(
+        stored: ExtractedProfile,
+        found: ExtractedProfile,
+    ): ChangedField {
+        val nameChanged = stored.name != found.name
+        val profileUrlChanged = stored.profileUrl != found.profileUrl
+        return when {
+            nameChanged && profileUrlChanged -> ChangedField.NAME_AND_PROFILE_URL
+            nameChanged -> ChangedField.NAME
+            else -> ChangedField.PROFILE_URL
+        }
+    }
+
+    /**
+     * @return The job record as it was before being marked removed, or null if there is no valid one.
+     */
     private suspend fun updateOptOutJobRecordAsRemoved(
         profileQuery: ProfileQuery?,
         extractedProfileId: Long,
         removedDateInMillis: Long,
-    ) {
-        withContext(dispatcherProvider.io()) {
+    ): OptOutJobRecord? {
+        return withContext(dispatcherProvider.io()) {
             schedulingRepository.getValidOptOutJobRecord(extractedProfileId)?.also {
                 schedulingRepository.saveOptOutJobRecord(
                     it
