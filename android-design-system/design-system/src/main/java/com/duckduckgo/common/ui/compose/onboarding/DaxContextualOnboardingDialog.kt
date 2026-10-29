@@ -119,6 +119,7 @@ fun DaxContextualOnboardingDialog(
     dismiss: DaxOnboardingDialogDismiss? = null,
     content: (@Composable DaxOnboardingDialogContentScope.() -> Unit)? = null,
 ) {
+    val landscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     DaxOnboardingDialogCore(
         contentKey = contentKey,
         title = AnnotatedString(title),
@@ -137,7 +138,19 @@ fun DaxContextualOnboardingDialog(
         onIntroFinished = onIntroFinished,
         dismiss = dismiss,
         content = content,
-        landscapeLayout = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE,
+        landscapeLayout = landscape,
+        topPadding = if (landscape) {
+            DaxOnboardingDialogDefaults.ContextualLandscapeVerticalPadding
+        } else {
+            DaxOnboardingDialogDefaults.ContextualTopPadding
+        },
+        bottomPadding = if (landscape) {
+            DaxOnboardingDialogDefaults.ContextualLandscapeVerticalPadding
+        } else {
+            DaxOnboardingDialogDefaults.BottomPadding
+        },
+        titleBodySpacing = DaxOnboardingDialogDefaults.ContextualTitleBodySpacing,
+        elevation = DaxOnboardingDialogDefaults.ContextualElevation,
     )
 }
 
@@ -196,6 +209,7 @@ fun DaxContextualOnboardingDialog(
     dismiss: DaxOnboardingDialogDismiss? = null,
     content: (@Composable DaxOnboardingDialogContentScope.() -> Unit)? = null,
 ) {
+    val landscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     DaxOnboardingDialogCore(
         contentKey = contentKey,
         title = AnnotatedString(title),
@@ -214,7 +228,19 @@ fun DaxContextualOnboardingDialog(
         onIntroFinished = onIntroFinished,
         dismiss = dismiss,
         content = content,
-        landscapeLayout = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE,
+        landscapeLayout = landscape,
+        topPadding = if (landscape) {
+            DaxOnboardingDialogDefaults.ContextualLandscapeVerticalPadding
+        } else {
+            DaxOnboardingDialogDefaults.ContextualTopPadding
+        },
+        bottomPadding = if (landscape) {
+            DaxOnboardingDialogDefaults.ContextualLandscapeVerticalPadding
+        } else {
+            DaxOnboardingDialogDefaults.BottomPadding
+        },
+        titleBodySpacing = DaxOnboardingDialogDefaults.ContextualTitleBodySpacing,
+        elevation = DaxOnboardingDialogDefaults.ContextualElevation,
     )
 }
 
@@ -274,6 +300,7 @@ fun DaxContextualOnboardingDialog(
     dismiss: DaxOnboardingDialogDismiss? = null,
     content: (@Composable DaxOnboardingDialogContentScope.() -> Unit)? = null,
 ) {
+    val landscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     DaxOnboardingDialogCore(
         contentKey = contentKey,
         title = AnnotatedString(title),
@@ -292,7 +319,19 @@ fun DaxContextualOnboardingDialog(
         onIntroFinished = onIntroFinished,
         dismiss = dismiss,
         content = content,
-        landscapeLayout = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE,
+        landscapeLayout = landscape,
+        topPadding = if (landscape) {
+            DaxOnboardingDialogDefaults.ContextualLandscapeVerticalPadding
+        } else {
+            DaxOnboardingDialogDefaults.ContextualTopPadding
+        },
+        bottomPadding = if (landscape) {
+            DaxOnboardingDialogDefaults.ContextualLandscapeVerticalPadding
+        } else {
+            DaxOnboardingDialogDefaults.BottomPadding
+        },
+        titleBodySpacing = DaxOnboardingDialogDefaults.ContextualTitleBodySpacing,
+        elevation = DaxOnboardingDialogDefaults.ContextualElevation,
     )
 }
 
