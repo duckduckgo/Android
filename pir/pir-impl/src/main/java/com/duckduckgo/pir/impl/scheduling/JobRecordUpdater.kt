@@ -145,9 +145,10 @@ interface JobRecordUpdater {
      *
      * This method should be called when the opt-out attempt has been successfully completed.
      * It updates the corresponding all necessary attributes to mark the [OptOutJobRecord] as
-     * requested. Also stamps [OptOutJobRecord.optOutFormSubmittedDateInMillis] on first call,
-     * leaving it untouched on subsequent retries so that it always reflects the first
-     * successful form submission.
+     * requested. Also stamps [OptOutJobRecord.optOutFormSubmittedDateInMillis] and
+     * [OptOutJobRecord.optOutFirstRequestedDateInMillis] on first call, leaving them untouched on
+     * subsequent retries so that they always reflect the first successful form submission and
+     * the first successful request.
      *
      * @param extractedProfileId The id stored in our database for the [ExtractedProfile]
      */
@@ -499,6 +500,7 @@ class RealJobRecordUpdater @Inject constructor(
                 val updatedRecord = it.copy(
                     status = OptOutJobStatus.REQUESTED,
                     optOutRequestedDateInMillis = now,
+                    optOutFirstRequestedDateInMillis = it.optOutFirstRequestedDateInMillis ?: now,
                     optOutFormSubmittedDateInMillis = it.optOutFormSubmittedDateInMillis ?: now,
                 )
                 schedulingRepository.saveOptOutJobRecord(updatedRecord)

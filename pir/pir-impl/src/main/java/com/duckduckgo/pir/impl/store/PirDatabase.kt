@@ -21,7 +21,9 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.pir.impl.store.db.BrokerDao
 import com.duckduckgo.pir.impl.store.db.BrokerEntity
 import com.duckduckgo.pir.impl.store.db.BrokerJsonDao
@@ -54,7 +56,7 @@ import com.squareup.moshi.Types
 
 @Database(
     exportSchema = true,
-    version = 17,
+    version = 18,
     entities = [
         BrokerJsonEtag::class,
         BrokerEntity::class,
@@ -79,6 +81,8 @@ import com.squareup.moshi.Types
         AutoMigration(from = 15, to = 16),
         // v17: adds extras column to StoredExtractedProfile
         AutoMigration(from = 16, to = 17),
+        // v18: adds nullable optOutFirstRequestedDate column to OptOutJobRecordEntity
+        AutoMigration(from = 17, to = 18, spec = PirDatabaseMigration17To18Spec::class),
     ],
 )
 @TypeConverters(PirDatabaseConverters::class)
@@ -103,6 +107,18 @@ abstract class PirDatabase : RoomDatabase() {
 
     companion object {
         val ALL_MIGRATIONS: List<Migration> = emptyList()
+    }
+}
+
+/**
+ * The first request date was never stored before v18, so already-requested opt-outs start from their latest
+ * request date: the closest value we have. Opt-outs that were never requested keep a null date.
+ */
+class PirDatabaseMigration17To18Spec : AutoMigrationSpec {
+    override fun onPostMigrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "UPDATE pir_optout_job_record SET optOutFirstRequestedDate = optOutRequestedDate WHERE optOutRequestedDate != 0",
+        )
     }
 }
 
