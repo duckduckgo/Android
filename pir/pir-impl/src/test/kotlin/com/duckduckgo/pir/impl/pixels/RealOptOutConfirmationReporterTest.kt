@@ -54,6 +54,7 @@ class RealOptOutConfirmationReporterTest {
     private val sevenDays = TimeUnit.DAYS.toMillis(7)
     private val fourteenDays = TimeUnit.DAYS.toMillis(14)
     private val twentyOneDays = TimeUnit.DAYS.toMillis(21)
+    private val twentyEightDays = TimeUnit.DAYS.toMillis(28)
     private val fortyTwoDays = TimeUnit.DAYS.toMillis(42)
 
     private val testBroker = Broker(
@@ -106,7 +107,8 @@ class RealOptOutConfirmationReporterTest {
             extractedProfileId = 1L,
             brokerName = testBroker.name,
             status = OptOutJobStatus.NOT_EXECUTED,
-            optOutRequestedDateInMillis = baseTime,
+            optOutRequestedDateInMillis = 0L,
+            optOutFirstRequestedDateInMillis = null,
         )
 
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker))
@@ -494,12 +496,83 @@ class RealOptOutConfirmationReporterTest {
         verify(mockPixelSender, never()).reportBrokerOptOutUnconfirmed7Days(any())
     }
 
+    @Test
+    fun whenRemovedOptOutWasNeverRequestedThenDoesNotFirePixels() = runTest {
+        val now = baseTime + fortyTwoDays
+        val jobRecord = createOptOutJobRecord(
+            extractedProfileId = 1L,
+            brokerName = testBroker.name,
+            status = OptOutJobStatus.REMOVED,
+            optOutRequestedDateInMillis = 0L,
+            optOutFirstRequestedDateInMillis = null,
+        )
+
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker))
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(jobRecord))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(now)
+
+        testee.attemptFirePixel()
+
+        verifyNoInteractions(mockPixelSender)
+        verify(mockPirSchedulingRepository, never()).markOptOutDay7ConfirmationPixelSent(any(), any())
+        verify(mockPirSchedulingRepository, never()).markOptOutDay42ConfirmationPixelSent(any(), any())
+    }
+
+    @Test
+    fun whenOptOutReRequestedThen42DayPixelIsMeasuredFromFirstRequest() = runTest {
+        val now = baseTime + fortyTwoDays
+        val jobRecord = createOptOutJobRecord(
+            extractedProfileId = 1L,
+            brokerName = testBroker.name,
+            status = OptOutJobStatus.REQUESTED,
+            optOutRequestedDateInMillis = baseTime + twentyEightDays,
+            optOutFirstRequestedDateInMillis = baseTime,
+            confirmation7dayReportSentDateMs = baseTime + sevenDays,
+            confirmation14dayReportSentDateMs = baseTime + fourteenDays,
+            confirmation21dayReportSentDateMs = baseTime + twentyOneDays,
+        )
+
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker))
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(jobRecord))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(now)
+
+        testee.attemptFirePixel()
+
+        verify(mockPixelSender).reportBrokerOptOutUnconfirmed42Days(testBroker.url)
+        verify(mockPirSchedulingRepository).markOptOutDay42ConfirmationPixelSent(1L, now)
+    }
+
+    @Test
+    fun whenPreviouslyRequestedOptOutIsPendingEmailConfirmationThenFiresUnconfirmedPixel() = runTest {
+        val now = baseTime + fortyTwoDays
+        val jobRecord = createOptOutJobRecord(
+            extractedProfileId = 1L,
+            brokerName = testBroker.name,
+            status = OptOutJobStatus.PENDING_EMAIL_CONFIRMATION,
+            optOutRequestedDateInMillis = baseTime,
+            optOutFirstRequestedDateInMillis = baseTime,
+            confirmation7dayReportSentDateMs = baseTime + sevenDays,
+            confirmation14dayReportSentDateMs = baseTime + fourteenDays,
+            confirmation21dayReportSentDateMs = baseTime + twentyOneDays,
+        )
+
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker))
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(jobRecord))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(now)
+
+        testee.attemptFirePixel()
+
+        verify(mockPixelSender).reportBrokerOptOutUnconfirmed42Days(testBroker.url)
+        verify(mockPirSchedulingRepository).markOptOutDay42ConfirmationPixelSent(1L, now)
+    }
+
     private fun createOptOutJobRecord(
         extractedProfileId: Long,
         brokerName: String = testBroker.name,
         userProfileId: Long = 1L,
         status: OptOutJobStatus = OptOutJobStatus.REQUESTED,
         optOutRequestedDateInMillis: Long = baseTime,
+        optOutFirstRequestedDateInMillis: Long? = baseTime,
         optOutRemovedDateInMillis: Long = 0L,
         confirmation7dayReportSentDateMs: Long = 0L,
         confirmation14dayReportSentDateMs: Long = 0L,
@@ -514,6 +587,7 @@ class RealOptOutConfirmationReporterTest {
             attemptCount = 0,
             lastOptOutAttemptDateInMillis = 0L,
             optOutRequestedDateInMillis = optOutRequestedDateInMillis,
+            optOutFirstRequestedDateInMillis = optOutFirstRequestedDateInMillis,
             optOutRemovedDateInMillis = optOutRemovedDateInMillis,
             deprecated = false,
             dateCreatedInMillis = baseTime,

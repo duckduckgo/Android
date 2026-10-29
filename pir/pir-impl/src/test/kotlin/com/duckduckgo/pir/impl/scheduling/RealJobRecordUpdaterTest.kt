@@ -304,6 +304,7 @@ class RealJobRecordUpdaterTest {
                 testOptOutJobRecord.copy(
                     status = OptOutJobStatus.REQUESTED,
                     optOutRequestedDateInMillis = TEST_CURRENT_TIME,
+                    optOutFirstRequestedDateInMillis = TEST_CURRENT_TIME,
                     optOutFormSubmittedDateInMillis = TEST_CURRENT_TIME,
                 ),
             )
@@ -325,7 +326,31 @@ class RealJobRecordUpdaterTest {
                 recordWithFormSubmittedDate.copy(
                     status = OptOutJobStatus.REQUESTED,
                     optOutRequestedDateInMillis = TEST_CURRENT_TIME,
+                    optOutFirstRequestedDateInMillis = TEST_CURRENT_TIME,
                     optOutFormSubmittedDateInMillis = originalFormSubmittedDate,
+                ),
+            )
+        }
+
+    @Test
+    fun whenUpdateOptOutRequestedIsReRequestedThenFirstRequestedDateIsNotOverwritten() =
+        runTest {
+            val originalRequestedDate = 1234L
+            val previouslyRequestedRecord = testOptOutJobRecord.copy(
+                status = OptOutJobStatus.REQUESTED,
+                optOutRequestedDateInMillis = originalRequestedDate,
+                optOutFirstRequestedDateInMillis = originalRequestedDate,
+                optOutFormSubmittedDateInMillis = originalRequestedDate,
+            )
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
+                .thenReturn(previouslyRequestedRecord)
+
+            toTest.updateOptOutRequested(testExtractedProfileId)
+
+            verify(mockSchedulingRepository).saveOptOutJobRecord(
+                previouslyRequestedRecord.copy(
+                    optOutRequestedDateInMillis = TEST_CURRENT_TIME,
+                    optOutFirstRequestedDateInMillis = originalRequestedDate,
                 ),
             )
         }
@@ -856,6 +881,7 @@ class RealJobRecordUpdaterTest {
                 recordWithFormSubmittedDate.copy(
                     status = OptOutJobStatus.REQUESTED,
                     optOutRequestedDateInMillis = TEST_CURRENT_TIME,
+                    optOutFirstRequestedDateInMillis = TEST_CURRENT_TIME,
                     optOutFormSubmittedDateInMillis = originalFormSubmittedDate,
                 ),
             )

@@ -41,6 +41,10 @@ sealed class JobRecord(
      * @property optOutRequestedDateInMillis Date (in milliseconds) when the opt-out request
      * was successfully requested. For brokers requiring email confirmation this is set when
      * confirmation completes; for other brokers it equals the form-submission moment.
+     * Overwritten every time the opt-out is re-requested.
+     * @property optOutFirstRequestedDateInMillis Date (in milliseconds) of the first time the opt-out
+     * was successfully requested. Set once and never overwritten on re-requests. Null if the opt-out
+     * has never been successfully requested.
      * @property optOutFormSubmittedDateInMillis Date (in milliseconds) of the first successful
      * form submission to the broker. Set once and never overwritten on retries. Null for
      * records created before this field was introduced and for child brokers (which do not run
@@ -58,6 +62,7 @@ sealed class JobRecord(
         val attemptCount: Int = 0,
         val lastOptOutAttemptDateInMillis: Long = 0L,
         val optOutRequestedDateInMillis: Long = 0L,
+        val optOutFirstRequestedDateInMillis: Long? = null,
         val optOutFormSubmittedDateInMillis: Long? = null,
         val optOutRemovedDateInMillis: Long = 0L,
         val deprecated: Boolean = false,
