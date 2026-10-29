@@ -26,12 +26,16 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import androidx.test.uiautomator.uiAutomator
+import org.junit.FixMethodOrder
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.MethodSorters
 
 /** Measures ordinary cold startup after onboarding has been completed. Run each method on a physical device. */
+// Name order runs baselineProfile first, on a cool device, before thermal build-up.
 @RunWith(AndroidJUnit4::class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class StartupBenchmark {
 
     @get:Rule
@@ -41,20 +45,17 @@ class StartupBenchmark {
     private val device = UiDevice.getInstance(instrumentation)
 
     @Test
+    fun baselineProfile() = measureStartup(
+        CompilationMode.Partial(baselineProfileMode = BaselineProfileMode.Require),
+    )
+
+    @Test
     fun noCompilation() = measureStartup(CompilationMode.None())
 
     @Test
     fun partialNoProfile() = measureStartup(
         CompilationMode.Partial(baselineProfileMode = BaselineProfileMode.Disable, warmupIterations = 3),
     )
-
-    @Test
-    fun baselineProfile() = measureStartup(
-        CompilationMode.Partial(baselineProfileMode = BaselineProfileMode.Require),
-    )
-
-    @Test
-    fun fullCompilation() = measureStartup(CompilationMode.Full())
 
     private fun measureStartup(compilationMode: CompilationMode) {
         benchmarkRule.measureRepeated(

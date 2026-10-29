@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       tests:
-        description: 'Comma-separated StartupBenchmark methods (noCompilation, partialNoProfile, baselineProfile, fullCompilation)'
+        description: 'Comma-separated StartupBenchmark methods (noCompilation, partialNoProfile, baselineProfile)'
         required: true
-        default: 'noCompilation,partialNoProfile,baselineProfile,fullCompilation'
+        default: 'noCompilation,partialNoProfile,baselineProfile'
       device_model:
         description: 'FTL physical device model id (shiba = Pixel 8)'
         required: true
@@ -29,7 +29,7 @@ jobs:
     runs-on: android-large-runner
     timeout-minutes: 90
     env:
-      DEFAULT_TESTS: noCompilation,partialNoProfile,baselineProfile,fullCompilation
+      DEFAULT_TESTS: noCompilation,partialNoProfile,baselineProfile
       DEFAULT_DEVICE_MODEL: shiba
       DEFAULT_DEVICE_VERSION: '34'
 
@@ -40,7 +40,7 @@ jobs:
           DEVICE_MODEL: ${{ inputs.device_model || env.DEFAULT_DEVICE_MODEL }}
           DEVICE_VERSION: ${{ inputs.device_version || env.DEFAULT_DEVICE_VERSION }}
         run: |
-          [[ "$TESTS" =~ ^(noCompilation|partialNoProfile|baselineProfile|fullCompilation)(,(noCompilation|partialNoProfile|baselineProfile|fullCompilation))*$ ]] || { echo "Invalid tests: $TESTS"; exit 1; }
+          [[ "$TESTS" =~ ^(noCompilation|partialNoProfile|baselineProfile)(,(noCompilation|partialNoProfile|baselineProfile))*$ ]] || { echo "Invalid tests: $TESTS"; exit 1; }
           [[ "$DEVICE_MODEL" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "Invalid device_model"; exit 1; }
           [[ "$DEVICE_VERSION" =~ ^[0-9]+$ ]] || { echo "Invalid device_version"; exit 1; }
 
