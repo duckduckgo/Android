@@ -60,16 +60,22 @@ import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.ChangePlanActivity.Companion.ChangePlanScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.DismissWithdrawalDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToWithdrawalHelp
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.LaunchOnboarding
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialog
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialogError
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.CompletedWithdrawalState
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.OnboardingEntryPoint
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.CustomTitle
+import com.duckduckgo.subscriptions.impl.withdrawal.SubscriptionWithdrawalDialog
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -93,6 +99,11 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
     private val viewModel: SubscriptionSettingsViewModel by bindViewModel()
     private val binding: ActivitySubscriptionSettingsBinding by viewBinding()
+    private val withdrawalDialog = SubscriptionWithdrawalDialog(
+        context = this,
+        onConfirm = { viewModel.onWithdrawalConfirmed() },
+        onHelpLinkClicked = { viewModel.onWithdrawalHelpLinkClicked() },
+    )
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -162,6 +173,10 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             viewModel.onContinueSetupClicked()
         }
 
+        binding.withdraw.setClickListener {
+            viewModel.onWithdrawClicked()
+        }
+
         if (savedInstanceState == null) {
             pixelSender.reportSubscriptionSettingsShown()
         }
@@ -201,6 +216,8 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         binding.upgradeToProContainer.isVisible = false
         binding.verticalTierDivider.isVisible = false
         binding.pendingDowngradeInfoPanel.gone()
+
+        if (renderCompletedWithdrawal(viewState.completedWithdrawal)) return
 
         if (viewState.status in listOf(INACTIVE, EXPIRED)) {
             binding.viewPlans.isVisible = true
@@ -304,6 +321,12 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
+        val withdrawal = viewState.withdrawal
+        binding.withdraw.isVisible = withdrawal != null
+        if (withdrawal != null) {
+            binding.withdraw.setSecondaryText(getString(string.subscriptionSettingWithdrawDeadline, withdrawal.deadline))
+        }
+
         if (viewState.email == null) {
             binding.manageEmail.gone()
             binding.addToDevice.setSecondaryText(resources.getString(string.addToDeviceSecondaryTextWithoutEmail))
@@ -340,6 +363,23 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun renderCompletedWithdrawal(completedWithdrawal: CompletedWithdrawalState?): Boolean {
+        val withdrawn = completedWithdrawal != null
+        binding.settingsSections.isVisible = !withdrawn
+        binding.completedWithdrawal.isVisible = withdrawn
+        binding.subscriptionNotSubscribedStatusContainer.isVisible = withdrawn
+        if (completedWithdrawal == null) return false
+
+        binding.subscriptionActiveStatusContainer.isVisible = false
+        binding.subscriptionExpiredStatusContainer.isVisible = false
+        binding.completedWithdrawal.setPrimaryText(getString(string.subscriptionWithdrawnTitle, completedWithdrawal.date))
+        val refundText = completedWithdrawal.refundAmount
+            ?.let { getString(string.subscriptionWithdrawnRefund, it) }
+            ?: getString(string.subscriptionWithdrawnRefundWithoutAmount)
+        binding.completedWithdrawal.setSecondaryText(refundText)
+        return true
+    }
+
     private fun renderOnboardingEntryPoint(card: OnboardingEntryPoint?) {
         binding.onboardingProgressCard.isVisible = card != null
         if (card == null) return
@@ -371,7 +411,21 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             }
 
             LaunchOnboarding -> globalActivityStarter.start(this, SubscriptionOnboardingScreenWithEmptyParams)
+            is ShowWithdrawalDialog -> withdrawalDialog.show(getString(command.tierNameResId), command.refundAmount)
+            DismissWithdrawalDialog -> withdrawalDialog.dismiss()
+            ShowWithdrawalDialogError -> withdrawalDialog.showError()
+            GoToWithdrawalHelp -> goToWithdrawalHelp()
         }
+    }
+
+    private fun goToWithdrawalHelp() {
+        globalActivityStarter.start(
+            this,
+            SubscriptionsWebViewActivityWithParams(
+                url = WITHDRAWAL_HELP_URL,
+                toolbarConfig = CustomTitle(""), // empty toolbar
+            ),
+        )
     }
 
     private fun goToFaqs() {
@@ -489,6 +543,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         const val LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email"
         const val PRIVACY_POLICY_URL = "https://duckduckgo.com/pro/privacy-terms"
 
+        private const val WITHDRAWAL_HELP_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/cancel-or-change-subscription"
         private const val PURCHASE_VIEW_PLANS_ORIGIN = "funnel_subscriptionsettings_android__viewplans"
     }
 }
