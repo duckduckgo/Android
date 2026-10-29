@@ -40,8 +40,7 @@ internal data class DaxOnboardingDialogColors(
  * Dimensions and timing shared by both onboarding dialog variants.
  *
  * [EntranceDelay] is the production base delay. A caller's `entryDelay` is added to it; it does
- * not replace it. The CTA colours intentionally come from the existing blue Compose button
- * placeholders until a dedicated onboarding brand button is available.
+ * not replace it.
  */
 object DaxOnboardingDialogDefaults {
     val BoundsAnimationDuration: Duration = 400.milliseconds
@@ -56,7 +55,7 @@ object DaxOnboardingDialogDefaults {
     val ContentHorizontalPadding: Dp = 20.dp
     val HeaderImageSize: Dp = 96.dp
     val HeaderTitleSpacing: Dp = 16.dp
-    val TitleBodySpacing: Dp = 16.dp
+    val TitleBodySpacing: Dp = 20.dp
     val HeaderContentSpacing: Dp = 20.dp
 
     // The View CTA's 20dp margin plus the 4dp vertical inset of a small rebrand button.
@@ -82,6 +81,10 @@ object DaxOnboardingDialogDefaults {
     internal val LandscapeCtaWidth = 200.dp
     internal val LandscapeTextCtaSpacing = 8.dp
     internal val LandscapeTitleBodySpacing = 8.dp
+    internal val ContextualTopPadding = 32.dp
+    internal val ContextualTitleBodySpacing = 16.dp
+    internal val ContextualLandscapeVerticalPadding = 24.dp
+    internal val ContextualElevation = 0.dp
 
     /** Colours for the current [com.duckduckgo.common.ui.compose.theme.OnboardingTheme]. */
     internal val colors: DaxOnboardingDialogColors
