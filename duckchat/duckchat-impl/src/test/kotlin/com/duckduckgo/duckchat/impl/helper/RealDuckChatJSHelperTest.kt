@@ -2618,13 +2618,21 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenNativePromptConsumedInFullModeThenResponseWaitGetsPendingEffortAndTool() = runTest {
+    fun whenNativePromptConsumedInFullModeThenResponseWaitGetsModePendingEffortAndTool() = runTest {
         whenever(mockPendingNativePromptStore.consume())
             .thenReturn(PendingNativePrompt("test prompt", "model", "high", selectedTool = "WebSearch"))
 
-        testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext, tabId = "tab-1")
+        testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativePrompt",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+            tabId = "tab-1",
+            browserMode = BrowserMode.FIRE,
+        )
 
-        verify(mockResponseWaitWideEvent).onNativePromptSubmitted("tab-1", "high", "WebSearch")
+        verify(mockResponseWaitWideEvent).onNativePromptSubmitted("tab-1", BrowserMode.FIRE, "high", "WebSearch")
     }
 
     @Test

@@ -22,6 +22,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -61,6 +62,7 @@ class DuckAiResponseWaitFlowStoreTest {
                 readyWhileAwayRecorded = true,
                 readyToReturnRunning = true,
                 chatSwitchedAway = false,
+                browserMode = BrowserMode.REGULAR,
             ),
             PersistedResponseWaitFlow(
                 flowId = 2L,
@@ -72,6 +74,7 @@ class DuckAiResponseWaitFlowStoreTest {
                 readyWhileAwayRecorded = false,
                 readyToReturnRunning = false,
                 chatSwitchedAway = true,
+                browserMode = BrowserMode.FIRE,
             ),
         )
 
@@ -102,5 +105,14 @@ class DuckAiResponseWaitFlowStoreTest {
 
         assertEquals(null, loaded.chatId)
         assertEquals(false, loaded.chatSwitchedAway)
+    }
+
+    @Test
+    fun `load without browserMode defaults it to regular`() = runTest {
+        val json = """[{"flowId":1,"tabId":"t1","chatId":"A","left":true,"returned":false,"done":false,""" +
+            """"readyWhileAwayRecorded":false,"readyToReturnRunning":false,"chatSwitchedAway":false}]"""
+        dataStore.edit { it[stringPreferencesKey("duckai_response_wait_open_flows")] = json }
+
+        assertEquals(BrowserMode.REGULAR, testee.load().single().browserMode)
     }
 }

@@ -1932,9 +1932,10 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
-    fun whenPromptSubmittedInDuckAiTabThenResponseWaitGetsTabEffortAndTool() = runTest {
+    fun whenPromptSubmittedInDuckAiTabThenResponseWaitGetsTabModeEffortAndTool() = runTest {
         whenever(modelManager.getResolvedReasoningEffort()).thenReturn("medium")
-        val viewModel = createViewModel()
+        whenever(termsRepository.observeTermsAccepted(BrowserMode.FIRE)).thenReturn(termsAccepted)
+        val viewModel = createViewModel(browserMode = BrowserMode.FIRE)
         viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
         advanceUntilIdle()
         viewModel.setSelectedTool(Tool.IMAGE_GENERATION.rawValue)
@@ -1947,7 +1948,7 @@ class NativeInputModeWidgetViewModelTest {
             submitMethod = InputSubmitMethod.BUTTON,
         )
 
-        verify(responseWaitWideEvent).onNativePromptSubmitted("tab-A", "medium", Tool.IMAGE_GENERATION.rawValue)
+        verify(responseWaitWideEvent).onNativePromptSubmitted("tab-A", BrowserMode.FIRE, "medium", Tool.IMAGE_GENERATION.rawValue)
     }
 
     @Test

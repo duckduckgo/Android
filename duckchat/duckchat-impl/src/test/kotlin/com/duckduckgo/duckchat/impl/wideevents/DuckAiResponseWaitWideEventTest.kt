@@ -21,13 +21,16 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -123,6 +126,7 @@ class DuckAiResponseWaitWideEventTest {
         returned: Boolean = false,
         done: Boolean = false,
         chatSwitchedAway: Boolean = false,
+        browserMode: BrowserMode = BrowserMode.REGULAR,
     ) = PersistedResponseWaitFlow(
         flowId = flowId,
         tabId = tabId,
@@ -133,9 +137,21 @@ class DuckAiResponseWaitWideEventTest {
         readyWhileAwayRecorded = false,
         readyToReturnRunning = false,
         chatSwitchedAway = chatSwitchedAway,
+        browserMode = browserMode,
     )
 
     private fun idle() = coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+    // Returns the store as it was when onClearData returned, so tests can check the write happened before then.
+    private fun clear(vararg types: ClearableData): List<PersistedResponseWaitFlow> {
+        var storedOnReturn: List<PersistedResponseWaitFlow>? = null
+        coroutineRule.testScope.launch {
+            testee.onClearData(types.toSet())
+            storedOnReturn = flowStore.flows
+        }
+        idle()
+        return checkNotNull(storedOnReturn)
+    }
 
     private fun onChat(tabId: String, chatId: String?) {
         testee.onSelectedTabChanged(tabId = tabId, url = if (chatId == null) DUCK_AI_URL else "$DUCK_AI_URL?chatID=$chatId")
@@ -147,9 +163,10 @@ class DuckAiResponseWaitWideEventTest {
         effort: String? = "low",
         tool: String? = null,
         streamStarted: Boolean = true,
+        browserMode: BrowserMode = BrowserMode.REGULAR,
     ) {
         onChat(tabId = tabId, chatId = chatId)
-        testee.onNativePromptSubmitted(tabId = tabId, reasoningEffort = effort, selectedTool = tool)
+        testee.onNativePromptSubmitted(tabId = tabId, browserMode = browserMode, reasoningEffort = effort, selectedTool = tool)
         if (streamStarted) testee.onResponseState(tabId = tabId, status = "start_stream:new_prompt")
         idle()
     }
@@ -287,7 +304,7 @@ class DuckAiResponseWaitWideEventTest {
     @Test
     fun `when outside-chat prompt streams before its page is visible then ready finishes watched`() = runTest {
         testee.onSelectedTabChanged(tabId = "t1", url = OTHER_URL)
-        testee.onNativePromptSubmitted(tabId = "t1", reasoningEffort = "low", selectedTool = null)
+        testee.onNativePromptSubmitted(tabId = "t1", browserMode = BrowserMode.REGULAR, reasoningEffort = "low", selectedTool = null)
         idle()
 
         testee.onResponseState(tabId = "t1", status = "start_stream:new_prompt")
@@ -584,7 +601,7 @@ class DuckAiResponseWaitWideEventTest {
         onChat(tabId = "t1", chatId = "A")
         idle()
 
-        testee.onNativePromptSubmitted(tabId = "t1", reasoningEffort = "low", selectedTool = null)
+        testee.onNativePromptSubmitted(tabId = "t1", browserMode = BrowserMode.REGULAR, reasoningEffort = "low", selectedTool = null)
         idle()
 
         verify(wideEventClient).flowStep(eq(1L), eq("prompt_after_return"), eq(true), any())
@@ -685,7 +702,7 @@ class DuckAiResponseWaitWideEventTest {
     fun `when native prompt submitted twice for the same tab before any response state then only one flow starts`() = runTest {
         promptInChat(streamStarted = false)
 
-        testee.onNativePromptSubmitted(tabId = "t1", reasoningEffort = "low", selectedTool = null)
+        testee.onNativePromptSubmitted(tabId = "t1", browserMode = BrowserMode.REGULAR, reasoningEffort = "low", selectedTool = null)
         idle()
 
         verify(wideEventClient, times(1)).flowStart(any(), anyOrNull(), any(), any(), any(), any())
@@ -921,7 +938,7 @@ class DuckAiResponseWaitWideEventTest {
         assertEquals(emptyList<PersistedResponseWaitFlow>(), flowStore.flows)
 
         testee.onResponseState(tabId = "t1", status = "ready")
-        testee.onNativePromptSubmitted(tabId = "t1", reasoningEffort = "low", selectedTool = null)
+        testee.onNativePromptSubmitted(tabId = "t1", browserMode = BrowserMode.REGULAR, reasoningEffort = "low", selectedTool = null)
         idle()
 
         verify(wideEventClient, never()).flowFinish(eq(7L), any(), any())
@@ -968,6 +985,88 @@ class DuckAiResponseWaitWideEventTest {
         idle()
 
         assertEquals(listOf(1L), flowStore.flows.map { it.flowId })
+    }
+
+    @Test
+    fun `when fire chats cleared then fire flows fail not_returned and are off disk while regular flows stay`() = runTest {
+        restart(
+            stored = listOf(stored(flowId = 7L, chatId = "A", browserMode = BrowserMode.FIRE), stored(flowId = 8L, tabId = "t2", chatId = "B")),
+            openIds = listOf(7L, 8L),
+            landingTabId = null,
+            landingUrl = null,
+        )
+
+        val storedOnReturn = clear(ClearableData.DuckChats.AllForMode(BrowserMode.FIRE))
+
+        verify(wideEventClient).flowFinish(eq(7L), eq(FlowStatus.Failure(reason = "not_returned")), any())
+        verify(wideEventClient, never()).flowFinish(eq(8L), any(), any())
+        assertEquals(listOf(8L), storedOnReturn.map { it.flowId })
+    }
+
+    @Test
+    fun `when chats cleared for a returned flow whose response is done then it finishes SUCCESS returned`() = runTest {
+        promptInChat(tabId = "t1", chatId = "A", browserMode = BrowserMode.FIRE)
+        switchToOtherSite()
+        testee.onResponseState(tabId = "t1", status = "ready")
+        onChat(tabId = "t1", chatId = "A")
+        idle()
+
+        val storedOnReturn = clear(ClearableData.DuckChats.AllForMode(BrowserMode.FIRE))
+
+        verify(wideEventClient).flowFinish(eq(1L), eq(FlowStatus.Success), eq(mapOf("status_reason" to "returned")))
+        assertEquals(emptyList<PersistedResponseWaitFlow>(), storedOnReturn)
+    }
+
+    @Test
+    fun `when selected chats cleared then only flows for those chats in that mode fail`() = runTest {
+        restart(
+            stored = listOf(
+                stored(flowId = 7L, tabId = "t1", chatId = "A"),
+                stored(flowId = 8L, tabId = "t2", chatId = "B"),
+                stored(flowId = 9L, tabId = "t3", chatId = "A", browserMode = BrowserMode.FIRE),
+            ),
+            openIds = listOf(7L, 8L, 9L),
+            landingTabId = null,
+            landingUrl = null,
+        )
+
+        val storedOnReturn = clear(ClearableData.DuckChats.SelectedForMode(setOf("$DUCK_AI_URL?chatID=A"), BrowserMode.REGULAR))
+
+        verify(wideEventClient).flowFinish(eq(7L), eq(FlowStatus.Failure(reason = "not_returned")), any())
+        verify(wideEventClient, never()).flowFinish(eq(8L), any(), any())
+        verify(wideEventClient, never()).flowFinish(eq(9L), any(), any())
+        assertEquals(listOf(8L, 9L), storedOnReturn.map { it.flowId })
+    }
+
+    @Test
+    fun `when all chats cleared then flows in every mode fail`() = runTest {
+        restart(
+            stored = listOf(stored(flowId = 7L, chatId = "A"), stored(flowId = 8L, tabId = "t2", chatId = "B", browserMode = BrowserMode.FIRE)),
+            openIds = listOf(7L, 8L),
+            landingTabId = null,
+            landingUrl = null,
+        )
+
+        val storedOnReturn = clear(ClearableData.DuckChats.All)
+
+        verify(wideEventClient).flowFinish(eq(7L), eq(FlowStatus.Failure(reason = "not_returned")), any())
+        verify(wideEventClient).flowFinish(eq(8L), eq(FlowStatus.Failure(reason = "not_returned")), any())
+        assertEquals(emptyList<PersistedResponseWaitFlow>(), storedOnReturn)
+    }
+
+    @Test
+    fun `when only tabs and browser data are cleared then flows stay`() = runTest {
+        restart(
+            stored = listOf(stored(flowId = 7L, chatId = "A", browserMode = BrowserMode.FIRE)),
+            openIds = listOf(7L),
+            landingTabId = null,
+            landingUrl = null,
+        )
+
+        val storedOnReturn = clear(ClearableData.Tabs.AllForMode(BrowserMode.FIRE), ClearableData.BrowserData.AllForMode(BrowserMode.FIRE))
+
+        verify(wideEventClient, never()).flowFinish(any(), any(), any())
+        assertEquals(listOf(7L), storedOnReturn.map { it.flowId })
     }
 
     private class FakeFlowStore : DuckAiResponseWaitFlowStore {

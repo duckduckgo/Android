@@ -20,6 +20,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.firstOrNull
@@ -39,6 +40,7 @@ data class PersistedResponseWaitFlow(
     val readyWhileAwayRecorded: Boolean,
     val readyToReturnRunning: Boolean,
     val chatSwitchedAway: Boolean,
+    val browserMode: BrowserMode,
 )
 
 /** Keeps open response-wait flows on the device so they can be picked up again after the process restarts. */
@@ -80,6 +82,7 @@ class DuckAiResponseWaitFlowStoreImpl @Inject constructor(
         .put(READY_WHILE_AWAY_RECORDED, readyWhileAwayRecorded)
         .put(READY_TO_RETURN_RUNNING, readyToReturnRunning)
         .put(CHAT_SWITCHED_AWAY, chatSwitchedAway)
+        .put(BROWSER_MODE, browserMode.name)
 
     private fun JSONObject.toFlow() = PersistedResponseWaitFlow(
         flowId = getLong(FLOW_ID),
@@ -91,6 +94,7 @@ class DuckAiResponseWaitFlowStoreImpl @Inject constructor(
         readyWhileAwayRecorded = getBoolean(READY_WHILE_AWAY_RECORDED),
         readyToReturnRunning = getBoolean(READY_TO_RETURN_RUNNING),
         chatSwitchedAway = optBoolean(CHAT_SWITCHED_AWAY, false),
+        browserMode = BrowserMode.entries.firstOrNull { it.name == optString(BROWSER_MODE) } ?: BrowserMode.REGULAR,
     )
 
     private companion object {
@@ -105,5 +109,6 @@ class DuckAiResponseWaitFlowStoreImpl @Inject constructor(
         const val READY_WHILE_AWAY_RECORDED = "readyWhileAwayRecorded"
         const val READY_TO_RETURN_RUNNING = "readyToReturnRunning"
         const val CHAT_SWITCHED_AWAY = "chatSwitchedAway"
+        const val BROWSER_MODE = "browserMode"
     }
 }

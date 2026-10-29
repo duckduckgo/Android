@@ -605,7 +605,7 @@ class RealDuckChatJSHelper @Inject constructor(
     ): JsCallbackData {
         val pending = pendingNativePromptStore.consume()
         if (pending != null && mode == Mode.FULL && tabId.isNotEmpty()) {
-            responseWaitWideEvent.onNativePromptSubmitted(tabId, pending.reasoningEffort, pending.selectedTool)
+            responseWaitWideEvent.onNativePromptSubmitted(tabId, browserMode, pending.reasoningEffort, pending.selectedTool)
         }
         val jsonPayload = JSONObject().apply {
             put(PLATFORM, ANDROID)

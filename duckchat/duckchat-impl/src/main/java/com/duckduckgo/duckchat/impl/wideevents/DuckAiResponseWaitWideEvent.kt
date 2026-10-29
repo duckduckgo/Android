@@ -22,7 +22,10 @@ import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.dataclearing.api.plugin.ClearableData
+import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
@@ -35,6 +38,7 @@ import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
@@ -45,7 +49,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 interface DuckAiResponseWaitWideEvent {
-    fun onNativePromptSubmitted(tabId: String, reasoningEffort: String?, selectedTool: String?)
+    fun onNativePromptSubmitted(tabId: String, browserMode: BrowserMode, reasoningEffort: String?, selectedTool: String?)
     fun onResponseState(tabId: String, status: String)
     fun onStopTapped(tabId: String)
 }
@@ -61,10 +65,13 @@ interface DuckAiResponseWaitWideEvent {
  *
  * Open flows are saved to [DuckAiResponseWaitFlowStore] after every change and restored as the first
  * action, so a wait that outlives the process can still record the user's return.
+ *
+ * Clearing Duck.ai chats ends their flows, so no chat ID outlives the chat it belongs to, including Fire mode chats.
  */
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class, binding = binding<DuckAiResponseWaitWideEvent>())
 @ContributesIntoSet(AppScope::class, binding = binding<BrowserLifecycleObserver>())
+@ContributesIntoSet(AppScope::class, binding = binding<DataClearingPlugin>())
 class DuckAiResponseWaitWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
     private val duckChat: DuckChat,
@@ -73,7 +80,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
     private val flowStore: DuckAiResponseWaitFlowStore,
     dispatchers: DispatcherProvider,
     @AppCoroutineScope appCoroutineScope: CoroutineScope,
-) : DuckAiResponseWaitWideEvent, DuckAiSessionCallback, BrowserLifecycleObserver {
+) : DuckAiResponseWaitWideEvent, DuckAiSessionCallback, BrowserLifecycleObserver, DataClearingPlugin {
 
     private val coroutineScope = CoroutineScope(appCoroutineScope.coroutineContext + dispatchers.io())
     private val channel = Channel<Action>(capacity = Channel.UNLIMITED)
@@ -95,17 +102,19 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
                 try {
                     processAction(action)
                     persist()
+                    if (action is Action.ClearChats) action.cleared.complete(Unit)
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
                     logcat(tag = TAG) { "Error handling ${action::class.simpleName}: ${e.message}" }
+                    if (action is Action.ClearChats) action.cleared.completeExceptionally(e)
                 }
             }
         }
     }
 
-    override fun onNativePromptSubmitted(tabId: String, reasoningEffort: String?, selectedTool: String?) {
-        channel.trySend(Action.NativePromptSubmitted(tabId, reasoningEffort, selectedTool))
+    override fun onNativePromptSubmitted(tabId: String, browserMode: BrowserMode, reasoningEffort: String?, selectedTool: String?) {
+        channel.trySend(Action.NativePromptSubmitted(tabId, browserMode, reasoningEffort, selectedTool))
     }
 
     override fun onResponseState(tabId: String, status: String) {
@@ -145,6 +154,13 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         channel.trySend(Action.AppClosed)
     }
 
+    // Returns only once the cleared flows are off disk, since a Fire clear can kill the process right after.
+    override suspend fun onClearData(types: Set<ClearableData>) {
+        val cleared = CompletableDeferred<Unit>()
+        channel.send(Action.ClearChats(types, cleared))
+        cleared.await()
+    }
+
     private suspend fun processAction(action: Action) {
         if (action is Action.Recover) return recover()
         val previousTab = selectedTab
@@ -155,9 +171,10 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         } else {
             if (action is Action.AppOpened) dropFlowsClosedByCleanup()
             when (action) {
-                is Action.NativePromptSubmitted -> startFlow(action.tabId, action.reasoningEffort, action.selectedTool)
+                is Action.NativePromptSubmitted -> startFlow(action.tabId, action.browserMode, action.reasoningEffort, action.selectedTool)
                 is Action.ResponseState -> applyResponseState(action.tabId, action.status)
                 is Action.StopTapped -> applyStop(action.tabId)
+                is Action.ClearChats -> clearChats(action.types)
                 else -> reconcileOnScreen(appClosed = action is Action.AppClosed)
             }
         }
@@ -280,7 +297,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         }
     }
 
-    private suspend fun startFlow(tabId: String, reasoningEffort: String?, selectedTool: String?) {
+    private suspend fun startFlow(tabId: String, browserMode: BrowserMode, reasoningEffort: String?, selectedTool: String?) {
         flows.firstOrNull { it.onScreen && it.tabId == tabId && it.returned }?.let { flow ->
             wideEventClient.flowStep(flow.flowId, STEP_PROMPT_AFTER_RETURN)
             finish(flow, REASON_RETURNED)
@@ -295,7 +312,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
             metadata = startMetadata(reasoningEffort, selectedTool),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 24.hours, flowStatus = FlowStatus.Failure(reason = REASON_NOT_RETURNED)),
         ).onSuccess { flowId ->
-            val flow = ResponseWait(flowId = flowId, tabId = tabId, chatId = chatId, awaitingFirstProgressStatus = true)
+            val flow = ResponseWait(flowId = flowId, tabId = tabId, chatId = chatId, browserMode = browserMode, awaitingFirstProgressStatus = true)
             flow.onScreen = onScreen()?.let(flow::matches) ?: false
             flows += flow
             wideEventClient.intervalStart(flowId, INTERVAL_PROMPT_TO_LEAVE, buckets = PROMPT_BUCKETS)
@@ -361,6 +378,30 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         finish(flow, REASON_STOPPED)
     }
 
+    private suspend fun clearChats(types: Set<ClearableData>) {
+        types.forEach { type ->
+            val cleared = when (type) {
+                is ClearableData.DuckChats.All -> flows.toList()
+                is ClearableData.DuckChats.AllForMode -> flows.filter { it.browserMode == type.mode }
+                is ClearableData.DuckChats.SelectedForMode -> {
+                    val chatIds = type.chatUrls.mapNotNull { it.toUri().toChatIdOrNull(duckChat) }.toSet()
+                    flows.filter { it.browserMode == type.mode && it.chatId in chatIds }
+                }
+                else -> emptyList()
+            }
+            cleared.forEach { flow ->
+                // Matches leaving the screen: a return already seen still counts, anything else ends as the 24h cleanup would.
+                if (flow.returned && flow.done) finish(flow, REASON_RETURNED) else failNotReturned(flow)
+            }
+        }
+    }
+
+    private suspend fun failNotReturned(flow: ResponseWait) {
+        flows.remove(flow)
+        wideEventClient.flowFinish(wideEventId = flow.flowId, status = FlowStatus.Failure(reason = REASON_NOT_RETURNED))
+        logcat(tag = TAG) { "Duck.ai response wait failed: reason=$REASON_NOT_RETURNED" }
+    }
+
     private suspend fun finish(flow: ResponseWait, statusReason: String) {
         flows.remove(flow)
         wideEventClient.flowFinish(
@@ -399,7 +440,12 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
     }
 
     private sealed class Action {
-        data class NativePromptSubmitted(val tabId: String, val reasoningEffort: String?, val selectedTool: String?) : Action()
+        data class NativePromptSubmitted(
+            val tabId: String,
+            val browserMode: BrowserMode,
+            val reasoningEffort: String?,
+            val selectedTool: String?,
+        ) : Action()
         data class ResponseState(val tabId: String, val status: String) : Action()
         data class StopTapped(val tabId: String) : Action()
         data class LaunchLandingResolved(val tabId: String?, val url: String?) : Action()
@@ -409,6 +455,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         data object AppOpened : Action()
         data object AppClosed : Action()
         data object Recover : Action()
+        data class ClearChats(val types: Set<ClearableData>, val cleared: CompletableDeferred<Unit>) : Action()
     }
 
     private data class TabState(
@@ -425,6 +472,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
         val flowId: Long,
         var tabId: String,
         var chatId: String?,
+        val browserMode: BrowserMode,
         var awaitingFirstProgressStatus: Boolean = false,
     ) {
         var onScreen = false
@@ -447,6 +495,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
             readyWhileAwayRecorded = readyWhileAwayRecorded,
             readyToReturnRunning = readyToReturnRunning,
             chatSwitchedAway = chatSwitchedAway,
+            browserMode = browserMode,
         )
 
         // A new chat has no ID until the page creates it, so match by tab until then.
@@ -454,7 +503,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
             if (chatId != null) chatId == screen.chatId else tabId == screen.tabId && !chatSwitchedAway
     }
 
-    private fun PersistedResponseWaitFlow.restore() = ResponseWait(flowId = flowId, tabId = tabId, chatId = chatId).also {
+    private fun PersistedResponseWaitFlow.restore() = ResponseWait(flowId = flowId, tabId = tabId, chatId = chatId, browserMode = browserMode).also {
         it.left = left
         it.returned = returned
         it.done = done

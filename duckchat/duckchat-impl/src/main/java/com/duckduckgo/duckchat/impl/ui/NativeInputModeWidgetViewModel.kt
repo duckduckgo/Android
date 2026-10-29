@@ -336,7 +336,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             null -> {}
         }
         inputOutcomeTracker.promptSubmitted(submitMethod)
-        activeDuckAiTabId(surface)?.let { responseWaitWideEvent.onNativePromptSubmitted(it, reasoningEffort, rawTool) }
+        activeDuckAiTabId(surface)?.let { responseWaitWideEvent.onNativePromptSubmitted(it, browserMode, reasoningEffort, rawTool) }
     }
 
     fun fireSentPromptInChat() = duckChatPixels.fireSentPromptInChat(currentSurface())
