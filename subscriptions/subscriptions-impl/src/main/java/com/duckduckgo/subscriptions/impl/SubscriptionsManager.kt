@@ -756,14 +756,6 @@ class RealSubscriptionsManager @Inject constructor(
         // Moving token refresh to app-scoped coroutine to ensure it's not interrupted by caller cancellation.
         return coroutineScope.async {
             tokenRefreshMutex.withLock {
-                // A caller waiting on the mutex may find the token already rotated by the previous holder.
-                if (!force && isSkipValidAccessTokenRefreshEnabled()) {
-                    val storedAccessToken = authRepository.getAccessTokenV2()
-                    if (storedAccessToken != null && isAccessTokenUsable(storedAccessToken)) {
-                        return@withLock storedAccessToken
-                    }
-                }
-
                 try {
                     tokenRefreshWideEvent.onStart(subscriptionStatus())
 
@@ -771,6 +763,15 @@ class RealSubscriptionsManager @Inject constructor(
                     tokenRefreshWideEvent.onCrossProcessLockAcquired(lockResult)
 
                     val accessToken = try {
+                        // A caller waiting on either lock may find the token already rotated by the previous holder.
+                        if (!force && isSkipValidAccessTokenRefreshEnabled()) {
+                            val storedAccessToken = authRepository.getAccessTokenV2()
+                            if (storedAccessToken != null && isAccessTokenUsable(storedAccessToken)) {
+                                tokenRefreshWideEvent.onSkipped()
+                                return@withLock storedAccessToken
+                            }
+                        }
+
                         doRefreshAccessToken()
                     } finally {
                         lockResult.getOrNull()?.let { lockHandle ->

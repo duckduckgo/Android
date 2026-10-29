@@ -118,7 +118,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import retrofit2.HttpException
@@ -1570,6 +1569,8 @@ class RealSubscriptionsManagerTest {
 
     @Test
     fun whenRefreshAccessTokenAndStoredTokenIsUsableThenReturnsStoredTokenWithoutRotating() = runTest {
+        val lockHandle = FakeLockHandle()
+        whenever(crossProcessLock.acquire(any(), any())).thenReturn(Result.success(lockHandle))
         givenSkipValidAccessTokenRefreshEnabled(true)
         givenUserIsSignedIn()
         givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
@@ -1579,8 +1580,27 @@ class RealSubscriptionsManagerTest {
 
         assertEquals(storedAccessToken, result)
         verify(authClient, never()).getTokens(any<String>())
-        verify(crossProcessLock, never()).acquire(any(), any())
-        verifyNoInteractions(tokenRefreshWideEvent)
+        verify(crossProcessLock).acquire(any(), any())
+        assertTrue(lockHandle.closed)
+        verify(tokenRefreshWideEvent).onSkipped()
+        verify(tokenRefreshWideEvent, never()).onSuccess()
+        verify(tokenRefreshWideEvent, never()).onFailure(any())
+    }
+
+    @Test
+    fun whenCrossProcessLockAcquisitionFailsAndStoredTokenIsUsableThenRefreshAccessTokenSkips() = runTest {
+        whenever(crossProcessLock.acquire(any(), any())).thenReturn(Result.failure(timeoutCancellationException()))
+        givenSkipValidAccessTokenRefreshEnabled(true)
+        givenUserIsSignedIn()
+        givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
+        val storedAccessToken = authRepository.getAccessTokenV2()
+
+        val result = subscriptionsManager.refreshAccessToken()
+
+        assertEquals(storedAccessToken, result)
+        verify(authClient, never()).getTokens(any<String>())
+        verify(tokenRefreshWideEvent).onSkipped()
+        verify(tokenRefreshWideEvent, never()).onSuccess()
     }
 
     @Test
