@@ -18,7 +18,9 @@ package com.duckduckgo.common.ui.compose.button
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -31,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
@@ -80,7 +83,7 @@ fun DaxIconButton(
 ) {
     CompositionLocalProvider(
         LocalMinimumInteractiveComponentSize provides Dp.Unspecified,
-        LocalRippleConfiguration provides DaxIconButtonDefaults.rippleConfiguration(),
+        LocalRippleConfiguration provides null,
     ) {
         IconButton(
             onClick = onClick,
@@ -94,11 +97,14 @@ fun DaxIconButton(
             enabled = enabled,
             interactionSource = interactionSource,
         ) {
-            Icon(
-                painter = iconPainter,
-                contentDescription = contentDescription,
-                modifier = if (iconSize.isSpecified) Modifier.size(iconSize) else Modifier,
-            )
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                DaxRippleLayer(interactionSource, DaxIconButtonDefaults.rippleConfiguration(), Modifier.matchParentSize())
+                Icon(
+                    painter = iconPainter,
+                    contentDescription = contentDescription,
+                    modifier = if (iconSize.isSpecified) Modifier.size(iconSize) else Modifier,
+                )
+            }
         }
     }
 }
@@ -125,7 +131,7 @@ object DaxIconButtonDefaults {
     @Composable
     fun rippleConfiguration(): RippleConfiguration {
         val color = if (DuckDuckGoTheme.colors.isDark) White12 else Black6
-        return remember(color) { RippleConfiguration(color = color) }
+        return remember(color) { daxRippleConfiguration(color) }
     }
 }
 
