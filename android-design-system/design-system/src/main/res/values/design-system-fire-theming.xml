@@ -21,8 +21,6 @@
 
         <item name="daxColorOmnibarAccent">?attr/daxColorFireModeAccentLight</item>
         <item name="daxOmnibarTextColorHighlight">?attr/daxColorFireModeAccentLightTranslucent</item>
-        <item name="daxColorAccentAltPrimary">?attr/daxColorOmnibarAccent</item>
-        <item name="daxColorAccentAltContentPrimary">?attr/daxColorWhite</item>
 
         <item name="colorControlActivated">?attr/daxColorFireModeAccentLight</item>
         <item name="daxColorSnackbarAction">?attr/daxColorFireModeAccentLight</item>
@@ -42,9 +40,7 @@
 
         <item name="daxColorOmnibarAccent">?attr/daxColorFireModeAccentDark</item>
         <item name="daxOmnibarTextColorHighlight">?attr/daxColorFireModeAccentDarkTranslucent</item>
-        <item name="daxColorAccentAltPrimary">?attr/daxColorOmnibarAccent</item>
 
-        <item name="daxColorAccentAltContentPrimary">?attr/daxColorBlack</item>
         <item name="daxColorOmnibarAccentContent">?attr/daxColorBlack</item>
 
         <item name="colorControlActivated">?attr/daxColorFireModeAccentDark</item>
@@ -78,8 +74,6 @@
     <style name="ThemeOverlay.DuckDuckGo.InputModeCard.DarkFire" parent="Theme.DuckDuckGo.Dark.Fire">
         <item name="daxColorOmnibarAccent">?attr/daxColorFireModeAccentDark</item>
         <item name="daxOmnibarTextColorHighlight">?attr/daxColorFireModeAccentDarkTranslucent</item>
-        <item name="daxColorAccentAltPrimary">?attr/daxColorOmnibarAccent</item>
-        <item name="daxColorAccentAltContentPrimary">?attr/daxColorBlack</item>
         <item name="daxColorOmnibarAccentContent">?attr/daxColorBlack</item>
         <item name="colorControlActivated">?attr/daxColorFireModeAccentDark</item>
     </style>

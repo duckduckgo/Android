@@ -15,18 +15,8 @@
   -->
 
 <resources>
-    <!-- Dax Colors -->
-    <attr name="daxColorOnboardingDialogBackground" format="color" />
-
-    <!-- Design System Raw Colors -->
-    <!-- Should be moved to theme if experiment is successful -->
-
-    <color name="daxOnboardingDialogBackgroundColorLight">#FEFEFE</color>
-    <color name="daxOnboardingDialogBackgroundColorDark">#011D34</color>
-
     <!-- Input Screen -->
     <color name="daxColorBackdropDark">#080808</color>
-    <color name="daxColorBackdropLight">#E0E0E0</color>
 
     <!-- Widgets -->
     <color name="searchWidgetBackgroundColorLight">#F2F2F2</color>

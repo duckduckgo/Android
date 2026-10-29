@@ -51,11 +51,9 @@
     <attr name="daxColorContainer" format="color"/>
     <attr name="daxColorWindow" format="color"/>
     <attr name="daxColorDuckAiBackground" format="color"/>
-    <attr name="daxColorCanvas" format="color"/>
     <attr name="daxColorPrimaryText" format="color"/>
     <attr name="daxColorPrimaryInvertedText" format="color"/>
     <attr name="daxColorSecondaryText" format="color"/>
-    <attr name="daxColorSecondaryInvertedText" format="color"/>
     <attr name="daxColorTertiaryText" format="color"/>
     <attr name="daxColorPrimaryIcon" format="color"/>
     <attr name="daxColorSecondaryIcon" format="color"/>
@@ -84,8 +82,6 @@
 
     <!-- Visual Design Specific Colors -->
     <attr name="daxColorControlFillPrimary" format="color"/>
-    <attr name="daxColorControlFillSecondary" format="color"/>
-    <attr name="daxColorControlFillTertiary" format="color"/>
     <attr name="daxColorControlDecorationTertiary" format="color"/>
 
     <attr name="daxColorButtonPrimaryContainer" format="color"/>
@@ -95,11 +91,6 @@
     <attr name="daxColorButtonBrandText" format="color"/>
     <attr name="daxColorButtonSecondaryContainer" format="color"/>
     <attr name="daxColorButtonSecondaryContainerPressed" format="color"/>
-    <attr name="daxColorButtonGhostAltContainerPressed" format="color"/>
-    <attr name="daxColorButtonDestructiveContainer" format="color"/>
-    <attr name="daxColorButtonDestructiveContainerPressed" format="color"/>
-    <attr name="daxColorButtonDestructiveGhostContainer" format="color"/>
-    <attr name="daxColorButtonDestructiveGhostContainerPressed" format="color"/>
 
     <attr name="daxColorFabPrimaryContainer" format="color"/>
     <attr name="daxColorFabPrimaryContainerPressed" format="color"/>
@@ -107,11 +98,8 @@
     <attr name="daxColorFabPrimaryIcon" format="color"/>
     <attr name="daxColorFabSecondaryContainer" format="color"/>
     <attr name="daxColorFabSecondaryContainerPressed" format="color"/>
-    <attr name="daxColorFabSecondaryText" format="color"/>
     <attr name="daxColorFabSecondaryIcon" format="color"/>
 
-    <attr name="daxColorAccentAltContentPrimary" format="color"/>
-    <attr name="daxColorAccentAltPrimary" format="color"/>
 
     <attr name="daxColorTabHighlight" format="color"/>
     <attr name="daxColorTabDuckAiContentTypeBorder" format="color"/>
@@ -120,19 +108,11 @@
     <attr name="daxColorButtonPrimaryTextPressed" format="color"/>
     <attr name="daxColorButtonSecondaryText" format="color"/>
     <attr name="daxColorButtonSecondaryTextPressed" format="color"/>
-    <attr name="daxColorButtonDestructiveGhostText" format="color"/>
-    <attr name="daxColorButtonGhostAltText" format="color"/>
-    <attr name="daxColorButtonGhostAltTextPressed" format="color"/>
-    <attr name="daxColorButtonDestructiveGhostTextPressed" format="color"/>
 
     <attr name="daxColorSwitchTrackOn" format="color"/>
     <attr name="daxColorSwitchTrackOff" format="color"/>
-    <attr name="daxColorSwitchTrackDisabledOn" format="color"/>
-    <attr name="daxColorSwitchTrackDisabledOff" format="color"/>
     <attr name="daxColorSwitchThumbOn" format="color"/>
     <attr name="daxColorSwitchThumbOff" format="color"/>
-    <attr name="daxColorSwitchThumbDisabledOn" format="color"/>
-    <attr name="daxColorSwitchThumbDisabledOff" format="color"/>
 
     <attr name="daxColorSliderTrackInactive" format="color"/>
     <attr name="daxColorSliderActive" format="color"/>
@@ -218,19 +198,14 @@
     <color name="black96">#F5000000</color>
     <color name="black84">#D6000000</color>
     <color name="black60">#99000000</color>
-    <color name="black50">#80000000</color>
     <color name="black48">#7A000000</color>
-    <color name="black40">#66000000</color>
     <color name="black36">#5C000000</color>
     <color name="black30">#4D000000</color>
-    <color name="black35">#35000000</color>
     <color name="black20">#33000000</color>
-    <color name="black18">#2E000000</color>
     <color name="black16">#29000000</color>
     <color name="black12">#1F000000</color>
     <color name="black9">#17000000</color>
     <color name="black6">#0F000000</color>
-    <color name="black3">#08000000</color>
     <color name="black">#000000</color>
 
     <color name="white84">#D6FFFFFF</color>
@@ -240,14 +215,11 @@
     <color name="white36">#5CFFFFFF</color>
     <color name="white30">#4DFFFFFF</color>
     <color name="white24">#3DFFFFFF</color>
-    <color name="white20">#33FFFFFF</color>
     <color name="white18">#2EFFFFFF</color>
     <color name="white12">#1FFFFFFF</color>
-    <color name="white9">#17FFFFFF</color>
     <color name="white8">#14FFFFFF</color>
     <color name="white6">#0FFFFFFF</color>
     <color name="white4">#0AFFFFFF</color>
-    <color name="white3">#08FFFFFF</color>
     <color name="white">#FFFFFF</color>
     <color name="white_60">#F2F5F9</color>
 
@@ -272,7 +244,6 @@
     <color name="translucentDark">#b000</color>
 
     <color name="ic_launcher_red_background">#DE5833</color>
-    <color name="ic_launcher_white_background">#FFFFFF</color>
     <color name="ic_launcher_gold_background">#EEA849</color>
     <color name="ic_launcher_silhouette_background">#222222</color>
     <color name="ic_launcher_green_background">#5FAD3E</color>
@@ -297,12 +268,10 @@
     <color name="background_window_dark">#3D3D3D</color>
     <color name="background_duck_ai_dark">#111111</color>
     <color name="background_canvas_dark">#1F1F1F</color>
-    <color name="background_container_dark">#404145</color>
 
     <!-- Text -->
     <color name="text_primary_dark">#E6FFFFFF</color>
     <color name="text_secondary_dark">#99FFFFFF</color>
-    <color name="text_tertiary_dark">#66FFFFFF</color>
 
     <!-- Icons -->
     <color name="icon_primary_dark">#C7FFFFFF</color>
@@ -318,8 +287,6 @@
 
     <!-- Controls -->
     <color name="controls_fill_primary_dark">#1FF9F9F9</color>
-    <color name="controls_fill_secondary_dark">#2EF9F9F9</color>
-    <color name="controls_fill_tertiary_dark">#3DF9F9F9</color>
     <color name="controls_decoration_tertiary_dark">#B8F9F9F9</color>
 
     <!-- Light Palette -->
@@ -333,13 +300,10 @@
     <color name="background_surface_tertiary_light">@color/white</color>
     <color name="background_window_light">#FFFFFF</color>
     <color name="background_duck_ai_light">#FFFFFF</color>
-    <color name="background_canvas_light">#FFFFFF</color>
-    <color name="background_container_light">#FFFFFF</color>
 
     <!-- Text -->
     <color name="text_primary_light">#1F1F1F</color>
     <color name="text_secondary_light">#B81C1F21</color>
-    <color name="text_tertiary_light">#661F1F1F</color>
 
     <!-- Icons -->
     <color name="icon_primary_light">#D61F1F1F</color>
@@ -355,14 +319,7 @@
 
     <!-- Controls -->
     <color name="controls_fill_primary_light">#171F1F1F</color>
-    <color name="controls_fill_secondary_light">#1F1F1F1F</color>
-    <color name="controls_fill_tertiary_light">#2E1F1F1F</color>
     <color name="controls_decoration_tertiary_light">#991F1F1F</color>
-
-    <!-- Fire Button -->
-    <attr name="daxColorFireButtonOne" format="color"/>
-    <attr name="daxColorFireButtonTwo" format="color"/>
-    <attr name="daxColorFireButtonThree" format="color"/>
 
     <!-- Fire Mode Accent -->
     <attr name="daxColorFireModeAccentLight" format="color"/>
