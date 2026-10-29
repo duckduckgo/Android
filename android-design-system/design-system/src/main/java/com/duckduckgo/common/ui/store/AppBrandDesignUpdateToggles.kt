@@ -32,7 +32,4 @@ interface AppBrandDesignUpdateToggles {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun newTheme(): Toggle
 }
