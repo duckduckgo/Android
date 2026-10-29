@@ -15,7 +15,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] = "EMULATOR"
         missingDimensionStrategy "store", "internal"
-        buildConfigField "String", "TARGET_PACKAGE", "\"com.duckduckgo.mobile.android\""
     }
 
     compileOptions {
@@ -37,15 +36,6 @@ android {
         release {
             signingConfig signingConfigs.debugKey
         }
-        benchmark {
-            signingConfig signingConfigs.debugKey
-            buildConfigField "String", "TARGET_PACKAGE", "\"com.duckduckgo.mobile.android.benchmark\""
-            matchingFallbacks = ["release"]
-        }
-    }
-
-    buildFeatures {
-        buildConfig = true
     }
 
     targetProjectPath = ":app"
@@ -58,7 +48,7 @@ kotlin {
 
 androidComponents {
     beforeVariants(selector().all()) { variant ->
-        variant.enable = variant.buildType in ["release", "benchmark", "nonMinifiedRelease", "benchmarkRelease"]
+        variant.enable = variant.buildType in ["release", "nonMinifiedRelease", "benchmarkRelease"]
     }
 }
 

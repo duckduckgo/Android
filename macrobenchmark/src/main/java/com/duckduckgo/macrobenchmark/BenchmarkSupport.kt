@@ -22,21 +22,10 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import com.duckduckgo.testseeder.api.TestSeederKey
-import java.util.regex.Pattern
 
-/**
- * The Gradle build type supplies this value so the test APK and target app always use the same
- * package.
- */
-internal val TARGET_PACKAGE: String
-    get() = BuildConfig.TARGET_PACKAGE
+internal const val TARGET_PACKAGE = "com.duckduckgo.mobile.android"
 
-/**
- * Resource ids keep the base package even when the build type adds an applicationIdSuffix, so match on the id alone.
- */
-internal fun appResource(id: String) = By.res(Pattern.compile(".*:id/${Pattern.quote(id)}"))
-
-internal val BROWSER_TAB = appResource("newTabRootLayout")
+internal val BROWSER_TAB = By.res(TARGET_PACKAGE, "newTabRootLayout")
 
 internal const val SCREEN_TIMEOUT_MS = 30_000L
 
