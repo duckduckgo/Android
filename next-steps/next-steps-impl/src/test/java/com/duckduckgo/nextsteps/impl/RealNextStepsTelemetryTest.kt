@@ -63,20 +63,23 @@ class RealNextStepsTelemetryTest {
     }
 
     @Test
-    fun `section shown unique is sent only on the first render of the install`() = runTest {
+    fun `section shown unique is requested once for each displayed message`() = runTest {
         testee.onFrontCardShown("message", A, setOf(A, B))
         testee.onFrontCardShown("message", A, setOf(A, B))
         testee.onActiveMessageChanged(null)
         testee.onFrontCardShown("message2", B, setOf(B))
+        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, clock, coroutineRule.testDispatcherProvider)
+        restored.onFrontCardShown("message2", B, setOf(B))
 
-        verify(pixels, times(1)).sectionShownUnique()
+        verify(pixels, times(1)).sectionShownUnique("message")
+        verify(pixels, times(1)).sectionShownUnique("message2")
     }
 
     @Test
     fun `first impression marks the message displayed and seeds every card in the stack with zero`() = runTest {
         testee.onFrontCardShown("message", A, setOf(A, B))
 
-        verify(pixels).sectionShownUnique()
+        verify(pixels).sectionShownUnique("message")
         val state = telemetryStore.state()
         assertEquals("message", state.displayedMessageId)
         assertEquals(firstDay.toEpochDay(), state.firstRenderDay)
@@ -142,14 +145,16 @@ class RealNextStepsTelemetryTest {
     }
 
     @Test
-    fun `completion after the carousel ended sends nothing`() = runTest {
+    fun `completion before another section renders is reported as already complete once`() = runTest {
         testee.onFrontCardShown("message", A, setOf(A, B))
         testee.onActiveMessageChanged(null)
         clearInvocations(pixels)
 
         testee.onCardsCompleted(setOf(B))
+        testee.onCardsCompleted(setOf(B))
 
-        verifyNoInteractions(pixels)
+        verify(pixels, times(1)).cardRemoved(B, DAY_0, ALREADY_COMPLETE, "0")
+        verifyNoMoreInteractions(pixels)
     }
 
     @Test
@@ -209,7 +214,7 @@ class RealNextStepsTelemetryTest {
         assertEquals(emptyMap<String, Int>(), state.dayCounts)
         assertEquals(0, state.completedCards)
         assertEquals(0, state.dismissedCards)
-        assertEquals(firstDay.toEpochDay(), state.firstRenderDay)
+        assertNull(state.firstRenderDay)
     }
 
     @Test
@@ -394,7 +399,7 @@ class RealNextStepsTelemetryTest {
     }
 
     @Test
-    fun `an impression for a new message ends the old carousel and keeps the day anchor`() = runTest {
+    fun `an impression for a new message sends the old days before resetting the day counters`() = runTest {
         testee.onFrontCardShown("old", A, setOf(A, B))
         today = today.plusDays(4)
 
@@ -404,9 +409,10 @@ class RealNextStepsTelemetryTest {
         verify(pixels).cardDailyImpressions(A, DAY_0, "1")
         verify(pixels).cardDailyImpressions(B, DAY_0, "0")
         testee.onCtaClicked(B)
-        verify(pixels).cardCtaClicked(B, Days(activeDay = "1", calendarDay = "4-7"), "1")
+        verify(pixels).cardCtaClicked(B, DAY_0, "1")
+        assertEquals(today.toEpochDay(), telemetryStore.state().firstRenderDay)
         assertEquals("new", telemetryStore.state().displayedMessageId)
-        assertEquals(firstDay.toEpochDay(), telemetryStore.state().firstRenderDay)
+        verify(pixels).sectionShownUnique("new")
     }
 
     @Test
@@ -521,6 +527,63 @@ class RealNextStepsTelemetryTest {
     }
 
     @Test
+    fun `replacing the carousel on the same day starts at day zero`() = runTest {
+        testee.onFrontCardShown("old", A, setOf(A, B))
+
+        testee.onFrontCardShown("new", B, setOf(A, B))
+        testee.onCtaClicked(B)
+
+        verify(pixels).cardCtaClicked(B, DAY_0, "1")
+        verify(pixels).cardDailyImpressions(A, DAY_0, "1")
+        verify(pixels).cardDailyImpressions(B, DAY_0, "0")
+        assertEquals(1, telemetryStore.state().activeDays)
+        assertEquals(mapOf(A to 0, B to 1), telemetryStore.state().dayCounts)
+    }
+
+    @Test
+    fun `a new carousel after ending and restarting on the same day starts at day zero`() = runTest {
+        testee.onFrontCardShown("old", A, setOf(A))
+        testee.onActiveMessageChanged(null)
+        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, clock, coroutineRule.testDispatcherProvider)
+
+        restored.onFrontCardShown("new", A, setOf(A))
+        restored.onCtaClicked(A)
+
+        verify(pixels).cardCtaClicked(A, DAY_0, "2")
+        assertEquals(1, telemetryStore.state().activeDays)
+        assertEquals(mapOf(A to 1), telemetryStore.state().dayCounts)
+    }
+
+    @Test
+    fun `ending a carousel resets days and reports the new section across a restart`() = runTest {
+        testee.onCardsCompleted(setOf(C))
+        testee.onFrontCardShown("old", A, setOf(A))
+        today = today.plusDays(2)
+        testee.onFrontCardShown("old", A, setOf(A))
+        testee.onAllCardsDone()
+
+        verify(pixels).cardsDismissed(Days(activeDay = "1", calendarDay = "2"), "all_cards_done", completed = 0, dismissed = 0)
+        assertEquals(0, telemetryStore.state().activeDays)
+        assertNull(telemetryStore.state().firstRenderDay)
+        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, clock, coroutineRule.testDispatcherProvider)
+        clearInvocations(pixels)
+        today = today.plusDays(3)
+
+        restored.onCardsCompleted(setOf(B, C))
+        verify(pixels).cardRemoved(B, DAY_0, ALREADY_COMPLETE, "0")
+        verifyNoMoreInteractions(pixels)
+        restored.onFrontCardShown("new", A, setOf(A))
+        restored.onCtaClicked(A)
+
+        verify(pixels).sectionShownUnique("new")
+        verify(pixels).cardCtaClicked(A, DAY_0, "3-4")
+        today = today.plusDays(2)
+        restored.onFrontCardShown("new", A, setOf(A))
+        restored.onCtaClicked(A)
+        verify(pixels).cardCtaClicked(A, Days(activeDay = "1", calendarDay = "2"), "3-4")
+    }
+
+    @Test
     fun `impressions keep counting across carousels`() = runTest {
         testee.onFrontCardShown("old", A, setOf(A))
         testee.onActiveMessageChanged(null)
@@ -529,7 +592,7 @@ class RealNextStepsTelemetryTest {
 
         testee.onCardDismissed(A)
 
-        verify(pixels).cardRemoved(A, Days(activeDay = "1", calendarDay = "1"), DISMISSED, "2")
+        verify(pixels).cardRemoved(A, DAY_0, DISMISSED, "2")
     }
 
     @Test

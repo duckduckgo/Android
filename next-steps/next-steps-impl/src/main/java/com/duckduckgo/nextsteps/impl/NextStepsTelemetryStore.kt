@@ -24,9 +24,9 @@ import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 data class NextStepsTelemetryState(
-    /** Epoch day of the first impression ever; `calendarDay` in every pixel counts from it. */
+    /** Epoch day of this section's first render; reset when the section ends. */
     val firstRenderDay: Long? = null,
-    /** Calendar days on which a card was shown; `activeDay` in every pixel is this minus one. */
+    /** Calendar days on which this carousel was shown; `activeDay` in every pixel is this minus one. */
     val activeDays: Int = 0,
     val displayedMessageId: String? = null,
     val ctaClickedCardId: String? = null,
