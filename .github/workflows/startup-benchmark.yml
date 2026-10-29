@@ -130,16 +130,20 @@ jobs:
 
       - name: Summarize results
         if: always()
+        env:
+          DEVICE_MODEL: ${{ inputs.device_model || env.DEFAULT_DEVICE_MODEL }}
+          DEVICE_VERSION: ${{ inputs.device_version || env.DEFAULT_DEVICE_VERSION }}
+          REF_NAME: ${{ github.ref_name }}
         run: |
           {
-            echo "Device: \`${{ inputs.device_model || env.DEFAULT_DEVICE_MODEL }}\` API ${{ inputs.device_version || env.DEFAULT_DEVICE_VERSION }}, ref \`${{ github.ref_name }}\` @ \`${GITHUB_SHA::10}\`"
+            echo "Device: \`${DEVICE_MODEL}\` API ${DEVICE_VERSION}, ref \`${REF_NAME}\` @ \`${GITHUB_SHA::10}\`"
             echo
             echo "| Test | TTID min | TTID median | TTID max | TTFD min | TTFD median | TTFD max |"
             echo "|---|---:|---:|---:|---:|---:|---:|"
             find startup-artifacts -name '*benchmarkData.json' -print0 | xargs -0 -r jq -r '
-              .benchmarks[] | .name as $n | .metrics as $m
-              | "| \($n) | " + ([ "timeToInitialDisplayMs", "timeToFullDisplayMs" ]
-                  | map($m[.] | "\(.minimum) | \(.median) | \(.maximum)") | join(" | ")) + " |"'
+              .benchmarks[]
+              | "| \(.name) | " + ([ .metrics.timeToInitialDisplayMs, .metrics.timeToFullDisplayMs ]
+                  | map("\(.minimum) | \(.median) | \(.maximum)") | join(" | ")) + " |"'
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload results
