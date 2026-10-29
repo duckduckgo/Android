@@ -33,8 +33,8 @@ enum class NextStepsPixelName(override val pixelName: String) : Pixel.PixelName 
  * `impressionsSoFar` is the bucketed number of times the card was the front card on this install, so a per-impression pixel is not needed.
  */
 interface NextStepsPixels {
-    /** Once per install, the first time the stacked cards are rendered. */
-    fun sectionShownUnique()
+    /** Once per RMF message ID per install; the message ID is used only for local deduplication. */
+    fun sectionShownUnique(messageId: String)
     fun cardCtaClicked(card: String, days: Days, impressionsSoFar: String)
     fun cardRemoved(card: String, days: Days, reason: CardRemovalReason, impressionsSoFar: String)
     fun cardDailyImpressions(card: String, days: Days, impressions: String)
@@ -52,14 +52,19 @@ interface NextStepsPixels {
         /** Detected complete while in the stack, without a CTA tap on it. */
         FINISHED_ELSEWHERE("finished_elsewhere"),
 
-        /** Already complete the first time the cards were evaluated, so it never entered the stack. */
+        /** Detected complete before the current section first rendered. */
         ALREADY_COMPLETE("already_complete"),
     }
 }
 
 @ContributesBinding(AppScope::class)
 class RealNextStepsPixels @Inject constructor(private val pixel: Pixel) : NextStepsPixels {
-    override fun sectionShownUnique() = pixel.fire(NextStepsPixelName.SECTION_SHOWN_UNIQUE, type = Pixel.PixelType.Unique())
+    override fun sectionShownUnique(messageId: String) {
+        pixel.fire(
+            NextStepsPixelName.SECTION_SHOWN_UNIQUE,
+            type = Pixel.PixelType.Unique(tag = "${NextStepsPixelName.SECTION_SHOWN_UNIQUE.pixelName}_$messageId"),
+        )
+    }
 
     override fun cardCtaClicked(card: String, days: NextStepsPixels.Days, impressionsSoFar: String) {
         fire(NextStepsPixelName.CARD_CTA_CLICKED, days, "card" to card, "impressionsSoFar" to impressionsSoFar)

@@ -37,9 +37,10 @@ class RealNextStepsTelemetryStoreTest {
     }
 
     @Test
-    fun `state survives a new store instance and clearing keeps the anchor`() {
+    fun `state survives a new store instance and clearing removes the anchor`() {
         val state = NextStepsTelemetryState(
             firstRenderDay = 20000L,
+            activeDays = 2,
             displayedMessageId = "message",
             ctaClickedCardId = "setup_add_widget",
             openDay = 20002L,
@@ -50,7 +51,7 @@ class RealNextStepsTelemetryStoreTest {
         testee.save(state)
         assertEquals(state, RealNextStepsTelemetryStore(preferencesProvider).state())
 
-        testee.save(NextStepsTelemetryState(firstRenderDay = state.firstRenderDay))
-        assertEquals(NextStepsTelemetryState(firstRenderDay = 20000L), RealNextStepsTelemetryStore(preferencesProvider).state())
+        testee.save(NextStepsTelemetryState())
+        assertEquals(NextStepsTelemetryState(), RealNextStepsTelemetryStore(preferencesProvider).state())
     }
 }
