@@ -203,4 +203,17 @@
     <string name="subscriptionExpiredStatusIconContentDescription">Abonelik süresi doldu</string>
     <string name="subscriptionActiveStatusIconContentDescription">Abonelik aktif</string>
 
+    <!-- Right of withdrawal -->
+    <string name="subscriptionSettingWithdraw" instruction="Subscription settings option to use the legal right of withdrawal: cancel the subscription within 14 days of purchase and get a full refund">Cayma Hakkını Kullan</string>
+    <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">%1$s tarihine kadar cayabilir ve tam para iadesi alabilirsin</string>
+    <string name="subscriptionWithdrawDialogTitle">Cayma hakkını kullanmak istiyor musun?</string>
+    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">%1$s aboneliğin hemen sona erecek ve %2$s tutarındaki ödemen, 14 gün içinde orijinal ödeme yöntemine iade edilecek.\n\nOnayladığında VPN, Personal Information Removal ve gelişmiş Duck.ai modelleri çalışmayı durdurur.</string>
+    <string name="subscriptionWithdrawDialogConfirm">Cayma İşlemini Onayla</string>
+    <string name="subscriptionWithdrawDialogKeep">Aboneliği Sürdür</string>
+    <string name="subscriptionStatusNotSubscribed">Abone Değilsin</string>
+    <string name="subscriptionWithdrawnTitle" instruction="Placeholder is the date the user withdrew from their subscription, e.g. October 6, 2026">%1$s tarihinde caydın.</string>
+    <string name="subscriptionWithdrawnRefund" instruction="Placeholder is the refund amount with currency, e.g. €9.99">%1$s tutarındaki para iaden işleme alınıyor.</string>
+    <string name="subscriptionWithdrawnRefundWithoutAmount">İaden işleme alınıyor.</string>
+    <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Cayma işlemini otomatik olarak gerçekleştiremedik. Cayma işlemini tamamlamak için <annotation type="withdrawal_help_link">bu sayfayı</annotation> ziyaret et.</string>
+
 </resources>
