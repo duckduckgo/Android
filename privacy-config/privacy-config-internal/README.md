@@ -51,7 +51,7 @@ leaves settings unchanged.
 ### Processing
 
 The receiver handles the command itself, in the background (`goAsync`), so the process
-stays alive until the command finishes. Commands run one at a time, in order. A valid
+stays alive until the command finishes. Commands are serialized. A valid
 SET_URL enables the developer override, then resets the stored version and ETag before
 downloading. There is no command retry, polling, or new periodic work; the existing
 hourly worker is unchanged. The override is persistent: it remains until a RESET or a

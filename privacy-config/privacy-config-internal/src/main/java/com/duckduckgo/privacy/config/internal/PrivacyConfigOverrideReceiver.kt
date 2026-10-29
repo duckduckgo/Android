@@ -44,8 +44,7 @@ class PrivacyConfigOverrideReceiver : BroadcastReceiver() {
             else -> return
         }
         AndroidInjection.inject(this, context)
-        // adb sends a background broadcast, which may stay pending for about a minute: enough for one download.
-        // The process stays alive until finish(), and the next broadcast to this receiver waits for it.
+        // Keep the broadcast pending until the background command finishes.
         val pendingResult = goAsync()
         appCoroutineScope.launch(dispatcherProvider.io()) {
             try {

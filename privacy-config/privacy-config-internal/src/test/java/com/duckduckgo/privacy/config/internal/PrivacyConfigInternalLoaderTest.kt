@@ -42,10 +42,12 @@ class PrivacyConfigInternalLoaderTest {
     }
     private var downloads = 0
     private var downloadResult: ConfigDownloadResult = Success
+    private var downloadException: Exception? = null
     private val downloader = object : PrivacyConfigDownloader {
         override suspend fun download(force: Boolean): ConfigDownloadResult {
             assertTrue(force)
             downloads++
+            downloadException?.let { throw it }
             return downloadResult
         }
     }
@@ -111,6 +113,15 @@ class PrivacyConfigInternalLoaderTest {
             "CONFIG_OVERRIDE_FAILED action=reset reason=download_failed source=$PRIVACY_REMOTE_CONFIG_URL",
         )
         assertEquals(expected, lines)
+    }
+
+    @Test
+    fun whenDownloadThrowsThenEmitOneFailedLine() = runTest {
+        downloadException = IllegalStateException("database failure")
+
+        testee.handleCommand(SetUrl(URL))
+
+        assertEquals(listOf("CONFIG_OVERRIDE_FAILED action=set_url reason=download_failed source=$URL"), lines)
     }
 
     @Test

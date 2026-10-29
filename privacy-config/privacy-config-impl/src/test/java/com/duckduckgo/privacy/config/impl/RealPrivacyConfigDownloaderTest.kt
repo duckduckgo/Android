@@ -80,6 +80,21 @@ class RealPrivacyConfigDownloaderTest {
     }
 
     @Test
+    fun whenForcedDownloadFailsThenKeepPreviousConfigMetadata() = runTest {
+        val previous = PrivacyConfig(version = 42, readme = "previous", eTag = "previous-etag", timestamp = "previous-time")
+        val repository = object : PrivacyConfigRepository {
+            var current: PrivacyConfig? = previous
+            override fun insert(privacyConfig: PrivacyConfig) { current = privacyConfig }
+            override fun get(): PrivacyConfig? = current
+            override fun delete() { current = null }
+        }
+        testee = RealPrivacyConfigDownloader(TestFailingPrivacyConfigService(), mockPrivacyConfigPersister, pluginPoint, pixel, telemetry, repository)
+
+        assertTrue(testee.download(force = true) is Error)
+        assertEquals(previous, repository.get())
+    }
+
+    @Test
     fun whenForcedDownloadWaitsForExistingDownloadThenResetOnlyAfterExistingRequestCompletes() = runTest {
         val repository = mock<PrivacyConfigRepository>()
         val started = CompletableDeferred<Unit>()

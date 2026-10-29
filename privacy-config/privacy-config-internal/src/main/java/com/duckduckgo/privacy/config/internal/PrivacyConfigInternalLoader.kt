@@ -23,6 +23,7 @@ import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader.ConfigDownload
 import com.duckduckgo.privacy.config.internal.store.DevPrivacyConfigSettingsDataStore
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
 import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.net.URI
@@ -47,38 +48,43 @@ class PrivacyConfigInternalLoader @Inject constructor(
     suspend fun load(): ConfigDownloadResult = mutex.withLock { forceLoad() }
 
     suspend fun handleCommand(command: OverrideCommand) = mutex.withLock {
-        when (command) {
-            is OverrideCommand.SetUrl -> setUrl(command.url)
-            OverrideCommand.Reset -> reset()
+        val line = try {
+            when (command) {
+                is OverrideCommand.SetUrl -> setUrl(command.url)
+                OverrideCommand.Reset -> reset()
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            when (command) {
+                is OverrideCommand.SetUrl -> "$FAILED action=set_url reason=download_failed source=${command.url.orEmpty()}"
+                OverrideCommand.Reset -> "$FAILED action=reset reason=download_failed source=$PRIVACY_REMOTE_CONFIG_URL"
+            }
         }
+        marker.emit(line)
     }
 
-    private suspend fun setUrl(url: String?) {
+    private suspend fun setUrl(url: String?): String {
         if (!isValidUrl(url)) {
-            marker.emit("$FAILED action=set_url reason=invalid_url source=${url.orEmpty().filterNot { it.isWhitespace() }}")
-            return
+            return "$FAILED action=set_url reason=invalid_url source=${url.orEmpty().filterNot { it.isWhitespace() }}"
         }
         store.remotePrivacyConfigUrl = url
         store.useCustomPrivacyConfigUrl = true
         if (forceLoad() is ConfigDownloadResult.Error) {
-            marker.emit("$FAILED action=set_url reason=download_failed source=$url")
-            return
+            return "$FAILED action=set_url reason=download_failed source=$url"
         }
-        // A forced download that succeeds has always persisted, because the stored version was reset first.
-        marker.emit("$APPLIED ${storedConfig()} source=$url")
+        return "$APPLIED ${storedConfig()} source=$url"
     }
 
-    private suspend fun reset() {
+    private suspend fun reset(): String {
         store.useCustomPrivacyConfigUrl = false
         store.remotePrivacyConfigUrl = null
         if (forceLoad() is ConfigDownloadResult.Error) {
-            marker.emit("$FAILED action=reset reason=download_failed source=$PRIVACY_REMOTE_CONFIG_URL")
-            return
+            return "$FAILED action=reset reason=download_failed source=$PRIVACY_REMOTE_CONFIG_URL"
         }
-        marker.emit("$RESET ${storedConfig()}")
+        return "$RESET ${storedConfig()}"
     }
 
-    // The downloader resets version and ETag under its shared download lock.
     private suspend fun forceLoad(): ConfigDownloadResult = downloader.download(force = true)
 
     private fun storedConfig(): String {

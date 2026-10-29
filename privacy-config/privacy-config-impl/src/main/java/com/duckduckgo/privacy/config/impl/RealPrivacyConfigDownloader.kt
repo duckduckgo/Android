@@ -69,10 +69,17 @@ class RealPrivacyConfigDownloader @Inject constructor(
     private val downloadMutex = Mutex()
 
     override suspend fun download(force: Boolean): PrivacyConfigDownloader.ConfigDownloadResult = downloadMutex.withLock {
+        val previousConfig = if (force) repository.get() else null
         if (force) {
             repository.insert(PrivacyConfig(version = -1, readme = "", eTag = "", timestamp = ""))
         }
-        downloadConfig()
+        try {
+            downloadConfig()
+        } finally {
+            if (force && repository.get()?.version == -1L) {
+                if (previousConfig == null) repository.delete() else repository.insert(previousConfig)
+            }
+        }
     }
 
     private suspend fun downloadConfig(): PrivacyConfigDownloader.ConfigDownloadResult {
