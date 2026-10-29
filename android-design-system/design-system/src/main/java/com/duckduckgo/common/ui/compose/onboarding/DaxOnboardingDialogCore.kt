@@ -181,6 +181,10 @@ internal fun DaxOnboardingDialogCore(
     headerToActionsSpacing: Dp = DaxOnboardingDialogDefaults.HeaderContentSpacing,
     textHorizontalPadding: Dp = DaxOnboardingDialogDefaults.TextHorizontalPadding,
     contentHorizontalPadding: Dp = DaxOnboardingDialogDefaults.ContentHorizontalPadding,
+    topPadding: Dp = DaxOnboardingDialogDefaults.TopPadding,
+    bottomPadding: Dp = DaxOnboardingDialogDefaults.BottomPadding,
+    titleBodySpacing: Dp = DaxOnboardingDialogDefaults.TitleBodySpacing,
+    elevation: Dp = DaxOnboardingDialogDefaults.Elevation,
     useNativeCtaInsets: Boolean = false,
     showScrollbar: Boolean = false,
 ) {
@@ -371,7 +375,7 @@ internal fun DaxOnboardingDialogCore(
             val cardModifier = Modifier
                 .groupAlphaWithOverflow(CardShadowOverflow, shellAlpha)
                 .bubbleStroke(bubbleShape, colors.stroke, DaxOnboardingDialogDefaults.StrokeWidth)
-                .shadowAndClip(bubbleShape, colors.shadow)
+                .shadowAndClip(bubbleShape, colors.shadow, elevation)
                 .bubbleFill(bubbleShape, colors.surface)
                 .then(
                     if (inInspectionMode) {
@@ -402,8 +406,8 @@ internal fun DaxOnboardingDialogCore(
                                 updateCardSize(size)
                             }
                             .padding(
-                                top = DaxOnboardingDialogDefaults.TopPadding,
-                                bottom = DaxOnboardingDialogDefaults.BottomPadding,
+                                top = topPadding,
+                                bottom = bottomPadding,
                             ),
                     ) {
                         @Composable
@@ -488,7 +492,7 @@ internal fun DaxOnboardingDialogCore(
                                                 if (landscapeLayout) {
                                                     DaxOnboardingDialogDefaults.LandscapeTitleBodySpacing
                                                 } else {
-                                                    DaxOnboardingDialogDefaults.TitleBodySpacing
+                                                    titleBodySpacing
                                                 },
                                             ),
                                         )
@@ -700,12 +704,17 @@ private class CardSizeTracker {
     val bounded: Boolean get() = maxHeight != Int.MAX_VALUE
 }
 
-private fun Modifier.shadowAndClip(shape: () -> Shape, color: Color): Modifier = then(
-    if (Build.VERSION.SDK_INT >= 29) {
+private fun Modifier.shadowAndClip(shape: () -> Shape, color: Color, elevation: Dp): Modifier = then(
+    if (elevation == 0.dp) {
         Modifier.graphicsLayer {
             this.shape = shape()
             clip = true
-            shadowElevation = DaxOnboardingDialogDefaults.Elevation.toPx()
+        }
+    } else if (Build.VERSION.SDK_INT >= 29) {
+        Modifier.graphicsLayer {
+            this.shape = shape()
+            clip = true
+            shadowElevation = elevation.toPx()
             ambientShadowColor = color
             spotShadowColor = color
         }
