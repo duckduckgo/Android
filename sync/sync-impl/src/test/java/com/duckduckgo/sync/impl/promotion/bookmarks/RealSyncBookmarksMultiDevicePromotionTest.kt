@@ -34,6 +34,7 @@ import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 
 class RealSyncBookmarksMultiDevicePromotionTest {
@@ -179,6 +180,22 @@ class RealSyncBookmarksMultiDevicePromotionTest {
 
         installAge = null
         assertFalse(testee.canShowPromotion(savedBookmarks = 1))
+    }
+
+    @Test
+    fun `when set up sync promotion was shown less than a day ago cannot show promotion`() = runTest {
+        configurePromotionToShow()
+
+        promotionDataStore.setTimeSinceLastPromoImpression(BookmarksScreen, 24.hours - 1.milliseconds)
+        assertFalse(testee.canShowPromotion(savedBookmarks = 1))
+    }
+
+    @Test
+    fun `when set up sync promotion was shown a day ago can show promotion`() = runTest {
+        configurePromotionToShow()
+
+        promotionDataStore.setTimeSinceLastPromoImpression(BookmarksScreen, 24.hours)
+        assertTrue(testee.canShowPromotion(savedBookmarks = 1))
     }
 
     @Test

@@ -16,12 +16,9 @@
 
 package com.duckduckgo.sync.impl.promotion.passwords
 
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.DeviceSyncState
-import com.duckduckgo.sync.impl.pixels.SyncPixelName
-import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.impl.promotion.SyncPromotionFeature
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.binding
@@ -32,8 +29,6 @@ import javax.inject.Inject
 
 interface PasswordsImportSyncPromotion {
     suspend fun canShowPromotion(importedPasswords: Int): Boolean
-    fun onPromotionDisplayed()
-    fun onPromotionConfirmed()
 }
 
 @ContributesBinding(AppScope::class, binding = binding<PasswordsImportSyncPromotion>())
@@ -41,7 +36,6 @@ class RealPasswordsImportSyncPromotion @Inject constructor(
     private val syncState: DeviceSyncState,
     private val syncPromotionFeature: SyncPromotionFeature,
     private val dispatchers: DispatcherProvider,
-    private val pixel: Pixel,
 ) : PasswordsImportSyncPromotion {
     override suspend fun canShowPromotion(importedPasswords: Int): Boolean {
         if (importedPasswords == 0) return false
@@ -53,14 +47,6 @@ class RealPasswordsImportSyncPromotion @Inject constructor(
         }
     }
 
-    override fun onPromotionDisplayed() {
-        pixel.fire(SyncPixelName.SYNC_FEATURE_PROMOTION_DISPLAYED, pixelParams())
-    }
-
-    override fun onPromotionConfirmed() {
-        pixel.fire(SyncPixelName.SYNC_FEATURE_PROMOTION_CONFIRMED, pixelParams())
-    }
-
     private suspend fun isPromotionEnabled(): Boolean = withContext(dispatchers.io()) {
         syncPromotionFeature.self().isEnabled() && syncPromotionFeature.passwordsImport().isEnabled()
     }
@@ -68,6 +54,4 @@ class RealPasswordsImportSyncPromotion @Inject constructor(
     private suspend fun canTurnOnSync(): Boolean = withContext(dispatchers.io()) {
         syncState.isFeatureEnabled() && !syncState.isUserSignedInOnDevice()
     }
-
-    private fun pixelParams() = mapOf(SyncPixelParameters.SYNC_FEATURE_PROMOTION_SOURCE to "passwords_import")
 }

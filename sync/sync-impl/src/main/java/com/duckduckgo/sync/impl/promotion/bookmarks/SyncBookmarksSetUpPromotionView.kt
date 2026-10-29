@@ -133,6 +133,7 @@ class SyncBookmarksSetUpPromotionViewModel @Inject constructor(
 
     fun recordImpression() {
         pixel.fire(SyncPixelName.SYNC_FEATURE_PROMOTION_DISPLAYED, pixelParams())
+        viewModelScope.launch { promotionDataStore.recordPromoImpression(BookmarksScreen) }
     }
 
     fun setUpSync() {
