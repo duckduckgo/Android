@@ -25,6 +25,7 @@ import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState.D
 import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState.Enabled
 import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState.Enabled.Type
 import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState.Hidden
+import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
@@ -34,6 +35,8 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.api.model.Entitlement
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -41,6 +44,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -52,6 +56,8 @@ class PirSettingViewModelTest {
     private val pirPixelSender: PirPixelSender = mock()
     private val subscriptions: Subscriptions = mock()
     private val pirFeature: PirFeature = mock()
+    private val pirRepository: PirRepository = mock()
+    private val pirEntitlement = Entitlement(name = "subscriber", product = Product.PIR.value)
     private lateinit var pirSettingsViewModel: PirSettingViewModel
 
     @Before
@@ -60,6 +66,7 @@ class PirSettingViewModelTest {
             pirPixelSender,
             subscriptions,
             pirFeature,
+            pirRepository,
         )
     }
 
@@ -71,10 +78,10 @@ class PirSettingViewModelTest {
 
     @Test
     fun `when subscription state is unknown then PirState is hidden`() = runTest {
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(emptySet()))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(UNKNOWN)
 
-        pirSettingsViewModel.onCreate(mock())
+        pirSettingsViewModel.onStart(mock())
 
         pirSettingsViewModel.viewState.test {
             assertEquals(
@@ -86,11 +93,11 @@ class PirSettingViewModelTest {
 
     @Test
     fun `when subscription state is inactive and no pir product available then PirState is hidden`() = runTest {
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(emptySet()))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(INACTIVE)
         whenever(subscriptions.getAvailableProducts()).thenReturn(emptySet())
 
-        pirSettingsViewModel.onCreate(mock())
+        pirSettingsViewModel.onStart(mock())
 
         pirSettingsViewModel.viewState.test {
             assertEquals(
@@ -102,11 +109,11 @@ class PirSettingViewModelTest {
 
     @Test
     fun `when subscription state is inactive and pir product available then PirState is disabled`() = runTest {
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(emptySet()))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(INACTIVE)
         whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.PIR))
 
-        pirSettingsViewModel.onCreate(mock())
+        pirSettingsViewModel.onStart(mock())
 
         pirSettingsViewModel.viewState.test {
             assertEquals(
@@ -118,11 +125,11 @@ class PirSettingViewModelTest {
 
     @Test
     fun `when subscription state is expired and no pir product available then PirState is hidden`() = runTest {
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(emptySet()))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(EXPIRED)
         whenever(subscriptions.getAvailableProducts()).thenReturn(emptySet())
 
-        pirSettingsViewModel.onCreate(mock())
+        pirSettingsViewModel.onStart(mock())
 
         pirSettingsViewModel.viewState.test {
             assertEquals(
@@ -134,11 +141,11 @@ class PirSettingViewModelTest {
 
     @Test
     fun `when subscription state is expired and pir product available then PirState is disabled`() = runTest {
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(emptySet()))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(EXPIRED)
         whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.PIR))
 
-        pirSettingsViewModel.onCreate(mock())
+        pirSettingsViewModel.onStart(mock())
 
         pirSettingsViewModel.viewState.test {
             assertEquals(
@@ -150,11 +157,11 @@ class PirSettingViewModelTest {
 
     @Test
     fun `when subscription state is waiting and no pir product available then PirState is hidden`() = runTest {
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(emptySet()))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(WAITING)
         whenever(subscriptions.getAvailableProducts()).thenReturn(emptySet())
 
-        pirSettingsViewModel.onCreate(mock())
+        pirSettingsViewModel.onStart(mock())
 
         pirSettingsViewModel.viewState.test {
             assertEquals(
@@ -166,11 +173,11 @@ class PirSettingViewModelTest {
 
     @Test
     fun `when subscription state is waiting and pir product available then PirState is disabled`() = runTest {
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(emptySet()))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(WAITING)
         whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.PIR))
 
-        pirSettingsViewModel.onCreate(mock())
+        pirSettingsViewModel.onStart(mock())
 
         pirSettingsViewModel.viewState.test {
             assertEquals(
@@ -182,15 +189,15 @@ class PirSettingViewModelTest {
 
     @Test
     fun `when subscription state is auto renewable and entitled then PirState is enabled and beta FF is false`() = runTest {
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(pirEntitlement)))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
 
-        pirSettingsViewModel.onCreate(mock())
+        pirSettingsViewModel.onStart(mock())
 
         pirSettingsViewModel.viewState.test {
             assertEquals(
-                Enabled(Type.DESKTOP),
+                Enabled(Type.DESKTOP, isOn = true),
                 expectMostRecentItem().pirState,
             )
         }
@@ -198,15 +205,16 @@ class PirSettingViewModelTest {
 
     @Test
     fun `when subscription state is auto renewable and entitled then PirState is enabled and beta FF is true`() = runTest {
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(pirEntitlement)))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        whenever(pirRepository.hasValidUserProfileQueries()).thenReturn(true)
 
-        pirSettingsViewModel.onCreate(mock())
+        pirSettingsViewModel.onStart(mock())
 
         pirSettingsViewModel.viewState.test {
             assertEquals(
-                Enabled(Type.DASHBOARD),
+                Enabled(Type.DASHBOARD, isOn = true),
                 expectMostRecentItem().pirState,
             )
         }
@@ -214,10 +222,10 @@ class PirSettingViewModelTest {
 
     @Test
     fun `when subscription state is auto renewable and not entitled then PirState is hidden`() = runTest {
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(emptySet()))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(AUTO_RENEWABLE)
 
-        pirSettingsViewModel.onCreate(mock())
+        pirSettingsViewModel.onStart(mock())
 
         pirSettingsViewModel.viewState.test {
             assertEquals(
@@ -229,15 +237,15 @@ class PirSettingViewModelTest {
 
     @Test
     fun `when subscription state is not auto renewable and entitled then PirState is enabled and beta FF is false`() = runTest {
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(pirEntitlement)))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(NOT_AUTO_RENEWABLE)
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
 
-        pirSettingsViewModel.onCreate(mock())
+        pirSettingsViewModel.onStart(mock())
 
         pirSettingsViewModel.viewState.test {
             assertEquals(
-                Enabled(Type.DESKTOP),
+                Enabled(Type.DESKTOP, isOn = true),
                 expectMostRecentItem().pirState,
             )
         }
@@ -245,15 +253,16 @@ class PirSettingViewModelTest {
 
     @Test
     fun `when subscription state is not auto renewable and entitled then PirState is enabled and beta FF is true`() = runTest {
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(pirEntitlement)))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(NOT_AUTO_RENEWABLE)
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        whenever(pirRepository.hasValidUserProfileQueries()).thenReturn(true)
 
-        pirSettingsViewModel.onCreate(mock())
+        pirSettingsViewModel.onStart(mock())
 
         pirSettingsViewModel.viewState.test {
             assertEquals(
-                Enabled(Type.DASHBOARD),
+                Enabled(Type.DASHBOARD, isOn = true),
                 expectMostRecentItem().pirState,
             )
         }
@@ -261,10 +270,10 @@ class PirSettingViewModelTest {
 
     @Test
     fun `when subscription state is not auto renewable and not entitled then PirState is hidden`() = runTest {
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(emptySet()))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(NOT_AUTO_RENEWABLE)
 
-        pirSettingsViewModel.onCreate(mock())
+        pirSettingsViewModel.onStart(mock())
 
         pirSettingsViewModel.viewState.test {
             assertEquals(
@@ -276,15 +285,15 @@ class PirSettingViewModelTest {
 
     @Test
     fun `when subscription state is grace period and entitled then PirState is enabled and beta FF is false`() = runTest {
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(pirEntitlement)))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(GRACE_PERIOD)
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
 
-        pirSettingsViewModel.onCreate(mock())
+        pirSettingsViewModel.onStart(mock())
 
         pirSettingsViewModel.viewState.test {
             assertEquals(
-                Enabled(Type.DESKTOP),
+                Enabled(Type.DESKTOP, isOn = true),
                 expectMostRecentItem().pirState,
             )
         }
@@ -292,15 +301,16 @@ class PirSettingViewModelTest {
 
     @Test
     fun `when subscription state is grace period and entitled then PirState is enabled and beta FF is true`() = runTest {
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(pirEntitlement)))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(GRACE_PERIOD)
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        whenever(pirRepository.hasValidUserProfileQueries()).thenReturn(true)
 
-        pirSettingsViewModel.onCreate(mock())
+        pirSettingsViewModel.onStart(mock())
 
         pirSettingsViewModel.viewState.test {
             assertEquals(
-                Enabled(Type.DASHBOARD),
+                Enabled(Type.DASHBOARD, isOn = true),
                 expectMostRecentItem().pirState,
             )
         }
@@ -308,10 +318,126 @@ class PirSettingViewModelTest {
 
     @Test
     fun `when subscription state is grace period and not entitled then PirState is hidden`() = runTest {
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(emptySet()))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(GRACE_PERIOD)
 
-        pirSettingsViewModel.onCreate(mock())
+        pirSettingsViewModel.onStart(mock())
+
+        pirSettingsViewModel.viewState.test {
+            assertEquals(
+                Hidden,
+                expectMostRecentItem().pirState,
+            )
+        }
+    }
+
+    @Test
+    fun `when entitled and no profile stored then PirState is enabled and off`() = runTest {
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(pirEntitlement)))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        whenever(pirRepository.hasValidUserProfileQueries()).thenReturn(false)
+
+        pirSettingsViewModel.onStart(mock())
+
+        pirSettingsViewModel.viewState.test {
+            assertEquals(
+                Enabled(Type.DASHBOARD, isOn = false),
+                expectMostRecentItem().pirState,
+            )
+        }
+    }
+
+    @Test
+    fun `when entitled and pir storage not available then PirState is enabled and off`() = runTest {
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(pirEntitlement)))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.NOT_AVAILABLE)
+
+        pirSettingsViewModel.onStart(mock())
+
+        pirSettingsViewModel.viewState.test {
+            assertEquals(
+                Enabled(Type.DASHBOARD, isOn = false),
+                expectMostRecentItem().pirState,
+            )
+        }
+    }
+
+    @Test
+    fun `when reading the profile fails then PirState is enabled and off`() = runTest {
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(pirEntitlement)))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        whenever(pirRepository.hasValidUserProfileQueries()).thenThrow(IllegalStateException("query failed"))
+
+        pirSettingsViewModel.onStart(mock())
+
+        pirSettingsViewModel.viewState.test {
+            assertEquals(
+                Enabled(Type.DASHBOARD, isOn = false),
+                expectMostRecentItem().pirState,
+            )
+        }
+    }
+
+    @Test
+    fun `when profile deleted while away from settings then returning turns PirState off`() = runTest {
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(pirEntitlement)))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        whenever(pirRepository.hasValidUserProfileQueries()).thenReturn(true, false)
+
+        pirSettingsViewModel.onStart(mock())
+        pirSettingsViewModel.onStop(mock())
+        pirSettingsViewModel.onStart(mock())
+
+        pirSettingsViewModel.viewState.test {
+            assertEquals(
+                Enabled(Type.DASHBOARD, isOn = false),
+                expectMostRecentItem().pirState,
+            )
+        }
+    }
+
+    @Test
+    fun `when stopped then entitlement changes do not update PirState`() = runTest {
+        val entitlements = MutableStateFlow(setOf(pirEntitlement))
+        whenever(subscriptions.getEntitlements()).thenReturn(entitlements)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        whenever(pirRepository.hasValidUserProfileQueries()).thenReturn(true)
+
+        pirSettingsViewModel.onStart(mock())
+        pirSettingsViewModel.onStop(mock())
+        entitlements.value = emptySet()
+
+        pirSettingsViewModel.viewState.test {
+            assertEquals(
+                Enabled(Type.DASHBOARD, isOn = true),
+                expectMostRecentItem().pirState,
+            )
+        }
+    }
+
+    @Test
+    fun `when entitlements re-emit unchanged while started then PIR state is read once`() = runTest {
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(pirEntitlement), setOf(pirEntitlement)))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        whenever(pirRepository.hasValidUserProfileQueries()).thenReturn(true)
+
+        pirSettingsViewModel.onStart(mock())
+
+        verify(pirFeature, times(1)).getPirFeatureState()
+    }
+
+    @Test
+    fun `when subscription is active with only non-PIR entitlements then PirState is hidden`() = runTest {
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "subscriber", product = Product.NetP.value))))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+
+        pirSettingsViewModel.onStart(mock())
 
         pirSettingsViewModel.viewState.test {
             assertEquals(
