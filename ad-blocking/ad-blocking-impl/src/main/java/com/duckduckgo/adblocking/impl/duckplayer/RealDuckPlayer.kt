@@ -150,7 +150,7 @@ class RealDuckPlayer @Inject constructor(
                 adBlockingExtensionFeature.self().enabled(),
                 ::Pair,
             ).collect { (stored, selfEnabled) ->
-                applyAdBlockingRolloutDefaultIfEligible(stored, selfEnabled)
+                applyNewInstallDuckPlayerDefaultIfEligible(stored, selfEnabled)
             }
         }
     }
@@ -159,7 +159,7 @@ class RealDuckPlayer @Inject constructor(
         loadToMemory()
     }
 
-    private suspend fun applyAdBlockingRolloutDefaultIfEligible(
+    private suspend fun applyNewInstallDuckPlayerDefaultIfEligible(
         stored: StoredUserPreferences,
         selfEnabled: Boolean,
     ) {

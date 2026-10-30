@@ -227,9 +227,9 @@ class RealDuckPlayerTest {
 
     //endregion
 
-    // region ad-blocking rollout default (driven by combine() started in onCreate)
+    // region new-install Duck Player default (driven by combine() started in onCreate)
     @Test
-    fun whenNotNewInstall_combineDoesNotPersistRolloutDefault() = runTest {
+    fun whenNotNewInstall_combineDoesNotPersistDuckPlayerDefault() = runTest {
         whenever(mockAppBuildConfig.isNewInstall()).thenReturn(false)
         adBlockingExtensionFeature.self().setRawStoredState(State(true))
 
@@ -239,7 +239,7 @@ class RealDuckPlayerTest {
     }
 
     @Test
-    fun whenNewInstallAndKillSwitchOff_combineDoesNotPersistRolloutDefault() = runTest {
+    fun whenNewInstallAndKillSwitchOff_combineDoesNotPersistDuckPlayerDefault() = runTest {
         whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
         adBlockingExtensionFeature.self().setRawStoredState(State(false))
 
