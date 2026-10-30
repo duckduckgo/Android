@@ -59,6 +59,7 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.selectChatSuggestions
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiResponseWaitWideEvent
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -148,6 +149,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature,
     private val termsConsent: DuckAiTermsConsent,
     private val chatStateStore: ChatStateStore,
+    private val responseWaitWideEvent: DuckAiResponseWaitWideEvent,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -196,7 +198,7 @@ class RealDuckChatJSHelper @Inject constructor(
 
             METHOD_GET_AI_CHAT_NATIVE_PROMPT ->
                 id?.let {
-                    getAIChatNativePrompt(featureName, method, it, browserMode)
+                    getAIChatNativePrompt(featureName, method, it, mode, tabId, browserMode)
                 }
 
             METHOD_OPEN_AI_CHAT -> {
@@ -228,6 +230,9 @@ class RealDuckChatJSHelper @Inject constructor(
                     ChatState
                         .fromValue(data?.optString("status"))
                         ?.let { status -> chatStateStore.update(tabId, status) }
+                }
+                if (mode == Mode.FULL && tabId.isNotEmpty()) {
+                    responseWaitWideEvent.onResponseState(tabId, data?.optString("status").orEmpty())
                 }
                 data?.optJSONObject("attachments")?.let { attachments ->
                     val usage = AIChatAttachmentUsage(
@@ -594,9 +599,14 @@ class RealDuckChatJSHelper @Inject constructor(
         featureName: String,
         method: String,
         id: String,
+        mode: Mode,
+        tabId: String,
         browserMode: BrowserMode,
     ): JsCallbackData {
         val pending = pendingNativePromptStore.consume()
+        if (pending != null && mode == Mode.FULL && tabId.isNotEmpty()) {
+            responseWaitWideEvent.onNativePromptSubmitted(tabId, browserMode, pending.reasoningEffort, pending.selectedTool)
+        }
         val jsonPayload = JSONObject().apply {
             put(PLATFORM, ANDROID)
             if (pending != null) {
