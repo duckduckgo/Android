@@ -320,4 +320,11 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun duckAiPromoCampaigns(): Toggle
+
+    /**
+     * @return `true` when Duck.ai promo cards are supported. Exposed to Duck.ai as `supportsPromoCards`.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiPromoCards(): Toggle
 }
