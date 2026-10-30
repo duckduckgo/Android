@@ -59,6 +59,7 @@
         <exclude domain="sharedpref" path="com.duckduckgo.mobile.android.app.tracking.conn.loss.xml"/>
         <exclude domain="sharedpref" path="com.duckduckgo.mobile.android.vpn.prefs.xml"/>
         <exclude domain="sharedpref" path="com.duckduckgo.android.atp.onboarding.store.xml"/>
+        <exclude domain="sharedpref" path="com.duckduckgo.mobile.atp.cohort.prefs.xml"/>
         <exclude domain="file" path="harmony_prefs/com.duckduckgo.mobile.android.vpn.feature.registry.v1"/>
         <exclude domain="file" path="harmony_prefs/com.duckduckgo.vpn.tunnel.config.v1"/>
         <exclude domain="file" path="harmony_prefs/com.duckduckgo.networkprotection.store.prefs.v1"/>

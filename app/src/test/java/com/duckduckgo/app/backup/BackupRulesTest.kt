@@ -134,6 +134,7 @@ class BackupRulesTest {
                 "sharedpref" to "com.duckduckgo.mobile.android.app.tracking.conn.loss.xml",
                 "sharedpref" to "com.duckduckgo.mobile.android.vpn.prefs.xml",
                 "sharedpref" to "com.duckduckgo.android.atp.onboarding.store.xml",
+                "sharedpref" to "com.duckduckgo.mobile.atp.cohort.prefs.xml",
                 "file" to "harmony_prefs/com.duckduckgo.mobile.android.vpn.feature.registry.v1",
                 "file" to "harmony_prefs/com.duckduckgo.vpn.tunnel.config.v1",
                 "file" to "harmony_prefs/com.duckduckgo.networkprotection.store.prefs.v1",
