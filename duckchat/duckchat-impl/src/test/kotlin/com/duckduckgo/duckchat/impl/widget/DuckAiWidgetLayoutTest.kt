@@ -112,6 +112,10 @@ class DuckAiWidgetLayoutTest {
         assertEquals(current("searchWidgetSearchBarTrailingIconColor"), widgetColor("OnContainer"))
     }
 
+    private fun assertDynamicColors(vararg expected: Pair<String, Int>) {
+        expected.forEach { (name, systemColor) -> assertEquals(name, activity.getColor(systemColor), widgetColor(name)) }
+    }
+
     @Test
     @Config(sdk = [30])
     fun whenApi30ThenColorsMatchCurrentLightColors() = assertFallbackColors(container = "black9", divider = "black12")
@@ -119,4 +123,28 @@ class DuckAiWidgetLayoutTest {
     @Test
     @Config(sdk = [30], qualifiers = "night")
     fun whenApi30NightThenColorsMatchCurrentDarkColors() = assertFallbackColors(container = "white9", divider = "white12")
+
+    @Test
+    @Config(sdk = [34], qualifiers = "notnight")
+    fun whenApi34ThenColorsUseLightSystemPalette() = assertDynamicColors(
+        "Background" to android.R.color.system_neutral2_100,
+        "SearchBar" to android.R.color.system_neutral1_0,
+        "Container" to android.R.color.system_accent2_200,
+        "Divider" to android.R.color.system_neutral2_200,
+        "Hint" to android.R.color.system_neutral2_700,
+        "Text" to android.R.color.system_neutral1_900,
+        "OnContainer" to android.R.color.system_accent2_900,
+    )
+
+    @Test
+    @Config(sdk = [34], qualifiers = "night")
+    fun whenApi34NightThenColorsUseDarkSystemPalette() = assertDynamicColors(
+        "Background" to android.R.color.system_neutral1_900,
+        "SearchBar" to android.R.color.system_neutral2_700,
+        "Container" to android.R.color.system_accent2_700,
+        "Divider" to android.R.color.system_neutral2_700,
+        "Hint" to android.R.color.system_neutral2_200,
+        "Text" to android.R.color.system_neutral1_50,
+        "OnContainer" to android.R.color.system_accent2_100,
+    )
 }
