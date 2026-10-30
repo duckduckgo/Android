@@ -30,6 +30,7 @@
                     "promotion_bookmarks",
                     "promotion_passwords_import",
                     "promotion_bookmarks_import",
+                    "promotion_bookmarks_multi_device",
                     "promotion_bookmark_added_dialog",
                     "promotion_ai_chat",
                     "other"
