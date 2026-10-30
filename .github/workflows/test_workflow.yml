@@ -1,26 +1,75 @@
 name: Test - Workflow for Testing
 
+# Scratch workflow for iterating on the ad-click Maestro suite with WebView
+# devtools inspection enabled. Builds the internal flavour and patches the
+# privacy remote config so InternalWebContentDebuggingFlag/webContentDebugging
+# is enabled, which is required for `androidWebViewHierarchy: devtools` to
+# attach to the WebView over the Chrome DevTools Protocol.
+
 on:
   workflow_dispatch:
-
     inputs:
-      ref:
-        description: 'This is an example of an input'
+      tags:
+        description: 'Comma-separated Maestro tags to include'
         required: true
+        type: string
+        default: 'adClickTest'
+      test_name:
+        description: 'Display name for this test suite (used in Asana failure task)'
+        required: true
+        type: string
+        default: 'AdClick WebView Debug'
+      maestro_api_level:
+        description: 'Android API level to run tests on (e.g. 30, 33, 34)'
+        required: false
+        type: string
+        default: '35'
 
-env:
-  ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
-  GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
+concurrency:
+  group: ${{ github.workflow_ref }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test-workflow:
+  instrumentation_tests:
     runs-on: ubuntu-latest
-    name: Add here whatever steps you want to test
+    name: End-to-End Tests
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          token: ${{ secrets.GT_DAXMOBILE }}
-          ref: ${{ github.event.inputs.ref }}
+
+      - name: Assemble APKs
+        id: assemble
+        uses: ./.github/actions/checkout-and-assemble
+        with:
+          flavours: 'internal'
+          release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+          release_key: ${{ secrets.FAKE_RELEASE_KEY }}
+          gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
+          ducksans_package_auth_user: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
+          ducksans_package_auth_token: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
+          gradle_flags: '-Pconfig_patches=.maestro/ad_click_detection_flows/patches/web_content_debugging_enabled_patch.json'
+
+      - name: Run Maestro Tests
+        id: maestro-run
+        uses: ./.github/actions/maestro-cloud-asana-reporter
+        timeout-minutes: 120
+        with:
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: ${{ inputs.test_name }}_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_file: ${{ steps.assemble.outputs.internal_apk_path }}
+          maestro_api_level: ${{ inputs.maestro_api_level }}
+          maestro_include_tags: ${{ inputs.tags }}
+          test_suite_name: ${{ inputs.test_name }}
+          is_release_blocker: false
+          create_asana_error_task: false
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
+          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
